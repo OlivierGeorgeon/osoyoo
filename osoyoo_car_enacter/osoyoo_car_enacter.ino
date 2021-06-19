@@ -8,7 +8,10 @@
  * CopyRight www.osoyoo.com
  * 
  */
+#include "arduino_secrets.h"
 #include <Servo.h>
+#include <WiFiEsp.h>
+#include <WiFiEspUDP.h>
 
 #define SPEED 85    
 #define TURN_SPEED 90  
@@ -279,13 +282,6 @@ void init_GPIO()
   pinMode(sensor4, INPUT);
   pinMode(sensor5, INPUT);
 }
-#include "WiFiEsp.h"
-#include "WiFiEspUDP.h"
-// AP mode
-//char ssid[] = "osoyoo_robot";
-// STA mode
-char ssid[] = "chezOlivier";
-char pass[] = ""; // Enter password
 
 int status = WL_IDLE_STATUS;
 // use a ring buffer to increase speed and reduce memory allocation
@@ -311,18 +307,19 @@ void setup()
     // don't continue
     while (true);
   }
-
-  // *** Begin AP mode
-  //Serial.print("Attempting to start AP ");
-  //Serial.println(ssid);
-  //status = WiFi.beginAP(ssid, 10, "", 0);
-  // *** end AP mode
-
-  // *** begin STA mode  - attempt to connect to WiFi network
-  while (status != WL_CONNECTED) {
-    Serial.print("Attempting to connect to WPA SSID: ");
+  if (SECRET_WIFI_TYPE == "AP") { // Wifi configuration in arduino_secret.h
+    char ssid[] = "osoyoo_robot";
+    Serial.print("Attempting to start AP ");
     Serial.println(ssid);
-    status = WiFi.begin(ssid, pass);
+    status = WiFi.beginAP(ssid, 10, "", 0);
+  } else {
+    char ssid[] = SECRET_SSID;
+    char pass[] = SECRET_PASS;
+    while (status != WL_CONNECTED) {
+      Serial.print("Attempting to connect to WPA SSID: ");
+      Serial.println(ssid);
+      status = WiFi.begin(ssid, pass);
+    }
   }
   // *** end STA mode
 
@@ -365,7 +362,6 @@ void loop()
       reflex_end_time = millis() + 200;
       if (is_enacting_action) {
         reflex_end_time += 100; // Give it more time to reverse direction
-        outcome = '1'; // Outcome must be set to 0 at the beginning of actions
         action_end_time = 0; // Terminate the action
       }
     }
@@ -417,7 +413,6 @@ void loop()
     }
     action_end_time = millis() + 1000;
     is_enacting_action = true;
-    outcome = '0';
   }
   if (is_enacting_action) {
     if (millis() > action_end_time ) {
