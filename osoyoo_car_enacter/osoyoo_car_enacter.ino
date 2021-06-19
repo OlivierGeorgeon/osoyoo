@@ -334,8 +334,8 @@ void setup()
 }
 
 int previous_measure_floor = measure_floor();
-unsigned long reflex_end_time = 0;
-bool is_enacting_reflex = false;
+unsigned long floor_reflex_end_time = 0;
+bool is_enacting_floor_reflex = false;
 
 unsigned long action_end_time = 0;
 bool is_enacting_action = false;
@@ -355,25 +355,25 @@ void loop()
   int measure_floor_changed = current_measure_floor ^ previous_measure_floor; // Bitwise XOR
   previous_measure_floor = current_measure_floor;
 
-  if (is_enacting_reflex)
+  if (is_enacting_floor_reflex)
   {
-    if (millis() > reflex_end_time) {
-      // Stop reflex
+    if (millis() > floor_reflex_end_time) {
+      // Stop floor reflex
       stop_motion();
       Serial.print("End reflex at ");
       Serial.println(millis());
-      is_enacting_reflex = false;
+      is_enacting_floor_reflex = false;
     }
   }
-  else // If is not enacting reflex
+  else // If is not enacting floor reflex
   {
     if (measure_floor_changed != 0)
     {
-      // Start Reflex floor changed
+      // Start floor reflex
       Serial.print("Start reflex at ");
       Serial.println(millis());
       //Serial.println(String(measure_floor_changed, BIN));
-      is_enacting_reflex = true;
+      is_enacting_floor_reflex = true;
         switch (measure_floor_changed) {
           case 0b10000:set_motion(-150,-150,-50,-50);break; // back right
           case 0b11000:set_motion(-150,-150,-50,-50);break; // back right
@@ -381,9 +381,9 @@ void loop()
           case 0b00001:set_motion(-50,-50,-150,-150);break; // back left
           default:go_back(150);break;
         }
-      reflex_end_time = millis() + 200;
+      floor_reflex_end_time = millis() + 200;
       if (is_enacting_action) {
-        reflex_end_time += 100; // Give it more time to reverse direction
+        floor_reflex_end_time += 100; // Give it more time to reverse direction
         action_end_time = 0; // Terminate the action
       }
     }
@@ -401,14 +401,20 @@ void loop()
             head_angle_interval = - head_angle_interval;
             if (penultimate_measure_echo >= previous_measure_echo) {
               Serial.println("Was aligned");
+              action_end_time = 0; // Stops the action on the next loop (after re-aligning the head)
+            }
+          } else {
+            if ((head_angle <= 10)||(head_angle >= 170)) {
+              Serial.println("Lowest measure at head stopper");
               action_end_time = 0;
+              head_angle -= head_angle_interval;
             }
           }
           penultimate_measure_echo = previous_measure_echo;
           previous_measure_echo = current_measure_echo;
           head_angle += head_angle_interval;
-          if (head_angle < 20) { head_angle = 20;};
-          if (head_angle > 160) { head_angle = 160;};
+          Serial.print("head angle ");
+          Serial.println(head_angle);
           head.write(head_angle); // left
         }
       }
@@ -419,14 +425,15 @@ void loop()
       switch (action)
       {
         case 'A':
-          if (is_enacting_reflex) {
+          if (is_enacting_floor_reflex) {
             outcome = '1';
           } else {
             stop_motion(); // Stop motion unless a reflex is being enacted
           }
           break;
         case 'E':
-          outcome = '2'; // previous_measure_echo;
+          outcome = '2';
+          //outcome = outcome + String(previous_measure_echo, outcome);
           break;
       }
       is_enacting_action = false;
@@ -440,7 +447,7 @@ void loop()
   }
   else // If is not enacting action
   {
-    // measure_echo the wifi for new action
+    // Watch the wifi for new action
     int packetSize = Udp.parsePacket();
     if (packetSize) {                               // if you get a client,
       int len = Udp.read(packetBuffer, 255);
