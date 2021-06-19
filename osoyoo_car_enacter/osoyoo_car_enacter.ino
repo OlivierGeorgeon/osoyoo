@@ -267,7 +267,7 @@ void init_GPIO()
    
   stop_motion();
 
-  // init HC-SR04 Echo sensor
+  // init HC-SR04 ultrasonic Echo sensor
   pinMode(Trig_PIN, OUTPUT); 
   pinMode(Echo_PIN,INPUT);
   digitalWrite(Trig_PIN,LOW);
@@ -334,98 +334,124 @@ void setup()
 }
 
 int previous_measure_floor = measure_floor();
-unsigned long floor_reflex_end_time = 0;
-bool is_enacting_floor_reflex = false;
+unsigned long floor_change_retreat_end_time = 0;
+bool is_enacting_floor_change_retreat = false;
 
 unsigned long action_end_time = 0;
 bool is_enacting_action = false;
-
 char action =' ';
-unsigned long next_measure_echo_time = 0;
 
-int previous_measure_echo = 1000;
-int penultimate_measure_echo = 1000;
+bool is_enacting_head_alignment = false;
+unsigned long next_ultrasonic_measure_time = 0;
+int penultimate_ultrasonic_measure = 1000;
+int previous_ultrasonic_measure = 1000;
+unsigned long next_saccade_time = 0;
+
+//int previous_measure_echo = 1000;
+//int penultimate_measure_echo = 1000;
 int head_angle = 90; // from 20° (right) to 160° (left)
 int head_angle_interval = 10;
 
 void loop()
 {
-
+  // Detect change in the floor measure
   int current_measure_floor = measure_floor();
-  int measure_floor_changed = current_measure_floor ^ previous_measure_floor; // Bitwise XOR
+  int floor_change = current_measure_floor ^ previous_measure_floor; // Bitwise XOR
   previous_measure_floor = current_measure_floor;
 
-  if (is_enacting_floor_reflex)
+
+  if (is_enacting_floor_change_retreat)
   {
-    if (millis() > floor_reflex_end_time) {
-      // Stop floor reflex
+    if (millis() > floor_change_retreat_end_time) {
+      // Stop floor change retreat
       stop_motion();
       Serial.print("End reflex at ");
       Serial.println(millis());
-      is_enacting_floor_reflex = false;
+      is_enacting_floor_change_retreat = false;
     }
   }
-  else // If is not enacting floor reflex
+  else // If is not enacting floor change retreat
   {
-    if (measure_floor_changed != 0)
+    if (floor_change != 0)
     {
-      // Start floor reflex
+      // Start floor change retreat
       Serial.print("Start reflex at ");
       Serial.println(millis());
-      //Serial.println(String(measure_floor_changed, BIN));
-      is_enacting_floor_reflex = true;
-        switch (measure_floor_changed) {
+      //Serial.println(String(floor_change, BIN));
+      is_enacting_floor_change_retreat = true;
+        switch (floor_change) {
           case 0b10000:set_motion(-150,-150,-50,-50);break; // back right
           case 0b11000:set_motion(-150,-150,-50,-50);break; // back right
           case 0b00011:set_motion(-50,-50,-150,-150);break; // back left
           case 0b00001:set_motion(-50,-50,-150,-150);break; // back left
           default:go_back(150);break;
         }
-      floor_reflex_end_time = millis() + 200;
+      floor_change_retreat_end_time = millis() + 200;
       if (is_enacting_action) {
-        floor_reflex_end_time += 100; // Give it more time to reverse direction
-        action_end_time = 0; // Terminate the action
+        floor_change_retreat_end_time += 100; // Give it more time to reverse direction
+        action_end_time = 0; // Terminate the action so it can send the outcome
+      }
+    }
+  }
+
+  if (is_enacting_head_alignment)
+  {
+    if (next_saccade_time < millis()) {
+      next_saccade_time = millis() + 250;
+      int current_ultrasonic_measure = measure_ultrasonic_echo();
+      Serial.print("Ultrasonic measure ");
+      Serial.print(current_ultrasonic_measure);
+      Serial.print(" at angle ");
+      Serial.println(head_angle);
+      if (current_ultrasonic_measure > previous_ultrasonic_measure) {
+        head_angle_interval = - head_angle_interval;
+        if (penultimate_ultrasonic_measure >= previous_ultrasonic_measure) {
+          Serial.println("Was aligned");
+          is_enacting_head_alignment = false;
+          action_end_time = 0; // Stops the action on the next loop (after re-aligning the head)
+        }
+      } else {
+        if ((head_angle <= 10) || (head_angle >= 170)) {
+          Serial.println("Lowest measure at head stopper");
+          is_enacting_head_alignment = false;
+          action_end_time = 0;
+          head_angle -= head_angle_interval; // Compensate head movement
+        }
+      }
+      penultimate_ultrasonic_measure = previous_ultrasonic_measure;
+      previous_ultrasonic_measure = current_ultrasonic_measure;
+      head_angle += head_angle_interval;
+      //Serial.print("head angle ");
+      //Serial.println(head_angle);
+      head.write(head_angle);
+    }
+  }
+  else // If not enacting head alignment
+  {
+  // Detect change in the ultrasonic measure
+    if (next_ultrasonic_measure_time < millis()) {
+      next_ultrasonic_measure_time = millis() + 100;
+      int current_ultrasonic_measure = measure_ultrasonic_echo();
+      int ultrasonic_measure_change = current_ultrasonic_measure - previous_ultrasonic_measure;
+      penultimate_ultrasonic_measure = previous_ultrasonic_measure;
+      previous_ultrasonic_measure = current_ultrasonic_measure;
+      if ((ultrasonic_measure_change < -100) || ((ultrasonic_measure_change > 100) && (previous_ultrasonic_measure < 500))) {
+        is_enacting_head_alignment = true;
+        Serial.print("Ultrasonic measure change ");
+        Serial.println(ultrasonic_measure_change);
       }
     }
   }
 
   if (is_enacting_action)
   {
-    if (millis() < action_end_time )
-    {
-      if (action == 'E') { // Is enacting measure_echo action
-        if (next_measure_echo_time < millis()) {
-          next_measure_echo_time = millis() + 250;
-          int current_measure_echo = measure_echo();
-          if (current_measure_echo > previous_measure_echo) {
-            head_angle_interval = - head_angle_interval;
-            if (penultimate_measure_echo >= previous_measure_echo) {
-              Serial.println("Was aligned");
-              action_end_time = 0; // Stops the action on the next loop (after re-aligning the head)
-            }
-          } else {
-            if ((head_angle <= 10)||(head_angle >= 170)) {
-              Serial.println("Lowest measure at head stopper");
-              action_end_time = 0;
-              head_angle -= head_angle_interval;
-            }
-          }
-          penultimate_measure_echo = previous_measure_echo;
-          previous_measure_echo = current_measure_echo;
-          head_angle += head_angle_interval;
-          Serial.print("head angle ");
-          Serial.println(head_angle);
-          head.write(head_angle); // left
-        }
-      }
-    }
-    else // If action duration is over
+    if (action_end_time < millis())
     {
       char outcome = '0';
       switch (action)
       {
         case 'A':
-          if (is_enacting_floor_reflex) {
+          if (is_enacting_floor_change_retreat) {
             outcome = '1';
           } else {
             stop_motion(); // Stop motion unless a reflex is being enacted
@@ -483,9 +509,10 @@ void loop()
         case '4':left_shift(SPEED);break;
         case '6':right_shift(SPEED);break;
         case 'E':
+          is_enacting_head_alignment = true;
           action_end_time = millis() + 10000;
-          penultimate_measure_echo = 0;
-          previous_measure_echo = 1;
+          penultimate_ultrasonic_measure = 0;
+          previous_ultrasonic_measure = 1;
           break;
         default:break;
       }
@@ -507,7 +534,7 @@ void printWifiStatus()
 }
 
 /*detection of ultrasonic distance*/
-int measure_echo()
+int measure_ultrasonic_echo()
 {
   long echo_distance;
   digitalWrite(Trig_PIN,LOW);
@@ -517,8 +544,8 @@ int measure_echo()
   digitalWrite(Trig_PIN,LOW);
   echo_distance=pulseIn(Echo_PIN,HIGH);
   echo_distance=echo_distance*0.1657; //how far away is the object in mm
-  Serial.print("Echo measure (mm): ");
-  Serial.println((int)echo_distance);
+  //Serial.print("Echo measure (mm): ");
+  //Serial.println((int)echo_distance);
   return round(echo_distance);
 }
 
