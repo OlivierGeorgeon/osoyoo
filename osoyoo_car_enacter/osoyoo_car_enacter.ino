@@ -53,7 +53,7 @@ void right_shift(int speed_fl_fwd,int speed_rl_bck ,int speed_rr_fwd,int speed_f
   RR_fwd(speed_rr_fwd);
 }
 
-void set_in_motion(int speed_fl, int speed_rl, int speed_rr, int speed_fr){
+void set_motion(int speed_fl, int speed_rl, int speed_rr, int speed_fr){
   front_left_wheel(speed_fl);
   rear_left_wheel(speed_rl);
   front_right_wheel(speed_fr);
@@ -110,7 +110,7 @@ void clockwise(int speed){
    FR_bck(speed);
    FL_fwd(speed); 
 }
-void countclockwise(int speed){
+void count_clockwise(int speed){
    RL_bck(speed);
    RR_fwd(speed);
    FR_fwd(speed);
@@ -267,10 +267,11 @@ void init_GPIO()
    
   stop_motion();
 
-  /*init HC-SR04*/
+  // init HC-SR04 Echo sensor
   pinMode(Trig_PIN, OUTPUT); 
   pinMode(Echo_PIN,INPUT);
-   
+  digitalWrite(Trig_PIN,LOW);
+
   /*init servo*/
   head.attach(SERVO_PIN); 
   head.write(90);
@@ -307,12 +308,14 @@ void setup()
     // don't continue
     while (true);
   }
-  if (SECRET_WIFI_TYPE == "AP") { // Wifi configuration in arduino_secret.h
+  if (SECRET_WIFI_TYPE == "AP") { // Wifi parameters in arduino_secret.h
+    // Connecting to wifi as an Access Point (AP)
     char ssid[] = "osoyoo_robot";
     Serial.print("Attempting to start AP ");
     Serial.println(ssid);
     status = WiFi.beginAP(ssid, 10, "", 0);
   } else {
+    // Connecting to wifi as a Station (STA)
     char ssid[] = SECRET_SSID;
     char pass[] = SECRET_PASS;
     while (status != WL_CONNECTED) {
@@ -321,7 +324,6 @@ void setup()
       status = WiFi.begin(ssid, pass);
     }
   }
-  // *** end STA mode
 
   Serial.println("Robot connected to the network");
   printWifiStatus();
@@ -331,32 +333,52 @@ void setup()
   Serial.println(localPort);
 }
 
-int previous_sense_floor = sense_floor();
+int previous_measure_floor = measure_floor();
 unsigned long reflex_end_time = 0;
 bool is_enacting_reflex = false;
 
 unsigned long action_end_time = 0;
 bool is_enacting_action = false;
 
+char action =' ';
+unsigned long next_measure_echo_time = 0;
+
+int previous_measure_echo = 1000;
+int penultimate_measure_echo = 1000;
+int head_angle = 90; // from 20° (right) to 160° (left)
+int head_angle_interval = 10;
+
 void loop()
 {
-  // Reflex floor changed
-  int current_sense_floor = sense_floor();
-  int sense_floor_changed = current_sense_floor ^ previous_sense_floor; // Bitwise XOR
-  previous_sense_floor = current_sense_floor;
 
-  if (!is_enacting_reflex) {
-    // Start Reflex floor changed
-    if (sense_floor_changed != 0) {
+  int current_measure_floor = measure_floor();
+  int measure_floor_changed = current_measure_floor ^ previous_measure_floor; // Bitwise XOR
+  previous_measure_floor = current_measure_floor;
+
+  if (is_enacting_reflex)
+  {
+    if (millis() > reflex_end_time) {
+      // Stop reflex
+      stop_motion();
+      Serial.print("End reflex at ");
+      Serial.println(millis());
+      is_enacting_reflex = false;
+    }
+  }
+  else // If is not enacting reflex
+  {
+    if (measure_floor_changed != 0)
+    {
+      // Start Reflex floor changed
       Serial.print("Start reflex at ");
       Serial.println(millis());
-      //Serial.println(String(sense_floor_changed, BIN));
+      //Serial.println(String(measure_floor_changed, BIN));
       is_enacting_reflex = true;
-        switch (sense_floor_changed) {
-          case 0b10000:set_in_motion(-150,-150,-50,-50);break; // back right
-          case 0b11000:set_in_motion(-150,-150,-50,-50);break; // back right
-          case 0b00011:set_in_motion(-50,-50,-150,-150);break; // back left
-          case 0b00001:set_in_motion(-50,-50,-150,-150);break; // back left
+        switch (measure_floor_changed) {
+          case 0b10000:set_motion(-150,-150,-50,-50);break; // back right
+          case 0b11000:set_motion(-150,-150,-50,-50);break; // back right
+          case 0b00011:set_motion(-50,-50,-150,-150);break; // back left
+          case 0b00001:set_motion(-50,-50,-150,-150);break; // back left
           default:go_back(150);break;
         }
       reflex_end_time = millis() + 200;
@@ -365,62 +387,47 @@ void loop()
         action_end_time = 0; // Terminate the action
       }
     }
-  } else {
-    // Stop reflex
-    if (millis() > reflex_end_time) {
-      stop_motion();
-      Serial.print("End reflex at ");
-      Serial.println(millis());
-      is_enacting_reflex = false;
-    }
   }
 
-  // Actions from the wifi
-  int packetSize = Udp.parsePacket();
-  if (packetSize) {                               // if you get a client,
-    int len = Udp.read(packetBuffer, 255);
-    if (len > 0) {
-      packetBuffer[len] = 0;
-    }
-    char c=packetBuffer[0];
-    Serial.print("Received action ");
-    Serial.print(c);
-    Serial.print(" from ");
-    IPAddress remoteIp = Udp.remoteIP();
-    Serial.print(remoteIp);
-    Serial.print("/");
-    Serial.println(Udp.remotePort());
-    switch (c)    //serial control instructions
+  if (is_enacting_action)
+  {
+    if (millis() < action_end_time )
     {
-        case 'A':go_advance(SPEED);break;
-        case 'L':left_turn(TURN_SPEED);break;
-        case 'R':right_turn(TURN_SPEED);break;
-        case 'B':go_back(SPEED);break;
-        case 'E':stop_motion();break;
-        case 'F':left_shift(0,150,0,150);break; //left ahead
-        case 'H':right_shift(180,0,150,0);break; //right ahead
-        case 'I':left_shift(150,0,150,0);break;//left back
-        case 'K':right_shift(0,130,0,130);break;//right back
-        case 'O':left_shift(200,150,150,200);break;//left shift
-        case 'T':right_shift(200,200,200,200);break;//left shift
-        case 'C':clockwise(TURN_SPEED);break;//turn in spot clockwise
-        case 'G':countclockwise(TURN_SPEED);break;//turn in spot counterclockwise
-        case '4':left_shift(SPEED);break;
-        case '6':right_shift(SPEED);break;
-        case 'D':watch(); break;
-        case 'S':sense_floor(); break;
-        default:break;
+      if (action == 'E') { // Is enacting measure_echo action
+        if (next_measure_echo_time < millis()) {
+          next_measure_echo_time = millis() + 250;
+          int current_measure_echo = measure_echo();
+          if (current_measure_echo > previous_measure_echo) {
+            head_angle_interval = - head_angle_interval;
+            if (penultimate_measure_echo >= previous_measure_echo) {
+              Serial.println("Was aligned");
+              action_end_time = 0;
+            }
+          }
+          penultimate_measure_echo = previous_measure_echo;
+          previous_measure_echo = current_measure_echo;
+          head_angle += head_angle_interval;
+          if (head_angle < 20) { head_angle = 20;};
+          if (head_angle > 160) { head_angle = 160;};
+          head.write(head_angle); // left
+        }
+      }
     }
-    action_end_time = millis() + 1000;
-    is_enacting_action = true;
-  }
-  if (is_enacting_action) {
-    if (millis() > action_end_time ) {
+    else // If action duration is over
+    {
       char outcome = '0';
-      if (is_enacting_reflex) {
-        outcome = '1';
-      } else {
-        stop_motion(); // Stop motion unless a reflex is being enacted
+      switch (action)
+      {
+        case 'A':
+          if (is_enacting_reflex) {
+            outcome = '1';
+          } else {
+            stop_motion(); // Stop motion unless a reflex is being enacted
+          }
+          break;
+        case 'E':
+          outcome = '2'; // previous_measure_echo;
+          break;
       }
       is_enacting_action = false;
       // Send the outcome to the IP address and port that sent the action
@@ -431,8 +438,53 @@ void loop()
       Udp.endPacket();
     }
   }
-}
+  else // If is not enacting action
+  {
+    // measure_echo the wifi for new action
+    int packetSize = Udp.parsePacket();
+    if (packetSize) {                               // if you get a client,
+      int len = Udp.read(packetBuffer, 255);
+      if (len > 0) {
+        packetBuffer[len] = 0;
+      }
+      action = packetBuffer[0];
+      Serial.print("Received action ");
+      Serial.print(action);
+      Serial.print(" from ");
+      IPAddress remoteIp = Udp.remoteIP();
+      Serial.print(remoteIp);
+      Serial.print("/");
+      Serial.println(Udp.remotePort());
 
+      action_end_time = millis() + 1000;
+      is_enacting_action = true;
+      switch (action)    //serial control instructions
+      {
+        case 'A':go_advance(SPEED);break;
+        case 'L':left_turn(TURN_SPEED);break;
+        case 'R':right_turn(TURN_SPEED);break;
+        case 'B':go_back(SPEED);break;
+        case 'S':stop_motion();break;
+        case 'F':left_shift(0,150,0,150);break; //left ahead
+        case 'H':right_shift(180,0,150,0);break; //right ahead
+        case 'I':left_shift(150,0,150,0);break;//left back
+        case 'K':right_shift(0,130,0,130);break;//right back
+        case 'O':left_shift(200,150,150,200);break;//left shift
+        case 'T':right_shift(200,200,200,200);break;//left shift
+        case 'C':clockwise(TURN_SPEED);break;//turn in spot clockwise
+        case 'G':count_clockwise(TURN_SPEED);break;//turn in spot counterclockwise
+        case '4':left_shift(SPEED);break;
+        case '6':right_shift(SPEED);break;
+        case 'E':
+          action_end_time = millis() + 10000;
+          penultimate_measure_echo = 0;
+          previous_measure_echo = 1;
+          break;
+        default:break;
+      }
+    }
+  }
+}
 
 
 void printWifiStatus()
@@ -448,7 +500,8 @@ void printWifiStatus()
 }
 
 /*detection of ultrasonic distance*/
-int watch(){
+int measure_echo()
+{
   long echo_distance;
   digitalWrite(Trig_PIN,LOW);
   delayMicroseconds(5);                                                                              
@@ -456,22 +509,23 @@ int watch(){
   delayMicroseconds(15);
   digitalWrite(Trig_PIN,LOW);
   echo_distance=pulseIn(Echo_PIN,HIGH);
-  echo_distance=echo_distance*0.01657; //how far away is the object in cm
-  Serial.print("Echo distance (cm): ");
+  echo_distance=echo_distance*0.1657; //how far away is the object in mm
+  Serial.print("Echo measure (mm): ");
   Serial.println((int)echo_distance);
   return round(echo_distance);
 }
 
-int sense_floor(){
+int measure_floor()
+{
   int s0 = !digitalRead(sensor1); // Left sensor
   int s1 = !digitalRead(sensor2);
   int s2 = !digitalRead(sensor3);
   int s3 = !digitalRead(sensor4);
   int s4 = !digitalRead(sensor5); // Right sensor
-  int sensorvalue=32;
+  int sensor_value=32;
   // from left to right: 1 when floor is dark and sensor's led is on
-  sensorvalue +=s0*16+s1*8+s2*4+s3*2+s4;
+  sensor_value +=s0*16+s1*8+s2*4+s3*2+s4;
   //Serial.print("Flor sensor: ");
-  //Serial.println(String(sensorvalue, BIN));
-  return sensorvalue;
+  //Serial.println(String(sensor_value, BIN));
+  return sensor_value;
 }
