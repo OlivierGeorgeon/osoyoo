@@ -15,7 +15,7 @@ if __name__ == '__main__':
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # UDP
     # Connect to the osoyoo car server
     sock.connect((UDP_IP, UDP_PORT))
-    sock.settimeout(20)
+    sock.settimeout(2)
 
     for i in range(100):
         message = bytes(input("Action: "), 'utf-8')

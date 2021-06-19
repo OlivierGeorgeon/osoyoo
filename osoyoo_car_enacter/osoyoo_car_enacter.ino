@@ -404,38 +404,43 @@ void loop()
       Serial.print(" at angle ");
       Serial.println(head_angle);
       if (current_ultrasonic_measure > previous_ultrasonic_measure) {
+        // moving away, reverse movement
         head_angle_interval = - head_angle_interval;
+        head_angle += head_angle_interval;
+        head.write(head_angle);
         if (penultimate_ultrasonic_measure >= previous_ultrasonic_measure) {
-          Serial.println("Was aligned");
-          is_enacting_head_alignment = false;
-          action_end_time = 0; // Stops the action on the next loop (after re-aligning the head)
-        }
-      } else {
-        if ((head_angle <= 10) || (head_angle >= 170)) {
-          Serial.println("Lowest measure at head stopper");
+          // Passed the minimum, stop
+          Serial.print("Aligned at angle ");
+          Serial.println(head_angle);
           is_enacting_head_alignment = false;
           action_end_time = 0;
-          head_angle -= head_angle_interval; // Compensate head movement
+        }
+      } else {
+        // Moving closer
+        if ((head_angle > 10) && (head_angle < 170)) {
+          head_angle += head_angle_interval;
+          head.write(head_angle);
+        } else {
+          Serial.print("Lowest measure at border angle ");
+          Serial.println(head_angle);
+          is_enacting_head_alignment = false;
+          action_end_time = 0;
         }
       }
       penultimate_ultrasonic_measure = previous_ultrasonic_measure;
       previous_ultrasonic_measure = current_ultrasonic_measure;
-      head_angle += head_angle_interval;
-      //Serial.print("head angle ");
-      //Serial.println(head_angle);
-      head.write(head_angle);
     }
   }
   else // If not enacting head alignment
   {
-  // Detect change in the ultrasonic measure
+    // Detect change in the ultrasonic measure
     if (next_ultrasonic_measure_time < millis()) {
       next_ultrasonic_measure_time = millis() + 100;
       int current_ultrasonic_measure = measure_ultrasonic_echo();
       int ultrasonic_measure_change = current_ultrasonic_measure - previous_ultrasonic_measure;
       penultimate_ultrasonic_measure = previous_ultrasonic_measure;
       previous_ultrasonic_measure = current_ultrasonic_measure;
-      if ((ultrasonic_measure_change < -100) || ((ultrasonic_measure_change > 100) && (previous_ultrasonic_measure < 500))) {
+      if ((ultrasonic_measure_change < -50) && (previous_ultrasonic_measure < 400)) {
         is_enacting_head_alignment = true;
         Serial.print("Ultrasonic measure change ");
         Serial.println(ultrasonic_measure_change);
@@ -457,6 +462,13 @@ void loop()
             stop_motion(); // Stop motion unless a reflex is being enacted
           }
           break;
+        case 'C':
+          if (is_enacting_head_alignment) {
+            outcome = '1';
+          } else {
+            stop_motion();
+          }
+          break;
         case 'E':
           outcome = '2';
           //outcome = outcome + String(previous_measure_echo, outcome);
@@ -469,6 +481,15 @@ void loop()
       Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
       Udp.write(outcome);
       Udp.endPacket();
+    }
+    else // If action being enacted
+    {
+      if (action == 'C') {
+        if (is_enacting_head_alignment) {
+          stop_motion();
+          action_end_time = 0;
+        }
+      }
     }
   }
   else // If is not enacting action
@@ -504,11 +525,15 @@ void loop()
         case 'K':right_shift(0,130,0,130);break;//right back
         case 'O':left_shift(200,150,150,200);break;//left shift
         case 'T':right_shift(200,200,200,200);break;//left shift
-        case 'C':clockwise(TURN_SPEED);break;//turn in spot clockwise
+        case 'C': //turn in spot clockwise
+          head_angle = 60; // Look ahead
+          head.write(head_angle);
+          clockwise(TURN_SPEED);
+          break;
         case 'G':count_clockwise(TURN_SPEED);break;//turn in spot counterclockwise
         case '4':left_shift(SPEED);break;
         case '6':right_shift(SPEED);break;
-        case 'E':
+        case 'E': // Align head
           is_enacting_head_alignment = true;
           action_end_time = millis() + 10000;
           penultimate_ultrasonic_measure = 0;
