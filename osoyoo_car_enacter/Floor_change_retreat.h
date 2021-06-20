@@ -9,15 +9,16 @@
 #include "Arduino.h"
 #include "Omny_wheel_motion.h"
 
-#define RETREAT_DURATION_IMMOBILE 200
-#define RETREAT_DURATION_REVERSE  300
+#define RETREAT_DURATION 200
+#define RETREAT_EXTRA_DURATION 100
 
 class Floor_change_retreat
 {
   public:
     Floor_change_retreat();
-    bool update(int duration);
+    bool update();
     int measureFloor();
+    void extraDuration(int duration);
   private:
     Omny_wheel_motion _OWM;
     bool _is_enacting_floor_change_retreat;

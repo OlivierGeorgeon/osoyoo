@@ -35,12 +35,6 @@
 #define LeftMotorDirPin2B 8  //Rear left Motor direction pin 2 to Back MODEL-X IN4  k3
 #define speedPinLB 12    //   LEFT WHEEL  PWM pin D8 connect Rear MODEL-X ENB
 
-#define sensor1   A4 // Left most sensor
-#define sensor2   A3 // 2nd Left   sensor
-#define sensor3   A2 // center sensor
-#define sensor4   A1 // 2nd right sensor
-#define sensor5   A0 // Right most sensor
-
 #define SERVO_PIN     13  //servo connect to D5
 #define Echo_PIN    31 // Ultrasonic Echo pin connect to A5
 #define Trig_PIN    30  // Ultrasonic Trig pin connect to A4
@@ -54,20 +48,11 @@ void right_shift(int speed_fl_fwd,int speed_rl_bck ,int speed_rr_fwd,int speed_f
   FR_bck(speed_fr_bck);
   RR_fwd(speed_rr_fwd);
 }
-
-void set_motion(int speed_fl, int speed_rl, int speed_rr, int speed_fr){
-  front_left_wheel(speed_fl);
-  rear_left_wheel(speed_rl);
-  front_right_wheel(speed_fr);
-  rear_right_wheel(speed_rr);
-}
-
 void left_shift(int speed_fl_bck,int speed_rl_fwd ,int speed_rr_bck,int speed_fr_fwd){
    FL_bck(speed_fl_bck);
    RL_fwd(speed_rl_fwd);
    FR_fwd(speed_fr_fwd);
    RR_bck(speed_rr_bck);
-  
 }
 void go_advance(int speed){
    RL_fwd(speed);
@@ -132,63 +117,6 @@ void left_shift(int speed){
    FL_bck(speed);
 }
 /*motor control*/
-void front_right_wheel(int speed)
-{
-  if (speed > 0) {
-    // Forward
-    digitalWrite(RightMotorDirPin1,LOW);
-    digitalWrite(RightMotorDirPin2,HIGH);
-    analogWrite(speedPinR,speed);
-  } else {
-    // Backward
-    digitalWrite(RightMotorDirPin1,HIGH);
-    digitalWrite(RightMotorDirPin2,LOW);
-    analogWrite(speedPinR,-speed);
-  }
-}
-void front_left_wheel(int speed)
-{
-  if (speed > 0) {
-    // Forward
-    digitalWrite(LeftMotorDirPin1,LOW);
-    digitalWrite(LeftMotorDirPin2,HIGH);
-    analogWrite(speedPinL,speed);
-  } else {
-    // Backward
-    digitalWrite(LeftMotorDirPin1,HIGH);
-    digitalWrite(LeftMotorDirPin2,LOW);
-    analogWrite(speedPinL,-speed);
-  }
-}
-void rear_right_wheel(int speed)
-{
-  if (speed > 0) {
-    // Forward
-    digitalWrite(RightMotorDirPin1B, LOW);
-    digitalWrite(RightMotorDirPin2B,HIGH);
-    analogWrite(speedPinRB,speed);
-  } else {
-    // Backward
-    digitalWrite(RightMotorDirPin1B, HIGH);
-    digitalWrite(RightMotorDirPin2B,LOW);
-    analogWrite(speedPinRB,-speed);
-  }
-}
-void rear_left_wheel(int speed)
-{
-  if (speed > 0) {
-    // Forward
-    digitalWrite(LeftMotorDirPin1B,LOW);
-    digitalWrite(LeftMotorDirPin2B,HIGH);
-    analogWrite(speedPinLB,speed * 1.2); // Extra voltage because this wheel is weak
-  } else {
-    // Backward
-    digitalWrite(LeftMotorDirPin1B,HIGH);
-    digitalWrite(LeftMotorDirPin2B,LOW);
-    analogWrite(speedPinLB,-speed * 1.2); // Extra voltage because this wheel is weak
-  }
-}
-
 
 void FR_bck(int speed)  //front-right wheel backward turn
 {
@@ -278,12 +206,6 @@ void init_GPIO()
   head.attach(SERVO_PIN); 
   head.write(90);
 
-  /*init floor sensors*/
-  pinMode(sensor1, INPUT);
-  pinMode(sensor2, INPUT);
-  pinMode(sensor3, INPUT);
-  pinMode(sensor4, INPUT);
-  pinMode(sensor5, INPUT);
 }
 
 int status = WL_IDLE_STATUS;
@@ -358,42 +280,11 @@ String outcome = "0";
 
 void loop()
 {
-  // Detect change in the floor measure
-  int current_measure_floor = FCR.measureFloor();
-  int floor_change = current_measure_floor ^ previous_measure_floor; // Bitwise XOR
-  previous_measure_floor = current_measure_floor;
-
-
-  if (is_enacting_floor_change_retreat)
-  {
-    if (millis() > floor_change_retreat_end_time) {
-      // End floor change retreat
-      stop_motion();
-      Serial.println("End retreat at " + String(millis()));
-      is_enacting_floor_change_retreat = false;
-    }
-  }
-  else // If is not enacting floor change retreat
-  {
-    if (floor_change != 0)
-    {
-      // Begin floor change retreat
-      Serial.println("Floor change " + String(floor_change, BIN) + " Begin retreat at " + String(millis()));
-      is_enacting_floor_change_retreat = true;
-      switch (floor_change) {
-        case 0b10000:set_motion(-150,-150,-50,-50);break; // back right
-        case 0b11000:set_motion(-150,-150,-50,-50);break; // back right
-        case 0b00011:set_motion(-50,-50,-150,-150);break; // back left
-        case 0b00001:set_motion(-50,-50,-150,-150);break; // back left
-        default:go_back(150);break;
-      }
-      floor_change_retreat_end_time = millis() + 200;
-      if (is_enacting_action) {
-        floor_change_retreat_end_time += 100; // Give it more time to reverse direction
-        outcome = "1";
-        action_end_time = 0; // Terminate the action so it can send the outcome
-      }
-    }
+  // Behavior floor change retreat
+  is_enacting_floor_change_retreat = FCR.update();
+  if (is_enacting_floor_change_retreat && is_enacting_action) {
+    outcome ="1";
+    action_end_time = 0;
   }
 
   if (is_enacting_head_alignment)
@@ -453,9 +344,9 @@ void loop()
       switch (action)
       {
         case 'A':
-          if (!is_enacting_floor_change_retreat) {
-          //  outcome = '1';
-          //} else {
+          if (is_enacting_floor_change_retreat) {
+            FCR.extraDuration(RETREAT_EXTRA_DURATION); // Extend retreat duration because need to reverse speed
+          } else {
             stop_motion(); // Stop motion unless a reflex is being enacted
           }
           break;
@@ -574,19 +465,3 @@ int measure_ultrasonic_echo()
   //Serial.println((int)echo_distance);
   return round(echo_distance);
 }
-
-/*int measure_floor()
-{
-  int s0 = !digitalRead(sensor1); // Left sensor
-  int s1 = !digitalRead(sensor2);
-  int s2 = !digitalRead(sensor3);
-  int s3 = !digitalRead(sensor4);
-  int s4 = !digitalRead(sensor5); // Right sensor
-  int sensor_value=32;
-  // from left to right: 1 when floor is dark and sensor's led is on
-  sensor_value +=s0*16+s1*8+s2*4+s3*2+s4;
-  //Serial.print("Flor sensor: ");
-  //Serial.println(String(sensor_value, BIN));
-  return sensor_value;
-}
-*/
