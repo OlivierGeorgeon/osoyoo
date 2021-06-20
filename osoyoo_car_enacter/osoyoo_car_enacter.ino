@@ -352,6 +352,8 @@ unsigned long next_saccade_time = 0;
 int head_angle = 90; // from 20° (right) to 160° (left)
 int head_angle_interval = 10;
 
+String outcome = "0";
+
 void loop()
 {
   // Detect change in the floor measure
@@ -363,10 +365,9 @@ void loop()
   if (is_enacting_floor_change_retreat)
   {
     if (millis() > floor_change_retreat_end_time) {
-      // Stop floor change retreat
+      // End floor change retreat
       stop_motion();
-      Serial.print("End reflex at ");
-      Serial.println(millis());
+      Serial.println("End retreat at " + String(millis()));
       is_enacting_floor_change_retreat = false;
     }
   }
@@ -374,21 +375,20 @@ void loop()
   {
     if (floor_change != 0)
     {
-      // Start floor change retreat
-      Serial.print("Start reflex at ");
-      Serial.println(millis());
-      //Serial.println(String(floor_change, BIN));
+      // Begin floor change retreat
+      Serial.println("Floor change " + String(floor_change, BIN) + " Begin retreat at " + String(millis()));
       is_enacting_floor_change_retreat = true;
-        switch (floor_change) {
-          case 0b10000:set_motion(-150,-150,-50,-50);break; // back right
-          case 0b11000:set_motion(-150,-150,-50,-50);break; // back right
-          case 0b00011:set_motion(-50,-50,-150,-150);break; // back left
-          case 0b00001:set_motion(-50,-50,-150,-150);break; // back left
-          default:go_back(150);break;
-        }
+      switch (floor_change) {
+        case 0b10000:set_motion(-150,-150,-50,-50);break; // back right
+        case 0b11000:set_motion(-150,-150,-50,-50);break; // back right
+        case 0b00011:set_motion(-50,-50,-150,-150);break; // back left
+        case 0b00001:set_motion(-50,-50,-150,-150);break; // back left
+        default:go_back(150);break;
+      }
       floor_change_retreat_end_time = millis() + 200;
       if (is_enacting_action) {
         floor_change_retreat_end_time += 100; // Give it more time to reverse direction
+        outcome = "1";
         action_end_time = 0; // Terminate the action so it can send the outcome
       }
     }
@@ -397,32 +397,27 @@ void loop()
   if (is_enacting_head_alignment)
   {
     if (next_saccade_time < millis()) {
-      next_saccade_time = millis() + 250;
+      next_saccade_time = millis() + 150; // servo specification speed is 120ms/60°
       int current_ultrasonic_measure = measure_ultrasonic_echo();
-      Serial.print("Ultrasonic measure ");
-      Serial.print(current_ultrasonic_measure);
-      Serial.print(" at angle ");
-      Serial.println(head_angle);
-      if (current_ultrasonic_measure > previous_ultrasonic_measure) {
+      Serial.println("Angle " +String(head_angle) + " measure " + String(current_ultrasonic_measure));
+      if (previous_ultrasonic_measure > current_ultrasonic_measure ) {
+        // Moving closer
+        if ((head_angle > 10) && (head_angle < 170)) {
+          head_angle += head_angle_interval;
+          head.write(head_angle);
+        } else {
+          Serial.println("End head alignment at edge angle " + String(head_angle));
+          is_enacting_head_alignment = false;
+          action_end_time = 0;
+        }
+      } else {
         // moving away, reverse movement
         head_angle_interval = - head_angle_interval;
         head_angle += head_angle_interval;
         head.write(head_angle);
         if (penultimate_ultrasonic_measure >= previous_ultrasonic_measure) {
           // Passed the minimum, stop
-          Serial.print("Aligned at angle ");
-          Serial.println(head_angle);
-          is_enacting_head_alignment = false;
-          action_end_time = 0;
-        }
-      } else {
-        // Moving closer
-        if ((head_angle > 10) && (head_angle < 170)) {
-          head_angle += head_angle_interval;
-          head.write(head_angle);
-        } else {
-          Serial.print("Lowest measure at border angle ");
-          Serial.println(head_angle);
+          Serial.println("End head alignment at angle " + String(head_angle));
           is_enacting_head_alignment = false;
           action_end_time = 0;
         }
@@ -431,9 +426,9 @@ void loop()
       previous_ultrasonic_measure = current_ultrasonic_measure;
     }
   }
-  else // If not enacting head alignment
+  /*else // If not enacting head alignment
   {
-    // Detect change in the ultrasonic measure
+    // Trigger head alignment
     if (next_ultrasonic_measure_time < millis()) {
       next_ultrasonic_measure_time = millis() + 100;
       int current_ultrasonic_measure = measure_ultrasonic_echo();
@@ -446,40 +441,43 @@ void loop()
         Serial.println(ultrasonic_measure_change);
       }
     }
-  }
+  }*/
 
   if (is_enacting_action)
   {
     if (action_end_time < millis())
     {
-      char outcome = '0';
+      //char outcome = '0';
       switch (action)
       {
         case 'A':
-          if (is_enacting_floor_change_retreat) {
-            outcome = '1';
-          } else {
+          if (!is_enacting_floor_change_retreat) {
+          //  outcome = '1';
+          //} else {
             stop_motion(); // Stop motion unless a reflex is being enacted
           }
           break;
         case 'C':
           if (is_enacting_head_alignment) {
-            outcome = '1';
+            outcome = "1";
           } else {
             stop_motion();
           }
           break;
         case 'E':
-          outcome = '2';
+          outcome = String(measure_ultrasonic_echo()) ;
           //outcome = outcome + String(previous_measure_echo, outcome);
           break;
       }
       is_enacting_action = false;
       // Send the outcome to the IP address and port that sent the action
-      Serial.print("Send outcome ");
-      Serial.println(outcome);
+      Serial.println("Outcome string " + outcome);
+      // char outcome_char[outcome.length()+1]; // One more char for the null end of string
+      // outcome.toCharArray(outcome_char, outcome.length()+1);
+      // Serial.println("Sending outcome " + String(outcome_char));
       Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
-      Udp.write(outcome);
+      Udp.print(outcome);
+      //Udp.write(outcome_char);
       Udp.endPacket();
     }
     else // If action being enacted
@@ -512,6 +510,7 @@ void loop()
 
       action_end_time = millis() + 1000;
       is_enacting_action = true;
+      outcome = "0";
       switch (action)    //serial control instructions
       {
         case 'A':go_advance(SPEED);break;
