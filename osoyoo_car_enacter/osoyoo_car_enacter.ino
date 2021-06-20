@@ -9,6 +9,7 @@
  * 
  */
 #include "arduino_secrets.h"
+#include "Floor_change_retreat.h"
 #include <Servo.h>
 #include <WiFiEsp.h>
 #include <WiFiEspUDP.h>
@@ -44,6 +45,7 @@
 #define Echo_PIN    31 // Ultrasonic Echo pin connect to A5
 #define Trig_PIN    30  // Ultrasonic Trig pin connect to A4
 Servo head;
+Floor_change_retreat FCR;
 
 /*motor control*/
 void right_shift(int speed_fl_fwd,int speed_rl_bck ,int speed_rr_fwd,int speed_fr_bck) {
@@ -333,7 +335,7 @@ void setup()
   Serial.println(localPort);
 }
 
-int previous_measure_floor = measure_floor();
+int previous_measure_floor = FCR.measureFloor();
 unsigned long floor_change_retreat_end_time = 0;
 bool is_enacting_floor_change_retreat = false;
 
@@ -357,7 +359,7 @@ String outcome = "0";
 void loop()
 {
   // Detect change in the floor measure
-  int current_measure_floor = measure_floor();
+  int current_measure_floor = FCR.measureFloor();
   int floor_change = current_measure_floor ^ previous_measure_floor; // Bitwise XOR
   previous_measure_floor = current_measure_floor;
 
@@ -573,7 +575,7 @@ int measure_ultrasonic_echo()
   return round(echo_distance);
 }
 
-int measure_floor()
+/*int measure_floor()
 {
   int s0 = !digitalRead(sensor1); // Left sensor
   int s1 = !digitalRead(sensor2);
@@ -587,3 +589,4 @@ int measure_floor()
   //Serial.println(String(sensor_value, BIN));
   return sensor_value;
 }
+*/
