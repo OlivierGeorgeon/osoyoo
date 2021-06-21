@@ -22,7 +22,7 @@
 
 Omny_wheel_motion::Omny_wheel_motion()
 {
-  pinMode(RightMotorDirPin1, OUTPUT);
+/*  pinMode(RightMotorDirPin1, OUTPUT);
   pinMode(RightMotorDirPin2, OUTPUT);
   pinMode(speedPinL, OUTPUT);
 
@@ -39,6 +39,7 @@ Omny_wheel_motion::Omny_wheel_motion()
   pinMode(speedPinRB, OUTPUT);
 
   stopMotion();
+  */
 }
 
 void Omny_wheel_motion::setMotion(int speed_fl, int speed_rl, int speed_rr, int speed_fr){

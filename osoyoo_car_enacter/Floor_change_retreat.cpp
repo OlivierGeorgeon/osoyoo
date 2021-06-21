@@ -68,10 +68,9 @@ int Floor_change_retreat::measureFloor()
   int s2 = !digitalRead(sensor3);
   int s3 = !digitalRead(sensor4);
   int s4 = !digitalRead(sensor5); // Right sensor
-  int sensor_value=32;
   // from left to right: 1 when floor is dark and sensor's led is on
-  sensor_value +=s0*16+s1*8+s2*4+s3*2+s4;
+  int sensor_value = s0*16+s1*8+s2*4+s3*2+s4;
   //Serial.print("Flor sensor: ");
-  //Serial.println(String(sensor_value, BIN));
+  //Serial.println(String(32 + sensor_value, BIN)); // Begin with "1" so we can see all the zeros
   return sensor_value;
 }
