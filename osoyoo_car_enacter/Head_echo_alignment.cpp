@@ -34,6 +34,8 @@ void Head_echo_alignment::setup()
 void Head_echo_alignment::begin()
 {
   _is_enacting_head_alignment = true;
+  _penultimate_ultrasonic_measure = 0; // Reinitialize previous measures so it will not ...
+  _previous_ultrasonic_measure = 1;    // ... believe that the next measure is a minimum
 }
 
 bool Head_echo_alignment::update()
@@ -63,6 +65,7 @@ bool Head_echo_alignment::update()
           // Passed the minimum, stop
           Serial.println("End head alignment at angle " + String(_head_angle));
           _is_enacting_head_alignment = false;
+          _head_angle_span = - _head_angle_span;
 //          action_end_time = 0;
         }
       }
