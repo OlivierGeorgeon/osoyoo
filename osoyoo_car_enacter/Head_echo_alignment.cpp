@@ -13,10 +13,11 @@
 
 Head_echo_alignment::Head_echo_alignment()
 {
-  Servo _head;
+  //Servo _head;
   _is_enacting_head_alignment = false;
   _penultimate_ultrasonic_measure = 0;
-  _previous_ultrasonic_measure = 0;
+  _previous_ultrasonic_measure = 1;
+  _min_ultrasonic_measure = 0;
   _next_saccade_time = 0;
   _head_angle = 90;
   _head_angle_span = SACCADE_SPAN;
@@ -54,7 +55,8 @@ bool Head_echo_alignment::update()
           _head_angle += _head_angle_span;
           _head.write(_head_angle);
         } else {
-          Serial.println("End head alignment at edge angle " + String(_head_angle));
+          _min_ultrasonic_measure = current_ultrasonic_measure;
+          Serial.println("Aligned at edge angle " + String(_head_angle) + " measure " + String(_min_ultrasonic_measure));
           _is_enacting_head_alignment = false;
         }
       } else {
@@ -64,7 +66,8 @@ bool Head_echo_alignment::update()
         _head.write(_head_angle);
         if (_penultimate_ultrasonic_measure >= _previous_ultrasonic_measure) {
           // Passed the minimum, stop
-          Serial.println("End head alignment at angle " + String(_head_angle));
+          _min_ultrasonic_measure = _previous_ultrasonic_measure;
+          Serial.println("Aligned at angle " + String(_head_angle) + " measure " + String(_min_ultrasonic_measure));
           _is_enacting_head_alignment = false;
           _head_angle_span = - _head_angle_span;
         }
@@ -78,7 +81,21 @@ bool Head_echo_alignment::update()
 
 String Head_echo_alignment::outcome()
 {
-  return "A" + String(_head_angle) + "O" + String(_penultimate_ultrasonic_measure);
+  return "A" + String(_head_angle) + "O" + String(_min_ultrasonic_measure);
+}
+
+bool Head_echo_alignment::monitor()
+{
+  if (!_is_enacting_head_alignment && _next_saccade_time < millis())
+  {
+    _next_saccade_time = millis() + ECHO_MONITOR_PERIOD;
+    int current_ultrasonic_measure = measureUltrasonicEcho();
+    //Serial.println("Angle " +String(_head_angle) + " measure " + String(current_ultrasonic_measure));
+    if (abs(current_ultrasonic_measure - _min_ultrasonic_measure) > ECHO_MONITOR_VARIATION) {
+      begin();
+    }
+  }
+  return _is_enacting_head_alignment;
 }
 
 int Head_echo_alignment::measureUltrasonicEcho()

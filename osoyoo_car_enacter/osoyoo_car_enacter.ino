@@ -246,7 +246,7 @@ void setup()
 }
 
 bool is_enacting_floor_change_retreat = false;
-
+bool is_enacting_head_alignment = false;
 unsigned long action_end_time = 0;
 bool is_enacting_action = false;
 char action =' ';
@@ -263,12 +263,13 @@ void loop()
   }
 
   // Behavior head echo alignment
-  if (is_enacting_action && (action == 'E')){
-    bool is_enacting_head_alignment = HEA.update();
-    if (!is_enacting_head_alignment) {
-      action_end_time = 0;
-      outcome = HEA.outcome();
-    }
+  is_enacting_head_alignment = HEA.update();
+  if (!is_enacting_action && !is_enacting_floor_change_retreat ) {
+    HEA.monitor(); // Could be included in update()
+  }
+  if (is_enacting_action && (action == 'E') && !is_enacting_head_alignment) {
+    outcome = HEA.outcome();
+    action_end_time = 0;
   }
 
   if (is_enacting_action)
