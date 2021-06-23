@@ -11,7 +11,6 @@
 #include "arduino_secrets.h"
 #include "Floor_change_retreat.h"
 #include "Head_echo_alignment.h"
-//#include <Servo.h>
 #include <WiFiEsp.h>
 #include <WiFiEspUDP.h>
 
@@ -35,14 +34,6 @@
 #define LeftMotorDirPin1B 7    //Rear left Motor direction pin 1 to Back MODEL-X IN3  K3
 #define LeftMotorDirPin2B 8  //Rear left Motor direction pin 2 to Back MODEL-X IN4  k3
 #define speedPinLB 12    //   LEFT WHEEL  PWM pin D8 connect Rear MODEL-X ENB
-
-
-//#define SERVO_PIN     13  //servo connect to D5
-/*
-#define Echo_PIN    31 // Ultrasonic Echo pin connect to A5
-#define Trig_PIN    30  // Ultrasonic Trig pin connect to A4
-*/
-//Servo head;
 
 Floor_change_retreat FCR;
 Head_echo_alignment HEA;
@@ -202,15 +193,6 @@ void init_GPIO()
   pinMode(speedPinRB, OUTPUT);
    
   stop_motion();
-
-/*  // init HC-SR04 ultrasonic Echo sensor
-  pinMode(Trig_PIN, OUTPUT); 
-  pinMode(Echo_PIN,INPUT);
-  digitalWrite(Trig_PIN,LOW);
-*/
-  // init servo
-  //head.attach(SERVO_PIN);
-  //head.write(90);
 }
 
 int status = WL_IDLE_STATUS;
@@ -263,24 +245,11 @@ void setup()
   Serial.println(localPort);
 }
 
-//int previous_measure_floor = FCR.measureFloor();
-//unsigned long floor_change_retreat_end_time = 0;
 bool is_enacting_floor_change_retreat = false;
 
 unsigned long action_end_time = 0;
 bool is_enacting_action = false;
 char action =' ';
-
-
-//unsigned long next_ultrasonic_measure_time = 0;
-//int penultimate_ultrasonic_measure = 1000;
-//int previous_ultrasonic_measure = 1000;
-//unsigned long next_saccade_time = 0;
-
-//int previous_measure_echo = 1000;
-//int penultimate_measure_echo = 1000;
-//int head_angle = 90; // from 20° (right) to 160° (left)
-//int head_angle_interval = 10;
 
 String outcome = "0";
 
@@ -293,62 +262,14 @@ void loop()
     action_end_time = 0;
   }
 
+  // Behavior head echo alignment
   if (is_enacting_action && (action == 'E')){
     bool is_enacting_head_alignment = HEA.update();
     if (!is_enacting_head_alignment) {
       action_end_time = 0;
+      outcome = HEA.outcome();
     }
   }
-
-/*  // Behavior head echo alignment
-  if (is_enacting_head_alignment)
-  {
-    if (next_saccade_time < millis()) {
-      next_saccade_time = millis() + 150; // servo specification speed is 120ms/60°
-      int current_ultrasonic_measure = measure_ultrasonic_echo();
-      Serial.println("Angle " +String(head_angle) + " measure " + String(current_ultrasonic_measure));
-      if (previous_ultrasonic_measure > current_ultrasonic_measure ) {
-        // Moving closer
-        if ((head_angle > 10) && (head_angle < 170)) {
-          head_angle += head_angle_interval;
-          head.write(head_angle);
-        } else {
-          Serial.println("End head alignment at edge angle " + String(head_angle));
-          is_enacting_head_alignment = false;
-          action_end_time = 0;
-        }
-      } else {
-        // moving away, reverse movement
-        head_angle_interval = - head_angle_interval;
-        head_angle += head_angle_interval;
-        head.write(head_angle);
-        if (penultimate_ultrasonic_measure >= previous_ultrasonic_measure) {
-          // Passed the minimum, stop
-          Serial.println("End head alignment at angle " + String(head_angle));
-          is_enacting_head_alignment = false;
-          action_end_time = 0;
-        }
-      }
-      penultimate_ultrasonic_measure = previous_ultrasonic_measure;
-      previous_ultrasonic_measure = current_ultrasonic_measure;
-    }
-  }
-  /*else // If not enacting head alignment
-  {
-    // Trigger head alignment
-    if (next_ultrasonic_measure_time < millis()) {
-      next_ultrasonic_measure_time = millis() + 100;
-      int current_ultrasonic_measure = measure_ultrasonic_echo();
-      int ultrasonic_measure_change = current_ultrasonic_measure - previous_ultrasonic_measure;
-      penultimate_ultrasonic_measure = previous_ultrasonic_measure;
-      previous_ultrasonic_measure = current_ultrasonic_measure;
-      if ((ultrasonic_measure_change < -50) && (previous_ultrasonic_measure < 400)) {
-        is_enacting_head_alignment = true;
-        Serial.print("Ultrasonic measure change ");
-        Serial.println(ultrasonic_measure_change);
-      }
-    }
-  }*/
 
   if (is_enacting_action)
   {
@@ -372,8 +293,6 @@ void loop()
           }*/
           break;
         case 'E':
-          //outcome = String(measure_ultrasonic_echo()) ;
-          //outcome = outcome + String(previous_measure_echo, outcome);
           break;
       }
       is_enacting_action = false;
@@ -441,10 +360,7 @@ void loop()
         case '6':right_shift(SPEED);break;
         case 'E': // Align head
           HEA.begin();
-          //is_enacting_head_alignment = true;
           action_end_time = millis() + 10000;
-          //penultimate_ultrasonic_measure = 0;
-          //previous_ultrasonic_measure = 1;
           break;
         default:break;
       }
@@ -458,26 +374,8 @@ void printWifiStatus()
   // print the SSID of the network you're attached to
   Serial.print("SSID: ");
   Serial.println(WiFi.SSID());
-
   // print your WiFi shield's IP address
   IPAddress ip = WiFi.localIP();
   Serial.print("IP Address: ");
   Serial.println(ip);
 }
-
-/*  // detection of ultrasonic distance
-int measure_ultrasonic_echo()
-{
-  long echo_distance;
-  digitalWrite(Trig_PIN,LOW);
-  delayMicroseconds(5);                                                                              
-  digitalWrite(Trig_PIN,HIGH);
-  delayMicroseconds(15);
-  digitalWrite(Trig_PIN,LOW);
-  echo_distance=pulseIn(Echo_PIN,HIGH);
-  echo_distance=echo_distance*0.1657; //how far away is the object in mm
-  //Serial.print("Echo measure (mm): ");
-  //Serial.println((int)echo_distance);
-  return round(echo_distance);
-}
-*/

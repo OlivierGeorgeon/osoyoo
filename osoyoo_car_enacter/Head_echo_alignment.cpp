@@ -24,9 +24,11 @@ Head_echo_alignment::Head_echo_alignment()
 
 void Head_echo_alignment::setup()
 {
+  // init HC-SR04 ultrasonic Echo sensor
   pinMode(Trig_PIN, OUTPUT);
   pinMode(Echo_PIN,INPUT);
   digitalWrite(Trig_PIN,LOW);
+  // init servo
   _head.attach(SERVO_PIN);
   _head.write(_head_angle);
 }
@@ -54,7 +56,6 @@ bool Head_echo_alignment::update()
         } else {
           Serial.println("End head alignment at edge angle " + String(_head_angle));
           _is_enacting_head_alignment = false;
-//          action_end_time = 0;
         }
       } else {
         // moving away, reverse movement
@@ -66,7 +67,6 @@ bool Head_echo_alignment::update()
           Serial.println("End head alignment at angle " + String(_head_angle));
           _is_enacting_head_alignment = false;
           _head_angle_span = - _head_angle_span;
-//          action_end_time = 0;
         }
       }
       _penultimate_ultrasonic_measure = _previous_ultrasonic_measure;
@@ -74,6 +74,11 @@ bool Head_echo_alignment::update()
     }
   }
   return _is_enacting_head_alignment;
+}
+
+String Head_echo_alignment::outcome()
+{
+  return "A" + String(_head_angle) + "O" + String(_penultimate_ultrasonic_measure);
 }
 
 int Head_echo_alignment::measureUltrasonicEcho()

@@ -19,6 +19,7 @@ class Head_echo_alignment
     void begin();
     bool update();
     int measureUltrasonicEcho();
+    String outcome();
   private:
     Servo _head;
     bool _is_enacting_head_alignment;
