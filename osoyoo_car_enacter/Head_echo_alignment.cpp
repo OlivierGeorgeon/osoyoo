@@ -98,6 +98,12 @@ bool Head_echo_alignment::monitor()
   return _is_enacting_head_alignment;
 }
 
+void Head_echo_alignment::turnHead(int head_angle)
+{
+  _head_angle = head_angle;
+  _head.write(_head_angle);
+}
+
 int Head_echo_alignment::measureUltrasonicEcho()
 {
   long echo_distance;

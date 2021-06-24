@@ -22,7 +22,11 @@
 
 Omny_wheel_motion::Omny_wheel_motion()
 {
-/*  pinMode(RightMotorDirPin1, OUTPUT);
+}
+void Omny_wheel_motion::setup()
+{
+  //Pins initialize
+  pinMode(RightMotorDirPin1, OUTPUT);
   pinMode(RightMotorDirPin2, OUTPUT);
   pinMode(speedPinL, OUTPUT);
 
@@ -39,7 +43,6 @@ Omny_wheel_motion::Omny_wheel_motion()
   pinMode(speedPinRB, OUTPUT);
 
   stopMotion();
-  */
 }
 
 void Omny_wheel_motion::setMotion(int speed_fl, int speed_rl, int speed_rr, int speed_fr){
@@ -47,6 +50,14 @@ void Omny_wheel_motion::setMotion(int speed_fl, int speed_rl, int speed_rr, int 
   rearLeftWheel(speed_rl);
   frontRightWheel(speed_fr);
   rearRightWheel(speed_rr);
+}
+
+void Omny_wheel_motion::stopMotion()    //Stop
+{
+  analogWrite(speedPinLB,0);
+  analogWrite(speedPinRB,0);
+  analogWrite(speedPinL,0);
+  analogWrite(speedPinR,0);
 }
 
 /*motor control*/
@@ -107,10 +118,3 @@ void Omny_wheel_motion::rearLeftWheel(int speed)
   }
 }
 
-void Omny_wheel_motion::stopMotion()    //Stop
-{
-  analogWrite(speedPinLB,0);
-  analogWrite(speedPinRB,0);
-  analogWrite(speedPinL,0);
-  analogWrite(speedPinR,0);
-}

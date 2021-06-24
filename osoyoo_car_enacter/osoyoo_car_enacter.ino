@@ -21,6 +21,7 @@
 #define TURN_TIME 500  
 #define MOVE_TIME 500  
 
+
 #define speedPinR 9   //  RIGHT WHEEL PWM pin D45 connect front MODEL-X ENA 
 #define RightMotorDirPin1  22    //Front Right Motor direction pin 1 to Front MODEL-X IN1  (K1)
 #define RightMotorDirPin2  24   //Front Right Motor direction pin 2 to Front MODEL-X IN2   (K1)                                 
@@ -35,7 +36,9 @@
 #define LeftMotorDirPin2B 8  //Rear left Motor direction pin 2 to Back MODEL-X IN4  k3
 #define speedPinLB 12    //   LEFT WHEEL  PWM pin D8 connect Rear MODEL-X ENB
 
-Floor_change_retreat FCR;
+
+Omny_wheel_motion OWM;
+Floor_change_retreat FCR(OWM);
 Head_echo_alignment HEA;
 
 /*motor control*/
@@ -175,6 +178,7 @@ void stop_motion()    //Stop
 
 
 //Pins initialize
+/*
 void init_GPIO()
 {
   pinMode(RightMotorDirPin1, OUTPUT); 
@@ -194,7 +198,7 @@ void init_GPIO()
    
   stop_motion();
 }
-
+*/
 int status = WL_IDLE_STATUS;
 // use a ring buffer to increase speed and reduce memory allocation
 char packetBuffer[5];
@@ -203,7 +207,8 @@ unsigned int localPort = 8888;  // local port to listen on
 
 void setup()
 {
-  init_GPIO();
+  //init_GPIO();
+  OWM.setup();
   HEA.setup();
   Serial.begin(9600);   // initialize serial for debugging
   Serial1.begin(115200);
@@ -283,15 +288,13 @@ void loop()
           if (is_enacting_floor_change_retreat) {
             FCR.extraDuration(RETREAT_EXTRA_DURATION); // Extend retreat duration because need to reverse speed
           } else {
-            stop_motion(); // Stop motion unless a reflex is being enacted
+            OWM.stopMotion(); // Stop motion unless a reflex is being enacted
+            // stop_motion(); // Stop motion unless a reflex is being enacted
           }
           break;
         case 'C':
-          /*if (is_enacting_head_alignment) {
-            outcome = "1";
-          } else {
-            stop_motion();
-          }*/
+          OWM.stopMotion();
+          //stop_motion();
           break;
         case 'E':
           break;
@@ -352,8 +355,8 @@ void loop()
         case 'O':left_shift(200,150,150,200);break;//left shift
         case 'T':right_shift(200,200,200,200);break;//left shift
         case 'C': //turn in spot clockwise
-          //head_angle = 60; // Look ahead
-          //head.write(head_angle);
+          action_end_time = millis() + 500;
+          HEA.turnHead(90);  // Look ahead
           clockwise(TURN_SPEED);
           break;
         case 'G':count_clockwise(TURN_SPEED);break;//turn in spot counterclockwise

@@ -15,7 +15,7 @@
 class Floor_change_retreat
 {
   public:
-    Floor_change_retreat();
+    Floor_change_retreat(Omny_wheel_motion _OWM);
     bool update();
     int measureFloor();
     void extraDuration(int duration);

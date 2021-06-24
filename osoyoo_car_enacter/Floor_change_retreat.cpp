@@ -13,13 +13,14 @@
 #define sensor4   A1 // 2nd right sensor
 #define sensor5   A0 // Right most sensor
 
-Floor_change_retreat::Floor_change_retreat()
+Floor_change_retreat::Floor_change_retreat(Omny_wheel_motion OWM)
 {
-  Omny_wheel_motion _OWM;
+  _OWM = OWM;
   _is_enacting_floor_change_retreat = false;
   _previous_measure_floor = 0;
   _floor_change_retreat_end_time = 0;
 }
+
 bool Floor_change_retreat::update()
 {
   // Detect change in the floor measure

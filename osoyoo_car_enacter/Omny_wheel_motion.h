@@ -11,6 +11,7 @@ class Omny_wheel_motion
 {
   public:
     Omny_wheel_motion();
+    void setup();
     void setMotion(int speed_fl, int speed_rl, int speed_rr, int speed_fr);
     void stopMotion();
   private:
