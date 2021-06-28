@@ -11,6 +11,7 @@
 #include "arduino_secrets.h"
 #include "Floor_change_retreat.h"
 #include "Head_echo_alignment.h"
+#include "Imu_control.h"
 #include <WiFiEsp.h>
 #include <WiFiEspUDP.h>
 
@@ -40,6 +41,7 @@
 Omny_wheel_motion OWM;
 Floor_change_retreat FCR(OWM);
 Head_echo_alignment HEA;
+Imu_control IMU;
 
 /*motor control*/
 void right_shift(int speed_fl_fwd,int speed_rl_bck ,int speed_rr_fwd,int speed_fr_bck) {
@@ -211,6 +213,7 @@ void setup()
   OWM.setup();
   HEA.setup();
   Serial.begin(9600);   // initialize serial for debugging
+  IMU.setup();
   Serial1.begin(115200);
   Serial1.write("AT+UART_DEF=9600,8,1,0,0\r\n");
   delay(200);
@@ -277,6 +280,9 @@ void loop()
     action_end_time = 0;
   }
 
+  // IMU reading
+  IMU.update();
+
   if (is_enacting_action)
   {
     if (action_end_time < millis())
@@ -289,14 +295,13 @@ void loop()
             FCR.extraDuration(RETREAT_EXTRA_DURATION); // Extend retreat duration because need to reverse speed
           } else {
             OWM.stopMotion(); // Stop motion unless a reflex is being enacted
-            // stop_motion(); // Stop motion unless a reflex is being enacted
           }
+          break;
+        case 'E':
+          OWM.stopMotion();
           break;
         case 'C':
           OWM.stopMotion();
-          //stop_motion();
-          break;
-        case 'E':
           break;
       }
       is_enacting_action = false;
@@ -343,11 +348,11 @@ void loop()
       outcome = "0";
       switch (action)    //serial control instructions
       {
-        case 'A':go_advance(SPEED);break;
+        case 'A':OWM.goForward(SPEED);break;
         case 'L':left_turn(TURN_SPEED);break;
         case 'R':right_turn(TURN_SPEED);break;
         case 'B':go_back(SPEED);break;
-        case 'S':stop_motion();break;
+        case 'S':OWM.stopMotion();break;
         case 'F':left_shift(0,150,0,150);break; //left ahead
         case 'H':right_shift(180,0,150,0);break; //right ahead
         case 'I':left_shift(150,0,150,0);break;//left back
@@ -357,7 +362,8 @@ void loop()
         case 'C': //turn in spot clockwise
           action_end_time = millis() + 500;
           HEA.turnHead(90);  // Look ahead
-          clockwise(TURN_SPEED);
+          OWM.turnInSpotRight(TURN_SPEED);
+          //clockwise(TURN_SPEED);
           break;
         case 'G':count_clockwise(TURN_SPEED);break;//turn in spot counterclockwise
         case '4':left_shift(SPEED);break;
