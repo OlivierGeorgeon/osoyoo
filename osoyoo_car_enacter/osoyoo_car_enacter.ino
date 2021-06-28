@@ -303,7 +303,11 @@ void loop()
         case 'C':
           OWM.stopMotion();
           break;
+        case 'G':
+          OWM.stopMotion();
+          break;
       }
+      outcome += "Y" + String(IMU.end());
       is_enacting_action = false;
       // Send the outcome to the IP address and port that sent the action
       Serial.println("Outcome string " + outcome);
@@ -345,6 +349,7 @@ void loop()
 
       action_end_time = millis() + 1000;
       is_enacting_action = true;
+      IMU.begin();
       outcome = "0";
       switch (action)    //serial control instructions
       {
@@ -360,12 +365,16 @@ void loop()
         case 'O':left_shift(200,150,150,200);break;//left shift
         case 'T':right_shift(200,200,200,200);break;//left shift
         case 'C': //turn in spot clockwise
-          action_end_time = millis() + 500;
+          action_end_time = millis() + 1000;
           HEA.turnHead(90);  // Look ahead
           OWM.turnInSpotRight(TURN_SPEED);
           //clockwise(TURN_SPEED);
           break;
-        case 'G':count_clockwise(TURN_SPEED);break;//turn in spot counterclockwise
+        case 'G'://count_clockwise(TURN_SPEED);break;//turn in spot counterclockwise
+          action_end_time = millis() + 1000;
+          HEA.turnHead(90);  // Look ahead
+          OWM.turnInSpotLeft(TURN_SPEED);
+          break;
         case '4':left_shift(SPEED);break;
         case '6':right_shift(SPEED);break;
         case 'E': // Align head

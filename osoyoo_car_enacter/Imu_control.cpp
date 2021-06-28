@@ -1,6 +1,7 @@
 /*
   Imu_control.cpp - library for controlling the GY521 / MPU6050 IMU
   Created by Olivier Georgeon, june 28 2021
+  Uses Korneliusz Jarzebski's MPU6050 library provided in the ELEGOO kit
   released into the public domain
 */
 #include "Arduino.h"
@@ -28,10 +29,16 @@ Imu_control::setup()
   // Calibrate gyroscope. The calibration must be at rest.
   // If you don't want calibrate, comment this line.
   _mpu.calibrateGyro();
+  Serial.println("Gyroscope calibrated");
 
-  // Set threshold sensivty. Default 3.
+  // Set threshold sensitivity. Default 3.
   // If you don't want use threshold, comment this line or set 0.
   _mpu.setThreshold(3);
+
+  // Set DLP Filter
+  // See https://ulrichbuschbaum.wordpress.com/2015/01/18/using-the-mpu6050s-dlpf/
+  _mpu.setDLPFMode(4);  // Filter out frequencies over 21 Hz
+
 
 }
 Imu_control::begin()
@@ -52,10 +59,13 @@ Imu_control::update()
     _yaw = _yaw + norm.ZAxis * IMU_READ_PERIOD / 1000;
 
     // Output raw
-    Serial.print("Yaw = ");
-    Serial.println(_yaw);
+    //Serial.print("Yaw = ");
+    //Serial.println(_yaw);
   }
 }
-Imu_control::end()
+float Imu_control::end()
 {
+  Serial.print("End yaw = ");
+  Serial.println(_yaw);
+  return _yaw;
 }
