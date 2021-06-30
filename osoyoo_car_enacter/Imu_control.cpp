@@ -33,7 +33,7 @@ Imu_control::setup()
 
   // Set threshold sensitivity. Default 3.
   // If you don't want use threshold, comment this line or set 0.
-  _mpu.setThreshold(3);
+  _mpu.setThreshold(3); // Tried without but gives absurd results
 
   // Set DLP Filter
   // See https://ulrichbuschbaum.wordpress.com/2015/01/18/using-the-mpu6050s-dlpf/

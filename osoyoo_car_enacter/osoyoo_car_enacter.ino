@@ -22,7 +22,7 @@
 #define TURN_TIME 500  
 #define MOVE_TIME 500  
 
-
+/*
 #define speedPinR 9   //  RIGHT WHEEL PWM pin D45 connect front MODEL-X ENA 
 #define RightMotorDirPin1  22    //Front Right Motor direction pin 1 to Front MODEL-X IN1  (K1)
 #define RightMotorDirPin2  24   //Front Right Motor direction pin 2 to Front MODEL-X IN2   (K1)                                 
@@ -36,14 +36,14 @@
 #define LeftMotorDirPin1B 7    //Rear left Motor direction pin 1 to Back MODEL-X IN3  K3
 #define LeftMotorDirPin2B 8  //Rear left Motor direction pin 2 to Back MODEL-X IN4  k3
 #define speedPinLB 12    //   LEFT WHEEL  PWM pin D8 connect Rear MODEL-X ENB
-
+*/
 
 Omny_wheel_motion OWM;
 Floor_change_retreat FCR(OWM);
 Head_echo_alignment HEA;
 Imu_control IMU;
 
-/*motor control*/
+/*motor control
 void right_shift(int speed_fl_fwd,int speed_rl_bck ,int speed_rr_fwd,int speed_fr_bck) {
   FL_fwd(speed_fl_fwd); 
   RL_bck(speed_rl_bck); 
@@ -118,7 +118,7 @@ void left_shift(int speed){
    FR_fwd(speed);
    FL_bck(speed);
 }
-/*motor control*/
+
 
 void FR_bck(int speed)  //front-right wheel backward turn
 {
@@ -177,30 +177,8 @@ void stop_motion()    //Stop
   analogWrite(speedPinL,0);
   analogWrite(speedPinR,0);
 }
-
-
-//Pins initialize
-/*
-void init_GPIO()
-{
-  pinMode(RightMotorDirPin1, OUTPUT); 
-  pinMode(RightMotorDirPin2, OUTPUT); 
-  pinMode(speedPinL, OUTPUT);
- 
-  pinMode(LeftMotorDirPin1, OUTPUT);
-  pinMode(LeftMotorDirPin2, OUTPUT); 
-  pinMode(speedPinR, OUTPUT);
-  pinMode(RightMotorDirPin1B, OUTPUT); 
-  pinMode(RightMotorDirPin2B, OUTPUT); 
-  pinMode(speedPinLB, OUTPUT);  
- 
-  pinMode(LeftMotorDirPin1B, OUTPUT);
-  pinMode(LeftMotorDirPin2B, OUTPUT); 
-  pinMode(speedPinRB, OUTPUT);
-   
-  stop_motion();
-}
 */
+
 int status = WL_IDLE_STATUS;
 // use a ring buffer to increase speed and reduce memory allocation
 char packetBuffer[5];
@@ -209,7 +187,6 @@ unsigned int localPort = 8888;  // local port to listen on
 
 void setup()
 {
-  //init_GPIO();
   OWM.setup();
   HEA.setup();
   Serial.begin(9600);   // initialize serial for debugging
@@ -297,6 +274,9 @@ void loop()
             OWM.stopMotion(); // Stop motion unless a reflex is being enacted
           }
           break;
+        case 'B':
+          OWM.stopMotion();
+          break;
         case 'E':
           OWM.stopMotion();
           break;
@@ -311,9 +291,9 @@ void loop()
       is_enacting_action = false;
       // Send the outcome to the IP address and port that sent the action
       Serial.println("Outcome string " + outcome);
-      // char outcome_char[outcome.length()+1]; // One more char for the null end of string
-      // outcome.toCharArray(outcome_char, outcome.length()+1);
-      // Serial.println("Sending outcome " + String(outcome_char));
+
+      //StaticJsonDocument<200> doc;
+
       Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
       Udp.print(outcome);
       //Udp.write(outcome_char);
@@ -353,17 +333,23 @@ void loop()
       outcome = "0";
       switch (action)    //serial control instructions
       {
-        case 'A':OWM.goForward(SPEED);break;
-        case 'L':left_turn(TURN_SPEED);break;
-        case 'R':right_turn(TURN_SPEED);break;
-        case 'B':go_back(SPEED);break;
+        case 'A':
+          OWM.goForward(SPEED);
+          action_end_time = millis() + 1000;
+          break;
+        //case 'L':left_turn(TURN_SPEED);break;
+        //case 'R':right_turn(TURN_SPEED);break;
+        case 'B':
+          OWM.goBack(SPEED);
+          action_end_time = millis() + 1000;
+          break;
         case 'S':OWM.stopMotion();break;
-        case 'F':left_shift(0,150,0,150);break; //left ahead
-        case 'H':right_shift(180,0,150,0);break; //right ahead
-        case 'I':left_shift(150,0,150,0);break;//left back
-        case 'K':right_shift(0,130,0,130);break;//right back
-        case 'O':left_shift(200,150,150,200);break;//left shift
-        case 'T':right_shift(200,200,200,200);break;//left shift
+        //case 'F':left_shift(0,150,0,150);break; //left ahead
+        //case 'H':right_shift(180,0,150,0);break; //right ahead
+        //case 'I':left_shift(150,0,150,0);break;//left back
+        //case 'K':right_shift(0,130,0,130);break;//right back
+        //case 'O':left_shift(200,150,150,200);break;//left shift
+        //case 'T':right_shift(200,200,200,200);break;//left shift
         case 'C': //turn in spot clockwise
           action_end_time = millis() + 1000;
           HEA.turnHead(90);  // Look ahead
@@ -375,8 +361,8 @@ void loop()
           HEA.turnHead(90);  // Look ahead
           OWM.turnInSpotLeft(TURN_SPEED);
           break;
-        case '4':left_shift(SPEED);break;
-        case '6':right_shift(SPEED);break;
+        //case '4':left_shift(SPEED);break;
+        //case '6':right_shift(SPEED);break;
         case 'E': // Align head
           HEA.begin();
           action_end_time = millis() + 10000;
