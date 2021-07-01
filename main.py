@@ -1,12 +1,21 @@
 # This is a sample Python script.
-import time
 import socket
+from time import sleep
 import keyboard
+from msvcrt import getch, kbhit
 import json
 # Press Maj+F10 to execute it or replace it with your code.
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 
 interactionDict = {"Action": "0", "outcome": "0", "head_angle": 0, "echo_distance": 0, "angle_travelled": 0, "distance_travelled": 0}
+
+# for i in range(10):
+#     print(i)
+#     sleep(1)
+#     if kbhit(): # returns True if the user has pressed a key
+#         action = getch()
+#         print("test")
+
 
 
 # Press the green button in the gutter to run the script.
@@ -28,19 +37,19 @@ if __name__ == '__main__':
             sock.sendto(bytes(key, 'utf-8'), (UDP_IP, UDP_PORT))
             try:
                 # Wait for outcome
-                sock.settimeout(2)
+                sock.settimeout(6)
                 data, address = sock.recvfrom(1024)  # buffer size is 1024 bytes
                 print("received  outcome %s" % data)
             except:
                 pass
-        else:
-            try:
-                # Catch complementary incoming data
-                sock.settimeout(0)
-                data, address = sock.recvfrom(1024)  # buffer size is 1024 bytes
-                print("received complementary data %s" % data)
-            except:
-                pass
+        # else:
+        #     try:
+        #         # Catch complementary incoming data
+        #         sock.settimeout(0)
+        #         data, address = sock.recvfrom(1024)  # buffer size is 1024 bytes
+        #         print("received complementary data %s" % data)
+        #     except:
+        #         pass
 
     # for i in range(100):
     #     message = bytes(input("Action: "), 'utf-8')

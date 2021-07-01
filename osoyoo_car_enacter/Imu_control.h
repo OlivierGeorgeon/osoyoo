@@ -20,9 +20,9 @@ class Imu_control
     begin();
     update();
     float end();
+    float _yaw;
   private:
     MPU6050 _mpu;
     unsigned long _next_imu_read_time;
-    float _yaw;
 };
 #endif

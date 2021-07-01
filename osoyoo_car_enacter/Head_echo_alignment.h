@@ -24,6 +24,7 @@ class Head_echo_alignment
     String outcome();
     bool monitor();
     void turnHead(int head_angle);
+    int _head_angle;
   private:
     Servo _head;
     bool _is_enacting_head_alignment;
@@ -31,7 +32,6 @@ class Head_echo_alignment
     int _previous_ultrasonic_measure;
     int _min_ultrasonic_measure;
     unsigned long _next_saccade_time;
-    int _head_angle;
     int _head_angle_span;
 };
 

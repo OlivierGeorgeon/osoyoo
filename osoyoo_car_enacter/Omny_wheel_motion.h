@@ -16,7 +16,7 @@ class Omny_wheel_motion
     void goBack(int speed);
     void turnInSpotRight(int speed);
     void turnInSpotLeft(int speed);
-    void turnFrontRigh(int speed);
+    void turnFrontRight(int speed);
     void turnFrontLeft(int speed);
     void setMotion(int speed_fl, int speed_rl, int speed_rr, int speed_fr);
     void stopMotion();

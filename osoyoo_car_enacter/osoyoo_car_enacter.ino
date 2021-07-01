@@ -39,6 +39,7 @@ void setup()
   HEA.setup();
   Serial.begin(9600);   // initialize serial for debugging
   IMU.setup();
+
   Serial1.begin(115200);
   Serial1.write("AT+UART_DEF=9600,8,1,0,0\r\n");
   delay(200);
@@ -83,14 +84,14 @@ bool is_enacting_head_alignment = false;
 unsigned long action_end_time = 0;
 bool is_enacting_action = false;
 char action =' ';
-
 String outcome = "0";
+int robot_angle_alignment = 0;
 
 void loop()
 {
   // Behavior floor change retreat
   is_enacting_floor_change_retreat = FCR.update();
-  if (is_enacting_floor_change_retreat && is_enacting_action) {
+  if (is_enacting_floor_change_retreat && is_enacting_action && (action == 'A') ) {
     outcome ="1";
     action_end_time = 0;
   }
@@ -134,6 +135,9 @@ void loop()
         case 'G':
           OWM.stopMotion();
           break;
+        case 'Z':
+          OWM.stopMotion();
+          break;
       }
       outcome += "Y" + String(IMU.end());
       is_enacting_action = false;
@@ -154,6 +158,15 @@ void loop()
           stop_motion();
           action_end_time = 0;
         }*/
+      }
+      if (action == 'Z') {
+         if (((robot_angle_alignment > 0) && (IMU._yaw > robot_angle_alignment)) ||
+         ((robot_angle_alignment < 0) && (IMU._yaw < robot_angle_alignment)) ||
+         (robot_angle_alignment == 0)) {
+           HEA.turnHead(90);  // Look ahead
+           OWM.stopMotion();
+           action_end_time = 0;
+         }
       }
     }
   }
@@ -185,37 +198,39 @@ void loop()
           OWM.goForward(SPEED);
           action_end_time = millis() + 1000;
           break;
-        //case 'L':left_turn(TURN_SPEED);break;
-        //case 'R':right_turn(TURN_SPEED);break;
         case 'B':
           OWM.goBack(SPEED);
           action_end_time = millis() + 1000;
           break;
-        case 'S':OWM.stopMotion();break;
-        //case 'F':left_shift(0,150,0,150);break; //left ahead
-        //case 'H':right_shift(180,0,150,0);break; //right ahead
-        //case 'I':left_shift(150,0,150,0);break;//left back
-        //case 'K':right_shift(0,130,0,130);break;//right back
-        //case 'O':left_shift(200,150,150,200);break;//left shift
-        //case 'T':right_shift(200,200,200,200);break;//left shift
+        case 'S':
+          OWM.stopMotion();break;
         case 'C': //turn in spot clockwise
           action_end_time = millis() + 1000;
           HEA.turnHead(90);  // Look ahead
           OWM.turnInSpotRight(TURN_SPEED);
-          //clockwise(TURN_SPEED);
           break;
-        case 'G'://count_clockwise(TURN_SPEED);break;//turn in spot counterclockwise
+        case 'G':
           action_end_time = millis() + 1000;
           HEA.turnHead(90);  // Look ahead
           OWM.turnInSpotLeft(TURN_SPEED);
           break;
-        //case '4':left_shift(SPEED);break;
-        //case '6':right_shift(SPEED);break;
         case 'E': // Align head
           HEA.begin();
           action_end_time = millis() + 10000;
           break;
-        default:break;
+        case 'Z': // Align robot body to head
+          action_end_time = millis() + 5000;
+          robot_angle_alignment = HEA._head_angle - 90;
+          Serial.println("Begin align robot angle : " + String(robot_angle_alignment));
+          if ( robot_angle_alignment < 0){
+            OWM.turnInSpotRight(SPEED);
+          }
+          if ( robot_angle_alignment > 0){
+            OWM.turnInSpotLeft(SPEED);
+          }
+          break;
+        default:
+          break;
       }
     }
   }
