@@ -61,6 +61,14 @@ void Omny_wheel_motion::turnInSpotLeft(int speed)
 {
   setMotion(-speed, -speed, speed, speed);
 }
+void turnFrontRight(int speed)
+{
+  setMotion(speed, 0, -speed, 0);
+}
+void turnFrontLeft(int speed)
+{
+  setMotion(-speed, 0, speed, 0);
+}
 
 void Omny_wheel_motion::setMotion(int speed_fl, int speed_rl, int speed_rr, int speed_fr){
   frontLeftWheel(speed_fl);
