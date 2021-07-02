@@ -22,6 +22,10 @@
 #define TURN_TIME 500  
 #define MOVE_TIME 500  
 
+#define ENDING_DELAY 250
+#define ENDING_ANGLE 11
+
+
 Omny_wheel_motion OWM;
 Floor_change_retreat FCR(OWM);
 Head_echo_alignment HEA;
@@ -83,6 +87,7 @@ bool is_enacting_floor_change_retreat = false;
 bool is_enacting_head_alignment = false;
 unsigned long action_end_time = 0;
 bool is_enacting_action = false;
+bool is_ending_interaction = false;
 char action =' ';
 String outcome = "0";
 int robot_angle_alignment = 0;
@@ -136,6 +141,7 @@ void loop()
           OWM.stopMotion();
           break;
         case 'Z':
+          is_ending_interaction = false;
           OWM.stopMotion();
           break;
       }
@@ -160,12 +166,15 @@ void loop()
         }*/
       }
       if (action == 'Z') {
-         if (((robot_angle_alignment > 0) && (IMU._yaw > robot_angle_alignment)) ||
-         ((robot_angle_alignment < 0) && (IMU._yaw < robot_angle_alignment)) ||
-         (robot_angle_alignment == 0)) {
+         if (((robot_angle_alignment > ENDING_ANGLE) && (IMU._yaw > robot_angle_alignment - ENDING_ANGLE)) ||
+         ((robot_angle_alignment < -ENDING_ANGLE) && (IMU._yaw < robot_angle_alignment + ENDING_ANGLE)) ||
+         (abs(robot_angle_alignment) < ENDING_ANGLE)) {
            HEA.turnHead(90);  // Look ahead
            OWM.stopMotion();
-           action_end_time = 0;
+           if (!is_ending_interaction){
+             is_ending_interaction = true;
+             action_end_time = millis() + ENDING_DELAY;// leave time to immobilize and then end interaction
+           }
          }
       }
     }
@@ -222,10 +231,10 @@ void loop()
           action_end_time = millis() + 5000;
           robot_angle_alignment = HEA._head_angle - 90;
           Serial.println("Begin align robot angle : " + String(robot_angle_alignment));
-          if ( robot_angle_alignment < 0){
+          if ( robot_angle_alignment < - ENDING_ANGLE){
             OWM.turnInSpotRight(SPEED);
           }
-          if ( robot_angle_alignment > 0){
+          if ( robot_angle_alignment > ENDING_ANGLE){
             OWM.turnInSpotLeft(SPEED);
           }
           break;

@@ -32,24 +32,24 @@ if __name__ == '__main__':
     key = ""
     while key != "0":
         key = keyboard.read_key().upper()
-        if len(key) == 1:
-            print("Sending action %s" % key)
-            sock.sendto(bytes(key, 'utf-8'), (UDP_IP, UDP_PORT))
-            try:
-                # Wait for outcome
-                sock.settimeout(6)
-                data, address = sock.recvfrom(1024)  # buffer size is 1024 bytes
-                print("received  outcome %s" % data)
-            except:
-                pass
-        # else:
-        #     try:
-        #         # Catch complementary incoming data
-        #         sock.settimeout(0)
-        #         data, address = sock.recvfrom(1024)  # buffer size is 1024 bytes
-        #         print("received complementary data %s" % data)
-        #     except:
-        #         pass
+        try:
+            # Catch complementary incoming data
+            sock.settimeout(0)
+            data, address = sock.recvfrom(1024)  # buffer size is 1024 bytes
+            print("received complementary data %s" % data)
+        except:
+            pass
+        #if len(key) == 1:
+        print("Sending action %s" % key)
+        sock.sendto(bytes(key, 'utf-8'), (UDP_IP, UDP_PORT))
+        try:
+            # Wait for outcome
+            sock.settimeout(6)
+            data, address = sock.recvfrom(1024)  # buffer size is 1024 bytes
+            print("received  outcome %s" % data)
+        except:
+            print("reception timeout")
+        #else:
 
     # for i in range(100):
     #     message = bytes(input("Action: "), 'utf-8')
