@@ -45,9 +45,9 @@ void Omny_wheel_motion::setup()
   stopMotion();
 }
 
-void Omny_wheel_motion::goForward(int speed)
+void Omny_wheel_motion::turnInSpotLeft(int speed)
 {
-  setMotion(speed, speed, speed, speed);
+  setMotion(-speed, -speed, speed, speed);
 }
 void Omny_wheel_motion::goBack(int speed)
 {
@@ -57,17 +57,33 @@ void Omny_wheel_motion::turnInSpotRight(int speed)
 {
   setMotion(speed, speed, -speed, -speed);
 }
-void Omny_wheel_motion::turnInSpotLeft(int speed)
+void Omny_wheel_motion::turnFrontLeft(int speed)
 {
-  setMotion(-speed, -speed, speed, speed);
+  setMotion(speed / 4, -speed, speed, speed / 4);
 }
 void Omny_wheel_motion::turnFrontRight(int speed)
 {
-  setMotion(speed, 0, 0, -speed);
+  setMotion(speed / 4, speed, -speed, speed / 4);
 }
-void Omny_wheel_motion::turnFrontLeft(int speed)
+void Omny_wheel_motion::shiftLeft(int speed)
 {
-  setMotion(-speed, 0, 0, speed);
+  setMotion( -speed, speed, -speed, speed);
+}
+void Omny_wheel_motion::shiftRight(int speed)
+{
+  setMotion(speed, -speed, speed, -speed);
+}
+void Omny_wheel_motion::turnLeft(int speed)
+{
+  setMotion(0, 0, speed, speed);
+}
+void Omny_wheel_motion::goForward(int speed)
+{
+  setMotion(speed, speed, speed, speed);
+}
+void Omny_wheel_motion::turnRight(int speed)
+{
+  setMotion(speed, speed, 0, 0);
 }
 
 void Omny_wheel_motion::setMotion(int speed_fl, int speed_rl, int speed_rr, int speed_fr){

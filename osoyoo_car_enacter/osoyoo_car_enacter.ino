@@ -22,9 +22,22 @@
 #define TURN_TIME 500  
 #define MOVE_TIME 500  
 
-#define ENDING_DELAY 250
-#define ENDING_ANGLE 11
+#define TURN_FRONT_ENDING_DELAY 100
+#define TURN_FRONT_ENDING_ANGLE 3
+#define TURN_SPOT_ENDING_DELAY 500
+#define TURN_SPOT_ENDING_ANGLE 15
 
+#define ACTION_TURN_IN_SPOT_LEFT '1'
+#define ACTION_GO_BACK '2'
+#define ACTION_TURN_IN_SPOT_RIGHT '3'
+#define ACTION_SHIFT_LEFT '4'
+#define ACTION_STOP '5'
+#define ACTION_SHIFT_RIGHT '6'
+#define ACTION_TURN_LEFT '7'
+#define ACTION_GO_ADVANCE '8'
+#define ACTION_TURN_RIGHT '9'
+#define ACTION_ALIGN_ROBOT '/'
+#define ACTION_ALIGN_HEAD '*'
 
 Omny_wheel_motion OWM;
 Floor_change_retreat FCR(OWM);
@@ -90,13 +103,13 @@ bool is_enacting_action = false;
 bool is_ending_interaction = false;
 char action =' ';
 String outcome = "0";
-int robot_angle_alignment = 0;
+int robot_destination_angle = 0;
 
 void loop()
 {
   // Behavior floor change retreat
   is_enacting_floor_change_retreat = FCR.update();
-  if (is_enacting_floor_change_retreat && is_enacting_action && (action == 'A') ) {
+  if (is_enacting_floor_change_retreat && is_enacting_action && (action == ACTION_GO_ADVANCE) ) {
     outcome ="1";
     action_end_time = 0;
   }
@@ -106,7 +119,7 @@ void loop()
   if (!is_enacting_action && !is_enacting_floor_change_retreat ) {
     HEA.monitor(); // Could be included in update()
   }
-  if (is_enacting_action && (action == 'E') && !is_enacting_head_alignment) {
+  if (is_enacting_action && (action == '*') && !is_enacting_head_alignment) {
     outcome = HEA.outcome();
     action_end_time = 0;
   }
@@ -121,26 +134,14 @@ void loop()
       //char outcome = '0';
       switch (action)
       {
-        case 'A':
+        case ACTION_GO_ADVANCE:
           if (is_enacting_floor_change_retreat) {
             FCR.extraDuration(RETREAT_EXTRA_DURATION); // Extend retreat duration because need to reverse speed
           } else {
             OWM.stopMotion(); // Stop motion unless a reflex is being enacted
           }
           break;
-        case 'B':
-          OWM.stopMotion();
-          break;
-        case 'E':
-          OWM.stopMotion();
-          break;
-        case 'C':
-          OWM.stopMotion();
-          break;
-        case 'G':
-          OWM.stopMotion();
-          break;
-        case 'Z':
+        default:
           is_ending_interaction = false;
           OWM.stopMotion();
           break;
@@ -165,15 +166,36 @@ void loop()
           action_end_time = 0;
         }*/
       }
-      if (action == 'Z') {
-         if (((robot_angle_alignment > ENDING_ANGLE) && (IMU._yaw > robot_angle_alignment - ENDING_ANGLE)) ||
-         ((robot_angle_alignment < -ENDING_ANGLE) && (IMU._yaw < robot_angle_alignment + ENDING_ANGLE)) ||
-         (abs(robot_angle_alignment) < ENDING_ANGLE)) {
-           HEA.turnHead(90);  // Look ahead
+      if (action == ACTION_TURN_IN_SPOT_LEFT)
+      {
+        if (IMU._yaw > robot_destination_angle - TURN_SPOT_ENDING_ANGLE)
+        {
            OWM.stopMotion();
            if (!is_ending_interaction){
              is_ending_interaction = true;
-             action_end_time = millis() + ENDING_DELAY;// leave time to immobilize and then end interaction
+             action_end_time = millis() + TURN_SPOT_ENDING_DELAY;// leave time to immobilize and then end interaction
+           }
+        }
+      }
+      if (action == ACTION_TURN_IN_SPOT_RIGHT)
+      {
+        if (IMU._yaw < robot_destination_angle + TURN_SPOT_ENDING_ANGLE)
+        {
+           OWM.stopMotion();
+           if (!is_ending_interaction){
+             is_ending_interaction = true;
+             action_end_time = millis() + TURN_SPOT_ENDING_DELAY;// leave time to immobilize and then end interaction
+           }
+        }
+      }
+      if (action == ACTION_ALIGN_ROBOT) {
+         if (((robot_destination_angle > TURN_FRONT_ENDING_ANGLE) && (IMU._yaw > robot_destination_angle - TURN_FRONT_ENDING_ANGLE)) ||
+         ((robot_destination_angle < -TURN_FRONT_ENDING_ANGLE) && (IMU._yaw < robot_destination_angle + TURN_FRONT_ENDING_ANGLE)) ||
+         (abs(robot_destination_angle) < TURN_FRONT_ENDING_ANGLE)) {
+           OWM.stopMotion();
+           if (!is_ending_interaction){
+             is_ending_interaction = true;
+             action_end_time = millis() + TURN_FRONT_ENDING_DELAY;// leave time to immobilize and then end interaction
            }
          }
       }
@@ -203,39 +225,53 @@ void loop()
       outcome = "0";
       switch (action)    //serial control instructions
       {
-        case 'A':
-          OWM.goForward(SPEED);
-          action_end_time = millis() + 1000;
-          break;
-        case 'B':
-          OWM.goBack(SPEED);
-          action_end_time = millis() + 1000;
-          break;
-        case 'S':
-          OWM.stopMotion();break;
-        case 'C': //turn in spot clockwise
-          action_end_time = millis() + 1000;
-          HEA.turnHead(90);  // Look ahead
-          OWM.turnInSpotRight(TURN_SPEED);
-          break;
-        case 'G':
-          action_end_time = millis() + 1000;
+        case ACTION_TURN_IN_SPOT_LEFT:
+          robot_destination_angle = 45;
           HEA.turnHead(90);  // Look ahead
           OWM.turnInSpotLeft(TURN_SPEED);
           break;
-        case 'E': // Align head
+        case ACTION_GO_BACK:
+          OWM.goBack(SPEED);
+          break;
+        case ACTION_TURN_IN_SPOT_RIGHT:
+          robot_destination_angle = -45;
+          HEA.turnHead(90);  // Look ahead
+          OWM.turnInSpotRight(TURN_SPEED);
+          break;
+        case ACTION_SHIFT_LEFT:
+          OWM.shiftLeft(SHIFT_SPEED);
+          //action_end_time = millis() + 5000;
+          break;
+        case ACTION_STOP:
+          OWM.stopMotion();
+          break;
+        case ACTION_SHIFT_RIGHT:
+          //action_end_time = millis() + 5000;
+          OWM.shiftRight(SHIFT_SPEED);
+          break;
+        case ACTION_TURN_LEFT:
+          OWM.turnLeft(SPEED);
+          break;
+        case ACTION_GO_ADVANCE:
+          OWM.goForward(SPEED);
+          break;
+        case ACTION_TURN_RIGHT:
+          OWM.turnRight(SPEED);
+          break;
+        case ACTION_ALIGN_HEAD:
           HEA.begin();
           action_end_time = millis() + 10000;
           break;
-        case 'Z': // Align robot body to head
+        case ACTION_ALIGN_ROBOT:
           action_end_time = millis() + 5000;
-          robot_angle_alignment = HEA._head_angle - 90;
-          Serial.println("Begin align robot angle : " + String(robot_angle_alignment));
-          if ( robot_angle_alignment < - ENDING_ANGLE){
-            OWM.turnInSpotRight(SPEED);
+          robot_destination_angle = HEA._head_angle - 90;
+          Serial.println("Begin align robot angle : " + String(robot_destination_angle));
+          HEA.turnHead(90);  // Look ahead
+          if ( robot_destination_angle < - TURN_FRONT_ENDING_ANGLE){
+            OWM.turnFrontRight(SPEED);
           }
-          if ( robot_angle_alignment > ENDING_ANGLE){
-            OWM.turnInSpotLeft(SPEED);
+          if ( robot_destination_angle > TURN_FRONT_ENDING_ANGLE){
+            OWM.turnFrontLeft(SPEED);
           }
           break;
         default:

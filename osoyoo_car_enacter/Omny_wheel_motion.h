@@ -12,12 +12,16 @@ class Omny_wheel_motion
   public:
     Omny_wheel_motion();
     void setup();
-    void goForward(int speed);
+    void turnInSpotLeft(int speed);
     void goBack(int speed);
     void turnInSpotRight(int speed);
-    void turnInSpotLeft(int speed);
-    void turnFrontRight(int speed);
     void turnFrontLeft(int speed);
+    void turnFrontRight(int speed);
+    void shiftLeft(int speed);
+    void shiftRight(int speed);
+    void turnLeft(int speed);
+    void goForward(int speed);
+    void turnRight(int speed);
     void setMotion(int speed_fl, int speed_rl, int speed_rr, int speed_fr);
     void stopMotion();
   private:
