@@ -3,6 +3,8 @@
   Created by Olivier Georgeon, june 28 2021
   Uses Korneliusz Jarzebski's MPU6050 library provided in the ELEGOO kit
   released into the public domain
+
+  Attention: You must reset the arduino after turning the power on otherwise the IMU is not properly calibrate
 */
 #include "Arduino.h"
 #include "Imu_control.h"

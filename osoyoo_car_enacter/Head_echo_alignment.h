@@ -20,19 +20,20 @@ class Head_echo_alignment
     void setup();
     void beginEchoAlignment();
     void beginEchoScan();
-    bool update();
+    void update();
     int measureUltrasonicEcho();
     String outcome();
     bool monitor();
     void turnHead(int head_angle);
     int _head_angle;
-  private:
-    Servo _head;
     bool _is_enacting_head_alignment;
     bool _is_enacting_echo_scan;
+  private:
+    Servo _head;
     int _penultimate_ultrasonic_measure;
     int _previous_ultrasonic_measure;
     int _min_ultrasonic_measure;
+    int _angle_min_ultrasonic_measure;
     unsigned long _next_saccade_time;
     int _head_angle_span;
 };

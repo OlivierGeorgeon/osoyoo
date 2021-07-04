@@ -17,7 +17,7 @@
 
 #define SPEED 85    
 #define TURN_SPEED 90  
-#define SHIFT_SPEED 130  
+#define SHIFT_SPEED 130
 
 #define TURN_TIME 500  
 #define MOVE_TIME 500  
@@ -98,7 +98,7 @@ void setup()
 }
 
 bool is_enacting_floor_change_retreat = false;
-bool is_enacting_head_alignment = false;
+//bool is_enacting_head_alignment = false;
 unsigned long action_end_time = 0;
 bool is_enacting_action = false;
 bool is_ending_interaction = false;
@@ -116,11 +116,15 @@ void loop()
   }
 
   // Behavior head echo alignment
-  is_enacting_head_alignment = HEA.update();
+  HEA.update();
   if (!is_enacting_action && !is_enacting_floor_change_retreat ) {
     HEA.monitor(); // Could be included in update()
   }
-  if (is_enacting_action && (action == '*') && !is_enacting_head_alignment) {
+  if (is_enacting_action && (action == ACTION_ALIGN_HEAD) && !HEA._is_enacting_head_alignment) {
+    outcome = HEA.outcome();
+    action_end_time = 0;
+  }
+  if (is_enacting_action && (action == ACTION_ECHO_SCAN) && !HEA._is_enacting_echo_scan) {
     outcome = HEA.outcome();
     action_end_time = 0;
   }
@@ -161,12 +165,6 @@ void loop()
     }
     else // If action being enacted
     {
-      if (action == 'C') {
-        /*if (is_enacting_head_alignment) {
-          stop_motion();
-          action_end_time = 0;
-        }*/
-      }
       if (action == ACTION_TURN_IN_SPOT_LEFT)
       {
         if (IMU._yaw > robot_destination_angle - TURN_SPOT_ENDING_ANGLE)
@@ -227,6 +225,7 @@ void loop()
       switch (action)    //serial control instructions
       {
         case ACTION_TURN_IN_SPOT_LEFT:
+          action_end_time = millis() + 5000;
           robot_destination_angle = 45;
           HEA.turnHead(0);  // Look ahead
           OWM.turnInSpotLeft(TURN_SPEED);
@@ -235,6 +234,7 @@ void loop()
           OWM.goBack(SPEED);
           break;
         case ACTION_TURN_IN_SPOT_RIGHT:
+          action_end_time = millis() + 5000;
           robot_destination_angle = -45;
           HEA.turnHead(0);  // Look ahead
           OWM.turnInSpotRight(TURN_SPEED);
@@ -265,7 +265,7 @@ void loop()
           break;
         case ACTION_ECHO_SCAN:
           HEA.beginEchoScan();
-          action_end_time = millis() + 2000;
+          action_end_time = millis() + 5000;
           break;
         case ACTION_ALIGN_ROBOT:
           action_end_time = millis() + 5000;

@@ -40,13 +40,23 @@ void Head_echo_alignment::beginEchoAlignment()
   _is_enacting_head_alignment = true;
   _penultimate_ultrasonic_measure = 0; // Reinitialize previous measures so it will not ...
   _previous_ultrasonic_measure = 1;    // ... believe that the next measure is a minimum
+  _head_angle_span = SACCADE_SPAN;
 }
 void Head_echo_alignment::beginEchoScan()
 {
   _is_enacting_echo_scan = true;
+  _min_ultrasonic_measure = 1000;
+  if (_head_angle > 0) {
+    _angle_min_ultrasonic_measure = 90;
+    _head_angle_span = -SACCADE_SPAN * 2;
+  } else {
+    _angle_min_ultrasonic_measure = -90;
+    _head_angle_span = SACCADE_SPAN * 2;
+  }
+  turnHead(_angle_min_ultrasonic_measure);
 }
 
-bool Head_echo_alignment::update()
+void Head_echo_alignment::update()
 {
   if (_is_enacting_head_alignment)
   {
@@ -81,7 +91,25 @@ bool Head_echo_alignment::update()
       _previous_ultrasonic_measure = current_ultrasonic_measure;
     }
   }
-  return _is_enacting_head_alignment;
+  if (_is_enacting_echo_scan)
+  {
+    if (_next_saccade_time < millis()) {
+      _next_saccade_time = millis() + SACCADE_DURATION;
+      int current_ultrasonic_measure = measureUltrasonicEcho();
+      if (current_ultrasonic_measure < _min_ultrasonic_measure){
+        _min_ultrasonic_measure = current_ultrasonic_measure;
+        _angle_min_ultrasonic_measure = _head_angle;
+      }
+      _head_angle += _head_angle_span;
+      _head.write(_head_angle + 90);
+      if (abs(_head_angle) >= 90){
+        _is_enacting_echo_scan = false;
+        turnHead(_angle_min_ultrasonic_measure);
+        Serial.println("Aligned to closest angle " + String(_head_angle) + " measure " + String(_min_ultrasonic_measure));
+      }
+    }
+  }
+  //return _is_enacting_head_alignment;
 }
 
 String Head_echo_alignment::outcome()
@@ -106,6 +134,8 @@ bool Head_echo_alignment::monitor()
 void Head_echo_alignment::turnHead(int head_angle)
 {
   _head_angle = head_angle;
+  if (_head_angle > 90) _head_angle = 90;
+  if (_head_angle < -90) _head_angle = -90;
   _head.write(_head_angle + 90);
 }
 
