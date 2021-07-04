@@ -18,7 +18,8 @@ class Head_echo_alignment
   public:
     Head_echo_alignment();
     void setup();
-    void begin();
+    void beginEchoAlignment();
+    void beginEchoScan();
     bool update();
     int measureUltrasonicEcho();
     String outcome();
@@ -28,6 +29,7 @@ class Head_echo_alignment
   private:
     Servo _head;
     bool _is_enacting_head_alignment;
+    bool _is_enacting_echo_scan;
     int _penultimate_ultrasonic_measure;
     int _previous_ultrasonic_measure;
     int _min_ultrasonic_measure;

@@ -38,6 +38,7 @@
 #define ACTION_TURN_RIGHT '9'
 #define ACTION_ALIGN_ROBOT '/'
 #define ACTION_ALIGN_HEAD '*'
+#define ACTION_ECHO_SCAN '-'
 
 Omny_wheel_motion OWM;
 Floor_change_retreat FCR(OWM);
@@ -173,7 +174,7 @@ void loop()
            OWM.stopMotion();
            if (!is_ending_interaction){
              is_ending_interaction = true;
-             action_end_time = millis() + TURN_SPOT_ENDING_DELAY;// leave time to immobilize and then end interaction
+             action_end_time = millis() + TURN_SPOT_ENDING_DELAY;
            }
         }
       }
@@ -184,7 +185,7 @@ void loop()
            OWM.stopMotion();
            if (!is_ending_interaction){
              is_ending_interaction = true;
-             action_end_time = millis() + TURN_SPOT_ENDING_DELAY;// leave time to immobilize and then end interaction
+             action_end_time = millis() + TURN_SPOT_ENDING_DELAY;
            }
         }
       }
@@ -227,7 +228,7 @@ void loop()
       {
         case ACTION_TURN_IN_SPOT_LEFT:
           robot_destination_angle = 45;
-          HEA.turnHead(90);  // Look ahead
+          HEA.turnHead(0);  // Look ahead
           OWM.turnInSpotLeft(TURN_SPEED);
           break;
         case ACTION_GO_BACK:
@@ -235,7 +236,7 @@ void loop()
           break;
         case ACTION_TURN_IN_SPOT_RIGHT:
           robot_destination_angle = -45;
-          HEA.turnHead(90);  // Look ahead
+          HEA.turnHead(0);  // Look ahead
           OWM.turnInSpotRight(TURN_SPEED);
           break;
         case ACTION_SHIFT_LEFT:
@@ -259,14 +260,18 @@ void loop()
           OWM.turnRight(SPEED);
           break;
         case ACTION_ALIGN_HEAD:
-          HEA.begin();
-          action_end_time = millis() + 10000;
+          HEA.beginEchoAlignment();
+          action_end_time = millis() + 2000;
+          break;
+        case ACTION_ECHO_SCAN:
+          HEA.beginEchoScan();
+          action_end_time = millis() + 2000;
           break;
         case ACTION_ALIGN_ROBOT:
           action_end_time = millis() + 5000;
-          robot_destination_angle = HEA._head_angle - 90;
+          robot_destination_angle = HEA._head_angle;
           Serial.println("Begin align robot angle : " + String(robot_destination_angle));
-          HEA.turnHead(90);  // Look ahead
+          HEA.turnHead(0);  // Look ahead
           if ( robot_destination_angle < - TURN_FRONT_ENDING_ANGLE){
             OWM.turnFrontRight(SPEED);
           }
