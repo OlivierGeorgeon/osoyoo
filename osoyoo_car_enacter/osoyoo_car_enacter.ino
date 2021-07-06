@@ -14,6 +14,8 @@
 #include "Imu_control.h"
 #include <WiFiEsp.h>
 #include <WiFiEspUDP.h>
+//#include <ArduinoJson.h>
+#include <Arduino_JSON.h>
 
 #define SPEED 85    
 #define TURN_SPEED 90  
@@ -151,17 +153,27 @@ void loop()
           OWM.stopMotion();
           break;
       }
-      outcome += "Y" + String(IMU.end());
+      //StaticJsonDocument<200> doc;
+      //doc["outcome"] = outcome;
+      String imuYaw = IMU.end();
+      //doc["yaw"] = imuYaw;
+
       is_enacting_action = false;
       // Send the outcome to the IP address and port that sent the action
-      Serial.println("Outcome string " + outcome);
 
-      //StaticJsonDocument<200> doc;
+      JSONVar outcome_object;
+      outcome_object["outcome"] = outcome;
+      outcome_object["yaw"] = imuYaw;
+      String outcome_json_string = JSON.stringify(outcome_object);
+
+      Serial.println("Outcome string " + outcome_json_string);
+
+      //outcome += imuYaw ;
 
       Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
-      Udp.print(outcome);
-      //Udp.write(outcome_char);
+      Udp.print(outcome_json_string);
       Udp.endPacket();
+      //serializeJson(doc, Serial);
     }
     else // If action being enacted
     {

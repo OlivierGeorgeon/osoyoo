@@ -19,8 +19,10 @@ class Imu_control
     setup();
     begin();
     update();
-    float end();
+    String end();
     float _yaw;
+    float _xSpeed;
+    float _xDistance;
   private:
     MPU6050 _mpu;
     unsigned long _next_imu_read_time;

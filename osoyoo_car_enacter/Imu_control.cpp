@@ -46,6 +46,8 @@ Imu_control::setup()
 Imu_control::begin()
 {
   _yaw = 0;
+  _xSpeed = 0;
+  _xDistance = 0;
 }
 Imu_control::update()
 {
@@ -55,19 +57,26 @@ Imu_control::update()
     _next_imu_read_time = timer + IMU_READ_PERIOD;
 
     // Read normalized values
-    Vector norm = _mpu.readNormalizeGyro();
+    Vector normAccel = _mpu.readNormalizeAccel();
+    Vector normGyro = _mpu.readNormalizeGyro();
 
-    // Calculate Pitch, Roll and Yaw
-    _yaw = _yaw + norm.ZAxis * IMU_READ_PERIOD / 1000;
+    // Integrate Yaw during the interaction
+    _yaw = _yaw + normGyro.ZAxis * IMU_READ_PERIOD / 1000;
+
+    _xSpeed += (normAccel.XAxis + 0.27) * IMU_READ_PERIOD / 1000;
+    //Serial.println(normAccel.XAxis);
+    //Serial.println(normAccel.ZAxis);
+    //Serial.println(_xSpeed);
+    _xDistance += _xSpeed * IMU_READ_PERIOD / 1000;
 
     // Output raw
     //Serial.print("Yaw = ");
     //Serial.println(_yaw);
   }
 }
-float Imu_control::end()
+String Imu_control::end()
 {
-  Serial.print("End yaw = ");
-  Serial.println(_yaw);
-  return _yaw;
+  Serial.println("End yaw = " + String(_yaw));
+  Serial.println("End distance " + String(_xDistance));
+  return " Y:" + String(_yaw) + " D:" + String(_xDistance);
 }
