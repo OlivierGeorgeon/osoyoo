@@ -74,9 +74,11 @@ Imu_control::update()
     //Serial.println(_yaw);
   }
 }
-String Imu_control::end()
+void Imu_control::outcome(JSONVar & outcome_object)
 {
+  outcome_object["yaw"] = _yaw;
+
   Serial.println("End yaw = " + String(_yaw));
   Serial.println("End distance " + String(_xDistance));
-  return " Y:" + String(_yaw) + " D:" + String(_xDistance);
+  //return _yaw;
 }

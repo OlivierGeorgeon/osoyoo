@@ -9,6 +9,7 @@
 #include "Arduino.h"
 #include <Wire.h>
 #include <MPU6050.h>
+#include <Arduino_JSON.h>
 
 #define IMU_READ_PERIOD 50
 
@@ -19,7 +20,7 @@ class Imu_control
     setup();
     begin();
     update();
-    String end();
+    void outcome(JSONVar & outcome_object);
     float _yaw;
     float _xSpeed;
     float _xDistance;
