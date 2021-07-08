@@ -78,7 +78,7 @@ void Imu_control::outcome(JSONVar & outcome_object)
 {
   outcome_object["yaw"] = _yaw;
 
-  Serial.println("End yaw = " + String(_yaw));
-  Serial.println("End distance " + String(_xDistance));
+  //Serial.println("End yaw = " + String(_yaw));
+  //Serial.println("End distance " + String(_xDistance));
   //return _yaw;
 }

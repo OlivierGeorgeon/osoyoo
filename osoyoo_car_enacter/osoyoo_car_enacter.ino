@@ -122,11 +122,11 @@ void loop()
     HEA.monitor(); // Could be included in update()
   }
   if (is_enacting_action && (action == ACTION_ALIGN_HEAD) && !HEA._is_enacting_head_alignment) {
-    outcome = HEA.outcome();
+    //outcome = HEA.outcome();
     action_end_time = 0;
   }
   if (is_enacting_action && (action == ACTION_ECHO_SCAN) && !HEA._is_enacting_echo_scan) {
-    outcome = HEA.outcome();
+    //outcome = HEA.outcome();
     action_end_time = 0;
   }
 
@@ -137,7 +137,9 @@ void loop()
   {
     if (action_end_time < millis())
     {
-      //char outcome = '0';
+      JSONVar outcome_object;
+      outcome_object["outcome"] = outcome;
+
       switch (action)
       {
         case ACTION_GO_ADVANCE:
@@ -147,6 +149,10 @@ void loop()
             OWM.stopMotion(); // Stop motion unless a reflex is being enacted
           }
           break;
+        case ACTION_ALIGN_HEAD:
+        case ACTION_ECHO_SCAN:
+          HEA.outcome(outcome_object);
+          break;
         default:
           is_ending_interaction = false;
           OWM.stopMotion();
@@ -155,9 +161,6 @@ void loop()
 
       is_enacting_action = false;
 
-      JSONVar outcome_object;
-      outcome_object["outcome"] = outcome;
-      //outcome_object["yaw"] =
       IMU.outcome(outcome_object);
       String outcome_json_string = JSON.stringify(outcome_object);
       Serial.println("Outcome string " + outcome_json_string);

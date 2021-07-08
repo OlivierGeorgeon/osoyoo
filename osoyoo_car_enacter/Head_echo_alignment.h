@@ -7,6 +7,7 @@
 #define Head_echo_alignment_h
 #include "Arduino.h"
 #include <Servo.h>
+#include <Arduino_JSON.h>
 
 #define SACCADE_DURATION 150 // Servo specification speed is 120ms/60°
 #define SACCADE_SPAN     10
@@ -22,7 +23,7 @@ class Head_echo_alignment
     void beginEchoScan();
     void update();
     int measureUltrasonicEcho();
-    String outcome();
+    void outcome(JSONVar & outcome_object);
     bool monitor();
     void turnHead(int head_angle);
     int _head_angle;

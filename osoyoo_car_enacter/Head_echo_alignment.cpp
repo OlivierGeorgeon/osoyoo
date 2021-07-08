@@ -112,9 +112,12 @@ void Head_echo_alignment::update()
   //return _is_enacting_head_alignment;
 }
 
-String Head_echo_alignment::outcome()
+void Head_echo_alignment::outcome(JSONVar & outcome_object)
 {
-  return "A" + String(_head_angle) + "O" + String(_min_ultrasonic_measure);
+  outcome_object["head_angle"] = _head_angle;
+  outcome_object["echo_distance"] = _min_ultrasonic_measure;
+
+  //return "A" + String(_head_angle) + "O" + String(_min_ultrasonic_measure);
 }
 
 bool Head_echo_alignment::monitor()
