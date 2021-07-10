@@ -101,8 +101,8 @@ void setup()
 bool is_enacting_floor_change_retreat = false;
 //bool is_enacting_head_alignment = false;
 unsigned long action_end_time = 0;
+int action_step = 0;
 bool is_enacting_action = false;
-bool is_ending_interaction = false;
 char action =' ';
 String outcome = "0";
 int robot_destination_angle = 0;
@@ -133,81 +133,8 @@ void loop()
   // IMU reading
   IMU.update();
 
-  if (is_enacting_action)
-  {
-    if (action_end_time < millis())
-    {
-      JSONVar outcome_object;
-      outcome_object["outcome"] = outcome;
-
-      switch (action)
-      {
-        case ACTION_GO_ADVANCE:
-          if (is_enacting_floor_change_retreat) {
-            FCR.extraDuration(RETREAT_EXTRA_DURATION); // Extend retreat duration because need to reverse speed
-          } else {
-            OWM.stopMotion(); // Stop motion unless a reflex is being enacted
-          }
-          break;
-        case ACTION_ALIGN_HEAD:
-        case ACTION_ECHO_SCAN:
-          HEA.outcome(outcome_object);
-          break;
-        default:
-          is_ending_interaction = false;
-          OWM.stopMotion();
-          break;
-      }
-
-      is_enacting_action = false;
-
-      IMU.outcome(outcome_object);
-      String outcome_json_string = JSON.stringify(outcome_object);
-      Serial.println("Outcome string " + outcome_json_string);
-
-      // Send the outcome to the IP address and port that sent the action
-      Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
-      Udp.print(outcome_json_string);
-      Udp.endPacket();
-    }
-    else // If action being enacted
-    {
-      if (action == ACTION_TURN_IN_SPOT_LEFT)
-      {
-        if (IMU._yaw > robot_destination_angle - TURN_SPOT_ENDING_ANGLE)
-        {
-           OWM.stopMotion();
-           if (!is_ending_interaction){
-             is_ending_interaction = true;
-             action_end_time = millis() + TURN_SPOT_ENDING_DELAY;
-           }
-        }
-      }
-      if (action == ACTION_TURN_IN_SPOT_RIGHT)
-      {
-        if (IMU._yaw < robot_destination_angle + TURN_SPOT_ENDING_ANGLE)
-        {
-           OWM.stopMotion();
-           if (!is_ending_interaction){
-             is_ending_interaction = true;
-             action_end_time = millis() + TURN_SPOT_ENDING_DELAY;
-           }
-        }
-      }
-      if (action == ACTION_ALIGN_ROBOT) {
-         if (((robot_destination_angle > TURN_FRONT_ENDING_ANGLE) && (IMU._yaw > robot_destination_angle - TURN_FRONT_ENDING_ANGLE)) ||
-         ((robot_destination_angle < -TURN_FRONT_ENDING_ANGLE) && (IMU._yaw < robot_destination_angle + TURN_FRONT_ENDING_ANGLE)) ||
-         (abs(robot_destination_angle) < TURN_FRONT_ENDING_ANGLE)) {
-           OWM.stopMotion();
-           if (!is_ending_interaction){
-             is_ending_interaction = true;
-             action_end_time = millis() + TURN_FRONT_ENDING_DELAY;// leave time to immobilize and then end interaction
-           }
-         }
-      }
-    }
-  }
-  else // If is not enacting action
+  // If is not enacting action
+  if (action_step == 0 )
   {
     // Watch the wifi for new action
     int packetSize = Udp.parsePacket();
@@ -227,9 +154,10 @@ void loop()
 
       action_end_time = millis() + 1000;
       is_enacting_action = true;
+      action_step = 1;
       IMU.begin();
       outcome = "0";
-      switch (action)    //serial control instructions
+      switch (action)
       {
         case ACTION_TURN_IN_SPOT_LEFT:
           action_end_time = millis() + 5000;
@@ -289,6 +217,67 @@ void loop()
         default:
           break;
       }
+    }
+  }
+
+  // If action being enacted
+  if (action_step == 1)
+  {
+    if (((action == ACTION_TURN_IN_SPOT_LEFT) && (IMU._yaw > robot_destination_angle - TURN_SPOT_ENDING_ANGLE)) ||
+       ((action == ACTION_TURN_IN_SPOT_RIGHT) && (IMU._yaw < robot_destination_angle + TURN_SPOT_ENDING_ANGLE)))
+    {
+      OWM.stopMotion();
+      action_step = 2;
+      action_end_time = millis() + TURN_SPOT_ENDING_DELAY;
+    }
+    if (action == ACTION_ALIGN_ROBOT) {
+      if (((robot_destination_angle > TURN_FRONT_ENDING_ANGLE) && (IMU._yaw > robot_destination_angle - TURN_FRONT_ENDING_ANGLE)) ||
+      ((robot_destination_angle < -TURN_FRONT_ENDING_ANGLE) && (IMU._yaw < robot_destination_angle + TURN_FRONT_ENDING_ANGLE)) ||
+      (abs(robot_destination_angle) < TURN_FRONT_ENDING_ANGLE)) {
+        OWM.stopMotion();
+        action_step = 2;
+        action_end_time = millis() + TURN_FRONT_ENDING_DELAY;// leave time to immobilize and then end interaction
+      }
+    }
+  }
+
+  // Terminate action
+  if (action_step >= 1)
+  {
+    if (action_end_time < millis())
+    {
+      JSONVar outcome_object;
+      outcome_object["outcome"] = outcome;
+
+      switch (action)
+      {
+        case ACTION_GO_ADVANCE:
+          if (is_enacting_floor_change_retreat) {
+            FCR.extraDuration(RETREAT_EXTRA_DURATION); // Extend retreat duration because need to reverse speed
+          } else {
+            OWM.stopMotion(); // Stop motion unless a reflex is being enacted
+          }
+          break;
+        case ACTION_ALIGN_HEAD:
+        case ACTION_ECHO_SCAN:
+          HEA.outcome(outcome_object);
+          break;
+        default:
+          OWM.stopMotion();
+          break;
+      }
+
+      is_enacting_action = false;
+      action_step = 0;
+
+      IMU.outcome(outcome_object);
+      String outcome_json_string = JSON.stringify(outcome_object);
+      Serial.println("Outcome string " + outcome_json_string);
+
+      // Send the outcome to the IP address and port that sent the action
+      Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
+      Udp.print(outcome_json_string);
+      Udp.endPacket();
     }
   }
 }

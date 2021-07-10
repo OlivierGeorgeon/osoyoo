@@ -27,5 +27,8 @@ class Imu_control
   private:
     MPU6050 _mpu;
     unsigned long _next_imu_read_time;
+    float _max_acceleration;
+    float _min_acceleration;
+    float _max_speed;
 };
 #endif

@@ -46,6 +46,9 @@ Imu_control::setup()
 Imu_control::begin()
 {
   _yaw = 0;
+  _max_acceleration = 0;
+  _min_acceleration = 0;
+  _max_speed = 0;
   _xSpeed = 0;
   _xDistance = 0;
 }
@@ -63,7 +66,13 @@ Imu_control::update()
     // Integrate Yaw during the interaction
     _yaw = _yaw + normGyro.ZAxis * IMU_READ_PERIOD / 1000;
 
-    _xSpeed += (normAccel.XAxis + 0.27) * IMU_READ_PERIOD / 1000;
+    if (normAccel.XAxis > _max_acceleration) _max_acceleration =  normAccel.XAxis;
+    if (normAccel.XAxis < _min_acceleration) _min_acceleration =  normAccel.XAxis;
+
+    _xSpeed += (normAccel.XAxis) * IMU_READ_PERIOD / 1000;
+
+    if (abs(_xSpeed) > _max_speed) _max_speed = abs(_xSpeed);
+
     //Serial.println(normAccel.XAxis);
     //Serial.println(normAccel.ZAxis);
     //Serial.println(_xSpeed);
@@ -77,6 +86,9 @@ Imu_control::update()
 void Imu_control::outcome(JSONVar & outcome_object)
 {
   outcome_object["yaw"] = _yaw;
+  //outcome_object["max_acceleration"] = _max_acceleration;
+  //outcome_object["min_acceleration"] = _min_acceleration;
+  //outcome_object["max_speed"] = _max_speed;
 
   //Serial.println("End yaw = " + String(_yaw));
   //Serial.println("End distance " + String(_xDistance));
