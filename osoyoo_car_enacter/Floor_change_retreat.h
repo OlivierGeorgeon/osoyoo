@@ -16,12 +16,12 @@ class Floor_change_retreat
 {
   public:
     Floor_change_retreat(Omny_wheel_motion _OWM);
-    bool update();
+    void update();
     int measureFloor();
     void extraDuration(int duration);
+    bool _is_enacting;
   private:
     Omny_wheel_motion _OWM;
-    bool _is_enacting_floor_change_retreat;
     int _previous_measure_floor;
     unsigned long _floor_change_retreat_end_time;
 };

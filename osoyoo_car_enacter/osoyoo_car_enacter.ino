@@ -98,10 +98,10 @@ void setup()
   Serial.println(localPort);
 }
 
-bool is_enacting_floor_change_retreat = false;
+//bool is_enacting_floor_change_retreat = false;
 //bool is_enacting_head_alignment = false;
 unsigned long action_end_time = 0;
-int action_step = 0;
+int interaction_step = 0;
 bool is_enacting_action = false;
 char action =' ';
 String outcome = "0";
@@ -110,31 +110,31 @@ int robot_destination_angle = 0;
 void loop()
 {
   // Behavior floor change retreat
-  is_enacting_floor_change_retreat = FCR.update();
-  if (is_enacting_floor_change_retreat && is_enacting_action && (action == ACTION_GO_ADVANCE) ) {
-    outcome ="1";
-    action_end_time = 0;
-  }
+  FCR.update();
+  //if (is_enacting_floor_change_retreat && is_enacting_action && (action == ACTION_GO_ADVANCE) ) {
+  //  outcome ="1";
+  //  action_end_time = 0;
+  //}
 
   // Behavior head echo alignment
   HEA.update();
-  if (!is_enacting_action && !is_enacting_floor_change_retreat ) {
-    HEA.monitor(); // Could be included in update()
-  }
-  if (is_enacting_action && (action == ACTION_ALIGN_HEAD) && !HEA._is_enacting_head_alignment) {
+  //if (!is_enacting_action && !is_enacting_floor_change_retreat ) {
+  //  HEA.monitor(); // Could be included in update()
+  //}
+//  if (is_enacting_action && (action == ACTION_ALIGN_HEAD) && !HEA._is_enacting_head_alignment) {
+//    //outcome = HEA.outcome();
+//    action_end_time = 0;
+//  }
+//  if (is_enacting_action && (action == ACTION_ECHO_SCAN) && !HEA._is_enacting_echo_scan) {
     //outcome = HEA.outcome();
-    action_end_time = 0;
-  }
-  if (is_enacting_action && (action == ACTION_ECHO_SCAN) && !HEA._is_enacting_echo_scan) {
-    //outcome = HEA.outcome();
-    action_end_time = 0;
-  }
+//    action_end_time = 0;
+//  }
 
   // IMU reading
   IMU.update();
 
-  // If is not enacting action
-  if (action_step == 0 )
+  // If no interaction being enacted
+  if (interaction_step == 0 )
   {
     // Watch the wifi for new action
     int packetSize = Udp.parsePacket();
@@ -154,13 +154,13 @@ void loop()
 
       action_end_time = millis() + 1000;
       is_enacting_action = true;
-      action_step = 1;
+      interaction_step = 1;
       IMU.begin();
       outcome = "0";
       switch (action)
       {
         case ACTION_TURN_IN_SPOT_LEFT:
-          action_end_time = millis() + 5000;
+          //action_end_time = millis() + 5000;
           robot_destination_angle = 45;
           HEA.turnHead(0);  // Look ahead
           OWM.turnInSpotLeft(TURN_SPEED);
@@ -169,7 +169,7 @@ void loop()
           OWM.goBack(SPEED);
           break;
         case ACTION_TURN_IN_SPOT_RIGHT:
-          action_end_time = millis() + 5000;
+          //action_end_time = millis() + 5000;
           robot_destination_angle = -45;
           HEA.turnHead(0);  // Look ahead
           OWM.turnInSpotRight(TURN_SPEED);
@@ -220,65 +220,113 @@ void loop()
     }
   }
 
-  // If action being enacted
-  if (action_step == 1)
+  // If an interaction is being enacted
+  if (interaction_step == 1)
   {
-    if (((action == ACTION_TURN_IN_SPOT_LEFT) && (IMU._yaw > robot_destination_angle - TURN_SPOT_ENDING_ANGLE)) ||
-       ((action == ACTION_TURN_IN_SPOT_RIGHT) && (IMU._yaw < robot_destination_angle + TURN_SPOT_ENDING_ANGLE)))
+    switch (action)
     {
-      OWM.stopMotion();
-      action_step = 2;
-      action_end_time = millis() + TURN_SPOT_ENDING_DELAY;
-    }
-    if (action == ACTION_ALIGN_ROBOT) {
-      if (((robot_destination_angle > TURN_FRONT_ENDING_ANGLE) && (IMU._yaw > robot_destination_angle - TURN_FRONT_ENDING_ANGLE)) ||
-      ((robot_destination_angle < -TURN_FRONT_ENDING_ANGLE) && (IMU._yaw < robot_destination_angle + TURN_FRONT_ENDING_ANGLE)) ||
-      (abs(robot_destination_angle) < TURN_FRONT_ENDING_ANGLE)) {
-        OWM.stopMotion();
-        action_step = 2;
-        action_end_time = millis() + TURN_FRONT_ENDING_DELAY;// leave time to immobilize and then end interaction
-      }
+      case ACTION_GO_ADVANCE:
+      case ACTION_TURN_RIGHT:
+      case ACTION_TURN_LEFT:
+        if (FCR._is_enacting) {
+          FCR.extraDuration(RETREAT_EXTRA_DURATION); // Extend retreat duration because need to reverse speed
+          outcome ="1";
+          action_end_time = 0;
+          interaction_step = 2;
+        }
+        else if (action_end_time < millis()) {
+          interaction_step = 3;
+        }
+        break;
+      case ACTION_TURN_IN_SPOT_LEFT:
+      case ACTION_TURN_IN_SPOT_RIGHT:
+        if (((action == ACTION_TURN_IN_SPOT_LEFT) && (IMU._yaw > robot_destination_angle - TURN_SPOT_ENDING_ANGLE)) ||
+        ((action == ACTION_TURN_IN_SPOT_RIGHT) && (IMU._yaw < robot_destination_angle + TURN_SPOT_ENDING_ANGLE)))
+        {
+          OWM.stopMotion();
+          interaction_step = 2;
+          action_end_time = millis() + TURN_SPOT_ENDING_DELAY;
+        }
+        break;
+      case ACTION_ALIGN_ROBOT:
+        if (((robot_destination_angle > TURN_FRONT_ENDING_ANGLE) && (IMU._yaw > robot_destination_angle - TURN_FRONT_ENDING_ANGLE)) ||
+        ((robot_destination_angle < -TURN_FRONT_ENDING_ANGLE) && (IMU._yaw < robot_destination_angle + TURN_FRONT_ENDING_ANGLE)) ||
+        (abs(robot_destination_angle) < TURN_FRONT_ENDING_ANGLE))
+        {
+          OWM.stopMotion();
+          interaction_step = 2;
+          action_end_time = millis() + TURN_FRONT_ENDING_DELAY;// give it time to immobilize before terminating interaction
+        }
+        break;
+      case ACTION_ALIGN_HEAD:
+      case ACTION_ECHO_SCAN:
+        if (!HEA._is_enacting_head_alignment && !HEA._is_enacting_echo_scan)
+        {
+          action_end_time = 0;
+          interaction_step = 3;
+        }
+        break;
+      default:
+        interaction_step = 2;
+        break;
     }
   }
 
-  // Terminate action
-  if (action_step >= 1)
+  // If an interaction is being terminated
+  if (interaction_step == 2)
   {
-    if (action_end_time < millis())
+    switch (action)
     {
-      JSONVar outcome_object;
-      outcome_object["outcome"] = outcome;
-
-      switch (action)
-      {
-        case ACTION_GO_ADVANCE:
-          if (is_enacting_floor_change_retreat) {
-            FCR.extraDuration(RETREAT_EXTRA_DURATION); // Extend retreat duration because need to reverse speed
-          } else {
-            OWM.stopMotion(); // Stop motion unless a reflex is being enacted
-          }
-          break;
-        case ACTION_ALIGN_HEAD:
-        case ACTION_ECHO_SCAN:
-          HEA.outcome(outcome_object);
-          break;
-        default:
-          OWM.stopMotion();
-          break;
-      }
-
-      is_enacting_action = false;
-      action_step = 0;
-
-      IMU.outcome(outcome_object);
-      String outcome_json_string = JSON.stringify(outcome_object);
-      Serial.println("Outcome string " + outcome_json_string);
-
-      // Send the outcome to the IP address and port that sent the action
-      Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
-      Udp.print(outcome_json_string);
-      Udp.endPacket();
+      case ACTION_GO_ADVANCE:
+      case ACTION_TURN_RIGHT:
+      case ACTION_TURN_LEFT:
+        if (!FCR._is_enacting) {
+          Serial.println("interaction step = 3");
+          interaction_step = 3;
+        }
+        break;
+      default:
+        if (action_end_time < millis()) {
+          interaction_step = 3;
+        }
+        break;
     }
+  }
+
+  // End of interaction
+  if ((interaction_step == 3))
+  {
+    JSONVar outcome_object;
+    outcome_object["outcome"] = outcome;
+
+    switch (action)
+    {
+//      case ACTION_GO_ADVANCE:
+//        if (is_enacting_floor_change_retreat) {
+          //FCR.extraDuration(RETREAT_EXTRA_DURATION); // Extend retreat duration because need to reverse speed
+//        } else {
+//          OWM.stopMotion(); // Stop motion unless a reflex is being enacted
+//        }
+//        break;
+      case ACTION_ALIGN_HEAD:
+      case ACTION_ECHO_SCAN:
+        HEA.outcome(outcome_object);
+        break;
+      default:
+        OWM.stopMotion();
+        break;
+    }
+    is_enacting_action = false;
+    interaction_step = 0;
+
+    IMU.outcome(outcome_object);
+    String outcome_json_string = JSON.stringify(outcome_object);
+    Serial.println("Outcome string " + outcome_json_string);
+
+    // Send the outcome to the IP address and port that sent the action
+    Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
+    Udp.print(outcome_json_string);
+    Udp.endPacket();
   }
 }
 

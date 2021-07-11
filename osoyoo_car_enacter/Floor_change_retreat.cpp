@@ -16,25 +16,25 @@
 Floor_change_retreat::Floor_change_retreat(Omny_wheel_motion OWM)
 {
   _OWM = OWM;
-  _is_enacting_floor_change_retreat = false;
+  _is_enacting = false;
   _previous_measure_floor = 0;
   _floor_change_retreat_end_time = 0;
 }
 
-bool Floor_change_retreat::update()
+void Floor_change_retreat::update()
 {
   // Detect change in the floor measure
   int current_measure_floor = measureFloor();
   int floor_change = current_measure_floor ^ _previous_measure_floor; // Bitwise XOR
   _previous_measure_floor = current_measure_floor;
 
-  if (_is_enacting_floor_change_retreat)
+  if (_is_enacting)
   {
     if (millis() > _floor_change_retreat_end_time) {
       // End floor change retreat
       _OWM.stopMotion();
       Serial.println("End retreat at " + String(millis()));
-      _is_enacting_floor_change_retreat = false;
+      _is_enacting = false;
     }
   }
   else // If is not enacting floor change retreat
@@ -43,7 +43,7 @@ bool Floor_change_retreat::update()
     {
       // Begin floor change retreat
       Serial.println("Floor change " + String(floor_change, BIN) + " Begin retreat at " + String(millis()));
-      _is_enacting_floor_change_retreat = true;
+      _is_enacting = true;
       switch (floor_change) {
         case 0b10000:_OWM.setMotion(-150,-150,-50,-50);break; // back right
         case 0b11000:_OWM.setMotion(-150,-150,-50,-50);break; // back right
@@ -54,7 +54,7 @@ bool Floor_change_retreat::update()
       _floor_change_retreat_end_time = millis() + RETREAT_DURATION;
     }
   }
-  return _is_enacting_floor_change_retreat;
+  //return _is_enacting_floor_change_retreat;
 }
 
 void Floor_change_retreat::extraDuration(int duration)
