@@ -11,7 +11,8 @@ void setMotion(int speed_fl,int speed_rl ,int speed_rr,int speed_fr)
    RR(speed_rr);
 }
 
-void go_forward(int speed) // faire avancer le robot 
+void go_forward(int speed) // faire avancer le robot
+{
   setMotion(speed,speed,speed,speed);
 }
 
@@ -26,7 +27,7 @@ void right_turn(int speed)//Faire tourne le robot à droite
 }
 
 void left_turn(int speed)//Faire tourne le robot à gauche 
-}
+{
     setMotion(0,0,speed,speed);
 }
 

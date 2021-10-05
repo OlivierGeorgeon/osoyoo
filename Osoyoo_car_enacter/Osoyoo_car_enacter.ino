@@ -16,15 +16,17 @@ char ssid[] = "osoyoo_robot";
 
 int status = WL_IDLE_STATUS;
 // use a ring buffer to increase speed and reduce memory allocation
- char packetBuffer[5]; 
+char packetBuffer[5];
 WiFiEspUDP Udp;
 unsigned int localPort = 8888;  // local port to listen on
+unsigned long endTime = 0;
+int actionStep = 0;
 void setup()
 {
 // init_GPIO();
   Serial.begin(9600);   // initialize serial for debugging
-    Serial1.begin(115200);
-    Serial1.write("AT+UART_DEF=9600,8,1,0,0\r\n");
+  Serial1.begin(115200);
+  Serial1.write("AT+UART_DEF=9600,8,1,0,0\r\n");
   delay(200);
   Serial1.write("AT+RST\r\n");
   delay(200);
@@ -38,7 +40,7 @@ void setup()
     while (true);
   }
 
-    Serial.print("Attempting to start AP ");
+   Serial.print("Attempting to start AP ");
    Serial.println(ssid);
    //AP mode
    status = WiFi.beginAP(ssid, 10, "", 0);
@@ -56,14 +58,16 @@ void loop()
 {
   int packetSize = Udp.parsePacket();
   if (packetSize) {                               // if you get a client,
-     Serial.print("Received packet of size ");
+    Serial.print("Received packet of size ");
     Serial.println(packetSize);
     int len = Udp.read(packetBuffer, 255);
     if (len > 0) {
       packetBuffer[len] = 0;
     }
       char c=packetBuffer[0];
-      
+
+      endTime = millis() + 2000;
+      actionStep = 1;
       switch (c)    //serial control instructions
       {  
         case '8':go_forward(SPEED);break;
@@ -73,9 +77,19 @@ void loop()
         case '5':stop_Stop();break;
         default:break;
       }
-      Udp.beginPacket(Udp.remoteIP(), 9999);
+
+    }
+    //Terminated interaction
+    if ((endTime < millis()) && (actionStep == 1))
+    {
+      stop_Stop();
+
+      //Send outcome to PC
+      Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
       Udp.write("test");
       Udp.endPacket();
+
+      actionStep = 0;
     }
     
 }
