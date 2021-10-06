@@ -9,6 +9,7 @@
  * 
  */
 #include "omny_wheel_motion.h"
+#include "calcDist.h"
 
 #include "WiFiEsp.h"
 #include "WiFiEspUDP.h"
@@ -25,6 +26,7 @@ void setup()
 {
 // init_GPIO();
   Serial.begin(9600);   // initialize serial for debugging
+  set();
   Serial1.begin(115200);
   Serial1.write("AT+UART_DEF=9600,8,1,0,0\r\n");
   delay(200);
@@ -56,6 +58,7 @@ void setup()
 
 void loop()
 {
+  dist();
   int packetSize = Udp.parsePacket();
   if (packetSize) {                               // if you get a client,
     Serial.print("Received packet of size ");
