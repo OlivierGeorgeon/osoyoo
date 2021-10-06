@@ -11,3 +11,11 @@ Incremental Natural Interactions on roboT
     └── first_step # tutorials to start
         └── connect_robot.md
 ```
+
+## Set Up
+
+### Python venv
+- [pyglet](http://pyglet.org/) 
+- 
+
+## Arduino part
