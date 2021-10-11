@@ -10,6 +10,7 @@
  */
 #include "omny_wheel_motion.h"
 #include "calcDist.h"
+#include "tracking.h"
 
 #include "WiFiEsp.h"
 #include "WiFiEspUDP.h"
@@ -82,6 +83,13 @@ void loop()
       }
 
     }
+      if ( tracking()) // la fonction renvoi true si elle capte une ligne noir
+   {
+      stop_Stop();
+      go_back(SPEED);//recule
+      actionStep = 1;
+      endTime = millis() + 1000; //1sec
+   }
     //Terminated interaction
     if ((endTime < millis()) && (actionStep == 1))
     {
