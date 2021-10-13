@@ -12,6 +12,9 @@
 #include "calcDist.h"
 #include "tracking.h"
 
+#include "JsonOutcome.h"
+JsonOutcome outcome;
+
 #include "WiFiEsp.h"
 #include "WiFiEspUDP.h"
 char ssid[] = "osoyoo_robot"; 
@@ -26,7 +29,9 @@ int actionStep = 0;
 void setup()
 {
 // init_GPIO();
+
   Serial.begin(9600);   // initialize serial for debugging
+  outcome.addValue("key", "val");
   set();
   Serial1.begin(115200);
   Serial1.write("AT+UART_DEF=9600,8,1,0,0\r\n");
@@ -83,21 +88,27 @@ void loop()
       }
 
     }
-      if ( tracking()) // la fonction renvoi true si elle capte une ligne noir
-   {
+    if ( tracking()) // la fonction renvoi true si elle capte une ligne noir
+    {
       stop_Stop();
       go_back(SPEED);//recule
       actionStep = 1;
       endTime = millis() + 1000; //1sec
-   }
+    }
     //Terminated interaction
     if ((endTime < millis()) && (actionStep == 1))
     {
       stop_Stop();
 
+
+      //Convertion de String à char[] pour être envoyé par le wifi
+      String str = outcome.get();
+      int len = str.length() +1;
+      char outcomeStr[len];
+      str.toCharArray(outcomeStr, len);
       //Send outcome to PC
       Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
-      Udp.write("test");
+      Udp.write(outcomeStr);
       Udp.endPacket();
 
       actionStep = 0;
