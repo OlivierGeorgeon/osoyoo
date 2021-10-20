@@ -19,3 +19,9 @@ bool tracking()
   senstr=senstr.substring(1,6);
   return senstr!="11111";//si au moins un des capteurs capte du noir alors :
 }
+void until_line(int speed){
+    while (tracking()==false){
+        go_forward(speed);
+    }
+    stop_Stop();
+}

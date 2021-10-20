@@ -84,6 +84,7 @@ void loop()
         case '6':right_turn(SPEED);break;
         case '2':go_back(SPEED);break;
         case '5':stop_Stop();break;
+        case '0':until_line(SPEED);break;
         default:break;
       }
 

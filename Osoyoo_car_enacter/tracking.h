@@ -8,5 +8,6 @@
 #define sensor4   A4 // right sensor
 
 bool tracking();
+void until_line(int speed);
 
 #endif
