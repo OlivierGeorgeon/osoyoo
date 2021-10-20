@@ -85,7 +85,7 @@ void loop()
         case '2':go_back(SPEED);break;
         case '5':stop_Stop();break;
         case '0':until_line(SPEED);break;
-        case 'D':dist();break;
+        case 'D':outcome.addValue("distance", (String) dist());break;
         default:break;
       }
 
