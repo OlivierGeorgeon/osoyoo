@@ -14,6 +14,6 @@ const float SOUND_SPEED = 340.0 / 1000;
 
 
 void set();
-void dist();
+float dist();
 
 #endif

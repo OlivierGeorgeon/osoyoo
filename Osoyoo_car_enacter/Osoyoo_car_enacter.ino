@@ -64,9 +64,13 @@ void setup()
 
 void loop()
 {
-  dist();
   int packetSize = Udp.parsePacket();
   if (packetSize) {                               // if you get a client,
+    String str1=(String)dist();
+    int len1 = str1.length() +1;
+    char retour[len1];
+    str1.toCharArray(retour, len1);
+    outcome.addValue("distance", retour);
     Serial.print("Received packet of size ");
     Serial.println(packetSize);
     int len = Udp.read(packetBuffer, 255);
@@ -85,6 +89,7 @@ void loop()
         case '2':go_back(SPEED);break;
         case '5':stop_Stop();break;
         case '0':until_line(SPEED);break;
+        case 'D':dist();break;
         default:break;
       }
 
