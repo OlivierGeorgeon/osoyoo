@@ -6,7 +6,7 @@ JsonOutcome::JsonOutcome()
     data = JSON.parse("{}");
 }
 
-void JsonOutcome::addValue(char key[], char value[])
+void JsonOutcome::addValue(char key[], String value)
 {
     data[(String) key] = value;
 }

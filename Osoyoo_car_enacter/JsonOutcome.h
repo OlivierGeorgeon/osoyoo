@@ -13,7 +13,7 @@ class JsonOutcome
     JSONVar data;
 
     //Méthode pour ajouter une key/value à data
-    void addValue(char key[], char value[]);
+    void addValue(char key[], String value);
 
     //Méthode pour récuperer les données à envoyer par le wifi
     String get();

@@ -31,7 +31,6 @@ void setup()
 // init_GPIO();
 
   Serial.begin(9600);   // initialize serial for debugging
-  outcome.addValue("key", "val");
   set();
   Serial1.begin(115200);
   Serial1.write("AT+UART_DEF=9600,8,1,0,0\r\n");
@@ -65,12 +64,9 @@ void setup()
 void loop()
 {
   int packetSize = Udp.parsePacket();
-  if (packetSize) {                               // if you get a client,
-    String str1=(String)dist();
-    int len1 = str1.length() +1;
-    char retour[len1];
-    str1.toCharArray(retour, len1);
-    outcome.addValue("distance", retour);
+  if (packetSize) {
+    // if you get a client,
+    outcome.addValue("distance", (String) dist());
     Serial.print("Received packet of size ");
     Serial.println(packetSize);
     int len = Udp.read(packetBuffer, 255);
@@ -106,15 +102,9 @@ void loop()
     {
       stop_Stop();
 
-
-      //Convertion de String à char[] pour être envoyé par le wifi
-      String str = outcome.get();
-      int len = str.length() +1;
-      char outcomeStr[len];
-      str.toCharArray(outcomeStr, len);
       //Send outcome to PC
       Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
-      Udp.write(outcomeStr);
+      Udp.print(outcome.get());
       Udp.endPacket();
 
       actionStep = 0;
