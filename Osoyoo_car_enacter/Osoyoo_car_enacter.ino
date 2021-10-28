@@ -11,6 +11,7 @@
 #include "omny_wheel_motion.h"
 #include "calcDist.h"
 #include "tracking.h"
+#include "gyro.h"
 
 #include "JsonOutcome.h"
 JsonOutcome outcome;
@@ -26,6 +27,7 @@ char packetBuffer[5];
 
 unsigned long endTime = 0;
 int actionStep = 0;
+float somme_gyroZ = 0;
 
 void setup()
 {
@@ -33,6 +35,7 @@ void setup()
   Serial.begin(9600);   // initialize serial for debugging
   set();
   wifiBot.wifiInit();
+  mpu_setup();
 }
 
 
@@ -78,10 +81,16 @@ void loop()
       stop_Stop();
 
       //Send outcome to PC
+      outcome.addValue( "gyroZ", (String) somme_gyroZ);
       wifiBot.sendOutcome(outcome.get());
       outcome.clear();
 
       actionStep = 0;
+      somme_gyroZ = 0;
+    }
+    if(actionStep == 1)
+    {
+        somme_gyroZ += gyroZ();
     }
     
 }
