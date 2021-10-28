@@ -39,9 +39,9 @@ void setup()
 void loop()
 {
   int packetSize = wifiBot.Udp.parsePacket();
-  if (packetSize) {
-    // if you get a client,
+  if (packetSize) { // if you get a client,
     outcome.addValue("distance", (String) dist());
+
     Serial.print("Received packet of size ");
     Serial.println(packetSize);
     int len = wifiBot.Udp.read(packetBuffer, 255);
@@ -79,6 +79,7 @@ void loop()
 
       //Send outcome to PC
       wifiBot.sendOutcome(outcome.get());
+      outcome.clear();
 
       actionStep = 0;
     }
