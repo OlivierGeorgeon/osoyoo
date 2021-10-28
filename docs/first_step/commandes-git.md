@@ -17,3 +17,11 @@ git push origin ma_branche
 git fetch origin ma_branche
 ```
 
+4. Une fois la branche merge sur "dev" on peut la supprimer
+```
+// Suppression en local
+git branch -d localBranchName
+
+// Suppression à distance
+git push origin --delete remoteBranchName
+```
