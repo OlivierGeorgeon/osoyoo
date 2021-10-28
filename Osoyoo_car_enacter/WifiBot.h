@@ -8,7 +8,7 @@ class WifiBot
 {
   public:
     //Constructeur
-    WifiBot();
+    WifiBot(String _ssid, int port);
 
     //Variable
     WiFiEspUDP Udp;

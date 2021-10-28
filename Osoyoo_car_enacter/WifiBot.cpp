@@ -3,11 +3,11 @@
 #include "WiFiEsp.h"
 #include "WiFiEspUDP.h"
 
-WifiBot::WifiBot()
+WifiBot::WifiBot(String _ssid, int port)
 {
-    localPort = 8888;
+    localPort = port;
     status = WL_IDLE_STATUS;
-    ssid = "osoyoo_robot2";
+    ssid = _ssid;
 }
 
 void WifiBot::wifiInit()
