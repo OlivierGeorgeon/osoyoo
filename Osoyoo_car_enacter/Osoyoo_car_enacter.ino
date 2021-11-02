@@ -16,62 +16,38 @@
 #include "JsonOutcome.h"
 JsonOutcome outcome;
 
+#include "WifiBot.h"
+WifiBot wifiBot = WifiBot("osoyoo_robot2", 8888);
+
 #include "WiFiEsp.h"
 #include "WiFiEspUDP.h"
-char ssid[] = "osoyoo_robot"; 
 
-int status = WL_IDLE_STATUS;
 // use a ring buffer to increase speed and reduce memory allocation
 char packetBuffer[5];
-WiFiEspUDP Udp;
-unsigned int localPort = 8888;  // local port to listen on
+
 unsigned long endTime = 0;
 int actionStep = 0;
+
 void setup()
 {
 // init_GPIO();
   Serial.begin(9600);   // initialize serial for debugging
-  Serial1.begin(115200);
-  Serial1.write("AT+UART_DEF=9600,8,1,0,0\r\n");
-  delay(200);
-  Serial1.write("AT+RST\r\n");
-  delay(200);
-  Serial1.begin(9600);    // initialize serial for ESP module
-  WiFi.init(&Serial1);    // initialize ESP module
-
-  // check for the presence of the shield
-  if (WiFi.status() == WL_NO_SHIELD) {
-    Serial.println("WiFi shield not present");
-    // don't continue
-    while (true);
-  }
-
-   Serial.print("Attempting to start AP ");
-   Serial.println(ssid);
-   //AP mode
-   status = WiFi.beginAP(ssid, 10, "", 0);
-
-  Serial.println("You're connected to the network");
-  printWifiStatus();
-  Udp.begin(localPort);
-  
-  Serial.print("Listening on port ");
-  Serial.println(localPort);
-
   servo_port();
   set();
+  wifiBot.wifiInit();
+
 }
 
 
 void loop()
 {
-  int packetSize = Udp.parsePacket();
-  if (packetSize) {
-    // if you get a client,
+  int packetSize = wifiBot.Udp.parsePacket();
+  if (packetSize) { // if you get a client,
     outcome.addValue("distance", (String) dist());
+
     Serial.print("Received packet of size ");
     Serial.println(packetSize);
-    int len = Udp.read(packetBuffer, 255);
+    int len = wifiBot.Udp.read(packetBuffer, 255);
     if (len > 0) {
       packetBuffer[len] = 0;
     }
@@ -106,30 +82,10 @@ void loop()
       stop_Stop();
 
       //Send outcome to PC
-      Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
-      Udp.print(outcome.get());
-      Udp.endPacket();
+      wifiBot.sendOutcome(outcome.get());
+      outcome.clear();
 
       actionStep = 0;
     }
     
-}
-
-
-void printWifiStatus()
-{
-  // print the SSID of the network you're attached to
-  Serial.print("SSID: ");
-  Serial.println(WiFi.SSID());
-
-  // print your WiFi shield's IP address
-  IPAddress ip = WiFi.localIP();
-  Serial.print("IP Address: ");
-  Serial.println(ip);
-
-  // print where to go in the browser
-  Serial.println();
-  Serial.print("To see this page in action, open a browser to http://");
-  Serial.println(ip);
-  Serial.println();
 }

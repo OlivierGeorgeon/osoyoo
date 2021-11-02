@@ -15,3 +15,8 @@ String JsonOutcome::get()
 {
     return JSON.stringify(data);
 }
+
+void JsonOutcome::clear()
+{
+    data = JSON.parse("{}");
+}
