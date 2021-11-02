@@ -11,6 +11,7 @@
 #include "omny_wheel_motion.h"
 #include "calcDist.h"
 #include "tracking.h"
+#include "Servo_Scan.h"
 
 #include "JsonOutcome.h"
 JsonOutcome outcome;
@@ -29,9 +30,7 @@ int actionStep = 0;
 void setup()
 {
 // init_GPIO();
-
   Serial.begin(9600);   // initialize serial for debugging
-  set();
   Serial1.begin(115200);
   Serial1.write("AT+UART_DEF=9600,8,1,0,0\r\n");
   delay(200);
@@ -58,6 +57,9 @@ void setup()
   
   Serial.print("Listening on port ");
   Serial.println(localPort);
+
+  servo_port();
+  set();
 }
 
 
@@ -86,6 +88,7 @@ void loop()
         case '5':stop_Stop();break;
         case '0':until_line(SPEED);break;
         case 'D':outcome.addValue("distance", (String) dist());break;
+        case 'S': scan(); break;
         default:break;
       }
 

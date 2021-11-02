@@ -15,35 +15,30 @@
 #include "Servo_Scan.h"
 #include "Arduino.h"
 
-Servo myservo;  // create servo object to control a servo
-// twelve servo objects can be created on most boards
+Servo myservo;
 
-int pos = 0;    // variable to store the servo position
-double distances[10];
-
+// Initialisation de port de branchement sur la carte
 void servo_port() {
-  myservo.attach(13);  // attaches the servo on pin 9 to the servo object
+  myservo.attach(13);
 }
 
 void scan() {
-  myservo.write(90);
-  for (pos = 0; pos <= 9; pos += 1) { // goes from 0 degrees to 180 degrees
-    // in steps of 1 degree
-    myservo.write(pos*20);              // tell servo to go to position in variable 'pos'
-    delay(1000); 
+  float distances[10];
+  //Scan de 9 calcul de distances tout les 20 degrés pour couvrir les 180°
+  for (int pos = 0; pos <= 9; pos += 1) {
+    myservo.write(pos*20);
+    delay(300);
     distances[pos] = dist();
-    Serial.print(distances[pos]);
-    Serial.print(" ; ");
-    delay(1000);
   }
-  for (pos = 0; pos <= 9; pos += 1) { // goes from 0 degrees to 180 degrees
-    // in steps of 1 degree
-    myservo.write(pos*20);              // tell servo to go to position in variable 'pos'
-    delay(1000); 
-    distances[pos] = dist();
-    Serial.print(distances[pos]);
-    Serial.print(" ; ");
-    delay(1000);
+
+  //Recherche de la plus petite distances
+  int indexMin;
+  float valMin = distances[0];
+  for (int i = 1; i <= 9; i++){
+    if(distances[i] < varMin){
+        valMin = distances[i];
+        indexMin = i;
+    }
   }
-   myservo.write(90); //Remettre la tete en place
+   myservo.write(indexMin*20); //S'aligner sur l'objet la plus proche
 }
