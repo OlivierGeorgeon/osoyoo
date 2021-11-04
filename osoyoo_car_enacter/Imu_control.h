@@ -17,9 +17,9 @@ class Imu_control
 {
   public:
     Imu_control();
-    setup();
-    begin();
-    update();
+    void setup();
+    void begin();
+    void update();
     void outcome(JSONVar & outcome_object);
     float _yaw;
     float _xSpeed;

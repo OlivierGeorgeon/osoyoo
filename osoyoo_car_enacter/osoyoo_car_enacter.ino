@@ -9,6 +9,7 @@
  * 
  */
 #include "arduino_secrets.h"
+#include "Robot_define.h"
 #include "Floor_change_retreat.h"
 #include "Head_echo_alignment.h"
 #include "Imu_control.h"
@@ -57,6 +58,8 @@ void setup()
   OWM.setup();
   HEA.setup();
   Serial.begin(9600);   // initialize serial for debugging
+  Serial.println("Serial initialized");
+
   IMU.setup();
 
   Serial1.begin(115200);
@@ -186,12 +189,14 @@ void loop()
           OWM.shiftRight(SHIFT_SPEED);
           break;
         case ACTION_TURN_LEFT:
+          action_end_time = millis() + 250;
           OWM.turnLeft(SPEED);
           break;
         case ACTION_GO_ADVANCE:
           OWM.goForward(SPEED);
           break;
         case ACTION_TURN_RIGHT:
+          action_end_time = millis() + 250;
           OWM.turnRight(SPEED);
           break;
         case ACTION_ALIGN_HEAD:
@@ -337,7 +342,7 @@ void printWifiStatus()
   Serial.print("SSID: ");
   Serial.println(WiFi.SSID());
   // print your WiFi shield's IP address
-  IPAddress ip = WiFi.localIP();
+  //IPAddress ip = WiFi.localIP();
   Serial.print("IP Address: ");
-  Serial.println(ip);
+  Serial.println(WiFi.localIP());
 }

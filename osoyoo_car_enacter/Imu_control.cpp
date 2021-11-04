@@ -2,12 +2,14 @@
   Imu_control.cpp - library for controlling the GY521 / MPU6050 IMU
   Created by Olivier Georgeon, june 28 2021
   Uses Korneliusz Jarzebski's MPU6050 library provided in the ELEGOO kit
+  https://github.com/jarzebski/Arduino-MPU6050
   released into the public domain
 
-  Attention: You must reset the arduino after turning the power on otherwise the IMU is not properly calibrate
+  Attention: You must reset the arduino after turning the power on otherwise the IMU is not properly calibrated
 */
 #include "Arduino.h"
 #include "Imu_control.h"
+#include "Robot_define.h"
 #include <Wire.h>
 #include <MPU6050.h>
 
@@ -16,11 +18,13 @@ Imu_control::Imu_control()
   _next_imu_read_time = 0;
   _yaw = 0;
 }
-Imu_control::setup()
+void Imu_control::setup()
 {
   //Serial.begin(9200);
 
+  #if ROBOT_HAS_MPU6050 == true
   // Initialize MPU6050
+
   while(!_mpu.begin(MPU6050_SCALE_2000DPS, MPU6050_RANGE_2G))
   {
     Serial.println("Could not find a valid MPU6050 sensor, check wiring!");
@@ -41,9 +45,11 @@ Imu_control::setup()
   // See https://ulrichbuschbaum.wordpress.com/2015/01/18/using-the-mpu6050s-dlpf/
   _mpu.setDLPFMode(4);  // Filter out frequencies over 21 Hz
 
-
+  #else
+    #warning "No MPU6050"
+  #endif
 }
-Imu_control::begin()
+void Imu_control::begin()
 {
   _yaw = 0;
   _max_acceleration = 0;
@@ -52,13 +58,14 @@ Imu_control::begin()
   _xSpeed = 0;
   _xDistance = 0;
 }
-Imu_control::update()
+void Imu_control::update()
 {
   unsigned long timer = millis();
   if (_next_imu_read_time < timer)
   {
     _next_imu_read_time = timer + IMU_READ_PERIOD;
 
+    #if ROBOT_HAS_MPU6050 == true
     // Read normalized values
     Vector normAccel = _mpu.readNormalizeAccel();
     Vector normGyro = _mpu.readNormalizeGyro();
@@ -81,6 +88,8 @@ Imu_control::update()
     // Output raw
     //Serial.print("Yaw = ");
     //Serial.println(_yaw);
+
+    #endif
   }
 }
 void Imu_control::outcome(JSONVar & outcome_object)

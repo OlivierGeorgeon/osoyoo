@@ -5,6 +5,7 @@
 */
 #include "Arduino.h"
 #include "Omny_wheel_motion.h"
+#include "Robot_define.h"
 
 #define speedPinR 9   //  RIGHT WHEEL PWM pin D45 connect front MODEL-X ENA
 #define RightMotorDirPin1  22    //Front Right Motor direction pin 1 to Front MODEL-X IN1  (K1)
@@ -67,17 +68,16 @@ void Omny_wheel_motion::turnFrontRight(int speed)
 }
 void Omny_wheel_motion::shiftLeft(int speed)
 {
-  //setMotion( 0, speed, 0, speed);
   setMotion( -speed, speed, -speed, speed);
 }
 void Omny_wheel_motion::shiftRight(int speed)
 {
-  //setMotion(speed, 0, speed, 0);
   setMotion(speed, -speed, speed, -speed);
 }
 void Omny_wheel_motion::turnLeft(int speed)
 {
-  setMotion(0, 0, speed, speed);
+  setMotion( 0, speed, 0, speed);
+  //setMotion(0, 0, speed, speed);
 }
 void Omny_wheel_motion::goForward(int speed)
 {
@@ -85,7 +85,8 @@ void Omny_wheel_motion::goForward(int speed)
 }
 void Omny_wheel_motion::turnRight(int speed)
 {
-  setMotion(speed, speed, 0, 0);
+  setMotion(speed, 0, speed, 0);
+  //setMotion(speed, speed, 0, 0);
 }
 
 void Omny_wheel_motion::setMotion(int speed_fl, int speed_rl, int speed_rr, int speed_fr){
@@ -152,12 +153,20 @@ void Omny_wheel_motion::rearLeftWheel(int speed)
     // Forward
     digitalWrite(LeftMotorDirPin1B,LOW);
     digitalWrite(LeftMotorDirPin2B,HIGH);
-    analogWrite(speedPinLB,speed * 1.2); // Extra voltage because this wheel is weak
+    #if ROBOT_ID == 1
+      analogWrite(speedPinLB,speed * 1.2); // Extra voltage because this wheel is weak
+    #else
+      analogWrite(speedPinLB,speed);
+    #endif
   } else {
     // Backward
     digitalWrite(LeftMotorDirPin1B,HIGH);
     digitalWrite(LeftMotorDirPin2B,LOW);
-    analogWrite(speedPinLB,-speed * 1.2); // Extra voltage because this wheel is weak
+    #if ROBOT_ID == 1
+      analogWrite(speedPinLB,-speed * 1.2); // Extra voltage because this wheel is weak
+    #else
+      analogWrite(speedPinLB,-speed);
+    #endif
   }
 }
 
