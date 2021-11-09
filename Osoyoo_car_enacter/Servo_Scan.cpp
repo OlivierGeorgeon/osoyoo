@@ -35,7 +35,7 @@ void scan() {
   int indexMin;
   float valMin = distances[0];
   for (int i = 1; i <= 9; i++){
-    if(distances[i] < varMin){
+    if(distances[i] < valMin){
         valMin = distances[i];
         indexMin = i;
     }
