@@ -54,7 +54,6 @@ void Floor_change_retreat::update()
       _floor_change_retreat_end_time = millis() + RETREAT_DURATION;
     }
   }
-  //return _is_enacting_floor_change_retreat;
 }
 
 void Floor_change_retreat::extraDuration(int duration)

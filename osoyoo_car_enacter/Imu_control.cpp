@@ -43,7 +43,7 @@ void Imu_control::setup()
 
   // Set DLP Filter
   // See https://ulrichbuschbaum.wordpress.com/2015/01/18/using-the-mpu6050s-dlpf/
-  _mpu.setDLPFMode(4);  // Filter out frequencies over 21 Hz
+  _mpu.setDLPFMode(MPU6050_DLPF_4);  // Filter out frequencies over 21 Hz
 
   #else
     #warning "No MPU6050"
@@ -52,8 +52,9 @@ void Imu_control::setup()
 void Imu_control::begin()
 {
   _yaw = 0;
-  _shock = false;
-  _measure_cycle = 0;
+  _shock_measure = 0;
+  _cycle_count = 0;
+  _blocked = false;
   _max_acceleration = X_AXIS_DEFAULT_ACCELERATION;
   _min_acceleration = X_AXIS_DEFAULT_ACCELERATION;
   _max_speed = 0;
@@ -66,7 +67,7 @@ void Imu_control::update()
   if (_next_imu_read_time < timer)
   {
     _next_imu_read_time = timer + IMU_READ_PERIOD;
-    _measure_cycle++;
+    _cycle_count++;
 
     #if ROBOT_HAS_MPU6050 == true
     // Read normalized values
@@ -74,15 +75,25 @@ void Imu_control::update()
     Vector normGyro = _mpu.readNormalizeGyro();
 
     // Integrate Yaw during the interaction
-    _yaw += normGyro.ZAxis * IMU_READ_PERIOD / 1000;
+    float _ZAngle = normGyro.ZAxis * IMU_READ_PERIOD / 1000;
+    _yaw += _ZAngle;
 
     // Trying to detect strong X-axis acceleration after starting, possibly due to shock on solid obstacle
-    if (_measure_cycle > 3){
-      if (normAccel.XAxis > _max_acceleration) _max_acceleration =  normAccel.XAxis;
+    if (normAccel.XAxis > _max_acceleration) _max_acceleration =  normAccel.XAxis;
+    if (_cycle_count <= 6) {
       if (normAccel.XAxis < _min_acceleration) _min_acceleration =  normAccel.XAxis;
     }
-    // When moving forward, a front shock causes XAxis > 7
-    if (normAccel.XAxis > 7) _shock = true;
+    // When moving forward
+    // Check for shock on the right
+    if (_ZAngle < -1) _shock_measure |= B001;
+    // Check for shock on the front
+    if (normAccel.XAxis > X_AXIS_DEFAULT_ACCELERATION + 2) _shock_measure |= B010;
+    // Check for shock on the left
+    if (_ZAngle > 1) _shock_measure |= B100;
+    // Check for blocked on the front (cannot accelerate properly during the first 250ms)
+    if (_cycle_count >= 6) {
+      if (_min_acceleration > X_AXIS_DEFAULT_ACCELERATION - 0.3) _blocked = true;
+    }
 
     // Trying to compute the speed by integrating acceleration (not working)
     _xSpeed += (normAccel.XAxis) * IMU_READ_PERIOD / 1000;
@@ -91,8 +102,8 @@ void Imu_control::update()
     _xDistance += _xSpeed * IMU_READ_PERIOD / 1000;
 
     // Output raw
-    Serial.print("normAccel.XAxis = ");
-    Serial.println(normAccel.XAxis);
+    //Serial.print("ZAxis = ");
+    //Serial.println(normGyro.ZAxis * IMU_READ_PERIOD / 1000);
 
     #endif
   }
@@ -100,11 +111,8 @@ void Imu_control::update()
 void Imu_control::outcome(JSONVar & outcome_object)
 {
   outcome_object["yaw"] = _yaw;
-  outcome_object["shock"] = _shock;
+  outcome_object["shock"] = _shock_measure;
+  outcome_object["blocked"] = _blocked;
   outcome_object["max_acceleration"] = _max_acceleration;
   outcome_object["min_acceleration"] = _min_acceleration;
-
-  //Serial.println("End yaw = " + String(_yaw));
-  //Serial.println("End distance " + String(_xDistance));
-  //return _yaw;
 }

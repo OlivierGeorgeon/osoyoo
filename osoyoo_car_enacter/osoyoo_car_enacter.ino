@@ -99,8 +99,7 @@ void setup()
   Serial.println(localPort);
 }
 
-//bool is_enacting_floor_change_retreat = false;
-//bool is_enacting_head_alignment = false;
+unsigned long action_start_time = 0;
 unsigned long action_end_time = 0;
 int interaction_step = 0;
 bool is_enacting_action = false;
@@ -112,24 +111,9 @@ void loop()
 {
   // Behavior floor change retreat
   FCR.update();
-  //if (is_enacting_floor_change_retreat && is_enacting_action && (action == ACTION_GO_ADVANCE) ) {
-  //  outcome ="1";
-  //  action_end_time = 0;
-  //}
 
   // Behavior head echo alignment
   HEA.update();
-  //if (!is_enacting_action && !is_enacting_floor_change_retreat ) {
-  //  HEA.monitor(); // Could be included in update()
-  //}
-//  if (is_enacting_action && (action == ACTION_ALIGN_HEAD) && !HEA._is_enacting_head_alignment) {
-//    //outcome = HEA.outcome();
-//    action_end_time = 0;
-//  }
-//  if (is_enacting_action && (action == ACTION_ECHO_SCAN) && !HEA._is_enacting_echo_scan) {
-    //outcome = HEA.outcome();
-//    action_end_time = 0;
-//  }
 
   // IMU reading
   IMU.update();
@@ -153,7 +137,8 @@ void loop()
       Serial.print("/");
       Serial.println(Udp.remotePort());
 
-      action_end_time = millis() + 1000;
+      action_start_time = millis();
+      action_end_time = action_start_time + 1000;
       is_enacting_action = true;
       interaction_step = 1;
       IMU.begin();
@@ -161,7 +146,7 @@ void loop()
       switch (action)
       {
         case ACTION_TURN_IN_SPOT_LEFT:
-          action_end_time = millis() + 2000;
+          action_end_time = millis() + TURN_SPOT_MAX_DURATION;
           robot_destination_angle = 45;
           HEA.turnHead(0);  // Look ahead
           OWM.turnInSpotLeft(TURN_SPEED);
@@ -170,7 +155,7 @@ void loop()
           OWM.goBack(SPEED);
           break;
         case ACTION_TURN_IN_SPOT_RIGHT:
-          action_end_time = millis() + 2000;
+          action_end_time = millis() + TURN_SPOT_MAX_DURATION;
           robot_destination_angle = -45;
           HEA.turnHead(0);  // Look ahead
           OWM.turnInSpotRight(TURN_SPEED);
@@ -309,13 +294,7 @@ void loop()
 
     switch (action)
     {
-//      case ACTION_GO_ADVANCE:
-//        if (is_enacting_floor_change_retreat) {
-          //FCR.extraDuration(RETREAT_EXTRA_DURATION); // Extend retreat duration because need to reverse speed
-//        } else {
-//          OWM.stopMotion(); // Stop motion unless a reflex is being enacted
-//        }
-//        break;
+      //case ACTION_GO_ADVANCE:
       case ACTION_ALIGN_HEAD:
       case ACTION_ECHO_SCAN:
         HEA.outcome(outcome_object);
@@ -325,6 +304,8 @@ void loop()
         break;
     }
     is_enacting_action = false;
+    outcome_object["duration"] = millis() - action_start_time;
+
     interaction_step = 0;
 
     IMU.outcome(outcome_object);
