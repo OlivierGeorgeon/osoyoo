@@ -4,11 +4,12 @@
   released into the public domain
 */
 #include "Arduino.h"
+#include "Robot_define.h"
 #include "head_echo_alignment.h"
 #include <Servo.h>
 
-#define SERVO_PIN   13  //servo connect to D5
-#define Echo_PIN    31 // Ultrasonic Echo pin connect to A5
+//#define SERVO_PIN   13  //servo connect to D5
+#define Echo_PIN    31  // Ultrasonic Echo pin connect to A5
 #define Trig_PIN    30  // Ultrasonic Trig pin connect to A4
 
 Head_echo_alignment::Head_echo_alignment()
@@ -31,7 +32,7 @@ void Head_echo_alignment::setup()
   pinMode(Echo_PIN,INPUT);
   digitalWrite(Trig_PIN,LOW);
   // init servo
-  _head.attach(SERVO_PIN);
+  _head.attach(ROBOT_SERVO_PIN);
   _head.write(_head_angle + 90);
 }
 
