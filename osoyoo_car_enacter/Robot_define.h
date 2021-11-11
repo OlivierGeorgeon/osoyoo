@@ -1,10 +1,14 @@
-#define ROBOT_ID 0 // 0: robot Doll, 1: robot UCLy, 2: robot Olivier
+#define ROBOT_ID 2 // 0: robot Doll, 1: robot UCLy, 2: robot Olivier
 
 #if ROBOT_ID == 1
 
 #define ROBOT_HAS_MPU6050  true
 #define ROBOT_HAS_HMC5883L false
-#define ROBOT_WHEELS_REVERSED false
+#define ROBOT_REAR_RIGHT_WHEEL_COEF 1
+#define ROBOT_REAR_LEFT_WHEEL_COEF 1.2
+#define TURN_SPOT_ENDING_DELAY 500
+#define TURN_SPOT_ENDING_ANGLE 15
+#define X_AXIS_DEFAULT_ACCELERATION 5.3
 
 #warning "Compiling for UCLy's robot"
 
@@ -12,7 +16,11 @@
 
 #define ROBOT_HAS_MPU6050  true
 #define ROBOT_HAS_HMC5883L true
-#define ROBOT_WHEELS_REVERSED false
+#define ROBOT_REAR_RIGHT_WHEEL_COEF 1.2
+#define ROBOT_REAR_LEFT_WHEEL_COEF 1
+#define TURN_SPOT_ENDING_DELAY 200
+#define TURN_SPOT_ENDING_ANGLE 3
+#define X_AXIS_DEFAULT_ACCELERATION 5.3
 
 #warning "Compiling for Olivier's robot"
 
@@ -20,7 +28,11 @@
 
 #define ROBOT_HAS_MPU6050  false
 #define ROBOT_HAS_HMC5883L false
-#define ROBOT_WHEELS_REVERSED false
+#define ROBOT_REAR_RIGHT_WHEEL_COEF 1
+#define ROBOT_REAR_LEFT_WHEEL_COEF 1
+#define TURN_SPOT_ENDING_DELAY 200
+#define TURN_SPOT_ENDING_ANGLE 3
+#define X_AXIS_DEFAULT_ACCELERATION 5.3
 
 #warning "Compiling for Paul's robot"
 

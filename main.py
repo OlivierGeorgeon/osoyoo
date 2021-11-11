@@ -15,8 +15,9 @@ interactionDict = {"Action": "0", "outcome": "0", "head_angle": 0, "echo_distanc
 
 if __name__ == '__main__':
     UDP_IP = "192.168.4.1"  # AP mode
-    # UDP_IP = "192.168.1.21"  # STA mode
-    UDP_IP = "10.40.22.251" # STA sur RobotBSN
+    UDP_IP = "192.168.1.19"  # STA mode sur Olivier's wifi
+    # UDP_IP = "10.40.22.251" # STA sur RobotBSN Olivier's Robot
+    # UDP_IP = "10.40.22.254" # STA sur RobotBSN
 
     UDP_PORT = 8888
     print("UDP target IP: %s" % UDP_IP)

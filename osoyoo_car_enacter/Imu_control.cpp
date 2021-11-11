@@ -52,8 +52,10 @@ void Imu_control::setup()
 void Imu_control::begin()
 {
   _yaw = 0;
-  _max_acceleration = 0;
-  _min_acceleration = 0;
+  _shock = false;
+  _measure_cycle = 0;
+  _max_acceleration = X_AXIS_DEFAULT_ACCELERATION;
+  _min_acceleration = X_AXIS_DEFAULT_ACCELERATION;
   _max_speed = 0;
   _xSpeed = 0;
   _xDistance = 0;
@@ -64,6 +66,7 @@ void Imu_control::update()
   if (_next_imu_read_time < timer)
   {
     _next_imu_read_time = timer + IMU_READ_PERIOD;
+    _measure_cycle++;
 
     #if ROBOT_HAS_MPU6050 == true
     // Read normalized values
@@ -71,23 +74,25 @@ void Imu_control::update()
     Vector normGyro = _mpu.readNormalizeGyro();
 
     // Integrate Yaw during the interaction
-    _yaw = _yaw + normGyro.ZAxis * IMU_READ_PERIOD / 1000;
+    _yaw += normGyro.ZAxis * IMU_READ_PERIOD / 1000;
 
-    if (normAccel.XAxis > _max_acceleration) _max_acceleration =  normAccel.XAxis;
-    if (normAccel.XAxis < _min_acceleration) _min_acceleration =  normAccel.XAxis;
+    // Trying to detect strong X-axis acceleration after starting, possibly due to shock on solid obstacle
+    if (_measure_cycle > 3){
+      if (normAccel.XAxis > _max_acceleration) _max_acceleration =  normAccel.XAxis;
+      if (normAccel.XAxis < _min_acceleration) _min_acceleration =  normAccel.XAxis;
+    }
+    // When moving forward, a front shock causes XAxis > 7
+    if (normAccel.XAxis > 7) _shock = true;
 
+    // Trying to compute the speed by integrating acceleration (not working)
     _xSpeed += (normAccel.XAxis) * IMU_READ_PERIOD / 1000;
-
     if (abs(_xSpeed) > _max_speed) _max_speed = abs(_xSpeed);
-
-    //Serial.println(normAccel.XAxis);
-    //Serial.println(normAccel.ZAxis);
-    //Serial.println(_xSpeed);
+    // Trying to compute the distance by integrating the speed (not working)
     _xDistance += _xSpeed * IMU_READ_PERIOD / 1000;
 
     // Output raw
-    //Serial.print("Yaw = ");
-    //Serial.println(_yaw);
+    Serial.print("normAccel.XAxis = ");
+    Serial.println(normAccel.XAxis);
 
     #endif
   }
@@ -95,9 +100,9 @@ void Imu_control::update()
 void Imu_control::outcome(JSONVar & outcome_object)
 {
   outcome_object["yaw"] = _yaw;
-  //outcome_object["max_acceleration"] = _max_acceleration;
-  //outcome_object["min_acceleration"] = _min_acceleration;
-  //outcome_object["max_speed"] = _max_speed;
+  outcome_object["shock"] = _shock;
+  outcome_object["max_acceleration"] = _max_acceleration;
+  outcome_object["min_acceleration"] = _min_acceleration;
 
   //Serial.println("End yaw = " + String(_yaw));
   //Serial.println("End distance " + String(_xDistance));

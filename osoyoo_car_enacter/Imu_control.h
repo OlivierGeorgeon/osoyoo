@@ -30,5 +30,7 @@ class Imu_control
     float _max_acceleration;
     float _min_acceleration;
     float _max_speed;
+    int _measure_cycle;
+    bool _shock;
 };
 #endif

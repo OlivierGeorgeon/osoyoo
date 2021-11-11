@@ -26,8 +26,6 @@
 
 #define TURN_FRONT_ENDING_DELAY 100
 #define TURN_FRONT_ENDING_ANGLE 3
-#define TURN_SPOT_ENDING_DELAY 500
-#define TURN_SPOT_ENDING_ANGLE 15
 
 #define ACTION_TURN_IN_SPOT_LEFT '1'
 #define ACTION_GO_BACK '2'
@@ -163,7 +161,7 @@ void loop()
       switch (action)
       {
         case ACTION_TURN_IN_SPOT_LEFT:
-          //action_end_time = millis() + 5000;
+          action_end_time = millis() + 2000;
           robot_destination_angle = 45;
           HEA.turnHead(0);  // Look ahead
           OWM.turnInSpotLeft(TURN_SPEED);
@@ -172,7 +170,7 @@ void loop()
           OWM.goBack(SPEED);
           break;
         case ACTION_TURN_IN_SPOT_RIGHT:
-          //action_end_time = millis() + 5000;
+          action_end_time = millis() + 2000;
           robot_destination_angle = -45;
           HEA.turnHead(0);  // Look ahead
           OWM.turnInSpotRight(TURN_SPEED);
@@ -245,12 +243,17 @@ void loop()
         break;
       case ACTION_TURN_IN_SPOT_LEFT:
       case ACTION_TURN_IN_SPOT_RIGHT:
+        // Stop when yaw reach 45°
         if (((action == ACTION_TURN_IN_SPOT_LEFT) && (IMU._yaw > robot_destination_angle - TURN_SPOT_ENDING_ANGLE)) ||
         ((action == ACTION_TURN_IN_SPOT_RIGHT) && (IMU._yaw < robot_destination_angle + TURN_SPOT_ENDING_ANGLE)))
         {
           OWM.stopMotion();
           interaction_step = 2;
           action_end_time = millis() + TURN_SPOT_ENDING_DELAY;
+        }
+        // Stop at action end time
+        else if (action_end_time < millis()) {
+          interaction_step = 2;
         }
         break;
       case ACTION_ALIGN_ROBOT:

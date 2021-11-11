@@ -139,12 +139,12 @@ void Omny_wheel_motion::rearRightWheel(int speed)
     // Forward
     digitalWrite(RightMotorDirPin1B, LOW);
     digitalWrite(RightMotorDirPin2B,HIGH);
-    analogWrite(speedPinRB,speed);
+    analogWrite(speedPinRB,speed * ROBOT_REAR_RIGHT_WHEEL_COEF); // corrective coefficient depends on robot
   } else {
     // Backward
     digitalWrite(RightMotorDirPin1B, HIGH);
     digitalWrite(RightMotorDirPin2B,LOW);
-    analogWrite(speedPinRB,-speed);
+    analogWrite(speedPinRB,-speed * ROBOT_REAR_RIGHT_WHEEL_COEF); // corrective coefficient depends on robot
   }
 }
 void Omny_wheel_motion::rearLeftWheel(int speed)
@@ -153,20 +153,12 @@ void Omny_wheel_motion::rearLeftWheel(int speed)
     // Forward
     digitalWrite(LeftMotorDirPin1B,LOW);
     digitalWrite(LeftMotorDirPin2B,HIGH);
-    #if ROBOT_ID == 1
-      analogWrite(speedPinLB,speed * 1.2); // Extra voltage because this wheel is weak
-    #else
-      analogWrite(speedPinLB,speed);
-    #endif
+    analogWrite(speedPinLB,speed * ROBOT_REAR_LEFT_WHEEL_COEF); // corrective coefficient depends on robot
   } else {
     // Backward
     digitalWrite(LeftMotorDirPin1B,HIGH);
     digitalWrite(LeftMotorDirPin2B,LOW);
-    #if ROBOT_ID == 1
-      analogWrite(speedPinLB,-speed * 1.2); // Extra voltage because this wheel is weak
-    #else
-      analogWrite(speedPinLB,-speed);
-    #endif
+    analogWrite(speedPinLB,-speed * ROBOT_REAR_LEFT_WHEEL_COEF); // corrective coefficient depends on robot
   }
 }
 
