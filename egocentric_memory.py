@@ -1,50 +1,46 @@
 import pyglet
+from pyglet.gl import *
 from pyglet import shapes
 from pyglet.window import key
 import socket
+import json
 
-#import main
 
-xOffset = 200
-yOffset = 200
-xScale = 0.5
-yScale = 0.5
+window_center_x = 0
+window_center_y = 0
+window_scale_x = 0.5
+window_scale_y = 0.5
 
-window = pyglet.window.Window(400, 400, resizable=True)
-window.set_caption('Egocentric memory')
+window = pyglet.window.Window(400, 400, "Egocentric memory", resizable=True)
 batch = pyglet.graphics.Batch()
 pyglet.gl.glClearColor(1, 1, 1, 1)
-window.clear()
-pyglet.gl.glTranslatef(xOffset, yOffset, 0.0)
-pyglet.gl.glScalef(xScale, yScale, 1.0)
+# pyglet.gl.glTranslatef(window_center_x, window_center_y, 0.0)
+# pyglet.gl.glScalef(window_scale_x, window_scale_y, 1.0)
 # pyglet.gl.glRotatef(0, 0, 0, 90)
 
 
 class RobotGroup(pyglet.graphics.Group):
     def __init__(self):
         super().__init__()
-        # pyglet.gl.glTranslatef(xOffset, yOffset, 0.0)
-        # pyglet.gl.glScalef(xScale, yScale, 1.0)
-
-    def set_state(self):
-        pass
 
 
 robot = RobotGroup()
 robotBody = shapes.Rectangle(0, 0, 160, 200, color=(0, 0, 0), batch=batch, group=robot)
 robotBody.anchor_position = 80, 100
-FLWheel = shapes.Rectangle(0, 0, 30, 80, color=(0, 0, 0), batch=batch, group=robot)
-FLWheel.anchor_position = 115, -10
-FRWheel = shapes.Rectangle(0, 0, 30, 80, color=(0, 0, 0), batch=batch, group=robot)
+FLWheel = shapes.Rectangle(0, 0, 36, 80, color=(0, 0, 0), batch=batch, group=robot)
+FLWheel.anchor_position = 120, -10
+FRWheel = shapes.Rectangle(0, 0, 36, 80, color=(0, 0, 0), batch=batch, group=robot)
 FRWheel.anchor_position = -85, -10
-RLWheel = shapes.Rectangle(0, 0, 30, 80, color=(0, 0, 0), batch=batch, group=robot)
-RLWheel.anchor_position = 115, 90
-RRWheel = shapes.Rectangle(0, 0, 30, 80, color=(0, 0, 0), batch=batch, group=robot)
+RLWheel = shapes.Rectangle(0, 0, 36, 80, color=(0, 0, 0), batch=batch, group=robot)
+RLWheel.anchor_position = 120, 90
+RRWheel = shapes.Rectangle(0, 0, 36, 80, color=(0, 0, 0), batch=batch, group=robot)
 RRWheel.anchor_position = -85, 90
-robot = 100
+robotHead = shapes.Rectangle(0, 80, 50, 20, color=(150, 150, 150), batch=batch, group=robot)
+robotHead.anchor_position = 25, 0
 
+head_angle = 0
 
-circle = shapes.Circle(0, 0, 10, color=(50, 225, 30), batch=batch)
+# circle = shapes.Circle(0, 0, 10, color=(50, 225, 30), batch=batch)
 # square = shapes.Rectangle(200, 200, 200, 200, color=(55, 55, 255), batch=batch)
 # robotBody = shapes.Rectangle(0, 0, 160, 200, color=(255, 22, 20), batch=batch)
 # rectangle.opacity = 128
@@ -53,60 +49,101 @@ circle = shapes.Circle(0, 0, 10, color=(50, 225, 30), batch=batch)
 # line2 = shapes.Line(150, 150, 444, 111, width=4, color=(200, 20, 20), batch=batch)
 # star = shapes.Star(800, 400, 60, 40, num_spikes=20, color=(255, 255, 0), batch=batch)
 
+
 @window.event
 def on_draw():
     window.clear()
-    #vertex_list = batch.add(2, pyglet.gl.GL_POINTS, None,
-    #                        ('v2i', (10, 15, 30, 35)),
-    #                        ('c3B', (0, 0, 255, 0, 255, 0))
-    #                        )
-    # robot.unset_state()
+    #glClear(GL_COLOR_BUFFER_BIT)
+    #glViewport(0, 0, 400, 400)
+    #glLoadIdentity()
+    robotHead.rotation = -head_angle
     batch.draw()
-    # pyglet.graphics.draw(2, pyglet.gl.GL_POINTS, ('v2i', (10, 15, 30, 35)))
-    #pyglet.graphics.draw_indexed(4, pyglet.gl.GL_TRIANGLES,
-    #[0, 1, 2, 0, 2, 3],
-    #('v2i', (100, 100, 150, 100, 150, 150, 100, 150)))
+
+
 @window.event
 def on_resize(width, height):
-    global xOffset
-    global yOffset
-    pyglet.gl.glScalef(1 / xScale, 1 /yScale, 1.0)
-    pyglet.gl.glTranslatef(-xOffset, -yOffset, 0.0)
-    xOffset = width * 0.5
-    yOffset = height * 0.5
-    pyglet.gl.glTranslatef(xOffset, yOffset, 0.0)
-    pyglet.gl.glScalef(xScale, yScale, 1.0)
+    glViewport(0, 0, width, height)
+    #glMatrixMode(gl.GL_PROJECTION)
+    #glLoadIdentity()
+    #glOrtho(0, width, 0, height, -1, 1)
+    #glMatrixMode(gl.GL_MODELVIEW)
+    pass
 
-    #xOffset = width / 2
-    #yOffset = height / 2
-    #robotBody.x = xOffset
-    #robotBody.y = yOffset
+    # # keep the robot at the center of the window
+    # global window_center_x
+    # global window_center_y
+    # pyglet.gl.glScalef(1 / window_scale_x, 1 / window_scale_y, 1.0)
+    # pyglet.gl.glTranslatef(-window_center_x, -window_center_y, 0.0)
+    # window_center_x = width * 0.5
+    # window_center_y = height * 0.5
+    # pyglet.gl.glTranslatef(window_center_x, window_center_y, 0.0)
+    # pyglet.gl.glScalef(window_scale_x, window_scale_y, 1.0)
+
 
 @window.event
 def on_key_press(symbol, modifiers):
-    key_pressed_string = str(key.symbol_string(symbol)[4])
-    print("sending action " + key_pressed_string)
-    key_pressed_byte = bytes(key_pressed_string, 'utf-8')
-    sock.sendto(key_pressed_byte, (UDP_IP, UDP_PORT))
+    global head_angle
+    key_byte = b'0'
+    if symbol == key.NUM_1:
+        key_byte = b'1'
+    if symbol == key.NUM_2:
+        key_byte = b'2'
+    if symbol == key.NUM_3:
+        key_byte = b'3'
+    if symbol == key.NUM_4:
+        key_byte = b'4'
+    if symbol == key.NUM_5:
+        key_byte = b'5'
+    if symbol == key.NUM_6:
+        key_byte = b'6'
+    if symbol == key.NUM_7:
+        key_byte = b'7'
+    if symbol == key.NUM_8:
+        key_byte = b'8'
+    if symbol == key.NUM_9:
+        key_byte = b'9'
+    if symbol == key.NUM_MULTIPLY:
+        key_byte = b'*'
+    if symbol == key.NUM_DIVIDE:
+        key_byte = b'/'
+    if symbol == key.NUM_SUBTRACT:
+        key_byte = b'-'
+
+    print("Sending action ", end='')
+    print(key_byte)
+    sock.sendto(key_byte, (UDP_IP, UDP_PORT))
     try:
-        # Wait for outcome
-        sock.settimeout(6)
-        data, address = sock.recvfrom(1024)  # buffer size is 1024 bytes
-        print("received  outcome %s" % data)
+        outcome_string, address = sock.recvfrom(1024)  # buffer size is 1024 bytes
+        print("received  outcome %s" % outcome_string)
     except:
         print("reception timeout")
+    outcome = json.loads(outcome_string)
+    head_angle = outcome['head_angle']
+    print("Head angle %i" % head_angle)
+
+
+@window.event
+def on_mouse_press(x, y, button, modifiers):
+    # Get the color at the window's position
+    # https://stackoverflow.com/questions/367684/get-data-from-opengl-glreadpixelsusing-pyglet
+    a = (pyglet.gl.GLuint * 1)(0)
+    pyglet.gl.glReadPixels(x, y, 1, 1, pyglet.gl.GL_RGB, pyglet.gl.GL_UNSIGNED_INT, a)
+    print(a[0])
+
 
 if __name__ == '__main__':
-    UDP_IP = "192.168.4.1"  # AP mode
+    # UDP_IP = "192.168.4.1"  # AP mode
     # UDP_IP = "192.168.1.17"  # STA mode
+    UDP_IP = "192.168.1.19"  # STA mode sur Olivier's wifi
     UDP_PORT = 8888
     print("UDP target IP: %s" % UDP_IP)
     print("UDP target port: %s" % UDP_PORT)
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # UDP
     # Connect to the osoyoo car server
     sock.connect((UDP_IP, UDP_PORT))
+    sock.settimeout(6)
 
-    event_logger = pyglet.window.event.WindowEventLogger()
-    window.push_handlers(event_logger)
+    # event_logger = pyglet.window.event.WindowEventLogger()
+    # window.push_handlers(event_logger)
     pyglet.app.run()
 

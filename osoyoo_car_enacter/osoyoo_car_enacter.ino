@@ -292,12 +292,14 @@ void loop()
     JSONVar outcome_object;
     outcome_object["outcome"] = outcome;
 
+    HEA.outcome(outcome_object);
+
     switch (action)
     {
       //case ACTION_GO_ADVANCE:
       case ACTION_ALIGN_HEAD:
       case ACTION_ECHO_SCAN:
-        HEA.outcome(outcome_object);
+        // HEA.outcome(outcome_object);
         break;
       default:
         OWM.stopMotion();
