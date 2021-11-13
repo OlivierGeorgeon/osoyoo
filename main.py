@@ -24,7 +24,7 @@ if __name__ == '__main__':
     print("UDP target port: %s" % UDP_PORT)
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # UDP
     # Connect to the osoyoo car server
-    sock.connect((UDP_IP, UDP_PORT))
+    # sock.connect((UDP_IP, UDP_PORT))  # Not necessary
 
     key = ""
     while key != "0":

@@ -2,7 +2,7 @@ import pyglet
 from pyglet import shapes
 
 
-class Robot:
+class OsoyooCar:
     def __init__(self, batch):
         self.batch = batch
 

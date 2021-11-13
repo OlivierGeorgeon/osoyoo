@@ -1,6 +1,6 @@
 import pyglet
 from pyglet.gl import *
-from Robot import Robot
+from Robot import OsoyooCar
 
 # Zooming constants
 ZOOM_IN_FACTOR = 1.2
@@ -9,14 +9,15 @@ ZOOM_OUT_FACTOR = 1/ZOOM_IN_FACTOR
 
 class EgoMemoryWindow(pyglet.window.Window):
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super().__init__(400, 400, resizable=True, *args, **kwargs)
+        self.set_caption("Egocentric Memory")
         self.set_minimum_size(150, 150)
         glClearColor(1.0, 1.0, 1.0, 1.0)
 
         self.batch = pyglet.graphics.Batch()
         self.zoom_level = 1
 
-        self.robot = Robot(self.batch)
+        self.robot = OsoyooCar(self.batch)
         self.robot.rotate_head(20)
 
         # self.circle = pyglet.shapes.Circle(0, 0, 100, color=(50, 225, 30), batch=self.batch)
@@ -54,5 +55,5 @@ class EgoMemoryWindow(pyglet.window.Window):
 
 
 if __name__ == "__main__":
-    em_window = EgoMemoryWindow(400, 400, "Egocentric Memory", resizable=True)
+    em_window = EgoMemoryWindow()
     pyglet.app.run()
