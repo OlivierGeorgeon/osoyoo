@@ -17,7 +17,7 @@ class WifiInterface:
 
     '''Send the action. Return the outcome'''
     def enact(self, _action):
-        _outcome = ""
+        _outcome = "{}"
         self.socket.sendto(bytes(_action, 'utf-8'), (self.IP, self.port))
         try:
             _outcome, address = self.socket.recvfrom(255)
@@ -27,7 +27,7 @@ class WifiInterface:
 
 
 if __name__ == '__main__':
-    wifiInterface = WifiInterface(UDP_IP)
+    wifiInterface = WifiInterface()
     action = ""
     while True:
         print("Action key: ", end="")
