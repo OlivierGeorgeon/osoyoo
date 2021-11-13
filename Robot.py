@@ -6,20 +6,21 @@ class OsoyooCar:
     def __init__(self, batch):
         self.batch = batch
 
-        self.robotBody = shapes.Rectangle(0, 0, 160, 200, color=(0, 0, 0), batch=self.batch)
-        self.robotBody.anchor_position = 80, 100
-        self.FLWheel = shapes.Rectangle(0, 0, 36, 80, color=(0, 0, 0), batch=self.batch)
-        self.FLWheel.anchor_position = 120, -10
-        self.FRWheel = shapes.Rectangle(0, 0, 36, 80, color=(0, 0, 0), batch=self.batch)
-        self.FRWheel.anchor_position = -85, -10
-        self.RLWheel = shapes.Rectangle(0, 0, 36, 80, color=(0, 0, 0), batch=self.batch)
-        self.RLWheel.anchor_position = 120, 90
-        self.RRWheel = shapes.Rectangle(0, 0, 36, 80, color=(0, 0, 0), batch=self.batch)
-        self.RRWheel.anchor_position = -85, 90
-        self.robotHead = shapes.Rectangle(0, 80, 50, 20, color=(150, 150, 150), batch=self.batch)
-        self.robotHead.anchor_position = 25, 0
+        # The robot is drawn along the X axis (horizontal)
+        self.robotBody = shapes.Rectangle(0, 0, 200, 160, color=(0, 0, 0), batch=self.batch)
+        self.robotBody.anchor_position = self.robotBody.width / 2, self.robotBody.height / 2
+        self.FLWheel = shapes.Rectangle(50, 100, 80, 36, color=(0, 0, 0), batch=self.batch)
+        self.FLWheel.anchor_position = 40, 18
+        self.FRWheel = shapes.Rectangle(50, -100, 80, 36, color=(0, 0, 0), batch=self.batch)
+        self.FRWheel.anchor_position = 40, 18
+        self.RLWheel = shapes.Rectangle(-50, 100, 80, 36, color=(0, 0, 0), batch=self.batch)
+        self.RLWheel.anchor_position = 40, 18
+        self.RRWheel = shapes.Rectangle(-50, -100, 80, 36, color=(0, 0, 0), batch=self.batch)
+        self.RRWheel.anchor_position = 40, 18
+        self.robotHead = shapes.Rectangle(80, 0, 20, 50, color=(150, 150, 150), batch=self.batch)
+        self.robotHead.anchor_position = 0, 25
 
-        self.azimuth = 20
+        self.azimuth = 0
         self.head_angle = 0
 
     def rotate_head(self, head_angle):

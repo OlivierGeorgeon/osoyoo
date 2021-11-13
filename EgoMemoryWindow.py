@@ -35,8 +35,8 @@ class EgoMemoryWindow(pyglet.window.Window):
         glOrtho(-self.width * self.zoom_level, self.width * self.zoom_level, -self.height * self.zoom_level,
                 self.height * self.zoom_level, 1, -1)
 
-        # Redraw
-        glRotatef(self.robot.azimuth, 0.0, 0.0, 1.0)  # For allocentric spatial memory
+        # Draw the robot
+        glRotatef(90, 0.0, 0.0, 1.0)  # Rotate upwards
         self.batch.draw()
 
         # Restore the default model view matrix
