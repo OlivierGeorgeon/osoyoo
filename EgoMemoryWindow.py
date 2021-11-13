@@ -7,7 +7,7 @@ ZOOM_IN_FACTOR = 1.2
 ZOOM_OUT_FACTOR = 1/ZOOM_IN_FACTOR
 
 
-class EMWindow(pyglet.window.Window):
+class EgoMemoryWindow(pyglet.window.Window):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.set_minimum_size(150, 150)
@@ -30,21 +30,23 @@ class EMWindow(pyglet.window.Window):
         # Clear window with ClearColor
         glClear(GL_COLOR_BUFFER_BIT)
 
-        # Set orthographic projection matrix
+        # Set orthographic projection matrix. Centered on (0,0)
         glOrtho(-self.width * self.zoom_level, self.width * self.zoom_level, -self.height * self.zoom_level,
                 self.height * self.zoom_level, 1, -1)
 
         # Redraw
+        glRotatef(self.robot.azimuth, 0.0, 0.0, 1.0)  # For allocentric spatial memory
         self.batch.draw()
 
-        # Restore default model view matrix
-        # glLoadIdentity()
+        # Restore the default model view matrix
         # glPopMatrix()
 
     def on_resize(self, width, height):
+        # Display in the whole window
         glViewport(0, 0, width, height)
 
     def on_mouse_scroll(self, x, y, dx, dy):
+        # Inspired from https://www.py4u.net/discuss/148957
         # Get scale factor
         f = ZOOM_IN_FACTOR if dy > 0 else ZOOM_OUT_FACTOR if dy < 0 else 1
         if .2 < self.zoom_level * f < 2:
@@ -52,5 +54,5 @@ class EMWindow(pyglet.window.Window):
 
 
 if __name__ == "__main__":
-    em_window = EMWindow(400, 400, "Egocentric Memory", resizable=True)
+    em_window = EgoMemoryWindow(400, 400, "Egocentric Memory", resizable=True)
     pyglet.app.run()

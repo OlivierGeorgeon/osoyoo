@@ -19,6 +19,7 @@ class Robot:
         self.robotHead = shapes.Rectangle(0, 80, 50, 20, color=(150, 150, 150), batch=self.batch)
         self.robotHead.anchor_position = 25, 0
 
+        self.azimuth = 20
         self.head_angle = 0
 
     def rotate_head(self, head_angle):
