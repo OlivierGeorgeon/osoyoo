@@ -8,8 +8,8 @@ UDP_IP = "192.168.1.19"  # STA mode sur Olivier's wifi
 
 
 class WifiInterface:
-    def __init__(self, IP, port=8888):
-        self.IP = IP
+    def __init__(self, ip=UDP_IP, port=8888):
+        self.IP = ip
         self.port = port
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.socket.settimeout(5)

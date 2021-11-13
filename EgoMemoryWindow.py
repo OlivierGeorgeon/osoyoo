@@ -1,6 +1,8 @@
 import pyglet
 from pyglet.gl import *
 from Robot import OsoyooCar
+from WifiInterface import WifiInterface
+import json
 
 # Zooming constants
 ZOOM_IN_FACTOR = 1.2
@@ -20,6 +22,8 @@ class EgoMemoryWindow(pyglet.window.Window):
         self.robot = OsoyooCar(self.batch)
         self.robot.rotate_head(20)
 
+        self.wifiInterface = WifiInterface()
+
         # self.circle = pyglet.shapes.Circle(0, 0, 100, color=(50, 225, 30), batch=self.batch)
         # self.rect = pyglet.shapes.Rectangle(0, 0,1000, 10, color=(0, 0, 0), batch=self.batch)
 
@@ -36,7 +40,7 @@ class EgoMemoryWindow(pyglet.window.Window):
                 self.height * self.zoom_level, 1, -1)
 
         # Draw the robot
-        glRotatef(90, 0.0, 0.0, 1.0)  # Rotate upwards
+        # glRotatef(90, 0.0, 0.0, 1.0)  # Rotate upwards
         self.batch.draw()
 
         # Restore the default model view matrix
@@ -52,6 +56,15 @@ class EgoMemoryWindow(pyglet.window.Window):
         f = ZOOM_IN_FACTOR if dy > 0 else ZOOM_OUT_FACTOR if dy < 0 else 1
         if .2 < self.zoom_level * f < 2:
             self.zoom_level *= f
+
+    def on_text(self, text):
+        print("Send action: ", text)
+        outcome_string = self.wifiInterface.enact(text)
+        print(outcome_string)
+        outcome = json.loads(outcome_string)
+        head_angle = outcome['head_angle']
+        print("Head angle %i" % head_angle)
+        self.robot.rotate_head(head_angle)
 
 
 if __name__ == "__main__":
