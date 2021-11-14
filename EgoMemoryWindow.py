@@ -24,45 +24,43 @@ class EgoMemoryWindow(pyglet.window.Window):
         self.zoom_level = 1
 
         self.robot = OsoyooCar(self.robot_batch)
-        self.origin = shapes.Circle(0, 0, 20, color=(150, 150, 225))
-        self.robot.rotate_head(20)
-
         self.wifiInterface = WifiInterface()
 
         self.phenomena = []
+        # self.origin = shapes.Circle(0, 0, 20, color=(150, 150, 225))
+        self.origin = shapes.Rectangle(0, 0, 60, 40, color=(150, 150, 225))
+        self.origin.anchor_position = 30, 20
 
-        self.dx = 0
-        self.dy = 0
-        self.dangle = 0
 
-        self.envMat = (GLfloat * 16)(1, 0, 0, 0,
-                                     0, 1, 0, 0,
-                                     0, 0, 1, 0,
-                                     0, 0, 0, 1)
+        self.environment_matrix = (GLfloat * 16)(1, 0, 0, 0,
+                                                 0, 1, 0, 0,
+                                                 0, 0, 1, 0,
+                                                 0, 0, 0, 1)
         #glLoadIdentity()
         #glTranslatef(150, 0, 0)
         #glGetFloatv(GL_MODELVIEW_MATRIX, self.envMat)  # The only way i found to set envMat to identity
 
     def on_draw(self):
-        # Clear window with ClearColor
         glClear(GL_COLOR_BUFFER_BIT)
-
         glLoadIdentity()
-        # Save the default model view matrix
-        # glPushMatrix()
-        # Set orthographic projection matrix. Centered on (0,0)
+
+        # The transformations are stacked, and applied backward to the vertices
+
+        # Stack the projection matrix. Centered on (0,0). Fit the window size and zoom factor
         glOrtho(-self.width * self.zoom_level, self.width * self.zoom_level, -self.height * self.zoom_level,
                 self.height * self.zoom_level, 1, -1)
 
-        # Draw the robot
-        # glRotatef(90, 0.0, 0.0, 1.0)  # Rotate upwards
-        self.robot_batch.draw()
+        # Stack the rotation of the world so the robot's front is up
+        # glRotatef(90, 0.0, 0.0, 1.0)
 
-        # glTranslatef(150, 0, 0)
-        glMultMatrixf(self.envMat)  # Apply the cumulative displacement to the environment
+        # Draw the robot
+        self.robot_batch.draw()
         # Draw the phenomena
         self.phenomena_batch.draw()
-        self.origin.draw()  # The origin of the robot
+
+        # Stack the environment's displacement and draw the origin just to check
+        glMultMatrixf(self.environment_matrix)
+        self.origin.draw()  # Draw the origin of the robot
 
     def on_resize(self, width, height):
         # Display in the whole window
@@ -79,17 +77,15 @@ class EgoMemoryWindow(pyglet.window.Window):
         print("Send action: ", text)
         outcome_string = self.wifiInterface.enact(text)
         print(outcome_string)
-
-        if text == "8":
-            glLoadMatrixf(self.envMat)
-            glTranslatef(-200, 0, 0)
-            glGetFloatv(GL_MODELVIEW_MATRIX, self.envMat)
-        if text == "2":
-            glLoadMatrixf(self.envMat)
-            glTranslatef(200, 0, 0)
-            glGetFloatv(GL_MODELVIEW_MATRIX, self.envMat)
-
         outcome = json.loads(outcome_string)
+
+        # Update the model from the outcome
+        glLoadIdentity()
+        if text == "8":
+            glTranslatef(-200, 0, 0)
+        if text == "2":
+            glTranslatef(200, 0, 0)
+
         if 'head_angle' in outcome:
             head_angle = outcome['head_angle']
             print("Head angle %i" % head_angle)
@@ -102,7 +98,10 @@ class EgoMemoryWindow(pyglet.window.Window):
             obstacle = Phenomenon(x, y, self.phenomena_batch)
             self.phenomena.append(obstacle)
         if 'yaw' in outcome:
-            self.dangle = outcome['yaw']
+            glRotatef(-outcome['yaw'], 0, 0, 1.0)
+
+        glMultMatrixf(self.environment_matrix)
+        glGetFloatv(GL_MODELVIEW_MATRIX, self.environment_matrix)
 
 
 if __name__ == "__main__":
