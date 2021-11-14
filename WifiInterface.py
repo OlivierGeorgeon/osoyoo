@@ -6,13 +6,14 @@ UDP_IP = "192.168.1.19"  # STA mode sur Olivier's wifi
 # UDP_IP = "10.40.22.251" # STA sur RobotBSN Olivier's Robot
 # UDP_IP = "10.40.22.254" # STA sur RobotBSN
 
+UDP_TIMEOUT = 3  # Seconds
 
 class WifiInterface:
     def __init__(self, ip=UDP_IP, port=8888):
         self.IP = ip
         self.port = port
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.socket.settimeout(5)
+        self.socket.settimeout(UDP_TIMEOUT)
         # self.socket.connect((UDP_IP, UDP_PORT))  # Not necessary
 
     '''Send the action. Return the outcome'''

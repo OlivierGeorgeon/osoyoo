@@ -19,11 +19,10 @@ class EgoMemoryWindow(pyglet.window.Window):
         self.set_minimum_size(150, 150)
         glClearColor(1.0, 1.0, 1.0, 1.0)
 
-        self.robot_batch = pyglet.graphics.Batch()
-        self.phenomena_batch = pyglet.graphics.Batch()
+        self.batch = pyglet.graphics.Batch()
         self.zoom_level = 1
 
-        self.robot = OsoyooCar(self.robot_batch)
+        self.robot = OsoyooCar(self.batch)
         self.wifiInterface = WifiInterface()
 
         self.phenomena = []
@@ -53,10 +52,8 @@ class EgoMemoryWindow(pyglet.window.Window):
         # Stack the rotation of the world so the robot's front is up
         # glRotatef(90, 0.0, 0.0, 1.0)
 
-        # Draw the robot
-        self.robot_batch.draw()
-        # Draw the phenomena
-        self.phenomena_batch.draw()
+        # Draw the robot and the phenomena
+        self.batch.draw()
 
         # Stack the environment's displacement and draw the origin just to check
         glMultMatrixf(self.environment_matrix)
@@ -80,26 +77,39 @@ class EgoMemoryWindow(pyglet.window.Window):
         outcome = json.loads(outcome_string)
 
         # Update the model from the outcome
-        glLoadIdentity()
-        if text == "8":
-            glTranslatef(-200, 0, 0)
+        translation = [0, 0]
+        rotation = 0
+        if text == "1":
+            rotation = 45
         if text == "2":
-            glTranslatef(200, 0, 0)
+            translation[0] = 180
+        if text == "3":
+            rotation = -45
+        if text == "8":
+            translation[0] = -180
 
         if 'head_angle' in outcome:
             head_angle = outcome['head_angle']
             print("Head angle %i" % head_angle)
             self.robot.rotate_head(head_angle)
-        if 'echo_distance' in outcome:
-            echo_distance = outcome['echo_distance']
-            print("Echo distance %i" % echo_distance)
-            x = self.robot.head_x + math.cos(math.radians(head_angle)) * echo_distance
-            y = self.robot.head_y + math.sin(math.radians(head_angle)) * echo_distance
-            obstacle = Phenomenon(x, y, self.phenomena_batch)
-            self.phenomena.append(obstacle)
         if 'yaw' in outcome:
-            glRotatef(-outcome['yaw'], 0, 0, 1.0)
+            rotation = outcome['yaw']
+        if text == "-" or text == "*":
+            if 'echo_distance' in outcome:
+                echo_distance = outcome['echo_distance']
+                print("Echo distance %i" % echo_distance)
+                x = self.robot.head_x + math.cos(math.radians(head_angle)) * echo_distance
+                y = self.robot.head_y + math.sin(math.radians(head_angle)) * echo_distance
+                obstacle = Phenomenon(x, y, self.batch)
+                self.phenomena.append(obstacle)
 
+        for p in self.phenomena:
+            p.translate(translation)
+            p.rotate(-rotation)
+
+        glLoadIdentity()
+        glTranslatef(translation[0], translation[1], 0)
+        glRotatef(-rotation, 0, 0, 1.0)
         glMultMatrixf(self.environment_matrix)
         glGetFloatv(GL_MODELVIEW_MATRIX, self.environment_matrix)
 
