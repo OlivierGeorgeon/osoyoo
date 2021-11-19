@@ -16,6 +16,6 @@ Incremental Natural Interactions on roboT
 
 ### Python venv
 - [pyglet](http://pyglet.org/) 
-- 
+- keyboard
 
 ## Arduino part
