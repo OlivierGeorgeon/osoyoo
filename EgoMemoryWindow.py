@@ -102,6 +102,14 @@ class EgoMemoryWindow(pyglet.window.Window):
                 y = self.robot.head_y + math.sin(math.radians(head_angle)) * echo_distance
                 obstacle = Phenomenon(x, y, self.batch)
                 self.phenomena.append(obstacle)
+        floor_outcome = outcome['outcome']
+        if floor_outcome == '1':  # Black line detected
+            print("Floor change")
+            x = 150
+            y = 0
+            obstacle = Phenomenon(x, y, self.batch, 1)
+            self.phenomena.append(obstacle)
+            translation[0] = -180*outcome['duration']/1000 + 120  # To be adjusted
 
         for p in self.phenomena:
             p.translate(translation)

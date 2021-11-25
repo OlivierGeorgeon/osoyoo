@@ -3,12 +3,16 @@ import math
 
 
 class Phenomenon:
-    def __init__(self, x, y, batch):
+    def __init__(self, x, y, batch, shape=0):
         self.batch = batch
         self.x = x
         self.y = y
 
-        self.circle = shapes.Circle(self.x, self.y, 20, color=(50, 225, 30), batch=self.batch)
+        if shape == 0:
+            self.shape = shapes.Circle(self.x, self.y, 20, color=(50, 225, 30), batch=self.batch)
+        else:
+            self.shape = shapes.Rectangle(0, 0, 14, 80, color=(200, 0, 0), batch=self.batch)
+            self.shape.anchor_position = 7, 40
 
     def rotate(self, angle):
         theta = math.radians(angle)
@@ -16,11 +20,12 @@ class Phenomenon:
         y = math.sin(theta)*self.x + math.cos(theta)*self.y
         self.x = x
         self.y = y
-        self.circle.x = self.x
-        self.circle.y = self.y
+        self.shape.x = self.x
+        self.shape.y = self.y
+        self.shape.rotation = -angle
 
     def translate(self, translation):
         self.x += translation[0]
         self.y += translation[1]
-        self.circle.x = self.x
-        self.circle.y = self.y
+        self.shape.x = self.x
+        self.shape.y = self.y
