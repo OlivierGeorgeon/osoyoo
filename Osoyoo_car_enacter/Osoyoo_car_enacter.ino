@@ -11,7 +11,9 @@
 #include "omny_wheel_motion.h"
 #include "calcDist.h"
 #include "tracking.h"
+
 #include "Servo_Scan.h"
+#include "gyro.h"
 
 #include "JsonOutcome.h"
 JsonOutcome outcome;
@@ -27,6 +29,7 @@ char packetBuffer[5];
 
 unsigned long endTime = 0;
 int actionStep = 0;
+float somme_gyroZ = 0;
 
 void setup()
 {
@@ -36,15 +39,16 @@ void setup()
   set();
   wifiBot.wifiInit();
 
+  mpu_setup();
+
 }
 
 
 void loop()
 {
   int packetSize = wifiBot.Udp.parsePacket();
+  gyro_update();
   if (packetSize) { // if you get a client,
-    outcome.addValue("distance", (String) dist());
-
     Serial.print("Received packet of size ");
     Serial.println(packetSize);
     int len = wifiBot.Udp.read(packetBuffer, 255);
@@ -76,16 +80,19 @@ void loop()
       actionStep = 1;
       endTime = millis() + 1000; //1sec
     }
-    //Terminated interaction
     if ((endTime < millis()) && (actionStep == 1))
     {
       stop_Stop();
 
       //Send outcome to PC
+      outcome.addValue( "gyroZ", (String) (gyroZ()));
       wifiBot.sendOutcome(outcome.get());
       outcome.clear();
-
       actionStep = 0;
+    }
+    if(actionStep == 0)
+    {
+        reset_gyroZ(); //calibrer l'angle Z à 0 tant qu'il n'a pas fait d'action
     }
     
 }
