@@ -24,7 +24,6 @@ class Head_echo_alignment
     void update();
     int measureUltrasonicEcho();
     void outcome(JSONVar & outcome_object);
-    //bool monitor();
     void turnHead(int head_angle);
     int _head_angle;
     bool _is_enacting_head_alignment;

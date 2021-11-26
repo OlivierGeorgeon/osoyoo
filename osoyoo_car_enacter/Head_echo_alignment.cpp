@@ -129,20 +129,6 @@ void Head_echo_alignment::outcome(JSONVar & outcome_object)
   //return "A" + String(_head_angle) + "O" + String(_min_ultrasonic_measure);
 }
 
-//bool Head_echo_alignment::monitor()
-//{
-//  if (!_is_enacting_head_alignment && _next_saccade_time < millis())
-//  {
-//    _next_saccade_time = millis() + ECHO_MONITOR_PERIOD;
-//    int current_ultrasonic_measure = measureUltrasonicEcho();
-//    //Serial.println("Angle " +String(_head_angle) + " measure " + String(current_ultrasonic_measure));
-//    if (abs(current_ultrasonic_measure - _min_ultrasonic_measure) > ECHO_MONITOR_VARIATION) {
-//      beginEchoAlignment();
-//    }
-//  }
-//  return _is_enacting_head_alignment;
-//}
-
 void Head_echo_alignment::turnHead(int head_angle)
 {
   _head_angle = head_angle;

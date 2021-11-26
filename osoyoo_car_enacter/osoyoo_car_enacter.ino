@@ -291,7 +291,7 @@ void loop()
   {
     JSONVar outcome_object;
     outcome_object["outcome"] = outcome;
-
+    FCR.outcome(outcome_object);
     HEA.outcome(outcome_object);
 
     switch (action)

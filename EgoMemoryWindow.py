@@ -104,7 +104,8 @@ class EgoMemoryWindow(pyglet.window.Window):
             y = 0
             obstacle = Phenomenon(x, y, self.batch, 1)
             self.phenomena.append(obstacle)
-            translation[0] = -180*outcome['duration']/1000 + 120  # To be adjusted
+            forward_duration = outcome['duration'] - 300  # Subtract retreat duration
+            translation[0] = -180*forward_duration/1000 + 180  # To be adjusted
 
         for p in self.phenomena:
             p.translate(translation)

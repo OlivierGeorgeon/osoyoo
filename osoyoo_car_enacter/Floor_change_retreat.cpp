@@ -19,6 +19,7 @@ Floor_change_retreat::Floor_change_retreat(Omny_wheel_motion OWM)
   _is_enacting = false;
   _previous_measure_floor = 0;
   _floor_change_retreat_end_time = 0;
+  _floor_outcome = 0;
 }
 
 void Floor_change_retreat::update()
@@ -45,11 +46,11 @@ void Floor_change_retreat::update()
       Serial.println("Floor change " + String(floor_change, BIN) + " Begin retreat at " + String(millis()));
       _is_enacting = true;
       switch (floor_change) {
-        case 0b10000:_OWM.setMotion(-150,-150,-50,-50);break; // back right
-        case 0b11000:_OWM.setMotion(-150,-150,-50,-50);break; // back right
-        case 0b00011:_OWM.setMotion(-50,-50,-150,-150);break; // back left
-        case 0b00001:_OWM.setMotion(-50,-50,-150,-150);break; // back left
-        default:_OWM.setMotion(-150,-150,-150,-150);break;
+        case 0b10000:_OWM.setMotion(-150,-150,-50,-50);_floor_outcome=2;break; // back right
+        case 0b11000:_OWM.setMotion(-150,-150,-50,-50);_floor_outcome=2;break; // back right
+        case 0b00011:_OWM.setMotion(-50,-50,-150,-150);_floor_outcome=1;break; // back left
+        case 0b00001:_OWM.setMotion(-50,-50,-150,-150);_floor_outcome=1;break; // back left
+        default:_OWM.setMotion(-150,-150,-150,-150);_floor_outcome=3;break;
       }
       _floor_change_retreat_end_time = millis() + RETREAT_DURATION;
     }
@@ -73,4 +74,9 @@ int Floor_change_retreat::measureFloor()
   //Serial.print("Flor sensor: ");
   //Serial.println(String(32 + sensor_value, BIN)); // Begin with "1" so we can see all the zeros
   return sensor_value;
+}
+
+void Floor_change_retreat::outcome(JSONVar & outcome_object)
+{
+  outcome_object["floor_outcome"] = _floor_outcome;
 }

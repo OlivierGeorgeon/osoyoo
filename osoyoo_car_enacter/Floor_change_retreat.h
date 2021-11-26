@@ -8,6 +8,7 @@
 
 #include "Arduino.h"
 #include "Omny_wheel_motion.h"
+#include <Arduino_JSON.h>
 
 #define RETREAT_DURATION 200
 #define RETREAT_EXTRA_DURATION 100
@@ -20,8 +21,10 @@ class Floor_change_retreat
     int measureFloor();
     void extraDuration(int duration);
     bool _is_enacting;
+    void outcome(JSONVar & outcome_object);
   private:
     Omny_wheel_motion _OWM;
+    int _floor_outcome;
     int _previous_measure_floor;
     unsigned long _floor_change_retreat_end_time;
 };
