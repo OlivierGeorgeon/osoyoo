@@ -42,9 +42,8 @@ void setup()
 void loop()
 {
   int packetSize = wifiBot.Udp.parsePacket();
+  gyro_update();
   if (packetSize) { // if you get a client,
-    outcome.addValue("distance", (String) dist());
-
     Serial.print("Received packet of size ");
     Serial.println(packetSize);
     int len = wifiBot.Udp.read(packetBuffer, 255);
@@ -75,22 +74,20 @@ void loop()
       actionStep = 1;
       endTime = millis() + 1000; //1sec
     }
-    //Terminated interaction
     if ((endTime < millis()) && (actionStep == 1))
     {
       stop_Stop();
 
       //Send outcome to PC
-      outcome.addValue( "gyroZ", (String) somme_gyroZ);
+      outcome.addValue( "gyroZ", (String) (gyroZ()));
       wifiBot.sendOutcome(outcome.get());
       outcome.clear();
-
+      Serial.print(gyroZ());
       actionStep = 0;
-      somme_gyroZ = 0;
     }
-    if(actionStep == 1)
+    if(actionStep == 0)
     {
-        somme_gyroZ += gyroZ();
+        reset_gyroZ();
     }
     
 }
