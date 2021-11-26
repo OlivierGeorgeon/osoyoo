@@ -9,12 +9,11 @@ from pyglet import shapes
 
 # Zooming constants
 ZOOM_IN_FACTOR = 1.2
-ZOOM_OUT_FACTOR = 1/ZOOM_IN_FACTOR
 
 
 class EgoMemoryWindow(pyglet.window.Window):
-    def __init__(self, *args, **kwargs):
-        super().__init__(400, 400, resizable=True, *args, **kwargs)
+    def __init__(self, width=400, height=400, *args, **kwargs):
+        super().__init__(width, height, resizable=True, *args, **kwargs)
         self.set_caption("Egocentric Memory")
         self.set_minimum_size(150, 150)
         glClearColor(1.0, 1.0, 1.0, 1.0)
@@ -26,18 +25,14 @@ class EgoMemoryWindow(pyglet.window.Window):
         self.wifiInterface = WifiInterface()
 
         self.phenomena = []
-        # self.origin = shapes.Circle(0, 0, 20, color=(150, 150, 225))
         self.origin = shapes.Rectangle(0, 0, 60, 40, color=(150, 150, 225))
         self.origin.anchor_position = 30, 20
-
 
         self.environment_matrix = (GLfloat * 16)(1, 0, 0, 0,
                                                  0, 1, 0, 0,
                                                  0, 0, 1, 0,
                                                  0, 0, 0, 1)
-        #glLoadIdentity()
-        #glTranslatef(150, 0, 0)
-        #glGetFloatv(GL_MODELVIEW_MATRIX, self.envMat)  # The only way i found to set envMat to identity
+        # pyglet.app.run()
 
     def on_draw(self):
         glClear(GL_COLOR_BUFFER_BIT)
@@ -60,13 +55,13 @@ class EgoMemoryWindow(pyglet.window.Window):
         self.origin.draw()  # Draw the origin of the robot
 
     def on_resize(self, width, height):
-        # Display in the whole window
+        # Always display in the whole window
         glViewport(0, 0, width, height)
 
     def on_mouse_scroll(self, x, y, dx, dy):
-        # Inspired from https://www.py4u.net/discuss/148957
+        # Inspired by https://www.py4u.net/discuss/148957
         # Get scale factor
-        f = ZOOM_IN_FACTOR if dy > 0 else ZOOM_OUT_FACTOR if dy < 0 else 1
+        f = ZOOM_IN_FACTOR if dy > 0 else 1/ZOOM_IN_FACTOR if dy < 0 else 1
         if .4 < self.zoom_level * f < 5:
             self.zoom_level *= f
 
@@ -121,7 +116,19 @@ class EgoMemoryWindow(pyglet.window.Window):
         glMultMatrixf(self.environment_matrix)
         glGetFloatv(GL_MODELVIEW_MATRIX, self.environment_matrix)
 
+        return floor_outcome
+
 
 if __name__ == "__main__":
     em_window = EgoMemoryWindow()
+
+    # is_testing = False
+    # def test(dt):
+    #    global is_testing
+    #    if not is_testing:
+    #        is_testing = True
+    #        em_window.enact('8')
+    #        is_testing = False
+    # pyglet.clock.schedule_interval(test, 0.5)
+
     pyglet.app.run()
