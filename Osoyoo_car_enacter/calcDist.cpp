@@ -25,9 +25,9 @@ float dist() {
     float distance_mm = measure / 2.0 * SOUND_SPEED;
 
     /* Affiche les résultats en mm, cm et m */
-//    Serial.print(F("Distance: "));
+//      Serial.print(F("Distance: "));
 //    Serial.print(distance_mm);
-//    Serial.print(F("mm ("));
+//    Serial.println(F("mm "));
 //    Serial.print(distance_mm / 10.0, 2);
 //    Serial.print(F("cm, "));
 //    Serial.print(distance_mm / 1000.0, 2);
