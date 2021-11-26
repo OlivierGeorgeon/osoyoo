@@ -82,12 +82,11 @@ void loop()
       outcome.addValue( "gyroZ", (String) (gyroZ()));
       wifiBot.sendOutcome(outcome.get());
       outcome.clear();
-      Serial.print(gyroZ());
       actionStep = 0;
     }
     if(actionStep == 0)
     {
-        reset_gyroZ();
+        reset_gyroZ(); //calibrer l'angle Z à 0 tant qu'il n'a pas fait d'action
     }
     
 }

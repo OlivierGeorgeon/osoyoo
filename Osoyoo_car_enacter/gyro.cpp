@@ -18,24 +18,11 @@
        Serial.println("Done!\n");
  }
  void reset_gyroZ(){
-    mpu.setAngleZ(0.69);
+    mpu.setAngleZ(0); // créer une fonction pour réinitialiser l'angle à 0 quand on ne fait plus d'action.
  }
  void gyro_update(){
-    mpu.update();
+    mpu.update(); //Créer une fonction pour update le mpu dans le loop.
  }
  float gyroZ(){
-     return (mpu.getAngleZ());
+     return (mpu.getAngleZ()); //créer une fonction pour récuperer l'angle Z.
  }
-     /*void loop() {
-       mpu.update();
-     if ((millis() - timer) > 10) { // print data every 10ms
-         Serial.print("X : ");
-         Serial.print(mpu.getAngleX());
-         Serial.print("\tY : ");
-         Serial.print(mpu.getAngleY());
-         Serial.print("\tZ : ");
-         Serial.println(mpu.getAngleZ());
-         timer = millis();
-       }
-     }
-     */
