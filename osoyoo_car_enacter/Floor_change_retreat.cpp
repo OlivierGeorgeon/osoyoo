@@ -79,4 +79,5 @@ int Floor_change_retreat::measureFloor()
 void Floor_change_retreat::outcome(JSONVar & outcome_object)
 {
   outcome_object["floor_outcome"] = _floor_outcome;
+  _floor_outcome = 0;
 }

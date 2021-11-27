@@ -7,6 +7,7 @@ class Phenomenon:
         self.batch = batch
         self.x = x
         self.y = y
+        self.angle = 0
 
         if shape == 0:
             self.shape = shapes.Circle(self.x, self.y, 20, color=(50, 225, 30), batch=self.batch)
@@ -15,17 +16,18 @@ class Phenomenon:
             self.shape.anchor_position = 7, 40
 
     def rotate(self, angle):
-        theta = math.radians(angle)
+        theta = -math.radians(angle)
         x = math.cos(theta)*self.x - math.sin(theta)*self.y
         y = math.sin(theta)*self.x + math.cos(theta)*self.y
         self.x = x
         self.y = y
         self.shape.x = self.x
         self.shape.y = self.y
-        self.shape.rotation = -angle
+        self.angle += angle
+        self.shape.rotation = self.angle
 
     def translate(self, translation):
-        self.x += translation[0]
-        self.y += translation[1]
+        self.x -= translation[0]
+        self.y -= translation[1]
         self.shape.x = self.x
         self.shape.y = self.y

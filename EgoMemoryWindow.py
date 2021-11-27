@@ -6,8 +6,8 @@ import json
 from Phenomenon import Phenomenon
 import math
 from pyglet import shapes
+from RobotDefine import *
 
-# Zooming constants
 ZOOM_IN_FACTOR = 1.2
 
 
@@ -60,7 +60,6 @@ class EgoMemoryWindow(pyglet.window.Window):
 
     def on_mouse_scroll(self, x, y, dx, dy):
         # Inspired by https://www.py4u.net/discuss/148957
-        # Get scale factor
         f = ZOOM_IN_FACTOR if dy > 0 else 1/ZOOM_IN_FACTOR if dy < 0 else 1
         if .4 < self.zoom_level * f < 5:
             self.zoom_level *= f
@@ -71,21 +70,21 @@ class EgoMemoryWindow(pyglet.window.Window):
         print(outcome_string)
         outcome = json.loads(outcome_string)
 
-        # Update the model from the outcome
+        # Presupposed displacement of the robot relative to the environment
         translation = [0, 0]
         rotation = 0
         if text == "1":
             rotation = 45
         if text == "2":
-            translation[0] = 180
+            translation[0] = -STEP_FORWARD_DISTANCE
         if text == "3":
             rotation = -45
         if text == "8":
-            translation[0] = -180
+            translation[0] = STEP_FORWARD_DISTANCE
 
         if 'head_angle' in outcome:
             head_angle = outcome['head_angle']
-            print("Head angle %i" % head_angle)
+            # print("Head angle %i" % head_angle)
             self.robot.rotate_head(head_angle)
         if 'yaw' in outcome:
             rotation = outcome['yaw']
@@ -98,21 +97,24 @@ class EgoMemoryWindow(pyglet.window.Window):
                 obstacle = Phenomenon(x, y, self.batch)
                 self.phenomena.append(obstacle)
         floor_outcome = outcome['outcome']
-        if floor_outcome == '1':  # Black line detected
-            print("Floor change")
-            x = 150
-            y = 0
-            obstacle = Phenomenon(x, y, self.batch, 1)
-            self.phenomena.append(obstacle)
-            forward_duration = outcome['duration'] - 300  # Subtract retreat duration
-            translation[0] = -180*forward_duration/1000 + 180  # To be adjusted
+        if 'floor_outcome' in outcome:
+            floor_outcome = outcome['floor_outcome']
+            if floor_outcome > 0:  # Black line detected
+                # Display line
+                obstacle = Phenomenon(150, 0, self.batch, 1)
+                self.phenomena.append(obstacle)
 
+                forward_duration = outcome['duration'] - 300  # Subtract retreat duration
+                translation[0] = STEP_FORWARD_DISTANCE * forward_duration/1000 - RETREAT_DISTANCE  # To be adjusted
+
+        # Translate and rotate all the phenomena
         for p in self.phenomena:
             p.translate(translation)
-            p.rotate(-rotation)
+            p.rotate(rotation)
 
+        # Update the environment matrix used to keep track of the origin
         glLoadIdentity()
-        glTranslatef(translation[0], translation[1], 0)
+        glTranslatef(-translation[0], -translation[1], 0)
         glRotatef(-rotation, 0, 0, 1.0)
         glMultMatrixf(self.environment_matrix)
         glGetFloatv(GL_MODELVIEW_MATRIX, self.environment_matrix)

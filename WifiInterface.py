@@ -2,10 +2,10 @@ import socket
 import keyboard
 
 # UDP_IP = "192.168.4.1"  # AP mode
-# UDP_IP = "192.168.1.19"  # STA mode sur Olivier's wifi
+UDP_IP = "192.168.1.19"  # STA mode sur Olivier's wifi
 # UDP_IP = "10.40.22.251" # STA sur RobotBSN Olivier's Robot en A301
 # UDP_IP = "10.40.22.254" # STA sur RobotBSN
-UDP_IP = "10.44.53.11"  # STA sur RobotBSN Olivier's Robot en A485
+# UDP_IP = "10.44.53.11"  # STA sur RobotBSN Olivier's Robot en A485
 UDP_TIMEOUT = 3  # Seconds
 
 
