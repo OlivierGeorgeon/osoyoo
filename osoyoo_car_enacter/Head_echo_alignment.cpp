@@ -48,9 +48,11 @@ void Head_echo_alignment::beginEchoScan()
   _is_enacting_echo_scan = true;
   _min_ultrasonic_measure = 1000;
   if (_head_angle > 0) {
+    // If head is to the left, start from 90° and scan every 20° clockwise
     _angle_min_ultrasonic_measure = 90;
     _head_angle_span = -SACCADE_SPAN * 2;
   } else {
+    // If head is to the right, start from -90° and scan every 20° counterclockwise
     _angle_min_ultrasonic_measure = -90;
     _head_angle_span = SACCADE_SPAN * 2;
   }
@@ -79,8 +81,9 @@ void Head_echo_alignment::update()
       } else {
         // moving away, reverse movement
         _head_angle_span = - _head_angle_span;
-        _head_angle += _head_angle_span;
-        _head.write(_head_angle + 90);
+        _head_angle += _head_angle_span; // may reach -100° or 100° but ...
+        turnHead(_head_angle);           // ... turnHead() sets it back to -90° or 90°
+        //_head.write(_head_angle + 90);
         if (_penultimate_ultrasonic_measure >= _previous_ultrasonic_measure) {
           // Passed the minimum, stop
           _min_ultrasonic_measure = _previous_ultrasonic_measure;

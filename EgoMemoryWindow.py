@@ -100,12 +100,13 @@ class EgoMemoryWindow(pyglet.window.Window):
         if 'floor_outcome' in outcome:
             floor_outcome = outcome['floor_outcome']
             if floor_outcome > 0:  # Black line detected
-                # Display line
-                obstacle = Phenomenon(150, 0, self.batch, 1)
+                # Update the translation
+                if text == "8":
+                    forward_duration = outcome['duration'] - 300  # Subtract retreat duration
+                    translation[0] = STEP_FORWARD_DISTANCE * forward_duration/1000 - RETREAT_DISTANCE  # To be adjusted
+                # Display line phenomenon
+                obstacle = Phenomenon(150 + translation[0], 0, self.batch, 1)
                 self.phenomena.append(obstacle)
-
-                forward_duration = outcome['duration'] - 300  # Subtract retreat duration
-                translation[0] = STEP_FORWARD_DISTANCE * forward_duration/1000 - RETREAT_DISTANCE  # To be adjusted
 
         # Translate and rotate all the phenomena
         for p in self.phenomena:
