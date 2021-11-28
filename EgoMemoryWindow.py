@@ -69,6 +69,7 @@ class EgoMemoryWindow(pyglet.window.Window):
         outcome_string = self.wifiInterface.enact(text)
         print(outcome_string)
         outcome = json.loads(outcome_string)
+        floor_outcome = outcome['outcome']  # Agent5 uses floor_outcome
 
         # Presupposed displacement of the robot relative to the environment
         translation = [0, 0]
@@ -82,21 +83,11 @@ class EgoMemoryWindow(pyglet.window.Window):
         if text == "8":
             translation[0] = STEP_FORWARD_DISTANCE
 
-        if 'head_angle' in outcome:
-            head_angle = outcome['head_angle']
-            # print("Head angle %i" % head_angle)
-            self.robot.rotate_head(head_angle)
+        # Actual measured displacement if any
         if 'yaw' in outcome:
             rotation = outcome['yaw']
-        if text == "-" or text == "*":
-            if 'echo_distance' in outcome:
-                echo_distance = outcome['echo_distance']
-                print("Echo distance %i" % echo_distance)
-                x = self.robot.head_x + math.cos(math.radians(head_angle)) * echo_distance
-                y = self.robot.head_y + math.sin(math.radians(head_angle)) * echo_distance
-                obstacle = Phenomenon(x, y, self.batch)
-                self.phenomena.append(obstacle)
-        floor_outcome = outcome['outcome']
+
+        # Estimate displacement due to floor change retreat
         if 'floor_outcome' in outcome:
             floor_outcome = outcome['floor_outcome']
             if floor_outcome > 0:  # Black line detected
@@ -104,14 +95,27 @@ class EgoMemoryWindow(pyglet.window.Window):
                 if text == "8":
                     forward_duration = outcome['duration'] - 300  # Subtract retreat duration
                     translation[0] = STEP_FORWARD_DISTANCE * forward_duration/1000 - RETREAT_DISTANCE  # To be adjusted
-                # Display line phenomenon
-                obstacle = Phenomenon(150 + translation[0], 0, self.batch, 1)
+                # Create the floor-changed phenomenon
+                obstacle = Phenomenon(150 + translation[0], 0, self.batch, 1)  # the translation will be reapplied
                 self.phenomena.append(obstacle)
 
         # Translate and rotate all the phenomena
         for p in self.phenomena:
             p.translate(translation)
             p.rotate(rotation)
+
+        # Update head angle
+        if 'head_angle' in outcome:
+            head_angle = outcome['head_angle']
+            self.robot.rotate_head(head_angle)
+            if text == "-" or text == "*" or text == "1" or text == "3":
+                # Create echo phenomenon
+                echo_distance = outcome['echo_distance']
+                print("Echo distance %i" % echo_distance)
+                x = self.robot.head_x + math.cos(math.radians(head_angle)) * echo_distance
+                y = self.robot.head_y + math.sin(math.radians(head_angle)) * echo_distance
+                obstacle = Phenomenon(x, y, self.batch)
+                self.phenomena.append(obstacle)
 
         # Update the environment matrix used to keep track of the origin
         glLoadIdentity()

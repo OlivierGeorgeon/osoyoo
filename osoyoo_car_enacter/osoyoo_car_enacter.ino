@@ -148,7 +148,8 @@ void loop()
         case ACTION_TURN_IN_SPOT_LEFT:
           action_end_time = millis() + TURN_SPOT_MAX_DURATION;
           robot_destination_angle = 45;
-          HEA.turnHead(0);  // Look ahead
+          HEA.turnHead(45);  // Look ahead
+          Serial.println("Look left");
           OWM.turnInSpotLeft(TURN_SPEED);
           break;
         case ACTION_GO_BACK:
@@ -157,7 +158,8 @@ void loop()
         case ACTION_TURN_IN_SPOT_RIGHT:
           action_end_time = millis() + TURN_SPOT_MAX_DURATION;
           robot_destination_angle = -45;
-          HEA.turnHead(0);  // Look ahead
+          HEA.turnHead(-45);  // Look ahead
+          Serial.println("Look right");
           OWM.turnInSpotRight(TURN_SPEED);
           break;
         case ACTION_SHIFT_LEFT:
@@ -227,10 +229,25 @@ void loop()
         }
         break;
       case ACTION_TURN_IN_SPOT_LEFT:
-      case ACTION_TURN_IN_SPOT_RIGHT:
-        // Stop when yaw reach 45°
-        if (((action == ACTION_TURN_IN_SPOT_LEFT) && (IMU._yaw > robot_destination_angle - TURN_SPOT_ENDING_ANGLE)) ||
-        ((action == ACTION_TURN_IN_SPOT_RIGHT) && (IMU._yaw < robot_destination_angle + TURN_SPOT_ENDING_ANGLE)))
+        // Keep head aligned with destination angle
+        HEA.turnHead(45 - IMU._yaw);
+         // Stop before reaching 45°
+        if (IMU._yaw > robot_destination_angle - TURN_SPOT_ENDING_ANGLE)
+        {
+          OWM.stopMotion();
+          interaction_step = 2;
+          action_end_time = millis() + TURN_SPOT_ENDING_DELAY;
+        }
+        // Stop at action end time
+        else if (action_end_time < millis()) {
+          interaction_step = 2;
+        }
+        break;
+     case ACTION_TURN_IN_SPOT_RIGHT:
+        // Keep head aligned with destination angle
+        HEA.turnHead(-45 - IMU._yaw);
+        // Stop before reaching -45°
+        if (IMU._yaw < robot_destination_angle + TURN_SPOT_ENDING_ANGLE)
         {
           OWM.stopMotion();
           interaction_step = 2;
@@ -274,6 +291,12 @@ void loop()
       case ACTION_TURN_RIGHT:
       case ACTION_TURN_LEFT:
         if (!FCR._is_enacting) {
+          interaction_step = 3;
+        }
+        break;
+      case ACTION_TURN_IN_SPOT_LEFT:
+      case ACTION_TURN_IN_SPOT_RIGHT:
+        if (!FCR._is_enacting && action_end_time < millis() && !HEA._is_enacting_head_alignment) {
           Serial.println("interaction step = 3");
           interaction_step = 3;
         }
