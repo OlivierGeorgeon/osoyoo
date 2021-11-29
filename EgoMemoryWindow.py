@@ -6,6 +6,10 @@ import json
 from Phenomenon import Phenomenon
 import math
 from pyglet import shapes
+from pyglet import clock
+
+import threading
+import time
 
 # Zooming constants
 ZOOM_IN_FACTOR = 1.2
@@ -35,6 +39,8 @@ class EgoMemoryWindow(pyglet.window.Window):
                                                  0, 1, 0, 0,
                                                  0, 0, 1, 0,
                                                  0, 0, 0, 1)
+
+        self.outcome = "{}"
         #glLoadIdentity()
         #glTranslatef(150, 0, 0)
         #glGetFloatv(GL_MODELVIEW_MATRIX, self.envMat)  # The only way i found to set envMat to identity
@@ -42,7 +48,7 @@ class EgoMemoryWindow(pyglet.window.Window):
     def on_draw(self):
         glClear(GL_COLOR_BUFFER_BIT)
         glLoadIdentity()
-
+    
         # The transformations are stacked, and applied backward to the vertices
 
         # Stack the projection matrix. Centered on (0,0). Fit the window size and zoom factor
@@ -76,6 +82,9 @@ class EgoMemoryWindow(pyglet.window.Window):
         print(outcome_string)
         outcome = json.loads(outcome_string)
 
+        self.windowRefresh(text, outcome)
+
+    def windowRefresh(self, text, outcome):
         # Update the model from the outcome
         translation = [0, 0]
         rotation = 0
@@ -113,7 +122,28 @@ class EgoMemoryWindow(pyglet.window.Window):
         glMultMatrixf(self.environment_matrix)
         glGetFloatv(GL_MODELVIEW_MATRIX, self.environment_matrix)
 
+    # Boucle en arrière plan pour demander régulièrement des informations au robot
+    def actionLoop(self, frequence):
+        def loop(obj: EgoMemoryWindow):
+            while True:
+                time.sleep(frequence)
+                print("Data requests")
+                obj.outcome = obj.wifiInterface.enact('$')
+                # obj.windowRefresh('$', json.loads(outcome))
+
+        thread = threading.Thread(target=loop, args=[self])
+        thread.start()
+
+    # Boucle executer par pyglet pour utiliser les fonction de actionLoop
+    def actionLoopInterprete(self, dt):
+        if self.outcome != "{}":
+            print(self.outcome)
+            self.windowRefresh('$', json.loads(self.outcome))
+            self.outcome = "{}"
+
 
 if __name__ == "__main__":
     em_window = EgoMemoryWindow()
+    em_window.actionLoop(10)
+    clock.schedule_interval(em_window.actionLoopInterprete, 5)
     pyglet.app.run()
