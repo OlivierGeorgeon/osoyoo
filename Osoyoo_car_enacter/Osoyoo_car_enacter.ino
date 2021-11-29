@@ -43,7 +43,7 @@ void loop()
 {
   int packetSize = wifiBot.Udp.parsePacket();
   if (packetSize) { // if you get a client,
-    outcome.addValue("distance", (String) dist());
+    // outcome.addValue("distance", (String) dist());
 
     Serial.print("Received packet of size ");
     Serial.println(packetSize);
@@ -57,6 +57,7 @@ void loop()
       actionStep = 1;
       switch (c)    //serial control instructions
       {  
+        case '$':outcome.addValue("distance", (String) dist());break;
         case '8':go_forward(SPEED);break;
         case '4':left_turn(SPEED);break;
         case '6':right_turn(SPEED);break;
