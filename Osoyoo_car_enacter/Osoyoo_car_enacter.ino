@@ -38,9 +38,9 @@ void setup()
 
 }
 
-
 void loop()
 {
+  alignement();
   int packetSize = wifiBot.Udp.parsePacket();
   if (packetSize) { // if you get a client,
     outcome.addValue("distance", (String) dist());

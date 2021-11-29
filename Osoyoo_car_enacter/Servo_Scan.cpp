@@ -17,9 +17,19 @@
 
 Servo myservo;
 // Initialisation de port de branchement sur la carte
+float distMin;
 void servo_port() {
   myservo.attach(4);
 }
+
+void alignement(){
+  dist();
+  delay(300);
+  if (distMin != distMin + abs(20)){
+    scan(45, 135, 5);
+  }
+}
+
 void scan(int angleMin, int angleMax, int Nbre_mesure) {
   float pas = (angleMax-angleMin)/Nbre_mesure;
   float distances[Nbre_mesure];
@@ -39,5 +49,7 @@ void scan(int angleMin, int angleMax, int Nbre_mesure) {
         Serial.print(indexMin, pas);
     }
   }
+  distMin = distances[indexMin];
    myservo.write(indexMin*pas);
+   return distances[indexMin];
 }
