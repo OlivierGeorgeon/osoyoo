@@ -13,6 +13,7 @@
 #include "tracking.h"
 
 #include "Servo_Scan.h"
+#define pc "1"
 #include "gyro.h"
 
 #include "JsonOutcome.h"
@@ -37,7 +38,12 @@ void setup()
   Serial.begin(9600);   // initialize serial for debugging
   servo_port();
   set();
-  wifiBot.wifiInit();
+  if (pc == "1"){
+    wifiBot.wifiInitLocal();
+  }
+  if (pc == "2"){
+    wifiBot.wifiInitRouter();
+  }
 
   mpu_setup();
 
