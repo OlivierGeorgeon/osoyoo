@@ -16,29 +16,28 @@
 #include "Arduino.h"
 
 Servo myservo;
-
 // Initialisation de port de branchement sur la carte
 void servo_port() {
-  myservo.attach(13);
+  myservo.attach(4);
 }
-
-void scan() {
-  float distances[10];
-  //Scan de 9 calcul de distances tout les 20 degrés pour couvrir les 180°
-  for (int pos = 0; pos <= 9; pos += 1) {
-    myservo.write(pos*20);
+void scan(int angleMin, int angleMax, int Nbre_mesure) {
+  float pas = (angleMax-angleMin)/Nbre_mesure;
+  float distances[Nbre_mesure];
+  //Scan de Nbre_mesure calcul de distances tout les 20 degrés pour couvrir les 180°
+  for (int pos = 0; pos <= Nbre_mesure; pos += 1) {
+    myservo.write(angleMin+(pas*pos));
     delay(300);
     distances[pos] = dist();
   }
-
   //Recherche de la plus petite distances
   int indexMin;
   float valMin = distances[0];
-  for (int i = 1; i <= 9; i++){
+  for (int i = 1; i <= Nbre_mesure; i++){
     if(distances[i] < valMin){
         valMin = distances[i];
         indexMin = i;
+        Serial.print(indexMin, pas);
     }
   }
-   myservo.write(indexMin*20); //S'aligner sur l'objet la plus proche
+   myservo.write(indexMin*pas);
 }

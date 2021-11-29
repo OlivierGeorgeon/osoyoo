@@ -17,7 +17,7 @@
 JsonOutcome outcome;
 
 #include "WifiBot.h"
-WifiBot wifiBot = WifiBot("osoyoo_robot2", 8888);
+WifiBot wifiBot = WifiBot("osoyoo_robot", 8888);
 
 #include "WiFiEsp.h"
 #include "WiFiEspUDP.h"
@@ -64,7 +64,8 @@ void loop()
         case '5':stop_Stop();break;
         case '0':until_line(SPEED);break;
         case 'D':outcome.addValue("distance", (String) dist());break;
-        case 'S': scan(); break;
+        case 'S': scan(0, 180, 9); break;
+        case 'M': scan(45, 135, 10); break;
         default:break;
       }
 
