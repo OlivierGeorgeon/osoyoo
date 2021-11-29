@@ -1,6 +1,5 @@
 #ifndef WifiBot_h
 #define WifiBot_h
-
 #include "WiFiEsp.h"
 #include "WiFiEspUDP.h"
 
@@ -17,7 +16,9 @@ class WifiBot
     String ssid;
 
     //Methode
-    void wifiInit();
+    //void wifiInit();
+    void wifiInitLocal();
+    void wifiInitRouter();
 
     void printWifiStatus();
 
