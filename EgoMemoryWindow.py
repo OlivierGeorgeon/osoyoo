@@ -142,7 +142,8 @@ class EgoMemoryWindow(pyglet.window.Window):
         def async_action(emw: EgoMemoryWindow):
             print("1. Async send " + self.async_action)
             emw.async_outcome_string = emw.wifiInterface.enact(self.async_action)
-            print("2. Async receive " + emw.async_outcome_string)
+            print("2. Async receive ", end="")
+            print(emw.async_outcome_string)
             emw.async_flag = 2
 
         self.async_action = text
