@@ -12,6 +12,9 @@
 #include "Robot_define.h"
 #include <Wire.h>
 #include <MPU6050.h>
+#if ROBOT_HAS_HMC5883L == true
+#include <HMC5883L.h>
+#endif
 
 Imu_control::Imu_control()
 {
@@ -47,6 +50,36 @@ void Imu_control::setup()
 
   #else
     #warning "No MPU6050"
+  #endif
+
+  #if ROBOT_HAS_HMC5883L == true
+  // Initialize Initialize HMC5883L
+
+  _mpu.setI2CMasterModeEnabled(false);
+  _mpu.setI2CBypassEnabled(true) ;
+  _mpu.setSleepEnabled(false);
+
+  Serial.println("Initialize HMC5883L");
+  while (!compass.begin())
+  {
+    Serial.println("Could not find a valid HMC5883L sensor, check wiring!");
+    delay(500);
+  }
+
+  // Set measurement range
+  compass.setRange(HMC5883L_RANGE_1_3GA);
+
+  // Set measurement mode
+  compass.setMeasurementMode(HMC5883L_CONTINOUS);
+
+  // Set data rate
+  compass.setDataRate(HMC5883L_DATARATE_15HZ);
+
+  // Set number of samples averaged
+  compass.setSamples(HMC5883L_SAMPLES_8);
+
+  // Set calibration offset. See HMC5883L_calibration.ino
+  compass.setOffset(1475, -1685);
   #endif
 }
 void Imu_control::begin()
@@ -115,4 +148,41 @@ void Imu_control::outcome(JSONVar & outcome_object)
   outcome_object["blocked"] = _blocked;
   outcome_object["max_acceleration"] = _max_acceleration;
   outcome_object["min_acceleration"] = _min_acceleration;
+
+  #if ROBOT_HAS_HMC5883L == true
+  outcome_object["azimuth"] = read_azimuth();
+  #endif
 }
+
+#if ROBOT_HAS_HMC5883L == true
+int Imu_control::read_azimuth()
+{
+  Vector norm = compass.readNormalize();
+
+  // Calculate heading
+  float heading = atan2(norm.YAxis, norm.XAxis);
+
+  // Convert to degrees
+  int headingDegrees = heading * 180/M_PI;
+
+  // Set declination angle on your location and fix heading
+  // You can find your declination on: http://magnetic-declination.com/
+  // (+) Positive or (-) for negative
+  // For Bytom / Poland declination angle is 4'26E (positive)
+  // Formula: (deg + (min / 60.0)) / (180 / M_PI) radiant;
+  float declinationAngle = (4.0 + (26.0 / 60.0));
+  //heading += declinationAngle;
+
+  headingDegrees += 180;
+  if (heading >= 360)
+  {
+    headingDegrees -= 360;
+  }
+
+  Serial.print("Azimuth = ");
+  Serial.print(headingDegrees);
+  Serial.println();
+
+  return headingDegrees;
+}
+#endif
