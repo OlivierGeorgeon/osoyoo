@@ -7,6 +7,7 @@ from Phenomenon import Phenomenon
 import math
 from pyglet import shapes
 from RobotDefine import *
+import threading
 
 ZOOM_IN_FACTOR = 1.2
 
@@ -33,6 +34,9 @@ class EgoMemoryWindow(pyglet.window.Window):
                                                  0, 0, 1, 0,
                                                  0, 0, 0, 1)
         # pyglet.app.run()
+        self.async_action = ""
+        self.async_flag = 0
+        self.async_outcome_string = ""
 
     def on_draw(self):
         glClear(GL_COLOR_BUFFER_BIT)
@@ -65,9 +69,13 @@ class EgoMemoryWindow(pyglet.window.Window):
             self.zoom_level *= f
 
     def on_text(self, text):
-        print("Send action: ", text)
-        outcome_string = self.wifiInterface.enact(text)
-        print(outcome_string)
+        self.async_action_trigger(text)
+        # print("Send action: ", text)
+        # outcome_string = self.wifiInterface.enact(text)
+        # print(outcome_string)
+        # self.process_outcome(text, outcome_string)
+
+    def process_outcome(self, text, outcome_string):
         outcome = json.loads(outcome_string)
         floor_outcome = outcome['outcome']  # Agent5 uses floor_outcome
 
@@ -92,10 +100,10 @@ class EgoMemoryWindow(pyglet.window.Window):
             floor_outcome = outcome['floor_outcome']
             if floor_outcome > 0:  # Black line detected
                 # Update the translation
-                if text == "8":
+                if text == "8":  # TODO Other actions
                     forward_duration = outcome['duration'] - 300  # Subtract retreat duration
                     translation[0] = STEP_FORWARD_DISTANCE * forward_duration/1000 - RETREAT_DISTANCE  # To be adjusted
-                # Create the floor-changed phenomenon
+                # Create a new floor-changed phenomenon
                 obstacle = Phenomenon(150 + translation[0], 0, self.batch, 1)  # the translation will be reapplied
                 self.phenomena.append(obstacle)
 
@@ -109,7 +117,7 @@ class EgoMemoryWindow(pyglet.window.Window):
             head_angle = outcome['head_angle']
             self.robot.rotate_head(head_angle)
             if text == "-" or text == "*" or text == "1" or text == "3":
-                # Create echo phenomenon
+                # Create a new echo phenomenon
                 echo_distance = outcome['echo_distance']
                 print("Echo distance %i" % echo_distance)
                 x = self.robot.head_x + math.cos(math.radians(head_angle)) * echo_distance
@@ -126,17 +134,28 @@ class EgoMemoryWindow(pyglet.window.Window):
 
         return floor_outcome
 
+    # Asynchronous interaction with the robot
+    def async_action_trigger(self, text):
+        def async_action(emw: EgoMemoryWindow):
+            print("1. Async send " + self.async_action)
+            emw.async_flag = 1
+            emw.async_outcome_string = emw.wifiInterface.enact(self.async_action)
+            print("2. Async receive " + emw.async_outcome_string)
+            emw.async_flag = 2
+
+        self.async_action = text
+        thread = threading.Thread(target=async_action, args=[self])
+        thread.start()
+
 
 if __name__ == "__main__":
     em_window = EgoMemoryWindow()
 
-    # is_testing = False
-    # def test(dt):
-    #    global is_testing
-    #    if not is_testing:
-    #        is_testing = True
-    #        em_window.enact('8')
-    #        is_testing = False
-    # pyglet.clock.schedule_interval(test, 0.5)
+    def watch_async_outcome(dt):
+        if em_window.async_flag == 2:
+            print("3. Async processing outcome")
+            em_window.process_outcome(em_window.async_action, em_window.async_outcome_string)
+            em_window.async_flag = 0
 
+    pyglet.clock.schedule_interval(watch_async_outcome, 0.1)
     pyglet.app.run()
