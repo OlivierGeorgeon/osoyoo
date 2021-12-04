@@ -69,7 +69,10 @@ class EgoMemoryWindow(pyglet.window.Window):
             self.zoom_level *= f
 
     def on_text(self, text):
-        self.async_action_trigger(text)
+        if self.async_flag == 0:
+            self.async_action_trigger(text)
+        else:
+            print("Waiting for previous outcome before sending new action")
         # print("Send action: ", text)
         # outcome_string = self.wifiInterface.enact(text)
         # print(outcome_string)
@@ -138,12 +141,12 @@ class EgoMemoryWindow(pyglet.window.Window):
     def async_action_trigger(self, text):
         def async_action(emw: EgoMemoryWindow):
             print("1. Async send " + self.async_action)
-            emw.async_flag = 1
             emw.async_outcome_string = emw.wifiInterface.enact(self.async_action)
             print("2. Async receive " + emw.async_outcome_string)
             emw.async_flag = 2
 
         self.async_action = text
+        self.async_flag = 1
         thread = threading.Thread(target=async_action, args=[self])
         thread.start()
 
