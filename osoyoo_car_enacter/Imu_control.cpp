@@ -13,7 +13,7 @@
 #include <Wire.h>
 #include <MPU6050.h>
 #if ROBOT_HAS_HMC5883L == true
-#include <HMC5883L.h>
+  #include <HMC5883L.h>
 #endif
 
 Imu_control::Imu_control()
@@ -73,10 +73,10 @@ void Imu_control::setup()
   compass.setMeasurementMode(HMC5883L_CONTINOUS);
 
   // Set data rate
-  compass.setDataRate(HMC5883L_DATARATE_15HZ);
+  compass.setDataRate(HMC5883L_DATARATE_30HZ); // HMC5883L_DATARATE_15HZ
 
   // Set number of samples averaged
-  compass.setSamples(HMC5883L_SAMPLES_8);
+  compass.setSamples(HMC5883L_SAMPLES_4); // HMC5883L_SAMPLES_8
 
   // Set calibration offset. See HMC5883L_calibration.ino
   compass.setOffset(1475, -1685);

@@ -47,7 +47,7 @@ Imu_control IMU;
 
 int status = WL_IDLE_STATUS;
 // use a ring buffer to increase speed and reduce memory allocation
-char packetBuffer[5];
+char packetBuffer[20];
 WiFiEspUDP Udp;
 unsigned int localPort = 8888;  // local port to listen on
 
@@ -123,14 +123,25 @@ void loop()
   {
     // Watch the wifi for new action
     int packetSize = Udp.parsePacket();
-    if (packetSize) {                               // if you get a client,
+    // If the received packet exceeds the size of packetBuffer defined above, Arduino will crash
+    if (packetSize) {
       int len = Udp.read(packetBuffer, 255);
-      if (len > 0) {
+      //if (len > 0) {
         packetBuffer[len] = 0;
-      }
-      action = packetBuffer[0];
-      Serial.print("Received action ");
-      Serial.print(action);
+        Serial.print("Received action ");
+        if (len == 1) {
+          // Single character is the action
+          action = packetBuffer[0];
+          Serial.print(action);
+        } else {
+          // Multiple characters is json
+          JSONVar myObject = JSON.parse(packetBuffer);
+          Serial.print(myObject);
+          if (myObject.hasOwnProperty("action")) {
+            action = ((const char*) myObject["action"])[0];
+          }
+        }
+      //}
       Serial.print(" from ");
       IPAddress remoteIp = Udp.remoteIP();
       Serial.print(remoteIp);

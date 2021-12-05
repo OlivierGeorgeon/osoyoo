@@ -10,7 +10,9 @@
 #include "Robot_define.h"
 #include <Wire.h>
 #include <MPU6050.h>
-#include <HMC5883L.h>
+#if ROBOT_HAS_HMC5883L == true
+  #include <HMC5883L.h>
+#endif
 #include <Arduino_JSON.h>
 
 #define IMU_READ_PERIOD 50
@@ -26,10 +28,14 @@ class Imu_control
     float _yaw;
     float _xSpeed;
     float _xDistance;
-    int read_azimuth();
+    #if ROBOT_HAS_HMC5883L == true
+      int read_azimuth();
+    #endif
   private:
     MPU6050 _mpu;
-    HMC5883L compass;
+    #if ROBOT_HAS_HMC5883L == true
+      HMC5883L compass;
+    #endif
     unsigned long _next_imu_read_time;
     float _max_acceleration;
     float _min_acceleration;
