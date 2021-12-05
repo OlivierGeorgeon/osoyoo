@@ -38,6 +38,9 @@ class EgoMemoryWindow(pyglet.window.Window):
         self.async_flag = 0
         self.async_outcome_string = ""
 
+        self.mouse_press_x = 0
+        self.mouse_press_y = 0
+
     def on_draw(self):
         glClear(GL_COLOR_BUFFER_BIT)
         glLoadIdentity()
@@ -62,6 +65,11 @@ class EgoMemoryWindow(pyglet.window.Window):
         # Always display in the whole window
         glViewport(0, 0, width, height)
 
+    def on_mouse_press(self, x, y, button, modifiers):
+        self.mouse_press_x = int((x - self.width/2)*self.zoom_level*2)
+        self.mouse_press_y = int((y - self.height/2)*self.zoom_level*2)
+        print(self.mouse_press_x, self.mouse_press_y)
+
     def on_mouse_scroll(self, x, y, dx, dy):
         # Inspired by https://www.py4u.net/discuss/148957
         f = ZOOM_IN_FACTOR if dy > 0 else 1/ZOOM_IN_FACTOR if dy < 0 else 1
@@ -70,17 +78,16 @@ class EgoMemoryWindow(pyglet.window.Window):
 
     def on_text(self, text):
         if self.async_flag == 0:
+            if text == "/":  # Turn of the angle marked by the mouse click
+                angle = int(math.degrees(math.atan2(self.mouse_press_y, self.mouse_press_x)))
+                text = json.dumps({'action': '/', 'angle': angle})
             self.async_action_trigger(text)
         else:
             print("Waiting for previous outcome before sending new action")
-        # print("Send action: ", text)
-        # outcome_string = self.wifiInterface.enact(text)
-        # print(outcome_string)
-        # self.process_outcome(text, outcome_string)
 
     def process_outcome(self, text, outcome_string):
         outcome = json.loads(outcome_string)
-        floor_outcome = outcome['outcome']  # Agent5 uses floor_outcome
+        # floor_outcome = outcome['outcome']  # Agent5 uses floor_outcome
 
         # Presupposed displacement of the robot relative to the environment
         translation = [0, 0]
@@ -99,9 +106,8 @@ class EgoMemoryWindow(pyglet.window.Window):
             rotation = outcome['yaw']
 
         # Estimate displacement due to floor change retreat
-        if 'floor_outcome' in outcome:
-            floor_outcome = outcome['floor_outcome']
-            if floor_outcome > 0:  # Black line detected
+        if 'floor' in outcome:
+            if outcome['floor'] > 0:  # Black line detected
                 # Update the translation
                 if text == "8":  # TODO Other actions
                     forward_duration = outcome['duration'] - 300  # Subtract retreat duration
@@ -135,14 +141,12 @@ class EgoMemoryWindow(pyglet.window.Window):
         glMultMatrixf(self.environment_matrix)
         glGetFloatv(GL_MODELVIEW_MATRIX, self.environment_matrix)
 
-        return floor_outcome
-
     # Asynchronous interaction with the robot
     def async_action_trigger(self, text):
         def async_action(emw: EgoMemoryWindow):
-            print("1. Async send " + self.async_action)
+            print("Send " + self.async_action)
             emw.async_outcome_string = emw.wifiInterface.enact(self.async_action)
-            print("2. Async receive ", end="")
+            print("Receive ", end="")
             print(emw.async_outcome_string)
             emw.async_flag = 2
 
@@ -157,7 +161,7 @@ if __name__ == "__main__":
 
     def watch_async_outcome(dt):
         if em_window.async_flag == 2:
-            print("3. Async processing outcome")
+            # print("Redraw window")
             em_window.process_outcome(em_window.async_action, em_window.async_outcome_string)
             em_window.async_flag = 0
 

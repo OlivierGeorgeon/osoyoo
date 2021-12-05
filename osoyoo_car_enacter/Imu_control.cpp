@@ -143,11 +143,11 @@ void Imu_control::update()
 }
 void Imu_control::outcome(JSONVar & outcome_object)
 {
-  outcome_object["yaw"] = _yaw;
+  outcome_object["yaw"] = (int) _yaw;
   outcome_object["shock"] = _shock_measure;
   outcome_object["blocked"] = _blocked;
-  outcome_object["max_acceleration"] = _max_acceleration;
-  outcome_object["min_acceleration"] = _min_acceleration;
+  outcome_object["max_acceleration"] = (int) (_max_acceleration * 100);
+  outcome_object["min_acceleration"] = (int) (_min_acceleration * 100);
 
   #if ROBOT_HAS_HMC5883L == true
   outcome_object["azimuth"] = read_azimuth();

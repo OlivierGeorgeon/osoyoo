@@ -46,8 +46,7 @@ Head_echo_alignment HEA;
 Imu_control IMU;
 
 int status = WL_IDLE_STATUS;
-// use a ring buffer to increase speed and reduce memory allocation
-char packetBuffer[20];
+char packetBuffer[50];
 WiFiEspUDP Udp;
 unsigned int localPort = 8888;  // local port to listen on
 
@@ -91,11 +90,11 @@ void setup()
     }
   }
 
-  Serial.println("Robot connected to the network");
-  printWifiStatus();
   Udp.begin(localPort);
-  
-  Serial.print("Listening on port ");
+
+  Serial.print("IP Address: ");
+  Serial.println(WiFi.localIP());
+  Serial.print("Listening on port: ");
   Serial.println(localPort);
 }
 
@@ -135,10 +134,14 @@ void loop()
           Serial.print(action);
         } else {
           // Multiple characters is json
+          // https://github.com/arduino-libraries/Arduino_JSON/blob/master/examples/JSONObject/JSONObject.ino
           JSONVar myObject = JSON.parse(packetBuffer);
           Serial.print(myObject);
           if (myObject.hasOwnProperty("action")) {
             action = ((const char*) myObject["action"])[0];
+          }
+          if (myObject.hasOwnProperty("angle")) {
+            robot_destination_angle = ((int) myObject["angle"]);
           }
         }
       //}
@@ -153,14 +156,14 @@ void loop()
       is_enacting_action = true;
       interaction_step = 1;
       IMU.begin();
+      FCR._floor_outcome = 0; // Ignore floor change before the interaction
       outcome = "0";
       switch (action)
       {
         case ACTION_TURN_IN_SPOT_LEFT:
           action_end_time = millis() + TURN_SPOT_MAX_DURATION;
           robot_destination_angle = 45;
-          HEA.turnHead(45);  // Look ahead
-          Serial.println("Look left");
+          HEA.turnHead(robot_destination_angle);  // Look at destination
           OWM.turnInSpotLeft(TURN_SPEED);
           break;
         case ACTION_GO_BACK:
@@ -169,8 +172,7 @@ void loop()
         case ACTION_TURN_IN_SPOT_RIGHT:
           action_end_time = millis() + TURN_SPOT_MAX_DURATION;
           robot_destination_angle = -45;
-          HEA.turnHead(-45);  // Look ahead
-          Serial.println("Look right");
+          HEA.turnHead(robot_destination_angle);
           OWM.turnInSpotRight(TURN_SPEED);
           break;
         case ACTION_SHIFT_LEFT:
@@ -205,14 +207,16 @@ void loop()
           break;
         case ACTION_ALIGN_ROBOT:
           action_end_time = millis() + 5000;
-          robot_destination_angle = HEA._head_angle;
-          Serial.println("Begin align robot angle : " + String(robot_destination_angle));
-          HEA.turnHead(0);  // Look ahead
+          //robot_destination_angle = HEA._head_angle;
+          //Serial.println("Begin align robot angle : " + String(robot_destination_angle));
+          HEA.turnHead(robot_destination_angle);  // Look at destination
           if ( robot_destination_angle < - TURN_FRONT_ENDING_ANGLE){
-            OWM.turnFrontRight(SPEED);
+            OWM.turnInSpotRight(TURN_SPEED);
+            //OWM.turnFrontRight(SPEED);
           }
           if ( robot_destination_angle > TURN_FRONT_ENDING_ANGLE){
-            OWM.turnFrontLeft(SPEED);
+            OWM.turnInSpotLeft(TURN_SPEED);
+            //OWM.turnFrontLeft(SPEED);
           }
           break;
         default:
@@ -241,7 +245,7 @@ void loop()
         break;
       case ACTION_TURN_IN_SPOT_LEFT:
         // Keep head aligned with destination angle
-        HEA.turnHead(45 - IMU._yaw);
+        HEA.turnHead(robot_destination_angle - IMU._yaw);
          // Stop before reaching 45°
         if (IMU._yaw > robot_destination_angle - TURN_SPOT_ENDING_ANGLE)
         {
@@ -256,7 +260,7 @@ void loop()
         break;
      case ACTION_TURN_IN_SPOT_RIGHT:
         // Keep head aligned with destination angle
-        HEA.turnHead(-45 - IMU._yaw);
+        HEA.turnHead(robot_destination_angle - IMU._yaw);
         // Stop before reaching -45°
         if (IMU._yaw < robot_destination_angle + TURN_SPOT_ENDING_ANGLE)
         {
@@ -270,6 +274,7 @@ void loop()
         }
         break;
       case ACTION_ALIGN_ROBOT:
+        HEA.turnHead(robot_destination_angle - IMU._yaw); // Keep looking at destination
         if (((robot_destination_angle > TURN_FRONT_ENDING_ANGLE) && (IMU._yaw > robot_destination_angle - TURN_FRONT_ENDING_ANGLE)) ||
         ((robot_destination_angle < -TURN_FRONT_ENDING_ANGLE) && (IMU._yaw < robot_destination_angle + TURN_FRONT_ENDING_ANGLE)) ||
         (abs(robot_destination_angle) < TURN_FRONT_ENDING_ANGLE))
@@ -353,16 +358,4 @@ void loop()
     Udp.print(outcome_json_string);
     Udp.endPacket();
   }
-}
-
-
-void printWifiStatus()
-{
-  // print the SSID of the network you're attached to
-  Serial.print("SSID: ");
-  Serial.println(WiFi.SSID());
-  // print your WiFi shield's IP address
-  //IPAddress ip = WiFi.localIP();
-  Serial.print("IP Address: ");
-  Serial.println(WiFi.localIP());
 }

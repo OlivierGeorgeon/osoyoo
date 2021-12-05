@@ -22,9 +22,9 @@ class Floor_change_retreat
     void extraDuration(int duration);
     bool _is_enacting;
     void outcome(JSONVar & outcome_object);
+    int _floor_outcome;
   private:
     Omny_wheel_motion _OWM;
-    int _floor_outcome;
     int _previous_measure_floor;
     unsigned long _floor_change_retreat_end_time;
 };
