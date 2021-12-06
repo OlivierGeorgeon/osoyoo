@@ -19,9 +19,6 @@
 #include "JsonOutcome.h"
 JsonOutcome outcome;
 
-#include "DelayAction.h"
-DelayAction da;
-
 #include "WifiBot.h"
 WifiBot wifiBot = WifiBot("osoyoo_robot", 8888);
 
@@ -30,11 +27,12 @@ WifiBot wifiBot = WifiBot("osoyoo_robot", 8888);
 
 // use a ring buffer to increase speed and reduce memory allocation
 char packetBuffer[5];
-int angle_tete_robot = 0;
-int pasM = 0;
+
 unsigned long endTime = 0;
 int actionStep = 0;
 float somme_gyroZ = 0;
+int angle_tete_robot = 0;
+
 void setup()
 {
 // init_GPIO();
@@ -49,8 +47,6 @@ void setup()
   }
 
   mpu_setup();
-
-  //Exemple: da.setDelayAction(2000, [](){Serial.println("ok tout les 2s");}, millis());
 
 }
 
@@ -71,7 +67,7 @@ void loop()
       actionStep = 1;
       switch (c)    //serial control instructions
         {  
-        case '$':scan(angle_tete_robot-pasM, angle_tete_robot+pasM, 4);break;
+        case '$':outcome.addValue("distance", (String) dist());break;
         case '8':go_forward(SPEED);break;
         case '4':left_turn(SPEED);break;
         case '6':right_turn(SPEED);break;
@@ -82,8 +78,7 @@ void loop()
         case 'S': 
                   angle_tete_robot = scan(0, 180, 9);
                   float distance_objet_proche = dist();
-                  pasM = 30;
-                  
+
                   outcome.addValue("Angle", (String) angle_tete_robot);
                   outcome.addValue("distance", (String) distance_objet_proche);
                   
@@ -92,7 +87,7 @@ void loop()
       }
 
     }
-    if (tracking()) // la fonction renvoi true si elle capte une ligne noir
+    if ( tracking()) // la fonction renvoi true si elle capte une ligne noir
     {
       stop_Stop();
       go_back(SPEED);//recule
@@ -113,6 +108,5 @@ void loop()
     {
         reset_gyroZ(); //calibrer l'angle Z à 0 tant qu'il n'a pas fait d'action
     }
-
-    //Exemple: da.checkDelayAction(millis());
+    
 }
