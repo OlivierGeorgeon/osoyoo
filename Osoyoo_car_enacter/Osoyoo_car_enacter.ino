@@ -19,6 +19,9 @@
 #include "JsonOutcome.h"
 JsonOutcome outcome;
 
+#include "DelayAction.h"
+DelayAction da;
+
 #include "WifiBot.h"
 WifiBot wifiBot = WifiBot("osoyoo_robot", 8888);
 
@@ -31,7 +34,6 @@ char packetBuffer[5];
 unsigned long endTime = 0;
 int actionStep = 0;
 float somme_gyroZ = 0;
-
 void setup()
 {
 // init_GPIO();
@@ -47,11 +49,12 @@ void setup()
 
   mpu_setup();
 
+  da.setDelayAction(2000, [](){Serial.println("ok tout les 2s");}, millis());
+
 }
 
 void loop()
 {
-  alignement();
   int packetSize = wifiBot.Udp.parsePacket();
   gyro_update();
   if (packetSize) { // if you get a client,
@@ -81,7 +84,7 @@ void loop()
       }
 
     }
-    if ( tracking()) // la fonction renvoi true si elle capte une ligne noir
+    if (tracking()) // la fonction renvoi true si elle capte une ligne noir
     {
       stop_Stop();
       go_back(SPEED);//recule
@@ -102,5 +105,6 @@ void loop()
     {
         reset_gyroZ(); //calibrer l'angle Z à 0 tant qu'il n'a pas fait d'action
     }
-    
+
+    da.checkDelayAction(millis());
 }
