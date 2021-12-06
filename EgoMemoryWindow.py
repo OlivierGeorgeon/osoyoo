@@ -5,11 +5,35 @@ from WifiInterface import WifiInterface
 import json
 from Phenomenon import Phenomenon
 import math
+import random
 from pyglet import shapes
 
 # Zooming constants
 ZOOM_IN_FACTOR = 1.2
 ZOOM_OUT_FACTOR = 1/ZOOM_IN_FACTOR
+
+class ModalWindow(pyglet.window.Window):
+    def __init__(self, phenomena):
+        super(ModalWindow, self).__init__(width=100, height=100, resizable=True)
+
+        self.label = pyglet.text.Label('Hello', font_name='Times New Roman',
+        font_size=36, x=75, y=75)
+        self.phenomena = phenomena
+
+    def on_draw(self):
+        self.clear()
+        self.label.draw()
+
+
+    def on_text(self, text):
+        print("Send action: ", text)
+        if text == "O":
+            self.phenomena.clear()
+            ModalWindow.close(self)
+        # if text == "O":
+        #     self.clear_ms()
+
+
 
 
 class EgoMemoryWindow(pyglet.window.Window):
@@ -26,7 +50,7 @@ class EgoMemoryWindow(pyglet.window.Window):
         self.wifiInterface = WifiInterface()
 
         self.phenomena = []
-        # self.origin = shapes.Circle(0, 0, 20, color=(150, 150, 225))
+        #self.origin = shapes.Circle(0, 0, 20, color=(150, 150, 225))
         self.origin = shapes.Rectangle(0, 0, 60, 40, color=(150, 150, 225))
         self.origin.anchor_position = 30, 20
 
@@ -35,13 +59,16 @@ class EgoMemoryWindow(pyglet.window.Window):
                                                  0, 1, 0, 0,
                                                  0, 0, 1, 0,
                                                  0, 0, 0, 1)
+
         #glLoadIdentity()
         #glTranslatef(150, 0, 0)
         #glGetFloatv(GL_MODELVIEW_MATRIX, self.envMat)  # The only way i found to set envMat to identity
 
     def on_draw(self):
+
         glClear(GL_COLOR_BUFFER_BIT)
         glLoadIdentity()
+
 
         # The transformations are stacked, and applied backward to the vertices
 
@@ -50,14 +77,19 @@ class EgoMemoryWindow(pyglet.window.Window):
                 self.height * self.zoom_level, 1, -1)
 
         # Stack the rotation of the world so the robot's front is up
-        # glRotatef(90, 0.0, 0.0, 1.0)
+        glRotatef(90, 0.0, 0.0, 1.0)
+
 
         # Draw the robot and the phenomena
         self.batch.draw()
 
+
+
         # Stack the environment's displacement and draw the origin just to check
         glMultMatrixf(self.environment_matrix)
         self.origin.draw()  # Draw the origin of the robot
+
+
 
     def on_resize(self, width, height):
         # Display in the whole window
@@ -69,6 +101,10 @@ class EgoMemoryWindow(pyglet.window.Window):
         f = ZOOM_IN_FACTOR if dy > 0 else ZOOM_OUT_FACTOR if dy < 0 else 1
         if .4 < self.zoom_level * f < 5:
             self.zoom_level *= f
+
+    def clear_ms(self):
+        print("ok")
+        self.phenomena.clear()
 
     def on_text(self, text):
         print("Send action: ", text)
@@ -87,6 +123,14 @@ class EgoMemoryWindow(pyglet.window.Window):
             rotation = -45
         if text == "8":
             translation[0] = -180
+        if text == "C":
+           window = ModalWindow(self.phenomena)
+        if text == "O":
+            self.clear_ms()
+
+
+
+
 
         if 'head_angle' in outcome:
             head_angle = outcome['head_angle']
@@ -95,13 +139,29 @@ class EgoMemoryWindow(pyglet.window.Window):
         if 'yaw' in outcome:
             rotation = outcome['yaw']
         if text == "-" or text == "*":
-            if 'echo_distance' in outcome:
-                echo_distance = outcome['echo_distance']
-                print("Echo distance %i" % echo_distance)
-                x = self.robot.head_x + math.cos(math.radians(head_angle)) * echo_distance
-                y = self.robot.head_y + math.sin(math.radians(head_angle)) * echo_distance
-                obstacle = Phenomenon(x, y, self.batch)
-                self.phenomena.append(obstacle)
+            # if 'echo_distance' in outcome:
+            #             #     echo_distance = outcome['echo_distance']
+            #             #     print("Echo distance %i" % echo_distance)
+            #             #     x = self.robot.head_x + math.cos(math.radians(head_angle)) * echo_distance
+            #             #     y = self.robot.head_y + math.sin(math.radians(head_angle)) * echo_distance
+            #             #     obstacle = Phenomenon(x, y, self.batch)
+            #             #     self.phenomena.append(obstacle)
+
+            # ----------------------------------------------------- #
+            # ----------------------------------------------------- #
+               if not 'echo_distance' in outcome:
+                    echo_distance = random.randint(0, 300)
+                    head_angle = random.randint(0, 800)
+                    print("Echo distance %i" % echo_distance)
+                    x = self.robot.head_x + math.cos(math.radians(head_angle)) * echo_distance
+                    y = self.robot.head_y + math.sin(math.radians(head_angle)) * echo_distance
+                    obstacle = Phenomenon(x, y, self.batch)
+                    self.phenomena.append(obstacle)
+
+
+
+                #----------------------------------------------------#
+                #--------------------------------------------------#
 
         for p in self.phenomena:
             p.translate(translation)
