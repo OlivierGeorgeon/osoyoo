@@ -13,7 +13,7 @@
 #include "tracking.h"
 
 #include "Servo_Scan.h"
-#define pc "1"
+#define pc "2"
 #include "gyro.h"
 
 #include "JsonOutcome.h"
@@ -27,7 +27,8 @@ WifiBot wifiBot = WifiBot("osoyoo_robot", 8888);
 
 // use a ring buffer to increase speed and reduce memory allocation
 char packetBuffer[5];
-
+int angle_tete_robot = 0;
+int pasM = 0;
 unsigned long endTime = 0;
 int actionStep = 0;
 float somme_gyroZ = 0;
@@ -51,7 +52,6 @@ void setup()
 
 void loop()
 {
-  alignement();
   int packetSize = wifiBot.Udp.parsePacket();
   gyro_update();
   if (packetSize) { // if you get a client,
@@ -66,8 +66,8 @@ void loop()
       endTime = millis() + 2000;
       actionStep = 1;
       switch (c)    //serial control instructions
-      {  
-        case '$':outcome.addValue("distance", (String) dist());break;
+        {  
+        case '$':scan(angle_tete_robot-pasM, angle_tete_robot+pasM, 4);break;
         case '8':go_forward(SPEED);break;
         case '4':left_turn(SPEED);break;
         case '6':right_turn(SPEED);break;
@@ -75,8 +75,15 @@ void loop()
         case '5':stop_Stop();break;
         case '0':until_line(SPEED);break;
         case 'D':outcome.addValue("distance", (String) dist());break;
-        case 'S': scan(0, 180, 9); break;
-        case 'M': scan(45, 135, 10); break;
+        case 'S': 
+                  angle_tete_robot = scan(0, 180, 9);
+                  float distance_objet_proche = dist();
+                  pasM = 30;
+                  
+                  outcome.addValue("Angle", (String) angle_tete_robot);
+                  outcome.addValue("distance", (String) distance_objet_proche);
+                  
+                  break;
         default:break;
       }
 

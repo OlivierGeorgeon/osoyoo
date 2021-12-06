@@ -127,7 +127,7 @@ class EgoMemoryWindow(pyglet.window.Window):
         def loop(obj: EgoMemoryWindow):
             while True:
                 time.sleep(frequence)
-                print("Data requests")
+                #print("Data requests")
                 obj.outcome = obj.wifiInterface.enact('$')
                 # obj.windowRefresh('$', json.loads(outcome))
 
@@ -137,7 +137,7 @@ class EgoMemoryWindow(pyglet.window.Window):
     # Boucle executer par pyglet pour utiliser les fonction de actionLoop
     def actionLoopInterprete(self, dt):
         if self.outcome != "{}":
-            print(self.outcome)
+            #print(self.outcome)
             self.windowRefresh('$', json.loads(self.outcome))
             self.outcome = "{}"
 
