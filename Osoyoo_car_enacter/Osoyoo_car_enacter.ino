@@ -49,7 +49,7 @@ void setup()
 
   mpu_setup();
 
-  da.setDelayAction(2000, [](){Serial.println("ok tout les 2s");}, millis());
+  //Exemple: da.setDelayAction(2000, [](){Serial.println("ok tout les 2s");}, millis());
 
 }
 
@@ -106,5 +106,5 @@ void loop()
         reset_gyroZ(); //calibrer l'angle Z à 0 tant qu'il n'a pas fait d'action
     }
 
-    da.checkDelayAction(millis());
+    //Exemple: da.checkDelayAction(millis());
 }
