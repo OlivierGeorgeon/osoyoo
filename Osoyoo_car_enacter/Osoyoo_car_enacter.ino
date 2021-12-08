@@ -13,9 +13,10 @@
 #include "tracking.h"
 
 #include "Servo_Scan.h"
-#define pc "2"
+#define pc "1"
 #include "gyro.h"
-
+#include "DelayAction.h"
+DelayAction da;
 #include "JsonOutcome.h"
 JsonOutcome outcome;
 
@@ -31,7 +32,6 @@ char packetBuffer[5];
 unsigned long endTime = 0;
 int actionStep = 0;
 float somme_gyroZ = 0;
-int angle_tete_robot = 0;
 
 void setup()
 {
@@ -47,11 +47,12 @@ void setup()
   }
 
   mpu_setup();
-
+  ///da.setDelayAction(5000, scan(0, 180, 9), millis());
 }
 
 void loop()
 {
+    da.checkDelayAction(millis());
   int packetSize = wifiBot.Udp.parsePacket();
   gyro_update();
   if (packetSize) { // if you get a client,
@@ -76,7 +77,7 @@ void loop()
         case '0':until_line(SPEED);break;
         case 'D':outcome.addValue("distance", (String) dist());break;
         case 'S': 
-                  angle_tete_robot = scan(0, 180, 9);
+                  int angle_tete_robot = scan(0, 180, 9);
                   float distance_objet_proche = dist();
 
                   outcome.addValue("Angle", (String) angle_tete_robot);
