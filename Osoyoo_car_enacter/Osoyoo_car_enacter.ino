@@ -15,6 +15,8 @@
 #include "Servo_Scan.h"
 #define pc "1"
 #include "gyro.h"
+#include "compass.h"
+
 
 #include "JsonOutcome.h"
 JsonOutcome outcome;
@@ -48,6 +50,7 @@ void setup()
   }
 
   mpu_setup();
+  compass_setup();
 
   //Exemple: da.setDelayAction(2000, [](){Serial.println("ok tout les 2s");}, millis());
 
@@ -97,6 +100,7 @@ void loop()
 
       //Send outcome to PC
       outcome.addValue( "gyroZ", (String) (gyroZ()));
+      outcome.addValue( "compass", (String) (degreesNorth()));
       wifiBot.sendOutcome(outcome.get());
       outcome.clear();
       actionStep = 0;

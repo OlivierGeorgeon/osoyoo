@@ -1,5 +1,7 @@
 #ifndef compass_h
 #define compass_h
 
-void compass_setup()
-float degreesNorth()
+void compass_setup();
+float degreesNorth();
+
+#endif

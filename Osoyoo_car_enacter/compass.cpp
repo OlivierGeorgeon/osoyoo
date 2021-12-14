@@ -15,7 +15,7 @@ MPU6050 mpu;
 
 void compass_setup()
 {
-  Serial.begin(9600);
+  //Serial.begin(9600);
 
   // If you have GY-86 or GY-87 module.
   // To access HMC5883L you need to disable the I2C Master Mode and Sleep Mode, and enable I2C Bypass Mode
