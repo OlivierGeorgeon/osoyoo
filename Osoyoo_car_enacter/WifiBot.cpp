@@ -1,7 +1,10 @@
 #include "WifiBot.h"
-
 #include "WiFiEsp.h"
 #include "WiFiEspUDP.h"
+#define USER_ID "RobotBSN"
+#define PASSWD "BSNgoodlife"
+#define PORT "8888"
+int status = WL_IDLE_STATUS;     // the Wifi radio's status
 
 WifiBot::WifiBot(String _ssid, int port)
 {
@@ -10,9 +13,8 @@ WifiBot::WifiBot(String _ssid, int port)
     ssid = _ssid;
 }
 
-void WifiBot::wifiInit()
+void WifiBot::wifiInitLocal()
 {
-  Serial.begin(9600);
   Serial1.begin(115200);
   Serial1.write("AT+UART_DEF=9600,8,1,0,0\r\n");
   delay(200);
@@ -20,6 +22,7 @@ void WifiBot::wifiInit()
   delay(200);
   Serial1.begin(9600);    // initialize serial for ESP module
   WiFi.init(&Serial1);    // initialize ESP module
+  //IPAddress ip = WiFi.localIP();
 
   // check for the presence of the shield
   if (WiFi.status() == WL_NO_SHIELD) {
@@ -41,30 +44,45 @@ void WifiBot::wifiInit()
    status = WiFi.beginAP(char_ssid, 10, "", 0);
 
   Serial.println("You're connected to the network");
-  printWifiStatus();
+  //printWifiStatus();
   Udp.begin(localPort);
 
   Serial.print("Listening on port ");
   Serial.println(localPort);
 }
 
-void WifiBot::printWifiStatus()
+void WifiBot::wifiInitRouter()
 {
-  // print the SSID of the network you're attached to
-  Serial.print("SSID: ");
-  Serial.println(WiFi.SSID());
 
-  // print your WiFi shield's IP address
+  // initialize serial for ESP module
+  Serial1.begin(9600);
+  // initialize ESP module
+  WiFi.init(&Serial1);
+
+  // check for the presence of the shield
+  if (WiFi.status() == WL_NO_SHIELD) {
+    Serial.println("WiFi shield not present");
+    // don't continue
+    while (true);
+  }
+
+  // attempt to connect to WiFi network
+  while ( status != WL_CONNECTED) {
+    Serial.print("Attempting to connect to WPA SSID: ");
+    Serial.println(USER_ID);
+    // Connect to WPA/WPA2 network
+    status = WiFi.begin(USER_ID, PASSWD);
+  }
+
+  Serial.println("You're connected to the network");
   IPAddress ip = WiFi.localIP();
   Serial.print("IP Address: ");
   Serial.println(ip);
-
-  // print where to go in the browser
-  Serial.println();
-  Serial.print("To see this page in action, open a browser to http://");
-  Serial.println(ip);
-  Serial.println();
+  Udp.begin(localPort);
+  Serial.print("Listening on port ");
+  Serial.println(localPort);
 }
+
 
 void WifiBot::sendOutcome(String json)
 {

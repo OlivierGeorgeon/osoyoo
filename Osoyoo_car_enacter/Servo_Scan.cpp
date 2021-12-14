@@ -16,29 +16,44 @@
 #include "Arduino.h"
 
 Servo myservo;
-
 // Initialisation de port de branchement sur la carte
 void servo_port() {
-  myservo.attach(13);
+  myservo.attach(4);
 }
 
-void scan() {
-  float distances[10];
-  //Scan de 9 calcul de distances tout les 20 degrés pour couvrir les 180°
-  for (int pos = 0; pos <= 9; pos += 1) {
-    myservo.write(pos*20);
-    delay(300);
-    distances[pos] = dist();
-  }
-
-  //Recherche de la plus petite distances
-  int indexMin;
+int getIndexMin(int nb_mesures, float distances[]){
+  
   float valMin = distances[0];
-  for (int i = 1; i <= 9; i++){
-    if(distances[i] < valMin){
+  int indexMin = 0;
+  
+  //Recherche de la plus petite distances
+  for (int i = 0; i < nb_mesures; i++){
+    if(distances[i] < valMin && distances[i] != 0){
         valMin = distances[i];
         indexMin = i;
     }
   }
-   myservo.write(indexMin*20); //S'aligner sur l'objet la plus proche
+  return indexMin;
+}
+
+int scan(int angleMin, int angleMax, int Nbre_mesure) {
+  int pas = round((angleMax-angleMin)/Nbre_mesure);
+  float distances[Nbre_mesure];
+  int indexMin;
+  int angle;
+  //Scan de Nbre_mesure calcul de distances tout les 20 degrés pour couvrir les 180°
+  for (int pos = 0; pos < Nbre_mesure; pos++) {
+    myservo.write(angleMin+(pas*pos));
+    delay(300);
+    distances[pos] = dist();
+    
+  }
+  
+
+  
+  // Appel fonction
+  indexMin = getIndexMin(Nbre_mesure, distances);
+  angle = indexMin*pas;
+  myservo.write(angle);
+  return angle;
 }

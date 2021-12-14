@@ -1,10 +1,13 @@
 import socket
 import keyboard
+import time
 
-# UDP_IP = "192.168.4.1"  # AP mode
-UDP_IP = "192.168.1.19"  # STA mode sur Olivier's wifi
+#UDP_IP = "192.168.4.1"  # AP mode
+# UDP_IP = "192.168.1.19"  # STA mode sur Olivier's wifi
 # UDP_IP = "10.40.22.251" # STA sur RobotBSN Olivier's Robot
-# UDP_IP = "10.40.22.254" # STA sur RobotBSN
+#UDP_IP = "10.40.22.251" #IP du robot 2 STA sur RobotBSN
+# UDP_IP = "10.40.22.254" #IP du robot 1 STA sur RobotBSN
+
 
 UDP_TIMEOUT = 3  # Seconds
 
@@ -23,16 +26,29 @@ class WifiInterface:
         try:
             _outcome, address = self.socket.recvfrom(255)
         except:
-            print("Reception Timeout")
+            print("Reception Timeout for command:", _action)
         return _outcome
 
 
+def onkeypress(event):
+    print("Send:", event.name)
+    outcome = wifiInterface.enact(event.name)
+    print(outcome)
+
 if __name__ == '__main__':
     wifiInterface = WifiInterface()
-    action = ""
+    # Bind event key press
+    keyboard.on_press(onkeypress)
+    # Every 15 seconds, requests bot data
+    cooldown = time.time()
     while True:
-        print("Action key: ", end="")
-        action = keyboard.read_key().upper()
-        print()
-        outcome = wifiInterface.enact(action)
-        print(outcome)
+        if cooldown + 15 <= time.time():
+            cooldown = time.time()
+            print("Data requests")
+            outcome = wifiInterface.enact('$')
+            
+
+
+
+
+

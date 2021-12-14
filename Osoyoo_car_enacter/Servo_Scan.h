@@ -10,11 +10,8 @@
 
 #ifndef Servo_Scan_h
 #define Servo_Scan_h
-
 #define SERVO_PIN     13  //servo connect to D5
-
 void servo_port();
-
-void scan();
-
+int scan(int angleMin, int angleMax, int Nbre_mesure);
+int getIndexMin(int nb_mesures, float distances[]);
 #endif

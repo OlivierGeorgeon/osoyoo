@@ -11,13 +11,23 @@
 #include "omny_wheel_motion.h"
 #include "calcDist.h"
 #include "tracking.h"
+
 #include "Servo_Scan.h"
+#define pc "2"
+#include "gyro.h"
+#include "compass.h"
+
 
 #include "JsonOutcome.h"
 JsonOutcome outcome;
 
+#include "DelayAction.h"
+DelayAction da;
+#include "JsonOutcome.h"
+JsonOutcome outcome;
+
 #include "WifiBot.h"
-WifiBot wifiBot = WifiBot("osoyoo_robot2", 8888);
+WifiBot wifiBot = WifiBot("osoyoo_robot", 8888);
 
 #include "WiFiEsp.h"
 #include "WiFiEspUDP.h"
@@ -27,24 +37,34 @@ char packetBuffer[5];
 
 unsigned long endTime = 0;
 int actionStep = 0;
-
+float somme_gyroZ = 0;
 void setup()
 {
 // init_GPIO();
   Serial.begin(9600);   // initialize serial for debugging
   servo_port();
   set();
-  wifiBot.wifiInit();
+  if (pc == "1"){
+    wifiBot.wifiInitLocal();
+  }
+  if (pc == "2"){
+    wifiBot.wifiInitRouter();
+  }
 
+  mpu_setup();
+  compass_setup();
+
+  //Exemple: da.setDelayAction(2000, [](){Serial.println("ok tout les 2s");}, millis());
+
+  ///da.setDelayAction(5000, scan(0, 180, 9), millis());
 }
-
 
 void loop()
 {
+    da.checkDelayAction(millis());
   int packetSize = wifiBot.Udp.parsePacket();
+  gyro_update();
   if (packetSize) { // if you get a client,
-    outcome.addValue("distance", (String) dist());
-
     Serial.print("Received packet of size ");
     Serial.println(packetSize);
     int len = wifiBot.Udp.read(packetBuffer, 255);
@@ -57,6 +77,7 @@ void loop()
       actionStep = 1;
       switch (c)    //serial control instructions
       {  
+        case '$':outcome.addValue("distance", (String) dist());break;
         case '8':go_forward(SPEED);break;
         case '4':left_turn(SPEED);break;
         case '6':right_turn(SPEED);break;
@@ -64,7 +85,14 @@ void loop()
         case '5':stop_Stop();break;
         case '0':until_line(SPEED);break;
         case 'D':outcome.addValue("distance", (String) dist());break;
-        case 'S': scan(); break;
+        case 'S':
+                  int angle_tete_robot = scan(0, 180, 9);
+                  float distance_objet_proche = dist();
+
+                  outcome.addValue("Angle", (String) angle_tete_robot);
+                  outcome.addValue("distance", (String) distance_objet_proche);
+
+                  break;
         default:break;
       }
 
@@ -76,16 +104,22 @@ void loop()
       actionStep = 1;
       endTime = millis() + 1000; //1sec
     }
-    //Terminated interaction
     if ((endTime < millis()) && (actionStep == 1))
     {
       stop_Stop();
 
       //Send outcome to PC
+      // renvoi JSON du degres de mouvement
+      outcome.addValue( "gyroZ", (String) (gyroZ()));
+      //renvoi JSON du azimut
+      outcome.addValue( "compass", (String) (degreesNorth()));
       wifiBot.sendOutcome(outcome.get());
       outcome.clear();
-
       actionStep = 0;
     }
-    
+    if(actionStep == 0)
+    {
+        reset_gyroZ(); //calibrer l'angle Z à 0 tant qu'il n'a pas fait d'action
+    }
+
 }
