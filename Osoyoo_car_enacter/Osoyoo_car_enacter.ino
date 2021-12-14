@@ -23,6 +23,8 @@ JsonOutcome outcome;
 
 #include "DelayAction.h"
 DelayAction da;
+#include "JsonOutcome.h"
+JsonOutcome outcome;
 
 #include "WifiBot.h"
 WifiBot wifiBot = WifiBot("osoyoo_robot", 8888);
@@ -54,10 +56,12 @@ void setup()
 
   //Exemple: da.setDelayAction(2000, [](){Serial.println("ok tout les 2s");}, millis());
 
+  ///da.setDelayAction(5000, scan(0, 180, 9), millis());
 }
 
 void loop()
 {
+    da.checkDelayAction(millis());
   int packetSize = wifiBot.Udp.parsePacket();
   gyro_update();
   if (packetSize) { // if you get a client,
@@ -81,13 +85,19 @@ void loop()
         case '5':stop_Stop();break;
         case '0':until_line(SPEED);break;
         case 'D':outcome.addValue("distance", (String) dist());break;
-        case 'S': scan(0, 180, 9); break;
-        case 'M': scan(45, 135, 10); break;
+        case 'S':
+                  int angle_tete_robot = scan(0, 180, 9);
+                  float distance_objet_proche = dist();
+
+                  outcome.addValue("Angle", (String) angle_tete_robot);
+                  outcome.addValue("distance", (String) distance_objet_proche);
+
+                  break;
         default:break;
       }
 
     }
-    if (tracking()) // la fonction renvoi true si elle capte une ligne noir
+    if ( tracking()) // la fonction renvoi true si elle capte une ligne noir
     {
       stop_Stop();
       go_back(SPEED);//recule
@@ -112,5 +122,4 @@ void loop()
         reset_gyroZ(); //calibrer l'angle Z à 0 tant qu'il n'a pas fait d'action
     }
 
-    //Exemple: da.checkDelayAction(millis());
 }

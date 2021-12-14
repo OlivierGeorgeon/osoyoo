@@ -17,39 +17,43 @@
 
 Servo myservo;
 // Initialisation de port de branchement sur la carte
-float distMin;
 void servo_port() {
   myservo.attach(4);
 }
 
-void alignement(){
-  dist();
-  delay(300);
-  if (distMin != distMin + abs(20)){
-    scan(45, 135, 5);
+int getIndexMin(int nb_mesures, float distances[]){
+  
+  float valMin = distances[0];
+  int indexMin = 0;
+  
+  //Recherche de la plus petite distances
+  for (int i = 0; i < nb_mesures; i++){
+    if(distances[i] < valMin && distances[i] != 0){
+        valMin = distances[i];
+        indexMin = i;
+    }
   }
+  return indexMin;
 }
 
-void scan(int angleMin, int angleMax, int Nbre_mesure) {
-  float pas = (angleMax-angleMin)/Nbre_mesure;
+int scan(int angleMin, int angleMax, int Nbre_mesure) {
+  int pas = round((angleMax-angleMin)/Nbre_mesure);
   float distances[Nbre_mesure];
+  int indexMin;
+  int angle;
   //Scan de Nbre_mesure calcul de distances tout les 20 degrés pour couvrir les 180°
-  for (int pos = 0; pos <= Nbre_mesure; pos += 1) {
+  for (int pos = 0; pos < Nbre_mesure; pos++) {
     myservo.write(angleMin+(pas*pos));
     delay(300);
     distances[pos] = dist();
+    
   }
-  //Recherche de la plus petite distances
-  int indexMin;
-  float valMin = distances[0];
-  for (int i = 1; i <= Nbre_mesure; i++){
-    if(distances[i] < valMin){
-        valMin = distances[i];
-        indexMin = i;
-        Serial.print(indexMin, pas);
-    }
-  }
-  distMin = distances[indexMin];
-   myservo.write(indexMin*pas);
-   return distances[indexMin];
+  
+
+  
+  // Appel fonction
+  indexMin = getIndexMin(Nbre_mesure, distances);
+  angle = indexMin*pas;
+  myservo.write(angle);
+  return angle;
 }
