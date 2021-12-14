@@ -44,7 +44,7 @@ class ModalWindow(pyglet.window.Window):
 
 
 class EgoMemoryWindow(pyglet.window.Window):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, ip="192.168.4.1", port=8888, udpTimeout=3, *args, **kwargs):
         super().__init__(400, 400, resizable=True, *args, **kwargs)
         self.set_caption("Egocentric Memory")
         self.set_minimum_size(150, 150)
@@ -54,7 +54,7 @@ class EgoMemoryWindow(pyglet.window.Window):
         self.zoom_level = 1
 
         self.robot = OsoyooCar(self.batch)
-        self.wifiInterface = WifiInterface()
+        self.wifiInterface = WifiInterface(ip, port, udpTimeout)
 
         self.phenomena = []
         #self.origin = shapes.Circle(0, 0, 20, color=(150, 150, 225))
@@ -194,7 +194,12 @@ class EgoMemoryWindow(pyglet.window.Window):
 
 
 if __name__ == "__main__":
-    em_window = EgoMemoryWindow()
+    ip_ = "192.168.4.1"  # AP mode
+    # ip_ = "192.168.1.19"  # STA mode sur Olivier's wifi
+    # ip_ = "10.40.22.251" # STA sur RobotBSN Olivier's Robot
+    # ip_ = "?" #IP du robot 2 STA sur RobotBSN
+    # ip_ = "10.40.22.254" #IP du robot 1 STA sur RobotBSN
+    em_window = EgoMemoryWindow(ip=ip_)
     em_window.actionLoop(10)
     clock.schedule_interval(em_window.actionLoopInterprete, 5)
     pyglet.app.run()
