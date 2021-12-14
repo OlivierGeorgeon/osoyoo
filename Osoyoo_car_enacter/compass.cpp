@@ -11,24 +11,9 @@
 #include <MPU6050.h>
 
 HMC5883L compass;
-MPU6050 mpu;
 
 void compass_setup()
 {
-  //Serial.begin(9600);
-
-  // If you have GY-86 or GY-87 module.
-  // To access HMC5883L you need to disable the I2C Master Mode and Sleep Mode, and enable I2C Bypass Mode
-
-  while(!mpu.begin(MPU6050_SCALE_2000DPS, MPU6050_RANGE_2G))
-  {
-    Serial.println("Could not find a valid MPU6050 sensor, check wiring!");
-    delay(500);
-  }
-
-  mpu.setI2CMasterModeEnabled(false);
-  mpu.setI2CBypassEnabled(true) ;
-  mpu.setSleepEnabled(false);
 
   // Initialize Initialize HMC5883L
   Serial.println("Initialize HMC5883L");
@@ -82,7 +67,7 @@ float degreesNorth()
 
   // Convert to degrees
   float headingDegrees = heading * 180/M_PI -180;
- // le nord est le sud sont inversés donc j'ai fais un calcul pour changer cela.
+  // le nord est le sud sont inversés donc j'ai fais un calcul pour changer cela.
   if (headingDegrees < 0)
   {
     headingDegrees = headingDegrees + 2*180;

@@ -13,7 +13,7 @@
 #include "tracking.h"
 
 #include "Servo_Scan.h"
-#define pc "1"
+#define pc "2"
 #include "gyro.h"
 #include "compass.h"
 
@@ -99,7 +99,9 @@ void loop()
       stop_Stop();
 
       //Send outcome to PC
+      // renvoi JSON du degres de mouvement
       outcome.addValue( "gyroZ", (String) (gyroZ()));
+      //renvoi JSON du azimut
       outcome.addValue( "compass", (String) (degreesNorth()));
       wifiBot.sendOutcome(outcome.get());
       outcome.clear();
