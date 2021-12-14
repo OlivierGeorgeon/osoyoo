@@ -16,8 +16,9 @@ class ModalWindow(pyglet.window.Window):
     def __init__(self, phenomena):
         super(ModalWindow, self).__init__(width=100, height=100, resizable=True)
 
-        self.label = pyglet.text.Label('Hello', font_name='Times New Roman',
-        font_size=36, x=75, y=75)
+        self.label = pyglet.text.Label('Appuyer sur "O" pour confirmer la suppression', font_name='Times New Roman',
+        font_size=36,x= 200, y= 160 )
+        self.label.anchor_position = 100, 80
         self.phenomena = phenomena
 
     def on_draw(self):
@@ -30,8 +31,10 @@ class ModalWindow(pyglet.window.Window):
         if text == "O":
             self.phenomena.clear()
             ModalWindow.close(self)
-        # if text == "O":
-        #     self.clear_ms()
+        elif text == "N":
+            ModalWindow.close(self)
+
+
 
 
 
@@ -77,19 +80,14 @@ class EgoMemoryWindow(pyglet.window.Window):
                 self.height * self.zoom_level, 1, -1)
 
         # Stack the rotation of the world so the robot's front is up
-        glRotatef(90, 0.0, 0.0, 1.0)
-
+        glRotatef(-90, 0.0, 0.0, 1.0) #mettre le Azimuth
 
         # Draw the robot and the phenomena
         self.batch.draw()
 
-
-
         # Stack the environment's displacement and draw the origin just to check
         glMultMatrixf(self.environment_matrix)
         self.origin.draw()  # Draw the origin of the robot
-
-
 
     def on_resize(self, width, height):
         # Display in the whole window
@@ -125,12 +123,8 @@ class EgoMemoryWindow(pyglet.window.Window):
             translation[0] = -180
         if text == "C":
            window = ModalWindow(self.phenomena)
-        if text == "O":
-            self.clear_ms()
-
-
-
-
+        # if text == "O":
+        #     self.clear_ms()
 
         if 'head_angle' in outcome:
             head_angle = outcome['head_angle']
@@ -157,11 +151,8 @@ class EgoMemoryWindow(pyglet.window.Window):
                     y = self.robot.head_y + math.sin(math.radians(head_angle)) * echo_distance
                     obstacle = Phenomenon(x, y, self.batch)
                     self.phenomena.append(obstacle)
-
-
-
-                #----------------------------------------------------#
-                #--------------------------------------------------#
+            #----------------------------------------------------#
+            #----------------------------------------------------#
 
         for p in self.phenomena:
             p.translate(translation)
