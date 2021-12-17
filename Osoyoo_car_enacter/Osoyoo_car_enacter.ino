@@ -25,7 +25,7 @@ DelayAction da;
 JsonOutcome outcome;
 
 #include "WifiBot.h"
-WifiBot wifiBot = WifiBot("osoyoo_robot", 8888);
+WifiBot wifiBot = WifiBot("osoyoo_robot2", 8888);
 
 #include "WiFiEsp.h"
 #include "WiFiEspUDP.h"
