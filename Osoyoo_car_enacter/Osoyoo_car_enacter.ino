@@ -18,8 +18,6 @@
 #include "compass.h"
 
 
-#include "JsonOutcome.h"
-JsonOutcome outcome;
 
 #include "DelayAction.h"
 DelayAction da;
