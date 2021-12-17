@@ -2,6 +2,7 @@ import socket
 import keyboard
 import time
 
+
 class WifiInterface:
     def __init__(self, ip="192.168.4.1", port=8888, udpTimeout=3):
         self.IP = ip
