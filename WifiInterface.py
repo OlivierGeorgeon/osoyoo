@@ -3,7 +3,7 @@ import keyboard
 import time
 
 class WifiInterface:
-    def __init__(self, ip="192.168.4.1", port=8888, udpTimeout=3):
+    def __init__(self, ip="192.168.4.1", port=8888, udpTimeout=4):
         self.IP = ip
         self.port = port
         self.udpTimeout = udpTimeout
@@ -12,10 +12,10 @@ class WifiInterface:
         # self.socket.connect((UDP_IP, UDP_PORT))  # Not necessary
 
     '''Send the action. Return the outcome'''
-    def enact(self, _action):
+    def enact(self, jsonAction):
         _outcome = "{}"
 
-        if _action != '$':
+        if jsonAction["action"] != '$':
             self.socket.settimeout(0.2)
             try:
                 Routcome, address = self.socket.recvfrom(255)
@@ -23,18 +23,18 @@ class WifiInterface:
             except:
                 pass
             self.socket.settimeout(self.udpTimeout)
-        
-        self.socket.sendto(bytes(_action, 'utf-8'), (self.IP, self.port))
+            
+        self.socket.sendto(bytes(str(jsonAction).replace("\'", "\""), 'utf-8'), (self.IP, self.port))
         try:
             _outcome, address = self.socket.recvfrom(255)
         except:
-            print("Reception Timeout for command:", _action)
+            print("Reception Timeout for command:", jsonAction["action"])
         return _outcome
 
 
 def onkeypress(event):
     print("Send:", event.name)
-    outcome = wifiInterface.enact(event.name)
+    outcome = wifiInterface.enact({"action":event.name})
     print(outcome)
 
 if __name__ == '__main__':
@@ -47,7 +47,7 @@ if __name__ == '__main__':
         if cooldown + 15 <= time.time():
             cooldown = time.time()
             print("Data requests")
-            outcome = wifiInterface.enact('$')
+            outcome = wifiInterface.enact({"action": "$"})
             
 
 
