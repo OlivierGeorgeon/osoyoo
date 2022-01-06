@@ -11,6 +11,7 @@
 
 #include "omny_wheel_motion.h"
 #include "Arduino.h"
+#include "gyro.h"
 
 //Controle de la vitesse des roues du robot
 void setMotion(int speed_fl,int speed_rl ,int speed_rr,int speed_fr)
@@ -24,6 +25,14 @@ void setMotion(int speed_fl,int speed_rl ,int speed_rr,int speed_fr)
 void go_forward(int speed) // faire avancer le robot
 {
   setMotion(speed,speed,speed,speed);
+}
+
+void turn_degrees(int speed, int deg)
+{
+    while (mpu.getAngleZ() < deg)
+    {
+
+    }
 }
 
 void  go_back(int speed)//faire reculer le robot 
