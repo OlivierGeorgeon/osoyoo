@@ -144,6 +144,6 @@ class EgoMemoryWindow(pyglet.window.Window):
 
 if __name__ == "__main__":
     em_window = EgoMemoryWindow()
-    em_window.actionLoop(10)
-    clock.schedule_interval(em_window.actionLoopInterprete, 5)
+    #em_window.actionLoop(10)
+    #clock.schedule_interval(em_window.actionLoopInterprete, 5)
     pyglet.app.run()
