@@ -30,14 +30,12 @@ class ModalWindow(pyglet.window.Window):
 
 
     def on_text(self, text):
-        print("Send action: ", text)
+        print("Send action:", text)
         if text == "O":
             self.phenomena.clear()
             ModalWindow.close(self)
         elif text == "N":
             ModalWindow.close(self)
-
-
 
 
 
@@ -95,6 +93,13 @@ class EgoMemoryWindow(pyglet.window.Window):
         self.origin.draw()  # Draw the origin of the robot
 
 
+    def on_mouse_press(self,x, y, button, modifiers):
+        w, h = self.get_size()
+        deltaX = x - (w/2)
+        deltaY = y - (h/2)
+        angleInDegrees = math.atan2(deltaY, deltaX) * 180 / math.pi
+        print(int(angleInDegrees))
+
 
     def on_resize(self, width, height):
         # Display in the whole window
@@ -113,7 +118,7 @@ class EgoMemoryWindow(pyglet.window.Window):
 
     def on_text(self, text):
         print("Send action: ", text)
-        outcome_string = self.wifiInterface.enact(text)
+        outcome_string = self.wifiInterface.enact({"action": text})
         print(outcome_string)
         outcome = json.loads(outcome_string)
 
@@ -138,7 +143,7 @@ class EgoMemoryWindow(pyglet.window.Window):
 
         if 'head_angle' in outcome:
             head_angle = outcome['head_angle']
-            print("Head angle %i" % head_angle)
+            print("Head angle %s" % head_angle)
             self.robot.rotate_head(head_angle)
 
         if 'yaw' in outcome:
@@ -183,7 +188,7 @@ class EgoMemoryWindow(pyglet.window.Window):
             while True:
                 time.sleep(frequence)
                 #print("Data requests")
-                obj.outcome = obj.wifiInterface.enact('$')
+                obj.outcome = obj.wifiInterface.enact({"action": "$"})
                 # obj.windowRefresh('$', json.loads(outcome))
 
         thread = threading.Thread(target=loop, args=[self])
@@ -204,6 +209,6 @@ if __name__ == "__main__":
     # ip_ = "?" #IP du robot 2 STA sur RobotBSN
     # ip_ = "10.40.22.254" #IP du robot 1 STA sur RobotBSN
     em_window = EgoMemoryWindow(ip=ip_)
-    em_window.actionLoop(10)
-    clock.schedule_interval(em_window.actionLoopInterprete, 5)
+    # em_window.actionLoop(10)
+    # clock.schedule_interval(em_window.actionLoopInterprete, 5)
     pyglet.app.run()
