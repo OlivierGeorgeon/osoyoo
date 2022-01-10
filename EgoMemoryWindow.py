@@ -137,7 +137,7 @@ class EgoMemoryWindow(pyglet.window.Window):
 
         if 'head_angle' in outcome:
             head_angle = outcome['head_angle']
-            print("Head angle %i" % head_angle)
+            print("Head angle %s" % head_angle)
             self.robot.rotate_head(head_angle)
         if 'yaw' in outcome:
             rotation = outcome['yaw']
@@ -200,6 +200,6 @@ if __name__ == "__main__":
     # ip_ = "?" #IP du robot 2 STA sur RobotBSN
     # ip_ = "10.40.22.254" #IP du robot 1 STA sur RobotBSN
     em_window = EgoMemoryWindow(ip=ip_)
-    em_window.actionLoop(10)
-    clock.schedule_interval(em_window.actionLoopInterprete, 5)
+    #em_window.actionLoop(10)
+    #clock.schedule_interval(em_window.actionLoopInterprete, 5)
     pyglet.app.run()

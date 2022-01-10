@@ -36,6 +36,9 @@ char packetBuffer[5];
 unsigned long endTime = 0;
 int actionStep = 0;
 float somme_gyroZ = 0;
+int angle_tete_robot = 90;
+float distance_objet_proche = 0;
+
 void setup()
 {
 // init_GPIO();
@@ -59,7 +62,7 @@ void setup()
 
 void loop()
 {
-    da.checkDelayAction(millis());
+  da.checkDelayAction(millis());
   int packetSize = wifiBot.Udp.parsePacket();
   gyro_update();
   if (packetSize) { // if you get a client,
@@ -82,14 +85,13 @@ void loop()
         case '2':go_back(SPEED);break;
         case '5':stop_Stop();break;
         case '0':until_line(SPEED);break;
+        case 'B':distances_loop(angle_tete_robot, distance_objet_proche); break;
         case 'D':outcome.addValue("distance", (String) dist());break;
-        case 'S':
-                  int angle_tete_robot = scan(0, 180, 9);
-                  float distance_objet_proche = dist();
-
-                  outcome.addValue("Angle", (String) angle_tete_robot);
-                  outcome.addValue("distance", (String) distance_objet_proche);
-
+        case 'S': 
+                  angle_tete_robot = scan(0, 180, 9, 0);
+                  distance_objet_proche = dist();
+                  outcome.addValue("head_angle", (String) angle_tete_robot);
+                  outcome.addValue("echo_distance", (String) distance_objet_proche);  
                   break;
         default:break;
       }
@@ -119,5 +121,4 @@ void loop()
     {
         reset_gyroZ(); //calibrer l'angle Z à 0 tant qu'il n'a pas fait d'action
     }
-
 }
