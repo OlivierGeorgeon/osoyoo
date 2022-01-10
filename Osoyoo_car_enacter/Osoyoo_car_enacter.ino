@@ -12,83 +12,98 @@
 #include "calcDist.h"
 #include "tracking.h"
 
+#include "Servo_Scan.h"
+#define pc "1"
+#include "gyro.h"
+#include "compass.h"
+
 #include "JsonOutcome.h"
 JsonOutcome outcome;
 
+#include "DelayAction.h"
+DelayAction da;
+
+#include "WifiBot.h"
+WifiBot wifiBot = WifiBot("osoyoo_robot2", 8888);
+
 #include "WiFiEsp.h"
 #include "WiFiEspUDP.h"
-char ssid[] = "osoyoo_robot"; 
 
-int status = WL_IDLE_STATUS;
+#include "Arduino_JSON.h"
+
 // use a ring buffer to increase speed and reduce memory allocation
-char packetBuffer[5];
-WiFiEspUDP Udp;
-unsigned int localPort = 8888;  // local port to listen on
+char packetBuffer[100];
+
 unsigned long endTime = 0;
 int actionStep = 0;
+float somme_gyroZ = 0;
+int angle_tete_robot = 90;
+float distance_objet_proche = 0;
+
 void setup()
 {
 // init_GPIO();
-
   Serial.begin(9600);   // initialize serial for debugging
+  servo_port();
   set();
-  Serial1.begin(115200);
-  Serial1.write("AT+UART_DEF=9600,8,1,0,0\r\n");
-  delay(200);
-  Serial1.write("AT+RST\r\n");
-  delay(200);
-  Serial1.begin(9600);    // initialize serial for ESP module
-  WiFi.init(&Serial1);    // initialize ESP module
-
-  // check for the presence of the shield
-  if (WiFi.status() == WL_NO_SHIELD) {
-    Serial.println("WiFi shield not present");
-    // don't continue
-    while (true);
+  if (pc == "1"){
+    wifiBot.wifiInitLocal();
+  }
+  if (pc == "2"){
+    wifiBot.wifiInitRouter();
   }
 
-   Serial.print("Attempting to start AP ");
-   Serial.println(ssid);
-   //AP mode
-   status = WiFi.beginAP(ssid, 10, "", 0);
+  mpu_setup();
+  compass_setup();
 
-  Serial.println("You're connected to the network");
-  printWifiStatus();
-  Udp.begin(localPort);
-  
-  Serial.print("Listening on port ");
-  Serial.println(localPort);
+  //Exemple: da.setDelayAction(2000, [](){Serial.println("ok tout les 2s");}, millis());
 }
-
 
 void loop()
 {
-  int packetSize = Udp.parsePacket();
-  if (packetSize) {
-    // if you get a client,
-    outcome.addValue("distance", (String) dist());
+  da.checkDelayAction(millis());
+  
+  int packetSize = wifiBot.Udp.parsePacket();
+  gyro_update();
+
+  if (packetSize) { // if you get a client,
     Serial.print("Received packet of size ");
     Serial.println(packetSize);
-    int len = Udp.read(packetBuffer, 255);
+    int len = wifiBot.Udp.read(packetBuffer, 255);
+
     if (len > 0) {
       packetBuffer[len] = 0;
     }
-      char c=packetBuffer[0];
 
-      endTime = millis() + 2000;
-      actionStep = 1;
-      switch (c)    //serial control instructions
-      {  
-        case '8':go_forward(SPEED);break;
-        case '4':left_turn(SPEED);break;
-        case '6':right_turn(SPEED);break;
-        case '2':go_back(SPEED);break;
-        case '5':stop_Stop();break;
-        case '0':until_line(SPEED);break;
-        case 'D':outcome.addValue("distance", (String) dist());break;
+    JSONVar jsonReceive = JSON.parse(packetBuffer);
+    Serial.println(JSON.stringify(jsonReceive));
+    String strAction = JSON.stringify(jsonReceive["action"]);
+
+    int str_len = strAction.length() + 1;
+    char action[str_len];
+    strAction.toCharArray(action, str_len);
+
+    endTime = millis() + 2000;
+    actionStep = 1;
+
+    switch (action[1])    //serial control instructions
+    {  
+      case '$':outcome.addValue("distance", (String) dist());break;
+      case '8':go_forward(SPEED);break;
+      case '4':left_turn(SPEED);break;
+      case '6':right_turn(SPEED);break;
+      case '2':go_back(SPEED);break;
+      case '5':stop_Stop();break;
+      case '0':until_line(SPEED);break;
+      case 'D':outcome.addValue("distance", (String) dist());break;
+       case 'S': 
+                  angle_tete_robot = scan(0, 180, 9, 0);
+                  distance_objet_proche = dist();
+                  outcome.addValue("head_angle", (String) angle_tete_robot);
+                  outcome.addValue("echo_distance", (String) distance_objet_proche);  
+                  break;
         default:break;
       }
-
     }
     if ( tracking()) // la fonction renvoi true si elle capte une ligne noir
     {
@@ -97,36 +112,22 @@ void loop()
       actionStep = 1;
       endTime = millis() + 1000; //1sec
     }
-    //Terminated interaction
     if ((endTime < millis()) && (actionStep == 1))
     {
       stop_Stop();
 
       //Send outcome to PC
-      Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
-      Udp.print(outcome.get());
-      Udp.endPacket();
-
+      // renvoi JSON du degres de mouvement
+      outcome.addValue( "gyroZ", (String) (gyroZ()));
+      //renvoi JSON du azimut
+      outcome.addValue( "compass", (String) (degreesNorth()));
+      wifiBot.sendOutcome(outcome.get());
+      outcome.clear();
       actionStep = 0;
     }
-    
-}
+    if(actionStep == 0)
+    {
+        reset_gyroZ(); //calibrer l'angle Z à 0 tant qu'il n'a pas fait d'action
+    }
 
-
-void printWifiStatus()
-{
-  // print the SSID of the network you're attached to
-  Serial.print("SSID: ");
-  Serial.println(WiFi.SSID());
-
-  // print your WiFi shield's IP address
-  IPAddress ip = WiFi.localIP();
-  Serial.print("IP Address: ");
-  Serial.println(ip);
-
-  // print where to go in the browser
-  Serial.println();
-  Serial.print("To see this page in action, open a browser to http://");
-  Serial.println(ip);
-  Serial.println();
 }
