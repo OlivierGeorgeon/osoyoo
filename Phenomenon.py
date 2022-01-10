@@ -9,7 +9,6 @@ class Phenomenon:
         self.y = y
 
         self.circle = shapes.Circle(self.x, self.y, 20, color=(50, 225, 30), batch=self.batch)
-        #self.line = shapes.Line(100, 100, 100, 200, color=(0, 0, 0), width=19, batch=self.batch)
 
     def rotate(self, angle):
         theta = math.radians(angle)

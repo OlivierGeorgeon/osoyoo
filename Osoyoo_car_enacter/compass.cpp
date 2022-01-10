@@ -67,7 +67,7 @@ float degreesNorth()
 
   // Convert to degrees
   float headingDegrees = heading * 180/M_PI -180;
-  // le nord est le sud sont inversés donc j'ai fais un calcul pour changer cela.
+  // le nord et le sud sont inversés donc j'ai fais un calcul pour changer cela.
   if (headingDegrees < 0)
   {
     headingDegrees = headingDegrees + 2*180;
