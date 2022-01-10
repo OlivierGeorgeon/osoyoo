@@ -33,7 +33,7 @@ WifiBot wifiBot = WifiBot("osoyoo_robot2", 8888);
 #include "Arduino_JSON.h"
 
 // use a ring buffer to increase speed and reduce memory allocation
-char packetBuffer[50];
+char packetBuffer[100];
 
 unsigned long endTime = 0;
 int actionStep = 0;
@@ -52,7 +52,7 @@ void setup()
   }
 
   mpu_setup();
-  compass_setup();
+  // compass_setup();
 
   //Exemple: da.setDelayAction(2000, [](){Serial.println("ok tout les 2s");}, millis());
 }
@@ -71,20 +71,18 @@ void loop()
       packetBuffer[len] = 0;
     }
 
+    JSONVar jsonReceive = JSON.parse(packetBuffer);
+    Serial.println(JSON.stringify(jsonReceive));
+    String strAction = JSON.stringify(jsonReceive["action"]);
 
-    JSONVar jsonAction = JSON.parse((String) packetBuffer);
-    String action = JSON.stringify(jsonAction["action"]);
-
-    int str_len = action.length() + 1;
-    char char_action[str_len];
-    action.toCharArray(char_action, str_len);
-    char actionKey = char_action;
-    Serial.println(char_action);
+    int str_len = strAction.length() + 1;
+    char action[str_len];
+    strAction.toCharArray(action, str_len);
 
     endTime = millis() + 2000;
     actionStep = 1;
 
-    switch (actionKey)    //serial control instructions
+    switch (action[1])    //serial control instructions
     {  
       case '$':outcome.addValue("distance", (String) dist());break;
       case '8':go_forward(SPEED);break;
@@ -121,7 +119,7 @@ void loop()
     // renvoi JSON du degres de mouvement
     outcome.addValue( "gyroZ", (String) (gyroZ()));
     //renvoi JSON du azimut
-    outcome.addValue( "compass", (String) (degreesNorth()));
+    // outcome.addValue( "compass", (String) (degreesNorth()));
     wifiBot.sendOutcome(outcome.get());
     outcome.clear();
     actionStep = 0;
