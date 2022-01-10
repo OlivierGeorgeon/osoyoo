@@ -31,14 +31,12 @@ class ModalWindow(pyglet.window.Window):
 
 
     def on_text(self, text):
-        print("Send action: ", text)
+        print("Send action:", text)
         if text == "O":
             self.phenomena.clear()
             ModalWindow.close(self)
         elif text == "N":
             ModalWindow.close(self)
-
-
 
 
 
@@ -119,7 +117,7 @@ class EgoMemoryWindow(pyglet.window.Window):
 
     def on_text(self, text):
         print("Send action: ", text)
-        outcome_string = self.wifiInterface.enact(text)
+        outcome_string = self.wifiInterface.enact({"action": text})
         print(outcome_string)
         outcome = json.loads(outcome_string)
 
@@ -186,7 +184,7 @@ class EgoMemoryWindow(pyglet.window.Window):
             while True:
                 time.sleep(frequence)
                 #print("Data requests")
-                obj.outcome = obj.wifiInterface.enact('$')
+                obj.outcome = obj.wifiInterface.enact({"action": "$"})
                 # obj.windowRefresh('$', json.loads(outcome))
 
         thread = threading.Thread(target=loop, args=[self])
@@ -207,6 +205,6 @@ if __name__ == "__main__":
     # ip_ = "?" #IP du robot 2 STA sur RobotBSN
     # ip_ = "10.40.22.254" #IP du robot 1 STA sur RobotBSN
     em_window = EgoMemoryWindow(ip=ip_)
-    #em_window.actionLoop(10)
-    #clock.schedule_interval(em_window.actionLoopInterprete, 5)
+    # em_window.actionLoop(10)
+    # clock.schedule_interval(em_window.actionLoopInterprete, 5)
     pyglet.app.run()

@@ -35,13 +35,13 @@ void WifiBot::wifiInitLocal()
    String str = "This is my string";
 
 
-    int str_len = ssid.length() + 1;
-    char char_ssid[str_len];
-    ssid.toCharArray(char_ssid, str_len);
-
-   Serial.println(char_ssid);
-   //AP mode
-   status = WiFi.beginAP(char_ssid, 10, "", 0);
+  int str_len = ssid.length() + 1;
+  char char_ssid[str_len];
+  ssid.toCharArray(char_ssid, str_len);
+  
+  Serial.println(char_ssid);
+  //AP mode
+  status = WiFi.beginAP(char_ssid, 10, "", 0);
 
   Serial.println("You're connected to the network");
   //printWifiStatus();
@@ -49,6 +49,9 @@ void WifiBot::wifiInitLocal()
 
   Serial.print("Listening on port ");
   Serial.println(localPort);
+  IPAddress ip = WiFi.localIP();
+  Serial.print("IP Address: ");
+  Serial.println(ip);
 }
 
 void WifiBot::wifiInitRouter()

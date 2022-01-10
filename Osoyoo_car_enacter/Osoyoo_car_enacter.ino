@@ -13,7 +13,7 @@
 #include "tracking.h"
 
 #include "Servo_Scan.h"
-#define pc "2"
+#define pc "1"
 #include "gyro.h"
 #include "compass.h"
 
@@ -21,8 +21,6 @@
 
 #include "DelayAction.h"
 DelayAction da;
-#include "JsonOutcome.h"
-JsonOutcome outcome;
 
 #include "WifiBot.h"
 WifiBot wifiBot = WifiBot("osoyoo_robot2", 8888);
@@ -30,8 +28,10 @@ WifiBot wifiBot = WifiBot("osoyoo_robot2", 8888);
 #include "WiFiEsp.h"
 #include "WiFiEspUDP.h"
 
+#include "Arduino_JSON.h"
+
 // use a ring buffer to increase speed and reduce memory allocation
-char packetBuffer[5];
+char packetBuffer[100];
 
 unsigned long endTime = 0;
 int actionStep = 0;
@@ -56,38 +56,46 @@ void setup()
   compass_setup();
 
   //Exemple: da.setDelayAction(2000, [](){Serial.println("ok tout les 2s");}, millis());
-
-  ///da.setDelayAction(5000, scan(0, 180, 9), millis());
 }
 
 void loop()
 {
   da.checkDelayAction(millis());
+  
   int packetSize = wifiBot.Udp.parsePacket();
   gyro_update();
+
   if (packetSize) { // if you get a client,
     Serial.print("Received packet of size ");
     Serial.println(packetSize);
     int len = wifiBot.Udp.read(packetBuffer, 255);
+
     if (len > 0) {
       packetBuffer[len] = 0;
     }
-      char c=packetBuffer[0];
 
-      endTime = millis() + 2000;
-      actionStep = 1;
-      switch (c)    //serial control instructions
-      {  
-        case '$':outcome.addValue("distance", (String) dist());break;
-        case '8':go_forward(SPEED);break;
-        case '4':left_turn(SPEED);break;
-        case '6':right_turn(SPEED);break;
-        case '2':go_back(SPEED);break;
-        case '5':stop_Stop();break;
-        case '0':until_line(SPEED);break;
-        case 'B':distances_loop(angle_tete_robot, distance_objet_proche); break;
-        case 'D':outcome.addValue("distance", (String) dist());break;
-        case 'S': 
+    JSONVar jsonReceive = JSON.parse(packetBuffer);
+    Serial.println(JSON.stringify(jsonReceive));
+    String strAction = JSON.stringify(jsonReceive["action"]);
+
+    int str_len = strAction.length() + 1;
+    char action[str_len];
+    strAction.toCharArray(action, str_len);
+
+    endTime = millis() + 2000;
+    actionStep = 1;
+
+    switch (action[1])    //serial control instructions
+    {  
+      case '$':outcome.addValue("distance", (String) dist());break;
+      case '8':go_forward(SPEED);break;
+      case '4':left_turn(SPEED);break;
+      case '6':right_turn(SPEED);break;
+      case '2':go_back(SPEED);break;
+      case '5':stop_Stop();break;
+      case '0':until_line(SPEED);break;
+      case 'D':outcome.addValue("distance", (String) dist());break;
+       case 'S': 
                   angle_tete_robot = scan(0, 180, 9, 0);
                   distance_objet_proche = dist();
                   outcome.addValue("head_angle", (String) angle_tete_robot);
@@ -95,8 +103,6 @@ void loop()
                   break;
         default:break;
       }
-
-    }
     if ( tracking()) // la fonction renvoi true si elle capte une ligne noir
     {
       stop_Stop();
@@ -121,4 +127,5 @@ void loop()
     {
         reset_gyroZ(); //calibrer l'angle Z à 0 tant qu'il n'a pas fait d'action
     }
+
 }
