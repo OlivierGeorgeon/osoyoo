@@ -15,13 +15,17 @@
 #include "Servo_Scan.h"
 #define pc "2"
 #include "gyro.h"
+#include "compass.h"
+
+
+
 #include "DelayAction.h"
 DelayAction da;
 #include "JsonOutcome.h"
 JsonOutcome outcome;
 
 #include "WifiBot.h"
-WifiBot wifiBot = WifiBot("osoyoo_robot", 8888);
+WifiBot wifiBot = WifiBot("osoyoo_robot2", 8888);
 
 #include "WiFiEsp.h"
 #include "WiFiEspUDP.h"
@@ -49,6 +53,11 @@ void setup()
   }
 
   mpu_setup();
+  compass_setup();
+
+  //Exemple: da.setDelayAction(2000, [](){Serial.println("ok tout les 2s");}, millis());
+
+  ///da.setDelayAction(5000, scan(0, 180, 9), millis());
 }
 
 void loop()
@@ -68,7 +77,7 @@ void loop()
       endTime = millis() + 2000;
       actionStep = 1;
       switch (c)    //serial control instructions
-        {  
+      {  
         case '$':outcome.addValue("distance", (String) dist());break;
         case '8':go_forward(SPEED);break;
         case '4':left_turn(SPEED);break;
@@ -83,7 +92,6 @@ void loop()
                   distance_objet_proche = dist();
                   outcome.addValue("head_angle", (String) angle_tete_robot);
                   outcome.addValue("echo_distance", (String) distance_objet_proche);  
-                           
                   break;
         default:break;
       }
@@ -101,7 +109,10 @@ void loop()
       stop_Stop();
 
       //Send outcome to PC
+      // renvoi JSON du degres de mouvement
       outcome.addValue( "gyroZ", (String) (gyroZ()));
+      //renvoi JSON du azimut
+      outcome.addValue( "compass", (String) (degreesNorth()));
       wifiBot.sendOutcome(outcome.get());
       outcome.clear();
       actionStep = 0;
