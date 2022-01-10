@@ -27,13 +27,20 @@ void go_forward(int speed) // faire avancer le robot
   setMotion(speed,speed,speed,speed);
 }
 
-void turn_degrees(int speed, int deg)
+/*void turn_degrees(int speed, int deg)
 {
-    while (mpu.getAngleZ() < deg)
+    if(deg > 0){
+    while (getAngleZ() < deg)
     {
-
+        setMotion(0,0,speed,speed);
     }
-}
+    }else{
+    while (getAngleZ() > deg)
+    {
+        setMotion(speed,speed,0,0);
+    }
+    }
+}*/
 
 void  go_back(int speed)//faire reculer le robot 
 {
