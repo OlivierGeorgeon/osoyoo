@@ -93,6 +93,13 @@ class EgoMemoryWindow(pyglet.window.Window):
         glMultMatrixf(self.environment_matrix)
         self.origin.draw()  # Draw the origin of the robot
 
+    def on_mouse_press(self,x, y, button, modifiers):
+        w, h = self.get_size()
+        deltaX = x - (w/2)
+        deltaY = y - (h/2)
+        angleInDegrees = math.atan2(deltaY, deltaX) * 180 / math.pi
+        print(int(angleInDegrees))
+
     def on_resize(self, width, height):
         # Display in the whole window
         glViewport(0, 0, width, height)
@@ -135,7 +142,7 @@ class EgoMemoryWindow(pyglet.window.Window):
 
         if 'head_angle' in outcome:
             head_angle = outcome['head_angle']
-            print("Head angle %i" % head_angle)
+            print("Head angle %s" % head_angle)
             self.robot.rotate_head(head_angle)
         if 'yaw' in outcome:
             rotation = outcome['yaw']

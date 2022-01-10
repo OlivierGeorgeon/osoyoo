@@ -7,8 +7,6 @@
  * | |__|  | | |  \  \ |   \__/   | |  | \    | |  |____  |  |____       \  \ _ |  |  /   /    \   \  |  |         |  | |  |       |  |   \       / 
  * |______/  |_|   \__\ \________/  |__|  \___| |_______| |_______|       \ _______| /__ /      \   \ |__|         |__| |__|       |__|    \ ___ /
  */
-
-
 #include <Servo.h>
 #include "calcDist.h"
 
@@ -20,13 +18,12 @@ Servo myservo;
 void servo_port() {
   myservo.attach(4);
 }
-
 int getIndexMin(int nb_mesures, float distances[]){
   
   float valMin = distances[0];
   int indexMin = 0;
   
-  //Recherche de la plus petite distances
+  //Recherche de la plus petite distances de la fonction de scan pour alignement
   for (int i = 0; i < nb_mesures; i++){
     if(distances[i] < valMin && distances[i] != 0){
         valMin = distances[i];
@@ -36,24 +33,48 @@ int getIndexMin(int nb_mesures, float distances[]){
   return indexMin;
 }
 
-int scan(int angleMin, int angleMax, int Nbre_mesure) {
+//Fonction de full scan ballayant une zone de 180° devant le robot et assure l'alignement à l'objet la plus proche
+int scan(int angleMin, int angleMax, int Nbre_mesure, int index_0) {
   int pas = round((angleMax-angleMin)/Nbre_mesure);
   float distances[Nbre_mesure];
   int indexMin;
   int angle;
-  //Scan de Nbre_mesure calcul de distances tout les 20 degrés pour couvrir les 180°
-  for (int pos = 0; pos < Nbre_mesure; pos++) {
+  for (int pos = 0; pos <= Nbre_mesure; pos++) {
     myservo.write(angleMin+(pas*pos));
     delay(300);
     distances[pos] = dist();
-    
-  }
-  
-
-  
-  // Appel fonction
+  } 
   indexMin = getIndexMin(Nbre_mesure, distances);
-  angle = indexMin*pas;
+  angle = (indexMin + index_0)*pas;
   myservo.write(angle);
   return angle;
+}
+
+//Fonction permettant le suivi d'un objet detecté à l'aide des minis scan en 3 zones d'action
+int MiniScan(int angle){
+  if(angle > 0 && angle <= 60){
+    scan(0, 60, 6, 0);
+  }
+  else if(angle > 60 && angle <=120){
+    scan(60, 120, 6, 6);
+  }
+  else {
+    scan(120, 180, 6, 12);
+  }
+}
+
+void distances_loop(int angle, float mesure){
+    Serial.print("Angle : ");
+    Serial.println(angle);
+    Serial.print("Mesure : ");
+    Serial.println(mesure);
+    Serial.print("Distance : ");
+    float distance = dist();
+    Serial.println(distance);
+    if(mesure != 0 && distance - mesure > 50){
+        MiniScan(angle);
+        Serial.print("Distance de scan");
+        Serial.println(distance - mesure);
+        Serial.print("Scan 1");
+    }
 }

@@ -18,8 +18,6 @@
 #include "compass.h"
 
 
-#include "JsonOutcome.h"
-JsonOutcome outcome;
 
 #include "DelayAction.h"
 DelayAction da;
@@ -38,6 +36,9 @@ char packetBuffer[100];
 unsigned long endTime = 0;
 int actionStep = 0;
 float somme_gyroZ = 0;
+int angle_tete_robot = 90;
+float distance_objet_proche = 0;
+
 void setup()
 {
 // init_GPIO();
@@ -52,13 +53,15 @@ void setup()
   }
 
   mpu_setup();
-  // compass_setup();
+  compass_setup();
 
   //Exemple: da.setDelayAction(2000, [](){Serial.println("ok tout les 2s");}, millis());
 }
 
 void loop()
 {
+  da.checkDelayAction(millis());
+  
   int packetSize = wifiBot.Udp.parsePacket();
   gyro_update();
 
@@ -92,42 +95,37 @@ void loop()
       case '5':stop_Stop();break;
       case '0':until_line(SPEED);break;
       case 'D':outcome.addValue("distance", (String) dist());break;
-      case 'S':
-        int angle_tete_robot = scan(0, 180, 9);
-        float distance_objet_proche = dist();
-
-        outcome.addValue("Angle", (String) angle_tete_robot);
-        outcome.addValue("distance", (String) distance_objet_proche);
-        break;
-      default:break;
+       case 'S': 
+                  angle_tete_robot = scan(0, 180, 9, 0);
+                  distance_objet_proche = dist();
+                  outcome.addValue("head_angle", (String) angle_tete_robot);
+                  outcome.addValue("echo_distance", (String) distance_objet_proche);  
+                  break;
+        default:break;
+      }
+    if ( tracking()) // la fonction renvoi true si elle capte une ligne noir
+    {
+      stop_Stop();
+      go_back(SPEED);//recule
+      actionStep = 1;
+      endTime = millis() + 1000; //1sec
     }
-  }
+    if ((endTime < millis()) && (actionStep == 1))
+    {
+      stop_Stop();
 
-  if (tracking()) // la fonction renvoi true si elle capte une ligne noir
-  {
-    stop_Stop();
-    go_back(SPEED);//recule
-    actionStep = 1;
-    endTime = millis() + 1000; //1sec
-  }
-
-  if ((endTime < millis()) && (actionStep == 1))
-  {
-    stop_Stop();
-
-    //Send outcome to PC
-    // renvoi JSON du degres de mouvement
-    outcome.addValue( "gyroZ", (String) (gyroZ()));
-    //renvoi JSON du azimut
-    // outcome.addValue( "compass", (String) (degreesNorth()));
-    wifiBot.sendOutcome(outcome.get());
-    outcome.clear();
-    actionStep = 0;
-  }
-
-  if(actionStep == 0)
-  {
-      reset_gyroZ(); //calibrer l'angle Z à 0 tant qu'il n'a pas fait d'action
-  }
+      //Send outcome to PC
+      // renvoi JSON du degres de mouvement
+      outcome.addValue( "gyroZ", (String) (gyroZ()));
+      //renvoi JSON du azimut
+      outcome.addValue( "compass", (String) (degreesNorth()));
+      wifiBot.sendOutcome(outcome.get());
+      outcome.clear();
+      actionStep = 0;
+    }
+    if(actionStep == 0)
+    {
+        reset_gyroZ(); //calibrer l'angle Z à 0 tant qu'il n'a pas fait d'action
+    }
 
 }
