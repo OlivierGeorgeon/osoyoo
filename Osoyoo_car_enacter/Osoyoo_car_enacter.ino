@@ -17,7 +17,8 @@
 #include "gyro.h"
 #include "compass.h"
 
-
+#include "JsonOutcome.h"
+JsonOutcome outcome;
 
 #include "DelayAction.h"
 DelayAction da;
@@ -103,6 +104,7 @@ void loop()
                   break;
         default:break;
       }
+    }
     if ( tracking()) // la fonction renvoi true si elle capte une ligne noir
     {
       stop_Stop();
