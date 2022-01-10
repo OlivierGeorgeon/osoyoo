@@ -99,7 +99,7 @@ class EgoMemoryWindow(pyglet.window.Window):
 
         if 'head_angle' in outcome:
             head_angle = outcome['head_angle']
-            print("Head angle %i" % head_angle)
+            print("Head angle %s" % head_angle)
             self.robot.rotate_head(head_angle)
         if 'yaw' in outcome:
             rotation = outcome['yaw']

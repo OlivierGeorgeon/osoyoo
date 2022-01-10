@@ -4,10 +4,9 @@ import time
 
 #UDP_IP = "192.168.4.1"  # AP mode
 # UDP_IP = "192.168.1.19"  # STA mode sur Olivier's wifi
-# UDP_IP = "10.40.22.251" # STA sur RobotBSN Olivier's Robot
-UDP_IP = "10.40.22.251" #IP du robot 2 STA sur RobotBSN
+UDP_IP = "10.40.22.251" # STA sur RobotBSN Olivier's Robot
+#UDP_IP = "10.40.22.251" #IP du robot 2 STA sur RobotBSN
 #UDP_IP = "10.40.22.254" #IP du robot 1 STA sur RobotBSN
-
 #UDP_IP = "10.40.23.2" #IP du robot 1 STA sur RobotBSN
 
 

@@ -39,14 +39,13 @@ int scan(int angleMin, int angleMax, int Nbre_mesure, int index_0) {
   float distances[Nbre_mesure];
   int indexMin;
   int angle;
-  for (int pos = 0; pos < Nbre_mesure; pos++) {
+  for (int pos = 0; pos <= Nbre_mesure; pos++) {
     myservo.write(angleMin+(pas*pos));
     delay(300);
-    distances[pos] = dist();  
+    distances[pos] = dist();
   } 
   indexMin = getIndexMin(Nbre_mesure, distances);
   angle = (indexMin + index_0)*pas;
-  Serial.println(dist());
   myservo.write(angle);
   return angle;
 }
@@ -74,7 +73,8 @@ void distances_loop(int angle, float mesure){
     Serial.println(distance);
     if(mesure != 0 && distance - mesure > 50){
         MiniScan(angle);
-        Serial.print(distance - mesure);
+        Serial.print("Distance de scan");
+        Serial.println(distance - mesure);
         Serial.print("Scan 1");
     }
 }

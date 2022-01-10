@@ -81,8 +81,8 @@ void loop()
         case 'S': 
                   angle_tete_robot = scan(0, 180, 9, 0);
                   distance_objet_proche = dist();
-                  outcome.addValue("Angle_Robot", (String) angle_tete_robot);
-                  outcome.addValue("distance", (String) distance_objet_proche);  
+                  outcome.addValue("head_angle", (String) angle_tete_robot);
+                  outcome.addValue("echo_distance", (String) distance_objet_proche);  
                            
                   break;
         default:break;
