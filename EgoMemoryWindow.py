@@ -5,7 +5,6 @@ from WifiInterface import WifiInterface
 import json
 from Phenomenon import Phenomenon
 import math
-import random
 from pyglet import shapes
 from pyglet import clock
 
@@ -84,7 +83,7 @@ class EgoMemoryWindow(pyglet.window.Window):
                 self.height * self.zoom_level, 1, -1)
 
         # Stack the rotation of the world so the robot's front is up
-        glRotatef(-90, 0.0, 0.0, 1.0) #mettre le Azimuth
+        #glRotatef(90, 0.0, 0.0, 1.0) #360
 
         # Draw the robot and the phenomena
         self.batch.draw()
@@ -93,12 +92,14 @@ class EgoMemoryWindow(pyglet.window.Window):
         glMultMatrixf(self.environment_matrix)
         self.origin.draw()  # Draw the origin of the robot
 
+
     def on_mouse_press(self,x, y, button, modifiers):
         w, h = self.get_size()
         deltaX = x - (w/2)
         deltaY = y - (h/2)
         angleInDegrees = math.atan2(deltaY, deltaX) * 180 / math.pi
         print(int(angleInDegrees))
+
 
     def on_resize(self, width, height):
         # Display in the whole window
@@ -112,7 +113,7 @@ class EgoMemoryWindow(pyglet.window.Window):
             self.zoom_level *= f
 
     def clear_ms(self):
-        print("ok")
+        print("clear_ms")
         self.phenomena.clear()
 
     def on_text(self, text):
@@ -122,6 +123,7 @@ class EgoMemoryWindow(pyglet.window.Window):
         outcome = json.loads(outcome_string)
 
         self.windowRefresh(text, outcome)
+
 
     def windowRefresh(self, text, outcome):
         # Update the model from the outcome
@@ -137,36 +139,36 @@ class EgoMemoryWindow(pyglet.window.Window):
             translation[0] = -180
         if text == "C":
            window = ModalWindow(self.phenomena)
-        # if text == "O":
-        #     self.clear_ms()
+
 
         if 'head_angle' in outcome:
             head_angle = outcome['head_angle']
             print("Head angle %s" % head_angle)
             self.robot.rotate_head(head_angle)
+
         if 'yaw' in outcome:
             rotation = outcome['yaw']
-        if text == "-" or text == "*":
-            # if 'echo_distance' in outcome:
-            #             #     echo_distance = outcome['echo_distance']
-            #             #     print("Echo distance %i" % echo_distance)
-            #             #     x = self.robot.head_x + math.cos(math.radians(head_angle)) * echo_distance
-            #             #     y = self.robot.head_y + math.sin(math.radians(head_angle)) * echo_distance
-            #             #     obstacle = Phenomenon(x, y, self.batch)
-            #             #     self.phenomena.append(obstacle)
+
+        if 'echo_distance' in outcome and 'head_angle' in outcome:
+            echo_distance = outcome['echo_distance']
+            print("Echo distance %i" % echo_distance)
+            x = self.robot.head_x + math.cos(math.radians(head_angle)) * echo_distance
+            y = self.robot.head_y + math.sin(math.radians(head_angle)) * echo_distance
+            obstacle = Phenomenon(x, y, self.batch)
+            self.phenomena.append(obstacle)
 
             # ----------------------------------------------------- #
             # ----------------------------------------------------- #
-               if not 'echo_distance' in outcome:
-                    echo_distance = random.randint(0, 300)
-                    head_angle = random.randint(0, 800)
-                    print("Echo distance %i" % echo_distance)
-                    x = self.robot.head_x + math.cos(math.radians(head_angle)) * echo_distance
-                    y = self.robot.head_y + math.sin(math.radians(head_angle)) * echo_distance
-                    obstacle = Phenomenon(x, y, self.batch)
-                    self.phenomena.append(obstacle)
-            #----------------------------------------------------#
-            #----------------------------------------------------#
+            #    if not 'echo_distance' in outcome:
+            #         echo_distance = random.randint(0, 300)
+            #         head_angle = random.randint(0, 800)
+            #         print("Echo distance %i" % echo_distance)
+            #         x = self.robot.head_x + math.cos(math.radians(head_angle)) * echo_distance
+            #         y = self.robot.head_y + math.sin(math.radians(head_angle)) * echo_distance
+            #         obstacle = Phenomenon(x, y, self.batch)
+            #         self.phenomena.append(obstacle)
+
+
 
         for p in self.phenomena:
             p.translate(translation)
@@ -177,6 +179,8 @@ class EgoMemoryWindow(pyglet.window.Window):
         glRotatef(-rotation, 0, 0, 1.0)
         glMultMatrixf(self.environment_matrix)
         glGetFloatv(GL_MODELVIEW_MATRIX, self.environment_matrix)
+
+
 
     # Boucle en arrière plan pour demander régulièrement des informations au robot
     def actionLoop(self, frequence):
