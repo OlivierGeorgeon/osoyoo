@@ -84,3 +84,4 @@ float degreesNorth()
           // Output
           return headingDegrees;
       }
+}
