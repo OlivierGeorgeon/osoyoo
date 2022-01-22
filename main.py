@@ -19,14 +19,14 @@ def on_text(text):
         print("Waiting for previous outcome before sending new action")
 
 
+def watch_async_outcome(dt):
+    if controller.async_flag == 2:
+        print("Redraw window")
+        controller.process_outcome(controller.async_action, controller.async_outcome_string)
+        controller.async_flag = 0
+
+
 def main():
-
-    def watch_async_outcome(dt):
-        if controller.async_flag == 2:
-            print("Redraw window")
-            controller.process_outcome(controller.async_action, controller.async_outcome_string)
-            controller.async_flag = 0
-
     pyglet.clock.schedule_interval(watch_async_outcome, 0.1)
     pyglet.app.run()
 

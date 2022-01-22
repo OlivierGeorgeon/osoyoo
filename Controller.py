@@ -84,3 +84,4 @@ class Controller:
         self.async_flag = 1
         thread = threading.Thread(target=async_action, args=[self])
         thread.start()
+
