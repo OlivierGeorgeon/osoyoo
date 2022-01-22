@@ -1,12 +1,15 @@
 import socket
 import keyboard
+import RobotDefine
 
 # UDP_IP = "192.168.4.1"  # AP mode
-UDP_IP = "192.168.1.19"  # STA chezOlivier
+# UDP_IP = "192.168.1.19"  # STA chezOlivier
 # UDP_IP = "10.40.22.251" # STA RobotBSN - Olivier's Robot in A301
-# UDP_IP = "10.40.22.254" # STA RobotBSN
-# UDP_IP = "10.44.53.11"  # STA RobotBSN - Olivier's Robot in A485
-UDP_TIMEOUT = 3  # Seconds
+UDP_IP = "10.40.22.254" # STA RobotBSN
+# UDP_IP = "10.44.53.9"  # STA RobotBSN - Olivier's Robot in A485
+UDP_TIMEOUT = 5  # Seconds
+if RobotDefine.ROBOT_ID == 0:
+    UDP_TIMEOUT = 0
 
 
 class WifiInterface:
@@ -20,6 +23,7 @@ class WifiInterface:
     '''Send the action string. Return the outcome string'''
     def enact(self, action):
         outcome = '{"outcome":"0"}'
+        print("sending " + action)
         self.socket.sendto(bytes(action, 'utf-8'), (self.IP, self.port))
         try:
             outcome, address = self.socket.recvfrom(255)
@@ -28,6 +32,7 @@ class WifiInterface:
         return outcome
 
 
+# Test the wifi interface by controlling the robot from the console
 if __name__ == '__main__':
     wifiInterface = WifiInterface()
     _action = ""
