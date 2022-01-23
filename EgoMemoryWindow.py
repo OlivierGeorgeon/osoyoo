@@ -2,6 +2,7 @@ import pyglet
 from pyglet.gl import *
 from pyglet import shapes
 import math
+from OsoyooCar import OsoyooCar
 
 ZOOM_IN_FACTOR = 1.2
 
@@ -27,6 +28,7 @@ class EgoMemoryWindow(pyglet.window.Window):
         self.mouse_press_angle = 0
 
     def on_draw(self):
+        """ Drawing the window """
         glClear(GL_COLOR_BUFFER_BIT)
         glLoadIdentity()
 
@@ -47,23 +49,26 @@ class EgoMemoryWindow(pyglet.window.Window):
         self.origin.draw()  # Draw the origin of the robot
 
     def on_resize(self, width, height):
+        """ Adjusting the viewport when resizing the window """
         # Always display in the whole window
         glViewport(0, 0, width, height)
 
     def on_mouse_press(self, x, y, button, modifiers):
+        """ Computing the position of the mouse click relative to the robot in mm and degrees """
         self.mouse_press_x = int((x - self.width/2)*self.zoom_level*2)
         self.mouse_press_y = int((y - self.height/2)*self.zoom_level*2)
         print(self.mouse_press_x, self.mouse_press_y)
         self.mouse_press_angle = int(math.degrees(math.atan2(self.mouse_press_y, self.mouse_press_x)))
 
     def on_mouse_scroll(self, x, y, dx, dy):
+        """ Zooming the window """
         # Inspired by https://www.py4u.net/discuss/148957
         f = ZOOM_IN_FACTOR if dy > 0 else 1/ZOOM_IN_FACTOR if dy < 0 else 1
         if .4 < self.zoom_level * f < 5:
             self.zoom_level *= f
 
     def update_environment_matrix(self, translation, rotation):
-        # Update the environment matrix used to keep track of the origin
+        """ Updating the environment matrix used to keep track of the origin """
         glLoadIdentity()
         glTranslatef(-translation[0], -translation[1], 0)
         glRotatef(-rotation, 0, 0, 1.0)
@@ -71,7 +76,21 @@ class EgoMemoryWindow(pyglet.window.Window):
         glGetFloatv(GL_MODELVIEW_MATRIX, self.environment_matrix)
 
 
-# Display the egocentric memory windows for test
+# Testing the egocentric memory window by moving the environment with the keyboard
 if __name__ == "__main__":
-    em_window = EgoMemoryWindow()
+    emw = EgoMemoryWindow()
+    robot = OsoyooCar(emw.batch)
+
+    @emw.event
+    def on_text(text):
+        """ Receiving the action from the window and updating the position of the environment """
+        if text == "8":  # Move forward
+            emw.update_environment_matrix([180, 0], 0)
+        if text == "2":  # Move forward
+            emw.update_environment_matrix([-180, 0], 0)
+        if text == "1":  # Move forward
+            emw.update_environment_matrix([0, 0], 45)
+        if text == "3":  # Move forward
+            emw.update_environment_matrix([0, 0], -45)
+
     pyglet.app.run()

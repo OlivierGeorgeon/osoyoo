@@ -23,9 +23,10 @@ class Controller:
         self.enact_step = 0
         self.outcome_string = ""
 
-    # Create an asynchronous thread to send the action to the robot and wait for outcome
     def enact(self, text):
+        """ Creating an asynchronous thread to send the action to the robot and to wait for outcome """
         def enact_thread():
+            """ Sending the action to the robot and waiting for outcome """
             print("Send " + self.action)
             self.outcome_string = self.wifiInterface.enact(self.action)
             print("Receive " + self.outcome_string)
@@ -37,14 +38,14 @@ class Controller:
         thread = threading.Thread(target=enact_thread)
         thread.start()
 
-    # Watch for the reception of the outcome
     def watch_outcome(self, dt):
+        """ Watching for the reception of the outcome """
         if self.enact_step == 2:
-            self.update_model()
-            self.enact_step = 0
+           self.update_model()
+           self.enact_step = 0
 
-    # Update the model from the latest received outcome
     def update_model(self):
+        """ Updating the model from the latest received outcome """
         print(self.outcome_string)
         outcome = json.loads(self.outcome_string)
         # floor_outcome = outcome['outcome']  # Agent5 uses floor_outcome
@@ -98,14 +99,14 @@ class Controller:
         self.view.update_environment_matrix(translation, rotation)
 
 
-# Test the controller by controlling the robot from the egocentric memory window
+# Testing the controller by remote controlling the robot from the egocentric memory window
 if __name__ == "__main__":
     emw = EgoMemoryWindow()
     controller = Controller(emw)
 
-    # Receive the action from the window event and call the controller to send the action to the robot
     @emw.event
     def on_text(text):
+        """ Receiving the action from the window and calling the controller to send the action to the robot """
         if controller.enact_step == 0:
             if text == "/":  # Turn of the angle marked by the mouse click
                 text = json.dumps({'action': '/', 'angle': emw.mouse_press_angle})
