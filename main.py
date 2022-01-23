@@ -6,6 +6,7 @@ from Agent5 import Agent5
 
 
 def main():
+    """ Controlling the robot with Agent5 """
     emw = EgoMemoryWindow()
     controller = Controller(emw)
     agent = Agent5()

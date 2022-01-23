@@ -3,6 +3,8 @@ from pyglet.gl import *
 from pyglet import shapes
 import math
 from OsoyooCar import OsoyooCar
+from pyrr import matrix44
+from numpy import transpose
 
 ZOOM_IN_FACTOR = 1.2
 
@@ -19,10 +21,8 @@ class EgoMemoryWindow(pyglet.window.Window):
 
         self.origin = shapes.Rectangle(0, 0, 60, 40, color=(150, 150, 225))
         self.origin.anchor_position = 30, 20
-        self.environment_matrix = (GLfloat * 16)(1, 0, 0, 0,
-                                                 0, 1, 0, 0,
-                                                 0, 0, 1, 0,
-                                                 0, 0, 0, 1)
+        self.displacement_matrix = matrix44.create_identity()
+
         self.mouse_press_x = 0
         self.mouse_press_y = 0
         self.mouse_press_angle = 0
@@ -45,7 +45,9 @@ class EgoMemoryWindow(pyglet.window.Window):
         self.batch.draw()
 
         # Stack the environment's displacement and draw the origin just to check
-        glMultMatrixf(self.environment_matrix)
+        gl_displacement_vector = [y for x in self.displacement_matrix for y in x]
+        gl_displacement_matrix = (GLfloat * 16)(*gl_displacement_vector)
+        glMultMatrixf(gl_displacement_matrix)
         self.origin.draw()  # Draw the origin of the robot
 
     def on_resize(self, width, height):
@@ -68,12 +70,11 @@ class EgoMemoryWindow(pyglet.window.Window):
             self.zoom_level *= f
 
     def update_environment_matrix(self, translation, rotation):
-        """ Updating the environment matrix used to keep track of the origin """
-        glLoadIdentity()
-        glTranslatef(-translation[0], -translation[1], 0)
-        glRotatef(-rotation, 0, 0, 1.0)
-        glMultMatrixf(self.environment_matrix)
-        glGetFloatv(GL_MODELVIEW_MATRIX, self.environment_matrix)
+        """ Updating the total displacement matrix used to keep track of the origin """
+        translation_matrix = matrix44.create_from_translation([-translation[0], -translation[1], 0])
+        self.displacement_matrix = matrix44.multiply(self.displacement_matrix, translation_matrix)
+        rotation_matrix = matrix44.create_from_z_rotation(-math.radians(-rotation))
+        self.displacement_matrix = matrix44.multiply(self.displacement_matrix, rotation_matrix)
 
 
 # Testing the egocentric memory window by moving the environment with the keyboard
