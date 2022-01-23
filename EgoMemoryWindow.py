@@ -1,6 +1,7 @@
 import pyglet
 from pyglet.gl import *
 from pyglet import shapes
+import math
 
 ZOOM_IN_FACTOR = 1.2
 
@@ -23,6 +24,7 @@ class EgoMemoryWindow(pyglet.window.Window):
                                                  0, 0, 0, 1)
         self.mouse_press_x = 0
         self.mouse_press_y = 0
+        self.mouse_press_angle = 0
 
     def on_draw(self):
         glClear(GL_COLOR_BUFFER_BIT)
@@ -52,6 +54,7 @@ class EgoMemoryWindow(pyglet.window.Window):
         self.mouse_press_x = int((x - self.width/2)*self.zoom_level*2)
         self.mouse_press_y = int((y - self.height/2)*self.zoom_level*2)
         print(self.mouse_press_x, self.mouse_press_y)
+        self.mouse_press_angle = int(math.degrees(math.atan2(self.mouse_press_y, self.mouse_press_x)))
 
     def on_mouse_scroll(self, x, y, dx, dy):
         # Inspired by https://www.py4u.net/discuss/148957
@@ -68,7 +71,7 @@ class EgoMemoryWindow(pyglet.window.Window):
         glGetFloatv(GL_MODELVIEW_MATRIX, self.environment_matrix)
 
 
-# Test the Egocentric memory windows by controlling the robot from the window
+# Display the egocentric memory windows for test
 if __name__ == "__main__":
     em_window = EgoMemoryWindow()
     pyglet.app.run()
