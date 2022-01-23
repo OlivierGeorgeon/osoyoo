@@ -2,30 +2,36 @@ import pyglet
 from Controller import Controller
 from EgoMemoryWindow import EgoMemoryWindow
 import json
-import math
+from Agent5 import Agent5
 
 
 def main():
-    view = EgoMemoryWindow()
-    controller = Controller(view)
+    emw = EgoMemoryWindow()
+    controller = Controller(emw)
+    agent = Agent5()
 
-    @view.event
-    def on_text(text):
-        if controller.enact_step == 0:
-            if text == "/":  # Turn of the angle marked by the mouse click
-                angle = int(math.degrees(math.atan2(view.mouse_press_y, view.mouse_press_x)))
-                text = json.dumps({'action': '/', 'angle': angle})
-            controller.async_action_trigger(text)
-        else:
-            print("Waiting for previous outcome before sending new action")
-
-    def watch_async_outcome(dt):
+    def watch_agent_turn(dt):
+        """ Watch for the end of the previous interaction and choose the next """
         if controller.enact_step == 2:
-            print("Redraw window")
-            controller.process_outcome(controller.action, controller.async_outcome_string)
+            # Update the egocentric memory window
+            controller.update_model()
             controller.enact_step = 0
 
-    pyglet.clock.schedule_interval(watch_async_outcome, 0.1)
+        if controller.enact_step == 0:
+            # Retrieve the previous outcome
+            outcome = 0
+            json_outcome = json.loads(controller.outcome_string)
+            if 'floor' in json_outcome:
+                outcome = json_outcome['floor']
+
+            # Choose the next action
+            action = agent.action(outcome)
+            controller.enact(['8', '1', '3'][action])
+
+    # Schedule the watch of the end of the previous interaction and choosing the next
+    pyglet.clock.schedule_interval(watch_agent_turn, 0.1)
+
+    # Run the egocentric memory window
     pyglet.app.run()
 
 

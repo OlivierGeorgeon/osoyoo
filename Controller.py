@@ -21,7 +21,7 @@ class Controller:
 
         self.action = ""
         self.enact_step = 0
-        self.outcome_string = ""
+        self.outcome_string = '{"outcome":"0"}'
 
     def enact(self, text):
         """ Creating an asynchronous thread to send the action to the robot and to wait for outcome """

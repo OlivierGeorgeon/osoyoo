@@ -76,9 +76,17 @@ if __name__ == "__main__":
     emw.zoom_level = 2
     robot = OsoyooCar(emw.batch)
     agent = Agent5()
+    outcome = 0
+
+    @emw.event
+    def on_text(text):
+        """ Receiving the outcome from the window """
+        global outcome
+        if text.isnumeric():
+            outcome = int(text)
 
     def play(dt):
-        action = agent.action(0)
+        action = agent.action(outcome)
         if action == 0:  # Move forward
             emw.update_environment_matrix([180, 0], 0)
         if action == 1:  # turn left
@@ -86,7 +94,7 @@ if __name__ == "__main__":
         if action == 2:  # turn right
             emw.update_environment_matrix([0, 0], -45)
 
-    # Schedule the controller to call the agent every second
+    # Schedule call the agent every second
     pyglet.clock.schedule_interval(play, 1)
 
     # Run the egocentric memory window
