@@ -70,7 +70,7 @@ class Agent5:
         return self._action
 
 
-# Testing Agent5
+# Testing Agent5 by updating the window and expecting outcome from user keypress
 if __name__ == "__main__":
     emw = EgoMemoryWindow(600)
     emw.zoom_level = 2

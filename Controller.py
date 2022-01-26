@@ -21,15 +21,16 @@ class Controller:
 
         self.action = ""
         self.enact_step = 0
-        self.outcome_string = '{"outcome":"0"}'
+        self.outcome_bytes = b'{"outcome":"0"}'
 
     def enact(self, text):
         """ Creating an asynchronous thread to send the action to the robot and to wait for outcome """
         def enact_thread():
             """ Sending the action to the robot and waiting for outcome """
-            print("Send " + self.action)
-            self.outcome_string = self.wifiInterface.enact(self.action)
-            print("Receive " + self.outcome_string)
+            # print("Send " + self.action)
+            self.outcome_bytes = self.wifiInterface.enact(self.action)
+            print("Receive ", end="")
+            print(self.outcome_bytes)
             self.enact_step = 2
             # self.watch_outcome()
 
@@ -46,8 +47,8 @@ class Controller:
 
     def update_model(self):
         """ Updating the model from the latest received outcome """
-        print(self.outcome_string)
-        outcome = json.loads(self.outcome_string)
+        # print(self.outcome_bytes)
+        outcome = json.loads(self.outcome_bytes)
         # floor_outcome = outcome['outcome']  # Agent5 uses floor_outcome
 
         # Presupposed displacement of the robot relative to the environment
@@ -95,6 +96,10 @@ class Controller:
                 obstacle = Phenomenon(x, y, self.view.batch)
                 self.phenomena.append(obstacle)
 
+        # Update the azimuth
+        if 'azimuth' in outcome:
+            self.view.azimuth = outcome['azimuth']
+
         # Update the origin
         self.view.update_environment_matrix(translation, rotation)
 
@@ -108,7 +113,7 @@ if __name__ == "__main__":
     def on_text(text):
         """ Receiving the action from the window and calling the controller to send the action to the robot """
         if controller.enact_step == 0:
-            if text == "/":  # Turn of the angle marked by the mouse click
+            if text == "/":  # Send the angle marked by the mouse click
                 text = json.dumps({'action': '/', 'angle': emw.mouse_press_angle})
             controller.enact(text)
         else:
