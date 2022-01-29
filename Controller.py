@@ -86,9 +86,6 @@ class Controller:
                     if self.action == "8":  # TODO Other actions
                         forward_duration = outcome['duration'] - 300  # Subtract retreat duration
                         translation[0] = STEP_FORWARD_DISTANCE * forward_duration/1000 - RETREAT_DISTANCE  # To be adjusted
-                    # Create a new floor-changed phenomenon
-                    line = Phenomenon(150 + translation[0], 0, self.view.batch, 1)  # the translation will be reapplied
-                    self.phenomena.append(line)
 
             # The displacement matrix of this interaction
             translation_matrix = matrix44.create_from_translation([-translation[0], -translation[1], 0])
@@ -99,7 +96,14 @@ class Controller:
             for p in self.phenomena:
                 p.translate(translation)
                 p.rotate(rotation)
-                # p.displace(displacement_matrix) not working yet
+                # p.displace(displacement_matrix) # not working yet
+
+            if 'floor' in outcome:
+                if outcome['floor'] > 0:  # Black line detected
+                    # Create a new floor-changed phenomenon
+                    line = Phenomenon(150, 0, self.view.batch, 1)  # the translation will be reapplied
+                    self.phenomena.append(line)
+
 
             # Update head angle
             if 'head_angle' in outcome:
