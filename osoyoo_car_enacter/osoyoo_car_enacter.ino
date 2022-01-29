@@ -329,7 +329,7 @@ void loop()
   if ((interaction_step == 3))
   {
     JSONVar outcome_object;
-    outcome_object["outcome"] = outcome;
+    outcome_object["status"] = outcome;
     FCR.outcome(outcome_object);
     HEA.outcome(outcome_object);
 

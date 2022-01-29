@@ -3,10 +3,11 @@ import keyboard
 import RobotDefine
 
 # UDP_IP = "192.168.4.1"  # AP mode
-# UDP_IP = "192.168.1.19"  # STA chezOlivier
+UDP_IP = "192.168.1.15"  # STA chezOlivier
 # UDP_IP = "10.40.22.251" # STA RobotBSN - Olivier's Robot in A301
-# UDP_IP = "10.40.22.254" # STA RobotBSN
-UDP_IP = "10.44.53.11"  # STA RobotBSN - Olivier's Robot in A485
+# UDP_IP = "10.40.22.254" # STA RobotBSN -
+# UDP_IP = "10.44.53.11"  # STA RobotBSN - Olivier's Robot in A485
+# UDP_IP = "10.44.53.13"  # STA RobotBSN - UCLy's Robot in A485
 UDP_TIMEOUT = 5  # Seconds
 if RobotDefine.ROBOT_ID == 0:
     UDP_TIMEOUT = 0
@@ -22,7 +23,7 @@ class WifiInterface:
 
     def enact(self, action):
         """ Sending the action string, waiting for the outcome, and returning the outcome bytes """
-        outcome = b'{"outcome":"0"}'
+        outcome = b'{"status":"T"}'  # Default status T if timeout
         print("sending " + action)
         self.socket.sendto(bytes(action, 'utf-8'), (self.IP, self.port))
         try:

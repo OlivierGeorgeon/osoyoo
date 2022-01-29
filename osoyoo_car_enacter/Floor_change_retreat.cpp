@@ -48,6 +48,8 @@ void Floor_change_retreat::update()
       switch (floor_change) {
         case 0b10000:_OWM.setMotion(-150,-150,-50,-50);_floor_outcome=2;break; // back right
         case 0b11000:_OWM.setMotion(-150,-150,-50,-50);_floor_outcome=2;break; // back right
+        case 0b11100:_OWM.setMotion(-150,-150,-50,-50);_floor_outcome=2;break; // back right
+        case 0b00111:_OWM.setMotion(-50,-50,-150,-150);_floor_outcome=1;break; // back left
         case 0b00011:_OWM.setMotion(-50,-50,-150,-150);_floor_outcome=1;break; // back left
         case 0b00001:_OWM.setMotion(-50,-50,-150,-150);_floor_outcome=1;break; // back left
         default:_OWM.setMotion(-150,-150,-150,-150);_floor_outcome=3;break;

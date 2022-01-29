@@ -20,11 +20,11 @@ class EgoMemoryWindow(pyglet.window.Window):
 
         self.origin = shapes.Rectangle(0, 0, 60, 40, color=(150, 150, 225))
         self.origin.anchor_position = 30, 20
-        self.displacement_matrix = matrix44.create_identity()
+        self.total_displacement_matrix = matrix44.create_identity()
         self.azimuth = 0
 
-        self.mouse_press_x = 0
-        self.mouse_press_y = 0
+        # self.mouse_press_x = 0
+        # self.mouse_press_y = 0
         self.mouse_press_angle = 0
 
     def on_draw(self):
@@ -39,13 +39,13 @@ class EgoMemoryWindow(pyglet.window.Window):
                 self.height * self.zoom_level, 1, -1)
 
         # Stack the rotation of the world so the robot's front is up
-        glRotatef(90 - self.azimuth, 0.0, 0.0, 1.0)
+        # glRotatef(90 - self.azimuth, 0.0, 0.0, 1.0)
 
         # Draw the robot and the phenomena
         self.batch.draw()
 
         # Stack the environment's displacement and draw the origin just to check
-        gl_displacement_vector = [y for x in self.displacement_matrix for y in x]
+        gl_displacement_vector = [y for x in self.total_displacement_matrix for y in x]
         gl_displacement_matrix = (GLfloat * 16)(*gl_displacement_vector)
         glMultMatrixf(gl_displacement_matrix)
         self.origin.draw()  # Draw the origin of the robot
@@ -57,13 +57,14 @@ class EgoMemoryWindow(pyglet.window.Window):
 
     def on_mouse_press(self, x, y, button, modifiers):
         """ Computing the position of the mouse click relative to the robot in mm and degrees """
-        self.mouse_press_x = int((x - self.width/2)*self.zoom_level*2)
-        self.mouse_press_y = int((y - self.height/2)*self.zoom_level*2)
-        print(self.mouse_press_x, self.mouse_press_y)
+        mouse_press_x = int((x - self.width/2)*self.zoom_level*2)
+        mouse_press_y = int((y - self.height/2)*self.zoom_level*2)
+        # print(self.mouse_press_x, self.mouse_press_y)
         # The angle from the horizontal axis
-        self.mouse_press_angle = int(math.degrees(math.atan2(self.mouse_press_y, self.mouse_press_x)))
+        self.mouse_press_angle = int(math.degrees(math.atan2(mouse_press_y, mouse_press_x)))
         # The angle from the robot's axis
         self.mouse_press_angle += self.azimuth - 90
+        print(str(self.mouse_press_angle) + "°")
 
     def on_mouse_scroll(self, x, y, dx, dy):
         """ Zooming the window """
@@ -72,12 +73,12 @@ class EgoMemoryWindow(pyglet.window.Window):
         if .4 < self.zoom_level * f < 5:
             self.zoom_level *= f
 
-    def update_environment_matrix(self, translation, rotation):
+    def update_environment_matrix(self, displacement_matrix):
         """ Updating the total displacement matrix used to keep track of the origin """
-        translation_matrix = matrix44.create_from_translation([-translation[0], -translation[1], 0])
-        self.displacement_matrix = matrix44.multiply(self.displacement_matrix, translation_matrix)
-        rotation_matrix = matrix44.create_from_z_rotation(-math.radians(-rotation))
-        self.displacement_matrix = matrix44.multiply(self.displacement_matrix, rotation_matrix)
+        # translation_matrix = matrix44.create_from_translation([-translation[0], -translation[1], 0])
+        # self.total_displacement_matrix = matrix44.multiply(self.total_displacement_matrix, translation_matrix)
+        # rotation_matrix = matrix44.create_from_z_rotation(-math.radians(-rotation))
+        self.total_displacement_matrix = matrix44.multiply(self.total_displacement_matrix, displacement_matrix)
 
 
 # Testing the egocentric memory window by moving the environment with the keyboard
