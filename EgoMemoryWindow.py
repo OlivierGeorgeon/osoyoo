@@ -4,6 +4,7 @@ from pyglet import shapes
 import math
 from OsoyooCar import OsoyooCar
 from pyrr import matrix44
+from Phenomenon import Phenomenon
 
 ZOOM_IN_FACTOR = 1.2
 
@@ -77,9 +78,6 @@ class EgoMemoryWindow(pyglet.window.Window):
 
     def update_environment_matrix(self, displacement_matrix):
         """ Updating the total displacement matrix used to keep track of the origin """
-        # translation_matrix = matrix44.create_from_translation([-translation[0], -translation[1], 0])
-        # self.total_displacement_matrix = matrix44.multiply(self.total_displacement_matrix, translation_matrix)
-        # rotation_matrix = matrix44.create_from_z_rotation(-math.radians(-rotation))
         self.total_displacement_matrix = matrix44.multiply(self.total_displacement_matrix, displacement_matrix)
 
 
@@ -87,17 +85,30 @@ class EgoMemoryWindow(pyglet.window.Window):
 if __name__ == "__main__":
     emw = EgoMemoryWindow()
     robot = OsoyooCar(emw.batch)
+    phenomena = []
+    obstacle = Phenomenon(0, 0, emw.batch, 1)
+    phenomena.append(obstacle)
+
 
     @emw.event
     def on_text(text):
         """ Receiving the action from the window and updating the position of the environment """
+        translation = [0, 0]
+        rotation = 0
         if text == "8":  # Move forward
-            emw.update_environment_matrix([180, 0], 0)
+            translation[0] = 180
         if text == "2":  # Move forward
-            emw.update_environment_matrix([-180, 0], 0)
-        if text == "1":  # Move forward
-            emw.update_environment_matrix([0, 0], 45)
-        if text == "3":  # Move forward
-            emw.update_environment_matrix([0, 0], -45)
+            translation[0] = -180
+        if text == "1":  # Turn left
+            rotation = 45
+        if text == "3":  # Turn right
+            rotation = -45
+        # The displacement matrix
+        translation_matrix = matrix44.create_from_translation([-translation[0], -translation[1], 0])
+        rotation_matrix = matrix44.create_from_z_rotation(-math.radians(-rotation))
+        displacement_matrix = matrix44.multiply(rotation_matrix, translation_matrix)
+        emw.update_environment_matrix(displacement_matrix)
+        # Apply the displacement to the phenomenon
+        obstacle.displace(displacement_matrix)
 
     pyglet.app.run()

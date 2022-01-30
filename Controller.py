@@ -43,8 +43,8 @@ class Controller:
     def watch_outcome(self, dt):
         """ Watching for the reception of the outcome """
         if self.enact_step == 2:
-           self.update_model()
-           self.enact_step = 0
+            self.update_model()
+            self.enact_step = 0
 
     def update_model(self):
         """ Updating the model from the latest received outcome """
@@ -99,9 +99,9 @@ class Controller:
 
             # Translate and rotate all the phenomena
             for p in self.phenomena:
-                p.translate(translation)
-                p.rotate(rotation)
-                # p.displace(displacement_matrix) # not working yet
+                # p.translate(translation)
+                # p.rotate(rotation)
+                p.displace(displacement_matrix)
 
             # Check if line detected
             if floor > 0:

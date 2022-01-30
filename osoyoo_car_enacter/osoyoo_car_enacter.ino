@@ -117,10 +117,11 @@ void loop()
   // Behavior head echo alignment
   HEA.update();
 
-  // IMU reading
+  // Behavior IMU
   int shock_event = IMU.update();
 
-  // If no interaction being enacted
+  // STEP 0: no interaction being enacted
+  // Watching for message sent from PC
   if (interaction_step == 0 )
   {
     // Watch the wifi for new action
@@ -128,26 +129,24 @@ void loop()
     // If the received packet exceeds the size of packetBuffer defined above, Arduino will crash
     if (packetSize) {
       int len = Udp.read(packetBuffer, 255);
-      //if (len > 0) {
-        packetBuffer[len] = 0;
-        Serial.print("Received action ");
-        if (len == 1) {
-          // Single character is the action
-          action = packetBuffer[0];
-          Serial.print(action);
-        } else {
-          // Multiple characters is json
-          // https://github.com/arduino-libraries/Arduino_JSON/blob/master/examples/JSONObject/JSONObject.ino
-          JSONVar myObject = JSON.parse(packetBuffer);
-          Serial.print(myObject);
-          if (myObject.hasOwnProperty("action")) {
-            action = ((const char*) myObject["action"])[0];
-          }
-          if (myObject.hasOwnProperty("angle")) {
-            robot_destination_angle = ((int) myObject["angle"]);
-          }
+      packetBuffer[len] = 0;
+      Serial.print("Received action ");
+      if (len == 1) {
+        // Single character is the action
+        action = packetBuffer[0];
+        Serial.print(action);
+      } else {
+        // Multiple characters is json
+        // https://github.com/arduino-libraries/Arduino_JSON/blob/master/examples/JSONObject/JSONObject.ino
+        JSONVar myObject = JSON.parse(packetBuffer);
+        Serial.print(myObject);
+        if (myObject.hasOwnProperty("action")) {
+          action = ((const char*) myObject["action"])[0];
         }
-      //}
+        if (myObject.hasOwnProperty("angle")) {
+          robot_destination_angle = ((int) myObject["angle"]);
+        }
+      }
       Serial.print(" from ");
       IPAddress remoteIp = Udp.remoteIP();
       Serial.print(remoteIp);
@@ -229,7 +228,7 @@ void loop()
   }
 
   // STEP 1: Performing the action until the termination conditions are triggered
-  //   When termination conditions are triggered, stop the action and proceed to step 2
+  // When termination conditions are triggered, stop the action and proceed to step 2
   if (interaction_step == 1)
   {
     switch (action)
@@ -283,27 +282,19 @@ void loop()
         {
           OWM.stopMotion();
           interaction_step = 2;
-          action_end_time = millis() + TURN_SPOT_ENDING_DELAY;
+          action_end_time = millis() + TURN_SPOT_ENDING_DELAY; // Add time for stabilisation during step 2
         }
-        // If destination angle is not reached, check whether duration has elapsed
-        //else if (action_end_time < millis()) {
-        //  interaction_step = 2;
-        //}
         break;
       case ACTION_TURN_IN_SPOT_RIGHT:
         // Keep head aligned with destination angle
         HEA.turnHead(robot_destination_angle - IMU._yaw);
-        // Stop before reaching -45°
+         // Stop before reaching -45° or when duration has elapsed
         if ((IMU._yaw < robot_destination_angle + TURN_SPOT_ENDING_ANGLE) || (action_end_time < millis()))
         {
           OWM.stopMotion();
           interaction_step = 2;
-          action_end_time = millis() + TURN_SPOT_ENDING_DELAY;
+          action_end_time = millis() + TURN_SPOT_ENDING_DELAY; // Add time for stabilisation during step 2
         }
-        // If destination angle is not reached, check whether duration has elapsed
-        //else if (action_end_time < millis()) {
-        //  interaction_step = 2;
-        //}
         break;
       case ACTION_ALIGN_ROBOT:
         HEA.turnHead(robot_destination_angle - IMU._yaw); // Keep looking at destination
@@ -339,55 +330,17 @@ void loop()
   // When the terminations are finished, proceed to Step 3
   if (interaction_step == 2)
   {
-/*
-    switch (action)
-    {
-      case ACTION_GO_ADVANCE:
-      case ACTION_TURN_RIGHT:
-      case ACTION_TURN_LEFT:
-        // Check for the end of Floor Change Retreat
-        if (!FCR._is_enacting) {
-          interaction_step = 3;
-        }
-        break;
-      case ACTION_TURN_IN_SPOT_LEFT:
-      case ACTION_TURN_IN_SPOT_RIGHT:
-        if (!FCR._is_enacting && action_end_time < millis() && !HEA._is_enacting_head_alignment) {
-          interaction_step = 3;
-        }
-        break;
-      default:
-        if (action_end_time < millis()) {
-          interaction_step = 3;
-        }
-        break;
-    }
-*/
-    // Wait the interaction to terminate
-    // Don't wait for  the head alignment or it may never stop
+    // Wait for the interaction to terminate and proceed to Step 3
+    // (Don't wait for  the head alignment or it may never terminate)
     if (action_end_time < millis() &&  !FCR._is_enacting){ // && !HEA._is_enacting_head_alignment) {
       interaction_step = 3;
     }
   }
 
-  // STEP 3: End of interaction.
+  // STEP 3: Ending of interaction:
   // Send the outcome and go back to Step 1
   if ((interaction_step == 3))
   {
-    // Terminate all movement that was not yet terminated
-/*    switch (action)
-    {
-      //case ACTION_GO_ADVANCE:
-      case ACTION_ALIGN_HEAD:
-      case ACTION_ECHO_SCAN:
-        // HEA.outcome(outcome_object);
-        break;
-      default:
-        OWM.stopMotion();
-        break;
-    }*/
-    // OWM.stopMotion();
-
     // Compute the outcome message
     JSONVar outcome_object;
     outcome_object["status"] = status;
@@ -405,6 +358,5 @@ void loop()
 
     // Ready to begin a new interaction
     interaction_step = 0;
-    // is_enacting_action = false;
   }
 }
