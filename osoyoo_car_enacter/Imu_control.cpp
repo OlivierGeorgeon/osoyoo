@@ -94,9 +94,10 @@ void Imu_control::begin()
   _xSpeed = 0;
   _xDistance = 0;
 }
-void Imu_control::update()
+int Imu_control::update()
 {
   unsigned long timer = millis();
+  int _shock_event = 0;
   if (_next_imu_read_time < timer)
   {
     _next_imu_read_time = timer + IMU_READ_PERIOD;
@@ -118,14 +119,27 @@ void Imu_control::update()
     }
     // When moving forward
     // Check for shock on the right
-    if (_ZAngle < -1) _shock_measure |= B001;
+    if (_ZAngle < -1) {
+      _shock_measure = B01;
+      _shock_event = _shock_measure;
+    }
     // Check for shock on the front
-    if (normAccel.XAxis > X_AXIS_DEFAULT_ACCELERATION + 2) _shock_measure |= B010;
+    if (normAccel.XAxis > X_AXIS_DEFAULT_ACCELERATION + 2) {
+      _shock_measure = B11;
+      _shock_event = _shock_measure;
+    }
     // Check for shock on the left
-    if (_ZAngle > 1) _shock_measure |= B100;
+    if (_ZAngle > 1) {
+      _shock_measure = B10;
+      _shock_event = _shock_measure;
+    }
     // Check for blocked on the front (cannot accelerate properly during the first 250ms)
     if (_cycle_count >= 6) {
-      if (_min_acceleration > X_AXIS_DEFAULT_ACCELERATION - 0.3) _blocked = true;
+      if (_min_acceleration > X_AXIS_DEFAULT_ACCELERATION - 0.3) {
+        _shock_measure = B11;
+        _shock_event = _shock_measure;
+        _blocked = true;
+      }
     }
 
     // Trying to compute the speed by integrating acceleration (not working)
@@ -140,6 +154,7 @@ void Imu_control::update()
 
     #endif
   }
+  return _shock_event;
 }
 void Imu_control::outcome(JSONVar & outcome_object)
 {

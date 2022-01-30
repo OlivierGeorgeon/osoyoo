@@ -8,7 +8,7 @@ UDP_IP = "192.168.1.15"  # STA chezOlivier
 # UDP_IP = "10.40.22.254" # STA RobotBSN -
 # UDP_IP = "10.44.53.11"  # STA RobotBSN - Olivier's Robot in A485
 # UDP_IP = "10.44.53.13"  # STA RobotBSN - UCLy's Robot in A485
-UDP_TIMEOUT = 5  # Seconds
+UDP_TIMEOUT = 3  # Seconds
 if RobotDefine.ROBOT_ID == 0:
     UDP_TIMEOUT = 0
 

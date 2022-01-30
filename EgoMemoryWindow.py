@@ -64,6 +64,8 @@ class EgoMemoryWindow(pyglet.window.Window):
         self.mouse_press_angle = int(math.degrees(math.atan2(mouse_press_y, mouse_press_x)))
         # The angle from the robot's axis
         self.mouse_press_angle += self.azimuth - 90
+        if self.mouse_press_angle > 180:
+            self.mouse_press_angle -= 360
         print(str(self.mouse_press_angle) + "°")
 
     def on_mouse_scroll(self, x, y, dx, dy):

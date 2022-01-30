@@ -115,7 +115,7 @@ void loop()
   HEA.update();
 
   // IMU reading
-  IMU.update();
+  int shock_event = IMU.update();
 
   // If no interaction being enacted
   if (interaction_step == 0 )
@@ -231,6 +231,25 @@ void loop()
     switch (action)
     {
       case ACTION_GO_ADVANCE:
+        if (shock_event > 0){
+          // If shock then stop the go advance action
+          outcome ="1";
+          action_end_time = 0;
+          OWM.stopMotion();
+          // Loot to the direction of the shock and start echo alignment
+          HEA._next_saccade_time = millis() + 150;
+          if (shock_event == B01){ // Shock from the right
+            HEA.turnHead(-80);
+          }
+          if (shock_event == B10){ // Shock from the front
+            HEA.turnHead(80);
+          }
+          if (shock_event == B11){
+            HEA.turnHead(0);
+          }
+          HEA.beginEchoAlignment();
+          interaction_step = 2;
+        }
       case ACTION_TURN_RIGHT:
       case ACTION_TURN_LEFT:
         if (FCR._is_enacting) {
@@ -304,6 +323,11 @@ void loop()
     switch (action)
     {
       case ACTION_GO_ADVANCE:
+        if (!HEA._is_enacting_head_alignment && !HEA._is_enacting_echo_scan)
+        {
+          // Wait until head is aligned
+          interaction_step = 3;
+        }
       case ACTION_TURN_RIGHT:
       case ACTION_TURN_LEFT:
         if (!FCR._is_enacting) {

@@ -50,6 +50,7 @@ class Controller:
         """ Updating the model from the latest received outcome """
         outcome = json.loads(self.outcome_bytes)
         blocked = False
+        shock = 0
         # floor_outcome = outcome['outcome']  # Agent5 uses floor_outcome
 
         if outcome['status'] == "T":  # If timeout no ego memory update
@@ -57,6 +58,8 @@ class Controller:
         else:
             if 'blocked' in outcome:
                 blocked = outcome['blocked']
+            if 'shock' in outcome:
+                shock = outcome['shock']
 
             # Presupposed displacement of the robot relative to the environment
             translation = [0, 0]
@@ -67,13 +70,13 @@ class Controller:
                 translation[0] = -STEP_FORWARD_DISTANCE
             if self.action == "3":
                 rotation = -45
+            if self.action == "4":
+                translation[1] = SHIFT_DISTANCE
+            if self.action == "6":
+                translation[1] = -SHIFT_DISTANCE
             if self.action == "8":
-                # Draw blocking obstacle
-                if blocked:
-                    wall = Phenomenon(120, 0, self.view.batch, 2)
-                    self.phenomena.append(wall)
-                else:
-                    translation[0] = STEP_FORWARD_DISTANCE
+                if not blocked:
+                    translation[0] = STEP_FORWARD_DISTANCE * outcome['duration'] / 1000
 
             # Actual measured displacement if any
             if 'yaw' in outcome:
@@ -98,12 +101,28 @@ class Controller:
                 p.rotate(rotation)
                 # p.displace(displacement_matrix) # not working yet
 
+            # The phenomenon line
             if 'floor' in outcome:
                 if outcome['floor'] > 0:  # Black line detected
                     # Create a new floor-changed phenomenon
                     line = Phenomenon(150, 0, self.view.batch, 1)  # the translation will be reapplied
                     self.phenomena.append(line)
 
+            # The phenomenon wall
+            if self.action == "8":
+                if blocked:
+                    wall = Phenomenon(110, 0, self.view.batch, 2)
+                    self.phenomena.append(wall)
+                else:
+                    if shock == 0b01:
+                        wall = Phenomenon(110, -80, self.view.batch, 2)
+                        self.phenomena.append(wall)
+                    if shock == 0b11:
+                        wall = Phenomenon(110, 0, self.view.batch, 2)
+                        self.phenomena.append(wall)
+                    if shock == 0b10:
+                        wall = Phenomenon(110, 80, self.view.batch, 2)
+                        self.phenomena.append(wall)
 
             # Update head angle
             if 'head_angle' in outcome:
