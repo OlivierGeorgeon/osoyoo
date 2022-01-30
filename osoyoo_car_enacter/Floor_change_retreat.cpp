@@ -29,20 +29,13 @@ void Floor_change_retreat::update()
   int floor_change = current_measure_floor ^ _previous_measure_floor; // Bitwise XOR
   _previous_measure_floor = current_measure_floor;
 
-  if (_is_enacting)
+  // If is not already retreating
+  if (!_is_enacting)
   {
-    if (millis() > _floor_change_retreat_end_time) {
-      // End floor change retreat
-      _OWM.stopMotion();
-      Serial.println("End retreat at " + String(millis()));
-      _is_enacting = false;
-    }
-  }
-  else // If is not enacting floor change retreat
-  {
+    // Watch whether the floor has changed
     if (floor_change != 0)
     {
-      // Begin floor change retreat
+      // Start the retreat
       Serial.println("Floor change " + String(floor_change, BIN) + " Begin retreat at " + String(millis()));
       _is_enacting = true;
       switch (floor_change) {
@@ -55,6 +48,17 @@ void Floor_change_retreat::update()
         default:_OWM.setMotion(-150,-150,-150,-150);_floor_outcome=3;break;
       }
       _floor_change_retreat_end_time = millis() + RETREAT_DURATION;
+    }
+  }
+  // IF currently retreating
+  if (_is_enacting)
+  {
+    // Check whether the retreat time has elapsed
+    if (millis() > _floor_change_retreat_end_time) {
+      // Stop the retreat
+      _OWM.stopMotion();
+      Serial.println("End retreat at " + String(millis()));
+      _is_enacting = false;
     }
   }
 }

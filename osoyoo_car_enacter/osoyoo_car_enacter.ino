@@ -228,7 +228,8 @@ void loop()
     }
   }
 
-  // If an interaction is being enacted
+  // STEP 1: Performing the action until the termination conditions are triggered
+  //   When termination conditions are triggered, stop the action and proceed to step 2
   if (interaction_step == 1)
   {
     switch (action)
@@ -257,45 +258,52 @@ void loop()
 */
       case ACTION_TURN_RIGHT:
       case ACTION_TURN_LEFT:
+        // Check if Floor Change Retreat
         if (FCR._is_enacting) {
           FCR.extraDuration(RETREAT_EXTRA_DURATION); // Increase retreat duration because need to reverse speed
           status ="1";
+          if (FCR._floor_outcome > 0) {
+            status ="2";  // Check whether floor outcome has been set at this point
+          }
+          // Proceed to step 2 for enacting Floor Change Retreat
           action_end_time = 0;
           interaction_step = 2;
         }
+        // If no floor change, check whether duration has elapsed
         else if (action_end_time < millis()) {
-          interaction_step = 3;
+          OWM.stopMotion();
+          interaction_step = 3; // Skip termination step
         }
         break;
       case ACTION_TURN_IN_SPOT_LEFT:
         // Keep head aligned with destination angle
         HEA.turnHead(robot_destination_angle - IMU._yaw);
-         // Stop before reaching 45°
-        if (IMU._yaw > robot_destination_angle - TURN_SPOT_ENDING_ANGLE)
+         // Stop before reaching 45° or when duration has elapsed
+        if ((IMU._yaw > robot_destination_angle - TURN_SPOT_ENDING_ANGLE) || (action_end_time < millis()))
         {
           OWM.stopMotion();
           interaction_step = 2;
           action_end_time = millis() + TURN_SPOT_ENDING_DELAY;
         }
-        // Stop at action end time
-        else if (action_end_time < millis()) {
-          interaction_step = 2;
-        }
+        // If destination angle is not reached, check whether duration has elapsed
+        //else if (action_end_time < millis()) {
+        //  interaction_step = 2;
+        //}
         break;
-     case ACTION_TURN_IN_SPOT_RIGHT:
+      case ACTION_TURN_IN_SPOT_RIGHT:
         // Keep head aligned with destination angle
         HEA.turnHead(robot_destination_angle - IMU._yaw);
         // Stop before reaching -45°
-        if (IMU._yaw < robot_destination_angle + TURN_SPOT_ENDING_ANGLE)
+        if ((IMU._yaw < robot_destination_angle + TURN_SPOT_ENDING_ANGLE) || (action_end_time < millis()))
         {
           OWM.stopMotion();
           interaction_step = 2;
           action_end_time = millis() + TURN_SPOT_ENDING_DELAY;
         }
-        // Stop at action end time
-        else if (action_end_time < millis()) {
-          interaction_step = 2;
-        }
+        // If destination angle is not reached, check whether duration has elapsed
+        //else if (action_end_time < millis()) {
+        //  interaction_step = 2;
+        //}
         break;
       case ACTION_ALIGN_ROBOT:
         HEA.turnHead(robot_destination_angle - IMU._yaw); // Keep looking at destination
@@ -317,24 +325,27 @@ void loop()
         }
         break;
       default:
-        interaction_step = 2;
+        if (action_end_time < millis()) {
+          OWM.stopMotion();
+          interaction_step = 2;
+        }
         break;
     }
   }
 
-  // If an interaction is being terminated
+  // STEP 2: Enacting the termination of the interaction:
+  // - Floor change retreat
+  // - Stabilisation time
+  // When the terminations are finished, proceed to Step 3
   if (interaction_step == 2)
   {
+/*
     switch (action)
     {
       case ACTION_GO_ADVANCE:
-/*        if (!HEA._is_enacting_head_alignment && !HEA._is_enacting_echo_scan)
-        {
-          // Wait until head is aligned
-          interaction_step = 3;
-        }*/
       case ACTION_TURN_RIGHT:
       case ACTION_TURN_LEFT:
+        // Check for the end of Floor Change Retreat
         if (!FCR._is_enacting) {
           interaction_step = 3;
         }
@@ -342,7 +353,6 @@ void loop()
       case ACTION_TURN_IN_SPOT_LEFT:
       case ACTION_TURN_IN_SPOT_RIGHT:
         if (!FCR._is_enacting && action_end_time < millis() && !HEA._is_enacting_head_alignment) {
-          Serial.println("interaction step = 3");
           interaction_step = 3;
         }
         break;
@@ -352,9 +362,16 @@ void loop()
         }
         break;
     }
+*/
+    // Wait the interaction to terminate
+    // Don't wait for  the head alignment or it may never stop
+    if (action_end_time < millis() &&  !FCR._is_enacting){ // && !HEA._is_enacting_head_alignment) {
+      interaction_step = 3;
+    }
   }
 
-  // End of interaction. Stop all motion and send outcome
+  // STEP 3: End of interaction.
+  // Send the outcome and go back to Step 1
   if ((interaction_step == 3))
   {
     // Terminate all movement that was not yet terminated
@@ -369,15 +386,15 @@ void loop()
         OWM.stopMotion();
         break;
     }*/
-    OWM.stopMotion();
+    // OWM.stopMotion();
 
     // Compute the outcome message
     JSONVar outcome_object;
     outcome_object["status"] = status;
     FCR.outcome(outcome_object);
     HEA.outcome(outcome_object);
-    outcome_object["duration"] = millis() - action_start_time;
     IMU.outcome(outcome_object);
+    outcome_object["duration"] = millis() - action_start_time;
     String outcome_json_string = JSON.stringify(outcome_object);
     Serial.println("Outcome string " + outcome_json_string);
 

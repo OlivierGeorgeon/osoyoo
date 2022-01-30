@@ -135,7 +135,6 @@ class Controller:
                     # Create a new echo phenomenon
                     echo_distance = outcome['echo_distance']
                     if echo_distance > 0:  # echo measure 0 is false measure
-                        print("Echo distance %i" % echo_distance)
                         x = self.robot.head_x + math.cos(math.radians(head_angle)) * echo_distance
                         y = self.robot.head_y + math.sin(math.radians(head_angle)) * echo_distance
                         obstacle = Phenomenon(x, y, self.view.batch)
