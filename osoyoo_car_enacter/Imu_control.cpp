@@ -38,7 +38,7 @@ void Imu_control::setup()
   // Calibrate gyroscope. The calibration must be at rest.
   // If you don't want calibrate, comment this line.
   _mpu.calibrateGyro();
-  Serial.println("Gyroscope calibrated");
+  // Serial.println("Gyroscope calibrated");
 
   // Set threshold sensitivity. Default 3.
   // If you don't want use threshold, comment this line or set 0.
@@ -53,13 +53,12 @@ void Imu_control::setup()
   #endif
 
   #if ROBOT_HAS_HMC5883L == true
-  // Initialize Initialize HMC5883L
 
+  // Initialize Initialize HMC5883L
   _mpu.setI2CMasterModeEnabled(false);
   _mpu.setI2CBypassEnabled(true) ;
   _mpu.setSleepEnabled(false);
-
-  Serial.println("Initialize HMC5883L");
+  // Serial.println("Initialize HMC5883L");
   while (!compass.begin())
   {
     Serial.println("Could not find a valid HMC5883L sensor, check wiring!");
@@ -88,8 +87,8 @@ void Imu_control::begin()
   _shock_measure = 0;
   _cycle_count = 0;
   _blocked = false;
-  _max_acceleration = X_AXIS_DEFAULT_ACCELERATION;
-  _min_acceleration = X_AXIS_DEFAULT_ACCELERATION;
+  _max_acceleration = X_ACCELERATION_OFFSET;
+  _min_acceleration = X_ACCELERATION_OFFSET;
   _max_speed = 0;
   _xSpeed = 0;
   _xDistance = 0;
@@ -97,7 +96,6 @@ void Imu_control::begin()
 int Imu_control::update()
 {
   unsigned long timer = millis();
-  int _shock_event = 0;
   if (_next_imu_read_time < timer)
   {
     _next_imu_read_time = timer + IMU_READ_PERIOD;
@@ -108,36 +106,42 @@ int Imu_control::update()
     Vector normAccel = _mpu.readNormalizeAccel();
     Vector normGyro = _mpu.readNormalizeGyro();
 
-    // Integrate Yaw during the interaction
+    // Integrate yaw during the interaction
     float _ZAngle = normGyro.ZAxis * IMU_READ_PERIOD / 1000;
     _yaw += _ZAngle;
 
-    // Trying to detect strong X-axis acceleration after starting, possibly due to shock on solid obstacle
-    if (normAccel.XAxis > _max_acceleration) _max_acceleration =  normAccel.XAxis;
+    // Record the max acceleration during the interaction
+    // (This is in fact the max deceleration if collision)
+    if (normAccel.XAxis > _max_acceleration) {
+      _max_acceleration =  normAccel.XAxis;
+    }
+    // Record the min acceleration at the beginning of the interaction
+    // (This is in fact the max acceleration forward at the beginning of the interaction)
     if (_cycle_count <= 6) {
-      if (normAccel.XAxis < _min_acceleration) _min_acceleration =  normAccel.XAxis;
+      if (normAccel.XAxis < _min_acceleration) {
+        _min_acceleration =  normAccel.XAxis;
+      }
     }
-    // When moving forward
-    // Check for shock on the right
+    // Check for turned to the right by more than 1°/s
     if (_ZAngle < -1) {
+      // If moving forward, this will mean collision on the right
       _shock_measure = B01;
-      _shock_event = _shock_measure;
     }
-    // Check for shock on the front
-    if (normAccel.XAxis > X_AXIS_DEFAULT_ACCELERATION + 2) {
+    // Check a peek acceleration
+    // (this is in fact a peek deceleration, that is a frontal shock)
+    if (normAccel.XAxis > X_ACCELERATION_OFFSET + 2) {
       _shock_measure = B11;
-      _shock_event = _shock_measure;
     }
-    // Check for shock on the left
+    // Check for turned to the left by more than 1°/s
     if (_ZAngle > 1) {
+      // If moving forward, this will mean collision on the left
       _shock_measure = B10;
-      _shock_event = _shock_measure;
     }
-    // Check for blocked on the front (cannot accelerate properly during the first 250ms)
+    // Check for blocked on the front
+    // (there not the expected peek acceleration during the first 250ms)
     if (_cycle_count >= 6) {
-      if (_min_acceleration > X_AXIS_DEFAULT_ACCELERATION - 0.3) {
+      if (_min_acceleration > X_ACCELERATION_OFFSET - 0.3) {
         _shock_measure = B11;
-        _shock_event = _shock_measure;
         _blocked = true;
       }
     }
@@ -154,7 +158,7 @@ int Imu_control::update()
 
     #endif
   }
-  return _shock_event;
+  return _shock_measure;
 }
 void Imu_control::outcome(JSONVar & outcome_object)
 {

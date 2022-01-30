@@ -4,7 +4,7 @@ from pyrr import matrix33, matrix44, Vector3
 
 
 class Phenomenon:
-    def __init__(self, x, y, batch, shape=0):
+    def __init__(self, x, y, batch, shape=0, color=0):
         self.batch = batch
         self.type = shape
         self.angle = 0
@@ -19,7 +19,12 @@ class Phenomenon:
             self.shape.anchor_position = 10, 20
         else:
             # Orange triangle: Block
-            self.shape = shapes.Triangle(x, y, x+40, y-30, x+40, y+30, color=(255, 165, 0), batch=self.batch)
+            if color == 1:
+                # Pressing interaction: orange triangle
+                self.shape = shapes.Triangle(x, y, x+40, y-30, x+40, y+30, color=(255, 165, 0), batch=self.batch)
+            else:
+                # Collision interaction: red triangle
+                self.shape = shapes.Triangle(x, y, x+40, y-30, x+40, y+30, color=(255, 0, 0), batch=self.batch)
             # self.shape.x = x
             # self.shape.y = y
 

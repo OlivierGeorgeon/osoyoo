@@ -9,7 +9,7 @@
 #define TURN_SPOT_MAX_DURATION 1700
 #define TURN_SPOT_ENDING_DELAY 500
 #define TURN_SPOT_ENDING_ANGLE 15
-#define X_AXIS_DEFAULT_ACCELERATION 5.3
+#define X_ACCELERATION_OFFSET 5.3 // Below the offset means acceleration, above means deceleration
 #define ROBOT_SERVO_PIN 4
 
 #warning "Compiling for UCLy's robot"
@@ -23,7 +23,7 @@
 #define TURN_SPOT_MAX_DURATION 1700
 #define TURN_SPOT_ENDING_DELAY 200
 #define TURN_SPOT_ENDING_ANGLE 3
-#define X_AXIS_DEFAULT_ACCELERATION 5.3
+#define X_ACCELERATION_OFFSET 5.3 // Below the offset means acceleration, above means deceleration
 #define ROBOT_SERVO_PIN 4
 
 #warning "Compiling for Olivier's robot"
@@ -37,7 +37,7 @@
 #define TURN_SPOT_MAX_DURATION 1300
 #define TURN_SPOT_ENDING_DELAY 200
 #define TURN_SPOT_ENDING_ANGLE 3
-#define X_AXIS_DEFAULT_ACCELERATION 5.3
+#define X_ACCELERATION_OFFSET 5.3
 #define ROBOT_SERVO_PIN 13
 
 #warning "Compiling for Paul's robot"

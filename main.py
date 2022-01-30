@@ -49,9 +49,9 @@ def main():
                 json_outcome = json.loads(controller.outcome_bytes)
                 if 'floor' in json_outcome:
                     outcome = json_outcome['floor']
-                # if 'blocked' in json_outcome:
-                #    if json_outcome['blocked']:
-                #        outcome = 4
+                if 'shock' in json_outcome:
+                    if json_outcome['shock'] > 0:
+                        outcome = json_outcome['shock']
 
                 # Choose the next action
                 action = agent.action(outcome)

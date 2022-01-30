@@ -45,20 +45,17 @@ Floor_change_retreat FCR(OWM);
 Head_echo_alignment HEA;
 Imu_control IMU;
 
-int status = WL_IDLE_STATUS;
 char packetBuffer[50];
 WiFiEspUDP Udp;
 unsigned int localPort = 8888;  // local port to listen on
 
 void setup()
 {
-  OWM.setup();
-  HEA.setup();
-  Serial.begin(9600);   // initialize serial for debugging
+  // Initialize serial for debugging
+  Serial.begin(9600);
   Serial.println("Serial initialized");
 
-  IMU.setup();
-
+  // Connect to the wifi board
   Serial1.begin(115200);
   Serial1.write("AT+UART_DEF=9600,8,1,0,0\r\n");
   delay(200);
@@ -66,13 +63,14 @@ void setup()
   delay(200);
   Serial1.begin(9600);    // initialize serial for ESP module
   WiFi.init(&Serial1);    // initialize ESP module
-
   // check for the presence of the shield
   if (WiFi.status() == WL_NO_SHIELD) {
     Serial.println("WiFi shield not present");
     // don't continue
     while (true);
   }
+  // Connect to the wifi network
+  int status = WL_IDLE_STATUS;
   if (SECRET_WIFI_TYPE == "AP") { // Wifi parameters in arduino_secret.h
     // Connecting to wifi as an Access Point (AP)
     char ssid[] = "osoyoo_robot";
@@ -89,21 +87,26 @@ void setup()
       status = WiFi.begin(ssid, pass);
     }
   }
-
   Udp.begin(localPort);
 
   Serial.print("IP Address: ");
   Serial.println(WiFi.localIP());
   Serial.print("Listening on port: ");
   Serial.println(localPort);
+
+  // Initialize the automatic behaviors
+  OWM.setup();
+  HEA.setup();
+  IMU.setup();
+  Serial.println("--- Robot initialized ---");
 }
 
 unsigned long action_start_time = 0;
 unsigned long action_end_time = 0;
 int interaction_step = 0;
-bool is_enacting_action = false;
+// bool is_enacting_action = false;
 char action =' ';
-String outcome = "0";
+String status = "0"; // The outcome information used for sequential learning
 int robot_destination_angle = 0;
 
 void loop()
@@ -153,11 +156,11 @@ void loop()
 
       action_start_time = millis();
       action_end_time = action_start_time + 1000;
-      is_enacting_action = true;
+      // is_enacting_action = true;
       interaction_step = 1;
       IMU.begin();
-      FCR._floor_outcome = 0; // Ignore floor change before the interaction
-      outcome = "0";
+      // FCR._floor_outcome = 0; // Reset possible floor change when the robot was placed on the floor
+      status = "0";
       switch (action)
       {
         case ACTION_TURN_IN_SPOT_LEFT:
@@ -231,7 +234,8 @@ void loop()
     switch (action)
     {
       case ACTION_GO_ADVANCE:
-        if (shock_event > 0){
+/*
+        if (shock_event > 0 && !FCR._is_enacting){
           // If shock then stop the go advance action
           outcome ="1";
           action_end_time = 0;
@@ -250,11 +254,12 @@ void loop()
           HEA.beginEchoAlignment();
           interaction_step = 2;
         }
+*/
       case ACTION_TURN_RIGHT:
       case ACTION_TURN_LEFT:
         if (FCR._is_enacting) {
-          FCR.extraDuration(RETREAT_EXTRA_DURATION); // Extend retreat duration because need to reverse speed
-          outcome ="1";
+          FCR.extraDuration(RETREAT_EXTRA_DURATION); // Increase retreat duration because need to reverse speed
+          status ="1";
           action_end_time = 0;
           interaction_step = 2;
         }
@@ -323,11 +328,11 @@ void loop()
     switch (action)
     {
       case ACTION_GO_ADVANCE:
-        if (!HEA._is_enacting_head_alignment && !HEA._is_enacting_echo_scan)
+/*        if (!HEA._is_enacting_head_alignment && !HEA._is_enacting_echo_scan)
         {
           // Wait until head is aligned
           interaction_step = 3;
-        }
+        }*/
       case ACTION_TURN_RIGHT:
       case ACTION_TURN_LEFT:
         if (!FCR._is_enacting) {
@@ -349,15 +354,11 @@ void loop()
     }
   }
 
-  // End of interaction
+  // End of interaction. Stop all motion and send outcome
   if ((interaction_step == 3))
   {
-    JSONVar outcome_object;
-    outcome_object["status"] = outcome;
-    FCR.outcome(outcome_object);
-    HEA.outcome(outcome_object);
-
-    switch (action)
+    // Terminate all movement that was not yet terminated
+/*    switch (action)
     {
       //case ACTION_GO_ADVANCE:
       case ACTION_ALIGN_HEAD:
@@ -367,12 +368,15 @@ void loop()
       default:
         OWM.stopMotion();
         break;
-    }
-    is_enacting_action = false;
+    }*/
+    OWM.stopMotion();
+
+    // Compute the outcome message
+    JSONVar outcome_object;
+    outcome_object["status"] = status;
+    FCR.outcome(outcome_object);
+    HEA.outcome(outcome_object);
     outcome_object["duration"] = millis() - action_start_time;
-
-    interaction_step = 0;
-
     IMU.outcome(outcome_object);
     String outcome_json_string = JSON.stringify(outcome_object);
     Serial.println("Outcome string " + outcome_json_string);
@@ -381,5 +385,9 @@ void loop()
     Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
     Udp.print(outcome_json_string);
     Udp.endPacket();
+
+    // Ready to begin a new interaction
+    interaction_step = 0;
+    // is_enacting_action = false;
   }
 }

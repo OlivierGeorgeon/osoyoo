@@ -49,18 +49,21 @@ class Controller:
     def update_model(self):
         """ Updating the model from the latest received outcome """
         outcome = json.loads(self.outcome_bytes)
-        blocked = False
+        floor = 0
+        if 'floor' in outcome:
+            floor = outcome['floor']
         shock = 0
+        if 'shock' in outcome:
+            shock = outcome['shock']
+        blocked = False
+        if 'blocked' in outcome:
+            blocked = outcome['blocked']
+
         # floor_outcome = outcome['outcome']  # Agent5 uses floor_outcome
 
         if outcome['status'] == "T":  # If timeout no ego memory update
             print("No ego memory update")
         else:
-            if 'blocked' in outcome:
-                blocked = outcome['blocked']
-            if 'shock' in outcome:
-                shock = outcome['shock']
-
             # Presupposed displacement of the robot relative to the environment
             translation = [0, 0]
             rotation = 0
@@ -83,12 +86,11 @@ class Controller:
                 rotation = outcome['yaw']
 
             # Estimate displacement due to floor change retreat
-            if 'floor' in outcome:
-                if outcome['floor'] > 0:  # Black line detected
-                    # Update the translation
-                    if self.action == "8":  # TODO Other actions
-                        forward_duration = outcome['duration'] - 300  # Subtract retreat duration
-                        translation[0] = STEP_FORWARD_DISTANCE * forward_duration/1000 - RETREAT_DISTANCE  # To be adjusted
+            if floor > 0:  # Black line detected
+                # Update the translation
+                if self.action == "8":  # TODO Other actions
+                    forward_duration = outcome['duration'] - 300  # Subtract retreat duration
+                    translation[0] = STEP_FORWARD_DISTANCE * forward_duration/1000 - RETREAT_DISTANCE  # To be adjusted
 
             # The displacement matrix of this interaction
             translation_matrix = matrix44.create_from_translation([-translation[0], -translation[1], 0])
@@ -101,19 +103,20 @@ class Controller:
                 p.rotate(rotation)
                 # p.displace(displacement_matrix) # not working yet
 
-            # The phenomenon line
-            if 'floor' in outcome:
-                if outcome['floor'] > 0:  # Black line detected
-                    # Create a new floor-changed phenomenon
-                    line = Phenomenon(150, 0, self.view.batch, 1)  # the translation will be reapplied
-                    self.phenomena.append(line)
+            # Check if line detected
+            if floor > 0:
+                # Create a new lane crossing interaction
+                line = Phenomenon(150, 0, self.view.batch, 1)  # the translation will be reapplied
+                self.phenomena.append(line)
 
-            # The phenomenon wall
-            if self.action == "8":
+            # Check for collision when moving forward
+            if self.action == "8" and floor == 0:
                 if blocked:
-                    wall = Phenomenon(110, 0, self.view.batch, 2)
+                    # Create a new pressing interaction
+                    wall = Phenomenon(110, 0, self.view.batch, 2, 1)
                     self.phenomena.append(wall)
                 else:
+                    # Create a new collision interaction
                     if shock == 0b01:
                         wall = Phenomenon(110, -80, self.view.batch, 2)
                         self.phenomena.append(wall)
