@@ -13,11 +13,15 @@
 #include "tracking.h"
 
 #include "Servo_Scan.h"
-#define pc "1"
+#define pc "2"
 #include "gyro.h"
 #include "compass.h"
 
+#include "JsonOutcome.h"
+JsonOutcome outcome;
 
+#include "Head.h"
+Head head;
 
 #include "DelayAction.h"
 DelayAction da;
@@ -42,8 +46,9 @@ float distance_objet_proche = 0;
 void setup()
 {
 // init_GPIO();
+  head = Head();
   Serial.begin(9600);   // initialize serial for debugging
-  servo_port();
+  head.servo_port();
   set();
   if (pc == "1"){
     wifiBot.wifiInitLocal();
@@ -56,6 +61,7 @@ void setup()
   compass_setup();
 
   //Exemple: da.setDelayAction(2000, [](){Serial.println("ok tout les 2s");}, millis());
+  //da.setDelayAction(5000, distances_loop(angle_tete_robot, distance_objet_proche), millis());
 }
 
 void loop()
@@ -94,15 +100,22 @@ void loop()
       case '2':go_back(SPEED);break;
       case '5':stop_Stop();break;
       case '0':until_line(SPEED);break;
+      case 'B':
+               distances_loop(angle_tete_robot, distance_objet_proche);
+              // distance_objet_proche = dist();
+               outcome.addValue("head_angle", (String) angle_tete_robot);
+               outcome.addValue("echo_distance", (String) distance_objet_proche);
       case 'D':outcome.addValue("distance", (String) dist());break;
-       case 'S': 
+/*       case 'S':
                   angle_tete_robot = scan(0, 180, 9, 0);
                   distance_objet_proche = dist();
                   outcome.addValue("head_angle", (String) angle_tete_robot);
                   outcome.addValue("echo_distance", (String) distance_objet_proche);  
-                  break;
+                  break;*/
+       case 'S': head.scan(0, 180, 9, 0);break;
         default:break;
       }
+  }
     if ( tracking()) // la fonction renvoi true si elle capte une ligne noir
     {
       stop_Stop();
@@ -127,5 +140,4 @@ void loop()
     {
         reset_gyroZ(); //calibrer l'angle Z à 0 tant qu'il n'a pas fait d'action
     }
-
 }
