@@ -9,11 +9,12 @@
  * 
  */
 #include "omny_wheel_motion.h"
-#include "calcDist.h"
+#include "Head_Dist.h"
+Head_Dist HD;
 #include "tracking.h"
 
-#include "Servo_Scan.h"
-#define pc "1"
+//#include "Servo_Scan.h"
+#define WifiMode "R"        //Définir le mode de wifi du robot, 'R' pour routeur et 'W' pour la connexion au robot
 #include "gyro.h"
 #include "compass.h"
 
@@ -44,12 +45,12 @@ void setup()
 {
 // init_GPIO();
   Serial.begin(9600);   // initialize serial for debugging
-  servo_port();
-  set();
-  if (pc == "1"){
+  //servo_port();
+  HD.setup();
+  if (WifiMode == "W"){
     wifiBot.wifiInitLocal();
   }
-  if (pc == "2"){
+  if (WifiMode == "R"){
     wifiBot.wifiInitRouter();
   }
 
@@ -88,20 +89,20 @@ void loop()
 
     switch (action[1])    //serial control instructions
     {  
-      case '$':outcome.addValue("distance", (String) dist());break;
+      case '$':outcome.addValue("distance", (String) HD.dist());break;
       case '8':go_forward(SPEED);break;
       case '4':left_turn(SPEED);break;
       case '6':right_turn(SPEED);break;
       case '2':go_back(SPEED);break;
       case '5':stop_Stop();break;
       case '0':until_line(SPEED);break;
-      case 'D':outcome.addValue("distance", (String) dist());break;
-       case 'S': 
+      case 'D':outcome.addValue("distance", (String) HD.dist());break;
+       /*case 'S':
                   angle_tete_robot = scan(0, 180, 9, 0);
-                  distance_objet_proche = dist();
+                  distance_objet_proche = HD.dist();
                   outcome.addValue("head_angle", (String) angle_tete_robot);
                   outcome.addValue("echo_distance", (String) distance_objet_proche);  
-                  break;
+                  break;*/
         default:break;
       }
     }
