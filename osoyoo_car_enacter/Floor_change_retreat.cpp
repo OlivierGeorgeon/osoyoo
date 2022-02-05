@@ -20,6 +20,7 @@ Floor_change_retreat::Floor_change_retreat(Omny_wheel_motion OWM)
   _previous_measure_floor = 0;
   _floor_change_retreat_end_time = 0;
   _floor_outcome = 0;
+  _debug_message = "";
 }
 
 void Floor_change_retreat::update()
@@ -29,25 +30,43 @@ void Floor_change_retreat::update()
   int floor_change = current_measure_floor ^ _previous_measure_floor; // Bitwise XOR
   _previous_measure_floor = current_measure_floor;
 
+  // floor_change = current_measure_floor; // Test
+
   // If is not already retreating
   if (!_is_enacting)
   {
     // Watch whether the floor has changed
     if (floor_change != 0)
     {
+      // digitalWrite(LED_BUILTIN, HIGH); // for debug
       // Start the retreat
-      Serial.println("Floor change " + String(floor_change, BIN) + " Begin retreat at " + String(millis()));
+      // Serial.println("Floor change " + String(floor_change, BIN) + " Begin retreat at " + String(millis()));
       _is_enacting = true;
       switch (floor_change) {
-        case 0b10000:_OWM.setMotion(-150,-150,-50,-50);_floor_outcome=2;break; // back right
-        case 0b11000:_OWM.setMotion(-150,-150,-50,-50);_floor_outcome=2;break; // back right
-        case 0b11100:_OWM.setMotion(-150,-150,-50,-50);_floor_outcome=2;break; // back right
-        case 0b00111:_OWM.setMotion(-50,-50,-150,-150);_floor_outcome=1;break; // back left
-        case 0b00011:_OWM.setMotion(-50,-50,-150,-150);_floor_outcome=1;break; // back left
-        case 0b00001:_OWM.setMotion(-50,-50,-150,-150);_floor_outcome=1;break; // back left
-        default:_OWM.setMotion(-150,-150,-150,-150);_floor_outcome=3;break;
+        case 0b10000:
+        case 0b11000:
+        case 0b11100:
+          // back right
+          _OWM.setMotion(-150,-150,-50,-50);
+          _floor_outcome=2;
+          _floor_change_retreat_end_time = millis() + RETREAT_DURATION + 2* RETREAT_EXTRA_DURATION;
+          break;
+        case 0b00111:
+        case 0b00011:
+        case 0b00001:
+          // back left
+          _OWM.setMotion(-50,-50,-150,-150);
+          _floor_outcome=1;
+          _floor_change_retreat_end_time = millis() + RETREAT_DURATION + 2 * RETREAT_EXTRA_DURATION;
+          break;
+        default:
+          // back straight
+          _OWM.setMotion(-150,-150,-150,-150);
+          _floor_outcome=3;
+          _floor_change_retreat_end_time = millis() + RETREAT_DURATION;
+          break;
       }
-      _floor_change_retreat_end_time = millis() + RETREAT_DURATION;
+      _debug_message += String(millis()) + ": floor changed. ";
     }
   }
   // IF currently retreating
@@ -57,7 +76,7 @@ void Floor_change_retreat::update()
     if (millis() > _floor_change_retreat_end_time) {
       // Stop the retreat
       _OWM.stopMotion();
-      Serial.println("End retreat at " + String(millis()));
+      _debug_message += String(millis()) + ": end retreat. ";
       _is_enacting = false;
     }
   }
@@ -85,5 +104,7 @@ int Floor_change_retreat::measureFloor()
 void Floor_change_retreat::outcome(JSONVar & outcome_object)
 {
   outcome_object["floor"] = _floor_outcome;
+  outcome_object["debug"] = _debug_message;
+  _debug_message = "";
   _floor_outcome = 0;
 }

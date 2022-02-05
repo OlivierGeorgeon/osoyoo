@@ -158,8 +158,8 @@ void Imu_control::outcome(JSONVar & outcome_object)
   outcome_object["yaw"] = (int) _yaw;
   outcome_object["shock"] = _shock_measure;
   outcome_object["blocked"] = _blocked;
-  outcome_object["max_acceleration"] = _max_acceleration;
-  outcome_object["min_acceleration"] = _min_acceleration;
+  outcome_object["max_acc"] = _max_acceleration;
+  outcome_object["min_acc"] = _min_acceleration;
 
   #if ROBOT_HAS_HMC5883L == true
   outcome_object["azimuth"] = read_azimuth();
@@ -191,9 +191,9 @@ int Imu_control::read_azimuth()
     headingDegrees -= 360;
   }
 
-  Serial.print("Azimuth = ");
-  Serial.print(headingDegrees);
-  Serial.println();
+  //Serial.print("Azimuth = ");
+  //Serial.print(headingDegrees);
+  //Serial.println();
 
   return headingDegrees;
 }

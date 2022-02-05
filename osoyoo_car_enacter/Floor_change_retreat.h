@@ -23,6 +23,7 @@ class Floor_change_retreat
     bool _is_enacting;
     void outcome(JSONVar & outcome_object);
     int _floor_outcome;
+    String _debug_message;
   private:
     Omny_wheel_motion _OWM;
     int _previous_measure_floor;

@@ -9,10 +9,10 @@
 #include <Servo.h>
 #include <Arduino_JSON.h>
 
-#define SACCADE_DURATION 150 // Servo specification speed is 120ms/60°
+#define SACCADE_DURATION 200 // 150 Servo specification speed is 120ms/60°
 #define SACCADE_SPAN     10
-#define ECHO_MONITOR_PERIOD 500
-#define ECHO_MONITOR_VARIATION 50
+#define ECHO_MONITOR_PERIOD 500 // The period for checking whether to trigger head alignment
+#define ECHO_MONITOR_VARIATION 50 // the measure threshold to trigger head alignment
 
 class Head_echo_alignment
 {

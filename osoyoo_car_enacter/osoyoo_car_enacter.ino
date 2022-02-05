@@ -98,6 +98,10 @@ void setup()
   HEA.setup();
   IMU.setup();
   Serial.println("--- Robot initialized ---");
+
+  // Initialize PIN 13 LED for debugging
+  pinMode(LED_BUILTIN, OUTPUT);
+  //digitalWrite(LED_BUILTIN, HIGH);
 }
 
 unsigned long action_start_time = 0;
@@ -107,9 +111,23 @@ int interaction_step = 0;
 char action =' ';
 String status = "0"; // The outcome information used for sequential learning
 int robot_destination_angle = 0;
+unsigned long blink_end_time = 0;
+bool blink_on = true;
 
 void loop()
 {
+  // Display a flashing led to check whether something is blocking the main loop
+  if (millis()> blink_end_time){
+    if (blink_on) {
+      digitalWrite(LED_BUILTIN, HIGH); // for debug
+      blink_on = false;
+    }else {
+      digitalWrite(LED_BUILTIN, LOW); // for debug
+      blink_on = true;
+    }
+    blink_end_time = millis() + 50;
+  }
+
   // Behavior floor change retreat
   FCR.update();
 
@@ -127,18 +145,18 @@ void loop()
     int packetSize = Udp.parsePacket();
     // If the received packet exceeds the size of packetBuffer defined above, Arduino will crash
     if (packetSize) {
-      int len = Udp.read(packetBuffer, 255);
+      int len = Udp.read(packetBuffer, 512);
       packetBuffer[len] = 0;
-      Serial.print("Received action ");
+      //Serial.print("Received action ");
       if (len == 1) {
         // Single character is the action
         action = packetBuffer[0];
-        Serial.print(action);
+        //Serial.print(action);
       } else {
         // Multiple characters is json
         // https://github.com/arduino-libraries/Arduino_JSON/blob/master/examples/JSONObject/JSONObject.ino
         JSONVar myObject = JSON.parse(packetBuffer);
-        Serial.print(myObject);
+        //Serial.print(myObject);
         if (myObject.hasOwnProperty("action")) {
           action = ((const char*) myObject["action"])[0];
         }
@@ -146,11 +164,11 @@ void loop()
           robot_destination_angle = ((int) myObject["angle"]);
         }
       }
-      Serial.print(" from ");
+      //Serial.print(" from ");
       IPAddress remoteIp = Udp.remoteIP();
-      Serial.print(remoteIp);
-      Serial.print("/");
-      Serial.println(Udp.remotePort());
+      //Serial.print(remoteIp);
+      //Serial.print("/");
+      //Serial.println(Udp.remotePort());
 
       action_start_time = millis();
       action_end_time = action_start_time + 1000;
@@ -159,6 +177,7 @@ void loop()
       IMU.begin();
       shock_event = 0; // reset event from previous interaction
       FCR._floor_outcome = 0; // Reset possible floor change when the robot was placed on the floor
+      //digitalWrite(LED_BUILTIN, LOW); // for debug
       status = "0";
       switch (action)
       {
@@ -236,9 +255,11 @@ void loop()
       case ACTION_GO_ADVANCE:
         if (shock_event > 0 && !FCR._is_enacting){
           // If shock then stop the go advance action
-          status ="1";
+          status ="SHOCK EVENT 1";
           action_end_time = 0;
           OWM.stopMotion();
+          interaction_step = 2;
+          break;
           // Look to the direction of the shock and start echo alignment
           /*
           HEA._next_saccade_time = millis() + 150;
@@ -253,7 +274,6 @@ void loop()
           }
           HEA.beginEchoAlignment();
           */
-          interaction_step = 2;
         }
       case ACTION_TURN_RIGHT:
       case ACTION_TURN_LEFT:
@@ -271,7 +291,7 @@ void loop()
         // If no floor change, check whether duration has elapsed
         else if (action_end_time < millis()) {
           OWM.stopMotion();
-          interaction_step = 3; // Skip termination step
+          interaction_step = 2;
         }
         break;
       case ACTION_TURN_IN_SPOT_LEFT:
@@ -312,7 +332,7 @@ void loop()
         if (!HEA._is_enacting_head_alignment && !HEA._is_enacting_echo_scan)
         {
           action_end_time = 0;
-          interaction_step = 3;
+          interaction_step = 2;
         }
         break;
       default:
@@ -349,12 +369,14 @@ void loop()
     IMU.outcome(outcome_object);
     outcome_object["duration"] = millis() - action_start_time;
     String outcome_json_string = JSON.stringify(outcome_object);
-    Serial.println("Outcome string " + outcome_json_string);
+    // Serial.println("Outcome string " + outcome_json_string);
 
+    digitalWrite(LED_BUILTIN, HIGH); // light the led during transfer
     // Send the outcome to the IP address and port that sent the action
     Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
     Udp.print(outcome_json_string);
     Udp.endPacket();
+    digitalWrite(LED_BUILTIN, LOW);
 
     // Ready to begin a new interaction
     interaction_step = 0;

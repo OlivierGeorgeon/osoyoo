@@ -27,7 +27,7 @@ class WifiInterface:
         print("sending " + action)
         self.socket.sendto(bytes(action, 'utf-8'), (self.IP, self.port))
         try:
-            outcome, address = self.socket.recvfrom(255)
+            outcome, address = self.socket.recvfrom(512)
         except socket.error as error:  # Time out error when robot is not connected
             print(error)
         return outcome

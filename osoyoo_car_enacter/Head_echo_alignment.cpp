@@ -33,7 +33,8 @@ void Head_echo_alignment::setup()
   digitalWrite(Trig_PIN,LOW);
   // init servo
   _head.attach(ROBOT_SERVO_PIN);
-  _head.write(_head_angle + 90);
+  turnHead(0); // Head straight ahead
+  //_head.write(_head_angle + 90);
 }
 
 void Head_echo_alignment::beginEchoAlignment()
@@ -45,56 +46,61 @@ void Head_echo_alignment::beginEchoAlignment()
 }
 void Head_echo_alignment::beginEchoScan()
 {
+  _is_enacting_head_alignment = false; // Stop current head alignment if any
   _is_enacting_echo_scan = true;
   _min_ultrasonic_measure = 10000;
   if (_head_angle > 0) {
     // If head is to the left, start from 90° and scan every 20° clockwise
     _angle_min_ultrasonic_measure = 90;
-    _head_angle_span = -SACCADE_SPAN * 2;
+    _head_angle_span = -SACCADE_SPAN * 2; // saccade 20°
   } else {
     // If head is to the right, start from -90° and scan every 20° counterclockwise
     _angle_min_ultrasonic_measure = -90;
     _head_angle_span = SACCADE_SPAN * 2;
   }
   turnHead(_angle_min_ultrasonic_measure);
+  _next_saccade_time = millis() + SACCADE_DURATION; // Start the scan right away
 }
 
 void Head_echo_alignment::update()
 {
-  if (_next_saccade_time < millis())
+  if (millis() > _next_saccade_time )
   {
     if (_is_enacting_head_alignment)
     {
       int current_ultrasonic_measure = measureUltrasonicEcho();
-      if (current_ultrasonic_measure > 0) // Ignore measure 0. Will measure again on the next loop
-      {
+      //if (current_ultrasonic_measure > 0) // Ignore measure 0. Will measure again on the next loop
+      //{
         _next_saccade_time = millis() + SACCADE_DURATION;
-        Serial.println("Angle " +String(_head_angle) + " measure " + String(current_ultrasonic_measure));
+        //Serial.println("Angle " +String(_head_angle) + " measure " + String(current_ultrasonic_measure));
         if (_previous_ultrasonic_measure > current_ultrasonic_measure ) {
           // Moving closer
-          if ((_head_angle > -80) && (_head_angle < 80)) {
-            _head_angle += _head_angle_span;
-            _head.write(_head_angle + 90);
-          } else {
+          if ((_head_angle <= -90) || (_head_angle >= 90)) {
+            // If reached the max then the min is here
             _min_ultrasonic_measure = current_ultrasonic_measure;
-            Serial.println("Aligned at edge angle " + String(_head_angle) + " measure " + String(_min_ultrasonic_measure));
+            //Serial.println("Aligned at edge angle " + String(_head_angle) + " measure " + String(_min_ultrasonic_measure));
             _is_enacting_head_alignment = false;
+            _next_saccade_time = millis() + ECHO_MONITOR_PERIOD; // Wait before monitoring again
+          } else {
+            turnHead(_head_angle += _head_angle_span);
+          //if ((_head_angle > -80) && (_head_angle < 80)) {
+          //  _head_angle += _head_angle_span;
+          //  _head.write(_head_angle + 90);
           }
         } else {
           // moving away, reverse movement
           _head_angle_span = - _head_angle_span;
           _head_angle += _head_angle_span; // may reach -100° or 100° but ...
           turnHead(_head_angle);           // ... turnHead() sets it back to -90° or 90°
-          //_head.write(_head_angle + 90);
-          if (_penultimate_ultrasonic_measure >= _previous_ultrasonic_measure) {
-            // Passed the minimum, stop
+8           // Passed the minimum, stop
             _min_ultrasonic_measure = _previous_ultrasonic_measure;
-            Serial.println("Aligned at angle " + String(_head_angle) + " measure " + String(_min_ultrasonic_measure));
+            //Serial.println("Aligned at angle " + String(_head_angle) + " measure " + String(_min_ultrasonic_measure));
             _is_enacting_head_alignment = false;
+            _next_saccade_time = millis() + ECHO_MONITOR_PERIOD; // Wait before monitoring again
             _head_angle_span = - _head_angle_span;
           }
         }
-      }
+      //}
       _penultimate_ultrasonic_measure = _previous_ultrasonic_measure;
       _previous_ultrasonic_measure = current_ultrasonic_measure;
     }
@@ -108,12 +114,15 @@ void Head_echo_alignment::update()
         _angle_min_ultrasonic_measure = _head_angle;
       }
       _head_angle += _head_angle_span;
-      _head.write(_head_angle + 90);
-      if (abs(_head_angle) >= 90){
+      //_head.write(_head_angle + 90);
+      if (abs(_head_angle) > 90){ // The scan is over, move to the angle of the min measure
         _is_enacting_echo_scan = false;
-        turnHead(_angle_min_ultrasonic_measure);
-        Serial.println("Aligned to closest angle " + String(_head_angle) + " measure " + String(_min_ultrasonic_measure));
+        _head_angle  = _angle_min_ultrasonic_measure;
+        // turnHead(_angle_min_ultrasonic_measure);
+        //Serial.println("Aligned to closest angle " + String(_head_angle) + " measure " + String(_min_ultrasonic_measure));
+        _next_saccade_time = millis() + ECHO_MONITOR_PERIOD; // Wait before monitoring again
       }
+      turnHead(_head_angle);
     }
     else // Watch for variation in ultrasonic measure to trigger alignment
     {
@@ -122,7 +131,7 @@ void Head_echo_alignment::update()
       //Serial.println("Angle " +String(_head_angle) + " measure " + String(current_ultrasonic_measure));
 
       if (current_ultrasonic_measure > 0 && abs(current_ultrasonic_measure - _min_ultrasonic_measure) > ECHO_MONITOR_VARIATION) {
-        Serial.println("Trigger head alignment from variation " + String(current_ultrasonic_measure - _min_ultrasonic_measure));
+        //Serial.println("Trigger head alignment from variation " + String(current_ultrasonic_measure - _min_ultrasonic_measure));
         beginEchoAlignment();
       }
     }
@@ -133,15 +142,13 @@ void Head_echo_alignment::outcome(JSONVar & outcome_object)
 {
   outcome_object["head_angle"] = _head_angle;
   outcome_object["echo_distance"] = _min_ultrasonic_measure;
-
-  //return "A" + String(_head_angle) + "O" + String(_min_ultrasonic_measure);
 }
 
 void Head_echo_alignment::turnHead(int head_angle)
 {
-  _head_angle = head_angle;
-  if (_head_angle > 90) _head_angle = 90;
-  if (_head_angle < -90) _head_angle = -90;
+  _head_angle = constrain(head_angle, -90, 90);
+  // if (_head_angle > 90) _head_angle = 90;
+  // if (_head_angle < -90) _head_angle = -90;
   _head.write(_head_angle + 90);
 }
 
@@ -155,7 +162,5 @@ int Head_echo_alignment::measureUltrasonicEcho()
   digitalWrite(Trig_PIN,LOW);
   echo_distance=pulseIn(Echo_PIN,HIGH);
   echo_distance=echo_distance * 0.1657; //how far away is the object in mm
-  //Serial.print("Echo measure (mm): ");
-  //Serial.println((int)echo_distance);
   return round(echo_distance);
 }
