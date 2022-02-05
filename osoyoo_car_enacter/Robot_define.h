@@ -9,7 +9,10 @@
 #define TURN_SPOT_MAX_DURATION 1700
 #define TURN_SPOT_ENDING_DELAY 500
 #define TURN_SPOT_ENDING_ANGLE 15
-#define X_ACCELERATION_OFFSET 5.3 // Below the offset means acceleration, above means deceleration
+#define ACCELERATION_X_OFFSET 530 // TODO set this value
+#define ACCELERATION_SHOCK_THRESHOLD -200 // TODO set this value
+#define ACCELERATION_BLOCK_THRESHOLD 30 // TODO set this value
+#define GYRO_SHOCK_THRESHOLD 1 // °/s TODO set this value
 #define ROBOT_SERVO_PIN 4
 
 #warning "Compiling for UCLy's robot"
@@ -23,7 +26,12 @@
 #define TURN_SPOT_MAX_DURATION 1700
 #define TURN_SPOT_ENDING_DELAY 200
 #define TURN_SPOT_ENDING_ANGLE 3
-#define X_ACCELERATION_OFFSET 5.3 // Below the offset means acceleration, above means deceleration
+#define COMPASS_X_OFFSET 1475
+#define COMPASS_Y_OFFSET -1685
+#define ACCELERATION_X_OFFSET 530 //
+#define ACCELERATION_SHOCK_THRESHOLD -200 // Below the threshold it is a strong deceleration = shock
+#define ACCELERATION_BLOCK_THRESHOLD 40 // Below the threshold, the robot is blocked
+#define GYRO_SHOCK_THRESHOLD 1 // °/s Above the threshold is a shock to the left
 #define ROBOT_SERVO_PIN 4
 
 #warning "Compiling for Olivier's robot"
@@ -37,7 +45,10 @@
 #define TURN_SPOT_MAX_DURATION 1300
 #define TURN_SPOT_ENDING_DELAY 200
 #define TURN_SPOT_ENDING_ANGLE 3
-#define X_ACCELERATION_OFFSET 5.3
+#define ACCELERATION_X_OFFSET 530 // TODO set this value
+#define ACCELERATION_SHOCK_THRESHOLD -200 // TODO set this value
+#define ACCELERATION_BLOCK_THRESHOLD 30 // TODO set this value
+#define GYRO_SHOCK_THRESHOLD 1 // °/s TODO set this value
 #define ROBOT_SERVO_PIN 13
 
 #warning "Compiling for Paul's robot"

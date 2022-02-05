@@ -37,8 +37,8 @@ class Imu_control
       HMC5883L compass;
     #endif
     unsigned long _next_imu_read_time;
-    float _max_acceleration;
-    float _min_acceleration;
+    int _max_acceleration;
+    int _min_acceleration;
     float _max_speed;
     int _shock_measure;
     bool _blocked;

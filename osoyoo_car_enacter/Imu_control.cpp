@@ -78,7 +78,8 @@ void Imu_control::setup()
   compass.setSamples(HMC5883L_SAMPLES_4); // HMC5883L_SAMPLES_8
 
   // Set calibration offset. See HMC5883L_calibration.ino
-  compass.setOffset(1475, -1685);
+  compass.setOffset(COMPASS_X_OFFSET, COMPASS_Y_OFFSET);
+  // compass.setOffset(1475, -1685);
   #endif
 }
 void Imu_control::begin()
@@ -87,8 +88,8 @@ void Imu_control::begin()
   _shock_measure = 0;
   _cycle_count = 0;
   _blocked = false;
-  _max_acceleration = X_ACCELERATION_OFFSET;
-  _min_acceleration = X_ACCELERATION_OFFSET;
+  _max_acceleration = 0;
+  _min_acceleration = 0;
   _max_speed = 0;
   _xSpeed = 0;
   _xDistance = 0;
@@ -105,42 +106,38 @@ int Imu_control::update()
     // Read normalized values
     Vector normAccel = _mpu.readNormalizeAccel();
     Vector normGyro = _mpu.readNormalizeGyro();
+    int normalized_acceleration = -(normAccel.XAxis * 100 - ACCELERATION_X_OFFSET);
 
     // Integrate yaw during the interaction
     float _ZAngle = normGyro.ZAxis * IMU_READ_PERIOD / 1000;
     _yaw += _ZAngle;
 
-    // Record the max acceleration during the interaction
-    // (This is in fact the max deceleration if collision)
-    if (normAccel.XAxis > _max_acceleration) {
-      _max_acceleration =  normAccel.XAxis;
+    // Record the min acceleration (deceleration) during the interaction to detect collision
+    if (normalized_acceleration < _min_acceleration) {
+      _min_acceleration =  normalized_acceleration;
     }
-    // Record the min acceleration at the beginning of the interaction
-    // (This is in fact the max acceleration forward at the beginning of the interaction)
-    if (_cycle_count <= 6) {
-      if (normAccel.XAxis < _min_acceleration) {
-        _min_acceleration =  normAccel.XAxis;
-      }
+    // Record the max acceleration during the interaction to detect block
+    if (normalized_acceleration > _max_acceleration) {
+      _max_acceleration =  normalized_acceleration;
     }
     // Check for turned to the right by more than 1°/s
-    if (_ZAngle < -1) {
+    if (_ZAngle < -GYRO_SHOCK_THRESHOLD) {
       // If moving forward, this will mean collision on the right
       _shock_measure = B01;
     }
-    // Check a peek acceleration
-    // (this is in fact a peek deceleration, that is a frontal shock)
-    if (normAccel.XAxis > X_ACCELERATION_OFFSET + 2) {
+    // Check a peek deceleration = frontal shock
+    if (normalized_acceleration < ACCELERATION_SHOCK_THRESHOLD) {
       _shock_measure = B11;
     }
     // Check for turned to the left by more than 1°/s
-    if (_ZAngle > 1) {
+    if (_ZAngle > GYRO_SHOCK_THRESHOLD) {
       // If moving forward, this will mean collision on the left
       _shock_measure = B10;
     }
     // Check for blocked on the front
-    // (there not the expected peek acceleration during the first 250ms)
+    // (the acceleration did not pass the threshold during the first 250ms)
     if (_cycle_count >= 6) {
-      if (_min_acceleration > X_ACCELERATION_OFFSET - 0.3) {
+      if (_max_acceleration < ACCELERATION_BLOCK_THRESHOLD) {
         _shock_measure = B11;
         _blocked = true;
       }
@@ -152,10 +149,6 @@ int Imu_control::update()
     // Trying to compute the distance by integrating the speed (not working)
     _xDistance += _xSpeed * IMU_READ_PERIOD / 1000;
 
-    // Output raw
-    //Serial.print("ZAxis = ");
-    //Serial.println(normGyro.ZAxis * IMU_READ_PERIOD / 1000);
-
     #endif
   }
   return _shock_measure;
@@ -165,8 +158,8 @@ void Imu_control::outcome(JSONVar & outcome_object)
   outcome_object["yaw"] = (int) _yaw;
   outcome_object["shock"] = _shock_measure;
   outcome_object["blocked"] = _blocked;
-  outcome_object["max_acceleration"] = (int) (_max_acceleration * 100);
-  outcome_object["min_acceleration"] = (int) (_min_acceleration * 100);
+  outcome_object["max_acceleration"] = _max_acceleration;
+  outcome_object["min_acceleration"] = _min_acceleration;
 
   #if ROBOT_HAS_HMC5883L == true
   outcome_object["azimuth"] = read_azimuth();

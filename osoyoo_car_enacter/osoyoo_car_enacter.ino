@@ -3,10 +3,9 @@
  *| |_| |___ | |_| | |_| | |_| | |_| ( (__| |_| | | | |
  * \___/(___/ \___/ \__  |\___/ \___(_)____)___/|_|_|_|
  *                  (____/ 
- * Arduino Mecanum Omni Direction Wheel Robot Car Lesson5 Wifi Control
+ * Inspired form Arduino Mecanum Omni Direction Wheel Robot Car Lesson5 Wifi Control
  * Tutorial URL http://osoyoo.com/?p=30022
- * CopyRight www.osoyoo.com
- * 
+ *
  */
 #include "arduino_secrets.h"
 #include "Robot_define.h"
@@ -158,7 +157,8 @@ void loop()
       // is_enacting_action = true;
       interaction_step = 1;
       IMU.begin();
-      // FCR._floor_outcome = 0; // Reset possible floor change when the robot was placed on the floor
+      shock_event = 0; // reset event from previous interaction
+      FCR._floor_outcome = 0; // Reset possible floor change when the robot was placed on the floor
       status = "0";
       switch (action)
       {
@@ -234,13 +234,13 @@ void loop()
     switch (action)
     {
       case ACTION_GO_ADVANCE:
-/*
         if (shock_event > 0 && !FCR._is_enacting){
           // If shock then stop the go advance action
-          outcome ="1";
+          status ="1";
           action_end_time = 0;
           OWM.stopMotion();
-          // Loot to the direction of the shock and start echo alignment
+          // Look to the direction of the shock and start echo alignment
+          /*
           HEA._next_saccade_time = millis() + 150;
           if (shock_event == B01){ // Shock from the right
             HEA.turnHead(-80);
@@ -252,9 +252,9 @@ void loop()
             HEA.turnHead(0);
           }
           HEA.beginEchoAlignment();
+          */
           interaction_step = 2;
         }
-*/
       case ACTION_TURN_RIGHT:
       case ACTION_TURN_LEFT:
         // Check if Floor Change Retreat
