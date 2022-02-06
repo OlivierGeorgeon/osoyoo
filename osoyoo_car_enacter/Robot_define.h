@@ -28,10 +28,10 @@
 #define TURN_SPOT_ENDING_ANGLE 3
 #define COMPASS_X_OFFSET 1475
 #define COMPASS_Y_OFFSET -1685
-#define ACCELERATION_X_OFFSET 530 //
-#define ACCELERATION_SHOCK_THRESHOLD -200 // Below the threshold it is a strong deceleration = shock
-#define ACCELERATION_BLOCK_THRESHOLD 40 // Below the threshold, the robot is blocked
-#define GYRO_SHOCK_THRESHOLD 1 // °/s Above the threshold is a shock to the left
+#define ACCELERATION_X_OFFSET 550 //
+#define ACCELERATION_SHOCK_THRESHOLD -150 // Below the threshold it is a strong deceleration = shock
+#define ACCELERATION_BLOCK_THRESHOLD 60 // Below the threshold, the robot is blocked
+#define GYRO_SHOCK_THRESHOLD 1.5 // °/s Above the threshold is a shock to the left
 #define ROBOT_SERVO_PIN 4
 
 #warning "Compiling for Olivier's robot"

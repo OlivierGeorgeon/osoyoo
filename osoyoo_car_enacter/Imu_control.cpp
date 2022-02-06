@@ -106,7 +106,7 @@ int Imu_control::update()
     // Read normalized values
     Vector normAccel = _mpu.readNormalizeAccel();
     Vector normGyro = _mpu.readNormalizeGyro();
-    int normalized_acceleration = -(normAccel.XAxis * 100 - ACCELERATION_X_OFFSET);
+    int normalized_acceleration = -normAccel.XAxis * 100 + ACCELERATION_X_OFFSET;
 
     // Integrate yaw during the interaction
     float _ZAngle = normGyro.ZAxis * IMU_READ_PERIOD / 1000;
