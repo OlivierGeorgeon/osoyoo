@@ -9,11 +9,14 @@
  * 
  */
 #include "omny_wheel_motion.h"
-#include "calcDist.h"
+#include "Head_Dist.h"
+Head_Dist HD;
 #include "tracking.h"
 
+
+#define WifiMode "R"        //Définir le mode de wifi du robot, 'R' pour routeur et 'W' pour la connexion au robot
 #include "Servo_Scan.h"
-#define pc "2"
+
 #include "gyro.h"
 #include "compass.h"
 
@@ -48,12 +51,15 @@ void setup()
 // init_GPIO();
   head = Head();
   Serial.begin(9600);   // initialize serial for debugging
+  
   head.servo_port();
-  set();
-  if (pc == "1"){
+  
+  HD.setup();
+  if (WifiMode == "W"){
+
     wifiBot.wifiInitLocal();
   }
-  if (pc == "2"){
+  if (WifiMode == "R"){
     wifiBot.wifiInitRouter();
   }
 
@@ -93,7 +99,7 @@ void loop()
 
     switch (action[1])    //serial control instructions
     {  
-      case '$':outcome.addValue("distance", (String) dist());break;
+      case '$':outcome.addValue("distance", (String) HD.dist());break;
       case '8':go_forward(SPEED);break;
       case '4':left_turn(SPEED);break;
       case '6':right_turn(SPEED);break;
@@ -102,20 +108,22 @@ void loop()
       case '0':until_line(SPEED);break;
       case 'B':
                distances_loop(angle_tete_robot, distance_objet_proche);
-              // distance_objet_proche = dist();
                outcome.addValue("head_angle", (String) angle_tete_robot);
                outcome.addValue("echo_distance", (String) distance_objet_proche);
-      case 'D':outcome.addValue("distance", (String) dist());break;
-/*       case 'S':
+      case 'D':outcome.addValue("distance", (String) HD.dist());break;
+      case 'T':
                   angle_tete_robot = scan(0, 180, 9, 0);
-                  distance_objet_proche = dist();
+                  distance_objet_proche = HD.dist();
                   outcome.addValue("head_angle", (String) angle_tete_robot);
                   outcome.addValue("echo_distance", (String) distance_objet_proche);  
-                  break;*/
+                  break;
        case 'S': head.scan(0, 180, 9, 0);break;
         default:break;
       }
   }
+        default:break;
+      }
+    }
     if ( tracking()) // la fonction renvoi true si elle capte une ligne noir
     {
       stop_Stop();
