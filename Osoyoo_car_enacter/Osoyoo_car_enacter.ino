@@ -120,9 +120,6 @@ void loop()
        case 'S': head.scan(0, 180, 9, 0);break;
         default:break;
       }
-  }
-        default:break;
-      }
     }
     if ( tracking()) // la fonction renvoi true si elle capte une ligne noir
     {

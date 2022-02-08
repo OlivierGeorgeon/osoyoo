@@ -8,7 +8,8 @@
  * |______/  |_|   \__\ \________/  |__|  \___| |_______| |_______|       \ _______| /__ /      \   \ |__|         |__| |__|       |__|    \ ___ /
  */
 #include <Servo.h>
-#include "calcDist.h"
+#include "Head_Dist.h"
+Head_Dist DH;
 
 #include "Servo_Scan.h"
 #include "Arduino.h"
@@ -42,7 +43,7 @@ int scan(int angleMin, int angleMax, int Nbre_mesure, int index_0) {
   for (int pos = 0; pos <= Nbre_mesure; pos++) {
     myservo.write(angleMin+(pas*pos));
     delay(100);
-    distances[pos] = dist();
+    distances[pos] = DH.dist();
   }
   indexMin = getIndexMin(Nbre_mesure, distances);
   angle = (indexMin + index_0)*pas;
@@ -64,7 +65,7 @@ int MiniScan(int angle){
 }
 
 void distances_loop(int angle, float mesure){
-    float distance = dist();
+    float distance = DH.dist();
     Serial.print("distance : ");
     Serial.println(distance);
     Serial.print("mesure : ");
