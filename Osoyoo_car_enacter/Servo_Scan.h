@@ -10,7 +10,7 @@
 
 #ifndef Servo_Scan_h
 #define Servo_Scan_h
-#define SERVO_PIN     13  //servo connect to D5
+//#define SERVO_PIN     13  //servo connect to D5
 void servo_port();
 int MiniScan(int angle);
 void distances_loop(int angle, float mesure);

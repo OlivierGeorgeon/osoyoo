@@ -18,10 +18,10 @@ Servo myservo;
 void servo_port() {
   myservo.attach(4);
 }
-int getIndexMin(int nb_mesures, float distances[]){
 
+int getIndexMin(int nb_mesures, float distances[]){  
   float valMin = distances[0];
-  int indexMin = 0;
+  int indexMin = 0;  
 
   //Recherche de la plus petite distances de la fonction de scan pour alignement
   for (int i = 0; i < nb_mesures; i++){
@@ -64,17 +64,15 @@ int MiniScan(int angle){
 }
 
 void distances_loop(int angle, float mesure){
-    Serial.print("Angle : ");
-    Serial.println(angle);
-    Serial.print("Mesure : ");
-    Serial.println(mesure);
-    Serial.print("Distance : ");
     float distance = dist();
+    Serial.print("distance : ");
     Serial.println(distance);
+    Serial.print("mesure : ");
+    Serial.println(mesure);
     if(mesure != 0 && distance - mesure > 50){
         MiniScan(angle);
-        Serial.print("Distance de scan");
+        Serial.println("distance - mesure : ");
         Serial.println(distance - mesure);
-        Serial.print("Scan 1");
+        Serial.println("Scan_1");
     }
 }

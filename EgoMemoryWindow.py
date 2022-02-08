@@ -83,6 +83,9 @@ class EgoMemoryWindow(pyglet.window.Window):
                 self.height * self.zoom_level, 1, -1)
 
         # Stack the rotation of the world so the robot's front is up
+
+        #glRotatef(90, 0.0, 0.0, 1.0) #mettre le Azimuth
+
         #glRotatef(90, 0.0, 0.0, 1.0) #360
 
         # Draw the robot and the phenomena
@@ -203,6 +206,7 @@ class EgoMemoryWindow(pyglet.window.Window):
 
 
 if __name__ == "__main__":
+    # ip_ = "192.168.4.1"  # AP mode
     #ip_ = "192.168.4.1"  # AP mode
     # ip_ = "192.168.1.19"  # STA mode sur Olivier's wifi
     #ip_ = "10.40.22.251" # STA sur RobotBSN Olivier's Robot
