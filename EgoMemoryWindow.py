@@ -203,7 +203,7 @@ class EgoMemoryWindow(pyglet.window.Window):
 
 
 if __name__ == "__main__":
-    ip_ = "192.168.4.1"  # AP mode
+    #ip_ = "192.168.4.1"  # AP mode
     # ip_ = "192.168.1.19"  # STA mode sur Olivier's wifi
     #ip_ = "10.40.22.251" # STA sur RobotBSN Olivier's Robot
     # ip_ = "?" #IP du robot 2 STA sur RobotBSN

@@ -4,7 +4,7 @@
  * | |__|  | | |__|  | |  |    |  | |   \  |  | |  |__    |  |           /   /           /  /\  \     |    \    /     | |  |__|  | |  |   /   _   \
  * |     _/  |     _/  |  |    |  | |    \ |  | |     |   |  |          |   |  ____     /  /__\  \    |  |\  \ /  /|  | |  _____/  |  |  |   |  |  |
  * |  __  \  |  __  \  |  |    |  | |  |\ \|  | |   __|   |  |          |   |  |__ |   /   ____   \   |  |  \___/  |  | |  |       |  |  |   |_ |  |
- * | |__|  | | |  \  \ |   \__/   | |  | \    | |  |____  |  |____       \  \ _ |  |  /   /    \   \  |  |         |  | |  |       |  |   \       / 
+ * | |__|  | | |  \  \ |   \__/   | |  | \    | |  |____  |  |____       \  \ _ |  |  /   /    \   \  |  |         |  | |  |       |  |   \       /
  * |______/  |_|   \__\ \________/  |__|  \___| |_______| |_______|       \ _______| /__ /      \   \ |__|         |__| |__|       |__|    \ ___ /
  */
 #include <Servo.h>
@@ -19,10 +19,10 @@ void servo_port() {
   myservo.attach(4);
 }
 int getIndexMin(int nb_mesures, float distances[]){
-  
+
   float valMin = distances[0];
   int indexMin = 0;
-  
+
   //Recherche de la plus petite distances de la fonction de scan pour alignement
   for (int i = 0; i < nb_mesures; i++){
     if(distances[i] < valMin && distances[i] != 0){
@@ -43,7 +43,7 @@ int scan(int angleMin, int angleMax, int Nbre_mesure, int index_0) {
     myservo.write(angleMin+(pas*pos));
     delay(100);
     distances[pos] = dist();
-  } 
+  }
   indexMin = getIndexMin(Nbre_mesure, distances);
   angle = (indexMin + index_0)*pas;
   myservo.write(angle);
