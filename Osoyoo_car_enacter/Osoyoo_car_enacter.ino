@@ -20,7 +20,7 @@
 #include "JsonOutcome.h"
 JsonOutcome outcome;
 
-#include "Head.h"
+#include "Head.h";
 Head head;
 
 #include "DelayAction.h"
