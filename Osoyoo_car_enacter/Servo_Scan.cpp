@@ -41,7 +41,7 @@ int scan(int angleMin, int angleMax, int Nbre_mesure, int index_0) {
   int angle;
   for (int pos = 0; pos <= Nbre_mesure; pos++) {
     myservo.write(angleMin+(pas*pos));
-    delay(300);
+    delay(100);
     distances[pos] = dist();
   }
   indexMin = getIndexMin(Nbre_mesure, distances);

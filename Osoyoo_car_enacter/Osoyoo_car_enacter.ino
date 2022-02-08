@@ -13,8 +13,9 @@
 Head_Dist HD;
 #include "tracking.h"
 
-//#include "Servo_Scan.h"
+
 #define WifiMode "R"        //Définir le mode de wifi du robot, 'R' pour routeur et 'W' pour la connexion au robot
+#include "Servo_Scan.h"
 #include "gyro.h"
 #include "compass.h"
 

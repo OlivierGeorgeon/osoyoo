@@ -129,11 +129,11 @@ class EgoMemoryWindow(pyglet.window.Window):
         # Update the model from the outcome
         translation = [0, 0]
         rotation = 0
-        if text == "1":
+        if text == "4":
             rotation = 45
         if text == "2":
             translation[0] = 180
-        if text == "3":
+        if text == "6":
             rotation = -45
         if text == "8":
             translation[0] = -180
@@ -142,18 +142,18 @@ class EgoMemoryWindow(pyglet.window.Window):
 
 
         if 'head_angle' in outcome:
-            head_angle = outcome['head_angle']
-            print("Head angle %s" % head_angle)
+            head_angle = int(outcome['head_angle'])
+            print(f"Head angle {head_angle}")
             self.robot.rotate_head(head_angle)
 
         if 'yaw' in outcome:
             rotation = outcome['yaw']
 
         if 'echo_distance' in outcome and 'head_angle' in outcome:
-            echo_distance = outcome['echo_distance']
-            print("Echo distance %i" % echo_distance)
-            x = self.robot.head_x + math.cos(math.radians(head_angle)) * echo_distance
-            y = self.robot.head_y + math.sin(math.radians(head_angle)) * echo_distance
+            echo_distance = float(outcome['echo_distance'])
+            print(F"Echo distance {echo_distance}")
+            x = self.robot.head_x + math.cos(math.radians(head_angle - 90)) * echo_distance
+            y = self.robot.head_y + math.sin(math.radians(head_angle - 90)) * echo_distance
             obstacle = Phenomenon(x, y, self.batch)
             self.phenomena.append(obstacle)
 
@@ -205,7 +205,7 @@ class EgoMemoryWindow(pyglet.window.Window):
 if __name__ == "__main__":
     #ip_ = "192.168.4.1"  # AP mode
     # ip_ = "192.168.1.19"  # STA mode sur Olivier's wifi
-    # ip_ = "10.40.22.251" # STA sur RobotBSN Olivier's Robot
+    #ip_ = "10.40.22.251" # STA sur RobotBSN Olivier's Robot
     # ip_ = "?" #IP du robot 2 STA sur RobotBSN
     ip_ = "10.40.22.254" #IP du robot 1 STA sur RobotBSN
     em_window = EgoMemoryWindow(ip=ip_)
