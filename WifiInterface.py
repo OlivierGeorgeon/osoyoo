@@ -1,12 +1,20 @@
 import socket
 import keyboard
+import RobotDefine
 
 # UDP_IP = "192.168.4.1"  # AP mode
-UDP_IP = "192.168.1.19"  # STA mode sur Olivier's wifi
-# UDP_IP = "10.40.22.251" # STA sur RobotBSN Olivier's Robot
-# UDP_IP = "10.40.22.254" # STA sur RobotBSN
+# UDP_IP = "192.168.1.15"  # STA chezOlivier
+UDP_IP = "10.40.22.251"  # STA RobotBSN - Olivier's Robot in A301
+# UDP_IP = "10.40.22.254" # STA RobotBSN -
+# UDP_IP = "10.44.53.11"  # STA RobotBSN - Olivier's Robot in A485
+# UDP_IP = "10.44.53.13"  # STA RobotBSN - UCLy's Robot in A485
+# UDP_IP = "10.25.180.81"  # STA RobotBSN - A327
 
-UDP_TIMEOUT = 3  # Seconds
+
+UDP_TIMEOUT = 5  # Seconds
+if RobotDefine.ROBOT_ID == 0:
+    UDP_TIMEOUT = 0
+
 
 class WifiInterface:
     def __init__(self, ip=UDP_IP, port=8888):
@@ -16,23 +24,26 @@ class WifiInterface:
         self.socket.settimeout(UDP_TIMEOUT)
         # self.socket.connect((UDP_IP, UDP_PORT))  # Not necessary
 
-    '''Send the action. Return the outcome'''
-    def enact(self, _action):
-        _outcome = "{}"
-        self.socket.sendto(bytes(_action, 'utf-8'), (self.IP, self.port))
+    def enact(self, action):
+        """ Sending the action string, waiting for the outcome, and returning the outcome bytes """
+        outcome = b'{"status":"T"}'  # Default status T if timeout
+        print("sending " + action)
+        self.socket.sendto(bytes(action, 'utf-8'), (self.IP, self.port))
         try:
-            _outcome, address = self.socket.recvfrom(255)
-        except:
-            print("Reception Timeout")
-        return _outcome
+            outcome, address = self.socket.recvfrom(512)
+        except socket.error as error:  # Time out error when robot is not connected
+            print(error)
+        return outcome
 
 
+# Test the wifi interface by controlling the robot from the console
 if __name__ == '__main__':
     wifiInterface = WifiInterface()
-    action = ""
+    _action = ""
     while True:
         print("Action key: ", end="")
-        action = keyboard.read_key().upper()
+        _action = keyboard.read_key().upper()
         print()
-        outcome = wifiInterface.enact(action)
-        print(outcome)
+        _outcome = wifiInterface.enact('{"action":"' + _action + '"}')
+        # _outcome = wifiInterface.enact(_action)
+        print(_outcome)
