@@ -111,13 +111,7 @@ void loop()
                outcome.addValue("head_angle", (String) angle_tete_robot);
                outcome.addValue("echo_distance", (String) distance_objet_proche);
       case 'D':outcome.addValue("distance", (String) HD.dist());break;
-      case 'T':
-                  angle_tete_robot = scan(0, 180, 9, 0);
-                  distance_objet_proche = HD.dist();
-                  outcome.addValue("head_angle", (String) angle_tete_robot);
-                  outcome.addValue("echo_distance", (String) distance_objet_proche);  
-                  break;
-       case 'S': head.scan(0, 180, 9, 0);break;
+      case 'S': head.scan(0, 180, 9, 0);break;
         default:break;
       }
     }

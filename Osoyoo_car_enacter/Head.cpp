@@ -1,3 +1,12 @@
+/*
+ *  _____     _____     __      __   __     __   _______   __               _______         __         ___        ____   ______     __       ___
+ * |  __  \  |  __  \  |  |    |  | |  \   |  | |   ____| |  |            /   _____|      /    \      |   \      /    | |   __  \  |  |    /     \
+ * | |__|  | | |__|  | |  |    |  | |   \  |  | |  |__    |  |           /   /           /  /\  \     |    \    /     | |  |__|  | |  |   /   _   \
+ * |     _/  |     _/  |  |    |  | |    \ |  | |     |   |  |          |   |  ____     /  /__\  \    |  |\  \ /  /|  | |  _____/  |  |  |   |  |  |
+ * |  __  \  |  __  \  |  |    |  | |  |\ \|  | |   __|   |  |          |   |  |__ |   /   ____   \   |  |  \___/  |  | |  |       |  |  |   |_ |  |
+ * | |__|  | | |  \  \ |   \__/   | |  | \    | |  |____  |  |____       \  \ _ |  |  /   /    \   \  |  |         |  | |  |       |  |   \       /
+ * |______/  |_|   \__\ \________/  |__|  \___| |_______| |_______|       \ _______| /__ /      \   \ |__|         |__| |__|       |__|    \ ___ /
+ */
 #include <Servo.h>
 #include "Head.h"
 #include <Arduino.h>
@@ -38,4 +47,30 @@ int Head::scan(int angleMin, int angleMax, int Nbre_mesure, int index_0) {
   angle = (indexMin + index_0)*pas;
   head_servo.write(angle);
   return angle;
+}
+
+int Head::miniScan(int angle){
+  if(angle > 0 && angle <= 60){
+    scan(0, 60, 6, 0);
+  }
+  else if(angle > 60 && angle <=120){
+    scan(60, 120, 6, 6);
+  }
+  else {
+    scan(120, 180, 6, 12);
+  }
+}
+
+void Head::distances_loop(int angle, float mesure){
+    float distance = DistH.dist();
+    Serial.print("distance : ");
+    Serial.println(distance);
+    Serial.print("mesure : ");
+    Serial.println(mesure);
+    if(mesure != 0 && distance - mesure > 50){
+        miniScan(angle);
+        Serial.println("distance - mesure : ");
+        Serial.println(distance - mesure);
+        Serial.println("Scan_1");
+    }
 }
