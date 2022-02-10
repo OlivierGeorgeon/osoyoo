@@ -5,28 +5,30 @@ import math
 from OsoyooCar import OsoyooCar
 from pyrr import matrix44
 from Phenomenon import Phenomenon
-
+from MemoryNew import MemoryNew
+from PhenomenonNew import PhenomenonNew
 ZOOM_IN_FACTOR = 1.2
 
 
-class EgoMemoryWindow(pyglet.window.Window):
-    def __init__(self, width=400, height=400, *args, **kwargs):
+class EgoMemoryWindowNew(pyglet.window.Window):
+    def __init__(self, width=400, height=400, shapesList = None, *args, **kwargs):
         super().__init__(width, height, resizable=True, *args, **kwargs)
         self.set_caption("Egocentric Memory")
         self.set_minimum_size(150, 150)
         glClearColor(1.0, 1.0, 1.0, 1.0)
-
         self.batch = pyglet.graphics.Batch()
         self.zoom_level = 1
-
         self.origin = shapes.Rectangle(0, 0, 60, 40, color=(150, 150, 225))
         self.origin.anchor_position = 30, 20
         self.total_displacement_matrix = matrix44.create_identity()
         self.azimuth = 0
-
+        self.shapesList = shapesList
         # self.mouse_press_x = 0
         # self.mouse_press_y = 0
         self.mouse_press_angle = 0
+
+    def set_ShapesList(self,s):
+        self.shapesList = s
 
     def on_draw(self):
         """ Drawing the window """
@@ -43,6 +45,7 @@ class EgoMemoryWindow(pyglet.window.Window):
         glRotatef(90 - self.azimuth, 0.0, 0.0, 1.0)
 
         # Draw the robot and the phenomena
+        shapesListo = self.shapesList
         self.batch.draw()
 
         # Stack the environment's displacement and draw the origin just to check
@@ -86,31 +89,10 @@ class EgoMemoryWindow(pyglet.window.Window):
 # Testing the egocentric memory window by moving the environment with the keyboard
 if __name__ == "__main__":
     emw = EgoMemoryWindow()
-    robot = OsoyooCar(emw.batch)
-    phenomena = []
-    obstacle = Phenomenon(0, 0, emw.batch, 1)
-    phenomena.append(obstacle)
-
-
-    @emw.event
-    def on_text(text):
-        """ Receiving the action from the window and updating the position of the environment """
-        translation = [0, 0]
-        rotation = 0
-        if text == "8":  # Move forward
-            translation[0] = 180
-        if text == "2":  # Move forward
-            translation[0] = -180
-        if text == "1":  # Turn left
-            rotation = 45
-        if text == "3":  # Turn right
-            rotation = -45
-        # The displacement matrix
-        translation_matrix = matrix44.create_from_translation([-translation[0], -translation[1], 0])
-        rotation_matrix = matrix44.create_from_z_rotation(-math.radians(-rotation))
-        displacement_matrix = matrix44.multiply(rotation_matrix, translation_matrix)
-        emw.update_environment_matrix(displacement_matrix)
-        # Apply the displacement to the phenomenon
-        obstacle.displace(displacement_matrix)
+    memory = MemoryNew(emw,emw.batch)
+    rectangle = PhenomenonNew(50,50,width = 15, height = 15,color = "lime",durability = 10, decayIntensity = 1)
+    triangle = PhenomenonNew(0,0,shape = 2,color = "blue",durability = 10, decayIntensity = 1)
+    memory.add(rectangle)
+    memory.add(triangle)
 
     pyglet.app.run()

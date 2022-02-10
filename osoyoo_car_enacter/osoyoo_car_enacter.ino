@@ -16,6 +16,8 @@
 #include <WiFiEspUDP.h>
 #include <Arduino_JSON.h>
 
+#include <SoftwareSerial.h> // AJOUT ERREUR
+
 #define SPEED 100
 #define TURN_SPEED 90  
 #define SHIFT_SPEED 130

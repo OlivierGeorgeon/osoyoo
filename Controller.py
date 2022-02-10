@@ -46,7 +46,27 @@ class Controller:
             self.update_model()
             self.enact_step = 0
 
+
+    ########################################################################
+    def decay_test(self):
+        """Test de decay sur la vue
+        Return: Nombre d'éléments qui doivent être enlevés de la vue
+        Author: TKnockaert
+        
+        to_remove = list()
+        for pheno in self.phenomena:                        
+            pheno.decay()
+            if(not pheno.isAlive()):
+                to_remove = to_remove.append(pheno)
+        out = 1#len(to_remove)
+        for to_be_removed in to_remove:
+            self.phenomena.remove(to_be_removed)
+
+        return out
+        """
+    ########################################################################
     def update_model(self):
+        self.decay_test()
         """ Updating the model from the latest received outcome """
         outcome = json.loads(self.outcome_bytes)
         floor = 0
@@ -137,7 +157,7 @@ class Controller:
                     if echo_distance > 0:  # echo measure 0 is false measure
                         x = self.robot.head_x + math.cos(math.radians(head_angle)) * echo_distance
                         y = self.robot.head_y + math.sin(math.radians(head_angle)) * echo_distance
-                        obstacle = Phenomenon(x, y, self.view.batch)
+                        obstacle = Phenomenon(x, y, self.view.batch, durability = 3, decayIntensity = 1 ) # TEST DURABILITY-DECAY
                         self.phenomena.append(obstacle)
 
             # Update the azimuth
@@ -146,6 +166,11 @@ class Controller:
 
             # Update the origin
             self.view.update_environment_matrix(displacement_matrix)
+
+
+
+                
+
 
 
 # Testing the controller by remote controlling the robot from the egocentric memory window
@@ -168,3 +193,4 @@ if __name__ == "__main__":
 
     # Run the egocentric memory window
     pyglet.app.run()
+

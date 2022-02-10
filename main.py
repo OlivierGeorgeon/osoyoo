@@ -16,8 +16,8 @@ def main():
     emw = EgoMemoryWindow()
     controller = Controller(emw)
     agent = Agent5()
-
-    @emw.event
+    #QUESTION_OLIVIER
+    @emw.event 
     def on_text(text):
         global control_mode
         if text.upper() == "A":

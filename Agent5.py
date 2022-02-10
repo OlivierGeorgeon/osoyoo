@@ -28,7 +28,7 @@ class Agent5:
 
         """ Recording previous experience """
         self.previous_interaction = self.last_interaction
-        valence = self.hedonist_table[self._action][outcome]
+        valence = self.hedonist_table[self._action][outcome]  # stock la satisfaction obtenue à la dernière interaction
         self.last_interaction = Interaction.create_or_retrieve(self._action, outcome, valence)
         # print("Enacted interaction ", end="")
         # print(self.last_interaction)
