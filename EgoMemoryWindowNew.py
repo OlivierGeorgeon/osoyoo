@@ -7,6 +7,7 @@ from pyrr import matrix44
 from Phenomenon import Phenomenon
 from MemoryNew import MemoryNew
 from PhenomenonNew import PhenomenonNew
+from Utils import phenomList_to_pyglet
 ZOOM_IN_FACTOR = 1.2
 
 
@@ -29,6 +30,16 @@ class EgoMemoryWindowNew(pyglet.window.Window):
 
     def set_ShapesList(self,s):
         self.shapesList = s
+
+    def extract_and_convert_phenomenons(self,memory):
+        phenomenons = memory.phenomenons
+        self.shapesList = phenomList_to_pyglet(phenomenons,self.batch)
+
+
+    def refresh(self,memory):
+        self.extract_and_convert_phenomenons(memory)
+        self.on_draw()
+
 
     def on_draw(self):
         """ Drawing the window """

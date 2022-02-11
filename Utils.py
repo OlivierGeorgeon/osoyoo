@@ -2,6 +2,7 @@ from pyglet.gl import *
 from pyglet import shapes
 from PhenomenonNew import *
 from webcolors import name_to_rgb
+import math
 
 """Utils to make the project more modulable, if you decide to change the package
 used for the view you should just have to create a phenomList_to_whatev 
@@ -36,3 +37,12 @@ def phenom_to_pyglet(phenom,batch):
         # Pressing interaction: orange triangle
         final = shapes.Triangle(x, y, x+40, y-30, x+40, y+30, color=p.rgb, batch=batch)
     return final
+
+
+
+def rotate(x,y, radians):
+    """Only rotate a point around the origin (0, 0)."""
+    xx = x * math.cos(radians) + y * math.sin(radians)
+    yy = -x * math.sin(radians) + y * math.cos(radians)
+
+    return xx, yy

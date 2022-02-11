@@ -4,6 +4,7 @@ from pyglet import shapes
 from PhenomenonNew import *
 from webcolors import name_to_rgb
 from Utils import phenomList_to_pyglet
+from Utils import rotate
 class MemoryNew:
     """This class play the role of a memory manager : it stocks PhenomenonNew objects,
     apply transformations to them (such as decay)
@@ -32,6 +33,18 @@ class MemoryNew:
 
     def empty(self):
         self.phenomenons.clear()
+
+    def actualize(self, angle, distance):
+        self.tick()
+        for i in range(0,len(self.phenomenons)):
+            p = self.phenomenons[i]
+            x, y = rotate(p.x,p.y,angle)
+            p.x = x
+            p.y = y
+
+            p.y -= distance
+
+        
 
 if __name__ == "__main__":
     

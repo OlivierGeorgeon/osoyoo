@@ -66,7 +66,6 @@ class Controller:
         """
     ########################################################################
     def update_model(self):
-        self.decay_test()
         """ Updating the model from the latest received outcome """
         outcome = json.loads(self.outcome_bytes)
         floor = 0
