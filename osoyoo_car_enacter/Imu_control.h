@@ -31,6 +31,7 @@ class Imu_control
     #if ROBOT_HAS_HMC5883L == true
       int read_azimuth();
     #endif
+    //String _debug_message;
   private:
     MPU6050 _mpu;
     #if ROBOT_HAS_HMC5883L == true

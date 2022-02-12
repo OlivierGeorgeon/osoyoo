@@ -3,11 +3,15 @@ import keyboard
 import RobotDefine
 
 # UDP_IP = "192.168.4.1"  # AP mode
-UDP_IP = "192.168.1.15"  # STA chezOlivier
-# UDP_IP = "10.40.22.251" # STA RobotBSN - Olivier's Robot in A301
+# UDP_IP = "192.168.1.15"  # STA chezOlivier
+UDP_IP = "192.168.1.17"  # STA UCLy's robot chezOlivier
+# UDP_IP = "10.40.22.251"  # STA RobotBSN - Olivier's Robot in A301
 # UDP_IP = "10.40.22.254" # STA RobotBSN -
 # UDP_IP = "10.44.53.11"  # STA RobotBSN - Olivier's Robot in A485
 # UDP_IP = "10.44.53.13"  # STA RobotBSN - UCLy's Robot in A485
+# UDP_IP = "10.25.180.81"  # STA RobotBSN - A327
+
+
 UDP_TIMEOUT = 5  # Seconds
 if RobotDefine.ROBOT_ID == 0:
     UDP_TIMEOUT = 0
@@ -33,9 +37,17 @@ class WifiInterface:
         return outcome
 
 
+def onkeypress(event):
+    """ Suggested by Célien """
+    print("Send:", event.name)
+    outcome = wifiInterface.enact(event.name)
+    print(outcome)
+
+
 # Test the wifi interface by controlling the robot from the console
 if __name__ == '__main__':
     wifiInterface = WifiInterface()
+    # keyboard.on_press(onkeypress) Suggested by Celien
     _action = ""
     while True:
         print("Action key: ", end="")
