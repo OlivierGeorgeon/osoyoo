@@ -11,9 +11,9 @@
 #define TURN_SPOT_ENDING_ANGLE 15
 #define ACCELERATION_X_OFFSET -40
 #define ACCELERATION_SHOCK_THRESHOLD -200
-#define ACCELERATION_BLOCK_THRESHOLD 90
+#define ACCELERATION_BLOCK_THRESHOLD 60  // TODO depends whether the interaction starts when the robot is immobile
 #define GYRO_SHOCK_THRESHOLD 1 // °/s
-#define ROBOT_SERVO_PIN 4
+#define ROBOT_SERVO_PIN 4  // 13 Changed because 13 is used for internal led
 
 #warning "Compiling for UCLy's robot"
 
