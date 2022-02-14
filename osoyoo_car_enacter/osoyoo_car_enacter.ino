@@ -98,6 +98,7 @@ void setup()
   // Initialize the automatic behaviors
   OWM.setup();
   HEA.setup();
+  // delay(10000); tried delay but did not fix the imu setup problem
   IMU.setup();
   Serial.println("--- Robot initialized ---");
 

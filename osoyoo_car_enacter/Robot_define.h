@@ -1,4 +1,4 @@
-#define ROBOT_ID 2 // 0: robot Doll, 1: robot UCLy, 2: robot Olivier
+#define ROBOT_ID 1 // 0: robot Doll, 1: robot UCLy, 2: robot Olivier
 
 #if ROBOT_ID == 1
 
@@ -9,11 +9,11 @@
 #define TURN_SPOT_MAX_DURATION 1700
 #define TURN_SPOT_ENDING_DELAY 500
 #define TURN_SPOT_ENDING_ANGLE 15
-#define ACCELERATION_X_OFFSET 530 // TODO set this value
-#define ACCELERATION_SHOCK_THRESHOLD -200 // TODO set this value
-#define ACCELERATION_BLOCK_THRESHOLD 30 // TODO set this value
-#define GYRO_SHOCK_THRESHOLD 1 // °/s TODO set this value
-#define ROBOT_SERVO_PIN 4
+#define ACCELERATION_X_OFFSET -40
+#define ACCELERATION_SHOCK_THRESHOLD -200
+#define ACCELERATION_BLOCK_THRESHOLD 60  // TODO depends whether the interaction starts when the robot is immobile
+#define GYRO_SHOCK_THRESHOLD 1 // °/s
+#define ROBOT_SERVO_PIN 4  // 13 Changed because 13 is used for internal led
 
 #warning "Compiling for UCLy's robot"
 

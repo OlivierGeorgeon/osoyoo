@@ -20,7 +20,7 @@ Floor_change_retreat::Floor_change_retreat(Omny_wheel_motion OWM)
   _previous_measure_floor = 0;
   _floor_change_retreat_end_time = 0;
   _floor_outcome = 0;
-  _debug_message = "";
+  // _debug_message = "";
 }
 
 void Floor_change_retreat::update()
@@ -66,7 +66,7 @@ void Floor_change_retreat::update()
           _floor_change_retreat_end_time = millis() + RETREAT_DURATION;
           break;
       }
-      _debug_message += String(millis()) + ": floor changed. ";
+      // _debug_message += String(millis()) + ": floor changed. ";
     }
   }
   // IF currently retreating
@@ -76,7 +76,7 @@ void Floor_change_retreat::update()
     if (millis() > _floor_change_retreat_end_time) {
       // Stop the retreat
       _OWM.stopMotion();
-      _debug_message += String(millis()) + ": end retreat. ";
+      // _debug_message += String(millis()) + ": end retreat. ";
       _is_enacting = false;
     }
   }
@@ -104,7 +104,7 @@ int Floor_change_retreat::measureFloor()
 void Floor_change_retreat::outcome(JSONVar & outcome_object)
 {
   outcome_object["floor"] = _floor_outcome;
-  outcome_object["debug"] = _debug_message;
-  _debug_message = "";
+  // outcome_object["debug"] = _debug_message;
+  // _debug_message = "";
   _floor_outcome = 0;
 }

@@ -113,13 +113,11 @@ class Controller:
 
             # The displacement matrix of this interaction
             translation_matrix = matrix44.create_from_translation([-translation[0], -translation[1], 0])
-            rotation_matrix = matrix44.create_from_z_rotation(-math.radians(-rotation))
+            rotation_matrix = matrix44.create_from_z_rotation(math.radians(rotation))
             displacement_matrix = matrix44.multiply(rotation_matrix, translation_matrix)
 
             # Translate and rotate all the phenomena
             for p in self.phenomena:
-                # p.translate(translation)
-                # p.rotate(rotation)
                 p.displace(displacement_matrix)
 
             # Check if line detected
@@ -135,7 +133,7 @@ class Controller:
                     wall = Phenomenon(110, 0, self.view.batch, 2, 1)
                     self.phenomena.append(wall)
                 else:
-                    # Create a new collision interaction
+                    # Create a new blocked interaction
                     if shock == 0b01:
                         wall = Phenomenon(110, -80, self.view.batch, 2)
                         self.phenomena.append(wall)

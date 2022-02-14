@@ -4,8 +4,6 @@
   Uses Korneliusz Jarzebski's MPU6050 library provided in the ELEGOO kit
   https://github.com/jarzebski/Arduino-MPU6050
   released into the public domain
-
-  Attention: You must reset the arduino after turning the power on otherwise the IMU is not properly calibrated
 */
 #include "Arduino.h"
 #include "Imu_control.h"
@@ -20,33 +18,36 @@ Imu_control::Imu_control()
 {
   _next_imu_read_time = 0;
   _yaw = 0;
+  //_debug_message = "";
 }
 void Imu_control::setup()
 {
-  //Serial.begin(9200);
-
   #if ROBOT_HAS_MPU6050 == true
   // Initialize MPU6050
 
-  while(!_mpu.begin(MPU6050_SCALE_2000DPS, MPU6050_RANGE_2G))
-  {
-    Serial.println("Could not find a valid MPU6050 sensor, check wiring!");
-    Serial.println("You may need to comment line 54 in library MPU6050.cpp");
-    delay(500);
-  }
+  // Do it twice otherwise the calibration is wrong. I don't know why.
+  // Probably something to do with the order in which the imu registers are written.
+  _mpu.begin(MPU6050_SCALE_2000DPS, MPU6050_RANGE_2G);
+  _mpu.begin(MPU6050_SCALE_2000DPS, MPU6050_RANGE_2G);
 
-  // Calibrate gyroscope. The calibration must be at rest.
-  // If you don't want calibrate, comment this line.
-  _mpu.calibrateGyro();
-  // Serial.println("Gyroscope calibrated");
-
-  // Set threshold sensitivity. Default 3.
-  // If you don't want use threshold, comment this line or set 0.
-  _mpu.setThreshold(3); // Tried without but gives absurd results
+  //while(!_mpu.begin(MPU6050_SCALE_2000DPS, MPU6050_RANGE_2G))
+  //{
+  //  Serial.println("Could not find a valid MPU6050 sensor, check wiring!");
+  //  Serial.println("You may need to check the WHO_AM_I address in line 54 in library MPU6050.cpp");
+  //  delay(500);
+  //}
 
   // Set DLP Filter
   // See https://ulrichbuschbaum.wordpress.com/2015/01/18/using-the-mpu6050s-dlpf/
   _mpu.setDLPFMode(MPU6050_DLPF_4);  // Filter out frequencies over 21 Hz
+
+  // Calibrate gyroscope. The robot must be at rest during calibration.
+  // If you don't want calibrate, comment this line.
+  _mpu.calibrateGyro();
+
+  // Set threshold sensitivity. Default 3.
+  // If you don't want use threshold, comment this line or set 0.
+  _mpu.setThreshold(3); // Tried without but gives absurd results
 
   #else
     #warning "No MPU6050"
@@ -54,7 +55,7 @@ void Imu_control::setup()
 
   #if ROBOT_HAS_HMC5883L == true
 
-  // Initialize Initialize HMC5883L
+  // Initialize HMC5883L
   _mpu.setI2CMasterModeEnabled(false);
   _mpu.setI2CBypassEnabled(true) ;
   _mpu.setSleepEnabled(false);
@@ -79,7 +80,6 @@ void Imu_control::setup()
 
   // Set calibration offset. See HMC5883L_calibration.ino
   compass.setOffset(COMPASS_X_OFFSET, COMPASS_Y_OFFSET);
-  // compass.setOffset(1475, -1685);
   #endif
 }
 void Imu_control::begin()
@@ -160,6 +160,8 @@ void Imu_control::outcome(JSONVar & outcome_object)
   outcome_object["blocked"] = _blocked;
   outcome_object["max_acc"] = _max_acceleration;
   outcome_object["min_acc"] = _min_acceleration;
+  //outcome_object["debug"] = _debug_message;
+  //_debug_message = "";
 
   #if ROBOT_HAS_HMC5883L == true
   outcome_object["azimuth"] = read_azimuth();
