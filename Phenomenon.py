@@ -4,7 +4,11 @@ from pyrr import matrix44, Quaternion
 
 
 class Phenomenon:
-    def __init__(self, x, y, batch, shape=0, color=0):
+    def __init__(self, x, y, batch, shape=0, color=0, durability = 10, decayIntensity = 0):
+        ############
+        self.durability = durability
+        self.decayIntensity = decayIntensity
+        ############
         self.batch = batch
         self.type = shape
         # self.angle = 0
@@ -71,3 +75,18 @@ class Phenomenon:
             self.shape.x2, self.shape.y2 = v[0], v[1]
             v = matrix44.apply_to_vector(displacement_matrix, [self.shape.x3, self.shape.y3, 0])
             self.shape.x3, self.shape.y3 = v[0], v[1]
+
+    def decay(self):
+        """Remove one decayIntensity from the durability of the object.
+        Author: TKnockaert 
+        Return: The new durability after decay
+        """
+        self.durability -= self.decayIntensity
+        return self.durability
+
+    def isAlive(self):
+        """Check if the object is alive,
+        Author: TKnockaert
+        Return: True if the object is alive, False otherwise.
+        """
+        return self.durability > 0
