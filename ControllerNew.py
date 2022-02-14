@@ -8,7 +8,7 @@ from OsoyooCar import OsoyooCar
 from EgoMemoryWindow import EgoMemoryWindow
 import pyglet
 from pyrr import matrix44
-from PhenomenonNew import *
+from Interaction import *
 from MemoryNew import *
 from Agent5 import *
 
@@ -20,7 +20,7 @@ class ControllerNew:
     Robot, Agent, Memory, View
 
     It is responsible of the following tasks :
-        -Translate Robot datas into PhenomenonNew, Outcomes, and position changes (angle, distance)
+        -Translate Robot datas into Interaction, Outcomes, and position changes (angle, distance)
         -Translate the Agent Actions into Robot Actions, and command the robot to execute them
 
     It has the following communications :
@@ -35,7 +35,7 @@ class ControllerNew:
             - Send Outcomes to the Agent
 
         Memory Related :
-            - Send PhenomenonNew to the Memory
+            - Send Interaction to the Memory
             - Send position changes (angle,distance) to the Memory
 
         View Related :
@@ -53,9 +53,11 @@ class ControllerNew:
         self.agent = agent
         self.memory = memory
 
+        self.wifiInterface = WifiInterface()
+        self.outcome_bytes = b'{"status":"T"}'  # Default status T timeout
         """    
         # Model
-        self.wifiInterface = WifiInterface()
+        
         self.phenomena = []
         self.robot = OsoyooCar(self.view.batch)
 
@@ -80,7 +82,7 @@ class ControllerNew:
 
     ################################################# MEMORY RELATED #################################################################
     def send_phenom_to_memory(self,phenom):
-        """Send PhenomenonNew to the Memory
+        """Send Interaction to the Memory
         """
         self.memory.add(phenom)
 
@@ -98,18 +100,33 @@ class ControllerNew:
 
     ################################################# ROBOT RELATED #################################################################
 
-    def command_robot(self,action): #NOT IMPLEMENTED
-        data = None
+    def command_robot(self,action): #NOT TESTED
+        """ Creating an asynchronous thread to send the action to the robot and to wait for outcome """
+        def enact_thread():
+            """ Sending the action to the robot and waiting for outcome """
+            # print("Send " + self.action)
+            self.outcome_bytes = self.wifiInterface.enact(self.action)
+            print("Receive ", end="")
+            print(self.outcome_bytes)
+            self.enact_step = 2
+            # self.watch_outcome()
+
+        self.action = action
+        self.enact_step = 1
+        thread = threading.Thread(target=enact_thread)
+        thread.start()
+
+        data = self.outcome_bytes
         return data
 
 
     ################################################# SPECIFIC TASKS #################################################################
 
-    def translate_agent_action_to_robot_command(self,action): #NOT IMPLEMENTED
-        command = None
+    def translate_agent_action_to_robot_command(self,action): #NOT IMPLEMENTED, not needed I think
+        command = action
         return command
 
-    def translate_robot_data(self,data): #NOT IMPLEMENTED data = outcome_bytes ?
+    def translate_robot_data(self,data): #NOT TESTED data = outcome_bytes ?
         phenom = None
         angle = None
         distance = None
@@ -170,6 +187,6 @@ class ControllerNew:
         robot_data = self.command_robot(robot_action)
         phenom, angle, distance, outcome = self.translate_robot_data(robot_data)
         self.send_position_change_to_memory(angle,distance) #Might be an order problem between this line and the one under it, depending on
-        self.send_phenom_to_memory(phenom)                  # when the robot detect phenomenon (before or after moving)
+        self.send_phenom_to_memory(phenom)                  # when the robot detect interaction (before or after moving)
         interaction = self.ask_view_to_refresh_and_get_last_interaction_from_user()
         return outcome,interaction

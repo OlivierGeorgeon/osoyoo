@@ -6,7 +6,7 @@ from OsoyooCar import OsoyooCar
 from pyrr import matrix44
 from Phenomenon import Phenomenon
 from MemoryNew import MemoryNew
-from PhenomenonNew import PhenomenonNew
+from Interaction import Interaction
 from Utils import phenomList_to_pyglet
 ZOOM_IN_FACTOR = 1.2
 
@@ -101,8 +101,8 @@ class EgoMemoryWindowNew(pyglet.window.Window):
 if __name__ == "__main__":
     emw = EgoMemoryWindow()
     memory = MemoryNew(emw,emw.batch)
-    rectangle = PhenomenonNew(50,50,width = 15, height = 15,color = "lime",durability = 10, decayIntensity = 1)
-    triangle = PhenomenonNew(0,0,shape = 2,color = "blue",durability = 10, decayIntensity = 1)
+    rectangle = Interaction(50,50,width = 15, height = 15,color = "lime",durability = 10, decayIntensity = 1)
+    triangle = Interaction(0,0,shape = 2,color = "blue",durability = 10, decayIntensity = 1)
     memory.add(rectangle)
     memory.add(triangle)
 

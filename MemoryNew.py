@@ -1,16 +1,16 @@
 import pyglet
 from pyglet.gl import *
 from pyglet import shapes
-from PhenomenonNew import *
+from Interaction import *
 from webcolors import name_to_rgb
 from Utils import phenomList_to_pyglet
 from Utils import rotate
 class MemoryNew:
-    """This class play the role of a memory manager : it stocks PhenomenonNew objects,
+    """This class play the role of a memory manager : it stocks Interaction objects,
     apply transformations to them (such as decay)
     and also as the responsibility to translate them to concrete shapes on the GUI.
     
-    This aims to make both phenomenonNew and the view modulables.
+    This aims to make both Interaction and the view modulables.
 
     Author: TKnockaert
     """
@@ -57,8 +57,8 @@ if __name__ == "__main__":
     batch = pyglet.graphics.Batch()
 
     memory = MemoryNew(window,batch)
-    rectangle = PhenomenonNew(50,50,width = 15, height = 15,color = "lime",durability = 10, decayIntensity = 1)
-    triangle = PhenomenonNew(0,0,shape = 2,color = "blue",durability = 10, decayIntensity = 1)
+    rectangle = Interaction(50,50,width = 15, height = 15,color = "lime",durability = 10, decayIntensity = 1)
+    triangle = Interaction(0,0,shape = 2,color = "blue",durability = 10, decayIntensity = 1)
 
     memory.add(rectangle)
     memory.add(triangle)

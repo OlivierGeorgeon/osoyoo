@@ -1,6 +1,6 @@
 from webcolors import rgb_to_name
 from webcolors import name_to_rgb
-class PhenomenonNew:
+class Interaction:
     """This class implements phenomenons with object-oriented programming, that can be stored in a MemoryNew object and then translated to pyglet shapes.
       
     Author: TKnockaert

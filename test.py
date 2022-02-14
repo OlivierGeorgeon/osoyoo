@@ -2,7 +2,7 @@ from pyglet.gl import *
 from pyglet import shapes
 from EgoMemoryWindow import EgoMemoryWindow
 from EgoMemoryWindowNew import EgoMemoryWindowNew
-from PhenomenonNew import PhenomenonNew
+from Interaction import Interaction
 from MemoryNew import MemoryNew
 from webcolors import name_to_rgb
 from pyrr import matrix44
@@ -15,14 +15,14 @@ if __name__ == "__main__":
     batch = pyglet.graphics.Batch()
     robot = OsoyooCar(window.batch)
     memory = MemoryNew(window)
-    rectangle = PhenomenonNew(50,50,width = 15, height = 15,color = "lime",durability = 10, decayIntensity = 1)
-    triangle = PhenomenonNew(0,0,shape = 2,color = "blue",durability = 10, decayIntensity = 1)
+    rectangle = Interaction(50,50,width = 15, height = 15,color = "lime",durability = 10, decayIntensity = 1)
+    triangle = Interaction(0,0,shape = 2,color = "blue",durability = 10, decayIntensity = 1)
 
     memory.add(rectangle)
     memory.add(triangle)
     window.set_ShapesList( memory.draw())
     #memory.empty()
-    kss =  PhenomenonNew(50,50,shape = 1, width = 20, height = 15,color = "lime",durability = 10, decayIntensity = 1)
+    kss =  Interaction(50,50,shape = 1, width = 20, height = 15,color = "lime",durability = 10, decayIntensity = 1)
     memory.add(kss)
     window.set_ShapesList( memory.draw())
 

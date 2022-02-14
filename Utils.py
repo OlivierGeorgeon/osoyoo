@@ -1,6 +1,6 @@
 from pyglet.gl import *
 from pyglet import shapes
-from PhenomenonNew import *
+from Interaction import *
 from webcolors import name_to_rgb
 import math
 
