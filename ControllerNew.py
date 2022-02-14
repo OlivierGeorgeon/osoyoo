@@ -164,12 +164,12 @@ class ControllerNew:
         return phenom, angle, translation, outcome_for_agent
     ################################################# LOOP #################################################################
 
-    def loop(self,outcome): #NOT IMPLEMENTED: Change of behavior when user interact with view
+    def loop(self, outcome):  # NOT IMPLEMENTED: Change of behavior when user interact with view
         self.action = self.ask_agent_for_action(outcome)
         robot_action = self.translate_agent_action_to_robot_command(self.action)
         robot_data = self.command_robot(robot_action)
         phenom, angle, distance, outcome = self.translate_robot_data(robot_data)
-        self.send_position_change_to_memory(angle,distance) #Might be an order problem between this line and the one under it, depending on
+        self.send_position_change_to_memory(angle,distance)  # Might be an order problem between this line and the one under it, depending on
         self.send_phenom_to_memory(phenom)                  # when the robot detect phenomenon (before or after moving)
         interaction = self.ask_view_to_refresh_and_get_last_interaction_from_user()
         return outcome,interaction
