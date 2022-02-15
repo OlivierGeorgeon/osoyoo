@@ -1,6 +1,22 @@
 import socket
 import keyboard
 import time
+import RobotDefine
+
+# UDP_IP = "192.168.4.1"  # AP mode
+# UDP_IP = "192.168.1.15"  # STA chezOlivier
+UDP_IP = "10.40.22.251"  # STA RobotBSN - Olivier's Robot in A301
+# UDP_IP = "10.40.22.254" # STA RobotBSN -
+# UDP_IP = "10.44.53.11"  # STA RobotBSN - Olivier's Robot in A485
+# UDP_IP = "10.44.53.13"  # STA RobotBSN - UCLy's Robot in A485
+# UDP_IP = "10.25.180.81"  # STA RobotBSN - A327
+
+
+UDP_TIMEOUT = 5  # Seconds
+if RobotDefine.ROBOT_ID == 0:
+    UDP_TIMEOUT = 0
+
+
 
 class WifiInterface:
     def __init__(self, ip="192.168.4.1", port=8888, udpTimeout=4):
@@ -11,44 +27,44 @@ class WifiInterface:
         self.socket.settimeout(self.udpTimeout)
         # self.socket.connect((UDP_IP, UDP_PORT))  # Not necessary
 
-    '''Send the action. Return the outcome'''
-    def enact(self, jsonAction):
-        _outcome = "{}"
 
-        if jsonAction["action"] != '$':
-            self.socket.settimeout(0.2)
-            try:
-                Routcome, address = self.socket.recvfrom(255)
-                print("Outcome en retard", Routcome)
-            except:
-                pass
-            self.socket.settimeout(self.udpTimeout)
-            
-        self.socket.sendto(bytes(str(jsonAction).replace("\'", "\""), 'utf-8'), (self.IP, self.port))
+'''Send the action. Return the outcome'''
+    def enact(self, action):
+        """ Sending the action string, waiting for the outcome, and returning the outcome bytes """
+        outcome = b'{"status":"T"}'  # Default status T if timeout
+        print("sending " + action)
+        self.socket.sendto(bytes(action, 'utf-8'), (self.IP, self.port))
         try:
-            _outcome, address = self.socket.recvfrom(255)
-        except:
-            print("Reception Timeout for command:", jsonAction["action"])
-        return _outcome
+            outcome, address = self.socket.recvfrom(512)
+        except socket.error as error:  # Time out error when robot is not connected
+            print(error)
+        return outcome
+
+
+
+
+    
+
 
 
 def onkeypress(event):
     print("Send:", event.name)
     outcome = wifiInterface.enact({"action":event.name})
     print(outcome)
-
+    
+# Test the wifi interface by controlling the robot from the console
 if __name__ == '__main__':
     wifiInterface = WifiInterface()
-    # Bind event key press
-    keyboard.on_press(onkeypress)
-    # Every 15 seconds, requests bot data
-    cooldown = time.time()
+    _action = ""
     while True:
-        if cooldown + 15 <= time.time():
-            cooldown = time.time()
-            print("Data requests")
-            outcome = wifiInterface.enact({"action": "$"})
+        print("Action key: ", end="")
+        _action = keyboard.read_key().upper()
+        print()
+        _outcome = wifiInterface.enact('{"action":"' + _action + '"}')
+        # _outcome = wifiInterface.enact(_action)
+        print(_outcome)
             
+
 
 
 
