@@ -33,6 +33,7 @@ WifiBot wifiBot = WifiBot("osoyoo_robot2", 8888);
 
 // use a ring buffer to increase speed and reduce memory allocation
 char packetBuffer[100];
+char action = ' ';
 
 unsigned long endTime = 0;
 int actionStep = 0;
@@ -76,17 +77,16 @@ void loop()
     }
 
     JSONVar jsonReceive = JSON.parse(packetBuffer);
-    Serial.println(JSON.stringify(jsonReceive));
-    String strAction = JSON.stringify(jsonReceive["action"]);
+    if (jsonReceive.hasOwnProperty("action")) {
+      action = ((const char*) jsonReceive["action"])[0];
+    }
 
-    int str_len = strAction.length() + 1;
-    char action[str_len];
-    strAction.toCharArray(action, str_len);
+    Serial.print(action);
 
     endTime = millis() + 2000;
     actionStep = 1;
 
-    switch (action[1])    //serial control instructions
+    switch (action)    //serial control instructions
     {  
       case '$':outcome.addValue("distance", (String) dist());break;
       case '8':go_forward(SPEED);break;
