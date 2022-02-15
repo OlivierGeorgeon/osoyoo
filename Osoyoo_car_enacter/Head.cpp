@@ -11,7 +11,6 @@
 #include "Head.h"
 #include <Arduino.h>
 #include "Head_Dist.h"
-Head_Dist DistH;
 
 Head::Head(){
   }
@@ -41,7 +40,7 @@ int Head::scan(int angleMin, int angleMax, int Nbre_mesure, int index_0) {
   for (int pos = 0; pos <= Nbre_mesure; pos++) {
     head_servo.write(angleMin+(pas*pos));
     delay(300);
-    distances[pos] = DistH.dist();
+    distances[pos] = distUS.dist();
   } 
   indexMin = getIndexMin(Nbre_mesure, distances);
   angle = (indexMin + index_0)*pas;
@@ -62,7 +61,7 @@ int Head::miniScan(int angle){
 }
 
 void Head::distances_loop(int angle, float mesure){
-    float distance = DistH.dist();
+    float distance = distUS.dist();
     Serial.print("distance : ");
     Serial.println(distance);
     Serial.print("mesure : ");
