@@ -40,8 +40,6 @@ char packetBuffer[100];
 unsigned long endTime = 0;
 int actionStep = 0;
 float somme_gyroZ = 0;
-int angle_tete_robot = 90;
-float distance_objet_proche = 0;
 
 void setup()
 {
@@ -103,12 +101,11 @@ void loop()
       case '2':go_back(SPEED);break;
       case '5':stop_Stop();break;
       case '0':until_line(SPEED);break;
-      case 'B':
-               head.distances_loop(angle_tete_robot, distance_objet_proche);
-               outcome.addValue("head_angle", (String) angle_tete_robot);
-               outcome.addValue("echo_distance", (String) distance_objet_proche);
       case 'D':outcome.addValue("distance", (String) head.distUS.dist());break;
-      case 'S': head.scan(0, 180, 9, 0);break;
+      case 'S': head.scan(0, 180, 9, 0);
+                outcome.addValue("distance", (String) head.distUS.dist());
+                outcome.addValue("head_angle", (String) head.angle_actuelle);             
+      break;
         default:break;
       }
     }
