@@ -1,5 +1,6 @@
 import socket
 import keyboard
+import time
 import RobotDefine
 
 # UDP_IP = "192.168.4.1"  # AP mode
@@ -16,14 +17,18 @@ if RobotDefine.ROBOT_ID == 0:
     UDP_TIMEOUT = 0
 
 
+
 class WifiInterface:
-    def __init__(self, ip=UDP_IP, port=8888):
+    def __init__(self, ip="192.168.4.1", port=8888, udpTimeout=4):
         self.IP = ip
         self.port = port
+        self.udpTimeout = udpTimeout
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.socket.settimeout(UDP_TIMEOUT)
+        self.socket.settimeout(self.udpTimeout)
         # self.socket.connect((UDP_IP, UDP_PORT))  # Not necessary
 
+
+'''Send the action. Return the outcome'''
     def enact(self, action):
         """ Sending the action string, waiting for the outcome, and returning the outcome bytes """
         outcome = b'{"status":"T"}'  # Default status T if timeout
@@ -36,6 +41,17 @@ class WifiInterface:
         return outcome
 
 
+
+
+    
+
+
+
+def onkeypress(event):
+    print("Send:", event.name)
+    outcome = wifiInterface.enact({"action":event.name})
+    print(outcome)
+    
 # Test the wifi interface by controlling the robot from the console
 if __name__ == '__main__':
     wifiInterface = WifiInterface()
@@ -47,3 +63,10 @@ if __name__ == '__main__':
         _outcome = wifiInterface.enact('{"action":"' + _action + '"}')
         # _outcome = wifiInterface.enact(_action)
         print(_outcome)
+            
+
+
+
+
+
+
