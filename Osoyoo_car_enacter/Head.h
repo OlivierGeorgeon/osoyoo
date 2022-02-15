@@ -11,12 +11,14 @@
 #define Head_h
 #include <Servo.h>
 #define SERVO_PIN     13  //servo connect to D5
+#include "Head_Dist.h"
 class Head
 {
 private:
     Servo head_servo;
 public:
     Head();
+    Head_Dist distUS;
     int scan(int angleMin, int angleMax, int nbre_mesure, int index_0);
     void distances_loop(int angle, float mesure);
     int miniScan(int angle);
