@@ -151,8 +151,8 @@ class EgoMemoryWindow(pyglet.window.Window):
         if 'echo_distance' in outcome and 'head_angle' in outcome:
             echo_distance = float(outcome['echo_distance'])
             print(F"Echo distance {echo_distance}")
-            x = self.robot.head_x + math.cos(math.radians(head_angle - 90)) * echo_distance
-            y = self.robot.head_y + math.sin(math.radians(head_angle - 90)) * echo_distance
+            x = self.robot.head_x + math.cos(math.radians(head_angle)) * echo_distance
+            y = self.robot.head_y + math.sin(math.radians(head_angle)) * echo_distance
             obstacle = Phenomenon(x, y, self.batch)
             self.phenomena.append(obstacle)
 
@@ -194,8 +194,9 @@ class EgoMemoryWindow(pyglet.window.Window):
 
 
         for p in self.phenomena:
-            p.translate(translation)
-            p.rotate(-rotation)
+            pass
+            # p.translate(translation)
+            # p.rotate(-rotation)
 
         glLoadIdentity()
         glTranslatef(translation[0], translation[1], 0)
