@@ -4,25 +4,24 @@
  * | |__|  | | |__|  | |  |    |  | |   \  |  | |  |__    |  |           /   /           /  /\  \     |    \    /     | |  |__|  | |  |   /   _   \
  * |     _/  |     _/  |  |    |  | |    \ |  | |     |   |  |          |   |  ____     /  /__\  \    |  |\  \ /  /|  | |  _____/  |  |  |   |  |  |
  * |  __  \  |  __  \  |  |    |  | |  |\ \|  | |   __|   |  |          |   |  |__ |   /   ____   \   |  |  \___/  |  | |  |       |  |  |   |_ |  |
- * | |__|  | | |  \  \ |   \__/   | |  | \    | |  |____  |  |____       \  \ _ |  |  /   /    \   \  |  |         |  | |  |       |  |   \       / 
+ * | |__|  | | |  \  \ |   \__/   | |  | \    | |  |____  |  |____       \  \ _ |  |  /   /    \   \  |  |         |  | |  |       |  |   \       /
  * |______/  |_|   \__\ \________/  |__|  \___| |_______| |_______|       \ _______| /__ /      \   \ |__|         |__| |__|       |__|    \ ___ /
  */
 #include <Servo.h>
-#include "calcDist.h"
+#include "Head.h"
+#include <Arduino.h>
+#include "Head_Dist.h"
 
-#include "Servo_Scan.h"
-#include "Arduino.h"
+Head::Head(){
+  }
 
-Servo myservo;
-// Initialisation de port de branchement sur la carte
-void servo_port() {
-  myservo.attach(4);
+void Head::servo_port() {
+  head_servo.attach(4);
 }
-int getIndexMin(int nb_mesures, float distances[]){
-  
+
+int Head::getIndexMin(int nb_mesures, float distances[]){  
   float valMin = distances[0];
-  int indexMin = 0;
-  
+  int indexMin = 0;  
   //Recherche de la plus petite distances de la fonction de scan pour alignement
   for (int i = 0; i < nb_mesures; i++){
     if(distances[i] < valMin && distances[i] != 0){
@@ -33,25 +32,23 @@ int getIndexMin(int nb_mesures, float distances[]){
   return indexMin;
 }
 
-//Fonction de full scan ballayant une zone de 180° devant le robot et assure l'alignement à l'objet la plus proche
-int scan(int angleMin, int angleMax, int Nbre_mesure, int index_0) {
+void Head::scan(int angleMin, int angleMax, int Nbre_mesure, int index_0) {
   int pas = round((angleMax-angleMin)/Nbre_mesure);
   float distances[Nbre_mesure];
   int indexMin;
   int angle;
   for (int pos = 0; pos <= Nbre_mesure; pos++) {
-    myservo.write(angleMin+(pas*pos));
-    delay(100);
-    distances[pos] = dist();
+    head_servo.write(angleMin+(pas*pos));
+    delay(300);
+    distances[pos] = distUS.dist();
   } 
   indexMin = getIndexMin(Nbre_mesure, distances);
   angle = (indexMin + index_0)*pas;
-  myservo.write(angle);
-  return angle;
+  head_servo.write(angle);
+  angle_actuelle = angle;
 }
 
-//Fonction permettant le suivi d'un objet detecté à l'aide des minis scan en 3 zones d'action
-int MiniScan(int angle){
+int Head::miniScan(int angle){
   if(angle > 0 && angle <= 60){
     scan(0, 60, 6, 0);
   }
@@ -63,18 +60,16 @@ int MiniScan(int angle){
   }
 }
 
-void distances_loop(int angle, float mesure){
-    Serial.print("Angle : ");
-    Serial.println(angle);
-    Serial.print("Mesure : ");
-    Serial.println(mesure);
-    Serial.print("Distance : ");
-    float distance = dist();
+void Head::distances_loop(int angle, float mesure){
+    float distance = distUS.dist();
+    Serial.print("distance : ");
     Serial.println(distance);
+    Serial.print("mesure : ");
+    Serial.println(mesure);
     if(mesure != 0 && distance - mesure > 50){
-        MiniScan(angle);
-        Serial.print("Distance de scan");
+        miniScan(angle);
+        Serial.println("distance - mesure : ");
         Serial.println(distance - mesure);
-        Serial.print("Scan 1");
+        Serial.println("Scan_1");
     }
 }

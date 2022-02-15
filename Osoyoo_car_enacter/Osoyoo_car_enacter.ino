@@ -9,16 +9,19 @@
  * 
  */
 #include "omny_wheel_motion.h"
-#include "calcDist.h"
 #include "tracking.h"
 
-#include "Servo_Scan.h"
-#define pc "2"
+
+#define WifiMode "R"        //Définir le mode de wifi du robot, 'R' pour routeur et 'W' pour la connexion au robot
+
 #include "gyro.h"
 #include "compass.h"
 
 #include "JsonOutcome.h"
 JsonOutcome outcome;
+
+#include "Head.h";
+Head head;
 
 #include "DelayAction.h"
 DelayAction da;
@@ -38,19 +41,21 @@ char action = ' ';
 unsigned long endTime = 0;
 int actionStep = 0;
 float somme_gyroZ = 0;
-int angle_tete_robot = 90;
-float distance_objet_proche = 0;
 
 void setup()
 {
 // init_GPIO();
+//  head = Head();
   Serial.begin(9600);   // initialize serial for debugging
-  servo_port();
-  set();
-  if (pc == "1"){
+  
+  head.servo_port();
+  
+  head.distUS.setup();
+  if (WifiMode == "W"){
+
     wifiBot.wifiInitLocal();
   }
-  if (pc == "2"){
+  if (WifiMode == "R"){
     wifiBot.wifiInitRouter();
   }
 
@@ -58,6 +63,7 @@ void setup()
   compass_setup();
 
   //Exemple: da.setDelayAction(2000, [](){Serial.println("ok tout les 2s");}, millis());
+  //da.setDelayAction(5000, distances_loop(angle_tete_robot, distance_objet_proche), millis());
 }
 
 void loop()
@@ -88,20 +94,18 @@ void loop()
 
     switch (action)    //serial control instructions
     {  
-      case '$':outcome.addValue("distance", (String) dist());break;
+      case '$':outcome.addValue("distance", (String) head.distUS.dist());break;
       case '8':go_forward(SPEED);break;
       case '4':left_turn(SPEED);break;
       case '6':right_turn(SPEED);break;
       case '2':go_back(SPEED);break;
       case '5':stop_Stop();break;
       case '0':until_line(SPEED);break;
-      case 'D':outcome.addValue("distance", (String) dist());break;
-       case 'S': 
-                  angle_tete_robot = scan(0, 180, 9, 0);
-                  distance_objet_proche = dist();
-                  outcome.addValue("head_angle", (String) angle_tete_robot);
-                  outcome.addValue("echo_distance", (String) distance_objet_proche);  
-                  break;
+      case 'D':outcome.addValue("distance", (String) head.distUS.dist());break;
+      case 'S': head.scan(0, 180, 9, 0);
+                outcome.addValue("distance", (String) head.distUS.dist());
+                outcome.addValue("head_angle", (String) head.angle_actuelle);             
+      break;
         default:break;
       }
     }
@@ -129,5 +133,4 @@ void loop()
     {
         reset_gyroZ(); //calibrer l'angle Z à 0 tant qu'il n'a pas fait d'action
     }
-
 }
