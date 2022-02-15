@@ -32,7 +32,7 @@ int Head::getIndexMin(int nb_mesures, float distances[]){
   return indexMin;
 }
 
-int Head::scan(int angleMin, int angleMax, int Nbre_mesure, int index_0) {
+void Head::scan(int angleMin, int angleMax, int Nbre_mesure, int index_0) {
   int pas = round((angleMax-angleMin)/Nbre_mesure);
   float distances[Nbre_mesure];
   int indexMin;
@@ -45,7 +45,7 @@ int Head::scan(int angleMin, int angleMax, int Nbre_mesure, int index_0) {
   indexMin = getIndexMin(Nbre_mesure, distances);
   angle = (indexMin + index_0)*pas;
   head_servo.write(angle);
-  return angle;
+  angle_actuelle = angle;
 }
 
 int Head::miniScan(int angle){

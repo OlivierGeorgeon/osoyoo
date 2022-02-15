@@ -19,7 +19,8 @@ private:
 public:
     Head();
     Head_Dist distUS;
-    int scan(int angleMin, int angleMax, int nbre_mesure, int index_0);
+    int angle_actuelle = 90;
+    void scan(int angleMin, int angleMax, int nbre_mesure, int index_0);
     void distances_loop(int angle, float mesure);
     int miniScan(int angle);
     int getIndexMin(int nb_mesures, float distances[]);
