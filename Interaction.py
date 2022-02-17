@@ -1,12 +1,13 @@
 from webcolors import rgb_to_name
 from webcolors import name_to_rgb
+from pyrr import matrix44
 class Interaction:
     """This class implements phenomenons with object-oriented programming, that can be stored in a MemoryNew object and then translated to pyglet shapes.
       
     Author: TKnockaert
     """
 
-    def __init__(self,x,y,width = 50, height = 50, type = 'None',shape = 0,color = 'green',durability = 10,decayIntensity = 1):
+    def __init__(self,x,y,width = 50, height = 50, type = 'None',shape = 0,color = 'green',durability = 10,decayIntensity = 1, starArgs = None):
         """Create an object to be placed in the memory.
 
         Args:
@@ -20,17 +21,20 @@ class Interaction:
         Raise:
         Author: TKnockaert
         """
+        self.rotation = None
         self.x = x
         self.y = y
         self.width = width
         self.height = height
         self.durability = durability
+        self.actual_durability = durability
         self.decayIntensity = decayIntensity
         self.shape = shape
         self.type = type
         self.tick_number = 0
         self.color= color
         self.rgb = name_to_rgb(color)
+        self.starArgs = starArgs # At the moment, represent the number of spikes of a star
         print(self.rgb)
 
     def decay(self):
@@ -38,8 +42,8 @@ class Interaction:
 
         Return: The new durability after decay
         """
-        self.durability -= self.decayIntensity
-        return self.durability
+        self.actual_durability -= self.decayIntensity
+        return self.actual_durability
 
     def isAlive(self):
         """Check if the object is alive,
@@ -54,5 +58,12 @@ class Interaction:
 
         Author : TKnockaert
         """
-        self.tick += 1
+        self.tick_number += 1
         self.decay()
+
+    def displace(self,displacement_matrix):
+        """ Applying the displacement matrix to the phenomenon """
+        #  Rotate and translate the position
+        v = matrix44.apply_to_vector(displacement_matrix, [self.x, self.y, 0])
+        self.x, self.y = v[0], v[1]
+        # TO CHECK : Shape should rotate automaticly, mb, I think, idk

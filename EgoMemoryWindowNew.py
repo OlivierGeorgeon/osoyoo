@@ -6,8 +6,11 @@ from OsoyooCar import OsoyooCar
 from pyrr import matrix44
 from Phenomenon import Phenomenon
 from MemoryNew import MemoryNew
+from MemoryV1 import MemoryV1
 from Interaction import Interaction
-from Utils import phenomList_to_pyglet
+from Utils import interactionList_to_pyglet
+
+import time
 ZOOM_IN_FACTOR = 1.2
 
 
@@ -27,20 +30,34 @@ class EgoMemoryWindowNew(pyglet.window.Window):
         # self.mouse_press_x = 0
         # self.mouse_press_y = 0
         self.mouse_press_angle = 0
+        self.window = None
 
     def set_ShapesList(self,s):
         self.shapesList = s
 
     def extract_and_convert_phenomenons(self,memory):
         phenomenons = memory.phenomenons
-        self.shapesList = phenomList_to_pyglet(phenomenons,self.batch)
+        self.shapesList = interactionList_to_pyglet(phenomenons,self.batch)
 
 
     def refresh(self,memory):
+        @self.event
+        def on_close():
+            self.close()
+
+            #@self.window.event
+            #def on_key_press(key, mod):
+            #    # ...do stuff on key press
+
+        pyglet.clock.tick()
+        self.clear()
+        self.dispatch_events()
+
         self.extract_and_convert_phenomenons(memory)
         self.on_draw()
+        # ...transform, update, create all objects that need to be rendered
 
-
+        self.flip()
     def on_draw(self):
         """ Drawing the window """
         glClear(GL_COLOR_BUFFER_BIT)
@@ -99,11 +116,13 @@ class EgoMemoryWindowNew(pyglet.window.Window):
         
 # Testing the egocentric memory window by moving the environment with the keyboard
 if __name__ == "__main__":
-    emw = EgoMemoryWindow()
-    memory = MemoryNew(emw,emw.batch)
-    rectangle = Interaction(50,50,width = 15, height = 15,color = "lime",durability = 10, decayIntensity = 1)
-    triangle = Interaction(0,0,shape = 2,color = "blue",durability = 10, decayIntensity = 1)
-    memory.add(rectangle)
-    memory.add(triangle)
-
-    pyglet.app.run()
+    emw = EgoMemoryWindowNew()
+    #memory = MemoryNewV1(emw)
+    memory = MemoryV1(emw)
+    rectangle = Interaction(50,50,width = 150, height = 150,shape = 'Rectangle',color = "lime",durability = 1000, decayIntensity = 1)
+    memory.phenomenons.append(rectangle)
+    print(memory.phenomenons)
+    for i in range(10000):
+        emw.refresh(memory)
+        memory.tick()
+        #time.sleep(2)

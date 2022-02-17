@@ -7,13 +7,13 @@ class MemoryV1(MemoryNew):
     Author : TKnockaert
     """
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self,view):
+        super().__init__(view)
 
     def tick(self):
         super().tick()
         to_remove = []
         for p in self.phenomenons :
-            if(p.durability >= 0):
+            if(p.actual_durability <= 0):
                 to_remove.append(p)
         self.phenomenons = [x for x in self.phenomenons if x not in to_remove]
