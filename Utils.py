@@ -35,7 +35,7 @@ def interaction_to_pyglet(interaction,batch):
     elif shape == 'Star':
         # Triangle: collision
         # Pressing interaction: orange triangle
-        final = shapes.Star(x, y, width, height, numSpikes = p.starArgs, color=p.rgb, batch=batch)
+        final = shapes.Star(x, y, width, height, num_spikes = p.starArgs, color=p.rgb, batch=batch)
     final.opacity = (p.actual_durability/p.durability * 255)
     return final
 

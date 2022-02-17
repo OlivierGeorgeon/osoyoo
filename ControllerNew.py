@@ -61,6 +61,7 @@ class ControllerNew:
         self.outcome = 0
         self.enact_step = 0
         self.action = ""
+        self.robot = OsoyooCar(self.view.batch)
         """    
         # Model
         
@@ -131,7 +132,7 @@ class ControllerNew:
 
     ################################################# SPECIFIC TASKS #################################################################
 
-    def translate_agent_action_to_robot_command(self,action): #NOT IMPLEMENTED, not needed I think
+    def translate_agent_action_to_robot_command(self,action):
         command = action
         # 0-> '8', 1-> '1', 2-> '3'
         commands = ['8', '1', '3']
@@ -143,7 +144,12 @@ class ControllerNew:
         phenom_info = (0,0,0,0,None,None)
         translation = [0,0]
         rotation = 0
-
+        obstacle = 0
+        floor = 0
+        shock = 0
+        blocked = 0
+        x = None
+        y = None
         json_outcome = json.loads(self.outcome_bytes)
 
         """ Updating the model from the latest received outcome """
@@ -153,11 +159,11 @@ class ControllerNew:
             floor = outcome['floor']
             outcome_for_agent = json_outcome['floor']
         shock = 0
-        if 'shock' in outcome:
+        if 'shock' in outcome and self.action == '8' and floor == 0:
             shock = outcome['shock']
             outcome_for_agent = json_outcome['shock']
         blocked = 0
-        if 'blocked' in outcome:
+        if 'blocked' in outcome and self.action == '8':
             blocked = outcome['blocked']
             outcome_for_agent = json_outcome['shock'] #OULAH
 
@@ -186,6 +192,7 @@ class ControllerNew:
             # Actual measured displacement if any
             if 'yaw' in outcome:
                 rotation = outcome['yaw']
+                print("rotation")
 
             # Estimate displacement due to floor change retreat
             if floor > 0:  # Black line detected
@@ -200,22 +207,17 @@ class ControllerNew:
             if self.action == "8" and floor == 0:
                 if blocked:
                     # Create a new pressing interaction
-                    wall = Phenomenon(110, 0, self.view.batch, 2, 1) # TODO : oubli
-                    self.phenomena.append(wall)
+                    #wall = Phenomenon(110, 0, self.view.batch, 2, 1) # TODO : oubli
+                    #self.phenomena.append(wall)
+                    blocked = 1
                 else:
                     # Create a new blocked interaction
                     if shock == 0b01: # TODO : remettre en literral bit dans la traduction de MemoryNew
                         shock = 1
-                        # wall = Phenomenon(110, -80, self.view.batch, 2)
-                        # self.phenomena.append(wall)
                     if shock == 0b11:
                         shock = 2
-                        # wall = Phenomenon(110, 0, self.view.batch, 2)
-                        # self.phenomena.append(wall)
                     if shock == 0b10:
                         shock = 3
-                        # wall = Phenomenon(110, 80, self.view.batch, 2)
-                        # self.phenomena.append(wall)
 
             # Update head angle
             if 'head_angle' in outcome:
@@ -248,8 +250,8 @@ class ControllerNew:
         print("DEBUG CONTROLLER LOOP, 2")
         robot_action = self.translate_agent_action_to_robot_command(self.action) # a compléter
         print("DEBUG CONTROLLER LOOP, 3 ")
-        #self.command_robot(robot_action)
-        self.enact_step = 2 # FOR DEBUG
+        self.command_robot(robot_action)
+        #self.enact_step = 2 # FOR DEBUG
         print("DEBUG CONTROLLER LOOP, 4")
 
         while(self.enact_step < 2):   # refresh la vue tant que pas de reponses de command_robot 
@@ -269,6 +271,7 @@ class ControllerNew:
         user_interaction = None
         user_interaction = self.ask_view_to_refresh_and_get_last_interaction_from_user(self.memory)
         print("DEBUG CONTROLLER LOOP, 11")
+        self.memory.tick()
         return self.outcome,user_interaction
 
 

@@ -35,6 +35,7 @@ class Interaction:
         self.color= color
         self.rgb = name_to_rgb(color)
         self.starArgs = starArgs # At the moment, represent the number of spikes of a star
+        self.rotation = 0
         print(self.rgb)
 
     def decay(self):
