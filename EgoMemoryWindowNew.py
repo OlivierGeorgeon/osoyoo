@@ -122,6 +122,7 @@ if __name__ == "__main__":
     rectangle = Interaction(50,50,width = 150, height = 150,shape = 'Rectangle',color = "lime",durability = 1000, decayIntensity = 1)
     memory.phenomenons.append(rectangle)
     print(memory.phenomenons)
+    poly = shapes.Polygon(0,0,color = (0,0,0), batch = emw.batch)
     for i in range(10000):
         emw.refresh(memory)
         memory.tick()
