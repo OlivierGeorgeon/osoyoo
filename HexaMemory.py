@@ -1,4 +1,4 @@
-import HexaGrid
+from HexaGrid import *
 class HexaMemory(HexaGrid):
     def __init__(self,width,height,cells_radius = 50, robot_width = 200):
         """Construct the HexaMemory of the robot, child class of HexaGrid
@@ -12,7 +12,8 @@ class HexaMemory(HexaGrid):
         self.robot_width = robot_width
 
     def move(self, direction, distance):
-        """Handle the movement of the robot in the HexaGrid
+        """Handle the movement of the robot in the HexaGrid : change position of the robot in the HexaGrid
+        and apply changes on cells passed through
         Args : Direction : 0 = N, 1 = NE, 2 = SE, 3 = S, 4 = SW, 5 = NW
                Distance = distance travelled by the robot
 
@@ -33,11 +34,24 @@ class HexaMemory(HexaGrid):
                 y_base = tmp_cell.y
             
             ## ATTENTION TODO DEBUG : ça va merder quand on sort de la grille
-            self.apply_changes(cells_passed)
+            self.apply_changes_on_cells_passed(cells_passed)
             final_cell = self.get_neighbor_in_direction(x_base, y_base,direction)
 
         self.robotPos_x = final_cell.x
         self.robotPos_y = final_cell.y
 
-    def apply_changes(self, cells_passed):
+    def apply_phenomenon(self,phenomenon,pos_x,pos_y):
+        """Apply a phenomenon to the grid
+        Args : 
+            phenomenon : type of phenomenon (TODO: but should be things like "line", "unmovable object", "movable object", etc.)
+            pos_x, pos_y : position of the phenomenon (relative to the robot's position)
+        """
+        
+
+
+
+    def apply_changes_on_cells_passed(self, cells_passed):
+        """Apply changes on cells passed through by the robot i.e. change their state to "Free" 
+        """
+        cells_passed = [element.set_to("Free") for element in cells_passed]
         return None
