@@ -61,11 +61,11 @@ def hexaMemory_to_pyglet(hexaMemory,batch):
         for j in range(0, len(grid[0])):
             color_debug = (random.randint(0,255),random.randint(0,255),random.randint(0,255))
             cell = grid[i][j]
-            color = name_to_rgb("pink")
+            color = name_to_rgb("grey")
             if(cell.status == "Free"):
                 color = name_to_rgb("white")
             elif(cell.status == "Occupied"):
-                color = name_to_rgb("green")
+                color = name_to_rgb("lime")
             elif(cell.status == "Blocked"):
                 color = name_to_rgb("red")
 
@@ -99,7 +99,7 @@ def hexaMemory_to_pyglet(hexaMemory,batch):
             theta = math.radians(theta)
             point6 = [x1 + math.cos(theta)*radius, y1 + math.sin(theta)*radius]
 
-            hexagon = shapes.Polygon(point1, point2, point3, point4, point5, point6,color = color_debug, batch = batch)            
+            hexagon = shapes.Polygon(point1, point2, point3, point4, point5, point6,color = color, batch = batch)            
             shapesList.append(hexagon)
 
     return shapesList

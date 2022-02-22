@@ -7,9 +7,11 @@ class HexaMemory(HexaGrid):
         """
         super().__init__(width,height)
         self.cells_radius = cells_radius    
-        self.robotPos_x = self.width / 2
-        self.robotPos_y = self.height / 2
+        self.robotPos_x = self.width // 2
+        self.robotPos_y = self.height // 2
         self.robot_width = robot_width
+        print("DEBUG : Robot position at init of HEXAMEMORY : ",self.robotPos_x,self.robotPos_y)
+        self.grid[self.robotPos_x][self.robotPos_y].set_to("Occupied")
 
     def move(self, direction, distance):
         """Handle the movement of the robot in the HexaGrid : change position of the robot in the HexaGrid
@@ -23,22 +25,28 @@ class HexaMemory(HexaGrid):
 
         number_of_cells_travelled = 0
         number_of_cells_travelled = distance // (2*self.cells_radius)
+        final_cell = self.grid[self.robotPos_x][self.robotPos_y]
         if(number_of_cells_travelled > 0):
-            cells_passed.append(self.grid[x_base][y_base])
             x_base = self.robotPos_x
             y_base = self.robotPos_y
+            cells_passed.append(self.grid[x_base][y_base])
+            
             for i in range(number_of_cells_travelled-1):
                 tmp_cell = self.get_neighbor_in_direction(x_base, y_base,direction)
+                if(tmp_cell is None):
+                    break
                 cells_passed.append(tmp_cell)
                 x_base = tmp_cell.x
                 y_base = tmp_cell.y
             
             ## ATTENTION TODO DEBUG : ça va merder quand on sort de la grille
             self.apply_changes_on_cells_passed(cells_passed)
-            final_cell = self.get_neighbor_in_direction(x_base, y_base,direction)
-
-        self.robotPos_x = final_cell.x
-        self.robotPos_y = final_cell.y
+            final_cell_tmp = self.get_neighbor_in_direction(x_base, y_base,direction)
+            if(final_cell_tmp is not None):
+                final_cell = final_cell_tmp
+                self.robotPos_x = final_cell.x
+                self.robotPos_y = final_cell.y
+        final_cell.set_to("Occupied")
 
     def apply_phenomenon(self,phenomenon,pos_x,pos_y):
         """Apply a phenomenon to the grid
@@ -48,6 +56,8 @@ class HexaMemory(HexaGrid):
         """
         
 
+    def get_robot_pos(self):
+        return self.robotPos_x,self.robotPos_y
 
 
     def apply_changes_on_cells_passed(self, cells_passed):

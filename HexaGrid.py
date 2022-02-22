@@ -51,7 +51,14 @@ class HexaGrid:
         Return : HexaCell of the neighbor if it exists, otherwise None.
         """
 
-        dTab = [(0,2),(0,1),(0,-1),(0,-2),(-1,-1),(-1,1),(0,-2)]
+        
+        dTab_y_pair = [(0,2),(0,1),(0,-1),(0,-2),(-1,-1),(-1,1)]
+        dTab_y_impair = [(0,2),(1,1),(1,-1),(0,-2),(0,-1),(0,+1)]
+
+        if(y %2 == 0):
+            dTab = dTab_y_pair
+        else :
+            dTab = dTab_y_impair
         dx,dy = dTab[direction]
 
         x += dx
