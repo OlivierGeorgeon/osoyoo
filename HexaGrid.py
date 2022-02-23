@@ -34,7 +34,7 @@ class HexaGrid:
             output += "\n"
         return output
 
-    def getAllNeighbors(self,x,y):
+    def get_all_neighbors(self,x,y):
         output = []
         for i in range(6):
             tmp = self.get_neighbor_in_direction(x,y,i)
@@ -43,6 +43,14 @@ class HexaGrid:
 
         return output
 
+    def get_all_neighbors_with_direction(self,x,y):
+        output = []
+        for i in range(6):
+            tmp = self.get_neighbor_in_direction(x,y,i)
+            if not(tmp  == None):
+                output.append([tmp,i])
+
+        return output
 
     def get_neighbor_in_direction(self, x, y, direction):
         """Return the neighbor of the cell of coordinates x,y in the given direction 

@@ -3,6 +3,7 @@ from pyglet.gl import *
 from pyglet import shapes
 import math
 import time
+from Utils import hexaMemory_to_pyglet
 ZOOM_IN_FACTOR = 1.2
 
 
@@ -24,7 +25,7 @@ class HexaView(pyglet.window.Window):
     def set_ShapesList(self,s):
         self.shapesList = s
 
-    def refresh(self):
+    def refresh(self,memory):
         @self.event
         def on_close():
             self.close()
@@ -34,12 +35,15 @@ class HexaView(pyglet.window.Window):
         pyglet.clock.tick()
         self.clear()
         self.dispatch_events()
-        #self.extract_and_convert_phenomenons(memory)
+        self.extract_and_convert_phenomenons(memory)
         self.on_draw()
         # ...transform, update, create all objects that need to be rendered
         self.flip()
 
-    
+    def extract_and_convert_phenomenons(self,memory):
+        self.shapesList = hexaMemory_to_pyglet(memory,self.batch)
+
+
     def on_draw(self):
         """ Drawing the window """
         glClear(GL_COLOR_BUFFER_BIT)
