@@ -67,7 +67,7 @@ class HexaMemory(HexaGrid):
             print("Invalid rotation : ", rotation)
             return
         rotate_tab = [0,-1,1]
-        self.robot_orientation += rotate_tab[rotation]
+        self.robot_orientation = (self.robot_orientation + rotate_tab[rotation])%6
 
     def go_forward(self,distance):
         self.move(self.robot_orientation,distance)
@@ -87,7 +87,6 @@ class HexaMemory(HexaGrid):
 
 
 
-    def apply_movement(self,movement):
-        angle, distance = movement
-        if(action == 0):
-            self.go_forward
+    def apply_movement(self,rotation,distance):
+        self.rotate_robot(rotation)
+        self.go_forward(distance)

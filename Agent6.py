@@ -1,6 +1,6 @@
 from HexaMemory import HexaMemory
 from MemoryNew import MemoryNew
-
+import random
 
 class Agent6():
     """ The goal here is to create an agent that
@@ -28,8 +28,11 @@ class Agent6():
         if(len(unknown_neighbors) == 0):
             #jsp encore quoi faire ici
             print("AGENT 6 action() : no unknown neighbors")
-            return 0
+            return random.randint(0,2)
+        else :
+            print("Nb neighbors : " , len(unknown_neighbors))
         target, target_direction = unknown_neighbors[0][0], unknown_neighbors[0][1]
+        
         relative_direction = target_direction - self.hexa_memory.robot_orientation
         if(relative_direction < -3 ) :
             relative_direction += 6
@@ -38,12 +41,13 @@ class Agent6():
         
         action = 0
         match relative_direction :
-            case  -1,-2,-3 :
+            case  -1|-2|-3 :
                 action = 1
-            case 1,2,3 :
+            case 1|2|3 :
                 action = 2
             case 0 :
                 action = 0 
             case _:
                 print("AGENT 6 action() : invalid relative direction : ",  relative_direction)
+        return action
         

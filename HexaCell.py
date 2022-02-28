@@ -4,7 +4,8 @@ class HexaCell:
         self.x = x
         self.y = y
         self.status = "Unknown"  # Status : "Free" (when has been visited), "Occupied" (when robot is on it), "Blocked" (when object is on it), "Unknown" (when has not been visited)
-                              # "MovableObstacle"
+                              # "MovableObstacle" "Frontier"(when line) "Something"(when something echolocated) 
+        self.interactions = list()
 
     def __str__(self):
         return "(" + str(self.x)+','+str(self.y) + ")"

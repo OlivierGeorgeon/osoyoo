@@ -59,7 +59,8 @@ class HexaGrid:
         Return : HexaCell of the neighbor if it exists, otherwise None.
         """
 
-        
+        if(direction < 0 or direction > 5):
+            print("HexaGrid get neighbor_in_direction, invalid direction : ",direction)
         dTab_y_pair = [(0,2),(0,1),(0,-1),(0,-2),(-1,-1),(-1,1)]
         dTab_y_impair = [(0,2),(1,1),(1,-1),(0,-2),(0,-1),(0,+1)]
 

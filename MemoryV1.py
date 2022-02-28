@@ -7,8 +7,8 @@ class MemoryV1(MemoryNew):
     Author : TKnockaert
     """
 
-    def __init__(self,view):
-        super().__init__(view)
+    def __init__(self):
+        super().__init__()
 
     def tick(self):
         super().tick()

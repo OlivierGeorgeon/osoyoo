@@ -17,10 +17,9 @@ class MemoryNew:
     Author: TKnockaert
     """
 
-    def __init__(self,view):
+    def __init__(self):
         self.phenomenons = []
-        self.view = view
-        self.batch = view.batch
+        self.yaw = 0
 
 
     def add(self,phenom_info):
@@ -78,12 +77,12 @@ class MemoryNew:
 
         # interaction avec durability >= 0
 
-    def move(self, rotation, translation):
+    def move(self, rotation, translation,yaw = 0):
     # The displacement matrix of this interaction
         translation_matrix = matrix44.create_from_translation([-translation[0], -translation[1], 0])
         rotation_matrix = matrix44.create_from_z_rotation(math.radians(rotation))
         displacement_matrix = matrix44.multiply(rotation_matrix, translation_matrix)
-
+        self.yaw = yaw
         # Translate and rotate all the phenomena
         for p in self.phenomenons:
             p.displace(displacement_matrix)

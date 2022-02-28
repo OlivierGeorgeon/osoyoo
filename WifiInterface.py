@@ -8,7 +8,10 @@ import RobotDefine
 # UDP_IP = "10.40.22.254" # STA RobotBSN -
 # UDP_IP = "10.44.53.11"  # STA RobotBSN - Olivier's Robot in A485
 # UDP_IP = "10.44.53.13"  # STA RobotBSN - UCLy's Robot in A485
-UDP_IP = "10.40.23.0"  # STA RobotBSN - A327
+#UDP_IP = "10.40.23.0"  # STA RobotBSN - A327
+UDP_IP = "10.40.22.13"  # STA RobotBSN - A327
+
+
 
 
 UDP_TIMEOUT = 5  # Seconds
