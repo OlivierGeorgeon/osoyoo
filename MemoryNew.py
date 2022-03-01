@@ -1,7 +1,7 @@
 import pyglet
 from pyglet.gl import *
 from pyglet import shapes
-from Interaction import *
+from Interaction import Interaction
 from webcolors import name_to_rgb
 from Utils import rotate
 import math

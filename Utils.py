@@ -68,6 +68,8 @@ def hexaMemory_to_pyglet(hexaMemory,batch):
                 color = name_to_rgb("lime")
             elif(cell.status == "Blocked"):
                 color = name_to_rgb("red")
+            elif(cell.status == "Frontier"):
+                color = name_to_rgb("black")
 
             x1 = x0
             y1 = y0

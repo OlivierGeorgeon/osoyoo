@@ -1,5 +1,6 @@
 class HexaCell:
-
+    """This
+    """
     def __init__(self,x,y):
         self.x = x
         self.y = y
@@ -12,7 +13,9 @@ class HexaCell:
 
 
     def set_to(self,status):
-        if(status == "Occupied" or status == "Free" or status == "Blocked" or status == "Unknown"): 
+        """Change the cell status, print an error if the status is invalid.
+        """
+        if(status == "Occupied" or status == "Free" or status == "Blocked" or status == "Unknown" or status == "Line" or status == "Something"): 
             self.status = status
         else :
             print("Unknown status, existing status : \"Free\" (when has been visited), \"Occupied\" (when robot is on it), \"Blocked\" (when object is on it), \"Unknown\" (when has not been visited)")

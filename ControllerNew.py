@@ -1,19 +1,21 @@
 import json
+import math
+import threading
+from Agent5 import Agent5
 from MemoryV1 import MemoryV1
 from RobotDefine import *
-import threading
 from WifiInterface import WifiInterface
-from Phenomenon import Phenomenon
-import math
 from OsoyooCar import OsoyooCar
 from EgoMemoryWindowNew import EgoMemoryWindowNew
-import pyglet
-from pyrr import matrix44
-from Interaction import *
-from MemoryNew import *
-from Agent5 import *
 
-import time
+
+
+#from Phenomenon import Phenomenon
+#import time
+#import pyglet
+#from pyrr import matrix44
+#from Interaction import Interaction
+#from MemoryNew import MemoryNew
 
 
 class ControllerNew:
@@ -133,12 +135,16 @@ class ControllerNew:
     ################################################# SPECIFIC TASKS #################################################################
 
     def translate_agent_action_to_robot_command(self,action):
-        command = action
+        """ Translate the agent action to robot commands
+        """
         # 0-> '8', 1-> '1', 2-> '3'
         commands = ['8', '1', '3']
         return commands[action]
 
     def translate_robot_data(self,data): #PAS FINITO ?
+        """Translate data from the robot to data usable
+        by the model
+        """
         angle = 0
         outcome_for_agent = 0
         phenom_info = (0,0,0,0,None,None)
@@ -152,7 +158,7 @@ class ControllerNew:
         y = None
         json_outcome = json.loads(self.outcome_bytes)
 
-        """ Updating the model from the latest received outcome """
+        # Updating the model from the latest received outcome
         outcome = json.loads(data)
         floor = 0
         if 'floor' in outcome:
@@ -242,9 +248,14 @@ class ControllerNew:
         angle = rotation
         return  phenom_info, angle, translation, outcome_for_agent
         
-    """################################################# LOOP #################################################################"""
+    ################################################# LOOP #################################################################"""
 
     def loop(self): #NOT IMPLEMENTED: Change of behavior when user interact with view
+        """ Main loop of the controller
+            It has the responsibility to update all the system
+            i.e. ask the decider for an action and apply all changes
+            to the system
+        """
         print("DEBUG CONTROLLER LOOP, 1")
         self.action = self.ask_agent_for_action(self.outcome) # agent -> decider
         print("DEBUG CONTROLLER LOOP, 2")
@@ -266,7 +277,7 @@ class ControllerNew:
         print("DEBUG CONTROLLER LOOP, 8")
         self.send_position_change_to_memory(angle,translation) #Might be an order problem between this line and the one under it, depending on
         print("DEBUG CONTROLLER LOOP, 9")
-        self.send_phenom_info_to_memory(phenom_info)                  # when the robot detect interaction (before or after moving)
+        self.send_phenom_info_to_memory(phenom_info) # when the robot detect interaction (before or after moving)
         print("DEBUG CONTROLLER LOOP, 10")
         user_interaction = None
         user_interaction = self.ask_view_to_refresh_and_get_last_interaction_from_user(self.memory)
@@ -277,7 +288,7 @@ class ControllerNew:
 
 if __name__ == "__main__":
     view = EgoMemoryWindowNew()
-    memory = MemoryV1(view)
+    memory = MemoryV1()
     agent = Agent5()
     controller = ControllerNew(view,agent,memory)
     for i in range(10000):

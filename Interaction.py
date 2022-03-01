@@ -7,14 +7,14 @@ class Interaction:
     Author: TKnockaert
     """
 
-    def __init__(self,x,y,width = 50, height = 50, type = 'None',shape = 0,color = 'green',durability = 10,decayIntensity = 1, starArgs = None):
+    def __init__(self,x,y,width = 50, height = 50, type = 'None',shape = 'Circle',color = 'green',durability = 10,decayIntensity = 1, starArgs = None):
         """Create an object to be placed in the memory.
 
         Args:
         x : horizontal position on the matrix.
         y : vertical position on the matrix.
         type : type of phenomenons (i.e. Chock, Block, Echolocalisation, Line etc)
-        shape : shape of the phenomenon when draw with pyglet 0 = Circle, 1 = Red Dash, 2 = Triangle
+        shape : shape of the phenomenon when draw with pyglet 'Circle', 'Rectangle', 'Star'
         durability : durability of the object, when it reach zero the object should be removed from the memory.
         decayIntensity : represent how much is removed from durability at each iteraction.
 
@@ -68,3 +68,48 @@ class Interaction:
         v = matrix44.apply_to_vector(displacement_matrix, [self.x, self.y, 0])
         self.x, self.y = v[0], v[1]
         # TO CHECK : Shape should rotate automaticly, mb, I think, idk
+
+
+
+    ################## PRE-DONE interactions ########################
+    def red_line(self, x, y) :
+        """Change the Interaction to match :
+        Interaction(150,0,20,60,type = 'Line', shape = 'Rectangle', color= 'red', durability = 10, decayIntensity = 1)
+        """        
+        self.type = 'Line'
+        self.shape = 'Rectangle'
+        self.color = 'red'
+        self.durability = 10
+        self.decayIntensity = 1
+        self.x = x
+        self.y = y
+        self.width = 20
+        self.height = 60
+        return self
+    def green_circle(self, x, y) :
+        """Change the Interaction to match :
+       obstacleInter = Interaction(x,y,width = 50,type = 'obstacle', shape = 'Circle', color = 'green', durability = 10, decayIntensity = 1)
+        """        
+        self.type = 'obstacle'
+        self.shape = 'Circle'
+        self.color = 'green'
+        self.durability = 10
+        self.decayIntensity = 1
+        self.x = x
+        self.y = y
+        self.width = 50
+        return self
+    def yellow_star(self, x, y):
+        """Change the Interaction to match :
+                Interaction(110,0,20,60, type = 'shock', shape = 'Star',color = 'yellow', durability = 10, decayIntensity = 1, starArgs = 5)
+        """
+        self.type = 'obstacle'
+        self.shape = 'Circle'
+        self.color = 'green'
+        self.durability = 10
+        self.decayIntensity = 1
+        self.x = x
+        self.y = y
+        self.width = 20
+        self.height = 60
+        return self
