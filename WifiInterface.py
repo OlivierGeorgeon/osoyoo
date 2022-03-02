@@ -3,13 +3,7 @@ import keyboard
 import time
 import RobotDefine
 
-# UDP_IP = "192.168.4.1"  # AP mode
-# UDP_IP = "192.168.1.15"  # STA chezOlivier
-UDP_IP = "10.40.22.251"  # STA RobotBSN - Olivier's Robot in A301
-# UDP_IP = "10.40.22.254" # STA RobotBSN -
-# UDP_IP = "10.44.53.11"  # STA RobotBSN - Olivier's Robot in A485
-# UDP_IP = "10.44.53.13"  # STA RobotBSN - UCLy's Robot in A485
-# UDP_IP = "10.25.180.81"  # STA RobotBSN - A327
+
 
 
 UDP_TIMEOUT = 5  # Seconds
@@ -27,25 +21,17 @@ class WifiInterface:
         self.socket.settimeout(self.udpTimeout)
         # self.socket.connect((UDP_IP, UDP_PORT))  # Not necessary
 
-
-'''Send the action. Return the outcome'''
+    '''Send the action. Return the outcome'''
     def enact(self, action):
         """ Sending the action string, waiting for the outcome, and returning the outcome bytes """
         outcome = b'{"status":"T"}'  # Default status T if timeout
-        print("sending " + action)
-        self.socket.sendto(bytes(action, 'utf-8'), (self.IP, self.port))
+        print("sending " + str(action))
+        self.socket.sendto(bytes(str(action).replace("'", '"'), 'utf-8'), (self.IP, self.port))
         try:
             outcome, address = self.socket.recvfrom(512)
         except socket.error as error:  # Time out error when robot is not connected
             print(error)
         return outcome
-
-
-
-
-    
-
-
 
 def onkeypress(event):
     print("Send:", event.name)
