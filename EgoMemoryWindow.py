@@ -41,7 +41,7 @@ class ModalWindow(pyglet.window.Window):
 
 
 class EgoMemoryWindow(pyglet.window.Window):
-    def __init__(self, ip="192.168.4.1", port=8888, udpTimeout=3, *args, **kwargs):
+    def __init__(self, ip="192.168.4.1", port=8888, udpTimeout=6, *args, **kwargs):
         super().__init__(400, 400, resizable=True, *args, **kwargs)
         self.set_caption("Egocentric Memory")
         self.set_minimum_size(150, 150)
@@ -83,6 +83,9 @@ class EgoMemoryWindow(pyglet.window.Window):
                 self.height * self.zoom_level, 1, -1)
 
         # Stack the rotation of the world so the robot's front is up
+
+        #glRotatef(90, 0.0, 0.0, 1.0) #mettre le Azimuth
+
         #glRotatef(90, 0.0, 0.0, 1.0) #360
 
         # Draw the robot and the phenomena
@@ -146,7 +149,7 @@ class EgoMemoryWindow(pyglet.window.Window):
             self.robot.rotate_head(head_angle)
 
         if 'yaw' in outcome:
-            rotation = outcome['yaw']
+            rotation = float(outcome['yaw'])
 
         if 'echo_distance' in outcome and 'head_angle' in outcome:
             echo_distance = float(outcome['echo_distance'])
@@ -227,11 +230,7 @@ class EgoMemoryWindow(pyglet.window.Window):
 
 
 if __name__ == "__main__":
-    #ip_ = "192.168.4.1"  # AP mode
-    # ip_ = "192.168.1.19"  # STA mode sur Olivier's wifi
-    ip_ = "10.40.22.251" # STA sur RobotBSN Olivier's Robot
-    # ip_ = "?" #IP du robot 2 STA sur RobotBSN
-    #ip_ = "10.40.22.254" #IP du robot 1 STA sur RobotBSN
+    ip_ = "10.40.22.255"
     em_window = EgoMemoryWindow(ip=ip_)
     # em_window.actionLoop(10)
     # clock.schedule_interval(em_window.actionLoopInterprete, 5)

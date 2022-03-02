@@ -26,22 +26,6 @@ void go_forward(int speed) // faire avancer le robot
 {
   setMotion(speed,speed,speed,speed);
 }
-
-/*void turn_degrees(int speed, int deg)
-{
-    if(deg > 0){
-    while (getAngleZ() < deg)
-    {
-        setMotion(0,0,speed,speed);
-    }
-    }else{
-    while (getAngleZ() > deg)
-    {
-        setMotion(speed,speed,0,0);
-    }
-    }
-}*/
-
 void  go_back(int speed)//faire reculer le robot 
 {
   setMotion(-speed,-speed,-speed,-speed);
@@ -64,11 +48,9 @@ void FL(int speed)  //Rotation de la roue avant gauche
       digitalWrite(LeftMotorDirPin1,LOW);
       digitalWrite(LeftMotorDirPin2,HIGH);
       analogWrite(speedPinL,speed);
-
   }
   else 
   {
-
       digitalWrite(LeftMotorDirPin1,HIGH);
       digitalWrite(LeftMotorDirPin2,LOW);
       analogWrite(speedPinL,-speed);
