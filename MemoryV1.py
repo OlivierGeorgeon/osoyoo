@@ -14,6 +14,6 @@ class MemoryV1(MemoryNew):
         super().tick()
         to_remove = []
         for p in self.phenomenons :
-            if(p.durability >= 0):
+            if(p.actual_durability <= 0):
                 to_remove.append(p)
         self.phenomenons = [x for x in self.phenomenons if x not in to_remove]
