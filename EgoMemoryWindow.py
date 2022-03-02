@@ -20,7 +20,7 @@ class ModalWindow(pyglet.window.Window):
         super(ModalWindow, self).__init__(width=100, height=100, resizable=True)
 
         self.label = pyglet.text.Label('Appuyer sur "O" pour confirmer la suppression', font_name='Times New Roman',
-        font_size=36,x= 200, y= 160 )
+                                       font_size=36, x=200, y=160)
         self.label.anchor_position = 100, 80
         self.phenomena = phenomena
 
@@ -95,7 +95,6 @@ class EgoMemoryWindow(pyglet.window.Window):
         glMultMatrixf(self.environment_matrix)
         self.origin.draw()  # Draw the origin of the robot
 
-
     def on_mouse_press(self,x, y, button, modifiers):
         w, h = self.get_size()
         deltaX = x - (w/2)
@@ -155,12 +154,35 @@ class EgoMemoryWindow(pyglet.window.Window):
         if 'echo_distance' in outcome and 'head_angle' in outcome:
             echo_distance = float(outcome['echo_distance'])
             print(F"Echo distance {echo_distance}")
-            x = self.robot.head_x + math.cos(math.radians(head_angle - 90)) * echo_distance
-            y = self.robot.head_y + math.sin(math.radians(head_angle - 90)) * echo_distance
+            x = self.robot.head_x + math.cos(math.radians(head_angle)) * echo_distance
+            y = self.robot.head_y + math.sin(math.radians(head_angle)) * echo_distance
             obstacle = Phenomenon(x, y, self.batch)
             self.phenomena.append(obstacle)
 
-            # ----------------------------------------------------- #
+
+        #détecter la ligne noire
+        if 'floor' in outcome:
+            floor = int(outcome['floor'])
+            print(f"Floor {floor}")
+
+            if floor:
+                line = Phenomenon(150, 0, self.batch, 1)
+                self.phenomena.append(line)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             # ----------------------------------------------------- #
             #    if not 'echo_distance' in outcome:
             #         echo_distance = random.randint(0, 300)
@@ -170,12 +192,14 @@ class EgoMemoryWindow(pyglet.window.Window):
             #         y = self.robot.head_y + math.sin(math.radians(head_angle)) * echo_distance
             #         obstacle = Phenomenon(x, y, self.batch)
             #         self.phenomena.append(obstacle)
+            # ----------------------------------------------------- #
 
 
 
         for p in self.phenomena:
-            p.translate(translation)
-            p.rotate(-rotation)
+            pass
+            # p.translate(translation)
+            # p.rotate(-rotation)
 
         glLoadIdentity()
         glTranslatef(translation[0], translation[1], 0)
@@ -206,13 +230,7 @@ class EgoMemoryWindow(pyglet.window.Window):
 
 
 if __name__ == "__main__":
-    # ip_ = "192.168.4.1"  # AP mode
-    #ip_ = "192.168.4.1"  # AP mode
-    # ip_ = "192.168.1.19"  # STA mode sur Olivier's wifi
-    #ip_ = "10.40.22.251" # STA sur RobotBSN Olivier's Robot
     ip_ = "10.40.22.255"
-    # ip_ = "?" #IP du robot 2 STA sur RobotBSN
-    # ip_ = "10.40.22.254" #IP du robot 1 STA sur RobotBSN
     em_window = EgoMemoryWindow(ip=ip_)
     # em_window.actionLoop(10)
     # clock.schedule_interval(em_window.actionLoopInterprete, 5)

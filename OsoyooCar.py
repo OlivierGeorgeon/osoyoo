@@ -26,5 +26,5 @@ class OsoyooCar:
         self.azimuth = 0
 
     def rotate_head(self, head_angle):
-        self.head_angle = int(head_angle) - 90
+        self.head_angle = int(head_angle)
         self.robotHead.rotation = -self.head_angle  # head_angle is trigonometric while rotation is clockwise
