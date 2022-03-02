@@ -103,9 +103,9 @@ class Interaction:
         """Change the Interaction to match :
                 Interaction(110,0,20,60, type = 'shock', shape = 'Star',color = 'yellow', durability = 10, decayIntensity = 1, starArgs = 5)
         """
-        self.type = 'obstacle'
-        self.shape = 'Circle'
-        self.color = 'green'
+        self.type = 'Shock'
+        self.shape = 'Star'
+        self.color = 'yellow'
         self.durability = 10
         self.decayIntensity = 1
         self.x = x

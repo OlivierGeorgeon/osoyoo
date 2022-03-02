@@ -41,6 +41,7 @@ class EgoMemoryWindowNew(pyglet.window.Window):
 
 
     def refresh(self,memory):
+        #print("oh")
         @self.event
         def on_close():
             self.close()
@@ -51,8 +52,7 @@ class EgoMemoryWindowNew(pyglet.window.Window):
 
         pyglet.clock.tick()
         self.clear()
-        self.dispatch_events()
-
+        self.dispatch_events() #TODO: comprendre pourquoi ça bloque tout
         self.extract_and_convert_phenomenons(memory)
         self.on_draw()
         # ...transform, update, create all objects that need to be rendered

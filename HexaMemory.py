@@ -1,5 +1,10 @@
-from HexaGrid import *
+from HexaGrid import HexaGrid
 class HexaMemory(HexaGrid):
+    """Hexa memory is an allocentric memory, made with an hexagonal grid.
+    You can find informations on the hexagonal grid coordinates system in the docs
+    folder.
+    """
+
     def __init__(self,width,height,cells_radius = 50, robot_width = 200):
         """Construct the HexaMemory of the robot, child class of HexaGrid
         with the addition of the robot at the center of the grid and a link between the
@@ -61,13 +66,10 @@ class HexaMemory(HexaGrid):
 
         :Parameters:
             `rotation` : int
-                Use the same coding as the agents actions so 0 : no rotation, 1 : rotate left, 2 : rotate right
+                Degrees
         """
-        if(rotation < 0 or rotation > 2):
-            print("Invalid rotation : ", rotation)
-            return
-        rotate_tab = [0,-1,1]
-        self.robot_orientation = (self.robot_orientation + rotate_tab[rotation])%6
+        rotation =int( (rotation / 60 )% 6)
+        self.robot_orientation = (self.robot_orientation + rotation)%6
 
     def go_forward(self,distance):
         self.move(self.robot_orientation,distance)
