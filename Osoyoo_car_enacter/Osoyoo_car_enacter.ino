@@ -41,6 +41,7 @@ char action = ' ';
 unsigned long endTime = 0;
 int actionStep = 0;
 float somme_gyroZ = 0;
+int floorOutcome = 0;
 
 void setup()
 {
@@ -94,43 +95,47 @@ void loop()
 
     switch (action)    //serial control instructions
     {  
-      case '$':outcome.addValue("distance", (String) head.distUS.dist());break;
       case '8':go_forward(SPEED);break;
       case '4':left_turn(SPEED);break;
       case '6':right_turn(SPEED);break;
       case '2':go_back(SPEED);break;
       case '5':stop_Stop();break;
       case '0':until_line(SPEED);break;
-      case 'D':outcome.addValue("distance", (String) head.distUS.dist());break;
-      case 'S': head.scan(0, 180, 9, 0);
-                outcome.addValue("distance", (String) head.distUS.dist());
-                outcome.addValue("head_angle", (String) head.angle_actuelle);             
-      break;
-        default:break;
-      }
+      case 'D':outcome.addValue("echo_distance", (String) head.distUS.dist());break;
+      case 'S': head.scan(0, 180, 9, 0);break;               
+      default:break;
     }
-    if ( tracking()) // la fonction renvoi true si elle capte une ligne noir
-    {
-      stop_Stop();
-      go_back(SPEED);//recule
-      actionStep = 1;
-      endTime = millis() + 1000; //1sec
-    }
-    if ((endTime < millis()) && (actionStep == 1))
-    {
-      stop_Stop();
-
-      //Send outcome to PC
-      // renvoi JSON du degres de mouvement
-      outcome.addValue( "gyroZ", (String) (gyroZ()));
-      //renvoi JSON du azimut
-      outcome.addValue( "compass", (String) (degreesNorth()));
-      wifiBot.sendOutcome(outcome.get());
-      outcome.clear();
-      actionStep = 0;
-    }
-    if(actionStep == 0)
-    {
-        reset_gyroZ(); //calibrer l'angle Z à 0 tant qu'il n'a pas fait d'action
-    }
+  }
+  
+  if ( tracking()) // la fonction renvoi true si elle capte une ligne noir
+  {
+    stop_Stop();
+    floorOutcome = 3;
+    go_back(SPEED);//recule
+    actionStep = 1;
+    endTime = millis() + 1000; //1sec
+  }
+  
+  if ((endTime < millis()) && (actionStep == 1))
+  {
+    stop_Stop();
+    
+    //Send outcome to PC
+    // renvoi JSON du degres de mouvement
+    outcome.addValue("echo_distance", (String) head.distUS.dist());
+    outcome.addValue("head_angle", (String) head.angle_actuelle);
+    outcome.addValue( "yaw", (String) (gyroZ()));
+    outcome.addValue( "floor", (String) floorOutcome);
+    outcome.addValue( "status", (String) floorOutcome);
+    //renvoi JSON du azimut
+    outcome.addValue( "compass", (String) (degreesNorth()));
+    wifiBot.sendOutcome(outcome.get());
+    outcome.clear();
+    actionStep = 0;
+    floorOutcome = 0;
+  }
+  if(actionStep == 0)
+  {
+      reset_gyroZ(); //calibrer l'angle Z à 0 tant qu'il n'a pas fait d'action
+  }
 }
