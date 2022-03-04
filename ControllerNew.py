@@ -292,7 +292,6 @@ class ControllerNew:
                     translation[0] = STEP_FORWARD_DISTANCE * forward_duration/1000 - RETREAT_DISTANCE  # To be adjusted
             angle = rotation
 
-
             # Check for collision when moving forward
             if self.action == "8" and floor == 0:
                 if blocked:
