@@ -111,12 +111,12 @@ void Omny_wheel_motion::frontRightWheel(int speed)
     // Forward
     digitalWrite(RightMotorDirPin1,LOW);
     digitalWrite(RightMotorDirPin2,HIGH);
-    analogWrite(speedPinR,speed);
+    analogWrite(speedPinR,speed * ROBOT_FRONT_RIGHT_WHEEL_COEF);
   } else {
     // Backward
     digitalWrite(RightMotorDirPin1,HIGH);
     digitalWrite(RightMotorDirPin2,LOW);
-    analogWrite(speedPinR,-speed);
+    analogWrite(speedPinR,-speed * ROBOT_FRONT_RIGHT_WHEEL_COEF);
   }
 }
 void Omny_wheel_motion::frontLeftWheel(int speed)
@@ -125,12 +125,12 @@ void Omny_wheel_motion::frontLeftWheel(int speed)
     // Forward
     digitalWrite(LeftMotorDirPin1,LOW);
     digitalWrite(LeftMotorDirPin2,HIGH);
-    analogWrite(speedPinL,speed);
+    analogWrite(speedPinL,speed * ROBOT_FRONT_LEFT_WHEEL_COEF);
   } else {
     // Backward
     digitalWrite(LeftMotorDirPin1,HIGH);
     digitalWrite(LeftMotorDirPin2,LOW);
-    analogWrite(speedPinL,-speed);
+    analogWrite(speedPinL,-speed * ROBOT_FRONT_LEFT_WHEEL_COEF);
   }
 }
 void Omny_wheel_motion::rearRightWheel(int speed)
