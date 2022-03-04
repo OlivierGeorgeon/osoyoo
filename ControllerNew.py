@@ -51,7 +51,7 @@ class ControllerNew:
             - Receive Datas from the robot
     """
 
-    def __init__(self, view, agent, memory, synthesizer = None, hexa_memory = None, hexaview = None):
+    def __init__(self,  agent, memory, view = None, synthesizer = None, hexa_memory = None, hexaview = None):
         # View
         self.view = view
         self.agent = agent
@@ -66,7 +66,8 @@ class ControllerNew:
         self.outcome = 0
         self.enact_step = 0
         self.action = ""
-        self.robot = OsoyooCar(self.view.batch)
+        if self.view is not None:
+            self.robot = OsoyooCar(self.view.batch)
         """    
         # Model
         
@@ -101,12 +102,13 @@ class ControllerNew:
 
         while(self.enact_step < 2):   # refresh la vue tant que pas de reponses de command_robot 
             #print("oooooooo")
-            #self.view.refresh(self.memory) # TODO: camerde
+            if self.view is not None:
+                self.view.refresh(self.memory) # TODO: camerde
             #print("ok")
             if self.hexa_memory is not None :
                 ""
                 #print("ksss") 
-                #self.hexaview.refresh(self.hexa_memory)  # TODO: camerde
+                self.hexaview.refresh(self.hexa_memory)  # TODO: camerde
                 #print("kss")
 
             #print("aaaaaa")
@@ -123,7 +125,8 @@ class ControllerNew:
         self.send_phenom_info_to_memory(phenom_info) # when the robot detect interaction (before or after moving)
         print("DEBUG CONTROLLER LOOP, 10")
         user_interaction = None
-        #user_interaction = self.ask_view_to_refresh_and_get_last_interaction_from_user(self.memory)
+        if self.view is not None:
+            user_interaction = self.ask_view_to_refresh_and_get_last_interaction_from_user(self.memory)
         print("DEBUG CONTROLLER LOOP, 11")
         self.memory.tick()
 
@@ -133,7 +136,7 @@ class ControllerNew:
             self.ask_synthetizer_to_act()
         if self.hexaview is not None :
             ""
-            #self.ask_hexaview_to_refresh(self.hexa_memory)
+            self.ask_hexaview_to_refresh(self.hexa_memory)
         return self.outcome,user_interaction
     
     ################################################# AGENT RELATED #################################################################
@@ -170,6 +173,8 @@ class ControllerNew:
         """
         self.hexa_memory.rotate_robot(angle)
         distance = int(math.sqrt(translation[0]**2 + translation[1]**2 ) )
+        print("translation = ", translation,
+            " distance = ", distance)
         self.hexa_memory.go_forward(distance)
     ################################################# VIEW RELATED #################################################################
     def ask_view_to_refresh_and_get_last_interaction_from_user(self,memory):
@@ -311,9 +316,10 @@ class ControllerNew:
                 if self.action == "-" or self.action == "*" or self.action == "1" or self.action == "3":
                     # Create a new echo phenomenon
                     echo_distance = outcome['echo_distance']
-                    if echo_distance > 0:  # echo measure 0 is false measure
-                        x = self.robot.head_x + math.cos(math.radians(head_angle)) * echo_distance
-                        y = self.robot.head_y + math.sin(math.radians(head_angle)) * echo_distance
+                    if echo_distance > 0 :  # echo measure 0 is false measure
+                        if self.view is not None:
+                            x = self.robot.head_x + math.cos(math.radians(head_angle)) * echo_distance
+                            y = self.robot.head_y + math.sin(math.radians(head_angle)) * echo_distance
                         obstacle = 1
             #TODO
             """ # Update the azimuth 
