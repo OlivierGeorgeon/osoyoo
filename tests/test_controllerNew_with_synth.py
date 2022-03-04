@@ -12,12 +12,12 @@ from ControllerNew import ControllerNew
 from Agent6 import Agent6
 if __name__ == '__main__':
     memory = MemoryV1()
-    hexaMemory = HexaMemory(30,30,cells_radius = 20)
+    hexaMemory = HexaMemory(30,60,cells_radius = 20)
     agent = Agent6(memory,hexaMemory)
     synthesizer = Synthesizer(memory, hexaMemory)
-    view = EgoMemoryWindowNew()
+
     hexaview = HexaView()
-    controller  = ControllerNew(view,agent,memory,synthesizer = synthesizer,
+    controller  = ControllerNew(agent,memory,synthesizer = synthesizer,
                  hexa_memory = hexaMemory, hexaview = hexaview)
     while (True):
         controller.loop()
