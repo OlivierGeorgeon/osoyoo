@@ -87,11 +87,11 @@ class Controller:
             translation = [0, 0]
             rotation = 0
             if self.action == "1":
-                rotation = 45
+                rotation = 60
             if self.action == "2":
                 translation[0] = -STEP_FORWARD_DISTANCE
             if self.action == "3":
-                rotation = -45
+                rotation = -60
             if self.action == "4":
                 translation[1] = SHIFT_DISTANCE
             if self.action == "6":
