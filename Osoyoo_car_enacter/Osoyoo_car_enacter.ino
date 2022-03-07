@@ -9,7 +9,8 @@
  * 
  */
 #include "omny_wheel_motion.h"
-#include "tracking.h"
+#include "LightSensor.h"
+LightSensor ls;
 
 
 #define WifiMode "R"        //Définir le mode de wifi du robot, 'R' pour routeur et 'W' pour la connexion au robot
@@ -60,8 +61,8 @@ void setup()
     wifiBot.wifiInitRouter();
   }
 
-  mpu_setup();
-  compass_setup();
+  // mpu_setup();
+  // compass_setup();
 
   //Exemple: da.setDelayAction(2000, [](){Serial.println("ok tout les 2s");}, millis());
   //da.setDelayAction(5000, distances_loop(angle_tete_robot, distance_objet_proche), millis());
@@ -72,7 +73,7 @@ void loop()
   da.checkDelayAction(millis());
   
   int packetSize = wifiBot.Udp.parsePacket();
-  gyro_update();
+  // gyro_update();
 
   if (packetSize) { // if you get a client,
     Serial.print("Received packet of size ");
@@ -100,17 +101,17 @@ void loop()
       case '6':right_turn(SPEED);break;
       case '2':go_back(SPEED);break;
       case '5':stop_Stop();break;
-      case '0':until_line(SPEED);break;
+      case '0':ls.until_line(SPEED);break;
       case 'D':outcome.addValue("echo_distance", (String) head.distUS.dist());break;
       case 'S': head.scan(0, 180, 9, 0);break;               
       default:break;
     }
   }
   
-  if ( tracking()) // la fonction renvoi true si elle capte une ligne noir
+  if (ls.tracking() > 0) // la fonction renvoi true si elle capte une ligne noir
   {
     stop_Stop();
-    floorOutcome = 3;
+    floorOutcome = ls.tracking();
     go_back(SPEED);//recule
     actionStep = 1;
     endTime = millis() + 1000; //1sec
@@ -124,11 +125,11 @@ void loop()
     // renvoi JSON du degres de mouvement
     outcome.addValue("echo_distance", (String) head.distUS.dist());
     outcome.addValue("head_angle", (String) head.angle_actuelle);
-    outcome.addValue( "yaw", (String) (gyroZ()));
+    // outcome.addValue( "yaw", (String) (gyroZ()));
     outcome.addValue( "floor", (String) floorOutcome);
     outcome.addValue( "status", (String) floorOutcome);
     //renvoi JSON du azimut
-    outcome.addValue( "compass", (String) (degreesNorth()));
+    // outcome.addValue( "compass", (String) (degreesNorth()));
     wifiBot.sendOutcome(outcome.get());
     outcome.clear();
     actionStep = 0;
@@ -136,6 +137,6 @@ void loop()
   }
   if(actionStep == 0)
   {
-      reset_gyroZ(); //calibrer l'angle Z à 0 tant qu'il n'a pas fait d'action
+      // reset_gyroZ(); //calibrer l'angle Z à 0 tant qu'il n'a pas fait d'action
   }
 }
