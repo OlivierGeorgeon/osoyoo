@@ -13,7 +13,8 @@ print("Control mode: MANUAL")
 
 def main():
     """ Controlling the robot with Agent5 """
-    emw = EgoMemoryWindow()
+    ip_ = "10.40.22.255"
+    emw = EgoMemoryWindow(ip=ip_)
     controller = Controller(emw)
     agent = Agent5()
 

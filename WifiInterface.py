@@ -13,7 +13,7 @@ if RobotDefine.ROBOT_ID == 0:
 
 
 class WifiInterface:
-    def __init__(self, ip="192.168.4.1", port=8888, udpTimeout=4):
+    def __init__(self, ip="10.40.22.255", port=8888, udpTimeout=4):
         self.IP = ip
         self.port = port
         self.udpTimeout = udpTimeout
