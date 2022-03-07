@@ -1,6 +1,5 @@
 import math
-from turtle import distance
-
+import time
 
 class Cell():
     """Cell used in the World class."""
@@ -15,7 +14,7 @@ class World():
     `Author : `TKnockaert
     """
 
-    def __init__(self,width,height,cell_size = 5):
+    def __init__(self,width,height,cell_size = 5, robot_width = 50, robot_height = 50):
         self.width = width
         self.height = height
         self.cell_size = cell_size
@@ -28,8 +27,8 @@ class World():
         self.x_robot = width//2
         self.y_robot = height//2
         self.robot_angle = 0
-        self.robot_width = 200
-        self.robot_height = 200
+        self.robot_width = robot_width
+        self.robot_height = robot_height
         self.add_object(self.x_robot,self.y_robot,
                         self.robot_width,self.robot_height,'Robot')
 
@@ -96,7 +95,7 @@ class World():
                     removed_count += 1
         return error, removed_count
 
-    def rotate_robot(self,rotation):
+    def rotate_robot(self,rotation,robot_points):
         """Rotate the robot in the world.
         Return the real rotation that happened (i.e. if the robot hit something while rotating)
 
@@ -108,20 +107,22 @@ class World():
         """
         ROTATION_STEP = math.radians(5)
         real_rotation = 0
-        x_min = self.x_robot - self.robot_width//2
-        x_max = self.x_robot + self.robot_width//2
-        y_min = self.y_robot - self.robot_height//2
-        y_max = self.y_robot + self.robot_height//2
+        x_min = int(self.x_robot - self.robot_width//2)
+        x_max = int(self.x_robot + self.robot_width//2)
+        y_min = int(self.y_robot - self.robot_height//2)
+        y_max = int(self.y_robot + self.robot_height//2)
         rotation_start = math.radians(self.robot_angle)
         rotation_end = rotation_start + math.radians(rotation)
         tmp_endpoints = []
         end_endpoints = []
+        if(rotation_start == rotation_end):
+            end_endpoints = robot_points
         outcome = 0
         while (rotation_start != rotation_end) :
             step = ROTATION_STEP
             if(rotation_end - rotation_start < ROTATION_STEP):
                 step = rotation_end - rotation_start
-
+            print("rotation_start :", rotation_start, "rotation_end :", rotation_end)
             for i in range (x_min,x_max):
                 for j in range (y_min,y_max):
                     angle = rotation_start + step
@@ -129,18 +130,24 @@ class World():
                     sin = math.sin(angle)
                     x_prime = int( ((i-self.x_robot) * cos - (j-self.y_robot) * sin) + self.x_robot )
                     y_prime = int ( ((j-self.y_robot) * cos - (i-self.x_robot) * sin ) + self.y_robot )
-                    if(self.grid[x_prime][y_prime].status != 'Free'
+                    if(self.grid[x_prime][y_prime].status != 'Empty'
                     and self.grid[x_prime][y_prime].status != 'Robot'):
                         print("Robot was blocked by something when rotating")
                         outcome = 1
                         self.apply_status(end_endpoints,'Robot')
                         return real_rotation, outcome, end_endpoints
                     tmp_endpoints.append((x_prime, y_prime))
-                    real_rotation += step
-                    rotation_start += step
+                    
+            real_rotation += step
+            rotation_start += step
             end_endpoints = tmp_endpoints
-        self.remove_all_objects_of_type('Robot')
-        self.apply_status(end_endpoints, 'Robot')
+            print("len end_endpoints : " , len(end_endpoints))
+            tmp_endpoints = []
+        if(rotation != 0):
+            print("on fait les changements sur la grid")
+            self.remove_all_objects_of_type('Robot')
+            self.apply_status(end_endpoints, 'Robot')
+        print("len end_endpoints juste avant return : " , len(end_endpoints))
         return real_rotation, outcome, end_endpoints
 
     def apply_status(self,points_list,status):
@@ -152,14 +159,21 @@ class World():
 
 
     def move_robot(self,rotation, distance_x,distance_y):
-        """Move the robot in the world """
-        real_rotation, outcome_rotation, robot_points = self.rotate_robot(rotation)
+        """Blabla Move the robot in the world """
+        robot_points = []
+        for i in range(self.width):
+                robot_points.extend([(i,element.y) for element in self.grid[i] if element.status == 'Robot' ])
+        
+        real_rotation, outcome_rotation, robot_points = self.rotate_robot(rotation,robot_points)
         self.robot_angle = (self.robot_angle + rotation) % 360
         rotation = math.radians(self.robot_angle)
         distance_x_prime = distance_x * math.cos(rotation) - distance_y * math.sin(rotation)
         distance_y_prime = distance_y * math.cos(rotation) - distance_x * math.sin(rotation)
         print("len robot points: ", len(robot_points))
-        real_distance_x, real_distance_y, outcome_forward, end_endpoints = self.robot_go_forward(distance_x_prime, distance_y_prime, robot_points)
+        if(distance_x != 0 or distance_y != 0):
+            real_distance_x, real_distance_y, outcome_forward,robot_points = self.robot_go_forward(distance_x_prime, distance_y_prime, robot_points)
+        else : 
+            real_distance_x, real_distance_y, outcome_forward = 0,0,0
         return real_rotation,outcome_rotation, real_distance_x, real_distance_y, outcome_forward
 
     def robot_go_forward(self, distance_x, distance_y, robot_points):
@@ -176,19 +190,27 @@ class World():
         step_x = distance_x // FORWARD_STEP_NUMBER
         step_y = distance_y // FORWARD_STEP_NUMBER
         print("step_x :", step_x, "step_y :", step_y)
-        fini = end_x == start_x and end_y == start_y
+        fini = int(end_x) == int(start_x) and int(end_y) == int(start_y)
         tmp_endpoints = robot_points
         tmp_endpoints_next =[]
         end_endpoints = []
         while not fini:
-            print("start_x", start_x," end_x ,",end_x)
+            #print("start_x", start_x," end_x ,",end_x, "step_x avant verif :", step_x)
+            if( (step_x >0 and start_x + step_x > end_x) or (step_x <0 and start_x - step_x < end_x) ) :
+                step_x = end_x - start_x
+            if( (step_y >0 and start_y + step_y > end_y) or (step_y <0 and start_y - step_y < end_y) ) :
+                step_y = end_y - start_y
+            #print("step_x apres verif : ", step_x)
+            time.sleep(0.1)
             #ajouter if step trop grand
             for _,point in enumerate(tmp_endpoints):
                 x,y = point
-                next_x = x + step_x
-                next_y = y + step_y
+                
+                next_x = int(x + step_x)
+                next_y = int(y + step_y)
+                #print("x" , x, "y", y , "next_x", next_x," next_y", next_y, "step_x", step_x, "step_y",step_y)
                 next_cell = self.grid[next_x][next_y]
-                if next_cell.status != 'Free' and next_cell.status != 'Robot' :
+                if next_cell.status != 'Empty' and next_cell.status != 'Robot' :
                     print("Robot hit something while moving forward")
                     outcome = 1
                     fini = True
@@ -196,10 +218,16 @@ class World():
                 real_distance_x += step_x
                 real_distance_y += step_y
                 tmp_endpoints_next.append((next_x,next_y))
-            fini = end_x == start_x and end_y == start_y
+            
+            time.sleep(0.1)
             #print("fini : ",fini)
             start_x = start_x + step_x
-            start_y = start_y + step_x
+            start_y = start_y + step_y
+            #print("end_x and start_x : ",end_x, start_x, "egalité : ", int(end_x) == int(start_x))
+            #print("end_y and start_y : ",end_y, start_y, "egalité : ", int(end_y) == int(start_y))
+            fini = int(end_x) == int(start_x) and int(end_y) == int(start_y)
+            #print("fini : ",fini)
+            time.sleep(0.1)
             end_endpoints = tmp_endpoints_next
             tmp_endpoints = end_endpoints
 
