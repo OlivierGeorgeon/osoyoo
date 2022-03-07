@@ -124,7 +124,7 @@ void loop()
     //Send outcome to PC
     // renvoi JSON du degres de mouvement
     outcome.addValue("echo_distance", (String) head.distUS.dist());
-    outcome.addValue("head_angle", (String) head.angle_actuelle);
+    outcome.addValue("head_angle", (String) (head.angle_actuelle -  90)); 
     // outcome.addValue( "yaw", (String) (gyroZ()));
     outcome.addValue( "floor", (String) floorOutcome);
     outcome.addValue( "status", (String) floorOutcome);

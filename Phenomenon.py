@@ -33,8 +33,8 @@ class Phenomenon:
         self.shape.x = x
         self.shape.y = y
         # self.angle += angle
-        self.shape.rotation += angle
-        # if self.type == 1:  # Rotate the rectangle
+        if self.type == 1:  # Rotate the rectangle
+            self.shape.rotation += angle
 
         theta2 = -math.radians(angle)
         if self.type == 2:  # Rotate the triangle

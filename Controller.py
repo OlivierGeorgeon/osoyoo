@@ -49,6 +49,7 @@ class Controller:
     def update_model(self):
         """ Updating the model from the latest received outcome """
         outcome = json.loads(self.outcome_bytes)
+        print(outcome)
         floor = 0
         if 'floor' in outcome:
             floor = outcome['floor']
@@ -150,14 +151,18 @@ class Controller:
 
 # Testing the controller by remote controlling the robot from the egocentric memory window
 if __name__ == "__main__":
-    emw = EgoMemoryWindow()
+    ip_ = "10.40.22.255"
+    emw = EgoMemoryWindow(ip=ip_)
     controller = Controller(emw)
+
+
 
     @emw.event
     def on_text(text):
         """ Receiving the action from the window and calling the controller to send the action to the robot """
         if controller.enact_step == 0:
             if text == "/":  # Send the angle marked by the mouse click
+                emw.on_text(text)
                 text = json.dumps({'action': '/', 'angle': emw.mouse_press_angle})
             controller.enact(text)
         else:

@@ -197,9 +197,8 @@ class EgoMemoryWindow(pyglet.window.Window):
 
 
         for p in self.phenomena:
-            pass
-            # p.translate(translation)
-            # p.rotate(-rotation)
+            p.translate(translation)
+            p.rotate(-rotation)
 
         glLoadIdentity()
         glTranslatef(translation[0], translation[1], 0)
