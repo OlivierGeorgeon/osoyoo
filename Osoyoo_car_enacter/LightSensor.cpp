@@ -19,19 +19,16 @@ int LightSensor::tracking() {
     case 0b10000:
     case 0b11000:
     case 0b01000:
-      Serial.println("1");
       return 1; //01
     case 0b11111:
     case 0b11011:
     case 0b01110:
     case 0b01010:
     case 0b00100:
-      Serial.println("3");
       return 3; //11
     case 0b00001:
     case 0b00011:
     case 0b00010:
-      Serial.println("2");
       return 2; //10
     default:
       return 0;
