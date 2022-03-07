@@ -52,7 +52,7 @@ class Controller:
         print(outcome)
         floor = 0
         if 'floor' in outcome:
-            floor = outcome['floor']
+            floor = int(outcome['floor'])
         shock = 0
         if 'shock' in outcome:
             shock = outcome['shock']
@@ -80,7 +80,9 @@ class Controller:
                 translation[1] = -SHIFT_DISTANCE
             if self.action == "8":
                 if not blocked:
-                    translation[0] = STEP_FORWARD_DISTANCE * outcome['duration'] / 1000
+                    #translation[0] = STEP_FORWARD_DISTANCE * outcome['duration'] / 1000
+                    translation[0] = 100
+
 
             # Actual measured displacement if any
             if 'yaw' in outcome:
