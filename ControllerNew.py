@@ -1,6 +1,7 @@
 import json
 import math
 import threading
+import time
 from Agent5 import Agent5
 from MemoryV1 import MemoryV1
 from RobotDefine import *
@@ -91,43 +92,25 @@ class ControllerNew:
             to the system
         """
         self.enact_step = 0
-        print("DEBUG CONTROLLER LOOP, 1")
         self.action = self.ask_agent_for_action(self.outcome) # agent -> decider
-        print("DEBUG CONTROLLER LOOP, 2")
-        robot_action = self.translate_agent_action_to_robot_command(self.action) # a compléter
-        print("DEBUG CONTROLLER LOOP, 3 ")
+        action_debug = self.action
+        robot_action = self.translate_agent_action_to_robot_command(self.action)
+        print("<CONTROLLER> action choisie par le robot = ", self.action)
+        #time.sleep(1)
         self.command_robot(robot_action)
-        #self.enact_step = 2 # FOR DEBUG
-        print("DEBUG CONTROLLER LOOP, 4")
-
         while(self.enact_step < 2):   # refresh la vue tant que pas de reponses de command_robot 
-            #print("oooooooo")
             if self.view is not None:
                 self.view.refresh(self.memory) # TODO: camerde
-            #print("ok")
             if self.hexa_memory is not None :
-                ""
-                #print("ksss") 
                 self.hexaview.refresh(self.hexa_memory)  # TODO: camerde
-                #print("kss")
-
-            #print("aaaaaa")
-
-        print("DEBUG CONTROLLER LOOP, 5")
         self.enact_step = 0
-        print("DEBUG CONTROLLER LOOP, 6")
         robot_data = self.outcome_bytes
-        print("DEBUG CONTROLLER LOOP, 7")
         phenom_info, angle, translation, self.outcome = self.translate_robot_data(robot_data)
-        print("DEBUG CONTROLLER LOOP, 8")
         self.send_position_change_to_memory(angle,translation) #Might be an order problem between this line and the one under it, depending on
-        print("DEBUG CONTROLLER LOOP, 9")
         self.send_phenom_info_to_memory(phenom_info) # when the robot detect interaction (before or after moving)
-        print("DEBUG CONTROLLER LOOP, 10")
         user_interaction = None
         if self.view is not None:
             user_interaction = self.ask_view_to_refresh_and_get_last_interaction_from_user(self.memory)
-        print("DEBUG CONTROLLER LOOP, 11")
         self.memory.tick()
 
         if self.hexa_memory is not None :
@@ -171,7 +154,8 @@ class ControllerNew:
         angle is converted in nb of 60 degrees turns and translation is
         adapted to a number of radius
         """
-        self.hexa_memory.rotate_robot(angle)
+        print("angle sent by controller: ", angle)
+        self.hexa_memory.rotate_robot(-angle)
         distance = int(math.sqrt(translation[0]**2 + translation[1]**2 ) )
         print("translation = ", translation,
             " distance = ", distance)
@@ -202,7 +186,7 @@ class ControllerNew:
             print("Receive ", end="")
             print(self.outcome_bytes)
             self.enact_step = 2
-            print("Thread : enact_step = 2")
+            #print("Thread : enact_step = 2")
             # self.watch_outcome()
 
         self.action = action
@@ -290,6 +274,8 @@ class ControllerNew:
                 if self.action == "8":  # TODO Other actions
                     forward_duration = outcome['duration'] - 300  # Subtract retreat duration
                     translation[0] = STEP_FORWARD_DISTANCE * forward_duration/1000 - RETREAT_DISTANCE  # To be adjusted
+                    if (translation[0] < 0 ) :
+                         print("translation negative") 
             angle = rotation
 
             # Check for collision when moving forward
@@ -334,11 +320,3 @@ class ControllerNew:
         
 
 
-
-if __name__ == "__main__":
-    view = EgoMemoryWindowNew()
-    memory = MemoryV1()
-    agent = Agent5()
-    controller = ControllerNew(view,agent,memory)
-    for i in range(10000):
-        controller.loop()

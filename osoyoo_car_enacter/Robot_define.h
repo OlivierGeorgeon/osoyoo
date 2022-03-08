@@ -1,4 +1,4 @@
-#define ROBOT_ID 2 // 0: robot Doll, 1: robot UCLy, 2: robot Olivier
+#define ROBOT_ID 3 // 0: robot Doll, 1: robot UCLy, 2: robot Olivier
 
 #if ROBOT_ID == 1
 
