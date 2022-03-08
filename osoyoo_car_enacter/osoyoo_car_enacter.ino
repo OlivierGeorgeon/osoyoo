@@ -16,7 +16,7 @@
 #include <WiFiEspUDP.h>
 #include <Arduino_JSON.h>
 
-#include <SoftwareSerial.h> // AJOUT ERREUR
+// #include <SoftwareSerial.h> // AJOUT ERREUR. Commenté par Olivier je ne sais pas d'ou ca sort.
 
 #define SPEED 100
 #define TURN_SPEED 90  
@@ -98,8 +98,12 @@ void setup()
   // Initialize the automatic behaviors
   OWM.setup();
   HEA.setup();
-  // delay(10000); tried delay but did not fix the imu setup problem
   IMU.setup();
+  // Setup the imu twice otherwise the calibration is wrong. I don't know why.
+  // Probably something to do with the order in which the imu registers are written.
+  delay(10);
+  IMU.setup();
+
   Serial.println("--- Robot initialized ---");
 
   // Initialize PIN 13 LED for debugging
@@ -138,7 +142,9 @@ void loop()
   HEA.update();
 
   // Behavior IMU
+  digitalWrite(LED_BUILTIN, LOW); // for debug
   int shock_event = IMU.update();
+  if (blink_on) {digitalWrite(LED_BUILTIN, HIGH);} // for debug
 
   // STEP 0: no interaction being enacted
   // Watching for message sent from PC
@@ -372,7 +378,8 @@ void loop()
     IMU.outcome(outcome_object);
     outcome_object["duration"] = millis() - action_start_time;
     String outcome_json_string = JSON.stringify(outcome_object);
-    // Serial.println("Outcome string " + outcome_json_string);
+
+    Serial.println("Outcome string " + outcome_json_string);
 
     digitalWrite(LED_BUILTIN, HIGH); // light the led during transfer
     // Send the outcome to the IP address and port that sent the action

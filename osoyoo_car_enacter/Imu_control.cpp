@@ -25,10 +25,8 @@ void Imu_control::setup()
   #if ROBOT_HAS_MPU6050 == true
   // Initialize MPU6050
 
-  // Do it twice otherwise the calibration is wrong. I don't know why.
-  // Probably something to do with the order in which the imu registers are written.
   _mpu.begin(MPU6050_SCALE_2000DPS, MPU6050_RANGE_2G);
-  _mpu.begin(MPU6050_SCALE_2000DPS, MPU6050_RANGE_2G);
+  // _mpu.begin(MPU6050_SCALE_2000DPS, MPU6050_RANGE_2G);
 
   //while(!_mpu.begin(MPU6050_SCALE_2000DPS, MPU6050_RANGE_2G))
   //{
@@ -104,12 +102,16 @@ int Imu_control::update()
 
     #if ROBOT_HAS_MPU6050 == true
     // Read normalized values
+    // Serial.println("Read Acceleration"); // for debug
     Vector normAccel = _mpu.readNormalizeAccel();
+    // Serial.println("Read Gyro"); // for debug
     Vector normGyro = _mpu.readNormalizeGyro();
+    // Serial.println("end read mpu"); // for debug
+
     int normalized_acceleration = -normAccel.XAxis * 100 + ACCELERATION_X_OFFSET;
 
     // Integrate yaw during the interaction
-    float _ZAngle = normGyro.ZAxis * IMU_READ_PERIOD / 1000;
+    float _ZAngle = normGyro.ZAxis * IMU_READ_PERIOD / 1000 * GYRO_COEF;
     _yaw += _ZAngle;
 
     // Record the min acceleration (deceleration) during the interaction to detect collision
@@ -155,11 +157,13 @@ int Imu_control::update()
 }
 void Imu_control::outcome(JSONVar & outcome_object)
 {
+  #if ROBOT_HAS_MPU6050 == true
   outcome_object["yaw"] = (int) _yaw;
   outcome_object["shock"] = _shock_measure;
   outcome_object["blocked"] = _blocked;
   outcome_object["max_acc"] = _max_acceleration;
   outcome_object["min_acc"] = _min_acceleration;
+  #endif
   //outcome_object["debug"] = _debug_message;
   //_debug_message = "";
 
