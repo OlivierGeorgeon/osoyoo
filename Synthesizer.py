@@ -56,14 +56,9 @@ class Synthesizer:
             distance = math.sqrt(interaction.x**2 + interaction.y**2)
             print(distance)
             #calcul du x et y allocentric
-            #x_interaction = x_robot +  math.tan(yaw) * distance
+    
             x_prime = int(interaction.x * math.cos(yaw) - interaction.y * math.sin(yaw))
-            #y_interaction = y_robot + math.cos(yaw) * distance
             y_prime = int(interaction.y * math.cos(yaw) - interaction.x * math.sin(yaw))
-
-            #print("coordonnées de base : ", int(interaction.x), ",",int(interaction.y))
-            #print("coordonnées converties (tjr relatif au robot) : ", x_prime, ",",y_prime)
-            #print("coordonnées converties ", x_prime + x_robot, ",",y_prime + y_robot)
 
             # on converti le tout en coordonnées pour les cells
             x_robot, y_robot = self.hexa_memory.get_robot_pos()
