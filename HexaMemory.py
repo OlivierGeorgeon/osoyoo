@@ -74,6 +74,7 @@ class HexaMemory(HexaGrid):
             nb_cells_y = -1
             if (self.robot_pos_y + mini_radius) / (mini_radius*2) < -1 :
                 nb_cells_y += int((self.robot_pos_y + mini_radius) / (mini_radius*2))
+
         start_cell_x = self.width//2
         start_cell_y = self.height // 2
 
@@ -92,6 +93,7 @@ class HexaMemory(HexaGrid):
         cell_y = start_cell_y + y_decal
         current_y_is_even = cell_y % 2 == 0
 
+        nb_cells_x_is_even = nb_cells_x %2 == 0
         while nb_cells_x != 0:
             if nb_cells_x > 0:
                 if current_y_is_even :
@@ -112,6 +114,13 @@ class HexaMemory(HexaGrid):
                     y_add = 0
                     current_y_is_even = True
                 nb_cells_x += 1
+        if  (not nb_cells_x_is_even) and (y_add == 1) and (y_decal != 0)  :
+            if(y_decal > 0):
+                y_add = -1
+            else :
+                y_add = 1
+
+        
         end_x = start_cell_x +  x_decal
         end_y = start_cell_y + y_decal + y_add
 

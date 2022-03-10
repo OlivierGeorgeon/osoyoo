@@ -178,7 +178,7 @@ def test_convert_robot_pos_in_robot_cell():
         end_x,end_y = hx.convert_robot_pos_in_robot_cell()
         assert(end_x == 10 and end_y == 11)
     except AssertionError:
-        print("Cells of the robot incorrects after moving robot left : ", end_x, end_y, " should be 10,11")
+        print("Cells of the robot incorrects after moving robot one cell upper right  ", end_x, end_y, " should be 10,11")
         error = 19
 
 
@@ -188,8 +188,57 @@ def test_convert_robot_pos_in_robot_cell():
         end_x,end_y = hx.convert_robot_pos_in_robot_cell()
         assert(end_x == 11 and end_y == 12)
     except AssertionError:
-        print("Cells of the robot incorrects after moving robot left : ", end_x, end_y, " should be 11,12")
+        print("Cells of the robot incorrects after moving robot two cells upper right : ", end_x, end_y, " should be 11,12")
         error = 20
+
+    try :
+        hx.robot_pos_x = 11
+        hx.robot_pos_y = -10
+        end_x,end_y = hx.convert_robot_pos_in_robot_cell()
+        assert(end_x == 10 and end_y == 9)
+    except AssertionError:
+        print("Cells of the robot incorrects after moving robot one cell lower right : ", end_x, end_y, " should be 10,9")
+        error = 21
+
+    try :
+        hx.robot_pos_x = -11
+        hx.robot_pos_y = -10
+        end_x,end_y = hx.convert_robot_pos_in_robot_cell()
+        good_end_x,good_end_y = 9,9
+        assert(end_x == good_end_x and end_y == good_end_y)
+    except AssertionError:
+        print("Cells of the robot incorrects after moving robot one cell lower left : ", end_x, end_y, " should be" , good_end_x,",", good_end_y)
+        error = 22
+
+    try :
+        hx.robot_pos_x = -11
+        hx.robot_pos_y = 10
+        end_x,end_y = hx.convert_robot_pos_in_robot_cell()
+        good_end_x,good_end_y = 9,11
+        assert(end_x == good_end_x and end_y == good_end_y)
+    except AssertionError:
+        print("Cells of the robot incorrects after moving robot one cell upper left : ", end_x, end_y, " should be" , good_end_x,",", good_end_y)
+        error = 23
+
+    try :
+        hx.robot_pos_x = 15
+        hx.robot_pos_y = 30
+        end_x,end_y = hx.convert_robot_pos_in_robot_cell()
+        good_end_x,good_end_y = 10,13
+        assert(end_x == good_end_x and end_y == good_end_y)
+    except AssertionError:
+        print("Cells of the robot incorrects after moving robot  : ", end_x, end_y, " should be" , good_end_x,",", good_end_y)
+        error = 24
+
+    try :
+        hx.robot_pos_x = -15
+        hx.robot_pos_y = 30
+        end_x,end_y = hx.convert_robot_pos_in_robot_cell()
+        good_end_x,good_end_y = 9,13
+        assert(end_x == good_end_x and end_y == good_end_y)
+    except AssertionError:
+        print("Cells of the robot incorrects after moving robot  : ", end_x, end_y, " should be" , good_end_x,",", good_end_y)
+        error = 24
 
     
     return error
@@ -202,5 +251,6 @@ if __name__ == '__main__':
     try :
         error = test_convert_robot_pos_in_robot_cell()
         assert( error == 0 )
+        print("Every test in test_convert_robot_pos_in_robot_cell() passed without error")
     except AssertionError:
         print("test_convert_robot_pos_in_robot_cell failed with error : ", error)
