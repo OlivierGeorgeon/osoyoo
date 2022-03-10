@@ -245,6 +245,46 @@ def test_convert_robot_pos_in_robot_cell():
 
 
 
+def test_new_move():
+    """blala"""
+    hx = HexaMemory(20,20,cells_radius = 10)
+    error = 0
+    try :
+        hx.robot_pos_x = 0
+        hx.robot_pos_y = 0
+        rotation , move_x, move_y = 0,0,20
+        end_x,end_y = hx.new_move(rotation, move_x, move_y)
+        good_end_x,good_end_y = 0,20
+        assert(end_x == good_end_x and end_y == good_end_y)
+    except AssertionError:
+        print("Cells of the robot incorrects after moving robot  : ", end_x, end_y, " should be" , good_end_x,",", good_end_y)
+        error = 1
+
+    try :
+        hx.robot_pos_x = 0
+        hx.robot_pos_y = 0
+        rotation , move_x, move_y = 90,0,20
+        end_x,end_y = hx.new_move(rotation, move_x, move_y)
+        good_end_x,good_end_y = 20,0
+        assert(end_x == good_end_x and end_y == good_end_y)
+    except AssertionError:
+        print("Cells of the robot incorrects after moving robot  : ", end_x, end_y, " should be" , good_end_x,",", good_end_y)
+        error = 2
+
+    try :
+        hx.robot_pos_x = 0
+        hx.robot_pos_y = 0
+        hx.robot_angle = 0
+        rotation , move_x, move_y = 360,0,20
+        end_x,end_y = hx.new_move(rotation, move_x, move_y)
+        good_end_x,good_end_y = 0,20
+        assert(end_x == good_end_x and end_y == good_end_y)
+    except AssertionError:
+        print("Cells of the robot incorrects after moving robot  : ", end_x, end_y, " should be" , good_end_x,",", good_end_y)
+        error = 3
+
+    
+    return error
 
 if __name__ == '__main__':
     error = 0
@@ -254,3 +294,10 @@ if __name__ == '__main__':
         print("Every test in test_convert_robot_pos_in_robot_cell() passed without error")
     except AssertionError:
         print("test_convert_robot_pos_in_robot_cell failed with error : ", error)
+    error = 0
+    try :
+        error = test_new_move()
+        assert( error == 0 )
+        print("Every test in test_new_move passed without error")
+    except AssertionError:
+        print("test_new_move failed with error : ", error)
