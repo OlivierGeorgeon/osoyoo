@@ -149,7 +149,7 @@ class ControllerNew:
 
     ################################################# HEXA_MEMORY RELATED #################################################################
 
-    def send_position_change_to_hexa_memory(self,angle,translation):
+    def depr_send_position_change_to_hexa_memory(self,angle,translation):
         """Adapt position change to fit hexa_memory functioning
         angle is converted in nb of 60 degrees turns and translation is
         adapted to a number of radius
@@ -160,6 +160,10 @@ class ControllerNew:
         print("translation = ", translation,
             " distance = ", distance)
         self.hexa_memory.go_forward(distance)
+
+    def send_position_change_to_hexa_memory(self,angle,translation):
+        """Apply movement to hexamem"""
+        self.hexa_memory.move(angle,translation[0], translation[1])
     ################################################# VIEW RELATED #################################################################
     def ask_view_to_refresh_and_get_last_interaction_from_user(self,memory):
         """ Ask the View to refresh itself after an action from the robot
