@@ -9,7 +9,7 @@
 #include "Imu_control.h"
 #include "Robot_define.h"
 #include <Wire.h>
-#include <MPU6050.h>
+#include "src/lib/MPU6050.h"
 #if ROBOT_HAS_HMC5883L == true
   #include <HMC5883L.h>
 #endif
