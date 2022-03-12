@@ -8,7 +8,7 @@ ZOOM_IN_FACTOR = 1.2
 
 
 class HexaView(pyglet.window.Window):
-    def __init__(self, width=800, height=800, shapesList = None, *args, **kwargs):
+    def __init__(self, width=400, height=400, shapesList = None, *args, **kwargs):
         super().__init__(width, height, resizable=True, *args, **kwargs)
         self.set_caption("Hexa Memory")
         self.set_minimum_size(150, 150)
