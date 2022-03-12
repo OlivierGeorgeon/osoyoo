@@ -12,12 +12,14 @@ ZOOM_IN_FACTOR = 1.2
 class EgoMemoryWindow(pyglet.window.Window):
     def __init__(self, width=400, height=400, *args, **kwargs):
         super().__init__(width, height, resizable=True, *args, **kwargs)
-        self.set_caption("Egocentric Memory")
+        self.set_caption("Spatial Memory")
         self.set_minimum_size(150, 150)
         glClearColor(1.0, 1.0, 1.0, 1.0)
 
         self.batch = pyglet.graphics.Batch()
         self.zoom_level = 1
+
+        self.robot = OsoyooCar(self.batch)
 
         self.origin = shapes.Rectangle(0, 0, 60, 40, color=(150, 150, 225))
         self.origin.anchor_position = 30, 20

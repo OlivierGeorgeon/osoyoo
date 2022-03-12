@@ -18,7 +18,7 @@ class Controller:
         # Model
         self.wifiInterface = WifiInterface()
         self.phenomena = []
-        self.robot = OsoyooCar(self.view.batch)
+        self.azimuth = 0
 
         self.action = ""
         self.enact_step = 0
@@ -85,13 +85,13 @@ class Controller:
         else:
             # Presupposed displacement of the robot relative to the environment
             translation = [0, 0]
-            rotation = 0
+            yaw = 0
             if self.action == "1":
-                rotation = 60
+                yaw = DEFAULT_YAW
             if self.action == "2":
                 translation[0] = -STEP_FORWARD_DISTANCE
             if self.action == "3":
-                rotation = -60
+                yaw = -DEFAULT_YAW
             if self.action == "4":
                 translation[1] = SHIFT_DISTANCE
             if self.action == "6":
@@ -102,7 +102,7 @@ class Controller:
 
             # Actual measured displacement if any
             if 'yaw' in outcome:
-                rotation = outcome['yaw']
+                yaw = outcome['yaw']
 
             # Estimate displacement due to floor change retreat
             if floor > 0:  # Black line detected
@@ -113,7 +113,7 @@ class Controller:
 
             # The displacement matrix of this interaction
             translation_matrix = matrix44.create_from_translation([-translation[0], -translation[1], 0])
-            rotation_matrix = matrix44.create_from_z_rotation(math.radians(rotation))
+            rotation_matrix = matrix44.create_from_z_rotation(math.radians(yaw))
             displacement_matrix = matrix44.multiply(rotation_matrix, translation_matrix)
 
             # Translate and rotate all the phenomena
@@ -130,36 +130,39 @@ class Controller:
             if self.action == "8" and floor == 0:
                 if blocked:
                     # Create a new pressing interaction
-                    wall = Phenomenon(110, 0, self.view.batch, 2, 1)
+                    wall = Phenomenon(ROBOT_FRONT_X, 0, self.view.batch, 2, 1)
                     self.phenomena.append(wall)
                 else:
                     # Create a new blocked interaction
                     if shock == 0b01:
-                        wall = Phenomenon(110, -80, self.view.batch, 2)
+                        wall = Phenomenon(ROBOT_FRONT_X, -ROBOT_FRONT_Y, self.view.batch, 2)
                         self.phenomena.append(wall)
                     if shock == 0b11:
-                        wall = Phenomenon(110, 0, self.view.batch, 2)
+                        wall = Phenomenon(ROBOT_FRONT_X, 0, self.view.batch, 2)
                         self.phenomena.append(wall)
                     if shock == 0b10:
-                        wall = Phenomenon(110, 80, self.view.batch, 2)
+                        wall = Phenomenon(ROBOT_FRONT_X, ROBOT_FRONT_Y, self.view.batch, 2)
                         self.phenomena.append(wall)
 
             # Update head angle
             if 'head_angle' in outcome:
                 head_angle = outcome['head_angle']
-                self.robot.rotate_head(head_angle)
+                self.view.robot.rotate_head(head_angle)
                 if self.action == "-" or self.action == "*" or self.action == "1" or self.action == "3":
                     # Create a new echo phenomenon
                     echo_distance = outcome['echo_distance']
                     if echo_distance > 0:  # echo measure 0 is false measure
-                        x = self.robot.head_x + math.cos(math.radians(head_angle)) * echo_distance
-                        y = self.robot.head_y + math.sin(math.radians(head_angle)) * echo_distance
+                        x = ROBOT_HEAD_X + math.cos(math.radians(head_angle)) * echo_distance
+                        y = math.sin(math.radians(head_angle)) * echo_distance
                         obstacle = Phenomenon(x, y, self.view.batch, durability = 3, decayIntensity = 1 ) # TEST DURABILITY-DECAY
                         self.phenomena.append(obstacle)
 
             # Update the azimuth
             if 'azimuth' in outcome:
                 self.view.azimuth = outcome['azimuth']
+            else:
+                self.azimuth -= yaw
+            self.view.azimuth = self.azimuth
 
             # Update the origin
             self.view.update_environment_matrix(displacement_matrix)
@@ -174,6 +177,9 @@ class Controller:
 if __name__ == "__main__":
     emw = EgoMemoryWindow()
     controller = Controller(emw)
+
+    # emw2 = EgoMemoryWindow()
+    # emw2.set_caption("Alocentric spatial memory")
 
     @emw.event
     def on_text(text):
@@ -190,4 +196,3 @@ if __name__ == "__main__":
 
     # Run the egocentric memory window
     pyglet.app.run()
-
