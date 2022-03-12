@@ -51,7 +51,7 @@ class HexaView(pyglet.window.Window):
         # The transformations are stacked, and applied backward to the vertices
         # Stack the projection matrix. Centered on (0,0). Fit the window size and zoom factor  # DEBUG TODO ALED decentrer le bordel, ou plutot le centrer sur le milieu de la grid
         glOrtho(1 * self.zoom_level, self.width* self.zoom_level , 1* self.zoom_level,
-                self.height * self.zoom_level, 1, -1)
+                 self.height * self.zoom_level, 1, -1)
         # Draw the robot and the phenomena
         shapesListo = self.shapesList
         self.batch.draw()
@@ -65,8 +65,8 @@ class HexaView(pyglet.window.Window):
         """ Zooming the window """
         # Inspired by https://www.py4u.net/discuss/148957
         f = ZOOM_IN_FACTOR if dy > 0 else 1/ZOOM_IN_FACTOR if dy < 0 else 1
-        if .4 < self.zoom_level * f < 5:
-            self.zoom_level *= f
-    
+        # if .4 < self.zoom_level * f < 5:  # Olivier
+        self.zoom_level *= f
+
         def set_batch(self, batch):
             self.batch = batch
