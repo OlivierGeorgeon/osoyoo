@@ -65,8 +65,11 @@ class Interaction:
     def displace(self,displacement_matrix):
         """ Applying the displacement matrix to the phenomenon """
         #  Rotate and translate the position
-        v = matrix44.apply_to_vector(displacement_matrix, [self.x, self.y, 0])
-        self.x, self.y = v[0], v[1]
+        if displacement_matrix is None : 
+            print("HAAAAAAAAAAAAA")
+        if(self.x is not None and self.y is not None):
+            v = matrix44.apply_to_vector(displacement_matrix, [self.x, self.y, 0])
+            self.x, self.y = v[0], v[1]
         # TO CHECK : Shape should rotate automaticly, mb, I think, idk
 
 
@@ -85,6 +88,7 @@ class Interaction:
         self.y = y
         self.width = 20
         self.height = 60
+        print("red_line , interaction : ", self)
         return self
     def green_circle(self, x, y) :
         """Change the Interaction to match :
@@ -98,6 +102,7 @@ class Interaction:
         self.x = x
         self.y = y
         self.width = 50
+        print("green_circle , interaction : ", self)
         return self
     def yellow_star(self, x, y):
         """Change the Interaction to match :
@@ -112,4 +117,5 @@ class Interaction:
         self.y = y
         self.width = 20
         self.height = 60
+        print("yellow_star , interaction : ", self)
         return self

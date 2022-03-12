@@ -28,10 +28,12 @@ class MemoryNew:
             phenom_info : (floor,shock,blocked)
         Author : TKnockaert
         """
+        x = 10
+        y = 10
         floor,shock,blocked, obstacle, x , y = phenom_info
 
         if(floor):
-            floorInter = Interaction(150,0,20,60,type = 'Line', shape = 'Rectangle', color= 'red', durability = 10, decayIntensity = 1)
+            floorInter = Interaction(0,10,2,20,type = 'Line', shape = 'Rectangle', color= 'red', durability = 10, decayIntensity = 1)
             self.phenomenons.append(floorInter)
         if shock:
             shockInter = None
@@ -49,8 +51,16 @@ class MemoryNew:
 
         if obstacle :
             obstacleInter = Interaction(x,y,width = 50,type = 'obstacle', shape = 'Circle', color = 'green', durability = 10, decayIntensity = 1)
-            self.phenomenons.append(obstacleInter)
+            #self.phenomenons.append(obstacleInter)
         
+        for _,phenom in enumerate(self.phenomenons) :
+            try :
+                if phenom is tuple :
+                    phenom = phenom[1]
+                if phenom is None or phenom.x is None or phenom.y is None :
+                    self.phenomenons.remove(phenom)
+            except :
+                print("le coupable :  ", phenom)
     """
     def draw(self):
         return phenomList_to_pyglet(self.phenomenons,self.batch)

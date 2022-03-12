@@ -12,7 +12,7 @@ from ControllerNew import ControllerNew
 from Agent6 import Agent6
 if __name__ == '__main__':
     memory = MemoryV1()
-    hexaMemory = HexaMemory(30,60,cells_radius = 20)
+    hexaMemory = HexaMemory(100,200,cells_radius = 5)
     agent = Agent6(memory,hexaMemory)
     synthesizer = Synthesizer(memory, hexaMemory)
 

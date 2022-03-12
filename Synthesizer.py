@@ -35,31 +35,43 @@ class Synthesizer:
         """ Convert position of egocentric interactions of the memory into
         position in the allocentric representation
         """
+        for interaction in self.memory.phenomenons :
+            rota_radian = math.radians(self.hexa_memory.robot_angle)
+            # les interactions etant egocentrés, on fait la manip pour les allocentrer
+            x_prime = int(interaction.x * math.cos(rota_radian) - interaction.y * math.sin(rota_radian))
+            y_prime = int(interaction.y * math.cos(rota_radian) - interaction.x * math.sin(rota_radian))
+            # on demande ensuite à l'hexamem de nous traduire leur position en cells
+            x, y = self.hexa_memory.convert_pos_in_cell(x_prime, y_prime) # TODO : addition avec pos du robot
+            self.internal_hexa_grid.grid[x][y].interactions.append(interaction)
+
+    def depr_project_memory_on_internal_grid(self):
+        """ Convert position of egocentric interactions of the memory into
+        position in the allocentric representation
+        """
         # To understand the calculus made here I strongly advise you to
         # have a look at the (quite beautiful) drawing called
         # hexagonal_grid_neighbors_coordinates_schema.png that
         # you can find in the docs folder
         yaw = self.hexa_memory.robot_orientation * 60
-        print("yaw = ", yaw)
+        #print("yaw = ", yaw)
         yaw = math.radians(yaw)
         x_robot, y_robot = self.hexa_memory.get_robot_pos()
         radius = self.hexa_memory.cells_radius
         mini_radius = math.sqrt(radius**2 - (radius/2)**2)
         x_robot = x_robot * mini_radius
         y_robot = y_robot * mini_radius
+        print(len(self.memory.phenomenons))
         for interaction in self.memory.phenomenons :
-            #calcul de la distance au robot 
+            if(interaction is None or interaction.x is None or interaction.y is None):
+                continue
+            #calcul de la distance au robot
+            print( "interaction :" , interaction)
             distance = math.sqrt(interaction.x**2 + interaction.y**2)
             print(distance)
             #calcul du x et y allocentric
-            #x_interaction = x_robot +  math.tan(yaw) * distance
-            x_prime = interaction.x * math.cos(yaw) - interaction.y * math.sin(yaw)
-            #y_interaction = y_robot + math.cos(yaw) * distance
-            y_prime = interaction.y * math.cos(yaw) - interaction.x * math.sin(yaw)
-
-            print("coordonnées de base : ", interaction.x, ",",interaction.y)
-            print("coordonnées converties (tjr relatif au robot) : ", x_prime, ",",y_prime)
-            print("coordonnées converties ", x_prime + x_robot, ",",y_prime + y_robot)
+    
+            x_prime = int(interaction.x * math.cos(yaw) - interaction.y * math.sin(yaw))
+            y_prime = int(interaction.y * math.cos(yaw) - interaction.x * math.sin(yaw))
 
             # on converti le tout en coordonnées pour les cells
             x_robot, y_robot = self.hexa_memory.get_robot_pos()
@@ -92,12 +104,6 @@ class Synthesizer:
                 # so (1 + nb_radius_y//2) gets you the number of y cells passed
                 # you the multiply it by two because in our coordinates system
                 # the cell direct up from the (x,y) cell is the (x,y+2) cell        
-            """ if not nb_radius_x %2 == 0:
-                if not y_robot %2 == 0:
-                    x_add = 1
-                    print("x_add")
-                y_add = 1
-                print("y_add")   """
             x_interaction = x_for_hexa + x_robot +x_add
             y_interaction = y_for_hexa + y_robot + y_add
             # et on place le tout sur notre internal_grid
@@ -117,7 +123,8 @@ class Synthesizer:
                 cell_intra = self.internal_hexa_grid.grid[i][j]
                 interaction_line = [element for element in cell_intra.interactions if element.type == "Line"]
                 if(len(interaction_line) > 0) :
-                    print("Cell at (",i,",",j,"has interaction line")
+                    ""
+                    #print("Cell at (",i,",",j,"has interaction line")
                 interaction_blocked = [element for element in cell_intra.interactions if (element.type == "Block")]
                 interaction_shock = [element for element in cell_intra.interactions if (element.type == "Shock")]
                 interaction_echo = [element for element in cell_intra.interactions if (element.type == "obstacle")]
@@ -126,7 +133,7 @@ class Synthesizer:
                     print("Cell at (",i,",",j,") final_status : ", final_status)
                 elif(len(interaction_line) ):
                     final_status = "Frontier"
-                    print("Cell at (",i,",",j,") final_status : ", final_status)
+                    #print("Cell at (",i,",",j,") final_status : ", final_status)
                 elif(len(interaction_blocked)) :
                     final_status = "Blocked"
                 elif(len(interaction_shock)) :
