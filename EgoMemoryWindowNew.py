@@ -117,12 +117,12 @@ class EgoMemoryWindowNew(pyglet.window.Window):
 # Testing the egocentric memory window by moving the environment with the keyboard
 if __name__ == "__main__":
     emw = EgoMemoryWindowNew()
-    #memory = MemoryNewV1(emw)
-    memory = MemoryV1(emw)
+    # memory = MemoryNewV1(emw)
+    memory = MemoryV1()
     rectangle = Interaction(50,50,width = 150, height = 150,shape = 'Rectangle',color = "lime",durability = 1000, decayIntensity = 1)
     memory.phenomenons.append(rectangle)
     print(memory.phenomenons)
-    poly = shapes.Polygon(0,0,color = (0,0,0), batch = emw.batch)
+    poly = shapes.Rectangle(0,0, 100, 100, color = (0,0,0), batch = emw.batch)
     for i in range(10000):
         emw.refresh(memory)
         memory.tick()
