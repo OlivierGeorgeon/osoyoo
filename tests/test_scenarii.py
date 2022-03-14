@@ -22,7 +22,7 @@ if __name__ == '__main__':
 
 
 # COPY OF LOOP function 
-    for i in range(10) :
+    for i in range(100) :
         controller.enact_step = 0
         controller.action = controller.ask_agent_for_action(controller.outcome) # agent -> decider
         action_debug = controller.action
@@ -44,7 +44,7 @@ if __name__ == '__main__':
         angle = -angle
         print(" \n \n TRANSLATION : ", translation[0], ",", translation[1], "\n\n")
         #translation = translation[1], translation[0]
-        time.sleep(1)
+        # time.sleep(1)
         controller.send_position_change_to_memory(angle,translation) #Might be an order problem between this line and the one under it, depending on
         controller.send_phenom_info_to_memory(phenom_info) # when the robot detect interaction (before or after moving)
         user_interaction = None
@@ -59,6 +59,6 @@ if __name__ == '__main__':
         if controller.hexaview is not None :
             ""
             controller.ask_hexaview_to_refresh(controller.hexa_memory)
-        time.sleep(2)
+        # time.sleep(2)
 
-    time.sleep(100)
+    # time.sleep(100)

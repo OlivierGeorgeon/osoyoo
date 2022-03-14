@@ -154,7 +154,7 @@ int Head_echo_alignment::measureUltrasonicEcho()
   digitalWrite(Trig_PIN,HIGH);
   delayMicroseconds(15);
   digitalWrite(Trig_PIN,LOW);
-  echo_distance = pulseIn(Echo_PIN,HIGH, 10000);  // Timeout 10 milliseconds. It blocks the main loop!
+  echo_distance = pulseIn(Echo_PIN,HIGH, 10000);  // Timeout 10 milliseconds, otherwise it blocks the main loop!
   echo_distance = (int)(echo_distance * 0.1657);  // Convert to mm
   if (echo_distance == 0) echo_distance = 10000;  // Zero counts for far away
   //Serial.println("Angle " +String(_head_angle) + " measure " + String(echo_distance));

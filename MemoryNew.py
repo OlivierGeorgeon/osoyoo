@@ -109,13 +109,13 @@ if __name__ == "__main__":
     window = pyglet.window.Window(960, 540)
     batch = pyglet.graphics.Batch()
 
-    memory = MemoryNew(window,batch)
+    memory = MemoryNew()
     rectangle = Interaction(50,50,width = 15, height = 15,color = "lime",durability = 10, decayIntensity = 1)
     triangle = Interaction(0,0,shape = 2,color = "blue",durability = 10, decayIntensity = 1)
 
-    memory.add(rectangle)
-    memory.add(triangle)
-    liste = memory.draw()
+    memory.add((0, 0, 1, 0, 0, 0))
+    # memory.add(triangle)
+    # liste = memory.draw()
 
     #memory.draw()
     kss = func_bidon(batch)
