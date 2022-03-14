@@ -29,7 +29,7 @@ if __name__ == '__main__':
         if(i % 2 == 0):
             controller.action = 0
         else :
-            controller.action = 0
+            controller.action = 1
         robot_action = controller.translate_agent_action_to_robot_command(controller.action)
         print("<CONTROLLER> action choisie par le robot = ", controller.action)
         controller.command_robot(robot_action)
