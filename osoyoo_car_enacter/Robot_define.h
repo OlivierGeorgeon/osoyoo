@@ -1,4 +1,4 @@
-#define ROBOT_ID 3 // 0: regular Osoyoo robot, 1: robot BSN, 2: robot Olivier, 3: robot SHS
+#define ROBOT_ID 4 // 0: regular Osoyoo robot, 1: robot BSN, 2: robot Olivier, 3: robot SHS, 4: robot SHG with GY86
 
 #if ROBOT_ID == 1
 
@@ -42,7 +42,7 @@
 
 #elif ROBOT_ID == 3
 
-#warning "Compiling for SHS's robot"
+#warning "Compiling for SHS's robot with GY521"
 #define ROBOT_HAS_MPU6050  true
 #define ROBOT_HAS_HMC5883L false
 #define ROBOT_REAR_RIGHT_WHEEL_COEF 1
@@ -56,6 +56,27 @@
 #define ACCELERATION_SHOCK_THRESHOLD -200 // TODO set this value
 #define ACCELERATION_BLOCK_THRESHOLD 30 // TODO set this value
 #define GYRO_COEF -1 // IMU GY521 upside down
+#define GYRO_SHOCK_THRESHOLD 1 // °/s TODO set this value
+#define ROBOT_SERVO_PIN 4
+
+#elif ROBOT_ID == 4
+
+#warning "Compiling for SHS's robot with GY-86"
+#define ROBOT_HAS_MPU6050  true
+#define ROBOT_HAS_HMC5883L true
+#define ROBOT_REAR_RIGHT_WHEEL_COEF 1
+#define ROBOT_REAR_LEFT_WHEEL_COEF 1
+#define ROBOT_FRONT_RIGHT_WHEEL_COEF 1
+#define ROBOT_FRONT_LEFT_WHEEL_COEF 1.3
+#define TURN_SPOT_MAX_DURATION 1300
+#define TURN_SPOT_ENDING_DELAY 200
+#define TURN_SPOT_ENDING_ANGLE 3
+#define COMPASS_X_OFFSET 1020
+#define COMPASS_Y_OFFSET -1300
+#define ACCELERATION_X_OFFSET 35
+#define ACCELERATION_SHOCK_THRESHOLD -200 // TODO set this value
+#define ACCELERATION_BLOCK_THRESHOLD 30 // TODO set this value
+#define GYRO_COEF 1
 #define GYRO_SHOCK_THRESHOLD 1 // °/s TODO set this value
 #define ROBOT_SERVO_PIN 4
 
