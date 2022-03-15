@@ -31,26 +31,27 @@ class MemoryNew:
         x = 10
         y = 10
         floor,shock,blocked, obstacle, x , y = phenom_info
+        durability = 3
 
         if(floor):
-            floorInter = Interaction(0,10,2,20,type = 'Line', shape = 'Rectangle', color= 'red', durability = 10, decayIntensity = 1)
+            floorInter = Interaction(10,0,2,20,type = 'Line', shape = 'Rectangle', color= 'red', durability = durability, decayIntensity = 1)
             self.phenomenons.append(floorInter)
         if shock:
             shockInter = None
             if(shock == 1):
-                shockInter = Interaction(110,-80,20,60, type = 'shock', shape = 'Star',color = 'yellow', durability = 10, decayIntensity = 1, starArgs = 5)
+                shockInter = Interaction(110,-80,20,60, type = 'shock', shape = 'Star',color = 'yellow', durability = durability, decayIntensity = 1, starArgs = 5)
                 #Star(x, y, outer_radius, inner_radius, num_spikes, rotation=0, color=(255, 255, 255), batch=None, group=None)
             if(shock == 2):
-                shockInter = Interaction(110,0,20,60, type = 'shock', shape = 'Star',color = 'yellow', durability = 10, decayIntensity = 1, starArgs = 5)
+                shockInter = Interaction(110,0,20,60, type = 'shock', shape = 'Star',color = 'yellow', durability = durability, decayIntensity = 1, starArgs = 5)
             else :
-                shockInter = Interaction(110,80,20,60, type = 'shock', shape = 'Star',color = 'yellow', durability = 10, decayIntensity = 1, starArgs = 5)
+                shockInter = Interaction(110,80,20,60, type = 'shock', shape = 'Star',color = 'yellow', durability = durability, decayIntensity = 1, starArgs = 5)
             self.phenomenons.append(shockInter)
         if blocked :
-            blockInter =  Interaction(110,80,20,60, type = 'block', shape = 'Star',color = 'red', durability = 10, decayIntensity = 1, starArgs = 6)
+            blockInter =  Interaction(110,80,20,60, type = 'block', shape = 'Star',color = 'red', durability = durability, decayIntensity = 1, starArgs = 6)
             self.phenomenons.append(blockInter)
 
         if obstacle :
-            obstacleInter = Interaction(x,y,width = 50,type = 'obstacle', shape = 'Circle', color = 'green', durability = 10, decayIntensity = 1)
+            obstacleInter = Interaction(x,y,width = 50,type = 'obstacle', shape = 'Circle', color = 'green', durability = durability, decayIntensity = 1)
             #self.phenomenons.append(obstacleInter)
         
         for _,phenom in enumerate(self.phenomenons) :

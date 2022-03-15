@@ -1,5 +1,6 @@
 import json
 import math
+import random
 import threading
 import time
 from Agent5 import Agent5
@@ -334,11 +335,13 @@ if __name__ == '__main__':
     # Mandatory Initializations
     
     memory = MemoryV1()
-    hexa_memory = HexaMemory(width = 20, height = 40,cells_radius = 20)
+    hexa_memory = HexaMemory(width = 40, height = 80,cells_radius = 50)
     agent = Agent6(memory, hexa_memory)
     # Optionals Initializations
-    #view = EgoMemoryWindowNew()
+    
     view = None
+    #view = EgoMemoryWindowNew()
+    hexaview = None
     hexaview = HexaView()
     synthesizer = Synthesizer(memory,hexa_memory)
     controller = ControllerNew(agent,memory,view = view, synthesizer = synthesizer,
@@ -346,7 +349,8 @@ if __name__ == '__main__':
 
 
     # Chose between automatic controller loop or modified loop
-    automatic = False
+    automatic = False  # -> action from decider
+    manual = True # -> True :user input, False : custom sequence
     while True :
         if(automatic):
             # Main loop
@@ -362,14 +366,16 @@ if __name__ == '__main__':
 
 
             # Chose action manually
-            default = False
+           
             action_choisie = robot_action
-            if not default:
-                manual = True
+            if True:
+                
                 if manual :
                     action_choisie = input("Please input action : \n")
                 else :
                     "put here the actions you want the robot to take"
+                    action_possibles = ['1','8','3']
+                    action_choisie =action_possibles[ random.randint(0, len(action_possibles)-1)]
             robot_action = action_choisie
             print("<CONTROLLER> action envoyée au robot = ", robot_action)
             controller.command_robot(robot_action)
@@ -377,7 +383,7 @@ if __name__ == '__main__':
             while(controller.enact_step < 2):   # refresh la vue tant que pas de reponses de command_robot 
                 if controller.view is not None:
                     controller.view.refresh(controller.memory) # TODO: camerde
-                if controller.hexa_memory is not None :
+                if controller.hexa_memory is not None and controller.hexaview is not None:
                     controller.hexaview.refresh(controller.hexa_memory)  # TODO: camerde
             controller.enact_step = 0
             robot_data = controller.outcome_bytes

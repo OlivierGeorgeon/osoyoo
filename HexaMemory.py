@@ -142,8 +142,9 @@ class HexaMemory(HexaGrid):
         self.robot_pos_x = x_prime
         self.robot_pos_y = y_prime
         self.grid[self.robot_cell_x][self.robot_cell_y].set_to('Free')
+        self.grid[self.robot_cell_x][self.robot_cell_y].leave()
         self.robot_cell_x, self.robot_cell_y = self.convert_pos_in_cell(self.robot_pos_x, self.robot_pos_y)
-        self.grid[self.robot_cell_x][self.robot_cell_y].set_to('Occupied')
+        self.grid[self.robot_cell_x][self.robot_cell_y].occupy()
         print([self.robot_cell_x],[self.robot_cell_y], "set to occupied")
         return x_prime, y_prime
 
@@ -257,13 +258,19 @@ class HexaMemory(HexaGrid):
         current_pos_y = start_y
         for _ in range(nb_step):
             cell_x,cell_y = self.convert_pos_in_cell(current_pos_x,current_pos_y)
+            #if(self.grid[cell_x][cell_y].status == "Unknown"):
             self.grid[cell_x][cell_y].status = status
+            self.grid[cell_x][cell_y].leave()
+            ####
             current_pos_x += step_x
             current_pos_y += step_y
+            """
             if(abs(current_pos_x ) > abs(end_x)):
                 current_pos_x = end_x
             if(abs(current_pos_y ) > abs(end_y)):
                 current_pos_y = end_y
+            """
+            
 
 
 

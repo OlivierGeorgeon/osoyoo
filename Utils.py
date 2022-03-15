@@ -14,7 +14,6 @@ and a phenom_to_whatev function and use it instead.
 def interactionList_to_pyglet(liste,batch):
     shapesList = []
     for i in range(len(liste)):
-        print("kssutils")
         shapesList.append(interaction_to_pyglet(liste[i],batch))
     return shapesList
 
@@ -62,19 +61,24 @@ def hexaMemory_to_pyglet(hexaMemory,batch):
             robot = False
             color_debug = (random.randint(0,255),random.randint(0,255),random.randint(0,255))
             cell = grid[i][j]
-            color = name_to_rgb("grey")
-            if(cell.status == "Free"):
-                color = name_to_rgb("white")
-            elif(cell.status == "Occupied"):
+
+            if cell.occupied :
                 color = name_to_rgb("lime")
                 robot = True
-            
-            elif(cell.status == "Blocked"):
-                color = name_to_rgb("red")
-            elif(cell.status == "Frontier"):
-                color = name_to_rgb("black")
-            elif(cell.status == "Something"):
-                color = name_to_rgb("orange")
+            else : 
+                color = name_to_rgb("grey")
+                if(cell.status == "Free"):
+                    color = name_to_rgb("white")
+                elif(cell.status == "Occupied"):
+                    color = name_to_rgb("yellow")
+                    robot = True
+                
+                elif(cell.status == "Blocked"):
+                    color = name_to_rgb("red")
+                elif(cell.status == "Frontier"):
+                    color = name_to_rgb("black")
+                elif(cell.status == "Something"):
+                    color = name_to_rgb("orange")
 
             x1 = x0
             y1 = y0
