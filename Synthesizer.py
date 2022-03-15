@@ -36,13 +36,17 @@ class Synthesizer:
         position in the allocentric representation
         """
         for interaction in self.memory.phenomenons :
-            rota_radian = math.radians(self.hexa_memory.robot_angle)
-            # les interactions etant egocentrés, on fait la manip pour les allocentrer
-            x_prime = int(interaction.x * math.cos(rota_radian) - interaction.y * math.sin(rota_radian))
-            y_prime = int(interaction.y * math.cos(rota_radian) - interaction.x * math.sin(rota_radian))
-            # on demande ensuite à l'hexamem de nous traduire leur position en cells
-            x, y = self.hexa_memory.convert_pos_in_cell(x_prime, y_prime) # TODO : addition avec pos du robot
-            self.internal_hexa_grid.grid[x][y].interactions.append(interaction)
+            print("<SYNTHESIZER> : actual du of interact: ", interaction.actual_durability)
+            if(interaction.actual_durability > 0):
+                rota_radian = math.radians(self.hexa_memory.robot_angle)
+                # les interactions etant egocentrés, on fait la manip pour les allocentrer
+                x_prime = int(interaction.x * math.cos(rota_radian) + interaction.y * math.sin(rota_radian))
+                y_prime = int(interaction.y * math.cos(rota_radian) + interaction.x * math.sin(rota_radian))
+                # on demande ensuite à l'hexamem de nous traduire leur position en cells
+                x_prime += self.hexa_memory.robot_pos_x
+                y_prime += self.hexa_memory.robot_pos_y
+                x, y = self.hexa_memory.convert_pos_in_cell(x_prime, y_prime)
+                self.internal_hexa_grid.grid[x][y].interactions.append(interaction)
 
     def depr_project_memory_on_internal_grid(self):
         """ Convert position of egocentric interactions of the memory into

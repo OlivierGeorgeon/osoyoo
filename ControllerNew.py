@@ -1,5 +1,6 @@
 import json
 import math
+import random
 import threading
 import time
 from Agent5 import Agent5
@@ -270,7 +271,7 @@ class ControllerNew:
             # Actual measured displacement if any
             if 'yaw' in outcome:
                 rotation = outcome['yaw']
-                print("rotation")
+                print("rotation :", rotation)
 
             # Estimate displacement due to floor change retreat
             if floor > 0:  # Black line detected
@@ -321,6 +322,83 @@ class ControllerNew:
             print("DEBUG CONTROLLERNEW OUTCOME_FOR_AGENT :", outcome_for_agent)
         angle = rotation
         return  phenom_info, angle, translation, outcome_for_agent
+
+
+if __name__ == '__main__':
+    from Agent6 import Agent6
+    from HexaMemory import HexaMemory
+    from HexaView import HexaView
+    from MemoryV1 import MemoryV1
+    from EgoMemoryWindowNew import EgoMemoryWindowNew
+    from Synthesizer import Synthesizer
+
+    # Mandatory Initializations
+    
+    memory = MemoryV1()
+    hexa_memory = HexaMemory(width = 40, height = 80,cells_radius = 50)
+    agent = Agent6(memory, hexa_memory)
+    # Optionals Initializations
+    
+    view = None
+    #view = EgoMemoryWindowNew()
+    hexaview = None
+    hexaview = HexaView()
+    synthesizer = Synthesizer(memory,hexa_memory)
+    controller = ControllerNew(agent,memory,view = view, synthesizer = synthesizer,
+         hexa_memory = hexa_memory, hexaview = hexaview)
+
+
+    # Chose between automatic controller loop or modified loop
+    automatic = False  # -> action from decider
+    manual = True # -> True :user input, False : custom sequence
+    while True :
+        if(automatic):
+            # Main loop
+            controller.loop()
         
+        else :
+            controller.enact_step = 0
+            controller.action = controller.ask_agent_for_action(controller.outcome) # agent -> decider
+            action_debug = controller.action
+            robot_action = controller.translate_agent_action_to_robot_command(controller.action)
+            print("<CONTROLLER> action choisie par le decider = ", controller.action)
+            
 
 
+            # Chose action manually
+           
+            action_choisie = robot_action
+            if True:
+                
+                if manual :
+                    action_choisie = input("Please input action : \n")
+                else :
+                    "put here the actions you want the robot to take"
+                    action_possibles = ['1','8','3']
+                    action_choisie =action_possibles[ random.randint(0, len(action_possibles)-1)]
+            robot_action = action_choisie
+            print("<CONTROLLER> action envoyée au robot = ", robot_action)
+            controller.command_robot(robot_action)
+            robot_action
+            while(controller.enact_step < 2):   # refresh la vue tant que pas de reponses de command_robot 
+                if controller.view is not None:
+                    controller.view.refresh(controller.memory) # TODO: camerde
+                if controller.hexa_memory is not None and controller.hexaview is not None:
+                    controller.hexaview.refresh(controller.hexa_memory)  # TODO: camerde
+            controller.enact_step = 0
+            robot_data = controller.outcome_bytes
+            phenom_info, angle, translation, controller.outcome = controller.translate_robot_data(robot_data)
+            controller.send_position_change_to_memory(angle,translation) #Might be an order problem between this line and the one under it, depending on
+            controller.send_phenom_info_to_memory(phenom_info) # when the robot detect interaction (before or after moving)
+            user_interaction = None
+            if controller.view is not None:
+                user_interaction = controller.ask_view_to_refresh_and_get_last_interaction_from_user(controller.memory)
+            controller.memory.tick()
+
+            if controller.hexa_memory is not None :
+                controller.send_position_change_to_hexa_memory(angle,translation)
+            if controller.synthesizer is not None :
+                controller.ask_synthetizer_to_act()
+            if controller.hexaview is not None :
+                ""
+                controller.ask_hexaview_to_refresh(controller.hexa_memory)

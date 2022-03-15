@@ -14,7 +14,6 @@ and a phenom_to_whatev function and use it instead.
 def interactionList_to_pyglet(liste,batch):
     shapesList = []
     for i in range(len(liste)):
-        print("kssutils")
         shapesList.append(interaction_to_pyglet(liste[i],batch))
     return shapesList
 
@@ -59,19 +58,27 @@ def hexaMemory_to_pyglet(hexaMemory,batch):
     hauteur = math.sqrt( (2*radius)**2 -radius**2 )
     for i in range(0, len(grid)):
         for j in range(0, len(grid[0])):
+            robot = False
             color_debug = (random.randint(0,255),random.randint(0,255),random.randint(0,255))
             cell = grid[i][j]
-            color = name_to_rgb("grey")
-            if(cell.status == "Free"):
-                color = name_to_rgb("white")
-            elif(cell.status == "Occupied"):
+
+            if cell.occupied :
                 color = name_to_rgb("lime")
-            elif(cell.status == "Blocked"):
-                color = name_to_rgb("red")
-            elif(cell.status == "Frontier"):
-                color = name_to_rgb("black")
-            elif(cell.status == "Something"):
-                color = name_to_rgb("orange")
+                robot = True
+            else : 
+                color = name_to_rgb("grey")
+                if(cell.status == "Free"):
+                    color = name_to_rgb("white")
+                elif(cell.status == "Occupied"):
+                    color = name_to_rgb("yellow")
+                    robot = True
+                
+                elif(cell.status == "Blocked"):
+                    color = name_to_rgb("red")
+                elif(cell.status == "Frontier"):
+                    color = name_to_rgb("black")
+                elif(cell.status == "Something"):
+                    color = name_to_rgb("orange")
 
             x1 = x0
             y1 = y0
@@ -81,6 +88,8 @@ def hexaMemory_to_pyglet(hexaMemory,batch):
             else :
                 x1 = x0 + (1.5 * radius) + i * 3 * radius
                 y1 = y0 + (hauteur/2) + (j-1)/2 * hauteur
+
+            
 
                 
             
@@ -105,6 +114,12 @@ def hexaMemory_to_pyglet(hexaMemory,batch):
 
             hexagon = shapes.Polygon(point1, point2, point3, point4, point5, point6,color = color, batch = batch)            
             shapesList.append(hexagon)
+            if(robot):
+                theta = math.radians(hexaMemory.robot_angle)
+                x2 = radius * math.cos(theta) + x1
+                y2 = radius * math.sin(theta) + y1
+                line = shapes.Line(x1,y1,x2,y2,width = 5,color = name_to_rgb("black"), batch = batch)
+                shapesList.append(line)
 
     return shapesList
 

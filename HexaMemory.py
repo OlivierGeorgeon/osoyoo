@@ -24,7 +24,6 @@ class HexaMemory(HexaGrid):
         self.robot_angle = 0
 
 
-
     def convert_pos_in_cell(self, pos_x, pos_y):
         """blabla"""
         radius = self.cells_radius
@@ -133,16 +132,19 @@ class HexaMemory(HexaGrid):
         self.rotate_robot(rotation)
 
         rota_radian = math.radians(self.robot_angle)
-        move_x += self.robot_pos_x
-        move_y += self.robot_pos_y
-        x_prime = int(move_x * math.cos(rota_radian) - move_y * math.sin(rota_radian))
-        y_prime = int(move_y * math.cos(rota_radian) - move_x * math.sin(rota_radian))
+        #move_x += self.robot_pos_x
+        #move_y += self.robot_pos_y
+        x_prime = int(move_x * math.cos(rota_radian) + move_y * math.sin(rota_radian))
+        y_prime = int(move_y * math.cos(rota_radian) + move_x * math.sin(rota_radian))
+        x_prime += self.robot_pos_x
+        y_prime += self.robot_pos_y
         self.apply_changes(self.robot_pos_x,self.robot_pos_y,x_prime,y_prime)
         self.robot_pos_x = x_prime
         self.robot_pos_y = y_prime
         self.grid[self.robot_cell_x][self.robot_cell_y].set_to('Free')
+        self.grid[self.robot_cell_x][self.robot_cell_y].leave()
         self.robot_cell_x, self.robot_cell_y = self.convert_pos_in_cell(self.robot_pos_x, self.robot_pos_y)
-        self.grid[self.robot_cell_x][self.robot_cell_y].set_to('Occupied')
+        self.grid[self.robot_cell_x][self.robot_cell_y].occupy()
         print([self.robot_cell_x],[self.robot_cell_y], "set to occupied")
         return x_prime, y_prime
 
@@ -222,7 +224,8 @@ class HexaMemory(HexaGrid):
         self.robot_angle = self.robot_angle %360
         self.robot_orientation = int((self.robot_angle)//60)
         ""
-        print("robot_orientation in hexa_memory : ", self.robot_orientation) # TODO: arranger ce bordel
+        print("robot_orientation in hexa_memory : ", self.robot_orientation,
+                "robot_angle in hexa_memory : ", self.robot_angle) # TODO: arranger ce bordel
 
     #def go_forward(self,distance):
     #    self.move(self.robot_orientation,distance)
@@ -255,13 +258,19 @@ class HexaMemory(HexaGrid):
         current_pos_y = start_y
         for _ in range(nb_step):
             cell_x,cell_y = self.convert_pos_in_cell(current_pos_x,current_pos_y)
+            #if(self.grid[cell_x][cell_y].status == "Unknown"):
             self.grid[cell_x][cell_y].status = status
+            self.grid[cell_x][cell_y].leave()
+            ####
             current_pos_x += step_x
             current_pos_y += step_y
+            """
             if(abs(current_pos_x ) > abs(end_x)):
                 current_pos_x = end_x
             if(abs(current_pos_y ) > abs(end_y)):
                 current_pos_y = end_y
+            """
+            
 
 
 

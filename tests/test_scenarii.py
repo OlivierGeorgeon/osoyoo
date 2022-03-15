@@ -12,7 +12,7 @@ from ControllerNew import ControllerNew
 from Agent6 import Agent6
 if __name__ == '__main__':
     memory = MemoryV1()
-    hexaMemory = HexaMemory(20,100,cells_radius = 20)
+    hexaMemory = HexaMemory(10,10,cells_radius = 20)
     agent = Agent6(memory,hexaMemory)
     synthesizer = Synthesizer(memory, hexaMemory)
 
@@ -29,7 +29,7 @@ if __name__ == '__main__':
         if(i % 2 == 0):
             controller.action = 0
         else :
-            controller.action = 1
+            controller.action = 0
         robot_action = controller.translate_agent_action_to_robot_command(controller.action)
         print("<CONTROLLER> action choisie par le robot = ", controller.action)
         controller.command_robot(robot_action)
