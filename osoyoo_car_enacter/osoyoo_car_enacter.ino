@@ -114,7 +114,6 @@ void setup()
 unsigned long action_start_time = 0;
 unsigned long action_end_time = 0;
 int interaction_step = 0;
-// bool is_enacting_action = false;
 char action =' ';
 String status = "0"; // The outcome information used for sequential learning
 int robot_destination_angle = 0;
@@ -181,7 +180,6 @@ void loop()
 
       action_start_time = millis();
       action_end_time = action_start_time + 1000;
-      // is_enacting_action = true;
       interaction_step = 1;
       IMU.begin();
       shock_event = 0; // reset event from previous interaction
@@ -367,7 +365,7 @@ void loop()
   }
 
   // STEP 3: Ending of interaction:
-  // Send the outcome and go back to Step 1
+  // Send the outcome and go back to Step 0
   if ((interaction_step == 3))
   {
     // Compute the outcome message

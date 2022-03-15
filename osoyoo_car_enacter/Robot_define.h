@@ -1,4 +1,4 @@
-#define ROBOT_ID 4 // 0: regular Osoyoo robot, 1: robot BSN, 2: robot Olivier, 3: robot SHS, 4: robot SHG with GY86
+#define ROBOT_ID 4 // 0: regular Osoyoo robot, 1: robot BSN, 2: robot Olivier, 3: robot SHS, 4: robot SHS with GY86
 
 #if ROBOT_ID == 1
 
