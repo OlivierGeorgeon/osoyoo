@@ -24,7 +24,6 @@ class HexaMemory(HexaGrid):
         self.robot_angle = 0
 
 
-
     def convert_pos_in_cell(self, pos_x, pos_y):
         """blabla"""
         radius = self.cells_radius
@@ -133,10 +132,12 @@ class HexaMemory(HexaGrid):
         self.rotate_robot(rotation)
 
         rota_radian = math.radians(self.robot_angle)
-        move_x += self.robot_pos_x
-        move_y += self.robot_pos_y
-        x_prime = int(move_x * math.cos(rota_radian) - move_y * math.sin(rota_radian))
-        y_prime = int(move_y * math.cos(rota_radian) - move_x * math.sin(rota_radian))
+        #move_x += self.robot_pos_x
+        #move_y += self.robot_pos_y
+        x_prime = int(move_x * math.cos(rota_radian) + move_y * math.sin(rota_radian))
+        y_prime = int(move_y * math.cos(rota_radian) + move_x * math.sin(rota_radian))
+        x_prime += self.robot_pos_x
+        y_prime += self.robot_pos_y
         self.apply_changes(self.robot_pos_x,self.robot_pos_y,x_prime,y_prime)
         self.robot_pos_x = x_prime
         self.robot_pos_y = y_prime
@@ -222,7 +223,8 @@ class HexaMemory(HexaGrid):
         self.robot_angle = self.robot_angle %360
         self.robot_orientation = int((self.robot_angle)//60)
         ""
-        print("robot_orientation in hexa_memory : ", self.robot_orientation) # TODO: arranger ce bordel
+        print("robot_orientation in hexa_memory : ", self.robot_orientation,
+                "robot_angle in hexa_memory : ", self.robot_angle) # TODO: arranger ce bordel
 
     #def go_forward(self,distance):
     #    self.move(self.robot_orientation,distance)
