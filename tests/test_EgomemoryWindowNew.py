@@ -8,19 +8,21 @@ from Agent6 import Agent6
 from Agent5 import Agent5
 from HexaMemory import HexaMemory
 import pyglet
-
+from HexaView import HexaView
 
 # Testing ControllerNew by remote controlling the robot from the EgoMemoryWindowNew
 if __name__ == "__main__":
     emw = EgoMemoryWindowNew()
     emw2 = EgoMemoryWindowNew()
-    emw2.set_caption("Alocentric Memory")
+    emw2.set_caption("North up projection")
     memory = MemoryV1()
     hexa_memory = HexaMemory(width = 40, height = 80,cells_radius = 50)
     # agent = Agent5()
     agent = Agent6(memory, hexa_memory)
 
-    controller = ControllerNew(agent, memory, view=emw)
+    hexaview = HexaView()
+
+    controller = ControllerNew(agent, memory, view=emw, hexa_memory = hexa_memory, hexaview = hexaview)
 
     @emw.event
     def on_text(text):
@@ -30,7 +32,8 @@ if __name__ == "__main__":
         else:
             print("Waiting for previous outcome before sending new action")
 
-    def watch_outcome(dt):
+    def main_loop(dt):
+        """ The main loop is updating the agent """
         if controller.enact_step >= 2:
             robot_data = controller.outcome_bytes
             phenom_info, angle, translation, controller.outcome = controller.translate_robot_data(robot_data)
@@ -39,10 +42,11 @@ if __name__ == "__main__":
             emw.extract_and_convert_phenomenons(memory)
             emw2.extract_and_convert_phenomenons(memory)
             emw2.azimuth = controller.azimuth
+            controller.hexaview.extract_and_convert_phenomenons(controller.hexa_memory)
             controller.enact_step = 0
 
-    # Schedule the controller to watch for the outcome received from the robot
-    pyglet.clock.schedule_interval(watch_outcome, 0.1)
+    # Schedule the main loop that updates the agent
+    pyglet.clock.schedule_interval(main_loop, 0.1)
 
     # Run all the windows
     pyglet.app.run()
