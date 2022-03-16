@@ -68,8 +68,8 @@ class ControllerNew:
         self.outcome = 0
         self.enact_step = 0
         self.action = ""
-        if self.view is not None:
-            self.robot = OsoyooCar(self.view.batch)
+        # if self.view is not None:
+        #    self.robot = OsoyooCar(self.view.batch)
         """    
         # Model
         
@@ -302,14 +302,15 @@ class ControllerNew:
             # Update head angle
             if 'head_angle' in outcome:
                 head_angle = outcome['head_angle']
-                #self.robot.rotate_head(head_angle) TODO: Add robot to view 
+                if self.view is not None:
+                    self.view.robot.rotate_head(head_angle)
                 if self.action == "-" or self.action == "*" or self.action == "1" or self.action == "3":
                     # Create a new echo phenomenon
                     echo_distance = outcome['echo_distance']
                     if echo_distance > 0 :  # echo measure 0 is false measure
                         if self.view is not None:
-                            x = self.robot.head_x + math.cos(math.radians(head_angle)) * echo_distance
-                            y = self.robot.head_y + math.sin(math.radians(head_angle)) * echo_distance
+                            x = ROBOT_HEAD_X + math.cos(math.radians(head_angle)) * echo_distance
+                            y = math.sin(math.radians(head_angle)) * echo_distance
                         obstacle = 1
             #TODO
             """ # Update the azimuth 

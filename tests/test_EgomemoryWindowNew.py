@@ -36,10 +36,12 @@ if __name__ == "__main__":
             phenom_info, angle, translation, controller.outcome = controller.translate_robot_data(robot_data)
             controller.send_position_change_to_memory(angle,translation) #Might be an order problem between this line and the one under it, depending on
             controller.send_phenom_info_to_memory(phenom_info) # when the robot detect interaction (before or after moving)
+            emw.extract_and_convert_phenomenons(memory)
+            emw2.extract_and_convert_phenomenons(memory)
             controller.enact_step = 0
 
     # Schedule the controller to watch for the outcome received from the robot
     pyglet.clock.schedule_interval(watch_outcome, 0.1)
 
-    # Run the egocentric memory window
+    # Run all the windows
     pyglet.app.run()
