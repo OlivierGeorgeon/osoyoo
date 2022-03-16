@@ -35,7 +35,7 @@ def main():
             else:
                 print("Waiting for previous outcome before sending new action")
 
-    def watch_interaction(dt):
+    def main_loop(dt):
         """ Watch for the end of the previous interaction and choose the next """
         if controller.enact_step == 2:
             # Update the egocentric memory window
@@ -58,7 +58,7 @@ def main():
                 controller.enact(['8', '1', '3'][action])
 
     # Schedule the watch of the end of the previous interaction and choosing the next
-    pyglet.clock.schedule_interval(watch_interaction, 0.1)
+    pyglet.clock.schedule_interval(main_loop, 0.1)
 
     # Run the egocentric memory window
     pyglet.app.run()
