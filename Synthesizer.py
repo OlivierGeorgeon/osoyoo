@@ -36,7 +36,7 @@ class Synthesizer:
         position in the allocentric representation
         """
         for interaction in self.memory.phenomenons :
-            print("<SYNTHESIZER> : actual du of interact: ", interaction.actual_durability)
+            #print("<SYNTHESIZER> : actual_durability of interact: ", interaction.actual_durability)
             if(interaction.actual_durability > 0):
                 rota_radian = math.radians(self.hexa_memory.robot_angle)
                 # les interactions etant egocentrés, on fait la manip pour les allocentrer

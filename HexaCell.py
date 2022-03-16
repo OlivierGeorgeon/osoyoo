@@ -1,3 +1,6 @@
+from re import S
+
+
 class HexaCell:
     """This
     """
@@ -24,4 +27,4 @@ class HexaCell:
         if( status == "Free" or status == "Blocked" or status == "Unknown" or status == "Line" or status == "Something"): 
             self.status = status
         else :
-            print("Unknown status, existing status : \"Free\" (when has been visited), \"Occupied\" (when robot is on it), \"Blocked\" (when object is on it), \"Unknown\" (when has not been visited)")
+            print("Unknown status : \" ",status, ", existing status : \"Free\" (when has been visited), \"Occupied\" (when robot is on it), \"Blocked\" (when object is on it), \"Unknown\" (when has not been visited)")
