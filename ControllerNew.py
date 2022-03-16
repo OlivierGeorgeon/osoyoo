@@ -319,7 +319,6 @@ class ControllerNew:
             """
             
             phenom_info = (floor,shock,blocked,obstacle,x,y)
-            print("DEBUG CONTROLLERNEW OUTCOME_FOR_AGENT :", outcome_for_agent)
         angle = rotation
         return  phenom_info, angle, translation, outcome_for_agent
 
@@ -335,7 +334,7 @@ if __name__ == '__main__':
     # Mandatory Initializations
     
     memory = MemoryV1()
-    hexa_memory = HexaMemory(width = 40, height = 80,cells_radius = 50)
+    hexa_memory = HexaMemory(width = 40, height = 80,cells_radius = 10)
     agent = Agent6(memory, hexa_memory)
     # Optionals Initializations
     
@@ -361,7 +360,7 @@ if __name__ == '__main__':
             controller.action = controller.ask_agent_for_action(controller.outcome) # agent -> decider
             action_debug = controller.action
             robot_action = controller.translate_agent_action_to_robot_command(controller.action)
-            print("<CONTROLLER> action choisie par le decider = ", controller.action)
+            #print("<CONTROLLER> action choisie par le decider = ", controller.action)
             
 
 
@@ -374,10 +373,16 @@ if __name__ == '__main__':
                     action_choisie = input("Please input action : \n")
                 else :
                     "put here the actions you want the robot to take"
-                    action_possibles = ['1','8','3']
-                    action_choisie =action_possibles[ random.randint(0, len(action_possibles)-1)]
+                    action_possibles = ['1','3','8']
+                    dice = random.randint(0,10)
+                    if(dice < 7):
+                        action_choisie = '8'
+                    else :
+                        dice = random.randint(0,1)
+                        action_choisie = action_possibles[dice]
+                    #action_choisie =action_possibles[ random.randint(0, len(action_possibles)-1)]
             robot_action = action_choisie
-            print("<CONTROLLER> action envoyée au robot = ", robot_action)
+            #print("<CONTROLLER> action envoyée au robot = ", robot_action)
             controller.command_robot(robot_action)
             robot_action
             while(controller.enact_step < 2):   # refresh la vue tant que pas de reponses de command_robot 

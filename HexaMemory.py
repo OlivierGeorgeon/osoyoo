@@ -19,7 +19,7 @@ class HexaMemory(HexaGrid):
         self.robot_pos_y = 0
         self.robot_width = robot_width
         print("DEBUG : Robot position at init of HEXAMEMORY : ",self.robot_cell_x,self.robot_cell_y)
-        self.grid[self.robot_cell_x][self.robot_cell_y].set_to("Occupied")
+        self.grid[self.robot_cell_x][self.robot_cell_y].occupy()
         self.robot_orientation = 0 # Should use the same values as directions of the move() function
         self.robot_angle = 0
 
@@ -145,7 +145,7 @@ class HexaMemory(HexaGrid):
         self.grid[self.robot_cell_x][self.robot_cell_y].leave()
         self.robot_cell_x, self.robot_cell_y = self.convert_pos_in_cell(self.robot_pos_x, self.robot_pos_y)
         self.grid[self.robot_cell_x][self.robot_cell_y].occupy()
-        print([self.robot_cell_x],[self.robot_cell_y], "set to occupied")
+        print([self.robot_cell_x],[self.robot_cell_y], "occupied")
         return x_prime, y_prime
 
     def depr_move(self, direction, distance):

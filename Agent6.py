@@ -30,7 +30,8 @@ class Agent6():
             print("AGENT 6 action() : no unknown neighbors")
             return random.randint(0,2)
         else :
-            print("Nb neighbors : " , len(unknown_neighbors))
+            #print("Nb neighbors : " , len(unknown_neighbors))
+            ""
         target, target_direction = unknown_neighbors[0][0], unknown_neighbors[0][1]
         
         relative_direction = target_direction - self.hexa_memory.robot_orientation
