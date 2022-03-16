@@ -62,6 +62,8 @@ class ControllerNew:
         self.hexa_memory = hexa_memory
         self.hexaview = hexaview
 
+        self.azimuth = 0
+
         self.wifiInterface = WifiInterface()
         self.outcome_bytes = b'{"status":"T"}'  # Default status T timeout
 
@@ -320,6 +322,13 @@ class ControllerNew:
             """
             
             phenom_info = (floor,shock,blocked,obstacle,x,y)
+
+        # Update the azimuth
+        if 'azimuth' in outcome:
+            self.azimuth = outcome['azimuth']
+        else:
+            self.azimuth -= rotation
+
         angle = rotation
         return  phenom_info, angle, translation, outcome_for_agent
 

@@ -14,7 +14,7 @@ import pyglet
 if __name__ == "__main__":
     emw = EgoMemoryWindowNew()
     emw2 = EgoMemoryWindowNew()
-    emw2.set_caption("Window 2")
+    emw2.set_caption("Alocentric Memory")
     memory = MemoryV1()
     hexa_memory = HexaMemory(width = 40, height = 80,cells_radius = 50)
     # agent = Agent5()
@@ -38,6 +38,7 @@ if __name__ == "__main__":
             controller.send_phenom_info_to_memory(phenom_info) # when the robot detect interaction (before or after moving)
             emw.extract_and_convert_phenomenons(memory)
             emw2.extract_and_convert_phenomenons(memory)
+            emw2.azimuth = controller.azimuth
             controller.enact_step = 0
 
     # Schedule the controller to watch for the outcome received from the robot
