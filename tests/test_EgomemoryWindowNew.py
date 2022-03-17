@@ -26,10 +26,8 @@ if __name__ == "__main__":
     hexa_memory = HexaMemory(width = 40, height = 80,cells_radius = 50)
     agent_act = Agent5()
     agent = Agent6(memory, hexa_memory)
-
     hexaview = HexaView()
     synthesizer = Synthesizer(memory,hexa_memory)
-
     controller = ControllerNew(agent, memory, view=emw, synthesizer = synthesizer, hexa_memory = hexa_memory, hexaview = hexaview)
 
     @emw.event
@@ -79,27 +77,6 @@ if __name__ == "__main__":
                 # Choose the next action
                 action = agent_act.action(outcome)
                 controller.command_robot(['8', '1', '3'][action])
-
-    # @emw.event
-    # def on_text(text):
-    #     """ Receiving the action from the window and calling the controller to send the action to the robot """
-    #     if controller.enact_step == 0:
-    #         controller.command_robot(text)
-    #     else:
-    #         print("Waiting for previous outcome before sending new action")
-    #
-    # def main_loop(dt):
-    #     """ The main loop is updating the agent """
-    #     if controller.enact_step >= 2:
-    #         robot_data = controller.outcome_bytes
-    #         phenom_info, angle, translation, controller.outcome = controller.translate_robot_data(robot_data)
-    #         controller.send_position_change_to_memory(angle,translation) #Might be an order problem between this line and the one under it, depending on
-    #         controller.send_phenom_info_to_memory(phenom_info) # when the robot detect interaction (before or after moving)
-    #         emw.extract_and_convert_phenomenons(memory)
-    #         emw2.extract_and_convert_phenomenons(memory)
-    #         emw2.azimuth = controller.azimuth
-    #         controller.hexaview.extract_and_convert_phenomenons(controller.hexa_memory)
-    #         controller.enact_step = 0
 
     # Schedule the main loop that updates the agent
     pyglet.clock.schedule_interval(main_loop, 0.1)

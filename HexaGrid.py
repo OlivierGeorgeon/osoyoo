@@ -84,4 +84,4 @@ if __name__ == '__main__':
     hx = HexaGrid(5,5)
     print(hx)
     print(hx.get_neighbor_in_direction(2,2,0))
-    print("All neighbors of 2,2 : ", hx.getAllNeighbors(2,2))
+    print("All neighbors of 2,2 : ", hx.get_all_neighbors(2,2))

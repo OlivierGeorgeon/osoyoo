@@ -225,11 +225,11 @@ class ControllerNew:
             outcome_for_agent = json_outcome['floor']
         shock = 0
         if 'shock' in outcome and self.action == '8' and floor == 0:
-            shock = outcome['shock']
+            shock = outcome['shock']  # Yellow star
             outcome_for_agent = json_outcome['shock']
         blocked = 0
-        if 'blocked' in outcome and self.action == '8':
-            blocked = outcome['blocked']
+        if 'blocked' in outcome and self.action == '8' and floor == 0:
+            blocked = outcome['blocked'] # Red star
             outcome_for_agent = json_outcome['shock'] #OULAH
 
         # floor_outcome = outcome['outcome']  # Agent5 uses floor_outcome
@@ -269,22 +269,6 @@ class ControllerNew:
                          print("translation negative") 
             angle = rotation
 
-            # Check for collision when moving forward
-            if self.action == "8" and floor == 0:
-                if blocked:
-                    # Create a new pressing interaction
-                    #wall = Phenomenon(110, 0, self.view.batch, 2, 1) # TODO : oubli
-                    #self.phenomena.append(wall)
-                    blocked = 1
-                else:
-                    # Create a new blocked interaction
-                    if shock == 0b01: # TODO : remettre en literral bit dans la traduction de MemoryNew
-                        shock = 1
-                    if shock == 0b11:
-                        shock = 2
-                    if shock == 0b10:
-                        shock = 3
-
             # Update head angle
             if 'head_angle' in outcome:
                 head_angle = outcome['head_angle']
@@ -298,13 +282,7 @@ class ControllerNew:
                             x = ROBOT_HEAD_X + math.cos(math.radians(head_angle)) * echo_distance
                             y = math.sin(math.radians(head_angle)) * echo_distance
                         obstacle = 1
-            #TODO
-            """ # Update the azimuth 
-            if 'azimuth' in outcome:
-                self.view.azimuth = outcome['azimuth']
-                        #phenom_info = (floor,shock,blocked,x,y)
-            """
-            
+
             phenom_info = (floor,shock,blocked,obstacle,x,y)
 
         # Update the azimuth
@@ -315,6 +293,7 @@ class ControllerNew:
 
         angle = rotation
         return  phenom_info, angle, translation, outcome_for_agent
+
     ################################################ DEPRECATED #####################################################
     def loop(self):# DEPRECATED #NOT IMPLEMENTED: Change of behavior when user interact with view
         #NOT IMPLEMENTED : MANUAL mode
