@@ -20,6 +20,7 @@ class MemoryNew:
     def __init__(self):
         self.phenomenons = []
         self.yaw = 0
+        self.current_id = 0
 
 
     def add(self,phenom_info):
@@ -34,38 +35,27 @@ class MemoryNew:
         durability = 3
 
         if(floor):
-            floorInter = Interaction(10,0,2,20,type = 'Line', shape = 'Rectangle', color= 'red', durability = durability, decayIntensity = 1)
+            floorInter = Interaction(10,0,2,20,type = 'Line', shape = 'Rectangle', color= 'red', durability = durability, decayIntensity = 1, id = self.current_id)
             self.phenomenons.append(floorInter)
         if shock:
             shockInter = None
             if(shock == 1):
-                shockInter = Interaction(110,-80,20,60, type = 'shock', shape = 'Star',color = 'yellow', durability = durability, decayIntensity = 1, starArgs = 5)
+                shockInter = Interaction(110,-80,20,60, type = 'shock', shape = 'Star',color = 'yellow', durability = durability, decayIntensity = 1, starArgs = 5, id = self.current_id)
                 #Star(x, y, outer_radius, inner_radius, num_spikes, rotation=0, color=(255, 255, 255), batch=None, group=None)
             if(shock == 2):
-                shockInter = Interaction(110,0,20,60, type = 'shock', shape = 'Star',color = 'yellow', durability = durability, decayIntensity = 1, starArgs = 5)
+                shockInter = Interaction(110,0,20,60, type = 'shock', shape = 'Star',color = 'yellow', durability = durability, decayIntensity = 1, starArgs = 5, id = self.current_id)
             else :
-                shockInter = Interaction(110,80,20,60, type = 'shock', shape = 'Star',color = 'yellow', durability = durability, decayIntensity = 1, starArgs = 5)
+                shockInter = Interaction(110,80,20,60, type = 'shock', shape = 'Star',color = 'yellow', durability = durability, decayIntensity = 1, starArgs = 5, id = self.current_id)
             self.phenomenons.append(shockInter)
         if blocked :
-            blockInter =  Interaction(110,80,20,60, type = 'block', shape = 'Star',color = 'red', durability = durability, decayIntensity = 1, starArgs = 6)
+            blockInter =  Interaction(110,80,20,60, type = 'block', shape = 'Star',color = 'red', durability = durability, decayIntensity = 1, starArgs = 6, id = self.current_id)
             self.phenomenons.append(blockInter)
 
         if obstacle :
-            obstacleInter = Interaction(x,y,width = 50,type = 'obstacle', shape = 'Circle', color = 'green', durability = durability, decayIntensity = 1)
+            obstacleInter = Interaction(x,y,width = 50,type = 'obstacle', shape = 'Circle', color = 'green', durability = durability, decayIntensity = 1, id = self.current_id)
             #self.phenomenons.append(obstacleInter)
         
-        for _,phenom in enumerate(self.phenomenons) :
-            try :
-                if phenom is tuple :
-                    phenom = phenom[1]
-                if phenom is None or phenom.x is None or phenom.y is None :
-                    self.phenomenons.remove(phenom)
-            except :
-                print("le coupable :  ", phenom)
-    """
-    def draw(self):
-        return phenomList_to_pyglet(self.phenomenons,self.batch)
-    """
+        self.current_id += 1
         
 
     def tick(self):

@@ -97,9 +97,10 @@ class ControllerNew:
             self.send_position_change_to_hexa_memory(angle,translation)
             self.send_phenom_info_to_memory(phenom_info) # when the robot detect interaction (before or after moving)
             self.ask_synthetizer_to_act()
+            self.main_refresh()
             self.enact_step = 0
 
-    def main_refresh(self,dt):
+    def main_refresh(self):
         """Function that refresh the views"""
         if self.view is not None :
             self.view.extract_and_convert_phenomenons(self.memory)
@@ -111,7 +112,7 @@ class ControllerNew:
     def main(self):
         """Main function of the controller"""
         pyglet.clock.schedule_interval(self.main_loop,0.1)
-        pyglet.clock.schedule_interval(self.main_refresh,0.1)
+        #pyglet.clock.schedule_interval(self.main_refresh,0.1)
         pyglet.app.run()
     ################################################# LOOP #################################################################"""
 
@@ -377,7 +378,7 @@ if __name__ == '__main__':
     # Optionals Initializations
     
     view = None
-    #view = EgoMemoryWindowNew()
+    view = EgoMemoryWindowNew()
     hexaview = None
     hexaview = HexaView()
     synthesizer = Synthesizer(memory,hexa_memory)
