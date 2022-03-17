@@ -5,8 +5,10 @@ from Interaction import Interaction
 from webcolors import name_to_rgb
 from Utils import rotate
 import math
-
 from pyrr import matrix44
+from RobotDefine import *
+
+
 class MemoryNew:
     """This class play the role of a memory manager : it stocks Interaction objects,
     apply transformations to them (such as decay)
@@ -35,7 +37,7 @@ class MemoryNew:
         durability = 3
 
         if(floor):
-            floorInter = Interaction(150,0,10,40,type = 'Line', shape = 'Rectangle', color= 'red', durability = durability, decayIntensity = 1, id = self.current_id)
+            floorInter = Interaction(ROBOT_FRONT_X + RETREAT_DISTANCE,0,10,60,type = 'Line', shape = 'Rectangle', color= 'black', durability = durability, decayIntensity = 1, id = self.current_id)
             self.interactions.append(floorInter)
         if shock:
             shockInter = None
@@ -52,8 +54,8 @@ class MemoryNew:
             self.interactions.append(blockInter)
 
         if obstacle :
-            obstacleInter = Interaction(x,y,width = 50,type = 'obstacle', shape = 'Circle', color = 'green', durability = durability, decayIntensity = 1, id = self.current_id)
-            #self.phenomenons.append(obstacleInter)
+            obstacleInter = Interaction(x,y,width = 50,type = 'obstacle', shape = 'Circle', color = 'limegreen', durability = durability, decayIntensity = 1, id = self.current_id)
+            self.interactions.append(obstacleInter)
         
         self.current_id += 1
         
@@ -89,9 +91,8 @@ class MemoryNew:
             i.displace(displacement_matrix)
 
         
-
+# Testing MemoryNew by displaying interactions in an EgoMemoryWindowNew
 if __name__ == "__main__":
-    
 
     def func_bidon(batch):
        circle = shapes.Circle(500, 150, 100, color=(50, 225, 30), batch=batch)
