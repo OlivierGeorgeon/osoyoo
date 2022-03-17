@@ -24,6 +24,7 @@ class Synthesizer:
         self.memory = memory
         self.hexa_memory = hexa_memory
         self.internal_hexa_grid = HexaGrid(hexa_memory.width, hexa_memory.height)
+        self.last_used_id = 0
 
     def act(self):
         """Create phenoms based on Interactions in memory and States in hexa_memory"""
@@ -36,6 +37,9 @@ class Synthesizer:
         position in the allocentric representation
         """
         for interaction in self.memory.phenomenons :
+            print("<SYNTHESIZER> : interaction id : ,",interaction.id, "last used id :" ,self.last_used_id)
+            if(interaction.id< self.last_used_id):
+                continue
             #print("<SYNTHESIZER> : actual_durability of interact: ", interaction.actual_durability)
             if(interaction.actual_durability > 0):
                 rota_radian = math.radians(self.hexa_memory.robot_angle)
@@ -47,6 +51,8 @@ class Synthesizer:
                 y_prime += self.hexa_memory.robot_pos_y
                 x, y = self.hexa_memory.convert_pos_in_cell(x_prime, y_prime)
                 self.internal_hexa_grid.grid[x][y].interactions.append(interaction)
+            if(interaction.id > self.last_used_id):
+                self.last_used_id = interaction.id
 
     def depr_project_memory_on_internal_grid(self):
         """ Convert position of egocentric interactions of the memory into

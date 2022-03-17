@@ -7,7 +7,7 @@ class Interaction:
     Author: TKnockaert
     """
 
-    def __init__(self,x,y,width = 50, height = 50, type = 'None',shape = 'Circle',color = 'green',durability = 10,decayIntensity = 1, starArgs = None):
+    def __init__(self,x,y,width = 50, height = 50, type = 'None',shape = 'Circle',color = 'green',durability = 10,decayIntensity = 1, starArgs = None, id = 0):
         """Create an object to be placed in the memory.
 
         Args:
@@ -36,6 +36,7 @@ class Interaction:
         self.rgb = name_to_rgb(color)
         self.starArgs = starArgs # At the moment, represent the number of spikes of a star
         self.rotation = 0
+        self.id = id
         print(self.rgb)
 
     def decay(self):

@@ -9,6 +9,7 @@ from RobotDefine import *
 from WifiInterface import WifiInterface
 from OsoyooCar import OsoyooCar
 from EgoMemoryWindowNew import EgoMemoryWindowNew
+import msvcrt
 
 
 
@@ -53,7 +54,7 @@ class ControllerNew:
             - Receive Datas from the robot
     """
 
-    def __init__(self,  agent, memory, view = None, synthesizer = None, hexa_memory = None, hexaview = None):
+    def __init__(self,  agent, memory, view = None, synthesizer = None, hexa_memory = None, hexaview = None,automatic = True):
         # View
         self.view = view
         self.agent = agent
@@ -61,9 +62,9 @@ class ControllerNew:
         self.synthesizer = synthesizer
         self.hexa_memory = hexa_memory
         self.hexaview = hexaview
-
         self.azimuth = 0
 
+        self.automatic = automatic
         self.wifiInterface = WifiInterface()
         self.outcome_bytes = b'{"status":"T"}'  # Default status T timeout
 
@@ -85,45 +86,47 @@ class ControllerNew:
 
 
     
+
+    def main_loop(self,dt):
+        """blabla"""
+        robot_action = None
+        # 1 : demande l'action :
+        if(self.enact_step == 0):
+            if self.automatic :
+                self.action = self.ask_agent_for_action(self.outcome) # agent -> decider
+                robot_action = self.translate_agent_action_to_robot_command(self.action)
+                
+            else :
+                print("Input ?")
+                robot_action = msvcrt.getch().decode("utf-8")
+        # 2 : ordonne au robot
+            self.command_robot(robot_action)
+        if(self.enact_step >= 2):
+            robot_data = self.outcome_bytes
+            phenom_info, angle, translation, self.outcome = self.translate_robot_data(robot_data)
+            self.send_position_change_to_memory(angle,translation) #Might be an order problem between this line and the one under it, depending on
+            self.send_position_change_to_hexa_memory(angle,translation)
+            self.send_phenom_info_to_memory(phenom_info) # when the robot detect interaction (before or after moving)
+            self.ask_synthetizer_to_act()
+            self.main_refresh()
+            self.enact_step = 0
+
+    def main_refresh(self):
+        """Function that refresh the views"""
+        if self.view is not None :
+            self.view.extract_and_convert_phenomenons(self.memory)
+        if self.hexaview is not None :
+            self.hexaview.extract_and_convert_phenomenons(self.hexa_memory)
+        
+
+
+    def main(self):
+        """Main function of the controller"""
+        pyglet.clock.schedule_interval(self.main_loop,0.1)
+        #pyglet.clock.schedule_interval(self.main_refresh,0.1)
+        pyglet.app.run()
     ################################################# LOOP #################################################################"""
 
-    def loop(self): #NOT IMPLEMENTED: Change of behavior when user interact with view
-        #NOT IMPLEMENTED : MANUAL mode
-        """ Main loop of the controller
-            It has the responsibility to update all the system
-            i.e. ask the decider for an action and apply all changes
-            to the system
-        """
-        self.enact_step = 0
-        self.action = self.ask_agent_for_action(self.outcome) # agent -> decider
-        action_debug = self.action
-        robot_action = self.translate_agent_action_to_robot_command(self.action)
-        print("<CONTROLLER> action choisie par le robot = ", self.action)
-        #time.sleep(1)
-        self.command_robot(robot_action)
-        while(self.enact_step < 2):   # refresh la vue tant que pas de reponses de command_robot 
-            if self.view is not None:
-                self.view.refresh(self.memory) # TODO: camerde
-            if self.hexa_memory is not None :
-                self.hexaview.refresh(self.hexa_memory)  # TODO: camerde
-        self.enact_step = 0
-        robot_data = self.outcome_bytes
-        phenom_info, angle, translation, self.outcome = self.translate_robot_data(robot_data)
-        self.send_position_change_to_memory(angle,translation) #Might be an order problem between this line and the one under it, depending on
-        self.send_phenom_info_to_memory(phenom_info) # when the robot detect interaction (before or after moving)
-        user_interaction = None
-        if self.view is not None:
-            user_interaction = self.ask_view_to_refresh_and_get_last_interaction_from_user(self.memory)
-        self.memory.tick()
-
-        if self.hexa_memory is not None :
-             self.send_position_change_to_hexa_memory(angle,translation)
-        if self.synthesizer is not None : 
-            self.ask_synthetizer_to_act()
-        if self.hexaview is not None :
-            ""
-            self.ask_hexaview_to_refresh(self.hexa_memory)
-        return self.outcome,user_interaction
     
     ################################################# AGENT RELATED #################################################################
        
@@ -137,49 +140,30 @@ class ControllerNew:
     ################################################# SYNTHETIZER RELATED #################################################################
 
     def ask_synthetizer_to_act(self):
-        self.synthesizer.act()
+        if self.synthesizer is not None :
+            self.synthesizer.act()
 
     ################################################# MEMORY RELATED #################################################################
     def send_phenom_info_to_memory(self,phenom_info):
         """Send Interaction to the Memory
         """
-        self.memory.add(phenom_info)
+        if self.memory is not None:
+            self.memory.add(phenom_info)
 
     def send_position_change_to_memory(self, angle, translation):
         """Send position changes (angle,distance) to the Memory
         """
-        self.memory.move(angle, translation)
+        if self.memory is not None :
+            self.memory.move(angle, translation)
 
     ################################################# HEXA_MEMORY RELATED #################################################################
 
-    def depr_send_position_change_to_hexa_memory(self,angle,translation):
-        """Adapt position change to fit hexa_memory functioning
-        angle is converted in nb of 60 degrees turns and translation is
-        adapted to a number of radius
-        """
-        print("angle sent by controller: ", angle)
-        self.hexa_memory.rotate_robot(-angle)
-        distance = int(math.sqrt(translation[0]**2 + translation[1]**2 ) )
-        print("translation = ", translation,
-            " distance = ", distance)
-        self.hexa_memory.go_forward(distance)
 
     def send_position_change_to_hexa_memory(self,angle,translation):
         """Apply movement to hexamem"""
-        self.hexa_memory.move(angle,translation[0], translation[1])
-    ################################################# VIEW RELATED #################################################################
-    def ask_view_to_refresh_and_get_last_interaction_from_user(self,memory):
-        """ Ask the View to refresh itself after an action from the robot
-            Ask if the User has interacted with the view since the last iteration
-        """
-        return self.view.refresh(memory)
+        if self.hexa_memory is not None:
+            self.hexa_memory.move(angle,translation[0], translation[1])
 
-    ################################################# HEXAVIEW RELATED #################################################################
-    def ask_hexaview_to_refresh(self,hexamemory):
-        """ Ask the hexaview to refresh after robot action and
-        synthetizer work.
-        """
-        return self.hexaview.refresh(hexamemory)
 
     ################################################# ROBOT RELATED #################################################################
 
@@ -331,8 +315,72 @@ class ControllerNew:
 
         angle = rotation
         return  phenom_info, angle, translation, outcome_for_agent
+    ################################################ DEPRECATED #####################################################
+    def loop(self):# DEPRECATED #NOT IMPLEMENTED: Change of behavior when user interact with view
+        #NOT IMPLEMENTED : MANUAL mode
+        """ Main loop of the controller
+            It has the responsibility to update all the system
+            i.e. ask the decider for an action and apply all changes
+            to the system
+        """
+        self.enact_step = 0
+        self.action = self.ask_agent_for_action(self.outcome) # agent -> decider
+        action_debug = self.action
+        robot_action = self.translate_agent_action_to_robot_command(self.action)
+        print("<CONTROLLER> action choisie par le robot = ", self.action)
+        #time.sleep(1)
+        self.command_robot(robot_action)
 
 
+        while(self.enact_step < 2):   # refresh la vue tant que pas de reponses de command_robot 
+            if self.view is not None:
+                self.view.refresh(self.memory) # TODO: camerde
+            if self.hexa_memory is not None :
+                self.hexaview.refresh(self.hexa_memory)  # TODO: camerde
+        self.enact_step = 0
+        robot_data = self.outcome_bytes
+        phenom_info, angle, translation, self.outcome = self.translate_robot_data(robot_data)
+        self.send_position_change_to_memory(angle,translation) #Might be an order problem between this line and the one under it, depending on
+        self.send_phenom_info_to_memory(phenom_info) # when the robot detect interaction (before or after moving)
+        user_interaction = None
+        if self.view is not None:
+            user_interaction = self.ask_view_to_refresh_and_get_last_interaction_from_user(self.memory)
+        self.memory.tick()
+
+        if self.hexa_memory is not None :
+             self.send_position_change_to_hexa_memory(angle,translation)
+        if self.synthesizer is not None : 
+            self.ask_synthetizer_to_act()
+        if self.hexaview is not None :
+            ""
+            self.ask_hexaview_to_refresh(self.hexa_memory)
+        return self.outcome,user_interaction
+    
+    def depr_send_position_change_to_hexa_memory(self,angle,translation):
+        """Adapt position change to fit hexa_memory functioning
+        angle is converted in nb of 60 degrees turns and translation is
+        adapted to a number of radius
+        """
+        print("angle sent by controller: ", angle)
+        self.hexa_memory.rotate_robot(-angle)
+        distance = int(math.sqrt(translation[0]**2 + translation[1]**2 ) )
+        print("translation = ", translation,
+            " distance = ", distance)
+        self.hexa_memory.go_forward(distance)
+
+        ################################################# VIEW RELATED #################################################################
+    def ask_view_to_refresh_and_get_last_interaction_from_user(self,memory):
+        """ Ask the View to refresh itself after an action from the robot
+            Ask if the User has interacted with the view since the last iteration
+        """
+        return self.view.refresh(memory)
+
+    ################################################# HEXAVIEW RELATED #################################################################
+    def ask_hexaview_to_refresh(self,hexamemory):
+        """ Ask the hexaview to refresh after robot action and
+        synthetizer work.
+        """
+        return self.hexaview.refresh(hexamemory)
 if __name__ == '__main__':
     from Agent6 import Agent6
     from HexaMemory import HexaMemory
@@ -349,71 +397,15 @@ if __name__ == '__main__':
     # Optionals Initializations
     
     view = None
-    #view = EgoMemoryWindowNew()
+    view = EgoMemoryWindowNew()
     hexaview = None
     hexaview = HexaView()
     synthesizer = Synthesizer(memory,hexa_memory)
+    automatic = False
     controller = ControllerNew(agent,memory,view = view, synthesizer = synthesizer,
-         hexa_memory = hexa_memory, hexaview = hexaview)
+         hexa_memory = hexa_memory, hexaview = hexaview,automatic = automatic)
+
+    controller.main()
 
 
-    # Chose between automatic controller loop or modified loop
-    automatic = False  # -> action from decider
-    manual = True # -> True :user input, False : custom sequence
-    while True :
-        if(automatic):
-            # Main loop
-            controller.loop()
-        
-        else :
-            controller.enact_step = 0
-            controller.action = controller.ask_agent_for_action(controller.outcome) # agent -> decider
-            action_debug = controller.action
-            robot_action = controller.translate_agent_action_to_robot_command(controller.action)
-            #print("<CONTROLLER> action choisie par le decider = ", controller.action)
-            
-
-
-            # Chose action manually
-           
-            action_choisie = robot_action
-            if True:
-                
-                if manual :
-                    action_choisie = input("Please input action : \n")
-                else :
-                    "put here the actions you want the robot to take"
-                    action_possibles = ['1','3','8']
-                    dice = random.randint(0,10)
-                    if(dice < 7):
-                        action_choisie = '8'
-                    else :
-                        dice = random.randint(0,1)
-                        action_choisie = action_possibles[dice]
-                    #action_choisie =action_possibles[ random.randint(0, len(action_possibles)-1)]
-            robot_action = action_choisie
-            #print("<CONTROLLER> action envoyée au robot = ", robot_action)
-            controller.command_robot(robot_action)
-            robot_action
-            while(controller.enact_step < 2):   # refresh la vue tant que pas de reponses de command_robot 
-                if controller.view is not None:
-                    controller.view.refresh(controller.memory) # TODO: camerde
-                if controller.hexa_memory is not None and controller.hexaview is not None:
-                    controller.hexaview.refresh(controller.hexa_memory)  # TODO: camerde
-            controller.enact_step = 0
-            robot_data = controller.outcome_bytes
-            phenom_info, angle, translation, controller.outcome = controller.translate_robot_data(robot_data)
-            controller.send_position_change_to_memory(angle,translation) #Might be an order problem between this line and the one under it, depending on
-            controller.send_phenom_info_to_memory(phenom_info) # when the robot detect interaction (before or after moving)
-            user_interaction = None
-            if controller.view is not None:
-                user_interaction = controller.ask_view_to_refresh_and_get_last_interaction_from_user(controller.memory)
-            controller.memory.tick()
-
-            if controller.hexa_memory is not None :
-                controller.send_position_change_to_hexa_memory(angle,translation)
-            if controller.synthesizer is not None :
-                controller.ask_synthetizer_to_act()
-            if controller.hexaview is not None :
-                ""
-                controller.ask_hexaview_to_refresh(controller.hexa_memory)
+    
