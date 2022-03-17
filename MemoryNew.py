@@ -35,7 +35,7 @@ class MemoryNew:
         durability = 3
 
         if(floor):
-            floorInter = Interaction(10,0,2,20,type = 'Line', shape = 'Rectangle', color= 'red', durability = durability, decayIntensity = 1, id = self.current_id)
+            floorInter = Interaction(20,0,2,20,type = 'Line', shape = 'Rectangle', color= 'red', durability = durability, decayIntensity = 1, id = self.current_id)
             self.phenomenons.append(floorInter)
         if shock:
             shockInter = None
@@ -48,7 +48,7 @@ class MemoryNew:
                 shockInter = Interaction(110,80,20,60, type = 'shock', shape = 'Star',color = 'yellow', durability = durability, decayIntensity = 1, starArgs = 5, id = self.current_id)
             self.phenomenons.append(shockInter)
         if blocked :
-            blockInter =  Interaction(110,80,20,60, type = 'block', shape = 'Star',color = 'red', durability = durability, decayIntensity = 1, starArgs = 6, id = self.current_id)
+            blockInter =  Interaction(110,0,20,60, type = 'block', shape = 'Star',color = 'red', durability = durability, decayIntensity = 1, starArgs = 6, id = self.current_id)
             self.phenomenons.append(blockInter)
 
         if obstacle :
