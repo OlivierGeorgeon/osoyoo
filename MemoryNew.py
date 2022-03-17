@@ -18,7 +18,7 @@ class MemoryNew:
     """
 
     def __init__(self):
-        self.phenomenons = []
+        self.interactions = []
         self.yaw = 0
         self.current_id = 0
 
@@ -35,21 +35,21 @@ class MemoryNew:
         durability = 3
 
         if(floor):
-            floorInter = Interaction(20,0,2,20,type = 'Line', shape = 'Rectangle', color= 'red', durability = durability, decayIntensity = 1, id = self.current_id)
-            self.phenomenons.append(floorInter)
+            floorInter = Interaction(150,0,10,40,type = 'Line', shape = 'Rectangle', color= 'red', durability = durability, decayIntensity = 1, id = self.current_id)
+            self.interactions.append(floorInter)
         if shock:
             shockInter = None
-            if(shock == 1):
+            if(shock == 0b01):
                 shockInter = Interaction(110,-80,20,60, type = 'shock', shape = 'Star',color = 'yellow', durability = durability, decayIntensity = 1, starArgs = 5, id = self.current_id)
                 #Star(x, y, outer_radius, inner_radius, num_spikes, rotation=0, color=(255, 255, 255), batch=None, group=None)
-            if(shock == 2):
+            if(shock == 0b11):
                 shockInter = Interaction(110,0,20,60, type = 'shock', shape = 'Star',color = 'yellow', durability = durability, decayIntensity = 1, starArgs = 5, id = self.current_id)
             else :
                 shockInter = Interaction(110,80,20,60, type = 'shock', shape = 'Star',color = 'yellow', durability = durability, decayIntensity = 1, starArgs = 5, id = self.current_id)
-            self.phenomenons.append(shockInter)
+            self.interactions.append(shockInter)
         if blocked :
             blockInter =  Interaction(110,0,20,60, type = 'block', shape = 'Star',color = 'red', durability = durability, decayIntensity = 1, starArgs = 6, id = self.current_id)
-            self.phenomenons.append(blockInter)
+            self.interactions.append(blockInter)
 
         if obstacle :
             obstacleInter = Interaction(x,y,width = 50,type = 'obstacle', shape = 'Circle', color = 'green', durability = durability, decayIntensity = 1, id = self.current_id)
@@ -59,17 +59,17 @@ class MemoryNew:
         
 
     def tick(self):
-        for p in self.phenomenons:
+        for p in self.interactions:
             p.tick()
 
 
     def empty(self):
-        self.phenomenons.clear()
+        self.interactions.clear()
 
     def actualize(self, angle, distance):
         self.tick()
-        for i in range(0,len(self.phenomenons)):
-            p = self.phenomenons[i]
+        for i in range(0, len(self.interactions)):
+            p = self.interactions[i]
             x, y = rotate(p.x,p.y,angle)
             p.x = x
             p.y = y
@@ -85,8 +85,8 @@ class MemoryNew:
         displacement_matrix = matrix44.multiply(rotation_matrix, translation_matrix)
         self.yaw = yaw
         # Translate and rotate all the phenomena
-        for p in self.phenomenons:
-            p.displace(displacement_matrix)
+        for i in self.interactions:
+            i.displace(displacement_matrix)
 
         
 

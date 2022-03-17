@@ -37,6 +37,8 @@ def interaction_to_pyglet(interaction,batch):
         # Pressing interaction: orange triangle
         final = shapes.Star(x, y, width, height, num_spikes = p.starArgs, color=p.rgb, batch=batch)
     final.opacity = (p.actual_durability/p.durability * 255)
+
+    final.rotation = p.rotation
     return final
 
 def rotate(x,y, radians):

@@ -1,6 +1,9 @@
 from webcolors import rgb_to_name
 from webcolors import name_to_rgb
-from pyrr import matrix44
+from pyrr import matrix44, Quaternion
+import math
+
+
 class Interaction:
     """This class implements phenomenons with object-oriented programming, that can be stored in a MemoryNew object and then translated to pyglet shapes.
       
@@ -21,7 +24,7 @@ class Interaction:
         Raise:
         Author: TKnockaert
         """
-        self.rotation = None
+        self.rotation = 0
         self.x = x
         self.y = y
         self.width = width
@@ -72,6 +75,11 @@ class Interaction:
             v = matrix44.apply_to_vector(displacement_matrix, [self.x, self.y, 0])
             self.x, self.y = v[0], v[1]
         # TO CHECK : Shape should rotate automaticly, mb, I think, idk
+        q = Quaternion(displacement_matrix)
+        if q.axis[2] > 0:  # Rotate around z axis upwards
+            self.rotation += math.degrees(q.angle)
+        else:  # Rotate around z axis downward
+            self.rotation += math.degrees(-q.angle)
 
 
 

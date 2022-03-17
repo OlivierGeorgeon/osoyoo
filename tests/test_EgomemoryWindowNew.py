@@ -60,7 +60,7 @@ if __name__ == "__main__":
             controller.hexaview.extract_and_convert_phenomenons(controller.hexa_memory)
             controller.send_position_change_to_hexa_memory(angle, translation)
             controller.ask_synthetizer_to_act()
-            controller.ask_hexaview_to_refresh(controller.hexa_memory)
+            controller.main_refresh()
             controller.enact_step = 0
 
         if control_mode == CONTROL_MODE_AUTOMATIC:

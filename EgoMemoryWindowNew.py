@@ -39,8 +39,8 @@ class EgoMemoryWindowNew(pyglet.window.Window):
         self.shapesList = s
 
     def extract_and_convert_phenomenons(self,memory):
-        phenomenons = memory.phenomenons
-        self.shapesList = interactionList_to_pyglet(phenomenons,self.batch)
+        # phenomenons =
+        self.shapesList = interactionList_to_pyglet(memory.interactions,self.batch)
 
 
     def refresh(self,memory):

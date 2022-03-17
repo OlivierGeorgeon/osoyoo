@@ -36,7 +36,7 @@ class Synthesizer:
         """ Convert position of egocentric interactions of the memory into
         position in the allocentric representation
         """
-        for interaction in self.memory.phenomenons :
+        for interaction in self.memory.interactions :
             print("<SYNTHESIZER> : interaction id : ,",interaction.id, "last used id :" ,self.last_used_id)
             if(interaction.id< self.last_used_id):
                 continue
