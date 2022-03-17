@@ -124,7 +124,7 @@ if __name__ == "__main__":
     # Add phenomena to memory
     memory = MemoryV1()
     memory.add((3, 0, 0, 0, 0, 0))  # Line
-    memory.add((0, 0, 0, 1, 300, -300))  # Line
+    memory.add((0, 0, 0, 1, 300, -300))  # Echo
 
     # Retrieve phenomena from memory
     emw.extract_and_convert_phenomenons(memory)

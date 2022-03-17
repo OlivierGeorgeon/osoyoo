@@ -23,12 +23,13 @@ if __name__ == "__main__":
     emw2 = EgoMemoryWindowNew()
     emw2.set_caption("North up projection")
     memory = MemoryV1()
-    hexa_memory = HexaMemory(width = 40, height = 80,cells_radius = 50)
+    hexa_memory = HexaMemory(width = 30, height = 100,cells_radius = 50)
     agent_act = Agent5()
     agent = Agent6(memory, hexa_memory)
     hexaview = HexaView()
     synthesizer = Synthesizer(memory,hexa_memory)
     controller = ControllerNew(agent, memory, view=emw, synthesizer = synthesizer, hexa_memory = hexa_memory, hexaview = hexaview)
+    controller.hexaview.extract_and_convert_phenomenons(controller.hexa_memory)
 
     @emw.event
     def on_text(text):
