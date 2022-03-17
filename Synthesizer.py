@@ -24,7 +24,8 @@ class Synthesizer:
         self.memory = memory
         self.hexa_memory = hexa_memory
         self.internal_hexa_grid = HexaGrid(hexa_memory.width, hexa_memory.height)
-        self.last_used_id = 0
+        self.last_used_id = -1
+        self.tolerance = 3 #nombre d'id d'ecart d'une interaction que l'on tolère par rapport au last_id pour intervenir sur la synthese
 
     def act(self):
         """Create phenoms based on Interactions in memory and States in hexa_memory"""
@@ -37,8 +38,8 @@ class Synthesizer:
         position in the allocentric representation
         """
         for interaction in self.memory.interactions :
-            print("<SYNTHESIZER> : interaction id : ,",interaction.id, "last used id :" ,self.last_used_id)
-            if(interaction.id< self.last_used_id):
+            #print("<SYNTHESIZER> : interaction id : ,",interaction.id, "last used id :" ,self.last_used_id)
+            if(interaction.id<= self.last_used_id):
                 continue
             #print("<SYNTHESIZER> : actual_durability of interact: ", interaction.actual_durability)
             if(interaction.actual_durability > 0):
@@ -128,16 +129,16 @@ class Synthesizer:
         """
         for i in range(self.hexa_memory.width) :
             for j in range(self.hexa_memory.height):
-                final_status = "Unknown"
+                final_status = self.hexa_memory.grid[i][j].status
                 cell_hexa = self.hexa_memory.grid[i][j]
                 cell_intra = self.internal_hexa_grid.grid[i][j]
-                interaction_line = [element for element in cell_intra.interactions if element.type == "Line"]
+                interaction_line = [element for element in cell_intra.interactions if (element.type == "Line" and element.id > self.last_used_id - self.tolerance )]
                 if(len(interaction_line) > 0) :
                     ""
                     #print("Cell at (",i,",",j,"has interaction line")
-                interaction_blocked = [element for element in cell_intra.interactions if (element.type == "Block")]
-                interaction_shock = [element for element in cell_intra.interactions if (element.type == "Shock")]
-                interaction_echo = [element for element in cell_intra.interactions if (element.type == "obstacle")]
+                interaction_blocked = [element for element in cell_intra.interactions if (element.type == "Block" and element.id > self.last_used_id - self.tolerance )]
+                interaction_shock = [element for element in cell_intra.interactions if (element.type == "Shock" and element.id > self.last_used_id - self.tolerance )]
+                interaction_echo = [element for element in cell_intra.interactions if (element.type == "obstacle" and element.id > self.last_used_id - self.tolerance )]
                 if(cell_hexa.status == 'Occupied'):
                     final_status = 'Occupied'
                     print("Cell at (",i,",",j,") final_status : ", final_status)

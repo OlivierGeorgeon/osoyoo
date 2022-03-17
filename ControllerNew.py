@@ -274,12 +274,14 @@ if __name__ == '__main__':
     from MemoryV1 import MemoryV1
     from EgoMemoryWindowNew import EgoMemoryWindowNew
     from Synthesizer import Synthesizer
+    from Agent5 import Agent5
 
     # Mandatory Initializations
     
     memory = MemoryV1()
-    hexa_memory = HexaMemory(width = 40, height = 80,cells_radius = 10)
-    agent = Agent6(memory, hexa_memory)
+    hexa_memory = HexaMemory(width = 50, height = 100,cells_radius = 50)
+    #agent = Agent6(memory, hexa_memory)
+    agent = Agent5()
     # Optionals Initializations
     
     view = None
@@ -287,7 +289,7 @@ if __name__ == '__main__':
     hexaview = None
     hexaview = HexaView()
     synthesizer = Synthesizer(memory,hexa_memory)
-    automatic = False
+    automatic = True
     controller = ControllerNew(agent,memory,view = view, synthesizer = synthesizer,
          hexa_memory = hexa_memory, hexaview = hexaview,automatic = automatic)
 
