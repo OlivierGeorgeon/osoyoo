@@ -1,5 +1,9 @@
 # By Olivier GEORGEON 15 March 2022
 
+import sys
+import os
+import time
+sys.path.insert(1, os.path.join(sys.path[0], '..'))
 from EgoMemoryWindowNew import EgoMemoryWindowNew
 from ControllerNew import ControllerNew
 from Synthesizer import Synthesizer
