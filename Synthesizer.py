@@ -54,7 +54,10 @@ class Synthesizer:
                 if(x >= self.hexa_memory.width or y >= self.hexa_memory.height):
                     print("<SYNTHESIZER> Interaction ignorée car hors de la grille")
                     continue
-                self.internal_hexa_grid.grid[x][y].interactions.append(interaction)
+                try :
+                    self.internal_hexa_grid.grid[x][y].interactions.append(interaction)
+                except IndexError:
+                    print("<SYNTHESIZER> Interaction caused an error : x=",x,"y = ",y,"width = ", self.hexa_memory.width,"height = ",self.hexa_memory.height)
             if(interaction.id > self.last_used_id):
                 self.last_used_id = interaction.id
 
