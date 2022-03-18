@@ -101,9 +101,9 @@ class ControllerNew:
     def main_refresh(self):
         """Function that refresh the views"""
         if self.view is not None :
-            self.view.extract_and_convert_phenomenons(self.memory)
+            self.view.extract_and_convert_interactions(self.memory)
         if self.hexaview is not None :
-            self.hexaview.extract_and_convert_phenomenons(self.hexa_memory)
+            self.hexaview.extract_and_convert_interactions(self.hexa_memory)
     def main(self):
         """Main function of the controller"""
         pyglet.clock.schedule_interval(self.main_loop,0.1)
