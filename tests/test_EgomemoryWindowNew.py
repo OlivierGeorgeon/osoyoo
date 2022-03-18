@@ -23,7 +23,7 @@ if __name__ == "__main__":
     emw2 = EgoMemoryWindowNew()
     emw2.set_caption("North up projection")
     memory = MemoryV1()
-    hexa_memory = HexaMemory(width = 30, height = 100,cells_radius = 50)
+    hexa_memory = HexaMemory(width=30, height=100, cells_radius=50)
     agent_act = Agent5()
     agent = Agent6(memory, hexa_memory)
     hexaview = HexaView()
