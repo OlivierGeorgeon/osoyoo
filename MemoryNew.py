@@ -21,7 +21,6 @@ class MemoryNew:
 
     def __init__(self):
         self.interactions = []
-        self.yaw = 0
         self.current_id = 0
 
 
@@ -68,27 +67,26 @@ class MemoryNew:
     def empty(self):
         self.interactions.clear()
 
-    def actualize(self, angle, distance):
-        self.tick()
-        for i in range(0, len(self.interactions)):
-            p = self.interactions[i]
-            x, y = rotate(p.x,p.y,angle)
-            p.x = x
-            p.y = y
+    # def actualize(self, angle, distance):
+    #     self.tick()
+    #     for i in range(0, len(self.interactions)):
+    #         p = self.interactions[i]
+    #         x, y = rotate(p.x,p.y,angle)
+    #         p.x = x
+    #         p.y = y
+    #
+    #         p.y -= distance
+    #
+    #     # interaction avec durability >= 0
 
-            p.y -= distance
-
-        # interaction avec durability >= 0
-
-    def move(self, rotation, translation,yaw = 0):
-    # The displacement matrix of this interaction
+    def move(self, rotation, translation):
+        """ Compute the displacement matrix and apply it to the interactions """
         translation_matrix = matrix44.create_from_translation([-translation[0], -translation[1], 0])
         rotation_matrix = matrix44.create_from_z_rotation(math.radians(rotation))
         displacement_matrix = matrix44.multiply(rotation_matrix, translation_matrix)
-        self.yaw = yaw
-        # Translate and rotate all the phenomena
-        for i in self.interactions:
-            i.displace(displacement_matrix)
+        # Translate and rotate all the interactions
+        for interaction in self.interactions:
+            interaction.displace(displacement_matrix)
 
         
 # Testing MemoryNew by displaying interactions in an EgoMemoryWindowNew
