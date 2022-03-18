@@ -1,12 +1,10 @@
 import pyglet
 from pyglet.gl import *
-from pyglet import shapes
 import math
 from OsoyooCar import OsoyooCar
 from pyrr import matrix44
 from MemoryV1 import MemoryV1
 from Utils import interactionList_to_pyglet
-
 
 import time
 ZOOM_IN_FACTOR = 1.2
@@ -33,32 +31,12 @@ class EgoMemoryWindowNew(pyglet.window.Window):
         self.mouse_press_angle = 0
         self.window = None
 
-    def set_ShapesList(self,s):
+    def set_ShapesList(self, s):
         self.shapesList = s
 
-    def extract_and_convert_phenomenons(self,memory):
-        # phenomenons =
-        self.shapesList = interactionList_to_pyglet(memory.interactions,self.batch)
+    def extract_and_convert_interactions(self, memory):
+        self.shapesList = interactionList_to_pyglet(memory.interactions, self.batch)
 
-
-    def refresh(self,memory):
-        #print("oh")
-        @self.event
-        def on_close():
-            self.close()
-
-            #@self.window.event
-            #def on_key_press(key, mod):
-            #    # ...do stuff on key press
-
-        pyglet.clock.tick()
-        self.clear()
-        self.dispatch_events() #TODO: comprendre pourquoi ça bloque tout
-        self.extract_and_convert_phenomenons(memory)
-        self.on_draw()
-        # ...transform, update, create all objects that need to be rendered
-
-        self.flip()
     def on_draw(self):
         """ Drawing the window """
         glClear(GL_COLOR_BUFFER_BIT)
@@ -74,7 +52,6 @@ class EgoMemoryWindowNew(pyglet.window.Window):
         glRotatef(90 - self.azimuth, 0.0, 0.0, 1.0)
 
         # Draw the robot and the phenomena
-        shapesListo = self.shapesList
         self.batch.draw()
 
         # Stack the environment's displacement and draw the origin just to check
@@ -108,13 +85,6 @@ class EgoMemoryWindowNew(pyglet.window.Window):
         if .4 < self.zoom_level * f < 5:
             self.zoom_level *= f
 
-    def update_environment_matrix(self, displacement_matrix):
-        """ Updating the total displacement matrix used to keep track of the origin """
-        self.total_displacement_matrix = matrix44.multiply(self.total_displacement_matrix, displacement_matrix)
-
-    # def set_batch(self, batch):
-    #     self.batch = batch
-
 
 # Displaying EgoMemoryWindowNew with phenomena in MemoryV1
 if __name__ == "__main__":
@@ -122,11 +92,11 @@ if __name__ == "__main__":
     emw.robot.rotate_head(-45)
 
     # Add phenomena to memory
-    memory = MemoryV1()
-    memory.add((3, 0, 0, 0, 0, 0))  # Line
-    memory.add((0, 0, 0, 1, 300, -300))  # Echo
+    mem = MemoryV1()
+    mem.add((3, 0, 0, 0, 0, 0))  # Line
+    mem.add((0, 0, 0, 1, 300, -300))  # Echo
 
     # Retrieve phenomena from memory
-    emw.extract_and_convert_phenomenons(memory)
+    emw.extract_and_convert_interactions(mem)
 
     pyglet.app.run()
