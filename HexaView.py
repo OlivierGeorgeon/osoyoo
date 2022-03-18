@@ -51,21 +51,16 @@ class HexaView(pyglet.window.Window):
     def on_draw(self):
         """ Drawing the window """
         glClear(GL_COLOR_BUFFER_BIT)
+
         glLoadIdentity()
         # The transformations are stacked, and applied backward to the vertices
-        # Stack the projection matrix. Centered on (0,0). Fit the window size and zoom factor  # DEBUG TODO ALED decentrer le bordel, ou plutot le centrer sur le milieu de la grid
-        # glOrtho(1 * self.zoom_level, self.width * self.zoom_level , 1* self.zoom_level,
-        #         self.height * self.zoom_level, 1, -1)
-        grid_width = NB_CELL_WIDTH * CELL_RADIUS * 3.3 # 36*50
-        grid_height = NB_CELL_HEIGHT * CELL_RADIUS  # 5000 36*50
-        left = -CELL_RADIUS  # -grid_width / 2  * self.zoom_level # * self.width
-        right = grid_width * self.zoom_level  # * self.width
-        bottom = -CELL_RADIUS # -center_y  * self.zoom_level  # * self.height
-        top = grid_height * self.zoom_level  # * self.height
+        # Stack the projection matrix. Centered on (0,0). Fit the window size and zoom factor
+        glOrtho(-self.width * self.zoom_level, self.width * self.zoom_level, -self.height * self.zoom_level,
+                self.height * self.zoom_level, 1, -1)
 
-        glOrtho(left, right, bottom, top, 1, 0)
-        # Draw the robot and the phenomena
-        shapesListo = self.shapesList
+        # Center the grid in the widow
+        glTranslatef(-900, -870, 0)  # TODO compute the parameters from the grid size
+
         self.batch.draw()
 
     def on_resize(self, width, height):
@@ -88,6 +83,6 @@ class HexaView(pyglet.window.Window):
 if __name__ == "__main__":
     hexaview = HexaView()
     hexa_memory = HexaMemory(width=NB_CELL_WIDTH, height=NB_CELL_HEIGHT, cells_radius=CELL_RADIUS)
-    hexaview.extract_and_convert_phenomenons(hexa_memory)
+    hexaview.extract_and_convert_interactions(hexa_memory)
 
     pyglet.app.run()
