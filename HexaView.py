@@ -44,8 +44,8 @@ class HexaView(pyglet.window.Window):
         # ...transform, update, create all objects that need to be rendered
         self.flip()
 
-    def extract_and_convert_phenomenons(self,memory):
-        self.shapesList = hexaMemory_to_pyglet(memory,self.batch)
+    def extract_and_convert_interactions(self, memory):
+        self.shapesList = hexaMemory_to_pyglet(memory, self.batch)
 
 
     def on_draw(self):

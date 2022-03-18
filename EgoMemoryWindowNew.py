@@ -91,12 +91,12 @@ if __name__ == "__main__":
     emw = EgoMemoryWindowNew()
     emw.robot.rotate_head(-45)
 
-    # Add phenomena to memory
+    # Add interactions to memory
     mem = MemoryV1()
     mem.add((3, 0, 0, 0, 0, 0))  # Line
     mem.add((0, 0, 0, 1, 300, -300))  # Echo
 
-    # Retrieve phenomena from memory
+    # Retrieve interactions from memory and construct the shapes in the window
     emw.extract_and_convert_interactions(mem)
 
     pyglet.app.run()
