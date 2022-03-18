@@ -4,11 +4,9 @@ from pyglet import shapes
 import math
 from OsoyooCar import OsoyooCar
 from pyrr import matrix44
-from Phenomenon import Phenomenon
-from MemoryNew import MemoryNew
 from MemoryV1 import MemoryV1
-from Interaction import Interaction
 from Utils import interactionList_to_pyglet
+
 
 import time
 ZOOM_IN_FACTOR = 1.2
@@ -25,8 +23,8 @@ class EgoMemoryWindowNew(pyglet.window.Window):
 
         self.robot = OsoyooCar(self.batch)
 
-        self.origin = shapes.Rectangle(0, 0, 60, 40, color=(150, 150, 225))
-        self.origin.anchor_position = 30, 20
+        # self.origin = shapes.Rectangle(0, 0, 60, 40, color=(150, 150, 225))
+        # self.origin.anchor_position = 30, 20
         self.total_displacement_matrix = matrix44.create_identity()
         self.azimuth = 0
         self.shapesList = shapesList
@@ -80,10 +78,10 @@ class EgoMemoryWindowNew(pyglet.window.Window):
         self.batch.draw()
 
         # Stack the environment's displacement and draw the origin just to check
-        gl_displacement_vector = [y for x in self.total_displacement_matrix for y in x]
-        gl_displacement_matrix = (GLfloat * 16)(*gl_displacement_vector)
-        glMultMatrixf(gl_displacement_matrix)
-        self.origin.draw()  # Draw the origin of the robot
+        # gl_displacement_vector = [y for x in self.total_displacement_matrix for y in x]
+        # gl_displacement_matrix = (GLfloat * 16)(*gl_displacement_vector)
+        # glMultMatrixf(gl_displacement_matrix)
+        # self.origin.draw()  # Draw the origin of the robot
 
     def on_resize(self, width, height):
         """ Adjusting the viewport when resizing the window """
@@ -114,19 +112,21 @@ class EgoMemoryWindowNew(pyglet.window.Window):
         """ Updating the total displacement matrix used to keep track of the origin """
         self.total_displacement_matrix = matrix44.multiply(self.total_displacement_matrix, displacement_matrix)
 
-    def set_batch(self, batch):
-        self.batch = batch
-        
-# Testing the egocentric memory window by moving the environment with the keyboard
+    # def set_batch(self, batch):
+    #     self.batch = batch
+
+
+# Displaying EgoMemoryWindowNew with phenomena in MemoryV1
 if __name__ == "__main__":
     emw = EgoMemoryWindowNew()
-    # memory = MemoryNewV1(emw)
+    emw.robot.rotate_head(-45)
+
+    # Add phenomena to memory
     memory = MemoryV1()
-    rectangle = Interaction(50,50,width = 150, height = 150,shape = 'Rectangle',color = "lime",durability = 1000, decayIntensity = 1)
-    memory.phenomenons.append(rectangle)
-    print(memory.phenomenons)
-    poly = shapes.Rectangle(0,0, 100, 100, color = (0,0,0), batch = emw.batch)
-    for i in range(10000):
-        emw.refresh(memory)
-        memory.tick()
-        #time.sleep(2)
+    memory.add((3, 0, 0, 0, 0, 0))  # Line
+    memory.add((0, 0, 0, 1, 300, -300))  # Echo
+
+    # Retrieve phenomena from memory
+    emw.extract_and_convert_phenomenons(memory)
+
+    pyglet.app.run()

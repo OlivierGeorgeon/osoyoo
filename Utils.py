@@ -31,7 +31,7 @@ def interaction_to_pyglet(interaction,batch):
     elif shape == 'Rectangle':
         # Red dash: black line
         final = shapes.Rectangle(x, y, width, height, color=p.rgb, batch=batch)
-        final.anchor_position = 10, 30
+        final.anchor_position = 0, height/2  # 10, 30
     elif shape == 'Star':
         # Triangle: collision
         # Pressing interaction: orange triangle

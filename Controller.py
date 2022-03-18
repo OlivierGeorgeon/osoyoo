@@ -123,7 +123,7 @@ class Controller:
             # Check if line detected
             if floor > 0:
                 # Create a new lane crossing interaction
-                line = Phenomenon(150, 0, self.view.batch, 1)  # the translation will be reapplied
+                line = Phenomenon(ROBOT_FRONT_X + RETREAT_DISTANCE, 0, self.view.batch, 1)  # the translation will be reapplied
                 self.phenomena.append(line)
 
             # Check for collision when moving forward
