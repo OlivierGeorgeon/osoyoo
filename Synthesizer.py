@@ -51,6 +51,9 @@ class Synthesizer:
                 x_prime += self.hexa_memory.robot_pos_x
                 y_prime += self.hexa_memory.robot_pos_y
                 x, y = self.hexa_memory.convert_pos_in_cell(x_prime, y_prime)
+                if(x > self.hexa_memory.width or y > self.hexa_memory.height):
+                    print("<SYNTHESIZER> Interaction ignorée car hors de la grille")
+                    continue
                 self.internal_hexa_grid.grid[x][y].interactions.append(interaction)
             if(interaction.id > self.last_used_id):
                 self.last_used_id = interaction.id
