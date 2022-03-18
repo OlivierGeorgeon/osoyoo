@@ -12,6 +12,7 @@ class Agent6():
     def __init__(self,memory,hexa_memory):
         self.memory = memory
         self.hexa_memory = hexa_memory
+        self.has_done_init = False
 
     def action(self, outcome):
         """Return the action taken by the agent

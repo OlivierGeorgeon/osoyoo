@@ -21,7 +21,7 @@ class HexaMemory(HexaGrid):
         print("DEBUG : Robot position at init of HEXAMEMORY : ",self.robot_cell_x,self.robot_cell_y)
         self.grid[self.robot_cell_x][self.robot_cell_y].occupy()
         self.robot_orientation = 0 # Should use the same values as directions of the move() function
-        self.robot_angle = 0
+        self.robot_angle = 90
 
 
     def convert_pos_in_cell(self, pos_x, pos_y):
@@ -35,16 +35,16 @@ class HexaMemory(HexaGrid):
             while to_go > 0 :
                 if nb_cells_x % 2 != 0:
                     if(to_go > radius):
-                        to_go -= radius 
+                        to_go -= radius
                         nb_cells_x += 1
-                    else : 
-                        to_go = 0 
+                    else :
+                        to_go = 0
                 else :
                     if(to_go > 2*radius):
                         to_go -= 2*radius
                         nb_cells_x += 1
-                    else : 
-                        to_go = 0 
+                    else :
+                        to_go = 0
            # nb_cells_x += int((pos_x - radius) / (radius*2)) #TODO: merde
         elif(pos_x < (0-radius)):
             nb_cells_x = -1
@@ -55,15 +55,15 @@ class HexaMemory(HexaGrid):
             while to_go < 0 :
                 if nb_cells_x % 2 != 0:
                     if(to_go < 0-radius):
-                        to_go += radius 
+                        to_go += radius
                         nb_cells_x -= 1
-                    else : 
-                        to_go = 0 
+                    else :
+                        to_go = 0
                 else :
                     if(to_go < 0-2*radius):
                         to_go += 2*radius
                         nb_cells_x -= 1
-                    else : 
+                    else :
                         to_go = 0
         nb_cells_y = 0
         if(pos_y > mini_radius):
@@ -145,7 +145,6 @@ class HexaMemory(HexaGrid):
         self.grid[self.robot_cell_x][self.robot_cell_y].leave()
         self.robot_cell_x, self.robot_cell_y = self.convert_pos_in_cell(self.robot_pos_x, self.robot_pos_y)
         self.grid[self.robot_cell_x][self.robot_cell_y].occupy()
-        print([self.robot_cell_x],[self.robot_cell_y], "occupied")
         return x_prime, y_prime
 
     def depr_move(self, direction, distance):
@@ -206,23 +205,22 @@ class HexaMemory(HexaGrid):
 
     def apply_phenomenon(self,phenomenon,pos_x,pos_y):
         """Apply a phenomenon to the grid
-        Args : 
+        Args :
             phenomenon : type of phenomenon (TODO: but should be things like "line", "unmovable object", "movable object", etc.)
             pos_x, pos_y : position of the phenomenon (relative to the robot's position)
         """
         
     def rotate_robot(self,rotation):
-        """Rotate the representation of the robot in the given direction.
+        """Rotate the representation of the robot by the given angle.
 
         :Parameters:
-            `rotation` : int
-                Degrees
+            `rotation` : int, degrees of rotation
         """
         self.robot_angle = (self.robot_angle + rotation)
         while self.robot_angle < 0 :
             self.robot_angle = 360 + self.robot_angle
         self.robot_angle = self.robot_angle %360
-        self.robot_orientation = int((self.robot_angle)//60)
+        self.robot_orientation = 6 - int((self.robot_angle)//60)
         ""
         print("robot_orientation in hexa_memory : ", self.robot_orientation,
                 "robot_angle in hexa_memory : ", self.robot_angle) # TODO: arranger ce bordel
@@ -249,7 +247,7 @@ class HexaMemory(HexaGrid):
         distance = math.sqrt((end_x - start_x)**2 + (end_y - start_y)**2)
         if distance == 0 :
             return
-        nb_step = int(distance/(self.cells_radius/2))
+        nb_step = int(distance/(self.cells_radius/5))
         if nb_step == 0 :
             return
         step_x = int((end_x - start_x)/nb_step)
@@ -272,7 +270,8 @@ class HexaMemory(HexaGrid):
             """
             
 
-
+    def get_direction_of_neighbor_with_status(self,status):
+        ""
 
 
     def apply_movement(self,rotation,distance):

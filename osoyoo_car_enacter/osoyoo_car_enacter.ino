@@ -41,6 +41,8 @@
 #define ACTION_ALIGN_HEAD '*'
 #define ACTION_ECHO_SCAN '-'
 
+#define TURN_SPOT_ANGLE 60
+
 Omny_wheel_motion OWM;
 Floor_change_retreat FCR(OWM);
 Head_echo_alignment HEA;
@@ -190,7 +192,7 @@ void loop()
       {
         case ACTION_TURN_IN_SPOT_LEFT:
           action_end_time = millis() + TURN_SPOT_MAX_DURATION;
-          robot_destination_angle = 45;
+          robot_destination_angle = TURN_SPOT_ANGLE;
           HEA.turnHead(robot_destination_angle);  // Look at destination
           OWM.turnInSpotLeft(TURN_SPEED);
           break;
@@ -199,7 +201,7 @@ void loop()
           break;
         case ACTION_TURN_IN_SPOT_RIGHT:
           action_end_time = millis() + TURN_SPOT_MAX_DURATION;
-          robot_destination_angle = -45;
+          robot_destination_angle = -TURN_SPOT_ANGLE;
           HEA.turnHead(robot_destination_angle);
           OWM.turnInSpotRight(TURN_SPEED);
           break;

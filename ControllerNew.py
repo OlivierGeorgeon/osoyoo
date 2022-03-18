@@ -94,6 +94,7 @@ class ControllerNew:
             self.send_position_change_to_memory(angle,translation) #Might be an order problem between this line and the one under it, depending on
             self.send_position_change_to_hexa_memory(angle,translation)
             self.send_phenom_info_to_memory(phenom_info) # when the robot detect interaction (before or after moving)
+            self.memory.tick()
             self.ask_synthetizer_to_act()
             self.main_refresh()
             self.enact_step = 0
