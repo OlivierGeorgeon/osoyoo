@@ -53,7 +53,7 @@ class MemoryNew:
             self.interactions.append(blockInter)
 
         if obstacle :
-            obstacleInter = Interaction(x,y,width = 50,type = 'obstacle', shape = 'Circle', color = 'limegreen', durability = durability, decayIntensity = 1, id = self.current_id)
+            obstacleInter = Interaction(x,y,width = 50,type = 'obstacle', shape = 'Circle', color = 'orange', durability = durability, decayIntensity = 1, id = self.current_id)
             self.interactions.append(obstacleInter)
         
         self.current_id += 1
