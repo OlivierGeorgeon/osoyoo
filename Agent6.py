@@ -35,7 +35,7 @@ class Agent6():
             ""
         target, target_direction = unknown_neighbors[0][0], unknown_neighbors[0][1]
         
-        relative_direction = target_direction - self.hexa_memory.robot_orientation
+        relative_direction = target_direction - self.hexa_memory.orientation
         if(relative_direction < -3 ) :
             relative_direction += 6
         elif(relative_direction > 3):
