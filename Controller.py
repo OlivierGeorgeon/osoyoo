@@ -4,7 +4,6 @@ import threading
 from WifiInterface import WifiInterface
 from Phenomenon import Phenomenon
 import math
-from OsoyooCar import OsoyooCar
 from EgoMemoryWindow import EgoMemoryWindow
 import pyglet
 from pyrr import matrix44
@@ -46,25 +45,6 @@ class Controller:
             self.update_model()
             self.enact_step = 0
 
-
-    ########################################################################
-    def decay_test(self):
-        """Test de decay sur la vue
-        Return: Nombre d'éléments qui doivent être enlevés de la vue
-        Author: TKnockaert
-        
-        to_remove = list()
-        for pheno in self.phenomena:                        
-            pheno.decay()
-            if(not pheno.isAlive()):
-                to_remove = to_remove.append(pheno)
-        out = 1#len(to_remove)
-        for to_be_removed in to_remove:
-            self.phenomena.remove(to_be_removed)
-
-        return out
-        """
-    ########################################################################
     def update_model(self):
         """ Updating the model from the latest received outcome """
         outcome = json.loads(self.outcome_bytes)
@@ -168,18 +148,10 @@ class Controller:
             self.view.update_environment_matrix(displacement_matrix)
 
 
-
-                
-
-
-
 # Testing the controller by remote controlling the robot from the egocentric memory window
 if __name__ == "__main__":
     emw = EgoMemoryWindow()
     controller = Controller(emw)
-
-    # emw2 = EgoMemoryWindow()
-    # emw2.set_caption("Alocentric spatial memory")
 
     @emw.event
     def on_text(text):

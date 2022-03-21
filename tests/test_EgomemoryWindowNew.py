@@ -27,7 +27,7 @@ if __name__ == "__main__":
     emw2 = EgoMemoryWindowNew()
     emw2.set_caption("North up projection")
     memory = MemoryV1()
-    hexa_memory = HexaMemory(width=30, height=100, cells_radius=50)
+    hexa_memory = HexaMemory(width=20, height=70, cells_radius=100)
     agent_act = Agent5()
     agent = Agent6(memory, hexa_memory)
     hexaview = HexaView()
@@ -59,6 +59,7 @@ if __name__ == "__main__":
             phenom_info, angle, translation, controller.outcome = controller.translate_robot_data(robot_data)
             controller.send_position_change_to_memory(angle,translation) #Might be an order problem between this line and the one under it, depending on
             controller.send_phenom_info_to_memory(phenom_info) # when the robot detect interaction (before or after moving)
+            controller.memory.tick()
             emw.extract_and_convert_interactions(memory)
             emw2.extract_and_convert_interactions(memory)
             emw2.azimuth = controller.azimuth

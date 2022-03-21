@@ -294,7 +294,9 @@ if __name__ == '__main__':
     controller = ControllerNew(agent,memory,view = view, synthesizer = synthesizer,
          hexa_memory = hexa_memory, hexaview = hexaview,automatic = automatic)
 
-    controller.main()
+    pyglet.clock.schedule_interval(controller.main_loop, 0.1)
+
+    pyglet.app.run()
 
 
     

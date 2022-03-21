@@ -11,9 +11,10 @@ class MemoryV1(MemoryNew):
         super().__init__()
 
     def tick(self):
+        """ Remove the interactions when they are too old """
         super().tick()
         to_remove = []
-        for p in self.phenomenons :
-            if(p.actual_durability <= 0):
-                to_remove.append(p)
-        self.phenomenons = [x for x in self.phenomenons if x not in to_remove]
+        for i in self.interactions:
+            if i.actual_durability <= 0:
+                to_remove.append(i)
+        self.interactions = [x for x in self.interactions if x not in to_remove]

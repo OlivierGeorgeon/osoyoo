@@ -2,8 +2,8 @@ import socket
 import keyboard
 import RobotDefine
 # UDP_IP = "192.168.4.1"  # AP mode
-# UDP_IP = "192.168.1.22"  # STA chezOlivier
-UDP_IP = "192.168.8.189"  #
+UDP_IP = "192.168.1.22"  # STA chezOlivier
+# UDP_IP = "192.168.8.189"  #
 # UDP_IP = "10.40.22.251" # STA RobotBSN - Olivier's Robot in A301
 # UDP_IP = "10.40.22.254" # STA RobotBSN -
 # UDP_IP = "10.44.53.11"  # STA RobotBSN - Olivier's Robot in A485
