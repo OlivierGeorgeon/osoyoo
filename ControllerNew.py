@@ -4,6 +4,7 @@ import random
 import threading
 import time
 from Agent5 import Agent5
+from AgentRandom import AgentRandom
 from MemoryV1 import MemoryV1
 from RobotDefine import *
 from WifiInterface import WifiInterface
@@ -86,6 +87,9 @@ class ControllerNew:
             else :
                 print("Input ?")
                 robot_action = msvcrt.getch().decode("utf-8")
+                if robot_action == 'n':
+                    robot_action = json.dumps({'action': '/', 'angle': 360-controller.azimuth})
+                    print('Vers le nord')
         # 2 : ordonne au robot
             self.command_robot(robot_action)
         if(self.enact_step >= 2):
@@ -169,8 +173,8 @@ class ControllerNew:
     def translate_agent_action_to_robot_command(self,action):
         """ Translate the agent action to robot commands
         """
-        # 0-> '8', 1-> '1', 2-> '3'
-        commands = ['8', '1', '3']
+        # 0-> '8', 1-> '1', 2-> '3', 3 -> 'tourne vers le nord'
+        commands = ['8', '1', '3',json.dumps({'action': '/', 'angle': 360-controller.azimuth})]
         return commands[action]
 
     def translate_robot_data(self,data): #PAS FINITO ?
@@ -261,6 +265,7 @@ class ControllerNew:
         # Update the azimuth
         if 'azimuth' in outcome:
             self.azimuth = outcome['azimuth']
+            print("self az : ", self.azimuth)
         else:
             self.azimuth -= rotation
 
@@ -281,8 +286,9 @@ if __name__ == '__main__':
     
     memory = MemoryV1()
     hexa_memory = HexaMemory(width = 50, height = 100,cells_radius = 100)
-    agent = Agent6(memory, hexa_memory)
+    #agent = Agent6(memory, hexa_memory)
     #agent = Agent5()
+    agent = AgentRandom(memory, hexa_memory)
     # Optionals Initializations
     
     view = None
@@ -290,11 +296,19 @@ if __name__ == '__main__':
     hexaview = None
     hexaview = HexaView()
     synthesizer = Synthesizer(memory,hexa_memory)
-    automatic = True
+    automatic = False
     controller = ControllerNew(agent,memory,view = view, synthesizer = synthesizer,
          hexa_memory = hexa_memory, hexaview = hexaview,automatic = automatic)
 
+    controller.action = json.dumps({'action': '/', 'angle': 360})
+    controller.command_robot(controller.action)
+
+    ac = json.dumps({'action': '/', 'angle': -controller.azimuth})
+    controller.action = json.dumps({'action': '/', 'angle': -controller.azimuth})
+    controller.command_robot(controller.action)
+
     pyglet.clock.schedule_interval(controller.main_loop, 0.1)
+
 
     pyglet.app.run()
 
