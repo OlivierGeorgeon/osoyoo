@@ -235,7 +235,7 @@ class HexaMemory(HexaGrid):
                    return self.find_coordinates_corner(tmp_cell_x,tmp_cell_y, x_sign,y_sign)
                 else :
                    "on est dans d"
-                   return tmp_cell_x+ x_sign, tmp_cell_y + y_sign
+                   return tmp_cell_x+ x_sign, tmp_cell_y
             
         if abs(pos_x)> radius and abs(pos_x)< 2*radius :
             "on est dans hd"
