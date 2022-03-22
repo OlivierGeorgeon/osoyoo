@@ -81,6 +81,7 @@ class Controller:
             if self.action == "8":
                 if not blocked:
                     #translation[0] = STEP_FORWARD_DISTANCE * outcome['duration'] / 1000
+                    print("exec")
                     translation[0] = 100
 
 
@@ -92,7 +93,7 @@ class Controller:
             if floor > 0:  # Black line detected
                 # Update the translation
                 if self.action == "8":  # TODO Other actions
-                    forward_duration = outcome['duration'] - 300  # Subtract retreat duration
+                    forward_duration = 1000 #outcome['duration'] - 300  # Subtract retreat duration
                     translation[0] = STEP_FORWARD_DISTANCE * forward_duration/1000 - RETREAT_DISTANCE  # To be adjusted
 
             # The displacement matrix of this interaction
@@ -132,11 +133,11 @@ class Controller:
 
             # Update head angle
             if 'head_angle' in outcome:
-                head_angle = outcome['head_angle']
+                head_angle = int(outcome['head_angle'])
                 self.robot.rotate_head(head_angle)
                 if self.action == "-" or self.action == "*" or self.action == "1" or self.action == "3":
                     # Create a new echo phenomenon
-                    echo_distance = outcome['echo_distance']
+                    echo_distance = float(outcome['echo_distance'])
                     if echo_distance > 0:  # echo measure 0 is false measure
                         x = self.robot.head_x + math.cos(math.radians(head_angle)) * echo_distance
                         y = self.robot.head_y + math.sin(math.radians(head_angle)) * echo_distance
@@ -148,12 +149,12 @@ class Controller:
                 self.view.azimuth = outcome['azimuth']
 
             # Update the origin
-            self.view.update_environment_matrix(displacement_matrix)
+            # self.view.update_environment_matrix(displacement_matrix)
 
 
 # Testing the controller by remote controlling the robot from the egocentric memory window
 if __name__ == "__main__":
-    ip_ = "10.40.22.255"
+    ip_ = "10.40.22.252"
     emw = EgoMemoryWindow(ip=ip_)
     controller = Controller(emw)
 
@@ -164,7 +165,7 @@ if __name__ == "__main__":
         """ Receiving the action from the window and calling the controller to send the action to the robot """
         if controller.enact_step == 0:
             if text == "/":  # Send the angle marked by the mouse click
-                emw.on_text(text)
+                # emw.on_text(text)
                 text = json.dumps({'action': '/', 'angle': emw.mouse_press_angle})
             controller.enact(text)
         else:

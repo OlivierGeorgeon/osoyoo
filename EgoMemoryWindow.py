@@ -118,13 +118,13 @@ class EgoMemoryWindow(pyglet.window.Window):
         print("clear_ms")
         self.phenomena.clear()
 
-    def on_text(self, text):
-        print("Send action: ", text)
-        outcome_string = self.wifiInterface.enact({"action": text})
-        print(outcome_string)
-        outcome = json.loads(outcome_string)
+    # def on_text(self, text):
+        # print("Send action: ", text)
+        # outcome_string = self.wifiInterface.enact({"action": text})
+        # print(outcome_string)
+        # outcome = json.loads(outcome_string)
 
-        self.windowRefresh(text, outcome)
+        # self.windowRefresh(text, outcome)
 
 
     def windowRefresh(self, text, outcome):
@@ -169,20 +169,6 @@ class EgoMemoryWindow(pyglet.window.Window):
                 line = Phenomenon(150, 0, self.batch, 1)
                 self.phenomena.append(line)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
             # ----------------------------------------------------- #
             #    if not 'echo_distance' in outcome:
             #         echo_distance = random.randint(0, 300)
@@ -193,8 +179,6 @@ class EgoMemoryWindow(pyglet.window.Window):
             #         obstacle = Phenomenon(x, y, self.batch)
             #         self.phenomena.append(obstacle)
             # ----------------------------------------------------- #
-
-
 
         for p in self.phenomena:
             p.translate(translation)
