@@ -11,7 +11,7 @@ from pyrr import matrix44
 
 
 class Controller:
-    def __init__(self, view):
+    def __init__(self, view: EgoMemoryWindow):
         # View
         self.view = view
 
@@ -81,7 +81,6 @@ class Controller:
             if self.action == "8":
                 if not blocked:
                     #translation[0] = STEP_FORWARD_DISTANCE * outcome['duration'] / 1000
-                    print("exec")
                     translation[0] = 100
 
 

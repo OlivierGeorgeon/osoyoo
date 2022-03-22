@@ -113,7 +113,10 @@ void loop()
   if (current_floor != previous_floor) // la fonction renvoi true si elle capte une ligne noir
   {
     stop_Stop();
-    floorOutcome = ls.tracking();
+    if (current_floor > 0)
+    {
+      floorOutcome = current_floor;
+    }
     go_back(SPEED);//recule
     actionStep = 1;
     endTime = millis() + 1000; //1sec

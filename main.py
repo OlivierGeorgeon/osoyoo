@@ -13,7 +13,7 @@ print("Control mode: MANUAL")
 
 def main():
     """ Controlling the robot with Agent5 """
-    ip_ = "10.40.22.255"
+    ip_ = "10.40.22.252"
     emw = EgoMemoryWindow(ip=ip_)
     controller = Controller(emw)
     agent = Agent5()
@@ -49,7 +49,7 @@ def main():
                 outcome = 0
                 json_outcome = json.loads(controller.outcome_bytes)
                 if 'floor' in json_outcome:
-                    outcome = json_outcome['floor']
+                    outcome = int(json_outcome['floor'])
                 if 'shock' in json_outcome:
                     if json_outcome['shock'] > 0:
                         outcome = json_outcome['shock']

@@ -55,8 +55,8 @@ class EgoMemoryWindow(pyglet.window.Window):
 
         self.phenomena = []
         #self.origin = shapes.Circle(0, 0, 20, color=(150, 150, 225))
-        self.origin = shapes.Rectangle(0, 0, 60, 40, color=(150, 150, 225))
-        self.origin.anchor_position = 30, 20
+        # self.origin = shapes.Rectangle(0, 0, 60, 40, color=(150, 150, 225))
+        # self.origin.anchor_position = 30, 20
 
 
         self.environment_matrix = (GLfloat * 16)(1, 0, 0, 0,
@@ -93,7 +93,7 @@ class EgoMemoryWindow(pyglet.window.Window):
 
         # Stack the environment's displacement and draw the origin just to check
         glMultMatrixf(self.environment_matrix)
-        self.origin.draw()  # Draw the origin of the robot
+        # self.origin.draw()  # Draw the origin of the robot
 
     def on_mouse_press(self,x, y, button, modifiers):
         w, h = self.get_size()

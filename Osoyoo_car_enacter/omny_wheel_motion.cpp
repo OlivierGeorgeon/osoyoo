@@ -90,13 +90,13 @@ void RL(int speed)//Rotation de la roue arriere gauche
     {
         digitalWrite(LeftMotorDirPin1B,LOW);
         digitalWrite(LeftMotorDirPin2B,HIGH);
-        analogWrite(speedPinLB,1.5*speed);
+        analogWrite(speedPinLB,1.2*speed);
     }
     else
     {
         digitalWrite(LeftMotorDirPin1B,HIGH);
         digitalWrite(LeftMotorDirPin2B,LOW);
-        analogWrite(speedPinLB,-speed*1.5);
+        analogWrite(speedPinLB,-speed*1.2);
     }
 }
 
