@@ -11,6 +11,7 @@
 #include "omny_wheel_motion.h"
 #include "LightSensor.h"
 LightSensor ls;
+int previous_floor = 0; 
 
 
 #define WifiMode "R"        //Définir le mode de wifi du robot, 'R' pour routeur et 'W' pour la connexion au robot
@@ -97,24 +98,27 @@ void loop()
     switch (action)    //serial control instructions
     {  
       case '8':go_forward(SPEED);break;
-      case '4':left_turn(SPEED);break;
-      case '6':right_turn(SPEED);break;
+      case '1':left_turn(SPEED);break;
+      case '3':right_turn(SPEED);break;
       case '2':go_back(SPEED);break;
       case '5':stop_Stop();break;
       case '0':ls.until_line(SPEED);break;
       case 'D':outcome.addValue("echo_distance", (String) head.distUS.dist());break;
-      case 'S': head.scan(0, 180, 9, 0);break;               
+      case '-': head.scan(0, 180, 9, 0);break;               
       default:break;
     }
   }
   
-  if (ls.tracking() > 0) // la fonction renvoi true si elle capte une ligne noir
+  int current_floor = ls.tracking();
+  if (current_floor != previous_floor) // la fonction renvoi true si elle capte une ligne noir
   {
     stop_Stop();
     floorOutcome = ls.tracking();
     go_back(SPEED);//recule
     actionStep = 1;
     endTime = millis() + 1000; //1sec
+
+    previous_floor = current_floor;
   }
   
   if ((endTime < millis()) && (actionStep == 1))

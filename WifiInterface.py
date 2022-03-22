@@ -13,7 +13,7 @@ if RobotDefine.ROBOT_ID == 0:
 
 
 class WifiInterface:
-    def __init__(self, ip="10.40.22.255", port=8888, udpTimeout=4):
+    def __init__(self, ip="10.40.22.252", port=8888, udpTimeout=4):
         self.IP = ip
         self.port = port
         self.udpTimeout = udpTimeout
@@ -26,7 +26,7 @@ class WifiInterface:
         """ Sending the action string, waiting for the outcome, and returning the outcome bytes """
         outcome = b'{"status":"T"}'  # Default status T if timeout
         print("sending " + str(action))
-        self.socket.sendto(bytes(str(action).replace("'", '"'), 'utf-8'), (self.IP, self.port))
+        self.socket.sendto(bytes(str({"action" : action}).replace("'", '"'), 'utf-8'), (self.IP, self.port))
         try:
             outcome, address = self.socket.recvfrom(512)
         except socket.error as error:  # Time out error when robot is not connected
