@@ -1,13 +1,14 @@
 import pyglet
+import sys
+import os
+sys.path.insert(1, os.path.join(sys.path[0], '..'))
 from Synthesizer import Synthesizer
 from MemoryV1 import MemoryV1
 from HexaMemory import HexaMemory
 from HexaView import HexaView
 from EgoMemoryWindowNew import EgoMemoryWindowNew
 
-import sys
-import os
-sys.path.insert(1, os.path.join(sys.path[0], '..'))
+
 
 
 # Testing the synthesiser
