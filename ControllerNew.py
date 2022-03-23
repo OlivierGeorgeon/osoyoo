@@ -149,8 +149,9 @@ class ControllerNew:
     def send_position_change_to_hexa_memory(self,angle,translation):
         """Apply movement to hexamem"""
         if self.hexa_memory is not None:
-            self.hexa_memory.move(angle,translation[0], translation[1])
             self.hexa_memory.azimuth = self.azimuth
+            self.hexa_memory.move(angle,translation[0], translation[1])
+            
 
     ################################################# ROBOT RELATED #################################################################
 
