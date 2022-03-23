@@ -8,12 +8,12 @@ from EgoMemoryWindowNew import EgoMemoryWindowNew
 from ControllerNew import ControllerNew
 from Synthesizer import Synthesizer
 from MemoryV1 import MemoryV1
-from Agent6 import Agent6
+from Agents.Agent6 import Agent6
 from HexaMemory import HexaMemory
 import pyglet
 from HexaView import HexaView
 import json
-from Agent5 import Agent5
+from Agents.Agent5 import Agent5
 
 CONTROL_MODE_MANUAL = 0
 CONTROL_MODE_AUTOMATIC = 1
