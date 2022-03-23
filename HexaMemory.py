@@ -25,6 +25,7 @@ class HexaMemory(HexaGrid):
         self.robot_angle = 90
         self.orientation = 0
         self.update_orientation()
+        self.azimuth = 0
 
     def update_orientation(self):
         "update the orientation of the robot based on its angle"

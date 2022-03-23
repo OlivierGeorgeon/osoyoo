@@ -3,8 +3,10 @@ import math
 import random
 import threading
 import time
-from Agent5 import Agent5
-from AgentRandom import AgentRandom
+from tkinter import E
+from Agents.Agent5 import Agent5
+from Agents.AgentRandom import AgentRandom
+from Agents.AgentAlignNorth import AgentAlignNorth
 from MemoryV1 import MemoryV1
 from RobotDefine import *
 from WifiInterface import WifiInterface
@@ -21,7 +23,7 @@ import pyglet
 #from Interaction import Interaction
 #from MemoryNew import MemoryNew
 
-
+ 
 class ControllerNew:
     """Controller of the application
     It is the only object in the application that should have access to every of the following objects :
@@ -72,6 +74,7 @@ class ControllerNew:
         self.outcome = 0
         self.enact_step = 0
         self.action = ""
+        
 
     ################################################# LOOP #################################################################"""
 
@@ -88,7 +91,7 @@ class ControllerNew:
                 print("Input ?")
                 robot_action = msvcrt.getch().decode("utf-8")
                 if robot_action == 'n':
-                    robot_action = json.dumps({'action': '/', 'angle': 360-controller.azimuth})
+                    robot_action = self.action_align_north()
                     print('Vers le nord')
         # 2 : ordonne au robot
             self.command_robot(robot_action)
@@ -147,6 +150,7 @@ class ControllerNew:
         """Apply movement to hexamem"""
         if self.hexa_memory is not None:
             self.hexa_memory.move(angle,translation[0], translation[1])
+            self.hexa_memory.azimuth = self.azimuth
 
     ################################################# ROBOT RELATED #################################################################
 
@@ -170,11 +174,21 @@ class ControllerNew:
 
     ################################################# SPECIFIC TASKS #################################################################
 
+    def action_align_north(self):
+        """Compute the angle to align the robot with the north, and create the string for the corresponding action"""
+        action = '0'
+        if((controller.azimuth < 354 and controller.azimuth > 6) or controller.azimuth == 0): # if the angle is too small it makes the robot crash
+                        if controller.azimuth > 180 :
+                            action = json.dumps({'action': '/', 'angle': controller.azimuth-360})
+                        else:
+                            action = json.dumps({'action': '/', 'angle': controller.azimuth})
+        return action
+
     def translate_agent_action_to_robot_command(self,action):
         """ Translate the agent action to robot commands
         """
         # 0-> '8', 1-> '1', 2-> '3', 3 -> 'tourne vers le nord'
-        commands = ['8', '1', '3',json.dumps({'action': '/', 'angle': 360-controller.azimuth})]
+        commands = ['8', '1', '3',self.action_align_north()]
         return commands[action]
 
     def translate_robot_data(self,data): #PAS FINITO ?
@@ -274,13 +288,13 @@ class ControllerNew:
 
 
 if __name__ == '__main__':
-    from Agent6 import Agent6
+    from Agents.Agent6 import Agent6
     from HexaMemory import HexaMemory
     from HexaView import HexaView
     from MemoryV1 import MemoryV1
     from EgoMemoryWindowNew import EgoMemoryWindowNew
     from Synthesizer import Synthesizer
-    from Agent5 import Agent5
+    from Agents.Agent5 import Agent5
 
     # Mandatory Initializations
     
@@ -288,7 +302,8 @@ if __name__ == '__main__':
     hexa_memory = HexaMemory(width = 50, height = 100,cells_radius = 100)
     #agent = Agent6(memory, hexa_memory)
     #agent = Agent5()
-    agent = AgentRandom(memory, hexa_memory)
+    #agent = AgentRandom(memory, hexa_memory)
+    agent = AgentAlignNorth(memory, hexa_memory)
     # Optionals Initializations
     
     view = None
@@ -296,16 +311,9 @@ if __name__ == '__main__':
     hexaview = None
     hexaview = HexaView()
     synthesizer = Synthesizer(memory,hexa_memory)
-    automatic = False
+    automatic = True
     controller = ControllerNew(agent,memory,view = view, synthesizer = synthesizer,
          hexa_memory = hexa_memory, hexaview = hexaview,automatic = automatic)
-
-    controller.action = json.dumps({'action': '/', 'angle': 360})
-    controller.command_robot(controller.action)
-
-    ac = json.dumps({'action': '/', 'angle': -controller.azimuth})
-    controller.action = json.dumps({'action': '/', 'angle': -controller.azimuth})
-    controller.command_robot(controller.action)
 
     pyglet.clock.schedule_interval(controller.main_loop, 0.1)
 
