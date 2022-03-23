@@ -23,12 +23,10 @@ if __name__ == '__main__':
     synthesizer = Synthesizer(mem, hexa_memory)
     synthesizer.act()
 
-
     # Create and populate hexa view
     hexaview = HexaView()
-    hexa_memory.move(30, 0, 0)
+    # hexa_memory.move(30, 0, 0)
     hexaview.extract_and_convert_interactions(hexa_memory)
-
 
     @hexaview.event
     def on_text(text):
