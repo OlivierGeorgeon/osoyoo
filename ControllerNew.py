@@ -311,7 +311,7 @@ if __name__ == '__main__':
     hexaview = None
     hexaview = HexaView()
     synthesizer = Synthesizer(memory,hexa_memory)
-    automatic = True
+    automatic = False
     controller = ControllerNew(agent,memory,view = view, synthesizer = synthesizer,
          hexa_memory = hexa_memory, hexaview = hexaview,automatic = automatic)
 
