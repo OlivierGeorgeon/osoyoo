@@ -1,4 +1,4 @@
-#define ROBOT_ID 4 // 0: regular Osoyoo robot, 1: robot BSN, 2: robot Olivier, 3: robot SHS, 4: robot SHS with GY86
+#define ROBOT_ID 2 // 0: regular Osoyoo robot, 1: robot BSN, 2: robot Olivier, 3: robot SHS, 4: robot SHS with GY86
 
 #if ROBOT_ID == 1
 
@@ -28,7 +28,7 @@
 #define ROBOT_REAR_LEFT_WHEEL_COEF 1
 #define ROBOT_FRONT_RIGHT_WHEEL_COEF 1
 #define ROBOT_FRONT_LEFT_WHEEL_COEF 1
-#define TURN_SPOT_MAX_DURATION 1700
+#define TURN_SPOT_MAX_DURATION 1800
 #define TURN_SPOT_ENDING_DELAY 200
 #define TURN_SPOT_ENDING_ANGLE 3
 #define COMPASS_X_OFFSET 1475
