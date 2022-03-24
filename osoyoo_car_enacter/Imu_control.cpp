@@ -140,7 +140,7 @@ int Imu_control::update()
     // (the acceleration did not pass the threshold during the first 250ms)
     if (_cycle_count >= 6) {
       if (_max_acceleration < ACCELERATION_BLOCK_THRESHOLD) {
-        _shock_measure = B11;
+        // _shock_measure = B11;
         _blocked = true;
       }
     }

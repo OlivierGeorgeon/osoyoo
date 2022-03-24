@@ -124,7 +124,7 @@ bool blink_on = true;
 
 void loop()
 {
-  // Display a flashing led to check whether something is blocking the main loop
+  // Display a flashing led to check whether something is freezing the main loop
   if (millis()> blink_end_time){
     if (blink_on) {
       digitalWrite(LED_BUILTIN, HIGH); // for debug
