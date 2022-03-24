@@ -303,8 +303,8 @@ if __name__ == '__main__':
     hexa_memory = HexaMemory(width = 50, height = 100,cells_radius = 100)
     #agent = Agent6(memory, hexa_memory)
     #agent = Agent5()
-    #agent = AgentRandom(memory, hexa_memory)
-    agent = AgentAlignNorth(memory, hexa_memory)
+    agent = AgentRandom(memory, hexa_memory)
+    #agent = AgentAlignNorth(memory, hexa_memory)
     # Optionals Initializations
     
     view = None
