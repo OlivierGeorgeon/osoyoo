@@ -300,7 +300,7 @@ if __name__ == '__main__':
     # Mandatory Initializations
     
     memory = MemoryV1()
-    hexa_memory = HexaMemory(width = 50, height = 100,cells_radius = 100)
+    hexa_memory = HexaMemory(width = 70, height = 150,cells_radius = 20)
     #agent = Agent6(memory, hexa_memory)
     #agent = Agent5()
     agent = AgentRandom(memory, hexa_memory)
