@@ -269,21 +269,9 @@ void loop()
           OWM.stopMotion();
           interaction_step = 2;
           break;
-          // Look to the direction of the shock and start echo alignment
-          /*
-          HEA._next_saccade_time = millis() + 150;
-          if (shock_event == B01){ // Shock from the right
-            HEA.turnHead(-80);
-          }
-          if (shock_event == B10){ // Shock from the front
-            HEA.turnHead(80);
-          }
-          if (shock_event == B11){
-            HEA.turnHead(0);
-          }
-          HEA.beginEchoAlignment();
-          */
         }
+      case ACTION_SHIFT_RIGHT:
+      case ACTION_SHIFT_LEFT:
       case ACTION_TURN_RIGHT:
       case ACTION_TURN_LEFT:
         // Check if Floor Change Retreat
