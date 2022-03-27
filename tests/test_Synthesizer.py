@@ -6,7 +6,7 @@ from Synthesizer import Synthesizer
 from MemoryV1 import MemoryV1
 from HexaMemory import HexaMemory
 from HexaView import HexaView
-from EgoMemoryWindowNew import EgoMemoryWindowNew
+from RobotDefine import *
 
 
 
@@ -20,6 +20,9 @@ if __name__ == '__main__':
     mem.add((0, 0, 0, 1, 300, -300))  # Echo
 
     hexa_memory = HexaMemory(20, 60, cells_radius=40)
+    hexa_memory.robot_pos_x = 0
+    hexa_memory.robot_pos_y = 0
+
     synthesizer = Synthesizer(mem, hexa_memory)
     synthesizer.act()
 
@@ -34,14 +37,20 @@ if __name__ == '__main__':
         translation = [0, 0]
         rotation = 0
         if text == "8":  # Move forward
-            translation[0] = 180
+            translation[0] = 80  # STEP_FORWARD_DISTANCE
         if text == "2":  # Move forward
-            translation[0] = -180
+            translation[0] = -80  # STEP_FORWARD_DISTANCE
         if text == "1":  # Turn left
             rotation = 60
         if text == "3":  # Turn right
             rotation = -60
+        if text == "4":
+            translation[1] = SHIFT_DISTANCE
+        if text == "6":
+            translation[1] = -SHIFT_DISTANCE
 
+        hexa_memory.azimuth -= rotation + 360
+        hexa_memory.azimuth %= 360
         hexa_memory.move(rotation, translation[0], translation[1])
         synthesizer.act()
         hexaview.extract_and_convert_interactions(hexa_memory)

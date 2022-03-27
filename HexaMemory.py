@@ -303,10 +303,8 @@ class HexaMemory(HexaGrid):
         rota_radian = math.radians(self.robot_angle)
         #move_x += self.robot_pos_x
         #move_y += self.robot_pos_y
-        x_prime = int(move_x * math.cos(rota_radian) +
-                      move_y * math.sin(rota_radian))
-        y_prime = int(move_y * math.cos(rota_radian) +
-                      move_x * math.sin(rota_radian))
+        x_prime = int(move_x * math.cos(rota_radian) - move_y * math.sin(rota_radian))  # OG 27/08/2022
+        y_prime = int(move_x * math.sin(rota_radian) + move_y * math.cos(rota_radian))
         x_prime += self.robot_pos_x
         y_prime += self.robot_pos_y
         self.apply_changes(
