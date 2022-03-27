@@ -258,7 +258,14 @@ class ControllerNew:
                     forward_duration = outcome['duration'] - 300  # Subtract retreat duration
                     translation[0] = STEP_FORWARD_DISTANCE * forward_duration/1000 - RETREAT_DISTANCE  # To be adjusted
                     if (translation[0] < 0 ) :
-                         print("translation negative") 
+                         print("translation negative")
+                if floor == 0b01:  # Black line on the right
+                    translation[0] -= 20
+                    translation[1] = RETREAT_DISTANCE_Y
+                if floor == 0b10:  # Black line on the left
+                    translation[0] -= 20
+                    translation[1] = -RETREAT_DISTANCE_Y
+
             angle = rotation
 
             # Update head angle

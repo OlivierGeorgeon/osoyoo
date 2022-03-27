@@ -37,7 +37,7 @@ class MemoryNew:
         durability = INTERACTION_PERSISTENCE
 
         if(floor):
-            floorInter = Interaction(ROBOT_FRONT_X + RETREAT_DISTANCE,0,10,60,type = 'Line', shape = 'Rectangle', color= 'black', durability = durability, decayIntensity = 1, id = self.current_id)
+            floorInter = Interaction(LINE_X,0,10,60,type = 'Line', shape = 'Rectangle', color= 'black', durability = durability, decayIntensity = 1, id = self.current_id)
             self.interactions.append(floorInter)
         if shock:
             shockInter = None
