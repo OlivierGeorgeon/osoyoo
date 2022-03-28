@@ -8,7 +8,7 @@ import math
 from pyrr import matrix44
 from RobotDefine import *
 
-INTERACTION_PERSISTENCE = 10
+INTERACTION_PERSISTENCE = 20
 
 class MemoryNew:
     """This class play the role of a memory manager : it stocks Interaction objects,

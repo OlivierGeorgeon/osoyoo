@@ -261,10 +261,10 @@ class ControllerNew:
                          print("translation negative")
                 if self.action == "4":
                     translation[0] = SHIFT_DISTANCE * forward_duration/1000
-                    translation[1] = -RETREAT_DISTANCE
+                    translation[1] = -50
                 if self.action == "6":
                     translation[0] = -SHIFT_DISTANCE * forward_duration/1000
-                    translation[1] = -RETREAT_DISTANCE
+                    translation[1] = -50
                 if floor == 0b01:  # Black line on the right
                     translation[0] -= 20
                     translation[1] = RETREAT_DISTANCE_Y
