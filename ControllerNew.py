@@ -300,10 +300,10 @@ if __name__ == '__main__':
     # Mandatory Initializations
     
     memory = MemoryV1()
-    hexa_memory = HexaMemory(width = 70, height = 150,cells_radius = 20)
+    hexa_memory = HexaMemory(width = 70, height = 150,cells_radius = 100)
     #agent = Agent6(memory, hexa_memory)
-    #agent = Agent5()
-    agent = AgentRandom(memory, hexa_memory)
+    agent = Agent5()
+    #agent = AgentRandom(memory, hexa_memory)
     #agent = AgentAlignNorth(memory, hexa_memory)
     # Optionals Initializations
     
@@ -312,7 +312,7 @@ if __name__ == '__main__':
     hexaview = None
     hexaview = HexaView()
     synthesizer = Synthesizer(memory,hexa_memory)
-    automatic = False
+    automatic = True
     controller = ControllerNew(agent,memory,view = view, synthesizer = synthesizer,
          hexa_memory = hexa_memory, hexaview = hexaview,automatic = automatic)
 
