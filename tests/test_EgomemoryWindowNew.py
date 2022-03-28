@@ -27,7 +27,7 @@ if __name__ == "__main__":
     emw2 = EgoMemoryWindowNew()
     emw2.set_caption("North up projection")
     memory = MemoryV1()
-    hexa_memory = HexaMemory(width=20, height=70, cells_radius=100)
+    hexa_memory = HexaMemory(width=40, height=140, cells_radius=50)
     agent_act = Agent5()
     agent = Agent6(memory, hexa_memory)
     hexaview = HexaView()
@@ -63,6 +63,7 @@ if __name__ == "__main__":
             emw.extract_and_convert_interactions(memory)
             emw2.extract_and_convert_interactions(memory)
             emw2.azimuth = controller.azimuth
+            emw2.robot.rotate_head(emw.robot.head_angle)
             controller.hexaview.extract_and_convert_interactions(controller.hexa_memory)
             controller.send_position_change_to_hexa_memory(angle, translation)
             controller.ask_synthetizer_to_act()

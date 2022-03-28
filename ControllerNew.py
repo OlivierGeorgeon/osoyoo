@@ -254,11 +254,24 @@ class ControllerNew:
             # Estimate displacement due to floor change retreat
             if floor > 0:  # Black line detected
                 # Update the translation
+                forward_duration = outcome['duration'] - 300  # Subtract retreat duration
                 if self.action == "8":  # TODO Other actions
-                    forward_duration = outcome['duration'] - 300  # Subtract retreat duration
-                    translation[0] = STEP_FORWARD_DISTANCE * forward_duration/1000 - RETREAT_DISTANCE  # To be adjusted
+                    translation[0] = STEP_FORWARD_DISTANCE * forward_duration/1000 - RETREAT_DISTANCE
                     if (translation[0] < 0 ) :
-                         print("translation negative") 
+                         print("translation negative")
+                if self.action == "4":
+                    translation[0] = SHIFT_DISTANCE * forward_duration/1000
+                    translation[1] = -RETREAT_DISTANCE
+                if self.action == "6":
+                    translation[0] = -SHIFT_DISTANCE * forward_duration/1000
+                    translation[1] = -RETREAT_DISTANCE
+                if floor == 0b01:  # Black line on the right
+                    translation[0] -= 20
+                    translation[1] = RETREAT_DISTANCE_Y
+                if floor == 0b10:  # Black line on the left
+                    translation[0] -= 20
+                    translation[1] = -RETREAT_DISTANCE_Y
+
             angle = rotation
 
             # Update head angle

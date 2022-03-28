@@ -8,6 +8,7 @@ import math
 from pyrr import matrix44
 from RobotDefine import *
 
+INTERACTION_PERSISTENCE = 10
 
 class MemoryNew:
     """This class play the role of a memory manager : it stocks Interaction objects,
@@ -33,10 +34,10 @@ class MemoryNew:
         x = 10
         y = 10
         floor,shock,blocked, obstacle, x , y = phenom_info
-        durability = 3
+        durability = INTERACTION_PERSISTENCE
 
         if(floor):
-            floorInter = Interaction(ROBOT_FRONT_X + RETREAT_DISTANCE,0,10,60,type = 'Line', shape = 'Rectangle', color= 'black', durability = durability, decayIntensity = 1, id = self.current_id)
+            floorInter = Interaction(LINE_X,0,10,60,type = 'Line', shape = 'Rectangle', color= 'black', durability = durability, decayIntensity = 1, id = self.current_id)
             self.interactions.append(floorInter)
         if shock:
             shockInter = None
