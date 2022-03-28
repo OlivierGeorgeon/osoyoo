@@ -39,26 +39,36 @@ class Synthesizer:
         """
         for interaction in self.memory.interactions :
             #print("<SYNTHESIZER> : interaction id : ,",interaction.id, "last used id :" ,self.last_used_id)
+            corners = interaction.corners
+            used_points = []
             if(interaction.id<= self.last_used_id):
                 continue
             #print("<SYNTHESIZER> : actual_durability of interact: ", interaction.actual_durability)
             if(interaction.actual_durability > 0):
-                rota_radian = math.radians(self.hexa_memory.robot_angle)
-                # les interactions etant egocentrés, on fait la manip pour les allocentrer
-                x_prime = int(interaction.x * math.cos(rota_radian) + interaction.y * math.sin(rota_radian))
-                y_prime = int(interaction.y * math.cos(rota_radian) + interaction.x * math.sin(rota_radian))
-                # on demande ensuite à l'hexamem de nous traduire leur position en cells
-                x_prime += self.hexa_memory.robot_pos_x
-                y_prime += self.hexa_memory.robot_pos_y
-                x, y = self.hexa_memory.convert_pos_in_cell(x_prime, y_prime)
-                if(x >= self.hexa_memory.width or y >= self.hexa_memory.height or x <  0 or y < 0):
-                    #print("<SYNTHESIZER> Interaction ignorée car hors de la grille")
-                    continue
-                try :
-                    self.internal_hexa_grid.grid[x][y].interactions.append(interaction)
-                except IndexError:
-                    print("<SYNTHESIZER> Interaction caused an error : x=",x,"y = ",y,"width = ", self.hexa_memory.width,"height = ",self.hexa_memory.height)
-                    continue
+                for _,point in enumerate(corners) :
+                    rota_radian = math.radians(self.hexa_memory.robot_angle)
+                    x_corner = point[0]
+                    y_corner = point[1]
+                    # les interactions etant egocentrés, on fait la manip pour les allocentrer
+                    x_prime = int(x_corner * math.cos(rota_radian) + y_corner * math.sin(rota_radian))
+                    y_prime = int(y_corner * math.cos(rota_radian) + x_corner * math.sin(rota_radian))
+                    # on demande ensuite à l'hexamem de nous traduire leur position en cells
+                    x_prime += self.hexa_memory.robot_pos_x
+                    y_prime += self.hexa_memory.robot_pos_y
+                    x, y = self.hexa_memory.convert_pos_in_cell(x_prime, y_prime)
+                    if(x,y) in used_points :
+                        continue
+                    if(x >= self.hexa_memory.width or y >= self.hexa_memory.height or x <  0 or y < 0):
+                        #print("<SYNTHESIZER> Interaction ignorée car hors de la grille")
+                        continue
+                    try :
+                        self.internal_hexa_grid.grid[x][y].interactions.append(interaction)
+                        used_points.append((x,y))
+                        if len(used_points )>1 : 
+                            print("print sur ", len(used_points)," cases : ",used_points[0],used_points[1])
+                    except IndexError:
+                        print("<SYNTHESIZER> Interaction caused an error : x=",x,"y = ",y,"width = ", self.hexa_memory.width,"height = ",self.hexa_memory.height)
+                        continue
             if(interaction.id > self.last_used_id):
                 self.last_used_id = interaction.id
 

@@ -41,6 +41,19 @@ class Interaction:
         self.rotation = 0
         self.id = id
         print(self.rgb)
+        self.corners = None
+        self.compute_corners()
+
+
+    def compute_corners(self):
+        """Compute the corners of the Interaction.
+        """
+        self.corners = [
+            (self.x, self.y),
+            (self.x + self.width, self.y),
+            (self.x + self.width, self.y + self.height),
+            (self.x, self.y + self.height),
+        ]
 
     def decay(self):
         """Remove one decayIntensity from the durability of the object.
