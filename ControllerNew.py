@@ -259,18 +259,18 @@ class ControllerNew:
                     translation[0] = STEP_FORWARD_DISTANCE * forward_duration/1000 - RETREAT_DISTANCE
                     if (translation[0] < 0 ) :
                          print("translation negative")
+                    if floor == 0b01:  # Black line on the right
+                        translation[0] -= 0
+                        translation[1] = RETREAT_DISTANCE_Y
+                    if floor == 0b10:  # Black line on the left
+                        translation[0] -= 0
+                        translation[1] = -RETREAT_DISTANCE_Y
                 if self.action == "4":
-                    translation[0] = SHIFT_DISTANCE * forward_duration/1000
-                    translation[1] = -50
+                    translation[0] = -RETREAT_DISTANCE
+                    translation[1] = SHIFT_DISTANCE * forward_duration/1000
                 if self.action == "6":
-                    translation[0] = -SHIFT_DISTANCE * forward_duration/1000
-                    translation[1] = -50
-                if floor == 0b01:  # Black line on the right
-                    translation[0] -= 20
-                    translation[1] = RETREAT_DISTANCE_Y
-                if floor == 0b10:  # Black line on the left
-                    translation[0] -= 20
-                    translation[1] = -RETREAT_DISTANCE_Y
+                    translation[0] = -RETREAT_DISTANCE
+                    translation[1] = -SHIFT_DISTANCE * forward_duration/1000
 
             angle = rotation
 
