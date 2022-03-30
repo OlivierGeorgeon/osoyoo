@@ -27,11 +27,42 @@ class Synthesizer:
         self.last_used_id = -1
         self.tolerance = 3 #nombre d'id d'ecart d'une interaction que l'on tolère par rapport au last_id pour intervenir sur la synthese
 
+        delta = 250
+        self.delta_x = delta
+        self.delta_y = delta
+
+        self.min_delta = 20
+        self.obstacles_list = []
+
     def act(self):
         """Create phenoms based on Interactions in memory and States in hexa_memory"""
         self.project_memory_on_internal_grid()
         self.synthesize()
      
+
+    def compare_echolocation(self,interaction):
+        """ Compare the coordinates of the interaction with the coordinates of the obstacles in the list,
+        if the difference between the coordinates of the interaction and one known obstacle is less than self.delta_x and self.delta_y,
+        return True and the obstacle, else return False, None """
+        # les interactions etant egocentrés, on fait la manip pour les allocentrer
+        rota_radian = math.radians(self.hexa_memory.robot_angle)
+        x_prime = int(interaction.x * math.cos(rota_radian) - interaction.y * math.sin(rota_radian))
+        y_prime = int(interaction.y * math.cos(rota_radian) + interaction.x * math.sin(rota_radian))
+        # on demande ensuite à l'hexamem de nous traduire leur position en cells
+        x_prime += self.hexa_memory.robot_pos_x
+        y_prime += self.hexa_memory.robot_pos_y
+        for obstacle in self.obstacles_list :
+            # print difference between obstacle and interaction coordinates
+            print("<SYNTHESIZER> : obstacle x : ", obstacle[0], "interaction x : ", x_prime, "obstacle y : ", obstacle[1], "interaction y : ", y_prime)
+            if(abs(obstacle[0] - x_prime) < self.delta_x and abs(obstacle[1] - y_prime) < self.delta_y):
+                is_significant = False
+                if(abs(obstacle[0] -x_prime) > self.min_delta or abs(obstacle[1] - y_prime) > self.min_delta):
+                    is_significant = True
+
+                delta_x = obstacle[0] - x_prime
+                delta_y = obstacle[1] - y_prime
+                return True, obstacle, is_significant, delta_x, delta_y
+        return False, None, False, 0, 0
 
     def project_memory_on_internal_grid(self):
         """ Convert position of egocentric interactions of the memory into
@@ -45,12 +76,37 @@ class Synthesizer:
                 continue
             #print("<SYNTHESIZER> : actual_durability of interact: ", interaction.actual_durability)
             if(interaction.actual_durability > 0):
+                # call compare_echolocation if the interaction is of type obstacle
+                if(interaction.type == "obstacle"): # TODO : changer obstacle -> echo   
+                    is_same_obstacle, obstacle, is_away_enough, obstacle_delta_x, obstacle_delta_y = self.compare_echolocation(interaction)
+                    print("<SYNTHESIZER> : tested is_same_obstacle : ", is_same_obstacle)
+                    if(is_same_obstacle):
+                        if not is_away_enough:
+                            print("<SYNTHESIZER> : obstacle is not far enough")
+                            continue
+                        #move the robot in the memory, according to the mesured delta
+                        self.hexa_memory.robot_pos_x += obstacle_delta_x
+                        self.hexa_memory.robot_pos_y += obstacle_delta_y
+                        print("<SYNTHESIZER> : OBSTACLE already known detected, robot has been moved by :",-obstacle_delta_x,-obstacle_delta_y)
+                        if(interaction.id > self.last_used_id):
+                            self.last_used_id = interaction.id
+                        continue
+                    else :
+                        print("SYNTHESIZER : adding new obstacle to list")
+                        # les interactions etant egocentrés, on fait la manip pour les allocentrer
+                        rota_radian = math.radians(self.hexa_memory.robot_angle)
+                        x_prime = int(interaction.x * math.cos(rota_radian) - interaction.y * math.sin(rota_radian))
+                        y_prime = int(interaction.y * math.cos(rota_radian) + interaction.x * math.sin(rota_radian))
+                        # on demande ensuite à l'hexamem de nous traduire leur position en cells
+                        x_prime += self.hexa_memory.robot_pos_x
+                        y_prime += self.hexa_memory.robot_pos_y
+                        self.obstacles_list.append((x_prime,y_prime))
                 for _,point in enumerate(corners) :
                     rota_radian = math.radians(self.hexa_memory.robot_angle)
                     x_corner = point[0]
                     y_corner = point[1]
                     # les interactions etant egocentrés, on fait la manip pour les allocentrer
-                    x_prime = int(x_corner * math.cos(rota_radian) + y_corner * math.sin(rota_radian))
+                    x_prime = int(x_corner * math.cos(rota_radian) - y_corner * math.sin(rota_radian))
                     y_prime = int(y_corner * math.cos(rota_radian) + x_corner * math.sin(rota_radian))
                     # on demande ensuite à l'hexamem de nous traduire leur position en cells
                     x_prime += self.hexa_memory.robot_pos_x
@@ -64,8 +120,6 @@ class Synthesizer:
                     try :
                         self.internal_hexa_grid.grid[x][y].interactions.append(interaction)
                         used_points.append((x,y))
-                        if len(used_points )>1 : 
-                            print("print sur ", len(used_points)," cases : ",used_points[0],used_points[1])
                     except IndexError:
                         print("<SYNTHESIZER> Interaction caused an error : x=",x,"y = ",y,"width = ", self.hexa_memory.width,"height = ",self.hexa_memory.height)
                         continue
@@ -158,7 +212,6 @@ class Synthesizer:
                 interaction_echo = [element for element in cell_intra.interactions if (element.type == "obstacle" and element.id > self.last_used_id - self.tolerance )]
                 if(cell_hexa.status == 'Occupied'):
                     final_status = 'Occupied'
-                    print("Cell at (",i,",",j,") final_status : ", final_status)
                 elif(len(interaction_line) ):
                     final_status = "Frontier"
                     #print("Cell at (",i,",",j,") final_status : ", final_status)
@@ -168,7 +221,6 @@ class Synthesizer:
                     final_status = "Movable Obstacle"
                 elif (len(interaction_echo)):
                     final_status = "Something"
-                    print("Cell at (",i,",",j,") final_status : ", final_status)
                 else :
                     final_status = cell_hexa.status
 

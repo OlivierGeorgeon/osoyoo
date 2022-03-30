@@ -318,7 +318,89 @@ class HexaMemory(HexaGrid):
         self.grid[self.robot_cell_x][self.robot_cell_y].occupy()
         return x_prime, y_prime
 
-    def depr_move(self, direction, distance):
+    
+    def apply_phenomenon(self, phenomenon, pos_x, pos_y):
+        """Apply a phenomenon to the grid
+        Args :
+            phenomenon : type of phenomenon (TODO: but should be things like "line", "unmovable object", "movable object", etc.)
+            pos_x, pos_y : position of the phenomenon (relative to the robot's position)
+        """
+
+    def rotate_robot(self, rotation):
+        """Rotate the representation of the robot by the given angle.
+
+        :Parameters:
+            `rotation` : int, degrees of rotation
+        """
+        self.robot_angle = (self.robot_angle + rotation)
+        while self.robot_angle < 0:
+            self.robot_angle = 360 + self.robot_angle
+        self.robot_angle = self.robot_angle % 360
+
+        if(360-(self.robot_angle-90)  < self.azimuth -10 or 360-(self.robot_angle-90) > self.azimuth+10):
+            print( " <HEXA_MEMORY> : correction erreur angle")
+            self.robot_angle = 360 - self.azimuth +90
+        self.update_orientation()
+        #print("robot_orientation in hexa_memory : ", self.orientation,
+        #      "robot_angle in hexa_memory : ", self.robot_angle)  # TODO: arranger ce bordel
+
+    # def go_forward(self,distance):
+    #    self.move(self.robot_orientation,distance)
+
+    def get_robot_pos(self):
+        return self.robot_cell_x, self.robot_cell_y
+
+    def get_robot_neighbors_with_direction(self):
+        """"""
+        return self.get_all_neighbors_with_direction(self.robot_cell_x, self.robot_cell_y)
+
+
+
+    def apply_changes(self, start_x, start_y, end_x, end_y, status="Free"):
+        """Apply the given status (Free by default) to every cell between coordinates start_x,start_y and end_x,end_y"""
+
+        distance = math.sqrt((end_x - start_x)**2 + (end_y - start_y)**2)
+        if distance == 0:
+            return
+        nb_step = int(distance/(self.cells_radius))
+        if nb_step == 0:
+            return
+        step_x = int((end_x - start_x)/nb_step)
+        step_y = int((end_y - start_y)/nb_step)
+        current_pos_x = start_x
+        current_pos_y = start_y
+        for _ in range(nb_step):
+            cell_x, cell_y = self.convert_pos_in_cell(
+                current_pos_x, current_pos_y)
+            # if(self.grid[cell_x][cell_y].status == "Unknown"):
+            self.grid[cell_x][cell_y].status = status
+            self.grid[cell_x][cell_y].leave()
+            ####
+            current_pos_x += step_x
+            current_pos_y += step_y
+            """
+            if(abs(current_pos_x ) > abs(end_x)):
+                current_pos_x = end_x
+            if(abs(current_pos_y ) > abs(end_y)):
+                current_pos_y = end_y
+            """
+
+    def get_direction_of_neighbor_with_status(self, status):
+        ""
+
+    def apply_movement(self, rotation, distance):
+        self.rotate_robot(rotation)
+        self.go_forward(distance)
+
+
+
+
+
+
+
+
+################ DEPRECATED
+def depr_move(self, direction, distance):
         """Handle the movement of the robot in the HexaGrid : change position of the robot in the HexaGrid
         and apply changes on cells passed through
         Args : Direction : 0 = N, 1 = NE, 2 = SE, 3 = S, 4 = SW, 5 = NW
@@ -378,79 +460,8 @@ class HexaMemory(HexaGrid):
                 self.robot_cell_y = final_cell.y
         final_cell.set_to("Occupied")
 
-    def apply_phenomenon(self, phenomenon, pos_x, pos_y):
-        """Apply a phenomenon to the grid
-        Args :
-            phenomenon : type of phenomenon (TODO: but should be things like "line", "unmovable object", "movable object", etc.)
-            pos_x, pos_y : position of the phenomenon (relative to the robot's position)
-        """
-
-    def rotate_robot(self, rotation):
-        """Rotate the representation of the robot by the given angle.
-
-        :Parameters:
-            `rotation` : int, degrees of rotation
-        """
-        self.robot_angle = (self.robot_angle + rotation)
-        while self.robot_angle < 0:
-            self.robot_angle = 360 + self.robot_angle
-        self.robot_angle = self.robot_angle % 360
-
-        if(360-(self.robot_angle-90)  < self.azimuth -10 or 360-(self.robot_angle-90) > self.azimuth+10):
-            print( " <HEXA_MEMORY> : correction erreur angle")
-            self.robot_angle = 360 - self.azimuth +90
-        self.update_orientation()
-        print("robot_orientation in hexa_memory : ", self.orientation,
-              "robot_angle in hexa_memory : ", self.robot_angle)  # TODO: arranger ce bordel
-
-    # def go_forward(self,distance):
-    #    self.move(self.robot_orientation,distance)
-
-    def get_robot_pos(self):
-        return self.robot_cell_x, self.robot_cell_y
-
-    def get_robot_neighbors_with_direction(self):
-        """"""
-        return self.get_all_neighbors_with_direction(self.robot_cell_x, self.robot_cell_y)
-
-    def apply_changes_on_cells_passed(self, cells_passed):
-        """Apply changes on cells passed through by the robot i.e. change their state to "Free" 
-        """
-        cells_passed = [element.set_to("Free") for element in cells_passed]
-        return None
-
-    def apply_changes(self, start_x, start_y, end_x, end_y, status="Free"):
-        """Apply the given status (Free by default) to every cell between coordinates start_x,start_y and end_x,end_y"""
-
-        distance = math.sqrt((end_x - start_x)**2 + (end_y - start_y)**2)
-        if distance == 0:
-            return
-        nb_step = int(distance/(self.cells_radius/5))
-        if nb_step == 0:
-            return
-        step_x = int((end_x - start_x)/nb_step)
-        step_y = int((end_y - start_y)/nb_step)
-        current_pos_x = start_x
-        current_pos_y = start_y
-        for _ in range(nb_step):
-            cell_x, cell_y = self.convert_pos_in_cell(
-                current_pos_x, current_pos_y)
-            # if(self.grid[cell_x][cell_y].status == "Unknown"):
-            self.grid[cell_x][cell_y].status = status
-            self.grid[cell_x][cell_y].leave()
-            ####
-            current_pos_x += step_x
-            current_pos_y += step_y
-            """
-            if(abs(current_pos_x ) > abs(end_x)):
-                current_pos_x = end_x
-            if(abs(current_pos_y ) > abs(end_y)):
-                current_pos_y = end_y
-            """
-
-    def get_direction_of_neighbor_with_status(self, status):
-        ""
-
-    def apply_movement(self, rotation, distance):
-        self.rotate_robot(rotation)
-        self.go_forward(distance)
+def apply_changes_on_cells_passed(self, cells_passed):
+    """Apply changes on cells passed through by the robot i.e. change their state to "Free" 
+    """
+    cells_passed = [element.set_to("Free") for element in cells_passed]
+    return None

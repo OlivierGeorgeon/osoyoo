@@ -29,7 +29,7 @@ class WifiInterface:
     def enact(self, action):
         """ Sending the action string, waiting for the outcome, and returning the outcome bytes """
         outcome = b'{"status":"T"}'  # Default status T if timeout
-        print("sending " + action)
+        #print("sending " + action)
         self.socket.sendto(bytes(action, 'utf-8'), (self.IP, self.port))
         try:
             outcome, address = self.socket.recvfrom(512)
