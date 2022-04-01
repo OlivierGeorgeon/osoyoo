@@ -27,13 +27,18 @@ class Synthesizer:
         self.last_used_id = -1
         self.tolerance = 3 #nombre d'id d'ecart d'une interaction que l'on tolère par rapport au last_id pour intervenir sur la synthese
 
-        delta = 250
+        delta = 400
         self.delta_x = delta
         self.delta_y = delta
 
         self.min_delta = 20
         self.obstacles_list = []
 
+    def reset(self):
+        """ Reset the internal_hexa_grid """
+        self.internal_hexa_grid = HexaGrid(self.hexa_memory.width, self.hexa_memory.height)
+        self.obstacles_list = []
+        self.last_used_id = -1
     def act(self):
         """Create phenoms based on Interactions in memory and States in hexa_memory"""
         self.project_memory_on_internal_grid()

@@ -25,6 +25,10 @@ class MemoryNew:
         self.current_id = 0
 
 
+    def reset(self):
+        self.interactions = []
+        self.current_id = 0
+        
     def add(self,phenom_info):
         """Translate interactions information into an interaction object, and add it to the list
         Arg :

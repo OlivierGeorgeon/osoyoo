@@ -27,6 +27,19 @@ class HexaMemory(HexaGrid):
         self.update_orientation()
         self.azimuth = 0
 
+    def reset(self):
+        """Reset the hexamemory"""
+        super().__init__(self.width, self.height)
+        self.robot_cell_x = self.width // 2
+        self.robot_cell_y = self.height // 2
+        self.robot_pos_x = 0
+        self.robot_pos_y = 0
+        self.grid[self.robot_cell_x][self.robot_cell_y].occupy()
+        self.robot_angle = 90
+        self.orientation = 0
+        self.azimuth = 0
+        self.update_orientation()
+
     def update_orientation(self):
         "update the orientation of the robot based on its angle"
         angle = self.robot_angle
