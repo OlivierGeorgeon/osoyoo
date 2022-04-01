@@ -143,9 +143,9 @@ void loop()
   HEA.update();
 
   // Behavior IMU
-  digitalWrite(LED_BUILTIN, LOW); // for debug
+  //digitalWrite(LED_BUILTIN, LOW); // for debug
   int shock_event = IMU.update();
-  if (blink_on) {digitalWrite(LED_BUILTIN, HIGH);} // for debug
+  // if (blink_on) {digitalWrite(LED_BUILTIN, HIGH);} // for debug
 
   // STEP 0: no interaction being enacted
   // Watching for message sent from PC
