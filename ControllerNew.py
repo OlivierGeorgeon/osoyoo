@@ -93,6 +93,9 @@ class ControllerNew:
                 if robot_action == 'n':
                     robot_action = self.action_align_north()
                     print('Vers le nord')
+                if robot_action == 'r':
+                    robot_action = self.action_reset()
+                    print('Reset')
         # 2 : ordonne au robot
             self.command_robot(robot_action)
         if(self.enact_step >= 2):
@@ -184,6 +187,19 @@ class ControllerNew:
                         else:
                             action = json.dumps({'action': '/', 'angle': controller.azimuth})
         return action
+
+    def action_reset(self):
+        """Reset everything"""
+        if hexa_memory is not None :
+            hexa_memory.reset()
+
+        if memory is not None :
+            memory.reset()
+
+        if synthesizer is not None :
+            synthesizer.reset()
+
+        return '0'
 
     def translate_agent_action_to_robot_command(self,action):
         """ Translate the agent action to robot commands
@@ -332,6 +348,4 @@ if __name__ == '__main__':
 
 
     pyglet.app.run()
-
-
     
