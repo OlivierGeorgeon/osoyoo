@@ -19,7 +19,7 @@
 // #include <SoftwareSerial.h> // AJOUT ERREUR. Commenté par Olivier je ne sais pas d'ou ca sort.
 
 #define SPEED 100
-#define TURN_SPEED 90  
+#define TURN_SPEED 100
 #define SHIFT_SPEED 130
 
 #define TURN_TIME 500  
@@ -40,6 +40,7 @@
 #define ACTION_ALIGN_ROBOT '/'
 #define ACTION_ALIGN_HEAD '*'
 #define ACTION_ECHO_SCAN '-'
+#define ACTION_SCAN_DIRECTION '+'
 
 #define TURN_SPOT_ANGLE 60
 
@@ -103,7 +104,9 @@ void setup()
   IMU.setup();
   // Setup the imu twice otherwise the calibration is wrong. I don't know why.
   // Probably something to do with the order in which the imu registers are written.
-  delay(10);
+  delay(100);
+  IMU.setup();
+  delay(100);
   IMU.setup();
 
   Serial.println("--- Robot initialized ---");
@@ -155,6 +158,7 @@ void loop()
     int packetSize = Udp.parsePacket();
     // If the received packet exceeds the size of packetBuffer defined above, Arduino will crash
     if (packetSize) {
+      int action_angle = 0;
       int len = Udp.read(packetBuffer, 512);
       packetBuffer[len] = 0;
       //Serial.print("Received action ");
@@ -171,7 +175,7 @@ void loop()
           action = ((const char*) myObject["action"])[0];
         }
         if (myObject.hasOwnProperty("angle")) {
-          robot_destination_angle = ((int) myObject["angle"]);
+          action_angle = ((int) myObject["angle"]);
         }
       }
       //Serial.print(" from ");
@@ -231,13 +235,17 @@ void loop()
           HEA.beginEchoAlignment();
           action_end_time = millis() + 2000;
           break;
+        case ACTION_SCAN_DIRECTION:
+          HEA.turnHead(action_angle);
+          HEA.beginEchoAlignment();
+          break;
         case ACTION_ECHO_SCAN:
           HEA.beginEchoScan();
           action_end_time = millis() + 5000;
           break;
         case ACTION_ALIGN_ROBOT:
           action_end_time = millis() + 5000;
-          //robot_destination_angle = HEA._head_angle;
+          robot_destination_angle = action_angle;
           //Serial.println("Begin align robot angle : " + String(robot_destination_angle));
           HEA.turnHead(robot_destination_angle);  // Look at destination
           if ( robot_destination_angle < - TURN_FRONT_ENDING_ANGLE){
@@ -278,9 +286,9 @@ void loop()
         if (FCR._is_enacting) {
           FCR.extraDuration(RETREAT_EXTRA_DURATION); // Increase retreat duration because need to reverse speed
           status ="1";
-          if (FCR._floor_outcome > 0) {
-            status ="2";  // Check whether floor outcome has been set at this point
-          }
+          //if (FCR._floor_outcome > 0) {
+          //  status ="2";  // Check whether floor outcome has been set at this point
+          //}
           // Proceed to step 2 for enacting Floor Change Retreat
           action_end_time = 0;
           interaction_step = 2;
@@ -326,6 +334,7 @@ void loop()
         break;
       case ACTION_ALIGN_HEAD:
       case ACTION_ECHO_SCAN:
+      case ACTION_SCAN_DIRECTION:
         if (!HEA._is_enacting_head_alignment && !HEA._is_enacting_echo_scan)
         {
           action_end_time = 0;
@@ -349,7 +358,8 @@ void loop()
   {
     // Wait for the interaction to terminate and proceed to Step 3
     // (Don't wait for  the head alignment or it may never terminate)
-    if (action_end_time < millis() &&  !FCR._is_enacting){ // && !HEA._is_enacting_head_alignment) {
+    if (action_end_time < millis() &&  !FCR._is_enacting && !HEA._is_enacting_head_alignment)
+    {
       interaction_step = 3;
     }
   }

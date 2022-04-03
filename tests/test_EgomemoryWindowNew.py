@@ -47,6 +47,9 @@ if __name__ == "__main__":
 
         if control_mode == CONTROL_MODE_MANUAL:
             if controller.enact_step == 0:
+                controller.action_angle = emw.mouse_press_angle
+                #  if text == "/" or text == "+":  # Send the angle marked by the mouse click
+                #      text = json.dumps({'action': text, 'angle': emw.mouse_press_angle})
                 controller.command_robot(text)
             else:
                 print("Waiting for previous outcome before sending new action")

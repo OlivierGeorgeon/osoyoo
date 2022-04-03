@@ -74,6 +74,7 @@ class ControllerNew:
         self.outcome = 0
         self.enact_step = 0
         self.action = ""
+        self.action_angle = 0
         
 
     ################################################# LOOP #################################################################"""
@@ -163,8 +164,9 @@ class ControllerNew:
         self.outcome_bytes = "Waiting"
         def enact_thread():
             """ Sending the action to the robot and waiting for outcome """
-            # print("Send " + self.action)
-            self.outcome_bytes = self.wifiInterface.enact(self.action)
+            action_string = json.dumps({'action': self.action, 'angle': self.action_angle})
+            print("Sending: " + action_string)
+            self.outcome_bytes = self.wifiInterface.enact(action_string)
             print("Receive ", end="")
             print(self.outcome_bytes)
             self.enact_step = 2
@@ -294,10 +296,11 @@ class ControllerNew:
                 head_angle = outcome['head_angle']
                 if self.view is not None:
                     self.view.robot.rotate_head(head_angle)
-                if self.action == "-" or self.action == "*" or self.action == "1" or self.action == "3":
-                    # Create a new echo phenomenon
+                #  if self.action == "-" or self.action == "*" or self.action == "1" or self.action == "3" or self.action =="+":
+                if self.action == "-" or self.action == "*" or self.action == "+":
+                    print("Create a new echo interaction")
                     echo_distance = outcome['echo_distance']
-                    if echo_distance > 0 :  # echo measure 0 is false measure
+                    if echo_distance > 0:  # echo measure 0 is false measure
                         if self.view is not None:
                             x = ROBOT_HEAD_X + math.cos(math.radians(head_angle)) * echo_distance
                             y = math.sin(math.radians(head_angle)) * echo_distance

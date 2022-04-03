@@ -36,6 +36,7 @@ class Head_echo_alignment
     int _min_ultrasonic_measure;
     int _angle_min_ultrasonic_measure;
     int _head_angle_span;
+    int _echo_alignment_step;
 };
 
 #endif
