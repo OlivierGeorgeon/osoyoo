@@ -41,6 +41,7 @@ class Imu_control
     int _max_acceleration;
     int _min_acceleration;
     float _max_speed;
+    float _min_speed;
     int _shock_measure;
     bool _blocked;
     int _cycle_count;

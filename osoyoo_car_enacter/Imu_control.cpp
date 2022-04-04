@@ -37,7 +37,7 @@ void Imu_control::setup()
 
   // Set DLP Filter
   // See https://ulrichbuschbaum.wordpress.com/2015/01/18/using-the-mpu6050s-dlpf/
-  _mpu.setDLPFMode(MPU6050_DLPF_4);  // Filter out frequencies over 21 Hz
+  _mpu.setDLPFMode(MPU6050_DLPF_6);  // Filter out frequencies over 21 Hz
 
   // Calibrate gyroscope. The robot must be at rest during calibration.
   // If you don't want calibrate, comment this line.
@@ -89,6 +89,7 @@ void Imu_control::begin()
   _max_acceleration = 0;
   _min_acceleration = 0;
   _max_speed = 0;
+  _min_speed = 0;
   _xSpeed = 0;
   _xDistance = 0;
 }
@@ -146,8 +147,9 @@ int Imu_control::update()
     }
 
     // Trying to compute the speed by integrating acceleration (not working)
-    _xSpeed += (normAccel.XAxis) * IMU_READ_PERIOD / 1000;
-    if (abs(_xSpeed) > _max_speed) _max_speed = abs(_xSpeed);
+    _xSpeed += (normalized_acceleration) * IMU_READ_PERIOD / 100;
+    if (_xSpeed > _max_speed) _max_speed = _xSpeed;
+    if (_xSpeed < _min_speed) _min_speed = _xSpeed;
     // Trying to compute the distance by integrating the speed (not working)
     _xDistance += _xSpeed * IMU_READ_PERIOD / 1000;
 
@@ -163,6 +165,10 @@ void Imu_control::outcome(JSONVar & outcome_object)
   outcome_object["blocked"] = _blocked;
   outcome_object["max_acc"] = _max_acceleration;
   outcome_object["min_acc"] = _min_acceleration;
+  // outcome_object["max_speed"] = (int) _max_speed;
+  // outcome_object["min_speed"] = (int) _min_speed;
+  // outcome_object["distance"] = (int) _xDistance;
+
   #endif
   //outcome_object["debug"] = _debug_message;
   //_debug_message = "";
