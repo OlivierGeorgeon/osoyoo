@@ -11,6 +11,7 @@
 #include "Robot_define.h"
 #include "Floor_change_retreat.h"
 #include "Head_echo_alignment.h"
+#include "Head_echo_complete_scan.h"
 #include "Imu_control.h"
 #include <WiFiEsp.h>
 #include <WiFiEspUDP.h>
@@ -40,6 +41,7 @@
 #define ACTION_ALIGN_ROBOT '/'
 #define ACTION_ALIGN_HEAD '*'
 #define ACTION_ECHO_SCAN '-'
+#define ACTION_ECHO_COMPLETE 's'
 #define ACTION_SCAN_DIRECTION '+'
 
 #define TURN_SPOT_ANGLE 60
@@ -48,7 +50,7 @@ Omny_wheel_motion OWM;
 Floor_change_retreat FCR(OWM);
 Head_echo_alignment HEA;
 Imu_control IMU;
-
+Head_echo_complete_scan HECS;
 char packetBuffer[50];
 WiFiEspUDP Udp;
 unsigned int localPort = 8888;  // local port to listen on
@@ -144,6 +146,9 @@ void loop()
 
   // Behavior head echo alignment
   HEA.update();
+
+  // Behavior head echo complete scan
+  HECS.update();
 
   // Behavior IMU
   //digitalWrite(LED_BUILTIN, LOW); // for debug
@@ -241,6 +246,11 @@ void loop()
           break;
         case ACTION_ECHO_SCAN:
           HEA.beginEchoScan();
+          action_end_time = millis() + 5000;
+          break;
+
+        case ACTION_ECHO_COMPLETE:
+          HECS.beginEchoScan();
           action_end_time = millis() + 5000;
           break;
         case ACTION_ALIGN_ROBOT:
@@ -374,6 +384,8 @@ void loop()
     FCR.outcome(outcome_object);
     HEA.outcome(outcome_object);
     IMU.outcome(outcome_object);
+
+    HECS.outcome(outcome_object);
     outcome_object["duration"] = millis() - action_start_time;
     String outcome_json_string = JSON.stringify(outcome_object);
 
