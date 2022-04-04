@@ -7,6 +7,7 @@
 #include "Robot_define.h"
 #include "Head_echo_complete_scan.h"
 #include <Servo.h>
+
 //#define SERVO_PIN   13  //servo connect to D5
 #define Echo_PIN    31  // Ultrasonic Echo pin connect to A5
 #define Trig_PIN    30  // Ultrasonic Trig pin connect to A4
@@ -77,9 +78,7 @@ void Head_echo_complete_scan::update()
       _echo_alignment_step++;
       _next_saccade_time = millis() + SACCADE_DURATION;
       int current_ultrasonic_measure = measureUltrasonicEcho();
-      _sign_array.distances[_current_index] = current_ultrasonic_measure;
-      _sign_array.angles[_current_index] = _head_angle;
-      _current_index++;
+      
       Serial.println("Step: " + String(_echo_alignment_step) + ", Angle: " +String(_head_angle) + ", measure: " + String(current_ultrasonic_measure));
       if (_previous_ultrasonic_measure > current_ultrasonic_measure )
       // The echo is closer
@@ -132,6 +131,9 @@ void Head_echo_complete_scan::update()
         _min_ultrasonic_measure = current_ultrasonic_measure;
         _angle_min_ultrasonic_measure = _head_angle;
       }
+      _sign_array.distances[_current_index] = current_ultrasonic_measure;
+      _sign_array.angles[_current_index] = _head_angle;
+      _current_index++;
       _head_angle += _head_angle_span;
       if (abs(_head_angle) > 90){ // The scan is over, move to the angle of the min measure
         _is_enacting_echo_scan = false;
@@ -181,8 +183,9 @@ void Head_echo_complete_scan::outcome(JSONVar & outcome_object)
     int nb_echo = 0;
     for (int i = 0; i < _sign_array.size; i++){
         if (_sign_array.sign[i]){
-            outcome_object["head_angle_"+ std::to_string(nb_echo)] = _sign_array.angles[i];
-            outcome_object["echo_distance_"+ std::to_string(nb_echo)] = _sign_array.distances[i];
+            String str = String(i);
+            outcome_object["head_angle_"+str] = _sign_array.angles[i];
+            outcome_object["echo_distance_"+ str] = _sign_array.distances[i];
         }
     }
     
