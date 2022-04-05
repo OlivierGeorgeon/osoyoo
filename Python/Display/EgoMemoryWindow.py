@@ -96,13 +96,15 @@ class EgoMemoryWindow(pyglet.window.Window):
         glMultMatrixf(self.environment_matrix)
         # self.origin.draw()  # Draw the origin of the robot
 
-    def on_mouse_press(self, x, y, button, modifiers):
+    def on_mouse_press(self,x, y, button, modifiers):
         # pass the event to any widgets within range of the mouse
         # the on mouse press event for mouse management
-        # params : x, y, button and modifiers
+        # get the size of the window
         w, h = self.get_size()
-        deltaX = x - (w / 2)
-        deltaY = y - (h / 2)
+
+        # mathematical formula to calculate the angle between a mouse click and the center of the window
+        deltaX = x - (w/2)
+        deltaY = y - (h/2)
         angleInDegrees = math.atan2(deltaY, deltaX) * 180 / math.pi
         print(int(angleInDegrees))
 

@@ -9,10 +9,10 @@ class Head_Dist
     const byte TRIGGER_PIN = 30; // Broche TRIGGER
     const byte ECHO_PIN = 31;    // Broche ECHO
 
-    /* Constantes pour le timeout */
-    const unsigned long MEASURE_TIMEOUT = 25000UL; // 25ms = ~8m à 340m/s
+    /* Constants for the timeout */
+    const unsigned long MEASURE_TIMEOUT = 25000UL; // 25ms = ~8m to 340m/s
 
-    /* Vitesse du son dans l'air en mm/us */
+    /* Speed of sound in air in mm/us */
     const float SOUND_SPEED = 340.0 / 1000;
     public:
     Head_Dist();
