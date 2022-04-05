@@ -6,19 +6,34 @@
 class JsonOutcome
 {
   public:
-    //Constructeur
+    /*
+     * Constructor
+     * Init before Robot setup function
+     */
     JsonOutcome();
 
-    //Variable qui contient toute les données json
+    /*
+     * JSON Variable that contains all the data added with the method "get" json
+     */
     JSONVar data;
 
-    //Méthode pour ajouter une key/value à data
+    /*
+     * Method for adding key/value in "data"
+     * Execute in robot setup or loop fonction for each value to be added in "data"
+     *
+     * Example : jsonOutcome.addValue("distance", (String) calcDistance());
+     */
     void addValue(char key[], String value);
 
-    //Méthode pour supprimer toute les key/value de data
+    /*
+     * Method for deleting all key/value of "data"
+     * Execute after sending json data by wifi for clear data
+     */
     void clear();
 
-    //Méthode pour récuperer les données à envoyer par le wifi
+    /*
+     * Method for get json data converted to string
+     */
     String get();
 };
 
