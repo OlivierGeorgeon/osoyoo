@@ -8,27 +8,27 @@
  * CopyRight www.osoyoo.com
  * 
  */
-#include "omny_wheel_motion.h"
-#include "LightSensor.h"
+#include "src/wheel/omny_wheel_motion.h"
+#include "src/lightSensor/LightSensor.h"
 LightSensor ls;
 int previous_floor = 0; 
 
 
 #define WifiMode "R"        //Définir le mode de wifi du robot, 'R' pour routeur et 'W' pour la connexion au robot
 
-#include "gyro.h"
-#include "compass.h"
+#include "src/imu/gyro.h"
+#include "src/imu/compass.h"
 
-#include "JsonOutcome.h"
+#include "src/wifi/JsonOutcome.h"
 JsonOutcome outcome;
 
-#include "Head.h";
+#include "src/head/Head.h";
 Head head;
 
-#include "DelayAction.h"
+#include "src/utils/DelayAction.h"
 DelayAction da;
 
-#include "WifiBot.h"
+#include "src/wifi/WifiBot.h"
 WifiBot wifiBot = WifiBot("osoyoo_robot2", 8888);
 
 #include "WiFiEsp.h"
