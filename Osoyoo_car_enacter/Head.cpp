@@ -14,20 +14,20 @@
 
 Head::Head(){
   }
-/**Connection à l'ambranchement du port du capteur rotatif servo**/
+/**Connection to the servo rotary sensor port**/
 void Head::servo_port() {
   head_servo.attach(4);
 }
 
 /**
-Deduit la valeur de l'index contenant la plus petite distance dans le tableau de distance des mersures de scan
-@nb_mesures : Nombre de mesure effectuer au cours du scan
-@distances[] : enregistre un tableau de taille @nb_mesures-1 qui enregistre à chaque intervalle une mesure lors du scan
+Deducts the value of the index containing the smallest distance in the distance table of the scan measures
+@nb_mesures : Number of measurements made during the scan
+@distances[] : saves an array of size @nb_measurements-1 which records at each interval a measurement during the scan
 **/
 int Head::getIndexMin(int nb_mesures, float distances[]){
   float valMin = distances[0];
   int indexMin = 0;
-  //Recherche de la plus petite distances de la fonction de scan pour alignement
+  //Search for the smallest distance of the scan function for alignment
   for (int i = 0; i < nb_mesures; i++){
     if(distances[i] < valMin && distances[i] != 0){
         valMin = distances[i];
@@ -38,11 +38,11 @@ int Head::getIndexMin(int nb_mesures, float distances[]){
 }
 
 /**
-    Scan entre 0 et 180 degré devant la tete du robot afin de s'aligner à l'objet la plus proche
-    @angleMin : angle minimum du debut de scan
-    @angleMax : angle maximum pour la fin de scan
-    @Nbre_mesure : Nombre de mesure à effectuer permettant de determiner l'angle de saut de scan
-    @index_0 : sert à determiner l'angle de debut du @miniScan dependant de l'alignement du scan
+    Scan between 0 and 180 degrees in front of the robot head to align with the closest object
+    @angleMin : minimum scan start angle
+    @angleMax : maximum angle for the end of the scan
+    @Nbre_mesure : Number of measurements to determine the scan jump angle
+    @index_0 : is used to determine the starting angle of the @miniScan depending on the scan alignment
 **/
 void Head::scan(int angleMin, int angleMax, int Nbre_mesure, int index_0) {
   int pas = round((angleMax-angleMin)/Nbre_mesure);
@@ -62,10 +62,9 @@ void Head::scan(int angleMin, int angleMax, int Nbre_mesure, int index_0) {
 
 
 /**
-    Effectue un miniScan si la @mesure de l'alignement enregistrer differe de la @distance actuelle en integrant une marge de 50cm
-    @angle : angle de l'alignement de la tete apres le scan
-    La fonction n'est pas appelé dans le projet car bug du capteur ultra son
-**/
+    Performs a miniScan if the recorded @alignment measurement differs from the current @distance with a 50mm margin
+    @angle : head alignment angle after the scan
+    he function is not called in the project because bug of the ultra sound sensor**/
 int Head::miniScan(int angle){
   if(angle > 0 && angle <= 60){
     scan(0, 60, 6, 0);
@@ -80,13 +79,16 @@ int Head::miniScan(int angle){
 
 
 /**
-    Fonction qui permet de mesurer à intervalle regulier une distance par rapport à un objet
-    @param1 : angle retourner de l'alignement du scan
-    @param2 : variable de mesure de distance memoriser lors du dernier alignement
+    Function that allows to measure at regular intervals a distance from an object
+    @param1 : angle from the scan alignment
+    @param2 : distance measurement variable stored during the last alignment
 **/
 void Head::distances_loop(int angle, float mesure){
     float distance = distUS.dist();
     if(mesure != 0 && distance - mesure > 50){
+        miniScan(angle);
+    }
+    else if (mesure != 0 && distance - mesure < 50){
         miniScan(angle);
     }
 }
