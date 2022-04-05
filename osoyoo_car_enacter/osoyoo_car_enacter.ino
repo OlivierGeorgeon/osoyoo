@@ -146,7 +146,7 @@ void loop()
   FCR.update();
 
   // Behavior head echo alignment
-  HEA.update();
+  // HEA.update();
 
   // Behavior head echo complete scan
   HECS.update();

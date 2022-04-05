@@ -67,6 +67,8 @@ void Head_echo_complete_scan::beginEchoScan()
   }
   turnHead(_angle_min_ultrasonic_measure); // Start the scan right away
   _next_saccade_time = millis() + SACCADE_DURATION;
+  _echo_alignment_step = 0;
+  _current_index = 0;
 }
 
 void Head_echo_complete_scan::update()
@@ -125,6 +127,7 @@ void Head_echo_complete_scan::update()
     }
     else if (_is_enacting_echo_scan)
     {
+      _echo_alignment_step++;
       int current_ultrasonic_measure = measureUltrasonicEcho();
       _next_saccade_time = millis() + SACCADE_DURATION;
       if (current_ultrasonic_measure < _min_ultrasonic_measure){
@@ -133,6 +136,7 @@ void Head_echo_complete_scan::update()
       }
       _sign_array.distances[_current_index] = current_ultrasonic_measure;
       _sign_array.angles[_current_index] = _head_angle;
+      Serial.println("Index: " + (String)_current_index + ", angle: " + (String)_head_angle + ", distance; "+ (String)current_ultrasonic_measure);
       _current_index++;
       _head_angle += _head_angle_span;
       if (abs(_head_angle) > 90){ // The scan is over, move to the angle of the min measure
