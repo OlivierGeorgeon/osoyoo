@@ -123,7 +123,7 @@ void loop()
     stop_Stop();
     
     outcome.addValue("echo_distance", (String) head.distUS.dist());
-    outcome.addValue("head_angle", (String) (head.angle_actuelle -  90)); 
+    outcome.addValue("head_angle", (String) (head.current_angle -  90));
     outcome.addValue( "floor", (String) floorOutcome);
     outcome.addValue( "status", (String) floorOutcome);
 
