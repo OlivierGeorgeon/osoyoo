@@ -90,13 +90,14 @@ void RL(int speed)//Rotation de la roue arriere gauche
     {
         digitalWrite(LeftMotorDirPin1B,LOW);
         digitalWrite(LeftMotorDirPin2B,HIGH);
-        analogWrite(speedPinLB,1.5*speed);
+        //Ajout de la puissance supplementaire de 1.2 à la roue pour cause de defaillance
+        analogWrite(speedPinLB,1.2*speed);
     }
     else
     {
         digitalWrite(LeftMotorDirPin1B,HIGH);
         digitalWrite(LeftMotorDirPin2B,LOW);
-        analogWrite(speedPinLB,-speed*1.5);
+        analogWrite(speedPinLB,-speed*1.2);
     }
 }
 
@@ -107,25 +108,4 @@ void stop_Stop()    //Stop
   analogWrite(speedPinRB,0);
   analogWrite(speedPinL,0);
   analogWrite(speedPinR,0);
-}
-
-//Pins initialize
-void init_GPIO()
-{
-  pinMode(RightMotorDirPin1, OUTPUT); 
-  pinMode(RightMotorDirPin2, OUTPUT); 
-  pinMode(speedPinL, OUTPUT);  
- 
-  pinMode(LeftMotorDirPin1, OUTPUT);
-  pinMode(LeftMotorDirPin2, OUTPUT); 
-  pinMode(speedPinR, OUTPUT);
-  pinMode(RightMotorDirPin1B, OUTPUT); 
-  pinMode(RightMotorDirPin2B, OUTPUT); 
-  pinMode(speedPinLB, OUTPUT);  
- 
-  pinMode(LeftMotorDirPin1B, OUTPUT);
-  pinMode(LeftMotorDirPin2B, OUTPUT); 
-  pinMode(speedPinRB, OUTPUT);
-   
-  stop_Stop();
 }

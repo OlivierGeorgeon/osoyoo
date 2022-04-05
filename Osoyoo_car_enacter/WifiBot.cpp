@@ -4,13 +4,13 @@
 #define USER_ID "RobotBSN"
 #define PASSWD "BSNgoodlife"
 #define PORT "8888"
-int status = WL_IDLE_STATUS;     // the Wifi radio's status
+// int status = WL_IDLE_STATUS;     // the Wifi radio's status
 
 WifiBot::WifiBot(String _ssid, int port)
 {
-    localPort = port;
-    status = WL_IDLE_STATUS;
-    ssid = _ssid;
+  localPort = port;
+  status = WL_IDLE_STATUS;
+  ssid = _ssid;
 }
 
 void WifiBot::wifiInitLocal()
@@ -32,8 +32,7 @@ void WifiBot::wifiInitLocal()
   }
 
    Serial.print("Attempting to start AP ");
-   String str = "This is my string";
-
+  
 
   int str_len = ssid.length() + 1;
   char char_ssid[str_len];
@@ -43,15 +42,9 @@ void WifiBot::wifiInitLocal()
   //AP mode
   status = WiFi.beginAP(char_ssid, 10, "", 0);
 
-  Serial.println("You're connected to the network");
-  //printWifiStatus();
+  printWifiStatus();
   Udp.begin(localPort);
 
-  Serial.print("Listening on port ");
-  Serial.println(localPort);
-  IPAddress ip = WiFi.localIP();
-  Serial.print("IP Address: ");
-  Serial.println(ip);
 }
 
 void WifiBot::wifiInitRouter()
@@ -77,12 +70,18 @@ void WifiBot::wifiInitRouter()
     status = WiFi.begin(USER_ID, PASSWD);
   }
 
+  Udp.begin(localPort);
+  printWifiStatus();
+}
+
+
+void WifiBot::printWifiStatus()
+{
   Serial.println("You're connected to the network");
   IPAddress ip = WiFi.localIP();
   Serial.print("IP Address: ");
   Serial.println(ip);
-  Udp.begin(localPort);
-  Serial.print("Listening on port ");
+  Serial.print("Port: ");
   Serial.println(localPort);
 }
 
