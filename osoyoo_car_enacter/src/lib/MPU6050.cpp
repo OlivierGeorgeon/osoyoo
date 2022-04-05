@@ -586,7 +586,7 @@ void MPU6050::calibrateGyro(uint8_t samples)
     dg.YAxis = sumY / samples;
     dg.ZAxis = sumZ / samples;
 
-    Serial.println("tg.ZAxis:" + String(tg.ZAxis));
+    // Serial.println("tg.ZAxis:" + String(tg.ZAxis));
 
 
     // Calculate threshold vectors
@@ -594,7 +594,7 @@ void MPU6050::calibrateGyro(uint8_t samples)
     th.YAxis = sqrt((sigmaY / 50) - (dg.YAxis * dg.YAxis));
     th.ZAxis = sqrt((sigmaZ / 50) - (dg.ZAxis * dg.ZAxis));
 
-    Serial.println("th.ZAxis:" + String(th.ZAxis));
+    // Serial.println("th.ZAxis:" + String(th.ZAxis));
 
 
     // If already set threshold, recalculate threshold vectors

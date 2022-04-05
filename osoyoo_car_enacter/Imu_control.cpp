@@ -47,6 +47,8 @@ void Imu_control::setup()
   // If you don't want use threshold, comment this line or set 0.
   _mpu.setThreshold(3); // Tried without but gives absurd results
 
+  Serial.println("Speed, Distance");
+
   #else
     #warning "No MPU6050"
   #endif
@@ -92,8 +94,13 @@ void Imu_control::begin()
   _min_speed = 0;
   _xSpeed = 0;
   _xDistance = 0;
+
+  Serial.print(_xSpeed);
+  Serial.print(", ");
+  Serial.println(_xDistance);
+
 }
-int Imu_control::update()
+int Imu_control::update(int interaction_step)
 {
   unsigned long timer = millis();
   if (_next_imu_read_time < timer)
@@ -153,6 +160,12 @@ int Imu_control::update()
     // Trying to compute the distance by integrating the speed (not working)
     _xDistance += _xSpeed * IMU_READ_PERIOD / 1000;
 
+    if (interaction_step > 0) {
+      Serial.print(_xSpeed);
+      Serial.print(", ");
+      Serial.println(_xDistance);
+    }
+
     #endif
   }
   return _shock_measure;
@@ -165,9 +178,11 @@ void Imu_control::outcome(JSONVar & outcome_object)
   outcome_object["blocked"] = _blocked;
   outcome_object["max_acc"] = _max_acceleration;
   outcome_object["min_acc"] = _min_acceleration;
-  // outcome_object["max_speed"] = (int) _max_speed;
-  // outcome_object["min_speed"] = (int) _min_speed;
-  // outcome_object["distance"] = (int) _xDistance;
+  outcome_object["max_speed"] = (int) _max_speed;
+  outcome_object["min_speed"] = (int) _min_speed;
+  outcome_object["distance"] = (int) _xDistance;
+  _xSpeed =0;
+  _xDistance = 0;
 
   #endif
   //outcome_object["debug"] = _debug_message;

@@ -81,6 +81,7 @@ class Synthesizer:
                 continue
             #print("<SYNTHESIZER> : actual_durability of interact: ", interaction.actual_durability)
             if(interaction.actual_durability > 0):
+                continue
                 # call compare_echolocation if the interaction is of type obstacle
                 if(interaction.type == "obstacle"): # TODO : changer obstacle -> echo   
                     is_same_obstacle, obstacle, is_away_enough, obstacle_delta_x, obstacle_delta_y = self.compare_echolocation(interaction)

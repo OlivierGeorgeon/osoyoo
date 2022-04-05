@@ -57,7 +57,7 @@ void setup()
 {
   // Initialize serial for debugging
   Serial.begin(9600);
-  Serial.println("Serial initialized");
+  // Serial.println("Serial initialized");
 
   // Connect to the wifi board
   Serial1.begin(115200);
@@ -86,17 +86,17 @@ void setup()
     char ssid[] = SECRET_SSID;
     char pass[] = SECRET_PASS;
     while (status != WL_CONNECTED) {
-      Serial.print("Attempting to connect to WPA SSID: ");
-      Serial.println(ssid);
+      // Serial.print("Attempting to connect to WPA SSID: ");
+      // Serial.println(ssid);
       status = WiFi.begin(ssid, pass);
     }
   }
   Udp.begin(localPort);
 
-  Serial.print("IP Address: ");
-  Serial.println(WiFi.localIP());
-  Serial.print("Listening on port: ");
-  Serial.println(localPort);
+  // Serial.print("IP Address: ");
+  // Serial.println(WiFi.localIP());
+  // Serial.print("Listening on port: ");
+  // Serial.println(localPort);
 
   // Initialize the automatic behaviors
   OWM.setup();
@@ -109,7 +109,7 @@ void setup()
   delay(100);
   IMU.setup();
 
-  Serial.println("--- Robot initialized ---");
+  // Serial.println("--- Robot initialized ---");
 
   // Initialize PIN 13 LED for debugging
   pinMode(LED_BUILTIN, OUTPUT);
@@ -147,7 +147,7 @@ void loop()
 
   // Behavior IMU
   //digitalWrite(LED_BUILTIN, LOW); // for debug
-  int shock_event = IMU.update();
+  int shock_event = IMU.update(interaction_step);
   // if (blink_on) {digitalWrite(LED_BUILTIN, HIGH);} // for debug
 
   // STEP 0: no interaction being enacted
@@ -377,7 +377,7 @@ void loop()
     outcome_object["duration"] = millis() - action_start_time;
     String outcome_json_string = JSON.stringify(outcome_object);
 
-    Serial.println("Outcome string " + outcome_json_string);
+    // Serial.println("Outcome string " + outcome_json_string);
 
     digitalWrite(LED_BUILTIN, HIGH); // light the led during transfer
     // Send the outcome to the IP address and port that sent the action
