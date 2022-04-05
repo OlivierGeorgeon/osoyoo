@@ -104,6 +104,7 @@ void setup()
   OWM.setup();
   HEA.setup();
   IMU.setup();
+  HECS.setup();
   // Setup the imu twice otherwise the calibration is wrong. I don't know why.
   // Probably something to do with the order in which the imu registers are written.
   delay(100);
@@ -344,6 +345,12 @@ void loop()
         break;
       case ACTION_ALIGN_HEAD:
       case ACTION_ECHO_SCAN:
+      case ACTION_ECHO_COMPLETE:
+        if(!HECS._is_enacting_echo_scan){
+          action_end_time = 0;
+          interaction_step = 2;
+        }
+        break;
       case ACTION_SCAN_DIRECTION:
         if (!HEA._is_enacting_head_alignment && !HEA._is_enacting_echo_scan)
         {
@@ -368,7 +375,7 @@ void loop()
   {
     // Wait for the interaction to terminate and proceed to Step 3
     // (Don't wait for  the head alignment or it may never terminate)
-    if (action_end_time < millis() &&  !FCR._is_enacting && !HEA._is_enacting_head_alignment)
+    if (action_end_time < millis() &&  !FCR._is_enacting && !HEA._is_enacting_head_alignment && !HECS._is_enacting_echo_scan) 
     {
       interaction_step = 3;
     }

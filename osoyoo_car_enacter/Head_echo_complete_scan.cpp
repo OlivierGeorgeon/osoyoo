@@ -165,7 +165,7 @@ void Head_echo_complete_scan::outcome(JSONVar & outcome_object)
     // and false otherwise
     for (int i = 0; i < _sign_array.size; i++)
     {
-      if (_sign_array.distances[i] < _sign_array.distances[i+1])
+      if (_sign_array.distances[i] < _sign_array.distances[i+1] && _sign_array.distances[i] > 0)
       {
         if(i != 0 and _sign_array.distances[i] > _sign_array.distances[i-1]){
             continue;
@@ -183,11 +183,20 @@ void Head_echo_complete_scan::outcome(JSONVar & outcome_object)
     int nb_echo = 0;
     for (int i = 0; i < _sign_array.size; i++){
         if (_sign_array.sign[i]){
-            String str = String(i);
-            outcome_object["head_angle_"+str] = _sign_array.angles[i];
-            outcome_object["echo_distance_"+ str] = _sign_array.distances[i];
+            String str = String(nb_echo);
+            outcome_object["ha_"+str] = _sign_array.angles[i];
+            outcome_object["ed_"+ str] = _sign_array.distances[i];
+            nb_echo++;
         }
+        // reset values
+        _sign_array.sign[i] = false;
+        _sign_array.distances[i] = 0;
+        _sign_array.angles[i] = 0;
     }
+
+    // Reset every values
+    nb_echo = 0;
+    
     
     /*
   outcome_object["head_angle"] = _head_angle;
