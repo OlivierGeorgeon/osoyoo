@@ -1,9 +1,9 @@
 import pyglet
 from pyglet.gl import *
-from OsoyooCar import OsoyooCar
-from WifiInterface import WifiInterface
+from Python.Display.OsoyooCar import OsoyooCar
+from Python.Wifi.WifiInterface import WifiInterface
 import json
-from Phenomenon import Phenomenon
+from Python.Display.Phenomenon import Phenomenon
 import math
 from pyglet import shapes
 from pyglet import clock

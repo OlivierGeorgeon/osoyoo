@@ -1,11 +1,11 @@
 import json
-from RobotDefine import *
+from Python.RobotDefine import *
 import threading
-from WifiInterface import WifiInterface
-from Phenomenon import Phenomenon
+from Python.Wifi.WifiInterface import WifiInterface
+from Python.Display.Phenomenon import Phenomenon
 import math
-from OsoyooCar import OsoyooCar
-from EgoMemoryWindow import EgoMemoryWindow
+from Python.Display.OsoyooCar import OsoyooCar
+from Python.Display.EgoMemoryWindow import EgoMemoryWindow
 import pyglet
 from pyrr import matrix44
 

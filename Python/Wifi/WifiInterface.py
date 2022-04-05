@@ -1,7 +1,8 @@
 import socket
 import keyboard
 import time
-import RobotDefine
+from Python import RobotDefine
+
 
 
 

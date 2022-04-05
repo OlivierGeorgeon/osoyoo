@@ -1,8 +1,8 @@
 import pyglet
-from Controller import Controller
-from EgoMemoryWindow import EgoMemoryWindow
+from Display.Controller import Controller
+from Display.EgoMemoryWindow import EgoMemoryWindow
 import json
-from Agent5 import Agent5
+from Agent.Agent5 import Agent5
 
 
 CONTROL_MODE_MANUAL = 0
