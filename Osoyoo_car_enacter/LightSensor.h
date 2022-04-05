@@ -10,11 +10,22 @@
 class LightSensor
 {
     public:
-    //Constructeur
+    //Constructor
     LightSensor();
     
-    //Methode
+    /*
+     * Method to check if the robot detects a black line
+     *
+     * Return 1 =   Oriented line : /
+     * Return 2 =   Oriented line : \
+     * Return 3 =   Oriented line : --
+     * Return 0 =   No line
+     */
     int tracking();
+
+    /*
+     * Move forward until the robot detects a line
+     */
     void until_line(int speed);
 };
 

@@ -7,7 +7,7 @@
 class DelayAction
 {
   public:
-    //constructeur
+    //Constructor
     DelayAction();
 
     unsigned long interval[10];
@@ -16,13 +16,20 @@ class DelayAction
 
     unsigned int index;
 
-    //appeler dans le setup
-    //  interval_  = temps entre 2 execution
-    //  func       = Fonction à executer tout les interval_
-    //  millis     = millis() pour avoir le temps actuel
+    /* 
+     * Execute in robot setup function
+     * interval_  : time between 2 function execution
+     * func       : Execute function
+     * millis     : "millis()" to get current time
+     *
+     * Example: setDelayAction(2000, [](){Serial.println("print every 2 s");}, millis());
+     */
     void setDelayAction(unsigned long interval_, void (*func)(), int millis);
 
-    //appeler 1 fois dans loop pour vérifier si il y a des fonctions à executer
+    /*
+     * To check if a function should be executed
+     * Execute 1 time in robot loop function
+     */
     void checkDelayAction(int millis);
     
 };

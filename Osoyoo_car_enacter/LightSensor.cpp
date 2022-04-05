@@ -6,12 +6,12 @@ LightSensor::LightSensor(){}
 
 
 int LightSensor::tracking() {
-  // quand un capteur affiche 1 ca veut dire quil capte la ligne noire
-  int s0 = !digitalRead(sensor0); //capteur de droite
+  // return 1 if line
+  int s0 = !digitalRead(sensor0); // Right sensor
   int s1 = !digitalRead(sensor1);
   int s2 = !digitalRead(sensor2);
   int s3 = !digitalRead(sensor3);
-  int s4 = !digitalRead(sensor4); //capteur de gauche
+  int s4 = !digitalRead(sensor4); // Left sensor
 
   int sensorInt = s0*16+s1*8+s2*4+s3*2+s4;
 
