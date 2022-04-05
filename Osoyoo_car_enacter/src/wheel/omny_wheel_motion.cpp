@@ -11,7 +11,6 @@
 
 #include "omny_wheel_motion.h"
 #include "Arduino.h"
-#include "gyro.h"
 
 //Controle de la vitesse des roues du robot
 void setMotion(int speed_fl,int speed_rl ,int speed_rr,int speed_fr)

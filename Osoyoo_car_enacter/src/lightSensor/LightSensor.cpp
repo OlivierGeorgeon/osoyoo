@@ -1,6 +1,6 @@
 #include <Arduino.h>
 #include "LightSensor.h"
-#include "omny_wheel_motion.h"
+#include "../wheel/omny_wheel_motion.h"
 
 LightSensor::LightSensor(){}
 
