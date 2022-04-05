@@ -13,9 +13,4 @@ Incremental Natural Interactions on roboT
 ```
 
 ## Set Up
-
-### Python venv
-- [pyglet](http://pyglet.org/) 
-- 
-
-## Arduino part
+Lire le fichier "premier_pas" dans le dossier "/docs/first_step" pour les instructions.
