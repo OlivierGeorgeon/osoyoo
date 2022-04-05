@@ -14,7 +14,7 @@ LightSensor ls;
 int previous_floor = 0; 
 
 
-#define WifiMode "R"        //Définir le mode de wifi du robot, 'R' pour routeur et 'W' pour la connexion au robot
+#define WifiMode "R"        //Define the wifi mode of the robot, 'R' for router and 'W' for robot connection
 
 #include "gyro.h"
 #include "compass.h"
