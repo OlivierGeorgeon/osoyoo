@@ -11,6 +11,7 @@
 #include "Robot_define.h"
 #include "Floor_change_retreat.h"
 #include "Head_echo_alignment.h"
+//#include "Head_echo_complete_scan.h"
 #include "Imu_control.h"
 #include <WiFiEsp.h>
 #include <WiFiEspUDP.h>
@@ -40,6 +41,7 @@
 #define ACTION_ALIGN_ROBOT '/'
 #define ACTION_ALIGN_HEAD '*'
 #define ACTION_ECHO_SCAN '-'
+//#define ACTION_ECHO_COMPLETE 's'
 #define ACTION_SCAN_DIRECTION '+'
 
 #define TURN_SPOT_ANGLE 60
@@ -48,7 +50,7 @@ Omny_wheel_motion OWM;
 Floor_change_retreat FCR(OWM);
 Head_echo_alignment HEA;
 Imu_control IMU;
-
+//Head_echo_complete_scan HECS;
 char packetBuffer[50];
 WiFiEspUDP Udp;
 unsigned int localPort = 8888;  // local port to listen on
@@ -102,6 +104,7 @@ void setup()
   OWM.setup();
   HEA.setup();
   IMU.setup();
+  //HECS.setup();
   // Setup the imu twice otherwise the calibration is wrong. I don't know why.
   // Probably something to do with the order in which the imu registers are written.
   delay(100);
@@ -144,6 +147,9 @@ void loop()
 
   // Behavior head echo alignment
   HEA.update();
+
+  // Behavior head echo complete scan
+  //HECS.update();
 
   // Behavior IMU
   //digitalWrite(LED_BUILTIN, LOW); // for debug
@@ -243,6 +249,11 @@ void loop()
           HEA.beginEchoScan();
           action_end_time = millis() + 5000;
           break;
+
+        /*case ACTION_ECHO_COMPLETE:
+          HECS.beginEchoScan();
+          action_end_time = millis() + 5000;
+          break;*/
         case ACTION_ALIGN_ROBOT:
           action_end_time = millis() + 5000;
           robot_destination_angle = action_angle;
@@ -334,6 +345,12 @@ void loop()
         break;
       case ACTION_ALIGN_HEAD:
       case ACTION_ECHO_SCAN:
+      /*case ACTION_ECHO_COMPLETE:
+        if(!HECS._is_enacting_echo_scan){
+          action_end_time = 0;
+          interaction_step = 2;
+        }
+        break;*/
       case ACTION_SCAN_DIRECTION:
         if (!HEA._is_enacting_head_alignment && !HEA._is_enacting_echo_scan)
         {
@@ -358,7 +375,7 @@ void loop()
   {
     // Wait for the interaction to terminate and proceed to Step 3
     // (Don't wait for  the head alignment or it may never terminate)
-    if (action_end_time < millis() &&  !FCR._is_enacting && !HEA._is_enacting_head_alignment)
+    if (action_end_time < millis() &&  !FCR._is_enacting && !HEA._is_enacting_head_alignment /*&& !HECS._is_enacting_echo_scan*/) 
     {
       interaction_step = 3;
     }
@@ -374,6 +391,8 @@ void loop()
     FCR.outcome(outcome_object);
     HEA.outcome(outcome_object);
     IMU.outcome(outcome_object);
+
+    //HECS.outcome(outcome_object);
     outcome_object["duration"] = millis() - action_start_time;
     String outcome_json_string = JSON.stringify(outcome_object);
 

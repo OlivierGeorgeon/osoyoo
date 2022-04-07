@@ -1,10 +1,10 @@
 /*
-  Head_echo_alignment.h - library for Osoyoo car align head towards closest ultrasonic echo.
-  Created by Olivier Georgeon, june 20 2021
+  Head_echo_complete_scan.h - library for Osoyoo car get every object detected by ultrasonic echo.
+  Created by Titouan Knockaert, April 2022
   released into the public domain
 */
-#ifndef Head_echo_alignment_h
-#define Head_echo_alignment_h
+#ifndef Head_echo_complete_scan_h
+#define Head_echo_complete_scan_h
 #include "Arduino.h"
 #include <Servo.h>
 #include <Arduino_JSON.h>
@@ -13,7 +13,6 @@
 #define SACCADE_SPAN     5
 #define ECHO_MONITOR_PERIOD 500 // The period for checking whether to trigger head alignment
 #define ECHO_MONITOR_VARIATION 50 // the measure threshold to trigger head alignment
-
 struct significant_array {
         // Struct to store the angles and the corresponding measures,
         // and booleans to indicate if the measure are significant
@@ -22,10 +21,11 @@ struct significant_array {
         bool sign[180/SACCADE_SPAN]{false};
         int size = 180/SACCADE_SPAN;
     };
-class Head_echo_alignment
+class Head_echo_complete_scan
 {
   public:
-    Head_echo_alignment();
+    
+    Head_echo_complete_scan();
     void setup();
     void beginEchoAlignment();
     void beginEchoScan();

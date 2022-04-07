@@ -1,18 +1,18 @@
 /*
-  Head_echo_alignment.h - library for Osoyoo car align head towards closest ultrasonic echo.
+  Head_echo_complete_scan.h - library for Osoyoo car align head towards closest ultrasonic echo.
   Created by Olivier Georgeon, june 20 2021
   released into the public domain
 */
 #include "Arduino.h"
 #include "Robot_define.h"
-#include "head_echo_alignment.h"
+#include "Head_echo_complete_scan.h"
 #include <Servo.h>
 
 //#define SERVO_PIN   13  //servo connect to D5
 #define Echo_PIN    31  // Ultrasonic Echo pin connect to A5
 #define Trig_PIN    30  // Ultrasonic Trig pin connect to A4
 
-Head_echo_alignment::Head_echo_alignment()
+Head_echo_complete_scan::Head_echo_complete_scan()
 {
   //Servo _head;
   _is_enacting_head_alignment = false;
@@ -27,7 +27,7 @@ Head_echo_alignment::Head_echo_alignment()
   _current_index = 0;
 }
 
-void Head_echo_alignment::setup()
+void Head_echo_complete_scan::setup()
 {
   // init HC-SR04 ultrasonic Echo sensor
   pinMode(Trig_PIN, OUTPUT);
@@ -37,25 +37,19 @@ void Head_echo_alignment::setup()
   _head.attach(ROBOT_SERVO_PIN);
   turnHead(0); // Head straight ahead
   //Serial.println("HEA initialized");
-  _head_angle_span = SACCADE_SPAN;
 }
 
-void Head_echo_alignment::beginEchoAlignment()
+void Head_echo_complete_scan::beginEchoAlignment()
 {
   _is_enacting_head_alignment = true;
   _penultimate_ultrasonic_measure = 1;  // Reinitialize previous measures so it will not ...
   _previous_ultrasonic_measure = 10001; // ... believe that the next measure is a minimum
-  //if (_head_angle > 0) { // Begins with a saccade towards the center so it will not stay at the limit angle
-  //  _head_angle_span = -SACCADE_SPAN;
-  //} else {
-  //  _head_angle_span = SACCADE_SPAN;
-  //}
+  _head_angle_span = SACCADE_SPAN;
   _echo_alignment_step = 0;
-  _head_angle_span =  -_head_angle_span;  // Inverse the movement to track moving objects more easily
   //turnHead(_head_angle - _head_angle_span);
   _next_saccade_time = millis() + SACCADE_DURATION;
 }
-void Head_echo_alignment::beginEchoScan()
+void Head_echo_complete_scan::beginEchoScan()
 {
   _is_enacting_head_alignment = false; // Stop current head alignment if any
   _is_enacting_echo_scan = true;
@@ -75,7 +69,7 @@ void Head_echo_alignment::beginEchoScan()
   _current_index = 0;
 }
 
-void Head_echo_alignment::update()
+void Head_echo_complete_scan::update()
 {
   if (millis() > _next_saccade_time )
   {
@@ -83,7 +77,7 @@ void Head_echo_alignment::update()
     {
       _echo_alignment_step++;
       _next_saccade_time = millis() + SACCADE_DURATION;
-      int current_ultrasonic_measure = measureUltrasonicEcho();
+      int current_ultrasonic_measure = measureUltrasonicEcho();      
       Serial.println("Step: " + String(_echo_alignment_step) + ", Angle: " +String(_head_angle) + ", measure: " + String(current_ultrasonic_measure));
       if (_previous_ultrasonic_measure > current_ultrasonic_measure )
       // The echo is closer
@@ -92,17 +86,16 @@ void Head_echo_alignment::update()
         // The head reached the limit angle
         {
           if (_echo_alignment_step > 1)
-          // The echo is closer after several steps then the min distance is on the limit angle
+          // The echo is closer after several steps then the min distance is here
           {
             _min_ultrasonic_measure = current_ultrasonic_measure;
-            Serial.println("Step: " + String(_echo_alignment_step) + ", Aligned at limit angle " + String(_head_angle) + " measure " + String(_min_ultrasonic_measure));
+            Serial.println("Step: " + String(_echo_alignment_step) + ", Aligned at edge angle " + String(_head_angle) + " measure " + String(_min_ultrasonic_measure));
             _is_enacting_head_alignment = false;
             _next_saccade_time = millis() + ECHO_MONITOR_PERIOD; // Wait before monitoring again
           } else
-          // First step on the limit angle: apply the saccade towards the center
+          // The echo is closer on the first step then we need to reverse head movement
           {
-            _head_angle_span = SACCADE_SPAN;
-            if (_head_angle >= 90) {_head_angle_span = -SACCADE_SPAN;}
+            _head_angle_span = - _head_angle_span;
             _head_angle += _head_angle_span;
             turnHead(_head_angle);
           }
@@ -118,7 +111,7 @@ void Head_echo_alignment::update()
         _head_angle += _head_angle_span;
         turnHead(_head_angle);
         if ((_penultimate_ultrasonic_measure >= _previous_ultrasonic_measure) &&  (_echo_alignment_step > 2))
-        // The head passed the minimum echo distance after two measures: the minimum is at the previous angle
+        // The head passed the minimum echo distance after two measure: the minimum is here
         {
           _min_ultrasonic_measure = _previous_ultrasonic_measure;
           Serial.println("Step: " + String(_echo_alignment_step) + ", Aligned at angle " + String(_head_angle) + " measure " + String(_min_ultrasonic_measure));
@@ -147,14 +140,12 @@ void Head_echo_alignment::update()
         _is_enacting_echo_scan = false;
         _head_angle  = _angle_min_ultrasonic_measure;
         // turnHead(_angle_min_ultrasonic_measure);
-        _head_angle_span = SACCADE_SPAN;  // reset saccade span to normal
         Serial.println("Scan aligned at angle: " + String(_head_angle) + ", measure: " + String(_min_ultrasonic_measure));
         _next_saccade_time = millis() + ECHO_MONITOR_PERIOD; // Wait before monitoring again
       }
       turnHead(_head_angle);
     }
-    else
-    // Watch for variation in ultrasonic measure to trigger alignment
+    else // Watch for variation in ultrasonic measure to trigger alignment
     {
       _next_saccade_time = millis() + ECHO_MONITOR_PERIOD;
       int current_ultrasonic_measure = measureUltrasonicEcho();
@@ -169,29 +160,13 @@ void Head_echo_alignment::update()
   }
 }
 
-void Head_echo_alignment::outcome(JSONVar & outcome_object)
+void Head_echo_complete_scan::outcome(JSONVar & outcome_object)
 {
-  //outcome_object["head_angle"] = _head_angle;
-
-  // The latest measure obtained from echo alignment
-  //outcome_object["echo_distance"] = _min_ultrasonic_measure;
-
-  // Make a new measure
-  // outcome_object["echo_distance"] = measureUltrasonicEcho(); Not working
-  // For every index i in _sign_array, set _sign_array.sign[i] to true if _sign_array.distances[i] < _sign_array.distances[i-1] and _sign_array.distances[i] < _sign_array.distances[i+1] 
+    // For every index i in _sign_array, set _sign_array.sign[i] to true if _sign_array.distances[i] < _sign_array.distances[i-1] and _sign_array.distances[i] < _sign_array.distances[i+1] 
     // and false otherwise
     for (int i = 0; i < _sign_array.size; i++)
     {
-      if( _sign_array.distances[i] > 0 and _sign_array.distances[i]< 10000){
-        String str = String(_sign_array.angles[i]);
-        //outcome_object["ha"+str] = _sign_array.angles[i];
-        outcome_object["ed"+ str] = _sign_array.distances[i];
-        // reset values
-        _sign_array.sign[i] = false;
-        _sign_array.distances[i] = 0;
-        _sign_array.angles[i] = 0;
-      }
-      /*if (_sign_array.distances[i] < _sign_array.distances[i+1] && _sign_array.distances[i] > 0)
+      if (_sign_array.distances[i] < _sign_array.distances[i+1] && _sign_array.distances[i] > 0)
       {
         if(i != 0 and _sign_array.distances[i] > _sign_array.distances[i-1]){
             continue;
@@ -203,6 +178,9 @@ void Head_echo_alignment::outcome(JSONVar & outcome_object)
         _sign_array.sign[i] = false;
       }
     }
+
+    // TODO: HELP: Write every _sign_array.distances[i] in the
+    // outcome_object if _sign_array.sign[i] is true
     int nb_echo = 0;
     for (int i = 0; i < _sign_array.size; i++){
         if (_sign_array.sign[i]){
@@ -215,20 +193,29 @@ void Head_echo_alignment::outcome(JSONVar & outcome_object)
         _sign_array.sign[i] = false;
         _sign_array.distances[i] = 0;
         _sign_array.angles[i] = 0;
-    }*/
     }
-    // Reset every values
-    //nb_echo = 0;
 
+    // Reset every values
+    nb_echo = 0;
+    
+    
+    /*
+  outcome_object["head_angle"] = _head_angle;
+
+  // The latest measure obtained from echo alignment
+  outcome_object["echo_distance"] = _min_ultrasonic_measure;
+    */
+  // Make a new measure
+  // outcome_object["echo_distance"] = measureUltrasonicEcho(); Not working
 }
 
-void Head_echo_alignment::turnHead(int head_angle)
+void Head_echo_complete_scan::turnHead(int head_angle)
 {
   _head_angle = constrain(head_angle, -90, 90);
   _head.write(_head_angle + 90);
 }
 
-int Head_echo_alignment::measureUltrasonicEcho()
+int Head_echo_complete_scan::measureUltrasonicEcho()
 {
   long echo_distance;
   digitalWrite(Trig_PIN,LOW);
