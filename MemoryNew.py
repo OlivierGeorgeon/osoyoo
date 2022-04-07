@@ -58,12 +58,20 @@ class MemoryNew:
             self.interactions.append(blockInter)
 
         if obstacle :
-            obstacleInter = Interaction(x,y,width = 50,type = 'obstacle', shape = 'Circle', color = 'orange', durability = durability, decayIntensity = 1, id = self.current_id)
+            obstacleInter = Interaction(x,y,width = 5,type = 'obstacle', shape = 'Circle', color = 'orange', durability = durability, decayIntensity = 1, id = self.current_id)
             self.interactions.append(obstacleInter)
         
         self.current_id += 1
         
-
+    def add_echo_array(self,echo_array):
+        """Convert echo array given as parameter to a list of interaction objects and add it to  self.interactions"""
+        durability = INTERACTION_PERSISTENCE
+        for i,echo in enumerate(echo_array):
+            x = echo[0]
+            y = echo[1]
+            obstacleInter = Interaction(x,y,width = 15,type = 'obstacle', shape = 'Circle', color = 'orange', durability = durability, decayIntensity = 1, id = self.current_id)
+            self.interactions.append(obstacleInter)
+            self.current_id += 1
     def tick(self):
         for p in self.interactions:
             p.tick()

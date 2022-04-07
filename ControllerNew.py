@@ -101,10 +101,10 @@ class ControllerNew:
             self.command_robot(robot_action)
         if(self.enact_step >= 2):
             robot_data = self.outcome_bytes
-            phenom_info, angle, translation, self.outcome = self.translate_robot_data(robot_data)
+            phenom_info, angle, translation, self.outcome, echo_array = self.translate_robot_data(robot_data)
             self.send_position_change_to_memory(angle,translation) #Might be an order problem between this line and the one under it, depending on
             self.send_position_change_to_hexa_memory(angle,translation)
-            self.send_phenom_info_to_memory(phenom_info) # when the robot detect interaction (before or after moving)
+            self.send_phenom_info_to_memory(phenom_info,echo_array) # when the robot detect interaction (before or after moving)
             self.memory.tick()
             self.ask_synthetizer_to_act()
             self.main_refresh()
@@ -137,11 +137,12 @@ class ControllerNew:
             self.synthesizer.act()
 
     ################################################# MEMORY RELATED #################################################################
-    def send_phenom_info_to_memory(self,phenom_info):
+    def send_phenom_info_to_memory(self,phenom_info,echo_array):
         """Send Interaction to the Memory
         """
         if self.memory is not None:
             self.memory.add(phenom_info)
+            self.memory.add_echo_array(echo_array)
 
     def send_position_change_to_memory(self, angle, translation):
         """Send position changes (angle,distance) to the Memory
@@ -226,6 +227,7 @@ class ControllerNew:
         x = None
         y = None
         json_outcome = json.loads(self.outcome_bytes)
+        echo_array = []
 
         # Updating the model from the latest received outcome
         outcome = json.loads(data)
@@ -289,6 +291,10 @@ class ControllerNew:
                     translation[0] = -RETREAT_DISTANCE
                     translation[1] = -SHIFT_DISTANCE * forward_duration/1000
 
+                
+
+
+
             angle = rotation
 
             # Update head angle
@@ -306,6 +312,27 @@ class ControllerNew:
                             y = math.sin(math.radians(head_angle)) * echo_distance
                         obstacle = 1
 
+            for i in range(20):
+                    hastr = "ha_" + str(i)
+                    edstr = "ed_"+str(i)
+
+                    if hastr in outcome and edstr in outcome:
+                        ha = outcome[hastr]
+                        ed = outcome[edstr]
+                        tmp_x = ROBOT_HEAD_X + math.cos(math.radians(ha)) * ed
+                        tmp_y = math.sin(math.radians(ha)) * ed
+                        echo_array.append((tmp_x, tmp_y))
+
+            for i in range(-90,99,10):
+                    edstr = "ed"+str(i)
+
+                    if edstr in outcome:
+                        ha =i
+                        ed = outcome[edstr]
+                        tmp_x = ROBOT_HEAD_X + math.cos(math.radians(ha)) * ed
+                        tmp_y = math.sin(math.radians(ha)) * ed
+                        echo_array.append((tmp_x, tmp_y))
+
             phenom_info = (floor,shock,blocked,obstacle,x,y)
 
         # Update the azimuth
@@ -316,7 +343,7 @@ class ControllerNew:
             self.azimuth -= rotation
 
         angle = rotation
-        return  phenom_info, angle, translation, outcome_for_agent
+        return  phenom_info, angle, translation, outcome_for_agent,echo_array
 
 
 if __name__ == '__main__':

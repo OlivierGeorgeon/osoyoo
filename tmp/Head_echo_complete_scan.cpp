@@ -12,8 +12,6 @@
 #define Echo_PIN    31  // Ultrasonic Echo pin connect to A5
 #define Trig_PIN    30  // Ultrasonic Trig pin connect to A4
 
-
-
 Head_echo_complete_scan::Head_echo_complete_scan()
 {
   //Servo _head;
@@ -79,8 +77,7 @@ void Head_echo_complete_scan::update()
     {
       _echo_alignment_step++;
       _next_saccade_time = millis() + SACCADE_DURATION;
-      int current_ultrasonic_measure = measureUltrasonicEcho();
-      
+      int current_ultrasonic_measure = measureUltrasonicEcho();      
       Serial.println("Step: " + String(_echo_alignment_step) + ", Angle: " +String(_head_angle) + ", measure: " + String(current_ultrasonic_measure));
       if (_previous_ultrasonic_measure > current_ultrasonic_measure )
       // The echo is closer

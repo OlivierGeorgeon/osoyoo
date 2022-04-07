@@ -13,7 +13,7 @@ import RobotDefine
 UDP_IP = "192.168.8.189"  # AP mode routeur margit
 
 
-UDP_TIMEOUT = 5  # Seconds
+UDP_TIMEOUT = 10  # Seconds
 if RobotDefine.ROBOT_ID == 0:
     UDP_TIMEOUT = 0
 
