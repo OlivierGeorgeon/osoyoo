@@ -59,9 +59,9 @@ if __name__ == "__main__":
         if controller.enact_step == 2:
             # Update the egocentric memory window
             robot_data = controller.outcome_bytes
-            phenom_info, angle, translation, controller.outcome = controller.translate_robot_data(robot_data)
+            phenom_info, angle, translation, controller.outcome, echo_array = controller.translate_robot_data(robot_data)
             controller.send_position_change_to_memory(angle,translation) #Might be an order problem between this line and the one under it, depending on
-            controller.send_phenom_info_to_memory(phenom_info) # when the robot detect interaction (before or after moving)
+            controller.send_phenom_info_to_memory(phenom_info, echo_array) # when the robot detect interaction (before or after moving)
             controller.memory.tick()
             emw.extract_and_convert_interactions(memory)
             emw2.extract_and_convert_interactions(memory)
