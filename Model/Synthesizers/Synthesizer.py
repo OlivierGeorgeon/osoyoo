@@ -55,22 +55,35 @@ class Synthesizer:
         echos = []
         output =[]
         to_remove = []
+        distance_max = 400
+        print("len self.interactions_list avant treat_echos", len(self.interactions_list))
         for _,inte in enumerate(self.interactions_list):
             if inte.type ==  "obstacle":
+
                 echos.append(inte)
                 to_remove.append(inte)
         for _,inte in enumerate(to_remove):
             self.interactions_list.remove(inte)
+        to_remove = []
+        print("len interactions_list après avoir viré les echo : ", len(self.interactions_list))
+        print("len echos :", len(echos))
         last_dist = -1
-        accepted_difference = 10
+        accepted_difference = 20
         streak = []
         for _,echo in enumerate(echos):
             #compute distance between echo and the robot, using echo.x and echo.y and robot_pos_x and robot_pos_y
-            dist = math.sqrt((echo.x - self.hexa_memory.robot_pos_x)**2 + (echo.y - self.hexa_memory.robot_pos_y)**2)
+            rota_radian = math.radians(self.hexa_memory.robot_angle)
+            x_prime = int(echo.x * math.cos(rota_radian) - echo.y * math.sin(rota_radian))
+            y_prime = int(echo.y * math.cos(rota_radian) + echo.x * math.sin(rota_radian))
+            dist = math.sqrt((x_prime - self.hexa_memory.robot_pos_x)**2 + (y_prime - self.hexa_memory.robot_pos_y)**2)
+            if dist > distance_max :
+                continue
+            print("distance :", dist)
             if last_dist == -1:
                 last_dist = dist
-            if abs(dist - last_dist) < accepted_difference:
+            if abs(dist - last_dist) < accepted_difference :
                 streak.append((echo,dist))
+                print("element ajouté à streak, len streak :", len(streak))
                 last_dist = dist
             else:
                 if len(streak) > 0:
@@ -104,13 +117,13 @@ class Synthesizer:
         x_prime = int(interaction.x * math.cos(rota_radian) - interaction.y * math.sin(rota_radian))
         y_prime = int(interaction.y * math.cos(rota_radian) + interaction.x * math.sin(rota_radian))
         # on demande ensuite à l'hexamem de nous traduire leur position en cells
-        print("ksss")
+        #print("ksss")
         x_prime += self.hexa_memory.robot_pos_x
         y_prime += self.hexa_memory.robot_pos_y
         for obstacle in self.obstacles_list :
-            print("kss")
+            #print("kss")
             # print difference between obstacle and interaction coordinates
-            print("<SYNTHESIZER> : obstacle x : ", obstacle[0], "interaction x : ", x_prime, "obstacle y : ", obstacle[1], "interaction y : ", y_prime)
+            #print("<SYNTHESIZER> : obstacle x : ", obstacle[0], "interaction x : ", x_prime, "obstacle y : ", obstacle[1], "interaction y : ", y_prime)
             if(abs(obstacle[0] - x_prime) < self.delta_x and abs(obstacle[1] - y_prime) < self.delta_y):
                 is_significant = False
                 if(abs(obstacle[0] -x_prime) > self.min_delta or abs(obstacle[1] - y_prime) > self.min_delta):
@@ -141,7 +154,7 @@ class Synthesizer:
                         #move the robot in the memory, according to the mesured delta
                         self.hexa_memory.robot_pos_x += obstacle_delta_x
                         self.hexa_memory.robot_pos_y += obstacle_delta_y
-                        print("<SYNTHESIZER> : OBSTACLE already known detected, robot has been moved by :",-obstacle_delta_x,-obstacle_delta_y)
+                        #print("<SYNTHESIZER> : OBSTACLE already known detected, robot has been moved by :",-obstacle_delta_x,-obstacle_delta_y)
                         if(interaction.id > self.last_used_id):
                             self.last_used_id = interaction.id
                         continue
@@ -175,7 +188,7 @@ class Synthesizer:
                         self.internal_hexa_grid.grid[x][y].interactions.append(interaction)
                         used_points.append((x,y))
                     except IndexError:
-                        print("<SYNTHESIZER> Interaction caused an error : x=",x,"y = ",y,"width = ", self.hexa_memory.width,"height = ",self.hexa_memory.height)
+                        #print("<SYNTHESIZER> Interaction caused an error : x=",x,"y = ",y,"width = ", self.hexa_memory.width,"height = ",self.hexa_memory.height)
                         continue
             if(interaction.id > self.last_used_id):
                 self.last_used_id = interaction.id

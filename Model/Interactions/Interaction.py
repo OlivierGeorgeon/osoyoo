@@ -39,7 +39,6 @@ class Interaction:
         self.starArgs = starArgs # At the moment, represent the number of spikes of a star
         self.rotation = 0
         self.id = id
-        print(self.rgb)
         self.corners = None
         self.compute_corners()
 
