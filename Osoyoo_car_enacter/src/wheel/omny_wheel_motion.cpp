@@ -11,7 +11,6 @@
 
 #include "omny_wheel_motion.h"
 #include "Arduino.h"
-#include "gyro.h"
 
 //Controle de la vitesse des roues du robot
 void setMotion(int speed_fl,int speed_rl ,int speed_rr,int speed_fr)
@@ -26,22 +25,6 @@ void go_forward(int speed) // faire avancer le robot
 {
   setMotion(speed,speed,speed,speed);
 }
-
-/*void turn_degrees(int speed, int deg)
-{
-    if(deg > 0){
-    while (getAngleZ() < deg)
-    {
-        setMotion(0,0,speed,speed);
-    }
-    }else{
-    while (getAngleZ() > deg)
-    {
-        setMotion(speed,speed,0,0);
-    }
-    }
-}*/
-
 void  go_back(int speed)//faire reculer le robot 
 {
   setMotion(-speed,-speed,-speed,-speed);
@@ -64,11 +47,9 @@ void FL(int speed)  //Rotation de la roue avant gauche
       digitalWrite(LeftMotorDirPin1,LOW);
       digitalWrite(LeftMotorDirPin2,HIGH);
       analogWrite(speedPinL,speed);
-
   }
   else 
   {
-
       digitalWrite(LeftMotorDirPin1,HIGH);
       digitalWrite(LeftMotorDirPin2,LOW);
       analogWrite(speedPinL,-speed);
@@ -108,13 +89,14 @@ void RL(int speed)//Rotation de la roue arriere gauche
     {
         digitalWrite(LeftMotorDirPin1B,LOW);
         digitalWrite(LeftMotorDirPin2B,HIGH);
-        analogWrite(speedPinLB,1.5*speed);
+        //Ajout de la puissance supplementaire de 1.2 à la roue pour cause de defaillance
+        analogWrite(speedPinLB,1.2*speed);
     }
     else
     {
         digitalWrite(LeftMotorDirPin1B,HIGH);
         digitalWrite(LeftMotorDirPin2B,LOW);
-        analogWrite(speedPinLB,-speed*1.5);
+        analogWrite(speedPinLB,-speed*1.2);
     }
 }
 
@@ -125,25 +107,4 @@ void stop_Stop()    //Stop
   analogWrite(speedPinRB,0);
   analogWrite(speedPinL,0);
   analogWrite(speedPinR,0);
-}
-
-//Pins initialize
-void init_GPIO()
-{
-  pinMode(RightMotorDirPin1, OUTPUT); 
-  pinMode(RightMotorDirPin2, OUTPUT); 
-  pinMode(speedPinL, OUTPUT);  
- 
-  pinMode(LeftMotorDirPin1, OUTPUT);
-  pinMode(LeftMotorDirPin2, OUTPUT); 
-  pinMode(speedPinR, OUTPUT);
-  pinMode(RightMotorDirPin1B, OUTPUT); 
-  pinMode(RightMotorDirPin2B, OUTPUT); 
-  pinMode(speedPinLB, OUTPUT);  
- 
-  pinMode(LeftMotorDirPin1B, OUTPUT);
-  pinMode(LeftMotorDirPin2B, OUTPUT); 
-  pinMode(speedPinRB, OUTPUT);
-   
-  stop_Stop();
 }

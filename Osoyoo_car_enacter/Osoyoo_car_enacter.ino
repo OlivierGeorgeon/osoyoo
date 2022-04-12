@@ -8,22 +8,27 @@
  * CopyRight www.osoyoo.com
  * 
  */
-#include "omny_wheel_motion.h"
-#include "calcDist.h"
-#include "tracking.h"
+#include "src/wheel/omny_wheel_motion.h"
+#include "src/lightSensor/LightSensor.h"
+LightSensor ls;
+int previous_floor = 0; 
 
-#include "Servo_Scan.h"
-#define pc "1"
-#include "gyro.h"
-#include "compass.h"
 
-#include "JsonOutcome.h"
+#define WifiMode "R"        //Define the wifi mode of the robot, 'R' for router and 'W' for robot connection
+
+#include "src/imu/gyro.h"
+#include "src/imu/compass.h"
+
+#include "src/wifi/JsonOutcome.h"
 JsonOutcome outcome;
 
-#include "DelayAction.h"
+#include "src/head/Head.h";
+Head head;
+
+#include "src/utils/DelayAction.h"
 DelayAction da;
 
-#include "WifiBot.h"
+#include "src/wifi/WifiBot.h"
 WifiBot wifiBot = WifiBot("osoyoo_robot2", 8888);
 
 #include "WiFiEsp.h"
@@ -33,30 +38,32 @@ WifiBot wifiBot = WifiBot("osoyoo_robot2", 8888);
 
 // use a ring buffer to increase speed and reduce memory allocation
 char packetBuffer[100];
+char action = ' ';
 
 unsigned long endTime = 0;
 int actionStep = 0;
 float somme_gyroZ = 0;
-int angle_tete_robot = 90;
-float distance_objet_proche = 0;
+int floorOutcome = 0;
 
 void setup()
 {
 // init_GPIO();
+
   Serial.begin(9600);   // initialize serial for debugging
-  servo_port();
-  set();
-  if (pc == "1"){
+  
+  head.servo_port();
+  
+  head.distUS.setup();
+  if (WifiMode == "W"){
+
     wifiBot.wifiInitLocal();
   }
-  if (pc == "2"){
+  if (WifiMode == "R"){
     wifiBot.wifiInitRouter();
   }
 
-  mpu_setup();
-  compass_setup();
-
-  //Exemple: da.setDelayAction(2000, [](){Serial.println("ok tout les 2s");}, millis());
+  // mpu_setup();
+  // compass_setup();
 }
 
 void loop()
@@ -64,9 +71,9 @@ void loop()
   da.checkDelayAction(millis());
   
   int packetSize = wifiBot.Udp.parsePacket();
-  gyro_update();
+  // gyro_update();
 
-  if (packetSize) { // if you get a client,
+  if (packetSize) { // if you get a client
     Serial.print("Received packet of size ");
     Serial.println(packetSize);
     int len = wifiBot.Udp.read(packetBuffer, 255);
@@ -76,58 +83,63 @@ void loop()
     }
 
     JSONVar jsonReceive = JSON.parse(packetBuffer);
-    Serial.println(JSON.stringify(jsonReceive));
-    String strAction = JSON.stringify(jsonReceive["action"]);
-
-    int str_len = strAction.length() + 1;
-    char action[str_len];
-    strAction.toCharArray(action, str_len);
+    if (jsonReceive.hasOwnProperty("action")) {
+      action = ((const char*) jsonReceive["action"])[0];
+    }
 
     endTime = millis() + 2000;
     actionStep = 1;
 
-    switch (action[1])    //serial control instructions
+    switch (action)    //serial control instructions
     {  
-      case '$':outcome.addValue("distance", (String) dist());break;
       case '8':go_forward(SPEED);break;
-      case '4':left_turn(SPEED);break;
-      case '6':right_turn(SPEED);break;
+      case '1':left_turn(SPEED);break;
+      case '3':right_turn(SPEED);break;
       case '2':go_back(SPEED);break;
       case '5':stop_Stop();break;
-      case '0':until_line(SPEED);break;
-      case 'D':outcome.addValue("distance", (String) dist());break;
-       case 'S': 
-                  angle_tete_robot = scan(0, 180, 9, 0);
-                  distance_objet_proche = dist();
-                  outcome.addValue("head_angle", (String) angle_tete_robot);
-                  outcome.addValue("echo_distance", (String) distance_objet_proche);  
-                  break;
-        default:break;
-      }
+      case '0':ls.until_line(SPEED);break;
+      case '-': head.scan(0, 180, 9, 0);break;
+      default:break;
     }
-    if ( tracking()) // la fonction renvoi true si elle capte une ligne noir
+  }
+  
+  int current_floor = ls.tracking();
+  if (current_floor != previous_floor) // la fonction renvoi true si elle capte une ligne noir
+  {
+    stop_Stop();
+    if (current_floor > 0)
     {
-      stop_Stop();
-      go_back(SPEED);//recule
-      actionStep = 1;
-      endTime = millis() + 1000; //1sec
+      floorOutcome = current_floor;
     }
-    if ((endTime < millis()) && (actionStep == 1))
-    {
-      stop_Stop();
+    go_back(SPEED);
+    actionStep = 1;
+    endTime = millis() + 1000; // 1 sec
 
-      //Send outcome to PC
-      // renvoi JSON du degres de mouvement
-      outcome.addValue( "gyroZ", (String) (gyroZ()));
-      //renvoi JSON du azimut
-      outcome.addValue( "compass", (String) (degreesNorth()));
-      wifiBot.sendOutcome(outcome.get());
-      outcome.clear();
-      actionStep = 0;
-    }
-    if(actionStep == 0)
-    {
-        reset_gyroZ(); //calibrer l'angle Z à 0 tant qu'il n'a pas fait d'action
-    }
+    previous_floor = current_floor;
+  }
+  
+  if ((endTime < millis()) && (actionStep == 1))
+  {
+    stop_Stop();
+    
+    outcome.addValue("echo_distance", (String) head.distUS.dist());
+    outcome.addValue("head_angle", (String) (head.current_angle -  90));
+    outcome.addValue( "floor", (String) floorOutcome);
+    outcome.addValue( "status", (String) floorOutcome);
 
+    //renvoi JSON du azimuth
+    // outcome.addValue( "yaw", (String) (gyroZ()));
+    // outcome.addValue( "compass", (String) (degreesNorth()));
+
+    //Send outcome to PC
+    wifiBot.sendOutcome(outcome.get());
+    outcome.clear();
+    
+    actionStep = 0;
+    floorOutcome = 0;
+  }
+  if(actionStep == 0)
+  {
+      // reset_gyroZ(); //calibrer l'angle Z à 0 tant qu'il n'a pas fait d'action
+  }
 }
