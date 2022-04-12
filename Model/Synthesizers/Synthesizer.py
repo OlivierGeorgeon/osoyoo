@@ -43,9 +43,6 @@ class Synthesizer:
     def act(self):
         """Create phenoms based on Interactions in memory and States in hexa_memory"""
         self.interactions_list = [elem for elem in self.memory.interactions if elem.id>self.last_used_id]
-        if len(self.interactions_list) != 0:
-            #self.last_used_id = self.interactions_list[-1].id
-            ""
         self.treat_echos()
         self.project_memory_on_internal_grid()
         self.synthesize()
@@ -53,50 +50,41 @@ class Synthesizer:
     def treat_echos(self):
         """Analyse interactions created by the echolocation, to find true position of the object located """
         echos = []
-        output =[]
+
         to_remove = []
-        distance_max = 400
-        print("len self.interactions_list avant treat_echos", len(self.interactions_list))
+        distance_max = 600
+        rota_radian = math.radians(self.hexa_memory.robot_angle)
+        
         for _,inte in enumerate(self.interactions_list):
             if inte.type ==  "obstacle":
-
                 echos.append(inte)
                 to_remove.append(inte)
         for _,inte in enumerate(to_remove):
             self.interactions_list.remove(inte)
-        to_remove = []
-        print("len interactions_list après avoir viré les echo : ", len(self.interactions_list))
-        print("len echos :", len(echos))
-        last_dist = -1
-        accepted_difference = 20
-        streak = []
+        dists = []
         for _,echo in enumerate(echos):
-            #compute distance between echo and the robot, using echo.x and echo.y and robot_pos_x and robot_pos_y
-            rota_radian = math.radians(self.hexa_memory.robot_angle)
             x_prime = int(echo.x * math.cos(rota_radian) - echo.y * math.sin(rota_radian))
             y_prime = int(echo.y * math.cos(rota_radian) + echo.x * math.sin(rota_radian))
-            dist = math.sqrt((x_prime - self.hexa_memory.robot_pos_x)**2 + (y_prime - self.hexa_memory.robot_pos_y)**2)
+            # on demande ensuite à l'hexamem de nous traduire leur position en cells
+            #print("ksss")
+            x_prime += self.hexa_memory.robot_pos_x
+            y_prime += self.hexa_memory.robot_pos_y
+            dists.append(math.sqrt((x_prime - self.hexa_memory.robot_pos_x )**2 + (y_prime- self.hexa_memory.robot_pos_y)**2))
+        output =[]
+        for i,dist in enumerate(dists):
+
             if dist > distance_max :
                 continue
-            print("distance :", dist)
-            if last_dist == -1:
-                last_dist = dist
-            if abs(dist - last_dist) < accepted_difference :
-                streak.append((echo,dist))
-                print("element ajouté à streak, len streak :", len(streak))
-                last_dist = dist
-            else:
-                if len(streak) > 0:
-                    #get the element of streak with the minimal distance (echos[j][1]), append echos[j][0] to output
-                    j = 0
-                    for i in range(1,len(streak)):
-                        if(streak[i][1] < streak[j][1]):
-                            j = i
-                    output.append(streak[j][0])
-                streak = []
-                last_dist = dist
-                streak.append((echo,dist))
-
+            if i!= len(dists)-1 and (dist< dists[i+1] or abs(dist-dists[i+1]) > 100):
+                print(dist, ",", abs(dist-dists[i+1]))
+                if i > 0 and dist>=dists[i-1] and abs(dist-dists[i-1]) < 100:
+                    continue
+                output.append(echos[i])
+                print("i1 : ", i)
+            elif i== len(dists)-1 and dist < dists[i-1]:
+                output.append(echos[i])
+                print("i2 : ", i)
+            
         print("len output :", len(output))
         for _,echo in enumerate(output):
             self.interactions_list.append(echo)
