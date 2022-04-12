@@ -1,16 +1,12 @@
 import socket
 import keyboard
 import time
-from Python import RobotDefine
-
-
-
+from ..RobotDefine import *
 
 
 UDP_TIMEOUT = 5  # Seconds
-if RobotDefine.ROBOT_ID == 0:
+if ROBOT_ID == 0:
     UDP_TIMEOUT = 0
-
 
 
 class WifiInterface:

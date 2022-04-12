@@ -1,11 +1,11 @@
 import json
-from Python.RobotDefine import *
+from ..RobotDefine import *
 import threading
-from Python.Wifi.WifiInterface import WifiInterface
-from Python.Display.Phenomenon import Phenomenon
+from ..Wifi.WifiInterface import WifiInterface
+from ..Display.Phenomenon import Phenomenon
 import math
-from Python.Display.OsoyooCar import OsoyooCar
-from Python.Display.EgoMemoryWindow import EgoMemoryWindow
+from ..Display.OsoyooCar import OsoyooCar
+from ..Display.EgoMemoryWindow import EgoMemoryWindow
 import pyglet
 from pyrr import matrix44
 
@@ -16,7 +16,7 @@ class Controller:
         self.view = view
 
         # Model
-        self.wifiInterface = WifiInterface()
+        self.wifiInterface = WifiInterface(ip=self.view.ip)
         self.phenomena = []
         self.robot = OsoyooCar(self.view.batch)
 

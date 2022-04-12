@@ -1,5 +1,5 @@
 # This resource is useful for Agent4
-from Python.Agent.Resources import Interaction
+from ..Agent.Resources import Interaction
 
 
 class CompositeInteraction:

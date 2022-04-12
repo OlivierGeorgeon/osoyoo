@@ -1,9 +1,8 @@
 import pyglet
-from Display.Controller import Controller
-from Display.EgoMemoryWindow import EgoMemoryWindow
+from OsoyooControllerBSN.Display.Controller import Controller
+from OsoyooControllerBSN.Display.EgoMemoryWindow import EgoMemoryWindow
+from OsoyooControllerBSN.Agent.Agent5 import Agent5
 import json
-from Agent.Agent5 import Agent5
-
 
 CONTROL_MODE_MANUAL = 0
 CONTROL_MODE_AUTOMATIC = 1
@@ -13,7 +12,7 @@ print("Control mode: MANUAL")
 
 def main():
     """ Controlling the robot with Agent5 """
-    ip_ = "10.40.22.252"
+    ip_ = "10.40.22.254"
     emw = EgoMemoryWindow(ip=ip_)
     controller = Controller(emw)
     agent = Agent5()

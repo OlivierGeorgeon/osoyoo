@@ -1,7 +1,7 @@
-from Python.Agent.Resources import Interaction
-from Python.Agent.CompositeInteraction import CompositeInteraction
-from Python.Display.EgoMemoryWindow import EgoMemoryWindow
-from Python.Display.OsoyooCar import OsoyooCar
+from ..Agent.Resources import Interaction
+from ..Agent.CompositeInteraction import CompositeInteraction
+from ..Display.EgoMemoryWindow import EgoMemoryWindow
+from ..Display.OsoyooCar import OsoyooCar
 import pyglet
 
 

@@ -1,9 +1,9 @@
 import pyglet
 from pyglet.gl import *
-from Python.Display.OsoyooCar import OsoyooCar
-from Python.Wifi.WifiInterface import WifiInterface
+from ..Display.OsoyooCar import OsoyooCar
+from ..Wifi.WifiInterface import WifiInterface
 import json
-from Python.Display.Phenomenon import Phenomenon
+from ..Display.Phenomenon import Phenomenon
 import math
 from pyglet import shapes
 from pyglet import clock
@@ -48,6 +48,7 @@ class EgoMemoryWindow(pyglet.window.Window):
     # set_minimum_size: resize window
     def __init__(self, ip="192.168.4.1", port=8888, udpTimeout=6, *args, **kwargs):
         super().__init__(400, 400, resizable=True, *args, **kwargs)
+        self.ip = ip
         self.set_caption("Egocentric Memory")
         self.set_minimum_size(150, 150)
         glClearColor(1.0, 1.0, 1.0, 1.0)
