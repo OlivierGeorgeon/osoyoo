@@ -27,7 +27,7 @@ class Synthesizer:
         self.last_used_id = -1
         self.tolerance = 3 #nombre d'id d'ecart d'une interaction que l'on tolère par rapport au last_id pour intervenir sur la synthese
 
-        delta = 400
+        delta = 100
         self.delta_x = delta
         self.delta_y = delta
 
