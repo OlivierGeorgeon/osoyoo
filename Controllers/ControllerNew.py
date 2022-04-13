@@ -310,18 +310,7 @@ class ControllerNew:
                             y = math.sin(math.radians(head_angle)) * echo_distance
                         obstacle = 1
 
-            for i in range(20):
-                    hastr = "ha_" + str(i)
-                    edstr = "ed_"+str(i)
-
-                    if hastr in outcome and edstr in outcome:
-                        ha = outcome[hastr]
-                        ed = outcome[edstr]
-                        tmp_x = ROBOT_HEAD_X + math.cos(math.radians(ha)) * ed
-                        tmp_y = math.sin(math.radians(ha)) * ed
-                        echo_array.append((tmp_x, tmp_y))
-
-            for i in range(-90,99,10):
+            for i in range(100,-99,-10):
                     edstr = "ed"+str(i)
 
                     if edstr in outcome:

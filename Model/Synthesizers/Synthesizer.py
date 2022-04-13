@@ -75,6 +75,7 @@ class Synthesizer:
 
             if dist > distance_max :
                 continue
+            """
             if i!= len(dists)-1 and (dist< dists[i+1] or abs(dist-dists[i+1]) > 100):
                 print(dist, ",", abs(dist-dists[i+1]))
                 if i > 0 and dist>=dists[i-1] and abs(dist-dists[i-1]) < 100:
@@ -84,7 +85,21 @@ class Synthesizer:
             elif i== len(dists)-1 and dist < dists[i-1]:
                 output.append(echos[i])
                 print("i2 : ", i)
+                """
             
+            if i==0 :
+                if (dist<dists[i+1] or abs(dist-dists[i+1]) > 100):
+                    output.append(echos[i])
+                    print("i1 : ", i)
+            elif i == len(dists)-1 :
+                if (dist <= dists[i-1] or abs(dist-dists[i-1]) > 100):
+                    output.append(echos[i])
+                    print("i2 : ", i)
+            elif (dist <= dists[i-1] or abs(dist-dists[i-1]) > 100) and (dist<dists[i+1] or abs(dist-dists[i+1]) > 100):
+                    print(dist)
+                    output.append(echos[i])
+                    print("i3 : ", i)
+
         print("len output :", len(output))
         for _,echo in enumerate(output):
             self.interactions_list.append(echo)
