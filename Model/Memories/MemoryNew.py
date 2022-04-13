@@ -67,8 +67,9 @@ class MemoryNew:
     def add_echo_array(self,echo_array):
         """Convert echo array given as parameter to a list of interaction objects and add it to  self.interactions"""
         durability = INTERACTION_PERSISTENCE
-        for i,echo in enumerate(echo_array):
+        for _,echo in enumerate(echo_array):
             x = echo[0]
+            #print("add_echo_array, x :",x)
             y = echo[1]
             obstacleInter = Interaction(x,y,width = 15,type = 'obstacle', shape = 'Circle', color = 'orange', durability = durability, decayIntensity = 1, id = self.current_id)
             self.interactions.append(obstacleInter)
