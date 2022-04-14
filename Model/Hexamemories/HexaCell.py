@@ -11,6 +11,7 @@ class HexaCell:
                               # "MovableObstacle" "Frontier"(when line) "Something"(when something echolocated) 
         self.occupied = False
         self.interactions = list()
+        self.confidence = 1
 
     def __str__(self):
         return "(" + str(self.x)+','+str(self.y) + ")"

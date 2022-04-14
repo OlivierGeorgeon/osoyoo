@@ -319,6 +319,7 @@ class ControllerNew:
                         tmp_x = ROBOT_HEAD_X + math.cos(math.radians(ha)) * ed
                         tmp_y = math.sin(math.radians(ha)) * ed
                         echo_array.append((tmp_x, tmp_y))
+                        #print("ha :",ha,"ed :",ed, "tmp_x :",tmp_x,"tmp_y :",tmp_y)
 
             phenom_info = (floor,shock,blocked,obstacle,x,y)
 

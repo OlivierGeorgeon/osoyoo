@@ -50,6 +50,7 @@ def rotate(x,y, radians):
 
 
 def hexaMemory_to_pyglet(hexaMemory,batch):
+    """blabla"""
     grid = hexaMemory.grid
     shapesList = []
     x0 = 0
@@ -82,6 +83,13 @@ def hexaMemory_to_pyglet(hexaMemory,batch):
                     color = name_to_rgb("black")
                 elif(cell.status == "Something"):
                     color = name_to_rgb("orange")
+                    r,g,b = color
+                    confidence = hexaMemory.grid[i][j].confidence
+                    factor = 10
+                    r = min(255,r + confidence*factor)
+                    g = min(255,g + confidence*factor)
+                    b = min(255,b + confidence*factor)
+                    color = r,g,b
 
             x1 = x0
             y1 = y0
