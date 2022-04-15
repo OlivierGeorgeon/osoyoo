@@ -2,7 +2,7 @@ import math
 from Memories import MemoryNew
 from Hexamemories import HexaMemory
 from Hexamemories import HexaGrid
-
+from Misc import translate_interaction_type_to_cell_status
 class Synthesizer:
     """ The synthesizer has the role to synthesize the short term egocentric memory
         and the long term allocentric hexa_memory.
@@ -42,6 +42,9 @@ class Synthesizer:
         self.last_used_id = -1
     def act(self):
         """Create phenoms based on Interactions in memory and States in hexa_memory"""
+        if True :
+            self.new_act()
+            return
         self.interactions_list = [elem for elem in self.memory.interactions if elem.id>self.last_used_id]
         self.treat_echos()
         self.project_memory_on_internal_grid()
@@ -51,9 +54,11 @@ class Synthesizer:
         """Create phenoms based on Interactions in memory and States in hexa_memory"""
         #Firstly : keep only the interactions that are not already treated (id > last_used_id)
         self.interactions_list = [elem for elem in self.memory.interactions if elem.id>self.last_used_id]
+        print(len(self.interactions_list))
         #Secondly : At this point self.interactions_list contains all the echolocations made by the robot, so we need to treat them to find the
         #true position of the objects echolocated
         real_echos = self.new_treat_echos()
+        print("len real_echos :", len(real_echos) )
         #Remove the echos not returned by new_treat_echos
         self.interactions_list= [elem for elem in self.memory.interactions if elem.type != 'obstacle' or elem in real_echos]
         #Project the interactions on the internal_hexa_grid
@@ -69,7 +74,8 @@ class Synthesizer:
         dist_list = [math.sqrt(elem.x**2 + elem.y**2) for elem in echo_list]
         #Find all the local minimums in dist_list (dist_list[i] < dist_list[i+1] and dist_list[i] < dist_list[i-1])
         # append the corresponding echo to min_list
-        min_list = [echo_list[i] for i,elem in enumerate(dist_list[1:-1]) if elem<dist_list[i-1] and elem<dist_list[i+1]]
+        min_list = [echo_list[i+1] for i,elem in enumerate(dist_list[1:-1]) if (elem<dist_list[i] and elem<dist_list[i+2])]                
+        print("len(min_list)",len(min_list))
         return min_list
 
     def new_project_memory_on_internal_grid(self):
@@ -78,24 +84,28 @@ class Synthesizer:
         #and add it to the internal_hexa_grid
         rota_radian = math.radians(self.hexa_memory.robot_angle)
         allocentric_coordinates = []
-        for _,interaction in self.interactions_list:
-            x_prime = int(interaction.x * math.cos(rota_radian) - interaction.y * math.sin(rota_radian) + self.hexa_memory.robot_pos_x)
-            y_prime = int(interaction.y * math.cos(rota_radian) + interaction.x * math.sin(rota_radian) + self.hexa_memory.robot_pos_y)
-            allocentric_coordinates.append((x_prime,y_prime),interaction)
+        for _,interaction in enumerate(self.interactions_list):
+            for corner in interaction.corners:
+                corner_x,corner_y = corner
+                x_prime = int(corner_x* math.cos(rota_radian) - corner_y * math.sin(rota_radian) + self.hexa_memory.robot_pos_x)
+                y_prime = int(corner_y * math.cos(rota_radian) + corner_x* math.sin(rota_radian) + self.hexa_memory.robot_pos_y)
+                allocentric_coordinates.append(((x_prime,y_prime),interaction))
         #Add the allocentric coordinates to the internal_hexa_grid
         for allocentric_coordinate,interaction in allocentric_coordinates:
             coordinate_x,coordinate_y = allocentric_coordinate
             cell_x,cell_y = self.hexa_memory.convert_pos_in_cell(coordinate_x,coordinate_y)
             self.internal_hexa_grid.add_interaction(cell_x,cell_y,interaction)
-            self.last_used_id = interaction.id
+            self.last_used_id = max(interaction.id,self.last_used_id)
     
 
     def new_synthesize(self):
         """Compare the content of the hexamemory and the internal hexa grid, apply the final status of each cell to the hexa_memory"""
-        for i in range(len(self.internal_hexa_grid.grid)):
-            for j in range(len(self.internal_hexa_grid[0])):
-                intern_status = "Free" if len(self.internal_hexa_grid[i][j].interactions) == 0 else self.internal_hexa_grid[i][j].interactions[-1].status
-
+        for i,row in enumerate(self.internal_hexa_grid.grid):
+            for j, cell in enumerate(row):
+                intern_status = "Free" if len(cell.interactions) == 0 else translate_interaction_type_to_cell_status(cell.interactions[-1].type)
+                current_status = self.hexa_memory.grid[i][j].status
+                final_status = current_status if intern_status == "Free" else intern_status
+                self.hexa_memory.grid[i][j].status = final_status
 
 
 

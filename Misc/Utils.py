@@ -134,6 +134,19 @@ def hexaMemory_to_pyglet(hexaMemory,batch):
 
     return shapesList
 
+def translate_interaction_type_to_cell_status(type):
+    """Free Blocked Occupied Frontier Something"""
+    if(type == "Line"):
+        return "Frontier"
+    elif(type == "shock" or type == "block"):
+        return "Blocked"
+    elif(type == "obstacle"):
+        return "Something"
+    print("Problemo problemo utils translate mauvaise interaction type : ", interaction.type)
+    return "Free"
+
+
+
 # DEPRECATED
 """
 def phenomList_to_pyglet(liste,batch):

@@ -1,6 +1,6 @@
 from Osoyoo import *
 mem = MemoryV1()
-hexMem = HexaMemory(50,100, cells_radius = 100)
+hexMem = HexaMemory(50,200, cells_radius = 20)
 synthe = Synthesizer(mem,hexMem)
 view = EgoMemoryWindowNew()
 hexaview = HexaView()
