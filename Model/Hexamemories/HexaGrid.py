@@ -76,6 +76,14 @@ class HexaGrid:
         else :
             return self.grid[x][y]
 
+    def add_interaction(self,x,y,interaction):
+        """Add an interaction to the cell of coordinates x,y
+        Args :
+            x : x coordinate of the cell
+            y : y coordinate of the cell
+            interaction : interaction to add
+        """
+        self.grid[x][y].add_interaction(interaction)
 
 if __name__ == '__main__':
     hx = HexaGrid(5,5)

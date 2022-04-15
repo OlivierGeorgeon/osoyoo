@@ -46,6 +46,60 @@ class Synthesizer:
         self.treat_echos()
         self.project_memory_on_internal_grid()
         self.synthesize()
+
+    def new_act(self):
+        """Create phenoms based on Interactions in memory and States in hexa_memory"""
+        #Firstly : keep only the interactions that are not already treated (id > last_used_id)
+        self.interactions_list = [elem for elem in self.memory.interactions if elem.id>self.last_used_id]
+        #Secondly : At this point self.interactions_list contains all the echolocations made by the robot, so we need to treat them to find the
+        #true position of the objects echolocated
+        real_echos = self.new_treat_echos()
+        #Remove the echos not returned by new_treat_echos
+        self.interactions_list= [elem for elem in self.memory.interactions if elem.type != 'obstacle' or elem in real_echos]
+        #Project the interactions on the internal_hexa_grid
+        self.new_project_memory_on_internal_grid()
+        #Synthesize the existing hexamemory and the internal_hexa_grid
+        self.new_synthesize()
+
+    def new_treat_echos(self):
+        """Find true position of the objects echolocated"""
+        #Filter self.interactions_list to keep only the echolocations (interaction.type == 'obstacle')
+        echo_list = [elem for elem in self.interactions_list if elem.type == 'obstacle']
+        #Compute distance between robot and echolocation for every element in echo_list
+        dist_list = [math.sqrt(elem.x**2 + elem.y**2) for elem in echo_list]
+        #Find all the local minimums in dist_list (dist_list[i] < dist_list[i+1] and dist_list[i] < dist_list[i-1])
+        # append the corresponding echo to min_list
+        min_list = [echo_list[i] for i,elem in enumerate(dist_list[1:-1]) if elem<dist_list[i-1] and elem<dist_list[i+1]]
+        return min_list
+
+    def new_project_memory_on_internal_grid(self):
+        """Project the interactions on the internal_hexa_grid"""
+        #For each interaction in self.interactions_list compute the allocentric coordinates of the interaction
+        #and add it to the internal_hexa_grid
+        rota_radian = math.radians(self.hexa_memory.robot_angle)
+        allocentric_coordinates = []
+        for _,interaction in self.interactions_list:
+            x_prime = int(interaction.x * math.cos(rota_radian) - interaction.y * math.sin(rota_radian) + self.hexa_memory.robot_pos_x)
+            y_prime = int(interaction.y * math.cos(rota_radian) + interaction.x * math.sin(rota_radian) + self.hexa_memory.robot_pos_y)
+            allocentric_coordinates.append((x_prime,y_prime),interaction)
+        #Add the allocentric coordinates to the internal_hexa_grid
+        for allocentric_coordinate,interaction in allocentric_coordinates:
+            coordinate_x,coordinate_y = allocentric_coordinate
+            cell_x,cell_y = self.hexa_memory.convert_pos_in_cell(coordinate_x,coordinate_y)
+            self.internal_hexa_grid.add_interaction(cell_x,cell_y,interaction)
+            self.last_used_id = interaction.id
+    
+
+    def new_synthesize(self):
+        """Compare the content of the hexamemory and the internal hexa grid, apply the final status of each cell to the hexa_memory"""
+        for i in range(len(self.internal_hexa_grid.grid)):
+            for j in range(len(self.internal_hexa_grid[0])):
+                intern_status = "Free" if len(self.internal_hexa_grid[i][j].interactions) == 0 else self.internal_hexa_grid[i][j].interactions[-1].status
+
+
+
+
+    
      
     def treat_echos(self):
         """Analyse interactions created by the echolocation, to find true position of the object located """
@@ -91,12 +145,6 @@ class Synthesizer:
         for _,echo in enumerate(output):
             self.interactions_list.append(echo)
             #print("interactions :", len(self.interactions_list))
-
-        
-                    
-
-
-
 
     def compare_echolocation(self,interaction):
         """ Compare the coordinates of the interaction with the coordinates of the obstacles in the list,

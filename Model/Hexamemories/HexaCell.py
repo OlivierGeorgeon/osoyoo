@@ -21,7 +21,15 @@ class HexaCell:
 
     def leave(self):
         self.occupied = False
-        
+
+    def add_interaction(self,interaction):
+        """Add a new interaction to the list of interactions
+        """
+        self.interactions.append(interaction)
+        if not interaction in self.interactions:
+            self.interactions.append(interaction)
+
+            
     def set_to(self,status):
         """Change the cell status, print an error if the status is invalid.
         """
