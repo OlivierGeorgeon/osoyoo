@@ -19,6 +19,8 @@
  }
  void reset_gyroZ(){
     mpu.setAngleZ(0); // créer une fonction pour réinitialiser l'angle à 0 quand on ne fait plus d'action.
+    // Il faut créer cette fonction dans la librairie MPU6050_light.h ligne 91, inserer :
+    // 	void setAngleZ(float value) {angleZ = value;};
  }
  void gyro_update(){
     mpu.update(); //Créer une fonction pour update le mpu dans le loop.

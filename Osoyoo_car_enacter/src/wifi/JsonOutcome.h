@@ -25,6 +25,8 @@ class JsonOutcome
      */
     void addValue(char key[], String value);
 
+    void addInt(String, int value);
+
     /*
      * Method for deleting all key/value of "data"
      * Execute after sending json data by wifi for clear data

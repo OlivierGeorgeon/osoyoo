@@ -12,7 +12,7 @@
 #define omny_wheel_motion_h
 
 //Definition de la vitesse des roues
-#define SPEED 85
+#define SPEED 100
 
 //Selection des ports sur la cartes Arduino et la carte WIFI
 #define speedPinR 9   //  RIGHT WHEEL PWM pin D45 connect front MODEL-X ENA
