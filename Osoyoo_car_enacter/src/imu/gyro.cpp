@@ -12,10 +12,11 @@
      Serial.print(F("MPU6050 status: "));
      Serial.println(status);
      while (status != 0) { } // stop everything if could not connect to MPU6050
-       Serial.println(F("Calculating offsets, do not move MPU6050"));
-       delay(1000);
-       mpu.calcOffsets(); // gyro and accelero
-       Serial.println("Done!\n");
+     Serial.println(F("Calculating offsets, do not move MPU6050"));
+     delay(1000);
+     mpu.calcOffsets(); // gyro and accelero
+     mpu.setAngleZ(0);
+     Serial.println("Done!\n");
  }
  void reset_gyroZ(){
     mpu.setAngleZ(0); // créer une fonction pour réinitialiser l'angle à 0 quand on ne fait plus d'action.

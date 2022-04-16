@@ -72,6 +72,7 @@ class EgoMemoryWindow(pyglet.window.Window):
                                                  0, 0, 1, 0,
                                                  0, 0, 0, 1)
         self.outcome = "{}"
+        self.azimuth = 0
 
         # glLoadIdentity()
         # glTranslatef(150, 0, 0)
@@ -88,7 +89,7 @@ class EgoMemoryWindow(pyglet.window.Window):
                 self.height * self.zoom_level, 1, -1)
 
         # Stack the rotation of the world so the robot's front is up
-        # glRotatef(90, 0.0, 0.0, 1.0) #mettre le Azimuth
+        glRotatef(90 - self.azimuth, 0.0, 0.0, 1.0) #mettre le Azimuth
         # glRotatef(90, 0.0, 0.0, 1.0)
         # Draw the robot and the phenomena
         self.batch.draw()

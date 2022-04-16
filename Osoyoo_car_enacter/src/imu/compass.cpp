@@ -11,9 +11,15 @@
 #include <MPU6050.h>
 
 HMC5883L compass;
+MPU6050 _mpu;
 
 void compass_setup()
 {
+  // The compass works, but it distorts the measurement of yaw
+  _mpu.begin(MPU6050_SCALE_2000DPS, MPU6050_RANGE_2G);
+  _mpu.setI2CMasterModeEnabled(false);
+  _mpu.setI2CBypassEnabled(true) ;
+  _mpu.setSleepEnabled(false);
 
   // Initialize Initialize HMC5883L
   Serial.println("Initialize HMC5883L");

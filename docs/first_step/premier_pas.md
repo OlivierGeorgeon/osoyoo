@@ -12,6 +12,20 @@ Installer la bibliotheque "servo" via le gestionnaire de biblioltheque de Arduin
 Telecharger en ligne et Installer les bibliotheques suivantes dans /Document/arduino/librairies :
 [HMC5883L](https://github.com/jarzebski/Arduino-HMC5883L) - [Arduino_JSON](https://github.com/arduino-libraries/Arduino_JSON) - [WifiEsp](https://osoyoo.com/driver/mecanum_metal_chassis/for_mega2560/WiFiEsp-master.zip) - [MPU6050_L](https://www.arduino.cc/reference/en/libraries/mpu6050_light/) - [MPU6050](https://github.com/jarzebski/Arduino-MPU6050.git)
 
+Il faut créer la fonction setAngleZ dans la librairie MPU6050_light.h. En ligne 91, inserer :
+```
+void setAngleZ(float value) {angleZ = value;};
+```
+
+Il faut éditer MPU6050.cpp pour que la méthode begin ne revoie pas false si l'adresse n'est pas 0x68. Ligne 58:
+```
+fastRegister8(MPU6050_REG_WHO_AM_I);
+```
+
+
+La carte GY521 ne contient pas de compass. 
+La carte GY-86 contient un compass mais la mesure du compass semble fausser la mesure du yaw.
+
 ## Etape 1: L'initialisation du robot
 
 Téléverser le script principal Osoyoo_car_enacter.ino (via le logiciel arduino) dans le robot qui contient :

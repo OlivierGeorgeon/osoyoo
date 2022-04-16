@@ -55,8 +55,6 @@ int floorOutcome = 0;
 
 void setup()
 {
-// init_GPIO();
-
   Serial.begin(9600);   // initialize serial for debugging
   
   head.servo_port();
@@ -70,8 +68,8 @@ void setup()
     wifiBot.wifiInitRouter();
   }
 
-  mpu_setup();
-  // compass_setup();
+  compass_setup();
+  mpu_setup();     // After compass_setup() otherwise yaw is distorted
 }
 
 void loop()
@@ -134,10 +132,8 @@ void loop()
     outcome.addInt("head_angle", (int) (head.current_angle -  90));
     outcome.addInt("floor", (int) floorOutcome);
     outcome.addInt("status", (int) floorOutcome);
-
-    //renvoi JSON du azimuth
-    outcome.addInt( "yaw", (int) (gyroZ()));
-    outcome.addInt( "azimuth", (int) (degreesNorth()));
+    outcome.addInt("yaw", (int) (gyroZ()));
+    outcome.addInt("azimuth", (int) (degreesNorth()));
 
     //Send outcome to PC
     wifiBot.sendOutcome(outcome.get());
@@ -145,9 +141,6 @@ void loop()
     
     actionStep = 0;
     floorOutcome = 0;
-  }
-  if(actionStep == 0)
-  {
-      reset_gyroZ(); //calibrer l'angle Z à 0 tant qu'il n'a pas fait d'action
+    reset_gyroZ();
   }
 }
