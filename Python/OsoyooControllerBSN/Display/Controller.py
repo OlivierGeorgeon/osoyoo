@@ -1,3 +1,4 @@
+import sys
 import json
 from ..RobotDefine import *
 import threading
@@ -49,7 +50,7 @@ class Controller:
     def update_model(self):
         """ Updating the model from the latest received outcome """
         outcome = json.loads(self.outcome_bytes)
-        print(outcome)
+        # print(outcome)
         floor = 0
         if 'floor' in outcome:
             floor = int(outcome['floor'])
@@ -80,9 +81,8 @@ class Controller:
                 translation[1] = -SHIFT_DISTANCE
             if self.action == "8":
                 if not blocked:
-                    #translation[0] = STEP_FORWARD_DISTANCE * outcome['duration'] / 1000
+                    # translation[0] = STEP_FORWARD_DISTANCE * outcome['duration'] / 1000
                     translation[0] = 100
-
 
             # Actual measured displacement if any
             if 'yaw' in outcome:
@@ -152,12 +152,17 @@ class Controller:
 
 
 # Testing the controller by remote controlling the robot from the egocentric memory window
+# Set the IP address. Run:
+# > python -m Python.OsoyooControllerBSN.Display.Controller <Robot's IP>
 if __name__ == "__main__":
-    ip_ = "10.40.22.252"
-    emw = EgoMemoryWindow(ip=ip_)
+    ip = "192.168.4.1"
+    if len(sys.argv) > 1:
+        ip = sys.argv[1]
+    else:
+        print("Please provide your robot's IP address")
+    print("Sending to: " + ip)
+    emw = EgoMemoryWindow(ip=ip)
     controller = Controller(emw)
-
-
 
     @emw.event
     def on_text(text):

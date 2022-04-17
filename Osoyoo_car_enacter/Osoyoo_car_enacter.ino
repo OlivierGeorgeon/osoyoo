@@ -88,9 +88,13 @@ void loop()
       packetBuffer[len] = 0;
     }
 
-    JSONVar jsonReceive = JSON.parse(packetBuffer);
-    if (jsonReceive.hasOwnProperty("action")) {
-      action = ((const char*) jsonReceive["action"])[0];
+    if (len == 1) { // If one character, then it is the action
+        action = packetBuffer[0];
+    } else {        // If more than one characters, then it is a JSon string
+      JSONVar jsonReceive = JSON.parse(packetBuffer);
+      if (jsonReceive.hasOwnProperty("action")) {
+        action = ((const char*) jsonReceive["action"])[0];
+      }
     }
 
     endTime = millis() + 2000;

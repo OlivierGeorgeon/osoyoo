@@ -1,3 +1,19 @@
+# .______        _______..__   __.
+# |   _  \      /       ||  \ |  |
+# |  |_)  |    |   (----`|   \|  |
+# |   _  <      \   \    |  . `  |
+# |  |_)  | .----)   |   |  |\   |
+# |______/  |_______/    |__| \__|
+#
+#  BSN2 2021-2022
+#   Aleksei Apostolou
+#   Daniel Duval
+#   Célien Fiorelli
+#   Geordi Gampio
+#   Julina Matouassiloua
+#
+#  ESQESE. UCLy. France
+
 import pyglet
 from OsoyooControllerBSN.Display.Controller import Controller
 from OsoyooControllerBSN.Display.EgoMemoryWindow import EgoMemoryWindow
