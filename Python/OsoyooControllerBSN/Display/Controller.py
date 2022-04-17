@@ -153,7 +153,7 @@ class Controller:
 
 # Testing the controller by remote controlling the robot from the egocentric memory window
 # Set the IP address. Run:
-# > python -m Python.OsoyooControllerBSN.Display.Controller <Robot's IP>
+# python -m Python.OsoyooControllerBSN.Display.Controller <Robot's IP>
 if __name__ == "__main__":
     ip = "192.168.4.1"
     if len(sys.argv) > 1:

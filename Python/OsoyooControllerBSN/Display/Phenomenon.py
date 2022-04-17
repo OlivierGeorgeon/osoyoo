@@ -71,3 +71,7 @@ class Phenomenon:
             self.shape.x2, self.shape.y2 = v[0], v[1]
             v = matrix44.apply_to_vector(displacement_matrix, [self.shape.x3, self.shape.y3, 0])
             self.shape.x3, self.shape.y3 = v[0], v[1]
+
+    def delete(self):
+        """ Delete the shape to remove it from the batch """
+        self.shape.delete()
