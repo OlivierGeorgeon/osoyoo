@@ -1,6 +1,6 @@
 import pyglet
 from pyglet.gl import *
-from Misc import hexaMemory_to_pyglet
+from Misc.Utils import hexaMemory_to_pyglet
 from Model.Hexamemories import HexaMemory
 from webcolors import name_to_rgb
 

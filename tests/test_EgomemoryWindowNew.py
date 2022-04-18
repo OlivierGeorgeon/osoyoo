@@ -5,14 +5,14 @@ import os
 import time
 sys.path.insert(1, os.path.join(sys.path[0], '..'))
 from Osoyoo import *
-# from EgoMemoryWindowNew import EgoMemoryWindowNew
-# from ControllerNew import ControllerNew
-# from Synthesizer import Synthesizer
-# from MemoryV1 import MemoryV1
+from Views.EgoMemoryWindowNew import EgoMemoryWindowNew
+from Controllers.ControllerNew import ControllerNew
+from Model.Synthesizers.Synthesizer import Synthesizer
+from Model.Memories.MemoryV1 import MemoryV1
 from Agents.Agent6 import Agent6
-# from HexaMemory import HexaMemory
+from Model.Hexamemories.HexaMemory import HexaMemory
 import pyglet
-# from HexaView import HexaView
+from Views.HexaView import HexaView
 import json
 from Agents.Agent5 import Agent5
 
@@ -23,7 +23,14 @@ print("Control mode: MANUAL")
 
 
 # Testing ControllerNew by remote controlling the robot from the EgoMemoryWindowNew
+# py -m tests.test_EgomemoryWindowNew <ROBOT_IP>
 if __name__ == "__main__":
+    ip = "192.168.1.11"
+    if len(sys.argv) > 1:
+        ip = sys.argv[1]
+    else:
+        print("Please provide your robot's IP address")
+    print("Sending to: " + ip)
     emw = EgoMemoryWindowNew()
     emw2 = EgoMemoryWindowNew()
     emw2.set_caption("North up projection")
@@ -33,7 +40,7 @@ if __name__ == "__main__":
     agent = Agent6(memory, hexa_memory)
     hexaview = HexaView()
     synthesizer = Synthesizer(memory,hexa_memory)
-    controller = ControllerNew(agent, memory, view=emw, synthesizer = synthesizer, hexa_memory = hexa_memory, hexaview = hexaview)
+    controller = ControllerNew(agent, memory, ip, view=emw, synthesizer = synthesizer, hexa_memory = hexa_memory, hexaview = hexaview)
     controller.hexaview.extract_and_convert_interactions(controller.hexa_memory)
 
     @emw.event

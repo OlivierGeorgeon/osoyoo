@@ -8,7 +8,8 @@ from tkinter import E
 from Model import AgentRandom
 from Model import AgentAlignNorth
 from Model import MemoryV1
-from Misc import *
+from Misc.WifiInterface import WifiInterface
+from Misc.RobotDefine import *
 from Views.EgoMemoryWindowNew import EgoMemoryWindowNew
 import msvcrt
 
@@ -55,7 +56,7 @@ class ControllerNew:
             - Receive Datas from the robot
     """
 
-    def __init__(self,  agent, memory, view = None, synthesizer = None, hexa_memory = None, hexaview = None,automatic = True):
+    def __init__(self,  agent, memory, ip, view = None, synthesizer = None, hexa_memory = None, hexaview = None,automatic = True):
         # View
         self.view = view
         self.agent = agent
@@ -66,7 +67,7 @@ class ControllerNew:
         self.azimuth = 0
 
         self.automatic = automatic
-        self.wifiInterface = WifiInterface()
+        self.wifiInterface = WifiInterface(ip)
         self.outcome_bytes = b'{"status":"T"}'  # Default status T timeout
 
         self.outcome = 0

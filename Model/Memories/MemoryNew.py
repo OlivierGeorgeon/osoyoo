@@ -1,9 +1,10 @@
 import pyglet
 from pyglet.gl import *
 from pyglet import shapes
-# from Interactions import Interaction
+from Model.Interactions import Interaction
 from webcolors import name_to_rgb
-from Misc import rotate
+from Misc.RobotDefine import *
+# from Misc import rotate
 import math
 from pyrr import matrix44
 from Misc import *

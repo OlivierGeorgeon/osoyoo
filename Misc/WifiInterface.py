@@ -1,6 +1,7 @@
 import socket
 import keyboard
-from Misc import ROBOT_ID
+import sys
+from Misc.RobotDefine import ROBOT_ID
 # UDP_IP = "192.168.4.1"  # AP mode
 #UDP_IP = "192.168.1.22"  # STA chezOlivier
 # UDP_IP = "192.168.8.189"  #
@@ -46,8 +47,15 @@ def onkeypress(event):
 
 
 # Test the wifi interface by controlling the robot from the console
+# py -m Misc.WifiInterface <ROBOT_IP>
 if __name__ == '__main__':
-    wifiInterface = WifiInterface()
+    ip = UDP_IP
+    if len(sys.argv) > 1:
+        ip = sys.argv[1]
+    else:
+        print("Please provide your robot's IP address")
+    print("Sending to: " + ip)
+    wifiInterface = WifiInterface(ip)
     # keyboard.on_press(onkeypress) Suggested by Celien
     _action = ""
     while True:
