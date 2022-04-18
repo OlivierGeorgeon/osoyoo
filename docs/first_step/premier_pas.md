@@ -50,10 +50,12 @@ Et pour finir le pc doit etre connecté au routeur et normalement le pc est conn
 
 Lancer le script python main.py.
 #### Touches de déplacements et d'action : 
-    -Avancer = 8
-    -Reculer = 2
-    -Tourner a Gauche = 1
-    -Tourner a Droite = 3
-    -Arret = 5
-    -Avancer jusqu'a une ligne noir = 0
-    -Scan = '-'
+    - Avancer = 8
+    - Reculer = 2
+    - Tourner a Gauche = 1
+    - Tourner a Droite = 3
+    - Arret = 5
+    - Avancer jusqu'a une ligne noir = 0
+    - Scan = '-'
+
+    - Effacer les interactions = C

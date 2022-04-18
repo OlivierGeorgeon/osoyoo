@@ -17,6 +17,7 @@
 import pyglet
 from OsoyooControllerBSN.Display.Controller import Controller
 from OsoyooControllerBSN.Display.EgoMemoryWindow import EgoMemoryWindow
+from OsoyooControllerBSN.Display.ModalWindow import ModalWindow
 from OsoyooControllerBSN.Agent.Agent5 import Agent5
 import json
 
@@ -36,6 +37,9 @@ def main():
     @emw.event
     def on_text(text):
         global control_mode
+        if text == "C":
+            ModalWindow(controller.phenomena)
+            return
         if text.upper() == "A":
             control_mode = CONTROL_MODE_AUTOMATIC
             print("Control mode: AUTOMATIC")

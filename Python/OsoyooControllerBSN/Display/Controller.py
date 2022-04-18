@@ -7,17 +7,18 @@ from ..Display.Phenomenon import Phenomenon
 import math
 from ..Display.OsoyooCar import OsoyooCar
 from ..Display.EgoMemoryWindow import EgoMemoryWindow
+from ..Display.ModalWindow import ModalWindow
 import pyglet
 from pyrr import matrix44
 
 
 class Controller:
-    def __init__(self, view: EgoMemoryWindow):
+    def __init__(self, view: EgoMemoryWindow, robot_ip):
         # View
         self.view = view
 
         # Model
-        self.wifiInterface = WifiInterface(ip=self.view.ip)
+        self.wifiInterface = WifiInterface(robot_ip)
         self.phenomena = []
         self.robot = OsoyooCar(self.view.batch)
 
@@ -147,9 +148,6 @@ class Controller:
             if 'azimuth' in outcome:
                 self.view.azimuth = outcome['azimuth']
 
-            # Update the origin
-            # self.view.update_environment_matrix(displacement_matrix)
-
 
 # Testing the controller by remote controlling the robot from the egocentric memory window
 # Set the IP address. Run:
@@ -161,12 +159,15 @@ if __name__ == "__main__":
     else:
         print("Please provide your robot's IP address")
     print("Sending to: " + ip)
-    emw = EgoMemoryWindow(ip=ip)
-    controller = Controller(emw)
+    emw = EgoMemoryWindow()
+    controller = Controller(emw, ip)
 
     @emw.event
     def on_text(text):
         """ Receiving the action from the window and calling the controller to send the action to the robot """
+        if text == "C":
+            window = ModalWindow(controller.phenomena)
+            return
         if controller.enact_step == 0:
             if text == "/":  # Send the angle marked by the mouse click
                 # emw.on_text(text)
