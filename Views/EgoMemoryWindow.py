@@ -2,7 +2,7 @@ import pyglet
 from pyglet.gl import *
 from pyglet import shapes
 import math
-from OsoyooCar import OsoyooCar
+from Misc.OsoyooCar import OsoyooCar
 from pyrr import matrix44
 from deprecateds.Phenomenon import Phenomenon
 

@@ -1,7 +1,7 @@
 import json
-from RobotDefine import *
+from Misc.RobotDefine import *
 import threading
-from WifiInterface import WifiInterface
+from Misc.WifiInterface import WifiInterface
 from deprecateds.Phenomenon import Phenomenon
 import math
 from Views.EgoMemoryWindow import EgoMemoryWindow

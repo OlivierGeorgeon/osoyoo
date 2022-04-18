@@ -1,9 +1,8 @@
-from Resources import Interaction
-from CompositeInteraction import CompositeInteraction
-from EgoMemoryWindow import EgoMemoryWindow
-from OsoyooCar import OsoyooCar
+from Agents.Resources import Interaction
+from Agents.CompositeInteraction import CompositeInteraction
+# from EgoMemoryWindow import EgoMemoryWindow
+# from OsoyooCar import OsoyooCar
 import pyglet
-
 
 class Agent5:
     def __init__(self, hedonist_table=[[4, -2, -2, -2], [-1, -1, -1, -1], [-2, -2, -2, -2]]):

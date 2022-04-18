@@ -1,7 +1,7 @@
 import math
-from Memories import MemoryNew
-from Hexamemories import HexaMemory
-from Hexamemories import HexaGrid
+from Model.Memories import MemoryNew
+from Model.Hexamemories import HexaMemory
+from Model.Hexamemories import HexaGrid
 from Misc import translate_interaction_type_to_cell_status
 class Synthesizer:
     """ The synthesizer has the role to synthesize the short term egocentric memory

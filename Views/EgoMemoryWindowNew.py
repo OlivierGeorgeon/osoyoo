@@ -1,10 +1,10 @@
 import pyglet
 from pyglet.gl import *
 import math
-from OsoyooCar import OsoyooCar
+from Misc.OsoyooCar import OsoyooCar
 from pyrr import matrix44
 from Model.Memories.MemoryV1 import MemoryV1
-from Utils import interactionList_to_pyglet
+from Misc.Utils import interactionList_to_pyglet
 
 import time
 ZOOM_IN_FACTOR = 1.2

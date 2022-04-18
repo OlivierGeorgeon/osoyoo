@@ -4,14 +4,15 @@ import sys
 import os
 import time
 sys.path.insert(1, os.path.join(sys.path[0], '..'))
-from EgoMemoryWindowNew import EgoMemoryWindowNew
-from ControllerNew import ControllerNew
-from Synthesizer import Synthesizer
-from MemoryV1 import MemoryV1
+from Osoyoo import *
+# from EgoMemoryWindowNew import EgoMemoryWindowNew
+# from ControllerNew import ControllerNew
+# from Synthesizer import Synthesizer
+# from MemoryV1 import MemoryV1
 from Agents.Agent6 import Agent6
-from HexaMemory import HexaMemory
+# from HexaMemory import HexaMemory
 import pyglet
-from HexaView import HexaView
+# from HexaView import HexaView
 import json
 from Agents.Agent5 import Agent5
 

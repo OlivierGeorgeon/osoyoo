@@ -1,5 +1,5 @@
-from HexaMemory import HexaMemory
-from MemoryNew import MemoryNew
+# from HexaMemory import HexaMemory
+# from MemoryNew import MemoryNew
 import random
 
 class Agent6():

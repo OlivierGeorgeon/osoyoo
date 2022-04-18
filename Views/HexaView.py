@@ -1,7 +1,7 @@
 import pyglet
 from pyglet.gl import *
 from Misc import hexaMemory_to_pyglet
-from Hexamemories import HexaMemory
+from Model.Hexamemories import HexaMemory
 from webcolors import name_to_rgb
 
 NB_CELL_WIDTH = 30

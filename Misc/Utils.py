@@ -1,6 +1,6 @@
 from pyglet.gl import *
 from pyglet import shapes
-from Interactions import Interaction
+from Model.Interactions import Interaction
 from webcolors import name_to_rgb
 import math
 import random
