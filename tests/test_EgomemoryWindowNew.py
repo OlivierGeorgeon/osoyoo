@@ -43,24 +43,24 @@ if __name__ == "__main__":
     controller = ControllerNew(agent, memory, ip, view=emw, synthesizer = synthesizer, hexa_memory = hexa_memory, hexaview = hexaview)
     controller.hexaview.extract_and_convert_interactions(controller.hexa_memory)
 
-    @emw.event
-    def on_text(text):
-        global control_mode
-        if text.upper() == "A":
-            control_mode = CONTROL_MODE_AUTOMATIC
-            print("Control mode: AUTOMATIC")
-        elif text.upper() == "M":
-            control_mode = CONTROL_MODE_MANUAL
-            print("Control mode: MANUAL")
-
-        if control_mode == CONTROL_MODE_MANUAL:
-            if controller.enact_step == 0:
-                controller.action_angle = emw.mouse_press_angle
-                #  if text == "/" or text == "+":  # Send the angle marked by the mouse click
-                #      text = json.dumps({'action': text, 'angle': emw.mouse_press_angle})
-                controller.command_robot(text)
-            else:
-                print("Waiting for previous outcome before sending new action")
+    # @emw.event
+    # def on_text(text):
+    #     global control_mode
+    #     if text.upper() == "A":
+    #         control_mode = CONTROL_MODE_AUTOMATIC
+    #         print("Control mode: AUTOMATIC")
+    #     elif text.upper() == "M":
+    #         control_mode = CONTROL_MODE_MANUAL
+    #         print("Control mode: MANUAL")
+    #
+    #     if control_mode == CONTROL_MODE_MANUAL:
+    #         if controller.enact_step == 0:
+    #             controller.action_angle = emw.mouse_press_angle
+    #             #  if text == "/" or text == "+":  # Send the angle marked by the mouse click
+    #             #      text = json.dumps({'action': text, 'angle': emw.mouse_press_angle})
+    #             controller.command_robot(text)
+    #         else:
+    #             print("Waiting for previous outcome before sending new action")
 
     def main_loop(dt):
         """ Watch for the end of the previous interaction and choose the next """

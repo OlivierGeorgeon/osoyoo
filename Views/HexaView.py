@@ -92,23 +92,37 @@ class HexaView(pyglet.window.Window):
         # def set_batch(self, batch):
         #     self.batch = batch
 
-    def on_mouse_press(self, x, y, button, modifiers):
-        """ Computing the position of the mouse click in the hexagrid  """
-        # Compute the position relative to the center in mm
-        self.mouse_press_x = int((x - self.width/2)*self.zoom_level*2)
-        self.mouse_press_y = int((y - self.height/2)*self.zoom_level*2)
-        print(self.mouse_press_x, self.mouse_press_y)
-
+    # def on_mouse_press(self, x, y, button, modifiers):
+    #     """ Computing the position of the mouse click in the hexagrid  """
+    #     # Compute the position relative to the center in mm
+    #     self.mouse_press_x = int((x - self.width/2)*self.zoom_level*2)
+    #     self.mouse_press_y = int((y - self.height/2)*self.zoom_level*2)
+    #     print(self.mouse_press_x, self.mouse_press_y)
 
 
 # Testing  HexaView by displaying HexaMemory
+# py -m Views.HexaView
 if __name__ == "__main__":
     hexaview = HexaView()
 
     # Create the hexa grid
-    hexa_memory = HexaMemory(width=30, height=100, cells_radius=50)
+    hexa_memory = HexaMemory(width=30, height=100, cell_radius=50)
 
     # Create the shapes to draw the cells
     hexaview.extract_and_convert_interactions(hexa_memory)
+
+    @hexaview.event
+    def on_mouse_press(x, y, button, modifiers):
+        """ Computing the position of the mouse click in the hexagrid  """
+        # Compute the position relative to the center in mm
+        hexaview.mouse_press_x = int((x - hexaview.width/2)*hexaview.zoom_level*2)
+        hexaview.mouse_press_y = int((y - hexaview.height/2)*hexaview.zoom_level*2)
+        print(hexaview.mouse_press_x, hexaview.mouse_press_y)
+        # Find the cell
+        cell_x, cell_y = hexa_memory.convert_pos_in_cell(hexaview.mouse_press_x, hexaview.mouse_press_y)
+        print("Cell: ", cell_x, cell_y)
+        hexa_memory.grid[cell_x][cell_y].status = "Free"
+        # Refresh
+        hexaview.extract_and_convert_interactions(hexa_memory)
 
     pyglet.app.run()
