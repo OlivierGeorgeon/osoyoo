@@ -56,7 +56,7 @@ def hexaMemory_to_pyglet(hexaMemory,batch):
     x0 = 0
     y0 = 0
     #radius = 20
-    radius = hexaMemory.cells_radius
+    radius = hexaMemory.cell_radius
 
     
     hauteur = math.sqrt( (2*radius)**2 -radius**2 )

@@ -12,13 +12,13 @@ class HexaMemory(HexaGrid):
     folder.
     """
 
-    def __init__(self, width, height, cells_radius=50, robot_width=200):
+    def __init__(self, width, height, cell_radius=50, robot_width=200):
         """Construct the HexaMemory of the robot, child class of HexaGrid
         with the addition of the robot at the center of the grid and a link between the
         software and the real word, cell_radius representing the radius of a cell in the real world (in millimeters)
         """
         super().__init__(width, height)
-        self.cells_radius = cells_radius
+        self.cell_radius = cell_radius
         self.robot_cell_x = self.width // 2
         self.robot_cell_y = self.height // 2
         self.robot_pos_x = 0
@@ -65,7 +65,7 @@ class HexaMemory(HexaGrid):
 
     def depr_convert_pos_in_cell(self, pos_x, pos_y):
         """blabla"""
-        radius = self.cells_radius
+        radius = self.cell_radius
         mini_radius = math.sqrt(radius**2 - (radius/2)**2)
         nb_cells_x = 0
         if(pos_x > radius):
@@ -166,7 +166,7 @@ class HexaMemory(HexaGrid):
 
     def convert_pos_in_cell(self,pos_x, pos_y):
         """j'essaie autre chose"""
-        radius = self.cells_radius
+        radius = self.cell_radius
         mini_radius = math.sqrt(radius**2 - (radius/2)**2)
         tmp_cell_x = self.width // 2
         tmp_cell_y = self.height // 2
@@ -378,7 +378,7 @@ class HexaMemory(HexaGrid):
         distance = math.sqrt((end_x - start_x)**2 + (end_y - start_y)**2)
         if distance == 0:
             return
-        nb_step = int(distance/(self.cells_radius))
+        nb_step = int(distance / (self.cell_radius))
         if nb_step == 0:
             return
         step_x = int((end_x - start_x)/nb_step)
@@ -427,7 +427,7 @@ def depr_move(self, direction, distance):
         cells_passed = []
 
         number_of_cells_travelled = 0
-        number_of_cells_travelled = distance // (2*self.cells_radius)
+        number_of_cells_travelled = distance // (2 * self.cell_radius)
         final_cell = self.grid[self.robot_cell_x][self.robot_cell_y]
         if(number_of_cells_travelled > 0):
             x_base = self.robot_cell_x

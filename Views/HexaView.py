@@ -8,11 +8,11 @@ NB_CELL_WIDTH = 30
 NB_CELL_HEIGHT = 100
 CELL_RADIUS = 50
 
-ZOOM_IN_FACTOR = 1
+ZOOM_IN_FACTOR = 1.2
 
 
 class HexaView(pyglet.window.Window):
-    def __init__(self, width=400, height=400, shapesList = None, *args, **kwargs):
+    def __init__(self, width=400, height=400, shapesList=None, cell_radius=20, *args, **kwargs):
         super().__init__(width, height, resizable=True, *args, **kwargs)
         self.set_caption("Hexa Memory")
         self.set_minimum_size(150, 150)
@@ -29,7 +29,7 @@ class HexaView(pyglet.window.Window):
 
         self.nb_cell_x = 30
         self.nb_cell_y = 100
-        self.cell_radius = 50
+        self.cell_radius = cell_radius
 
         self.mouse_press_x = 0
         self.mouse_press_y = 0
@@ -56,7 +56,7 @@ class HexaView(pyglet.window.Window):
         self.shapesList = hexaMemory_to_pyglet(memory, self.batch)
         self.nb_cell_x = memory.width
         self.nb_cell_y = memory.height
-        self.cell_radius = memory.cells_radius
+        self.cell_radius = memory.cell_radius
 
     def on_draw(self):
         """ Drawing the window """
@@ -70,8 +70,8 @@ class HexaView(pyglet.window.Window):
                 self.height * self.zoom_level, 1, -1)
 
         # Stack the translation to center the grid in the widow
-        tx = -self.nb_cell_x * 30
-        ty = -self.nb_cell_y * 8.7
+        tx = -self.nb_cell_x * 30 * self.cell_radius / 20
+        ty = -self.nb_cell_y * 8.66 * self.cell_radius / 20
         glTranslatef(tx, ty, 0)
 
         # Draw the grid
