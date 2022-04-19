@@ -22,7 +22,8 @@ import pyglet
 #from Interaction import Interaction
 #from MemoryNew import MemoryNew
 
- 
+CONTROL_MODE_MANUAL = 0
+CONTROL_MODE_AUTOMATIC = 1
 class ControllerNew:
     """Controller of the application
     It is the only object in the application that should have access to every of the following objects :
@@ -74,30 +75,50 @@ class ControllerNew:
         self.enact_step = 0
         self.action = ""
         self.action_angle = 0
-        
+        emw = self.view if self.view is not None else None
+        self.control_mode = CONTROL_MODE_MANUAL
+        if emw is not None:
+            @emw.event
+            def on_text(text):
+                if text.upper() == "A":
+                    self.control_mode = CONTROL_MODE_AUTOMATIC
+                    print("Control mode: AUTOMATIC")
+                elif text.upper() == "M":
+                    self.control_mode = CONTROL_MODE_MANUAL
+                    print("Control mode: MANUAL")
 
+                if self.control_mode == CONTROL_MODE_MANUAL:
+                    if self.enact_step == 0:
+                        self.action_angle = emw.mouse_press_angle
+                        #  if text == "/" or text == "+":  # Send the angle marked by the mouse click
+                        #      text = json.dumps({'action': text, 'angle': emw.mouse_press_angle})
+                        self.command_robot(text)
+                    else:
+                        print("Waiting for previous outcome before sending new action")
     ################################################# LOOP #################################################################"""
 
     def main_loop(self,dt):
         """blabla"""
         robot_action = None
         # 1 : demande l'action :
-        if(self.enact_step == 0):
-            if self.automatic :
-                self.action = self.ask_agent_for_action(self.outcome) # agent -> decider
-                robot_action = self.translate_agent_action_to_robot_command(self.action)
-                
-            else :
-                print("Input ?")
-                robot_action = msvcrt.getch().decode("utf-8")
-                if robot_action == 'n':
-                    robot_action = self.action_align_north()
-                    print('Vers le nord')
-                if robot_action == 'r':
-                    robot_action = self.action_reset()
-                    print('Reset')
-        # 2 : ordonne au robot
-            self.command_robot(robot_action)
+        if self.control_mode == CONTROL_MODE_AUTOMATIC :
+            if(self.enact_step == 0):
+                self.automatic = True
+                if self.automatic :
+                    self.action = self.ask_agent_for_action(self.outcome) # agent -> decider
+                    robot_action = self.translate_agent_action_to_robot_command(self.action)
+                    
+                else :
+                    print("Input ?")
+                    robot_action = msvcrt.getch().decode("utf-8")
+                    if robot_action == 'n':
+                        robot_action = self.action_align_north()
+                        print('Vers le nord')
+                    if robot_action == 'r':
+                        robot_action = self.action_reset()
+                        print('Reset')
+            # 2 : ordonne au robot
+                self.command_robot(robot_action)
         if(self.enact_step >= 2):
             robot_data = self.outcome_bytes
             phenom_info, angle, translation, self.outcome, echo_array = self.translate_robot_data(robot_data)
