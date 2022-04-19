@@ -1,16 +1,15 @@
-from re import S
-
-
 class HexaCell:
-    """This
+    """This class represent a cell in a hexagrid
     """
     def __init__(self,x,y):
+        """Constructor of the class, x and y are the coordinates of the cell
+        """
         self.x = x
         self.y = y
         self.status = "Unknown"  # Status : "Free" (when has been visited), "Occupied" (when robot is on it), "Blocked" (when object is on it), "Unknown" (when has not been visited)
                               # "MovableObstacle" "Frontier"(when line) "Something"(when something echolocated) 
-        self.occupied = False
-        self.interactions = list()
+        self.occupied = False # True if the cell is occupied by the agent
+        self.interactions = list() # Used in Synthesizer to store the interactions that happened on the cell
         self.confidence = 1
 
     def __str__(self):
