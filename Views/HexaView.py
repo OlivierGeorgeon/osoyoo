@@ -8,7 +8,7 @@ NB_CELL_WIDTH = 30
 NB_CELL_HEIGHT = 100
 CELL_RADIUS = 50
 
-ZOOM_IN_FACTOR = 1.2
+ZOOM_IN_FACTOR = 1
 
 
 class HexaView(pyglet.window.Window):
@@ -30,6 +30,9 @@ class HexaView(pyglet.window.Window):
         self.nb_cell_x = 30
         self.nb_cell_y = 100
         self.cell_radius = 50
+
+        self.mouse_press_x = 0
+        self.mouse_press_y = 0
 
     def set_ShapesList(self,s):
         self.shapesList = s
@@ -88,6 +91,14 @@ class HexaView(pyglet.window.Window):
 
         # def set_batch(self, batch):
         #     self.batch = batch
+
+    def on_mouse_press(self, x, y, button, modifiers):
+        """ Computing the position of the mouse click in the hexagrid  """
+        # Compute the position relative to the center in mm
+        self.mouse_press_x = int((x - self.width/2)*self.zoom_level*2)
+        self.mouse_press_y = int((y - self.height/2)*self.zoom_level*2)
+        print(self.mouse_press_x, self.mouse_press_y)
+
 
 
 # Testing  HexaView by displaying HexaMemory
