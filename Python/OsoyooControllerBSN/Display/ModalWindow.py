@@ -23,8 +23,7 @@ class ModalWindow(pyglet.window.Window):
         # the on_text event called when this event is triggered
         # param : text
         print("Pressed :", text)
-        if text == "O":
-            # self.phenomena.clear()
+        if text.upper() == "O":
             for p in self.phenomena:
                 p.delete()
             self.phenomena.clear()

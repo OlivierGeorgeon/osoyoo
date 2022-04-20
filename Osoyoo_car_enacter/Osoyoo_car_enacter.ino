@@ -7,13 +7,15 @@
  * |______/  |_______/    |__| \__|
  *
  *  BSN2 2021-2022
- *  Aleksei Apostolou
- *  Daniel Duval
- *  Célien Fiorelli
- *  Geordi Gampio
- *  Julina Matouassiloua
+ *   Aleksei Apostolou, Daniel Duval, Célien Fiorelli, Geordi Gampio, Julina Matouassiloua
  *
- *  ESQESE. UCLy. France
+ *  Teachers
+ *   Raphaël Cazorla, Florian Tholin, Olivier Georgeon
+ *
+ *  Bachelor Sciences du Numerique. ESQESE. UCLy. France
+ *
+ * Warning: If libraries MPU6050_Light, MPU6050, and HMC5883L are not installed
+ * and if the robot does not have an IMU board then please comment the corresponding code below
  */
 
 #include "src/wheel/omny_wheel_motion.h"
@@ -22,10 +24,10 @@ LightSensor ls;
 int previous_floor = 0; 
 
 
-#define WifiMode "R"        //Define the wifi mode of the robot, 'R' for router and 'W' for robot connection
+#define WifiMode "R"        // Define the wifi mode of the robot, 'R' for router and 'W' for robot connection
 
-#include "src/imu/gyro.h"
-#include "src/imu/compass.h"
+#include "src/imu/gyro.h"    // Comment if the robot has no IMU
+#include "src/imu/compass.h" // Comment if the robot has no compass
 
 #include "src/wifi/JsonOutcome.h"
 JsonOutcome outcome;
@@ -68,8 +70,8 @@ void setup()
     wifiBot.wifiInitRouter();
   }
 
-  compass_setup();
-  mpu_setup();     // After compass_setup() otherwise yaw is distorted
+  compass_setup(); // Comment if the robot has no compass
+  mpu_setup();     // Must be after compass_setup() otherwise yaw is distorted
 }
 
 void loop()
@@ -114,7 +116,7 @@ void loop()
   }
   
   int current_floor = ls.tracking();
-  if (current_floor != previous_floor) // la fonction renvoi true si elle capte une ligne noir
+  if (current_floor != previous_floor) // la fonction renvoie true si elle capte une ligne noir
   {
     stop_Stop();
     if (current_floor > 0)
@@ -137,7 +139,7 @@ void loop()
     outcome.addInt("floor", (int) floorOutcome);
     outcome.addInt("status", (int) floorOutcome);
     outcome.addInt("yaw", (int) (gyroZ()));
-    outcome.addInt("azimuth", (int) (degreesNorth()));
+    outcome.addInt("azimuth", (int) (degreesNorth()));  // Comment if the robot as no compass
 
     //Send outcome to PC
     wifiBot.sendOutcome(outcome.get());
