@@ -18,7 +18,6 @@ class WifiInterface:
         self.socket.settimeout(self.udpTimeout)
         # self.socket.connect((UDP_IP, UDP_PORT))  # Not necessary
 
-    '''Send the action. Return the outcome'''
     def enact(self, action):
         """ Sending the action string, waiting for the outcome, and returning the outcome bytes """
         outcome = b'{"status":"T"}'  # Default status T if timeout
@@ -35,6 +34,7 @@ def onkeypress(event):
     outcome = wifiInterface.enact({"action":event.name})
     print(outcome)
     
+
 # Test the wifi interface by controlling the robot from the console
 if __name__ == '__main__':
     wifiInterface = WifiInterface()
