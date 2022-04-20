@@ -2,6 +2,7 @@ import pyglet
 from pyglet.gl import *
 from pyglet import shapes
 from Model.Interactions import Interaction
+from Model.Interactions.Interaction import INTERACTION_TRESPASSING, INTERACTION_ECHO, INTERACTION_BLOCK, INTERACTION_SHOCK
 from webcolors import name_to_rgb
 from Misc.RobotDefine import *
 # from Misc import rotate
@@ -43,24 +44,24 @@ class MemoryNew:
         durability = INTERACTION_PERSISTENCE
 
         if(floor):
-            floorInter = Interaction(LINE_X,0,10,60,type = 'Line', shape = 'Rectangle', color= 'black', durability = durability, decayIntensity = 1, id = self.current_id)
+            floorInter = Interaction(LINE_X,0,10,60,type = INTERACTION_TRESPASSING, shape = 'Rectangle', color= 'black', durability = durability, decayIntensity = 1, id = self.current_id)
             self.interactions.append(floorInter)
         if shock:
             shockInter = None
             if(shock == 0b01):
-                shockInter = Interaction(110,-80,20,60, type = 'shock', shape = 'Star',color = 'yellow', durability = durability, decayIntensity = 1, starArgs = 5, id = self.current_id)
+                shockInter = Interaction(110,-80,20,60, type = INTERACTION_SHOCK, shape = 'Star',color = 'yellow', durability = durability, decayIntensity = 1, starArgs = 5, id = self.current_id)
                 #Star(x, y, outer_radius, inner_radius, num_spikes, rotation=0, color=(255, 255, 255), batch=None, group=None)
             if(shock == 0b11):
-                shockInter = Interaction(110,0,20,60, type = 'shock', shape = 'Star',color = 'yellow', durability = durability, decayIntensity = 1, starArgs = 5, id = self.current_id)
+                shockInter = Interaction(110,0,20,60, type = INTERACTION_SHOCK, shape = 'Star',color = 'yellow', durability = durability, decayIntensity = 1, starArgs = 5, id = self.current_id)
             else :
-                shockInter = Interaction(110,80,20,60, type = 'shock', shape = 'Star',color = 'yellow', durability = durability, decayIntensity = 1, starArgs = 5, id = self.current_id)
+                shockInter = Interaction(110,80,20,60, type = INTERACTION_SHOCK, shape = 'Star',color = 'yellow', durability = durability, decayIntensity = 1, starArgs = 5, id = self.current_id)
             self.interactions.append(shockInter)
         if blocked :
-            blockInter =  Interaction(110,0,20,60, type = 'block', shape = 'Star',color = 'red', durability = durability, decayIntensity = 1, starArgs = 6, id = self.current_id)
+            blockInter =  Interaction(110,0,20,60, type = INTERACTION_BLOCK, shape = 'Star',color = 'red', durability = durability, decayIntensity = 1, starArgs = 6, id = self.current_id)
             self.interactions.append(blockInter)
 
         if obstacle :
-            obstacleInter = Interaction(x,y,width = 5,type = 'obstacle', shape = 'Circle', color = 'orange', durability = durability, decayIntensity = 1, id = self.current_id)
+            obstacleInter = Interaction(x,y,width = 5,type = INTERACTION_ECHO, shape = 'Circle', color = 'orange', durability = durability, decayIntensity = 1, id = self.current_id)
             self.interactions.append(obstacleInter)
         
         self.current_id += 1
@@ -72,7 +73,7 @@ class MemoryNew:
             x = echo[0]
             #print("add_echo_array, x :",x)
             y = echo[1]
-            obstacleInter = Interaction(x,y,width = 15,type = 'obstacle', shape = 'Circle', color = 'orange', durability = durability, decayIntensity = 1, id = self.current_id)
+            obstacleInter = Interaction(x,y,width = 15,type = INTERACTION_ECHO, shape = 'Circle', color = 'orange', durability = durability, decayIntensity = 1, id = self.current_id)
             self.interactions.append(obstacleInter)
             self.current_id += 1
     def tick(self):
@@ -82,18 +83,6 @@ class MemoryNew:
 
     def empty(self):
         self.interactions.clear()
-
-    # def actualize(self, angle, distance):
-    #     self.tick()
-    #     for i in range(0, len(self.interactions)):
-    #         p = self.interactions[i]
-    #         x, y = rotate(p.x,p.y,angle)
-    #         p.x = x
-    #         p.y = y
-    #
-    #         p.y -= distance
-    #
-    #     # interaction avec durability >= 0
 
     def move(self, rotation, translation):
         """ Compute the displacement matrix and apply it to the interactions """

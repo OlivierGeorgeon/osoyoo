@@ -3,6 +3,11 @@ from pyrr import matrix44, Quaternion
 import math
 
 
+INTERACTION_ECHO = 'Echo'
+INTERACTION_BLOCK = 'Block'
+INTERACTION_SHOCK = 'Shock'
+INTERACTION_TRESPASSING = 'Trespassing'
+
 class Interaction:
     """This class implements phenomenons with object-oriented programming, that can be stored in a MemoryNew object and then translated to pyglet shapes.
       

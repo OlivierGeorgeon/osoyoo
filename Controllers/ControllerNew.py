@@ -5,9 +5,9 @@ import random
 import threading
 import time
 from tkinter import E
-from Model import AgentRandom
-from Model import AgentAlignNorth
-from Model import MemoryV1
+from Model.Agents import AgentRandom
+from Model.Agents import AgentAlignNorth
+from Model.Memories import MemoryV1
 from Misc.WifiInterface import WifiInterface
 from Misc.RobotDefine import *
 from Views.EgoMemoryWindowNew import EgoMemoryWindowNew
@@ -111,9 +111,6 @@ class ControllerNew:
                 else :
                     print("Input ?")
                     robot_action = msvcrt.getch().decode("utf-8")
-                    if robot_action == 'n':
-                        robot_action = self.action_align_north()
-                        print('Vers le nord')
                     if robot_action == 'r':
                         robot_action = self.action_reset()
                         print('Reset')
@@ -199,17 +196,12 @@ class ControllerNew:
         thread = threading.Thread(target=enact_thread)
         thread.start()
 
+        # Cas d'actions particulières :
+        if action == "r":
+            self.action_reset()
+
     ################################################# SPECIFIC TASKS #################################################################
 
-    def action_align_north(self):
-        """Compute the angle to align the robot with the north, and create the string for the corresponding action"""
-        action = '0'
-        if((controller.azimuth < 354 and controller.azimuth > 6) or controller.azimuth == 0): # if the angle is too small it makes the robot crash
-                        if controller.azimuth > 180 :
-                            action = json.dumps({'action': '/', 'angle': controller.azimuth-360})
-                        else:
-                            action = json.dumps({'action': '/', 'angle': controller.azimuth})
-        return action
 
     def action_reset(self):
         """Reset everything"""
@@ -228,7 +220,7 @@ class ControllerNew:
         """ Translate the agent action to robot commands
         """
         # 0-> '8', 1-> '1', 2-> '3', 3 -> 'tourne vers le nord'
-        commands = ['8', '1', '3',self.action_align_north()]
+        commands = ['8', '1', '3']
         return commands[action]
 
     def translate_robot_data(self,data): #PAS FINITO ?
@@ -354,3 +346,16 @@ class ControllerNew:
 
         angle = rotation
         return  phenom_info, angle, translation, outcome_for_agent,echo_array
+
+
+if __name__ == '__main__':
+    from Osoyoo import *
+    mem = MemoryV1()
+    hexMem = HexaMemory(50,200, cell_radius = 20)
+    synthe = Synthesizer(mem,hexMem)
+    view = EgoMemoryWindowNew()
+    hexaview = HexaView()
+    controller = ControllerNew(Agent6(mem,hexMem),mem, ip = "192.168.8.189",synthesizer = synthe, hexa_memory = hexMem,
+                        view = view, hexaview = hexaview, automatic = False)
+    print("Debut loop")
+    controller.main()
