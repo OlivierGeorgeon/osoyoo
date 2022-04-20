@@ -1,3 +1,4 @@
+import sys
 import json
 from ..RobotDefine import *
 import threading
@@ -6,17 +7,18 @@ from ..Display.Phenomenon import Phenomenon
 import math
 from ..Display.OsoyooCar import OsoyooCar
 from ..Display.EgoMemoryWindow import EgoMemoryWindow
+from ..Display.ModalWindow import ModalWindow
 import pyglet
 from pyrr import matrix44
 
 
 class Controller:
-    def __init__(self, view: EgoMemoryWindow):
+    def __init__(self, view: EgoMemoryWindow, robot_ip):
         # View
         self.view = view
 
         # Model
-        self.wifiInterface = WifiInterface(ip=self.view.ip)
+        self.wifiInterface = WifiInterface(robot_ip)
         self.phenomena = []
         self.robot = OsoyooCar(self.view.batch)
 
@@ -49,7 +51,7 @@ class Controller:
     def update_model(self):
         """ Updating the model from the latest received outcome """
         outcome = json.loads(self.outcome_bytes)
-        print(outcome)
+        # print(outcome)
         floor = 0
         if 'floor' in outcome:
             floor = int(outcome['floor'])
@@ -80,9 +82,8 @@ class Controller:
                 translation[1] = -SHIFT_DISTANCE
             if self.action == "8":
                 if not blocked:
-                    #translation[0] = STEP_FORWARD_DISTANCE * outcome['duration'] / 1000
+                    # translation[0] = STEP_FORWARD_DISTANCE * outcome['duration'] / 1000
                     translation[0] = 100
-
 
             # Actual measured displacement if any
             if 'yaw' in outcome:
@@ -147,21 +148,26 @@ class Controller:
             if 'azimuth' in outcome:
                 self.view.azimuth = outcome['azimuth']
 
-            # Update the origin
-            # self.view.update_environment_matrix(displacement_matrix)
-
 
 # Testing the controller by remote controlling the robot from the egocentric memory window
+# Set the IP address. Run:
+# python -m Python.OsoyooControllerBSN.Display.Controller <Robot's IP>
 if __name__ == "__main__":
-    ip_ = "10.40.22.252"
-    emw = EgoMemoryWindow(ip=ip_)
-    controller = Controller(emw)
-
-
+    ip = "192.168.4.1"
+    if len(sys.argv) > 1:
+        ip = sys.argv[1]
+    else:
+        print("Please provide your robot's IP address")
+    print("Sending to: " + ip)
+    emw = EgoMemoryWindow()
+    controller = Controller(emw, ip)
 
     @emw.event
     def on_text(text):
         """ Receiving the action from the window and calling the controller to send the action to the robot """
+        if text == "C":
+            window = ModalWindow(controller.phenomena)
+            return
         if controller.enact_step == 0:
             if text == "/":  # Send the angle marked by the mouse click
                 # emw.on_text(text)

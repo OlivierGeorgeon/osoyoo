@@ -11,6 +11,11 @@ void JsonOutcome::addValue(char key[], String value)
     data[(String) key] = value;
 }
 
+void JsonOutcome::addInt(String key, int value)
+{
+    data[key] = value;
+}
+
 String JsonOutcome::get()
 {
     return JSON.stringify(data);

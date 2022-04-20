@@ -1,28 +1,38 @@
-/*  ___   ___  ___  _   _  ___   ___   ____ ___  ____  
- * / _ \ /___)/ _ \| | | |/ _ \ / _ \ / ___) _ \|    \ 
- *| |_| |___ | |_| | |_| | |_| | |_| ( (__| |_| | | | |
- * \___/(___/ \___/ \__  |\___/ \___(_)____)___/|_|_|_|
- *                  (____/ 
- * Arduino Mecanum Omni Direction Wheel Robot Car Lesson5 Wifi Control
- * Tutorial URL http://osoyoo.com/?p=30022
- * CopyRight www.osoyoo.com
- * 
+/*
+ * .______        _______..__   __.
+ * |   _  \      /       ||  \ |  |
+ * |  |_)  |    |   (----`|   \|  |
+ * |   _  <      \   \    |  . `  |
+ * |  |_)  | .----)   |   |  |\   |
+ * |______/  |_______/    |__| \__|
+ *
+ *  BSN2 2021-2022
+ *   Aleksei Apostolou, Daniel Duval, Célien Fiorelli, Geordi Gampio, Julina Matouassiloua
+ *
+ *  Teachers
+ *   Raphaël Cazorla, Florian Tholin, Olivier Georgeon
+ *
+ *  Bachelor Sciences du Numerique. ESQESE. UCLy. France
+ *
+ * Warning: If libraries MPU6050_Light, MPU6050, and HMC5883L are not installed
+ * and if the robot does not have an IMU board then please comment the corresponding code below
  */
+
 #include "src/wheel/omny_wheel_motion.h"
 #include "src/lightSensor/LightSensor.h"
 LightSensor ls;
 int previous_floor = 0; 
 
 
-#define WifiMode "R"        //Define the wifi mode of the robot, 'R' for router and 'W' for robot connection
+#define WifiMode "R"        // Define the wifi mode of the robot, 'R' for router and 'W' for robot connection
 
-#include "src/imu/gyro.h"
-#include "src/imu/compass.h"
+#include "src/imu/gyro.h"    // Comment if the robot has no IMU
+#include "src/imu/compass.h" // Comment if the robot has no compass
 
 #include "src/wifi/JsonOutcome.h"
 JsonOutcome outcome;
 
-#include "src/head/Head.h";
+#include "src/head/Head.h"
 Head head;
 
 #include "src/utils/DelayAction.h"
@@ -47,8 +57,6 @@ int floorOutcome = 0;
 
 void setup()
 {
-// init_GPIO();
-
   Serial.begin(9600);   // initialize serial for debugging
   
   head.servo_port();
@@ -62,8 +70,8 @@ void setup()
     wifiBot.wifiInitRouter();
   }
 
-  // mpu_setup();
-  // compass_setup();
+  compass_setup(); // Comment if the robot has no compass
+  mpu_setup();     // Must be after compass_setup() otherwise yaw is distorted
 }
 
 void loop()
@@ -71,7 +79,7 @@ void loop()
   da.checkDelayAction(millis());
   
   int packetSize = wifiBot.Udp.parsePacket();
-  // gyro_update();
+  gyro_update();
 
   if (packetSize) { // if you get a client
     Serial.print("Received packet of size ");
@@ -82,9 +90,13 @@ void loop()
       packetBuffer[len] = 0;
     }
 
-    JSONVar jsonReceive = JSON.parse(packetBuffer);
-    if (jsonReceive.hasOwnProperty("action")) {
-      action = ((const char*) jsonReceive["action"])[0];
+    if (len == 1) { // If one character, then it is the action
+        action = packetBuffer[0];
+    } else {        // If more than one characters, then it is a JSon string
+      JSONVar jsonReceive = JSON.parse(packetBuffer);
+      if (jsonReceive.hasOwnProperty("action")) {
+        action = ((const char*) jsonReceive["action"])[0];
+      }
     }
 
     endTime = millis() + 2000;
@@ -104,7 +116,7 @@ void loop()
   }
   
   int current_floor = ls.tracking();
-  if (current_floor != previous_floor) // la fonction renvoi true si elle capte une ligne noir
+  if (current_floor != previous_floor) // la fonction renvoie true si elle capte une ligne noir
   {
     stop_Stop();
     if (current_floor > 0)
@@ -122,14 +134,12 @@ void loop()
   {
     stop_Stop();
     
-    outcome.addValue("echo_distance", (String) head.distUS.dist());
-    outcome.addValue("head_angle", (String) (head.current_angle -  90));
-    outcome.addValue( "floor", (String) floorOutcome);
-    outcome.addValue( "status", (String) floorOutcome);
-
-    //renvoi JSON du azimuth
-    // outcome.addValue( "yaw", (String) (gyroZ()));
-    // outcome.addValue( "compass", (String) (degreesNorth()));
+    outcome.addInt("echo_distance", (int) head.distUS.dist());
+    outcome.addInt("head_angle", (int) (head.current_angle -  90));
+    outcome.addInt("floor", (int) floorOutcome);
+    outcome.addInt("status", (int) floorOutcome);
+    outcome.addInt("yaw", (int) (gyroZ()));
+    outcome.addInt("azimuth", (int) (degreesNorth()));  // Comment if the robot as no compass
 
     //Send outcome to PC
     wifiBot.sendOutcome(outcome.get());
@@ -137,9 +147,6 @@ void loop()
     
     actionStep = 0;
     floorOutcome = 0;
-  }
-  if(actionStep == 0)
-  {
-      // reset_gyroZ(); //calibrer l'angle Z à 0 tant qu'il n'a pas fait d'action
+    reset_gyroZ();
   }
 }

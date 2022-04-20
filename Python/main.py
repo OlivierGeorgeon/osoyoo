@@ -1,25 +1,44 @@
+# .______        _______..__   __.
+# |   _  \      /       ||  \ |  |
+# |  |_)  |    |   (----`|   \|  |
+# |   _  <      \   \    |  . `  |
+# |  |_)  | .----)   |   |  |\   |
+# |______/  |_______/    |__| \__|
+#
+#  BSN2 2021-2022
+#   Aleksei Apostolou, Daniel Duval, Célien Fiorelli, Geordi Gampio, Julina Matouassiloua
+#
+#  Teachers
+#   Raphaël Cazorla, Florian Tholin, Olivier Georgeon
+#
+#  Bachelor Sciences du Numérique. ESQESE. UCLy. France
+#
+
 import pyglet
 from OsoyooControllerBSN.Display.Controller import Controller
 from OsoyooControllerBSN.Display.EgoMemoryWindow import EgoMemoryWindow
+from OsoyooControllerBSN.Display.ModalWindow import ModalWindow
 from OsoyooControllerBSN.Agent.Agent5 import Agent5
 import json
+import sys
 
 CONTROL_MODE_MANUAL = 0
 CONTROL_MODE_AUTOMATIC = 1
 control_mode = CONTROL_MODE_MANUAL
-print("Control mode: MANUAL")
 
 
-def main():
+def main(ip):
     """ Controlling the robot with Agent5 """
-    ip_ = "10.40.22.254"
-    emw = EgoMemoryWindow(ip=ip_)
-    controller = Controller(emw)
+    emw = EgoMemoryWindow()
+    controller = Controller(emw, ip)
     agent = Agent5()
 
     @emw.event
     def on_text(text):
         global control_mode
+        if text.upper() == "C":
+            ModalWindow(controller.phenomena)
+            return
         if text.upper() == "A":
             control_mode = CONTROL_MODE_AUTOMATIC
             print("Control mode: AUTOMATIC")
@@ -64,4 +83,15 @@ def main():
     pyglet.app.run()
 
 
-main()
+#################################################################
+# Running the main demo
+# Please provide the Robot's IP address as a launch argument
+#################################################################
+robot_ip = "192.168.4.1"
+if len(sys.argv) > 1:
+    robot_ip = sys.argv[1]
+else:
+    print("Please provide your robot's IP address")
+print("EXPECTED ROBOT IP: " + robot_ip)
+print("Control mode: MANUAL")
+main(robot_ip)

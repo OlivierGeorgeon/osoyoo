@@ -12,13 +12,16 @@
      Serial.print(F("MPU6050 status: "));
      Serial.println(status);
      while (status != 0) { } // stop everything if could not connect to MPU6050
-       Serial.println(F("Calculating offsets, do not move MPU6050"));
-       delay(1000);
-       mpu.calcOffsets(); // gyro and accelero
-       Serial.println("Done!\n");
+     Serial.println(F("Calculating offsets, do not move MPU6050"));
+     delay(1000);
+     mpu.calcOffsets(); // gyro and accelero
+     mpu.setAngleZ(0);
+     Serial.println("Done!\n");
  }
  void reset_gyroZ(){
     mpu.setAngleZ(0); // créer une fonction pour réinitialiser l'angle à 0 quand on ne fait plus d'action.
+    // Il faut créer cette fonction dans la librairie MPU6050_light.h ligne 91, inserer :
+    // 	void setAngleZ(float value) {angleZ = value;};
  }
  void gyro_update(){
     mpu.update(); //Créer une fonction pour update le mpu dans le loop.

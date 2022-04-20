@@ -51,12 +51,13 @@ void Head::scan(int angleMin, int angleMax, int Nbre_mesure, int index_0) {
   int angle;
   for (int pos = 0; pos <= Nbre_mesure; pos++) {
     head_servo.write(angleMin+(pas*pos));
-    delay(300);
+    delay(150);
     distances[pos] = distUS.dist();
   }
   indexMin = getIndexMin(Nbre_mesure, distances);
   angle = (indexMin + index_0)*pas;
   head_servo.write(angle);
+  delay(150); // Wait because it will read the distance again
   current_angle = angle;
 }
 
