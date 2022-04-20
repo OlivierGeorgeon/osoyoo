@@ -1,7 +1,7 @@
 import socket
 import keyboard
 import sys
-from Misc.RobotDefine import ROBOT_ID
+from .. Misc.RobotDefine import ROBOT_ID
 # UDP_IP = "192.168.4.1"  # AP mode
 #UDP_IP = "192.168.1.22"  # STA chezOlivier
 # UDP_IP = "192.168.8.189"  #

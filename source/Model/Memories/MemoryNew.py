@@ -1,14 +1,14 @@
 import pyglet
 from pyglet.gl import *
 from pyglet import shapes
-from Model.Interactions import Interaction
-from Model.Interactions.Interaction import INTERACTION_TRESPASSING, INTERACTION_ECHO, INTERACTION_BLOCK, INTERACTION_SHOCK
+from ... Model.Interactions.Interaction import Interaction
+from ... Model.Interactions.Interaction import INTERACTION_TRESPASSING, INTERACTION_ECHO, INTERACTION_BLOCK, INTERACTION_SHOCK
 from webcolors import name_to_rgb
-from Misc.RobotDefine import *
+from ... Misc.RobotDefine import *
 # from Misc import rotate
 import math
 from pyrr import matrix44
-from Misc import *
+from  ... Misc import *
 
 INTERACTION_PERSISTENCE = 20
 

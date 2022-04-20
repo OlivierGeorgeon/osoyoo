@@ -1,10 +1,10 @@
 from pyglet.gl import *
 from pyglet import shapes
-from Model.Interactions import Interaction
+from .. Model.Interactions import Interaction
 from webcolors import name_to_rgb
 import math
 import random
-from Model.Interactions.Interaction import INTERACTION_TRESPASSING, INTERACTION_ECHO, INTERACTION_BLOCK, INTERACTION_SHOCK
+from .. Model.Interactions.Interaction import INTERACTION_TRESPASSING, INTERACTION_ECHO, INTERACTION_BLOCK, INTERACTION_SHOCK
 
 """Utils to make the project more modulable, if you decide to change the package
 used for the view you should just have to create a phenomList_to_whatev 

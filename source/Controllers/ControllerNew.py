@@ -5,12 +5,12 @@ import random
 import threading
 import time
 from tkinter import E
-from Model.Agents import AgentRandom
-from Model.Agents import AgentAlignNorth
-from Model.Memories import MemoryV1
-from Misc.WifiInterface import WifiInterface
-from Misc.RobotDefine import *
-from Views.EgoMemoryWindowNew import EgoMemoryWindowNew
+from .. Model.Agents import AgentRandom
+from .. Model.Agents import AgentAlignNorth
+from .. Model.Memories import MemoryV1
+from .. Misc.WifiInterface import WifiInterface
+from .. Misc.RobotDefine import *
+from .. Views.EgoMemoryWindowNew import EgoMemoryWindowNew
 import msvcrt
 
 

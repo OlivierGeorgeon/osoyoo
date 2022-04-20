@@ -1,7 +1,7 @@
 import math
-from Model.Hexamemories import HexaGrid
-from Misc.Utils import translate_interaction_type_to_cell_status
-from Model.Interactions.Interaction import INTERACTION_TRESPASSING, INTERACTION_ECHO, INTERACTION_BLOCK, INTERACTION_SHOCK
+from ... Model.Hexamemories.HexaGrid import HexaGrid
+from ... Misc.Utils import translate_interaction_type_to_cell_status
+from ... Model.Interactions.Interaction import INTERACTION_TRESPASSING, INTERACTION_ECHO, INTERACTION_BLOCK, INTERACTION_SHOCK
 class Synthesizer:
     """ The synthesizer has the role to synthesize the short term egocentric memory
         and the long term allocentric hexa_memory.
