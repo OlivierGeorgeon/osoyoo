@@ -1,4 +1,4 @@
-from source import *
+from stage_titouan import *
 mem = MemoryV1()
 hexMem = HexaMemory(50,200, cell_radius = 20)
 synthe = Synthesizer(mem,hexMem)
