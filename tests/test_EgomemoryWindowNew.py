@@ -4,17 +4,7 @@ import sys
 import os
 import time
 sys.path.insert(1, os.path.join(sys.path[0], '..'))
-from Osoyoo import *
-from Views.EgoMemoryWindowNew import EgoMemoryWindowNew
-from Controllers.ControllerNew import ControllerNew
-from Model.Synthesizers.Synthesizer import Synthesizer
-from Model.Memories.MemoryV1 import MemoryV1
-from Agents.Agent6 import Agent6
-from Model.Hexamemories.HexaMemory import HexaMemory
-import pyglet
-from Views.HexaView import HexaView
-import json
-from Agents.Agent5 import Agent5
+from stage_titouan import *
 
 CONTROL_MODE_MANUAL = 0
 CONTROL_MODE_AUTOMATIC = 1

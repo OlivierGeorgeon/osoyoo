@@ -34,6 +34,7 @@ class Synthesizer:
         self.mode = MANUAL_MODE
 
         self.indecisive_cells = []
+        self.synthetizing_step = 0  # 0: idle. 1: Projection ready, waiting for decision. 2: decision mode, hexamem adjusted.
 
     def reset(self):
         """ Reset the internal_hexa_grid """
