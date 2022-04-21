@@ -21,20 +21,18 @@ class EgoMemoryWindowNew(pyglet.window.Window):
 
         self.robot = OsoyooCar(self.batch)
 
-        # self.origin = shapes.Rectangle(0, 0, 60, 40, color=(150, 150, 225))
-        # self.origin.anchor_position = 30, 20
         self.total_displacement_matrix = matrix44.create_identity()
         self.azimuth = 0
         self.shapesList = shapesList
-        # self.mouse_press_x = 0
-        # self.mouse_press_y = 0
         self.mouse_press_angle = 0
         self.window = None
 
     def set_ShapesList(self, s):
+        # Not used
         self.shapesList = s
 
     def extract_and_convert_interactions(self, memory):
+        """ Retrieve the interactions from memory and create the shapes in the batch """
         self.shapesList = interactionList_to_pyglet(memory.interactions, self.batch)
 
     def on_draw(self):
