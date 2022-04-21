@@ -217,19 +217,34 @@ class Synthesizer:
                 self.last_used_id = max(interaction.id,self.last_used_id)
                 already_used_cells.append((cell_x,cell_y))
 
-    def synthesize_step(self):
+    def projection_step(self):
         """Compare the content of the hexamemory and the internal hexa grid, depending on the mode apply a final status to the cell or ask
         the user to take a decision."""
+        if self.mode == AUTOMATIC_MODE :
+            self.synthetizing_step = 2
+            return
         for i,row in enumerate(self.internal_hexa_grid.grid):
             for j, cell in enumerate(row):
                 intern_status = "Free" if len(cell.interactions) == 0 else translate_interaction_type_to_cell_status(cell.interactions[-1].type)
                 current_status = self.hexa_memory.grid[i][j].status
                 if self.mode == MANUAL_MODE :
-                    if intern_status != "Free" and intern_status != current_status :
+                    if intern_status not in ["Free", current_status] :
                         self.indecisive_cells.append((i,j), intern_status)
+                        self.synthetizing_step = 1 # A cell need user decision, so we enter synthetizing step 1
+        self.synthetizing_step = 2 if not self.synthetizing_step==1 else 1 # If self.synthetizing_step == 1 we need user decision
+        #before synthetizing, so we stay in 1 else we can synthesize right away so we go in step 2
 
-        self.last_used_id_on_last_round = self.last_used_id
-
+    def synthesize_step(self):
+        """If the projection is finished, synthesize"""
+        if self.synthetizing_step != 2 :
+            return
+        #Compare the content of the hexamemory and the internal hexa grid, apply the final status of each cell to the hexa_memory
+        for i,row in enumerate(self.internal_hexa_grid.grid):
+            for j, cell in enumerate(row):
+                intern_status = "Free" if len(cell.interactions) == 0 else translate_interaction_type_to_cell_status(cell.interactions[-1].type)
+                current_status = self.hexa_memory.grid[i][j].status
+                final_status = current_status if intern_status == "Free" else intern_status
+                self.hexa_memory.grid[i][j].status = final_status
 class obstacle():
 
     def __init__(self,x,y, cell_x = None, cell_y = None):
