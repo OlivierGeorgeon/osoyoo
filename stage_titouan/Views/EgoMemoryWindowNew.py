@@ -87,6 +87,7 @@ class EgoMemoryWindowNew(pyglet.window.Window):
 
 
 # Displaying EgoMemoryWindowNew with phenomena in MemoryV1
+# py -m Views.EgoMemoryWindowNew
 if __name__ == "__main__":
     emw = EgoMemoryWindowNew()
     emw.robot.rotate_head(-45)
