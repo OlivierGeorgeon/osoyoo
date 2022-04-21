@@ -33,6 +33,8 @@ class HexaView(pyglet.window.Window):
 
         self.mouse_press_x = 0
         self.mouse_press_y = 0
+        self.label = pyglet.text.Label('0', font_name='Arial', font_size=200, x=0, y=-300, batch = self.batch)
+        self.label.color = (0,0,0,255)
 
     def set_ShapesList(self,s):
         self.shapesList = s
@@ -101,6 +103,7 @@ class HexaView(pyglet.window.Window):
 
 
 # Testing  HexaView by displaying HexaMemory
+# Click on a cell to change its status
 # py -m Views.HexaView
 if __name__ == "__main__":
     hexaview = HexaView()
@@ -121,8 +124,18 @@ if __name__ == "__main__":
         # Find the cell
         cell_x, cell_y = hexa_memory.convert_pos_in_cell(hexaview.mouse_press_x, hexaview.mouse_press_y)
         print("Cell: ", cell_x, cell_y)
+        hexaview.label.text = "Cell: " + str(cell_x) + ", " + str(cell_y)
         hexa_memory.grid[cell_x][cell_y].status = "Free"
         # Refresh
         hexaview.extract_and_convert_interactions(hexa_memory)
+
+    @hexaview.event
+    def on_mouse_motion(x, y, dx, dy):
+        mouse_x = int((x - hexaview.width/2)*hexaview.zoom_level*2)
+        mouse_y = int((y - hexaview.height/2)*hexaview.zoom_level*2)
+        # Find the cell
+        cell_x, cell_y = hexa_memory.convert_pos_in_cell(mouse_x, mouse_y)
+        print("Cell: ", cell_x, cell_y)
+        hexaview.label.text = "Cell: " + str(cell_x) + ", " + str(cell_y)
 
     pyglet.app.run()
