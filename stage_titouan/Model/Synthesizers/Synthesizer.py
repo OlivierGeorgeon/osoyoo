@@ -27,6 +27,7 @@ class Synthesizer:
         self.interactions_list = []
         self.max_delta = 200
         self.obstacles_list = []
+        self.synthetizing_step = 0  # 0: idle. 1: Projection ready, waiting for decision. 2: decision mode, hexamem adjusted.
 
     def reset(self):
         """ Reset the internal_hexa_grid """
