@@ -12,6 +12,7 @@ ZOOM_IN_FACTOR = 1.2
 
 
 class HexaView(pyglet.window.Window):
+    """blabla"""
     def __init__(self, width=400, height=400, shapesList=None, cell_radius=20, *args, **kwargs):
         super().__init__(width, height, resizable=True, *args, **kwargs)
         self.set_caption("Hexa Memory")
@@ -35,6 +36,9 @@ class HexaView(pyglet.window.Window):
         self.mouse_press_y = 0
         self.label = pyglet.text.Label('0', font_name='Arial', font_size=200, x=0, y=-300, batch = self.batch)
         self.label.color = (0,0,0,255)
+
+        self.need_user_action = False
+        self.user_acted = False
 
     def set_ShapesList(self,s):
         self.shapesList = s
@@ -60,6 +64,8 @@ class HexaView(pyglet.window.Window):
         self.nb_cell_y = memory.height
         self.cell_radius = memory.cell_radius
 
+    def show_indecisive_cell(self,indecisive_cell):
+        self.indecisive_cell_shape = indecisive_cell_to_pyglet(indecisive_cell,batch)
     def on_draw(self):
         """ Drawing the window """
         glClear(GL_COLOR_BUFFER_BIT)

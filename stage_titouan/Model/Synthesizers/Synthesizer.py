@@ -35,7 +35,7 @@ class Synthesizer:
 
         self.indecisive_cells = []
         self.synthetizing_step = 0  # 0: idle. 1: Projection ready, waiting for decision. 2: decision mode, hexamem adjusted.
-
+        self.decided_cells = []
     def reset(self):
         """ Reset the internal_hexa_grid """
         self.internal_hexa_grid = HexaGrid(self.hexa_memory.width, self.hexa_memory.height)
@@ -47,6 +47,7 @@ class Synthesizer:
         """Create phenoms based on Interactions in memory and States in hexa_memory"""
         #Firstly : keep only the interactions that are not already treated (id > last_used_id)
         self.indecisive_cells = []
+        self.decided_cells = []
         self.interactions_list = []
         self.interactions_list = [elem for elem in self.memory.interactions if elem.id>self.last_used_id]
         for i,row in enumerate(self.internal_hexa_grid.grid):
@@ -245,6 +246,21 @@ class Synthesizer:
                 current_status = self.hexa_memory.grid[i][j].status
                 final_status = current_status if intern_status == "Free" else intern_status
                 self.hexa_memory.grid[i][j].status = final_status
+    
+    
+    def apply_user_action(self,action):
+        """Apply the user action concerning the last indecisive_cell"""
+        text,coord = action
+        indecisive_cell,status = self.indecisive_cells[-1]
+        if text == "y": #Apply the status to the cell
+            self.indecisive_cells.pop()
+            self.decided_cells.append((indecisive_cell,status))
+        elif text == "n": #Keep the cell as it is
+            self.indecisive_cells.pop()
+            self.decided_cells.append((indecisive_cell,self.hexa_memory.grid[indecisive_cell[0]][indecisive_cell[1]].status))
+        elif text == "click": #Give the status to the cell clicked by the user
+            self.indecisive_cells.pop()
+            self.decided_cells.append((coord,status))
 class obstacle():
 
     def __init__(self,x,y, cell_x = None, cell_y = None):
