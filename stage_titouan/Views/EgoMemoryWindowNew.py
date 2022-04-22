@@ -27,6 +27,10 @@ class EgoMemoryWindowNew(pyglet.window.Window):
         self.mouse_press_angle = 0
         self.window = None
 
+        # Room to write some text
+        self.label = pyglet.text.Label('', font_name='Segoe', font_size=15, x=10, y=10)
+        self.label.color = (0, 0, 0, 255)
+
     def set_ShapesList(self, s):
         # Not used
         self.shapesList = s
@@ -51,6 +55,11 @@ class EgoMemoryWindowNew(pyglet.window.Window):
 
         # Draw the robot and the phenomena
         self.batch.draw()
+
+        # Draw the text in the bottom left corner
+        glLoadIdentity()
+        glOrtho(0, self.width, 0, self.height, -1, 1)
+        self.label.draw()
 
         # Stack the environment's displacement and draw the origin just to check
         # gl_displacement_vector = [y for x in self.total_displacement_matrix for y in x]
@@ -85,7 +94,7 @@ class EgoMemoryWindowNew(pyglet.window.Window):
 
 
 # Displaying EgoMemoryWindowNew with phenomena in MemoryV1
-# py -m Views.EgoMemoryWindowNew
+# py -m stage_titouan.Views.EgoMemoryWindowNew
 if __name__ == "__main__":
     emw = EgoMemoryWindowNew()
     emw.robot.rotate_head(-45)

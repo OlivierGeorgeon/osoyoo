@@ -1,6 +1,6 @@
 import sys
 import os
-sys.path.insert(1, os.path.join(sys.path[0], '..'))
+# sys.path.insert(1, os.path.join(sys.path[0], '..'))
 from ast import match_case
 import math
 from . HexaGrid import HexaGrid

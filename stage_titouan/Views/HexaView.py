@@ -33,7 +33,7 @@ class HexaView(pyglet.window.Window):
 
         self.mouse_press_x = 0
         self.mouse_press_y = 0
-        self.label = pyglet.text.Label('0', font_name='Arial', font_size=200, x=0, y=-300, batch = self.batch)
+        self.label = pyglet.text.Label('', font_name='Arial', font_size=15, x=10, y=10)
         self.label.color = (0,0,0,255)
 
     def set_ShapesList(self,s):
@@ -79,6 +79,12 @@ class HexaView(pyglet.window.Window):
         # Draw the grid
         self.batch.draw()
 
+        # Draw the text in the bottom left corner
+        glLoadIdentity()
+        glOrtho(0, self.width, 0, self.height, -1, 1)
+        self.label.draw()
+
+
     def on_resize(self, width, height):
         """ Adjusting the viewport when resizing the window """
         # Always display in the whole window
@@ -104,7 +110,7 @@ class HexaView(pyglet.window.Window):
 
 # Testing  HexaView by displaying HexaMemory
 # Click on a cell to change its status
-# py -m Views.HexaView
+# py -m stage_titouan.Views.HexaView
 if __name__ == "__main__":
     hexaview = HexaView()
 
