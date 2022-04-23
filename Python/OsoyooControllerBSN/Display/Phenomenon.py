@@ -3,34 +3,55 @@ import math
 from pyrr import matrix44, Quaternion
 from webcolors import name_to_rgb
 
-SHAPE_CIRCLE = 0
-SHAPE_LINE = 1
+POINT_ECHO = 0
+POINT_TRESPASS = 1
+POINT_SHOCK = 2
+POINT_PUSH = 3
+POINT_PLACE = 4
+
 
 class Phenomenon:
-    def __init__(self, x, y, batch, shape=0, color=0):
+    def __init__(self, x, y, batch, point_type):
         self.batch = batch
-        self.type = shape
-        # self.angle = 0
+        self.type = point_type
 
-        if shape == SHAPE_CIRCLE:
-            if color == 1:
-                # Blue circle: Place
-                self.shape = shapes.Circle(x, y, 20, color=name_to_rgb("LightGreen"), batch=self.batch)
-            else:
-                # Orange circle: Echo
-                self.shape = shapes.Circle(x, y, 20, color=name_to_rgb("orange"), batch=self.batch)
-        elif shape == SHAPE_LINE:
-            # Red dash: black line
+        if self.type == POINT_PLACE:
+            # Place: Blue circle
+            self.shape = shapes.Circle(x, y, 20, color=name_to_rgb("LightGreen"), batch=self.batch)
+        if self.type == POINT_ECHO:
+            # Echo: Orange circle
+            self.shape = shapes.Circle(x, y, 20, color=name_to_rgb("orange"), batch=self.batch)
+        if self.type == POINT_TRESPASS:
+            # Trespassing: black dash
             self.shape = shapes.Rectangle(x, y, 10, 60, color=name_to_rgb("black"), batch=self.batch)
             self.shape.anchor_position = 5, 30
-        else:
-            # Triangle: collision
-            if color == 1:
-                # Pressing interaction: yellow triangle
-                self.shape = shapes.Triangle(x, y, x+40, y-30, x+40, y+30, color=name_to_rgb("yellow"), batch=self.batch)
-            else:
+        if self.type == POINT_SHOCK:
+            # Chock interaction: red triangle
+            self.shape = shapes.Triangle(x, y, x+40, y-30, x+40, y+30, color=name_to_rgb("red"), batch=self.batch)
+        if self.type == POINT_PUSH:
+            # Pushing: yellow triangle
+            self.shape = shapes.Triangle(x, y, x+40, y-30, x+40, y+30, color=name_to_rgb("yellow"), batch=self.batch)
+
+    def set_color(self, color_name=None):
+
+        if color_name is None:
+            if self.type == POINT_PLACE:
+                # Place: Blue circle
+                self.shape.color = name_to_rgb("LightGreen")
+            if self.type == POINT_ECHO:
+                # Echo: Orange circle
+                self.shape.color = name_to_rgb("orange")
+            if self.type == POINT_TRESPASS:
+                # Trespassing: black dash
+                self.shape.color = name_to_rgb("black")
+            if self.type == POINT_SHOCK:
                 # Chock interaction: red triangle
-                self.shape = shapes.Triangle(x, y, x+40, y-30, x+40, y+30, color=name_to_rgb("red"), batch=self.batch)
+                self.shape.color = name_to_rgb("red")
+            if self.type == POINT_PUSH:
+                # Pushing: yellow triangle
+                self.shape.color = name_to_rgb("yellow")
+        else:
+            self.shape.color = name_to_rgb(color_name)
 
     def displace(self, displacement_matrix):
         """ Applying the displacement matrix to the phenomenon """
@@ -54,3 +75,7 @@ class Phenomenon:
     def delete(self):
         """ Delete the shape to remove it from the batch """
         self.shape.delete()
+
+    def is_near(self, x, y):
+        """ Return true if the point is near the x y coordinate """
+        return math.dist([x, y], [self.shape.x, self.shape.y]) < 50

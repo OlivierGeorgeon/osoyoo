@@ -26,6 +26,16 @@ class Controller:
         self.enact_step = 0
         self.outcome_bytes = b'{"status":"T"}'  # Default status T timeout
 
+        # Stack an additional handler to EgoMemoryWindow
+        def on_mouse_press(x, y, button, modifiers):
+            self.view.set_mouse_press_coordinate(x, y, button, modifiers)
+            for p in self.phenomena:
+                if p.is_near(self.view.mouse_press_x, self.view.mouse_press_y):
+                    p.set_color("red")
+                else:
+                    p.set_color()
+        self.view.push_handlers(on_mouse_press)
+
     def enact(self, text):
         """ Creating an asynchronous thread to send the action to the robot and to wait for outcome """
         def enact_thread():
@@ -106,31 +116,31 @@ class Controller:
             p.displace(displacement_matrix)
 
         # Marker the new position
-        position = Phenomenon(0, 0, self.view.batch, SHAPE_CIRCLE, 1)
+        position = Phenomenon(0, 0, self.view.batch, POINT_PLACE)
         self.phenomena.append(position)
 
         # Check if line detected
         if floor > 0:
             # Mark a new trespassing interaction
-            line = Phenomenon(LINE_X, 0, self.view.batch, SHAPE_LINE)
+            line = Phenomenon(LINE_X, 0, self.view.batch, POINT_TRESPASS)
             self.phenomena.append(line)
 
         # Check for collision when moving forward
         if self.action == "8" and floor == 0:
             if blocked:
-                # Create a new pressing interaction
-                wall = Phenomenon(110, 0, self.view.batch, 2, 1)
-                self.phenomena.append(wall)
+                # Create a new push interaction
+                push = Phenomenon(110, 0, self.view.batch, POINT_PUSH)
+                self.phenomena.append(push)
             else:
-                # Create a new collision interaction
+                # Create a new shock interaction
                 if shock == 0b01:
-                    wall = Phenomenon(110, -80, self.view.batch, 2)
+                    wall = Phenomenon(110, -80, self.view.batch, POINT_SHOCK)
                     self.phenomena.append(wall)
                 if shock == 0b11:
-                    wall = Phenomenon(110, 0, self.view.batch, 2)
+                    wall = Phenomenon(110, 0, self.view.batch, POINT_SHOCK)
                     self.phenomena.append(wall)
                 if shock == 0b10:
-                    wall = Phenomenon(110, 80, self.view.batch, 2)
+                    wall = Phenomenon(110, 80, self.view.batch, POINT_SHOCK)
                     self.phenomena.append(wall)
 
         # Update head angle
@@ -143,8 +153,8 @@ class Controller:
                 if echo_distance > 0:  # echo measure 0 is false measure
                     x = self.robot.head_x + math.cos(math.radians(head_angle)) * echo_distance
                     y = self.robot.head_y + math.sin(math.radians(head_angle)) * echo_distance
-                    obstacle = Phenomenon(x, y, self.view.batch, SHAPE_CIRCLE)
-                    self.phenomena.append(obstacle)
+                    echo = Phenomenon(x, y, self.view.batch, POINT_ECHO)
+                    self.phenomena.append(echo)
 
         # Update the azimuth
         if 'azimuth' in outcome:
@@ -153,7 +163,7 @@ class Controller:
 
 # Testing the controller by remote controlling the robot from the egocentric memory window
 # Set the IP address. Run:
-# python -m Python.OsoyooControllerBSN.Display.Controller <Robot's IP>
+# py -m Python.OsoyooControllerBSN.Display.Controller <Robot's IP>
 if __name__ == "__main__":
     ip = "192.168.4.1"
     if len(sys.argv) > 1:
