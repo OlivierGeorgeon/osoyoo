@@ -8,12 +8,14 @@ POINT_TRESPASS = 1
 POINT_SHOCK = 2
 POINT_PUSH = 3
 POINT_PLACE = 4
+POINT_PHENOMENON = 5
 
 
 class Phenomenon:
     def __init__(self, x, y, batch, point_type):
         self.batch = batch
         self.type = point_type
+        self.is_selected = False
 
         if self.type == POINT_PLACE:
             # Place: Blue circle
@@ -30,7 +32,12 @@ class Phenomenon:
             self.shape = shapes.Triangle(x, y, x+40, y-30, x+40, y+30, color=name_to_rgb("red"), batch=self.batch)
         if self.type == POINT_PUSH:
             # Pushing: yellow triangle
-            self.shape = shapes.Triangle(x, y, x+40, y-30, x+40, y+30, color=name_to_rgb("yellow"), batch=self.batch)
+            self.shape = shapes.Triangle(x, y, x+40, y-30, x+40, y+30, color=name_to_rgb("salmon"), batch=self.batch)
+        if self.type == POINT_PHENOMENON:
+            self.shape = shapes.Circle(x, y, 40, color=name_to_rgb("tomato"), batch=self.batch)
+            # I can't find a way to access the points to move the polygon
+            # self.shape = shapes.Polygon([x+20,y+0], [x+10, y+17], [x-10, y+17], [x-20, y], [x-10, y-17], [x+10, y-17],color = name_to_rgb("tomato"), batch=self.batch)
+            # print(self.shape.position)
 
     def set_color(self, color_name=None):
 
@@ -50,6 +57,9 @@ class Phenomenon:
             if self.type == POINT_PUSH:
                 # Pushing: yellow triangle
                 self.shape.color = name_to_rgb("yellow")
+            if self.type == POINT_PHENOMENON:
+                # Pushing: yellow triangle
+                self.shape.color = name_to_rgb("tomato")
         else:
             self.shape.color = name_to_rgb(color_name)
 
@@ -60,13 +70,14 @@ class Phenomenon:
         self.shape.x, self.shape.y = v[0], v[1]
 
         # Rotate the shapes
-        if self.type == 1:  # Rotate the rectangle
+        if self.type == POINT_TRESPASS:  # Rotate the rectangle
             q = Quaternion(displacement_matrix)
             if q.axis[2] > 0:  # Rotate around z axis upwards
                 self.shape.rotation += math.degrees(q.angle)
             else:  # Rotate around z axis downward
                 self.shape.rotation += math.degrees(-q.angle)
-        if self.type == 2:  # Rotate and translate the other points of the triangle
+        if self.type == POINT_PUSH or self.type == POINT_SHOCK :
+            # Rotate and translate the other points of the triangle
             v = matrix44.apply_to_vector(displacement_matrix, [self.shape.x2, self.shape.y2, 0])
             self.shape.x2, self.shape.y2 = v[0], v[1]
             v = matrix44.apply_to_vector(displacement_matrix, [self.shape.x3, self.shape.y3, 0])
@@ -77,5 +88,10 @@ class Phenomenon:
         self.shape.delete()
 
     def is_near(self, x, y):
-        """ Return true if the point is near the x y coordinate """
-        return math.dist([x, y], [self.shape.x, self.shape.y]) < 50
+        """ If the point is near the x y coordinate, select this point and return True """
+        is_near = math.dist([x, y], [self.shape.x, self.shape.y]) < 50
+        if is_near:
+            self.is_selected = True
+        else:
+            self.is_selected = False
+        return is_near

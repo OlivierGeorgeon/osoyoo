@@ -32,10 +32,6 @@ class EgoMemoryWindow(pyglet.window.Window):
         self.label = pyglet.text.Label('', font_name='Verdana', font_size=10, x=10, y=10)
         self.label.color = (0, 0, 0, 255)
 
-        self.mouse_press_x = 0
-        self.mouse_press_y = 0
-        self.mouse_press_angle = 0
-
     def on_draw(self):
 
         glClear(GL_COLOR_BUFFER_BIT)
@@ -67,14 +63,13 @@ class EgoMemoryWindow(pyglet.window.Window):
         if .4 < self.zoom_level * f < 5:
             self.zoom_level *= f
 
-
     def set_mouse_press_coordinate(self, x, y, button, modifiers):
         """ Computing the position of the mouse click relative to the robot in mm and degrees """
-        mouse_press_x = (x - self.width / 2) * self.zoom_level * 2
-        mouse_press_y = (y - self.height / 2) * self.zoom_level * 2
+        window_press_x = (x - self.width / 2) * self.zoom_level * 2
+        window_press_y = (y - self.height / 2) * self.zoom_level * 2
         # Polar coordinates from the window center
-        r = numpy.hypot(mouse_press_x, mouse_press_y)
-        theta_window = math.atan2(mouse_press_y, mouse_press_x)
+        r = numpy.hypot(window_press_x, window_press_y)
+        theta_window = math.atan2(window_press_y, window_press_x)
         # Polar angle from the robot axis
         theta_robot = theta_window + math.radians(self.azimuth - 90) + 2 * math.pi
         theta_robot %= 2 * math.pi
@@ -82,11 +77,13 @@ class EgoMemoryWindow(pyglet.window.Window):
             theta_robot -= 2 * math.pi
         # Cartesian coordinates from the robot axis
         z = r * numpy.exp(1j * theta_robot)
-        self.mouse_press_x, self.mouse_press_y = int(z.real), int(z.imag)
-        self.mouse_press_angle = int(math.degrees(theta_robot))
+        mouse_press_x, mouse_press_y = int(z.real), int(z.imag)
+        mouse_press_angle = int(math.degrees(theta_robot))
 
-        self.label.text = "Click: x:" + str(self.mouse_press_x) + ", y:" + str(self.mouse_press_y) \
-                          + ", angle:" + str(self.mouse_press_angle) + "°"
+        self.label.text = "Click: x:" + str(mouse_press_x) + ", y:" + str(mouse_press_y) \
+                          + ", angle:" + str(mouse_press_angle) + "°"
+
+        return mouse_press_x, mouse_press_y, mouse_press_angle
 
 
 # Showing the EgoMemoryWindow

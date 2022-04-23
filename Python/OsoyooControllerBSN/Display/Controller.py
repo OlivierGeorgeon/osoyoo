@@ -9,6 +9,7 @@ from ..Display.OsoyooCar import OsoyooCar
 from ..Display.EgoMemoryWindow import EgoMemoryWindow
 from ..Display.ModalWindow import ModalWindow
 import pyglet
+from pyglet.window import key
 from pyrr import matrix44
 
 
@@ -26,15 +27,33 @@ class Controller:
         self.enact_step = 0
         self.outcome_bytes = b'{"status":"T"}'  # Default status T timeout
 
-        # Stack an additional handler to EgoMemoryWindow
+        self.mouse_press_x = 0
+        self.mouse_press_y = 0
+        self.mouse_press_angle = 0
+
+        # Mouse press: select or unselect points
         def on_mouse_press(x, y, button, modifiers):
-            self.view.set_mouse_press_coordinate(x, y, button, modifiers)
+            self.mouse_press_x, self.mouse_press_y, self.mouse_press_angle = \
+                self.view.set_mouse_press_coordinate(x, y, button, modifiers)
             for p in self.phenomena:
-                if p.is_near(self.view.mouse_press_x, self.view.mouse_press_y):
+                if p.is_near(self.mouse_press_x, self.mouse_press_y):
                     p.set_color("red")
                 else:
                     p.set_color()
-        self.view.push_handlers(on_mouse_press)
+
+        # key press: delete selected points
+        def on_key_press(symbol, modifiers):
+            if symbol == key.DELETE:
+                for p in self.phenomena:
+                    if p.is_selected:
+                        p.delete()
+                        self.phenomena.remove(p)
+            if symbol == key.INSERT:
+                print("insert phenomenon")
+                phenomenon = Phenomenon(self.mouse_press_x, self.mouse_press_y, self.view.batch, POINT_PHENOMENON)
+                self.phenomena.append(phenomenon)
+
+        self.view.push_handlers(on_mouse_press, on_key_press)
 
     def enact(self, text):
         """ Creating an asynchronous thread to send the action to the robot and to wait for outcome """
