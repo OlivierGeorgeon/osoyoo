@@ -171,15 +171,14 @@ void Head_echo_alignment::update()
 
 void Head_echo_alignment::outcome(JSONVar & outcome_object)
 {
-  //outcome_object["head_angle"] = _head_angle;
+  outcome_object["head_angle"] = _head_angle;
 
   // The latest measure obtained from echo alignment
-  //outcome_object["echo_distance"] = _min_ultrasonic_measure;
+  outcome_object["echo_distance"] = _min_ultrasonic_measure;
+}
 
-  // Make a new measure
-  // outcome_object["echo_distance"] = measureUltrasonicEcho(); Not working
-  // For every index i in _sign_array, set _sign_array.sign[i] to true if _sign_array.distances[i] < _sign_array.distances[i-1] and _sign_array.distances[i] < _sign_array.distances[i+1] 
-    // and false otherwise
+void Head_echo_alignment::outcome_complete(JSONVar & outcome_object)
+{
     for (int i = 0; i < _sign_array.size; i++)
     {
       if( _sign_array.distances[i] > 0 and _sign_array.distances[i]< 10000){
@@ -216,7 +215,7 @@ void Head_echo_alignment::outcome(JSONVar & outcome_object)
         _sign_array.distances[i] = 0;
         _sign_array.angles[i] = 0;
     }*/
-    }
+   }
     // Reset every values
     //nb_echo = 0;
 
