@@ -1,10 +1,7 @@
 import pyglet
 from pyglet.gl import *
 from ..Display.OsoyooCar import OsoyooCar
-import json
 import math
-import threading
-import time
 
 # Zooming constants
 ZOOM_IN_FACTOR = 1.2
@@ -22,6 +19,8 @@ class EgoMemoryWindow(pyglet.window.Window):
         glClearColor(1.0, 1.0, 1.0, 1.0)
 
         self.batch = pyglet.graphics.Batch()  # create a batch
+        self.background = pyglet.graphics.OrderedGroup(0)  # Will be used to manage the overlapping of shapes
+        self.foreground = pyglet.graphics.OrderedGroup(1)
         self.zoom_level = 1
 
         # draw the robot for display in the window using the batch parameter and used OsoyooCar's file
@@ -66,34 +65,10 @@ class EgoMemoryWindow(pyglet.window.Window):
         if .4 < self.zoom_level * f < 5:
             self.zoom_level *= f
 
-    def actionLoop(self, frequence):
-        """ Loop in the background to regularly ask the robot for information """
-        # This function is not used in the final version
-        def loop(obj: EgoMemoryWindow):
-            while True:
-                time.sleep(frequence)
-                # print("Data requests")
-                obj.outcome = obj.wifiInterface.enact({"action": "$"})
-                # obj.windowRefresh('$', json.loads(outcome))
 
-        thread = threading.Thread(target=loop, args=[self])
-        thread.start()
-
-    def actionLoopInterprete(self, dt):
-        """ Loop executed by pyglet to use the actionLoop functions"""
-        # This function is not used in the final version
-        if self.outcome != "{}":
-            # print(self.outcome)
-            self.windowRefresh('$', json.loads(self.outcome))
-            self.outcome = "{}"
-
-
-# Testing the delete phenomena functionality
-# The EgoMemoryWindow must be redrawn for the change to take effect
+# Showing the EgoMemoryWindow
 # python -m Python.OsoyooControllerBSN.Display.EgoMemoryWindow
 if __name__ == "__main__":
     em_window = EgoMemoryWindow()
 
-    # em_window.actionLoop(10)
-    # clock.schedule_interval(em_window.actionLoopInterprete, 5)
     pyglet.app.run()
