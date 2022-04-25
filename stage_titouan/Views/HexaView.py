@@ -1,6 +1,7 @@
 import pyglet
 from pyglet.gl import *
 from .. Misc.Utils import hexaMemory_to_pyglet
+from .. Misc.Utils import translate_indecisive_cell_to_pyglet
 from .. Model.Hexamemories import HexaMemory
 from webcolors import name_to_rgb
 
@@ -13,7 +14,7 @@ ZOOM_IN_FACTOR = 1.2
 
 class HexaView(pyglet.window.Window):
     """blabla"""
-    def __init__(self, width=400, height=400, shapesList=None, cell_radius=20, *args, **kwargs):
+    def __init__(self, width=400, height=400, shapesList=None, cell_radius=20, hexa_memory = None, *args, **kwargs):
         super().__init__(width, height, resizable=True, *args, **kwargs)
         self.set_caption("Hexa Memory")
         self.set_minimum_size(150, 150)
@@ -39,6 +40,7 @@ class HexaView(pyglet.window.Window):
 
         self.need_user_action = False
         self.user_acted = False
+        self.hexa_memory = hexa_memory
 
     def set_ShapesList(self,s):
         self.shapesList = s
@@ -64,8 +66,8 @@ class HexaView(pyglet.window.Window):
         self.nb_cell_y = memory.height
         self.cell_radius = memory.cell_radius
 
-    def show_indecisive_cell(self,indecisive_cell):
-        self.indecisive_cell_shape = indecisive_cell_to_pyglet(indecisive_cell,batch)
+    def show_indecisive_cell(self,indecisive_cell): #(indecisive_cell,hexaMemory,batch)
+        self.indecisive_cell_shape = translate_indecisive_cell_to_pyglet(indecisive_cell,self.hexa_memory,self.batch)
     def on_draw(self):
         """ Drawing the window """
         glClear(GL_COLOR_BUFFER_BIT)

@@ -152,7 +152,7 @@ def translate_indecisive_cell_to_pyglet(indecisive_cell,hexaMemory,batch):
     x0 = 0
     y0 = 0
     (coord_x, coord_y), status = indecisive_cell
-    radius = radius = hexaMemory.cell_radius
+    radius = hexaMemory.cell_radius
     hauteur = math.sqrt( (2*radius)**2 -radius**2 )
     if(coord_y%2 == 0):
         x1 = x0 + coord_x * 3 * radius

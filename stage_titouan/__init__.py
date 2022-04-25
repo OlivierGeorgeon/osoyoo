@@ -22,6 +22,7 @@ from . Model.Memories.MemoryNew import MemoryNew
 from . Model.Memories.MemoryV1 import MemoryV1
 
 from . Model.Synthesizers.Synthesizer import Synthesizer
+from . Model.Synthesizers.SynthesizerUserInteraction import SynthesizerUserInteraction
 
 from . Views.EgoMemoryWindowNew import EgoMemoryWindowNew
 from . Views.HexaView import HexaView

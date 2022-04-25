@@ -147,7 +147,7 @@ class ControllerUserAction :
 
             
         else :
-            
+            self.need_user_action = False if self.synthesizer.indecisive_cells == [] else True
             robot_action = None
             # 1 : demande l'action :
             if self.control_mode == CONTROL_MODE_AUTOMATIC :
