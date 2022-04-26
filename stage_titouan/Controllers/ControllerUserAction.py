@@ -81,6 +81,7 @@ class ControllerUserAction :
         self.control_mode = CONTROL_MODE_MANUAL
         self.need_user_action = False #True if there a synthesizer and it has indecisive_cells
         self.user_action = None
+        self.print_done = True
         if emw is not None:
             @emw.event
             def on_text(text):
@@ -92,13 +93,14 @@ class ControllerUserAction :
                     print("Control mode: MANUAL")
 
                 if self.control_mode == CONTROL_MODE_MANUAL:
-                    if self.enact_step == 0:
+                    if self.enact_step == 0 and not self.need_user_action:
                         self.action_angle = emw.mouse_press_angle
                         #  if text == "/" or text == "+":  # Send the angle marked by the mouse click
                         #      text = json.dumps({'action': text, 'angle': emw.mouse_press_angle})
                         self.command_robot(text)
                     else:
-                        print("Waiting for previous outcome before sending new action")
+                        message = "Waiting for previous outcome before sending new action" if self.enact_step != 0 else "Waiting for user action"
+                        print(message)
 
         hemw = self.hexaview if self.hexaview is not None else None
         if hemw is not None:
@@ -124,6 +126,15 @@ class ControllerUserAction :
                     self.user_action = 'click',(cell_x,cell_y)
                     self.need_user_action = False
             hemw.on_mouse_press = on_mouse_press_hemw
+            @hemw.event
+            def on_mouse_motion(x, y, dx, dy):
+                mouse_x = int((x - hemw.width/2)*hemw.zoom_level*2)
+                mouse_y = int((y - hemw.height/2)*hemw.zoom_level*2)
+                # Find the cell
+                cell_x, cell_y = hexa_memory.convert_pos_in_cell(mouse_x, mouse_y)
+                if self.need_user_action :
+                    print("Cell: ", cell_x, cell_y)
+                hemw.label.text = "Cell: " + str(cell_x) + ", " + str(cell_y)
     ################################################# LOOP #################################################################"""
 
     def main_loop(self,dt):
@@ -131,7 +142,10 @@ class ControllerUserAction :
         if self.need_user_action :
             #There is the self.synthesizer.indicisive_cells[-1] shown in the hexaview
             #we are now waiting for the user action
-            print("Please select the action  : 'y' : accept suggestion, 'n' : reject suggestion, 'click' : apply suggestion to the selected cell")
+            if not self.print_done :
+                print("Please select the action  : 'y' : accept suggestion, 'n' : reject suggestion, 'click' : apply suggestion to the selected cell")
+                self.hexaview.show_indecisive_cell(self.synthesizer.indecisive_cells[-1])
+                self.print_done = True
         elif self.user_action is not None:
             #The user has selected an action
             #We now need to send it to the synthesizer
@@ -144,6 +158,7 @@ class ControllerUserAction :
             if self.hexaview is not None :
                 self.hexaview.show_indecisive_cell(self.synthesizer.indecisive_cells[-1])
                 self.need_user_action = True
+                self.print_done = False
 
             
         else :
@@ -181,7 +196,10 @@ class ControllerUserAction :
         if self.view is not None :
             self.view.extract_and_convert_interactions(self.memory)
         if self.hexaview is not None :
-            self.hexaview.extract_and_convert_interactions(self.hexa_memory)
+            if not self.need_user_action :
+                self.hexaview.extract_and_convert_interactions(self.hexa_memory)
+            else :
+                self.hexaview.show_indecisive_cell(self.synthesizer.indecisive_cells[-1])
     def main(self):
         """Main function of the controller"""
         pyglet.clock.schedule_interval(self.main_loop,0.1)

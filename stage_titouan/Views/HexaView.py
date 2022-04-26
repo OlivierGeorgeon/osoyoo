@@ -68,6 +68,7 @@ class HexaView(pyglet.window.Window):
 
     def show_indecisive_cell(self,indecisive_cell): #(indecisive_cell,hexaMemory,batch)
         self.indecisive_cell_shape = translate_indecisive_cell_to_pyglet(indecisive_cell,self.hexa_memory,self.batch)
+        
     def on_draw(self):
         """ Drawing the window """
         glClear(GL_COLOR_BUFFER_BIT)

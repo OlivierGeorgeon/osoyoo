@@ -31,6 +31,7 @@ class SynthesizerUserInteraction :
         self.indecisive_cells = []
         self.synthetizing_step = 0  # 0: idle. 1: Projection ready, waiting for decision. 2: decision mode, hexamem adjusted.
         self.decided_cells = []
+        self.cells_to_wipe = []
     def reset(self):
         """ Reset the internal_hexa_grid """
         self.internal_hexa_grid = HexaGrid(self.hexa_memory.width, self.hexa_memory.height)
@@ -42,6 +43,7 @@ class SynthesizerUserInteraction :
         """Create phenoms based on Interactions in memory and States in hexa_memory"""
         self.interaction_step()
         if(self.synthetizing_step == 0):
+            self.internal_hexa_grid = HexaGrid(self.hexa_memory.width, self.hexa_memory.height)
             #Firstly : keep only the interactions that are not already treated (id > last_used_id)
             self.indecisive_cells = []
             self.decided_cells = []
@@ -102,8 +104,8 @@ class SynthesizerUserInteraction :
             if (cell_x,cell_y) not in already_used_cells:
                 print("cell_x,cell_y",cell_x,cell_y , "  already used : ", already_used_cells)
                 self.internal_hexa_grid.add_interaction(cell_x,cell_y,interaction)
-                self.last_used_id = max(interaction.id,self.last_used_id)
                 already_used_cells.append((cell_x,cell_y))
+            self.last_used_id = max(interaction.id,self.last_used_id)
 
     def projection_step(self):
         """Compare the content of the hexamemory and the internal hexa grid, depending on the mode skip to the end or ask
@@ -130,25 +132,45 @@ class SynthesizerUserInteraction :
 
     def synthesize_step(self):
         """If the projection is finished, synthesize"""
+        final_statuses = []
         if self.synthetizing_step != 2 :
             return
         #Compare the content of the hexamemory and the internal hexa grid, apply the final status of each cell to the hexa_memory
         for i,row in enumerate(self.internal_hexa_grid.grid):
+            final_statuses.append([])
             for j, cell in enumerate(row):
                 decided_cells_matching = [elem for elem in self.decided_cells if elem[0] == (i,j)]
+                final_status = None
                 if len(decided_cells_matching) > 0:
                     print("decided_cells_matching : ",decided_cells_matching)
-                intern_status = "Free" if len(cell.interactions) == 0 else translate_interaction_type_to_cell_status(cell.interactions[-1].type)
-                current_status = self.hexa_memory.grid[i][j].status
-                final_status = current_status if intern_status == "Free" else intern_status
-                self.hexa_memory.grid[i][j].status = final_status
+                    decision = decided_cells_matching[0]
+                    final_status = decision[1]
+                    if len(decision) == 3 : #means the action was a click and the suggestion must be forgotten
+                        print("keks")
+                        cell_to_wipe_x,cell_to_wipe_y = decision[2]
+                        print("cell_to_wipe :",cell_to_wipe_x," , ",cell_to_wipe_y)
+                        if len(final_statuses) > i and len(final_statuses[i]) > j :
+                            print("kss")
+                            final_statuses[i][j] = self.hexa_memory.grid[i][j].status
+                        self.cells_to_wipe.append(decision[2])
+
+                elif (i,j) not in self.cells_to_wipe :
+                    intern_status = "Free" if len(cell.interactions) == 0 or (i,j) in self.cells_to_wipe else translate_interaction_type_to_cell_status(cell.interactions[-1].type)
+                    current_status = self.hexa_memory.grid[i][j].status
+                    final_status = current_status if intern_status == "Free" else intern_status
+                final_statuses[i].append(final_status)
+                #self.hexa_memory.grid[i][j].status = final_status
+        for i,row in enumerate(final_statuses):
+            for j, status in enumerate(row):
+                self.hexa_memory.grid[i][j].status = status
+        self.synthetizing_step = 0
    
     def apply_user_action(self,action):
         """Apply the user action concerning the last indecisive_cell"""
         text,coord = action
         indecisive_cell,status = self.indecisive_cells[-1]
         if text == "y": #Apply the status to the cell
-            ("Suggestion accepted")
+            print("Suggestion accepted")
             self.indecisive_cells.pop()
             self.decided_cells.append((indecisive_cell,status))
         elif text == "n": #Keep the cell as it is
@@ -158,7 +180,7 @@ class SynthesizerUserInteraction :
         elif text == "click": #Give the status to the cell clicked by the user
             print("Suggestion accepted for cell ",coord)
             self.indecisive_cells.pop()
-            self.decided_cells.append((coord,status))
-        if len(self.indecisive_cells )== 0: 
+            self.decided_cells.append((coord,status,indecisive_cell))
+        if len(self.indecisive_cells )== 0:
             print("sytnhese")
             self.synthesize_step()
