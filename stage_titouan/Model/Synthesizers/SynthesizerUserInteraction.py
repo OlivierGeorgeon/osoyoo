@@ -29,9 +29,11 @@ class SynthesizerUserInteraction :
         self.mode = MANUAL_MODE
 
         self.indecisive_cells = []
-        self.synthetizing_step = 0  # 0: idle. 1: Projection ready, waiting for decision. 2: decision mode, hexamem adjusted.
+        self.synthetizing_step = 0  # 0: idle. 1: Projection ready, waiting for decision. 2: decision made, hexamem adjusted.
         self.decided_cells = []
         self.cells_to_wipe = []
+
+        self.hexa_memory_change_flag = False
     def reset(self):
         """ Reset the internal_hexa_grid """
         self.internal_hexa_grid = HexaGrid(self.hexa_memory.width, self.hexa_memory.height)
@@ -132,38 +134,27 @@ class SynthesizerUserInteraction :
 
     def synthesize_step(self):
         """If the projection is finished, synthesize"""
-        final_statuses = []
         if self.synthetizing_step != 2 :
             return
-        #Compare the content of the hexamemory and the internal hexa grid, apply the final status of each cell to the hexa_memory
-        for i,row in enumerate(self.internal_hexa_grid.grid):
-            final_statuses.append([])
-            for j, cell in enumerate(row):
-                decided_cells_matching = [elem for elem in self.decided_cells if elem[0] == (i,j)]
-                final_status = None
-                if len(decided_cells_matching) > 0:
-                    print("decided_cells_matching : ",decided_cells_matching)
-                    decision = decided_cells_matching[0]
-                    final_status = decision[1]
-                    if len(decision) == 3 : #means the action was a click and the suggestion must be forgotten
-                        print("keks")
-                        cell_to_wipe_x,cell_to_wipe_y = decision[2]
-                        print("cell_to_wipe :",cell_to_wipe_x," , ",cell_to_wipe_y)
-                        if len(final_statuses) > i and len(final_statuses[i]) > j :
-                            print("kss")
-                            final_statuses[i][j] = self.hexa_memory.grid[i][j].status
-                        self.cells_to_wipe.append(decision[2])
+        #Compare the content of the hexamemory and the internal hexa grid, apply the final status of each cell to the hexa_memory        
+        for _,cell in enumerate(self.decided_cells):
+            self.decided_cells.remove(cell)
+            if len(cell) == 3 :
+                cell_to_wipe_x,cell_to_wipe_y = cell[2]
+                self.hexa_memory.grid[cell_to_wipe_x][cell_to_wipe_y].status = "Free"
+                pos_attendue_inte = self.hexa_memory.convert_cell_to_pos(cell_to_wipe_x,cell_to_wipe_y)
+                pos_reelle_inte = self.hexa_memory.convert_cell_to_pos(cell[0][0],cell[0][1])
+                diff_x = pos_reelle_inte[0] - pos_attendue_inte[0]
+                diff_y = pos_reelle_inte[1] - pos_attendue_inte[1]
+                print("moving robot by ",-diff_x,-diff_y)
+                self.hexa_memory.robot_pos_x -= diff_x
+                self.hexa_memory.robot_pos_y -= diff_y
 
-                elif (i,j) not in self.cells_to_wipe :
-                    intern_status = "Free" if len(cell.interactions) == 0 or (i,j) in self.cells_to_wipe else translate_interaction_type_to_cell_status(cell.interactions[-1].type)
-                    current_status = self.hexa_memory.grid[i][j].status
-                    final_status = current_status if intern_status == "Free" else intern_status
-                final_statuses[i].append(final_status)
-                #self.hexa_memory.grid[i][j].status = final_status
-        for i,row in enumerate(final_statuses):
-            for j, status in enumerate(row):
-                self.hexa_memory.grid[i][j].status = status
-        self.synthetizing_step = 0
+            
+            cell_x,cell_y = cell[0]
+            self.hexa_memory.grid[cell_x][cell_y].status = cell[1]
+            self.hexa_memory_change_flag = True
+        self.synthetizing_step = 0 if len(self.indecisive_cells) == 0 else 1
    
     def apply_user_action(self,action):
         """Apply the user action concerning the last indecisive_cell"""

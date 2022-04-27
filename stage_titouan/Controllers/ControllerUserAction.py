@@ -139,28 +139,24 @@ class ControllerUserAction :
 
     def main_loop(self,dt):
         """blabla"""
-        if self.need_user_action :
+        self.need_user_action = self.synthesizer.synthetizing_step == 1 and len(self.synthesizer.indecisive_cells) != 0
+        #print(self.need_user_action)
+        if self.need_user_action and self.user_action is None :
             #There is the self.synthesizer.indicisive_cells[-1] shown in the hexaview
             #we are now waiting for the user action
             if not self.print_done :
                 print("Please select the action  : 'y' : accept suggestion, 'n' : reject suggestion, 'click' : apply suggestion to the selected cell")
-                self.hexaview.show_indecisive_cell(self.synthesizer.indecisive_cells[-1])
                 self.print_done = True
+            self.hexaview.show_indecisive_cell(self.synthesizer.indecisive_cells[-1])
         elif self.user_action is not None:
             #The user has selected an action
             #We now need to send it to the synthesizer
             self.synthesizer.apply_user_action(self.user_action)
             self.user_action = None
-        elif self.synthesizer is not None and len(self.synthesizer.indecisive_cells) > 0:
-            #There is indecisive_cells in the synthesizer
-            #we need to ask the user to interact,
-            #to do so we must show the indecisive_cells in the hexaview
-            if self.hexaview is not None :
-                self.hexaview.show_indecisive_cell(self.synthesizer.indecisive_cells[-1])
-                self.need_user_action = True
-                self.print_done = False
-
-            
+            self.print_done = False
+            self.synthesizer.synthesize_step()
+            self.hexaview.extract_and_convert_interactions(self.hexa_memory)
+                
         else :
             self.need_user_action = False if self.synthesizer.indecisive_cells == [] else True
             robot_action = None
@@ -193,12 +189,13 @@ class ControllerUserAction :
 
     def main_refresh(self):
         """Function that refresh the views"""
-        if self.view is not None :
-            self.view.extract_and_convert_interactions(self.memory)
         if self.hexaview is not None :
             if not self.need_user_action :
                 self.hexaview.extract_and_convert_interactions(self.hexa_memory)
             else :
+                if(self.synthesizer.hexa_memory_change_flag ):
+                    self.synthesizer.hexa_memory_change_flag = False
+                    self.hexaview.extract_and_convert_interactions(self.hexa_memory)
                 self.hexaview.show_indecisive_cell(self.synthesizer.indecisive_cells[-1])
     def main(self):
         """Main function of the controller"""

@@ -185,6 +185,21 @@ class HexaMemory(HexaGrid):
             return tmp_cell_x, tmp_cell_y
 
 
+    def convert_cell_to_pos(self, cell_x, cell_y):
+        """
+        Convert a cell coordinate to a position in the grid
+        """
+        diff_x = self.width//2 - cell_x
+        diff_y = self.height//2 - cell_y
+        diff_y_impair = diff_y//2 != 0
+        change_x = 0
+        radius = self.cell_radius
+        mini_radius = math.sqrt(radius**2 - (radius/2)**2)
+        if diff_y_impair :
+            change_x = (int(diff_x) // abs(int(diff_x)) )* radius
+        pos_x = diff_x * 3 * radius + change_x
+        pos_y = diff_y * mini_radius
+        return pos_x, pos_y
 
     def find_coordinates_corner(self,cell_x,cell_y,x_sign,y_sign):
         """aaaaaaaaa"""
