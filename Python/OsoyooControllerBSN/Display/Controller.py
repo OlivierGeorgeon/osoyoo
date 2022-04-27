@@ -50,7 +50,7 @@ class Controller:
                         self.phenomena.remove(p)
             if symbol == key.INSERT:
                 print("insert phenomenon")
-                phenomenon = Phenomenon(self.mouse_press_x, self.mouse_press_y, self.view.batch, POINT_PHENOMENON)
+                phenomenon = Phenomenon(self.mouse_press_x, self.mouse_press_y, self.view.batch, self.view.foreground, POINT_PHENOMENON)
                 self.phenomena.append(phenomenon)
 
         self.view.push_handlers(on_mouse_press, on_key_press)
@@ -135,31 +135,31 @@ class Controller:
             p.displace(displacement_matrix)
 
         # Marker the new position
-        position = Phenomenon(0, 0, self.view.batch, POINT_PLACE)
+        position = Phenomenon(0, 0, self.view.batch, self.view.foreground, POINT_PLACE)
         self.phenomena.append(position)
 
         # Check if line detected
         if floor > 0:
             # Mark a new trespassing interaction
-            line = Phenomenon(LINE_X, 0, self.view.batch, POINT_TRESPASS)
+            line = Phenomenon(LINE_X, 0, self.view.batch, self.view.foreground, POINT_TRESPASS)
             self.phenomena.append(line)
 
         # Check for collision when moving forward
         if self.action == "8" and floor == 0:
             if blocked:
                 # Create a new push interaction
-                push = Phenomenon(110, 0, self.view.batch, POINT_PUSH)
+                push = Phenomenon(110, 0, self.view.batch, self.view.foreground, POINT_PUSH)
                 self.phenomena.append(push)
             else:
                 # Create a new shock interaction
                 if shock == 0b01:
-                    wall = Phenomenon(110, -80, self.view.batch, POINT_SHOCK)
+                    wall = Phenomenon(110, -80, self.view.batch, self.view.foreground, POINT_SHOCK)
                     self.phenomena.append(wall)
                 if shock == 0b11:
-                    wall = Phenomenon(110, 0, self.view.batch, POINT_SHOCK)
+                    wall = Phenomenon(110, 0, self.view.batch, self.view.foreground, POINT_SHOCK)
                     self.phenomena.append(wall)
                 if shock == 0b10:
-                    wall = Phenomenon(110, 80, self.view.batch, POINT_SHOCK)
+                    wall = Phenomenon(110, 80, self.view.batch, self.view.foreground, POINT_SHOCK)
                     self.phenomena.append(wall)
 
         # Update head angle
@@ -172,7 +172,7 @@ class Controller:
                 if echo_distance > 0:  # echo measure 0 is false measure
                     x = self.robot.head_x + math.cos(math.radians(head_angle)) * echo_distance
                     y = self.robot.head_y + math.sin(math.radians(head_angle)) * echo_distance
-                    echo = Phenomenon(x, y, self.view.batch, POINT_ECHO)
+                    echo = Phenomenon(x, y, self.view.batch, self.view.foreground, POINT_ECHO)
                     self.phenomena.append(echo)
 
         # Update the azimuth

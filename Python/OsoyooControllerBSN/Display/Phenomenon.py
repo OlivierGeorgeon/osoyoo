@@ -1,4 +1,4 @@
-from pyglet import shapes
+from pyglet import shapes, gl
 import math
 from pyrr import matrix44, Quaternion
 from webcolors import name_to_rgb
@@ -12,14 +12,17 @@ POINT_PHENOMENON = 5
 
 
 class Phenomenon:
-    def __init__(self, x, y, batch, point_type):
+    def __init__(self, x, y, batch, group, point_type):
         self.batch = batch
+        self.group = group
         self.type = point_type
         self.is_selected = False
 
         if self.type == POINT_PLACE:
             # Place: Blue circle
-            self.shape = shapes.Circle(x, y, 20, color=name_to_rgb("LightGreen"), batch=self.batch)
+            # self.shape = shapes.Circle(x, y, 20, color=name_to_rgb("LightGreen"), batch=self.batch)
+            self.shape = self.batch.add(3, gl.GL_TRIANGLES, self.group, ('v2i', [20, 0, -20, -20, -20, 20]),
+                                        ('c3B', (144, 238, 144, 144, 238, 144, 144, 238, 144)))
         if self.type == POINT_ECHO:
             # Echo: Orange circle
             self.shape = shapes.Circle(x, y, 20, color=name_to_rgb("orange"), batch=self.batch)
@@ -37,7 +40,6 @@ class Phenomenon:
             self.shape = shapes.Circle(x, y, 40, color=name_to_rgb("tomato"), batch=self.batch)
             # I can't find a way to access the points to move the polygon
             # self.shape = shapes.Polygon([x+20,y+0], [x+10, y+17], [x-10, y+17], [x-20, y], [x-10, y-17], [x+10, y-17],color = name_to_rgb("tomato"), batch=self.batch)
-            # print(self.shape.position)
 
     def set_color(self, color_name=None):
 
@@ -65,6 +67,13 @@ class Phenomenon:
 
     def displace(self, displacement_matrix):
         """ Applying the displacement matrix to the phenomenon """
+        # POINT PLACE are vertex list
+        if self.type == POINT_PLACE:
+            for i in range(0, len(self.shape.vertices)-1, 2):
+                v = matrix44.apply_to_vector(displacement_matrix, [self.shape.vertices[i], self.shape.vertices[i+1], 0])
+                self.shape.vertices[i], self.shape.vertices[i+1] = int(v[0]), int(v[1])
+            return
+
         #  Rotate and translate the position
         v = matrix44.apply_to_vector(displacement_matrix, [self.shape.x, self.shape.y, 0])
         self.shape.x, self.shape.y = v[0], v[1]
