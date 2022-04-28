@@ -195,7 +195,7 @@ class HexaMemory(HexaGrid):
         change_x = 0
         radius = self.cell_radius
         mini_radius = math.sqrt(radius**2 - (radius/2)**2)
-        if diff_y_impair :
+        if diff_y_impair and diff_x != 0 :
             change_x = (int(diff_x) // abs(int(diff_x)) )* radius
         pos_x = diff_x * 3 * radius + change_x
         pos_y = diff_y * mini_radius

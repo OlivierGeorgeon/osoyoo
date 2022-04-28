@@ -1,4 +1,3 @@
-
 import json
 import math
 import random
@@ -74,6 +73,8 @@ class ControllerUserAction :
         self.need_user_action = False #True if there a synthesizer and it has indecisive_cells
         self.user_action = None
         self.print_done = True
+        self.need_traitement_flag= False
+        self.cell_inde_a_traiter = None
         if emw is not None:
             @emw.event
             def on_text(text):
@@ -127,27 +128,20 @@ class ControllerUserAction :
                 if self.need_user_action :
                     print("Cell: ", cell_x, cell_y)
                 hemw.label.text = "Cell: " + str(cell_x) + ", " + str(cell_y)
-    ################################################# LOOP #################################################################"""
 
     def main_loop(self,dt):
         """blabla"""
-        self.need_user_action = self.synthesizer.need_user_action
-        #print(self.need_user_action)
-        if self.need_user_action and self.user_action is None :
-            #There is the self.synthesizer.indicisive_cells[-1] shown in the hexaview
-            #we are now waiting for the user action
-            if not self.print_done :
-                print("Please select the action  : 'y' : accept suggestion, 'n' : reject suggestion, 'click' : apply suggestion to the selected cell")
-                self.print_done = True
-        elif self.user_action is not None:
-            #The user has selected an action
-            #We now need to send it to the synthesizer
-            self.synthesizer.apply_user_action(self.user_action)
+        if self.synthesizer.synthetizing_step == 1 and not self.need_traitement_flag :
+            self.cell_inde_a_traiter = self.synthesizer.indecisive_cells[-1]
+            self.need_traitement_flag = True
+            self.need_user_action = True
             self.user_action = None
-            self.print_done = False
-                
-        else :
-            self.need_user_action = self.synthesizer.need_user_action
+        elif self.need_traitement_flag and self.user_action is not None :
+            self.synthesizer.apply_user_action(self.user_action)
+            self.synthesizer.synthetize()
+            self.need_traitement_flag = False
+        elif not self.need_traitement_flag :
+            #boucle normale
             robot_action = None
             # 1 : demande l'action :
             if self.control_mode == CONTROL_MODE_AUTOMATIC :
@@ -164,27 +158,24 @@ class ControllerUserAction :
                 self.send_position_change_to_hexa_memory(angle,translation)
                 self.send_phenom_info_to_memory(phenom_info,echo_array) # when the robot detect interaction (before or after moving)
                 self.memory.tick()
-                self.ask_synthetizer_to_act()
-                #self.main_refresh()
                 self.enact_step = 0
 
-    def main_refresh(self,dt):
+
+    def main_refresh(self):
         """Function that refresh the views"""
-        if self.hexaview is not None :
-            if not self.need_user_action :
-                self.hexaview.extract_and_convert_interactions(self.hexa_memory)
-            else :
-                if self.synthesizer.need_user_action :
-                    self.hexaview.extract_and_convert_interactions(self.hexa_memory)
-                    self.hexaview.show_indecisive_cell(self.synthesizer.indecisive_cells[-1])
+        if not self.need_traitement_flag :
+            self.hexaview.extract_and_convert_interactions(self.hexa_memory)
+        else :
+            self.hexaview.show_indecisive_cell(self.cell_inde_a_traiter)
+
     def main(self):
         """Main function of the controller"""
-        pyglet.clock.schedule_interval(self.main_loop,0.1)
-        pyglet.clock.schedule_interval(self.main_refresh,0.1)
+        pyglet.clock.schedule_interval(self.main_loop,0.3)
+        pyglet.clock.schedule_interval(self.main_refresh,0.3)
         pyglet.app.run()
 
 
-    
+
     ################################################# AGENT RELATED #################################################################
     def ask_agent_for_action(self,outcome):
         """ Ask for Action from the Agent 

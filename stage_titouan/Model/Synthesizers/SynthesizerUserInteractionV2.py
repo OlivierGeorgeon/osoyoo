@@ -43,29 +43,12 @@ class SynthesizerUserInteraction :
 
 
     def act(self):
-        """Create phenoms based on Interactions in memory and States in hexa_memory"""
-        self.interaction_step()
-        if(self.synthetizing_step == 0):
-            self.internal_hexa_grid = HexaGrid(self.hexa_memory.width, self.hexa_memory.height)
-            #Firstly : keep only the interactions that are not already treated (id > last_used_id)
-            self.indecisive_cells = []
-            self.decided_cells = []
-            self.interactions_list = []
-            self.interactions_list = [elem for elem in self.memory.interactions if elem.id>self.last_used_id]
-            for i,row in enumerate(self.internal_hexa_grid.grid):
-                for j, cell in enumerate(row):
-                    cell.interactions_list = []
-            print(len(self.interactions_list))
-            #Secondly : At this point self.interactions_list contains all the echolocations made by the robot, so we need to treat them to find the
-            #true position of the objects echolocated
-            real_echos = self.treat_echos()
-            print("len real_echos :", len(real_echos))
-            self.interactions_list = [elem for elem in self.interactions_list if elem.type != "Echo" or elem in real_echos]
-            self.project_interactions_on_internal_hexagrid()
-            self.projection_step()
-        if self.synthetizing_step == 2 :
-            self.synthesize_step()
-            self.synthetizing_step = 0
+        """blabla"""
+        self.interactions_list = [elem for elem in self.memory.interactions if elem.id>self.last_used_id]
+        real_echos = self.treat_echos()
+        self.interactions_list = [elem for elem in self.interactions_list if elem.type != "Echo" or elem in real_echos]
+        self.project_interactions_on_internal_hexagrid()
+        self.comparison_step()
 
 
     def treat_echos(self):
@@ -110,12 +93,9 @@ class SynthesizerUserInteraction :
                 already_used_cells.append((cell_x,cell_y))
             self.last_used_id = max(interaction.id,self.last_used_id)
 
-    def projection_step(self):
+    def comparison_step(self):
         """Compare the content of the hexamemory and the internal hexa grid, depending on the mode skip to the end or ask
         the user to take a decision."""
-        if self.mode == AUTOMATIC_MODE :
-            self.synthetizing_step = 2
-            return
         for i,row in enumerate(self.internal_hexa_grid.grid):
             for j, cell in enumerate(row):
                 intern_status = "Free" if len(cell.interactions) == 0 else translate_interaction_type_to_cell_status(cell.interactions[-1].type)
@@ -129,39 +109,6 @@ class SynthesizerUserInteraction :
         #before synthetizing, so we stay in 1 else we can synthesize right away so we go in step 2
         self.need_user_action = self.synthetizing_step == 1
 
-    def interaction_step(self):
-        """check if the user as made decision for every indecisive cell, and if not, loop until it has"""
-        if len(self.indecisive_cells) == 0 :
-            self.synthetizing_step = 2 if self.synthetizing_step==1 else 0
-        else :
-            self.need_user_action = True
-        return
-
-    def synthesize_step(self):
-        """If the projection is finished, synthesize"""
-        if self.synthetizing_step != 2 :
-            return
-        #Compare the content of the hexamemory and the internal hexa grid, apply the final status of each cell to the hexa_memory        
-        for _,cell in enumerate(self.decided_cells):
-            self.decided_cells.remove(cell)
-            if len(cell) == 3 :
-                cell_to_wipe_x,cell_to_wipe_y = cell[2]
-                self.hexa_memory.grid[cell_to_wipe_x][cell_to_wipe_y].status = "Free"
-                pos_attendue_inte = self.hexa_memory.convert_cell_to_pos(cell_to_wipe_x,cell_to_wipe_y)
-                pos_reelle_inte = self.hexa_memory.convert_cell_to_pos(cell[0][0],cell[0][1])
-                diff_x = pos_reelle_inte[0] - pos_attendue_inte[0]
-                diff_y = pos_reelle_inte[1] - pos_attendue_inte[1]
-                print("moving robot by ",-diff_x,-diff_y)
-                self.hexa_memory.robot_pos_x -= diff_x
-                self.hexa_memory.robot_pos_y -= diff_y
-
-            
-            cell_x,cell_y = cell[0]
-            self.hexa_memory.grid[cell_x][cell_y].status = cell[1]
-            self.hexa_memory_change_flag = True
-        self.synthetizing_step = 0 if len(self.indecisive_cells) == 0 else 1
-        self.need_user_action = self.synthetizing_step == 1
-   
     def apply_user_action(self,action):
         """Apply the user action concerning the last indecisive_cell"""
         text,coord = action
@@ -179,4 +126,15 @@ class SynthesizerUserInteraction :
             self.indecisive_cells.pop()
             self.decided_cells.append((coord,status,indecisive_cell))
 
-        self.synthesize_step()
+    def synthetize_step(self):
+        """Synthetize the internal hexagrid according to the decided_cells"""
+        for decision in self.decided_cells:
+            cell,status,cell_to_wipe = None,None,None
+            if len (decision) == 2 :
+                cell,status = decision
+            if len (decision) == 3 :
+                cell,status,cell_to_wipe = decision
+            self.hexa_memory.grid[cell[0]][cell[1]].status = status
+        self.decided_cells = []
+        self.synthetizing_step = 2 if len(self.indecisive_cells) == 0 else 1
+        self.need_user_action = self.synthetizing_step == 1
