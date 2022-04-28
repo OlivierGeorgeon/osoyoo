@@ -1,7 +1,6 @@
 from . Controllers.ControllerNew import ControllerNew
 
 from . Misc.Utils import *
-from .  Misc.OsoyooCar import OsoyooCar
 from . Misc.Resources import *
 from . Misc.WifiInterface import WifiInterface
 
@@ -22,5 +21,6 @@ from . Model.Memories.MemoryV1 import MemoryV1
 
 from . Model.Synthesizers.Synthesizer import Synthesizer
 
-from . Views.EgoMemoryWindowNew import EgoMemoryWindowNew
+from . Views.OsoyooCar import OsoyooCar
+from . Views.EgocentricView import EgocentricView
 from . Views.HexaView import HexaView
