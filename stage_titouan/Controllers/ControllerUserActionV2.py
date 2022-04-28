@@ -185,6 +185,8 @@ class ControllerUserActionV2 :
         self.main_refresh(dt)
 
         self.main_loop(dt)
+
+        self.main_refresh(dt)
         
     def main(self):
         """Main function of the controller"""
