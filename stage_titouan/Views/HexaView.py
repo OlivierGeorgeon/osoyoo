@@ -2,6 +2,7 @@ import pyglet
 from pyglet.gl import *
 from .. Misc.Utils import hexaMemory_to_pyglet
 from .. Misc.Utils import translate_indecisive_cell_to_pyglet
+from .. Misc.Utils import recently_changed_to_pyglet
 #from .. Model.Hexamemories import HexaMemory
 from .. Model.Hexamemories.HexaMemory import HexaMemory
 from webcolors import name_to_rgb
@@ -48,6 +49,10 @@ class HexaView(pyglet.window.Window):
         self.nb_cell_x = memory.width
         self.nb_cell_y = memory.height
         self.cell_radius = memory.cell_radius
+
+    def extract_and_convert_recently_changed_cells(self, memory):
+        self.shapesList.append( recently_changed_to_pyglet(memory,self.batch))
+        memory.cells_changed_recently = []
 
     def show_indecisive_cell(self,indecisive_cell): #(indecisive_cell,hexaMemory,batch)
         self.indecisive_cell_shape = []
