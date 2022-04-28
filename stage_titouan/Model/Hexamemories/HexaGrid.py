@@ -1,5 +1,6 @@
-
 from . HexaCell import HexaCell
+
+
 class HexaGrid:
     """Inspired by http://roguebasin.com/?title=Hexagonal_Tiles#Coordinate_systems_with_a_hex_grid
     """

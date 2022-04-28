@@ -21,8 +21,8 @@ if __name__ == "__main__":
     else:
         print("Please provide your robot's IP address")
     print("Sending to: " + ip)
-    emw = EgoMemoryWindowNew()
-    emw2 = EgoMemoryWindowNew()
+    emw = EgocentricView()
+    emw2 = EgocentricView()
     emw2.set_caption("North up projection")
     memory = MemoryV1()
     hexa_memory = HexaMemory(width=40, height=80, cell_radius=50)

@@ -10,7 +10,7 @@ from .. Model.Agents import AgentAlignNorth
 from .. Model.Memories import MemoryV1
 from .. Misc.WifiInterface import WifiInterface
 from .. Misc.RobotDefine import *
-from .. Views.EgoMemoryWindowNew import EgoMemoryWindowNew
+from .. Views.EgocentricView import EgocentricView
 import msvcrt
 
 
@@ -353,7 +353,7 @@ if __name__ == '__main__':
     mem = MemoryV1()
     hexMem = HexaMemory(50,200, cell_radius = 20)
     synthe = Synthesizer(mem,hexMem)
-    view = EgoMemoryWindowNew()
+    view = EgocentricView()
     hexaview = HexaView()
     controller = ControllerNew(Agent6(mem,hexMem),mem, ip = "192.168.8.189",synthesizer = synthe, hexa_memory = hexMem,
                         view = view, hexaview = hexaview, automatic = False)
