@@ -25,7 +25,7 @@ class EgoMemoryWindow(pyglet.window.Window):
         self.zoom_level = 1
 
         # draw the robot for display in the window using the batch parameter and used OsoyooCar's file
-        self.robot = OsoyooCar(self.batch)
+        self.robot = OsoyooCar(self.batch, self.background)
         self.azimuth = 0
 
         # Room to write some text

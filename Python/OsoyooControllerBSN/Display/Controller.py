@@ -21,7 +21,7 @@ class Controller:
         # Model
         self.wifiInterface = WifiInterface(robot_ip)
         self.phenomena = []
-        self.robot = OsoyooCar(self.view.batch)
+        self.robot = OsoyooCar(self.view.batch, self.view.background)
 
         self.action = ""
         self.enact_step = 0

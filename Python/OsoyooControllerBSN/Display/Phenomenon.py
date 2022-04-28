@@ -13,6 +13,8 @@ POINT_PHENOMENON = 5
 
 class Phenomenon:
     def __init__(self, x, y, batch, group, point_type):
+        self.x = x
+        self.y = y
         self.batch = batch
         self.group = group
         self.type = point_type
@@ -67,6 +69,10 @@ class Phenomenon:
 
     def displace(self, displacement_matrix):
         """ Applying the displacement matrix to the phenomenon """
+        #  Rotate and translate the position
+        v = matrix44.apply_to_vector(displacement_matrix, [self.x, self.y, 0])
+        self.x, self.y = v[0], v[1]
+
         # POINT PLACE are vertex list
         if self.type == POINT_PLACE:
             for i in range(0, len(self.shape.vertices)-1, 2):
@@ -74,9 +80,8 @@ class Phenomenon:
                 self.shape.vertices[i], self.shape.vertices[i+1] = int(v[0]), int(v[1])
             return
 
-        #  Rotate and translate the position
-        v = matrix44.apply_to_vector(displacement_matrix, [self.shape.x, self.shape.y, 0])
-        self.shape.x, self.shape.y = v[0], v[1]
+        # Other points of interest are shapes
+        self.shape.x, self.shape.y = self.x, self.y
 
         # Rotate the shapes
         if self.type == POINT_TRESPASS:  # Rotate the rectangle
@@ -98,7 +103,7 @@ class Phenomenon:
 
     def is_near(self, x, y):
         """ If the point is near the x y coordinate, select this point and return True """
-        is_near = math.dist([x, y], [self.shape.x, self.shape.y]) < 50
+        is_near = math.dist([x, y], [self.x, self.y]) < 50
         if is_near:
             self.is_selected = True
         else:
