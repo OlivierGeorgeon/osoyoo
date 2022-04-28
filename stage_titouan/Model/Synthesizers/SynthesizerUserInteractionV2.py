@@ -6,7 +6,7 @@ from ... Model.Interactions.Interaction import INTERACTION_TRESPASSING, INTERACT
 MANUAL_MODE = "manual"
 AUTOMATIC_MODE = "automatic"
 
-class SynthesizerUserInteraction :
+class SynthesizerUserInteractionV2 :
     """Blabla"""
 
     def __init__(self,memory,hexa_memory):
@@ -49,7 +49,7 @@ class SynthesizerUserInteraction :
         self.interactions_list = [elem for elem in self.interactions_list if elem.type != "Echo" or elem in real_echos]
         self.project_interactions_on_internal_hexagrid()
         self.comparison_step()
-
+        print("kss")
 
     def treat_echos(self):
         """Find true position of the objects echolocated"""
@@ -76,6 +76,7 @@ class SynthesizerUserInteraction :
     def project_interactions_on_internal_hexagrid(self):
         """ Compute allocentric coordinates for every interaction of the given type in self.interactions_list,
         and add them to the internal hexagrid"""
+        self.internal_hexa_grid = HexaGrid(self.hexa_memory.width, self.hexa_memory.height)
         rota_radian = math.radians(self.hexa_memory.robot_angle)
         allocentric_coordinates = []
         for _,interaction in enumerate(self.interactions_list):
@@ -101,7 +102,7 @@ class SynthesizerUserInteraction :
                 intern_status = "Free" if len(cell.interactions) == 0 else translate_interaction_type_to_cell_status(cell.interactions[-1].type)
                 current_status = self.hexa_memory.grid[i][j].status
                 if self.mode == MANUAL_MODE :
-                    if intern_status not in ["Free", current_status] :
+                    if intern_status not in ["Free", current_status]  :
                         self.indecisive_cells.append(((i,j), intern_status))
                         self.synthetizing_step = 1 # A cell need user decision, so we enter synthetizing step 1
                         self.need_user_action = True
@@ -123,10 +124,13 @@ class SynthesizerUserInteraction :
             self.decided_cells.append((indecisive_cell,self.hexa_memory.grid[indecisive_cell[0]][indecisive_cell[1]].status))
         elif text == "click": #Give the status to the cell clicked by the user
             print("Suggestion accepted for cell ",coord)
+            print("indecisive_cell",len(self.indecisive_cells))
             self.indecisive_cells.pop()
+            print("indecisive_cell_apre_pop",len(self.indecisive_cells))
             self.decided_cells.append((coord,status,indecisive_cell))
 
-    def synthetize_step(self):
+
+    def synthetize(self):
         """Synthetize the internal hexagrid according to the decided_cells"""
         for decision in self.decided_cells:
             cell,status,cell_to_wipe = None,None,None
@@ -134,6 +138,14 @@ class SynthesizerUserInteraction :
                 cell,status = decision
             if len (decision) == 3 :
                 cell,status,cell_to_wipe = decision
+                cell_to_wipe_x,cell_to_wipe_y = cell_to_wipe
+                pos_attendue_inte = self.hexa_memory.convert_cell_to_pos(cell_to_wipe_x,cell_to_wipe_y)
+                pos_reelle_inte = self.hexa_memory.convert_cell_to_pos(cell[0],cell[1])
+                diff_x = pos_reelle_inte[0] - pos_attendue_inte[0]
+                diff_y = pos_reelle_inte[1] - pos_attendue_inte[1]
+                print("moving robot by ",-diff_x,-diff_y)
+                self.hexa_memory.robot_pos_x -= diff_x
+                self.hexa_memory.robot_pos_y -= diff_y
             self.hexa_memory.grid[cell[0]][cell[1]].status = status
         self.decided_cells = []
         self.synthetizing_step = 2 if len(self.indecisive_cells) == 0 else 1

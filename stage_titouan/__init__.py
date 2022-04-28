@@ -1,5 +1,6 @@
 from . Controllers.ControllerNew import ControllerNew
 from . Controllers.ControllerUserAction import ControllerUserAction
+from . Controllers.ControllerUserActionV2 import ControllerUserActionV2
 
 from . Misc.Utils import *
 from . Misc.Resources import *
@@ -22,6 +23,7 @@ from . Model.Memories.MemoryV1 import MemoryV1
 
 from . Model.Synthesizers.Synthesizer import Synthesizer
 from . Model.Synthesizers.SynthesizerUserInteraction import SynthesizerUserInteraction
+from . Model.Synthesizers.SynthesizerUserInteractionV2 import SynthesizerUserInteractionV2
 
 from . Views.OsoyooCar import OsoyooCar
 from . Views.EgocentricView import EgocentricView

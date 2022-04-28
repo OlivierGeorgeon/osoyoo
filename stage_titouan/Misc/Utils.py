@@ -149,6 +149,7 @@ def translate_interaction_type_to_cell_status(type):
 
 def translate_indecisive_cell_to_pyglet(indecisive_cell,hexaMemory,batch):
     """blabla"""
+    print("indecisive_cell to translate : ", indecisive_cell)
     x0 = 0
     y0 = 0
     (coord_x, coord_y), status = indecisive_cell
@@ -190,8 +191,6 @@ def translate_indecisive_cell_to_pyglet(indecisive_cell,hexaMemory,batch):
         color = name_to_rgb("white")
     elif(status == "Occupied"):
         color = name_to_rgb("yellow")
-        robot = True
-    
     elif(status == "Blocked"):
         color = name_to_rgb("red")
     elif(status == "Frontier"):
