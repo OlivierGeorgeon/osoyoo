@@ -174,6 +174,7 @@ class ControllerUserActionV2 :
         """Function that refresh the views"""
         if not self.need_traitement_flag :
             self.hexaview.extract_and_convert_interactions(self.hexa_memory)
+            self.view.extract_and_convert_interactions(self.memory)
         else :
             if not self.print_done :
                 print("pif")
