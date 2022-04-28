@@ -47,7 +47,7 @@ class PointOfInterest:
         if color_name is None:
             if self.type == POINT_PLACE:
                 # Place: Blue circle
-                self.shape.color = name_to_rgb("LightGreen")
+                self.shape.colors[0:9] = [144, 238, 144, 144, 238, 144, 144, 238, 144]
             if self.type == POINT_ECHO:
                 # Echo: Orange circle
                 self.shape.color = name_to_rgb("orange")
@@ -64,7 +64,11 @@ class PointOfInterest:
                 # Pushing: yellow triangle
                 self.shape.color = name_to_rgb("tomato")
         else:
-            self.shape.color = name_to_rgb(color_name)
+            if self.type == POINT_PLACE:
+                # Place:
+                self.shape.colors[0:9] = [255, 0, 0, 255, 0, 0, 255, 0, 0]
+            else:
+                self.shape.color = name_to_rgb(color_name)
 
     def displace(self, displacement_matrix):
         """ Applying the displacement matrix to the phenomenon """

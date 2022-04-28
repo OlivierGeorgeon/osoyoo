@@ -12,6 +12,7 @@ from .. Misc.WifiInterface import WifiInterface
 from .. Misc.RobotDefine import *
 from .. Views.EgocentricView import EgocentricView
 import msvcrt
+from .. Views.PointOfInterest import *
 
 
 
@@ -157,6 +158,12 @@ class ControllerNew:
     def send_phenom_info_to_memory(self,phenom_info,echo_array):
         """Send Interaction to the Memory
         """
+        floor, shock, blocked, obstacle, x, y = phenom_info
+        if floor:
+            self.view.add_point_of_interest(LINE_X, 0, POINT_TRESPASS)
+        if obstacle:
+            self.view.add_point_of_interest(x, y, POINT_ECHO)
+
         if self.memory is not None:
             self.memory.add(phenom_info)
             self.memory.add_echo_array(echo_array)
@@ -303,11 +310,18 @@ class ControllerNew:
                     translation[0] = -RETREAT_DISTANCE
                     translation[1] = -SHIFT_DISTANCE * forward_duration/1000
 
-                
-
-
-
             angle = rotation
+
+            # The displacement matrix of this interaction
+            translation_matrix = matrix44.create_from_translation([-translation[0], -translation[1], 0])
+            rotation_matrix = matrix44.create_from_z_rotation(-math.radians(-rotation))
+            displacement_matrix = matrix44.multiply(rotation_matrix, translation_matrix)
+
+            # Translate and rotate all the points of interest
+            self.view.displace(displacement_matrix)
+
+            # Marker the new position
+            self.view.add_point_of_interest(0, 0, POINT_PLACE)
 
             # Update head angle
             if 'head_angle' in outcome:

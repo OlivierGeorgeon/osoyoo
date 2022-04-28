@@ -16,43 +16,11 @@ class Controller:
     def __init__(self, view: EgocentricView, robot_ip):
         # View
         self.view = view
-
-        # Model
         self.wifiInterface = WifiInterface(robot_ip)
-        self.points_of_interest = []
-        # self.robot = OsoyooCar(self.view.batch, self.view.background)
 
         self.action = ""
         self.enact_step = 0
         self.outcome_bytes = b'{"status":"T"}'  # Default status T timeout
-
-        self.mouse_press_x = 0
-        self.mouse_press_y = 0
-        self.mouse_press_angle = 0
-
-        # Mouse press: select or unselect points
-        def on_mouse_press(x, y, button, modifiers):
-            self.mouse_press_x, self.mouse_press_y, self.mouse_press_angle = \
-                self.view.set_mouse_press_coordinate(x, y, button, modifiers)
-            for p in self.points_of_interest:
-                if p.is_near(self.mouse_press_x, self.mouse_press_y):
-                    p.set_color("red")
-                else:
-                    p.set_color()
-
-        # key press: delete selected points
-        def on_key_press(symbol, modifiers):
-            if symbol == key.DELETE:
-                for p in self.points_of_interest:
-                    if p.is_selected:
-                        p.delete()
-                        self.points_of_interest.remove(p)
-            if symbol == key.INSERT:
-                print("insert phenomenon")
-                phenomenon = PointOfInterest(self.mouse_press_x, self.mouse_press_y, self.view.batch, self.view.foreground, POINT_PHENOMENON)
-                self.points_of_interest.append(phenomenon)
-
-        self.view.push_handlers(on_mouse_press, on_key_press)
 
     def enact(self, text):
         """ Creating an asynchronous thread to send the action to the robot and to wait for outcome """
@@ -129,37 +97,30 @@ class Controller:
         rotation_matrix = matrix44.create_from_z_rotation(-math.radians(-rotation))
         displacement_matrix = matrix44.multiply(rotation_matrix, translation_matrix)
 
-        # Translate and rotate all the phenomena
-        for p in self.points_of_interest:
-            p.displace(displacement_matrix)
+        # Translate and rotate all the points of interest
+        self.view.displace(displacement_matrix)
 
         # Marker the new position
-        position = PointOfInterest(0, 0, self.view.batch, self.view.foreground, POINT_PLACE)
-        self.points_of_interest.append(position)
+        self.view.add_point_of_interest(0, 0, POINT_PLACE)
 
         # Check if line detected
         if floor > 0:
             # Mark a new trespassing interaction
-            line = PointOfInterest(LINE_X, 0, self.view.batch, self.view.foreground, POINT_TRESPASS)
-            self.points_of_interest.append(line)
+            self.view.add_point_of_interest(LINE_X, 0, POINT_TRESPASS)
 
         # Check for collision when moving forward
         if self.action == "8" and floor == 0:
             if blocked:
                 # Create a new push interaction
-                push = PointOfInterest(110, 0, self.view.batch, self.view.foreground, POINT_PUSH)
-                self.points_of_interest.append(push)
+                self.view.add_point_of_interest(110, 0, POINT_PUSH)
             else:
                 # Create a new shock interaction
                 if shock == 0b01:
-                    wall = PointOfInterest(110, -80, self.view.batch, self.view.foreground, POINT_SHOCK)
-                    self.points_of_interest.append(wall)
+                    self.view.add_point_of_interest(110, -80, POINT_SHOCK)
                 if shock == 0b11:
-                    wall = PointOfInterest(110, 0, self.view.batch, self.view.foreground, POINT_SHOCK)
-                    self.points_of_interest.append(wall)
+                    self.view.add_point_of_interest(110, 0, POINT_SHOCK)
                 if shock == 0b10:
-                    wall = PointOfInterest(110, 80, self.view.batch, self.view.foreground, POINT_SHOCK)
-                    self.points_of_interest.append(wall)
+                    self.view.add_point_of_interest(110, 80, POINT_SHOCK)
 
         # Update head angle
         if 'head_angle' in outcome:
@@ -171,8 +132,7 @@ class Controller:
                 if echo_distance > 0:  # echo measure 0 is false measure
                     x = self.robot.head_x + math.cos(math.radians(head_angle)) * echo_distance
                     y = self.robot.head_y + math.sin(math.radians(head_angle)) * echo_distance
-                    echo = PointOfInterest(x, y, self.view.batch, self.view.foreground, POINT_ECHO)
-                    self.points_of_interest.append(echo)
+                    self.view.add_point_of_interest(x, y, POINT_ECHO)
 
         # Update the azimuth
         if 'azimuth' in outcome:
