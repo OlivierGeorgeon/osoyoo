@@ -27,7 +27,7 @@ class ControllerUserActionV2 :
         -Translate the Agent Actions into Robot Actions, and command the robot to execute them
 
     It has the following communications :
-        VOCABULARY : for a class X wich the Y class (here Controller) communicate with : 
+        VOCABULARY : for a class X wich the Y class (here Controller) communicate with :
             Ask = X.ask(_) (a method of x is called, and x return a result)
             Send = X.receive(data) (a method of x is called, wich change the inner state of X)
             Receive = X does Y.receive(data)
@@ -72,9 +72,10 @@ class ControllerUserActionV2 :
         self.control_mode = CONTROL_MODE_MANUAL
         self.need_user_action = False #True if there a synthesizer and it has indecisive_cells
         self.user_action = None
-        self.print_done = True
+        self.print_done = False
         self.need_traitement_flag= False
         self.cell_inde_a_traiter = None
+        self.robot_command = None
         if emw is not None:
             @emw.event
             def on_text(text):
@@ -85,13 +86,14 @@ class ControllerUserActionV2 :
                     self.control_mode = CONTROL_MODE_MANUAL
                     print("Control mode: MANUAL")
 
-                if self.control_mode == CONTROL_MODE_MANUAL and self.synthesizer.synthetizing_step == 1 and not self.need_traitement_flag :
+                if self.control_mode == CONTROL_MODE_MANUAL and not self.synthesizer.synthetizing_step == 1 and not self.need_traitement_flag :
                     
                     if self.enact_step == 0 and not self.need_user_action:
                         self.action_angle = emw.mouse_press_angle
                         #  if text == "/" or text == "+":  # Send the angle marked by the mouse click
                         #      text = json.dumps({'action': text, 'angle': emw.mouse_press_angle})
-                        self.command_robot(text)
+                        #self.command_robot(text)
+                        self.robot_command = text
                     else:
                         message = "Waiting for previous outcome before sending new action" if self.enact_step != 0 else "Waiting for user action"
                         print(message)
@@ -126,19 +128,19 @@ class ControllerUserActionV2 :
                 mouse_y = int((y - hemw.height/2)*hemw.zoom_level*2)
                 # Find the cell
                 cell_x, cell_y = hexa_memory.convert_pos_in_cell(mouse_x, mouse_y)
-                if self.need_user_action :
-                    print("Cell: ", cell_x, cell_y)
                 hemw.label.text = "Cell: " + str(cell_x) + ", " + str(cell_y)
 
     def main_loop(self,dt):
         """blabla"""
         if self.synthesizer.synthetizing_step == 1 and not self.need_traitement_flag :
+            self.print_done = False
             print("1")
             self.cell_inde_a_traiter = self.synthesizer.indecisive_cells[-1]
             self.need_traitement_flag = True
             self.need_user_action = True
             self.user_action = None
         elif self.need_traitement_flag and self.user_action is not None :
+            self.cell_inde_a_traiter = self.synthesizer.indecisive_cells[-1]
             print("2")
             self.synthesizer.apply_user_action(self.user_action)
             self.synthesizer.synthetize()
@@ -154,6 +156,10 @@ class ControllerUserActionV2 :
                     robot_action = self.translate_agent_action_to_robot_command(self.action)
                 # 2 : ordonne au robot
                     self.command_robot(robot_action)
+            if self.robot_command is not None:
+                    print("he")
+                    self.command_robot(self.robot_command)
+                    self.robot_command = None
             if(self.enact_step >= 2):
                 robot_data = self.outcome_bytes
                 phenom_info, angle, translation, self.outcome, echo_array = self.translate_robot_data(robot_data)
@@ -164,18 +170,27 @@ class ControllerUserActionV2 :
                 self.enact_step = 0
                 self.synthesizer.act()
 
-
     def main_refresh(self,dt):
         """Function that refresh the views"""
         if not self.need_traitement_flag :
             self.hexaview.extract_and_convert_interactions(self.hexa_memory)
         else :
-            self.hexaview.show_indecisive_cell(self.cell_inde_a_traiter)
+            if not self.print_done :
+                print("pif")
+                self.hexaview.show_indecisive_cell(self.cell_inde_a_traiter)
+                self.print_done = True
 
+
+    def mains(self,dt):
+        self.main_refresh(dt)
+
+        self.main_loop(dt)
+        
     def main(self):
         """Main function of the controller"""
-        pyglet.clock.schedule_interval(self.main_loop,0.3)
-        pyglet.clock.schedule_interval(self.main_refresh,0.3)
+        #pyglet.clock.schedule_interval(self.main_loop,0.5)
+        #pyglet.clock.schedule_interval(self.main_refresh,0.1)
+        pyglet.clock.schedule_interval(self.mains,0.1)
         pyglet.app.run()
 
 

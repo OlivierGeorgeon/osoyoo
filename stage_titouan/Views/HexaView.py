@@ -25,8 +25,6 @@ class HexaView(pyglet.window.Window):
         self.zoom_level = 4
         self.azimuth = 0
         self.shapesList = shapesList
-        # self.mouse_press_x = 0
-        # self.mouse_press_y = 0
         self.mouse_press_angle = 0
         self.window = None
 
@@ -43,24 +41,10 @@ class HexaView(pyglet.window.Window):
     def set_ShapesList(self,s):
         self.shapesList = s
 
-    # def refresh(self,memory):
-    #     @self.event
-    #     def on_close():
-    #         self.close()
-    #         #@self.window.event
-    #         #def on_key_press(key, mod):
-    #         #    # ...do stuff on key press
-    #     pyglet.clock.tick()
-    #     self.clear()
-    #     self.dispatch_events()
-    #     self.extract_and_convert_phenomenons(memory)
-    #     self.on_draw()
-    #     # ...transform, update, create all objects that need to be rendered
-    #     self.flip()
-
     def extract_and_convert_interactions(self, memory):
         self.indecisive_cell_shape = []
         self.shapesList = hexaMemory_to_pyglet(memory, self.batch)
+        #print("ici")
         self.nb_cell_x = memory.width
         self.nb_cell_y = memory.height
         self.cell_radius = memory.cell_radius
@@ -68,6 +52,7 @@ class HexaView(pyglet.window.Window):
     def show_indecisive_cell(self,indecisive_cell): #(indecisive_cell,hexaMemory,batch)
         self.indecisive_cell_shape = []
         self.indecisive_cell_shape = translate_indecisive_cell_to_pyglet(indecisive_cell,self.hexa_memory,self.batch)
+        print("p2 :",self.indecisive_cell_shape[0].position)
         
     def on_draw(self):
         """ Drawing the window """
@@ -105,16 +90,6 @@ class HexaView(pyglet.window.Window):
         f = ZOOM_IN_FACTOR if dy > 0 else 1/ZOOM_IN_FACTOR if dy < 0 else 1
         # if .4 < self.zoom_level * f < 5:  # Olivier
         self.zoom_level *= f
-
-        # def set_batch(self, batch):
-        #     self.batch = batch
-
-    # def on_mouse_press(self, x, y, button, modifiers):
-    #     """ Computing the position of the mouse click in the hexagrid  """
-    #     # Compute the position relative to the center in mm
-    #     self.mouse_press_x = int((x - self.width/2)*self.zoom_level*2)
-    #     self.mouse_press_y = int((y - self.height/2)*self.zoom_level*2)
-    #     print(self.mouse_press_x, self.mouse_press_y)
 
 
 # Testing  HexaView by displaying HexaMemory
