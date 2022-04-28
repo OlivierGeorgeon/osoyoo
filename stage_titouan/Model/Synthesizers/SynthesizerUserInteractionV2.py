@@ -6,7 +6,7 @@ from ... Model.Interactions.Interaction import INTERACTION_TRESPASSING, INTERACT
 MANUAL_MODE = "manual"
 AUTOMATIC_MODE = "automatic"
 
-class SynthesizerUserInteraction :
+class SynthesizerUserInteractionV2 :
     """Blabla"""
 
     def __init__(self,memory,hexa_memory):
@@ -49,7 +49,7 @@ class SynthesizerUserInteraction :
         self.interactions_list = [elem for elem in self.interactions_list if elem.type != "Echo" or elem in real_echos]
         self.project_interactions_on_internal_hexagrid()
         self.comparison_step()
-
+        print("kss")
 
     def treat_echos(self):
         """Find true position of the objects echolocated"""
@@ -126,7 +126,7 @@ class SynthesizerUserInteraction :
             self.indecisive_cells.pop()
             self.decided_cells.append((coord,status,indecisive_cell))
 
-    def synthetize_step(self):
+    def synthetize(self):
         """Synthetize the internal hexagrid according to the decided_cells"""
         for decision in self.decided_cells:
             cell,status,cell_to_wipe = None,None,None

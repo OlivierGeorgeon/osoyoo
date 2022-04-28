@@ -10,7 +10,7 @@ from ..Model.Agents import AgentAlignNorth
 from ..Model.Memories import MemoryV1
 from ..Misc.WifiInterface import WifiInterface
 from ..Misc.RobotDefine import *
-from ..Views.EgoMemoryWindowNew import EgoMemoryWindowNew
+from ..Views.EgocentricView import EgocentricView
 import msvcrt
 import pyglet
 

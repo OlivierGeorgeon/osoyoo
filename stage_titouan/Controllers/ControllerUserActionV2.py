@@ -9,14 +9,14 @@ from ..Model.Agents import AgentAlignNorth
 from ..Model.Memories import MemoryV1
 from ..Misc.WifiInterface import WifiInterface
 from ..Misc.RobotDefine import *
-from ..Views.EgoMemoryWindowNew import EgoMemoryWindowNew
+from ..Views.EgocentricView import EgocentricView
 import msvcrt
 import pyglet
 
 CONTROL_MODE_MANUAL = 0
 CONTROL_MODE_AUTOMATIC = 1
 
-class ControllerUserAction :
+class ControllerUserActionV2 :
 
     """Controller of the application
     It is the only object in the application that should have access to every of the following objects :
@@ -85,7 +85,8 @@ class ControllerUserAction :
                     self.control_mode = CONTROL_MODE_MANUAL
                     print("Control mode: MANUAL")
 
-                if self.control_mode == CONTROL_MODE_MANUAL:
+                if self.control_mode == CONTROL_MODE_MANUAL and self.synthesizer.synthetizing_step == 1 and not self.need_traitement_flag :
+                    
                     if self.enact_step == 0 and not self.need_user_action:
                         self.action_angle = emw.mouse_press_angle
                         #  if text == "/" or text == "+":  # Send the angle marked by the mouse click
@@ -132,11 +133,13 @@ class ControllerUserAction :
     def main_loop(self,dt):
         """blabla"""
         if self.synthesizer.synthetizing_step == 1 and not self.need_traitement_flag :
+            print("1")
             self.cell_inde_a_traiter = self.synthesizer.indecisive_cells[-1]
             self.need_traitement_flag = True
             self.need_user_action = True
             self.user_action = None
         elif self.need_traitement_flag and self.user_action is not None :
+            print("2")
             self.synthesizer.apply_user_action(self.user_action)
             self.synthesizer.synthetize()
             self.need_traitement_flag = False
@@ -159,9 +162,10 @@ class ControllerUserAction :
                 self.send_phenom_info_to_memory(phenom_info,echo_array) # when the robot detect interaction (before or after moving)
                 self.memory.tick()
                 self.enact_step = 0
+                self.synthesizer.act()
 
 
-    def main_refresh(self):
+    def main_refresh(self,dt):
         """Function that refresh the views"""
         if not self.need_traitement_flag :
             self.hexaview.extract_and_convert_interactions(self.hexa_memory)

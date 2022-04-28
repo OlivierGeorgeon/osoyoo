@@ -38,9 +38,6 @@ class HexaView(pyglet.window.Window):
         self.mouse_press_y = 0
         self.label = pyglet.text.Label('', font_name='Arial', font_size=15, x=10, y=10)
         self.label.color = (0,0,0,255)
-
-        self.need_user_action = False
-        self.user_acted = False
         self.hexa_memory = hexa_memory
 
     def set_ShapesList(self,s):
@@ -62,12 +59,14 @@ class HexaView(pyglet.window.Window):
     #     self.flip()
 
     def extract_and_convert_interactions(self, memory):
+        self.indecisive_cell_shape = []
         self.shapesList = hexaMemory_to_pyglet(memory, self.batch)
         self.nb_cell_x = memory.width
         self.nb_cell_y = memory.height
         self.cell_radius = memory.cell_radius
 
     def show_indecisive_cell(self,indecisive_cell): #(indecisive_cell,hexaMemory,batch)
+        self.indecisive_cell_shape = []
         self.indecisive_cell_shape = translate_indecisive_cell_to_pyglet(indecisive_cell,self.hexa_memory,self.batch)
         
     def on_draw(self):
