@@ -11,7 +11,7 @@ POINT_PLACE = 4
 POINT_PHENOMENON = 5
 
 
-class Phenomenon:
+class PointOfInterest:
     def __init__(self, x, y, batch, group, point_type):
         self.x = x
         self.y = y

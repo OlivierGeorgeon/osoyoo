@@ -37,7 +37,7 @@ def main(ip):
     def on_text(text):
         global control_mode
         if text.upper() == "C":
-            ModalWindow(controller.phenomena)
+            ModalWindow(controller.points_of_interest)
             return
         if text.upper() == "A":
             control_mode = CONTROL_MODE_AUTOMATIC

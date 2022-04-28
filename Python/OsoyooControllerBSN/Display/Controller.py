@@ -3,7 +3,7 @@ import json
 from ..RobotDefine import *
 import threading
 from ..Wifi.WifiInterface import WifiInterface
-from ..Display.Phenomenon import *
+from ..Display.PointOfInterest import *
 import math
 from ..Display.OsoyooCar import OsoyooCar
 from ..Display.EgoMemoryWindow import EgoMemoryWindow
@@ -20,7 +20,7 @@ class Controller:
 
         # Model
         self.wifiInterface = WifiInterface(robot_ip)
-        self.phenomena = []
+        self.points_of_interest = []
         self.robot = OsoyooCar(self.view.batch, self.view.background)
 
         self.action = ""
@@ -35,7 +35,7 @@ class Controller:
         def on_mouse_press(x, y, button, modifiers):
             self.mouse_press_x, self.mouse_press_y, self.mouse_press_angle = \
                 self.view.set_mouse_press_coordinate(x, y, button, modifiers)
-            for p in self.phenomena:
+            for p in self.points_of_interest:
                 if p.is_near(self.mouse_press_x, self.mouse_press_y):
                     p.set_color("red")
                 else:
@@ -44,14 +44,14 @@ class Controller:
         # key press: delete selected points
         def on_key_press(symbol, modifiers):
             if symbol == key.DELETE:
-                for p in self.phenomena:
+                for p in self.points_of_interest:
                     if p.is_selected:
                         p.delete()
-                        self.phenomena.remove(p)
+                        self.points_of_interest.remove(p)
             if symbol == key.INSERT:
                 print("insert phenomenon")
-                phenomenon = Phenomenon(self.mouse_press_x, self.mouse_press_y, self.view.batch, self.view.foreground, POINT_PHENOMENON)
-                self.phenomena.append(phenomenon)
+                phenomenon = PointOfInterest(self.mouse_press_x, self.mouse_press_y, self.view.batch, self.view.foreground, POINT_PHENOMENON)
+                self.points_of_interest.append(phenomenon)
 
         self.view.push_handlers(on_mouse_press, on_key_press)
 
@@ -131,36 +131,36 @@ class Controller:
         displacement_matrix = matrix44.multiply(rotation_matrix, translation_matrix)
 
         # Translate and rotate all the phenomena
-        for p in self.phenomena:
+        for p in self.points_of_interest:
             p.displace(displacement_matrix)
 
         # Marker the new position
-        position = Phenomenon(0, 0, self.view.batch, self.view.foreground, POINT_PLACE)
-        self.phenomena.append(position)
+        position = PointOfInterest(0, 0, self.view.batch, self.view.foreground, POINT_PLACE)
+        self.points_of_interest.append(position)
 
         # Check if line detected
         if floor > 0:
             # Mark a new trespassing interaction
-            line = Phenomenon(LINE_X, 0, self.view.batch, self.view.foreground, POINT_TRESPASS)
-            self.phenomena.append(line)
+            line = PointOfInterest(LINE_X, 0, self.view.batch, self.view.foreground, POINT_TRESPASS)
+            self.points_of_interest.append(line)
 
         # Check for collision when moving forward
         if self.action == "8" and floor == 0:
             if blocked:
                 # Create a new push interaction
-                push = Phenomenon(110, 0, self.view.batch, self.view.foreground, POINT_PUSH)
-                self.phenomena.append(push)
+                push = PointOfInterest(110, 0, self.view.batch, self.view.foreground, POINT_PUSH)
+                self.points_of_interest.append(push)
             else:
                 # Create a new shock interaction
                 if shock == 0b01:
-                    wall = Phenomenon(110, -80, self.view.batch, self.view.foreground, POINT_SHOCK)
-                    self.phenomena.append(wall)
+                    wall = PointOfInterest(110, -80, self.view.batch, self.view.foreground, POINT_SHOCK)
+                    self.points_of_interest.append(wall)
                 if shock == 0b11:
-                    wall = Phenomenon(110, 0, self.view.batch, self.view.foreground, POINT_SHOCK)
-                    self.phenomena.append(wall)
+                    wall = PointOfInterest(110, 0, self.view.batch, self.view.foreground, POINT_SHOCK)
+                    self.points_of_interest.append(wall)
                 if shock == 0b10:
-                    wall = Phenomenon(110, 80, self.view.batch, self.view.foreground, POINT_SHOCK)
-                    self.phenomena.append(wall)
+                    wall = PointOfInterest(110, 80, self.view.batch, self.view.foreground, POINT_SHOCK)
+                    self.points_of_interest.append(wall)
 
         # Update head angle
         if 'head_angle' in outcome:
@@ -172,8 +172,8 @@ class Controller:
                 if echo_distance > 0:  # echo measure 0 is false measure
                     x = self.robot.head_x + math.cos(math.radians(head_angle)) * echo_distance
                     y = self.robot.head_y + math.sin(math.radians(head_angle)) * echo_distance
-                    echo = Phenomenon(x, y, self.view.batch, self.view.foreground, POINT_ECHO)
-                    self.phenomena.append(echo)
+                    echo = PointOfInterest(x, y, self.view.batch, self.view.foreground, POINT_ECHO)
+                    self.points_of_interest.append(echo)
 
         # Update the azimuth
         if 'azimuth' in outcome:
@@ -197,7 +197,7 @@ if __name__ == "__main__":
     def on_text(text):
         """ Receiving the action from the window and calling the controller to send the action to the robot """
         if text.upper() == "C":
-            window = ModalWindow(controller.phenomena)
+            window = ModalWindow(controller.points_of_interest)
             return
         if controller.enact_step == 0:
             if text == "/":  # Send the angle marked by the mouse click
