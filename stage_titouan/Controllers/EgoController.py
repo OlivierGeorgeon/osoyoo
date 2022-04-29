@@ -57,9 +57,14 @@ class EgoController:
         self.points_of_interest = []
         for i in range(len(memory.interactions)):
             interaction = memory.interactions[i]
-            poi = self.add_point_of_interest(interaction.x, interaction.y, interaction.type)
+            poi = self.add_point_of_interest(0, 0, interaction.type)
             # Attach the interaction to this point of interest
             poi.reference = interaction
+            # Move and rotate this point of interest by the interaction's position
+            translation_matrix = matrix44.create_from_translation([interaction.x, interaction.y, 0])
+            rotation_matrix = matrix44.create_from_z_rotation(math.radians(interaction.rotation))
+            displacement_matrix = matrix44.multiply(rotation_matrix, translation_matrix)
+            poi.displace(displacement_matrix)
 
 
 # Displaying EgoMemoryWindowNew with phenomena in MemoryV1

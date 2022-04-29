@@ -42,7 +42,6 @@ class Interaction:
         self.color= color
         self.rgb = name_to_rgb(color)
         self.starArgs = starArgs # At the moment, represent the number of spikes of a star
-        self.rotation = 0
         self.id = id
         self.corners = None
         self.compute_corners()
