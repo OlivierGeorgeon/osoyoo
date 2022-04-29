@@ -49,7 +49,7 @@ if __name__ == "__main__":
             print("Control mode: MANUAL")
 
         if control_mode == CONTROL_MODE_MANUAL:
-            if controller.enact_step == 0:
+            if robot_controller.enact_step == 0:
                 # controller.action_angle = emw.mouse_press_angle
                 #  if text == "/" or text == "+":  # Send the angle marked by the mouse click
                 #      text = json.dumps({'action': text, 'angle': emw.mouse_press_angle})

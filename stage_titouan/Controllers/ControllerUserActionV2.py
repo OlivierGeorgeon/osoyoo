@@ -64,10 +64,10 @@ class ControllerUserActionV2 :
         self.wifiInterface = WifiInterface(ip)
         self.outcome_bytes = b'{"status":"T"}'  # Default status T timeout
 
-        self.outcome = 0
-        self.enact_step = 0
-        self.action = ""
-        self.action_angle = 0
+        # self.outcome = 0     OG: Moved to RobotController
+        # self.enact_step = 0
+        # self.action = ""
+        # self.action_angle = 0
         emw = self.view if self.view is not None else None
         self.control_mode = CONTROL_MODE_MANUAL
         self.need_user_action = False #True if there a synthesizer and it has indecisive_cells
