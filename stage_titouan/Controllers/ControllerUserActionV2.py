@@ -104,7 +104,6 @@ class ControllerUserActionV2 :
         if hemw is not None:
             
             def on_text_hemw(text):
-                print("y")
                 if self.need_user_action :
                     if text.upper() == "Y":
                         self.user_action = 'y',None
