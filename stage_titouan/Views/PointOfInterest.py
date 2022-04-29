@@ -3,10 +3,11 @@ import math
 from pyrr import matrix44, Quaternion
 from webcolors import name_to_rgb
 
-POINT_ECHO = 0
-POINT_TRESPASS = 1
-POINT_SHOCK = 2
-POINT_PUSH = 3
+POINT_ECHO = 1
+POINT_TINY_ECHO = 'Echo'
+POINT_TRESPASS = 'Trespassing'
+POINT_SHOCK = 'Shock'
+POINT_PUSH = 'Block'
 POINT_PLACE = 4
 POINT_PHENOMENON = 5
 
@@ -19,6 +20,7 @@ class PointOfInterest:
         self.group = group
         self.type = point_type
         self.is_selected = False
+        self.reference = None
 
         if self.type == POINT_PLACE:
             # Place: "LightGreen" triangle
@@ -27,6 +29,9 @@ class PointOfInterest:
         if self.type == POINT_ECHO:
             # Echo: Orange circle
             self.shape = shapes.Circle(x, y, 20, color=name_to_rgb("orange"), batch=self.batch)
+        if self.type == POINT_TINY_ECHO:
+            # Echo: Orange circle
+            self.shape = shapes.Circle(x, y, 7, color=name_to_rgb("orange"), batch=self.batch)
         if self.type == POINT_TRESPASS:
             # Trespassing: black dash
             self.shape = shapes.Rectangle(x, y, 10, 60, color=name_to_rgb("black"), batch=self.batch)
@@ -49,6 +54,9 @@ class PointOfInterest:
                 # Place: Blue circle
                 self.shape.colors[0:9] = [144, 238, 144, 144, 238, 144, 144, 238, 144]
             if self.type == POINT_ECHO:
+                # Echo: Orange circle
+                self.shape.color = name_to_rgb("orange")
+            if self.type == POINT_TINY_ECHO:
                 # Echo: Orange circle
                 self.shape.color = name_to_rgb("orange")
             if self.type == POINT_TRESPASS:
@@ -102,7 +110,7 @@ class PointOfInterest:
 
     def delete(self):
         """ Delete the shape to remove it from the batch """
-        self.shape.delete()
+        self.shape.delete()  # Not sure whether it is necessary or not
 
     def is_near(self, x, y):
         """ If the point is near the x y coordinate, select this point and return True """

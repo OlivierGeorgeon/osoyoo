@@ -1,6 +1,8 @@
 from . Controllers.ControllerNew import ControllerNew
 from . Controllers.ControllerUserAction import ControllerUserAction
 from . Controllers.ControllerUserActionV2 import ControllerUserActionV2
+from . Controllers.EgoController import EgoController
+from . Controllers.RobotController import RobotController
 
 from . Misc.Utils import *
 from . Misc.Resources import *
