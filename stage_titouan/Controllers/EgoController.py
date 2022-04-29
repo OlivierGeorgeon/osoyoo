@@ -12,7 +12,7 @@ from pyglet.window import key
 from pyrr import matrix44
 
 
-class Controller:
+class EgoController:
     def __init__(self, view: EgocentricView, robot_ip):
         # View
         self.view = view
@@ -141,7 +141,7 @@ class Controller:
 
 # Testing the controller by remote controlling the robot from the egocentric memory window
 # Set the IP address. Run:
-# py -m Python.OsoyooControllerBSN.Display.Controller <Robot's IP>
+# py -m stage_titouan.Controllers.EgoController <Robot's IP>
 if __name__ == "__main__":
     ip = "192.168.4.1"
     if len(sys.argv) > 1:
@@ -150,7 +150,7 @@ if __name__ == "__main__":
         print("Please provide your robot's IP address")
     print("Sending to: " + ip)
     emw = EgocentricView()
-    controller = Controller(emw, ip)
+    controller = EgoController(emw, ip)
 
     @emw.event
     def on_text(text):
