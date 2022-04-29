@@ -52,12 +52,11 @@ class HexaView(pyglet.window.Window):
 
     def extract_and_convert_recently_changed_cells(self, memory):
         self.shapesList.append( recently_changed_to_pyglet(memory,self.batch))
-        memory.cells_changed_recently = []
+        
 
     def show_indecisive_cell(self,indecisive_cell): #(indecisive_cell,hexaMemory,batch)
         self.indecisive_cell_shape = []
         self.indecisive_cell_shape = translate_indecisive_cell_to_pyglet(indecisive_cell,self.hexa_memory,self.batch)
-        print("p2 :",self.indecisive_cell_shape[0].position)
         
     def on_draw(self):
         """ Drawing the window """

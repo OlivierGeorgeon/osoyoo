@@ -2,7 +2,7 @@ import math
 from ... Model.Hexamemories.HexaGrid import HexaGrid
 from ... Misc.Utils import translate_interaction_type_to_cell_status
 from ... Model.Interactions.Interaction import INTERACTION_TRESPASSING, INTERACTION_ECHO, INTERACTION_BLOCK, INTERACTION_SHOCK
-
+from ... Misc.RobotDefine import RETREAT_DISTANCE
 MANUAL_MODE = "manual"
 AUTOMATIC_MODE = "automatic"
 
@@ -32,9 +32,11 @@ class SynthesizerUserInteractionV2 :
         self.synthetizing_step = 0  # 0: idle. 1: Projection ready, waiting for decision. 2: decision made, hexamem adjusted.
         self.decided_cells = []
         self.cells_to_wipe = []
-
-        self.hexa_memory_change_flag = False
+        self.change_RETREAT_DISTANCE = None
+        self.flag_no = False
         self.need_user_action = False
+
+        self.indecisive_interactions = []
     def reset(self):
         """ Reset the internal_hexa_grid """
         self.internal_hexa_grid = HexaGrid(self.hexa_memory.width, self.hexa_memory.height)
@@ -49,7 +51,6 @@ class SynthesizerUserInteractionV2 :
         self.interactions_list = [elem for elem in self.interactions_list if elem.type != "Echo" or elem in real_echos]
         self.project_interactions_on_internal_hexagrid()
         self.comparison_step()
-        print("kss")
 
     def treat_echos(self):
         """Find true position of the objects echolocated"""
@@ -89,7 +90,6 @@ class SynthesizerUserInteractionV2 :
             coordinate_x,coordinate_y = allocentric_coordinate
             cell_x,cell_y = self.hexa_memory.convert_pos_in_cell(coordinate_x,coordinate_y)
             if (cell_x,cell_y) not in already_used_cells:
-                print("cell_x,cell_y",cell_x,cell_y , "  already used : ", already_used_cells)
                 self.internal_hexa_grid.add_interaction(cell_x,cell_y,interaction)
                 already_used_cells.append((cell_x,cell_y))
             self.last_used_id = max(interaction.id,self.last_used_id)
@@ -104,8 +104,12 @@ class SynthesizerUserInteractionV2 :
                 if self.mode == MANUAL_MODE :
                     if intern_status not in ["Free", current_status]  :
                         self.indecisive_cells.append(((i,j), intern_status))
+                        self.indecisive_interactions.append(cell.interactions[-1])
                         self.synthetizing_step = 1 # A cell need user decision, so we enter synthetizing step 1
                         self.need_user_action = True
+                    else :
+                        if len(cell.interactions) > 0 :
+                            self.hexa_memory.grid[i][j].interactions.append(cell.interactions[-1])
         self.synthetizing_step = 2 if not self.synthetizing_step==1 else 1 # If self.synthetizing_step == 1 we need user decision
         #before synthetizing, so we stay in 1 else we can synthesize right away so we go in step 2
         self.need_user_action = self.synthetizing_step == 1
@@ -118,24 +122,43 @@ class SynthesizerUserInteractionV2 :
             print("Suggestion accepted")
             self.indecisive_cells.pop()
             self.decided_cells.append((indecisive_cell,status))
+            #self.hexa_memory.grid[indecisive_cell[0]][indecisive_cell[1]].interactions.append(self.indecisive_interactions.pop())
         elif text == "n": #Keep the cell as it is
             print("Suggestion refused")
             self.indecisive_cells.pop()
             self.decided_cells.append((indecisive_cell,self.hexa_memory.grid[indecisive_cell[0]][indecisive_cell[1]].status))
+            self.flag_no = True
         elif text == "click": #Give the status to the cell clicked by the user
             print("Suggestion accepted for cell ",coord)
-            print("indecisive_cell",len(self.indecisive_cells))
             self.indecisive_cells.pop()
-            print("indecisive_cell_apre_pop",len(self.indecisive_cells))
             self.decided_cells.append((coord,status,indecisive_cell))
+            
 
-
+            # Try to find an interaction that match the status given, and approx the position of the chosen cell
+            # then store the distance between that interaction and the one of the indecisive_cell
+            # we should be able to use that distance to modify the RETREAT_DISTANCE of the controller
+            interactions_correctes = [inte for inte in self.hexa_memory.grid[coord[0]][coord[1]].interactions if status == translate_interaction_type_to_cell_status(inte.type) ]
+            if coord != indecisive_cell and len(interactions_correctes) >0:
+                inte_corr_x = interactions_correctes[-1].x
+                inte_corr_y = interactions_correctes[-1].y
+                inte_fausse_x = self.indecisive_interactions[-1].x
+                inte_fausse_y = self.indecisive_interactions[-1].y
+                dist_between_corr_and_fausse_x = inte_corr_x - inte_fausse_x
+                dist_between_corr_and_fausse_y = inte_corr_y - inte_fausse_y
+                print("Dist between corr and fausse : ", dist_between_corr_and_fausse_x, dist_between_corr_and_fausse_y)
+                if abs(interactions_correctes[-1].id - self.indecisive_interactions[-1].id) < 2 :
+                    self.change_RETREAT_DISTANCE = - dist_between_corr_and_fausse_x
     def synthetize(self):
         """Synthetize the internal hexagrid according to the decided_cells"""
         for decision in self.decided_cells:
             cell,status,cell_to_wipe = None,None,None
             if len (decision) == 2 :
                 cell,status = decision
+                if self.flag_no :
+                    self.indecisive_interactions.pop()
+                    self.flag_no = False
+                else :
+                    self.hexa_memory.grid[cell[0]][cell[1]].interactions.append(self.indecisive_interactions.pop())
             if len (decision) == 3 :
                 cell,status,cell_to_wipe = decision
                 cell_to_wipe_x,cell_to_wipe_y = cell_to_wipe
@@ -146,8 +169,13 @@ class SynthesizerUserInteractionV2 :
                 print("moving robot by ",-diff_x,-diff_y)
                 self.hexa_memory.robot_pos_x -= diff_x
                 self.hexa_memory.robot_pos_y -= diff_y
+                if cell == cell_to_wipe :
+                    self.hexa_memory.grid[cell[0]][cell[1]].interactions.append(self.indecisive_interactions.pop())
+                else :
+                    self.indecisive_interactions.pop()
             #self.hexa_memory.grid[cell[0]][cell[1]].status = status
             self.hexa_memory.change_cell(cell[0],cell[1],status)
+            
         self.decided_cells = []
         self.synthetizing_step = 2 if len(self.indecisive_cells) == 0 else 1
         self.need_user_action = self.synthetizing_step == 1

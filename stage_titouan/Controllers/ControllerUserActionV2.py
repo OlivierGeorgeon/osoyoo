@@ -59,7 +59,7 @@ class ControllerUserActionV2 :
         self.hexa_memory = hexa_memory
         self.hexaview = hexaview
         self.azimuth = 0
-
+        self.RETREAT_DISTANCE = RETREAT_DISTANCE
         self.automatic = automatic
         self.wifiInterface = WifiInterface(ip)
         self.outcome_bytes = b'{"status":"T"}'  # Default status T timeout
@@ -154,20 +154,22 @@ class ControllerUserActionV2 :
         """blabla"""
         if self.synthesizer.synthetizing_step == 1 and not self.need_traitement_flag :
             self.print_done = False
-            print("1")
             self.cell_inde_a_traiter = self.synthesizer.indecisive_cells[-1]
             self.need_traitement_flag = True
             self.need_user_action = True
             self.user_action = None
         elif self.need_traitement_flag and self.user_action is not None :
             self.cell_inde_a_traiter = self.synthesizer.indecisive_cells[-1]
-            print("2")
             self.synthesizer.apply_user_action(self.user_action)
             self.synthesizer.synthetize()
             self.need_traitement_flag = False
         elif not self.need_traitement_flag :
             #boucle normale
             robot_action = None
+            if self.synthesizer.change_RETREAT_DISTANCE is not None :
+                self.RETREAT_DISTANCE -= self.synthesizer.change_RETREAT_DISTANCE
+                self.synthesizer.change_RETREAT_DISTANCE = None
+                print("Changement retreat dist : ",self.RETREAT_DISTANCE)
             # 1 : demande l'action :
             if self.control_mode == CONTROL_MODE_AUTOMATIC :
                 if(self.enact_step == 0):
@@ -177,7 +179,6 @@ class ControllerUserActionV2 :
                 # 2 : ordonne au robot
                     self.command_robot(robot_action)
             if self.robot_command is not None:
-                    print("he")
                     self.command_robot(self.robot_command)
                     self.robot_command = None
             if(self.enact_step >= 2):
@@ -198,7 +199,7 @@ class ControllerUserActionV2 :
             self.hexa_memory.cells_changed_recently = []
             self.view.extract_and_convert_interactions(self.memory)
             self.refresh_count += 1
-            if self.refresh_count >= 2000 :
+            if self.refresh_count >= 5000 : # We keep adding shapes, so every once in a while we must clean everything to avoid memory shortages
                 self.refresh_count = 0
                 print("reset")
                 self.hexaview.shapesList = []
@@ -206,7 +207,6 @@ class ControllerUserActionV2 :
 
         else :
             if not self.print_done :
-                print("pif")
                 self.hexaview.show_indecisive_cell(self.cell_inde_a_traiter)
                 self.print_done = True
 
@@ -373,7 +373,7 @@ class ControllerUserActionV2 :
                 # Update the translation
                 forward_duration = outcome['duration'] - 300  # Subtract retreat duration
                 if self.action == "8":  # TODO Other actions
-                    translation[0] = STEP_FORWARD_DISTANCE * forward_duration/1000 - RETREAT_DISTANCE
+                    translation[0] = STEP_FORWARD_DISTANCE * forward_duration/1000 - self.RETREAT_DISTANCE
                     if (translation[0] < 0 ) :
                          print("translation negative")
                     if floor == 0b01:  # Black line on the right
@@ -383,10 +383,10 @@ class ControllerUserActionV2 :
                         translation[0] -= 0
                         translation[1] = -RETREAT_DISTANCE_Y
                 if self.action == "4":
-                    translation[0] = -RETREAT_DISTANCE
+                    translation[0] = -self.RETREAT_DISTANCE
                     translation[1] = SHIFT_DISTANCE * forward_duration/1000
                 if self.action == "6":
-                    translation[0] = -RETREAT_DISTANCE
+                    translation[0] = -self.RETREAT_DISTANCE
                     translation[1] = -SHIFT_DISTANCE * forward_duration/1000
 
                 
