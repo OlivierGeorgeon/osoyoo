@@ -362,6 +362,7 @@ class ControllerNew:
         return  phenom_info, angle, translation, outcome_for_agent,echo_array
 
 
+# py -m stage_titouan.Controllers.ControllerNew
 if __name__ == '__main__':
     from  stage_titouan import *
     mem = MemoryV1()

@@ -5,7 +5,7 @@ import math
 import numpy
 from pyrr import matrix44
 from . OsoyooCar import OsoyooCar
-from . PointOfInterest import PointOfInterest, POINT_PHENOMENON
+from . PointOfInterest import PointOfInterest, POINT_PHENOMENON, POINT_TRESPASS, POINT_ECHO
 from .. Model.Memories.MemoryV1 import MemoryV1
 from .. Misc.Utils import interactionList_to_pyglet
 
@@ -131,7 +131,7 @@ class EgocentricView(pyglet.window.Window):
 
 
 # Displaying EgoMemoryWindowNew with phenomena in MemoryV1
-# py -m stage_titouan.Views.EgoMemoryWindowNew
+# py -m stage_titouan.Views.EgocentricView
 if __name__ == "__main__":
     emw = EgocentricView()
     emw.robot.rotate_head(-45)
@@ -140,8 +140,11 @@ if __name__ == "__main__":
     mem = MemoryV1()
     mem.add((3, 0, 0, 0, 0, 0))  # Line
     mem.add((0, 0, 0, 1, 300, -300))  # Echo
-
     # Retrieve interactions from memory and construct the shapes in the window
     emw.extract_and_convert_interactions(mem)
+
+    # Add points of interest
+    emw.add_point_of_interest(150, 0, POINT_TRESPASS)
+    emw.add_point_of_interest(300, -300, POINT_ECHO)
 
     pyglet.app.run()
