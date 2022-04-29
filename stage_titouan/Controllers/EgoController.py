@@ -31,7 +31,7 @@ class EgoController:
             if symbol == key.DELETE:
                 for p in self.points_of_interest:
                     if p.is_selected:
-                        # p.delete()
+                        p.delete()
                         self.points_of_interest.remove(p)
             if symbol == key.INSERT:
                 print("insert phenomenon")
@@ -47,6 +47,9 @@ class EgoController:
         self.points_of_interest.append(point_of_interest)
         return point_of_interest
 
+    def rotate_head(self, head_angle):
+        self.ego_view.robot.rotate_head(head_angle)
+
     def displace(self, displacement_matrix):
         """ Moving all the points of interest by the displacement matrix """
         for p in self.points_of_interest:
@@ -54,7 +57,10 @@ class EgoController:
 
     def extract_and_convert_interactions(self, memory):
         """ Retrieve the interactions from memory and create the points of interest """
-        self.points_of_interest = []
+        # self.points_of_interest = []
+        for p in self.points_of_interest:
+            if p.type == INTERACTION_ECHO or p.type == INTERACTION_TRESPASSING:
+                self.points_of_interest.remove(p)
         for i in range(len(memory.interactions)):
             interaction = memory.interactions[i]
             poi = self.add_point_of_interest(0, 0, interaction.type)

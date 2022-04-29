@@ -30,3 +30,4 @@ from . Model.Synthesizers.SynthesizerUserInteractionV2 import SynthesizerUserInt
 from . Views.OsoyooCar import OsoyooCar
 from . Views.EgocentricView import EgocentricView
 from . Views.HexaView import HexaView
+from . Views.PointOfInterest import *
