@@ -29,6 +29,7 @@ class HexaMemory(HexaGrid):
         self.orientation = 0
         self.update_orientation()
         self.azimuth = 0
+        self.cells_changed_recently = []
 
     def reset(self):
         """Reset the hexamemory"""
@@ -42,6 +43,7 @@ class HexaMemory(HexaGrid):
         self.orientation = 0
         self.azimuth = 0
         self.update_orientation()
+        self.cells_changed_recently = []
 
     def update_orientation(self):
         "update the orientation of the robot based on its angle"
@@ -243,9 +245,11 @@ class HexaMemory(HexaGrid):
         self.robot_pos_y = y_prime
         self.grid[self.robot_cell_x][self.robot_cell_y].set_to('Free')
         self.grid[self.robot_cell_x][self.robot_cell_y].leave()
+        self.cells_changed_recently.append((self.robot_cell_x, self.robot_cell_y))
         self.robot_cell_x, self.robot_cell_y = self.convert_pos_in_cell(
             self.robot_pos_x, self.robot_pos_y)
         self.grid[self.robot_cell_x][self.robot_cell_y].occupy()
+        self.cells_changed_recently.append((self.robot_cell_x, self.robot_cell_y))
         return x_prime, y_prime
 
     
@@ -300,6 +304,7 @@ class HexaMemory(HexaGrid):
             # if(self.grid[cell_x][cell_y].status == "Unknown"):
             self.grid[cell_x][cell_y].status = status
             self.grid[cell_x][cell_y].leave()
+            self.cells_changed_recently.append((cell_x, cell_y))
             ####
             current_pos_x += step_x
             current_pos_y += step_y
@@ -310,3 +315,7 @@ class HexaMemory(HexaGrid):
                 current_pos_y = end_y
             """
 
+
+    def change_cell(self, cell_x, cell_y,status):
+        self.grid[cell_x][cell_y].status = status
+        self.cells_changed_recently.append((cell_x,cell_y))

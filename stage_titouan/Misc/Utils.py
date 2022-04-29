@@ -135,6 +135,90 @@ def hexaMemory_to_pyglet(hexaMemory,batch):
 
     return shapesList
 
+def recently_changed_to_pyglet(hexaMemory,batch):
+    """blabla"""
+    cell_list = hexaMemory.cells_changed_recently
+    shapesList = []
+    x0 = 0
+    y0 = 0
+    #radius = 20
+    radius = hexaMemory.cell_radius
+    grid = hexaMemory.grid
+    
+    hauteur = math.sqrt( (2*radius)**2 -radius**2 )
+    for (i,j) in cell_list :
+            robot = False
+            color_debug = (random.randint(0,255),random.randint(0,255),random.randint(0,255))
+            cell = grid[i][j]
+
+            if cell.occupied :
+                color = name_to_rgb("lime")
+                robot = True
+            else : 
+                color = name_to_rgb("grey")
+                if(cell.status == "Free"):
+                    color = name_to_rgb("white")
+                elif(cell.status == "Occupied"):
+                    color = name_to_rgb("yellow")
+                    robot = True
+                
+                elif(cell.status == "Blocked"):
+                    color = name_to_rgb("red")
+                elif(cell.status == "Frontier"):
+                    color = name_to_rgb("black")
+                elif(cell.status == "Something"):
+                    color = name_to_rgb("orange")
+                    r,g,b = color
+                    confidence = hexaMemory.grid[i][j].confidence
+                    factor = 10
+                    r = min(255,r + confidence*factor)
+                    g = min(255,g + confidence*factor)
+                    b = min(255,b + confidence*factor)
+                    color = r,g,b
+
+            x1 = x0
+            y1 = y0
+            if(j%2 == 0):
+                x1 = x0 + i * 3 * radius
+                y1 =y0 +  hauteur * (j/2)
+            else :
+                x1 = x0 + (1.5 * radius) + i * 3 * radius
+                y1 = y0 + (hauteur/2) + (j-1)/2 * hauteur
+
+            
+
+                
+            
+            theta = 0
+            theta = math.radians(theta)
+            point1 = [x1 + math.cos(theta)*radius, y1 + math.sin(theta)*radius] 
+            theta = 60
+            theta = math.radians(theta)
+            point2 = [x1 + math.cos(theta)*radius, y1 + math.sin(theta)*radius] 
+            theta = 120
+            theta = math.radians(theta)
+            point3 = [x1 + math.cos(theta)*radius, y1 + math.sin(theta)*radius] 
+            theta = 180
+            theta = math.radians(theta)
+            point4 = [x1 + math.cos(theta)*radius, y1 + math.sin(theta)*radius]
+            theta = 240
+            theta = math.radians(theta)
+            point5 = [x1 + math.cos(theta)*radius, y1 + math.sin(theta)*radius]
+            theta = 300
+            theta = math.radians(theta)
+            point6 = [x1 + math.cos(theta)*radius, y1 + math.sin(theta)*radius]
+
+            hexagon = shapes.Polygon(point1, point2, point3, point4, point5, point6,color = color, batch = batch)            
+            shapesList.append(hexagon)
+            if(robot):
+                theta = math.radians(hexaMemory.robot_angle)
+                x2 = radius * math.cos(theta) + x1
+                y2 = radius * math.sin(theta) + y1
+                line = shapes.Line(x1,y1,x2,y2,width = 5,color = name_to_rgb("black"), batch = batch)
+                shapesList.append(line)
+
+    return shapesList
+
 def translate_interaction_type_to_cell_status(type):
     """Free Blocked Occupied Frontier Something"""
     if(type == INTERACTION_TRESPASSING):

@@ -146,7 +146,8 @@ class SynthesizerUserInteractionV2 :
                 print("moving robot by ",-diff_x,-diff_y)
                 self.hexa_memory.robot_pos_x -= diff_x
                 self.hexa_memory.robot_pos_y -= diff_y
-            self.hexa_memory.grid[cell[0]][cell[1]].status = status
+            #self.hexa_memory.grid[cell[0]][cell[1]].status = status
+            self.hexa_memory.change_cell(cell[0],cell[1],status)
         self.decided_cells = []
         self.synthetizing_step = 2 if len(self.indecisive_cells) == 0 else 1
         self.need_user_action = self.synthetizing_step == 1
