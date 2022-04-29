@@ -1,10 +1,14 @@
+import sys
 import json
 import threading
+import keyboard
 from pyrr import matrix44, Quaternion
 import math
 from .. Misc.RobotDefine import *
 from .. Misc.WifiInterface import WifiInterface
 from .. Views.PointOfInterest import *
+from .. Views.EgocentricView import EgocentricView
+from .. Model.Memories.MemoryV1 import MemoryV1
 
 
 class RobotController:
@@ -132,3 +136,24 @@ class RobotController:
         # Update the azimuth
         if 'azimuth' in outcome:
             self.view.azimuth = outcome['azimuth']
+
+
+# Testing the controller by remote controlling the robot from the egocentric memory window
+# Set the IP address. Run:
+# py -m stage_titouan.Controllers.RobotControllerOlivier "192.168.8.189"
+if __name__ == "__main__":
+    ip = "192.168.4.1"
+    if len(sys.argv) > 1:
+        ip = sys.argv[1]
+    else:
+        print("Please provide your robot's IP address")
+    print("Sending to: " + ip)
+    ev = EgocentricView()
+    controller = RobotController(ip)
+
+    _action = ""
+    while True:
+        print("Action key: ", end="")
+        a = keyboard.read_key().upper()
+        print()
+        controller.enact('{"action":"' + a + '"}')
