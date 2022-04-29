@@ -1,55 +1,35 @@
 import pyglet
 from pyglet.gl import *
-from pyglet.window import key
 import math
 import numpy
-from pyrr import matrix44
 from . OsoyooCar import OsoyooCar
-from . PointOfInterest import PointOfInterest, POINT_PHENOMENON, POINT_TRESPASS, POINT_ECHO
-from .. Model.Memories.MemoryV1 import MemoryV1
-from .. Misc.Utils import interactionList_to_pyglet
 
-import time
 ZOOM_IN_FACTOR = 1.2
 
 
 class EgocentricView(pyglet.window.Window):
-    def __init__(self, width=400, height=400, shapesList = None, *args, **kwargs):
+    def __init__(self, width=400, height=400, *args, **kwargs):
         super().__init__(width, height, resizable=True, *args, **kwargs)
-        self.set_caption("Egocentric Memory")
+        self.set_caption("Egocentric View")
         self.set_minimum_size(150, 150)
+
+        # Initialize OpenGL parameters
         glClearColor(1.0, 1.0, 1.0, 1.0)
         self.batch = pyglet.graphics.Batch()
-        self.background = pyglet.graphics.OrderedGroup(0)  # Will be used to manage the overlapping of shapes
+        self.background = pyglet.graphics.OrderedGroup(0)
         self.foreground = pyglet.graphics.OrderedGroup(1)
         self.zoom_level = 1
 
+        # Define the robot
         self.robot = OsoyooCar(self.batch, self.background)
-
-        self.total_displacement_matrix = matrix44.create_identity()
         self.azimuth = 0
-        self.shapesList = shapesList
-        self.points_of_interest = []
 
-        self.mouse_press_x = 0
-        self.mouse_press_y = 0
-        self.mouse_press_angle = 0
-        self.window = None
-
-        # Room to write some text
+        # Define the text area at the bottom of the view
         self.label = pyglet.text.Label('', font_name='Verdana', font_size=10, x=10, y=10)
         self.label.color = (0, 0, 0, 255)
 
-    def set_ShapesList(self, s):
-        # Not used
-        self.shapesList = s
-
-    def extract_and_convert_interactions(self, memory):
-        """ Retrieve the interactions from memory and create the shapes in the batch """
-        self.shapesList = interactionList_to_pyglet(memory.interactions, self.batch)
-
     def on_draw(self):
-        """ Drawing the window """
+        """ Drawing the view """
         glClear(GL_COLOR_BUFFER_BIT)
         glLoadIdentity()
 
@@ -82,7 +62,7 @@ class EgocentricView(pyglet.window.Window):
         if .4 < self.zoom_level * f < 5:
             self.zoom_level *= f
 
-    def on_mouse_press(self, x, y, button, modifiers):
+    def set_mouse_press_coordinate(self, x, y, button, modifiers):
         """ Computing the position of the mouse click relative to the robot in mm and degrees """
         window_press_x = (x - self.width / 2) * self.zoom_level * 2
         window_press_y = (y - self.height / 2) * self.zoom_level * 2
@@ -96,55 +76,24 @@ class EgocentricView(pyglet.window.Window):
             theta_robot -= 2 * math.pi
         # Cartesian coordinates from the robot axis
         z = r * numpy.exp(1j * theta_robot)
-        self.mouse_press_x, self.mouse_press_y = int(z.real), int(z.imag)
-        self.mouse_press_angle = int(math.degrees(theta_robot))
-        self.label.text = "Click: x:" + str(self.mouse_press_x) + ", y:" + str(self.mouse_press_y) \
-                          + ", angle:" + str(self.mouse_press_angle) + "°"
-        # Mark any nearby point of interest
-        for p in self.points_of_interest:
-            if p.is_near(self.mouse_press_x, self.mouse_press_y):
-                p.set_color("red")
-            else:
-                p.set_color()
-        # return mouse_press_x, mouse_press_y, mouse_press_angle
-
-    def on_key_press(self, symbol, modifiers):
-        """ Deleting points of interest, inserting a phenomenon"""
-        if symbol == key.DELETE:
-            for p in self.points_of_interest:
-                if p.is_selected:
-                    p.delete()
-                    self.points_of_interest.remove(p)
-        if symbol == key.INSERT:
-            print("insert phenomenon")
-            self.add_point_of_interest(self.mouse_press_x, self.mouse_press_y, POINT_PHENOMENON)
-
-    def add_point_of_interest(self, x, y, point_type):
-        """ Adding a point of interest to the view """
-        point_of_interest = PointOfInterest(x, y, self.batch, self.foreground, point_type)
-        self.points_of_interest.append(point_of_interest)
-
-    def displace(self, displacement_matrix):
-        """ Moving all the points of interest by the displacement matrix """
-        for p in self.points_of_interest:
-            p.displace(displacement_matrix)
+        mouse_press_x, mouse_press_y = int(z.real), int(z.imag)
+        mouse_press_angle = int(math.degrees(theta_robot))
+        # Display the mouse click coordinates at the bottom of the view
+        self.label.text = "Click: x:" + str(mouse_press_x) + ", y:" + str(mouse_press_y) \
+                          + ", angle:" + str(mouse_press_angle) + "°"
+        # Return the click position to the controller
+        return mouse_press_x, mouse_press_y, mouse_press_angle
 
 
-# Displaying EgoMemoryWindowNew with phenomena in MemoryV1
+# Displaying the EgocentricView with the robot in a pretty position, and the mouse click coordinates
 # py -m stage_titouan.Views.EgocentricView
 if __name__ == "__main__":
-    emw = EgocentricView()
-    emw.robot.rotate_head(-45)
+    view = EgocentricView()
+    view.robot.rotate_head(-45)  # Turn head 45° to the right
+    view.azimuth = 350           # Turn robot 10° to the left
 
-    # Add interactions to memory
-    mem = MemoryV1()
-    mem.add((3, 0, 0, 0, 0, 0))  # Line
-    mem.add((0, 0, 0, 1, 300, -300))  # Echo
-    # Retrieve interactions from memory and construct the shapes in the window
-    emw.extract_and_convert_interactions(mem)
-
-    # Add points of interest
-    emw.add_point_of_interest(150, 0, POINT_TRESPASS)
-    emw.add_point_of_interest(300, -300, POINT_ECHO)
+    @view.event
+    def on_mouse_press(x, y, button, modifiers):
+        view.set_mouse_press_coordinate(x, y, button, modifiers)  # Display mouse click coordinates
 
     pyglet.app.run()
