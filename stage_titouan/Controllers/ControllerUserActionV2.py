@@ -112,6 +112,25 @@ class ControllerUserActionV2 :
                     elif text.upper() == "N":
                         self.user_action = 'n',None
                         self.need_user_action = False
+                else : 
+                    if text.upper() == "A":
+                        self.control_mode = CONTROL_MODE_AUTOMATIC
+                        print("Control mode: AUTOMATIC")
+                    elif text.upper() == "M":
+                        self.control_mode = CONTROL_MODE_MANUAL
+                        print("Control mode: MANUAL")
+
+                    if self.control_mode == CONTROL_MODE_MANUAL and not self.synthesizer.synthetizing_step == 1 and not self.need_traitement_flag :
+                    
+                        if self.enact_step == 0 and not self.need_user_action:
+                            self.action_angle = emw.mouse_press_angle
+                            #  if text == "/" or text == "+":  # Send the angle marked by the mouse click
+                            #      text = json.dumps({'action': text, 'angle': emw.mouse_press_angle})
+                            #self.command_robot(text)
+                            self.robot_command = text
+                        else:
+                            message = "Waiting for previous outcome before sending new action" if self.enact_step != 0 else "Waiting for user action"
+                            print(message)
             hemw.on_text = on_text_hemw
             def on_mouse_press_hemw(x, y, button, modifiers):
                 """ Computing the position of the mouse click in the hexagrid  """
@@ -175,11 +194,12 @@ class ControllerUserActionV2 :
     def main_refresh(self,dt):
         """Function that refresh the views"""
         if not self.need_traitement_flag :
+            self.hexaview.indecisive_cell_shape = []
             self.hexaview.extract_and_convert_recently_changed_cells(self.hexa_memory)
             self.hexa_memory.cells_changed_recently = []
             self.view.extract_and_convert_interactions(self.memory)
             self.refresh_count += 1
-            if self.refresh_count >= 500 :
+            if self.refresh_count >= 2000 :
                 self.refresh_count = 0
                 print("reset")
                 self.hexaview.shapesList = []

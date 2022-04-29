@@ -304,7 +304,7 @@ class HexaMemory(HexaGrid):
             # if(self.grid[cell_x][cell_y].status == "Unknown"):
             self.grid[cell_x][cell_y].status = status
             self.grid[cell_x][cell_y].leave()
-            self.cells_changed_recently.append((self.robot_cell_x, self.robot_cell_y))
+            self.cells_changed_recently.append((cell_x, cell_y))
             ####
             current_pos_x += step_x
             current_pos_y += step_y
