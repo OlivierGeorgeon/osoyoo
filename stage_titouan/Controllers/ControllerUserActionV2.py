@@ -197,7 +197,7 @@ class ControllerUserActionV2 :
             self.hexaview.indecisive_cell_shape = []
             self.hexaview.extract_and_convert_recently_changed_cells(self.hexa_memory)
             self.hexa_memory.cells_changed_recently = []
-            self.view.extract_and_convert_interactions(self.memory)
+            # self.view.extract_and_convert_interactions(self.memory)
             self.refresh_count += 1
             if self.refresh_count >= 2000 :
                 self.refresh_count = 0
