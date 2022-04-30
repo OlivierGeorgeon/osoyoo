@@ -13,88 +13,86 @@ class RobotController:
     def __init__(self, robot_ip):
         self.wifiInterface = WifiInterface(robot_ip)
 
-        self.action = ""
-        self.action_angle = 0
+        self.intended_interaction = {'action': "8"}  # Need random initialization
         self.enact_step = 0
         self.outcome_bytes = b'{"status":"T"}'  # Default status T timeout
         self.azimuth = 0
 
-    def command_robot(self, action):
+    def command_robot(self, intended_interaction):
         """ Creating an asynchronous thread to send the action to the robot and to wait for outcome """
         self.outcome_bytes = "Waiting"
 
         def enact_thread():
             """ Sending the action to the robot and waiting for outcome """
-            action_string = json.dumps({'action': self.action, 'angle': self.action_angle})
-            print("Sending: " + action_string)
+            # action_string = json.dumps({'action': self.action, 'angle': self.action_angle})
+            action_string = json.dumps(self.intended_interaction)
+            # print("Sending: " + action_string)
             self.outcome_bytes = self.wifiInterface.enact(action_string)
-            print("Receive ", end="")
+            print("Receive: ", end="")
             print(self.outcome_bytes)
             self.enact_step = 2
 
-        self.action = action
+        # self.action = action
+        self.intended_interaction = intended_interaction
         self.enact_step = 1
         thread = threading.Thread(target=enact_thread)
         thread.start()
 
-        # Cas d'actions particulières :
-        if action == "r":
-            self.action_reset()
-
     def translate_robot_data(self):
         """ Computes the enacted interaction from the robot's outcome data """
-        outcome = json.loads(self.outcome_bytes)
-        enacted_interaction = {'action': self.action, 'status': outcome['status']}
+        action = self.intended_interaction['action']
+        enacted_interaction = json.loads(self.outcome_bytes)
+        # enacted_interaction = {'action': action, 'status': outcome['status']}
 
         # If timeout then no ego memory update
         if enacted_interaction['status'] == "T":
             return enacted_interaction
 
         # Head angle
-        head_angle = 90
-        if 'head_angle' in outcome:
-            head_angle = outcome['head_angle']
-        enacted_interaction['head_angle'] = head_angle
-
-        # Azimuth
-        if 'azimuth' in outcome:
-            self.azimuth = outcome['azimuth']
-        else:
-            self.azimuth -= enacted_interaction['yaw']
-        enacted_interaction['azimuth'] = self.azimuth
+        # head_angle = 90
+        # if 'head_angle' in outcome:
+        #     head_angle = outcome['head_angle']
+        # enacted_interaction['head_angle'] = head_angle
 
         # Presupposed displacement of the robot relative to the environment
         translation, yaw = [0, 0], 0
-        if self.action == "1":
+        if action == "1":
             yaw = 45
-        if self.action == "2":
+        if action == "2":
             translation[0] = -STEP_FORWARD_DISTANCE
-        if self.action == "3":
+        if action == "3":
             yaw = -45
-        if self.action == "4":
+        if action == "4":
             translation[1] = SHIFT_DISTANCE
-        if self.action == "6":
+        if action == "6":
             translation[1] = -SHIFT_DISTANCE
-        if self.action == "8":
+        if action == "8":
             translation[0] = STEP_FORWARD_DISTANCE # * outcome['duration'] / 1000
 
-        # Actual measured yaw if any
-        if 'yaw' in outcome:
-            yaw = outcome['yaw']
+        # If the robot returns yaw then use it
+        if 'yaw' in enacted_interaction:
+            yaw = enacted_interaction['yaw']
+        else:
+            enacted_interaction['yaw'] = yaw
+
+        # If the robot does not return the azimuth then compute it from the yaw
+        if 'azimuth' not in enacted_interaction:
+            self.azimuth -= yaw
+            enacted_interaction['azimuth'] = self.azimuth
 
         # interacting with phenomena
         obstacle, floor, shock, blocked, x, y = 0, 0, 0, 0, 0, 0
         echo_distance = 0
 
-        if 'floor' in outcome:
-            floor = outcome['floor']
-        if 'shock' in outcome and self.action == '8' and floor == 0:
-            shock = outcome['shock']
-        if 'blocked' in outcome and self.action == '8' and floor == 0:
-            blocked = outcome['blocked']
-        if 'echo_distance' in outcome and self.action == "-" or self.action == "*" or self.action == "+":
-            echo_distance = outcome['echo_distance']
-            if echo_distance > 0:
+        if 'floor' in enacted_interaction:
+            floor = enacted_interaction['floor']
+        if 'shock' in enacted_interaction and action == '8' and floor == 0:
+            shock = enacted_interaction['shock']
+        if 'blocked' in enacted_interaction and action == '8' and floor == 0:
+            blocked = enacted_interaction['blocked']
+        if 'echo_distance' in enacted_interaction and action == "-" or action == "*" or action == "+":
+            echo_distance = enacted_interaction['echo_distance']
+            if 0 < echo_distance < 10000:
                 obstacle = 1
 
         # Interaction trespassing
@@ -102,8 +100,8 @@ class RobotController:
             # The position of the interaction trespassing
             x, y = LINE_X, 0
             # The resulting translation
-            forward_duration = outcome['duration'] - 300  # Subtract retreat duration
-            if self.action == "8":  # TODO Other actions
+            forward_duration = enacted_interaction['duration'] - 300  # Subtract retreat duration
+            if action == "8":  # TODO Other actions
                 translation[0] = STEP_FORWARD_DISTANCE * forward_duration / 1000 - RETREAT_DISTANCE
                 if translation[0] < 0:
                     print("translation negative")
@@ -113,10 +111,10 @@ class RobotController:
                 if floor == 0b10:  # Black line on the left
                     translation[0] -= 0
                     translation[1] = -RETREAT_DISTANCE_Y
-            if self.action == "4":
+            if action == "4":
                 translation[0] = -RETREAT_DISTANCE
                 translation[1] = SHIFT_DISTANCE * forward_duration / 1000
-            if self.action == "6":
+            if action == "6":
                 translation[0] = -RETREAT_DISTANCE
                 translation[1] = -SHIFT_DISTANCE * forward_duration / 1000
 
@@ -134,8 +132,8 @@ class RobotController:
 
         # Interaction ECHO
         if obstacle:
-            x = int(ROBOT_HEAD_X + math.cos(math.radians(head_angle)) * echo_distance)
-            y = int(math.sin(math.radians(head_angle)) * echo_distance)
+            x = int(ROBOT_HEAD_X + math.cos(math.radians(enacted_interaction['head_angle'])) * echo_distance)
+            y = int(math.sin(math.radians(enacted_interaction['head_angle'])) * echo_distance)
 
         enacted_interaction['phenom_info'] = (floor, shock, blocked, obstacle, x, y)
         enacted_interaction['echo_distance'] = echo_distance
@@ -148,7 +146,7 @@ class RobotController:
         enacted_interaction['displacement_matrix'] = matrix44.multiply(rotation_matrix, translation_matrix)
 
         # Returning the enacted interaction
-        print(enacted_interaction)
+        print("Enacted interaction:", enacted_interaction)
         return enacted_interaction
 
 

@@ -87,7 +87,7 @@ class EgocentricView(pyglet.window.Window):
         return mouse_press_x, mouse_press_y, mouse_press_angle
 
 
-# Showing the EgoMemoryWindow
+# Showing the EgocentricView
 # py -m Python.OsoyooControllerBSN.Display.EgocentricView
 if __name__ == "__main__":
     view = EgocentricView()

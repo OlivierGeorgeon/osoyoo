@@ -12,12 +12,9 @@ class EgoController:
         self.ego_view = ego_view
         self.points_of_interest = []
 
-        # Model
-        self.wifiInterface = WifiInterface()
-
-        self.action = ""
-        self.enact_step = 0
-        self.outcome_bytes = b'{"status":"T"}'  # Default status T timeout
+        # self.action = ""
+        # self.enact_step = 0
+        # self.outcome_bytes = b'{"status":"T"}'  # Default status T timeout
 
         self.mouse_press_x = 0
         self.mouse_press_y = 0
@@ -62,28 +59,6 @@ class EgoController:
         for p in self.points_of_interest:
             p.displace(displacement_matrix)
 
-    def enact(self, text):
-        """ Creating an asynchronous thread to send the action to the robot and to wait for outcome """
-        def enact_thread():
-            """ Sending the action to the robot and waiting for outcome """
-            # print("Send " + self.action)
-            self.outcome_bytes = self.wifiInterface.enact(self.action)
-            print("Receive ", end="")
-            print(self.outcome_bytes)
-            self.enact_step = 2
-            # self.watch_outcome()
-
-        self.action = text
-        self.enact_step = 1
-        thread = threading.Thread(target=enact_thread)
-        thread.start()
-
-    def watch_outcome(self, dt):
-        """ Watching for the reception of the outcome """
-        if self.enact_step == 2:
-            self.update_model()
-            self.enact_step = 0
-
     def update_model(self, enacted_interaction):
         """ Updating the model from the latest received outcome """
 
@@ -123,6 +98,13 @@ class EgoController:
         # Point of interest echo
         if obstacle:
             self.add_point_of_interest(x, y, POINT_ECHO)
+
+    def get_focus_phenomenon(self):
+        """ Returning the first selected phenomenon """
+        for p in self.points_of_interest:
+            if p.type == POINT_PHENOMENON and p.is_selected:
+                return p
+        return None
 
 
 # Displaying EgoMemoryWindowNew with points of interest
