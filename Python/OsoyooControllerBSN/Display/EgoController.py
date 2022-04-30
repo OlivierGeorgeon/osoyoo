@@ -1,13 +1,9 @@
-import json
-from ..RobotDefine import *
 import threading
 from ..Wifi.WifiInterface import WifiInterface
 from ..Display.PointOfInterest import *
-import math
 from ..Display.EgocentricView import EgocentricView
 import pyglet
 from pyglet.window import key
-from pyrr import matrix44
 
 
 class EgoController:
@@ -46,7 +42,8 @@ class EgoController:
                         self.points_of_interest.remove(p)
             if symbol == key.INSERT:
                 print("insert phenomenon")
-                phenomenon = PointOfInterest(self.mouse_press_x, self.mouse_press_y, self.ego_view.batch, self.ego_view.foreground, POINT_PHENOMENON)
+                phenomenon = PointOfInterest(self.mouse_press_x, self.mouse_press_y, self.ego_view.batch,
+                                             self.ego_view.background, POINT_PHENOMENON)
                 self.points_of_interest.append(phenomenon)
 
         self.ego_view.push_handlers(on_mouse_press, on_key_press)

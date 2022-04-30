@@ -23,6 +23,9 @@ from OsoyooControllerBSN.Display.ModalWindow import ModalWindow
 from OsoyooControllerBSN.Agent.Agent5 import Agent5
 from OsoyooControllerBSN.Wifi.RobotController import RobotController
 
+from OsoyooControllerBSN.Display.PointOfInterest import *
+
+
 CONTROL_MODE_MANUAL = 0
 CONTROL_MODE_AUTOMATIC = 1
 control_mode = CONTROL_MODE_MANUAL
@@ -51,8 +54,6 @@ def main(ip):
         if control_mode == CONTROL_MODE_MANUAL:
             if robot_controller.enact_step == 0:
                 robot_controller.action_angle = ego_controller.mouse_press_angle
-                # if text == "/" or text == "+":  # Send the angle marked by the mouse click
-                #     text = json.dumps({'action': text, 'angle': ego_controller.mouse_press_angle})
                 robot_controller.command_robot(text)
             else:
                 print("Waiting for previous outcome before sending new action")
@@ -61,7 +62,21 @@ def main(ip):
         """ Watch for the end of the previous interaction and choose the next """
         if robot_controller.enact_step == 2:
             # Update the egocentric memory window
-            ego_controller.update_model(robot_controller.translate_robot_data())
+            enacted_interaction = robot_controller.translate_robot_data()
+            ego_controller.update_model(enacted_interaction)
+
+            # Action "+" adjusts the robot's position relative to the selected phenomenon
+            if enacted_interaction['action'] == "+" and enacted_interaction['echo_distance'] < 10000 \
+                    and enacted_interaction['status'] != "T":
+                ref_x, ref_y = None, None
+                for p in ego_controller.points_of_interest:
+                    if p.type == POINT_PHENOMENON:
+                        ref_x, ref_y = p.x, p.y
+                if ref_x:
+                    floor, shock, blocked, obstacle, x, y = enacted_interaction['phenom_info']
+                    translation_matrix = matrix44.create_from_translation([x - ref_x, y - ref_y, 0])
+                    ego_controller.displace(translation_matrix)
+
             robot_controller.enact_step = 0
 
         if control_mode == CONTROL_MODE_AUTOMATIC:

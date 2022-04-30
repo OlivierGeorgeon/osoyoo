@@ -6,7 +6,7 @@ import keyboard
 import math
 from pyrr import matrix44
 from . WifiInterface import WifiInterface
-from .. RobotDefine import *
+from . RobotDefine import *
 
 
 class RobotController:

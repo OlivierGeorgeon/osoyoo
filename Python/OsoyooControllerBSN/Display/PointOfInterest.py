@@ -44,8 +44,6 @@ class PointOfInterest:
             self.shape = shapes.Triangle(x, y, x+40, y-30, x+40, y+30, color=name_to_rgb("salmon"), batch=self.batch)
         if self.type == POINT_PHENOMENON:
             self.shape = shapes.Circle(x, y, 40, color=name_to_rgb("tomato"), batch=self.batch)
-            # I can't find a way to access the points to move the polygon
-            # self.shape = shapes.Polygon([x+20,y+0], [x+10, y+17], [x-10, y+17], [x-20, y], [x-10, y-17], [x+10, y-17],color = name_to_rgb("tomato"), batch=self.batch)
 
     def set_color(self, color_name=None):
 
@@ -84,14 +82,14 @@ class PointOfInterest:
         v = matrix44.apply_to_vector(displacement_matrix, [self.x, self.y, 0])
         self.x, self.y = v[0], v[1]
 
-        # POINT PLACE are vertex list
-        if self.type == POINT_PLACE:
+        # If the shape has a list of vertices (POINT PLACE)
+        if hasattr(self.shape, 'vertices'):
             for i in range(0, len(self.shape.vertices)-1, 2):
                 v = matrix44.apply_to_vector(displacement_matrix, [self.shape.vertices[i], self.shape.vertices[i+1], 0])
                 self.shape.vertices[i], self.shape.vertices[i+1] = int(v[0]), int(v[1])
             return
 
-        # Other points of interest are shapes
+        # Other points of interest have x and y
         self.shape.x, self.shape.y = self.x, self.y
 
         # Rotate the shapes

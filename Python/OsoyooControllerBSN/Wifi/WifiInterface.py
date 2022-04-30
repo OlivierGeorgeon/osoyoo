@@ -1,7 +1,7 @@
 import socket
 import keyboard
 import sys
-from ..RobotDefine import *
+from . RobotDefine import *
 
 UDP_TIMEOUT = 5  # Seconds
 if ROBOT_ID == 0:
