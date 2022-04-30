@@ -23,12 +23,13 @@ class PointOfInterest:
         self.reference = None
 
         if self.type == POINT_PLACE:
-            # Place: "LightGreen" triangle
+            # Place: LightGreen triangle
             self.shape = self.batch.add(3, gl.GL_TRIANGLES, self.group, ('v2i', [20, 0, -20, -20, -20, 20]),
-                                        ('c3B', (144, 238, 144, 144, 238, 144, 144, 238, 144)))
+                                        ('c3B', 3 * name_to_rgb("LightGreen") ))
         if self.type == POINT_ECHO:
             # Echo: Orange circle
             self.shape = shapes.Circle(x, y, 20, color=name_to_rgb("orange"), batch=self.batch)
+            self.shape.group = group
         if self.type == POINT_TINY_ECHO:
             # Echo: Orange circle
             self.shape = shapes.Circle(x, y, 7, color=name_to_rgb("orange"), batch=self.batch)
@@ -43,7 +44,10 @@ class PointOfInterest:
             # Pushing: yellow triangle
             self.shape = shapes.Triangle(x, y, x+40, y-30, x+40, y+30, color=name_to_rgb("salmon"), batch=self.batch)
         if self.type == POINT_PHENOMENON:
-            self.shape = shapes.Circle(x, y, 40, color=name_to_rgb("tomato"), batch=self.batch)
+            # Phenomenon: tomato
+            self.shape = self.batch.add_indexed(6, gl.GL_TRIANGLES, group, [0, 1, 2, 0, 2, 3, 0, 3, 4, 0, 4, 5],
+                         ('v2i', [x+40, y+0, x+20, y+34, x-20, y+34, x-40, y, x-20, y-34, x+20, y-34]),
+                         ('c4B', 6 * (*name_to_rgb("tomato"), 128)))
 
     def set_color(self, color_name=None):
 
@@ -67,12 +71,12 @@ class PointOfInterest:
                 # Pushing: yellow triangle
                 self.shape.color = name_to_rgb("yellow")
             if self.type == POINT_PHENOMENON:
-                # Pushing: yellow triangle
-                self.shape.color = name_to_rgb("tomato")
+                self.shape.colors[0:24] = 6 * (*name_to_rgb("tomato"), 128)
         else:
             if self.type == POINT_PLACE:
-                # Place:
-                self.shape.colors[0:9] = [255, 0, 0, 255, 0, 0, 255, 0, 0]
+                self.shape.colors[0:9] = 3 * name_to_rgb(color_name)
+            elif self.type == POINT_PHENOMENON:
+                self.shape.colors[0:24] = 6 * (*name_to_rgb(color_name), 200)
             else:
                 self.shape.color = name_to_rgb(color_name)
 
@@ -112,7 +116,7 @@ class PointOfInterest:
 
     def is_near(self, x, y):
         """ If the point is near the x y coordinate, select this point and return True """
-        is_near = math.dist([x, y], [self.x, self.y]) < 50
+        is_near = math.dist([x, y], [self.x, self.y]) < 20
         if is_near:
             self.is_selected = True
         else:

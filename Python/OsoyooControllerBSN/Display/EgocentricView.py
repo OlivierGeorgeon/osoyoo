@@ -18,6 +18,8 @@ class EgocentricView(pyglet.window.Window):
 
         # Initialize OpenGL parameters
         glClearColor(1.0, 1.0, 1.0, 1.0)
+        pyglet.gl.glEnable(pyglet.gl.GL_BLEND)  # Allow Graphics transparency
+        # pyglet.gl.glBlendFunc(pyglet.gl.GL_SRC_ALPHA, pyglet.gl.GL_ONE_MINUS_SRC_ALPHA)
         self.batch = pyglet.graphics.Batch()
         self.background = pyglet.graphics.OrderedGroup(0)
         self.foreground = pyglet.graphics.OrderedGroup(1)

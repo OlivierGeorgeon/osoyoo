@@ -41,16 +41,16 @@ class EgoController:
                         p.delete()
                         self.points_of_interest.remove(p)
             if symbol == key.INSERT:
-                print("insert phenomenon")
-                phenomenon = PointOfInterest(self.mouse_press_x, self.mouse_press_y, self.ego_view.batch,
-                                             self.ego_view.background, POINT_PHENOMENON)
-                self.points_of_interest.append(phenomenon)
+                self.add_point_of_interest(self.mouse_press_x, self.mouse_press_y, POINT_PHENOMENON,
+                                           self.ego_view.background)
 
         self.ego_view.push_handlers(on_mouse_press, on_key_press)
 
-    def add_point_of_interest(self, x, y, point_type):
+    def add_point_of_interest(self, x, y, point_type, group=None):
         """ Adding a point of interest to the view """
-        point_of_interest = PointOfInterest(x, y, self.ego_view.batch, self.ego_view.foreground, point_type)
+        if group is None:
+            group = self.ego_view.foreground
+        point_of_interest = PointOfInterest(x, y, self.ego_view.batch, group, point_type)
         self.points_of_interest.append(point_of_interest)
         return point_of_interest
 
@@ -97,8 +97,7 @@ class EgoController:
             p.displace(enacted_interaction['displacement_matrix'])
 
         # Mark the new position
-        position = PointOfInterest(0, 0, self.ego_view.batch, self.ego_view.foreground, POINT_PLACE)
-        self.points_of_interest.append(position)
+        self.add_point_of_interest(0, 0, POINT_PLACE)
 
         # Update the robot's position
         self.ego_view.robot.rotate_head(enacted_interaction['head_angle'])
@@ -110,24 +109,20 @@ class EgoController:
         # Interaction trespassing
         if floor:
             # Mark a new trespassing interaction
-            line = PointOfInterest(x, y, self.ego_view.batch, self.ego_view.foreground, POINT_TRESPASS)
-            self.points_of_interest.append(line)
+            self.add_point_of_interest(x, y, POINT_TRESPASS)
 
         # Point of interest blocked
         if blocked:
             # Create a new push interaction
-            push = PointOfInterest(x, y, self.view.batch, self.view.foreground, POINT_PUSH)
-            self.points_of_interest.append(push)
+            self.add_point_of_interest(x, y, POINT_PUSH)
 
         # Point of interest shock
         if shock:
-            wall = PointOfInterest(x, y, self.view.batch, self.view.foreground, POINT_SHOCK)
-            self.points_of_interest.append(wall)
+            self.add_point_of_interest(x, y, POINT_SHOCK)
 
         # Point of interest echo
         if obstacle:
-            echo = PointOfInterest(x, y, self.ego_view.batch, self.ego_view.foreground, POINT_ECHO)
-            self.points_of_interest.append(echo)
+            self.add_point_of_interest(x, y, POINT_ECHO)
 
 
 # Displaying EgoMemoryWindowNew with points of interest

@@ -70,7 +70,7 @@ def main(ip):
                     and enacted_interaction['status'] != "T":
                 ref_x, ref_y = None, None
                 for p in ego_controller.points_of_interest:
-                    if p.type == POINT_PHENOMENON:
+                    if p.type == POINT_PHENOMENON and p.is_selected:
                         ref_x, ref_y = p.x, p.y
                 if ref_x:
                     floor, shock, blocked, obstacle, x, y = enacted_interaction['phenom_info']
