@@ -15,12 +15,13 @@
 #
 
 import pyglet
-from OsoyooControllerBSN.Display.Controller import Controller
-from OsoyooControllerBSN.Display.EgoMemoryWindow import EgoMemoryWindow
-from OsoyooControllerBSN.Display.ModalWindow import ModalWindow
-from OsoyooControllerBSN.Agent.Agent5 import Agent5
 import json
 import sys
+from OsoyooControllerBSN.Display.EgoController import EgoController
+from OsoyooControllerBSN.Display.EgocentricView import EgocentricView
+from OsoyooControllerBSN.Display.ModalWindow import ModalWindow
+from OsoyooControllerBSN.Agent.Agent5 import Agent5
+from OsoyooControllerBSN.Wifi.RobotController import RobotController
 
 CONTROL_MODE_MANUAL = 0
 CONTROL_MODE_AUTOMATIC = 1
@@ -29,15 +30,16 @@ control_mode = CONTROL_MODE_MANUAL
 
 def main(ip):
     """ Controlling the robot with Agent5 """
-    emw = EgoMemoryWindow()
-    controller = Controller(emw, ip)
+    emw = EgocentricView()
+    ego_controller = EgoController(emw)
+    robot_controller = RobotController(ip)
     agent = Agent5()
 
     @emw.event
     def on_text(text):
         global control_mode
         if text.upper() == "C":
-            ModalWindow(controller.points_of_interest)
+            ModalWindow(ego_controller.points_of_interest)
             return
         if text.upper() == "A":
             control_mode = CONTROL_MODE_AUTOMATIC
@@ -47,25 +49,26 @@ def main(ip):
             print("Control mode: MANUAL")
 
         if control_mode == CONTROL_MODE_MANUAL:
-            if controller.enact_step == 0:
-                if text == "/":  # Send the angle marked by the mouse click
-                    text = json.dumps({'action': '/', 'angle': emw.mouse_press_angle})
-                controller.enact(text)
+            if robot_controller.enact_step == 0:
+                robot_controller.action_angle = ego_controller.mouse_press_angle
+                # if text == "/" or text == "+":  # Send the angle marked by the mouse click
+                #     text = json.dumps({'action': text, 'angle': ego_controller.mouse_press_angle})
+                robot_controller.command_robot(text)
             else:
                 print("Waiting for previous outcome before sending new action")
 
     def watch_interaction(dt):
         """ Watch for the end of the previous interaction and choose the next """
-        if controller.enact_step == 2:
+        if robot_controller.enact_step == 2:
             # Update the egocentric memory window
-            controller.update_model()
-            controller.enact_step = 0
+            ego_controller.update_model(robot_controller.translate_robot_data())
+            robot_controller.enact_step = 0
 
         if control_mode == CONTROL_MODE_AUTOMATIC:
-            if controller.enact_step == 0:
+            if robot_controller.enact_step == 0:
                 # Retrieve the previous outcome
                 outcome = 0
-                json_outcome = json.loads(controller.outcome_bytes)
+                json_outcome = json.loads(robot_controller.outcome_bytes)
                 if 'floor' in json_outcome:
                     outcome = int(json_outcome['floor'])
                 if 'shock' in json_outcome:
@@ -74,7 +77,7 @@ def main(ip):
 
                 # Choose the next action
                 action = agent.action(outcome)
-                controller.enact(['8', '1', '3'][action])
+                robot_controller.command_robot(['8', '1', '3'][action])
 
     # Schedule the watch of the end of the previous interaction and choosing the next
     pyglet.clock.schedule_interval(watch_interaction, 0.1)

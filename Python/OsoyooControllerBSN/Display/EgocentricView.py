@@ -1,15 +1,13 @@
 import pyglet
 from pyglet.gl import *
-from ..Display.OsoyooCar import OsoyooCar
 import math
 import numpy
+from ..Display.OsoyooCar import OsoyooCar
 
-# Zooming constants
 ZOOM_IN_FACTOR = 1.2
-ZOOM_OUT_FACTOR = 1 / ZOOM_IN_FACTOR
 
 
-class EgoMemoryWindow(pyglet.window.Window):
+class EgocentricView(pyglet.window.Window):
     #  to draw a main window
     # set_caption: Set the window's caption, param: string(str)
     # set_minimum_size: resize window
@@ -17,34 +15,37 @@ class EgoMemoryWindow(pyglet.window.Window):
         super().__init__(400, 400, resizable=True, *args, **kwargs)
         self.set_caption("Egocentric Memory")
         self.set_minimum_size(150, 150)
-        glClearColor(1.0, 1.0, 1.0, 1.0)
 
-        self.batch = pyglet.graphics.Batch()  # create a batch
-        self.background = pyglet.graphics.OrderedGroup(0)  # Will be used to manage the overlapping of shapes
+        # Initialize OpenGL parameters
+        glClearColor(1.0, 1.0, 1.0, 1.0)
+        self.batch = pyglet.graphics.Batch()
+        self.background = pyglet.graphics.OrderedGroup(0)
         self.foreground = pyglet.graphics.OrderedGroup(1)
         self.zoom_level = 1
 
-        # draw the robot for display in the window using the batch parameter and used OsoyooCar's file
+        # Define the robot
         self.robot = OsoyooCar(self.batch, self.background)
         self.azimuth = 0
 
-        # Room to write some text
+        # Define the text area at the bottom of the view
         self.label = pyglet.text.Label('', font_name='Verdana', font_size=10, x=10, y=10)
         self.label.color = (0, 0, 0, 255)
 
     def on_draw(self):
-
+        """ Drawing the view """
         glClear(GL_COLOR_BUFFER_BIT)
         glLoadIdentity()
 
         # The transformations are stacked, and applied backward to the vertices
+
         # Stack the projection matrix. Centered on (0,0). Fit the window size and zoom factor
         glOrtho(-self.width * self.zoom_level, self.width * self.zoom_level, -self.height * self.zoom_level,
                 self.height * self.zoom_level, 1, -1)
 
         # Stack the rotation of the world so the robot's front is up
         glRotatef(90 - self.azimuth, 0.0, 0.0, 1.0)
-        # Draw the robot and the phenomena
+
+        # Draw the robot and the points of interest
         self.batch.draw()
 
         # Draw the text in the bottom left corner
@@ -53,13 +54,13 @@ class EgoMemoryWindow(pyglet.window.Window):
         self.label.draw()
 
     def on_resize(self, width, height):
-        # Display in the whole window
+        """ Adjusting the viewport when resizing the window """
         glViewport(0, 0, width, height)
 
     def on_mouse_scroll(self, x, y, dx, dy):
+        """ Zooming the window """
         # Inspired from https://www.py4u.net/discuss/148957
-        # Get scale factor
-        f = ZOOM_IN_FACTOR if dy > 0 else ZOOM_OUT_FACTOR if dy < 0 else 1
+        f = ZOOM_IN_FACTOR if dy > 0 else 1/ZOOM_IN_FACTOR if dy < 0 else 1
         if .4 < self.zoom_level * f < 5:
             self.zoom_level *= f
 
@@ -79,16 +80,20 @@ class EgoMemoryWindow(pyglet.window.Window):
         z = r * numpy.exp(1j * theta_robot)
         mouse_press_x, mouse_press_y = int(z.real), int(z.imag)
         mouse_press_angle = int(math.degrees(theta_robot))
-
         self.label.text = "Click: x:" + str(mouse_press_x) + ", y:" + str(mouse_press_y) \
                           + ", angle:" + str(mouse_press_angle) + "°"
-
         return mouse_press_x, mouse_press_y, mouse_press_angle
 
 
 # Showing the EgoMemoryWindow
-# py -m Python.OsoyooControllerBSN.Display.EgoMemoryWindow
+# py -m Python.OsoyooControllerBSN.Display.EgocentricView
 if __name__ == "__main__":
-    em_window = EgoMemoryWindow()
+    view = EgocentricView()
+    view.robot.rotate_head(-45)  # Turn head 45° to the right
+    view.azimuth = 350           # Turn robot 10° to the left
+
+    @view.event
+    def on_mouse_press(x, y, button, modifiers):
+        view.set_mouse_press_coordinate(x, y, button, modifiers)  # Display mouse click coordinates
 
     pyglet.app.run()

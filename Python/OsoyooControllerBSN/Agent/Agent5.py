@@ -1,6 +1,6 @@
 from ..Agent.Resources import Interaction
 from ..Agent.CompositeInteraction import CompositeInteraction
-from ..Display.EgoMemoryWindow import EgoMemoryWindow
+from ..Display.EgocentricView import EgocentricView
 from ..Display.OsoyooCar import OsoyooCar
 import pyglet
 
@@ -72,7 +72,7 @@ class Agent5:
 
 # Testing Agent5 by updating the window and expecting outcome from user keypress
 if __name__ == "__main__":
-    emw = EgoMemoryWindow(600)
+    emw = EgocentricView(600)
     emw.zoom_level = 2
     robot = OsoyooCar(emw.batch)
     agent = Agent5()

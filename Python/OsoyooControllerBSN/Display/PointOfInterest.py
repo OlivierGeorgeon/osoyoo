@@ -4,6 +4,7 @@ from pyrr import matrix44, Quaternion
 from webcolors import name_to_rgb
 
 POINT_ECHO = 0
+POINT_TINY_ECHO = -1
 POINT_TRESPASS = 1
 POINT_SHOCK = 2
 POINT_PUSH = 3
@@ -19,15 +20,18 @@ class PointOfInterest:
         self.group = group
         self.type = point_type
         self.is_selected = False
+        self.reference = None
 
         if self.type == POINT_PLACE:
-            # Place: Blue circle
-            # self.shape = shapes.Circle(x, y, 20, color=name_to_rgb("LightGreen"), batch=self.batch)
+            # Place: "LightGreen" triangle
             self.shape = self.batch.add(3, gl.GL_TRIANGLES, self.group, ('v2i', [20, 0, -20, -20, -20, 20]),
                                         ('c3B', (144, 238, 144, 144, 238, 144, 144, 238, 144)))
         if self.type == POINT_ECHO:
             # Echo: Orange circle
             self.shape = shapes.Circle(x, y, 20, color=name_to_rgb("orange"), batch=self.batch)
+        if self.type == POINT_TINY_ECHO:
+            # Echo: Orange circle
+            self.shape = shapes.Circle(x, y, 7, color=name_to_rgb("orange"), batch=self.batch)
         if self.type == POINT_TRESPASS:
             # Trespassing: black dash
             self.shape = shapes.Rectangle(x, y, 10, 60, color=name_to_rgb("black"), batch=self.batch)
@@ -48,8 +52,11 @@ class PointOfInterest:
         if color_name is None:
             if self.type == POINT_PLACE:
                 # Place: Blue circle
-                self.shape.color = name_to_rgb("LightGreen")
+                self.shape.colors[0:9] = [144, 238, 144, 144, 238, 144, 144, 238, 144]
             if self.type == POINT_ECHO:
+                # Echo: Orange circle
+                self.shape.color = name_to_rgb("orange")
+            if self.type == POINT_TINY_ECHO:
                 # Echo: Orange circle
                 self.shape.color = name_to_rgb("orange")
             if self.type == POINT_TRESPASS:
@@ -65,7 +72,11 @@ class PointOfInterest:
                 # Pushing: yellow triangle
                 self.shape.color = name_to_rgb("tomato")
         else:
-            self.shape.color = name_to_rgb(color_name)
+            if self.type == POINT_PLACE:
+                # Place:
+                self.shape.colors[0:9] = [255, 0, 0, 255, 0, 0, 255, 0, 0]
+            else:
+                self.shape.color = name_to_rgb(color_name)
 
     def displace(self, displacement_matrix):
         """ Applying the displacement matrix to the phenomenon """
@@ -99,7 +110,7 @@ class PointOfInterest:
 
     def delete(self):
         """ Delete the shape to remove it from the batch """
-        self.shape.delete()
+        self.shape.delete()  # Not sure whether it is necessary or not
 
     def is_near(self, x, y):
         """ If the point is near the x y coordinate, select this point and return True """
