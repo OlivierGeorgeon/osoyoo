@@ -59,6 +59,8 @@ class RobotController:
         x = None
         y = None
         echo_array = []
+        head_angle = 90
+        status = outcome['status']
 
         # Updating the model from the latest received outcome
         floor = 0
@@ -76,7 +78,7 @@ class RobotController:
 
         # floor_outcome = outcome['outcome']  # Agent5 uses floor_outcome
 
-        if outcome['status'] == "T":  # If timeout no ego memory update
+        if status == "T":  # If timeout no ego memory update
             print("No ego memory update")
         else:
             # Presupposed displacement of the robot relative to the environment
@@ -146,17 +148,17 @@ class RobotController:
 
             phenom_info = (floor, shock, blocked, obstacle, x, y)
 
-        # Update the azimuth
-        if 'azimuth' in outcome:
-            self.azimuth = outcome['azimuth']
-            # print("self az : ", self.azimuth)
-        else:
-            self.azimuth -= yaw
+            # Update the azimuth
+            if 'azimuth' in outcome:
+                self.azimuth = outcome['azimuth']
+                # print("self az : ", self.azimuth)
+            else:
+                self.azimuth -= yaw
 
         # TODO Return a dictionary named Enacted_Interaction
         print("phenom_info:", phenom_info, ", yaw:", yaw, ", translation:", translation, ", echo_array:", echo_array,
-              ", head_angle:", head_angle, ", azimuth:", self.azimuth)
-        return phenom_info, yaw, translation, outcome_for_agent, echo_array, head_angle, self.azimuth
+              ", head_angle:", head_angle, ", azimuth:", self.azimuth, ", status:", status)
+        return phenom_info, yaw, translation, outcome_for_agent, echo_array, head_angle, self.azimuth, status
 
 
 # Testing the controller by remote controlling the robot from the terminal
