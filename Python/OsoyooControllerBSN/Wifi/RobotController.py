@@ -44,115 +44,110 @@ class RobotController:
     def translate_robot_data(self):
         """ Computes the enacted interaction from the robot's outcome data """
         outcome = json.loads(self.outcome_bytes)
-        enacted_interaction = {'action': self.action, 'status': outcome['status'], 'head_angle': 90}
+        enacted_interaction = {'action': self.action, 'status': outcome['status']}
 
-        # outcome_for_agent = 0
-        obstacle = 0
-        floor = 0
-        shock = 0
-        blocked = 0
-        x = 0
-        y = 0
-        echo_array = []
+        # If timeout then no ego memory update
+        if enacted_interaction['status'] == "T":
+            return enacted_interaction
 
-        # Updating the model from the latest received outcome
-        floor = 0
+        # Head angle
+        head_angle = 90
+        if 'head_angle' in outcome:
+            head_angle = outcome['head_angle']
+        enacted_interaction['head_angle'] = head_angle
+
+        # Azimuth
+        if 'azimuth' in outcome:
+            self.azimuth = outcome['azimuth']
+        else:
+            self.azimuth -= enacted_interaction['yaw']
+        enacted_interaction['azimuth'] = self.azimuth
+
+        # Presupposed displacement of the robot relative to the environment
+        translation, yaw = [0, 0], 0
+        if self.action == "1":
+            yaw = 45
+        if self.action == "2":
+            translation[0] = -STEP_FORWARD_DISTANCE
+        if self.action == "3":
+            yaw = -45
+        if self.action == "4":
+            translation[1] = SHIFT_DISTANCE
+        if self.action == "6":
+            translation[1] = -SHIFT_DISTANCE
+        if self.action == "8":
+            translation[0] = STEP_FORWARD_DISTANCE # * outcome['duration'] / 1000
+
+        # Actual measured yaw if any
+        if 'yaw' in outcome:
+            yaw = outcome['yaw']
+
+        # interacting with phenomena
+        obstacle, floor, shock, blocked, x, y = 0, 0, 0, 0, 0, 0
+        echo_distance = 0
+
         if 'floor' in outcome:
             floor = outcome['floor']
-            # outcome_for_agent = outcome['floor']
-        shock = 0
         if 'shock' in outcome and self.action == '8' and floor == 0:
-            shock = outcome['shock']  # Yellow star
-            # outcome_for_agent = outcome['shock']
-        blocked = 0
+            shock = outcome['shock']
         if 'blocked' in outcome and self.action == '8' and floor == 0:
-            blocked = outcome['blocked']  # Red star
-            # outcome_for_agent = outcome['shock']  # OULAH
+            blocked = outcome['blocked']
+        if 'echo_distance' in outcome and self.action == "-" or self.action == "*" or self.action == "+":
+            echo_distance = outcome['echo_distance']
+            if echo_distance > 0:
+                obstacle = 1
 
-        # floor_outcome = outcome['outcome']  # Agent5 uses floor_outcome
-
-        if enacted_interaction['status'] != "T":  # If timeout no ego memory update
-            # Presupposed displacement of the robot relative to the environment
-            translation = [0, 0]
-            rotation = 0
-            if self.action == "1":
-                enacted_interaction['yaw'] = 45
-            if self.action == "2":
-                translation[0] = -STEP_FORWARD_DISTANCE
-            if self.action == "3":
-                enacted_interaction['yaw'] = -45
+        # Interaction trespassing
+        if floor > 0:
+            # The position of the interaction trespassing
+            x, y = LINE_X, 0
+            # The resulting translation
+            forward_duration = outcome['duration'] - 300  # Subtract retreat duration
+            if self.action == "8":  # TODO Other actions
+                translation[0] = STEP_FORWARD_DISTANCE * forward_duration / 1000 - RETREAT_DISTANCE
+                if translation[0] < 0:
+                    print("translation negative")
+                if floor == 0b01:  # Black line on the right
+                    translation[0] -= 0
+                    translation[1] = RETREAT_DISTANCE_Y
+                if floor == 0b10:  # Black line on the left
+                    translation[0] -= 0
+                    translation[1] = -RETREAT_DISTANCE_Y
             if self.action == "4":
-                translation[1] = SHIFT_DISTANCE
+                translation[0] = -RETREAT_DISTANCE
+                translation[1] = SHIFT_DISTANCE * forward_duration / 1000
             if self.action == "6":
-                translation[1] = -SHIFT_DISTANCE
-            if self.action == "8":
-                if not blocked:
-                    translation[0] = STEP_FORWARD_DISTANCE # * outcome['duration'] / 1000
+                translation[0] = -RETREAT_DISTANCE
+                translation[1] = -SHIFT_DISTANCE * forward_duration / 1000
 
-            # Actual measured displacement if any
-            if 'yaw' in outcome:
-                enacted_interaction['yaw'] = outcome['yaw']
+        # Interaction blocked
+        if blocked:
+            x, y = 110, 0
 
-            # Estimate displacement due to floor change retreat
-            if floor > 0:  # Black line detected
-                # Update the translation
-                forward_duration = outcome['duration'] - 300  # Subtract retreat duration
-                if self.action == "8":  # TODO Other actions
-                    translation[0] = STEP_FORWARD_DISTANCE * forward_duration / 1000 - RETREAT_DISTANCE
-                    if translation[0] < 0:
-                        print("translation negative")
-                    if floor == 0b01:  # Black line on the right
-                        translation[0] -= 0
-                        translation[1] = RETREAT_DISTANCE_Y
-                    if floor == 0b10:  # Black line on the left
-                        translation[0] -= 0
-                        translation[1] = -RETREAT_DISTANCE_Y
-                if self.action == "4":
-                    translation[0] = -RETREAT_DISTANCE
-                    translation[1] = SHIFT_DISTANCE * forward_duration / 1000
-                if self.action == "6":
-                    translation[0] = -RETREAT_DISTANCE
-                    translation[1] = -SHIFT_DISTANCE * forward_duration / 1000
+        # Interaction shock
+        if shock == 0b01:
+            x, y = 110, -80
+        if shock == 0b11:
+            x, y = 110, 0
+        if shock == 0b10:
+            x, y = 110, 80
 
-            enacted_interaction['translation'] = translation
+        # Interaction ECHO
+        if obstacle:
+            x = int(ROBOT_HEAD_X + math.cos(math.radians(head_angle)) * echo_distance)
+            y = int(math.sin(math.radians(head_angle)) * echo_distance)
 
-            # The displacement matrix of this interaction
-            translation_matrix = matrix44.create_from_translation([-translation[0], -translation[1], 0])
-            rotation_matrix = matrix44.create_from_z_rotation(-math.radians(-enacted_interaction['yaw']))
-            enacted_interaction['displacement_matrix'] = matrix44.multiply(rotation_matrix, translation_matrix)
+        enacted_interaction['phenom_info'] = (floor, shock, blocked, obstacle, x, y)
+        enacted_interaction['echo_distance'] = echo_distance
 
-            # Update head angle
-            if 'head_angle' in outcome:
-                enacted_interaction['head_angle'] = outcome['head_angle']
-                if self.action == "-" or self.action == "*" or self.action == "+":
-                    print("Create a new echo interaction")
-                    enacted_interaction['echo_distance'] = outcome['echo_distance']
-                    if enacted_interaction['echo_distance'] > 0:  # echo measure 0 is false measure
-                        x = ROBOT_HEAD_X + math.cos(math.radians(enacted_interaction['head_angle'])) * enacted_interaction['echo_distance']
-                        y = math.sin(math.radians(enacted_interaction['head_angle'])) * enacted_interaction['echo_distance']
-                        obstacle = 1
+        # The displacement caused by this interaction
+        enacted_interaction['translation'] = translation
+        enacted_interaction['yaw'] = yaw
+        translation_matrix = matrix44.create_from_translation([-translation[0], -translation[1], 0])
+        rotation_matrix = matrix44.create_from_z_rotation(-math.radians(-enacted_interaction['yaw']))
+        enacted_interaction['displacement_matrix'] = matrix44.multiply(rotation_matrix, translation_matrix)
 
-            for i in range(100, -99, -10):
-                edstr = "ed" + str(i)
-
-                if edstr in outcome:
-                    ha = i
-                    ed = outcome[edstr]
-                    tmp_x = ROBOT_HEAD_X + math.cos(math.radians(ha)) * ed
-                    tmp_y = math.sin(math.radians(ha)) * ed
-                    echo_array.append((tmp_x, tmp_y))
-                    # print("ha :",ha,"ed :",ed, "tmp_x :",tmp_x,"tmp_y :",tmp_y)
-
-            enacted_interaction['phenom_info'] = (floor, shock, blocked, obstacle, int(x), int(y))
-
-            # Update the azimuth
-            if 'azimuth' in outcome:
-                self.azimuth = outcome['azimuth']
-                # print("self az : ", self.azimuth)
-            else:
-                self.azimuth -= enacted_interaction['yaw']
-            enacted_interaction['azimuth'] = self.azimuth
-
+        # Returning the enacted interaction
         print(enacted_interaction)
         return enacted_interaction
 

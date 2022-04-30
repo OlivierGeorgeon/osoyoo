@@ -111,31 +111,24 @@ class EgoController:
         floor, shock, blocked, obstacle, x, y = enacted_interaction['phenom_info']
 
         # Interaction trespassing
-        if floor > 0:
+        if floor:
             # Mark a new trespassing interaction
-            line = PointOfInterest(LINE_X, 0, self.ego_view.batch, self.ego_view.foreground, POINT_TRESPASS)
+            line = PointOfInterest(x, y, self.ego_view.batch, self.ego_view.foreground, POINT_TRESPASS)
             self.points_of_interest.append(line)
 
-        # Interaction when moving forward
-        if self.action == "8" and floor == 0:
-            if blocked:
-                # Create a new push interaction
-                push = PointOfInterest(110, 0, self.view.batch, self.view.foreground, POINT_PUSH)
-                self.points_of_interest.append(push)
-            else:
-                # Create a new shock interaction
-                if shock == 0b01:
-                    wall = PointOfInterest(110, -80, self.view.batch, self.view.foreground, POINT_SHOCK)
-                    self.points_of_interest.append(wall)
-                if shock == 0b11:
-                    wall = PointOfInterest(110, 0, self.view.batch, self.view.foreground, POINT_SHOCK)
-                    self.points_of_interest.append(wall)
-                if shock == 0b10:
-                    wall = PointOfInterest(110, 80, self.ego_view.batch, self.ego_view.foreground, POINT_SHOCK)
-                    self.points_of_interest.append(wall)
+        # Point of interest blocked
+        if blocked:
+            # Create a new push interaction
+            push = PointOfInterest(x, y, self.view.batch, self.view.foreground, POINT_PUSH)
+            self.points_of_interest.append(push)
 
-        # Interaction echo
-        if obstacle > 0:
+        # Point of interest shock
+        if shock:
+            wall = PointOfInterest(x, y, self.view.batch, self.view.foreground, POINT_SHOCK)
+            self.points_of_interest.append(wall)
+
+        # Point of interest echo
+        if obstacle:
             echo = PointOfInterest(x, y, self.ego_view.batch, self.ego_view.foreground, POINT_ECHO)
             self.points_of_interest.append(echo)
 

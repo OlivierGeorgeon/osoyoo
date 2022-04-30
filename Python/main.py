@@ -5,7 +5,7 @@
 # |  |_)  | .----)   |   |  |\   |
 # |______/  |_______/    |__| \__|
 #
-#  BSN2 2021-2022
+#  v0.1.0 - BSN2 2021-2022
 #   Aleksei Apostolou, Daniel Duval, Célien Fiorelli, Geordi Gampio, Julina Matouassiloua
 #
 #  Teachers
