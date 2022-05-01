@@ -114,11 +114,12 @@ class PointOfInterest:
         """ Delete the shape to remove it from the batch """
         self.shape.delete()  # Not sure whether it is necessary or not
 
-    def is_near(self, x, y):
+    def select_if_near(self, x, y):
         """ If the point is near the x y coordinate, select this point and return True """
-        is_near = math.dist([x, y], [self.x, self.y]) < 20
-        if is_near:
+        # is_near = math.dist([x, y], [self.x, self.y]) < 20
+        if math.dist([x, y], [self.x, self.y]) < 20:
+            self.set_color('red')
             self.is_selected = True
         else:
+            self.set_color()
             self.is_selected = False
-        return is_near

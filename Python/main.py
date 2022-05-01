@@ -21,6 +21,7 @@ from OsoyooControllerBSN.Display.EgocentricView import EgocentricView
 from OsoyooControllerBSN.Display.ModalWindow import ModalWindow
 from OsoyooControllerBSN.Agent.Agent5 import Agent5
 from OsoyooControllerBSN.Wifi.RobotController import RobotController
+from OsoyooControllerBSN.Wifi.RobotDefine import *
 
 from OsoyooControllerBSN.Display.PointOfInterest import *
 
@@ -55,8 +56,9 @@ def main(ip):
                 intended_interaction = {'action': text, 'angle': ego_controller.mouse_press_angle}
                 focus = ego_controller.get_focus_phenomenon()
                 if focus:
-                    intended_interaction['focus_x'] = focus.x
-                    intended_interaction['focus_y'] = focus.y
+                    intended_interaction['focus_x'] = int(focus.x)
+                    intended_interaction['focus_y'] = int(focus.y)
+                    intended_interaction['speed'] = STEP_FORWARD_DISTANCE
                 robot_controller.command_robot(intended_interaction)
             else:
                 print("Waiting for previous outcome before sending new action")

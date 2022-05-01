@@ -19,22 +19,21 @@ class RobotController:
         self.azimuth = 0
 
     def command_robot(self, intended_interaction):
-        """ Creating an asynchronous thread to send the action to the robot and to wait for outcome """
+        """ Creating an asynchronous thread to send the command to the robot and to wait for the outcome """
         self.outcome_bytes = "Waiting"
 
         def enact_thread():
-            """ Sending the action to the robot and waiting for outcome """
-            # action_string = json.dumps({'action': self.action, 'angle': self.action_angle})
+            """ Sending the command to the robot and waiting for the outcome """
             action_string = json.dumps(self.intended_interaction)
             # print("Sending: " + action_string)
             self.outcome_bytes = self.wifiInterface.enact(action_string)
             print("Receive: ", end="")
             print(self.outcome_bytes)
-            self.enact_step = 2
+            self.enact_step = 2  # Now we have received the outcome from the robot
 
         # self.action = action
         self.intended_interaction = intended_interaction
-        self.enact_step = 1
+        self.enact_step = 1  # Now we send the command to the robot for enaction
         thread = threading.Thread(target=enact_thread)
         thread.start()
 

@@ -12,10 +12,6 @@ class EgoController:
         self.ego_view = ego_view
         self.points_of_interest = []
 
-        # self.action = ""
-        # self.enact_step = 0
-        # self.outcome_bytes = b'{"status":"T"}'  # Default status T timeout
-
         self.mouse_press_x = 0
         self.mouse_press_y = 0
         self.mouse_press_angle = 0
@@ -25,10 +21,7 @@ class EgoController:
             self.mouse_press_x, self.mouse_press_y, self.mouse_press_angle = \
                 self.ego_view.set_mouse_press_coordinate(x, y, button, modifiers)
             for p in self.points_of_interest:
-                if p.is_near(self.mouse_press_x, self.mouse_press_y):
-                    p.set_color("red")
-                else:
-                    p.set_color()
+                p.select_if_near(self.mouse_press_x, self.mouse_press_y)
 
         def on_key_press(symbol, modifiers):
             """ Deleting or inserting points of interest """
@@ -38,8 +31,13 @@ class EgoController:
                         p.delete()
                         self.points_of_interest.remove(p)
             if symbol == key.INSERT:
-                self.add_point_of_interest(self.mouse_press_x, self.mouse_press_y, POINT_PHENOMENON,
-                                           self.ego_view.background)
+                phenomenon = PointOfInterest(self.mouse_press_x, self.mouse_press_y, self.ego_view.batch,
+                                             self.ego_view.background, POINT_PHENOMENON)
+                self.points_of_interest.append(phenomenon)
+                phenomenon.is_selected = True
+                phenomenon.set_color('red')
+                # self.add_point_of_interest(self.mouse_press_x, self.mouse_press_y, POINT_PHENOMENON,
+                #                           self.ego_view.background)
 
         self.ego_view.push_handlers(on_mouse_press, on_key_press)
 
