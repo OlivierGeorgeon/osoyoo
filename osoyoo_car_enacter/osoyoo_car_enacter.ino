@@ -186,11 +186,12 @@ void loop()
           action = ((const char*) myObject["action"])[0];
         }
         if (myObject.hasOwnProperty("angle")) {
-          action_angle = (int)myObject["angle"];
+          action_angle = (int)myObject["angle"]; // for non-focussed
         }
         if (myObject.hasOwnProperty("focus_x")) {
           focus_x = (int)myObject["focus_x"];
           focus_y = (int)myObject["focus_y"];
+          action_angle = atan2(focus_y, focus_x) * 180.0 / M_PI; // for focussed
           is_focussed = true;
         } else {
           is_focussed = false;
@@ -263,7 +264,10 @@ void loop()
           action_end_time = millis() + 2000;
           break;
         case ACTION_SCAN_DIRECTION:
-          HEA.turnHead(action_angle);
+          if (is_focussed) {
+            HEA.turnHead(HEA.head_direction(focus_x, focus_y));  // Look to the focussed phenomenon
+          } else {
+            HEA.turnHead(action_angle);}  // look parallel to the direction
           HEA.beginEchoAlignment();
           break;
         case ACTION_ECHO_SCAN:
@@ -279,7 +283,11 @@ void loop()
           action_end_time = millis() + 5000;
           robot_destination_angle = action_angle;
           Serial.println("Begin align robot angle : " + String(robot_destination_angle));
-          HEA.turnHead(robot_destination_angle);  // Look at destination
+          HEA._next_saccade_time = action_end_time - SACCADE_DURATION;  // Inhibit HEA during the interaction
+          if (is_focussed) {
+            HEA.turnHead(HEA.head_direction(focus_x, focus_y));  // Look to the focussed phenomenon
+          } else {
+            HEA.turnHead(robot_destination_angle);}  // look parallel to the direction
           if ( robot_destination_angle < - TURN_FRONT_ENDING_ANGLE){
             OWM.turnInSpotRight(TURN_SPEED);
             //OWM.turnFrontRight(SPEED);
@@ -395,11 +403,20 @@ void loop()
         }
         break;
       case ACTION_ALIGN_ROBOT:
-        HEA.turnHead(robot_destination_angle - IMU._yaw); // Keep looking at destination
+        if (is_focussed){
+          float current_robot_direction = (robot_destination_angle - IMU._yaw) * M_PI / 180.0;
+          float r = sqrt(sq((float)focus_x) + sq((float)focus_y));  // conversion to float is necessary for some reason
+          float current_head_direction = HEA.head_direction(cos(current_robot_direction) * r, sin(current_robot_direction) * r);
+          // Serial.println("Directions robot: " + String(current_robot_direction) + ", head: " + String((int)current_head_direction) + ", dist: " + String((int)r));
+          HEA.turnHead(current_head_direction); // Keep looking at destination
+        } else {
+          HEA.turnHead(robot_destination_angle - IMU._yaw); // Keep looking at destination
+        }
         if (((robot_destination_angle > TURN_FRONT_ENDING_ANGLE) && (IMU._yaw > robot_destination_angle - TURN_FRONT_ENDING_ANGLE)) ||
         ((robot_destination_angle < -TURN_FRONT_ENDING_ANGLE) && (IMU._yaw < robot_destination_angle + TURN_FRONT_ENDING_ANGLE)) ||
         (abs(robot_destination_angle) < TURN_FRONT_ENDING_ANGLE))
         {
+          if (!HEA._is_enacting_head_alignment) {HEA.beginEchoAlignment();}  // Force HEA
           duration1 = millis()- action_start_time;
           OWM.stopMotion();
           interaction_step = 2;
