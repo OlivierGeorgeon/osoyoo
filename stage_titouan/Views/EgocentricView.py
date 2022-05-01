@@ -42,7 +42,7 @@ class EgocentricView(pyglet.window.Window):
         # Stack the rotation of the world so the robot's front is up
         glRotatef(90 - self.azimuth, 0.0, 0.0, 1.0)
 
-        # Draw the robot and the phenomena
+        # Draw the robot and the points of interest
         self.batch.draw()
 
         # Draw the text in the bottom left corner

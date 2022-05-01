@@ -10,9 +10,7 @@ from .. Misc.RobotDefine import *
 
 class RobotController:
     def __init__(self, robot_ip):
-        # Model
         self.wifiInterface = WifiInterface(robot_ip)
-        self.points_of_interest = []
 
         self.action = ""
         self.action_angle = 0

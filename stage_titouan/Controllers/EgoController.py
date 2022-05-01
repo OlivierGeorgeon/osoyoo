@@ -10,8 +10,6 @@ class EgoController:
         self.ego_view = ego_view
         self.points_of_interest = []
 
-        self.shape_list = []
-
         self.mouse_press_x = 0
         self.mouse_press_y = 0
         self.mouse_press_angle = 0
@@ -36,7 +34,7 @@ class EgoController:
             if symbol == key.INSERT:
                 print("insert phenomenon")
                 phenomenon = PointOfInterest(self.mouse_press_x, self.mouse_press_y, self.ego_view.batch,
-                                             self.ego_view.foreground, POINT_PHENOMENON)
+                                             self.ego_view.background, POINT_PHENOMENON)
                 self.points_of_interest.append(phenomenon)
 
         self.ego_view.push_handlers(on_mouse_press, on_key_press)

@@ -9,9 +9,14 @@
 #include <Servo.h>
 #include <Arduino_JSON.h>
 
-#define SACCADE_DURATION 150 // 150 Servo specification speed is 120ms/60°
-#define SACCADE_SPAN     5
-#define ECHO_MONITOR_PERIOD 500 // The period for checking whether to trigger head alignment
+//#define SERVO_PIN   13  //servo connect to D5. Now defined in Robot_define.h
+#define Echo_PIN    31  // Ultrasonic Echo pin connect to A5
+#define Trig_PIN    30  // Ultrasonic Trig pin connect to A4
+
+#define SACCADE_DURATION 150      // 150 Servo specification speed is 120ms/60°
+// #define SACCADE_SPAN 5           // 5°: good for complete-scan but bad for auto-alignment
+#define SACCADE_SPAN 10           // 10° good for auto-alignment
+#define ECHO_MONITOR_PERIOD 500   // The period for checking whether to trigger head alignment
 #define ECHO_MONITOR_VARIATION 50 // the measure threshold to trigger head alignment
 
 struct significant_array {
@@ -34,6 +39,7 @@ class Head_echo_alignment
     void outcome(JSONVar & outcome_object);
     void outcome_complete(JSONVar & outcome_object);
     void turnHead(int head_angle);
+    int head_direction(int x, int y);
     int _head_angle;
     bool _is_enacting_head_alignment;
     bool _is_enacting_echo_scan;
