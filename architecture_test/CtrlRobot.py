@@ -14,13 +14,15 @@ class CtrlRobot():
         self.action = ""
         self.enact_step = 0
         self.outcome_bytes = b'{"status":"T"}'  # Default status T timeout
-        self.ready = True
+        self.robot_has_finished_acting = True
 
     def main(self,dt):
         """Blabla"""
-        if self.ready:
-            self.ready = False
+        if self.robot_has_finished_acting:
+            self.robot_has_finished_acting = False
             robot_data = self.translate_robot_data(b'{"status":"T"}')
+            
+            
 
 
     def translate_robot_data(self,data): #PAS FINITO ?
@@ -154,19 +156,18 @@ class CtrlRobot():
 
 
 
-    def command_robot(self,action): #NOT TESTED
+    def command_robot(self, action):
         """ Creating an asynchronous thread to send the action to the robot and to wait for outcome """
         self.outcome_bytes = "Waiting"
+
         def enact_thread():
             """ Sending the action to the robot and waiting for outcome """
-            action_string = json.dumps({'action': self.model.agent_action, 'angle': self.model.action_angle})
+            action_string = json.dumps({'action': self.action, 'angle': self.action_angle})
             print("Sending: " + action_string)
             self.outcome_bytes = self.wifiInterface.enact(action_string)
             print("Receive ", end="")
             print(self.outcome_bytes)
             self.enact_step = 2
-            #print("Thread : enact_step = 2")
-            # self.watch_outcome()
 
         self.action = action
         self.enact_step = 1
@@ -175,4 +176,4 @@ class CtrlRobot():
 
         # Cas d'actions particulières :
         if action == "r":
-            self.model.action_reset()
+            self.action_reset()
