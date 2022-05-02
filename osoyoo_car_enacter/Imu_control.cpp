@@ -185,17 +185,26 @@ int Imu_control::read_azimuth()
 
   // Calculate heading
   float heading = atan2(norm.YAxis, norm.XAxis);
+  Serial.println("compass_x: " + String((int)norm.XAxis) + ", compass_y: " + String((int)norm.YAxis));
+
+  // You must set the offset so that compass_x is centered in East and West
+  // and compass_y is centered in North and South.
+  // For example, I obtain:
+  // North compass_x: -230, compass_y:    2
+  // Est   compass_x:  -30, compass_y: -225
+  // South compass_x:  218, compass_y:  -29
+  // West  compass_x:    3, compass_y:  217
 
   // Convert to degrees
-  int headingDegrees = heading * 180/M_PI;
+  int headingDegrees = heading * 180.0/M_PI;
 
   // Set declination angle on your location and fix heading
   // You can find your declination on: http://magnetic-declination.com/
   // (+) Positive or (-) for negative
   // For Bytom / Poland declination angle is 4'26E (positive)
   // Formula: (deg + (min / 60.0)) / (180 / M_PI) radiant;
-  float declinationAngle = (4.0 + (26.0 / 60.0));
-  //heading += declinationAngle;
+  float declinationAngle = (2.0 + (13.0 / 60.0));
+  heading += declinationAngle;
 
   headingDegrees += 180;
   if (heading >= 360)
