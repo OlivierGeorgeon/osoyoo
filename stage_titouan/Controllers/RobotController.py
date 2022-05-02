@@ -18,7 +18,7 @@ class RobotController:
         self.outcome_bytes = b'{"status":"T"}'  # Default status T timeout
         self.azimuth = 0
 
-    def command_robot(self, action):
+    def command_robot(self, action):  # TODO passer un dictionnaire intended_interacion au lieu de action
         """ Creating an asynchronous thread to send the action to the robot and to wait for outcome """
         self.outcome_bytes = "Waiting"
 
@@ -40,7 +40,7 @@ class RobotController:
         if action == "r":
             self.action_reset()
 
-    def translate_robot_data(self):
+    def translate_robot_data(self): # TODO return un dictionnaire enacted_interaction au lieu d'une tuple avec phenom_info
         """Translate data from the robot to data usable
         by the model
         """

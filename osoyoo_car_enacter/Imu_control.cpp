@@ -37,7 +37,7 @@ void Imu_control::setup()
 
   // Set DLP Filter
   // See https://ulrichbuschbaum.wordpress.com/2015/01/18/using-the-mpu6050s-dlpf/
-  _mpu.setDLPFMode(MPU6050_DLPF_6);  // Filter out frequencies over 21 Hz
+  _mpu.setDLPFMode(MPU6050_DLPF_4);  // Filter out frequencies over 21 Hz
 
   // Calibrate gyroscope. The robot must be at rest during calibration.
   // If you don't want calibrate, comment this line.
