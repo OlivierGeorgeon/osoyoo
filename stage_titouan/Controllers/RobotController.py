@@ -10,9 +10,7 @@ from .. Misc.RobotDefine import *
 
 class RobotController:
     def __init__(self, robot_ip):
-        # Model
         self.wifiInterface = WifiInterface(robot_ip)
-        self.points_of_interest = []
 
         self.action = ""
         self.action_angle = 0
@@ -59,6 +57,8 @@ class RobotController:
         x = None
         y = None
         echo_array = []
+        head_angle = 90
+        status = outcome['status']
 
         # Updating the model from the latest received outcome
         floor = 0
@@ -76,7 +76,7 @@ class RobotController:
 
         # floor_outcome = outcome['outcome']  # Agent5 uses floor_outcome
 
-        if outcome['status'] == "T":  # If timeout no ego memory update
+        if status == "T":  # If timeout no ego memory update
             print("No ego memory update")
         else:
             # Presupposed displacement of the robot relative to the environment
@@ -94,7 +94,7 @@ class RobotController:
                 translation[1] = -SHIFT_DISTANCE
             if self.action == "8":
                 if not blocked:
-                    translation[0] = STEP_FORWARD_DISTANCE * outcome['duration'] / 1000
+                    translation[0] = STEP_FORWARD_DISTANCE # * outcome['duration'] / 1000
 
             # Actual measured displacement if any
             if 'yaw' in outcome:
@@ -146,22 +146,24 @@ class RobotController:
 
             phenom_info = (floor, shock, blocked, obstacle, x, y)
 
-        # Update the azimuth
-        if 'azimuth' in outcome:
-            self.azimuth = outcome['azimuth']
-            # print("self az : ", self.azimuth)
-        else:
-            self.azimuth -= yaw
+            # Update the azimuth
+            if 'azimuth' in outcome:
+                self.azimuth = outcome['azimuth']
+                # print("self az : ", self.azimuth)
+            else:
+                self.azimuth -= yaw
 
-        print("phenom_info: ", phenom_info, ", yaw: ", yaw, ", translation: ", translation, ", echo_array ", echo_array)
-        return phenom_info, yaw, translation, outcome_for_agent, echo_array
+        # TODO Return a dictionary named Enacted_Interaction
+        print("phenom_info:", phenom_info, ", yaw:", yaw, ", translation:", translation, ", echo_array:", echo_array,
+              ", head_angle:", head_angle, ", azimuth:", self.azimuth, ", status:", status)
+        return phenom_info, yaw, translation, outcome_for_agent, echo_array, head_angle, self.azimuth, status
 
 
 # Testing the controller by remote controlling the robot from the terminal
 # py -m stage_titouan.Controllers.RobotController "192.168.8.189"
 # Select the terminal window and press command key
 if __name__ == "__main__":
-    ip = "192.168.4.1"
+    ip = "192.168.1.11"
     if len(sys.argv) > 1:
         ip = sys.argv[1]
     else:
@@ -180,6 +182,4 @@ if __name__ == "__main__":
         controller.command_robot(a)
         while controller.enact_step < 2:
             time.sleep(0.1)
-        phenom_info, _yaw, translation, controller.outcome, echo_array = controller.translate_robot_data()
-        print("phenom_info: ", phenom_info, ", yaw: ", _yaw, ", translation: ", translation, ", echo_array ", echo_array)
-
+        controller.translate_robot_data()

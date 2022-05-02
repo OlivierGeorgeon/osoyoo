@@ -51,7 +51,7 @@ Floor_change_retreat FCR(OWM);
 Head_echo_alignment HEA;
 Imu_control IMU;
 //Head_echo_complete_scan HECS;
-char packetBuffer[50];
+char packetBuffer[100]; // Max number of characters received
 WiFiEspUDP Udp;
 unsigned int localPort = 8888;  // local port to listen on
 
@@ -120,6 +120,7 @@ void setup()
 }
 
 unsigned long action_start_time = 0;
+unsigned long duration1 = 0;
 unsigned long action_end_time = 0;
 int interaction_step = 0;
 char action =' ';
@@ -127,6 +128,10 @@ String status = "0"; // The outcome information used for sequential learning
 int robot_destination_angle = 0;
 unsigned long blink_end_time = 0;
 bool blink_on = true;
+bool is_focussed = false;
+int focus_x = 0;
+int focus_y = 0;
+int focus_speed = 0;
 
 void loop()
 {
@@ -176,12 +181,23 @@ void loop()
         // Multiple characters is json
         // https://github.com/arduino-libraries/Arduino_JSON/blob/master/examples/JSONObject/JSONObject.ino
         JSONVar myObject = JSON.parse(packetBuffer);
-        //Serial.print(myObject);
+        Serial.println(myObject);
         if (myObject.hasOwnProperty("action")) {
           action = ((const char*) myObject["action"])[0];
         }
         if (myObject.hasOwnProperty("angle")) {
-          action_angle = ((int) myObject["angle"]);
+          action_angle = (int)myObject["angle"]; // for non-focussed
+        }
+        if (myObject.hasOwnProperty("focus_x")) {
+          focus_x = (int)myObject["focus_x"];
+          focus_y = (int)myObject["focus_y"];
+          action_angle = atan2(focus_y, focus_x) * 180.0 / M_PI; // for focussed
+          is_focussed = true;
+        } else {
+          is_focussed = false;
+        }
+        if (myObject.hasOwnProperty("speed")) {
+          focus_speed = (int)myObject["speed"];
         }
       }
       //Serial.print(" from ");
@@ -207,6 +223,9 @@ void loop()
           OWM.turnInSpotLeft(TURN_SPEED);
           break;
         case ACTION_GO_BACK:
+          HEA._next_saccade_time = action_end_time - SACCADE_DURATION;  // Inhibit HEA during the interaction
+          if (is_focussed) {
+            HEA.turnHead(HEA.head_direction(focus_x, focus_y));} // Turn head towards the focus point
           OWM.goBack(SPEED);
           break;
         case ACTION_TURN_IN_SPOT_RIGHT:
@@ -231,6 +250,9 @@ void loop()
           OWM.turnLeft(SPEED);
           break;
         case ACTION_GO_ADVANCE:
+          HEA._next_saccade_time = action_end_time - SACCADE_DURATION;  // Inhibit HEA during the interaction
+          if (is_focussed) {
+            HEA.turnHead(HEA.head_direction(focus_x, focus_y));} // Turn head towards the focus point
           OWM.goForward(SPEED);
           break;
         case ACTION_TURN_RIGHT:
@@ -242,7 +264,10 @@ void loop()
           action_end_time = millis() + 2000;
           break;
         case ACTION_SCAN_DIRECTION:
-          HEA.turnHead(action_angle);
+          if (is_focussed) {
+            HEA.turnHead(HEA.head_direction(focus_x, focus_y));  // Look to the focussed phenomenon
+          } else {
+            HEA.turnHead(action_angle);}  // look parallel to the direction
           HEA.beginEchoAlignment();
           break;
         case ACTION_ECHO_SCAN:
@@ -257,8 +282,12 @@ void loop()
         case ACTION_ALIGN_ROBOT:
           action_end_time = millis() + 5000;
           robot_destination_angle = action_angle;
-          //Serial.println("Begin align robot angle : " + String(robot_destination_angle));
-          HEA.turnHead(robot_destination_angle);  // Look at destination
+          Serial.println("Begin align robot angle : " + String(robot_destination_angle));
+          HEA._next_saccade_time = action_end_time - SACCADE_DURATION;  // Inhibit HEA during the interaction
+          if (is_focussed) {
+            HEA.turnHead(HEA.head_direction(focus_x, focus_y));  // Look to the focussed phenomenon
+          } else {
+            HEA.turnHead(robot_destination_angle);}  // look parallel to the direction
           if ( robot_destination_angle < - TURN_FRONT_ENDING_ANGLE){
             OWM.turnInSpotRight(TURN_SPEED);
             //OWM.turnFrontRight(SPEED);
@@ -281,14 +310,53 @@ void loop()
     switch (action)
     {
       case ACTION_GO_ADVANCE:
+        if (is_focussed){  // Keep the head towards the focus (HEA is inhibited during the action)
+          HEA.turnHead(HEA.head_direction(focus_x - focus_speed * (millis()- action_start_time)/1000, focus_y) - IMU._yaw);}
         if (shock_event > 0 && !FCR._is_enacting){
           // If shock then stop the go advance action
-          status ="SHOCK EVENT 1";
+          duration1 = millis()- action_start_time;
           action_end_time = 0;
           OWM.stopMotion();
           interaction_step = 2;
           break;
         }
+        // Check if Floor Change Retreat
+        if (FCR._is_enacting) {
+          FCR.extraDuration(RETREAT_EXTRA_DURATION); // Increase retreat duration because need to reverse speed
+          status ="1";
+          // Proceed to step 2 for enacting Floor Change Retreat
+          duration1 = millis()- action_start_time;
+          action_end_time = 0;
+          interaction_step = 2;
+        }
+        // If no floor change, check whether duration has elapsed
+        else if (action_end_time < millis()) {
+          if (!HEA._is_enacting_head_alignment) {HEA.beginEchoAlignment();}  // Force HEA
+          duration1 = millis()- action_start_time;
+          OWM.stopMotion();
+          interaction_step = 2;
+        }
+        break;
+      case ACTION_GO_BACK:
+        if (is_focussed)  // Keep the head towards the focus (HEA is inhibited during the action)
+          {HEA.turnHead(HEA.head_direction(focus_x + focus_speed * (millis()- action_start_time)/1000, focus_y) - IMU._yaw);}
+        // Check if Floor Change Retreat
+        if (FCR._is_enacting) {
+          FCR.extraDuration(RETREAT_EXTRA_DURATION); // Increase retreat duration because need to reverse speed
+          status ="1";
+          // Proceed to step 2 for enacting Floor Change Retreat
+          duration1 = millis()- action_start_time;
+          action_end_time = 0;
+          interaction_step = 2;
+        }
+        // If no floor change, check whether duration has elapsed
+        else if (action_end_time < millis()) {
+          if (!HEA._is_enacting_head_alignment) {HEA.beginEchoAlignment();}  // Force HEA
+          duration1 = millis()- action_start_time;
+          OWM.stopMotion();
+          interaction_step = 2;
+        }
+        break;
       case ACTION_SHIFT_RIGHT:
       case ACTION_SHIFT_LEFT:
       case ACTION_TURN_RIGHT:
@@ -297,15 +365,15 @@ void loop()
         if (FCR._is_enacting) {
           FCR.extraDuration(RETREAT_EXTRA_DURATION); // Increase retreat duration because need to reverse speed
           status ="1";
-          //if (FCR._floor_outcome > 0) {
-          //  status ="2";  // Check whether floor outcome has been set at this point
-          //}
           // Proceed to step 2 for enacting Floor Change Retreat
+          duration1 = millis()- action_start_time;
           action_end_time = 0;
           interaction_step = 2;
         }
         // If no floor change, check whether duration has elapsed
         else if (action_end_time < millis()) {
+          if (!HEA._is_enacting_head_alignment) {HEA.beginEchoAlignment();}  // Force HEA
+          duration1 = millis()- action_start_time;
           OWM.stopMotion();
           interaction_step = 2;
         }
@@ -316,6 +384,7 @@ void loop()
          // Stop before reaching 45° or when duration has elapsed
         if ((IMU._yaw > robot_destination_angle - TURN_SPOT_ENDING_ANGLE) || (action_end_time < millis()))
         {
+          duration1 = millis()- action_start_time;
           OWM.stopMotion();
           interaction_step = 2;
           action_end_time = millis() + TURN_SPOT_ENDING_DELAY; // Add time for stabilisation during step 2
@@ -327,17 +396,28 @@ void loop()
          // Stop before reaching -45° or when duration has elapsed
         if ((IMU._yaw < robot_destination_angle + TURN_SPOT_ENDING_ANGLE) || (action_end_time < millis()))
         {
+          duration1 = millis()- action_start_time;
           OWM.stopMotion();
           interaction_step = 2;
           action_end_time = millis() + TURN_SPOT_ENDING_DELAY; // Add time for stabilisation during step 2
         }
         break;
       case ACTION_ALIGN_ROBOT:
-        HEA.turnHead(robot_destination_angle - IMU._yaw); // Keep looking at destination
+        if (is_focussed){
+          float current_robot_direction = (robot_destination_angle - IMU._yaw) * M_PI / 180.0;
+          float r = sqrt(sq((float)focus_x) + sq((float)focus_y));  // conversion to float is necessary for some reason
+          float current_head_direction = HEA.head_direction(cos(current_robot_direction) * r, sin(current_robot_direction) * r);
+          // Serial.println("Directions robot: " + String(current_robot_direction) + ", head: " + String((int)current_head_direction) + ", dist: " + String((int)r));
+          HEA.turnHead(current_head_direction); // Keep looking at destination
+        } else {
+          HEA.turnHead(robot_destination_angle - IMU._yaw); // Keep looking at destination
+        }
         if (((robot_destination_angle > TURN_FRONT_ENDING_ANGLE) && (IMU._yaw > robot_destination_angle - TURN_FRONT_ENDING_ANGLE)) ||
         ((robot_destination_angle < -TURN_FRONT_ENDING_ANGLE) && (IMU._yaw < robot_destination_angle + TURN_FRONT_ENDING_ANGLE)) ||
         (abs(robot_destination_angle) < TURN_FRONT_ENDING_ANGLE))
         {
+          if (!HEA._is_enacting_head_alignment) {HEA.beginEchoAlignment();}  // Force HEA
+          duration1 = millis()- action_start_time;
           OWM.stopMotion();
           interaction_step = 2;
           action_end_time = millis() + TURN_FRONT_ENDING_DELAY;// give it time to immobilize before terminating interaction
@@ -354,12 +434,14 @@ void loop()
       case ACTION_SCAN_DIRECTION:
         if (!HEA._is_enacting_head_alignment && !HEA._is_enacting_echo_scan)
         {
+          duration1 = millis()- action_start_time;
           action_end_time = 0;
           interaction_step = 2;
         }
         break;
       default:
         if (action_end_time < millis()) {
+          duration1 = millis()- action_start_time;
           OWM.stopMotion();
           interaction_step = 2;
         }
@@ -375,7 +457,7 @@ void loop()
   {
     // Wait for the interaction to terminate and proceed to Step 3
     // (Don't wait for  the head alignment or it may never terminate)
-    if (action_end_time < millis() &&  !FCR._is_enacting && !HEA._is_enacting_head_alignment /*&& !HECS._is_enacting_echo_scan*/) 
+    if (action_end_time < millis() &&  !FCR._is_enacting && !HEA._is_enacting_head_alignment /*&& !HECS._is_enacting_echo_scan*/)
     {
       interaction_step = 3;
     }
@@ -394,6 +476,7 @@ void loop()
     IMU.outcome(outcome_object);
 
     //HECS.outcome(outcome_object);
+    outcome_object["duration1"] = duration1;
     outcome_object["duration"] = millis() - action_start_time;
     String outcome_json_string = JSON.stringify(outcome_object);
 

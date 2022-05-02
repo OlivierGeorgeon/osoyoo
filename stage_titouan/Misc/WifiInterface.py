@@ -2,18 +2,8 @@ import socket
 import keyboard
 import sys
 from .. Misc.RobotDefine import ROBOT_ID
-# UDP_IP = "192.168.4.1"  # AP mode
-#UDP_IP = "192.168.1.22"  # STA chezOlivier
-# UDP_IP = "192.168.8.189"  #
-# UDP_IP = "10.40.22.251" # STA RobotBSN - Olivier's Robot in A301
-# UDP_IP = "10.40.22.254" # STA RobotBSN -
-# UDP_IP = "10.44.53.11"  # STA RobotBSN - Olivier's Robot in A485
-# UDP_IP = "10.44.53.13"  # STA RobotBSN - UCLy's Robot in A485
-#UDP_IP = "10.40.23.0"  # STA RobotBSN - A327
-#UDP_IP = "10.40.22.13"  # STA RobotBSN - A327
+
 UDP_IP = "192.168.8.189"  # AP mode routeur margit
-
-
 UDP_TIMEOUT = 5  # Seconds
 if ROBOT_ID == 0:
     UDP_TIMEOUT = 0

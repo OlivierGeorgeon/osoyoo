@@ -8,10 +8,6 @@
 #include "head_echo_alignment.h"
 #include <Servo.h>
 
-//#define SERVO_PIN   13  //servo connect to D5
-#define Echo_PIN    31  // Ultrasonic Echo pin connect to A5
-#define Trig_PIN    30  // Ultrasonic Trig pin connect to A4
-
 Head_echo_alignment::Head_echo_alignment()
 {
   //Servo _head;
@@ -45,11 +41,6 @@ void Head_echo_alignment::beginEchoAlignment()
   _is_enacting_head_alignment = true;
   _penultimate_ultrasonic_measure = 1;  // Reinitialize previous measures so it will not ...
   _previous_ultrasonic_measure = 10001; // ... believe that the next measure is a minimum
-  //if (_head_angle > 0) { // Begins with a saccade towards the center so it will not stay at the limit angle
-  //  _head_angle_span = -SACCADE_SPAN;
-  //} else {
-  //  _head_angle_span = SACCADE_SPAN;
-  //}
   _echo_alignment_step = 0;
   _head_angle_span =  -_head_angle_span;  // Inverse the movement to track moving objects more easily
   //turnHead(_head_angle - _head_angle_span);
@@ -224,6 +215,7 @@ void Head_echo_alignment::outcome_complete(JSONVar & outcome_object)
 void Head_echo_alignment::turnHead(int head_angle)
 {
   _head_angle = constrain(head_angle, -90, 90);
+  Serial.println("Turning head to: " + String(head_angle));
   _head.write(_head_angle + 90);
 }
 
@@ -240,4 +232,19 @@ int Head_echo_alignment::measureUltrasonicEcho()
   if (echo_distance == 0) echo_distance = 10000;  // Zero counts for far away
   //Serial.println("Angle " +String(_head_angle) + " measure " + String(echo_distance));
   return echo_distance;
+}
+
+int Head_echo_alignment::head_direction(int x, int y)
+{
+  if (x < ROBOT_HEAD_X)
+  // The focus is behind the head
+  {
+    if (y > 0) {return 90;}
+    else {return -90;}
+  }
+  else
+  // The focus is before the head
+  {
+    return (int)(atan2(y, x-ROBOT_HEAD_X) * 180.0 / M_PI);
+  }
 }

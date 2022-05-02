@@ -2,12 +2,13 @@ from pyglet import shapes, gl
 import math
 from pyrr import matrix44, Quaternion
 from webcolors import name_to_rgb
+from .. Model.Interactions.Interaction import *
 
-POINT_ECHO = 1
-POINT_TINY_ECHO = 'Echo'
-POINT_TRESPASS = 'Trespassing'
-POINT_SHOCK = 'Shock'
-POINT_PUSH = 'Block'
+POINT_ECHO = INTERACTION_ECHO  # 1
+POINT_TINY_ECHO = 1  # INTERACTION_ECHO
+POINT_TRESPASS = INTERACTION_TRESPASSING
+POINT_SHOCK = INTERACTION_SHOCK
+POINT_PUSH = INTERACTION_BLOCK
 POINT_PLACE = 4
 POINT_PHENOMENON = 5
 
