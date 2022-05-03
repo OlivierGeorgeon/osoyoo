@@ -44,7 +44,7 @@
 //#define ACTION_ECHO_COMPLETE 's'
 #define ACTION_SCAN_DIRECTION '+'
 
-#define TURN_SPOT_ANGLE 60
+#define TURN_SPOT_ANGLE 45
 
 Omny_wheel_motion OWM;
 Floor_change_retreat FCR(OWM);
@@ -381,7 +381,7 @@ void loop()
       case ACTION_TURN_IN_SPOT_LEFT:
         // Keep head aligned with destination angle
         HEA.turnHead(robot_destination_angle - IMU._yaw);
-         // Stop before reaching 45° or when duration has elapsed
+         // Stop before reaching destination angle or when duration has elapsed
         if ((IMU._yaw > robot_destination_angle - TURN_SPOT_ENDING_ANGLE) || (action_end_time < millis()))
         {
           duration1 = millis()- action_start_time;
@@ -393,7 +393,7 @@ void loop()
       case ACTION_TURN_IN_SPOT_RIGHT:
         // Keep head aligned with destination angle
         HEA.turnHead(robot_destination_angle - IMU._yaw);
-         // Stop before reaching -45° or when duration has elapsed
+         // Stop before reaching reaching destination angle or when duration has elapsed
         if ((IMU._yaw < robot_destination_angle + TURN_SPOT_ENDING_ANGLE) || (action_end_time < millis()))
         {
           duration1 = millis()- action_start_time;
@@ -456,7 +456,7 @@ void loop()
   if (interaction_step == 2)
   {
     // Wait for the interaction to terminate and proceed to Step 3
-    // (Don't wait for  the head alignment or it may never terminate)
+    // Warning: in some situations, the head alignment may take quite long
     if (action_end_time < millis() &&  !FCR._is_enacting && !HEA._is_enacting_head_alignment /*&& !HECS._is_enacting_echo_scan*/)
     {
       interaction_step = 3;

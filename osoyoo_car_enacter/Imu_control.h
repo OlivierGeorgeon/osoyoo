@@ -29,7 +29,7 @@ class Imu_control
     float _xSpeed;
     float _xDistance;
     #if ROBOT_HAS_HMC5883L == true
-      int read_azimuth();
+      void read_azimuth(JSONVar & outcome_object);
     #endif
     //String _debug_message;
   private:

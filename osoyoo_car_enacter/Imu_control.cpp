@@ -174,21 +174,21 @@ void Imu_control::outcome(JSONVar & outcome_object)
   //_debug_message = "";
 
   #if ROBOT_HAS_HMC5883L == true
-  outcome_object["azimuth"] = read_azimuth();
+  read_azimuth(outcome_object);
   #endif
 }
 
 #if ROBOT_HAS_HMC5883L == true
-int Imu_control::read_azimuth()
+void Imu_control::read_azimuth(JSONVar & outcome_object)
 {
   Vector norm = compass.readNormalize();
 
   // Calculate heading
   float heading = atan2(norm.YAxis, norm.XAxis);
-  Serial.println("compass_x: " + String((int)norm.XAxis) + ", compass_y: " + String((int)norm.YAxis));
+  // Serial.println("compass_x: " + String((int)norm.XAxis) + ", compass_y: " + String((int)norm.YAxis));
 
   // You must set the offset so that compass_x is centered in East and West
-  // and compass_y is centered in North and South.
+  //                             and compass_y is centered in North and South.
   // For example, I obtain:
   // North compass_x: -230, compass_y:    2
   // Est   compass_x:  -30, compass_y: -225
@@ -203,8 +203,8 @@ int Imu_control::read_azimuth()
   // (+) Positive or (-) for negative
   // For Bytom / Poland declination angle is 4'26E (positive)
   // Formula: (deg + (min / 60.0)) / (180 / M_PI) radiant;
-  float declinationAngle = (2.0 + (13.0 / 60.0));
-  heading += declinationAngle;
+  // float declinationAngle = (2.0 + (13.0 / 60.0));
+  // heading += declinationAngle;
 
   headingDegrees += 180;
   if (heading >= 360)
@@ -212,10 +212,10 @@ int Imu_control::read_azimuth()
     headingDegrees -= 360;
   }
 
-  //Serial.print("Azimuth = ");
-  //Serial.print(headingDegrees);
-  //Serial.println();
+  outcome_object["compass_x"] = (int)norm.XAxis;
+  outcome_object["compass_y"] = (int)norm.YAxis;
+  outcome_object["azimuth"] = headingDegrees;
 
-  return headingDegrees;
+  // return headingDegrees;
 }
 #endif
