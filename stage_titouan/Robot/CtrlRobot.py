@@ -1,8 +1,9 @@
-from stage_titouan import *
+#from stage_titouan import *
 import json
-from stage_titouan.Misc.RobotDefine import *
+from Misc.RobotDefine import *
+from Misc.WifiInterface import WifiInterface
 import threading
-
+import math
 class CtrlRobot():
     """Blabla"""
 
@@ -21,7 +22,6 @@ class CtrlRobot():
     def main(self,dt):
         """Blabla"""
         if self.enact_step == 2:
-            print("action finie")
             self.robot_has_started_acting = False
             self.robot_has_finished_acting =True
             self.enact_step = 0
@@ -34,11 +34,9 @@ class CtrlRobot():
             self.model.f_memory_changed = True
             self.model.f_hexmem_changed = True
             self.model.f_new_things_in_memory = True
-            print("memories updated")
         elif not self.robot_has_started_acting and self.model.f_agent_action_ready :
             self.model.f_agent_action_ready = False
             self.action = self.model.agent_action
-            print("command_robot")
             self.command_robot(self.action)
             self.model.f_ready_for_next_loop = False
             self.robot_has_started_acting = True
@@ -64,7 +62,6 @@ class CtrlRobot():
         """Apply movement to hexamem"""
         if self.model.hexa_memory is not None:
             self.model.hexa_memory.azimuth = self.robot_data['azimuth']
-            print("CtrlRobot: send_position_change ",self.robot_data['angle'], self.robot_data['translation'][0], self.robot_data['translation'][1])
             self.model.hexa_memory.move(self.robot_data['angle'], self.robot_data['translation'][0], self.robot_data['translation'][1])
 
     def translate_robot_data(self,data): #PAS FINITO ?
@@ -120,7 +117,6 @@ class CtrlRobot():
             if self.action == "6":
                 translation[1] = -SHIFT_DISTANCE
             if self.action == "8":
-                print("translate robot data actyion 8888888888")
                 if not blocked:
                     translation[0] = STEP_FORWARD_DISTANCE * outcome['duration'] / 1000
 
@@ -164,6 +160,8 @@ class CtrlRobot():
                     if echo_distance > 0:  # echo measure 0 is false measure
                         obstacle = 1
 
+                        x =  ROBOT_HEAD_X + math.cos(math.radians(head_angle)) * echo_distance
+                        y = math.sin(math.radians(head_angle)) * echo_distance
             for i in range(100,-99,-10):
                     edstr = "ed"+str(i)
 

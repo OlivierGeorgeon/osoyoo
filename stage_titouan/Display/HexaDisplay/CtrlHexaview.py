@@ -1,4 +1,4 @@
-from stage_titouan import *
+from . HexaView import HexaView
 class CtrlHexaview :
     """ This class is used to control the model"""
 
@@ -56,13 +56,14 @@ class CtrlHexaview :
             self.refresh_count = 0
         if self.refresh_count == 0 :
             print("RESET BASE HEXAVIEW")
+            self.hexaview.shapesList = []
             self.hexaview.extract_and_convert_interactions(self.model.hexa_memory)
+            self.model.hexa_memory.cells_changed_recently = []
         model = self.model
-        if model.need_user_action and not model.f_user_action_ready and not model.f_inde_cell_projected :
+        if model.need_user_action and not model.f_user_action_ready : #and not model.f_inde_cell_projected :
             self.hexaview.show_indecisive_cell(model.cell_inde_a_traiter)
             model.f_inde_cell_projected = True
         if len(model.hexa_memory.cells_changed_recently) > 0 :
-           print("laaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
            self.hexaview.extract_and_convert_recently_changed_cells(model.hexa_memory)
            model.hexa_memory.cells_changed_recently = []
 

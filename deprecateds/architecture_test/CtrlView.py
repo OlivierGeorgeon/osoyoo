@@ -9,5 +9,6 @@ class CtrlView():
 
     def main(self,dt):
         if self.model.f_new_things_in_memory :
+            print("LAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
             self.view.extract_and_convert_interactions(self.model.memory)
             self.model.f_new_things_in_memory = False
