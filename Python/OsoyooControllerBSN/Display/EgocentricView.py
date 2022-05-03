@@ -5,6 +5,7 @@ import numpy
 from ..Display.OsoyooCar import OsoyooCar
 
 ZOOM_IN_FACTOR = 1.2
+IS_NORTH_UP = True  # Set to False to display the robot on the X axis
 
 
 class EgocentricView(pyglet.window.Window):
@@ -44,8 +45,9 @@ class EgocentricView(pyglet.window.Window):
         glOrtho(-self.width * self.zoom_level, self.width * self.zoom_level, -self.height * self.zoom_level,
                 self.height * self.zoom_level, 1, -1)
 
-        # Stack the rotation of the world so the robot's front is up
-        glRotatef(90 - self.azimuth, 0.0, 0.0, 1.0)
+        # Stack the azimuth so the north is up
+        if IS_NORTH_UP:
+            glRotatef(90 - self.azimuth, 0.0, 0.0, 1.0)
 
         # Draw the robot and the points of interest
         self.batch.draw()
@@ -73,11 +75,14 @@ class EgocentricView(pyglet.window.Window):
         # Polar coordinates from the window center
         r = numpy.hypot(window_press_x, window_press_y)
         theta_window = math.atan2(window_press_y, window_press_x)
-        # Polar angle from the robot axis
-        theta_robot = theta_window + math.radians(self.azimuth - 90) + 2 * math.pi
-        theta_robot %= 2 * math.pi
-        if theta_robot > math.pi:
-            theta_robot -= 2 * math.pi
+
+        theta_robot = theta_window
+        # If display north up then compute the polar angle from the robot axis
+        if IS_NORTH_UP:
+            theta_robot += math.radians(self.azimuth - 90) + 2 * math.pi
+            theta_robot %= 2 * math.pi
+            if theta_robot > math.pi:
+                theta_robot -= 2 * math.pi
         # Cartesian coordinates from the robot axis
         z = r * numpy.exp(1j * theta_robot)
         mouse_press_x, mouse_press_y = int(z.real), int(z.imag)

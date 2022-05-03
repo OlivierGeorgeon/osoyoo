@@ -71,13 +71,14 @@ def main(ip):
             ego_controller.update_model(enacted_interaction)
 
             # Action "+" adjusts the robot's position relative to the selected phenomenon
-            if robot_controller.intended_interaction['action'] == "+" and enacted_interaction['echo_distance'] < 10000 \
-                    and enacted_interaction['status'] != "T":
-                focus = ego_controller.get_focus_phenomenon()
-                if focus:
-                    floor, shock, blocked, obstacle, x, y = enacted_interaction['phenom_info']
-                    translation_matrix = matrix44.create_from_translation([x - focus.x, y - focus.y, 0])
-                    ego_controller.displace(translation_matrix)
+            if robot_controller.intended_interaction['action'] != "t":
+                if robot_controller.intended_interaction['action'] == "+" and enacted_interaction['echo_distance'] < 10000 \
+                        and enacted_interaction['status'] != "T":
+                    focus = ego_controller.get_focus_phenomenon()
+                    if focus:
+                        floor, shock, blocked, obstacle, x, y = enacted_interaction['phenom_info']
+                        translation_matrix = matrix44.create_from_translation([x - focus.x, y - focus.y, 0])
+                        ego_controller.displace(translation_matrix)
 
             robot_controller.enact_step = 0
 

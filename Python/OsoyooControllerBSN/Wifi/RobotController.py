@@ -74,6 +74,21 @@ class RobotController:
         else:
             enacted_interaction['yaw'] = yaw
 
+        # Compute the azimuth from compass_x and compass_y
+        # You must set the offset so that compass_x is centered in East and West
+        #                             and compass_y is centered in North and South.
+        if 'compass_x' in enacted_interaction:
+            cx = enacted_interaction['compass_x']
+            cy = enacted_interaction['compass_y']
+            x_offset = 10
+            y_offset = 60
+            self.azimuth = math.degrees(math.atan2(cy-y_offset, cx-x_offset))
+            self.azimuth += 180;
+            if self.azimuth >= 360:
+                self.azimuth -= 360
+            print("compass_x", cx-x_offset, "compass_y", cy-y_offset, "azimuth", int(self.azimuth))
+            enacted_interaction['azimuth'] = int(self.azimuth)
+
         # If the robot does not return the azimuth then compute it from the yaw
         if 'azimuth' not in enacted_interaction:
             self.azimuth -= yaw
