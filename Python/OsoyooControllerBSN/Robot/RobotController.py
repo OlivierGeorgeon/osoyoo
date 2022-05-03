@@ -75,8 +75,9 @@ class RobotController:
             enacted_interaction['yaw'] = yaw
 
         # Compute the azimuth from compass_x and compass_y
-        # You must set the offset so that compass_x is centered in East and West
-        #                             and compass_y is centered in North and South.
+        # You must set the offset so that compass_x is near 0 when the robot is East or West
+        #                             and compass_y is near 0 when the robot is North or South.
+        # see https://www.best-microcontroller-projects.com/hmc5883l.html
         if 'compass_x' in enacted_interaction:
             cx = enacted_interaction['compass_x']
             cy = enacted_interaction['compass_y']
@@ -166,7 +167,7 @@ class RobotController:
 
 # Test the wifi interface by controlling the robot from the console
 # Replace the IP address with your robot's IP address. Run :
-# py -m Python.OsoyooControllerBSN.Wifi.RobotController <Robot's IP>
+# py -m Python.OsoyooControllerBSN.Robot.RobotController <Robot's IP>
 if __name__ == "__main__":
     ip = "192.168.1.11"
     if len(sys.argv) > 1:

@@ -1,7 +1,7 @@
 import threading
-from ..Wifi.WifiInterface import WifiInterface
-from ..Display.PointOfInterest import *
-from ..Display.EgocentricView import EgocentricView
+from ..Robot.WifiInterface import WifiInterface
+from ..EgocentricDisplay.PointOfInterest import *
+from ..EgocentricDisplay.EgocentricView import EgocentricView
 import pyglet
 from pyglet.window import key
 
@@ -106,7 +106,7 @@ class EgoController:
 
 
 # Displaying EgoMemoryWindowNew with points of interest
-# py -m Python.OsoyooControllerBSN.Display.EgoController
+# py -m Python.OsoyooControllerBSN.EgocentricDisplay.EgoController
 if __name__ == "__main__":
     view = EgocentricView()
     view.robot.rotate_head(-45)

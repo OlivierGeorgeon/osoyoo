@@ -2,7 +2,7 @@ import pyglet
 from pyglet.gl import *
 import math
 import numpy
-from ..Display.OsoyooCar import OsoyooCar
+from ..EgocentricDisplay.OsoyooCar import OsoyooCar
 
 ZOOM_IN_FACTOR = 1.2
 IS_NORTH_UP = True  # Set to False to display the robot on the X axis
@@ -93,7 +93,7 @@ class EgocentricView(pyglet.window.Window):
 
 
 # Showing the EgocentricView
-# py -m Python.OsoyooControllerBSN.Display.EgocentricView
+# py -m Python.OsoyooControllerBSN.EgocentricDisplay.EgocentricView
 if __name__ == "__main__":
     view = EgocentricView()
     view.robot.rotate_head(-45)  # Turn head 45° to the right
@@ -101,6 +101,6 @@ if __name__ == "__main__":
 
     @view.event
     def on_mouse_press(x, y, button, modifiers):
-        view.set_mouse_press_coordinate(x, y, button, modifiers)  # Display mouse click coordinates
+        view.set_mouse_press_coordinate(x, y, button, modifiers)  # EgocentricDisplay mouse click coordinates
 
     pyglet.app.run()

@@ -1,7 +1,7 @@
 from ..Agent.Resources import Interaction
 from ..Agent.CompositeInteraction import CompositeInteraction
-from ..Display.EgocentricView import EgocentricView
-from ..Display.OsoyooCar import OsoyooCar
+from ..EgocentricDisplay.EgocentricView import EgocentricView
+from ..EgocentricDisplay.OsoyooCar import OsoyooCar
 import pyglet
 
 

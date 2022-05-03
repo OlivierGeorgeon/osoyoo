@@ -38,7 +38,7 @@ def onkeypress(event):
 
 # Test the wifi interface by controlling the robot from the console
 # Run as a module. Provide the Robot's IP address as an argument:
-# python -m Python.OsoyooControllerBSN.Wifi.WifiInterface <Robot's IP>
+# python -m Python.OsoyooControllerBSN.Robot.WifiInterface <Robot's IP>
 if __name__ == '__main__':
     ip = "192.168.4.1"
     if len(sys.argv) > 1:

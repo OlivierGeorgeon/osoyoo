@@ -1,6 +1,6 @@
 import pyglet
 from pyglet.gl import *
-from ..Display.PointOfInterest import PointOfInterest
+from ..EgocentricDisplay.PointOfInterest import PointOfInterest
 
 
 class ModalWindow(pyglet.window.Window):
@@ -33,7 +33,7 @@ class ModalWindow(pyglet.window.Window):
 
 
 # Testing the delete phenomena functionality
-# py -m Python.OsoyooControllerBSN.Display.ModalWindow
+# py -m Python.OsoyooControllerBSN.EgocentricDisplay.ModalWindow
 if __name__ == "__main__":
     echo = PointOfInterest(150, 0, None, None, 0)
     PointsOfInterest = [echo]

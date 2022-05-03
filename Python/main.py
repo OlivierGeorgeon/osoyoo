@@ -16,14 +16,14 @@
 
 import sys
 import pyglet
-from OsoyooControllerBSN.Display.EgoController import EgoController
-from OsoyooControllerBSN.Display.EgocentricView import EgocentricView
-from OsoyooControllerBSN.Display.ModalWindow import ModalWindow
+from OsoyooControllerBSN.EgocentricDisplay.EgoController import EgoController
+from OsoyooControllerBSN.EgocentricDisplay.EgocentricView import EgocentricView
+from OsoyooControllerBSN.EgocentricDisplay.ModalWindow import ModalWindow
 from OsoyooControllerBSN.Agent.Agent5 import Agent5
-from OsoyooControllerBSN.Wifi.RobotController import RobotController
-from OsoyooControllerBSN.Wifi.RobotDefine import *
+from OsoyooControllerBSN.Robot.RobotController import RobotController
+from OsoyooControllerBSN.Robot.RobotDefine import *
 
-from OsoyooControllerBSN.Display.PointOfInterest import *
+from OsoyooControllerBSN.EgocentricDisplay.PointOfInterest import *
 
 
 CONTROL_MODE_MANUAL = 0
