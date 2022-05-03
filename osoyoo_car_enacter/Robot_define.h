@@ -78,7 +78,7 @@
 #define ACCELERATION_X_OFFSET 35
 #define ACCELERATION_SHOCK_THRESHOLD -200 // TODO set this value
 #define ACCELERATION_BLOCK_THRESHOLD 30 // TODO set this value
-#define GYRO_COEF 1.5
+#define GYRO_COEF 1.50  // 1.5 si tourne trop, augmenter cette valeur
 #define GYRO_SHOCK_THRESHOLD 1 // °/s TODO set this value
 #define ROBOT_SERVO_PIN 4
 

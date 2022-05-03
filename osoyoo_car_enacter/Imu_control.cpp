@@ -187,8 +187,9 @@ void Imu_control::read_azimuth(JSONVar & outcome_object)
   float heading = atan2(norm.YAxis, norm.XAxis);
   // Serial.println("compass_x: " + String((int)norm.XAxis) + ", compass_y: " + String((int)norm.YAxis));
 
-  // You must set the offset so that compass_x is centered in East and West
-  //                             and compass_y is centered in North and South.
+  // You must set the offset so that compass_x is near 0 when the robot is East or West
+  //                             and compass_y is near 0 when the robot is North or South.
+  // see https://www.best-microcontroller-projects.com/hmc5883l.html
   // For example, I obtain:
   // North compass_x: -230, compass_y:    2
   // Est   compass_x:  -30, compass_y: -225

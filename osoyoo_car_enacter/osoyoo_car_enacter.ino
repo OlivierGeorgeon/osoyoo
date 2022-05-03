@@ -472,7 +472,7 @@ void loop()
     outcome_object["status"] = status;
     FCR.outcome(outcome_object);
     HEA.outcome(outcome_object);
-    // HEA.outcome_complete(outcome_object)
+    HEA.outcome_complete(outcome_object);
     IMU.outcome(outcome_object);
 
     //HECS.outcome(outcome_object);
