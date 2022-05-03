@@ -38,7 +38,8 @@ class RobotController:
 
         # Cas d'actions particulières :
         if action == "r":
-            self.action_reset()
+            #self.action_reset()
+            print("reset TODO in ROBOTCONTROLLER")
 
     def translate_robot_data(self): # TODO return un dictionnaire enacted_interaction au lieu d'une tuple avec phenom_info
         """Translate data from the robot to data usable

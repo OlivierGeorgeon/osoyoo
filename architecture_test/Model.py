@@ -1,4 +1,4 @@
-from .. stage_titouan import *
+from  stage_titouan import *
 class Model :
     """blabla"""
 
@@ -18,7 +18,6 @@ class Model :
         self.f_ready_for_hex_refresh = False
         self.f_inde_cell_projected = False
         
-        self.f_user_action_ready = False
 
         self.agent_action = None
         self.f_agent_action_ready = False
@@ -27,6 +26,13 @@ class Model :
         self.CONTROL_MODE_AUTOMATIC = "auto"
         self.CONTROL_MODE_MANUAL = "manual"
         self.control_mode =  self.CONTROL_MODE_MANUAL
+
+
+        self.enacted_interaction = {}
+        self.f_enacted_interaction_has_changed = False
+        self.f_new_things_in_memory = False
+
+        self.f_ready_for_next_loop = True
 
     def action_reset(self):
         print("A FAIRE") #TODO

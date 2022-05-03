@@ -3,6 +3,7 @@ from pyglet.gl import *
 import math
 import numpy
 from . OsoyooCar import OsoyooCar
+from .. Misc.Utils import memory_to_pyglet
 
 ZOOM_IN_FACTOR = 1.2
 
@@ -83,6 +84,11 @@ class EgocentricView(pyglet.window.Window):
                           + ", angle:" + str(mouse_press_angle) + "°"
         # Return the click position to the controller
         return mouse_press_x, mouse_press_y, mouse_press_angle
+
+    def extract_and_convert_interactions(self, memory):
+
+        self.shapesList = memory_to_pyglet(memory, self.batch)
+
 
 
 # Displaying the EgocentricView with the robot in a pretty position, and the mouse click coordinates

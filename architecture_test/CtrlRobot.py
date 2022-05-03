@@ -1,6 +1,6 @@
-from .. stage_titouan import *
+from stage_titouan import *
 import json
-from ..stage_titouan.Misc.RobotDefine import *
+from stage_titouan.Misc.RobotDefine import *
 import threading
 
 class CtrlRobot():
@@ -14,14 +14,58 @@ class CtrlRobot():
         self.action = ""
         self.enact_step = 0
         self.outcome_bytes = b'{"status":"T"}'  # Default status T timeout
-        self.ready = True
+        self.robot_has_started_acting = False
+        self.robot_has_finished_acting = False
+        self.robot_data = None
 
     def main(self,dt):
         """Blabla"""
-        if self.ready:
-            self.ready = False
-            robot_data = self.translate_robot_data(b'{"status":"T"}')
+        if self.enact_step == 2:
+            print("action finie")
+            self.robot_has_started_acting = False
+            self.robot_has_finished_acting =True
+            self.enact_step = 0
+        if self.robot_has_finished_acting:
+            self.robot_has_finished_acting = False
+            self.robot_data = self.translate_robot_data(self.outcome_bytes)
+            self.send_position_change_to_memory()
+            self.send_position_change_to_hexa_memory()
+            self.send_phenom_info_to_memory()
+            self.model.f_memory_changed = True
+            self.model.f_hexmem_changed = True
+            self.model.f_new_things_in_memory = True
+            print("memories updated")
+        elif not self.robot_has_started_acting and self.model.f_agent_action_ready :
+            self.model.f_agent_action_ready = False
+            self.action = self.model.agent_action
+            print("command_robot")
+            self.command_robot(self.action)
+            self.model.f_ready_for_next_loop = False
+            self.robot_has_started_acting = True
 
+        
+
+    def send_phenom_info_to_memory(self):
+        """Send Interaction to the Memory
+        """
+        phenom_info = self.robot_data['floor'],self.robot_data['shock'],self.robot_data['blocked'],self.robot_data['obstacle'],self.robot_data['x'],self.robot_data['y']
+        echo_array = self.robot_data['echo_array']
+        if self.model.memory is not None:
+            self.model.memory.add(phenom_info)
+            self.model.memory.add_echo_array(echo_array)        
+
+    def send_position_change_to_memory(self):
+        """Send position changes (angle,distance) to the Memory
+        """
+        if self.model.memory is not None :
+            self.model.memory.move(self.robot_data['angle'], self.robot_data['translation'])
+
+    def send_position_change_to_hexa_memory(self):
+        """Apply movement to hexamem"""
+        if self.model.hexa_memory is not None:
+            self.model.hexa_memory.azimuth = self.robot_data['azimuth']
+            print("CtrlRobot: send_position_change ",self.robot_data['angle'], self.robot_data['translation'][0], self.robot_data['translation'][1])
+            self.model.hexa_memory.move(self.robot_data['angle'], self.robot_data['translation'][0], self.robot_data['translation'][1])
 
     def translate_robot_data(self,data): #PAS FINITO ?
         """Translate data from the robot to data usable
@@ -43,6 +87,7 @@ class CtrlRobot():
 
         # Updating the model from the latest received outcome
         outcome = json.loads(data)
+        print(outcome)
         floor = 0
         if 'floor' in outcome:
             floor = outcome['floor']
@@ -75,6 +120,7 @@ class CtrlRobot():
             if self.action == "6":
                 translation[1] = -SHIFT_DISTANCE
             if self.action == "8":
+                print("translate robot data actyion 8888888888")
                 if not blocked:
                     translation[0] = STEP_FORWARD_DISTANCE * outcome['duration'] / 1000
 
@@ -131,12 +177,11 @@ class CtrlRobot():
 
             phenom_info = (floor,shock,blocked,obstacle,x,y)
 
+        azimuth = 0
         # Update the azimuth
         if 'azimuth' in outcome:
-            self.azimuth = outcome['azimuth']
+            azimuth = outcome['azimuth']
             #print("self az : ", self.azimuth)
-        else:
-            self.azimuth -= rotation
 
         angle = rotation
 
@@ -147,7 +192,11 @@ class CtrlRobot():
         outcome['floor'] = floor
         outcome['shock'] = shock
         outcome['blocked'] = blocked
-        outcome['obstacle'] = obstacle,x,y
+        outcome['obstacle'] = obstacle
+        outcome['x'] = x
+        outcome['y'] = y
+        outcome['echo_array'] = echo_array
+        outcome['azimuth'] = azimuth
         return  outcome
 
 

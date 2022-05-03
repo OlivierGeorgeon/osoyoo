@@ -16,7 +16,7 @@ ZOOM_IN_FACTOR = 1.2
 
 class HexaView(pyglet.window.Window):
     """blabla"""
-    def __init__(self, width=400, height=400, shapesList=None, cell_radius=20, hexa_memory = None, *args, **kwargs):
+    def __init__(self, width=400, height=400, shapesList= [], cell_radius=20, hexa_memory = None, *args, **kwargs):
         super().__init__(width, height, resizable=True, *args, **kwargs)
         self.set_caption("Hexa Memory")
         self.set_minimum_size(150, 150)
@@ -51,7 +51,9 @@ class HexaView(pyglet.window.Window):
         self.cell_radius = memory.cell_radius
 
     def extract_and_convert_recently_changed_cells(self, memory):
-        self.shapesList.append( recently_changed_to_pyglet(memory,self.batch))
+        tmp = recently_changed_to_pyglet(memory, self.batch)
+        print("len tmp", len(tmp))
+        self.shapesList.append( tmp)
         
 
     def show_indecisive_cell(self,indecisive_cell): #(indecisive_cell,hexaMemory,batch)
