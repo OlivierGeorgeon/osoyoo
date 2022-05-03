@@ -1,5 +1,9 @@
-from .. stage_titouan import *
-class Model :
+from Memory.EgocentricMemory.MemoryV1 import MemoryV1
+from Memory.HexaMemory.HexaMemory import HexaMemory
+from Synthesizer.SynthesizerUserInteractionV2 import SynthesizerUserInteractionV2
+from Agent.Agent6 import Agent6
+
+class Workspace :
     """blabla"""
 
     def __init__(self,hexamemory_size = (50,100), cell_radius = 20):
@@ -18,7 +22,6 @@ class Model :
         self.f_ready_for_hex_refresh = False
         self.f_inde_cell_projected = False
         
-        self.f_user_action_ready = False
 
         self.agent_action = None
         self.f_agent_action_ready = False
@@ -27,6 +30,13 @@ class Model :
         self.CONTROL_MODE_AUTOMATIC = "auto"
         self.CONTROL_MODE_MANUAL = "manual"
         self.control_mode =  self.CONTROL_MODE_MANUAL
+
+
+        self.enacted_interaction = {}
+        self.f_enacted_interaction_has_changed = False
+        self.f_new_things_in_memory = False
+
+        self.f_ready_for_next_loop = True
 
     def action_reset(self):
         print("A FAIRE") #TODO
