@@ -75,14 +75,14 @@ class RobotController:
             enacted_interaction['yaw'] = yaw
 
         # Compute the azimuth from compass_x and compass_y
-        # You must set the offset so that compass_x is near 0 when the robot is East or West
-        #                             and compass_y is near 0 when the robot is North or South.
+        # You must set the offset such that compass_x is near 0 when the robot is East or West
+        #                               and compass_y is near 0 when the robot is North or South.
         # see https://www.best-microcontroller-projects.com/hmc5883l.html
         if 'compass_x' in enacted_interaction:
             cx = enacted_interaction['compass_x']
             cy = enacted_interaction['compass_y']
-            x_offset = 10
-            y_offset = 60
+            x_offset = COMPASS_X_OFFSET
+            y_offset = COMPASS_Y_OFFSET
             self.azimuth = math.degrees(math.atan2(cy-y_offset, cx-x_offset))
             self.azimuth += 180;
             if self.azimuth >= 360:
@@ -115,7 +115,7 @@ class RobotController:
             # The position of the interaction trespassing
             x, y = LINE_X, 0
             # The resulting translation
-            forward_duration = enacted_interaction['duration'] - 300  # Subtract retreat duration
+            forward_duration = enacted_interaction['duration']  # - 300  # Subtract retreat duration
             if action == "8":  # TODO Other actions
                 translation[0] = STEP_FORWARD_DISTANCE * forward_duration / 1000 - RETREAT_DISTANCE
                 if translation[0] < 0:
