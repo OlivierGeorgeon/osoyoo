@@ -1,6 +1,6 @@
 from Memory.EgocentricMemory.MemoryV1 import MemoryV1
 from Memory.HexaMemory.HexaMemory import HexaMemory
-from Synthesizer.SynthesizerUserInteractionV2 import SynthesizerUserInteractionV2
+from Synthesizer.SynthesizerUserInteraction import SynthesizerUserInteraction
 from Agent.Agent6 import Agent6
 
 class Workspace :
@@ -9,7 +9,7 @@ class Workspace :
     def __init__(self,hexamemory_size = (50,100), cell_radius = 20):
         self.memory = MemoryV1()
         self.hexa_memory = HexaMemory(hexamemory_size[0],hexamemory_size[1],cell_radius = cell_radius)
-        self.synthesizer = SynthesizerUserInteractionV2(self.memory,self.hexa_memory)
+        self.synthesizer = SynthesizerUserInteraction(self.memory,self.hexa_memory)
         self.agent = Agent6(self.memory, self.hexa_memory)
         self.user_action = None
         #FLAGS :
