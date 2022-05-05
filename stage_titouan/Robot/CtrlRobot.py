@@ -1,7 +1,7 @@
 #from stage_titouan import *
 import json
-from Misc.RobotDefine import *
-from Misc.WifiInterface import WifiInterface
+from .. Misc.RobotDefine import *
+from .. Misc.WifiInterface import WifiInterface
 import threading
 import math
 class CtrlRobot():

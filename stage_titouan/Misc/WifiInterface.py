@@ -1,7 +1,7 @@
 import socket
 import keyboard
 import sys
-from Misc.RobotDefine import ROBOT_ID
+from  .. Misc.RobotDefine import ROBOT_ID
 
 UDP_IP = "192.168.8.189"  # AP mode routeur margit
 UDP_TIMEOUT = 5  # Seconds
