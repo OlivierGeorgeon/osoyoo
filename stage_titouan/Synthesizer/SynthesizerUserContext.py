@@ -5,7 +5,7 @@ class SynthesizerUserContext(SynthesizerUserInteraction):
     In Manual mode, the user can interact with the synthesizer.
     In Automatic mode, the synthesizer will try to find the best action for the user.
     """
-    def __init__(self,memory,hexa_memory,control_mode = "auto"):
+    def __init__(self,memory,hexa_memory):
         """
         :param memory: Memory object
         :param hexa_memory: HexaMemory object
@@ -45,11 +45,23 @@ class SynthesizerUserContext(SynthesizerUserInteraction):
             self.current_mode = mode
 
 
-    def comparison_step(self):
-        if self.mode == self.MANUAL_MODE :
-            super.comparison_step()
-        else :
-            ""
-            #commencé sur papier
-        
+
+    def act(self):
+        """blabla"""
+        if self.current_mode == self.MANUAL_MODE:
+            super().act()
+        else : 
+            self.interactions_list = [elem for elem in self.memory.interactions if elem.id>self.last_used_id]
+            real_echos = self.treat_echos()
+            self.interactions_list = [elem for elem in self.interactions_list if elem.type != "Echo" or elem in real_echos]
+            self.context_analysis(real_echos)
+            self.project_interactions_on_internal_hexagrid()
+            self.comparison_step()
+
+    ### treat_echos(self) is inchanged from SynthesizerUserInteraction, so we don't reimplement it
+    
+    def context_analysis(self, real_echos):
+        """Compare the positions of the real echos with the positions of the known obstacle"""
+    def project_interactions_on_internal_hexagrid(self):
+
         
