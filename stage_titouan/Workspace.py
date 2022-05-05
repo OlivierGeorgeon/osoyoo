@@ -1,7 +1,7 @@
-from Memory.EgocentricMemory.MemoryV1 import MemoryV1
-from Memory.HexaMemory.HexaMemory import HexaMemory
-from Synthesizer.SynthesizerUserInteraction import SynthesizerUserInteraction
-from Agent.Agent6 import Agent6
+from . Memory.EgocentricMemory.MemoryV1 import MemoryV1
+from . Memory.HexaMemory.HexaMemory import HexaMemory
+from . Synthesizer.SynthesizerUserInteraction import SynthesizerUserInteraction
+from . Agent.Agent6 import Agent6
 
 class Workspace :
     """blabla"""

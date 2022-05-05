@@ -1,6 +1,6 @@
 from pyglet.gl import *
 from pyglet import shapes
-from Memory.EgocentricMemory.Interactions.Interaction import Interaction,INTERACTION_TRESPASSING, INTERACTION_ECHO, INTERACTION_BLOCK, INTERACTION_SHOCK
+from .. Memory.EgocentricMemory.Interactions.Interaction import Interaction,INTERACTION_TRESPASSING, INTERACTION_ECHO, INTERACTION_BLOCK, INTERACTION_SHOCK
 from webcolors import name_to_rgb
 import math
 import random

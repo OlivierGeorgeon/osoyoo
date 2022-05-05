@@ -1,4 +1,4 @@
-import SynthesizerUserInteraction
+from ..  Synthesizer.SynthesizerUserInteraction import SynthesizerUserInteraction
 class SynthesizerUserContext(SynthesizerUserInteraction):
     """Synthesizer that have two modes : 
     Manual and Automatic.

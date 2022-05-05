@@ -1,8 +1,8 @@
 import math
-from  Memory.HexaMemory.HexaGrid import HexaGrid
-from  Misc.Utils import translate_interaction_type_to_cell_status
-from  Memory.EgocentricMemory.Interactions.Interaction import INTERACTION_TRESPASSING, INTERACTION_ECHO, INTERACTION_BLOCK, INTERACTION_SHOCK
-from  Misc.RobotDefine import RETREAT_DISTANCE
+from .. Memory.HexaMemory.HexaGrid import HexaGrid
+from .. Misc.Utils import translate_interaction_type_to_cell_status
+from ..  Memory.EgocentricMemory.Interactions.Interaction import INTERACTION_TRESPASSING, INTERACTION_ECHO, INTERACTION_BLOCK, INTERACTION_SHOCK
+from .. Misc.RobotDefine import RETREAT_DISTANCE
 MANUAL_MODE = "manual"
 AUTOMATIC_MODE = "automatic"
 

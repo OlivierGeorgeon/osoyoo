@@ -3,7 +3,7 @@ from pyglet.gl import *
 import math
 import numpy
 from . OsoyooCar import OsoyooCar
-from Misc.Utils import memory_to_pyglet
+from  ... Misc.Utils import memory_to_pyglet
 
 ZOOM_IN_FACTOR = 1.2
 
