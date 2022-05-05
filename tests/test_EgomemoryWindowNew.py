@@ -1,11 +1,18 @@
 # By Olivier GEORGEON 15 March 2022
 
 import sys
-import os
 import json
-import time
-sys.path.insert(1, os.path.join(sys.path[0], '..'))
 from stage_titouan import *
+from stage_titouan.Agent.Agent5 import Agent5
+from stage_titouan.Agent.Agent6 import Agent6
+# from . stage_titouan.Robot.CtrlRobot import CtrlRobot
+# from . stage_titouan.Display.EgocentricDisplay.CtrlView import CtrlView
+# from . stage_titouan.Display.EgocentricDisplay.EgocentricView import EgocentricView
+# from . stage_titouan.Display.HexaDisplay.CtrlHexaview import CtrlHexaview
+# from . stage_titouan.Display.HexaDisplay.HexaView import HexaView
+# from . stage_titouan.Synthesizer.CtrlSynthe import CtrlSynthe
+# from . stage_titouan.Model.Memories.MemoryV1 import MemoryV1
+# from . stage_titouan.Model.Hexamemories.HexaMemory import HexaMemory
 
 CONTROL_MODE_MANUAL = 0
 CONTROL_MODE_AUTOMATIC = 1
@@ -23,10 +30,11 @@ if __name__ == "__main__":
         print("Please provide your robot's IP address")
     print("Sending to: " + ip)
 
-    robot_controller = RobotController(ip)
+    workspace = Workspace()
+    robot_controller = CtrlRobot(workspace, ip)
 
     ego_view = EgocentricView()
-    ego_controller = EgoController(ego_view)
+    ego_controller = CtrlView(ego_view)
 
     memory = MemoryV1()
     hexa_memory = HexaMemory(width=40, height=80, cell_radius=50)
@@ -34,8 +42,8 @@ if __name__ == "__main__":
     agent = Agent6(memory, hexa_memory)
     hexaview = HexaView(cell_radius=hexa_memory.cell_radius)
 
-    synthesizer = Synthesizer(memory,hexa_memory)
-    controller = ControllerNew(agent, memory, ip, view=ego_view, synthesizer = synthesizer, hexa_memory = hexa_memory, hexaview = hexaview)
+    synthesizer = CtrlSynthe(workspace)
+    controller = CtrlRobot(agent, memory, ip, view=ego_view, synthesizer = synthesizer, hexa_memory = hexa_memory, hexaview = hexaview)
     controller.hexaview.extract_and_convert_interactions(controller.hexa_memory)
 
     @ego_view.event
