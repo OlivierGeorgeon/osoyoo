@@ -3,8 +3,8 @@
 import sys
 import json
 from stage_titouan import *
-# from . stage_titouan.Agent.Agent5 import Agent5
-# from . stage_titouan.Agent.Agent5 import Agent6
+from stage_titouan.Agent.Agent5 import Agent5
+from stage_titouan.Agent.Agent6 import Agent6
 # from . stage_titouan.Robot.CtrlRobot import CtrlRobot
 # from . stage_titouan.Display.EgocentricDisplay.CtrlView import CtrlView
 # from . stage_titouan.Display.EgocentricDisplay.EgocentricView import EgocentricView
@@ -30,7 +30,8 @@ if __name__ == "__main__":
         print("Please provide your robot's IP address")
     print("Sending to: " + ip)
 
-    robot_controller = CtrlRobot(ip)
+    workspace = Workspace()
+    robot_controller = CtrlRobot(workspace, ip)
 
     ego_view = EgocentricView()
     ego_controller = CtrlView(ego_view)
@@ -41,7 +42,7 @@ if __name__ == "__main__":
     agent = Agent6(memory, hexa_memory)
     hexaview = HexaView(cell_radius=hexa_memory.cell_radius)
 
-    synthesizer = Synthesizer(memory,hexa_memory)
+    synthesizer = CtrlSynthe(workspace)
     controller = CtrlRobot(agent, memory, ip, view=ego_view, synthesizer = synthesizer, hexa_memory = hexa_memory, hexaview = hexaview)
     controller.hexaview.extract_and_convert_interactions(controller.hexa_memory)
 

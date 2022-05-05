@@ -11,6 +11,7 @@ ZOOM_IN_FACTOR = 1.2
 class EgocentricView(pyglet.window.Window):
     def __init__(self, width=400, height=400, *args, **kwargs):
         super().__init__(width, height, resizable=True, *args, **kwargs)
+        self.is_north_up = True  # Set to False to display the robot on the X axis
         self.set_caption("Egocentric View")
         self.set_minimum_size(150, 150)
 
@@ -41,7 +42,8 @@ class EgocentricView(pyglet.window.Window):
                 self.height * self.zoom_level, 1, -1)
 
         # Stack the rotation of the world so the robot's front is up
-        glRotatef(90 - self.azimuth, 0.0, 0.0, 1.0)
+        if self.is_north_up:
+            glRotatef(90 - self.azimuth, 0.0, 0.0, 1.0)
 
         # Draw the robot and the points of interest
         self.batch.draw()
@@ -70,11 +72,14 @@ class EgocentricView(pyglet.window.Window):
         # Polar coordinates from the window center
         r = numpy.hypot(window_press_x, window_press_y)
         theta_window = math.atan2(window_press_y, window_press_x)
+
+        theta_robot = theta_window
         # Polar angle from the robot axis
-        theta_robot = theta_window + math.radians(self.azimuth - 90) + 2 * math.pi
-        theta_robot %= 2 * math.pi
-        if theta_robot > math.pi:
-            theta_robot -= 2 * math.pi
+        if self.is_north_up:
+            theta_robot = theta_window + math.radians(self.azimuth - 90) + 2 * math.pi
+            theta_robot %= 2 * math.pi
+            if theta_robot > math.pi:
+                theta_robot -= 2 * math.pi
         # Cartesian coordinates from the robot axis
         z = r * numpy.exp(1j * theta_robot)
         mouse_press_x, mouse_press_y = int(z.real), int(z.imag)
@@ -85,14 +90,13 @@ class EgocentricView(pyglet.window.Window):
         # Return the click position to the controller
         return mouse_press_x, mouse_press_y, mouse_press_angle
 
-    def extract_and_convert_interactions(self, memory):
-
-        self.shapesList = memory_to_pyglet(memory, self.batch)
-
+    # def extract_and_convert_interactions(self, memory):
+    #
+    #     self.shapesList = memory_to_pyglet(memory, self.batch)
 
 
 # Displaying the EgocentricView with the robot in a pretty position, and the mouse click coordinates
-# py -m stage_titouan.Views.EgocentricView
+# py -m stage_titouan.Display.EgocentricDisplay.EgocentricView
 if __name__ == "__main__":
     view = EgocentricView()
     view.robot.rotate_head(-45)  # Turn head 45° to the right

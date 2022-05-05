@@ -1,6 +1,6 @@
 from stage_titouan import *
 import json
-from stage_titouan.Misc.RobotDefine import *
+from stage_titouan.Robot.RobotDefine import *
 import threading
 
 class CtrlRobot():

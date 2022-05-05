@@ -1,5 +1,5 @@
 from . Resources import Interaction
-from Agents.CompositeInteraction import CompositeInteraction
+from . CompositeInteraction import CompositeInteraction
 # from EgoMemoryWindow import EgoMemoryWindow
 # from OsoyooCar import OsoyooCar
 import pyglet
