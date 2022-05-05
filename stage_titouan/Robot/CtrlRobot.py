@@ -35,6 +35,7 @@ class CtrlRobot():
             self.model.f_hexmem_changed = True
             self.model.f_new_things_in_memory = True
         elif not self.robot_has_started_acting and self.model.f_agent_action_ready :
+            self.model.f_reset_flag = False
             self.model.f_agent_action_ready = False
             self.action = self.model.agent_action
             self.command_robot(self.action)

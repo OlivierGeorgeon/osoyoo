@@ -6,7 +6,7 @@ from  Misc.RobotDefine import RETREAT_DISTANCE
 MANUAL_MODE = "manual"
 AUTOMATIC_MODE = "automatic"
 
-class SynthesizerUserInteractionV2 :
+class SynthesizerUserInteraction :
     """Blabla"""
 
     def __init__(self,memory,hexa_memory):

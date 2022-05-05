@@ -52,6 +52,9 @@ class CtrlHexaview :
     
     def main(self,dt):
         """blalbla"""
+        if self.model.f_reset_flag :
+            self.hexaview.shapesList = []
+            self.hexaview = HexaView()
         if self.refresh_count > 500 :
             self.refresh_count = 0
         if self.refresh_count == 0 :
