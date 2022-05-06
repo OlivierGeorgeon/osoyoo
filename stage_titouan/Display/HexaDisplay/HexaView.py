@@ -3,7 +3,6 @@ from pyglet.gl import *
 from ... Misc.Utils import hexaMemory_to_pyglet
 from ... Misc.Utils import translate_indecisive_cell_to_pyglet
 from ... Misc.Utils import recently_changed_to_pyglet
-#from .. Model.Hexamemories import HexaMemory
 from ... Memory.HexaMemory.HexaMemory import HexaMemory
 from webcolors import name_to_rgb
 
@@ -84,7 +83,6 @@ class HexaView(pyglet.window.Window):
         glOrtho(0, self.width, 0, self.height, -1, 1)
         self.label.draw()
 
-
     def on_resize(self, width, height):
         """ Adjusting the viewport when resizing the window """
         # Always display in the whole window
@@ -97,41 +95,25 @@ class HexaView(pyglet.window.Window):
         # if .4 < self.zoom_level * f < 5:  # Olivier
         self.zoom_level *= f
 
+    def on_mouse_motion(self, x, y, dx, dy):
+        mouse_x = int((x - self.width/2) * self.zoom_level * 2)
+        mouse_y = int((y - self.height/2) * self.zoom_level * 2)
+        # Find the cell
+        cell_x, cell_y = self.hexa_memory.convert_pos_in_cell(mouse_x, mouse_y)
+        self.label.text = "Cell: " + str(cell_x) + ", " + str(cell_y)
 
-# Testing  HexaView by displaying HexaMemory
-# Click on a cell to change its status
-# py -m stage_titouan.Views.HexaView
+
+# Testing HexaView by displaying HexaMemory
+# Hover the grid to display the mouse position
+# py -m stage_titouan.Display.HexaDisplay.HexaView
 if __name__ == "__main__":
-    hexaview = HexaView()
 
     # Create the hexa grid
     hexa_memory = HexaMemory(width=30, height=100, cell_radius=50)
 
+    hexaview = HexaView(hexa_memory=hexa_memory)
+
     # Create the shapes to draw the cells
     hexaview.extract_and_convert_interactions(hexa_memory)
-
-    @hexaview.event
-    def on_mouse_press(x, y, button, modifiers):
-        """ Computing the position of the mouse click in the hexagrid  """
-        # Compute the position relative to the center in mm
-        hexaview.mouse_press_x = int((x - hexaview.width/2)*hexaview.zoom_level*2)
-        hexaview.mouse_press_y = int((y - hexaview.height/2)*hexaview.zoom_level*2)
-        print(hexaview.mouse_press_x, hexaview.mouse_press_y)
-        # Find the cell
-        cell_x, cell_y = hexa_memory.convert_pos_in_cell(hexaview.mouse_press_x, hexaview.mouse_press_y)
-        print("Cell: ", cell_x, cell_y)
-        hexaview.label.text = "Cell: " + str(cell_x) + ", " + str(cell_y)
-        hexa_memory.grid[cell_x][cell_y].status = "Free"
-        # Refresh
-        hexaview.extract_and_convert_interactions(hexa_memory)
-
-    @hexaview.event
-    def on_mouse_motion(x, y, dx, dy):
-        mouse_x = int((x - hexaview.width/2)*hexaview.zoom_level*2)
-        mouse_y = int((y - hexaview.height/2)*hexaview.zoom_level*2)
-        # Find the cell
-        cell_x, cell_y = hexa_memory.convert_pos_in_cell(mouse_x, mouse_y)
-        print("Cell: ", cell_x, cell_y)
-        hexaview.label.text = "Cell: " + str(cell_x) + ", " + str(cell_y)
 
     pyglet.app.run()

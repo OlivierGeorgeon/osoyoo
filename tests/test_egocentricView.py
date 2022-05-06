@@ -47,7 +47,7 @@ if __name__ == "__main__":
         if control_mode == CONTROL_MODE_MANUAL:
             if robot_controller.enact_step == 0:
                 intended_interaction = {'action': text, 'angle': ego_controller.mouse_press_angle}
-                workspace.intended_interaction = intended_interaction
+                # workspace.intended_interaction = intended_interaction
                 robot_controller.command_robot(intended_interaction)
             else:
                 print("Waiting for previous outcome before sending new action")
