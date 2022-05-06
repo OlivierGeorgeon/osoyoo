@@ -2,6 +2,7 @@
 import json
 from stage_titouan.Robot.RobotDefine import *
 from stage_titouan.Robot.WifiInterface import WifiInterface
+from stage_titouan.Memory.EgocentricMemory.Interactions.Interaction import *
 import threading
 from pyrr import matrix44
 import math
@@ -80,6 +81,7 @@ class CtrlRobot():
         """ Computes the enacted interaction from the robot's outcome data """
         action = self.intended_interaction['action']
         enacted_interaction = json.loads(self.outcome_bytes)
+        enacted_interaction['points'] = []
         # enacted_interaction = {'action': action, 'status': outcome['status']}
 
         # If timeout then no ego memory update
@@ -150,7 +152,7 @@ class CtrlRobot():
         # Interaction trespassing
         if floor > 0:
             # The position of the interaction trespassing
-            x, y = LINE_X, 0
+            enacted_interaction['points'].append((INTERACTION_TRESPASSING,FLOOR_X, FLOOR_Y))
             # The resulting translation
             forward_duration = enacted_interaction['duration']  # - 300  # Subtract retreat duration
             if action == "8":  # TODO Other actions
@@ -170,10 +172,15 @@ class CtrlRobot():
                 translation[0] = -RETREAT_DISTANCE
                 translation[1] = -SHIFT_DISTANCE * forward_duration / 1000
 
+            
+
         # Interaction blocked
         if blocked:
-            x, y = 110, 0
+            #x, y = 110, 0
 
+            enacted_interaction['points'].append((INTERACTION_BLOCK,BLOCK_X, BLOCK_Y))
+
+        """
         # Interaction shock
         if shock == 0b01:
             x, y = 110, -80
@@ -181,11 +188,19 @@ class CtrlRobot():
             x, y = 110, 0
         if shock == 0b10:
             x, y = 110, 80
+        """
+
+        if shock:
+            enacted_interaction['points'].append((INTERACTION_SHOCK,SHOCK_X, SHOCK_Y))
+
+
+    
 
         # Interaction ECHO
         if obstacle:
             x = int(ROBOT_HEAD_X + math.cos(math.radians(enacted_interaction['head_angle'])) * echo_distance)
             y = int(math.sin(math.radians(enacted_interaction['head_angle'])) * echo_distance)
+            enacted_interaction['points'].append((INTERACTION_ECHO,x, y))
 
         enacted_interaction['phenom_info'] = (floor, shock, blocked, obstacle, x, y)
         enacted_interaction['echo_distance'] = echo_distance
@@ -199,7 +214,20 @@ class CtrlRobot():
 
         # Returning the enacted interaction
         # print("Enacted interaction:", enacted_interaction)
+
         enacted_interaction["echo_array"] = [] if not "echo_array" in enacted_interaction.keys() else enacted_interaction["echo_array"]
+
+        for i in range(100,-99,-5):
+                    edstr = "ed"+str(i)
+
+                    if edstr in enacted_interaction:
+                        ha =i
+                        ed = enacted_interaction[edstr]
+                        tmp_x = ROBOT_HEAD_X + math.cos(math.radians(ha)) * ed
+                        tmp_y = math.sin(math.radians(ha)) * ed
+                        enacted_interaction['echo_array'].append((tmp_x, tmp_y))
+
+        print("Enacted interaction apres translate robot data : ", enacted_interaction)
         return enacted_interaction
 
     def command_robot(self, intended_interaction):

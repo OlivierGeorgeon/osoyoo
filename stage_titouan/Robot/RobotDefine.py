@@ -30,3 +30,13 @@ if ROBOT_ID == 2:
 if ROBOT_ID == 4:
     COMPASS_X_OFFSET = -50  # Robot 4 chezOlivier
     COMPASS_Y_OFFSET = -120
+
+
+FLOOR_X = 160
+FLOOR_Y = 0
+
+SHOCK_X = 160
+SHOCK_Y = 0
+
+BLOCK_X = 160
+BLOCK_Y = 0

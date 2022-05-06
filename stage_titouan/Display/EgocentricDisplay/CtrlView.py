@@ -31,6 +31,7 @@ class CtrlView:
                     if p.is_selected:
                         p.delete()
                         self.points_of_interest.remove(p)
+                        self.model.memory.interactions.remove(p.interaction)
             if symbol == key.INSERT:
                 phenomenon = PointOfInterest(self.mouse_press_x, self.mouse_press_y, self.view.batch,
                                              self.view.background, POINT_PHENOMENON)
@@ -42,11 +43,11 @@ class CtrlView:
 
         self.view.push_handlers(on_mouse_press, on_key_press)
 
-    def add_point_of_interest(self, x, y, point_type, group=None):
+    def add_point_of_interest(self, x, y, point_type, group=None,interaction = None):
         """ Adding a point of interest to the view """
         if group is None:
             group = self.view.foreground
-        point_of_interest = PointOfInterest(x, y, self.view.batch, group, point_type)
+        point_of_interest = PointOfInterest(x, y, self.view.batch, group, point_type,interaction = interaction)
         self.points_of_interest.append(point_of_interest)
         return point_of_interest
 
@@ -85,7 +86,7 @@ class CtrlView:
         obstacle = enacted_interaction['obstacle'] if 'obstacle' in enacted_interaction else None
         x = enacted_interaction['x'] if 'x' in enacted_interaction else 0
         y = enacted_interaction['y'] if 'y' in enacted_interaction else 0
-        floor, shock, blocked, obstacle, x, y = enacted_interaction['phenom_info']
+        #floor, shock, blocked, obstacle, x, y = enacted_interaction['phenom_info']
 
 
         # Interaction trespassing
@@ -109,6 +110,16 @@ class CtrlView:
         # Point of interest compass
         self.add_point_of_interest(enacted_interaction['compass_x'], enacted_interaction['compass_y'], POINT_COMPASS)
 
+
+    def extract_and_convert_interactions_to_poi(self, memory):
+        """ Extracting interactions from the memory and converting them to points of interest """
+        dict_interactions_to_poi = {"Shock" : POINT_SHOCK, "Echo" : POINT_ECHO, "Trespassing" : POINT_TRESPASS}
+        for interaction in memory.interactions:
+            if interaction.type in dict_interactions_to_poi:
+                self.add_point_of_interest(interaction.x, interaction.y, dict_interactions_to_poi[interaction.type],interaction = interaction)#, self.view.group)
+            else :
+                print("Unknown interaction type in extract_and_convert_interactions_to_poi: ", interaction['type'])
+    
     def get_focus_phenomenon(self):
         """ Returning the first selected phenomenon """
         for p in self.points_of_interest:
@@ -121,8 +132,9 @@ class CtrlView:
             self.view = EgocentricView()
         if self.model.f_new_things_in_memory :
             print("LAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
-            #self.view.extract_and_convert_interactions(self.model.memory)
-            self.update_model(self.model.enacted_interaction)
+            self.points_of_interest = []
+            self.extract_and_convert_interactions_to_poi(self.model.memory)
+            #self.update_model(self.model.enacted_interaction)
             self.model.f_new_things_in_memory = False
 
 
