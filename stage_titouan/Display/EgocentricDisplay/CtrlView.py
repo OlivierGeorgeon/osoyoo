@@ -82,9 +82,9 @@ class CtrlView:
         floor = enacted_interaction['floor']
         shock = enacted_interaction['shock']
         blocked = enacted_interaction['blocked']
-        obstacle = enacted_interaction['obstacle']
-        x = enacted_interaction['x']
-        y = enacted_interaction['y']
+        obstacle = enacted_interaction['obstacle'] if 'obstacle' in enacted_interaction else None
+        x = enacted_interaction['x'] if 'x' in enacted_interaction else 0
+        y = enacted_interaction['y'] if 'y' in enacted_interaction else 0
 
 
         # Interaction trespassing
@@ -120,7 +120,8 @@ class CtrlView:
             self.view = EgocentricView()
         if self.model.f_new_things_in_memory :
             print("LAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
-            self.view.extract_and_convert_interactions(self.model.memory)
+            #self.view.extract_and_convert_interactions(self.model.memory)
+            self.update_model(self.model.enacted_interaction)
             self.model.f_new_things_in_memory = False
 
 

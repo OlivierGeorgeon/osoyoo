@@ -25,7 +25,7 @@ class CtrlRobot():
 
         self.robot_has_started_acting = False
         self.robot_has_finished_acting = False
-        # self.robot_data = None
+        self.enacted_interaction = {}
 
     def main(self,dt):
         """Blabla"""
@@ -35,18 +35,21 @@ class CtrlRobot():
             self.enact_step = 0
         if self.robot_has_finished_acting:
             self.robot_has_finished_acting = False
-            self.robot_data = self.translate_robot_data(self.outcome_bytes)
-            self.send_position_change_to_memory()
-            self.send_position_change_to_hexa_memory()
-            self.send_phenom_info_to_memory()
-            self.model.f_memory_changed = True
-            self.model.f_hexmem_changed = True
-            self.model.f_new_things_in_memory = True
+            self.enacted_interaction = self.translate_robot_data()
+            self.model.enacted_interaction = self.enacted_interaction
+            if self.enacted_interaction["status"] != "T":
+                self.send_position_change_to_memory()
+                self.send_position_change_to_hexa_memory()
+                self.send_phenom_info_to_memory()
+                self.model.f_memory_changed = True
+                self.model.f_hexmem_changed = True
+                self.model.f_new_things_in_memory = True
         elif not self.robot_has_started_acting and self.model.f_agent_action_ready :
             self.model.f_reset_flag = False
             self.model.f_agent_action_ready = False
-            self.action = self.model.agent_action
-            self.command_robot(self.action)
+            #self.action = self.model.agent_action
+            self.intended_interaction = self.model.intended_interaction
+            self.command_robot(self.intended_interaction)
             self.model.f_ready_for_next_loop = False
             self.robot_has_started_acting = True
 
@@ -55,9 +58,8 @@ class CtrlRobot():
     def send_phenom_info_to_memory(self):
         """Send Interaction to the Memory
         """
-        # phenom_info = self.robot_data['floor'],self.robot_data['shock'],self.robot_data['blocked'],self.robot_data['obstacle'],self.robot_data['x'],self.robot_data['y']
-        phenom_info = self.robot_data['phenom_info']
-        echo_array = self.robot_data['echo_array']
+        phenom_info = self.enacted_interaction['phenom_info']
+        echo_array = self.enacted_interaction['echo_array']
         if self.model.memory is not None:
             self.model.memory.add(phenom_info)
             self.model.memory.add_echo_array(echo_array)        
@@ -66,13 +68,13 @@ class CtrlRobot():
         """Send position changes (angle,distance) to the Memory
         """
         if self.model.memory is not None :
-            self.model.memory.move(self.robot_data['yaw'], self.robot_data['translation'])
+            self.model.memory.move(self.enacted_interaction['yaw'], self.enacted_interaction['translation'])
 
     def send_position_change_to_hexa_memory(self):
         """Apply movement to hexamem"""
         if self.model.hexa_memory is not None:
-            self.model.hexa_memory.azimuth = self.robot_data['azimuth']
-            self.model.hexa_memory.move(self.robot_data['angle'], self.robot_data['translation'][0], self.robot_data['translation'][1])
+            self.model.hexa_memory.azimuth = self.enacted_interaction['azimuth']
+            self.model.hexa_memory.move(self.enacted_interaction['yaw'], self.enacted_interaction['translation'][0], self.enacted_interaction['translation'][1])
 
     def translate_robot_data(self): #PAS FINITO ?
         """ Computes the enacted interaction from the robot's outcome data """
@@ -197,6 +199,7 @@ class CtrlRobot():
 
         # Returning the enacted interaction
         # print("Enacted interaction:", enacted_interaction)
+        enacted_interaction["echo_array"] = [] if not "echo_array" in enacted_interaction.keys() else enacted_interaction["echo_array"]
         return enacted_interaction
 
     def command_robot(self, intended_interaction):
@@ -217,7 +220,7 @@ class CtrlRobot():
         self.enact_step = 1  # Now we send the command to the robot for enaction
         thread = threading.Thread(target=enact_thread)
         thread.start()
-
+        print(intended_interaction)
         # Cas d'actions particulières :
-        if intended_interaction['action'] == "r":
+        if intended_interaction["action"] == "r":
             self.model.action_reset()

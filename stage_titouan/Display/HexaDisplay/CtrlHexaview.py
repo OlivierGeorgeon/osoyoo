@@ -6,6 +6,7 @@ class CtrlHexaview :
         self.model = model
         self.hexaview = HexaView(hexa_memory = self.model.hexa_memory)
         self.refresh_count = 0
+        self.mouse_x, self.mouse_y = None, None
         
         #Handlers
         hemw = self.hexaview
@@ -22,8 +23,17 @@ class CtrlHexaview :
                 elif not model.synthesizer.synthetizing_step == 1:
                         if model.enact_step == 0 and not model.need_user_action:
                             model.agent_action = text
-                            model.f_agent_action_ready = True
+
                             model.action_angle = 0
+                            model.intended_interaction = {"action" : text}
+                            if self.mouse_x is not None and self.mouse_y is not None :
+                                model.intended_interaction["x"] = self.mouse_x
+                                model.intended_interaction["y"] = self.mouse_y
+                            model.f_agent_action_ready = True
+
+                            print("intended interaction : ",model.intended_interaction)
+                            self.mouse_x = None
+                            self.mouse_y = None
 
                         else:
                             message = "Waiting for previous outcome before sending new action" if model.enact_step != 0 else "Waiting for user action"
@@ -41,6 +51,9 @@ class CtrlHexaview :
                     model.user_action = 'click',(cell_x,cell_y)
                     model.f_user_action_ready = True
                     self.react_to_user_interaction()
+                else :
+                    self.mouse_x = int((x - hemw.width/2)*hemw.zoom_level*2)
+                    self.mouse_y = int((y - hemw.height/2)*hemw.zoom_level*2)
         hemw.on_mouse_press = on_mouse_press_hemw
         @hemw.event
         def on_mouse_motion(x, y, dx, dy):
@@ -48,7 +61,7 @@ class CtrlHexaview :
             mouse_y = int((y - hemw.height/2)*hemw.zoom_level*2)
             # Find the cell
             cell_x, cell_y = model.hexa_memory.convert_pos_in_cell(mouse_x, mouse_y)
-            hemw.label.text = "Cell: " + str(cell_x) + ", " + str(cell_y)
+            hemw.label.text = "Cell: " + str(cell_x) + ", " + str(cell_y) + " Mouse: " + str(mouse_x) + ", " + str(mouse_y)
     
     def main(self,dt):
         """blalbla"""
