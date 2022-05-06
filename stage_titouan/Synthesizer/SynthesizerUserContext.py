@@ -103,3 +103,15 @@ class SynthesizerUserContext(SynthesizerUserInteraction):
         """blabla"""
         a = 1
         
+
+    def comparison_step(self):
+        """blabla"""
+        super().comparison_step() 
+        if self.current_mode == self.AUTOMATIC_MODE:
+            if self.synthetizing_step == 1 :
+                self.need_user_action = False
+                self.synthetizing_step = 2
+                for cell in self.indecisive_cells :
+                    self.decided_cells.append(cell)
+                    self.indecisive_cells.remove(cell)
+
