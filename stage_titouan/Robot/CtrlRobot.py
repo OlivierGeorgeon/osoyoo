@@ -3,7 +3,10 @@ import json
 from stage_titouan.Robot.RobotDefine import *
 from stage_titouan.Robot.WifiInterface import WifiInterface
 import threading
+from pyrr import matrix44
 import math
+
+
 class CtrlRobot():
     """Blabla"""
 
@@ -78,8 +81,8 @@ class CtrlRobot():
         floor = 0
         shock = 0
         blocked = 0
-        x = None
-        y = None
+        x = 0
+        y = 0
         json_outcome = json.loads(self.outcome_bytes)
         echo_array = []
 
@@ -146,9 +149,17 @@ class CtrlRobot():
                     translation[0] = -RETREAT_DISTANCE
                     translation[1] = -SHIFT_DISTANCE * forward_duration/1000
 
-                
+            # Interaction blocked
+            if blocked:
+                x, y = 110, 0
 
-
+            # Interaction shock
+            if shock == 0b01:
+                x, y = 110, -80
+            if shock == 0b11:
+                x, y = 110, 0
+            if shock == 0b10:
+                x, y = 110, 80
 
             angle = rotation
 
@@ -196,7 +207,19 @@ class CtrlRobot():
         outcome['y'] = y
         outcome['echo_array'] = echo_array
         outcome['azimuth'] = azimuth
-        return  outcome
+        outcome['status'] = json_outcome['status']
+        outcome['head_angle'] = json_outcome['head_angle']
+        outcome['echo_distance'] = json_outcome['echo_distance']
+        outcome['compass_x'] = json_outcome['compass_x']
+        outcome['compass_y'] = json_outcome['compass_y']
+
+        # The displacement caused by this interaction
+        outcome['yaw'] = rotation
+        translation_matrix = matrix44.create_from_translation([-translation[0], -translation[1], 0])
+        rotation_matrix = matrix44.create_from_z_rotation(-math.radians(-outcome['yaw']))
+        outcome['displacement_matrix'] = matrix44.multiply(rotation_matrix, translation_matrix)
+
+        return outcome
 
 
 

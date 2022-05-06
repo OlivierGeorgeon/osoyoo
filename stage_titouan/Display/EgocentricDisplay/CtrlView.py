@@ -78,7 +78,14 @@ class CtrlView:
         self.view.azimuth = enacted_interaction['azimuth']
 
         # Interacting with a phenomenon
-        floor, shock, blocked, obstacle, x, y = enacted_interaction['phenom_info']
+        # floor, shock, blocked, obstacle, x, y = enacted_interaction['phenom_info']
+        floor = enacted_interaction['floor']
+        shock = enacted_interaction['shock']
+        blocked = enacted_interaction['blocked']
+        obstacle = enacted_interaction['obstacle']
+        x = enacted_interaction['x']
+        y = enacted_interaction['y']
+
 
         # Interaction trespassing
         if floor:

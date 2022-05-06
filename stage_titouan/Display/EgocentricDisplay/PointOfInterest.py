@@ -2,12 +2,13 @@ from pyglet import shapes, gl
 import math
 from pyrr import matrix44, Quaternion
 from webcolors import name_to_rgb
+from ... Memory.EgocentricMemory.Interactions.Interaction import *
 
-POINT_ECHO = 0
-POINT_TINY_ECHO = -1
-POINT_TRESPASS = 1
-POINT_SHOCK = 2
-POINT_PUSH = 3
+POINT_ECHO = INTERACTION_ECHO  # 1
+POINT_TINY_ECHO = 1  # INTERACTION_ECHO
+POINT_TRESPASS = INTERACTION_TRESPASSING
+POINT_SHOCK = INTERACTION_SHOCK
+POINT_PUSH = INTERACTION_BLOCK
 POINT_PLACE = 4
 POINT_PHENOMENON = 5
 POINT_COMPASS = 6

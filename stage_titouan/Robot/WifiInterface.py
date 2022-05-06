@@ -37,7 +37,7 @@ def onkeypress(event):
 
 
 # Test the wifi interface by controlling the robot from the console
-# py -m Misc.WifiInterface <ROBOT_IP>
+#
 if __name__ == '__main__':
     ip = UDP_IP
     if len(sys.argv) > 1:
