@@ -24,9 +24,10 @@ class Workspace :
         
         self.f_reset_flag = False
 
-        self.agent_action = None
+        self.intended_interaction = {}
+        # self.agent_action = None
         self.f_agent_action_ready = False
-        self.action_angle = None
+        # self.action_angle = None
 
         self.CONTROL_MODE_AUTOMATIC = "auto"
         self.CONTROL_MODE_MANUAL = "manual"

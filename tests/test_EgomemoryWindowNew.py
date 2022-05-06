@@ -53,10 +53,12 @@ if __name__ == "__main__":
 
         if control_mode == CONTROL_MODE_MANUAL:
             if robot_controller.enact_step == 0:
-                workspace.agent_action = text
-                workspace.action_angle = ego_controller.mouse_press_angle
+                intended_interaction = {'action': text, 'angle': ego_controller.mouse_press_angle}
+                workspace.intended_interaction = intended_interaction
+                # workspace.agent_action = text
+                # workspace.action_angle = ego_controller.mouse_press_angle
                 # robot_controller.action_angle = ego_controller.mouse_press_angle
-                robot_controller.command_robot(text)
+                robot_controller.command_robot(intended_interaction)
             else:
                 print("Waiting for previous outcome before sending new action")
 
@@ -65,7 +67,7 @@ if __name__ == "__main__":
         if robot_controller.enact_step == 2:
             # Update the egocentric memory window
             # phenom_info, angle, translation, controller.outcome, echo_array, head_angle, azimuth, status = robot_controller.translate_robot_data()
-            robot_controller.robot_data = robot_controller.translate_robot_data(robot_controller.outcome_bytes)
+            robot_controller.robot_data = robot_controller.translate_robot_data()
             enacted_interaction = robot_controller.robot_data
             status = enacted_interaction["status"]
             if status != "T":
