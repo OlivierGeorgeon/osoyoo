@@ -79,16 +79,14 @@ class RobotController:
         #                               and compass_y is near 0 when the robot is North or South.
         # see https://www.best-microcontroller-projects.com/hmc5883l.html
         if 'compass_x' in enacted_interaction:
-            cx = enacted_interaction['compass_x']
-            cy = enacted_interaction['compass_y']
-            x_offset = COMPASS_X_OFFSET
-            y_offset = COMPASS_Y_OFFSET
-            self.azimuth = math.degrees(math.atan2(cy-y_offset, cx-x_offset))
+            enacted_interaction['compass_x'] -= COMPASS_X_OFFSET
+            enacted_interaction['compass_y'] -= COMPASS_Y_OFFSET
+            self.azimuth = math.degrees(math.atan2(enacted_interaction['compass_y'], enacted_interaction['compass_x']))
             self.azimuth += 180;
             if self.azimuth >= 360:
                 self.azimuth -= 360
-            print("compass_x", cx-x_offset, "compass_y", cy-y_offset, "azimuth", int(self.azimuth))
             enacted_interaction['azimuth'] = int(self.azimuth)
+            print("compass_x", enacted_interaction['compass_x'], "compass_y", enacted_interaction['compass_y'], "azimuth", int(self.azimuth))
 
         # If the robot does not return the azimuth then compute it from the yaw
         if 'azimuth' not in enacted_interaction:
@@ -161,7 +159,7 @@ class RobotController:
         enacted_interaction['displacement_matrix'] = matrix44.multiply(rotation_matrix, translation_matrix)
 
         # Returning the enacted interaction
-        print("Enacted interaction:", enacted_interaction)
+        # print("Enacted interaction:", enacted_interaction)
         return enacted_interaction
 
 

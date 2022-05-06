@@ -10,6 +10,7 @@ POINT_SHOCK = 2
 POINT_PUSH = 3
 POINT_PLACE = 4
 POINT_PHENOMENON = 5
+POINT_COMPASS = 6
 
 
 class PointOfInterest:
@@ -46,8 +47,13 @@ class PointOfInterest:
         if self.type == POINT_PHENOMENON:
             # Phenomenon: tomato
             self.shape = self.batch.add_indexed(6, gl.GL_TRIANGLES, group, [0, 1, 2, 0, 2, 3, 0, 3, 4, 0, 4, 5],
-                         ('v2i', [x+40, y+0, x+20, y+34, x-20, y+34, x-40, y, x-20, y-34, x+20, y-34]),
-                         ('c4B', 6 * (*name_to_rgb("tomato"), 128)))
+                            ('v2i', [x+40, y+0, x+20, y+34, x-20, y+34, x-40, y, x-20, y-34, x+20, y-34]),
+                            ('c4B', 6 * (*name_to_rgb("tomato"), 128)))
+        if self.type == POINT_COMPASS:
+            # Place: LightGreen triangle
+            self.shape = self.batch.add_indexed(4, gl.GL_TRIANGLES, self.group, [0,1,2,1,2,3],
+                            ('v2i', [x+10, y, x, y-10, x, y+10, x-10, y]),
+                            ('c3B', 4 * name_to_rgb("RoyalBlue") ))
 
     def set_color(self, color_name=None):
 
@@ -85,6 +91,10 @@ class PointOfInterest:
         #  Rotate and translate the position
         v = matrix44.apply_to_vector(displacement_matrix, [self.x, self.y, 0])
         self.x, self.y = v[0], v[1]
+
+        # If compass don't displace
+        if self.type == POINT_COMPASS:
+            return
 
         # If the shape has a list of vertices (POINT PLACE)
         if hasattr(self.shape, 'vertices'):

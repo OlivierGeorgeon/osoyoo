@@ -97,6 +97,9 @@ class EgoController:
         if obstacle:
             self.add_point_of_interest(x, y, POINT_ECHO)
 
+        # Point of interest compass
+        self.add_point_of_interest(enacted_interaction['compass_x'], enacted_interaction['compass_y'], POINT_COMPASS)
+
     def get_focus_phenomenon(self):
         """ Returning the first selected phenomenon """
         for p in self.points_of_interest:

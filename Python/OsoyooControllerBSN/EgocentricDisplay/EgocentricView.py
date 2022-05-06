@@ -5,7 +5,6 @@ import numpy
 from ..EgocentricDisplay.OsoyooCar import OsoyooCar
 
 ZOOM_IN_FACTOR = 1.2
-IS_NORTH_UP = True  # Set to False to display the robot on the X axis
 
 
 class EgocentricView(pyglet.window.Window):
@@ -14,6 +13,7 @@ class EgocentricView(pyglet.window.Window):
     # set_minimum_size: resize window
     def __init__(self, *args, **kwargs):
         super().__init__(400, 400, resizable=True, *args, **kwargs)
+        self.is_north_up = False  # Set to False to display the robot on the X axis
         self.set_caption("Egocentric Memory")
         self.set_minimum_size(150, 150)
 
@@ -46,7 +46,7 @@ class EgocentricView(pyglet.window.Window):
                 self.height * self.zoom_level, 1, -1)
 
         # Stack the azimuth so the north is up
-        if IS_NORTH_UP:
+        if self.is_north_up:
             glRotatef(90 - self.azimuth, 0.0, 0.0, 1.0)
 
         # Draw the robot and the points of interest
@@ -78,7 +78,7 @@ class EgocentricView(pyglet.window.Window):
 
         theta_robot = theta_window
         # If display north up then compute the polar angle from the robot axis
-        if IS_NORTH_UP:
+        if self.is_north_up:
             theta_robot += math.radians(self.azimuth - 90) + 2 * math.pi
             theta_robot %= 2 * math.pi
             if theta_robot > math.pi:
