@@ -5,11 +5,12 @@
   https://github.com/jarzebski/Arduino-MPU6050
   released into the public domain
 */
+#include <Wire.h>
 #include "Arduino.h"
 #include "Imu_control.h"
 #include "Robot_define.h"
-#include <Wire.h>
 #include "src/lib/MPU6050.h"
+#include "Action_define.h"
 #if ROBOT_HAS_HMC5883L == true
   #include <HMC5883L.h>
 #endif
@@ -157,14 +158,17 @@ int Imu_control::update()
   }
   return _shock_measure;
 }
-void Imu_control::outcome(JSONVar & outcome_object)
+void Imu_control::outcome(JSONVar & outcome_object, char action)
 {
   #if ROBOT_HAS_MPU6050 == true
   outcome_object["yaw"] = (int) _yaw;
-  outcome_object["shock"] = _shock_measure;
-  outcome_object["blocked"] = _blocked;
-  outcome_object["max_acc"] = _max_acceleration;
-  outcome_object["min_acc"] = _min_acceleration;
+  if (action == ACTION_GO_ADVANCE)
+  {
+    outcome_object["shock"] = _shock_measure;
+    outcome_object["blocked"] = _blocked;
+    outcome_object["max_acc"] = _max_acceleration;
+    outcome_object["min_acc"] = _min_acceleration;
+  }
   // outcome_object["max_speed"] = (int) _max_speed;
   // outcome_object["min_speed"] = (int) _min_speed;
   // outcome_object["distance"] = (int) _xDistance;
@@ -186,12 +190,6 @@ void Imu_control::read_azimuth(JSONVar & outcome_object)
   // Calculate heading
   float heading = atan2(norm.YAxis, norm.XAxis);
   // Serial.println("compass_x: " + String((int)norm.XAxis) + ", compass_y: " + String((int)norm.YAxis));
-
-  // You must set the compass offset to the center of the circle drawn by the (compass_x, compass_y) points.
-  // Display the compass points of interest in Egocentric memory.
-  // See screenshot docs/compass_calibration.png
-  // compass_x must be near 0 when the robot is East or West
-  // compass_y must be near 0 when the robot is North or South.
 
   // Convert to degrees
   int headingDegrees = heading * 180.0/M_PI;

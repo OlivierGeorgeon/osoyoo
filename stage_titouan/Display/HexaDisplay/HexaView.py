@@ -96,11 +96,19 @@ class HexaView(pyglet.window.Window):
         self.zoom_level *= f
 
     def on_mouse_motion(self, x, y, dx, dy):
+        # mouse_x = int((x - self.width/2) * self.zoom_level * 2)
+        # mouse_y = int((y - self.height/2) * self.zoom_level * 2)
+        # Find the cell
+        cell_x, cell_y = self.cell_from_screen_coordinate(x, y)
+        self.label.text = "Cell: " + str(cell_x) + ", " + str(cell_y)
+
+    def cell_from_screen_coordinate(self, x, y):
+        """ Computes the cell coordinates from the screen position"""
         mouse_x = int((x - self.width/2) * self.zoom_level * 2)
         mouse_y = int((y - self.height/2) * self.zoom_level * 2)
-        # Find the cell
         cell_x, cell_y = self.hexa_memory.convert_pos_in_cell(mouse_x, mouse_y)
         self.label.text = "Cell: " + str(cell_x) + ", " + str(cell_y)
+        return cell_x, cell_y
 
 
 # Testing HexaView by displaying HexaMemory

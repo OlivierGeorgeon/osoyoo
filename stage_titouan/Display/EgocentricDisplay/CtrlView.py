@@ -20,7 +20,7 @@ class CtrlView:
         def on_mouse_press(x, y, button, modifiers):
             """ Selecting or unselecting points of interest"""
             self.mouse_press_x, self.mouse_press_y, self.mouse_press_angle = \
-                self.view.set_mouse_press_coordinate(x, y, button, modifiers)
+                self.view.get_mouse_press_coordinate(x, y, button, modifiers)
             for p in self.points_of_interest:
                 p.select_if_near(self.mouse_press_x, self.mouse_press_y)
 
@@ -62,12 +62,12 @@ class CtrlView:
     def update_model(self, enacted_interaction):
         """ Updating the model from the latest received outcome """
 
-        # If timeout then no ego memory update
+        # If timeout then no egocentric view update
         if enacted_interaction['status'] == "T":
             print("No ego memory update")
             return
 
-        # Translate and rotate all the phenomena
+        # Translate and rotate all the previous points of interest
         for p in self.points_of_interest:
             p.displace(enacted_interaction['displacement_matrix'])
 
@@ -78,38 +78,16 @@ class CtrlView:
         self.view.robot.rotate_head(enacted_interaction['head_angle'])
         self.view.azimuth = enacted_interaction['azimuth']
 
-        # Interacting with a phenomenon
-
-        floor = enacted_interaction['floor']
-        shock = enacted_interaction['shock']
-        blocked = enacted_interaction['blocked']
-        obstacle = enacted_interaction['obstacle'] if 'obstacle' in enacted_interaction else None
-        x = enacted_interaction['x'] if 'x' in enacted_interaction else 0
-        y = enacted_interaction['y'] if 'y' in enacted_interaction else 0
-        #floor, shock, blocked, obstacle, x, y = enacted_interaction['phenom_info']
-
-
-        # Interaction trespassing
-        if floor:
-            # Mark a new trespassing interaction
-            self.add_point_of_interest(x, y, POINT_TRESPASS)
-
-        # Point of interest blocked
-        if blocked:
-            # Create a new push interaction
-            self.add_point_of_interest(x, y, POINT_PUSH)
-
-        # Point of interest shock
-        if shock:
-            self.add_point_of_interest(x, y, POINT_SHOCK)
-
-        # Point of interest echo
-        if obstacle:
-            self.add_point_of_interest(x, y, POINT_ECHO)
+        # Add new points of interest interactions
+        dict_interactions_to_poi = {"Shock": POINT_SHOCK, "Echo": POINT_ECHO, "Trespassing": POINT_TRESPASS}
+        for p in enacted_interaction['points']:
+            if p[0] in dict_interactions_to_poi:
+                self.add_point_of_interest(p[1], p[2], dict_interactions_to_poi[p[0]])
 
         # Point of interest compass
-        self.add_point_of_interest(enacted_interaction['compass_x'], enacted_interaction['compass_y'], POINT_COMPASS)
-
+        if 'compass_x' in enacted_interaction:
+            self.add_point_of_interest(enacted_interaction['compass_x'],
+                                       enacted_interaction['compass_y'], POINT_COMPASS)
 
     def extract_and_convert_interactions_to_poi(self, memory):
         """ Extracting interactions from the memory and converting them to points of interest """
@@ -117,7 +95,7 @@ class CtrlView:
         for interaction in memory.interactions:
             if interaction.type in dict_interactions_to_poi:
                 self.add_point_of_interest(interaction.x, interaction.y, dict_interactions_to_poi[interaction.type],interaction = interaction)#, self.view.group)
-            else :
+            else:
                 print("Unknown interaction type in extract_and_convert_interactions_to_poi: ", interaction['type'])
     
     def get_focus_phenomenon(self):

@@ -7,44 +7,17 @@
  * Tutorial URL http://osoyoo.com/?p=30022
  *
  */
+#include <WiFiEsp.h>
+#include <WiFiEspUDP.h>
+#include <Arduino_JSON.h>
+
 #include "arduino_secrets.h"
 #include "Robot_define.h"
 #include "Floor_change_retreat.h"
 #include "Head_echo_alignment.h"
 //#include "Head_echo_complete_scan.h"
 #include "Imu_control.h"
-#include <WiFiEsp.h>
-#include <WiFiEspUDP.h>
-#include <Arduino_JSON.h>
-
-// #include <SoftwareSerial.h> // AJOUT ERREUR. Commenté par Olivier je ne sais pas d'ou ca sort.
-
-#define SPEED 100
-#define TURN_SPEED 100
-#define SHIFT_SPEED 130
-
-#define TURN_TIME 500  
-#define MOVE_TIME 500  
-
-#define TURN_FRONT_ENDING_DELAY 100
-#define TURN_FRONT_ENDING_ANGLE 3
-
-#define ACTION_TURN_IN_SPOT_LEFT '1'
-#define ACTION_GO_BACK '2'
-#define ACTION_TURN_IN_SPOT_RIGHT '3'
-#define ACTION_SHIFT_LEFT '4'
-#define ACTION_STOP '5'
-#define ACTION_SHIFT_RIGHT '6'
-#define ACTION_TURN_LEFT '7'
-#define ACTION_GO_ADVANCE '8'
-#define ACTION_TURN_RIGHT '9'
-#define ACTION_ALIGN_ROBOT '/'
-#define ACTION_ALIGN_HEAD '*'
-#define ACTION_ECHO_SCAN '-'
-//#define ACTION_ECHO_COMPLETE 's'
-#define ACTION_SCAN_DIRECTION '+'
-
-#define TURN_SPOT_ANGLE 45
+#include "Action_define.h"
 
 Omny_wheel_motion OWM;
 Floor_change_retreat FCR(OWM);
@@ -473,7 +446,7 @@ void loop()
     FCR.outcome(outcome_object);
     HEA.outcome(outcome_object);
     HEA.outcome_complete(outcome_object);
-    IMU.outcome(outcome_object);
+    IMU.outcome(outcome_object, action);
 
     //HECS.outcome(outcome_object);
     outcome_object["duration1"] = duration1;

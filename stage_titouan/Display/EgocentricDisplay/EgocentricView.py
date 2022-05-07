@@ -65,7 +65,7 @@ class EgocentricView(pyglet.window.Window):
         if .4 < self.zoom_level * f < 5:
             self.zoom_level *= f
 
-    def set_mouse_press_coordinate(self, x, y, button, modifiers):
+    def get_mouse_press_coordinate(self, x, y, button, modifiers):
         """ Computing the position of the mouse click relative to the robot in mm and degrees """
         window_press_x = (x - self.width / 2) * self.zoom_level * 2
         window_press_y = (y - self.height / 2) * self.zoom_level * 2
@@ -104,6 +104,6 @@ if __name__ == "__main__":
 
     @view.event
     def on_mouse_press(x, y, button, modifiers):
-        view.set_mouse_press_coordinate(x, y, button, modifiers)  # Display mouse click coordinates
+        view.get_mouse_press_coordinate(x, y, button, modifiers)  # Display mouse click coordinates
 
     pyglet.app.run()

@@ -23,6 +23,7 @@ class CtrlRobot():
 
         self.enact_step = 0
         self.outcome_bytes = b'{"status":"T"}'  # Default status T timeout
+        self.azimuth = 0
 
         self.robot_has_started_acting = False
         self.robot_has_finished_acting = False
@@ -77,37 +78,30 @@ class CtrlRobot():
             self.model.hexa_memory.azimuth = self.enacted_interaction['azimuth']
             self.model.hexa_memory.move(self.enacted_interaction['yaw'], self.enacted_interaction['translation'][0], self.enacted_interaction['translation'][1])
 
-    def translate_robot_data(self): #PAS FINITO ?
+    def translate_robot_data(self):
         """ Computes the enacted interaction from the robot's outcome data """
         action = self.intended_interaction['action']
         enacted_interaction = json.loads(self.outcome_bytes)
         enacted_interaction['points'] = []
-        # enacted_interaction = {'action': action, 'status': outcome['status']}
 
         # If timeout then no ego memory update
         if enacted_interaction['status'] == "T":
             return enacted_interaction
 
-        # Head angle
-        # head_angle = 90
-        # if 'head_angle' in outcome:
-        #     head_angle = outcome['head_angle']
-        # enacted_interaction['head_angle'] = head_angle
-
         # Presupposed displacement of the robot relative to the environment
         translation, yaw = [0, 0], 0
         if action == "1":
-            yaw = 45
+            yaw = DEFAULT_YAW
         if action == "2":
-            translation[0] = -STEP_FORWARD_DISTANCE
+            translation[0] = -FORWARD_SPEED * enacted_interaction['duration1'] / 1000
         if action == "3":
-            yaw = -45
+            yaw = -DEFAULT_YAW
         if action == "4":
-            translation[1] = SHIFT_DISTANCE
+            translation[1] = LATERAL_SPEED * enacted_interaction['duration1'] / 1000
         if action == "6":
-            translation[1] = -SHIFT_DISTANCE
+            translation[1] = -LATERAL_SPEED * enacted_interaction['duration1'] / 1000
         if action == "8":
-            translation[0] = STEP_FORWARD_DISTANCE # * outcome['duration'] / 1000
+            translation[0] = FORWARD_SPEED * enacted_interaction['duration1'] / 1000
 
         # If the robot returns yaw then use it
         if 'yaw' in enacted_interaction:
@@ -115,108 +109,63 @@ class CtrlRobot():
         else:
             enacted_interaction['yaw'] = yaw
 
-        # Compute the azimuth from compass_x and compass_y
-        # You must set the offset such that compass_x is near 0 when the robot is East or West
-        #                               and compass_y is near 0 when the robot is North or South.
-        # see https://www.best-microcontroller-projects.com/hmc5883l.html
+        # If the robot does not return the azimuth then sum it from the yaw
+        if 'azimuth' not in enacted_interaction:
+            self.azimuth -= yaw
+            enacted_interaction['azimuth'] = self.azimuth
+
+        # If the robot returns compass_x and compass_y then recompute the azimuth
         if 'compass_x' in enacted_interaction:
+            # Subtract the offset from robot_define.py
             enacted_interaction['compass_x'] -= COMPASS_X_OFFSET
             enacted_interaction['compass_y'] -= COMPASS_Y_OFFSET
             self.azimuth = math.degrees(math.atan2(enacted_interaction['compass_y'], enacted_interaction['compass_x']))
             self.azimuth += 180;
             if self.azimuth >= 360:
                 self.azimuth -= 360
+            # Override the azimuth returned by the robot
             enacted_interaction['azimuth'] = int(self.azimuth)
             print("compass_x", enacted_interaction['compass_x'], "compass_y", enacted_interaction['compass_y'], "azimuth", int(self.azimuth))
 
-        # If the robot does not return the azimuth then compute it from the yaw
-        if 'azimuth' not in enacted_interaction:
-            self.azimuth -= yaw
-            enacted_interaction['azimuth'] = self.azimuth
-
-        # interacting with phenomena
-        obstacle, floor, shock, blocked, x, y = 0, 0, 0, 0, 0, 0
-        echo_distance = 0
-
-        if 'floor' in enacted_interaction:
-            floor = enacted_interaction['floor']
-        if 'shock' in enacted_interaction and action == '8' and floor == 0:
-            shock = enacted_interaction['shock']
-        if 'blocked' in enacted_interaction and action == '8' and floor == 0:
-            blocked = enacted_interaction['blocked']
-        if 'echo_distance' in enacted_interaction and action == "-" or action == "*" or action == "+":
-            echo_distance = enacted_interaction['echo_distance']
-            if 0 < echo_distance < 10000:
-                obstacle = 1
-
         # Interaction trespassing
-        if floor > 0:
-            # The position of the interaction trespassing
-            enacted_interaction['points'].append((INTERACTION_TRESPASSING,FLOOR_X, FLOOR_Y))
+        if enacted_interaction['floor'] > 0:
+            enacted_interaction['points'].append((INTERACTION_TRESPASSING, LINE_X, 0))
             # The resulting translation
-            forward_duration = enacted_interaction['duration']  # - 300  # Subtract retreat duration
-            if action == "8":  # TODO Other actions
-                translation[0] = STEP_FORWARD_DISTANCE * forward_duration / 1000 - RETREAT_DISTANCE
-                if translation[0] < 0:
-                    print("translation negative")
-                if floor == 0b01:  # Black line on the right
-                    translation[0] -= 0
-                    translation[1] = RETREAT_DISTANCE_Y
-                if floor == 0b10:  # Black line on the left
-                    translation[0] -= 0
-                    translation[1] = -RETREAT_DISTANCE_Y
-            if action == "4":
-                translation[0] = -RETREAT_DISTANCE
-                translation[1] = SHIFT_DISTANCE * forward_duration / 1000
-            if action == "6":
-                translation[0] = -RETREAT_DISTANCE
-                translation[1] = -SHIFT_DISTANCE * forward_duration / 1000
+            translation[0] -= RETREAT_DISTANCE
+            if enacted_interaction['floor'] == 0b01:  # Black line on the right
+                translation[1] = RETREAT_DISTANCE_Y
+            if enacted_interaction['floor'] == 0b10:  # Black line on the left
+                translation[1] = -RETREAT_DISTANCE_Y
 
-            
+        # Interaction ECHO for actions involving scanning
+        if action == "-" or action == "*" or action == "+":
+            if enacted_interaction['echo_distance'] < 10000:
+                x = int(ROBOT_HEAD_X + math.cos(math.radians(enacted_interaction['head_angle'])) * enacted_interaction['echo_distance'])
+                y = int(math.sin(math.radians(enacted_interaction['head_angle'])) * enacted_interaction['echo_distance'])
+                enacted_interaction['points'].append((INTERACTION_ECHO, x, y))
 
-        # Interaction blocked
-        if blocked:
-            #x, y = 110, 0
-
-            enacted_interaction['points'].append((INTERACTION_BLOCK,BLOCK_X, BLOCK_Y))
-
-        """
         # Interaction shock
-        if shock == 0b01:
-            x, y = 110, -80
-        if shock == 0b11:
-            x, y = 110, 0
-        if shock == 0b10:
-            x, y = 110, 80
-        """
+        if 'shock' in enacted_interaction and action == '8':
+            if enacted_interaction['shock'] == 0b01:  # Shock on the right
+                enacted_interaction['points'].append((INTERACTION_SHOCK, ROBOT_FRONT_X, -ROBOT_FRONT_Y))
+            if enacted_interaction['shock'] == 0b11:  # Shock on the front
+                enacted_interaction['points'].append((INTERACTION_SHOCK, ROBOT_FRONT_X, 0))
+            if enacted_interaction['shock'] == 0b10:  # Shock on the left
+                enacted_interaction['points'].append((INTERACTION_SHOCK, ROBOT_FRONT_X, ROBOT_FRONT_Y))
 
-        if shock:
-            enacted_interaction['points'].append((INTERACTION_SHOCK,SHOCK_X, SHOCK_Y))
+        # Interaction block
+        if 'blocked' in enacted_interaction and action == '8':
+            if enacted_interaction['blocked']:
+                enacted_interaction['points'].append((INTERACTION_BLOCK, ROBOT_FRONT_X, 0))
 
-
-    
-
-        # Interaction ECHO
-        if obstacle:
-            x = int(ROBOT_HEAD_X + math.cos(math.radians(enacted_interaction['head_angle'])) * echo_distance)
-            y = int(math.sin(math.radians(enacted_interaction['head_angle'])) * echo_distance)
-            enacted_interaction['points'].append((INTERACTION_ECHO,x, y))
-
-        enacted_interaction['phenom_info'] = (floor, shock, blocked, obstacle, x, y)
-        enacted_interaction['echo_distance'] = echo_distance
-
-        # The displacement caused by this interaction
+        # The displacement of the environment relative to the robot caused by this interaction
         enacted_interaction['translation'] = translation
-        enacted_interaction['yaw'] = yaw
         translation_matrix = matrix44.create_from_translation([-translation[0], -translation[1], 0])
-        rotation_matrix = matrix44.create_from_z_rotation(-math.radians(-enacted_interaction['yaw']))
+        rotation_matrix = matrix44.create_from_z_rotation(math.radians(yaw))
         enacted_interaction['displacement_matrix'] = matrix44.multiply(rotation_matrix, translation_matrix)
 
-        # Returning the enacted interaction
-        # print("Enacted interaction:", enacted_interaction)
-
+        # The echo array
         enacted_interaction["echo_array"] = [] if not "echo_array" in enacted_interaction.keys() else enacted_interaction["echo_array"]
-
         for i in range(100,-99,-5):
                     edstr = "ed"+str(i)
 

@@ -18,11 +18,11 @@ class CtrlHexaview:
         def on_text_hemw(text):
                 if model.need_user_action and not model.f_user_action_ready and model.f_inde_cell_projected :
                     if text.upper() == "Y":
-                        model.user_action = 'y',None
+                        model.user_action = 'y', None
                         model.f_user_action_ready = True
                         self.react_to_user_interaction()
                     elif text.upper() == "N":
-                        model.user_action = 'n',None
+                        model.user_action = 'n', None
                         model.f_user_action_ready = True
                         self.react_to_user_interaction()
                 elif not model.synthesizer.synthetizing_step == 1:
@@ -30,7 +30,7 @@ class CtrlHexaview:
                             model.agent_action = text
 
                             model.action_angle = 0
-                            model.intended_interaction = {"action" : text}
+                            model.intended_interaction = {"action": text}
                             if self.mouse_x is not None and self.mouse_y is not None :
                                 model.intended_interaction["x"] = self.mouse_x
                                 model.intended_interaction["y"] = self.mouse_y
@@ -48,20 +48,22 @@ class CtrlHexaview:
         def on_mouse_press_hemw(x, y, button, modifiers):
             """ Computing the position of the mouse click in the hexagrid  """
             # Compute the position relative to the center in mm
+            cell_x, cell_y = self.hexaview.cell_from_screen_coordinate(x, y)
+            print("Cell press:", cell_x, ",", cell_y)
             if model.need_user_action:
-                self.hexaview.mouse_press_x = int((x - self.hexaview.width/2)*self.hexaview.zoom_level*2)
-                self.hexaview.mouse_press_y = int((y - self.hexaview.height/2)*self.hexaview.zoom_level*2)
-                print(self.hexaview.mouse_press_x, self.hexaview.mouse_press_y)
-                cell_x, cell_y = model.hexa_memory.convert_pos_in_cell(self.hexaview.mouse_press_x, self.hexaview.mouse_press_y)
+                # self.hexaview.mouse_press_x = int((x - self.hexaview.width/2)*self.hexaview.zoom_level*2)
+                # self.hexaview.mouse_press_y = int((y - self.hexaview.height/2)*self.hexaview.zoom_level*2)
+                # print(self.hexaview.mouse_press_x, self.hexaview.mouse_press_y)
+                # cell_x, cell_y = model.hexa_memory.convert_pos_in_cell(self.hexaview.mouse_press_x, self.hexaview.mouse_press_y)
                 model.user_action = 'click',(cell_x,cell_y)
                 model.f_user_action_ready = True
                 self.react_to_user_interaction()
-            else:
-                self.mouse_x = int((x - hemw.width/2)*hemw.zoom_level*2)
-                self.mouse_y = int((y - hemw.height/2)*hemw.zoom_level*2)
-                # print(self.mouse_x, self.mouse_y)
+            # else:
+            #     self.mouse_x = int((x - self.hexaview.width/2)*hemw.zoom_level*2)
+            #     self.mouse_y = int((y - self.hexaview.height/2)*hemw.zoom_level*2)
+            #     print(self.mouse_x, self.mouse_y)
 
-        hemw.on_mouse_press = on_mouse_press_hemw
+        self.hexaview.on_mouse_press = on_mouse_press_hemw
 
     def main(self,dt):
         """blalbla"""
@@ -85,7 +87,6 @@ class CtrlHexaview:
 
         self.refresh_count +=1
 
-
     def react_to_user_interaction(self):
         """blbablal"""
         self.hexaview.indecisive_cell_shape = []
@@ -93,6 +94,7 @@ class CtrlHexaview:
 
 
 # Displaying Hexaview
+# Click on the grid to turn a cell white
 # py -m stage_titouan.Display.HexaDisplay.CtrlHexaview
 if __name__ == "__main__":
     workspace = Workspace()
@@ -105,8 +107,14 @@ if __name__ == "__main__":
     controller = CtrlHexaview(workspace)
     controller.hexaview.extract_and_convert_interactions(workspace.hexa_memory)
 
-    # workspace.need_user_action = True
-
     # Add points of interest
+
+    # Mouse press change cell status
+    @controller.hexaview.event
+    def on_mouse_press(x, y, button, modifiers):
+        """ Changing cell status on click  """
+        cell_x, cell_y = controller.hexaview.cell_from_screen_coordinate(x, y)
+        workspace.hexa_memory.grid[cell_x][cell_y].status = "Free"
+        controller.hexaview.extract_and_convert_interactions(workspace.hexa_memory)
 
     pyglet.app.run()

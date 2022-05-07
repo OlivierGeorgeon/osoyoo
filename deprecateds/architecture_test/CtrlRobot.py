@@ -108,16 +108,16 @@ class CtrlRobot():
             if self.action == "1":
                 rotation = 45
             if self.action == "2":
-                translation[0] = -STEP_FORWARD_DISTANCE
+                translation[0] = -FORWARD_SPEED
             if self.action == "3":
                 rotation = -45
             if self.action == "4":
-                translation[1] = SHIFT_DISTANCE
+                translation[1] = LATERAL_SPEED
             if self.action == "6":
-                translation[1] = -SHIFT_DISTANCE
+                translation[1] = -LATERAL_SPEED
             if self.action == "8":
                 if not blocked:
-                    translation[0] = STEP_FORWARD_DISTANCE * outcome['duration'] / 1000
+                    translation[0] = FORWARD_SPEED * outcome['duration'] / 1000
 
             # Actual measured displacement if any
             if 'yaw' in outcome:
@@ -128,7 +128,7 @@ class CtrlRobot():
                 # Update the translation
                 forward_duration = outcome['duration'] - 300  # Subtract retreat duration
                 if self.action == "8":  # TODO Other actions
-                    translation[0] = STEP_FORWARD_DISTANCE * forward_duration/1000 - RETREAT_DISTANCE
+                    translation[0] = FORWARD_SPEED * forward_duration / 1000 - RETREAT_DISTANCE
                     if (translation[0] < 0 ) :
                             print("translation negative")
                     if floor == 0b01:  # Black line on the right
@@ -139,10 +139,10 @@ class CtrlRobot():
                         translation[1] = -RETREAT_DISTANCE_Y
                 if self.action == "4":
                     translation[0] = -RETREAT_DISTANCE
-                    translation[1] = SHIFT_DISTANCE * forward_duration/1000
+                    translation[1] = LATERAL_SPEED * forward_duration / 1000
                 if self.action == "6":
                     translation[0] = -RETREAT_DISTANCE
-                    translation[1] = -SHIFT_DISTANCE * forward_duration/1000
+                    translation[1] = -LATERAL_SPEED * forward_duration / 1000
 
                 
 
