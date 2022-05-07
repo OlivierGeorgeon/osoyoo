@@ -8,7 +8,7 @@ POINT_ECHO = INTERACTION_ECHO  # 1
 POINT_TINY_ECHO = 1  # INTERACTION_ECHO
 POINT_TRESPASS = INTERACTION_TRESPASSING
 POINT_SHOCK = INTERACTION_SHOCK
-POINT_PUSH = INTERACTION_BLOCK
+POINT_BLOCK = INTERACTION_BLOCK
 POINT_PLACE = 4
 POINT_PHENOMENON = 5
 POINT_COMPASS = 6
@@ -43,7 +43,8 @@ class PointOfInterest:
         if self.type == POINT_SHOCK:
             # Chock interaction: red triangle
             self.shape = shapes.Triangle(x, y, x+40, y-30, x+40, y+30, color=name_to_rgb("red"), batch=self.batch)
-        if self.type == POINT_PUSH:
+        if self.type == POINT_BLOCK:
+            print("point push")
             # Pushing: yellow triangle
             self.shape = shapes.Triangle(x, y, x+40, y-30, x+40, y+30, color=name_to_rgb("salmon"), batch=self.batch)
         if self.type == POINT_PHENOMENON:
@@ -75,7 +76,7 @@ class PointOfInterest:
             if self.type == POINT_SHOCK:
                 # Chock interaction: red triangle
                 self.shape.color = name_to_rgb("red")
-            if self.type == POINT_PUSH:
+            if self.type == POINT_BLOCK:
                 # Pushing: yellow triangle
                 self.shape.color = name_to_rgb("yellow")
             if self.type == POINT_PHENOMENON:
@@ -115,7 +116,7 @@ class PointOfInterest:
                 self.shape.rotation += math.degrees(q.angle)
             else:  # Rotate around z axis downward
                 self.shape.rotation += math.degrees(-q.angle)
-        if self.type == POINT_PUSH or self.type == POINT_SHOCK :
+        if self.type == POINT_BLOCK or self.type == POINT_SHOCK :
             # Rotate and translate the other points of the triangle
             v = matrix44.apply_to_vector(displacement_matrix, [self.shape.x2, self.shape.y2, 0])
             self.shape.x2, self.shape.y2 = v[0], v[1]

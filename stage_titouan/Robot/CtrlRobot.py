@@ -157,6 +157,7 @@ class CtrlRobot():
         if 'blocked' in enacted_interaction and action == '8':
             if enacted_interaction['blocked']:
                 enacted_interaction['points'].append((INTERACTION_BLOCK, ROBOT_FRONT_X, 0))
+                translation[0] = 0  # Cancel forward translation
 
         # The displacement of the environment relative to the robot caused by this interaction
         enacted_interaction['translation'] = translation

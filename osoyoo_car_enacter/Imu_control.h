@@ -23,7 +23,7 @@ class Imu_control
     Imu_control();
     void setup();
     void begin();
-    int update();
+    int update(int interaction_step);
     void outcome(JSONVar & outcome_object, char action);
     float _yaw;
     float _xSpeed;

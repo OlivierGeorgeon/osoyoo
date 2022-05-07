@@ -94,7 +94,7 @@ void Imu_control::begin()
   _xSpeed = 0;
   _xDistance = 0;
 }
-int Imu_control::update()
+int Imu_control::update(int interaction_step)
 {
   unsigned long timer = millis();
   if (_next_imu_read_time < timer)
@@ -116,44 +116,46 @@ int Imu_control::update()
     float _ZAngle = normGyro.ZAxis * IMU_READ_PERIOD / 1000 * GYRO_COEF;
     _yaw += _ZAngle;
 
-    // Record the min acceleration (deceleration) during the interaction to detect collision
-    if (normalized_acceleration < _min_acceleration) {
-      _min_acceleration =  normalized_acceleration;
-    }
-    // Record the max acceleration during the interaction to detect block
-    if (normalized_acceleration > _max_acceleration) {
-      _max_acceleration =  normalized_acceleration;
-    }
-    // Check for turned to the right by more than 1°/s
-    if (_ZAngle < -GYRO_SHOCK_THRESHOLD) {
-      // If moving forward, this will mean collision on the right
-      _shock_measure = B01;
-    }
-    // Check a peek deceleration = frontal shock
-    if (normalized_acceleration < ACCELERATION_SHOCK_THRESHOLD) {
-      _shock_measure = B11;
-    }
-    // Check for turned to the left by more than 1°/s
-    if (_ZAngle > GYRO_SHOCK_THRESHOLD) {
-      // If moving forward, this will mean collision on the left
-      _shock_measure = B10;
-    }
-    // Check for blocked on the front
-    // (the acceleration did not pass the threshold during the first 250ms)
-    if (_cycle_count >= 6) {
-      if (_max_acceleration < ACCELERATION_BLOCK_THRESHOLD) {
-        // _shock_measure = B11;
-        _blocked = true;
+    if (interaction_step == 1)
+    {
+      // Record the min acceleration (deceleration) during the interaction to detect collision
+      if (normalized_acceleration < _min_acceleration) {
+        _min_acceleration =  normalized_acceleration;
       }
+      // Record the max acceleration during the interaction to detect block
+      if (normalized_acceleration > _max_acceleration) {
+        _max_acceleration =  normalized_acceleration;
+      }
+      // Check for turned to the right by more than 1°/s
+      if (_ZAngle < -GYRO_SHOCK_THRESHOLD) {
+        // If moving forward, this will mean collision on the right
+        _shock_measure = B01;
+      }
+      // Check a peek deceleration = frontal shock
+      if (normalized_acceleration < ACCELERATION_SHOCK_THRESHOLD) {
+        _shock_measure = B11;
+      }
+      // Check for turned to the left by more than 1°/s
+      if (_ZAngle > GYRO_SHOCK_THRESHOLD) {
+        // If moving forward, this will mean collision on the left
+        _shock_measure = B10;
+      }
+      // Check for blocked on the front
+      // (the acceleration did not pass the threshold during the first 250ms)
+      if (_cycle_count >= 6) {
+        if (_max_acceleration < ACCELERATION_BLOCK_THRESHOLD) {
+          // _shock_measure = B11;
+          _blocked = true;
+        }
+      }
+
+      // Trying to compute the speed by integrating acceleration (not working)
+      _xSpeed += (normalized_acceleration) * IMU_READ_PERIOD / 100;
+      if (_xSpeed > _max_speed) _max_speed = _xSpeed;
+      if (_xSpeed < _min_speed) _min_speed = _xSpeed;
+      // Trying to compute the distance by integrating the speed (not working)
+      _xDistance += _xSpeed * IMU_READ_PERIOD / 1000;
     }
-
-    // Trying to compute the speed by integrating acceleration (not working)
-    _xSpeed += (normalized_acceleration) * IMU_READ_PERIOD / 100;
-    if (_xSpeed > _max_speed) _max_speed = _xSpeed;
-    if (_xSpeed < _min_speed) _min_speed = _xSpeed;
-    // Trying to compute the distance by integrating the speed (not working)
-    _xDistance += _xSpeed * IMU_READ_PERIOD / 1000;
-
     #endif
   }
   return _shock_measure;

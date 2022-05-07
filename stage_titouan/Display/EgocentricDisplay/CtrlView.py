@@ -79,7 +79,7 @@ class CtrlView:
         self.view.azimuth = enacted_interaction['azimuth']
 
         # Add new points of interest interactions
-        dict_interactions_to_poi = {"Shock": POINT_SHOCK, "Echo": POINT_ECHO, "Trespassing": POINT_TRESPASS}
+        dict_interactions_to_poi = {"Shock": POINT_SHOCK, "Echo": POINT_ECHO, "Trespassing": POINT_TRESPASS, 'Block': POINT_BLOCK}
         for p in enacted_interaction['points']:
             if p[0] in dict_interactions_to_poi:
                 self.add_point_of_interest(p[1], p[2], dict_interactions_to_poi[p[0]])
@@ -91,10 +91,10 @@ class CtrlView:
 
     def extract_and_convert_interactions_to_poi(self, memory):
         """ Extracting interactions from the memory and converting them to points of interest """
-        dict_interactions_to_poi = {"Shock" : POINT_SHOCK, "Echo" : POINT_ECHO, "Trespassing" : POINT_TRESPASS}
+        dict_interactions_to_poi = {"Shock": POINT_SHOCK, "Echo": POINT_ECHO, "Trespassing": POINT_TRESPASS, 'Block': POINT_BLOCK}
         for interaction in memory.interactions:
             if interaction.type in dict_interactions_to_poi:
-                self.add_point_of_interest(interaction.x, interaction.y, dict_interactions_to_poi[interaction.type],interaction = interaction)#, self.view.group)
+                self.add_point_of_interest(interaction.x, interaction.y, dict_interactions_to_poi[interaction.type], interaction = interaction)#, self.view.group)
             else:
                 print("Unknown interaction type in extract_and_convert_interactions_to_poi: ", interaction['type'])
     

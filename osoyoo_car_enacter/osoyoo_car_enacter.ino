@@ -131,7 +131,7 @@ void loop()
 
   // Behavior IMU
   //digitalWrite(LED_BUILTIN, LOW); // for debug
-  int shock_event = IMU.update();
+  int shock_event = IMU.update(interaction_step);
   // if (blink_on) {digitalWrite(LED_BUILTIN, HIGH);} // for debug
 
   // STEP 0: no interaction being enacted
