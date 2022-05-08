@@ -55,16 +55,15 @@ class CtrlRobot():
             self.model.f_ready_for_next_loop = False
             self.robot_has_started_acting = True
 
-        
-
     def send_phenom_info_to_memory(self):
-        """Send Interaction to the Memory
+        """Send Enacted Interaction to Memory
         """
-        phenom_info = self.enacted_interaction['phenom_info']
+        # phenom_info = self.enacted_interaction['phenom_info']
         echo_array = self.enacted_interaction['echo_array']
         if self.model.memory is not None:
-            self.model.memory.add(phenom_info)
-            self.model.memory.add_echo_array(echo_array)        
+            self.model.memory.add_enacted_interaction(self.enacted_interaction)  # Added by Olivier 08/05/2022
+            # self.model.memory.add(phenom_info)
+            self.model.memory.add_echo_array(echo_array)
 
     def send_position_change_to_memory(self):
         """Send position changes (angle,distance) to the Memory
@@ -81,10 +80,11 @@ class CtrlRobot():
     def translate_robot_data(self):
         """ Computes the enacted interaction from the robot's outcome data """
         action = self.intended_interaction['action']
+        is_focussed = ('focus_x' in self.intended_interaction)
         enacted_interaction = json.loads(self.outcome_bytes)
         enacted_interaction['points'] = []
 
-        # If timeout then no ego memory update
+        # If timeout then no update
         if enacted_interaction['status'] == "T":
             return enacted_interaction
 
@@ -138,11 +138,14 @@ class CtrlRobot():
                 translation[1] = -RETREAT_DISTANCE_Y
 
         # Interaction ECHO for actions involving scanning
-        if action == "-" or action == "*" or action == "+":
+        if action in ['-', '*', '+', '8', '2', '1', '3', '4', '6']:
             if enacted_interaction['echo_distance'] < 10000:
                 x = int(ROBOT_HEAD_X + math.cos(math.radians(enacted_interaction['head_angle'])) * enacted_interaction['echo_distance'])
                 y = int(math.sin(math.radians(enacted_interaction['head_angle'])) * enacted_interaction['echo_distance'])
                 enacted_interaction['points'].append((INTERACTION_ECHO, x, y))
+                if is_focussed:
+                    print("Estimated speed x:", self.intended_interaction['focus_x'] - x, "mm/s, y:",
+                          self.intended_interaction['focus_y'] - y, "mm/s")
 
         # Interaction shock
         if 'shock' in enacted_interaction and action == '8':
@@ -178,6 +181,7 @@ class CtrlRobot():
                         enacted_interaction['echo_array'].append((tmp_x, tmp_y))
 
         print("Enacted interaction apres translate robot data : ", enacted_interaction)
+        self.enacted_interaction = enacted_interaction
         return enacted_interaction
 
     def command_robot(self, intended_interaction):
@@ -198,7 +202,7 @@ class CtrlRobot():
         self.enact_step = 1  # Now we send the command to the robot for enaction
         thread = threading.Thread(target=enact_thread)
         thread.start()
-        print(intended_interaction)
+        # print(intended_interaction)
         # Cas d'actions particulières :
         if intended_interaction["action"] == "r":
             self.model.action_reset()

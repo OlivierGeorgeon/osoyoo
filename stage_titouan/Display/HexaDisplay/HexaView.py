@@ -53,7 +53,6 @@ class HexaView(pyglet.window.Window):
         tmp = recently_changed_to_pyglet(memory, self.batch)
         print("len tmp", len(tmp))
         self.shapesList.append( tmp)
-        
 
     def show_indecisive_cell(self,indecisive_cell): #(indecisive_cell,hexaMemory,batch)
         self.indecisive_cell_shape = []
@@ -103,7 +102,7 @@ class HexaView(pyglet.window.Window):
         self.label.text = "Cell: " + str(cell_x) + ", " + str(cell_y)
 
     def cell_from_screen_coordinate(self, x, y):
-        """ Computes the cell coordinates from the screen position"""
+        """ Computes the cell coordinates from the screen coordinates """
         mouse_x = int((x - self.width/2) * self.zoom_level * 2)
         mouse_y = int((y - self.height/2) * self.zoom_level * 2)
         cell_x, cell_y = self.hexa_memory.convert_pos_in_cell(mouse_x, mouse_y)

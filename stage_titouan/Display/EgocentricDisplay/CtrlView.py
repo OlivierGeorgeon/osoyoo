@@ -31,7 +31,8 @@ class CtrlView:
                     if p.is_selected:
                         p.delete()
                         self.points_of_interest.remove(p)
-                        self.model.memory.interactions.remove(p.interaction)
+                        if p.interaction is not None:
+                            self.model.memory.interactions.remove(p.interaction)
             if symbol == key.INSERT:
                 phenomenon = PointOfInterest(self.mouse_press_x, self.mouse_press_y, self.view.batch,
                                              self.view.background, POINT_PHENOMENON)

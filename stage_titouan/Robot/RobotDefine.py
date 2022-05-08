@@ -18,19 +18,21 @@ RETREAT_DISTANCE_Y = 20     # (mm) Y displacement when line is detected on the s
 LINE_X = 160                # (mm) X coordinate of the line after retreat
 
 # You must set the compass offset to the center of the circle drawn by the (compass_x, compass_y) points.
-# Display the compass points of interest in Egocentric memory.
+# Display the compass points of interest in Egocentric view.
 # See screenshot docs/first_steps/compass_calibration.png
 # See https://www.best-microcontroller-projects.com/hmc5883l.html
 # compass_x must be near 0 when the robot is East or West
 # compass_y must be near 0 when the robot is North or South.
 
+# Robot 2 in ROOM A327.
 if ROBOT_ID == 2:
-    COMPASS_X_OFFSET = 0  # Robot 2 in ROOM A327.
-    COMPASS_Y_OFFSET = 0  # The offset is configured in the C++ code.
+    COMPASS_X_OFFSET = 0  # The offset is configured in the C++ code.
+    COMPASS_Y_OFFSET = 0
 
+# Robot 4 chezOlivier
 if ROBOT_ID == 4:
-    COMPASS_X_OFFSET = -50  # Robot 4 chezOlivier
-    COMPASS_Y_OFFSET = -120
-    FORWARD_SPEED = 120     # (mm/s) Forward translation speed. previous 120.
+    COMPASS_X_OFFSET = 0
+    COMPASS_Y_OFFSET = 0
+    FORWARD_SPEED = 120     # (mm/s) Forward translation speed.
     RETREAT_DISTANCE = 70   # (mm) Distance of the line after retreat
 

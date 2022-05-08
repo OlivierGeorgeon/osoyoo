@@ -29,6 +29,13 @@ class MemoryNew:
     def reset(self):
         self.interactions = []
         self.current_id = 0
+
+    def add_enacted_interaction(self, enacted_interaction):  # Added by Olivier 08/05/2022
+        """ Add interactions from the enacted interaction """
+        for p in enacted_interaction['points']:
+            interaction = Interaction(p[1], p[2], 10, 10, type=p[0], id=self.current_id)  # TODO Adjust the parameters
+            self.interactions.append(interaction)
+            self.current_id += 1
         
     def add(self,phenom_info):
         """Translate interactions information into an interaction object, and add it to the list
