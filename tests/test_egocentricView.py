@@ -28,6 +28,7 @@ if __name__ == "__main__":
     agent = Agent5()
     ctrl_hexaview = CtrlHexaview(workspace)
     ctrl_synthe = CtrlSynthe(workspace)
+    workspace.synthesizer.mode = 'automatic'
 
     # synthesizer = CtrlSynthe(workspace)
     # controller = CtrlRobot(agent, memory, ip, view=ego_view, synthesizer = synthesizer, hexa_memory = hexa_memory, hexaview = hexaview)
