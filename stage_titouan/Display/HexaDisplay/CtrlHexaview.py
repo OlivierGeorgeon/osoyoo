@@ -43,7 +43,7 @@ class CtrlHexaview :
         def on_mouse_press_hemw(x, y, button, modifiers):
                 """ Computing the position of the mouse click in the hexagrid  """
                 # Compute the position relative to the center in mm
-                if model.need_user_action:
+                if model.need_user_action and not model.f_agent_action_ready:
                     self.hexaview.mouse_press_x = int((x - self.hexaview.width/2)*self.hexaview.zoom_level*2)
                     self.hexaview.mouse_press_y = int((y - self.hexaview.height/2)*self.hexaview.zoom_level*2)
                     print(self.hexaview.mouse_press_x, self.hexaview.mouse_press_y)

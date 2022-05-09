@@ -1,16 +1,18 @@
 from ..  Synthesizer.SynthesizerUserInteraction import SynthesizerUserInteraction,math
+from .. Robot.RobotDefine import SCAN_DISTANCE
 class SynthesizerUserContext(SynthesizerUserInteraction):
     """Synthesizer that have two modes : 
     Manual and Automatic.
     In Manual mode, the user can interact with the synthesizer.
     In Automatic mode, the synthesizer will try to find the best action for the user.
     """
-    def __init__(self,memory,hexa_memory):
+    def __init__(self,memory,hexa_memory,model):
         """
         :param memory: Memory object
         :param hexa_memory: HexaMemory object
         :param control_mode: "auto" or "manual"
         """
+        self.model = model
         self.memory = None
         self.hexa_memory = None
         self.internal_hexa_grid = None
@@ -36,6 +38,7 @@ class SynthesizerUserContext(SynthesizerUserInteraction):
         self.MANUAL_MODE = "manual"
         self.current_mode = self.AUTOMATIC_MODE
         self.known_obstacles = []
+        self.obstacle_to_find = None
 
     def set_mode(self, mode):
         """AUTOMATIC : synthesizer use the known context
@@ -94,7 +97,40 @@ class SynthesizerUserContext(SynthesizerUserInteraction):
         # If there is, command the robot to scan in the direction of the obstacle
         # if we find it : nice
         # if we don't find it : we need to change the associations TODO
-        a = 1
+        robot_angle = self.hexa_memory.robot_angle
+        scan_dist = SCAN_DISTANCE
+        robot_pos_x = self.hexa_memory.robot_pos_x
+        robot_pos_y = self.hexa_memory.robot_pos_y
+        angle_calcul = math.radians(90+ robot_angle)
+        x_1 = math.cos(angle_calcul) * scan_dist
+        y_1= math.sin(angle_calcul) * scan_dist
+        line_slope = (y_1-robot_pos_y)/(x_1-robot_pos_x)
+        line_intercept = robot_pos_y - line_slope * robot_pos_x
+        sign_changer = 1 if robot_angle >= 0 else -1
+
+        for obstacle in known_obstacles:
+            if obstacle not in dict_association.values():
+                # we figure out if the obstacle should be scannable by the robot
+                # for that it need to meet two conditions :
+                # Be above the line formed by the robot pos and the point x1,y1 which is
+                # the point at scan_dsitance from the robot with an angle of robot_angle+90
+                # If robot_angle > 0, else below it
+                # And be at a distance under scan_distance from the robot
+
+                # first condition
+                first_condition_met = line_slope * obstacle[0] + line_intercept > obstacle[1] * sign_changer
+                # second condition
+                second_condition_met = math.sqrt((obstacle[0]-robot_pos_x)**2 + (obstacle[1]-robot_pos_y)**2) < scan_dist
+                if first_condition_met and second_condition_met:
+                    # we can scan in the direction of the obstacle
+                # TODO TODO TODO Command robot to tell to scan in the direction of the obstacle1    
+                    """blabla lance l'action"""
+                    self.model.intended_interaction = "TODO" #TODO
+                    self.model.f_agent_action_ready = True
+                    self.synthetizing_step = 3
+                    self.obstacle_to_find = obstacle
+
+ 
 
         # Third_step : Look for the position of the robot that match the best
         # the distance computed in dict_association
@@ -115,3 +151,6 @@ class SynthesizerUserContext(SynthesizerUserInteraction):
                     self.decided_cells.append(cell)
                     self.indecisive_cells.remove(cell)
 
+
+    def get_enacted_interaction_and_verify_it(self,enacted_interaction):
+        """"""
