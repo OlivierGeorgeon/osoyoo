@@ -65,13 +65,20 @@ if __name__ == "__main__":
         if robot_controller.enact_step == 2:
             # Update the egocentric memory window
             enacted_interaction = robot_controller.translate_robot_data()
+            workspace.enacted_interaction = enacted_interaction
             if enacted_interaction["status"] != "T":
                 ego_controller.update_model(enacted_interaction)
                 robot_controller.send_position_change_to_memory()
                 robot_controller.send_position_change_to_hexa_memory()
                 robot_controller.send_phenom_info_to_memory()
                 ctrl_hexaview.main(0.1)
+                if len(workspace.hexa_memory.cells_changed_recently) > 0:
+                    ctrl_hexaview.hexaview.extract_and_convert_recently_changed_cells(workspace.hexa_memory)
+                    workspace.hexa_memory.cells_changed_recently = []
+
                 ctrl_synthe.main(0.1)
+                workspace.synthesizer.synthetize()
+
                 # ctrl_hexaview.extract_and_convert_interactions(workspace.hexa_memory)
             robot_controller.enact_step = 0
 
