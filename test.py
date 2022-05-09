@@ -11,7 +11,7 @@ ctrl_robot = CtrlRobot(model, robot_ip)
 ctrl_view = CtrlView(model)
 ctrl_hexaview = CtrlHexaview(model)
 ctrl_synthe = CtrlSynthe(model)
-
+model.synthesizer.mode = "automatic"
 def mains(dt):
     """blabla"""
     ctrl_robot.main(dt)

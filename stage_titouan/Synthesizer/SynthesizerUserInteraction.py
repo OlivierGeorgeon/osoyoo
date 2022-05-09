@@ -111,7 +111,9 @@ class SynthesizerUserInteraction :
                         if len(cell.interactions) > 0 :
                             self.hexa_memory.grid[i][j].interactions.append(cell.interactions[-1])
                 else : 
-                    self.decided_cells.append(((i,j), intern_status))
+                    if intern_status not in ["Free", current_status]  : 
+                        self.decided_cells.append(((i,j), intern_status))
+                        print ("decided \n AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA \n \n" ,self.decided_cells)
         self.synthetizing_step = 2 if not self.synthetizing_step==1 else 1 # If self.synthetizing_step == 1 we need user decision
         #before synthetizing, so we stay in 1 else we can synthesize right away so we go in step 2
         self.need_user_action = self.synthetizing_step == 1
@@ -160,7 +162,8 @@ class SynthesizerUserInteraction :
                     self.indecisive_interactions.pop()
                     self.flag_no = False
                 else :
-                    self.hexa_memory.grid[cell[0]][cell[1]].interactions.append(self.indecisive_interactions.pop())
+                    if self.mode == MANUAL_MODE :
+                        self.hexa_memory.grid[cell[0]][cell[1]].interactions.append(self.indecisive_interactions.pop())
             if len (decision) == 3 :
                 cell,status,cell_to_wipe = decision
                 cell_to_wipe_x,cell_to_wipe_y = cell_to_wipe
