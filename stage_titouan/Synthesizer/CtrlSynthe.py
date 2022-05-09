@@ -29,8 +29,11 @@ class CtrlSynthe():
                 model.need_user_action = False
                 model.f_ready_for_hex_refresh = True
 
+        elif synthe.synthetizing_step == 3 : # CASE OF SYNTHE CONTEXT, when the synthe has commanded the roboto
+            """a"""
         if synthe.synthetizing_step == 2 :
             synthe.synthetize()
             synthe.synthetizing_step = 0
             model.f_ready_for_next_loop = True
 
+        

@@ -36,3 +36,6 @@ if ROBOT_ID == 4:
     FORWARD_SPEED = 120     # (mm/s) Forward translation speed.
     RETREAT_DISTANCE = 70   # (mm) Distance of the line after retreat
 
+
+
+SCAN_DISTANCE = 800
