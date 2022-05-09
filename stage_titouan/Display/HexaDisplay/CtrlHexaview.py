@@ -46,25 +46,28 @@ class CtrlHexaview:
         hemw.on_text = on_text_hemw
 
         def on_mouse_press_hemw(x, y, button, modifiers):
-            """ Computing the position of the mouse click in the hexagrid  """
-            # Compute the position relative to the center in mm
-            cell_x, cell_y = self.hexaview.cell_from_screen_coordinate(x, y)
-            print("Cell press:", cell_x, ",", cell_y)
-            if model.need_user_action:
-                # self.hexaview.mouse_press_x = int((x - self.hexaview.width/2)*self.hexaview.zoom_level*2)
-                # self.hexaview.mouse_press_y = int((y - self.hexaview.height/2)*self.hexaview.zoom_level*2)
-                # print(self.hexaview.mouse_press_x, self.hexaview.mouse_press_y)
-                # cell_x, cell_y = model.hexa_memory.convert_pos_in_cell(self.hexaview.mouse_press_x, self.hexaview.mouse_press_y)
-                model.user_action = 'click',(cell_x,cell_y)
-                model.f_user_action_ready = True
-                self.react_to_user_interaction()
-            # else:
-            #     self.mouse_x = int((x - self.hexaview.width/2)*hemw.zoom_level*2)
-            #     self.mouse_y = int((y - self.hexaview.height/2)*hemw.zoom_level*2)
-            #     print(self.mouse_x, self.mouse_y)
-
-        self.hexaview.on_mouse_press = on_mouse_press_hemw
-
+                """ Computing the position of the mouse click in the hexagrid  """
+                # Compute the position relative to the center in mm
+                if model.need_user_action and not model.f_agent_action_ready:
+                    self.hexaview.mouse_press_x = int((x - self.hexaview.width/2)*self.hexaview.zoom_level*2)
+                    self.hexaview.mouse_press_y = int((y - self.hexaview.height/2)*self.hexaview.zoom_level*2)
+                    print(self.hexaview.mouse_press_x, self.hexaview.mouse_press_y)
+                    cell_x, cell_y = model.hexa_memory.convert_pos_in_cell(self.hexaview.mouse_press_x, self.hexaview.mouse_press_y)
+                    model.user_action = 'click',(cell_x,cell_y)
+                    model.f_user_action_ready = True
+                    self.react_to_user_interaction()
+                else :
+                    self.mouse_x = int((x - hemw.width/2)*hemw.zoom_level*2)
+                    self.mouse_y = int((y - hemw.height/2)*hemw.zoom_level*2)
+        hemw.on_mouse_press = on_mouse_press_hemw
+        @hemw.event
+        def on_mouse_motion(x, y, dx, dy):
+            mouse_x = int((x - hemw.width/2)*hemw.zoom_level*2)
+            mouse_y = int((y - hemw.height/2)*hemw.zoom_level*2)
+            # Find the cell
+            cell_x, cell_y = model.hexa_memory.convert_pos_in_cell(mouse_x, mouse_y)
+            hemw.label.text = "Cell: " + str(cell_x) + ", " + str(cell_y) + " Mouse: " + str(mouse_x) + ", " + str(mouse_y)
+    
     def main(self,dt):
         """blalbla"""
         if self.model.f_reset_flag :

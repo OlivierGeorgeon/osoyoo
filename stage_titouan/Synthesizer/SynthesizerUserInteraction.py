@@ -110,6 +110,8 @@ class SynthesizerUserInteraction :
                     else :
                         if len(cell.interactions) > 0 :
                             self.hexa_memory.grid[i][j].interactions.append(cell.interactions[-1])
+                else : 
+                    self.decided_cells.append(((i,j), intern_status))
         self.synthetizing_step = 2 if not self.synthetizing_step==1 else 1 # If self.synthetizing_step == 1 we need user decision
         #before synthetizing, so we stay in 1 else we can synthesize right away so we go in step 2
         self.need_user_action = self.synthetizing_step == 1
