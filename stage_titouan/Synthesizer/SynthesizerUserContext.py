@@ -125,7 +125,10 @@ class SynthesizerUserContext(SynthesizerUserInteraction):
                     # we can scan in the direction of the obstacle
                 # TODO TODO TODO Command robot to tell to scan in the direction of the obstacle1    
                     """blabla lance l'action"""
-                    self.model.intended_interaction = "TODO" #TODO
+                    angle_to_look = 0 # TODO compute it
+                    self.model.intended_interaction["action"] = "+"
+                    self.model.intended_interaction["focus_x"] = 0 #TODO
+                    self.model.intended_interaction["focus_y"] = 0 #TODO
                     self.model.f_agent_action_ready = True
                     self.synthetizing_step = 3
                     self.obstacle_to_find = obstacle
