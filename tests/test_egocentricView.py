@@ -22,17 +22,14 @@ if __name__ == "__main__":
     print("Sending to: " + ip)
 
     workspace = Workspace()
-    robot_controller = CtrlRobot(workspace, ip)
-    ego_controller = CtrlView(workspace)
-    ego_view = ego_controller.view
+    ctrl_robot = CtrlRobot(workspace, ip)
+    ctrl_view = CtrlView(workspace)
+    ego_view = ctrl_view.view
     agent = Agent5()
     ctrl_hexaview = CtrlHexaview(workspace)
+    ctrl_hexaview.hexaview.extract_and_convert_interactions(workspace.hexa_memory)
     ctrl_synthe = CtrlSynthe(workspace)
     workspace.synthesizer.mode = 'automatic'
-
-    # synthesizer = CtrlSynthe(workspace)
-    # controller = CtrlRobot(agent, memory, ip, view=ego_view, synthesizer = synthesizer, hexa_memory = hexa_memory, hexaview = hexaview)
-    # controller.hexaview.extract_and_convert_interactions(controller.hexa_memory)
 
     @ego_view.event
     def on_text(text):
@@ -45,10 +42,10 @@ if __name__ == "__main__":
             print("Control mode: MANUAL")
 
         if control_mode == CONTROL_MODE_MANUAL:
-            if robot_controller.enact_step == 0:
-                intended_interaction = {'action': text, 'angle': ego_controller.mouse_press_angle}
+            if ctrl_robot.enact_step == 0:
+                intended_interaction = {'action': text, 'angle': ctrl_view.mouse_press_angle}
                 # workspace.intended_interaction = intended_interaction
-                focus = ego_controller.get_focus_phenomenon()
+                focus = ctrl_view.get_focus_phenomenon()
                 if focus:
                     intended_interaction['focus_x'] = int(focus.x)
                     intended_interaction['focus_y'] = int(focus.y)
@@ -56,36 +53,44 @@ if __name__ == "__main__":
                         intended_interaction['speed'] = FORWARD_SPEED
                     if text in ['4', '6']:
                         intended_interaction['speed'] = LATERAL_SPEED
-                robot_controller.command_robot(intended_interaction)
+                ctrl_robot.command_robot(intended_interaction)
             else:
                 print("Waiting for previous outcome before sending new action")
 
     def main_loop(dt):
         """ Watch for the end of the previous interaction and choose the next """
-        if robot_controller.enact_step == 2:
+        if ctrl_robot.enact_step == 2:
             # Update the egocentric memory window
-            enacted_interaction = robot_controller.translate_robot_data()
+            enacted_interaction = ctrl_robot.translate_robot_data()
             workspace.enacted_interaction = enacted_interaction
+            ctrl_robot.enact_step = 0
             if enacted_interaction["status"] != "T":
-                ego_controller.update_model(enacted_interaction)
-                robot_controller.send_position_change_to_memory()
-                robot_controller.send_position_change_to_hexa_memory()
-                robot_controller.send_phenom_info_to_memory()
-                ctrl_hexaview.main(0.1)
+                ctrl_view.update_model(enacted_interaction)
+                ctrl_robot.send_position_change_to_memory()
+                ctrl_robot.send_position_change_to_hexa_memory()
+                ctrl_robot.send_phenom_info_to_memory()
+                # ctrl_robot.main(0.1)
+                # ctrl_view.main(0.1)
+
+                workspace.synthesizer.act()  # prend les interactions qui n'ont pas été traitées dans memory
+                    # treat_echo trouve l'echo centré dans l'echo array
+                    # project_interactions_on_internal_hexagrid
+                    # comparison_step prend la derniere interaction dans internal grid et crée hexagrid
+                workspace.synthesizer.synthetize()  # c'est le moment ou on met à jour hexamemory
+
+                #ctrl_hexaview.main(0.1)
                 if len(workspace.hexa_memory.cells_changed_recently) > 0:
                     ctrl_hexaview.hexaview.extract_and_convert_recently_changed_cells(workspace.hexa_memory)
                     workspace.hexa_memory.cells_changed_recently = []
 
-                ctrl_synthe.main(0.1)
-                workspace.synthesizer.synthetize()
-
+                # ctrl_synthe.main(0.1)
                 # ctrl_hexaview.extract_and_convert_interactions(workspace.hexa_memory)
-            robot_controller.enact_step = 0
+            ctrl_robot.enact_step = 0
 
         if control_mode == CONTROL_MODE_AUTOMATIC:
-            if robot_controller.enact_step == 0:
+            if ctrl_robot.enact_step == 0:
                 # Construct the outcome expected by Agent5
-                enacted_interaction = robot_controller.translate_robot_data()
+                enacted_interaction = ctrl_robot.translate_robot_data()
                 outcome = 0
                 if 'floor' in enacted_interaction:
                     outcome = int(enacted_interaction['floor'])
@@ -96,7 +101,7 @@ if __name__ == "__main__":
                 # Choose the next action
                 action = agent.action(outcome)
                 intended_interaction = {'action': ['8', '1', '3'][action]}
-                robot_controller.command_robot(intended_interaction)
+                ctrl_robot.command_robot(intended_interaction)
 
     # Schedule the main loop that updates the agent
     pyglet.clock.schedule_interval(main_loop, 0.1)
