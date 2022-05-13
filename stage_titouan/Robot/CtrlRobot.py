@@ -1,0 +1,208 @@
+#from stage_titouan import *
+import json
+from stage_titouan.Robot.RobotDefine import *
+from stage_titouan.Robot.WifiInterface import WifiInterface
+from stage_titouan.Memory.EgocentricMemory.Interactions.Interaction import *
+import threading
+from pyrr import matrix44
+import math
+
+
+class CtrlRobot():
+    """Blabla"""
+
+    def __init__(self,model,robot_ip):
+        self.model = model
+
+        self.wifiInterface = WifiInterface(robot_ip)
+
+        # self.points_of_interest = []
+        # self.action = ""
+
+        self.intended_interaction = {'action': "8"}  # Need random initialization
+
+        self.enact_step = 0
+        self.outcome_bytes = b'{"status":"T"}'  # Default status T timeout
+        self.azimuth = 0
+
+        self.robot_has_started_acting = False
+        self.robot_has_finished_acting = False
+        self.enacted_interaction = {}
+
+    def main(self,dt):
+        """Blabla"""
+        if self.enact_step == 2:
+            self.robot_has_started_acting = False
+            self.robot_has_finished_acting =True
+            self.enact_step = 0
+        if self.robot_has_finished_acting:
+            self.robot_has_finished_acting = False
+            self.enacted_interaction = self.translate_robot_data()
+            self.model.enacted_interaction = self.enacted_interaction
+            if self.enacted_interaction["status"] != "T":
+                self.send_position_change_to_memory()
+                self.send_position_change_to_hexa_memory()
+                self.send_phenom_info_to_memory()
+                self.model.f_memory_changed = True
+                self.model.f_hexmem_changed = True
+                self.model.f_new_things_in_memory = True
+        elif not self.robot_has_started_acting and self.model.f_agent_action_ready :
+            self.model.f_reset_flag = False
+            self.model.f_agent_action_ready = False
+            #self.action = self.model.agent_action
+            self.intended_interaction = self.model.intended_interaction
+            self.command_robot(self.intended_interaction)
+            self.model.f_ready_for_next_loop = False
+            self.robot_has_started_acting = True
+
+    def send_phenom_info_to_memory(self):
+        """Send Enacted Interaction to Memory
+        """
+        # phenom_info = self.enacted_interaction['phenom_info']
+        echo_array = self.enacted_interaction['echo_array']
+        if self.model.memory is not None:
+            self.model.memory.add_enacted_interaction(self.enacted_interaction)  # Added by Olivier 08/05/2022
+            # self.model.memory.add(phenom_info)
+            self.model.memory.add_echo_array(echo_array)
+
+    def send_position_change_to_memory(self):
+        """Send position changes (angle,distance) to the Memory
+        """
+        if self.model.memory is not None :
+            self.model.memory.move(self.enacted_interaction['yaw'], self.enacted_interaction['translation'])
+
+    def send_position_change_to_hexa_memory(self):
+        """Apply movement to hexamem"""
+        if self.model.hexa_memory is not None:
+            self.model.hexa_memory.azimuth = self.enacted_interaction['azimuth']
+            self.model.hexa_memory.move(self.enacted_interaction['yaw'], self.enacted_interaction['translation'][0], self.enacted_interaction['translation'][1])
+
+    def translate_robot_data(self):
+        """ Computes the enacted interaction from the robot's outcome data """
+        action = self.intended_interaction['action']
+        is_focussed = ('focus_x' in self.intended_interaction)
+        enacted_interaction = json.loads(self.outcome_bytes)
+        enacted_interaction['points'] = []
+
+        # If timeout then no update
+        if enacted_interaction['status'] == "T":
+            return enacted_interaction
+
+        # Presupposed displacement of the robot relative to the environment
+        translation, yaw = [0, 0], 0
+        if action == "1":
+            yaw = DEFAULT_YAW
+        if action == "2":
+            translation[0] = -FORWARD_SPEED * enacted_interaction['duration1'] / 1000
+        if action == "3":
+            yaw = -DEFAULT_YAW
+        if action == "4":
+            translation[1] = LATERAL_SPEED * enacted_interaction['duration1'] / 1000
+        if action == "6":
+            translation[1] = -LATERAL_SPEED * enacted_interaction['duration1'] / 1000
+        if action == "8":
+            translation[0] = FORWARD_SPEED * enacted_interaction['duration1'] / 1000
+
+        # If the robot returns yaw then use it
+        if 'yaw' in enacted_interaction:
+            yaw = enacted_interaction['yaw']
+        else:
+            enacted_interaction['yaw'] = yaw
+
+        # If the robot does not return the azimuth then sum it from the yaw
+        if 'azimuth' not in enacted_interaction:
+            self.azimuth -= yaw
+            enacted_interaction['azimuth'] = self.azimuth
+
+        # If the robot returns compass_x and compass_y then recompute the azimuth
+        if 'compass_x' in enacted_interaction:
+            # Subtract the offset from robot_define.py
+            enacted_interaction['compass_x'] -= COMPASS_X_OFFSET
+            enacted_interaction['compass_y'] -= COMPASS_Y_OFFSET
+            self.azimuth = math.degrees(math.atan2(enacted_interaction['compass_y'], enacted_interaction['compass_x']))
+            self.azimuth += 180;
+            if self.azimuth >= 360:
+                self.azimuth -= 360
+            # Override the azimuth returned by the robot
+            enacted_interaction['azimuth'] = int(self.azimuth)
+            print("compass_x", enacted_interaction['compass_x'], "compass_y", enacted_interaction['compass_y'], "azimuth", int(self.azimuth))
+
+        # Interaction trespassing
+        if enacted_interaction['floor'] > 0:
+            enacted_interaction['points'].append((INTERACTION_TRESPASSING, LINE_X, 0))
+            # The resulting translation
+            translation[0] -= RETREAT_DISTANCE
+            if enacted_interaction['floor'] == 0b01:  # Black line on the right
+                translation[1] = RETREAT_DISTANCE_Y
+            if enacted_interaction['floor'] == 0b10:  # Black line on the left
+                translation[1] = -RETREAT_DISTANCE_Y
+
+        # Interaction ECHO for actions involving scanning
+        if action in ['-', '*', '+', '8', '2', '1', '3', '4', '6']:
+            if enacted_interaction['echo_distance'] < 10000:
+                x = int(ROBOT_HEAD_X + math.cos(math.radians(enacted_interaction['head_angle'])) * enacted_interaction['echo_distance'])
+                y = int(math.sin(math.radians(enacted_interaction['head_angle'])) * enacted_interaction['echo_distance'])
+                enacted_interaction['points'].append((INTERACTION_ECHO, x, y))
+                if is_focussed:
+                    print("Estimated speed x:", self.intended_interaction['focus_x'] - x, "mm/s, y:",
+                          self.intended_interaction['focus_y'] - y, "mm/s")
+
+        # Interaction shock
+        if 'shock' in enacted_interaction and action == '8':
+            if enacted_interaction['shock'] == 0b01:  # Shock on the right
+                enacted_interaction['points'].append((INTERACTION_SHOCK, ROBOT_FRONT_X, -ROBOT_FRONT_Y))
+            if enacted_interaction['shock'] == 0b11:  # Shock on the front
+                enacted_interaction['points'].append((INTERACTION_SHOCK, ROBOT_FRONT_X, 0))
+            if enacted_interaction['shock'] == 0b10:  # Shock on the left
+                enacted_interaction['points'].append((INTERACTION_SHOCK, ROBOT_FRONT_X, ROBOT_FRONT_Y))
+
+        # Interaction block
+        if 'blocked' in enacted_interaction and action == '8':
+            if enacted_interaction['blocked']:
+                enacted_interaction['points'].append((INTERACTION_BLOCK, ROBOT_FRONT_X, 0))
+                translation[0] = 0  # Cancel forward translation
+
+        # The displacement of the environment relative to the robot caused by this interaction
+        enacted_interaction['translation'] = translation
+        translation_matrix = matrix44.create_from_translation([-translation[0], -translation[1], 0])
+        rotation_matrix = matrix44.create_from_z_rotation(math.radians(yaw))
+        enacted_interaction['displacement_matrix'] = matrix44.multiply(rotation_matrix, translation_matrix)
+
+        # The echo array
+        enacted_interaction["echo_array"] = [] if not "echo_array" in enacted_interaction.keys() else enacted_interaction["echo_array"]
+        for i in range(100,-99,-5):
+                    edstr = "ed"+str(i)
+
+                    if edstr in enacted_interaction:
+                        ha =i
+                        ed = enacted_interaction[edstr]
+                        tmp_x = ROBOT_HEAD_X + math.cos(math.radians(ha)) * ed
+                        tmp_y = math.sin(math.radians(ha)) * ed
+                        enacted_interaction['echo_array'].append((tmp_x, tmp_y))
+
+        print("Enacted interaction apres translate robot data : ", enacted_interaction)
+        self.enacted_interaction = enacted_interaction
+        return enacted_interaction
+
+    def command_robot(self, intended_interaction):
+        """ Creating an asynchronous thread to send the command to the robot and to wait for the outcome """
+        self.outcome_bytes = "Waiting"
+
+        def enact_thread():
+            """ Sending the command to the robot and waiting for the outcome """
+            action_string = json.dumps(self.intended_interaction)
+            print("Sending: " + action_string)
+            self.outcome_bytes = self.wifiInterface.enact(action_string)
+            print("Receive: ", end="")
+            print(self.outcome_bytes)
+            self.enact_step = 2  # Now we have received the outcome from the robot
+
+        # self.action = action
+        self.intended_interaction = intended_interaction
+        self.enact_step = 1  # Now we send the command to the robot for enaction
+        thread = threading.Thread(target=enact_thread)
+        thread.start()
+        # print(intended_interaction)
+        # Cas d'actions particulières :
+        if intended_interaction["action"] == "r":
+            self.model.action_reset()

@@ -1,33 +1,22 @@
-from . Controllers.ControllerNew import ControllerNew
-from . Controllers.ControllerUserAction import ControllerUserAction
-from . Controllers.ControllerUserActionV2 import ControllerUserActionV2
-from . Controllers.EgoController import EgoController
-from . Controllers.RobotController import RobotController
-
+from . Memory import *
+from . Memory.EgocentricMemory.Interactions import Interaction
 from . Misc.Utils import *
-from . Misc.Resources import *
-from . Misc.WifiInterface import WifiInterface
+import pyglet
 
-from . Model.Agents.Agent5 import Agent5
-from . Model.Agents.Agent6 import Agent6
-from . Model.Agents.AgentAlignNorth import AgentAlignNorth
-from . Model.Agents.AgentRandom import AgentRandom
-from . Model.Agents.AgentSwing import AgentSwing
+from . Display.EgocentricDisplay.CtrlView import CtrlView
+from . Display.EgocentricDisplay.EgocentricView import EgocentricView
+from . Display.HexaDisplay.HexaView import HexaView
+from . Display.HexaDisplay.CtrlHexaview import CtrlHexaview
 
-from . Model.Hexamemories.HexaCell import HexaCell
-from . Model.Hexamemories.HexaMemory import HexaMemory
-from . Model.Hexamemories.HexaGrid import HexaGrid
+from . Memory.EgocentricMemory.MemoryV1 import MemoryV1
+from . Memory.HexaMemory.HexaMemory import HexaMemory
 
-from . Model.Interactions.Interaction import *
 
-from . Model.Memories.MemoryNew import MemoryNew
-from . Model.Memories.MemoryV1 import MemoryV1
+from . Robot.CtrlRobot import CtrlRobot
 
-from . Model.Synthesizers.Synthesizer import Synthesizer
-from . Model.Synthesizers.SynthesizerUserInteraction import SynthesizerUserInteraction
-from . Model.Synthesizers.SynthesizerUserInteractionV2 import SynthesizerUserInteractionV2
+from . Synthesizer.SynthesizerUserInteraction import SynthesizerUserInteraction
+from . Synthesizer.SynthesizerUserContext import SynthesizerUserContext
+from . Synthesizer.CtrlSynthe import CtrlSynthe
 
-from . Views.OsoyooCar import OsoyooCar
-from . Views.EgocentricView import EgocentricView
-from . Views.HexaView import HexaView
-from . Views.PointOfInterest import *
+from . Workspace import Workspace
+
