@@ -147,6 +147,7 @@ class CtrlRobot():
                     print("Estimated speed x:", self.intended_interaction['focus_x'] - x, "mm/s, y:",
                           self.intended_interaction['focus_y'] - y, "mm/s")
 
+
         # Interaction shock
         if 'shock' in enacted_interaction and action == '8':
             if enacted_interaction['shock'] == 0b01:  # Shock on the right

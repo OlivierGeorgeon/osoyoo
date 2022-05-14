@@ -13,19 +13,20 @@
 #define Echo_PIN    31  // Ultrasonic Echo pin connect to A5
 #define Trig_PIN    30  // Ultrasonic Trig pin connect to A4
 
-#define SACCADE_DURATION 150      // 150 Servo specification speed is 120ms/60°
-// #define SACCADE_SPAN 5           // 5°: good for complete-scan but bad for auto-alignment
-#define SACCADE_SPAN 10           // 10° good for auto-alignment
-#define ECHO_MONITOR_PERIOD 500   // The period for checking whether to trigger head alignment
-#define ECHO_MONITOR_VARIATION 50 // the measure threshold to trigger head alignment
+#define SACCADE_DURATION 150      // (ms) Servo specification speed is 120ms/60°
+#define ALIGN_SACCADE_SPAN 10     // (degrees)
+#define SCAN_SACCADE_SPAN 40      // (degrees) For full scan followed by head alignment
+// #define SCAN_SACCADE_SPAN 10   // (degrees) For complete-scan
+#define ECHO_MONITOR_PERIOD 500   // (ms) The period for checking whether to trigger head alignment
+#define ECHO_MONITOR_VARIATION 50 // (mm) The measure threshold to trigger head alignment
 
 struct significant_array {
         // Struct to store the angles and the corresponding measures,
         // and booleans to indicate if the measure are significant
-        int distances[180/SACCADE_SPAN]{0};
-        int angles[180/SACCADE_SPAN]{0};
-        bool sign[180/SACCADE_SPAN]{false};
-        int size = 180/SACCADE_SPAN;
+        int distances[180/SCAN_SACCADE_SPAN]{0};
+        int angles[180/SCAN_SACCADE_SPAN]{0};
+        bool sign[180/SCAN_SACCADE_SPAN]{false};
+        int size = 180/SCAN_SACCADE_SPAN;
     };
 class Head_echo_alignment
 {

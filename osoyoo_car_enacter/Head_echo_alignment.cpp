@@ -18,7 +18,7 @@ Head_echo_alignment::Head_echo_alignment()
   _min_ultrasonic_measure = 0;
   _next_saccade_time = 0;
   _head_angle = 0;
-  _head_angle_span = SACCADE_SPAN;
+  _head_angle_span = ALIGN_SACCADE_SPAN;
   _sign_array = significant_array();
   _current_index = 0;
 }
@@ -33,7 +33,7 @@ void Head_echo_alignment::setup()
   _head.attach(ROBOT_SERVO_PIN);
   turnHead(0); // Head straight ahead
   //Serial.println("HEA initialized");
-  _head_angle_span = SACCADE_SPAN;
+  _head_angle_span = ALIGN_SACCADE_SPAN;
 }
 
 void Head_echo_alignment::beginEchoAlignment()
@@ -53,12 +53,12 @@ void Head_echo_alignment::beginEchoScan()
   _min_ultrasonic_measure = 10000;
   if (_head_angle > 0) {
     // If head is to the left, start from 90° and scan every 20° clockwise
-    _angle_min_ultrasonic_measure = 90;
-    _head_angle_span = -SACCADE_SPAN * 2; // saccade 20°
+    _angle_min_ultrasonic_measure = 80;
+    _head_angle_span = -SCAN_SACCADE_SPAN ;//-SACCADE_SPAN * 2;
   } else {
     // If head is to the right, start from -90° and scan every 20° counterclockwise
-    _angle_min_ultrasonic_measure = -90;
-    _head_angle_span = SACCADE_SPAN * 2;
+    _angle_min_ultrasonic_measure = -80;
+    _head_angle_span = SCAN_SACCADE_SPAN; //SACCADE_SPAN * 2;
   }
   turnHead(_angle_min_ultrasonic_measure); // Start the scan right away
   _next_saccade_time = millis() + SACCADE_DURATION;
@@ -92,8 +92,8 @@ void Head_echo_alignment::update()
           } else
           // First step on the limit angle: apply the saccade towards the center
           {
-            _head_angle_span = SACCADE_SPAN;
-            if (_head_angle >= 90) {_head_angle_span = -SACCADE_SPAN;}
+            _head_angle_span = ALIGN_SACCADE_SPAN;
+            if (_head_angle >= 90) {_head_angle_span = -ALIGN_SACCADE_SPAN;}
             _head_angle += _head_angle_span;
             turnHead(_head_angle);
           }
@@ -138,7 +138,7 @@ void Head_echo_alignment::update()
         _is_enacting_echo_scan = false;
         _head_angle  = _angle_min_ultrasonic_measure;
         // turnHead(_angle_min_ultrasonic_measure);
-        _head_angle_span = SACCADE_SPAN;  // reset saccade span to normal
+        _head_angle_span = ALIGN_SACCADE_SPAN;  // reset saccade span for alignment
         Serial.println("Scan aligned at angle: " + String(_head_angle) + ", measure: " + String(_min_ultrasonic_measure));
         _next_saccade_time = millis() + ECHO_MONITOR_PERIOD; // Wait before monitoring again
       }

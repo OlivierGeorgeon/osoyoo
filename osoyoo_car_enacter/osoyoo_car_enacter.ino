@@ -258,7 +258,7 @@ void loop()
           break;
         case ACTION_ECHO_SCAN:
           HEA.beginEchoScan();
-          action_end_time = millis() + 5000;
+          action_end_time = millis() + 2000;
           break;
 
         /*case ACTION_ECHO_COMPLETE:
@@ -466,7 +466,6 @@ void loop()
         }
         break;
       case ACTION_ALIGN_HEAD:
-      case ACTION_ECHO_SCAN:
       /*case ACTION_ECHO_COMPLETE:
         if(!HECS._is_enacting_echo_scan){
           action_end_time = 0;
@@ -476,6 +475,15 @@ void loop()
       case ACTION_SCAN_DIRECTION:
         if (!HEA._is_enacting_head_alignment && !HEA._is_enacting_echo_scan)
         {
+          duration1 = millis()- action_start_time;
+          action_end_time = 0;
+          interaction_step = 2;
+        }
+        break;
+      case ACTION_ECHO_SCAN:
+        if (!HEA._is_enacting_echo_scan)
+        {
+          if (!HEA._is_enacting_head_alignment) {HEA.beginEchoAlignment();}  // Force HEA
           duration1 = millis()- action_start_time;
           action_end_time = 0;
           interaction_step = 2;

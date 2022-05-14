@@ -87,6 +87,10 @@ if __name__ == "__main__":
                 # ctrl_hexaview.extract_and_convert_interactions(workspace.hexa_memory)
             ctrl_robot.enact_step = 0
 
+            #if 'focus_x' in ctrl_robot.intended_interaction:
+            #    focus = ctrl_view.get_focus_phenomenon()
+            #33    focus.x = ctrl_robot.enacted_interaction.
+
         if control_mode == CONTROL_MODE_AUTOMATIC:
             if ctrl_robot.enact_step == 0:
                 # Construct the outcome expected by Agent5
