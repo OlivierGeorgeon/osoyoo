@@ -49,10 +49,14 @@ if __name__ == "__main__":
                 if focus:
                     intended_interaction['focus_x'] = int(focus.x)
                     intended_interaction['focus_y'] = int(focus.y)
-                    if text in ['8', '2']:
-                        intended_interaction['speed'] = FORWARD_SPEED
-                    if text in ['4', '6']:
-                        intended_interaction['speed'] = LATERAL_SPEED
+                    if text in ['8']:
+                        intended_interaction['speed'] = int(ctrl_robot.forward_speed[0])
+                    if text in ['2']:
+                        intended_interaction['speed'] = -int(ctrl_robot.backward_speed[0])
+                    if text in ['4']:
+                        intended_interaction['speed'] = int(ctrl_robot.leftward_speed[1])
+                    if text in ['6']:
+                        intended_interaction['speed'] = -int(ctrl_robot.rightward_speed[1])
                 ctrl_robot.command_robot(intended_interaction)
             else:
                 print("Waiting for previous outcome before sending new action")

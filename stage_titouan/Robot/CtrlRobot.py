@@ -1,11 +1,11 @@
-#from stage_titouan import *
 import json
+import math
+import numpy
+import threading
+from pyrr import matrix44
 from stage_titouan.Robot.RobotDefine import *
 from stage_titouan.Robot.WifiInterface import WifiInterface
 from stage_titouan.Memory.EgocentricMemory.Interactions.Interaction import *
-import threading
-from pyrr import matrix44
-import math
 
 
 class CtrlRobot():
@@ -16,9 +16,6 @@ class CtrlRobot():
 
         self.wifiInterface = WifiInterface(robot_ip)
 
-        # self.points_of_interest = []
-        # self.action = ""
-
         self.intended_interaction = {'action': "8"}  # Need random initialization
 
         self.enact_step = 0
@@ -28,12 +25,16 @@ class CtrlRobot():
         self.robot_has_started_acting = False
         self.robot_has_finished_acting = False
         self.enacted_interaction = {}
+        self.forward_speed = [FORWARD_SPEED, 0]
+        self.backward_speed = [-FORWARD_SPEED, 0]
+        self.leftward_speed = [0, LATERAL_SPEED]
+        self.rightward_speed = [0, -LATERAL_SPEED]
 
     def main(self,dt):
         """Blabla"""
         if self.enact_step == 2:
             self.robot_has_started_acting = False
-            self.robot_has_finished_acting =True
+            self.robot_has_finished_acting = True
             self.enact_step = 0
         if self.robot_has_finished_acting:
             self.robot_has_finished_acting = False
@@ -80,11 +81,11 @@ class CtrlRobot():
     def translate_robot_data(self):
         """ Computes the enacted interaction from the robot's outcome data """
         action = self.intended_interaction['action']
-        is_focussed = ('focus_x' in self.intended_interaction)
+        is_focussed = ('focus_x' in self.intended_interaction)  # The focus point was sent to the robot
         enacted_interaction = json.loads(self.outcome_bytes)
         enacted_interaction['points'] = []
 
-        # If timeout then no update
+        # If timeout then we consider that there was no enacted interaction
         if enacted_interaction['status'] == "T":
             return enacted_interaction
 
@@ -93,15 +94,19 @@ class CtrlRobot():
         if action == "1":
             yaw = DEFAULT_YAW
         if action == "2":
-            translation[0] = -FORWARD_SPEED * enacted_interaction['duration1'] / 1000
+            # translation = self.backward_speed * (enacted_interaction['duration1'] / 1000)
+            translation = [i * enacted_interaction['duration1'] / 1000 for i in self.backward_speed]
         if action == "3":
             yaw = -DEFAULT_YAW
         if action == "4":
-            translation[1] = LATERAL_SPEED * enacted_interaction['duration1'] / 1000
+            # translation = self.leftward_speed * (enacted_interaction['duration1'] / 1000)
+            translation = [i * enacted_interaction['duration1'] / 1000 for i in self.leftward_speed]
         if action == "6":
-            translation[1] = -LATERAL_SPEED * enacted_interaction['duration1'] / 1000
+            # translation = self.rightward_speed * (enacted_interaction['duration1'] / 1000)
+            translation = [i * enacted_interaction['duration1'] / 1000 for i in self.rightward_speed]
         if action == "8":
-            translation[0] = FORWARD_SPEED * enacted_interaction['duration1'] / 1000
+            # translation = self.forward_speed * (enacted_interaction['duration1'] / 1000)
+            translation = [i * enacted_interaction['duration1'] / 1000 for i in self.forward_speed]
 
         # If the robot returns yaw then use it
         if 'yaw' in enacted_interaction:
@@ -111,7 +116,7 @@ class CtrlRobot():
 
         # If the robot does not return the azimuth then sum it from the yaw
         if 'azimuth' not in enacted_interaction:
-            self.azimuth -= yaw
+            self.azimuth -= yaw  # yaw is counterclockwise, azimuth is clockwise
             enacted_interaction['azimuth'] = self.azimuth
 
         # If the robot returns compass_x and compass_y then recompute the azimuth
@@ -138,15 +143,14 @@ class CtrlRobot():
                 translation[1] = -RETREAT_DISTANCE_Y
 
         # Interaction ECHO for actions involving scanning
+        echo_xy = [0, 0]
         if action in ['-', '*', '+', '8', '2', '1', '3', '4', '6']:
             if enacted_interaction['echo_distance'] < 10000:
-                x = int(ROBOT_HEAD_X + math.cos(math.radians(enacted_interaction['head_angle'])) * enacted_interaction['echo_distance'])
-                y = int(math.sin(math.radians(enacted_interaction['head_angle'])) * enacted_interaction['echo_distance'])
-                enacted_interaction['points'].append((INTERACTION_ECHO, x, y))
-                if is_focussed:
-                    print("Estimated speed x:", self.intended_interaction['focus_x'] - x, "mm/s, y:",
-                          self.intended_interaction['focus_y'] - y, "mm/s")
-
+                echo_xy[0] = int(ROBOT_HEAD_X + math.cos(math.radians(enacted_interaction['head_angle']))
+                                 * enacted_interaction['echo_distance'])
+                echo_xy[1] = int(math.sin(math.radians(enacted_interaction['head_angle']))
+                                 * enacted_interaction['echo_distance'])
+                enacted_interaction['points'].append((INTERACTION_ECHO, *echo_xy))
 
         # Interaction shock
         if 'shock' in enacted_interaction and action == '8':
@@ -163,11 +167,46 @@ class CtrlRobot():
                 enacted_interaction['points'].append((INTERACTION_BLOCK, ROBOT_FRONT_X, 0))
                 translation[0] = 0  # Cancel forward translation
 
-        # The displacement of the environment relative to the robot caused by this interaction
-        enacted_interaction['translation'] = translation
+        # The estimated displacement of the environment relative to the robot caused by this interaction
         translation_matrix = matrix44.create_from_translation([-translation[0], -translation[1], 0])
         rotation_matrix = matrix44.create_from_z_rotation(math.radians(yaw))
-        enacted_interaction['displacement_matrix'] = matrix44.multiply(rotation_matrix, translation_matrix)
+        displacement_matrix = matrix44.multiply(rotation_matrix, translation_matrix)
+
+        # If focussed then adjust the displacement
+        if is_focussed:
+            # The new estimated position of the focus point
+            expected_focus_xy = matrix44.apply_to_vector(displacement_matrix,
+                                                         [self.intended_interaction['focus_x'],
+                                                          self.intended_interaction['focus_y'], 0])[0:2]
+            # The distance between the echo and the expected focus position
+            distance = int(math.dist(echo_xy, expected_focus_xy))
+            print("Distance between echo and focus:", distance)
+            if distance < 100:
+                additional_xy = expected_focus_xy - echo_xy
+                print("additional translation:", additional_xy)
+                # Adjust the displacement
+                translation += additional_xy
+                translation_matrix = matrix44.create_from_translation([-translation[0], -translation[1], 0])
+                displacement_matrix = matrix44.multiply(rotation_matrix, translation_matrix)
+                # Adjust the speed
+                if action == '8' and enacted_interaction['duration1'] >= 1000:
+                    self.forward_speed = (self.forward_speed + translation) / 2
+                    print("New forward speed:", self.forward_speed)
+                if action == '2' and enacted_interaction['duration1'] >= 1000:
+                    self.backward_speed = (self.backward_speed + translation) / 2
+                    print("New backward speed:", self.backward_speed)
+                if action == '4' and enacted_interaction['duration1'] >= 1000:
+                    self.leftward_speed = (self.leftward_speed + translation) / 2
+                    print("New leftward speed:", self.leftward_speed)
+                if action == '6' and enacted_interaction['duration1'] >= 1000:
+                    self.rightward_speed = (self.rightward_speed + translation) / 2
+                    print("New rightward speed:", self.rightward_speed)
+            else:
+                print("Lost focus with distance:", distance)
+
+        # Return the displacement
+        enacted_interaction['translation'] = translation
+        enacted_interaction['displacement_matrix'] = displacement_matrix
 
         # The echo array
         enacted_interaction["echo_array"] = [] if not "echo_array" in enacted_interaction.keys() else enacted_interaction["echo_array"]
