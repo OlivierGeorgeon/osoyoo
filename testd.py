@@ -1,7 +1,7 @@
 import sys
 from stage_titouan import *
 
-robot_ip = "192.168.8.189"
+robot_ip = "192.168.4.1"
 if len(sys.argv) > 1:
     robot_ip = sys.argv[1]
 print("Robot IP:", robot_ip)
@@ -21,5 +21,3 @@ def mains(dt):
 
 pyglet.clock.schedule_interval(mains,0.1)
 pyglet.app.run()
-
-"blabla test push"

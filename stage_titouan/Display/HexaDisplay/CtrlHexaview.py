@@ -43,6 +43,11 @@ class CtrlHexaview:
                         else:
                             message = "Waiting for previous outcome before sending new action" if model.enact_step != 0 else "Waiting for user action"
                             print(message)
+
+                if text.upper() == "O" :
+                    self.model.synthesizer.set_mode("automatic")
+                if text.upper() == "P" :
+                    self.model.synthesizer.set_mode("manual")
         hemw.on_text = on_text_hemw
 
         def on_mouse_press_hemw(x, y, button, modifiers):

@@ -200,19 +200,18 @@ class CtrlRobot():
 
 
 
-    def command_robot(self,action): #NOT TESTED
+    def command_robot(self, action):
         """ Creating an asynchronous thread to send the action to the robot and to wait for outcome """
         self.outcome_bytes = "Waiting"
+
         def enact_thread():
             """ Sending the action to the robot and waiting for outcome """
-            action_string = json.dumps({'action': self.model.agent_action, 'angle': self.model.action_angle})
+            action_string = json.dumps({'action': self.action, 'angle': self.action_angle})
             print("Sending: " + action_string)
             self.outcome_bytes = self.wifiInterface.enact(action_string)
             print("Receive ", end="")
             print(self.outcome_bytes)
             self.enact_step = 2
-            #print("Thread : enact_step = 2")
-            # self.watch_outcome()
 
         self.action = action
         self.enact_step = 1
@@ -221,4 +220,4 @@ class CtrlRobot():
 
         # Cas d'actions particulières :
         if action == "r":
-            self.model.action_reset()
+            self.action_reset()

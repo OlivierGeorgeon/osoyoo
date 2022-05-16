@@ -7,10 +7,12 @@ if len(sys.argv) > 1:
 print("Robot IP:", robot_ip)
 
 model = Workspace()
+model.synthesizer = SynthesizerUserContext(model.memory,model.hexa_memory,model)
 ctrl_robot = CtrlRobot(model, robot_ip)
 ctrl_view = CtrlView(model)
 ctrl_hexaview = CtrlHexaview(model)
 ctrl_synthe = CtrlSynthe(model)
+
 model.synthesizer.mode = "automatic"
 def mains(dt):
     """blabla"""
@@ -21,5 +23,3 @@ def mains(dt):
 
 pyglet.clock.schedule_interval(mains,0.1)
 pyglet.app.run()
-
-"blabla test push"

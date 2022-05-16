@@ -52,10 +52,10 @@ class SynthesizerUserInteraction :
         self.project_interactions_on_internal_hexagrid()
         self.comparison_step()
 
-    def treat_echos(self):
+    def treat_echos(self, interactions_list):
         """Find true position of the objects echolocated"""
         #Filter self.interactions_list to keep only the echolocations (interaction.type == INTERACTION_ECHO)
-        echo_list = [elem for elem in self.interactions_list if elem.type == INTERACTION_ECHO]
+        echo_list = [elem for elem in interactions_list if elem.type == INTERACTION_ECHO]
         #Compute distance between robot and echolocation for every element in echo_list
         dist_list = [math.sqrt(elem.x**2 + elem.y**2) for elem in echo_list]
         #Find all the local minimums in dist_list (dist_list[i] < dist_list[i+1] and dist_list[i] < dist_list[i-1])
@@ -184,3 +184,11 @@ class SynthesizerUserInteraction :
         self.decided_cells = []
         self.synthetizing_step = 2 if len(self.indecisive_cells) == 0 else 1
         self.need_user_action = self.synthetizing_step == 1
+
+    def set_mode(self, mode):
+        """AUTOMATIC : synthesizer use the known context
+        MANUAL : synthesizer use the user's input on divergences"""
+        if mode != AUTOMATIC_MODE and mode != MANUAL_MODE:
+            raise ValueError("Wrong mode : {}".format(mode))
+        else :
+            self.current_mode = mode
