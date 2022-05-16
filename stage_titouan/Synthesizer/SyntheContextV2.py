@@ -46,13 +46,17 @@ class SyntheContextV2 :
                 self.synthetizing_step = 2
 
         if self.synthetizing_step == 1 and self.user_action is not None:
-            self.apply_user_action(self.user_action)
+            cell_treated,decision = self.apply_user_action(self.user_action)
             self.user_action = None
+            if decision is not "Not done":
+                self.indecisive_cells.remove(cell_treated)
+                if decision is not None:
+                    self.decided_cells.append(decision)
 
         synthesize_results = self.synthesize()
-        self.known_obstacles.append([elem for elem in synthesize_results if elem[0].type == "Echo"])
+        self.known_obstacles.append([elem for elem in synthesize_results if elem[2] == "Obstacle"])
 
-        if self.synthetizing_step == 2 : 
+        if self.synthetizing_step == 2 :
             self.internal_hexa_grid = HexaGrid(self.hexa_memory.width, self.hexa_memory.height)
             self.interactions_list = []
 
@@ -80,7 +84,6 @@ class SyntheContextV2 :
         print("len(min_list)",len(min_list))
         return min_list
 
-
     def project_interactions_on_internal_hexagrid(self,interaction_list):
         """ Compute allocentric coordinates for every interaction of the given type in self.interactions_list,
         and add them to the internal hexagrid"""
@@ -101,7 +104,6 @@ class SyntheContextV2 :
                 already_used_cells.append((cell_x,cell_y))
             self.last_used_id = max(interaction.id,self.last_used_id)
 
-
     def comparison_step(self):
         """Compare cell by cell between internal_hexa_grid and hexa_memory.grid
         return (indecisive_cells,decided_cells)"""
@@ -121,6 +123,33 @@ class SyntheContextV2 :
                         decided_cells.append(((i,j),cell.interactions[-1], intern_status))
         return(inde_cells,decided_cells)
 
-
     def apply_user_action(self,user_action):
         """Apply the user action to the first of the indecided_cells"""
+        print("FAUTCHANGER TODO TODO")
+        text,coord = user_action
+        indecisive_cell,interaction,status = self.indecisive_cells[-1]
+        cell_treated = (indecisive_cell,interaction,status)
+        decision = "Not done"
+        if text == "y": # Apply the status to the cell, so keep status
+            decision = indecisive_cell,interaction,status
+            print("Status applied to the cell, suggestion accepted")
+        if text == "n" :# Don't do anything, act will erase indecided_cell
+            decision = None
+            print("Suggestion Denied")
+        if text == "click" :
+            decision = coord,interaction,status
+            print("Suggestion accepted for cell {}".format(coord))
+
+        return cell_treated,decision
+         
+    def synthesize(self):
+        """Apply the decisions of the decided cells"""
+        cells_treated = []
+        for coord,inte,status in self.decided_cells:
+            self.hexa_memory.grid[coord[0]][coord[1]].interactions.append(inte)
+            self.hexa_memory.grid[coord[0]][coord[1]].status = status
+            cells_treated.append((coord,inte,status))
+
+        for elem  in cells_treated:
+            self.decided_cells.remove(elem)
+        return cells_treated
