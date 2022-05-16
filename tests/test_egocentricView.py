@@ -59,7 +59,7 @@ if __name__ == "__main__":
                         intended_interaction['speed'] = -int(ctrl_robot.rightward_speed[1])
                 ctrl_robot.command_robot(intended_interaction)
             else:
-                print("Waiting for previous outcome before sending new action")
+                print("Waiting for previous outcome before sending new command")
 
     def main_loop(dt):
         """ Watch for the end of the previous interaction and choose the next """
@@ -73,22 +73,15 @@ if __name__ == "__main__":
                 ctrl_robot.send_position_change_to_memory()
                 ctrl_robot.send_position_change_to_hexa_memory()
                 ctrl_robot.send_phenom_info_to_memory()
-                # ctrl_robot.main(0.1)
-                # ctrl_view.main(0.1)
-
                 workspace.synthesizer.act()  # prend les interactions qui n'ont pas été traitées dans memory
                     # treat_echo trouve l'echo centré dans l'echo array
                     # project_interactions_on_internal_hexagrid
                     # comparison_step prend la derniere interaction dans internal grid et crée hexagrid
                 workspace.synthesizer.synthetize()  # c'est le moment ou on met à jour hexamemory
-
-                #ctrl_hexaview.main(0.1)
                 if len(workspace.hexa_memory.cells_changed_recently) > 0:
                     ctrl_hexaview.hexaview.extract_and_convert_recently_changed_cells(workspace.hexa_memory)
                     workspace.hexa_memory.cells_changed_recently = []
 
-                # ctrl_synthe.main(0.1)
-                # ctrl_hexaview.extract_and_convert_interactions(workspace.hexa_memory)
             ctrl_robot.enact_step = 0
 
             #if 'focus_x' in ctrl_robot.intended_interaction:

@@ -86,9 +86,9 @@ class CtrlView:
                 self.add_point_of_interest(p[1], p[2], dict_interactions_to_poi[p[0]])
 
         # Point of interest compass
-        if 'compass_x' in enacted_interaction:
-            self.add_point_of_interest(enacted_interaction['compass_x'],
-                                       enacted_interaction['compass_y'], POINT_COMPASS)
+        # if 'compass_x' in enacted_interaction:
+        #    self.add_point_of_interest(enacted_interaction['compass_x'],
+        #                               enacted_interaction['compass_y'], POINT_COMPASS)
 
     def extract_and_convert_interactions_to_poi(self, memory):
         """ Extracting interactions from the memory and converting them to points of interest """
