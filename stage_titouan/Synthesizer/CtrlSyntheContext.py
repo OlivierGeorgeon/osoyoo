@@ -18,4 +18,7 @@ class CtrlSyntheContext():
         synthesizer.act()
         #synthesizer.synthesize()
         self.need_user_action = synthesizer.synthetizing_step == 1
+        if self.need_user_action : print("need user action")
+        self.workspace.cell_inde_a_traiter = self.workspace.synthesizer.indecisive_cells[-1] if self.need_user_action else []
         self.workspace.need_user_action = self.need_user_action
+        
