@@ -9,10 +9,11 @@ from .. Memory.HexaMemory.HexaGrid import HexaGrid
 class SyntheContextV2 :
     """J'essaie de simplifier encore"""
 
-    def __init__(self,memory,hexa_memory):
+    def __init__(self,memory,hexa_memory,workspace):
         self.memory = memory
         self.hexa_memory = hexa_memory
         self.internal_hexa_grid = self.internal_hexa_grid = HexaGrid(hexa_memory.width, hexa_memory.height)
+        self.workspace = workspace
 
         self.synthetizing_step = 0
         self.mode = MANUAL_MODE
@@ -30,6 +31,8 @@ class SyntheContextV2 :
         elif self.mode == AUTOMATIC_MODE :
             self.act_automatic()
 
+    def act_automatic(self):
+        print("not implemented yet")
 
     def act_manual(self):
         """blabla"""
@@ -40,7 +43,7 @@ class SyntheContextV2 :
             self.interactions_list = [elem for elem in self.interactions_list if elem.type != "Echo" or elem in real_echos]
             self.project_interactions_on_internal_hexagrid(self.interactions_list)
             self.indecisive_cells,self.decided_cells = self.comparison_step()
-            if len(self.indecisive_cells > 0 ):
+            if len(self.indecisive_cells  )> 0:
                 self.synthetizing_step = 1
             else :
                 self.synthetizing_step = 2
