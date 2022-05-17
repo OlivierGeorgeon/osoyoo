@@ -47,7 +47,7 @@ class SynthesizerUserInteraction :
     def act(self):
         """blabla"""
         self.interactions_list = [elem for elem in self.memory.interactions if elem.id>self.last_used_id]
-        real_echos = self.treat_echos()
+        real_echos = self.treat_echos(self.interactions_list)
         self.interactions_list = [elem for elem in self.interactions_list if elem.type != "Echo" or elem in real_echos]
         self.project_interactions_on_internal_hexagrid()
         self.comparison_step()
