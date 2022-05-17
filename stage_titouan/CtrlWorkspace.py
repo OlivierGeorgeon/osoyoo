@@ -1,4 +1,4 @@
-class CtrlModel():
+class CtrlWorkspace():
     """Controller for everything involved in workspace (memory,hexamem,synthe,decider)"""
     
     def __init__(self,workspace):
@@ -34,7 +34,7 @@ class CtrlModel():
                 #1. Start the synthesizer process
                 self.synthesizer.act()
 
-                if self.synthesizer.synthetizing_step is in [0,2]:
+                if self.synthesizer.synthetizing_step in [0,2]:
 
 
         
