@@ -24,7 +24,7 @@ class SyntheContextV2 :
         self.indecisive_cells = []
         self.decided_cells = []
 
-    def act(self):
+    def act(self,user_action):
         """blabla"""
         if self.mode == MANUAL_MODE:
             self.act_manual()
