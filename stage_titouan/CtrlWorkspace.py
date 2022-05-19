@@ -40,13 +40,12 @@ class CtrlWorkspace():
                 #0. Update the memory with the last interaction and change position in hexa_memory and memory
                 print("aaabbbbccc")
                 if self.enacted_interaction['status'] is not "T":
-                    print ("aaaaaaaaaaaaaaaaaaaaaa ,", self.enacted_interaction)
+                    print ("finitoooooo ,", self.enacted_interaction)
                     self.send_phenom_info_to_memory()
                     self.send_position_change_to_hexa_memory()
                     self.send_position_change_to_memory()
-                print("aaaaaaaaaaaaaabbbbccc")
         #1. Start the synthesizer process
-        self.synthesizer.act(self.user_action)
+            self.synthesizer.act(self.user_action)
         self.user_action = None
         self.need_user_action = False
 
@@ -77,6 +76,7 @@ class CtrlWorkspace():
         echo_array = self.enacted_interaction['echo_array'] if 'echo_array' in self.enacted_interaction else None
         #self.workspace.memory.update_memory(self.enacted_interaction['phenom_info'],echo_array)
         if self.workspace.memory is not None:
+            print("Adding enacted interaction to memory")
             self.workspace.memory.add_enacted_interaction(self.enacted_interaction)  # Added by Olivier 08/05/2022
             # self.workspace.memory.add(phenom_info)
             if echo_array is not None :

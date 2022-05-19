@@ -212,6 +212,5 @@ class CtrlRobotNew:
                         tmp_y = math.sin(math.radians(ha)) * ed
                         enacted_interaction['echo_array'].append((tmp_x, tmp_y))
 
-        print("Enacted interaction apres translate robot data : ", enacted_interaction)
         self.enacted_interaction = enacted_interaction
         return enacted_interaction

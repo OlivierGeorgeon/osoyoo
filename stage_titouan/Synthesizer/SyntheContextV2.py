@@ -36,6 +36,7 @@ class SyntheContextV2 :
 
     def act_manual(self):
         """blabla"""
+        print("<SyntheContextV2> act_manual")
         if self.synthetizing_step == 0 :
             self.interactions_list = [elem for elem in self.memory.interactions if (elem.id>self.last_used_id)]
             echoes = [elem for elem in self.interactions_list if elem.type == "Echo"]
@@ -44,6 +45,7 @@ class SyntheContextV2 :
             self.project_interactions_on_internal_hexagrid(self.interactions_list)
             self.indecisive_cells,self.decided_cells = self.comparison_step()
             if len(self.indecisive_cells  )> 0:
+                print("<SyntheContextV2> synthe step passe a 1")
                 self.synthetizing_step = 1
             else :
                 self.synthetizing_step = 2
@@ -119,6 +121,7 @@ class SyntheContextV2 :
                 if self.mode == MANUAL_MODE :
                     if intern_status not in ["Free", current_status]  :
                         inde_cells.append(((i,j),cell.interactions[-1],intern_status))
+                        print("<SyntheContextV2> ajout à inde_cell")
                     else :
                         if len(cell.interactions) > 0 :
                             decided_cells.append((i,j),cell.interactions[-1],intern_status)
