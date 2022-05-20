@@ -3,6 +3,7 @@ from .. Memory.HexaMemory.HexaGrid import HexaGrid
 from .. Misc.Utils import translate_interaction_type_to_cell_status
 from ..  Memory.EgocentricMemory.Interactions.Interaction import INTERACTION_ECHO
 from .. Memory.HexaMemory.HexaGrid import HexaGrid
+import numpy as np
 AUTOMATIC_MODE = "automatic"
 MANUAL_MODE = "manual"
 from .. Memory.HexaMemory.HexaGrid import HexaGrid
@@ -24,46 +25,61 @@ class SyntheContextV2 :
         self.indecisive_cells = []
         self.decided_cells = []
 
-    def act(self,user_action):
+    def act(self,user_action = None):
         """blabla"""
         if self.mode == MANUAL_MODE:
-            self.act_manual()
+            self.act_manual(user_action)
         elif self.mode == AUTOMATIC_MODE :
             self.act_automatic()
 
     def act_automatic(self):
         print("not implemented yet")
 
-    def act_manual(self):
+    def act_manual(self,user_action):
         """blabla"""
-        print("<SyntheContextV2> act_manual")
+        #if user_action is not None and len(self.indecisive_cells > 0):
+         #   self.apply_user_action(user_action)
+        self.user_action = user_action
         if self.synthetizing_step == 0 :
             self.interactions_list = [elem for elem in self.memory.interactions if (elem.id>self.last_used_id)]
-            echoes = [elem for elem in self.interactions_list if elem.type == "Echo"]
-            real_echos = self.treat_echos(echoes)
-            self.interactions_list = [elem for elem in self.interactions_list if elem.type != "Echo" or elem in real_echos]
-            self.project_interactions_on_internal_hexagrid(self.interactions_list)
-            self.indecisive_cells,self.decided_cells = self.comparison_step()
-            if len(self.indecisive_cells  )> 0:
-                print("<SyntheContextV2> synthe step passe a 1")
-                self.synthetizing_step = 1
-            else :
-                self.synthetizing_step = 2
+            #set self_last_used_id to the max id of self.interactions_list
+            
+            if len(self.interactions_list )> 0:
+                self.last_used_id = max([elem.id for elem in self.interactions_list])
+                echoes = [elem for elem in self.interactions_list if elem.type == "Echo"]
+                real_echos = self.treat_echos(echoes)
+                self.interactions_list = [elem for elem in self.interactions_list if elem.type != "Echo" or elem in real_echos]
+                self.project_interactions_on_internal_hexagrid(self.interactions_list)
+                n_indecisive_cells,n_decided_cells = self.comparison_step()
+                self.indecisive_cells = self.indecisive_cells + n_indecisive_cells
+                print(self.indecisive_cells)
+                self.decided_cells = self.decided_cells + n_decided_cells
+                if len(self.indecisive_cells  )> 0:
+                    print("<SyntheContextV2> synthe step passe a 1")
+                    self.synthetizing_step = 1
+                else :
+                    self.synthetizing_step = 2
 
         if self.synthetizing_step == 1 and self.user_action is not None:
+            print("ok on est la")
             cell_treated,decision = self.apply_user_action(self.user_action)
             self.user_action = None
+            "on a pris la decision"
             if decision is not "Not done":
                 self.indecisive_cells.remove(cell_treated)
                 if decision is not None:
                     self.decided_cells.append(decision)
+            if len(self.indecisive_cells)  == 0 :
+                self.synthetizing_step = 2
 
         synthesize_results = self.synthesize()
         self.known_obstacles.append([elem for elem in synthesize_results if elem[2] == "Obstacle"])
 
         if self.synthetizing_step == 2 :
+            print("on rest tout ")
             self.internal_hexa_grid = HexaGrid(self.hexa_memory.width, self.hexa_memory.height)
             self.interactions_list = []
+            self.synthetizing_step = 0
 
 
 
@@ -85,8 +101,6 @@ class SyntheContextV2 :
                     #print("test ok")
                     min_list.append(echo_list[i+1])
                     min_ind_list.append(i+1)
-
-        print("len(min_list)",len(min_list))
         return min_list
 
     def project_interactions_on_internal_hexagrid(self,interaction_list):
@@ -121,17 +135,16 @@ class SyntheContextV2 :
                 if self.mode == MANUAL_MODE :
                     if intern_status not in ["Free", current_status]  :
                         inde_cells.append(((i,j),cell.interactions[-1],intern_status))
-                        print("<SyntheContextV2> ajout à inde_cell")
+                        print("\n\n<SyntheContextV2> ajout à inde_cell\n\n")
                     else :
                         if len(cell.interactions) > 0 :
-                            decided_cells.append((i,j),cell.interactions[-1],intern_status)
+                            decided_cells.append(((i,j),cell.interactions[-1],intern_status))
                 else : #AUTO_MODE
                         decided_cells.append(((i,j),cell.interactions[-1], intern_status))
         return(inde_cells,decided_cells)
 
     def apply_user_action(self,user_action):
         """Apply the user action to the first of the indecided_cells"""
-        print("FAUTCHANGER TODO TODO")
         text,coord = user_action
         indecisive_cell,interaction,status = self.indecisive_cells[-1]
         cell_treated = (indecisive_cell,interaction,status)
@@ -151,11 +164,14 @@ class SyntheContextV2 :
     def synthesize(self):
         """Apply the decisions of the decided cells"""
         cells_treated = []
-        for coord,inte,status in self.decided_cells:
-            self.hexa_memory.grid[coord[0]][coord[1]].interactions.append(inte)
-            self.hexa_memory.grid[coord[0]][coord[1]].status = status
-            cells_treated.append((coord,inte,status))
+        if len(self.decided_cells) > 0 :
+            print(self.decided_cells)
+            for coord,inte,status in self.decided_cells:
+                self.hexa_memory.grid[coord[0]][coord[1]].interactions.append(inte)
+                self.hexa_memory.grid[coord[0]][coord[1]].status = status
+                cells_treated.append((coord,inte,status))
 
         for elem  in cells_treated:
+            self.hexa_memory.cells_changed_recently.append(elem[0])
             self.decided_cells.remove(elem)
         return cells_treated

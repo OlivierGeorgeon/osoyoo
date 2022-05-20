@@ -16,15 +16,19 @@ class CtrlHexaviewNew:
 
         #Handlers
         def on_text_hemw(text):
-                if ctrl_workspace.need_user_action and not ctrl_workspace.f_user_action_ready and self.inde_cell_projection_done :
+                if ctrl_workspace.need_user_action and self.inde_cell_projection_done :
+                    print("hohihouhahah")
                     if text.upper() == "Y":
+                        print("YYYYYYYYYYYYYYYYYYYYYYYY")
                         ctrl_workspace.user_action = 'y', None
                         ctrl_workspace.f_user_action_ready = True
                         self.react_to_user_interaction()
+                        return
                     elif text.upper() == "N":
                         ctrl_workspace.user_action = 'n', None
                         ctrl_workspace.f_user_action_ready = True
                         self.react_to_user_interaction()
+                        return
                 elif ctrl_workspace.need_user_to_command_robot:
                     x = self.mouse_x
                     y= self.mouse_y
@@ -82,6 +86,7 @@ class CtrlHexaviewNew:
             self.hexa_memory.cells_changed_recently = []
         ctrl_workspace = self.ctrl_workspace
         if ctrl_workspace.need_user_action : #and not model.f_inde_cell_projected :
+            #print("projection inde_cell")
             self.hexaview.show_indecisive_cell(ctrl_workspace.cell_inde_a_traiter)
             self.inde_cell_projection_done = True
         if len(self.hexa_memory.cells_changed_recently) > 0 :

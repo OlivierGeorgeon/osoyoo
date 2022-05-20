@@ -25,6 +25,7 @@ class PointOfInterest:
         self.is_selected = False
         self.reference = None
 
+
         if self.type == POINT_PLACE:
             # Place: LightGreen triangle
             self.shape = self.batch.add(3, gl.GL_TRIANGLES, self.group, ('v2i', [20, 0, -20, -20, -20, 20]),
@@ -136,3 +137,15 @@ class PointOfInterest:
         else:
             self.set_color()
             self.is_selected = False
+
+    def update(self,displacement_matrix):
+        if self.interaction is not None:
+            self.x =self.interaction.x
+            self.y =self.interaction.y
+
+            self.shape.x = self.x
+            self.shape.y = self.y
+            self.shape.rotation = self.interaction.rotation
+        else :
+            if displacement_matrix is not None:
+                self.displace(displacement_matrix)

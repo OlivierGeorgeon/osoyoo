@@ -12,7 +12,7 @@ class CtrlWorkspace():
         self.user_action = None
         self.f_user_action_ready = False
         self.f_new_interaction_done = False
-        self.enacted_interaction = b'{"status":"T"}'
+        self.enacted_interaction = {'status':'T'}
         self.decision_mode = "manual"
         self.need_user_to_command_robot = False
 
@@ -20,12 +20,17 @@ class CtrlWorkspace():
         self.f_interaction_to_enact_ready = False
         self.cell_inde_a_traiter = None
 
+        self.flag_for_view_refresh = False
+
     def main(self,dt):
         """Handle the workspace work, from the moment the robot interaction is done,
         to the moment we have an action to command"""
-        if self.interaction_to_enact is not None:
-            print("reçu par workspace")
+        if self.need_user_action and self.user_action is not None:
+            print("shortcut")
+            #self.synthesizer.apply_user_action(self.user_action)
+
         if self.f_new_interaction_done :
+            self.flag_for_view_refresh = True
             self.f_new_interaction_done = False
             if self.work_step == 0 or self.work_step == 4:
                 #Whole processus has ended normally, now we :
@@ -38,14 +43,14 @@ class CtrlWorkspace():
                 # Else we need to send the command given by the synthesizer to the robot
 
                 #0. Update the memory with the last interaction and change position in hexa_memory and memory
-                print("aaabbbbccc")
                 if self.enacted_interaction['status'] is not "T":
-                    print ("finitoooooo ,", self.enacted_interaction)
                     self.send_phenom_info_to_memory()
                     self.send_position_change_to_hexa_memory()
                     self.send_position_change_to_memory()
         #1. Start the synthesizer process
-            self.synthesizer.act(self.user_action)
+        if self.user_action is not None :
+            print("user action dans synthe :", self.user_action)
+        self.synthesizer.act(self.user_action)
         self.user_action = None
         self.need_user_action = False
 
@@ -76,7 +81,6 @@ class CtrlWorkspace():
         echo_array = self.enacted_interaction['echo_array'] if 'echo_array' in self.enacted_interaction else None
         #self.workspace.memory.update_memory(self.enacted_interaction['phenom_info'],echo_array)
         if self.workspace.memory is not None:
-            print("Adding enacted interaction to memory")
             self.workspace.memory.add_enacted_interaction(self.enacted_interaction)  # Added by Olivier 08/05/2022
             # self.workspace.memory.add(phenom_info)
             if echo_array is not None :

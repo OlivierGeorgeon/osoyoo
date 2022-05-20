@@ -40,7 +40,6 @@ class CtrlRobotNew:
             self.ctrl_workspace.enacted_interaction = self.enacted_interaction
             self.ctrl_workspace.f_new_interaction_done = True
         if self.ctrl_workspace.f_interaction_to_enact_ready and not self.robot_has_started_acting:
-            print("kssss")
             self.command_robot(self.ctrl_workspace.interaction_to_enact)
             self.ctrl_workspace.interaction_to_enact = None
             self.robot_has_started_acting = True
@@ -213,4 +212,5 @@ class CtrlRobotNew:
                         enacted_interaction['echo_array'].append((tmp_x, tmp_y))
 
         self.enacted_interaction = enacted_interaction
+
         return enacted_interaction
