@@ -4,6 +4,7 @@ from . CompositeInteraction import CompositeInteraction
 # from OsoyooCar import OsoyooCar
 import pyglet
 
+
 class Agent5:
     def __init__(self, hedonist_table=[[4, -2, -2, -2], [-1, -1, -1, -1], [-2, -2, -2, -2]]):
         """ Creating our agent """
@@ -16,19 +17,19 @@ class Agent5:
         self.previous_interaction = None
         self.last_interaction = None
 
-    def action(self, outcome):
+    def action(self, _outcome):
         """ tracing the previous cycle """
         if self._action is not None:
             print("Action: " + str(self._action) +
                   ", Anticipation: " + str(self.anticipated_outcome) +
-                  ", Outcome: " + str(outcome) +
-                  ", Satisfaction: (anticipation: " + str(self.anticipated_outcome == outcome) +
-                  ", valence: " + str(self.hedonist_table[self._action][outcome]) + ")")
+                  ", Outcome: " + str(_outcome) +
+                  ", Satisfaction: (anticipation: " + str(self.anticipated_outcome == _outcome) +
+                  ", valence: " + str(self.hedonist_table[self._action][_outcome]) + ")")
 
         """ Recording previous experience """
         self.previous_interaction = self.last_interaction
-        valence = self.hedonist_table[self._action][outcome]  # stock la satisfaction obtenue à la dernière interaction
-        self.last_interaction = Interaction.create_or_retrieve(self._action, outcome, valence)
+        valence = self.hedonist_table[self._action][_outcome]  # stock la satisfaction obtenue à la dernière interaction
+        self.last_interaction = Interaction.create_or_retrieve(self._action, _outcome, valence)
         # print("Enacted interaction ", end="")
         # print(self.last_interaction)
         if self.previous_interaction is not None:
@@ -68,6 +69,17 @@ class Agent5:
 
         return self._action
 
+    def result(self, enacted_interaction):
+        _outcome = 0
+        if 'floor' in enacted_interaction:
+            _outcome = int(enacted_interaction['floor'])
+        if 'shock' in enacted_interaction:
+            if enacted_interaction['shock'] > 0:
+                _outcome = enacted_interaction['shock']
+        return _outcome
+
+    def intended_interaction(self, _action):
+        return {'action': ['8', '1', '3'][_action]}
 
 # Testing Agent5 by updating the window and expecting outcome from user keypress
 if __name__ == "__main__":
