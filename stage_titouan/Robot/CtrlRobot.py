@@ -151,6 +151,8 @@ class CtrlRobot():
                 echo_xy[1] = int(math.sin(math.radians(enacted_interaction['head_angle']))
                                  * enacted_interaction['echo_distance'])
                 enacted_interaction['points'].append((INTERACTION_ECHO, *echo_xy))
+                # Return the echo_xy to possibly use as focus
+                enacted_interaction['echo_xy'] = echo_xy
 
         # Interaction shock
         if 'shock' in enacted_interaction and action == '8':
@@ -184,6 +186,8 @@ class CtrlRobot():
             if distance < 100:
                 additional_xy = expected_focus_xy - echo_xy
                 print("additional translation:", additional_xy)
+                # The focus has been kept
+                enacted_interaction['focus'] = True
                 # Adjust the displacement
                 translation += additional_xy
                 translation_matrix = matrix44.create_from_translation([-translation[0], -translation[1], 0])

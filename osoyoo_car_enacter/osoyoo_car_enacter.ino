@@ -105,7 +105,7 @@ bool blink_on = true;
 bool is_focussed = false;
 int focus_x = 0;
 int focus_y = 0;
-int focus_speed = 0;
+int focus_speed = 180;
 
 void loop()
 {

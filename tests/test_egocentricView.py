@@ -3,6 +3,7 @@
 import sys
 from stage_titouan import *
 from stage_titouan.Agent.Agent5 import Agent5
+from stage_titouan.Agent.CircleBehavior import CircleBehavior
 from stage_titouan.Robot.RobotDefine import *
 
 CONTROL_MODE_MANUAL = 0
@@ -25,7 +26,8 @@ if __name__ == "__main__":
     ctrl_robot = CtrlRobot(workspace, ip)
     ctrl_view = CtrlView(workspace)
     ego_view = ctrl_view.view
-    agent = Agent5()
+    # agent = Agent5()
+    agent = CircleBehavior()
     ctrl_hexaview = CtrlHexaview(workspace)
     ctrl_hexaview.hexaview.extract_and_convert_interactions(workspace.hexa_memory)
     ctrl_synthe = CtrlSynthe(workspace)
@@ -92,16 +94,20 @@ if __name__ == "__main__":
             if ctrl_robot.enact_step == 0:
                 # Construct the outcome expected by Agent5
                 enacted_interaction = ctrl_robot.translate_robot_data()
-                outcome = 0
-                if 'floor' in enacted_interaction:
-                    outcome = int(enacted_interaction['floor'])
-                if 'shock' in enacted_interaction:
-                    if enacted_interaction['shock'] > 0:
-                        outcome = enacted_interaction['shock']
+                outcome = agent.result(enacted_interaction)
+                # outcome = 0
+                # if 'floor' in enacted_interaction:
+                #     outcome = int(enacted_interaction['floor'])
+                # if 'shock' in enacted_interaction:
+                #     if enacted_interaction['shock'] > 0:
+                #         outcome = enacted_interaction['shock']
 
                 # Choose the next action
                 action = agent.action(outcome)
-                intended_interaction = {'action': ['8', '1', '3'][action]}
+                # intended_interaction = {'action': ['8', '1', '3'][action]}
+                intended_interaction = agent.intended_interaction(action)
+                # TODO send the speed depending on the direction
+                intended_interaction['speed'] = ctrl_robot.forward_speed[0]
                 ctrl_robot.command_robot(intended_interaction)
 
     # Schedule the main loop that updates the agent

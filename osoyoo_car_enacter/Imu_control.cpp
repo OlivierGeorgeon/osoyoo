@@ -116,6 +116,7 @@ int Imu_control::update(int interaction_step)
     float _ZAngle = normGyro.ZAxis * IMU_READ_PERIOD / 1000 * GYRO_COEF;
     _yaw += _ZAngle;
 
+    // During the first step of the interaction, check acceleration
     if (interaction_step == 1)
     {
       // Record the min acceleration (deceleration) during the interaction to detect collision
