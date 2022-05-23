@@ -70,6 +70,7 @@ class CtrlWorkspace():
         if self.decision_mode == "automatic" :
             #  2. Start the decider process
             "padagent pour le moment"
+            # TODO mettre l'agent
         else :
             self.need_user_to_command_robot = True
 
