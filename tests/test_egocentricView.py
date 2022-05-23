@@ -94,20 +94,21 @@ if __name__ == "__main__":
             if ctrl_robot.enact_step == 0:
                 # Construct the outcome expected by Agent5
                 enacted_interaction = ctrl_robot.translate_robot_data()
-                outcome = agent.result(enacted_interaction)
-                # outcome = 0
-                # if 'floor' in enacted_interaction:
-                #     outcome = int(enacted_interaction['floor'])
-                # if 'shock' in enacted_interaction:
-                #     if enacted_interaction['shock'] > 0:
-                #         outcome = enacted_interaction['shock']
 
+                outcome = agent.result(enacted_interaction)
                 # Choose the next action
                 action = agent.action(outcome)
                 # intended_interaction = {'action': ['8', '1', '3'][action]}
                 intended_interaction = agent.intended_interaction(action)
                 # TODO send the speed depending on the direction
-                intended_interaction['speed'] = ctrl_robot.forward_speed[0]
+                if action == '8':
+                    intended_interaction['speed'] = ctrl_robot.forward_speed[0]
+                if action == '2':
+                    intended_interaction['speed'] = -ctrl_robot.backward_speed[0]
+                if action == '4':
+                    intended_interaction['speed'] = ctrl_robot.leftward_speed[1]
+                if action == '6':
+                    intended_interaction['speed'] = -ctrl_robot.rightward_speed[1]
                 ctrl_robot.command_robot(intended_interaction)
 
     # Schedule the main loop that updates the agent

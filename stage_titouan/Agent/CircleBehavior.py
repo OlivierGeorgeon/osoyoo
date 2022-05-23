@@ -17,39 +17,40 @@ ACTION_SCAN = '-'
 
 class CircleBehavior:
     def __init__(self):
-        self.clockwise = True
+        self.counterclockwise = True  # Turn in trigonometric direction
         self._action = '8'
         self.focus = False
         self.echo_xy = None
 
     def action(self, outcome):
-
+        """ Choose the action on the basis of the previous outcome """
         # If previous action was scanning then check if found focus
         if self._action == ACTION_SCAN:
             if outcome in [OUTCOME_LEFT, OUTCOME_FAR_LEFT]:
                 # Found focus to the left
-                print("Turn counterclockwise")
-                self.focus = True
-                self.clockwise = False
-            if outcome in [OUTCOME_RIGHT, OUTCOME_FAR_RIGHT]:
-                # Found focus to the right
                 print("Turn clockwise")
                 self.focus = True
-                self.clockwise = True
+                self.counterclockwise = False
+            if outcome in [OUTCOME_RIGHT, OUTCOME_FAR_RIGHT]:
+                # Found focus to the right
+                print("Turn counterclockwise")
+                self.focus = True
+                self.counterclockwise = True
 
         # if no focus then scan or turn
         if not self.focus:
             if self._action == ACTION_SCAN:
-                if self.clockwise:
+                if self.counterclockwise:
                     self._action = ACTION_TURN_RIGHT
                 else:
                     self._action = ACTION_TURN_LEFT
             else:
                 self._action = ACTION_SCAN
-
         else:
+            # If focus then choose an action depending on the position result
             if outcome in [OUTCOME_LEFT, OUTCOME_RIGHT]:
-                if self.clockwise:
+                # Keep turning in the same direction
+                if self.counterclockwise:
                     self._action = ACTION_RIGHTWARD
                 else:
                     self._action = ACTION_LEFTWARD
@@ -65,6 +66,7 @@ class CircleBehavior:
         return self._action
 
     def result(self, enacted_interaction):
+        """ Convert the enacted interaction into outcome adapted to the circle behavior """
         outcome = 'U'  # Outcome unknown
 
         # If there is an echo
@@ -83,13 +85,10 @@ class CircleBehavior:
             else:
                 outcome = OUTCOME_FAR_RIGHT
 
-        # if the agent was focussed
+        # Check if the agent lost the focus
         if self.focus:
-            if 'focus' in enacted_interaction:
-                # The focus has been kept
-                self.focus = True
-            else:
-                # The focus has been lost
+            if 'focus' not in enacted_interaction:
+                # The focus was lost
                 self.focus = False
                 outcome = OUTCOME_LOST_FOCUS
 
@@ -97,6 +96,7 @@ class CircleBehavior:
         return outcome
 
     def intended_interaction(self, _action):
+        """ Construct the intended interaction from the circle behavior action """
         intended_interaction = {'action': _action, 'speed': 180}
         if self.focus:
             intended_interaction['focus_x'] = self.echo_xy[0]
