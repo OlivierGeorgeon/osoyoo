@@ -42,12 +42,20 @@ class SyntheContextV2 :
         self.user_action = user_action
         if self.synthetizing_step == 0 :
             self.interactions_list = [elem for elem in self.memory.interactions if (elem.id>self.last_used_id)]
+            if self.interactions_list == [] :
+                #print("interactions list is empty")
+                ""
+            else :
+                for elem in self.interactions_list :
+                    print(elem.type)
             #set self_last_used_id to the max id of self.interactions_list
             
             if len(self.interactions_list )> 0:
                 self.last_used_id = max([elem.id for elem in self.interactions_list])
                 echoes = [elem for elem in self.interactions_list if elem.type == "Echo"]
-                real_echos = self.treat_echos(echoes)
+                print("len echoes :", len(echoes))
+                real_echos = self.treat_echos_alt(echoes)
+                print("len real_echos : ", len(real_echos))
                 self.interactions_list = [elem for elem in self.interactions_list if elem.type != "Echo" or elem in real_echos]
                 self.project_interactions_on_internal_hexagrid(self.interactions_list)
                 n_indecisive_cells,n_decided_cells = self.comparison_step()
@@ -65,7 +73,7 @@ class SyntheContextV2 :
             cell_treated,decision = self.apply_user_action(self.user_action)
             self.user_action = None
             "on a pris la decision"
-            if decision is not "Not done":
+            if decision != "Not done":
                 self.indecisive_cells.remove(cell_treated)
                 if decision is not None:
                     self.decided_cells.append(decision)
@@ -73,7 +81,13 @@ class SyntheContextV2 :
                 self.synthetizing_step = 2
 
         synthesize_results = self.synthesize()
-        self.known_obstacles.append([elem for elem in synthesize_results if elem[2] == "Obstacle"])
+        if len(synthesize_results) > 0 :
+            for elem in synthesize_results :
+                print(elem)
+            obstacles_in_results = [elem for elem in synthesize_results if elem[2] == "Something"]
+            self.known_obstacles = self.known_obstacles + obstacles_in_results
+            print(self.known_obstacles)
+            print("len obstacles : ",len(self.known_obstacles))
 
         if self.synthetizing_step == 2 :
             print("on rest tout ")
@@ -91,7 +105,7 @@ class SyntheContextV2 :
         dist_list = [math.sqrt(elem.x**2 + elem.y**2) for elem in echo_list]
         #Find all the local minimums in dist_list (dist_list[i] < dist_list[i+1] and dist_list[i] < dist_list[i-1])
         # append the corresponding echo to min_list
-        min_list = [echo_list[i+1] for i,elem in enumerate(dist_list[1:-1]) if (elem<dist_list[i] and elem<dist_list[i+2])]
+        min_list = [echo_list[i+1] for i,elem in enumerate(dist_list[1:-1]) if (elem<dist_list[i] and elem<=dist_list[i+2])]
         min_list = []
         min_ind_list = []
         for i,elem in enumerate(dist_list[1:-1]):
@@ -102,6 +116,60 @@ class SyntheContextV2 :
                     min_list.append(echo_list[i+1])
                     min_ind_list.append(i+1)
         return min_list
+
+    def treat_echos_alt(self,echo_list):
+        """blabla"""
+        echo_list = self.revert_echoes_to_angle_distance(echo_list)
+        max_delta_dist = 50
+        max_delta_angle = math.radians(20)
+        angle_start_of_strike = -1
+        angle_end_of_strike = -1
+        distance_start_of_strike = -1
+        distance_end_of_strike = -1
+        new_strike = False
+        current_strike = []
+        output = []
+        for angle,distance,interaction in echo_list :
+            if angle_start_of_strike == -1 :
+                angle_start_of_strike = angle
+                distance_start_of_strike = distance
+                angle_end_of_strike = angle
+                distance_end_of_strike = distance
+                current_strike.append(interaction)
+            else :
+                #if the difference between the angle and the last angle is too big or the difference between the last distance 
+                #and the current distance is too big, we have a new strike else we continue the current strike
+                #if we end the strike we take the interaction in the middle of it, and we add it to the output array
+                print("angle : ", angle, "angle_end_of_strike : ", angle_end_of_strike, "max_delta_angle : ", max_delta_angle)
+                print("distance :", distance, "distance_end_of_strike : ", distance_end_of_strike, "max_delta_dist : ", max_delta_dist)
+                if abs(angle - angle_end_of_strike) > max_delta_angle or abs(distance - distance_end_of_strike) > max_delta_dist :
+                    new_strike = True
+                    output.append(current_strike[int(len(current_strike)/2)])
+                    current_strike = []
+                    angle_start_of_strike = angle
+                    distance_start_of_strike = distance
+                    angle_end_of_strike = angle
+                    distance_end_of_strike = distance
+                    current_strike.append(interaction)
+                else :
+                    current_strike.append(interaction)
+                    angle_end_of_strike = angle
+                    distance_end_of_strike = distance
+
+        return output
+            
+
+
+    def revert_echoes_to_angle_distance(self,echo_list):
+        """blabla"""
+        output = []
+        for elem in echo_list:
+            #compute the angle using elem x and y
+            angle = math.atan2(elem.y,elem.x)
+            #compute the distance using elem x and y
+            distance = math.sqrt(elem.x**2 + elem.y**2)
+            output.append((angle,distance,elem))
+        return output
 
     def project_interactions_on_internal_hexagrid(self,interaction_list):
         """ Compute allocentric coordinates for every interaction of the given type in self.interactions_list,

@@ -15,8 +15,8 @@
 
 #define SACCADE_DURATION 150      // (ms) Servo specification speed is 120ms/60°
 #define ALIGN_SACCADE_SPAN 10     // (degrees)
-#define SCAN_SACCADE_SPAN 40      // (degrees) For full scan followed by head alignment
-// #define SCAN_SACCADE_SPAN 10   // (degrees) For complete-scan
+//#define SCAN_SACCADE_SPAN 40      // (degrees) For full scan followed by head alignment
+#define SCAN_SACCADE_SPAN 10   // (degrees) For complete-scan
 #define ECHO_MONITOR_PERIOD 500   // (ms) The period for checking whether to trigger head alignment
 #define ECHO_MONITOR_VARIATION 50 // (mm) The measure threshold to trigger head alignment
 
