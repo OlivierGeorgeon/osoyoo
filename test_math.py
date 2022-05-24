@@ -1,4 +1,5 @@
 import math
+import numpy
 """
 robot_angle = 45
 scan_dist = 100
@@ -37,3 +38,10 @@ robot_angle = math.radians(45)
 x_second = (x_obstacle-x_robot) * math.cos(robot_angle) - (y_obstacle-y_robot) * math.sin(robot_angle)
 y_second = (x_obstacle-x_robot) * math.sin(robot_angle) + (y_obstacle-y_robot) * math.cos(robot_angle)
 print("x_second : ",x_second,"\ny_second : ",y_second)
+
+tab = [1.2,1.5]
+duration = 2
+translation = numpy.multiply(tab,duration )
+translation2 = numpy.dot(tab,duration)
+print(translation)
+print(translation2)

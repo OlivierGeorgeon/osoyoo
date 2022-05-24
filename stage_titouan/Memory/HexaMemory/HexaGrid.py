@@ -84,7 +84,10 @@ class HexaGrid:
             y : y coordinate of the cell
             interaction : interaction to add
         """
-        self.grid[x][y].add_interaction(interaction)
+        if x < self.width and y < self.height :
+            self.grid[x][y].add_interaction(interaction)
+        else :
+            print("interaction out of bounds")
 
 if __name__ == '__main__':
     hx = HexaGrid(5,5)

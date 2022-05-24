@@ -6,7 +6,7 @@ from . Agent.Agent6 import Agent6
 class Workspace :
     """blabla"""
 
-    def __init__(self,hexamemory_size = (50,100), cell_radius = 20):
+    def __init__(self,hexamemory_size = (100,200), cell_radius = 20):
         self.memory = MemoryV1()
         self.hexa_memory = HexaMemory(hexamemory_size[0],hexamemory_size[1],cell_radius = cell_radius)
         self.synthesizer = SynthesizerUserInteraction(self.memory,self.hexa_memory)

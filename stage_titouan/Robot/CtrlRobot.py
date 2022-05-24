@@ -95,6 +95,7 @@ class CtrlRobot():
             yaw = DEFAULT_YAW
         if action == "2":
             # translation = self.backward_speed * (enacted_interaction['duration1'] / 1000)
+            # translation = numpy.multiply(self.backward_speed , (enacted_interaction['duration1'] / 1000 )
             translation = [i * enacted_interaction['duration1'] / 1000 for i in self.backward_speed]
         if action == "3":
             yaw = -DEFAULT_YAW

@@ -25,6 +25,10 @@ class SyntheContextV2 :
         self.indecisive_cells = []
         self.decided_cells = []
 
+
+        self.linking_list = []
+        self.obstacle_to_find = None
+
     def act(self,user_action = None):
         """blabla"""
         if self.mode == MANUAL_MODE:
@@ -32,24 +36,68 @@ class SyntheContextV2 :
         elif self.mode == AUTOMATIC_MODE :
             self.act_automatic()
 
-    def act_automatic(self):
-        print("not implemented yet")
+    def act_automatic(self,user_action):
+        """act automatic"""
+        # Should use the context created in the manual mode, so no new Obstacle should be added on the grid,
+        # instead an echo should be linked to a known obstacle, and used to compute the correct position of the robot.
+        self.user_action = user_action
+
+        if self.synthetizing_step == 0 : # start of the synthesis
+            self.synthetizing_step = 0.1 
+            self.interactions_list = [elem for elem in self.memory.interactions if (elem.id>self.last_used_id)]
+            if len(self.interactions_list )> 0:
+                self.last_used_id = max([elem.id for elem in self.interactions_list])
+                echoes = [elem for elem in self.interactions_list if elem.type == "Echo"]
+                real_echos = self.treat_echos_alt(echoes)
+                self.interactions_list = [elem for elem in self.interactions_list if elem.type != "Echo"]
+                #We now have the echoes differenciated from the other interactions
+                #We now have to compare the echoes with the known obstacles
+                self.linking_list = self.compare_echoes_with_context(real_echos,[])
+                #We now have the echoes linked to the known obstacles
+                #We have to make sure that there is no obstacle that should have been seen by the robot but wasn't 
+                #if the current linking is correct we should be able to find the obstacle by sending the correct action to the robot
+                is_missing_obstacle,self.obstacle_to_find, action_to_enact = self.find_missing_obstacle(self.linking_list)
+                if is_missing_obstacle:
+                    # there is a missing obstacle, we should try to find it by sending the correct action to the robot
+                    #TODO : ajouter l'envoi de l'action
+
+                    return
+                #there is no missing obstacle, we will consider that the linking is correct
+                self.synthetizing_step = 0.2
+        
+        if self.synthetizing_step == 0.1 : # we had a return during the previous loop in the if self.synthetizing_step == 0, which means
+            # we had an obstacle to find, so we need to see if the action we send to the robot was enacted
+            if  not self.f_robot_action_enacted :
+                # we need to wait for the robot to enact the action
+                return
+            # the robot has enacted the action, we need to see if it found the missing obstacle
+            missing_obstacle_found = self.has_missing_obstacle_been_found(self.obstacle_to_find)
+            if missing_obstacle_found :
+                #we can consider our linking as correct so we go to the next step
+                self.synthetizing_step = 0.2
+
+            else :
+                # our linking was incorrect, we need to try another one
+                # TODO : we need to try another linking
+                ""
+        if self.synthetizing_step == 0.2:
+            #we should now look for the correct position of the robot considering the linking between
+            #the known obstacles and the echoes
+            translation_between_echo_and_context = self.find_translation_between_echo_and_context(self.linking_list)
+            #we have the translation between the known obstacles and the echoes
+            #we should apply this translation to the robot position
+            self.apply_translation_to_hexa_memory(translation_between_echo_and_context)
+            #we have applied the translation to the robot position, our robot should now be in the right position in its hexa_memory
+            #we can now proceed with the normal synthesis (project interaction, compare, synthesize)
+            self.synthetizing_step = 0.3
+                
+
 
     def act_manual(self,user_action):
         """blabla"""
-        #if user_action is not None and len(self.indecisive_cells > 0):
-         #   self.apply_user_action(user_action)
         self.user_action = user_action
         if self.synthetizing_step == 0 :
             self.interactions_list = [elem for elem in self.memory.interactions if (elem.id>self.last_used_id)]
-            if self.interactions_list == [] :
-                #print("interactions list is empty")
-                ""
-            else :
-                for elem in self.interactions_list :
-                    print(elem.type)
-            #set self_last_used_id to the max id of self.interactions_list
-            
             if len(self.interactions_list )> 0:
                 self.last_used_id = max([elem.id for elem in self.interactions_list])
                 echoes = [elem for elem in self.interactions_list if elem.type == "Echo"]
@@ -140,7 +188,7 @@ class SyntheContextV2 :
                 #if the difference between the angle and the last angle is too big or the difference between the last distance 
                 #and the current distance is too big, we have a new strike else we continue the current strike
                 #if we end the strike we take the interaction in the middle of it, and we add it to the output array
-                print("angle : ", angle, "angle_end_of_strike : ", angle_end_of_strike, "max_delta_angle : ", max_delta_angle)
+                print("angle : ", math.degrees(angle), "angle_end_of_strike : ", math.degrees(angle_end_of_strike), "max_delta_angle : ",math.degrees( max_delta_angle))
                 print("distance :", distance, "distance_end_of_strike : ", distance_end_of_strike, "max_delta_dist : ", max_delta_dist)
                 if abs(angle - angle_end_of_strike) > max_delta_angle or abs(distance - distance_end_of_strike) > max_delta_dist :
                     new_strike = True
