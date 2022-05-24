@@ -34,7 +34,7 @@ class SyntheContextV2 :
         if self.mode == MANUAL_MODE:
             self.act_manual(user_action)
         elif self.mode == AUTOMATIC_MODE :
-            self.act_automatic()
+            self.act_automatic(user_action)
 
     def act_automatic(self,user_action):
         """act automatic"""
@@ -90,6 +90,14 @@ class SyntheContextV2 :
             #we have applied the translation to the robot position, our robot should now be in the right position in its hexa_memory
             #we can now proceed with the normal synthesis (project interaction, compare, synthesize)
             self.synthetizing_step = 0.3
+
+        if self.synthetizing_step == 0.3:
+            # normal synthesis (project interaction, compare, synthesize)
+            self.project_interactions_on_internal_hexagrid(self.interactions_list)
+            n_indecisive_cells,n_decided_cells = self.comparison_step()
+            self.decided_cells = self.decided_cells + n_decided_cells + n_indecisive_cells
+            self.synthesize()
+            self.synthetizing_step = 2
                 
 
 
