@@ -45,3 +45,5 @@ translation = numpy.multiply(tab,duration )
 translation2 = numpy.dot(tab,duration)
 print(translation)
 print(translation2)
+
+

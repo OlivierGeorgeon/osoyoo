@@ -29,6 +29,9 @@ class SyntheContextV2 :
         self.linking_list = []
         self.obstacle_to_find = None
 
+
+        self.f_robot_action_enacted = False
+
     def act(self,user_action = None):
         """blabla"""
         if self.mode == MANUAL_MODE:
@@ -56,7 +59,7 @@ class SyntheContextV2 :
                 #We now have the echoes linked to the known obstacles
                 #We have to make sure that there is no obstacle that should have been seen by the robot but wasn't 
                 #if the current linking is correct we should be able to find the obstacle by sending the correct action to the robot
-                is_missing_obstacle,self.obstacle_to_find, action_to_enact = self.find_missing_obstacle(self.linking_list)
+                is_missing_obstacle,self.obstacle_to_find, action_to_enact = self.look_for_missing_obstacle(self.linking_list)
                 if is_missing_obstacle:
                     # there is a missing obstacle, we should try to find it by sending the correct action to the robot
                     #TODO : ajouter l'envoi de l'action
@@ -95,7 +98,7 @@ class SyntheContextV2 :
             # normal synthesis (project interaction, compare, synthesize)
             self.project_interactions_on_internal_hexagrid(self.interactions_list)
             n_indecisive_cells,n_decided_cells = self.comparison_step()
-            self.decided_cells = self.decided_cells + n_decided_cells + n_indecisive_cells
+            self.decided_cells = self.decided_cells + n_decided_cells + n_indecisive_cells # we consider every cell to be correct, so indecided -> decided
             self.synthesize()
             self.synthetizing_step = 2
                 
@@ -112,6 +115,16 @@ class SyntheContextV2 :
                 print("len echoes :", len(echoes))
                 real_echos = self.treat_echos_alt(echoes)
                 print("len real_echos : ", len(real_echos))
+                print("linking test : ")
+                linking_list =  self.compare_echoes_with_context(real_echos, [])
+                if len(linking_list)> 0:
+                    print("linking list : ",linking_list)
+                    print("\n\n")
+                    for echo,obstacle_object in linking_list:
+                        coord,inte,_ = obstacle_object
+
+                        print("coord echo : ", echo.x, echo.y)
+                        print("coord obstacle : ", inte.x, inte.y)
                 self.interactions_list = [elem for elem in self.interactions_list if elem.type != "Echo" or elem in real_echos]
                 self.project_interactions_on_internal_hexagrid(self.interactions_list)
                 n_indecisive_cells,n_decided_cells = self.comparison_step()
@@ -299,3 +312,53 @@ class SyntheContextV2 :
             self.hexa_memory.cells_changed_recently.append(elem[0])
             self.decided_cells.remove(elem)
         return cells_treated
+
+    def compare_echoes_with_context(self,real_echos,linking_list):
+        """Compare the real echoes with the context (known_obstacles), and create a linking between all the echoes and one obstacle"""
+        linking_output = []
+        used_obstacles = []
+        known_obstacles = self.known_obstacles
+        for echo in real_echos :
+            min_dist = 9999999999
+            min_obstacle = None
+            for obstacle_object in known_obstacles:
+                _,interaction,_ = obstacle_object
+                #get the obstacle with the minimum distance from the echo
+                dist = math.sqrt((echo.x - interaction.x)**2 + (echo.y - interaction.y)**2)
+                #We want : 1) dist to be less than the current minimum, the obstactle not being already linked, and the linking not being in the previous linking list
+                if dist < min_dist and obstacle_object not in used_obstacles and (echo,obstacle_object) not in linking_list:
+                    min_dist = dist
+                    min_obstacle = obstacle_object
+            if min_obstacle is not None :
+                #TODO : just avoided for the time being to be able to conduct some tests, but should maybe produce an error
+                linking_output.append((echo,min_obstacle))
+
+        return linking_output
+                
+    def find_translation_between_echo_and_context(self,linking_list):
+        "Compute the mean of the translation between echo and obstacle in the linking list given as parameter, return the EGOCENTRIC translation"
+        sum_translation_x = 0
+        sum_translation_y = 0
+        for echo,obstacle in linking_list:
+            sum_translation_x += echo.x - obstacle.x
+            sum_translation_y += echo.y - obstacle.y
+        mean_translation_x = sum_translation_x/len(linking_list)
+        mean_translation_y = sum_translation_y/len(linking_list)
+        return mean_translation_x,mean_translation_y
+
+    def look_for_missing_obstacle(self,linking_list):
+        "Not implemented yet"
+        #TODO should be in synthesizercontext already
+        #is_missing_obstacle,self.obstacle_to_find, action_to_enact
+        return None,None,None
+
+    def apply_translation_to_hexa_memory(self,translation_between_echo_and_context):
+        "Convert the egocentric translation given as parameter to an allocentric one, and apply it to the hexa_memory"
+        translation_x,translation_y = translation_between_echo_and_context
+        allocentric_translation_x,allocentric_translation_y = self.hexa_memory.convert_egocentric_to_allocentric(translation_x,translation_y)
+        self.hexa_memory.apply_translation_to_robot_pos(allocentric_translation_x,allocentric_translation_y)
+
+    def has_missing_obstacle_been_found(self,obstacle_to_find):
+        "Not implemented yet"
+        #TODO
+        return False
