@@ -81,7 +81,7 @@ class SyntheContextV2 :
 
 
                 #We now have the echoes linked to the known obstacles
-                #We have to make sure that there is no obstacle that should have been seen by the robot but wasn't 
+                #We have to make sure that there is no obstacle that should have been seen by the robot but wasn't
                 #if the current linking is correct we should be able to find the obstacle by sending the correct action to the robot
                 is_missing_obstacle,self.obstacle_to_find, egocentric_x_of_missing_obstacle, egocentric_y_of_missing_obstacle = self.look_for_missing_obstacle(self.linking_list)
                 print("result of look_for_missing_obstacle : ", is_missing_obstacle, "coordinates of the obstacle : ", egocentric_x_of_missing_obstacle, egocentric_y_of_missing_obstacle)
