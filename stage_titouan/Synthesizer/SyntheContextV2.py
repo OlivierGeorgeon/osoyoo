@@ -48,21 +48,43 @@ class SyntheContextV2 :
         # instead an echo should be linked to a known obstacle, and used to compute the correct position of the robot.
         self.user_action = user_action
 
+
         if self.synthetizing_step == 0 : # start of the synthesis
-            self.synthetizing_step = 0.1 
+            
+            
             self.interactions_list = [elem for elem in self.memory.interactions if (elem.id>self.last_used_id)]
             if len(self.interactions_list )> 0:
+                print("Normal start of synthesis")
+                self.synthetizing_step = 0.1
                 self.last_used_id = max([elem.id for elem in self.interactions_list])
                 echoes = [elem for elem in self.interactions_list if elem.type == "Echo"]
                 real_echos = self.treat_echos_alt(echoes)
+
+
+########
+                echo_to_print = [(elem.x,elem.y) for elem in real_echos]
+                print("real echos : ",echo_to_print)
+########
+
                 self.interactions_list = [elem for elem in self.interactions_list if elem.type != "Echo"]
                 #We now have the echoes differenciated from the other interactions
                 #We now have to compare the echoes with the known obstacles
+
+########
                 self.linking_list = self.compare_echoes_with_context(real_echos,[])
+                print("linking done, len of linking_list : ", len(self.linking_list))
+                for echo,obstacle_object in self.linking_list:
+                        coord,inte,_ = obstacle_object
+                        print("coord echo : ", echo.x, echo.y)
+                        print("coord obstacle : ", inte.x, inte.y)
+########
+
+
                 #We now have the echoes linked to the known obstacles
                 #We have to make sure that there is no obstacle that should have been seen by the robot but wasn't 
                 #if the current linking is correct we should be able to find the obstacle by sending the correct action to the robot
                 is_missing_obstacle,self.obstacle_to_find, egocentric_x_of_missing_obstacle, egocentric_y_of_missing_obstacle = self.look_for_missing_obstacle(self.linking_list)
+                print("result of look_for_missing_obstacle : ", is_missing_obstacle, "coordinates of the obstacle : ", egocentric_x_of_missing_obstacle, egocentric_y_of_missing_obstacle)
                 if is_missing_obstacle:
                     # there is a missing obstacle, we should try to find it by sending the correct action to the robot
                     self.robot_action_todo = self.create_action_to_find_missing_obstacle(self.obstacle_to_find, egocentric_x_of_missing_obstacle, egocentric_y_of_missing_obstacle)
@@ -70,6 +92,8 @@ class SyntheContextV2 :
                     return
                 #there is no missing obstacle, we will consider that the linking is correct
                 self.synthetizing_step = 0.2
+            else :
+                self.synthetizing_step = 2
         
         if self.synthetizing_step == 0.1 : # we had a return during the previous loop in the if self.synthetizing_step == 0, which means
             # we had an obstacle to find, so we need to see if the action we send to the robot was enacted
@@ -91,6 +115,7 @@ class SyntheContextV2 :
             #we should now look for the correct position of the robot considering the linking between
             #the known obstacles and the echoes
             translation_between_echo_and_context = self.find_translation_between_echo_and_context(self.linking_list)
+            print("Mean translation between echo and context : ", translation_between_echo_and_context)
             #we have the translation between the known obstacles and the echoes
             #we should apply this translation to the robot position
             self.apply_translation_to_hexa_memory(translation_between_echo_and_context)
@@ -105,6 +130,10 @@ class SyntheContextV2 :
             self.decided_cells = self.decided_cells + n_decided_cells + n_indecisive_cells # we consider every cell to be correct, so indecided -> decided
             self.synthesize()
             self.synthetizing_step = 2
+
+        if self.synthetizing_step == 2:
+            # we have finished the synthesis
+            self.synthetizing_step = 0
                 
 
 
@@ -281,6 +310,7 @@ class SyntheContextV2 :
                         if len(cell.interactions) > 0 :
                             decided_cells.append(((i,j),cell.interactions[-1],intern_status))
                 else : #AUTO_MODE
+                    if len(cell.interactions) > 0 :
                         decided_cells.append(((i,j),cell.interactions[-1], intern_status))
         return(inde_cells,decided_cells)
 
@@ -342,9 +372,13 @@ class SyntheContextV2 :
                 
     def find_translation_between_echo_and_context(self,linking_list):
         "Compute the mean of the translation between echo and obstacle in the linking list given as parameter, return the EGOCENTRIC translation"
+        if len(linking_list) == 0 :
+            return 0,0
         sum_translation_x = 0
         sum_translation_y = 0
-        for echo,obstacle in linking_list:
+        for echo,obstacle_object in linking_list:
+            _,obstacle,_ = obstacle_object
+            print("ksss")
             sum_translation_x += echo.x - obstacle.x
             sum_translation_y += echo.y - obstacle.y
         mean_translation_x = sum_translation_x/len(linking_list)
@@ -353,6 +387,8 @@ class SyntheContextV2 :
 
     def look_for_missing_obstacle(self,linking_list):
         "Look if any obstacle known and not in the linkinglist should be visible by the robot (i.e. in the half circle of radius SCAN_DISTANCE in front of the robot)"
+        if len(linking_list) == 0:
+            return False, None, None, None
         robot_angle = self.hexa_memory.robot_angle
         scan_dist = SCAN_DISTANCE
         robot_pos_x = self.hexa_memory.robot_pos_x
@@ -368,14 +404,16 @@ class SyntheContextV2 :
         # we need to find if an obstacle in self.known_obstacles is over (or under depending on sign_changer) this line
         # and if it's distance to the robot is below the scan_dist
 
-        obstacle_object_in_linkings_list = zip(*linking_list)[1]
+        obstacle_object_in_linkings_list = list(zip(*linking_list))[1]
         for obstacle_object in self.known_obstacles:
                 if obstacle_object not in obstacle_object_in_linkings_list:
                     _,obstacle,_ = obstacle_object
+
+                    #TODO : FALSE, should be based on projection, not interaction
                     # first condition
-                    first_condition_met = line_slope * obstacle[0] + line_intercept > obstacle[1] * sign_changer # TODO: Maybe problem with the sign_changer
+                    first_condition_met = line_slope * obstacle.x + line_intercept > obstacle.y * sign_changer # TODO: Maybe problem with the sign_changer
                     # second condition
-                    second_condition_met = math.sqrt((obstacle[0]-robot_pos_x)**2 + (obstacle[1]-robot_pos_y)**2) < scan_dist
+                    second_condition_met = math.sqrt((obstacle.x-robot_pos_x)**2 + (obstacle.y-robot_pos_y)**2) < scan_dist
                     if not first_condition_met or not second_condition_met:
                         #the obstacle is not scannable from the current robot position, so we skip to the next one
                         continue
@@ -394,6 +432,7 @@ class SyntheContextV2 :
         "Convert the egocentric translation given as parameter to an allocentric one, and apply it to the hexa_memory"
         translation_x,translation_y = translation_between_echo_and_context
         allocentric_translation_x,allocentric_translation_y = self.hexa_memory.convert_egocentric_translation_to_allocentric(translation_x,translation_y)
+        print("SyntheContextV2 moves robot by",allocentric_translation_x,allocentric_translation_y)
         self.hexa_memory.apply_translation_to_robot_pos(allocentric_translation_x,allocentric_translation_y)
 
     def has_missing_obstacle_been_found(self,obstacle_to_find,robot_action_enacted):
@@ -418,3 +457,10 @@ class SyntheContextV2 :
         intended_interaction["focus_x"] = egocentric_x_of_missing_obstacle 
         intended_interaction["focus_y"] = egocentric_y_of_missing_obstacle
         return intended_interaction
+
+
+    def set_mode(self, mode):
+        if mode == MANUAL_MODE or mode == AUTOMATIC_MODE:
+            self.mode = mode
+        else :
+            print("Invalid mode for SyntheContextV2")

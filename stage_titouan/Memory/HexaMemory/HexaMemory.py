@@ -334,5 +334,4 @@ class HexaMemory(HexaGrid):
 
     def apply_translation_to_robot_pos(self,translation_x,translation_y):
         """Apply the given translation to the robot's position"""
-        self.robot_pos_x += translation_x
-        self.robot_pos_y += translation_y
+        self.move(0,translation_x,translation_y)

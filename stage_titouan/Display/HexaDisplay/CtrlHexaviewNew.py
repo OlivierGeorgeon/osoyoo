@@ -49,8 +49,10 @@ class CtrlHexaviewNew:
                     print(message)
 
                 if text.upper() == "O" :
+                    print("setting controler to automatic mode")
                     self.ctrl_workspace.synthesizer.set_mode("automatic")
                 if text.upper() == "P" :
+                    print("setting controler to manual mode")
                     self.ctrl_workspace.synthesizer.set_mode("manual")
         self.hexaview.on_text = on_text_hemw
 
