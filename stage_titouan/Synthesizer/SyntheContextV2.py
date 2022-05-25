@@ -6,6 +6,7 @@ from .. Memory.HexaMemory.HexaGrid import HexaGrid
 import numpy as np
 AUTOMATIC_MODE = "automatic"
 MANUAL_MODE = "manual"
+SCAN_DISTANCE = 600
 from .. Memory.HexaMemory.HexaGrid import HexaGrid
 class SyntheContextV2 :
     """J'essaie de simplifier encore"""
@@ -31,6 +32,8 @@ class SyntheContextV2 :
 
 
         self.f_robot_action_enacted = False
+        self.robot_interaction_enacted = None
+        self.robot_action_todo = None
 
     def act(self,user_action = None):
         """blabla"""
@@ -59,11 +62,11 @@ class SyntheContextV2 :
                 #We now have the echoes linked to the known obstacles
                 #We have to make sure that there is no obstacle that should have been seen by the robot but wasn't 
                 #if the current linking is correct we should be able to find the obstacle by sending the correct action to the robot
-                is_missing_obstacle,self.obstacle_to_find, action_to_enact = self.look_for_missing_obstacle(self.linking_list)
+                is_missing_obstacle,self.obstacle_to_find, egocentric_x_of_missing_obstacle, egocentric_y_of_missing_obstacle = self.look_for_missing_obstacle(self.linking_list)
                 if is_missing_obstacle:
                     # there is a missing obstacle, we should try to find it by sending the correct action to the robot
-                    #TODO : ajouter l'envoi de l'action
-
+                    self.robot_action_todo = self.create_action_to_find_missing_obstacle(self.obstacle_to_find, egocentric_x_of_missing_obstacle, egocentric_y_of_missing_obstacle)
+                    self.f_robot_action_enacted = False
                     return
                 #there is no missing obstacle, we will consider that the linking is correct
                 self.synthetizing_step = 0.2
@@ -74,7 +77,7 @@ class SyntheContextV2 :
                 # we need to wait for the robot to enact the action
                 return
             # the robot has enacted the action, we need to see if it found the missing obstacle
-            missing_obstacle_found = self.has_missing_obstacle_been_found(self.obstacle_to_find)
+            missing_obstacle_found = self.has_missing_obstacle_been_found(self.obstacle_to_find,self.robot_interaction_enacted)
             if missing_obstacle_found :
                 #we can consider our linking as correct so we go to the next step
                 self.synthetizing_step = 0.2
@@ -82,6 +85,7 @@ class SyntheContextV2 :
             else :
                 # our linking was incorrect, we need to try another one
                 # TODO : we need to try another linking
+                self.synthetizing_step = 0.2 # TODO : remove this line
                 ""
         if self.synthetizing_step == 0.2:
             #we should now look for the correct position of the robot considering the linking between
@@ -332,6 +336,7 @@ class SyntheContextV2 :
             if min_obstacle is not None :
                 #TODO : just avoided for the time being to be able to conduct some tests, but should maybe produce an error
                 linking_output.append((echo,min_obstacle))
+                used_obstacles.append(min_obstacle) # quoi que ? on peut peut-être utiliser le meme obstacle pour différents echo ?
 
         return linking_output
                 
@@ -347,18 +352,69 @@ class SyntheContextV2 :
         return mean_translation_x,mean_translation_y
 
     def look_for_missing_obstacle(self,linking_list):
-        "Not implemented yet"
-        #TODO should be in synthesizercontext already
-        #is_missing_obstacle,self.obstacle_to_find, action_to_enact
-        return None,None,None
+        "Look if any obstacle known and not in the linkinglist should be visible by the robot (i.e. in the half circle of radius SCAN_DISTANCE in front of the robot)"
+        robot_angle = self.hexa_memory.robot_angle
+        scan_dist = SCAN_DISTANCE
+        robot_pos_x = self.hexa_memory.robot_pos_x
+        robot_pos_y = self.hexa_memory.robot_pos_y
+        angle_calcul = math.radians(90+ robot_angle)
+        x_1 = math.cos(angle_calcul) * scan_dist
+        y_1= math.sin(angle_calcul) * scan_dist
+        line_slope = (y_1-robot_pos_y)/(x_1-robot_pos_x)
+        line_intercept = robot_pos_y - line_slope * robot_pos_x
+        sign_changer = 1 if robot_angle >= 0 else -1
+
+        # we know have a line equation in the form y = line_slope * x + line_intercept
+        # we need to find if an obstacle in self.known_obstacles is over (or under depending on sign_changer) this line
+        # and if it's distance to the robot is below the scan_dist
+
+        obstacle_object_in_linkings_list = zip(*linking_list)[1]
+        for obstacle_object in self.known_obstacles:
+                if obstacle_object not in obstacle_object_in_linkings_list:
+                    _,obstacle,_ = obstacle_object
+                    # first condition
+                    first_condition_met = line_slope * obstacle[0] + line_intercept > obstacle[1] * sign_changer # TODO: Maybe problem with the sign_changer
+                    # second condition
+                    second_condition_met = math.sqrt((obstacle[0]-robot_pos_x)**2 + (obstacle[1]-robot_pos_y)**2) < scan_dist
+                    if not first_condition_met or not second_condition_met:
+                        #the obstacle is not scannable from the current robot position, so we skip to the next one
+                        continue
+                    x_robot = self.hexa_memory.robot_pos_x
+                    y_robot = self.hexa_memory.robot_pos_y
+                    x_obstacle = obstacle[0]
+                    y_obstacle = obstacle[1]
+                    robot_angle = math.radians(self.hexa_memory.robot_angle)
+                    egocentric_x_of_missing_obstacle = (x_obstacle-x_robot) * math.cos(robot_angle) - (y_obstacle-y_robot) * math.sin(robot_angle)
+                    egocentric_y_of_missing_obstacle = (x_obstacle-x_robot) * math.sin(robot_angle) + (y_obstacle-y_robot) * math.cos(robot_angle)
+
+                    return True, obstacle_object, egocentric_x_of_missing_obstacle, egocentric_y_of_missing_obstacle
+        return False, None, None, None
 
     def apply_translation_to_hexa_memory(self,translation_between_echo_and_context):
         "Convert the egocentric translation given as parameter to an allocentric one, and apply it to the hexa_memory"
         translation_x,translation_y = translation_between_echo_and_context
-        allocentric_translation_x,allocentric_translation_y = self.hexa_memory.convert_egocentric_to_allocentric(translation_x,translation_y)
+        allocentric_translation_x,allocentric_translation_y = self.hexa_memory.convert_egocentric_translation_to_allocentric(translation_x,translation_y)
         self.hexa_memory.apply_translation_to_robot_pos(allocentric_translation_x,allocentric_translation_y)
 
-    def has_missing_obstacle_been_found(self,obstacle_to_find):
+    def has_missing_obstacle_been_found(self,obstacle_to_find,robot_action_enacted):
         "Not implemented yet"
+        coord,_,_ = obstacle_to_find
+        pos_x,pos_y = self.hexa_memory.convert_cell_to_pos(coord[0],coord[1])
+        #comput the distance between hexamemory.robotpos and coord
+        dist = math.sqrt((pos_x-self.hexa_memory.robot_pos_x)**2 + (pos_y-self.hexa_memory.robot_pos_y)**2)
+
+
+        #Compare that distance with the scan that has been done
         #TODO
+
+
+        if False : # if abs(dist - robot_action_enacted.scan_dist) < threshold :
+            return True
         return False
+
+    def create_action_to_find_missing_obstacle(self,obstacle_to_find, egocentric_x_of_missing_obstacle, egocentric_y_of_missing_obstacle):
+        intended_interaction = {}
+        intended_interaction['action'] = '+'
+        intended_interaction["focus_x"] = egocentric_x_of_missing_obstacle 
+        intended_interaction["focus_y"] = egocentric_y_of_missing_obstacle
+        return intended_interaction

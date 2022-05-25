@@ -54,17 +54,18 @@ class CtrlWorkspace():
         self.user_action = None
         self.need_user_action = False
 
-        if self.synthesizer.synthetizing_step in [0,2]:
+        if self.synthesizer.robot_action_todo is not None :
+            "le synthé a besoin d'une action du robot"
+            print("on a reçu la demande d'interaction robot du synthe")
+            self.interaction_to_enact = self.synthesizer.robot_action_todo
+            self.f_interaction_to_enact_ready = True
+
+        elif self.synthesizer.synthetizing_step in [0,2]:
             " tout s'est bien passé" #donc rien à faire de particulier
         elif self.synthesizer.synthetizing_step is 1 :
             "on a besoin d'une action de l'user sur l'hexaview"
             self.need_user_action = True
             self.cell_inde_a_traiter = self.synthesizer.indecisive_cells[-1]
-            return
-        elif self.synthesizer.synthetizing_step is 3 :
-            "le synthé a besoin d'une action du robot"
-            self.interaction_to_enact = self.synthesizer.get_interaction_needed()
-            self.f_interaction_to_enact_ready = True
             return
 
         if self.decision_mode == "automatic" :

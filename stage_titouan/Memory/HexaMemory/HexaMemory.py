@@ -320,12 +320,17 @@ class HexaMemory(HexaGrid):
         self.grid[cell_x][cell_y].status = status
         self.cells_changed_recently.append((cell_x,cell_y))
 
-    def convert_egocentric_to_allocentric(self,translation_x,translation_y):
+    def convert_egocentric_translation_to_allocentric(self,translation_x,translation_y):
         """Convert the given translation from egocentric to allocentric coordinates"""
         rota_radian = math.radians(self.robot_angle)
         x_prime = int(translation_x * math.cos(rota_radian) - translation_y * math.sin(rota_radian))
         y_prime = int(translation_x * math.sin(rota_radian) + translation_y * math.cos(rota_radian))
         return x_prime,y_prime
+
+    def convert_egocentric_position_to_allocentric(self,position_x,position_y):
+        """Convert the given position from egocentric to allocentric coordinates"""
+        translation_x,translation_y = self.convert_egocentric_translation_to_allocentric(position_x,position_y)
+        return self.robot_pos_x + translation_x, self.robot_pos_y + translation_y
 
     def apply_translation_to_robot_pos(self,translation_x,translation_y):
         """Apply the given translation to the robot's position"""
