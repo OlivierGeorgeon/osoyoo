@@ -4,6 +4,7 @@ import sys
 from stage_titouan import *
 from stage_titouan.Agent.Agent5 import Agent5
 from stage_titouan.Agent.CircleBehavior import CircleBehavior
+from stage_titouan.Agent.AgentCircle import AgentCircle
 from stage_titouan.Robot.RobotDefine import *
 
 CONTROL_MODE_MANUAL = 0
@@ -27,7 +28,8 @@ if __name__ == "__main__":
     ctrl_view = CtrlView(workspace)
     ego_view = ctrl_view.view
     # agent = Agent5()
-    agent = CircleBehavior()
+    # agent = CircleBehavior()
+    agent = AgentCircle()
     ctrl_hexaview = CtrlHexaview(workspace)
     ctrl_hexaview.hexaview.extract_and_convert_interactions(workspace.hexa_memory)
     ctrl_synthe = CtrlSynthe(workspace)

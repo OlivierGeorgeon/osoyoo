@@ -1,5 +1,5 @@
 # This resource is useful for Agent4
-from . Resources import Interaction
+from . Interaction import Interaction
 
 
 class CompositeInteraction:
@@ -41,6 +41,20 @@ class CompositeInteraction:
         else:
             # print("Creating ", end="")
             # print(interaction)
+            cls.composite_interaction_list.append(interaction)
+            return interaction
+
+    @classmethod
+    def create_or_reinforce(cls, pre_interaction, post_interaction):
+        interaction = CompositeInteraction(pre_interaction, post_interaction)
+
+        if interaction in cls.composite_interaction_list:
+            i = cls.composite_interaction_list.index(interaction)
+            print("reinforcing:", cls.composite_interaction_list[i].__str__())
+            cls.composite_interaction_list[i].weight += 1
+            return cls.composite_interaction_list[i]
+        else:
+            print("Learning:", interaction.__str__())
             cls.composite_interaction_list.append(interaction)
             return interaction
 
