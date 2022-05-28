@@ -104,13 +104,13 @@ if __name__ == "__main__":
                 intended_interaction = agent.intended_interaction(action)
                 # TODO send the speed depending on the direction
                 if action == '8':
-                    intended_interaction['speed'] = ctrl_robot.forward_speed[0]
+                    intended_interaction['speed'] = int(ctrl_robot.forward_speed[0])
                 if action == '2':
-                    intended_interaction['speed'] = -ctrl_robot.backward_speed[0]
+                    intended_interaction['speed'] = -int(ctrl_robot.backward_speed[0])
                 if action == '4':
-                    intended_interaction['speed'] = ctrl_robot.leftward_speed[1]
+                    intended_interaction['speed'] = int(ctrl_robot.leftward_speed[1])
                 if action == '6':
-                    intended_interaction['speed'] = -ctrl_robot.rightward_speed[1]
+                    intended_interaction['speed'] = -int(ctrl_robot.rightward_speed[1])
                 ctrl_robot.command_robot(intended_interaction)
 
     # Schedule the main loop that updates the agent

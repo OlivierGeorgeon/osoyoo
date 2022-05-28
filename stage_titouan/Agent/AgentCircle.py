@@ -1,6 +1,8 @@
+import math
+
 from . Interaction import Interaction
 from . CompositeInteraction import CompositeInteraction
-from . CircleBehaviorData import *
+from . PredefinedInteractions import *
 
 
 class AgentCircle:
@@ -39,15 +41,17 @@ class AgentCircle:
             self.memory.append(composite_interaction)
 
         # Selecting the next action to enact
-        self._action = ACTION_SCAN
+        self._action = ACTION_SCAN  # Good for circling around object behavior
         proclivity_dict = {}  # dict.fromkeys(ACTION_LIST, 0)
+        # proclivity_dict = {ACTION_FORWARD: 0, ACTION_TURN_LEFT: 0, ACTION_TURN_RIGHT: 0} good for exploring terrain
+        proclivity_dict = {ACTION_FORWARD: 0}  # Good for touring terrain
         if self.memory:
             activated_interactions = [ci for ci in self.memory if ci.pre_interaction == self.last_interaction]
             for ai in activated_interactions:
                 if ai.post_interaction.action in proclivity_dict:
                     proclivity_dict[ai.post_interaction.action] += ai.weight * ai.post_interaction.valence
                 else:
-                    proclivity_dict[ai.post_interaction.action] = 0
+                    proclivity_dict[ai.post_interaction.action] = ai.weight * ai.post_interaction.valence
 
         print("Proclivity dictionary:", proclivity_dict)
         # Select the action that has the highest proclivity value
@@ -87,12 +91,25 @@ class AgentCircle:
                 self.focus = False
                 outcome = OUTCOME_LOST_FOCUS
 
-        if self._action == ACTION_SCAN:
+        # Catch focus
+        if self._action in [ACTION_SCAN, ACTION_FORWARD]:
             if outcome in [OUTCOME_LEFT, OUTCOME_FAR_LEFT, OUTCOME_RIGHT, OUTCOME_FAR_RIGHT]:
                 # Found focus
                 self.focus = True
 
-        print("Result:", outcome)
+        # If not focus then no circle behavior outcome
+        if not self.focus and outcome != OUTCOME_LOST_FOCUS:
+            outcome = OUTCOME_DEFAULT
+
+        # Floor outcome
+        if 'floor' in enacted_interaction:
+            if enacted_interaction['floor'] == 0b10:
+                outcome = OUTCOME_FLOOR_LEFT
+            if enacted_interaction['floor'] == 0b11:
+                outcome = OUTCOME_FLOOR_FRONT
+            if enacted_interaction['floor'] == 0b01:
+                outcome = OUTCOME_FLOOR_RIGHT
+
         return outcome
 
     def intended_interaction(self, _action):

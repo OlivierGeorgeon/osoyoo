@@ -24,12 +24,14 @@ class Interaction:
             return False
 
     @classmethod
-    def create_or_retrieve(cls, action, outcome, valence=0):
+    def create_or_retrieve(cls, action, outcome, valence=None):
         """ Use this methode to create a new interaction or to retrieve it if it already exists """
-        interaction = Interaction(action, outcome, valence)
+        interaction = Interaction(action, outcome, valence if valence is not None else 0)
 
         if interaction in cls.interaction_list:
             i = cls.interaction_list.index(interaction)
+            if valence is not None:
+                cls.interaction_list[i].valence = valence  # Update the valence
             # print("Retrieving ", end="")
             # print(cls.interaction_list[i])
             return cls.interaction_list[i]

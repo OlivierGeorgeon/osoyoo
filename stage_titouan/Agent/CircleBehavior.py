@@ -1,4 +1,4 @@
-from . CircleBehaviorData import *
+from . PredefinedInteractions import *
 
 
 class CircleBehavior:
