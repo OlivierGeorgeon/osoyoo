@@ -100,6 +100,7 @@ char action =' ';
 String status = "0"; // The outcome information used for sequential learning
 int robot_destination_angle = 0;
 int head_destination_angle = 0;
+int action_angle = 0;
 unsigned long blink_end_time = 0;
 bool blink_on = true;
 bool is_focussed = false;
@@ -143,7 +144,7 @@ void loop()
     int packetSize = Udp.parsePacket();
     // If the received packet exceeds the size of packetBuffer defined above, Arduino will crash
     if (packetSize) {
-      int action_angle = 0;
+      action_angle = 0;
       int len = Udp.read(packetBuffer, 512);
       packetBuffer[len] = 0;
       //Serial.print("Received action ");
@@ -405,7 +406,8 @@ void loop()
       case ACTION_TURN_IN_SPOT_LEFT:
         // Keep head aligned with destination angle
         if (is_focussed){
-          float current_robot_direction = (head_destination_angle - IMU._yaw) * M_PI / 180.0;
+          //float current_robot_direction = (head_destination_angle - IMU._yaw) * M_PI / 180.0;
+          float current_robot_direction = (action_angle - IMU._yaw) * M_PI / 180.0;
           float r = sqrt(sq((float)focus_x) + sq((float)focus_y));  // conversion to float is necessary for some reason
           float current_head_direction = HEA.head_direction(cos(current_robot_direction) * r, sin(current_robot_direction) * r);
           // Serial.println("Directions robot: " + String(current_robot_direction) + ", head: " + String((int)current_head_direction) + ", dist: " + String((int)r));
@@ -426,7 +428,8 @@ void loop()
       case ACTION_TURN_IN_SPOT_RIGHT:
         // Keep head aligned with destination angle
         if (is_focussed){
-          float current_robot_direction = (head_destination_angle - IMU._yaw) * M_PI / 180.0;
+          // float current_robot_direction = (head_destination_angle - IMU._yaw) * M_PI / 180.0;
+          float current_robot_direction = (action_angle - IMU._yaw) * M_PI / 180.0;
           float r = sqrt(sq((float)focus_x) + sq((float)focus_y));  // conversion to float is necessary for some reason
           float current_head_direction = HEA.head_direction(cos(current_robot_direction) * r, sin(current_robot_direction) * r);
           // Serial.println("Directions robot: " + String(current_robot_direction) + ", head: " + String((int)current_head_direction) + ", dist: " + String((int)r));
