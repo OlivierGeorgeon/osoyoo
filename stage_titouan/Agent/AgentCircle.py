@@ -93,7 +93,7 @@ class AgentCircle:
 
         # Catch focus
         if self._action in [ACTION_SCAN, ACTION_FORWARD]:
-            if outcome in [OUTCOME_LEFT, OUTCOME_FAR_LEFT, OUTCOME_RIGHT, OUTCOME_FAR_RIGHT]:
+            if outcome in [OUTCOME_LEFT, OUTCOME_FAR_LEFT, OUTCOME_RIGHT, OUTCOME_FAR_RIGHT, OUTCOME_FAR_FRONT, OUTCOME_CLOSE_FRONT]:
                 # Found focus
                 self.focus = True
 
