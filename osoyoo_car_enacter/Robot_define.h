@@ -1,4 +1,4 @@
-#define ROBOT_ID 2 // 0: regular Osoyoo robot, 1: robot BSN, 2: robot Olivier, 3: robot SHS, 4: robot SHS with GY86
+#define ROBOT_ID 1 // 0: regular Osoyoo robot, 1: robot BSN, 2: robot Olivier, 3: robot SHS, 4: robot SHS with GY86
 
 #define ROBOT_HEAD_X 80  // X position of the head
 

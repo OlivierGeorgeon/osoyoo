@@ -166,7 +166,8 @@ void loop()
         if (myObject.hasOwnProperty("focus_x")) {
           focus_x = (int)myObject["focus_x"];
           focus_y = (int)myObject["focus_y"];
-          action_angle = atan2(focus_y, focus_x) * 180.0 / M_PI; // for focussed
+          action_angle = atan2(focus_y, focus_x) * 180.0 / M_PI; // Direction of the focus relative to the robot
+          // action_head_angle = HEA.head_direction(focus_x, focus_y);  // Direction of the focus from the head
           is_focussed = true;
         } else {
           is_focussed = false;
@@ -407,9 +408,9 @@ void loop()
         // Keep head aligned with destination angle
         if (is_focussed){
           //float current_robot_direction = (head_destination_angle - IMU._yaw) * M_PI / 180.0;
-          float current_robot_direction = (action_angle - IMU._yaw) * M_PI / 180.0;
+          float current_focus_direction = (action_angle - IMU._yaw) * M_PI / 180.0; // relative to robot
           float r = sqrt(sq((float)focus_x) + sq((float)focus_y));  // conversion to float is necessary for some reason
-          float current_head_direction = HEA.head_direction(cos(current_robot_direction) * r, sin(current_robot_direction) * r);
+          float current_head_direction = HEA.head_direction(cos(current_focus_direction) * r, sin(current_focus_direction) * r);
           // Serial.println("Directions robot: " + String(current_robot_direction) + ", head: " + String((int)current_head_direction) + ", dist: " + String((int)r));
           HEA.turnHead(current_head_direction); // Keep looking at destination
         } else {
@@ -429,9 +430,9 @@ void loop()
         // Keep head aligned with destination angle
         if (is_focussed){
           // float current_robot_direction = (head_destination_angle - IMU._yaw) * M_PI / 180.0;
-          float current_robot_direction = (action_angle - IMU._yaw) * M_PI / 180.0;
+          float current_focus_direction = (action_angle - IMU._yaw) * M_PI / 180.0;
           float r = sqrt(sq((float)focus_x) + sq((float)focus_y));  // conversion to float is necessary for some reason
-          float current_head_direction = HEA.head_direction(cos(current_robot_direction) * r, sin(current_robot_direction) * r);
+          float current_head_direction = HEA.head_direction(cos(current_focus_direction) * r, sin(current_focus_direction) * r);
           // Serial.println("Directions robot: " + String(current_robot_direction) + ", head: " + String((int)current_head_direction) + ", dist: " + String((int)r));
           HEA.turnHead(current_head_direction); // Keep looking at destination
         } else {
