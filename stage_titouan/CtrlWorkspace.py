@@ -6,7 +6,6 @@ class CtrlWorkspace():
         """Constructor"""
         self.workspace = workspace
         self.synthesizer = workspace.synthesizer
-        
         self.work_step = 0
         self.need_user_action = False
         self.user_action = None
@@ -43,7 +42,7 @@ class CtrlWorkspace():
                 # Else we need to send the command given by the synthesizer to the robot
 
                 #0. Update the memory with the last interaction and change position in hexa_memory and memory
-                if self.enacted_interaction['status'] is not "T":
+                if self.enacted_interaction['status'] != "T":
                     self.send_phenom_info_to_memory()
                     self.send_position_change_to_hexa_memory()
                     self.send_position_change_to_memory()
@@ -62,7 +61,7 @@ class CtrlWorkspace():
 
         elif self.synthesizer.synthetizing_step in [0,2]:
             " tout s'est bien passé" #donc rien à faire de particulier
-        elif self.synthesizer.synthetizing_step is 1 :
+        elif self.synthesizer.synthetizing_step == 1 :
             #"on a besoin d'une action de l'user sur l'hexaview"
             self.need_user_action = True
             self.cell_inde_a_traiter = self.synthesizer.indecisive_cells[-1]

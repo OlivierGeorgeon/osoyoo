@@ -71,12 +71,13 @@ class SyntheContextV2 :
                 #We now have to compare the echoes with the known obstacles
 
 ########
-                self.linking_list = self.compare_echoes_with_context(real_echos,[])
+                self.linking_list = self.compare_echoes_with_context_alt(real_echos,[])
                 print("linking done, len of linking_list : ", len(self.linking_list))
                 for echo,obstacle_object in self.linking_list:
                         coord,inte,_ = obstacle_object
-                        print("coord echo : ", echo.x, echo.y)
-                        print("coord obstacle : ", inte.x, inte.y)
+                        allo_x,allo_y = self.hexa_memory.convert_egocentric_position_to_allocentric(echo.x,echo.y)
+                        print("coord echo : ", allo_x,allo_y, " cell : ", self.hexa_memory.convert_pos_in_cell(allo_x,allo_y) )
+                        print("coord obstacle : ", self.hexa_memory.convert_cell_to_pos(coord[0],coord[1]), " cell : ", coord[0], coord[1])
 ########
 
 
@@ -242,8 +243,8 @@ class SyntheContextV2 :
                 #if the difference between the angle and the last angle is too big or the difference between the last distance 
                 #and the current distance is too big, we have a new strike else we continue the current strike
                 #if we end the strike we take the interaction in the middle of it, and we add it to the output array
-                print("angle : ", math.degrees(angle), "angle_end_of_strike : ", math.degrees(angle_end_of_strike), "max_delta_angle : ",math.degrees( max_delta_angle))
-                print("distance :", distance, "distance_end_of_strike : ", distance_end_of_strike, "max_delta_dist : ", max_delta_dist)
+                #print("angle : ", math.degrees(angle), "angle_end_of_strike : ", math.degrees(angle_end_of_strike), "max_delta_angle : ",math.degrees( max_delta_angle))
+                #print("distance :", distance, "distance_end_of_strike : ", distance_end_of_strike, "max_delta_dist : ", max_delta_dist)
                 if abs(angle - angle_end_of_strike) > max_delta_angle or abs(distance - distance_end_of_strike) > max_delta_dist :
                     new_strike = True
                     output.append(current_strike[int(len(current_strike)/2)])
@@ -292,6 +293,20 @@ class SyntheContextV2 :
                 self.internal_hexa_grid.add_interaction(cell_x,cell_y,interaction)
                 already_used_cells.append((cell_x,cell_y))
             self.last_used_id = max(interaction.id,self.last_used_id)
+
+    def get_allocentric_coordinates_of_interactions(self,interaction_list):
+        """ Compute allocentric coordinates for every interaction of the given type in self.interactions_list,
+        and add them to the internal hexagrid
+        
+        Return a list of ((x,y),interaction)"""
+        rota_radian = math.radians(self.hexa_memory.robot_angle)
+        allocentric_coordinates = []
+        for _,interaction in enumerate(interaction_list):
+                corner_x,corner_y = interaction.x,interaction.y
+                x_prime = int(corner_x* math.cos(rota_radian) - corner_y * math.sin(rota_radian) + self.hexa_memory.robot_pos_x)
+                y_prime = int(corner_y * math.cos(rota_radian) + corner_x* math.sin(rota_radian) + self.hexa_memory.robot_pos_y)
+                allocentric_coordinates.append(((x_prime,y_prime),interaction))
+        return allocentric_coordinates
 
     def comparison_step(self):
         """Compare cell by cell between internal_hexa_grid and hexa_memory.grid
@@ -370,19 +385,56 @@ class SyntheContextV2 :
 
         return linking_output
                 
+
+    def compare_echoes_with_context_alt(self,real_echos,linking_list):
+        """Compare the real echoes with the context (known_obstacles), and create a linking between all the echoes and one obstacle"""
+        linking_output = []
+        used_obstacles = []
+        known_obstacles = self.known_obstacles
+        echos_allocentric = self.get_allocentric_coordinates_of_interactions(real_echos)
+        for (x_echo,y_echo),echo_interaction in echos_allocentric :
+            min_dist = 9999999999
+            min_obstacle = None
+            for obstacle_object in known_obstacles:
+                coord,_,_ = obstacle_object
+                x_obstacle,y_obstacle = self.hexa_memory.convert_cell_to_pos(coord[0],coord[1])
+                #get the obstacle with the minimum distance from the echo
+                dist = math.sqrt((x_echo - x_obstacle)**2 + (y_echo - y_obstacle)**2)
+                #We want : 1) dist to be less than the current minimum, the obstactle not being already linked, and the linking not being in the previous linking list
+                if dist < min_dist and obstacle_object not in used_obstacles and (echo_interaction,obstacle_object) not in linking_list:
+                    min_dist = dist
+                    min_obstacle = obstacle_object
+            if min_obstacle is not None :
+                #TODO : just avoided for the time being to be able to conduct some tests, but should maybe produce an error
+                linking_output.append((echo_interaction,min_obstacle))
+                used_obstacles.append(min_obstacle) # quoi que ? on peut peut-être utiliser le meme obstacle pour différents echo ?
+
+        return linking_output
+
     def find_translation_between_echo_and_context(self,linking_list):
-        "Compute the mean of the translation between echo and obstacle in the linking list given as parameter, return the EGOCENTRIC translation"
+        "Compute the mean of the translation between echo and obstacle in the linking list given as parameter, return the ALLOCENTRIC translation"
         if len(linking_list) == 0 :
             return 0,0
         sum_translation_x = 0
         sum_translation_y = 0
         for echo,obstacle_object in linking_list:
-            _,obstacle,_ = obstacle_object
+            result_tmp = self.get_allocentric_coordinates_of_interactions([echo])
+
+            print("resukt_tmp : {}".format(result_tmp))
+            (allo_x,allo_y),_ = self.get_allocentric_coordinates_of_interactions([echo])[0]
+            coord,obstacle,_ = obstacle_object
+            obstacle_x,obstacle_y = self.hexa_memory.convert_cell_to_pos(coord[0],coord[1])
+            print("obstacle_x : {}".format(obstacle_x),"obstacle_y : {}".format(obstacle_y))
             print("ksss")
-            sum_translation_x += echo.x - obstacle.x
-            sum_translation_y += echo.y - obstacle.y
+            diff_x = allo_x - obstacle_x
+            diff_y = allo_y - obstacle_y
+            print("diff_x : {}".format(diff_x), "diff_y : {}".format(diff_y))
+            sum_translation_x += allo_x - obstacle_x
+            sum_translation_y += allo_y - obstacle_y
         mean_translation_x = sum_translation_x/len(linking_list)
         mean_translation_y = sum_translation_y/len(linking_list)
+
+
         return mean_translation_x,mean_translation_y
 
     def look_for_missing_obstacle(self,linking_list):
@@ -430,8 +482,8 @@ class SyntheContextV2 :
 
     def apply_translation_to_hexa_memory(self,translation_between_echo_and_context):
         "Convert the egocentric translation given as parameter to an allocentric one, and apply it to the hexa_memory"
-        translation_x,translation_y = translation_between_echo_and_context
-        allocentric_translation_x,allocentric_translation_y = self.hexa_memory.convert_egocentric_translation_to_allocentric(translation_x,translation_y)
+        allocentric_translation_x,allocentric_translation_y = translation_between_echo_and_context
+        #allocentric_translation_x,allocentric_translation_y = self.hexa_memory.convert_egocentric_translation_to_allocentric(translation_x,translation_y)
         print("SyntheContextV2 moves robot by",allocentric_translation_x,allocentric_translation_y)
         self.hexa_memory.apply_translation_to_robot_pos(allocentric_translation_x,allocentric_translation_y)
 
