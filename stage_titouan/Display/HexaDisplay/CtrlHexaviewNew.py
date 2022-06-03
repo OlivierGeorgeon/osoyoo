@@ -16,6 +16,14 @@ class CtrlHexaviewNew:
 
         #Handlers
         def on_text_hemw(text):
+                if text.upper() == "A" :
+                    self.ctrl_workspace.decision_mode = "automatic"
+                    print("passage du decider en mode automatique")
+                    return
+                if text.upper() == "M" :
+                    self.ctrl_workspace.decision_mode = "manual"
+                    print("passage du decider en mode manual")
+                    return
                 if ctrl_workspace.need_user_action and self.inde_cell_projection_done :
                     print("hohihouhahah")
                     if text.upper() == "Y":
