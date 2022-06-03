@@ -187,22 +187,30 @@ class HexaMemory(HexaGrid):
             return tmp_cell_x, tmp_cell_y
 
 
-    def convert_cell_to_pos(self, cell_x, cell_y):
-        """
-        Convert a cell coordinate to a position in the grid
-        """
-        diff_x = self.width//2 - cell_x
-        diff_y = self.height//2 - cell_y
-        diff_y_impair = diff_y//2 != 0
-        change_x = 0
+
+
+    def convert_cell_to_pos(self,cell_x, cell_y):
+        """Convert cell coordinates to position in the grid"""
         radius = self.cell_radius
         mini_radius = math.sqrt(radius**2 - (radius/2)**2)
-        if diff_y_impair and diff_x != 0 :
-            change_x = (int(diff_x) // abs(int(diff_x)) )* radius
-        pos_x = diff_x * 3 * radius + change_x
-        pos_y = diff_y * mini_radius
-        return pos_x, pos_y
+        start_x = self.width //2
+        change_x = cell_x - start_x
+        start_y = self.height //2
+        change_y = cell_y - start_y
+        pos_x = 3 * radius * change_x
+        pos_y = 0
+        reste = 0
+        if change_y % 2 == 0 :
+            pos_y = mini_radius * change_y
+        else :
+            signe =  (change_y/abs(change_y))
+            pos_y = mini_radius * (change_y - signe)
+            reste = signe
 
+        if reste != 0 :
+            "blabla" #todo
+
+        return int(pos_x), int(pos_y)
     def find_coordinates_corner(self,cell_x,cell_y,x_sign,y_sign):
         """aaaaaaaaa"""
         f_x, f_y =0,0
@@ -282,7 +290,6 @@ class HexaMemory(HexaGrid):
     def get_robot_neighbors_with_direction(self):
         """"""
         return self.get_all_neighbors_with_direction(self.robot_cell_x, self.robot_cell_y)
-
 
 
     def apply_changes(self, start_x, start_y, end_x, end_y, status="Free"):

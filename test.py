@@ -1,25 +1,21 @@
 import sys
+import random
 from stage_titouan import *
 
-robot_ip = "192.168.8.189"
-if len(sys.argv) > 1:
-    robot_ip = sys.argv[1]
-print("Robot IP:", robot_ip)
 
-model = Workspace()
-ctrl_robot = CtrlRobot(model, robot_ip)
-ctrl_view = CtrlView(model)
-ctrl_hexaview = CtrlHexaview(model)
-ctrl_synthe = CtrlSynthe(model)
-model.synthesizer.mode = "automatic"
-def mains(dt):
-    """blabla"""
-    ctrl_robot.main(dt)
-    ctrl_view.main(dt)
-    ctrl_hexaview.main(dt)
-    ctrl_synthe.main(dt)
+for i in range(10000):
+    if i % 10 == 0:
+        print(i)
+    cell_radius = random.randint(0,200)
+    hexamem = HexaMemory(200,200,cell_radius = cell_radius)
+    x= random.randint(0,199)
+    y = random.randint(0,199)
+    cell_x,cell_y = hexamem.convert_pos_in_cell(x,y)
+    #print("x = ",x," y = ",y," cell_x = ",cell_x," cell_y = ",cell_y)
+    x_p,y_p = hexamem.convert_cell_to_pos(cell_x,cell_y)
+    #print("x_p = ",x_p," y_p = ",y_p)
+    if abs(x_p - x) > 2*cell_radius :
+        print("x diff : ", x_p-x, "cell_radius :", cell_radius)
 
-pyglet.clock.schedule_interval(mains,0.1)
-pyglet.app.run()
-
-"blabla test push"
+    if abs(y_p - y) > 2* cell_radius :
+        print("y diff : ", y_p-y, "cell_radius :", cell_radius)
