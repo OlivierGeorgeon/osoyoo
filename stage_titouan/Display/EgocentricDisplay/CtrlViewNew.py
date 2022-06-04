@@ -2,11 +2,13 @@ from . EgocentricView import EgocentricView
 from . PointOfInterest import *
 import pyglet
 from pyglet.window import key
+from ... Workspace import Workspace
+from ... CtrlWorkspace import CtrlWorkspace
 
 
-class CtrlViewNew :
+class CtrlViewNew:
     """blabla"""
-    def __init__(self,ctrl_workspace):
+    def __init__(self, ctrl_workspace):
         self.view = EgocentricView()
         self.ctrl_workspace = ctrl_workspace
         self.memory = ctrl_workspace.workspace.memory
@@ -17,6 +19,7 @@ class CtrlViewNew :
         self.mouse_press_y = 0
         self.mouse_press_angle = 0
         self.last_used_id = -1
+
         def on_mouse_press(x, y, button, modifiers):
             """ Selecting or unselecting points of interest"""
             self.mouse_press_x, self.mouse_press_y, self.mouse_press_angle = \
@@ -61,21 +64,37 @@ class CtrlViewNew :
                 self.last_used_id = interaction.id
             poi = self.create_points_of_interest(interaction)
             self.points_of_interest.append(poi)
-            
 
         displacement_matrix = self.ctrl_workspace.enacted_interaction['displacement_matrix'] if 'displacement_matrix' in self.ctrl_workspace.enacted_interaction else None
         for poi in self.points_of_interest:
             poi.update(displacement_matrix)
 
-        
-
-
     def create_points_of_interest(self, interaction):
         """Create a point of interest corresponding to the interaction given as parameter"""
         dict_interactions_to_poi = {"Shock": POINT_SHOCK, "Echo": POINT_ECHO, "Trespassing": POINT_TRESPASS, 'Block': POINT_BLOCK}
-        return PointOfInterest(interaction.x, interaction.y, self.view.batch, self.view.foreground,dict_interactions_to_poi[interaction.type],interaction = interaction)
+        return PointOfInterest(interaction.x, interaction.y, self.view.batch, self.view.foreground, dict_interactions_to_poi[interaction.type],interaction = interaction)
         
-    def main(self,dt):
+    def main(self, dt):
         if self.ctrl_workspace.flag_for_view_refresh :
             self.update_points_of_interest()
             self.ctrl_workspace.flag_for_view_refresh = False
+
+
+# Displaying EgocentricView with points of interest
+# python3 -m stage_titouan.Display.EgocentricDisplay.CtrlViewNew
+if __name__ == "__main__":
+    workspace = Workspace()
+    ctrl_workspace = CtrlWorkspace(workspace)
+    ctrl_view = CtrlViewNew(ctrl_workspace)
+    ctrl_view.view.robot.rotate_head(-45)
+
+    # Add points of interest
+    ctrl_view.add_point_of_interest(0, 0, POINT_PLACE)
+    ctrl_view.add_point_of_interest(200, -200, POINT_COMPASS)
+
+    # Add an interaction
+    ctrl_workspace.enacted_interaction = {'status': '0', 'floor': 0, 'head_angle': 0, 'echo_distance': 221, 'ed-20': 249, 'ed-10': 247, 'ed0': 222, 'ed10': 230, 'ed20': 235, 'ed30': 874, 'ed50': 767, 'ed60': 640, 'ed70': 527, 'ed80': 467, 'ed90': 532, 'yaw': 0, 'compass_x': 76, 'compass_y': 223, 'azimuth': 251, 'duration1': 2862, 'duration': 3511, 'points': [('Echo', 301, 0)], 'echo_xy': [301, 0], 'translation': [0, 0]}
+    ctrl_workspace.send_phenom_info_to_memory()
+    ctrl_view.update_points_of_interest()
+
+    pyglet.app.run()

@@ -14,7 +14,7 @@ print("Control mode: MANUAL")
 
 
 # Testing ControllerNew by remote controlling the robot from the EgoMemoryWindowNew
-# py -m tests.test_EgomemoryWindowNew <ROBOT_IP>
+# py -m tests.test_egocentricView <ROBOT_IP>
 if __name__ == "__main__":
     ip = "192.168.1.11"
     if len(sys.argv) > 1:
