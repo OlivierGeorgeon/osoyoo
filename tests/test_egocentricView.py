@@ -28,7 +28,7 @@ if __name__ == "__main__":
     workspace = Workspace()
     ctrl_workspace = CtrlWorkspace(workspace)
     ctrl_robot = CtrlRobot(workspace, ip)
-    ctrl_view = CtrlView(ctrl_workspace)
+    ctrl_view = CtrlViewNew(ctrl_workspace)
     ego_view = ctrl_view.view
     # agent = Agent5()
     # agent = CircleBehavior()
@@ -73,10 +73,9 @@ if __name__ == "__main__":
         if ctrl_robot.enact_step == 2:
             # Update the egocentric memory window
             enacted_interaction = ctrl_robot.translate_robot_data()
-            workspace.enacted_interaction = enacted_interaction
+            ctrl_workspace.enacted_interaction = enacted_interaction
             ctrl_robot.enact_step = 0
             if enacted_interaction["status"] != "T":
-                ctrl_view.update_model(enacted_interaction)
                 ctrl_robot.send_position_change_to_memory()
                 ctrl_robot.send_position_change_to_hexa_memory()
                 ctrl_robot.send_phenom_info_to_memory()
@@ -88,6 +87,9 @@ if __name__ == "__main__":
                 if len(workspace.hexa_memory.cells_changed_recently) > 0:
                     ctrl_hexaview.hexaview.extract_and_convert_recently_changed_cells(workspace.hexa_memory)
                     workspace.hexa_memory.cells_changed_recently = []
+
+                # ctrl_view.update_model(enacted_interaction)
+                ctrl_view.update_points_of_interest()
 
             ctrl_robot.enact_step = 0
 

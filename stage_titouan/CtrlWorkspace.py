@@ -13,7 +13,7 @@ class CtrlWorkspace():
         self.user_action = None
         self.f_user_action_ready = False
         self.f_new_interaction_done = False
-        self.enacted_interaction = {'status':'T'}
+        self.enacted_interaction = {'status': 'T'}
         self.decision_mode = "manual"
         self.need_user_to_command_robot = False
 

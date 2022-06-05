@@ -21,7 +21,7 @@ class CtrlViewNew:
         self.last_used_id = -1
 
         def on_mouse_press(x, y, button, modifiers):
-            """ Selecting or unselecting points of interest"""
+            """ Selecting or unselecting points of interest """
             self.mouse_press_x, self.mouse_press_y, self.mouse_press_angle = \
                 self.view.get_mouse_press_coordinate(x, y, button, modifiers)
             for p in self.points_of_interest:
@@ -67,13 +67,33 @@ class CtrlViewNew:
 
         displacement_matrix = self.ctrl_workspace.enacted_interaction['displacement_matrix'] if 'displacement_matrix' in self.ctrl_workspace.enacted_interaction else None
         for poi in self.points_of_interest:
-            poi.update(displacement_matrix)
+            if poi.type != 6:  # Do not displace the compass points
+                poi.update(displacement_matrix)
+
+        # Mark the new position
+        self.add_point_of_interest(0, 0, POINT_PLACE)
+
+        # Update the robot's position
+        self.view.robot.rotate_head(self.ctrl_workspace.enacted_interaction['head_angle'])
+        self.view.azimuth = self.ctrl_workspace.enacted_interaction['azimuth']
+
+        # Point of interest compass
+        if 'compass_x' in self.ctrl_workspace.enacted_interaction:
+            self.add_point_of_interest(self.ctrl_workspace.enacted_interaction['compass_x'],
+                                       self.ctrl_workspace.enacted_interaction['compass_y'], POINT_COMPASS)
 
     def create_points_of_interest(self, interaction):
         """Create a point of interest corresponding to the interaction given as parameter"""
         dict_interactions_to_poi = {"Shock": POINT_SHOCK, "Echo": POINT_ECHO, "Trespassing": POINT_TRESPASS, 'Block': POINT_BLOCK}
         return PointOfInterest(interaction.x, interaction.y, self.view.batch, self.view.foreground, dict_interactions_to_poi[interaction.type],interaction = interaction)
-        
+
+    def get_focus_phenomenon(self):
+        """ Returning the first selected phenomenon """
+        for p in self.points_of_interest:
+            if p.type == POINT_PHENOMENON and p.is_selected:
+                return p
+        return None
+
     def main(self, dt):
         if self.ctrl_workspace.flag_for_view_refresh :
             self.update_points_of_interest()

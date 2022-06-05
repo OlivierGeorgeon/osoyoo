@@ -55,10 +55,10 @@ class CtrlView:
         self.points_of_interest.append(point_of_interest)
         return point_of_interest
 
-    def displace(self, displacement_matrix):
-        """ Moving all the points of interest by the displacement matrix """
-        for p in self.points_of_interest:
-            p.displace(displacement_matrix)
+    # def displace(self, displacement_matrix):
+    #     """ Moving all the points of interest by the displacement matrix """
+    #     for p in self.points_of_interest:
+    #         p.displace(displacement_matrix)
 
     def update_model(self, enacted_interaction):
         """ Updating the model from the latest received outcome """

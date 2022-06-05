@@ -17,8 +17,7 @@ POINT_COMPASS = 6
 class PointOfInterest:
     def __init__(self, x, y, batch, group, point_type, interaction=None):
         self.interaction = interaction
-        self.x = x
-        self.y = y
+        self.x, self.y = 0, 0  # will be displaced
         self.batch = batch
         self.group = group
         self.type = point_type

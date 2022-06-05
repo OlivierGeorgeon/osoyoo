@@ -31,10 +31,9 @@ class Workspace :
 
         self.CONTROL_MODE_AUTOMATIC = "auto"
         self.CONTROL_MODE_MANUAL = "manual"
-        self.control_mode =  self.CONTROL_MODE_MANUAL
+        self.control_mode = self.CONTROL_MODE_MANUAL
 
-
-        self.enacted_interaction = {}
+        # self.enacted_interaction = {} Commenté par Olivier le 5/6/2022
         self.f_enacted_interaction_has_changed = False
         self.f_new_things_in_memory = False
 
