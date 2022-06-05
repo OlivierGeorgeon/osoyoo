@@ -11,7 +11,7 @@ if len(sys.argv) > 1:
     robot_ip = sys.argv[1]
 print("Robot IP:", robot_ip)
 
-workspace = Workspace()
+workspace = Workspace(cell_radius = 40)
 workspace.synthesizer = SyntheContextV2(workspace.memory,workspace.hexa_memory,workspace)
 ctrl_workspace = CtrlWorkspace(workspace)
 ctrl_robot = CtrlRobotNew(ctrl_workspace, robot_ip)

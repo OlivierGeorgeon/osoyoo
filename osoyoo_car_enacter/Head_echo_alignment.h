@@ -21,7 +21,7 @@
 #define ECHO_MONITOR_VARIATION 50 // (mm) The measure threshold to trigger head alignment
 
 struct significant_array {
-        // Struct to store the angles and the corresponding measures,
+        // Struct to store the angles and the corresponding measures,6
         // and booleans to indicate if the measure are significant
         int distances[180/SCAN_SACCADE_SPAN]{0};
         int angles[180/SCAN_SACCADE_SPAN]{0};

@@ -1,3 +1,5 @@
+from . Agent.AgentCircle import AgentCircle
+
 
 class CtrlWorkspace():
     """Controller for everything involved in workspace (memory,hexamem,synthe,decider)"""
@@ -6,7 +8,6 @@ class CtrlWorkspace():
         """Constructor"""
         self.workspace = workspace
         self.synthesizer = workspace.synthesizer
-        
         self.work_step = 0
         self.need_user_action = False
         self.user_action = None
@@ -21,6 +22,7 @@ class CtrlWorkspace():
         self.cell_inde_a_traiter = None
 
         self.flag_for_view_refresh = False
+        self.agent = AgentCircle()
 
     def main(self,dt):
         """Handle the workspace work, from the moment the robot interaction is done,
@@ -43,7 +45,7 @@ class CtrlWorkspace():
                 # Else we need to send the command given by the synthesizer to the robot
 
                 #0. Update the memory with the last interaction and change position in hexa_memory and memory
-                if self.enacted_interaction['status'] is not "T":
+                if self.enacted_interaction['status'] != "T":
                     self.send_phenom_info_to_memory()
                     self.send_position_change_to_hexa_memory()
                     self.send_position_change_to_memory()
@@ -62,7 +64,7 @@ class CtrlWorkspace():
 
         elif self.synthesizer.synthetizing_step in [0,2]:
             " tout s'est bien passé" #donc rien à faire de particulier
-        elif self.synthesizer.synthetizing_step is 1 :
+        elif self.synthesizer.synthetizing_step == 1 :
             #"on a besoin d'une action de l'user sur l'hexaview"
             self.need_user_action = True
             self.cell_inde_a_traiter = self.synthesizer.indecisive_cells[-1]
@@ -70,8 +72,14 @@ class CtrlWorkspace():
 
         if self.decision_mode == "automatic" :
             #  2. Start the decider process
-            "pas d'agent pour le moment"
-            # TODO mettre l'agent
+
+            # The agent that generates automatic behavior
+            outcome = self.agent.result(self.enacted_interaction)
+            action = self.agent.action(outcome)
+            self.interaction_to_enact = self.agent.intended_interaction(action)
+
+            self.f_interaction_to_enact_ready = True
+
         else :
             self.need_user_to_command_robot = True
 

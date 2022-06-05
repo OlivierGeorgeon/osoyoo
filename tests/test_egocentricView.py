@@ -98,7 +98,8 @@ if __name__ == "__main__":
         if control_mode == CONTROL_MODE_AUTOMATIC:
             if ctrl_robot.enact_step == 0:
                 # Construct the outcome expected by Agent5
-                enacted_interaction = ctrl_robot.translate_robot_data()
+                # enacted_interaction = ctrl_robot.translate_robot_data()
+                enacted_interaction = workspace.enacted_interaction
 
                 outcome = agent.result(enacted_interaction)
                 # Choose the next action

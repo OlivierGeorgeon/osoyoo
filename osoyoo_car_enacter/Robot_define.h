@@ -1,4 +1,4 @@
-#define ROBOT_ID 4 // 0: regular Osoyoo robot, 1: robot BSN, 2: robot Olivier, 3: robot SHS, 4: robot SHS with GY86
+#define ROBOT_ID 1 // 0: regular Osoyoo robot, 1: robot BSN, 2: robot Olivier, 3: robot SHS, 4: robot SHS with GY86
 
 #define ROBOT_HEAD_X 80  // X position of the head
 
@@ -26,9 +26,9 @@
 #warning "Compiling for Olivier's robot"
 #define ROBOT_HAS_MPU6050  true
 #define ROBOT_HAS_HMC5883L true
-#define ROBOT_REAR_RIGHT_WHEEL_COEF 0  // 1.1
-#define ROBOT_REAR_LEFT_WHEEL_COEF 1.1 // 1
-#define ROBOT_FRONT_RIGHT_WHEEL_COEF 0  //1
+#define ROBOT_REAR_RIGHT_WHEEL_COEF 1.1  // 1.1
+#define ROBOT_REAR_LEFT_WHEEL_COEF 1 // 1
+#define ROBOT_FRONT_RIGHT_WHEEL_COEF 0.9  //1
 #define ROBOT_FRONT_LEFT_WHEEL_COEF 1  // 1
 #define TURN_SPOT_MAX_DURATION 2400
 #define TURN_SPOT_ENDING_DELAY 200  // Rotation speed is about 1° per 10ms

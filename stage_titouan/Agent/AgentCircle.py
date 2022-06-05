@@ -66,42 +66,42 @@ class AgentCircle:
 
     def result(self, enacted_interaction):
         """ Convert the enacted interaction into outcome adapted to the circle behavior """
-        outcome = 'U'  # Outcome unknown
+        outcome = OUTCOME_DEFAULT
 
-        # If there is an echo
+        # If there is an echo, compute the echo outcome
         if 'echo_xy' in enacted_interaction:
             self.echo_xy = enacted_interaction['echo_xy']
-            if self.echo_xy[0] < 10:
+            if self.echo_xy[0] < 50:
                 outcome = OUTCOME_CLOSE_FRONT
-            elif self.echo_xy[0] > 300:
+            elif self.echo_xy[0] > 400:     # Must be farther than the forward speed m
                 outcome = OUTCOME_FAR_FRONT
             elif self.echo_xy[1] > 150:
-                outcome = OUTCOME_FAR_LEFT
+                outcome = OUTCOME_FAR_LEFT  # More that 150 to the left
             elif self.echo_xy[1] > 0:
-                outcome = OUTCOME_LEFT
+                outcome = OUTCOME_LEFT      # between 0 and 150 to the left
             elif self.echo_xy[1] > -150:
-                outcome = OUTCOME_RIGHT
+                outcome = OUTCOME_RIGHT     # Between 0 and -150 to the right
             else:
-                outcome = OUTCOME_FAR_RIGHT
+                outcome = OUTCOME_FAR_RIGHT # More that -150 to the right
 
         # Check if the agent lost the focus
         if self.focus:
             if 'focus' not in enacted_interaction:
-                # The focus was lost
+                # The focus was lost, override the echo outcome
                 self.focus = False
                 outcome = OUTCOME_LOST_FOCUS
 
         # Catch focus
         if self._action in [ACTION_SCAN, ACTION_FORWARD]:
-            if outcome in [OUTCOME_LEFT, OUTCOME_FAR_LEFT, OUTCOME_RIGHT, OUTCOME_FAR_RIGHT]:
+            if outcome in [OUTCOME_LEFT, OUTCOME_FAR_LEFT, OUTCOME_RIGHT, OUTCOME_FAR_RIGHT, OUTCOME_FAR_FRONT, OUTCOME_CLOSE_FRONT]:
                 # Found focus
                 self.focus = True
 
         # If not focus then no circle behavior outcome
-        if not self.focus and outcome != OUTCOME_LOST_FOCUS:
-            outcome = OUTCOME_DEFAULT
+        # if not self.focus and outcome != OUTCOME_LOST_FOCUS:
+        #     outcome = OUTCOME_DEFAULT
 
-        # Floor outcome
+        # If floor then override the echo and focus outcome
         if 'floor' in enacted_interaction:
             if enacted_interaction['floor'] == 0b10:
                 outcome = OUTCOME_FLOOR_LEFT
