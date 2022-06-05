@@ -6,6 +6,8 @@ from stage_titouan.Agent.Agent5 import Agent5
 from stage_titouan.Agent.CircleBehavior import CircleBehavior
 from stage_titouan.Agent.AgentCircle import AgentCircle
 from stage_titouan.Robot.RobotDefine import *
+from stage_titouan.CtrlWorkspace import CtrlWorkspace
+
 
 CONTROL_MODE_MANUAL = 0
 CONTROL_MODE_AUTOMATIC = 1
@@ -24,8 +26,9 @@ if __name__ == "__main__":
     print("Sending to: " + ip)
 
     workspace = Workspace()
+    ctrl_workspace = CtrlWorkspace(workspace)
     ctrl_robot = CtrlRobot(workspace, ip)
-    ctrl_view = CtrlView(workspace)
+    ctrl_view = CtrlView(ctrl_workspace)
     ego_view = ctrl_view.view
     # agent = Agent5()
     # agent = CircleBehavior()

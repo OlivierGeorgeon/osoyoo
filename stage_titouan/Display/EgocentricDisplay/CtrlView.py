@@ -2,14 +2,17 @@ from . EgocentricView import EgocentricView
 from . PointOfInterest import *
 import pyglet
 from pyglet.window import key
+from ... Workspace import Workspace
+from ... CtrlWorkspace import CtrlWorkspace
 
 
 class CtrlView:
     """blabla"""
 
-    def __init__(self, model):
+    def __init__(self, ctrl_workspace):
         self.view = EgocentricView()
-        self.model = model
+        self.ctrl_workspace = ctrl_workspace
+        self.memory = ctrl_workspace.workspace.memory
 
         self.points_of_interest = []
 
@@ -32,7 +35,7 @@ class CtrlView:
                         p.delete()
                         self.points_of_interest.remove(p)
                         if p.interaction is not None:
-                            self.model.memory.interactions.remove(p.interaction)
+                            self.memory.interactions.remove(p.interaction)
             if symbol == key.INSERT:
                 phenomenon = PointOfInterest(self.mouse_press_x, self.mouse_press_y, self.view.batch,
                                              self.view.background, POINT_PHENOMENON)
@@ -44,16 +47,13 @@ class CtrlView:
 
         self.view.push_handlers(on_mouse_press, on_key_press)
 
-    def add_point_of_interest(self, x, y, point_type, group=None,interaction = None):
+    def add_point_of_interest(self, x, y, point_type, group=None, interaction=None):
         """ Adding a point of interest to the view """
         if group is None:
             group = self.view.foreground
-        point_of_interest = PointOfInterest(x, y, self.view.batch, group, point_type,interaction = interaction)
+        point_of_interest = PointOfInterest(x, y, self.view.batch, group, point_type, interaction=interaction)
         self.points_of_interest.append(point_of_interest)
         return point_of_interest
-
-    # def rotate_head(self, head_angle):
-    #     self.ego_view.robot.rotate_head(head_angle)
 
     def displace(self, displacement_matrix):
         """ Moving all the points of interest by the displacement matrix """
@@ -70,7 +70,8 @@ class CtrlView:
 
         # Translate and rotate all the previous points of interest
         for p in self.points_of_interest:
-            p.displace(enacted_interaction['displacement_matrix'])
+            if p.type != 6:  # Do not displace the compass points
+                p.displace(enacted_interaction['displacement_matrix'])
 
         # Mark the new position
         self.add_point_of_interest(0, 0, POINT_PLACE)
@@ -86,18 +87,18 @@ class CtrlView:
                 self.add_point_of_interest(p[1], p[2], dict_interactions_to_poi[p[0]])
 
         # Point of interest compass
-        # if 'compass_x' in enacted_interaction:
-        #    self.add_point_of_interest(enacted_interaction['compass_x'],
-        #                               enacted_interaction['compass_y'], POINT_COMPASS)
+        if 'compass_x' in enacted_interaction:
+            self.add_point_of_interest(enacted_interaction['compass_x'],
+                                       enacted_interaction['compass_y'], POINT_COMPASS)
 
-    def extract_and_convert_interactions_to_poi(self, memory):
-        """ Extracting interactions from the memory and converting them to points of interest """
-        dict_interactions_to_poi = {"Shock": POINT_SHOCK, "Echo": POINT_ECHO, "Trespassing": POINT_TRESPASS, 'Block': POINT_BLOCK}
-        for interaction in memory.interactions:
-            if interaction.type in dict_interactions_to_poi:
-                self.add_point_of_interest(interaction.x, interaction.y, dict_interactions_to_poi[interaction.type], interaction = interaction)#, self.view.group)
-            else:
-                print("Unknown interaction type in extract_and_convert_interactions_to_poi: ", interaction['type'])
+    # def extract_and_convert_interactions_to_poi(self, memory):
+    #     """ Extracting interactions from the memory and converting them to points of interest """
+    #     dict_interactions_to_poi = {"Shock": POINT_SHOCK, "Echo": POINT_ECHO, "Trespassing": POINT_TRESPASS, 'Block': POINT_BLOCK}
+    #     for interaction in memory.interactions:
+    #         if interaction.type in dict_interactions_to_poi:
+    #             self.add_point_of_interest(interaction.x, interaction.y, dict_interactions_to_poi[interaction.type], interaction = interaction)#, self.view.group)
+    #         else:
+    #             print("Unknown interaction type in extract_and_convert_interactions_to_poi: ", interaction['type'])
     
     def get_focus_phenomenon(self):
         """ Returning the first selected phenomenon """
@@ -106,22 +107,23 @@ class CtrlView:
                 return p
         return None
 
-    def main(self,dt):
-        if self.model.f_reset_flag :
-            self.view = EgocentricView()
-        if self.model.f_new_things_in_memory :
-            print("LAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
-            self.points_of_interest = []
-            self.extract_and_convert_interactions_to_poi(self.model.memory)
-            #self.update_model(self.model.enacted_interaction)
-            self.model.f_new_things_in_memory = False
+    # def main(self,dt):
+    #     if self.model.f_reset_flag :
+    #         self.view = EgocentricView()
+    #     if self.model.f_new_things_in_memory :
+    #         print("LAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+    #         self.points_of_interest = []
+    #         self.extract_and_convert_interactions_to_poi(self.model.memory)
+    #         #self.update_model(self.model.enacted_interaction)
+    #         self.model.f_new_things_in_memory = False
 
 
 # Displaying EgocentricView with points of interest
 # py -m stage_titouan.Display.EgocentricDisplay.CtrlView
 if __name__ == "__main__":
-
-    controller = CtrlView(None)
+    workspace = Workspace()
+    ctrl_workspace = CtrlWorkspace(workspace)
+    controller = CtrlView(ctrl_workspace)
     controller.view.robot.rotate_head(-45)
 
     # Add points of interest

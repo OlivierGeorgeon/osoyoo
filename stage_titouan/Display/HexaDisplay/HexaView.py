@@ -85,7 +85,8 @@ class HexaView(pyglet.window.Window):
     def on_resize(self, width, height):
         """ Adjusting the viewport when resizing the window """
         # Always display in the whole window
-        glViewport(0, 0, width, height)
+        glViewport(0, 0, width, height)        # For standard screen
+        # glViewport(0, 0, width * 2, height * 2)  # For retina screen on Mac
 
     def on_mouse_scroll(self, x, y, dx, dy):
         """ Zooming the window """

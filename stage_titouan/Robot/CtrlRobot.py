@@ -11,7 +11,7 @@ from stage_titouan.Memory.EgocentricMemory.Interactions.Interaction import *
 class CtrlRobot():
     """Blabla"""
 
-    def __init__(self,model,robot_ip):
+    def __init__(self, model, robot_ip):
         self.model = model
 
         self.wifiInterface = WifiInterface(robot_ip)
