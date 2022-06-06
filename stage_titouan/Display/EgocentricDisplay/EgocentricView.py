@@ -11,12 +11,13 @@ ZOOM_IN_FACTOR = 1.2
 class EgocentricView(pyglet.window.Window):
     def __init__(self, width=400, height=400, *args, **kwargs):
         super().__init__(width, height, resizable=True, *args, **kwargs)
-        self.is_north_up = True  # Set to False to display the robot on the X axis
+        self.is_north_up = True  # Reset to display the robot on the X axis
         self.set_caption("Egocentric View")
         self.set_minimum_size(150, 150)
 
         # Initialize OpenGL parameters
         glClearColor(1.0, 1.0, 1.0, 1.0)
+        pyglet.gl.glEnable(pyglet.gl.GL_BLEND)
         self.batch = pyglet.graphics.Batch()
         self.background = pyglet.graphics.OrderedGroup(0)
         self.foreground = pyglet.graphics.OrderedGroup(1)

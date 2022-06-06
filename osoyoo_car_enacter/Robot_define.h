@@ -1,6 +1,14 @@
 #define ROBOT_ID 4 // 0: regular Osoyoo robot, 1: robot BSN, 2: robot Olivier, 3: robot SHS, 4: robot SHS with GY86
 
-#define ROBOT_HEAD_X 80  // X position of the head
+#define ROBOT_HEAD_X 80                 // (mm) X position of the head
+#define SPEED 100
+#define TURN_SPEED 100
+#define SHIFT_SPEED 130
+#define TURN_TIME 500                   // (ms)
+#define MOVE_TIME 500
+#define TURN_FRONT_ENDING_DELAY 100     // (ms)
+#define TURN_FRONT_ENDING_ANGLE 3       // (degree)
+#define TURN_SPOT_ANGLE 45              // (degree)
 
 #if ROBOT_ID == 1
 

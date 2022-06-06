@@ -42,16 +42,14 @@ class CtrlViewNew:
                 self.points_of_interest.append(phenomenon)
                 phenomenon.is_selected = True
                 phenomenon.set_color('red')
-                # self.add_point_of_interest(self.mouse_press_x, self.mouse_press_y, POINT_PHENOMENON,
-                #                           self.ego_view.background)
 
         self.view.push_handlers(on_mouse_press, on_key_press)
 
-    def add_point_of_interest(self, x, y, point_type, group=None,interaction = None):
+    def add_point_of_interest(self, x, y, point_type, group=None, interaction=None):
         """ Adding a point of interest to the view """
         if group is None:
             group = self.view.foreground
-        point_of_interest = PointOfInterest(x, y, self.view.batch, group, point_type,interaction = interaction)
+        point_of_interest = PointOfInterest(x, y, self.view.batch, group, point_type, interaction=interaction)
         self.points_of_interest.append(point_of_interest)
         return point_of_interest
 
@@ -84,8 +82,10 @@ class CtrlViewNew:
 
     def create_points_of_interest(self, interaction):
         """Create a point of interest corresponding to the interaction given as parameter"""
-        dict_interactions_to_poi = {"Shock": POINT_SHOCK, "Echo": POINT_ECHO, "Trespassing": POINT_TRESPASS, 'Block': POINT_BLOCK}
-        return PointOfInterest(interaction.x, interaction.y, self.view.batch, self.view.foreground, dict_interactions_to_poi[interaction.type],interaction = interaction)
+        dict_interactions_to_poi = {"Shock": POINT_SHOCK, "Echo": POINT_ECHO, "Echo2": POINT_TINY_ECHO,
+                                    "Trespassing": POINT_TRESPASS, 'Block': POINT_BLOCK}
+        return PointOfInterest(interaction.x, interaction.y, self.view.batch, self.view.foreground,
+                               dict_interactions_to_poi[interaction.type], interaction=interaction)
 
     def get_focus_phenomenon(self):
         """ Returning the first selected phenomenon """

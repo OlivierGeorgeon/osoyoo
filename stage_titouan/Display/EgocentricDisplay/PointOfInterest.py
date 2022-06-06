@@ -23,7 +23,6 @@ class PointOfInterest:
         self.type = point_type
 
         self.is_selected = False
-        self.reference = None
 
         self.position_matrix = matrix44.create_from_translation([x, y, 0]).astype('float64')
         self.points = []
@@ -59,7 +58,7 @@ class PointOfInterest:
             # Phenomenon: tomato
             self.points = [40, 0, 20, 34, -20, 34, -40, 0, -20, -34, 20, -34]
             self.shape = self.batch.add_indexed(6, gl.GL_TRIANGLES, group, [0, 1, 2, 0, 2, 3, 0, 3, 4, 0, 4, 5],
-                                                ('v2i', self.points), ('c4B', 6 * (*name_to_rgb("tomato"), 128)))
+                                                ('v2i', self.points), ('c4B', 6 * (*name_to_rgb("fireBrick"), 128)))
         if self.type == POINT_COMPASS:
             # Compass: RoyalBlue square
             self.points = [10, 0, 0, -10, 0, 10, -10, 0]
@@ -92,7 +91,7 @@ class PointOfInterest:
                 # Pushing: yellow triangle
                 self.shape.color = name_to_rgb("yellow")
             if self.type == POINT_PHENOMENON:
-                self.shape.colors[0:24] = 6 * (*name_to_rgb("tomato"), 128)
+                self.shape.colors[0:24] = 6 * (*name_to_rgb("fireBrick"), 128)
         else:
             if self.type == POINT_PLACE:
                 self.shape.colors[0:9] = 3 * name_to_rgb(color_name)

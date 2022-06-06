@@ -56,14 +56,14 @@ if __name__ == "__main__":
                 if focus:
                     intended_interaction['focus_x'] = int(focus.x)
                     intended_interaction['focus_y'] = int(focus.y)
-                    if text in ['8']:
-                        intended_interaction['speed'] = int(ctrl_robot.forward_speed[0])
-                    if text in ['2']:
-                        intended_interaction['speed'] = -int(ctrl_robot.backward_speed[0])
-                    if text in ['4']:
-                        intended_interaction['speed'] = int(ctrl_robot.leftward_speed[1])
-                    if text in ['6']:
-                        intended_interaction['speed'] = -int(ctrl_robot.rightward_speed[1])
+                #     if text in ['8']:
+                #         intended_interaction['speed'] = int(ctrl_robot.forward_speed[0])
+                #     if text in ['2']:
+                #         intended_interaction['speed'] = -int(ctrl_robot.backward_speed[0])
+                #     if text in ['4']:
+                #         intended_interaction['speed'] = int(ctrl_robot.leftward_speed[1])
+                #     if text in ['6']:
+                #         intended_interaction['speed'] = -int(ctrl_robot.rightward_speed[1])
                 ctrl_robot.command_robot(intended_interaction)
             else:
                 print("Waiting for previous outcome before sending new command")
@@ -93,31 +93,39 @@ if __name__ == "__main__":
 
             ctrl_robot.enact_step = 0
 
-            #if 'focus_x' in ctrl_robot.intended_interaction:
-            #    focus = ctrl_view.get_focus_phenomenon()
-            #33    focus.x = ctrl_robot.enacted_interaction.
-
         if control_mode == CONTROL_MODE_AUTOMATIC:
             if ctrl_robot.enact_step == 0:
                 # Construct the outcome expected by Agent5
                 # enacted_interaction = ctrl_robot.translate_robot_data()
-                enacted_interaction = workspace.enacted_interaction
+                # enacted_interaction = workspace.enacted_interaction
+                enacted_interaction = ctrl_workspace.enacted_interaction
 
                 outcome = agent.result(enacted_interaction)
                 # Choose the next action
                 action = agent.action(outcome)
                 # intended_interaction = {'action': ['8', '1', '3'][action]}
                 intended_interaction = agent.intended_interaction(action)
-                # TODO send the speed depending on the direction
-                if action == '8':
-                    intended_interaction['speed'] = int(ctrl_robot.forward_speed[0])
-                if action == '2':
-                    intended_interaction['speed'] = -int(ctrl_robot.backward_speed[0])
-                if action == '4':
-                    intended_interaction['speed'] = int(ctrl_robot.leftward_speed[1])
-                if action == '6':
-                    intended_interaction['speed'] = -int(ctrl_robot.rightward_speed[1])
+                #
+                # if action == '8':
+                #     intended_interaction['speed'] = int(ctrl_robot.forward_speed[0])
+                # if action == '2':
+                #     intended_interaction['speed'] = -int(ctrl_robot.backward_speed[0])
+                # if action == '4':
+                #     intended_interaction['speed'] = int(ctrl_robot.leftward_speed[1])
+                # if action == '6':
+                #     intended_interaction['speed'] = -int(ctrl_robot.rightward_speed[1])
                 ctrl_robot.command_robot(intended_interaction)
+
+                f = None
+                for p in ctrl_view.points_of_interest:
+                    if p.type == 5:
+                        f = p
+                if f is not None:  # Remove the previous focus
+                    f.delete()
+                    ctrl_view.points_of_interest.remove(f)
+                # If new focus then add phenomenon
+                if agent.focus:
+                    ctrl_view.add_point_of_interest(intended_interaction['focus_x'], intended_interaction['focus_y'], 5)
 
     # Schedule the main loop that updates the agent
     pyglet.clock.schedule_interval(main_loop, 0.1)

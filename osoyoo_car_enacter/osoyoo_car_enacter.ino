@@ -173,7 +173,7 @@ void loop()
           is_focussed = false;
         }
         if (myObject.hasOwnProperty("speed")) {
-          focus_speed = (int)myObject["speed"];
+          focus_speed = (int)myObject["speed"]; // Must be positive otherwise multiplication with unsigned long fails
         }
       }
       //Serial.print(" from ");
