@@ -96,30 +96,26 @@ class CtrlViewNew:
     def get_focus_phenomenon(self):
         """ Returning the first selected phenomenon """
         for p in self.points_of_interest:
-            if p.type == POINT_PHENOMENON and p.is_selected:
+            if p.type == POINT_PHENOMENON:  # and p.is_selected:
                 return p
         return None
 
     def main(self, dt):
         if self.ctrl_workspace.flag_for_view_refresh:
             self.update_points_of_interest()
-            self.ctrl_workspace.flag_for_view_refresh = False
 
-            # f = None
-            # for p in self.points_of_interest:
-            #     if p.type == 5:
-            #         p.delete()
-            #         self.points_of_interest.remove(p)
-            # If the agent has focus then add the focus to egocentric window if not there already
+            # Add the focus
             p = self.get_focus_phenomenon()
             if self.ctrl_workspace.agent.focus:
                 if p is None:
-                    ctrl_view.add_point_of_interest(self.ctrl_workspace.intended_interaction['focus_x'],
-                                                    self.ctrl_workspace.intended_interaction['focus_y'], 5)
+                    self.add_point_of_interest(self.ctrl_workspace.agent.echo_xy[0],
+                                               self.ctrl_workspace.agent.echo_xy[1], POINT_PHENOMENON)
             else:
                 if p is not None:
                     p.delete()
                     self.points_of_interest.remove(p)
+
+            self.ctrl_workspace.flag_for_view_refresh = False
 
 
 # Displaying EgocentricView with points of interest
