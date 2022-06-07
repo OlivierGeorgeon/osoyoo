@@ -39,11 +39,12 @@ class CtrlRobotNew:
             self.enacted_interaction = self.translate_robot_data()
             self.ctrl_workspace.enacted_interaction = self.enacted_interaction
             self.ctrl_workspace.f_new_interaction_done = True
+            self.ctrl_workspace.f_interaction_to_enact_ready = False  # OG
         if self.ctrl_workspace.f_interaction_to_enact_ready and not self.robot_has_started_acting:
             self.command_robot(self.ctrl_workspace.interaction_to_enact)
             self.ctrl_workspace.interaction_to_enact = None
             self.robot_has_started_acting = True
-            self.ctrl_workspace.f_interaction_to_enact_ready = False
+            # self.ctrl_workspace.f_interaction_to_enact_ready = False  # OG
             
     
     def command_robot(self, intended_interaction):
@@ -142,6 +143,8 @@ class CtrlRobotNew:
                 echo_xy[1] = int(math.sin(math.radians(enacted_interaction['head_angle']))
                                  * enacted_interaction['echo_distance'])
                 enacted_interaction['points'].append((INTERACTION_ECHO, *echo_xy))
+                # Return the echo_xy to possibly use as focus
+                enacted_interaction['echo_xy'] = echo_xy
 
         # Interaction shock
         if 'shock' in enacted_interaction and action == '8':
@@ -175,6 +178,8 @@ class CtrlRobotNew:
             if distance < 100:
                 additional_xy = expected_focus_xy - echo_xy
                 print("additional translation:", additional_xy)
+                # The focus has been kept
+                enacted_interaction['focus'] = True
                 # Adjust the displacement
                 translation += additional_xy
                 translation_matrix = matrix44.create_from_translation([-translation[0], -translation[1], 0])
