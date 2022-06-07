@@ -73,12 +73,13 @@ class CtrlWorkspace():
         if self.decision_mode == "automatic" :
             #  2. Start the decider process
 
-            # The agent that generates automatic behavior
-            outcome = self.agent.result(self.enacted_interaction)
-            action = self.agent.action(outcome)
-            self.interaction_to_enact = self.agent.intended_interaction(action)
+            if not self.f_interaction_to_enact_ready:
+                # The agent that generates automatic behavior
+                outcome = self.agent.result(self.enacted_interaction)
+                action = self.agent.action(outcome)
+                self.interaction_to_enact = self.agent.intended_interaction(action)
 
-            self.f_interaction_to_enact_ready = True
+                self.f_interaction_to_enact_ready = True
 
         else :
             self.need_user_to_command_robot = True

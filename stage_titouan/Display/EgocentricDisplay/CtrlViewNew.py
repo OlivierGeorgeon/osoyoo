@@ -56,6 +56,12 @@ class CtrlViewNew:
     def update_points_of_interest(self):
         """Retrieve all new interactions from the memory, create corresponding points of interest
         then update the shape of each POI"""
+
+        # If timeout then no egocentric view update
+        if self.ctrl_workspace.enacted_interaction['status'] == "T":
+            print("No ego memory update")
+            return
+
         interactions_list = [elem for elem in self.memory.interactions if elem.id > self.last_used_id]
         for interaction in interactions_list:
             if interaction.id > self.last_used_id:
@@ -95,9 +101,25 @@ class CtrlViewNew:
         return None
 
     def main(self, dt):
-        if self.ctrl_workspace.flag_for_view_refresh :
+        if self.ctrl_workspace.flag_for_view_refresh:
             self.update_points_of_interest()
             self.ctrl_workspace.flag_for_view_refresh = False
+
+            # f = None
+            # for p in self.points_of_interest:
+            #     if p.type == 5:
+            #         p.delete()
+            #         self.points_of_interest.remove(p)
+            # If the agent has focus then add the focus to egocentric window if not there already
+            p = self.get_focus_phenomenon()
+            if self.ctrl_workspace.agent.focus:
+                if p is None:
+                    ctrl_view.add_point_of_interest(self.ctrl_workspace.intended_interaction['focus_x'],
+                                                    self.ctrl_workspace.intended_interaction['focus_y'], 5)
+            else:
+                if p is not None:
+                    p.delete()
+                    self.points_of_interest.remove(p)
 
 
 # Displaying EgocentricView with points of interest

@@ -7,6 +7,7 @@ from stage_titouan.Agent.CircleBehavior import CircleBehavior
 from stage_titouan.Agent.AgentCircle import AgentCircle
 from stage_titouan.Robot.RobotDefine import *
 from stage_titouan.CtrlWorkspace import CtrlWorkspace
+from stage_titouan.Agent.PredefinedInteractions import *
 
 
 CONTROL_MODE_MANUAL = 0
@@ -101,31 +102,25 @@ if __name__ == "__main__":
                 enacted_interaction = ctrl_workspace.enacted_interaction
 
                 outcome = agent.result(enacted_interaction)
+                # If lost focus then remove the focus from the egocentric window
+                if outcome == OUTCOME_LOST_FOCUS:
+                    for p in ctrl_view.points_of_interest:
+                        if p.type == 5:
+                            p.delete()
+                            ctrl_view.points_of_interest.remove(p)
+
                 # Choose the next action
                 action = agent.action(outcome)
-                # intended_interaction = {'action': ['8', '1', '3'][action]}
                 intended_interaction = agent.intended_interaction(action)
-                #
-                # if action == '8':
-                #     intended_interaction['speed'] = int(ctrl_robot.forward_speed[0])
-                # if action == '2':
-                #     intended_interaction['speed'] = -int(ctrl_robot.backward_speed[0])
-                # if action == '4':
-                #     intended_interaction['speed'] = int(ctrl_robot.leftward_speed[1])
-                # if action == '6':
-                #     intended_interaction['speed'] = -int(ctrl_robot.rightward_speed[1])
+
                 ctrl_robot.command_robot(intended_interaction)
 
-                f = None
-                for p in ctrl_view.points_of_interest:
-                    if p.type == 5:
-                        f = p
-                if f is not None:  # Remove the previous focus
-                    f.delete()
-                    ctrl_view.points_of_interest.remove(f)
-                # If new focus then add phenomenon
+                # If focus then add the focus to egocentric window if not there already
                 if agent.focus:
-                    ctrl_view.add_point_of_interest(intended_interaction['focus_x'], intended_interaction['focus_y'], 5)
+                    p = ctrl_view.get_focus_phenomenon()
+                    if p is None:
+                        ctrl_view.add_point_of_interest(intended_interaction['focus_x'], intended_interaction['focus_y'], 5)
+
 
     # Schedule the main loop that updates the agent
     pyglet.clock.schedule_interval(main_loop, 0.1)
