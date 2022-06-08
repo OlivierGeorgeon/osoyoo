@@ -190,7 +190,7 @@ class HexaMemory(HexaGrid):
 
 
     def convert_cell_to_pos(self,cell_x, cell_y):
-        """Convert cell coordinates to position in the grid"""
+        """Return the allocentric position of the center of the given cell."""
         radius = self.cell_radius
         mini_radius = math.sqrt(radius**2 - (radius/2)**2)
         start_x = self.width //2
@@ -208,7 +208,10 @@ class HexaMemory(HexaGrid):
             reste = signe
 
         if reste != 0 :
-            "blabla" #todo
+            y_arrivee = (change_y - signe) + start_y
+            signe_x = 1 if y_arrivee % 2 == 0 else -1
+            pos_x += signe_x * (3/2)*radius
+            pos_y += signe* mini_radius 
 
         return int(pos_x), int(pos_y)
     def find_coordinates_corner(self,cell_x,cell_y,x_sign,y_sign):

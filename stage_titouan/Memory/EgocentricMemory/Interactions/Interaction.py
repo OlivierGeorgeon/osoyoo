@@ -143,3 +143,7 @@ class Interaction:
         self.height = 60
         print("yellow_star , interaction : ", self)
         return self
+
+    def __str__(self):
+        """Return a string representation of the Interaction."""
+        return str(self.x)+","+str(self.y)

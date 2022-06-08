@@ -58,7 +58,7 @@ class SyntheContextV2 :
                 self.synthetizing_step = 0.1
                 self.last_used_id = max([elem.id for elem in self.interactions_list])
                 echoes = [elem for elem in self.interactions_list if elem.type == "Echo"]
-                real_echos = self.treat_echos_alt(echoes)
+                real_echos = self.treat_echos_alt2(echoes)
 
 
 ########
@@ -147,8 +147,10 @@ class SyntheContextV2 :
                 self.last_used_id = max([elem.id for elem in self.interactions_list])
                 echoes = [elem for elem in self.interactions_list if elem.type == "Echo"]
                 print("len echoes :", len(echoes))
-                real_echos = self.treat_echos_alt(echoes)
-                print("len real_echos : ", len(real_echos))
+                #real_echos3 = self.treat_echos_alt(echoes)
+                #real_echos2 = self.treat_echos_alt2(echoes)
+                real_echos = self.treat_echos_alt3(echoes)
+                print("len real_echos :", len(real_echos))
                 print("linking test : ")
                 linking_list =  self.compare_echoes_with_context(real_echos, [])
                 if len(linking_list)> 0:
@@ -262,6 +264,70 @@ class SyntheContextV2 :
         return output
             
 
+    def treat_echos_alt2(self,echo_list):
+        """blabla"""
+        echo_list = self.revert_echoes_to_angle_distance(echo_list)
+        max_delta_dist = 20
+        max_delta_angle = math.radians(20)
+        strikes = [[[],True],[[],True],[[],True],[[],True],[[],True],[[],True]]
+        current_id = 0
+        strike_debug=[[],[],[],[],[],[]]
+        strike_deb_ang_dist = [[],[],[],[],[],[]]
+
+        i_debug = 0
+        for angle,distance,interaction in echo_list :
+            if strikes[current_id][1] : #if the strike is not finished
+                serie = strikes[current_id][0]
+                if (len(serie) == 0) or(abs(distance - serie[-1][1]) < max_delta_dist and abs(angle - serie[-1][0]) < max_delta_angle ):
+                    serie.append((angle,distance,interaction))
+                    strike_debug[current_id].append(i_debug)
+                    strike_deb_ang_dist[current_id].append((angle,math.degrees(distance)))
+                    print(i_debug)
+                else :
+                    strikes[current_id][1] = False
+                    current_id = (current_id + 1)
+                    serie = strikes[current_id][0]
+                    serie.append((angle,distance,interaction))
+                    print(i_debug)
+            i_debug += 1
+        output = []
+        for strike in strikes :
+            print("REAL ECHOS  strike : ",strike)
+            if len(strike[0]) == 0 :
+                continue
+            serie = strike[0]
+            output.append(serie[int(len(serie)/2)][2])
+
+        print("strike_debug : ",strike_debug)
+        print("strike_deb_ang_dist : ",strike_deb_ang_dist)
+        return output
+
+    def treat_echos_alt3(self,echo_list):
+        print("len(echo_list) : ",len(echo_list))
+        if(len(echo_list) ==1):
+            print(echo_list[0])
+        echo_list = self.revert_echoes_to_angle_distance(echo_list)
+        max_delta_dist = 50
+        max_delta_angle = math.radians(20)
+        streaks = [[],[],[],[],[],[],[],[],[],[],[],[]]
+        angle_dist = [[],[],[],[],[],[],[],[],[],[],[],[]]
+        current_id = 0
+        for angle,distance,interaction in echo_list :
+            if (len(streaks[current_id]) == 0) or any((abs(ele[1]-distance)<max_delta_dist and abs(angle - ele[0])<max_delta_angle) for ele in streaks[current_id]):
+                streaks[current_id].append((angle,distance,interaction))
+                angle_dist[current_id].append((math.degrees(angle),distance))
+            else :
+                current_id = (current_id + 1)
+                streaks[current_id].append((angle,distance,interaction))
+                angle_dist[current_id].append((math.degrees(angle),distance))
+        output = []
+        for streak in streaks :
+            if len(streak) == 0 :
+                continue
+            else :
+                output.append(streak[int(len(streak)/2)][2])
+        print(angle_dist)
+        return output
 
     def revert_echoes_to_angle_distance(self,echo_list):
         """blabla"""
