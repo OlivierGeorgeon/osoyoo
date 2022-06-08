@@ -490,7 +490,7 @@ class SyntheContextV2 :
             (allo_x,allo_y),_ = self.get_allocentric_coordinates_of_interactions([echo])[0]
             coord,obstacle,_ = obstacle_object
             obstacle_x,obstacle_y = self.hexa_memory.convert_cell_to_pos(coord[0],coord[1])
-            print("obstacle_x : {}".format(obstacle_x),"obstacle_y : {}".format(obstacle_y))
+            print("obstacle_x : {}".format(obstacle_x),"obstacle_y : {}".format(obstacle_y), "echo_x : {}".format(allo_x),"echo_y : {}".format(allo_y))
             print("ksss")
             diff_x = allo_x - obstacle_x
             diff_y = allo_y - obstacle_y
