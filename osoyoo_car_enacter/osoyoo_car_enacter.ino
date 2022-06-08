@@ -100,6 +100,7 @@ char action =' ';
 String status = "0"; // The outcome information used for sequential learning
 int robot_destination_angle = 0;
 int head_destination_angle = 0;
+int action_angle = 0;
 unsigned long blink_end_time = 0;
 bool blink_on = true;
 bool is_focussed = false;
@@ -143,7 +144,7 @@ void loop()
     int packetSize = Udp.parsePacket();
     // If the received packet exceeds the size of packetBuffer defined above, Arduino will crash
     if (packetSize) {
-      int action_angle = 0;
+      action_angle = 0;
       int len = Udp.read(packetBuffer, 512);
       packetBuffer[len] = 0;
       //Serial.print("Received action ");
@@ -165,13 +166,14 @@ void loop()
         if (myObject.hasOwnProperty("focus_x")) {
           focus_x = (int)myObject["focus_x"];
           focus_y = (int)myObject["focus_y"];
-          action_angle = atan2(focus_y, focus_x) * 180.0 / M_PI; // for focussed
+          action_angle = atan2(focus_y, focus_x) * 180.0 / M_PI; // Direction of the focus relative to the robot
+          // action_head_angle = HEA.head_direction(focus_x, focus_y);  // Direction of the focus from the head
           is_focussed = true;
         } else {
           is_focussed = false;
         }
         if (myObject.hasOwnProperty("speed")) {
-          focus_speed = (int)myObject["speed"];
+          focus_speed = (int)myObject["speed"]; // Must be positive otherwise multiplication with unsigned long fails
         }
       }
       //Serial.print(" from ");
@@ -405,9 +407,10 @@ void loop()
       case ACTION_TURN_IN_SPOT_LEFT:
         // Keep head aligned with destination angle
         if (is_focussed){
-          float current_robot_direction = (head_destination_angle - IMU._yaw) * M_PI / 180.0;
+          //float current_robot_direction = (head_destination_angle - IMU._yaw) * M_PI / 180.0;
+          float current_focus_direction = (action_angle - IMU._yaw) * M_PI / 180.0; // relative to robot
           float r = sqrt(sq((float)focus_x) + sq((float)focus_y));  // conversion to float is necessary for some reason
-          float current_head_direction = HEA.head_direction(cos(current_robot_direction) * r, sin(current_robot_direction) * r);
+          float current_head_direction = HEA.head_direction(cos(current_focus_direction) * r, sin(current_focus_direction) * r);
           // Serial.println("Directions robot: " + String(current_robot_direction) + ", head: " + String((int)current_head_direction) + ", dist: " + String((int)r));
           HEA.turnHead(current_head_direction); // Keep looking at destination
         } else {
@@ -426,9 +429,10 @@ void loop()
       case ACTION_TURN_IN_SPOT_RIGHT:
         // Keep head aligned with destination angle
         if (is_focussed){
-          float current_robot_direction = (head_destination_angle - IMU._yaw) * M_PI / 180.0;
+          // float current_robot_direction = (head_destination_angle - IMU._yaw) * M_PI / 180.0;
+          float current_focus_direction = (action_angle - IMU._yaw) * M_PI / 180.0;
           float r = sqrt(sq((float)focus_x) + sq((float)focus_y));  // conversion to float is necessary for some reason
-          float current_head_direction = HEA.head_direction(cos(current_robot_direction) * r, sin(current_robot_direction) * r);
+          float current_head_direction = HEA.head_direction(cos(current_focus_direction) * r, sin(current_focus_direction) * r);
           // Serial.println("Directions robot: " + String(current_robot_direction) + ", head: " + String((int)current_head_direction) + ", dist: " + String((int)r));
           HEA.turnHead(current_head_direction); // Keep looking at destination
         } else {

@@ -1,3 +1,5 @@
+from . Agent.AgentCircle import AgentCircle
+
 
 class CtrlWorkspace():
     """Controller for everything involved in workspace (memory,hexamem,synthe,decider)"""
@@ -11,7 +13,7 @@ class CtrlWorkspace():
         self.user_action = None
         self.f_user_action_ready = False
         self.f_new_interaction_done = False
-        self.enacted_interaction = {'status':'T'}
+        self.enacted_interaction = {'status': 'T'}
         self.decision_mode = "manual"
         self.need_user_to_command_robot = False
 
@@ -20,6 +22,7 @@ class CtrlWorkspace():
         self.cell_inde_a_traiter = None
 
         self.flag_for_view_refresh = False
+        self.agent = AgentCircle()
 
     def main(self,dt):
         """Handle the workspace work, from the moment the robot interaction is done,
@@ -69,8 +72,15 @@ class CtrlWorkspace():
 
         if self.decision_mode == "automatic" :
             #  2. Start the decider process
-            "pas d'agent pour le moment"
-            # TODO mettre l'agent
+
+            if not self.f_interaction_to_enact_ready:
+                # The agent that generates automatic behavior
+                outcome = self.agent.result(self.enacted_interaction)
+                action = self.agent.action(outcome)
+                self.interaction_to_enact = self.agent.intended_interaction(action)
+
+                self.f_interaction_to_enact_ready = True
+
         else :
             self.need_user_to_command_robot = True
 

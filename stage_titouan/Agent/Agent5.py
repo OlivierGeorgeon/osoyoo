@@ -1,4 +1,4 @@
-from . Resources import Interaction
+from . Interaction import Interaction
 from . CompositeInteraction import CompositeInteraction
 # from EgoMemoryWindow import EgoMemoryWindow
 # from OsoyooCar import OsoyooCar
@@ -6,10 +6,10 @@ import pyglet
 
 
 class Agent5:
-    def __init__(self, hedonist_table=[[4, -2, -2, -2], [-1, -1, -1, -1], [-2, -2, -2, -2]]):
+    def __init__(self, valences=[[4, -2, -2, -2], [-1, -1, -1, -1], [-2, -2, -2, -2]]):
         """ Creating our agent """
         # These values give a nice demo with osoyoo car
-        self.hedonist_table = hedonist_table
+        self.valences = valences
         self._action = 0
         self.anticipated_outcome = None
 
@@ -24,11 +24,11 @@ class Agent5:
                   ", Anticipation: " + str(self.anticipated_outcome) +
                   ", Outcome: " + str(_outcome) +
                   ", Satisfaction: (anticipation: " + str(self.anticipated_outcome == _outcome) +
-                  ", valence: " + str(self.hedonist_table[self._action][_outcome]) + ")")
+                  ", valence: " + str(self.valences[self._action][_outcome]) + ")")
 
         """ Recording previous experience """
         self.previous_interaction = self.last_interaction
-        valence = self.hedonist_table[self._action][_outcome]  # stock la satisfaction obtenue à la dernière interaction
+        valence = self.valences[self._action][_outcome]  # stock la satisfaction obtenue à la dernière interaction
         self.last_interaction = Interaction.create_or_retrieve(self._action, _outcome, valence)
         # print("Enacted interaction ", end="")
         # print(self.last_interaction)
@@ -81,32 +81,13 @@ class Agent5:
     def intended_interaction(self, _action):
         return {'action': ['8', '1', '3'][_action]}
 
+
 # Testing Agent5 by updating the window and expecting outcome from user keypress
+# py -m stage_titouan.Agent.Agent5
 if __name__ == "__main__":
-    emw = EgoMemoryWindow(600)
-    emw.zoom_level = 2
-    robot = OsoyooCar(emw.batch)
     agent = Agent5()
     outcome = 0
 
-    @emw.event
-    def on_text(text):
-        """ Receiving the outcome from the window """
-        global outcome
-        if text.isnumeric():
-            outcome = int(text)
-
-    def play(dt):
+    for i in range(20):
         action = agent.action(outcome)
-        if action == 0:  # Move forward
-            emw.update_environment_matrix([180, 0], 0)
-        if action == 1:  # turn left
-            emw.update_environment_matrix([0, 0], 45)
-        if action == 2:  # turn right
-            emw.update_environment_matrix([0, 0], -45)
-
-    # Schedule call the agent every second
-    pyglet.clock.schedule_interval(play, 1)
-
-    # Run the egocentric memory window
-    pyglet.app.run()
+        outcome = 0

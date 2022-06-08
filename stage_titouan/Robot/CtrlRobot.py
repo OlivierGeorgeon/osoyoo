@@ -8,10 +8,10 @@ from stage_titouan.Robot.WifiInterface import WifiInterface
 from stage_titouan.Memory.EgocentricMemory.Interactions.Interaction import *
 
 
-class CtrlRobot():
+class CtrlRobot:
     """Blabla"""
 
-    def __init__(self,model,robot_ip):
+    def __init__(self, model, robot_ip):
         self.model = model
 
         self.wifiInterface = WifiInterface(robot_ip)
@@ -30,7 +30,7 @@ class CtrlRobot():
         self.leftward_speed = [0, LATERAL_SPEED]
         self.rightward_speed = [0, -LATERAL_SPEED]
 
-    def main(self,dt):
+    def main(self, dt):
         """Blabla"""
         if self.enact_step == 2:
             self.robot_has_started_acting = False
@@ -231,7 +231,6 @@ class CtrlRobot():
 
     def command_robot(self, intended_interaction):
         """ Creating an asynchronous thread to send the command to the robot and to wait for the outcome """
-        self.outcome_bytes = "Waiting"
 
         def enact_thread():
             """ Sending the command to the robot and waiting for the outcome """
@@ -242,12 +241,24 @@ class CtrlRobot():
             print(self.outcome_bytes)
             self.enact_step = 2  # Now we have received the outcome from the robot
 
-        # self.action = action
+        self.outcome_bytes = "Waiting"
+
+        # If keep focus, send the speed current value
+        if 'focus_x' in intended_interaction:
+            if intended_interaction['action'] == '8':
+                intended_interaction['speed'] = int(self.forward_speed[0])
+            if intended_interaction['action'] == '2':
+                intended_interaction['speed'] = -int(self.backward_speed[0])  # Must send positive speed
+            if intended_interaction['action'] == '4':
+                intended_interaction['speed'] = int(self.leftward_speed[1])
+            if intended_interaction['action'] == '6':
+                intended_interaction['speed'] = -int(self.rightward_speed[1])
+
         self.intended_interaction = intended_interaction
         self.enact_step = 1  # Now we send the command to the robot for enaction
         thread = threading.Thread(target=enact_thread)
         thread.start()
-        # print(intended_interaction)
+
         # Cas d'actions particulières :
         if intended_interaction["action"] == "r":
             self.model.action_reset()

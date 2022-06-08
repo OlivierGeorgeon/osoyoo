@@ -2,7 +2,7 @@ import pyglet
 from pyglet.gl import *
 from pyglet import shapes
 from . Interactions.Interaction import Interaction
-from . Interactions.Interaction import INTERACTION_TRESPASSING, INTERACTION_ECHO, INTERACTION_BLOCK, INTERACTION_SHOCK
+from . Interactions.Interaction import INTERACTION_TRESPASSING, INTERACTION_ECHO, INTERACTION_ECHO2, INTERACTION_BLOCK, INTERACTION_SHOCK
 from webcolors import name_to_rgb
 # from Misc import rotate
 import math
@@ -79,6 +79,7 @@ class MemoryNew:
             #print("add_echo_array, x :",x)
             y = echo[1]
             obstacleInter = Interaction(x,y,width = 15,type = INTERACTION_ECHO, shape = 'Circle', color = 'orange', durability = durability, decayIntensity = 1, id = self.current_id)
+            # obstacleInter = Interaction(x,y,width = 15,type = INTERACTION_ECHO2, shape = 'Circle', color = 'orange', durability = durability, decayIntensity = 1, id = self.current_id)
             self.interactions.append(obstacleInter)
             self.current_id += 1
     def tick(self):

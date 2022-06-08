@@ -24,10 +24,16 @@ LINE_X = 160                # (mm) X coordinate of the line after retreat
 # compass_x must be near 0 when the robot is East or West
 # compass_y must be near 0 when the robot is North or South.
 
+if ROBOT_ID == 1:
+    FORWARD_SPEED = 300  # (mm/s) Forward translation speed.
+    LATERAL_SPEED = 260  # (mm/s) Lateral translation speed.
+
 # Robot 2 in ROOM A327.
 if ROBOT_ID == 2:
     COMPASS_X_OFFSET = 0  # The offset is configured in the C++ code.
     COMPASS_Y_OFFSET = 0
+    FORWARD_SPEED = 230  # (mm/s) Forward translation speed.
+    LATERAL_SPEED = 140  # (mm/s) Lateral translation speed.
 
 # Robot 4 chezOlivier
 if ROBOT_ID == 4:

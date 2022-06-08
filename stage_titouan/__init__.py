@@ -4,6 +4,7 @@ from . Misc.Utils import *
 import pyglet
 
 from . Display.EgocentricDisplay.CtrlView import CtrlView
+from . Display.EgocentricDisplay.CtrlViewNew import CtrlViewNew
 from . Display.EgocentricDisplay.EgocentricView import EgocentricView
 from . Display.HexaDisplay.HexaView import HexaView
 from . Display.HexaDisplay.CtrlHexaview import CtrlHexaview

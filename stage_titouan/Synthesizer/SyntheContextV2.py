@@ -36,7 +36,7 @@ class SyntheContextV2 :
         self.robot_action_todo = None
 
     def act(self,user_action = None):
-        """blabla"""
+        """ Lance toute la synthese """
         if self.mode == MANUAL_MODE:
             self.act_manual(user_action)
         elif self.mode == AUTOMATIC_MODE :
