@@ -251,17 +251,18 @@ class HexaMemory(HexaGrid):
         x_prime += self.robot_pos_x
         y_prime += self.robot_pos_y
         try :
-            self.apply_changes(
-                self.robot_pos_x, self.robot_pos_y, x_prime, y_prime)
+            self.apply_changes(self.robot_pos_x, self.robot_pos_y, x_prime, y_prime)
+            self.robot_pos_x = x_prime
+            self.robot_pos_y = y_prime          
         except IndexError:
             print("IndexError")
-            self.robot_pos_x = 0
-            self.robot_pos_y = 0
             self.robot_cell_x = self.width // 2
             self.robot_cell_y = self.height // 2
+            self.robot_pos_x = 0
+            self.robot_pos_y = 0
 
-        self.robot_pos_x = x_prime
-        self.robot_pos_y = y_prime
+
+
         self.grid[self.robot_cell_x][self.robot_cell_y].set_to('Free')
         self.grid[self.robot_cell_x][self.robot_cell_y].leave()
         self.cells_changed_recently.append((self.robot_cell_x, self.robot_cell_y))
