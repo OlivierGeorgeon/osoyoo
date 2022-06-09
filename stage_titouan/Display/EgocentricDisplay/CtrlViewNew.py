@@ -12,14 +12,13 @@ class CtrlViewNew:
         self.view = EgocentricView()
         self.ctrl_workspace = ctrl_workspace
         self.memory = ctrl_workspace.workspace.memory
-
+        self.synthesizer = ctrl_workspace.synthesizer
         self.points_of_interest = []
 
         self.mouse_press_x = 0
         self.mouse_press_y = 0
         self.mouse_press_angle = 0
         self.last_used_id = -1
-
         def on_mouse_press(x, y, button, modifiers):
             """ Selecting or unselecting points of interest """
             self.mouse_press_x, self.mouse_press_y, self.mouse_press_angle = \
@@ -69,6 +68,14 @@ class CtrlViewNew:
             poi = self.create_points_of_interest(interaction)
             self.points_of_interest.append(poi)
 
+        real_echos_to_display = self.synthesizer.last_real_echos
+        # TODO: create pointe of interest from real_echos_to_display
+        for real_echo in real_echos_to_display:
+            ""
+            #TODO : poi = self.create_pointe_of_interest_from_real_echo(real_echo)
+            #self.points_of_interest.append(poi)
+
+
         displacement_matrix = self.ctrl_workspace.enacted_interaction['displacement_matrix'] if 'displacement_matrix' in self.ctrl_workspace.enacted_interaction else None
         for poi in self.points_of_interest:
             if poi.type != 6:  # Do not displace the compass points
@@ -101,6 +108,7 @@ class CtrlViewNew:
         return None
 
     def main(self, dt):
+        """Blabla"""
         if self.ctrl_workspace.flag_for_view_refresh:
             self.update_points_of_interest()
 
@@ -114,6 +122,13 @@ class CtrlViewNew:
                 if p is not None:
                     p.delete()
                     self.points_of_interest.remove(p)
+
+            if self.synthesizer is not None and len(self.synthesizer.last_real_echos) > 0:
+                ""
+
+
+
+                last_real_echos = []
 
             self.ctrl_workspace.flag_for_view_refresh = False
 

@@ -339,7 +339,10 @@ class HexaMemory(HexaGrid):
 
     def convert_egocentric_position_to_allocentric(self,position_x,position_y):
         """Convert the given position from egocentric to allocentric coordinates"""
+        print("position_x,position_y",position_x,position_y)
         translation_x,translation_y = self.convert_egocentric_translation_to_allocentric(position_x,position_y)
+        print("translation_x,translation_y",translation_x,translation_y)
+        
         return self.robot_pos_x + translation_x, self.robot_pos_y + translation_y
 
     def apply_translation_to_robot_pos(self,translation_x,translation_y):

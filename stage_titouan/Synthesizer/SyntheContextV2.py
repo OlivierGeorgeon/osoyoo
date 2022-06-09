@@ -35,6 +35,9 @@ class SyntheContextV2 :
         self.robot_interaction_enacted = None
         self.robot_action_todo = None
 
+
+        self.last_real_echos = []
+
     def act(self,user_action = None):
         """ Lance toute la synthese """
         if self.mode == MANUAL_MODE:
@@ -58,12 +61,14 @@ class SyntheContextV2 :
                 self.synthetizing_step = 0.1
                 self.last_used_id = max([elem.id for elem in self.interactions_list])
                 echoes = [elem for elem in self.interactions_list if elem.type == "Echo"]
-                real_echos = self.treat_echos_alt2(echoes)
-
+                real_echos = self.treat_echos_alt3(echoes)
+                self.last_real_echos = real_echos
+                len(real_echos)
+            
 
 ########
-                echo_to_print = [(elem.x,elem.y) for elem in real_echos]
-                print("real echos : ",echo_to_print)
+                #echo_to_print = [(elem.x,elem.y) for elem in real_echos]
+                #print("len real echos :", len(real_echos), "echos : ",echo_to_print)
 ########
 
                 self.interactions_list = [elem for elem in self.interactions_list if elem.type != "Echo"]
@@ -76,8 +81,8 @@ class SyntheContextV2 :
                 for echo,obstacle_object in self.linking_list:
                         coord,inte,_ = obstacle_object
                         allo_x,allo_y = self.hexa_memory.convert_egocentric_position_to_allocentric(echo.x,echo.y)
-                        print("coord echo : ", allo_x,allo_y, " cell : ", self.hexa_memory.convert_pos_in_cell(allo_x,allo_y) )
-                        print("coord obstacle : ", self.hexa_memory.convert_cell_to_pos(coord[0],coord[1]), " cell : ", coord[0], coord[1])
+                        #print("coord echo : ", allo_x,allo_y, " cell : ", self.hexa_memory.convert_pos_in_cell(allo_x,allo_y) )
+                        #print("coord obstacle : ", self.hexa_memory.convert_cell_to_pos(coord[0],coord[1]), " cell : ", coord[0], coord[1])
 ########
 
 
@@ -147,25 +152,14 @@ class SyntheContextV2 :
                 self.last_used_id = max([elem.id for elem in self.interactions_list])
                 echoes = [elem for elem in self.interactions_list if elem.type == "Echo"]
                 print("len echoes :", len(echoes))
-                #real_echos3 = self.treat_echos_alt(echoes)
-                #real_echos2 = self.treat_echos_alt2(echoes)
-                real_echos = self.treat_echos_alt3(echoes)
+                real_echos = self.treat_echos_alt4(echoes)
+                self.last_real_echos = real_echos
                 print("len real_echos :", len(real_echos))
-                print("linking test : ")
-                linking_list =  self.compare_echoes_with_context(real_echos, [])
-                if len(linking_list)> 0:
-                    print("linking list : ",linking_list)
-                    print("\n\n")
-                    for echo,obstacle_object in linking_list:
-                        coord,inte,_ = obstacle_object
-
-                        print("coord echo : ", echo.x, echo.y)
-                        print("coord obstacle : ", inte.x, inte.y)
                 self.interactions_list = [elem for elem in self.interactions_list if elem.type != "Echo" or elem in real_echos]
                 self.project_interactions_on_internal_hexagrid(self.interactions_list)
                 n_indecisive_cells,n_decided_cells = self.comparison_step()
                 self.indecisive_cells = self.indecisive_cells + n_indecisive_cells
-                print(self.indecisive_cells)
+                #print(self.indecisive_cells)
                 self.decided_cells = self.decided_cells + n_decided_cells
                 if len(self.indecisive_cells  )> 0:
                     print("<SyntheContextV2> synthe step passe a 1")
@@ -222,86 +216,6 @@ class SyntheContextV2 :
                     min_ind_list.append(i+1)
         return min_list
 
-    def treat_echos_alt(self,echo_list):
-        """blabla"""
-        echo_list = self.revert_echoes_to_angle_distance(echo_list)
-        max_delta_dist = 50
-        max_delta_angle = math.radians(20)
-        angle_start_of_strike = -1
-        angle_end_of_strike = -1
-        distance_start_of_strike = -1
-        distance_end_of_strike = -1
-        new_strike = False
-        current_strike = []
-        output = []
-        for angle,distance,interaction in echo_list :
-            if angle_start_of_strike == -1 :
-                angle_start_of_strike = angle
-                distance_start_of_strike = distance
-                angle_end_of_strike = angle
-                distance_end_of_strike = distance
-                current_strike.append(interaction)
-            else :
-                #if the difference between the angle and the last angle is too big or the difference between the last distance 
-                #and the current distance is too big, we have a new strike else we continue the current strike
-                #if we end the strike we take the interaction in the middle of it, and we add it to the output array
-                #print("angle : ", math.degrees(angle), "angle_end_of_strike : ", math.degrees(angle_end_of_strike), "max_delta_angle : ",math.degrees( max_delta_angle))
-                #print("distance :", distance, "distance_end_of_strike : ", distance_end_of_strike, "max_delta_dist : ", max_delta_dist)
-                if abs(angle - angle_end_of_strike) > max_delta_angle or abs(distance - distance_end_of_strike) > max_delta_dist :
-                    new_strike = True
-                    output.append(current_strike[int(len(current_strike)/2)])
-                    current_strike = []
-                    angle_start_of_strike = angle
-                    distance_start_of_strike = distance
-                    angle_end_of_strike = angle
-                    distance_end_of_strike = distance
-                    current_strike.append(interaction)
-                else :
-                    current_strike.append(interaction)
-                    angle_end_of_strike = angle
-                    distance_end_of_strike = distance
-
-        return output
-            
-
-    def treat_echos_alt2(self,echo_list):
-        """blabla"""
-        echo_list = self.revert_echoes_to_angle_distance(echo_list)
-        max_delta_dist = 20
-        max_delta_angle = math.radians(20)
-        strikes = [[[],True],[[],True],[[],True],[[],True],[[],True],[[],True]]
-        current_id = 0
-        strike_debug=[[],[],[],[],[],[]]
-        strike_deb_ang_dist = [[],[],[],[],[],[]]
-
-        i_debug = 0
-        for angle,distance,interaction in echo_list :
-            if strikes[current_id][1] : #if the strike is not finished
-                serie = strikes[current_id][0]
-                if (len(serie) == 0) or(abs(distance - serie[-1][1]) < max_delta_dist and abs(angle - serie[-1][0]) < max_delta_angle ):
-                    serie.append((angle,distance,interaction))
-                    strike_debug[current_id].append(i_debug)
-                    strike_deb_ang_dist[current_id].append((angle,math.degrees(distance)))
-                    print(i_debug)
-                else :
-                    strikes[current_id][1] = False
-                    current_id = (current_id + 1)
-                    serie = strikes[current_id][0]
-                    serie.append((angle,distance,interaction))
-                    print(i_debug)
-            i_debug += 1
-        output = []
-        for strike in strikes :
-            print("REAL ECHOS  strike : ",strike)
-            if len(strike[0]) == 0 :
-                continue
-            serie = strike[0]
-            output.append(serie[int(len(serie)/2)][2])
-
-        print("strike_debug : ",strike_debug)
-        print("strike_deb_ang_dist : ",strike_deb_ang_dist)
-        return output
-
     def treat_echos_alt3(self,echo_list):
         print("len(echo_list) : ",len(echo_list))
         if(len(echo_list) ==1):
@@ -329,6 +243,44 @@ class SyntheContextV2 :
         print(angle_dist)
         return output
 
+
+    def treat_echos_alt4(self,echo_list):
+        print("len(echo_list) : ",len(echo_list))
+        if(len(echo_list) ==1):
+            print(echo_list[0])
+        echo_list = self.revert_echoes_to_angle_distance(echo_list)
+        max_delta_dist = 50
+        max_delta_angle = math.radians(20)
+        streaks = [[],[],[],[],[],[],[],[],[],[],[],[]]
+        angle_dist = [[],[],[],[],[],[],[],[],[],[],[],[]]
+        current_id = 0
+        echo_list = sorted(echo_list, key=lambda elem: elem[0]) # on trie par angle, pour avoir les streak "préfaites"
+        for angle,distance,interaction in echo_list :
+            check = False
+            for i,streak in enumerate(streaks):
+                if len(streak)> 0 and check == False:
+                    print("streak : ",streak)
+                    if any((abs(ele[1]-distance)<max_delta_dist and abs(angle - ele[0])<max_delta_angle) for ele in streak):
+                        streak.append((angle,distance,interaction))
+                        angle_dist[i].append((math.degrees(angle),distance))
+                        check = True
+            if check:
+                continue
+            if (len(streaks[current_id]) == 0):
+                streaks[current_id].append((angle,distance,interaction))
+                angle_dist[current_id].append((math.degrees(angle),distance))
+            else :
+                current_id = (current_id + 1)
+                streaks[current_id].append((angle,distance,interaction))
+                angle_dist[current_id].append((math.degrees(angle),distance))
+        output = []
+        for streak in streaks :
+            if len(streak) == 0 :
+                continue
+            else :
+                output.append(streak[int(len(streak)/2)][2])
+        print(angle_dist)
+        return output
     def revert_echoes_to_angle_distance(self,echo_list):
         """blabla"""
         output = []
@@ -484,14 +436,10 @@ class SyntheContextV2 :
         sum_translation_x = 0
         sum_translation_y = 0
         for echo,obstacle_object in linking_list:
-            result_tmp = self.get_allocentric_coordinates_of_interactions([echo])
-
-            print("resukt_tmp : {}".format(result_tmp))
             (allo_x,allo_y),_ = self.get_allocentric_coordinates_of_interactions([echo])[0]
             coord,obstacle,_ = obstacle_object
             obstacle_x,obstacle_y = self.hexa_memory.convert_cell_to_pos(coord[0],coord[1])
             print("obstacle_x : {}".format(obstacle_x),"obstacle_y : {}".format(obstacle_y), "echo_x : {}".format(allo_x),"echo_y : {}".format(allo_y))
-            print("ksss")
             diff_x = allo_x - obstacle_x
             diff_y = allo_y - obstacle_y
             print("diff_x : {}".format(diff_x), "diff_y : {}".format(diff_y))
