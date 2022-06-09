@@ -90,9 +90,9 @@ class CtrlViewNew:
         self.view.azimuth = self.ctrl_workspace.enacted_interaction['azimuth']
 
         # Point of interest compass
-        if 'compass_x' in self.ctrl_workspace.enacted_interaction:
-            self.add_point_of_interest(self.ctrl_workspace.enacted_interaction['compass_x'],
-                                       self.ctrl_workspace.enacted_interaction['compass_y'], POINT_COMPASS)
+        # if 'compass_x' in self.ctrl_workspace.enacted_interaction:
+        #     self.add_point_of_interest(self.ctrl_workspace.enacted_interaction['compass_x'],
+        #                                self.ctrl_workspace.enacted_interaction['compass_y'], POINT_COMPASS)
 
     def create_points_of_interest(self, interaction):
         """Create a point of interest corresponding to the interaction given as parameter"""
