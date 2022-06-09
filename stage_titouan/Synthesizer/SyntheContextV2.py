@@ -63,20 +63,18 @@ class SyntheContextV2 :
                 echoes = [elem for elem in self.interactions_list if elem.type == "Echo2"]
                 real_echos = self.treat_echos_alt3(echoes)
                 self.last_real_echos = real_echos
-                len(real_echos)
-            
-
 ########
                 #echo_to_print = [(elem.x,elem.y) for elem in real_echos]
                 #print("len real echos :", len(real_echos), "echos : ",echo_to_print)
 ########
 
-                self.interactions_list = [elem for elem in self.interactions_list if elem.type != "Echo2"]
+                real_echos = real_echos + [elem for elem in self.interactions_list if elem.type == "Echo"]
+                self.interactions_list = [elem for elem in self.interactions_list if (elem.type != "Echo2" and elem.type != "Echo")]
                 #We now have the echoes differenciated from the other interactions
                 #We now have to compare the echoes with the known obstacles
 
 ########
-                real_echos = real_echos + [elem for elem in self.interactions_list if elem.type == "Echo"]
+                
                 self.linking_list = self.compare_echoes_with_context_alt(real_echos,[])
                 print("linking done, len of linking_list : ", len(self.linking_list))
                 for echo,obstacle_object in self.linking_list:
