@@ -72,7 +72,7 @@ class SyntheContextV2 :
                 #if so, remove the element from echo_focus
                 for elem in real_echos:
                     for elem2 in echo_focus:
-                        if math.sqrt((elem.x-elem2.x)**2 + (elem.y-elem2.y)**2) < 50:
+                        if math.sqrt((elem.x-elem2.x)**2 + (elem.y-elem2.y)**2) < 90:
                             echo_focus.remove(elem2)
                 real_echos = real_echos + echo_focus
                 
