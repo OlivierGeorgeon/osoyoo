@@ -72,8 +72,9 @@ class CtrlViewNew:
         # TODO: create pointe of interest from real_echos_to_display
         for real_echo in real_echos_to_display:
             ""
-            #TODO : poi = self.create_pointe_of_interest_from_real_echo(real_echo)
-            #self.points_of_interest.append(poi)
+            poi = self.create_pointe_of_interest_from_real_echo(real_echo)
+            self.points_of_interest.append(poi)
+        self.synthesizer.last_real_echos = []
 
 
         displacement_matrix = self.ctrl_workspace.enacted_interaction['displacement_matrix'] if 'displacement_matrix' in self.ctrl_workspace.enacted_interaction else None
@@ -100,6 +101,11 @@ class CtrlViewNew:
         return PointOfInterest(interaction.x, interaction.y, self.view.batch, self.view.foreground,
                                dict_interactions_to_poi[interaction.type], interaction=interaction)
 
+    def create_pointe_of_interest_from_real_echo(self,real_echo):
+        """Create a point of interest corresponding to the real echo given as parameter"""
+        interaction = real_echo
+        return PointOfInterest(interaction.x, interaction.y, self.view.batch, self.view.foreground,
+                               POINT_ECHO, interaction=interaction)
     def get_focus_phenomenon(self):
         """ Returning the first selected phenomenon """
         for p in self.points_of_interest:

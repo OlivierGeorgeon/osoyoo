@@ -1,6 +1,6 @@
 from pyglet.gl import *
 from pyglet import shapes
-from .. Memory.EgocentricMemory.Interactions.Interaction import Interaction,INTERACTION_TRESPASSING, INTERACTION_ECHO, INTERACTION_BLOCK, INTERACTION_SHOCK
+from .. Memory.EgocentricMemory.Interactions.Interaction import Interaction,INTERACTION_TRESPASSING, INTERACTION_ECHO,INTERACTION_ECHO2, INTERACTION_BLOCK, INTERACTION_SHOCK
 from webcolors import name_to_rgb
 import math
 import random
@@ -229,6 +229,8 @@ def translate_interaction_type_to_cell_status(type):
     elif(type == INTERACTION_SHOCK or type == INTERACTION_BLOCK):
         return "Blocked"
     elif(type == INTERACTION_ECHO):
+        return "Something"
+    elif(type == INTERACTION_ECHO2):
         return "Something"
     print("Problemo problemo utils translate mauvaise interaction type : ", type)
     return "Free"

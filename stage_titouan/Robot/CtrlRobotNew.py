@@ -142,7 +142,7 @@ class CtrlRobotNew:
                                  * enacted_interaction['echo_distance'])
                 echo_xy[1] = int(math.sin(math.radians(enacted_interaction['head_angle']))
                                  * enacted_interaction['echo_distance'])
-                enacted_interaction['points'].append((INTERACTION_ECHO, *echo_xy))
+                enacted_interaction['points'].append((INTERACTION_ECHO, *echo_xy)) 
                 # Return the echo_xy to possibly use as focus
                 enacted_interaction['echo_xy'] = echo_xy
 

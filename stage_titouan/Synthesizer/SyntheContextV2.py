@@ -60,7 +60,7 @@ class SyntheContextV2 :
                 print("Normal start of synthesis")
                 self.synthetizing_step = 0.1
                 self.last_used_id = max([elem.id for elem in self.interactions_list])
-                echoes = [elem for elem in self.interactions_list if elem.type == "Echo"]
+                echoes = [elem for elem in self.interactions_list if elem.type == "Echo2"]
                 real_echos = self.treat_echos_alt3(echoes)
                 self.last_real_echos = real_echos
                 len(real_echos)
@@ -71,11 +71,12 @@ class SyntheContextV2 :
                 #print("len real echos :", len(real_echos), "echos : ",echo_to_print)
 ########
 
-                self.interactions_list = [elem for elem in self.interactions_list if elem.type != "Echo"]
+                self.interactions_list = [elem for elem in self.interactions_list if elem.type != "Echo2"]
                 #We now have the echoes differenciated from the other interactions
                 #We now have to compare the echoes with the known obstacles
 
 ########
+                real_echos = real_echos + [elem for elem in self.interactions_list if elem.type == "Echo"]
                 self.linking_list = self.compare_echoes_with_context_alt(real_echos,[])
                 print("linking done, len of linking_list : ", len(self.linking_list))
                 for echo,obstacle_object in self.linking_list:
@@ -150,12 +151,12 @@ class SyntheContextV2 :
             self.interactions_list = [elem for elem in self.memory.interactions if (elem.id>self.last_used_id)]
             if len(self.interactions_list )> 0:
                 self.last_used_id = max([elem.id for elem in self.interactions_list])
-                echoes = [elem for elem in self.interactions_list if elem.type == "Echo"]
+                echoes = [elem for elem in self.interactions_list if elem.type == "Echo2"]
                 print("len echoes :", len(echoes))
                 real_echos = self.treat_echos_alt4(echoes)
                 self.last_real_echos = real_echos
                 print("len real_echos :", len(real_echos))
-                self.interactions_list = [elem for elem in self.interactions_list if elem.type != "Echo" or elem in real_echos]
+                self.interactions_list = [elem for elem in self.interactions_list if elem.type != "Echo2" or elem in real_echos]
                 self.project_interactions_on_internal_hexagrid(self.interactions_list)
                 n_indecisive_cells,n_decided_cells = self.comparison_step()
                 self.indecisive_cells = self.indecisive_cells + n_indecisive_cells

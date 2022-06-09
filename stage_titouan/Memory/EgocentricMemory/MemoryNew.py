@@ -78,7 +78,7 @@ class MemoryNew:
             x = echo[0]
             #print("add_echo_array, x :",x)
             y = echo[1]
-            obstacleInter = Interaction(x,y,width = 15,type = INTERACTION_ECHO, shape = 'Circle', color = 'orange', durability = durability, decayIntensity = 1, id = self.current_id)
+            obstacleInter = Interaction(x,y,width = 15,type = INTERACTION_ECHO2, shape = 'Circle', color = 'orange', durability = durability, decayIntensity = 1, id = self.current_id)
             # obstacleInter = Interaction(x,y,width = 15,type = INTERACTION_ECHO2, shape = 'Circle', color = 'orange', durability = durability, decayIntensity = 1, id = self.current_id)
             self.interactions.append(obstacleInter)
             self.current_id += 1
