@@ -67,8 +67,15 @@ class SyntheContextV2 :
                 #echo_to_print = [(elem.x,elem.y) for elem in real_echos]
                 #print("len real echos :", len(real_echos), "echos : ",echo_to_print)
 ########
-
-                real_echos = real_echos + [elem for elem in self.interactions_list if elem.type == "Echo"]
+                echo_focus = [elem for elem in self.interactions_list if elem.type == "Echo"]
+                #check if the distance between any element from real_echos and each element of echo_focus is below 50
+                #if so, remove the element from echo_focus
+                for elem in real_echos:
+                    for elem2 in echo_focus:
+                        if math.sqrt((elem.x-elem2.x)**2 + (elem.y-elem2.y)**2) < 50:
+                            echo_focus.remove(elem2)
+                real_echos = real_echos + echo_focus
+                
                 self.interactions_list = [elem for elem in self.interactions_list if (elem.type != "Echo2" and elem.type != "Echo")]
                 #We now have the echoes differenciated from the other interactions
                 #We now have to compare the echoes with the known obstacles
