@@ -36,6 +36,8 @@ class SynthesizerUserInteraction :
         self.flag_no = False
         self.need_user_action = False
 
+        self.last_real_echos = []
+
         self.indecisive_interactions = []
     def reset(self):
         """ Reset the internal_hexa_grid """
