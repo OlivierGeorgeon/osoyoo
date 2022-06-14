@@ -4,6 +4,7 @@ from .. Misc.Utils import translate_interaction_type_to_cell_status
 from ..  Memory.EgocentricMemory.Interactions.Interaction import INTERACTION_ECHO
 from .. Memory.HexaMemory.HexaGrid import HexaGrid
 import numpy as np
+from scipy.spatial.distance import cdist
 AUTOMATIC_MODE = "automatic"
 MANUAL_MODE = "manual"
 SCAN_DISTANCE = 600
@@ -50,7 +51,7 @@ class SyntheContextV2 :
         # Should use the context created in the manual mode, so no new Obstacle should be added on the grid,
         # instead an echo should be linked to a known obstacle, and used to compute the correct position of the robot.
         self.user_action = user_action
-
+        self.linking_list = []
 
         if self.synthetizing_step == 0 : # start of the synthesis
             
@@ -82,15 +83,17 @@ class SyntheContextV2 :
 
 ########
                 
-                self.linking_list = self.compare_echoes_with_context_alt(real_echos,[])
+                #self.linking_list, mean_translations = self.compare_echoes_with_context(real_echos,[])
+                self.linking_list, mean_translations= self.compare_echoes_with_context2(real_echos,[])
                 print("linking done, len of linking_list : ", len(self.linking_list))
                 for echo,obstacle_object in self.linking_list:
                         coord,inte,_ = obstacle_object
                         allo_x,allo_y = self.hexa_memory.convert_egocentric_position_to_allocentric(echo.x,echo.y)
-                        #print("coord echo : ", allo_x,allo_y, " cell : ", self.hexa_memory.convert_pos_in_cell(allo_x,allo_y) )
+                        print("\n","coord echo : ", allo_x,allo_y, " cell : ", self.hexa_memory.convert_pos_in_cell(allo_x,allo_y) ,"\n" )
                         #print("coord obstacle : ", self.hexa_memory.convert_cell_to_pos(coord[0],coord[1]), " cell : ", coord[0], coord[1])
 ########
 
+                print("\n\n MEAN TRANSLATIONS :",mean_translations)
 
                 #We now have the echoes linked to the known obstacles
                 #We have to make sure that there is no obstacle that should have been seen by the robot but wasn't
@@ -386,36 +389,16 @@ class SyntheContextV2 :
             self.decided_cells.remove(elem)
         return cells_treated
 
+
     def compare_echoes_with_context(self,real_echos,linking_list):
         """Compare the real echoes with the context (known_obstacles), and create a linking between all the echoes and one obstacle"""
         linking_output = []
         used_obstacles = []
         known_obstacles = self.known_obstacles
-        for echo in real_echos :
-            min_dist = 9999999999
-            min_obstacle = None
-            for obstacle_object in known_obstacles:
-                _,interaction,_ = obstacle_object
-                #get the obstacle with the minimum distance from the echo
-                dist = math.sqrt((echo.x - interaction.x)**2 + (echo.y - interaction.y)**2)
-                #We want : 1) dist to be less than the current minimum, the obstactle not being already linked, and the linking not being in the previous linking list
-                if dist < min_dist and obstacle_object not in used_obstacles and (echo,obstacle_object) not in linking_list:
-                    min_dist = dist
-                    min_obstacle = obstacle_object
-            if min_obstacle is not None :
-                #TODO : just avoided for the time being to be able to conduct some tests, but should maybe produce an error
-                linking_output.append((echo,min_obstacle))
-                used_obstacles.append(min_obstacle) # quoi que ? on peut peut-être utiliser le meme obstacle pour différents echo ?
-
-        return linking_output
-                
-
-    def compare_echoes_with_context_alt(self,real_echos,linking_list):
-        """Compare the real echoes with the context (known_obstacles), and create a linking between all the echoes and one obstacle"""
-        linking_output = []
-        used_obstacles = []
-        known_obstacles = self.known_obstacles
         echos_allocentric = self.get_allocentric_coordinates_of_interactions(real_echos)
+        sum_translation_x,sum_translation_y = 0,0
+        x_obstacle,y_obstacle = 0,0
+        nb_linking = 0
         for (x_echo,y_echo),echo_interaction in echos_allocentric :
             min_dist = 9999999999
             min_obstacle = None
@@ -432,8 +415,55 @@ class SyntheContextV2 :
                 #TODO : just avoided for the time being to be able to conduct some tests, but should maybe produce an error
                 linking_output.append((echo_interaction,min_obstacle))
                 used_obstacles.append(min_obstacle) # quoi que ? on peut peut-être utiliser le meme obstacle pour différents echo ?
+                sum_translation_x += x_obstacle - x_echo
+                sum_translation_y += y_obstacle - y_echo
+                nb_linking += 1
 
-        return linking_output
+        if nb_linking > 0 :
+            mean_translation_x = sum_translation_x / nb_linking
+            mean_translation_y = sum_translation_y / nb_linking
+        return linking_output,(mean_translation_x,mean_translation_y)
+
+
+    def compare_echoes_with_context2(self, real_echos, linking_list):
+        """Compare the real echoes with the context (known_obstacles), and create a linking between all the echoes and one obstacle"""
+        linking_output = []
+        sum_distance = 0
+        nb_linking = 0
+        echos_allocentric = self.get_allocentric_coordinates_of_interactions(real_echos)
+        obstacle_allo_coords = [ (elem,self.hexa_memory.convert_cell_to_pos(elem[0][0],elem[0][1])) for elem in self.known_obstacles]
+        all_distances = {}
+        for obstacle_object,(x_obstacle,y_obstacle) in obstacle_allo_coords :
+                all_distances[obstacle_object] = []
+                for (echo_x,echo_y),interaction in echos_allocentric :
+                    all_distances[obstacle_object].append((math.sqrt(((x_obstacle - echo_x)**2 + (y_obstacle - echo_y)**2)),interaction))
+       
+        obstacle_object_unused = [key for key in all_distances.keys()]
+        echoes_unused = [elem[1] for elem in echos_allocentric]
+
+        print("before linking :","len obstacle_object_unused : {}".format(len(obstacle_object_unused)),"len echoes_unused : {}".format(len(echoes_unused)))
+        while(len(obstacle_object_unused) > 0 and len(echoes_unused) > 0):
+            min = 9999999999
+            min_echo = None
+            min_obstacle = None  
+            for obstacle_object in all_distances :
+                if obstacle_object  in obstacle_object_unused:
+                    for distance,echo in all_distances[obstacle_object] :
+                        if echo in echoes_unused :
+                            if distance < min :
+                                min = distance
+                                min_echo = echo
+                                min_obstacle = obstacle_object
+            if min_obstacle is not None and min_echo is not None:
+                sum_distance += min
+                nb_linking += 1
+                linking_output.append((min_echo,min_obstacle))
+                obstacle_object_unused.remove(min_obstacle)
+                echoes_unused.remove(min_echo)
+        print("after linking :","len obstacle_object_unused : {}".format(len(obstacle_object_unused)),"len echoes_unused : {}".format(len(echoes_unused)))
+        return linking_output,sum_distance/nb_linking
+
+
 
     def find_translation_between_echo_and_context(self,linking_list):
         "Compute the mean of the translation between echo and obstacle in the linking list given as parameter, return the ALLOCENTRIC translation"
@@ -446,8 +476,8 @@ class SyntheContextV2 :
             coord,obstacle,_ = obstacle_object
             obstacle_x,obstacle_y = self.hexa_memory.convert_cell_to_pos(coord[0],coord[1])
             print("obstacle_x : {}".format(obstacle_x),"obstacle_y : {}".format(obstacle_y), "echo_x : {}".format(allo_x),"echo_y : {}".format(allo_y))
-            diff_x = allo_x - obstacle_x
-            diff_y = allo_y - obstacle_y
+            diff_x = obstacle_x - allo_x
+            diff_y = obstacle_y - allo_y 
             print("diff_x : {}".format(diff_x), "diff_y : {}".format(diff_y))
             sum_translation_x += allo_x - obstacle_x
             sum_translation_y += allo_y - obstacle_y
