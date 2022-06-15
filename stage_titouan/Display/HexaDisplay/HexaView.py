@@ -38,6 +38,8 @@ class HexaView(pyglet.window.Window):
         self.label.color = (0,0,0,255)
         self.hexa_memory = hexa_memory
 
+        self.projections_for_context = []
+
     def set_ShapesList(self,s):
         self.shapesList = s
 
@@ -49,8 +51,8 @@ class HexaView(pyglet.window.Window):
         self.nb_cell_y = memory.height
         self.cell_radius = memory.cell_radius
 
-    def extract_and_convert_recently_changed_cells(self, memory):
-        tmp = recently_changed_to_pyglet(memory, self.batch)
+    def extract_and_convert_recently_changed_cells(self,memory,to_reset = [],projections = []):
+        tmp = recently_changed_to_pyglet(memory, self.batch, projections = projections)
         print("len tmp", len(tmp))
         self.shapesList.append( tmp)
 

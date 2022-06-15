@@ -13,7 +13,8 @@ class CtrlHexaviewNew:
         self.mouse_x, self.mouse_y = None, None
         self.inde_cell_projection_done = False
         self.hexa_memory = ctrl_workspace.workspace.hexa_memory
-
+        self.projections_for_context = self.ctrl_workspace.workspace.synthesizer.last_projection_for_context
+        self.to_reset = []
         #Handlers
         def on_text_hemw(text):
                 if text.upper() == "A" :
@@ -23,6 +24,18 @@ class CtrlHexaviewNew:
                 if text.upper() == "M" :
                     self.ctrl_workspace.decision_mode = "manual"
                     print("passage du decider en mode manual")
+                    return
+                elif text.upper() == "O" :
+                        print("setting synthesizer to automatic mode")
+                        self.ctrl_workspace.synthesizer.set_mode("automatic")
+                        return
+                elif text.upper() == "P" :
+                    print("setting synthesizer to manual mode")
+                    self.ctrl_workspace.synthesizer.set_mode("manual")
+                    return
+                elif text.upper() == "R" :
+                    self.ctrl_workspace.reset()
+                    self.refresh_count = 0
                     return
                 if ctrl_workspace.need_user_action and self.inde_cell_projection_done :
                     print("hohihouhahah")
@@ -37,6 +50,7 @@ class CtrlHexaviewNew:
                         ctrl_workspace.f_user_action_ready = True
                         self.react_to_user_interaction()
                         return
+                    
                 elif ctrl_workspace.need_user_to_command_robot:
                     x = self.mouse_x
                     y= self.mouse_y
@@ -56,12 +70,7 @@ class CtrlHexaviewNew:
                     message = "Waiting for previous outcome before sending new action" if ctrl_workspace.enact_step != 0 else "Waiting for user action"
                     print(message)
 
-                if text.upper() == "O" :
-                    print("setting controler to automatic mode")
-                    self.ctrl_workspace.synthesizer.set_mode("automatic")
-                if text.upper() == "P" :
-                    print("setting controler to manual mode")
-                    self.ctrl_workspace.synthesizer.set_mode("manual")
+                
         self.hexaview.on_text = on_text_hemw
 
         def on_mouse_press_hemw(x, y, button, modifiers):
@@ -100,7 +109,11 @@ class CtrlHexaviewNew:
             self.hexaview.show_indecisive_cell(ctrl_workspace.cell_inde_a_traiter)
             self.inde_cell_projection_done = True
         if len(self.hexa_memory.cells_changed_recently) > 0 :
-           self.hexaview.extract_and_convert_recently_changed_cells(self.hexa_memory)
+           projections = self.ctrl_workspace.workspace.synthesizer.last_projection_for_context
+           self.hexaview.extract_and_convert_recently_changed_cells(self.hexa_memory,self.to_reset,projections)
+           self.to_reset = projections
            self.hexa_memory.cells_changed_recently = []
+
+     
 
         self.refresh_count +=1

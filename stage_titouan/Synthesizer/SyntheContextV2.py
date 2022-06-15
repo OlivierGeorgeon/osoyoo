@@ -38,6 +38,32 @@ class SyntheContextV2 :
 
 
         self.last_real_echos = []
+        self.last_projection_for_context =[]
+
+    def reset(self):
+        self.internal_hexa_grid = self.internal_hexa_grid = HexaGrid(self.hexa_memory.width, self.hexa_memory.height)
+
+        self.synthetizing_step = 0
+        self.mode = MANUAL_MODE
+        self.known_obstacles = []
+        self.interactions_list = []
+        self.last_used_id = -999
+        self.user_action = None
+        self.indecisive_cells = []
+        self.decided_cells = []
+
+
+        self.linking_list = []
+        self.obstacle_to_find = None
+
+
+        self.f_robot_action_enacted = False
+        self.robot_interaction_enacted = None
+        self.robot_action_todo = None
+
+
+        self.last_real_echos = []
+        self.last_projection_for_context =[]
 
     def act(self,user_action = None):
         """ Lance toute la synthese """
@@ -52,6 +78,7 @@ class SyntheContextV2 :
         # instead an echo should be linked to a known obstacle, and used to compute the correct position of the robot.
         self.user_action = user_action
         self.linking_list = []
+        self.last_projection_for_context = []
 
         if self.synthetizing_step == 0 : # start of the synthesis
             
@@ -62,13 +89,14 @@ class SyntheContextV2 :
                 self.synthetizing_step = 0.1
                 self.last_used_id = max([elem.id for elem in self.interactions_list])
                 echoes = [elem for elem in self.interactions_list if elem.type == "Echo2"]
-                real_echos = self.treat_echos_alt3(echoes)
+                real_echos = self.treat_echos_alt4(echoes)
                 self.last_real_echos = real_echos
 ########
                 #echo_to_print = [(elem.x,elem.y) for elem in real_echos]
                 #print("len real echos :", len(real_echos), "echos : ",echo_to_print)
 ########
-                echo_focus = [elem for elem in self.interactions_list if elem.type == "Echo"]
+                #echo_focus = [elem for elem in self.interactions_list if elem.type == "Echo"] #temporarily removed for debugging
+                echo_focus = []
                 #check if the distance between any element from real_echos and each element of echo_focus is below 50
                 #if so, remove the element from echo_focus
                 for elem in real_echos:
@@ -131,6 +159,14 @@ class SyntheContextV2 :
             #the known obstacles and the echoes
             translation_between_echo_and_context = self.find_translation_between_echo_and_context(self.linking_list)
             print("Mean translation between echo and context : ", translation_between_echo_and_context)
+            trans_x,trans_y = translation_between_echo_and_context
+            #if the vector created by trans_x and trans_y has a norm < to a cell_radius we reset them to zero
+            vector = math.sqrt(trans_x**2 + trans_y**2)
+            if vector < self.hexa_memory.cell_radius:
+                print("vector norm < to cell radius, putting translation to 0")
+                translation_between_echo_and_context = 0,0
+
+
             #we have the translation between the known obstacles and the echoes
             #we should apply this translation to the robot position
             self.apply_translation_to_hexa_memory(translation_between_echo_and_context)
@@ -164,6 +200,7 @@ class SyntheContextV2 :
                 real_echos = self.treat_echos_alt4(echoes)
                 self.last_real_echos = real_echos
                 print("len real_echos :", len(real_echos))
+                self.interactions_list = [elem for elem in self.interactions_list if elem.type != "Echo" ] #temporarily remove echo_focus for debugging
                 self.interactions_list = [elem for elem in self.interactions_list if elem.type != "Echo2" or elem in real_echos]
                 self.project_interactions_on_internal_hexagrid(self.interactions_list)
                 n_indecisive_cells,n_decided_cells = self.comparison_step()
@@ -226,7 +263,6 @@ class SyntheContextV2 :
         return min_list
 
     def treat_echos_alt3(self,echo_list):
-        print("len(echo_list) : ",len(echo_list))
         if(len(echo_list) ==1):
             print(echo_list[0])
         echo_list = self.revert_echoes_to_angle_distance(echo_list)
@@ -254,7 +290,6 @@ class SyntheContextV2 :
 
 
     def treat_echos_alt4(self,echo_list):
-        print("len(echo_list) : ",len(echo_list))
         if(len(echo_list) ==1):
             print(echo_list[0])
         echo_list = self.revert_echoes_to_angle_distance(echo_list)
@@ -268,7 +303,6 @@ class SyntheContextV2 :
             check = False
             for i,streak in enumerate(streaks):
                 if len(streak)> 0 and check == False:
-                    print("streak : ",streak)
                     if any((abs(ele[1]-distance)<max_delta_dist and abs(angle - ele[0])<max_delta_angle) for ele in streak):
                         streak.append((angle,distance,interaction))
                         angle_dist[i].append((math.degrees(angle),distance))
@@ -288,7 +322,6 @@ class SyntheContextV2 :
                 continue
             else :
                 output.append(streak[int(len(streak)/2)][2])
-        print(angle_dist)
         return output
     def revert_echoes_to_angle_distance(self,echo_list):
         """blabla"""
@@ -436,6 +469,7 @@ class SyntheContextV2 :
         for obstacle_object,(x_obstacle,y_obstacle) in obstacle_allo_coords :
                 all_distances[obstacle_object] = []
                 for (echo_x,echo_y),interaction in echos_allocentric :
+                    #self.last_projection_for_context.append(self.hexa_memory.convert_pos_in_cell(echo_x,echo_y))
                     all_distances[obstacle_object].append((math.sqrt(((x_obstacle - echo_x)**2 + (y_obstacle - echo_y)**2)),interaction))
        
         obstacle_object_unused = [key for key in all_distances.keys()]
@@ -461,7 +495,7 @@ class SyntheContextV2 :
                 obstacle_object_unused.remove(min_obstacle)
                 echoes_unused.remove(min_echo)
         print("after linking :","len obstacle_object_unused : {}".format(len(obstacle_object_unused)),"len echoes_unused : {}".format(len(echoes_unused)))
-        return linking_output,sum_distance/nb_linking
+        return linking_output,(sum_distance/nb_linking if nb_linking > 0 else sum_distance)
 
 
 
@@ -476,11 +510,11 @@ class SyntheContextV2 :
             coord,obstacle,_ = obstacle_object
             obstacle_x,obstacle_y = self.hexa_memory.convert_cell_to_pos(coord[0],coord[1])
             print("obstacle_x : {}".format(obstacle_x),"obstacle_y : {}".format(obstacle_y), "echo_x : {}".format(allo_x),"echo_y : {}".format(allo_y))
-            diff_x = obstacle_x - allo_x
-            diff_y = obstacle_y - allo_y 
+            diff_x = allo_x - obstacle_x
+            diff_y = allo_y - obstacle_y  
             print("diff_x : {}".format(diff_x), "diff_y : {}".format(diff_y))
-            sum_translation_x += allo_x - obstacle_x
-            sum_translation_y += allo_y - obstacle_y
+            sum_translation_x +=  obstacle_x - allo_x
+            sum_translation_y += obstacle_y - allo_y 
         mean_translation_x = sum_translation_x/len(linking_list)
         mean_translation_y = sum_translation_y/len(linking_list)
 
@@ -509,7 +543,7 @@ class SyntheContextV2 :
         obstacle_object_in_linkings_list = list(zip(*linking_list))[1]
         for obstacle_object in self.known_obstacles:
                 if obstacle_object not in obstacle_object_in_linkings_list:
-                    _,obstacle,_ = obstacle_object
+                    coord,obstacle,_ = obstacle_object
 
                     #TODO : FALSE, should be based on projection, not interaction
                     # first condition
@@ -521,8 +555,7 @@ class SyntheContextV2 :
                         continue
                     x_robot = self.hexa_memory.robot_pos_x
                     y_robot = self.hexa_memory.robot_pos_y
-                    x_obstacle = obstacle[0]
-                    y_obstacle = obstacle[1]
+                    x_obstacle,y_obstacle = self.hexa_memory.convert_cell_to_pos(coord[0],coord[1])
                     robot_angle = math.radians(self.hexa_memory.robot_angle)
                     egocentric_x_of_missing_obstacle = (x_obstacle-x_robot) * math.cos(robot_angle) - (y_obstacle-y_robot) * math.sin(robot_angle)
                     egocentric_y_of_missing_obstacle = (x_obstacle-x_robot) * math.sin(robot_angle) + (y_obstacle-y_robot) * math.cos(robot_angle)

@@ -116,6 +116,7 @@ class CtrlViewNew:
     def main(self, dt):
         """Blabla"""
         if self.ctrl_workspace.flag_for_view_refresh:
+            self.points_of_interest = []
             self.update_points_of_interest()
 
             # Add the focus

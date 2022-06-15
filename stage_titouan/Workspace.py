@@ -39,6 +39,8 @@ class Workspace :
 
         self.f_ready_for_next_loop = True
 
+    def reset(self):
+        self.action_reset()
     def action_reset(self):
         print("A FAIRE") #TODO
         self.synthesizer.reset()

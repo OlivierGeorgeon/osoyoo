@@ -24,6 +24,9 @@ class CtrlWorkspace():
         self.flag_for_view_refresh = False
         self.agent = AgentCircle()
 
+    def reset(self):
+        self.workspace.reset()
+
     def main(self,dt):
         """Handle the workspace work, from the moment the robot interaction is done,
         to the moment we have an action to command"""
