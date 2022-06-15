@@ -138,9 +138,10 @@ def hexaMemory_to_pyglet(hexaMemory,batch):
 
     return shapesList
 
-def recently_changed_to_pyglet(hexaMemory,batch):
+def recently_changed_to_pyglet(hexaMemory,batch,to_reset = [],projections = []):
     """blabla"""
-    cell_list = hexaMemory.cells_changed_recently
+    print("\n\nUTILS LEN PROJECTION :",len(projections))
+    cell_list = hexaMemory.cells_changed_recently + to_reset + projections
     shapesList = []
     x0 = 0
     y0 = 0
@@ -210,7 +211,9 @@ def recently_changed_to_pyglet(hexaMemory,batch):
             theta = 300
             theta = math.radians(theta)
             point6 = [x1 + math.cos(theta)*radius, y1 + math.sin(theta)*radius]
-
+            if (i,j) in projections :
+                color = name_to_rgb("pink")
+                print("PINKKKKKKKKKKKKK")
             hexagon = shapes.Polygon(point1, point2, point3, point4, point5, point6,color = color, batch = batch)            
             shapesList.append(hexagon)
             if(robot):

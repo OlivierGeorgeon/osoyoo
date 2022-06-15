@@ -239,15 +239,21 @@ class HexaMemory(HexaGrid):
         
 
 
-    def move(self, rotation, move_x, move_y):
+    def move(self, rotation, move_x, move_y,is_egocentric_translation= True):
         """Handle movement of the robot in the hexamemory"""
         self.rotate_robot(rotation)
 
         rota_radian = math.radians(self.robot_angle)
         #move_x += self.robot_pos_x
         #move_y += self.robot_pos_y
-        x_prime = int(move_x * math.cos(rota_radian) - move_y * math.sin(rota_radian))  # OG 27/08/2022
-        y_prime = int(move_x * math.sin(rota_radian) + move_y * math.cos(rota_radian))
+        x_prime = 0
+        y_prime = 0
+        if(is_egocentric_translation):
+            x_prime = int(move_x * math.cos(rota_radian) - move_y * math.sin(rota_radian))  # OG 27/08/2022
+            y_prime = int(move_x * math.sin(rota_radian) + move_y * math.cos(rota_radian))
+        else :
+            x_prime = move_x
+            y_prime = move_y
         x_prime += self.robot_pos_x
         y_prime += self.robot_pos_y
         try :
@@ -356,4 +362,6 @@ class HexaMemory(HexaGrid):
 
     def apply_translation_to_robot_pos(self,translation_x,translation_y):
         """Apply the given translation to the robot's position"""
-        self.move(0,translation_x,translation_y)
+        self.move(0,translation_x,translation_y,is_egocentric_translation = False)
+        #self.robot_pos_x += translation_x
+        #self.robot_pos_y += translation_y
