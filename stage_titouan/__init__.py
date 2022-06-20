@@ -4,7 +4,7 @@ from . Misc.Utils import *
 import pyglet
 
 from . Display.EgocentricDisplay.CtrlView import CtrlView
-from . Display.EgocentricDisplay.CtrlViewNew import CtrlViewNew
+
 from . Display.EgocentricDisplay.EgocentricView import EgocentricView
 from . Display.HexaDisplay.HexaView import HexaView
 from . Display.HexaDisplay.CtrlHexaview import CtrlHexaview
@@ -15,9 +15,7 @@ from . Memory.HexaMemory.HexaMemory import HexaMemory
 
 from . Robot.CtrlRobot import CtrlRobot
 
-from . Synthesizer.SynthesizerUserInteraction import SynthesizerUserInteraction
-from . Synthesizer.SynthesizerUserContext import SynthesizerUserContext
-from . Synthesizer.CtrlSynthe import CtrlSynthe
+from . Synthesizer.SynthesizerSemiAuto import SynthesizerSemiAuto
 
 from . Workspace import Workspace
 

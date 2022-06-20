@@ -1,22 +1,21 @@
 import math
-from .. Memory.HexaMemory.HexaGrid import HexaGrid
-from .. Misc.Utils import translate_interaction_type_to_cell_status
-from ..  Memory.EgocentricMemory.Interactions.Interaction import INTERACTION_ECHO
-from .. Memory.HexaMemory.HexaGrid import HexaGrid
+from ..Memory.HexaMemory.HexaGrid import HexaGrid
+from ..Misc.Utils import translate_interaction_type_to_cell_status
+from ..Memory.EgocentricMemory.Interactions.Interaction import INTERACTION_ECHO
+from ..Memory.HexaMemory.HexaGrid import HexaGrid
 import numpy as np
 from scipy.spatial.distance import cdist
 AUTOMATIC_MODE = "automatic"
 MANUAL_MODE = "manual"
 SCAN_DISTANCE = 600
-from .. Memory.HexaMemory.HexaGrid import HexaGrid
-class SyntheContextV2 :
+from ..Memory.HexaMemory.HexaGrid import HexaGrid
+class SynthesizerSemiAuto :
     """J'essaie de simplifier encore"""
 
-    def __init__(self,memory,hexa_memory,workspace):
+    def __init__(self,memory,hexa_memory):
         self.memory = memory
         self.hexa_memory = hexa_memory
         self.internal_hexa_grid = self.internal_hexa_grid = HexaGrid(hexa_memory.width, hexa_memory.height)
-        self.workspace = workspace
 
         self.synthetizing_step = 0
         self.mode = MANUAL_MODE
@@ -89,7 +88,7 @@ class SyntheContextV2 :
                 self.synthetizing_step = 0.1
                 self.last_used_id = max([elem.id for elem in self.interactions_list])
                 echoes = [elem for elem in self.interactions_list if elem.type == "Echo2"]
-                real_echos = self.treat_echos_alt4(echoes)
+                real_echos = self.treat_echos(echoes)
                 self.last_real_echos = real_echos
 ########
                 #echo_to_print = [(elem.x,elem.y) for elem in real_echos]
@@ -197,7 +196,7 @@ class SyntheContextV2 :
                 self.last_used_id = max([elem.id for elem in self.interactions_list])
                 echoes = [elem for elem in self.interactions_list if elem.type == "Echo2"]
                 print("len echoes :", len(echoes))
-                real_echos = self.treat_echos_alt4(echoes)
+                real_echos = self.treat_echos(echoes)
                 self.last_real_echos = real_echos
                 print("len real_echos :", len(real_echos))
                 self.interactions_list = [elem for elem in self.interactions_list if elem.type != "Echo" ] #temporarily remove echo_focus for debugging
@@ -208,16 +207,14 @@ class SyntheContextV2 :
                 #print(self.indecisive_cells)
                 self.decided_cells = self.decided_cells + n_decided_cells
                 if len(self.indecisive_cells  )> 0:
-                    print("<SyntheContextV2> synthe step passe a 1")
                     self.synthetizing_step = 1
                 else :
                     self.synthetizing_step = 2
 
         if self.synthetizing_step == 1 and self.user_action is not None:
-            print("ok on est la")
             cell_treated,decision = self.apply_user_action(self.user_action)
             self.user_action = None
-            "on a pris la decision"
+            #            "on a pris la decision"
             if decision != "Not done":
                 self.indecisive_cells.remove(cell_treated)
                 if decision is not None:
@@ -227,11 +224,8 @@ class SyntheContextV2 :
 
         synthesize_results = self.synthesize()
         if len(synthesize_results) > 0 :
-            for elem in synthesize_results :
-                print(elem)
             obstacles_in_results = [elem for elem in synthesize_results if elem[2] == "Something"]
             self.known_obstacles = self.known_obstacles + obstacles_in_results
-            print(self.known_obstacles)
             print("len obstacles : ",len(self.known_obstacles))
 
         if self.synthetizing_step == 2 :
@@ -262,34 +256,8 @@ class SyntheContextV2 :
                     min_ind_list.append(i+1)
         return min_list
 
-    def treat_echos_alt3(self,echo_list):
-        if(len(echo_list) ==1):
-            print(echo_list[0])
-        echo_list = self.revert_echoes_to_angle_distance(echo_list)
-        max_delta_dist = 50
-        max_delta_angle = math.radians(20)
-        streaks = [[],[],[],[],[],[],[],[],[],[],[],[]]
-        angle_dist = [[],[],[],[],[],[],[],[],[],[],[],[]]
-        current_id = 0
-        for angle,distance,interaction in echo_list :
-            if (len(streaks[current_id]) == 0) or any((abs(ele[1]-distance)<max_delta_dist and abs(angle - ele[0])<max_delta_angle) for ele in streaks[current_id]):
-                streaks[current_id].append((angle,distance,interaction))
-                angle_dist[current_id].append((math.degrees(angle),distance))
-            else :
-                current_id = (current_id + 1)
-                streaks[current_id].append((angle,distance,interaction))
-                angle_dist[current_id].append((math.degrees(angle),distance))
-        output = []
-        for streak in streaks :
-            if len(streak) == 0 :
-                continue
-            else :
-                output.append(streak[int(len(streak)/2)][2])
-        print(angle_dist)
-        return output
 
-
-    def treat_echos_alt4(self,echo_list):
+    def treat_echos(self,echo_list):
         if(len(echo_list) ==1):
             print(echo_list[0])
         echo_list = self.revert_echoes_to_angle_distance(echo_list)
@@ -380,7 +348,6 @@ class SyntheContextV2 :
                 if self.mode == MANUAL_MODE :
                     if intern_status not in ["Free", current_status]  :
                         inde_cells.append(((i,j),cell.interactions[-1],intern_status))
-                        print("\n\n<SyntheContextV2> ajout à inde_cell\n\n")
                     else :
                         if len(cell.interactions) > 0 :
                             decided_cells.append(((i,j),cell.interactions[-1],intern_status))
@@ -411,7 +378,6 @@ class SyntheContextV2 :
         """Apply the decisions of the decided cells"""
         cells_treated = []
         if len(self.decided_cells) > 0 :
-            print(self.decided_cells)
             for coord,inte,status in self.decided_cells:
                 self.hexa_memory.grid[coord[0]][coord[1]].interactions.append(inte)
                 self.hexa_memory.grid[coord[0]][coord[1]].status = status
@@ -509,10 +475,8 @@ class SyntheContextV2 :
             (allo_x,allo_y),_ = self.get_allocentric_coordinates_of_interactions([echo])[0]
             coord,obstacle,_ = obstacle_object
             obstacle_x,obstacle_y = self.hexa_memory.convert_cell_to_pos(coord[0],coord[1])
-            print("obstacle_x : {}".format(obstacle_x),"obstacle_y : {}".format(obstacle_y), "echo_x : {}".format(allo_x),"echo_y : {}".format(allo_y))
             diff_x = allo_x - obstacle_x
             diff_y = allo_y - obstacle_y  
-            print("diff_x : {}".format(diff_x), "diff_y : {}".format(diff_y))
             sum_translation_x +=  obstacle_x - allo_x
             sum_translation_y += obstacle_y - allo_y 
         mean_translation_x = sum_translation_x/len(linking_list)

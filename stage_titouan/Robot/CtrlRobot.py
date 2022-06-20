@@ -7,13 +7,10 @@ from stage_titouan.Robot.RobotDefine import *
 from stage_titouan.Robot.WifiInterface import WifiInterface
 from stage_titouan.Memory.EgocentricMemory.Interactions.Interaction import *
 
-
 class CtrlRobot:
-    """Blabla"""
-
-    def __init__(self, model, robot_ip):
-        self.model = model
-
+    """Made to work with CtrlWorkspace"""
+    def __init__(self,ctrl_workspace,robot_ip):
+        self.ctrl_workspace = ctrl_workspace
         self.wifiInterface = WifiInterface(robot_ip)
 
         self.intended_interaction = {'action': "8"}  # Need random initialization
@@ -23,15 +20,16 @@ class CtrlRobot:
         self.azimuth = 0
 
         self.robot_has_started_acting = False
-        self.robot_has_finished_acting = False
+        self.robot_has_finished_acting =False
         self.enacted_interaction = {}
         self.forward_speed = [FORWARD_SPEED, 0]
         self.backward_speed = [-FORWARD_SPEED, 0]
         self.leftward_speed = [0, LATERAL_SPEED]
         self.rightward_speed = [0, -LATERAL_SPEED]
 
-    def main(self, dt):
-        """Blabla"""
+
+    def main(self,dt):
+        """Handle the communications with the robot."""
         if self.enact_step == 2:
             self.robot_has_started_acting = False
             self.robot_has_finished_acting = True
@@ -39,45 +37,39 @@ class CtrlRobot:
         if self.robot_has_finished_acting:
             self.robot_has_finished_acting = False
             self.enacted_interaction = self.translate_robot_data()
-            self.model.enacted_interaction = self.enacted_interaction
-            if self.enacted_interaction["status"] != "T":
-                self.send_position_change_to_memory()
-                self.send_position_change_to_hexa_memory()
-                self.send_phenom_info_to_memory()
-                self.model.f_memory_changed = True
-                self.model.f_hexmem_changed = True
-                self.model.f_new_things_in_memory = True
-        elif not self.robot_has_started_acting and self.model.f_agent_action_ready :
-            self.model.f_reset_flag = False
-            self.model.f_agent_action_ready = False
-            #self.action = self.model.agent_action
-            self.intended_interaction = self.model.intended_interaction
-            self.command_robot(self.intended_interaction)
-            self.model.f_ready_for_next_loop = False
+            self.ctrl_workspace.enacted_interaction = self.enacted_interaction
+            self.ctrl_workspace.f_new_interaction_done = True
+            self.ctrl_workspace.f_interaction_to_enact_ready = False  # OG
+        if self.ctrl_workspace.f_interaction_to_enact_ready and not self.robot_has_started_acting:
+            self.command_robot(self.ctrl_workspace.interaction_to_enact)
+            self.ctrl_workspace.interaction_to_enact = None
             self.robot_has_started_acting = True
+            # self.ctrl_workspace.f_interaction_to_enact_ready = False  # OG
+            
+    
+    def command_robot(self, intended_interaction):
+        """ Creating an asynchronous thread to send the command to the robot and to wait for the outcome """
+        self.outcome_bytes = "Waiting"
 
-    def send_phenom_info_to_memory(self):
-        """Send Enacted Interaction to Memory
-        """
-        # phenom_info = self.enacted_interaction['phenom_info']
-        echo_array = self.enacted_interaction['echo_array']
-        if self.model.memory is not None:
-            self.model.memory.add_enacted_interaction(self.enacted_interaction)  # Added by Olivier 08/05/2022
-            # self.model.memory.add(phenom_info)
-            self.model.memory.add_echo_array(echo_array)
+        def enact_thread():
+            """ Sending the command to the robot and waiting for the outcome """
+            action_string = json.dumps(self.intended_interaction)
+            print("Sending: " + action_string)
+            self.outcome_bytes = self.wifiInterface.enact(action_string)
+            print("Receive: ", end="")
+            print(self.outcome_bytes)
+            self.enact_step = 2  # Now we have received the outcome from the robot
 
-    def send_position_change_to_memory(self):
-        """Send position changes (angle,distance) to the Memory
-        """
-        if self.model.memory is not None :
-            self.model.memory.move(self.enacted_interaction['yaw'], self.enacted_interaction['translation'])
-
-    def send_position_change_to_hexa_memory(self):
-        """Apply movement to hexamem"""
-        if self.model.hexa_memory is not None:
-            self.model.hexa_memory.azimuth = self.enacted_interaction['azimuth']
-            self.model.hexa_memory.move(self.enacted_interaction['yaw'], self.enacted_interaction['translation'][0], self.enacted_interaction['translation'][1])
-
+        # self.action = action
+        self.intended_interaction = intended_interaction
+        self.enact_step = 1  # Now we send the command to the robot for enaction
+        thread = threading.Thread(target=enact_thread)
+        thread.start()
+        # print(intended_interaction)
+        # Cas d'actions particulières :
+        if intended_interaction["action"] == "r":
+            #self.model.action_reset()
+            ""
     def translate_robot_data(self):
         """ Computes the enacted interaction from the robot's outcome data """
         action = self.intended_interaction['action']
@@ -95,7 +87,6 @@ class CtrlRobot:
             yaw = DEFAULT_YAW
         if action == "2":
             # translation = self.backward_speed * (enacted_interaction['duration1'] / 1000)
-            # translation = numpy.multiply(self.backward_speed , (enacted_interaction['duration1'] / 1000 )
             translation = [i * enacted_interaction['duration1'] / 1000 for i in self.backward_speed]
         if action == "3":
             yaw = -DEFAULT_YAW
@@ -151,7 +142,7 @@ class CtrlRobot:
                                  * enacted_interaction['echo_distance'])
                 echo_xy[1] = int(math.sin(math.radians(enacted_interaction['head_angle']))
                                  * enacted_interaction['echo_distance'])
-                enacted_interaction['points'].append((INTERACTION_ECHO, *echo_xy))
+                enacted_interaction['points'].append((INTERACTION_ECHO, *echo_xy)) 
                 # Return the echo_xy to possibly use as focus
                 enacted_interaction['echo_xy'] = echo_xy
 
@@ -225,40 +216,6 @@ class CtrlRobot:
                         tmp_y = math.sin(math.radians(ha)) * ed
                         enacted_interaction['echo_array'].append((tmp_x, tmp_y))
 
-        print("Enacted interaction apres translate robot data : ", enacted_interaction)
         self.enacted_interaction = enacted_interaction
+
         return enacted_interaction
-
-    def command_robot(self, intended_interaction):
-        """ Creating an asynchronous thread to send the command to the robot and to wait for the outcome """
-
-        def enact_thread():
-            """ Sending the command to the robot and waiting for the outcome """
-            action_string = json.dumps(self.intended_interaction)
-            print("Sending: " + action_string)
-            self.outcome_bytes = self.wifiInterface.enact(action_string)
-            print("Receive: ", end="")
-            print(self.outcome_bytes)
-            self.enact_step = 2  # Now we have received the outcome from the robot
-
-        self.outcome_bytes = "Waiting"
-
-        # If keep focus, send the speed current value
-        if 'focus_x' in intended_interaction:
-            if intended_interaction['action'] == '8':
-                intended_interaction['speed'] = int(self.forward_speed[0])
-            if intended_interaction['action'] == '2':
-                intended_interaction['speed'] = -int(self.backward_speed[0])  # Must send positive speed
-            if intended_interaction['action'] == '4':
-                intended_interaction['speed'] = int(self.leftward_speed[1])
-            if intended_interaction['action'] == '6':
-                intended_interaction['speed'] = -int(self.rightward_speed[1])
-
-        self.intended_interaction = intended_interaction
-        self.enact_step = 1  # Now we send the command to the robot for enaction
-        thread = threading.Thread(target=enact_thread)
-        thread.start()
-
-        # Cas d'actions particulières :
-        if intended_interaction["action"] == "r":
-            self.model.action_reset()

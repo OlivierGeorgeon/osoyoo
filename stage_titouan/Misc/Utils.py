@@ -140,7 +140,6 @@ def hexaMemory_to_pyglet(hexaMemory,batch):
 
 def recently_changed_to_pyglet(hexaMemory,batch,to_reset = [],projections = []):
     """blabla"""
-    print("\n\nUTILS LEN PROJECTION :",len(projections))
     cell_list = hexaMemory.cells_changed_recently + to_reset + projections
     shapesList = []
     x0 = 0

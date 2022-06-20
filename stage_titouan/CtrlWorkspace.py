@@ -1,4 +1,4 @@
-from . Agent.AgentCircle import AgentCircle
+from . Agent.CircleBehavior import CircleBehavior
 
 
 class CtrlWorkspace():
@@ -22,7 +22,7 @@ class CtrlWorkspace():
         self.cell_inde_a_traiter = None
 
         self.flag_for_view_refresh = False
-        self.agent = AgentCircle()
+        self.agent = CircleBehavior()
 
     def reset(self):
         self.workspace.reset()
@@ -30,10 +30,6 @@ class CtrlWorkspace():
     def main(self,dt):
         """Handle the workspace work, from the moment the robot interaction is done,
         to the moment we have an action to command"""
-        if self.need_user_action and self.user_action is not None:
-            print("shortcut")
-            #self.synthesizer.apply_user_action(self.user_action)
-
         if self.f_new_interaction_done :
             self.flag_for_view_refresh = True
             self.f_new_interaction_done = False
