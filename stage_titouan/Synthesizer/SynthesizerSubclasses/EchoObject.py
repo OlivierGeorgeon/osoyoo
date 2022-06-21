@@ -1,8 +1,46 @@
+import numpy as np
+import math
 class EchoObject:
-    
-    def __init__(self,cell_x, cell_y, allo_x, allo_y, echo_interaction):
-        self.cell_x = cell_x
-        self.cell_y = cell_y
-        self.allo_x = allo_x
-        self.allo_y = allo_y
-        self.echo_interaction = echo_interaction
+    """Blabla"""
+    def __init__(self,echo_interaction, hexa_memory,acceptable_delta = 75):
+        """Constructor
+        Parameters:
+            echo_interaction: the first echo interaction of the object phenomenon
+            hexa_memory: the hexa memory used to convert egocentric coordinates to allocentric coordinates
+            acceptable_delta: the acceptable delta between the allocentric coordinates of a new echo interaction and the center of the object phenomenon"""
+        self.acceptable_delta = acceptable_delta
+        self.echo_interactions = [echo_interaction]
+        self.hexa_memory = hexa_memory
+        self.allo_coordinates = [self.hexa_memory.convert_egocentric_position_to_allocentric(echo_interaction.x, echo_interaction.y)]
+        self.center =self.hexa_memory.convert_pos_in_cell(self.allo_coordinates[0])
+        self.has_been_validated = False
+        
+    def add_echo(self, echo_interaction):
+        """Add an echo interaction to the object phenomenon, change the center to the mean of all the echo interactions allocentric coordinates"""
+        self.echo_interactions.append(echo_interaction)
+        self.allo_coordinates.append(self.hexa_memory.convert_egocentric_position_to_allocentric(echo_interaction.x, echo_interaction.y))
+        
+    def compute_center(self):
+        """Compute the center of the object phenomenon"""
+        self.center = np.mean(self.allo_coordinates,axis=0)
+
+    def test_and_add(self,echo_interaction):
+        """Test if the echo interaction is in the acceptable delta of the center of the object phenomenon, if yes, add it to the object phenomenon"""
+        allocentric_coordinates = self.hexa_memory.convert_egocentric_position_to_allocentric(echo_interaction.x, echo_interaction.y)
+        if math.dist(allocentric_coordinates-self.center)<self.acceptable_delta:
+            self.add_echo(echo_interaction)
+            return True
+        else:
+            return False
+
+    def validate(self):
+        """Validate the object phenomenon, i.e. consider this object phenomenon as valid such that it can be used in the future
+        and can be added to the hexa_memory"""
+        self.has_been_validated = True
+
+    def try_to_validate(self,number_of_echos_needed):
+        """Try to validate the object phenomenon, i.e. consider this object phenomenon as valid such that it can be used in the future
+        and can be added to the hexa_memory, to do so, the number of echo interactions needed to be added to the object phenomenon must be reached"""
+        if len(self.echo_interactions)>=number_of_echos_needed:
+            self.validate()
+        return self.has_been_validated
