@@ -2,7 +2,7 @@
 
 import sys
 from stage_titouan import *
-from stage_titouan.Agent.Agent5 import Agent5
+# from stage_titouan.Agent.Agent5 import Agent5
 from stage_titouan.Agent.CircleBehavior import CircleBehavior
 from stage_titouan.Agent.AgentCircle import AgentCircle
 from stage_titouan.Robot.RobotDefine import *
@@ -29,14 +29,14 @@ if __name__ == "__main__":
     workspace = Workspace()
     ctrl_workspace = CtrlWorkspace(workspace)
     ctrl_robot = CtrlRobot(workspace, ip)
-    ctrl_view = CtrlViewNew(ctrl_workspace)
+    ctrl_view = CtrlView(ctrl_workspace)
     ego_view = ctrl_view.view
     # agent = Agent5()
     # agent = CircleBehavior()
     agent = AgentCircle()
-    ctrl_hexaview = CtrlHexaview(workspace)
+    ctrl_hexaview = CtrlHexaview(ctrl_workspace)
     ctrl_hexaview.hexaview.extract_and_convert_interactions(workspace.hexa_memory)
-    ctrl_synthe = CtrlSynthe(workspace)
+    # ctrl_synthe = CtrlSynthe(workspace)
     workspace.synthesizer.mode = 'automatic'
 
     @ego_view.event
@@ -77,14 +77,14 @@ if __name__ == "__main__":
             ctrl_workspace.enacted_interaction = enacted_interaction
             ctrl_robot.enact_step = 0
             if enacted_interaction["status"] != "T":
-                ctrl_robot.send_position_change_to_memory()
-                ctrl_robot.send_position_change_to_hexa_memory()
-                ctrl_robot.send_phenom_info_to_memory()
+                ctrl_workspace.send_position_change_to_memory()
+                ctrl_workspace.send_position_change_to_hexa_memory()
+                ctrl_workspace.send_phenom_info_to_memory()
                 workspace.synthesizer.act()  # prend les interactions qui n'ont pas été traitées dans memory
                     # treat_echo trouve l'echo centré dans l'echo array
                     # project_interactions_on_internal_hexagrid
                     # comparison_step prend la derniere interaction dans internal grid et crée hexagrid
-                workspace.synthesizer.synthetize()  # c'est le moment ou on met à jour hexamemory
+                # workspace.synthesizer.synthetize()  # c'est le moment ou on met à jour hexamemory
                 if len(workspace.hexa_memory.cells_changed_recently) > 0:
                     ctrl_hexaview.hexaview.extract_and_convert_recently_changed_cells(workspace.hexa_memory)
                     workspace.hexa_memory.cells_changed_recently = []
