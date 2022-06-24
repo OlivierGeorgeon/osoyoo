@@ -19,21 +19,31 @@ class SynthesizerAuto:
         self.interactions_list = []
         self.echo_objects_to_investigate = EchoObjectsToInvestigate(3,2,self.hexa_memory,acceptable_delta = 75)
         self.echo_objects_valided = EchoObjectValidateds(hexa_memory)
-
+        self.last_projection_for_context = []
         self.last_real_echos = []
+        self.last_used_id = 0
+        
 
     def act(self):
         """blabla"""
+        print("BGNEGNGNGNGGNGN")
         self.interactions_list = [elem for elem in self.memory.interactions if (elem.id>self.last_used_id)]
+
+        self.last_used_id = max([elem.id for elem in self.interactions_list],default = self.last_used_id)
         if(len(self.interactions_list)<=0):
-            return #TODOOO
+            print("bah merdeeeee aloorrrr")
+            return "-"
         echoes = [elem for elem in self.interactions_list if elem.type == "Echo2"]
+        print("len echoes :",len(echoes))
         real_echos = self.treat_echos(echoes)
         self.last_real_echos = real_echos
+        print("len real_echos at first",len(real_echos))
 
         real_echos,translation = self.echo_objects_valided.try_and_add(real_echos)
+        print("len real_echos after objetc validatalitedd",len(real_echos))
         self.apply_translation_to_hexa_memory(translation)
         real_echos = self.echo_objects_to_investigate.try_and_add(real_echos)
+        print("len real_echos after investiggg",len(real_echos))
         objects_validated = self.echo_objects_to_investigate.validate()
         self.echo_objects_valided.add_objects(objects_validated)
         
@@ -42,30 +52,58 @@ class SynthesizerAuto:
         self.synthesize([elem for elem in self.interactions_list if elem.type != "Echo" and elem.type != "Echo2"])
         action_to_return = None
         if(self.echo_objects_to_investigate.need_more_sweeps()):
-            action_to_return = "sweep"
+            action_to_return = "-"
+
+        print("RETURN SYNTHEAOUT ACT :",action_to_return)
         return action_to_return
 
         
 
-    def treat_echos(self, interactions_list):
-        """Find true position of the objects echolocated"""
-        #Filter self.interactions_list to keep only the echolocations (interaction.type == INTERACTION_ECHO)
-        echo_list = [elem for elem in interactions_list if elem.type == INTERACTION_ECHO]
-        #Compute distance between robot and echolocation for every element in echo_list
-        dist_list = [math.sqrt(elem.x**2 + elem.y**2) for elem in echo_list]
-        #Find all the local minimums in dist_list (dist_list[i] < dist_list[i+1] and dist_list[i] < dist_list[i-1])
-        # append the corresponding echo to min_list
-        min_list = [echo_list[i+1] for i,elem in enumerate(dist_list[1:-1]) if (elem<dist_list[i] and elem<=dist_list[i+2])]
-        min_list = []
-        min_ind_list = []
-        for i,elem in enumerate(dist_list[1:-1]):
-            if (elem<dist_list[i] and elem<dist_list[i+2]):
-                #print("on va test")
-                if( (len(min_ind_list )== 0) or (abs(min_ind_list[-1] - i+1) > 3 or abs(dist_list[min_ind_list[-1]-1] - elem) > 50 ) ):
-                    #print("test ok")
-                    min_list.append(echo_list[i+1])
-                    min_ind_list.append(i+1)
-        return min_list
+    def treat_echos(self,echo_list):
+        """blabla"""
+        if(len(echo_list) ==1):
+            print(echo_list[0])
+        echo_list = self.revert_echoes_to_angle_distance(echo_list)
+        max_delta_dist = 130
+        max_delta_angle = math.radians(20)
+        streaks = [[],[],[],[],[],[],[],[],[],[],[],[]]
+        angle_dist = [[],[],[],[],[],[],[],[],[],[],[],[]]
+        current_id = 0
+        echo_list = sorted(echo_list, key=lambda elem: elem[0]) # on trie par angle, pour avoir les streak "préfaites"
+        for angle,distance,interaction in echo_list :
+            check = False
+            for i,streak in enumerate(streaks):
+                if len(streak)> 0 and check == False:
+                    if any((abs(ele[1]-distance)<max_delta_dist and abs(angle - ele[0])<max_delta_angle) for ele in streak):
+                        streak.append((angle,distance,interaction))
+                        angle_dist[i].append((math.degrees(angle),distance))
+                        check = True
+            if check:
+                continue
+            if (len(streaks[current_id]) == 0):
+                streaks[current_id].append((angle,distance,interaction))
+                angle_dist[current_id].append((math.degrees(angle),distance))
+            else :
+                current_id = (current_id + 1)
+                streaks[current_id].append((angle,distance,interaction))
+                angle_dist[current_id].append((math.degrees(angle),distance))
+        output = []
+        for streak in streaks :
+            if len(streak) == 0 :
+                continue
+            else :
+                output.append(streak[int(len(streak)/2)][2])
+        return output
+    def revert_echoes_to_angle_distance(self,echo_list):
+        """blabla"""
+        output = []
+        for elem in echo_list:
+            #compute the angle using elem x and y
+            angle = math.atan2(elem.y,elem.x)
+            #compute the distance using elem x and y
+            distance = math.sqrt(elem.x**2 + elem.y**2)
+            output.append((angle,distance,elem))
+        return output
     
     def apply_translation_to_hexa_memory(self,translation_between_echo_and_context):
         "Convert the egocentric translation given as parameter to an allocentric one, and apply it to the hexa_memory"
@@ -79,11 +117,27 @@ class SynthesizerAuto:
         """Synthesize the interactions with the hexamem"""
         #Convert the interactions to an hexamem status and apply it to the
         #corresponding cells of the hexamem
+        cells_treated = []
         for elem in interactions_list:
 
             #Convert the interaction 
             status = translate_interaction_type_to_cell_status(elem.type)
             #Apply the status to the hexamem
-            allo_x,allo_y = self.hexa_memory.convert_egocentric_coordinates_to_allocentric(elem.x,elem.y)
-            cell_x, cell_y = self.hexa_memory.convert_allocentric_coordinates_to_cell(allo_x,allo_y)
+            allo_x,allo_y = self.get_allocentric_coordinates_of_interactions([elem])[0][0]
+            cell_x, cell_y = self.hexa_memory.convert_pos_in_cell(allo_x,allo_y)
+            cells_treated.append((cell_x,cell_y))
             self.hexa_memory.apply_status_to_cell(cell_x, cell_y,status)
+
+
+    def get_allocentric_coordinates_of_interactions(self,interaction_list):
+        """ Compute allocentric coordinates for every interaction of the given type in self.interactions_list
+        
+        Return a list of ((x,y),interaction)"""
+        rota_radian = math.radians(self.hexa_memory.robot_angle)
+        allocentric_coordinates = []
+        for _,interaction in enumerate(interaction_list):
+                corner_x,corner_y = interaction.x,interaction.y
+                x_prime = int(corner_x* math.cos(rota_radian) - corner_y * math.sin(rota_radian) + self.hexa_memory.robot_pos_x)
+                y_prime = int(corner_y * math.cos(rota_radian) + corner_x* math.sin(rota_radian) + self.hexa_memory.robot_pos_y)
+                allocentric_coordinates.append(((x_prime,y_prime),interaction))
+        return allocentric_coordinates

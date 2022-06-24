@@ -17,7 +17,7 @@ class CtrlWorkspace():
         self.decision_mode = "manual"
         self.need_user_to_command_robot = False
 
-        self.interaction_to_enact = None
+        self.interaction_to_enact = {}
         self.f_interaction_to_enact_ready = False
         self.cell_inde_a_traiter = None
 

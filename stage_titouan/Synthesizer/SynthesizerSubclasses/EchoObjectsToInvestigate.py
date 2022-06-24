@@ -24,17 +24,21 @@ class EchoObjectsToInvestigate:
                 for objet in new_objets:
                     if objet.try_and_add(echo):
                         clustered = True
-                    break
+                        break
+                    else : 
+                        print("NOCLUSTO")
                 if not clustered:
                     new_objets.append(EchoObject(echo,self.hexa_memory,acceptable_delta=self.acceptable_delta))
         for objet in new_objets:
-            self.list_objects_to_investigate.append((objet,0))
+            print("NEW OBJECTO")
+            self.list_objects_to_investigate.append([objet,0])
 
     def try_and_add(self,real_echos):
         """Try to add the echo interactions to the objects to investigate"""
         echo_restantes = real_echos
         for echo in real_echos:
             for objet,_ in self.list_objects_to_investigate:
+                print("kssssssssssssssssssssssssssssssssssss")
                 if objet.try_and_add(echo) :
                     echo_restantes.remove(echo)
                     break
@@ -46,11 +50,11 @@ class EchoObjectsToInvestigate:
         the objects that have been tried too much without meating the 
         threshold to be validated"""
         objet_validated = []
-        for (objet,count),i in enumerate(self.list_objects_to_investigate):
+        for i, [objet,count] in enumerate(self.list_objects_to_investigate):
             objet.try_to_validate(self.number_of_echo_before_validation)
             if objet.has_been_validated:
                 objet_validated.append(objet)
-                self.list_objects_to_investigate.remove((objet,count))
+                self.list_objects_to_investigate.remove([objet,count])
             else :
                 self.list_objects_to_investigate[i][1]+=1
 

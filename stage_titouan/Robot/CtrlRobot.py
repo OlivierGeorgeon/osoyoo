@@ -41,6 +41,7 @@ class CtrlRobot:
             self.ctrl_workspace.f_new_interaction_done = True
             self.ctrl_workspace.f_interaction_to_enact_ready = False  # OG
         if self.ctrl_workspace.f_interaction_to_enact_ready and not self.robot_has_started_acting:
+            print("LAAAAAAAAAAAAAA")
             self.command_robot(self.ctrl_workspace.interaction_to_enact)
             self.ctrl_workspace.interaction_to_enact = None
             self.robot_has_started_acting = True
@@ -67,9 +68,9 @@ class CtrlRobot:
         thread.start()
         # print(intended_interaction)
         # Cas d'actions particulières :
-        if intended_interaction["action"] == "r":
+        #if intended_interaction["action"] == "r":
             #self.model.action_reset()
-            ""
+        #    ""
     def translate_robot_data(self):
         """ Computes the enacted interaction from the robot's outcome data """
         action = self.intended_interaction['action']
