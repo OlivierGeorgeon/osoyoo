@@ -9,6 +9,9 @@ from stage_titouan.Display.EgocentricDisplay.CtrlView import CtrlView
 from stage_titouan import CtrlWorkspace2
 from stage_titouan import Workspace
 from stage_titouan import SynthesizerAuto
+
+from stage_titouan.Robot.CtrlRobotTest import CtrlRobotTest
+from stage_titouan.CtrlWorkspaceTest import CtrlWorkspaceTest
 robot_ip = "192.168.8.189"
 if len(sys.argv) > 1:
     robot_ip = sys.argv[1]
@@ -16,8 +19,9 @@ print("Robot IP:", robot_ip)
 
 workspace = Workspace(cell_radius = 40)
 workspace.synthesizer = SynthesizerAuto(workspace.memory, workspace.hexa_memory)
-ctrl_workspace = CtrlWorkspace2(workspace)
-ctrl_robot = CtrlRobot(ctrl_workspace, robot_ip)
+ctrl_robot = CtrlRobotTest(robot_ip)
+ctrl_workspace = CtrlWorkspaceTest(workspace,ctrl_robot)
+
 ctrl_view = CtrlView(ctrl_workspace)
 ctrl_hexaview = CtrlHexaview2(ctrl_workspace)
 

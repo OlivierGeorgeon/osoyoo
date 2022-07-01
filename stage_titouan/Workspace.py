@@ -1,7 +1,7 @@
 from . Memory.EgocentricMemory.MemoryV1 import MemoryV1
 from . Memory.HexaMemory.HexaMemory import HexaMemory
 from . Synthesizer.SynthesizerSemiAuto import SynthesizerSemiAuto
-
+from .Agent.CircleBehavior import CircleBehavior
 class Workspace :
     """blabla"""
 
@@ -36,6 +36,8 @@ class Workspace :
         self.f_new_things_in_memory = False
 
         self.f_ready_for_next_loop = True
+
+        self.agent = CircleBehavior()
 
     def reset(self):
         self.action_reset()
