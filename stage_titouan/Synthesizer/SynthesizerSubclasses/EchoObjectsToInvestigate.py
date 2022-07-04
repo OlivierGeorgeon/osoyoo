@@ -25,8 +25,8 @@ class EchoObjectsToInvestigate:
                     if objet.try_and_add(echo):
                         clustered = True
                         break
-                    else : 
-                        print("NOCLUSTO")
+    
+                    print("NOCLUSTO")
                 if not clustered:
                     new_objets.append(EchoObject(echo,self.hexa_memory,acceptable_delta=self.acceptable_delta))
         for objet in new_objets:

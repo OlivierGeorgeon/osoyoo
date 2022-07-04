@@ -17,7 +17,7 @@ class SynthesizerAuto:
         self.hexa_memory = hexa_memory
         self.internal_hexa_grid = self.internal_hexa_grid = HexaGrid(hexa_memory.width, hexa_memory.height)
         self.interactions_list = []
-        self.echo_objects_to_investigate = EchoObjectsToInvestigate(3,2,self.hexa_memory,acceptable_delta = 75)
+        self.echo_objects_to_investigate = EchoObjectsToInvestigate(3,2,self.hexa_memory,acceptable_delta = 700)
         self.echo_objects_valided = EchoObjectValidateds(hexa_memory)
         self.last_projection_for_context = []
         self.last_real_echos = []
@@ -26,36 +26,29 @@ class SynthesizerAuto:
 
     def act(self):
         """blabla"""
-        print("BGNEGNGNGNGGNGN")
         self.interactions_list = [elem for elem in self.memory.interactions if (elem.id>self.last_used_id)]
 
         self.last_used_id = max([elem.id for elem in self.interactions_list],default = self.last_used_id)
         if(len(self.interactions_list)<=0):
-            print("bah merdeeeee aloorrrr")
-            return "-"
+            return None,[]
         echoes = [elem for elem in self.interactions_list if elem.type == "Echo2"]
-        print("len echoes :",len(echoes))
         real_echos = self.treat_echos(echoes)
         self.last_real_echos = real_echos
-        print("len real_echos at first",len(real_echos))
-
         real_echos,translation = self.echo_objects_valided.try_and_add(real_echos)
-        print("len real_echos after objetc validatalitedd",len(real_echos))
         self.apply_translation_to_hexa_memory(translation)
         real_echos = self.echo_objects_to_investigate.try_and_add(real_echos)
-        print("len real_echos after investiggg",len(real_echos))
         objects_validated = self.echo_objects_to_investigate.validate()
         self.echo_objects_valided.add_objects(objects_validated)
         
         self.echo_objects_to_investigate.create_news(real_echos)
 
-        self.synthesize([elem for elem in self.interactions_list if elem.type != "Echo" and elem.type != "Echo2"])
+        cells_changed = self.synthesize([elem for elem in self.interactions_list if elem.type != "Echo" and elem.type != "Echo2"])
         action_to_return = None
         if(self.echo_objects_to_investigate.need_more_sweeps()):
             action_to_return = "-"
 
         print("RETURN SYNTHEAOUT ACT :",action_to_return)
-        return action_to_return
+        return action_to_return, cells_changed
 
         
 
@@ -64,7 +57,7 @@ class SynthesizerAuto:
         if(len(echo_list) ==1):
             print(echo_list[0])
         echo_list = self.revert_echoes_to_angle_distance(echo_list)
-        max_delta_dist = 130
+        max_delta_dist = 160
         max_delta_angle = math.radians(20)
         streaks = [[],[],[],[],[],[],[],[],[],[],[],[]]
         angle_dist = [[],[],[],[],[],[],[],[],[],[],[],[]]
@@ -73,7 +66,7 @@ class SynthesizerAuto:
         for angle,distance,interaction in echo_list :
             check = False
             for i,streak in enumerate(streaks):
-                if len(streak)> 0 and check == False:
+                if len(streak)> 0 and not check:
                     if any((abs(ele[1]-distance)<max_delta_dist and abs(angle - ele[0])<max_delta_angle) for ele in streak):
                         streak.append((angle,distance,interaction))
                         angle_dist[i].append((math.degrees(angle),distance))
@@ -127,6 +120,16 @@ class SynthesizerAuto:
             cell_x, cell_y = self.hexa_memory.convert_pos_in_cell(allo_x,allo_y)
             cells_treated.append((cell_x,cell_y))
             self.hexa_memory.apply_status_to_cell(cell_x, cell_y,status)
+
+        for object_valited in self.echo_objects_valided.list_objects :
+            if not object_valited.printed :
+                object_valited.printed = True
+                x,y = object_valited.coord_x, object_valited.coord_y
+                #cells_treated.append((x,y))
+                print("ON A AJOUTE UNE ECHO A L'HEXAMEM : ", x, y)
+                self.hexa_memory.apply_status_to_cell(x,y,translate_interaction_type_to_cell_status("Echo"))
+                
+        return cells_treated
 
 
     def get_allocentric_coordinates_of_interactions(self,interaction_list):

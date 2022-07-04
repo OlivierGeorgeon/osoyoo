@@ -71,12 +71,12 @@ def hexaMemory_to_pyglet(hexaMemory,batch):
             cell = grid[i][j]
 
             if cell.occupied :
-                color = name_to_rgb("lime")
+                color = name_to_rgb("darkslateBlue")
                 robot = True
             else : 
-                color = name_to_rgb("grey")
+                color = name_to_rgb("white")
                 if(cell.status == "Free"):
-                    color = name_to_rgb("white")
+                    color = name_to_rgb("lightgreen")
                 elif(cell.status == "Occupied"):
                     color = name_to_rgb("yellow")
                     robot = True
@@ -155,12 +155,12 @@ def recently_changed_to_pyglet(hexaMemory,batch,to_reset = [],projections = []):
             cell = grid[i][j]
 
             if cell.occupied :
-                color = name_to_rgb("lime")
+                color = name_to_rgb("darkslateBlue")
                 robot = True
             else : 
-                color = name_to_rgb("grey")
+                color = name_to_rgb("white")
                 if(cell.status == "Free"):
-                    color = name_to_rgb("white")
+                    color = name_to_rgb("lightgreen")
                 elif(cell.status == "Occupied"):
                     color = name_to_rgb("yellow")
                     robot = True
@@ -276,9 +276,9 @@ def translate_indecisive_cell_to_pyglet(indecisive_cell,hexaMemory,batch):
     point6 = [x1 + math.cos(theta)*radius, y1 + math.sin(theta)*radius]
 
 
-    color = name_to_rgb("grey")
+    color = name_to_rgb("white")
     if(status == "Free"):
-        color = name_to_rgb("white")
+        color = name_to_rgb("lightgreen")
     elif(status == "Occupied"):
         color = name_to_rgb("yellow")
     elif(status == "Blocked"):

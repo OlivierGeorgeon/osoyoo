@@ -42,6 +42,10 @@ class CtrlRobotTest :
             self.enacted_interaction = self.translate_robot_data()
             self.outcome = self.enacted_interaction
             self.has_new_outcome = True
+            self.ctrl_workspace.update_outcome(self.outcome)
+
+        if not self.has_new_action_to_enact:
+            self.has_new_action_to_enact, self.action_to_enact = self.ctrl_workspace.get_action_to_enact()
         if self.has_new_action_to_enact and self.enact_step == 0:
             self.command_robot(self.action_to_enact)
             self.action_to_enact = None
