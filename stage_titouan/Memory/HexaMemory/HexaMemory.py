@@ -365,3 +365,7 @@ class HexaMemory(HexaGrid):
         self.move(0,translation_x,translation_y,is_egocentric_translation = False)
         #self.robot_pos_x += translation_x
         #self.robot_pos_y += translation_y
+
+    def apply_status_to_cell(self,cell_x, cell_y,status):
+        self.grid[cell_x][cell_y].status = status
+        self.cells_changed_recently.append((cell_x,cell_y))

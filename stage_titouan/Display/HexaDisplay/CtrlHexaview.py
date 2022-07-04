@@ -53,6 +53,7 @@ class CtrlHexaview:
                     x = self.mouse_x
                     y= self.mouse_y
                     action = text
+                    print("krrrr")
                     ctrl_workspace.interaction_to_enact = {"action": action}
                     if x is not None and y is not None:
                         ctrl_workspace.interaction_to_enact["x"] = x

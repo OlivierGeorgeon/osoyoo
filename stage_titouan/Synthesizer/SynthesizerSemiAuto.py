@@ -236,25 +236,7 @@ class SynthesizerSemiAuto :
 
 
 
-    def treat_echos(self, interactions_list):
-        """Find true position of the objects echolocated"""
-        #Filter self.interactions_list to keep only the echolocations (interaction.type == INTERACTION_ECHO)
-        echo_list = [elem for elem in interactions_list if elem.type == INTERACTION_ECHO]
-        #Compute distance between robot and echolocation for every element in echo_list
-        dist_list = [math.sqrt(elem.x**2 + elem.y**2) for elem in echo_list]
-        #Find all the local minimums in dist_list (dist_list[i] < dist_list[i+1] and dist_list[i] < dist_list[i-1])
-        # append the corresponding echo to min_list
-        min_list = [echo_list[i+1] for i,elem in enumerate(dist_list[1:-1]) if (elem<dist_list[i] and elem<=dist_list[i+2])]
-        min_list = []
-        min_ind_list = []
-        for i,elem in enumerate(dist_list[1:-1]):
-            if (elem<dist_list[i] and elem<dist_list[i+2]):
-                #print("on va test")
-                if( (len(min_ind_list )== 0) or (abs(min_ind_list[-1] - i+1) > 3 or abs(dist_list[min_ind_list[-1]-1] - elem) > 50 ) ):
-                    #print("test ok")
-                    min_list.append(echo_list[i+1])
-                    min_ind_list.append(i+1)
-        return min_list
+
 
 
     def treat_echos(self,echo_list):
@@ -323,8 +305,7 @@ class SynthesizerSemiAuto :
             self.last_used_id = max(interaction.id,self.last_used_id)
 
     def get_allocentric_coordinates_of_interactions(self,interaction_list):
-        """ Compute allocentric coordinates for every interaction of the given type in self.interactions_list,
-        and add them to the internal hexagrid
+        """ Compute allocentric coordinates for every interaction of the given type in self.interactions_list
         
         Return a list of ((x,y),interaction)"""
         rota_radian = math.radians(self.hexa_memory.robot_angle)

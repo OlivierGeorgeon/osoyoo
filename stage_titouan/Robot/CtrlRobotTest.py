@@ -7,18 +7,15 @@ from stage_titouan.Robot.RobotDefine import *
 from stage_titouan.Robot.WifiInterface import WifiInterface
 from stage_titouan.Memory.EgocentricMemory.Interactions.Interaction import *
 
-class CtrlRobot:
-    """Made to work with CtrlWorkspace"""
-    def __init__(self,ctrl_workspace,robot_ip):
-        self.ctrl_workspace = ctrl_workspace
+class CtrlRobotTest :
+    """blabla"""
+    def __init__(self,robot_ip,ctrl_workspace):
+        self.robot_ip = robot_ip
         self.wifiInterface = WifiInterface(robot_ip)
-
         self.intended_interaction = {'action': "8"}  # Need random initialization
-
         self.enact_step = 0
         self.outcome_bytes = b'{"status":"T"}'  # Default status T timeout
         self.azimuth = 0
-
         self.robot_has_started_acting = False
         self.robot_has_finished_acting =False
         self.enacted_interaction = {}
@@ -27,6 +24,12 @@ class CtrlRobot:
         self.leftward_speed = [0, LATERAL_SPEED]
         self.rightward_speed = [0, -LATERAL_SPEED]
 
+        self.outcome = None
+        self.has_new_outcome = False
+        self.has_new_action_to_enact = False
+        self.action_to_enact = None
+
+        self.ctrl_workspace = ctrl_workspace
 
     def main(self,dt):
         """Handle the communications with the robot."""
@@ -37,21 +40,24 @@ class CtrlRobot:
         if self.robot_has_finished_acting:
             self.robot_has_finished_acting = False
             self.enacted_interaction = self.translate_robot_data()
-            self.ctrl_workspace.enacted_interaction = self.enacted_interaction
-            self.ctrl_workspace.f_new_interaction_done = True
-            self.ctrl_workspace.f_interaction_to_enact_ready = False  # OG
-        if self.ctrl_workspace.f_interaction_to_enact_ready and not self.robot_has_started_acting:
-            print("LAAAAAAAAAAAAAA")
-            self.command_robot(self.ctrl_workspace.interaction_to_enact)
-            self.ctrl_workspace.interaction_to_enact = None
+            self.outcome = self.enacted_interaction
+            self.has_new_outcome = True
+            self.ctrl_workspace.update_outcome(self.outcome)
+
+        if not self.has_new_action_to_enact:
+            self.has_new_action_to_enact, self.action_to_enact = self.ctrl_workspace.get_action_to_enact()
+        if self.has_new_action_to_enact and self.enact_step == 0:
+            self.command_robot(self.action_to_enact)
+            self.action_to_enact = None
+            self.has_new_action_to_enact = False
             self.robot_has_started_acting = True
-            # self.ctrl_workspace.f_interaction_to_enact_ready = False  # OG
-            
-    
+
+
     def command_robot(self, intended_interaction):
         """ Creating an asynchronous thread to send the command to the robot and to wait for the outcome """
         self.outcome_bytes = "Waiting"
-
+        if isinstance(intended_interaction, str):
+            intended_interaction = {'action': intended_interaction}
         def enact_thread():
             """ Sending the command to the robot and waiting for the outcome """
             action_string = json.dumps(self.intended_interaction)
@@ -62,6 +68,7 @@ class CtrlRobot:
             self.enact_step = 2  # Now we have received the outcome from the robot
 
         # self.action = action
+        print("COMMAND ROBOT : intended_interaction ", intended_interaction)
         self.intended_interaction = intended_interaction
         self.enact_step = 1  # Now we send the command to the robot for enaction
         thread = threading.Thread(target=enact_thread)
@@ -69,7 +76,7 @@ class CtrlRobot:
 
     def translate_robot_data(self):
         """ Computes the enacted interaction from the robot's outcome data """
-        action = self.intended_interaction['action']
+        action = self.intended_interaction.get('action')
         is_focussed = ('focus_x' in self.intended_interaction)  # The focus point was sent to the robot
         enacted_interaction = json.loads(self.outcome_bytes)
         enacted_interaction['points'] = []
@@ -216,3 +223,6 @@ class CtrlRobot:
         self.enacted_interaction = enacted_interaction
 
         return enacted_interaction
+
+    def send_outcome(self) :
+        """Send the outcome of the last interaction to the workspace controller"""
