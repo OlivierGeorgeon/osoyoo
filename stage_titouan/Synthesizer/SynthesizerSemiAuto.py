@@ -4,7 +4,7 @@ from ..Misc.Utils import translate_interaction_type_to_cell_status
 from ..Memory.EgocentricMemory.Interactions.Interaction import INTERACTION_ECHO
 from ..Memory.HexaMemory.HexaGrid import HexaGrid
 import numpy as np
-from scipy.spatial.distance import cdist
+# from scipy.spatial.distance import cdist
 AUTOMATIC_MODE = "automatic"
 MANUAL_MODE = "manual"
 SCAN_DISTANCE = 600
