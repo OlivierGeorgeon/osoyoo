@@ -133,7 +133,7 @@ def hexaMemory_to_pyglet(hexaMemory,batch):
                 theta = math.radians(hexaMemory.robot_angle)
                 x2 = radius * math.cos(theta) + x1
                 y2 = radius * math.sin(theta) + y1
-                line = shapes.Line(x1,y1,x2,y2,width = 5,color = name_to_rgb("black"), batch = batch)
+                line = shapes.Line(x1,y1,x2,y2,width = 15,color = name_to_rgb("yellow"), batch = batch)
                 shapesList.append(line)
 
     return shapesList
@@ -219,7 +219,7 @@ def recently_changed_to_pyglet(hexaMemory,batch,to_reset = [],projections = []):
                 theta = math.radians(hexaMemory.robot_angle)
                 x2 = radius * math.cos(theta) + x1
                 y2 = radius * math.sin(theta) + y1
-                line = shapes.Line(x1,y1,x2,y2,width = 5,color = name_to_rgb("black"), batch = batch)
+                line = shapes.Line(x1,y1,x2,y2,width = 15,color = name_to_rgb("yellow"), batch = batch)
                 shapesList.append(line)
 
     return shapesList
