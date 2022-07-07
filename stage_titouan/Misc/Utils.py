@@ -149,6 +149,7 @@ def recently_changed_to_pyglet(hexaMemory,batch,to_reset = [],projections = []):
     grid = hexaMemory.grid
     
     hauteur = math.sqrt( (2*radius)**2 -radius**2 )
+    print("CELLOO LISTOOO :", cell_list)
     for (i,j) in cell_list :
             robot = False
             color_debug = (random.randint(0,255),random.randint(0,255),random.randint(0,255))

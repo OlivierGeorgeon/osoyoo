@@ -26,9 +26,11 @@ class CtrlHexaviewTest:
             elif text.upper() == "A":
                 #TODO
                 ""
+                self.ctrl_workspace.put_decider_to_auto()
             elif text.upper() == "M":
                 #TODO
                 ""
+                self.ctrl_workspace.put_decider_to_manual()
             #CAS GENERAl
             else :
                 action = {"action": text}

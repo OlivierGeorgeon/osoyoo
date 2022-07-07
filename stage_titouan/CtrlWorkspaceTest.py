@@ -1,9 +1,11 @@
+from stage_titouan.Agent.AgentCircle import AgentCircle
 class CtrlWorkspaceTest :
     """Blabla"""
 
     def __init__(self,workspace):
         """Constructor"""
         self.workspace = workspace
+        self.workspace.agent = AgentCircle() #outcome = agent.result(enacted_interaction)
         self.synthesizer = self.workspace.synthesizer        
         self.flag_for_view_refresh = False
         self.enacted_interaction = {}
@@ -26,14 +28,15 @@ class CtrlWorkspaceTest :
             #3 We call Synthesizer.Act and get the results
             synthesizer_action,synthesizer_results = self.workspace.synthesizer.act()
             #4 We update the hexamemory
-            self.workspace.hexa_memory.cells_changed_recently = self.workspace.hexa_memory.cells_changed_recently + [elem[0] for elem in synthesizer_results]
+            #self.workspace.hexa_memory.cells_changed_recently = self.workspace.hexa_memory.cells_changed_recently + [elem[0] for elem in synthesizer_results]
             #self.workspace.hexa_memory.update(synthesizer_results)
             #4 If the synthesizer need an action done, we save it
             if synthesizer_action is not None :
                 self.action = synthesizer_action
                 self.has_new_action = True
         if self.action is None and self.decider_mode == "auto" :
-            self.action = self.workspace.agent.action()
+            outcome_ag = self.workspace.agent.result(self.enacted_interaction)
+            self.action = self.workspace.agent.action(outcome_ag)
             self.has_new_action = True
             
     def send_phenom_info_to_memory(self):

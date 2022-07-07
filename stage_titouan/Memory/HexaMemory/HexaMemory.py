@@ -368,4 +368,6 @@ class HexaMemory(HexaGrid):
 
     def apply_status_to_cell(self,cell_x, cell_y,status):
         self.grid[cell_x][cell_y].status = status
+        if status == "Frontier":
+            print("HEXMEM : ", cell_x, cell_y)
         self.cells_changed_recently.append((cell_x,cell_y))

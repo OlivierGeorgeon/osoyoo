@@ -115,6 +115,7 @@ class SynthesizerAuto:
 
             #Convert the interaction 
             status = translate_interaction_type_to_cell_status(elem.type)
+            print("Status: " + status  )
             #Apply the status to the hexamem
             allo_x,allo_y = self.get_allocentric_coordinates_of_interactions([elem])[0][0]
             cell_x, cell_y = self.hexa_memory.convert_pos_in_cell(allo_x,allo_y)
