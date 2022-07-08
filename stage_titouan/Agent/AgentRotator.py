@@ -104,12 +104,14 @@ class AgentRotator:
             print(" ROBOT ANGLE : ",self.hexa_memory.robot_angle)
         third_x = math.cos(math.radians(self.hexa_memory.robot_angle)) * 100
         third_y = math.sin(math.radians(self.hexa_memory.robot_angle)) * 100
-
+        """
         first_vector = (robot_pos_x - object_x , robot_pos_y - object_y)
         second_vector = (robot_pos_x-third_x, robot_pos_y-third_y)
-
+        
         #Compute angle between first and second vector
         angle = math.degrees(math.atan2(second_vector[1],second_vector[0]) - math.atan2(first_vector[1],first_vector[0]))
+        """
+        angle = ( math.degrees(math.atan2((object_y - robot_pos_y), (object_x - robot_pos_x))) - self.hexa_memory.robot_angle) %180
         self.angle_to_object = angle
         self.distance_to_object = math.dist([robot_pos_x,robot_pos_y],[object_x,object_y])
 

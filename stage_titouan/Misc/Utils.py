@@ -71,7 +71,7 @@ def hexaMemory_to_pyglet(hexaMemory,batch):
             cell = grid[i][j]
 
             if cell.occupied :
-                color = name_to_rgb("darkslateBlue")
+                color = name_to_rgb("slateBlue")
                 robot = True
             else : 
                 color = name_to_rgb("white")
