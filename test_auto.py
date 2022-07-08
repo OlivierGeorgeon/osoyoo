@@ -13,7 +13,7 @@ from stage_titouan import SynthesizerAuto
 from stage_titouan.Robot.CtrlRobotTest import CtrlRobotTest
 from stage_titouan.CtrlWorkspaceTest import CtrlWorkspaceTest
 from stage_titouan.Display.HexaDisplay.CtrlHexaviewTest import CtrlHexaviewTest
-
+from stage_titouan.Agent.AgentRotator import AgentRotator
 robot_ip = "192.168.8.189"
 if len(sys.argv) > 1:
     robot_ip = sys.argv[1]
@@ -27,7 +27,9 @@ ctrl_robot = CtrlRobotTest(robot_ip,ctrl_workspace)
 
 ctrl_view = CtrlView(ctrl_workspace)
 ctrl_hexaview = CtrlHexaviewTest(ctrl_workspace)
+#ctrl_workspace.workspace.agent = AgentRotator(ctrl_workspace.workspace.memory,ctrl_workspace.workspace.hexa_memory)
 
+ctrl_workspace.workspace.agent.debug_mode = True
 #model.synthesizer.mode = "automatic"
 def mains(dt):
     """blabla"""

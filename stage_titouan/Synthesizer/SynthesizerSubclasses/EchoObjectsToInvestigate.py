@@ -30,7 +30,7 @@ class EchoObjectsToInvestigate:
                 if not clustered:
                     new_objets.append(EchoObject(echo,self.hexa_memory,acceptable_delta=self.acceptable_delta))
         for objet in new_objets:
-            print("NEW OBJECTO")
+            #print("NEW OBJECTO")
             self.list_objects_to_investigate.append([objet,0])
 
     def try_and_add(self,real_echos):

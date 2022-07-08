@@ -298,7 +298,7 @@ class HexaMemory(HexaGrid):
         self.robot_angle = self.robot_angle % 360
 
         if(360-(self.robot_angle-90)  < self.azimuth -10 or 360-(self.robot_angle-90) > self.azimuth+10):
-            print( " <HEXA_MEMORY> : correction erreur angle")
+            #print( " <HEXA_MEMORY> : correction erreur angle")
             self.robot_angle = 360 - self.azimuth +90
         self.update_orientation()
 

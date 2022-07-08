@@ -47,7 +47,7 @@ class SynthesizerAuto:
         if(self.echo_objects_to_investigate.need_more_sweeps()):
             action_to_return = "-"
 
-        print("RETURN SYNTHEAOUT ACT :",action_to_return)
+        #print("RETURN SYNTHEAOUT ACT :",action_to_return)
         return action_to_return, cells_changed
 
         
