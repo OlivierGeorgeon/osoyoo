@@ -1,16 +1,14 @@
 from . Memory.EgocentricMemory.MemoryV1 import MemoryV1
 from . Memory.HexaMemory.HexaMemory import HexaMemory
-from . Synthesizer.SynthesizerUserInteraction import SynthesizerUserInteraction
-from . Agent.Agent6 import Agent6
-
+from . Synthesizer.SynthesizerSemiAuto import SynthesizerSemiAuto
+from .Agent.CircleBehavior import CircleBehavior
 class Workspace :
     """blabla"""
 
     def __init__(self,hexamemory_size = (100,200), cell_radius = 20):
         self.memory = MemoryV1()
         self.hexa_memory = HexaMemory(hexamemory_size[0],hexamemory_size[1],cell_radius = cell_radius)
-        self.synthesizer = SynthesizerUserInteraction(self.memory,self.hexa_memory)
-        self.agent = Agent6(self.memory, self.hexa_memory)
+        self.synthesizer = SynthesizerSemiAuto(self.memory,self.hexa_memory)
         self.user_action = None
         #FLAGS :
         self.need_user_action = False
@@ -38,6 +36,8 @@ class Workspace :
         self.f_new_things_in_memory = False
 
         self.f_ready_for_next_loop = True
+
+        self.agent = CircleBehavior()
 
     def reset(self):
         self.action_reset()

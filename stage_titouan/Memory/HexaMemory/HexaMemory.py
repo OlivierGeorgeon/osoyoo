@@ -298,7 +298,7 @@ class HexaMemory(HexaGrid):
         self.robot_angle = self.robot_angle % 360
 
         if(360-(self.robot_angle-90)  < self.azimuth -10 or 360-(self.robot_angle-90) > self.azimuth+10):
-            print( " <HEXA_MEMORY> : correction erreur angle")
+            #print( " <HEXA_MEMORY> : correction erreur angle")
             self.robot_angle = 360 - self.azimuth +90
         self.update_orientation()
 
@@ -365,3 +365,9 @@ class HexaMemory(HexaGrid):
         self.move(0,translation_x,translation_y,is_egocentric_translation = False)
         #self.robot_pos_x += translation_x
         #self.robot_pos_y += translation_y
+
+    def apply_status_to_cell(self,cell_x, cell_y,status):
+        self.grid[cell_x][cell_y].status = status
+        if status == "Frontier":
+            print("HEXMEM : ", cell_x, cell_y)
+        self.cells_changed_recently.append((cell_x,cell_y))

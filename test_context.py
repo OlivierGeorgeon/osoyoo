@@ -1,22 +1,21 @@
 import sys
 from stage_titouan import *
-from stage_titouan.Synthesizer.SyntheContextV2 import SyntheContextV2
-from stage_titouan.Synthesizer.CtrlSyntheContext import CtrlSyntheContext
-from stage_titouan.Display.HexaDisplay.CtrlHexaviewNew import CtrlHexaviewNew
-from stage_titouan.Robot.CtrlRobotNew import CtrlRobotNew
+from stage_titouan.Synthesizer.SynthesizerSemiAuto import SynthesizerSemiAuto
+from stage_titouan.Display.HexaDisplay.CtrlHexaview import CtrlHexaview
+from stage_titouan.Robot.CtrlRobot import CtrlRobot
 from stage_titouan.CtrlWorkspace import CtrlWorkspace
-from stage_titouan.Display.EgocentricDisplay.CtrlViewNew import CtrlViewNew
+from stage_titouan.Display.EgocentricDisplay.CtrlView import CtrlView
+
 robot_ip = "192.168.8.189"
 if len(sys.argv) > 1:
     robot_ip = sys.argv[1]
 print("Robot IP:", robot_ip)
 
 workspace = Workspace(cell_radius = 40)
-workspace.synthesizer = SyntheContextV2(workspace.memory,workspace.hexa_memory,workspace)
 ctrl_workspace = CtrlWorkspace(workspace)
-ctrl_robot = CtrlRobotNew(ctrl_workspace, robot_ip)
-ctrl_view = CtrlViewNew(ctrl_workspace)
-ctrl_hexaview = CtrlHexaviewNew(ctrl_workspace)
+ctrl_robot = CtrlRobot(ctrl_workspace, robot_ip)
+ctrl_view = CtrlView(ctrl_workspace)
+ctrl_hexaview = CtrlHexaview(ctrl_workspace)
 
 #model.synthesizer.mode = "automatic"
 def mains(dt):
