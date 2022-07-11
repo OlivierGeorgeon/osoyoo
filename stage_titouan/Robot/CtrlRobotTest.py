@@ -34,6 +34,9 @@ class CtrlRobotTest :
     def main(self,dt):
         """Handle the communications with the robot."""
         if self.enact_step == 2:
+            ##########
+            self.ctrl_workspace.robot_ready = True
+            ##########
             self.robot_has_started_acting = False
             self.robot_has_finished_acting = True
             self.enact_step = 0

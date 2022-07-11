@@ -16,6 +16,7 @@ class CtrlWorkspaceTest :
         self.flag_for_need_of_action = True
         self.agent = self.workspace.agent
         self.has_new_outcome_been_treated = True
+        self.robot_ready = True
     def main(self,dt):
         """Run the workspace"""
         # 1. We get the last outcome
@@ -36,7 +37,8 @@ class CtrlWorkspaceTest :
                 self.action = synthesizer_action
                 self.has_new_action = True
             self.has_new_outcome_been_treated = True
-        if self.action is None and self.decider_mode == "auto" and self.has_new_outcome_been_treated :
+        if self.action is None and self.decider_mode == "auto" and self.has_new_outcome_been_treated and self.robot_ready :
+            self.robot_ready = False
             self.has_new_outcome_been_treated = False
             outcome_ag = self.workspace.agent.result(self.enacted_interaction)
             self.action = self.workspace.agent.action(outcome_ag)
