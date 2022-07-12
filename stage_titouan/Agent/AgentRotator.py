@@ -22,6 +22,8 @@ class AgentRotator:
 
         self.focus_x = None
         self.focus_y = None
+
+        self.has_moved_last_interaction = False
     def result(self,a):
         return  {'action' : self.last_action}
     def action(self,outcome):
@@ -32,9 +34,18 @@ class AgentRotator:
                     print("Object to focus found : ", self.focus_object_cell_x, self.focus_object_cell_y)
                 self.last_action = self.C1()
                 return self.last_action
-        self.last_action = self.C2()
+        self.last_action = self.C6()
         return self.last_action
 
+    def C6(self):
+        if self.has_moved_last_interaction :
+            self.has_moved_last_interaction = False
+            return self.A6()
+        else :
+            return self.C2()
+
+    def A6(self):
+        return "-"
     def C1(self):
         """Sweep done ?"""
         return self.A1() if not self.sweep_done else self.A2()
@@ -59,7 +70,8 @@ class AgentRotator:
         angle = self.angle_to_object
         if angle > 180 :
             angle -= 360
-        if abs(angle) > 30 :
+            self.angle_to_object -= 360
+        if abs(angle) > 35 :
             if self.debug_mode :
                     print("Not aligned to the object, angle to object :",angle," doing a turn")
             return self.A3() 
@@ -71,7 +83,8 @@ class AgentRotator:
     def A3(self):
         """Turn in the direction of the object"""
         print("Angle to object too big: ", self.angle_to_object)
-        return "1" if self.angle_to_object < 0 else "3"
+        self.has_moved_last_interaction = True
+        return "3" if self.angle_to_object < 0 else "1"
 
     def C3(self):
         """Are we in the good distance interval ?"""
@@ -89,9 +102,11 @@ class AgentRotator:
         """We move to put ourself in the interval"""
         if self.debug_mode :
                     print("Moving forward/backward to get in good distance")
+        self.has_moved_last_interaction = True
         return "8" if self.distance_to_object > self.borne_haute_dist else "2"
     def A5(self):
         """We move to the left"""
+        self.has_moved_last_interaction = True
         return "4"
 
 
@@ -102,14 +117,8 @@ class AgentRotator:
         robot_pos_y = self.hexa_memory.robot_pos_y
         if self.debug_mode :
             print(" ROBOT ANGLE : ",self.hexa_memory.robot_angle)
-        third_x = math.cos(math.radians(self.hexa_memory.robot_angle)) * 100
-        third_y = math.sin(math.radians(self.hexa_memory.robot_angle)) * 100
 
-        first_vector = (robot_pos_x - object_x , robot_pos_y - object_y)
-        second_vector = (robot_pos_x-third_x, robot_pos_y-third_y)
-
-        #Compute angle between first and second vector
-        angle = math.degrees(math.atan2(second_vector[1],second_vector[0]) - math.atan2(first_vector[1],first_vector[0]))
+        angle = ( math.degrees(math.atan2((object_y - robot_pos_y), (object_x - robot_pos_x))) - self.hexa_memory.robot_angle) % 360
         self.angle_to_object = angle
         self.distance_to_object = math.dist([robot_pos_x,robot_pos_y],[object_x,object_y])
 
