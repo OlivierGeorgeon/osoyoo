@@ -12,10 +12,10 @@ class EchoObject:
         self.echo_interactions = [echo_interaction]
         self.hexa_memory = hexa_memory
         self.allo_coordinates =  [self.get_allocentric_coordinates_of_interactions([echo_interaction])[0][0]]
-        print("aLLLLLOOOOO",self.allo_coordinates)
+        #print("aLLLLLOOOOO",self.allo_coordinates)
         #self.center =self.hexa_memory.convert_pos_in_cell(self.allo_coordinates[0][0], self.allo_coordinates[0][1])
         self.center = [self.allo_coordinates[0][0],self.allo_coordinates[0][1]]
-        print("CENTERRRRR", self.center)
+        #print("CENTERRRRR", self.center)
         self.has_been_validated = False
         self.printed = False
         self.coord_x = -1
@@ -49,7 +49,7 @@ class EchoObject:
         """Test if the echo interaction is in the acceptable delta of the center of the object phenomenon, if yes, add it to the object phenomenon"""
         coord_tuple = self.get_allocentric_coordinates_of_interactions([echo_interaction])[0][0]
         allocentric_coordinates = [coord_tuple[0], coord_tuple[1] ]
-        print("DISTANCE TRY AND ADD : ", math.dist(allocentric_coordinates,self.center), "\n", "ALLO COORD :", allocentric_coordinates, "CENTER :", self.center)
+        ##print("DISTANCE TRY AND ADD : ", math.dist(allocentric_coordinates,self.center), "\n", "ALLO COORD :", allocentric_coordinates, "CENTER :", self.center)
         if math.dist(allocentric_coordinates,self.center)<self.acceptable_delta:
             dist_x = self.center[0]-allocentric_coordinates[0]
             dist_y = self.center[1]-allocentric_coordinates[1]
