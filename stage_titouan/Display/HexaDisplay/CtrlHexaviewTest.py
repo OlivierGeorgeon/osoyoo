@@ -32,6 +32,10 @@ class CtrlHexaviewTest:
                 ""
                 self.ctrl_workspace.put_decider_to_manual()
             #CAS GENERAl
+            elif text.upper() == "T":
+                #action = {"action": "/", "x":100, "y":100}
+                action = {"action": "+",'angle':-50}
+                self.ctrl_workspace.set_action(action)
             else :
                 action = {"action": text}
                 self.ctrl_workspace.set_action(action)

@@ -17,7 +17,7 @@ class EchoObjectValidateds:
             for objet in self.list_objects :
                 boule,translation =  objet.try_and_add(echo)
                 if boule:
-                    print("BOULE CEST VALIDEEEE OUAI OUAI")
+                    #print("BOULE CEST VALIDEEEE OUAI OUAI")
                     sum_translation_x += translation[0]
                     sum_translation_y += translation[1]
                     number_of_add += 1

@@ -1,6 +1,8 @@
 from ..Memory.HexaMemory.HexaGrid import HexaGrid
 from ..Misc.Utils import translate_interaction_type_to_cell_status
 from ..Memory.EgocentricMemory.Interactions.Interaction import INTERACTION_ECHO
+from ..Memory.EgocentricMemory.Interactions.Interaction import INTERACTION_ECHO2
+from ..Memory.EgocentricMemory.Interactions.Interaction import Interaction
 from ..Memory.HexaMemory.HexaGrid import HexaGrid
 import numpy as np
 from scipy.spatial.distance import cdist
@@ -81,11 +83,24 @@ class SynthesizerAuto:
                 streaks[current_id].append((angle,distance,interaction))
                 angle_dist[current_id].append((math.degrees(angle),distance))
         output = []
+        ########################################################################
+        streak_non_empty = [elem for elem in streaks if len(elem)>0]
+        print("TREAT ECHOS NBR OF STRING : ", len(streak_non_empty))
+        for streak in streak_non_empty:
+            print("len streak : ", len(streak))
+        ########################################################################
         for streak in streaks :
             if len(streak) == 0 :
                 continue
             else :
-                output.append(streak[int(len(streak)/2)][2])
+                if len(streak)%2 == 0 :
+                    #Compute the means of x and y values for the two elements at the center of the array
+                    x_mean = (streak[int(len(streak)/2)][2].x + streak[int(len(streak)/2)-1][2].x)/2
+                    y_mean = (streak[int(len(streak)/2)][2].y + streak[int(len(streak)/2)-1][2].y)/2
+                    inte =Interaction(int(x_mean),int(y_mean),width = 15,type = INTERACTION_ECHO2, shape = 'Circle', color = 'orange', durability = 5, decayIntensity = 1, id = 0)
+                    output.append(inte)
+                else :
+                    output.append(streak[int(len(streak)/2)][2])
         return output
     def revert_echoes_to_angle_distance(self,echo_list):
         """blabla"""

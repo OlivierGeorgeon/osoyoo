@@ -67,14 +67,14 @@ class CtrlRobotTest :
         def enact_thread():
             """ Sending the command to the robot and waiting for the outcome """
             action_string = json.dumps(self.intended_interaction)
-            print("Sending: " + action_string)
+            #print("Sending: " + action_string)
             self.outcome_bytes = self.wifiInterface.enact(action_string)
-            print("Receive: ", end="")
-            print(self.outcome_bytes)
+            #print("Receive: ", end="")
+            #print(self.outcome_bytes)
             self.enact_step = 2  # Now we have received the outcome from the robot
 
         # self.action = action
-        print("COMMAND ROBOT : intended_interaction ", intended_interaction)
+        #print("COMMAND ROBOT : intended_interaction ", intended_interaction)
         self.intended_interaction = intended_interaction
         self.enact_step = 1  # Now we send the command to the robot for enaction
         thread = threading.Thread(target=enact_thread)
@@ -132,7 +132,7 @@ class CtrlRobotTest :
                 self.azimuth -= 360
             # Override the azimuth returned by the robot
             enacted_interaction['azimuth'] = int(self.azimuth)
-            print("compass_x", enacted_interaction['compass_x'], "compass_y", enacted_interaction['compass_y'], "azimuth", int(self.azimuth))
+            #print("compass_x", enacted_interaction['compass_x'], "compass_y", enacted_interaction['compass_y'], "azimuth", int(self.azimuth))
 
         # Interaction trespassing
         if enacted_interaction['floor'] > 0:
@@ -184,10 +184,10 @@ class CtrlRobotTest :
                                                           self.intended_interaction['focus_y'], 0])[0:2]
             # The distance between the echo and the expected focus position
             distance = int(math.dist(echo_xy, expected_focus_xy))
-            print("Distance between echo and focus:", distance)
+            #print("Distance between echo and focus:", distance)
             if distance < 100:
                 additional_xy = expected_focus_xy - echo_xy
-                print("additional translation:", additional_xy)
+                #print("additional translation:", additional_xy)
                 # The focus has been kept
                 enacted_interaction['focus'] = True
                 # Adjust the displacement
@@ -197,18 +197,19 @@ class CtrlRobotTest :
                 # Adjust the speed
                 if action == '8' and enacted_interaction['duration1'] >= 1000:
                     self.forward_speed = (self.forward_speed + translation) / 2
-                    print("New forward speed:", self.forward_speed)
+                    #print("New forward speed:", self.forward_speed)
                 if action == '2' and enacted_interaction['duration1'] >= 1000:
                     self.backward_speed = (self.backward_speed + translation) / 2
-                    print("New backward speed:", self.backward_speed)
+                    #print("New backward speed:", self.backward_speed)
                 if action == '4' and enacted_interaction['duration1'] >= 1000:
                     self.leftward_speed = (self.leftward_speed + translation) / 2
-                    print("New leftward speed:", self.leftward_speed)
+                    #print("New leftward speed:", self.leftward_speed)
                 if action == '6' and enacted_interaction['duration1'] >= 1000:
                     self.rightward_speed = (self.rightward_speed + translation) / 2
-                    print("New rightward speed:", self.rightward_speed)
+                    #print("New rightward speed:", self.rightward_speed)
             else:
-                print("Lost focus with distance:", distance)
+                ""
+                #print("Lost focus with distance:", distance)
 
         # Return the displacement
         enacted_interaction['translation'] = translation

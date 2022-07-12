@@ -35,7 +35,10 @@ class AgentRotator:
                 self.last_action = self.C1()
                 return self.last_action
         self.last_action = self.C6()
-        return self.last_action
+        if type(self.last_action) is dict :
+            return self.last_action
+        else : 
+            return {'action' : self.last_action}
 
     def C6(self):
         if self.has_moved_last_interaction :
