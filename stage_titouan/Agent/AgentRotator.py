@@ -48,7 +48,7 @@ class AgentRotator:
             return self.C2()
 
     def A6(self):
-        return "-"
+        return {"action":"+", "angle":self.angle_to_object}
     def C1(self):
         """Sweep done ?"""
         return self.A1() if not self.sweep_done else self.A2()

@@ -1,12 +1,12 @@
 import sys
 from stage_titouan import *
 from stage_titouan.Synthesizer.SynthesizerSemiAuto import SynthesizerSemiAuto
-from stage_titouan.Display.HexaDisplay.CtrlHexaview import CtrlHexaview
-from stage_titouan.Display.HexaDisplay.CtrlHexaview2 import CtrlHexaview2
+#from stage_titouan.Display.HexaDisplay.CtrlHexaview import CtrlHexaview
+#from stage_titouan.Display.HexaDisplay.CtrlHexaview2 import CtrlHexaview2
 from stage_titouan.Robot.CtrlRobot import CtrlRobot
-from stage_titouan.CtrlWorkspace import CtrlWorkspace
+#from stage_titouan.CtrlWorkspace import CtrlWorkspace
 from stage_titouan.Display.EgocentricDisplay.CtrlView import CtrlView
-from stage_titouan import CtrlWorkspace2
+#from stage_titouan import CtrlWorkspace2
 from stage_titouan import Workspace
 from stage_titouan import SynthesizerAuto
 
