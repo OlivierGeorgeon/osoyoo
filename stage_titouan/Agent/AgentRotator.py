@@ -1,5 +1,7 @@
 import random
 import math
+
+# BASED ON https://drive.google.com/file/d/1OSWNrD-VopQigvEtu1yt4ZQrEH6JO5ec/view?usp=sharing
 class AgentRotator:
     """aaaaaaaaa"""
     def __init__(self,memory,hexa_memory):
