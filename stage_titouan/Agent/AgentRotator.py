@@ -50,7 +50,8 @@ class AgentRotator:
             return self.C2()
 
     def A6(self):
-        return {"action":"+", "angle":self.angle_to_object}
+        #return {"action":"+", "angle":self.angle_to_object}
+        return {"action":"-"}
     def C1(self):
         """Sweep done ?"""
         return self.A1() if not self.sweep_done else self.A2()
@@ -89,7 +90,8 @@ class AgentRotator:
         """Turn in the direction of the object"""
         print("Angle to object too big: ", self.angle_to_object)
         self.has_moved_last_interaction = True
-        return "3" if self.angle_to_object < 0 else "1"
+        action = "3" if self.angle_to_object < 0 else "1"
+        return self.action_with_focus(action)
 
     def C3(self):
         """Are we in the good distance interval ?"""
@@ -108,11 +110,13 @@ class AgentRotator:
         if self.debug_mode :
                     print("Moving forward/backward to get in good distance")
         self.has_moved_last_interaction = True
-        return "8" if self.distance_to_object > self.borne_haute_dist else "2"
+        action =  "8" if self.distance_to_object > self.borne_haute_dist else "2"
+        return self.action_with_focus(action)
     def A5(self):
         """We move to the left"""
         self.has_moved_last_interaction = True
-        return "4"
+        action = "4"
+        return self.action_with_focus(action)
 
 
     def compute_distance_and_angle_to_focus_object(self):
@@ -137,3 +141,10 @@ class AgentRotator:
                     self.focus_object_cell_y = y
                     return True
         return False
+
+    def action_with_focus(self, action):
+        """Return the dict for the given action with the focus on the focus object"""
+        object_x, object_y = self.hexa_memory.convert_cell_to_pos(self.focus_object_cell_x,self.focus_object_cell_y)
+        focus_x,focus_y = self.hexa_memory.convert_allocentric_position_to_egocentric_translation(object_x, object_y)
+        print("ROTATOR, FOCUS X,Y : ", focus_x, focus_y)
+        return {'action' : action, 'focus_x' : focus_x, 'focus_y' : focus_y}

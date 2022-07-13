@@ -352,11 +352,22 @@ class HexaMemory(HexaGrid):
         y_prime = int(translation_x * math.sin(rota_radian) + translation_y * math.cos(rota_radian))
         return x_prime,y_prime
 
+    def convert_allocentric_position_to_egocentric_translation(self,position_x,position_y):
+        """Use the give position to compute an allocentric translation from the robot position, then convert This
+        allocentric translation to an egocentric translation"""
+        #Compute the allocentric translation
+        translation_x = position_x - self.robot_pos_x
+        translation_y = position_y - self.robot_pos_y
+        #Convert the allocentric translation to an egocentric translation
+        rota_radian = -math.radians(self.robot_angle)
+        x_prime = int(translation_x * math.cos(rota_radian) - translation_y * math.sin(rota_radian))
+        y_prime = int(translation_x * math.sin(rota_radian) + translation_y * math.cos(rota_radian))
+        return x_prime,y_prime
     def convert_egocentric_position_to_allocentric(self,position_x,position_y):
         """Convert the given position from egocentric to allocentric coordinates"""
-        print("position_x,position_y",position_x,position_y)
+        #print("position_x,position_y",position_x,position_y)
         translation_x,translation_y = self.convert_egocentric_translation_to_allocentric(position_x,position_y)
-        print("translation_x,translation_y",translation_x,translation_y)
+        #print("translation_x,translation_y",translation_x,translation_y)
         
         return self.robot_pos_x + translation_x, self.robot_pos_y + translation_y
 
