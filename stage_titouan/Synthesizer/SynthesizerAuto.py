@@ -24,6 +24,8 @@ class SynthesizerAuto:
         self.last_projection_for_context = []
         self.last_real_echos = []
         self.last_used_id = 0
+
+        self.last_action_had_focus = False
         
 
     def act(self):
@@ -36,6 +38,7 @@ class SynthesizerAuto:
         echoes = [elem for elem in self.interactions_list if elem.type == "Echo2"]
         real_echos = self.treat_echos(echoes)
         self.last_real_echos = real_echos
+        real_echos += self.create_focus_echo()
         real_echos,translation = self.echo_objects_valided.try_and_add(real_echos)
         self.apply_translation_to_hexa_memory(translation)
         real_echos = self.echo_objects_to_investigate.try_and_add(real_echos)
@@ -160,3 +163,17 @@ class SynthesizerAuto:
                 y_prime = int(corner_y * math.cos(rota_radian) + corner_x* math.sin(rota_radian) + self.hexa_memory.robot_pos_y)
                 allocentric_coordinates.append(((x_prime,y_prime),interaction))
         return allocentric_coordinates
+
+    def create_focus_echo(self):
+        """Create a echo interaction corresponding to the focus"""
+        if self.last_action_had_focus :
+            print("Create focus echo")
+            self.last_action_had_focus = False
+            distance = self.memory.last_enacted_interaction['echo_distance']
+            angle = self.memory.last_enacted_interaction['head_angle']
+            x = int(distance * math.cos(math.radians(angle)))
+            y = int(distance * math.sin(math.radians(angle)))
+            interaction_focus = Interaction(x,y,width = 15,type = INTERACTION_ECHO2, shape = 'Circle', color = 'orange', durability = 5, decayIntensity = 1, id = 0)
+            return [interaction_focus]
+        else :
+            return []

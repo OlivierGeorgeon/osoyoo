@@ -36,7 +36,8 @@ class AgentRotator:
                     print("Object to focus found : ", self.focus_object_cell_x, self.focus_object_cell_y)
                 self.last_action = self.C1()
                 return self.last_action
-        self.last_action = self.C6()
+        #self.last_action = self.C6()
+        self.last_action = self.C6_bypass()
         if type(self.last_action) is dict :
             return self.last_action
         else : 
@@ -45,11 +46,15 @@ class AgentRotator:
     def C6(self):
         if self.has_moved_last_interaction :
             self.has_moved_last_interaction = False
-            return self.A6()
+            return self.Action_Sweep_After_Move()
         else :
             return self.C2()
+        
+    def C6_bypass(self):
+        self.has_moved_last_interaction = False
+        return self.C2()
 
-    def A6(self):
+    def Action_Sweep_After_Move(self):
         #return {"action":"+", "angle":self.angle_to_object}
         return {"action":"-"}
     def C1(self):

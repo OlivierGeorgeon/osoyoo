@@ -73,6 +73,8 @@ class CtrlWorkspaceTest :
         return False,None"""
         if self.has_new_action :
             self.has_new_action = False
+            if 'focus_x' in self.action :
+                self.workspace.synthesizer.last_action_had_focus = True
             returno = True,self.action
             self.action = None
             return returno
