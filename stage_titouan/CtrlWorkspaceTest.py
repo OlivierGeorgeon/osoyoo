@@ -42,6 +42,13 @@ class CtrlWorkspaceTest :
             self.has_new_outcome_been_treated = False
             outcome_ag = self.workspace.agent.result(self.enacted_interaction)
             self.action = self.workspace.agent.action(outcome_ag)
+            if 'focus_x' in self.action :
+                self.workspace.synthesizer.last_action_had_focus = True
+                print("FOCUSUSSS")
+            else :
+                self.workspace.synthesizer.last_action_had_focus = False
+                print("PAFOCUSUSSUSU")
+            self.synthesizer.last_action = self.action
             self.has_new_action = True
             
     def send_phenom_info_to_memory(self):

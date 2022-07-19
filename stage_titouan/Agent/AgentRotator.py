@@ -129,9 +129,6 @@ class AgentRotator:
         object_x, object_y = self.hexa_memory.convert_cell_to_pos(self.focus_object_cell_x,self.focus_object_cell_y)
         robot_pos_x = self.hexa_memory.robot_pos_x
         robot_pos_y = self.hexa_memory.robot_pos_y
-        if self.debug_mode :
-            print(" ROBOT ANGLE : ",self.hexa_memory.robot_angle)
-
         angle = ( math.degrees(math.atan2((object_y - robot_pos_y), (object_x - robot_pos_x))) - self.hexa_memory.robot_angle) % 360
         self.angle_to_object = angle
         self.distance_to_object = math.dist([robot_pos_x,robot_pos_y],[object_x,object_y])
@@ -151,5 +148,4 @@ class AgentRotator:
         """Return the dict for the given action with the focus on the focus object"""
         object_x, object_y = self.hexa_memory.convert_cell_to_pos(self.focus_object_cell_x,self.focus_object_cell_y)
         focus_x,focus_y = self.hexa_memory.convert_allocentric_position_to_egocentric_translation(object_x, object_y)
-        print("ROTATOR, FOCUS X,Y : ", focus_x, focus_y)
         return {'action' : action, 'focus_x' : focus_x, 'focus_y' : focus_y}
