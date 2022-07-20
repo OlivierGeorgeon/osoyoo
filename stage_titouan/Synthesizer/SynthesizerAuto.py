@@ -61,9 +61,9 @@ class SynthesizerAuto:
 
             #print("RETURN SYNTHEAOUT ACT :",action_to_return)
         else :
-            print("\n\nSYNTHE AUTO : FOCUS LOST, DOING A SWEEP, mais non j'ai viré, j'ai remplacé par un 3 pour voir\n\n")
-            action_to_return = "3"
-        return action_to_return, cells_changed
+            print("\n\nSYNTHE AUTO : FOCUS LOST, DOING A SWEEP, mais non j'ai viré, j'ai remplacé par un 3 pour voir , en fait je l'ai mis dans agent\n\n")
+            #action_to_return = "3"
+        return action_to_return, cells_changed, focus_lost
 
         
 

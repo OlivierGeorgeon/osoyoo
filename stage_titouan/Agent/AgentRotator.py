@@ -28,7 +28,7 @@ class AgentRotator:
         self.has_moved_last_interaction = False
     def result(self,a):
         return  {'action' : self.last_action}
-    def action(self,outcome):
+    def action(self,outcome, focus_lost):
         """aaa"""
         if self.focus_object_cell_x is None :
             if not (self.search_object_to_focus_on_in_hexamem()):
@@ -37,7 +37,10 @@ class AgentRotator:
                 self.last_action = self.C1()
                 return self.last_action
         #self.last_action = self.C6()
-        self.last_action = self.C6_bypass()
+        if not focus_lost :
+            self.last_action = self.C6_bypass()
+        else :
+            self.last_action = self.Rotation_Focus_Lost()
         if type(self.last_action) is dict :
             return self.last_action
         else : 
@@ -144,8 +147,14 @@ class AgentRotator:
                     return True
         return False
 
-    def action_with_focus(self, action):
+    def action_with_focus(self, action,modif_focus_x = 0, modif_focus_y = 0):
         """Return the dict for the given action with the focus on the focus object"""
         object_x, object_y = self.hexa_memory.convert_cell_to_pos(self.focus_object_cell_x,self.focus_object_cell_y)
         focus_x,focus_y = self.hexa_memory.convert_allocentric_position_to_egocentric_translation(object_x, object_y)
-        return {'action' : action, 'focus_x' : focus_x, 'focus_y' : focus_y}
+        return {'action' : action, 'focus_x' : focus_x+modif_focus_x, 'focus_y' : focus_y + modif_focus_y}
+
+    def Rotation_Focus_Lost(self):
+        """Rotation to the right with focus on the focus_object to try to get it back"""
+
+        print(" AGENT ROTATOR, ROTATION TO TRY TO GET FOCUS BACK")
+        return self.action_with_focus("3", modif_focus_y = -20)

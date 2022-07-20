@@ -19,6 +19,7 @@ class CtrlWorkspaceTest :
         self.robot_ready = True
     def main(self,dt):
         """Run the workspace"""
+        focus_lost = False
         # 1. We get the last outcome
         if self.has_new_outcome :            
             self.has_new_outcome = False
@@ -28,7 +29,7 @@ class CtrlWorkspaceTest :
             self.send_position_change_to_memory()
             self.flag_for_view_refresh = True
             #3 We call Synthesizer.Act and get the results
-            synthesizer_action,synthesizer_results = self.workspace.synthesizer.act()
+            synthesizer_action,synthesizer_results, focus_lost = self.workspace.synthesizer.act()
             #4 We update the hexamemory
             #self.workspace.hexa_memory.cells_changed_recently = self.workspace.hexa_memory.cells_changed_recently + [elem[0] for elem in synthesizer_results]
             #self.workspace.hexa_memory.update(synthesizer_results)
@@ -41,7 +42,7 @@ class CtrlWorkspaceTest :
             self.robot_ready = False
             self.has_new_outcome_been_treated = False
             outcome_ag = self.workspace.agent.result(self.enacted_interaction)
-            self.action = self.workspace.agent.action(outcome_ag)
+            self.action = self.workspace.agent.action(outcome_ag, focus_lost)
             if 'focus_x' in self.action :
                 self.workspace.synthesizer.last_action_had_focus = True
                 print("FOCUSUSSS")
