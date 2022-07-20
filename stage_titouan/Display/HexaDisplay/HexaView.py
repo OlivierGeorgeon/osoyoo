@@ -53,7 +53,6 @@ class HexaView(pyglet.window.Window):
 
     def extract_and_convert_recently_changed_cells(self,memory,to_reset = [],projections = []):
         tmp = recently_changed_to_pyglet(memory, self.batch, projections = projections)
-        print("len tmp", len(tmp))
         self.shapesList.append( tmp)
 
     def show_indecisive_cell(self,indecisive_cell): #(indecisive_cell,hexaMemory,batch)

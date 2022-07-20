@@ -1,5 +1,7 @@
 import random
 import math
+
+# BASED ON https://drive.google.com/file/d/1OSWNrD-VopQigvEtu1yt4ZQrEH6JO5ec/view?usp=sharing
 class AgentRotator:
     """aaaaaaaaa"""
     def __init__(self,memory,hexa_memory):
@@ -26,7 +28,7 @@ class AgentRotator:
         self.has_moved_last_interaction = False
     def result(self,a):
         return  {'action' : self.last_action}
-    def action(self,outcome):
+    def action(self,outcome, focus_lost):
         """aaa"""
         if self.focus_object_cell_x is None :
             if not (self.search_object_to_focus_on_in_hexamem()):
@@ -34,7 +36,11 @@ class AgentRotator:
                     print("Object to focus found : ", self.focus_object_cell_x, self.focus_object_cell_y)
                 self.last_action = self.C1()
                 return self.last_action
-        self.last_action = self.C6()
+        #self.last_action = self.C6()
+        if not focus_lost :
+            self.last_action = self.C6_bypass()
+        else :
+            self.last_action = self.Rotation_Focus_Lost()
         if type(self.last_action) is dict :
             return self.last_action
         else : 
@@ -43,12 +49,17 @@ class AgentRotator:
     def C6(self):
         if self.has_moved_last_interaction :
             self.has_moved_last_interaction = False
-            return self.A6()
+            return self.Action_Sweep_After_Move()
         else :
             return self.C2()
+        
+    def C6_bypass(self):
+        self.has_moved_last_interaction = False
+        return self.C2()
 
-    def A6(self):
-        return "-"
+    def Action_Sweep_After_Move(self):
+        #return {"action":"+", "angle":self.angle_to_object}
+        return {"action":"-"}
     def C1(self):
         """Sweep done ?"""
         return self.A1() if not self.sweep_done else self.A2()
@@ -87,7 +98,8 @@ class AgentRotator:
         """Turn in the direction of the object"""
         print("Angle to object too big: ", self.angle_to_object)
         self.has_moved_last_interaction = True
-        return "3" if self.angle_to_object < 0 else "1"
+        action = "3" if self.angle_to_object < 0 else "1"
+        return self.action_with_focus(action)
 
     def C3(self):
         """Are we in the good distance interval ?"""
@@ -106,11 +118,13 @@ class AgentRotator:
         if self.debug_mode :
                     print("Moving forward/backward to get in good distance")
         self.has_moved_last_interaction = True
-        return "8" if self.distance_to_object > self.borne_haute_dist else "2"
+        action =  "8" if self.distance_to_object > self.borne_haute_dist else "2"
+        return self.action_with_focus(action)
     def A5(self):
         """We move to the left"""
         self.has_moved_last_interaction = True
-        return "4"
+        action = "4"
+        return self.action_with_focus(action)
 
 
     def compute_distance_and_angle_to_focus_object(self):
@@ -118,9 +132,6 @@ class AgentRotator:
         object_x, object_y = self.hexa_memory.convert_cell_to_pos(self.focus_object_cell_x,self.focus_object_cell_y)
         robot_pos_x = self.hexa_memory.robot_pos_x
         robot_pos_y = self.hexa_memory.robot_pos_y
-        if self.debug_mode :
-            print(" ROBOT ANGLE : ",self.hexa_memory.robot_angle)
-
         angle = ( math.degrees(math.atan2((object_y - robot_pos_y), (object_x - robot_pos_x))) - self.hexa_memory.robot_angle) % 360
         self.angle_to_object = angle
         self.distance_to_object = math.dist([robot_pos_x,robot_pos_y],[object_x,object_y])
@@ -135,3 +146,15 @@ class AgentRotator:
                     self.focus_object_cell_y = y
                     return True
         return False
+
+    def action_with_focus(self, action,modif_focus_x = 0, modif_focus_y = 0):
+        """Return the dict for the given action with the focus on the focus object"""
+        object_x, object_y = self.hexa_memory.convert_cell_to_pos(self.focus_object_cell_x,self.focus_object_cell_y)
+        focus_x,focus_y = self.hexa_memory.convert_allocentric_position_to_egocentric_translation(object_x, object_y)
+        return {'action' : action, 'focus_x' : focus_x+modif_focus_x, 'focus_y' : focus_y + modif_focus_y}
+
+    def Rotation_Focus_Lost(self):
+        """Rotation to the right with focus on the focus_object to try to get it back"""
+
+        print(" AGENT ROTATOR, ROTATION TO TRY TO GET FOCUS BACK")
+        return self.action_with_focus("3", modif_focus_y = -20)

@@ -24,6 +24,9 @@ class SynthesizerAuto:
         self.last_projection_for_context = []
         self.last_real_echos = []
         self.last_used_id = 0
+
+        self.last_action_had_focus = False
+        self.last_action = None
         
 
     def act(self):
@@ -32,25 +35,35 @@ class SynthesizerAuto:
 
         self.last_used_id = max([elem.id for elem in self.interactions_list],default = self.last_used_id)
         if(len(self.interactions_list)<=0):
-            return None,[]
+            ""
+            #return None,[] DEBUGGO
         echoes = [elem for elem in self.interactions_list if elem.type == "Echo2"]
         real_echos = self.treat_echos(echoes)
         self.last_real_echos = real_echos
-        real_echos,translation = self.echo_objects_valided.try_and_add(real_echos)
-        self.apply_translation_to_hexa_memory(translation)
-        real_echos = self.echo_objects_to_investigate.try_and_add(real_echos)
-        objects_validated = self.echo_objects_to_investigate.validate()
-        self.echo_objects_valided.add_objects(objects_validated)
-        
-        self.echo_objects_to_investigate.create_news(real_echos)
-
-        cells_changed = self.synthesize([elem for elem in self.interactions_list if elem.type != "Echo" and elem.type != "Echo2"])
+        echo_focus, focus_lost = self.create_focus_echo()
+        cells_changed = []
         action_to_return = None
-        if(self.echo_objects_to_investigate.need_more_sweeps()):
-            action_to_return = "-"
+        if not focus_lost:
 
-        #print("RETURN SYNTHEAOUT ACT :",action_to_return)
-        return action_to_return, cells_changed
+            real_echos += echo_focus
+            real_echos,translation = self.echo_objects_valided.try_and_add(real_echos)
+            self.apply_translation_to_hexa_memory(translation)
+            real_echos = self.echo_objects_to_investigate.try_and_add(real_echos)
+            objects_validated = self.echo_objects_to_investigate.validate()
+            self.echo_objects_valided.add_objects(objects_validated)
+            
+            self.echo_objects_to_investigate.create_news(real_echos)
+
+            cells_changed = self.synthesize([elem for elem in self.interactions_list if elem.type != "Echo" and elem.type != "Echo2"])
+            action_to_return = None
+            if(self.echo_objects_to_investigate.need_more_sweeps()):
+                action_to_return = "-"
+
+            #print("RETURN SYNTHEAOUT ACT :",action_to_return)
+        else :
+            print("\n\nSYNTHE AUTO : FOCUS LOST, DOING A SWEEP, mais non j'ai viré, j'ai remplacé par un 3 pour voir , en fait je l'ai mis dans agent\n\n")
+            #action_to_return = "3"
+        return action_to_return, cells_changed, focus_lost
 
         
 
@@ -85,9 +98,9 @@ class SynthesizerAuto:
         output = []
         ########################################################################
         streak_non_empty = [elem for elem in streaks if len(elem)>0]
-        print("TREAT ECHOS NBR OF STRING : ", len(streak_non_empty))
+        """print("TREAT ECHOS NBR OF STRING : ", len(streak_non_empty))
         for streak in streak_non_empty:
-            print("len streak : ", len(streak))
+            print("len streak : ", len(streak))"""
         ########################################################################
         for streak in streaks :
             if len(streak) == 0 :
@@ -160,3 +173,20 @@ class SynthesizerAuto:
                 y_prime = int(corner_y * math.cos(rota_radian) + corner_x* math.sin(rota_radian) + self.hexa_memory.robot_pos_y)
                 allocentric_coordinates.append(((x_prime,y_prime),interaction))
         return allocentric_coordinates
+
+    def create_focus_echo(self):
+        """Create a echo interaction corresponding to the focus"""
+        focus_lost = False
+        if self.last_action_had_focus :
+            distance = self.memory.last_enacted_interaction['echo_distance']
+            print("ECHO DIST CREATE FOCUS ECHO :", distance)
+            if distance > 800 and not (self.last_action == "-" or self.last_action['action'] == "-"):
+                print( "DIST > 800, FOCUS LOSTO")
+                focus_lost = True
+            angle = self.memory.last_enacted_interaction['head_angle']
+            x = int(distance * math.cos(math.radians(angle)))
+            y = int(distance * math.sin(math.radians(angle)))
+            interaction_focus = Interaction(x,y,width = 15,type = INTERACTION_ECHO2, shape = 'Circle', color = 'orange', durability = 5, decayIntensity = 1, id = 0)
+            return [interaction_focus],focus_lost
+        else :
+            return [],focus_lost

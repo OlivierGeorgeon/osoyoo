@@ -69,8 +69,8 @@ class CtrlRobotTest :
             action_string = json.dumps(self.intended_interaction)
             #print("Sending: " + action_string)
             self.outcome_bytes = self.wifiInterface.enact(action_string)
-            #print("Receive: ", end="")
-            #print(self.outcome_bytes)
+            print("Receive: ", end="")
+            print(self.outcome_bytes)
             self.enact_step = 2  # Now we have received the outcome from the robot
 
         # self.action = action

@@ -3,7 +3,6 @@ from . PointOfInterest import *
 import pyglet
 from pyglet.window import key
 from ... Workspace import Workspace
-from ... CtrlWorkspace import CtrlWorkspace
 
 
 class CtrlView:
