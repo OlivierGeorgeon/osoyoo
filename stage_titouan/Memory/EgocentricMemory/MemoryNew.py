@@ -35,7 +35,7 @@ class MemoryNew:
     def add_enacted_interaction(self, enacted_interaction):  # Added by Olivier 08/05/2022
         """ Add interactions from the enacted interaction """
         self.last_enacted_interaction = enacted_interaction
-        print("MEMORY LAST ENACTIVATED INTERACTION Distance : ", self.last_enacted_interaction['echo_distance'])
+        print("MEMORY enacted interaction floor : ", enacted_interaction['floor'])
         for p in enacted_interaction['points']:
             interaction = Interaction(p[1], p[2], 10, 10, type=p[0], id=self.current_id)  # TODO Adjust the parameters
             self.interactions.append(interaction)
