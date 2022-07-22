@@ -27,7 +27,7 @@ ctrl_robot = CtrlRobotTest(robot_ip,ctrl_workspace)
 
 ctrl_view = CtrlView(ctrl_workspace)
 ctrl_hexaview = CtrlHexaviewTest(ctrl_workspace)
-ctrl_workspace.workspace.agent = AgentRotator(ctrl_workspace.workspace.memory,ctrl_workspace.workspace.hexa_memory)
+# ctrl_workspace.workspace.agent = AgentRotator(ctrl_workspace.workspace.memory,ctrl_workspace.workspace.hexa_memory)
 
 ctrl_workspace.workspace.agent.debug_mode = True
 #model.synthesizer.mode = "automatic"
