@@ -268,8 +268,8 @@ class HexaMemory(HexaGrid):
             self.robot_pos_y = 0
 
 
-
-        self.grid[self.robot_cell_x][self.robot_cell_y].set_to('Free')
+        if self.grid[self.robot_cell_x][self.robot_cell_y] != 'Frontier':
+            self.grid[self.robot_cell_x][self.robot_cell_y].set_to('Free')
         self.grid[self.robot_cell_x][self.robot_cell_y].leave()
         self.cells_changed_recently.append((self.robot_cell_x, self.robot_cell_y))
         self.robot_cell_x, self.robot_cell_y = self.convert_pos_in_cell(
@@ -327,7 +327,8 @@ class HexaMemory(HexaGrid):
             cell_x, cell_y = self.convert_pos_in_cell(
                 current_pos_x, current_pos_y)
             # if(self.grid[cell_x][cell_y].status == "Unknown"):
-            self.grid[cell_x][cell_y].status = status
+            if self.grid[cell_x][cell_y].status != "Frontier":
+                self.grid[cell_x][cell_y].status = status
             self.grid[cell_x][cell_y].leave()
             self.cells_changed_recently.append((cell_x, cell_y))
             ####
