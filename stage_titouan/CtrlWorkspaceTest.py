@@ -5,7 +5,7 @@ class CtrlWorkspaceTest :
     def __init__(self,workspace):
         """Constructor"""
         self.workspace = workspace
-        self.workspace.agent = AgentCircle() #outcome = agent.result(enacted_interaction)
+        # self.workspace.agent = AgentCircle() #outcome = agent.result(enacted_interaction)
         self.synthesizer = self.workspace.synthesizer        
         self.flag_for_view_refresh = False
         self.enacted_interaction = {}
