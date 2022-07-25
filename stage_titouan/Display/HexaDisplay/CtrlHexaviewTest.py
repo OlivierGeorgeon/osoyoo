@@ -35,9 +35,7 @@ class CtrlHexaviewTest:
                 self.ctrl_workspace.put_decider_to_manual()
             #CAS GENERAl
             elif text.upper() == "T":
-                #action = {"action": "/", "x":100, "y":100}
-                action = {"action": "+",'angle':-50}
-                self.ctrl_workspace.set_action(action)
+                self.ctrl_workspace.workspace.hexa_memory.apply_status_to_rectangle(-500,600,1000,1000,"Frontier")
             else :
                 action = {"action": text}
                 

@@ -106,6 +106,7 @@ class CtrlViewNew:
                             #print("sssddfsfsf " ,s)
                             #s.opacity = poi.interaction.durability * 10
                             #print("opacity : ",s.opacity)
+                            #TODO : CHANGE OPACITY OF VERTEX LIST
                             ''
                     else :
                         poi.shape.opacity = min(poi.interaction.actual_durability * (255/poi.interaction.durability), 255)

@@ -387,4 +387,12 @@ class HexaMemory(HexaGrid):
 
     def apply_status_to_rectangle(self, center_x,center_y,width,height, status):
         """Apply the given status to every cell in the rectangle defined by the given center and width/height"""
-        
+        max_x = center_x + width/2 if center_x + width / 2 < self.width/2 * self.cell_radius * 2 else self.width * self.cell_radius
+        max_y = center_y + height/2 if center_y + height / 2 < self.height/2 * self.cell_radius * 1.7 else self.height * self.cell_radius
+        min_x = center_x - width/2 if center_x - width / 2 > 0 - self.width/2 * self.cell_radius * 2  else 0 - self.width/2 * self.cell_radius * 2
+        min_y = center_y - height/2 if center_y - height / 2 > 0 - self.height/2 * self.cell_radius * 1.7 else 0 - self.height/2 * self.cell_radius * 1.7
+        for x in range(int(min_x), int(max_x), self.cell_radius):
+            for y in range(int(min_y), int(max_y), self.cell_radius):
+                cell_x, cell_y = self.convert_pos_in_cell(x, y)
+                self.apply_status_to_cell(cell_x, cell_y, status)
+
