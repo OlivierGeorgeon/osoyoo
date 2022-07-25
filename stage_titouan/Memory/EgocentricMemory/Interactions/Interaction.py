@@ -63,7 +63,8 @@ class Interaction:
 
         Return: The new durability after decay
         """
-        self.actual_durability -= self.decayIntensity
+        print("DECCCCCCCCCCAAAAAAAAAAAAAAY")
+        self.actual_durability -= 1
         return self.actual_durability
 
     def isAlive(self):

@@ -180,7 +180,7 @@ class SynthesizerAuto:
         if self.last_action_had_focus :
             distance = self.memory.last_enacted_interaction['echo_distance']
             print("ECHO DIST CREATE FOCUS ECHO :", distance)
-            if distance > 800 and not (self.last_action == "-" or self.last_action['action'] == "-"):
+            if distance > 800 and (self.last_action is not None) and not (self.last_action == "-" or self.last_action['action'] == "-"):
                 print( "DIST > 800, FOCUS LOSTO")
                 focus_lost = True
             angle = self.memory.last_enacted_interaction['head_angle']

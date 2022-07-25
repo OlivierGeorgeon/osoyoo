@@ -169,3 +169,8 @@ class AgentRotator:
             return self.action_with_focus("4", modif_focus_y = 20)
         return self.action_with_focus("4")
         
+    def last_action_had_focus(self):
+        """Return True if the last action had focus"""
+
+        return type(self.last_action) is dict and 'focus_x' in self.last_action.keys()
+        #return self.memory.last_enacted_interaction['focus_x'] != None

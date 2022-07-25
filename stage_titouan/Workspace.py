@@ -37,7 +37,8 @@ class Workspace :
 
         self.f_ready_for_next_loop = True
 
-        self.agent = CircleBehavior()
+        #self.agent = CircleBehavior()
+        self.agent = None
 
     def reset(self):
         self.action_reset()

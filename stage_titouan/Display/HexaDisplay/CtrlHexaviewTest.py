@@ -15,6 +15,8 @@ class CtrlHexaviewTest:
         self.mouse_x, self.mouse_y = None, None
         self.hexa_memory = ctrl_workspace.workspace.hexa_memory
         self.to_reset = []
+        self.focus_x = None
+        self.focus_y = None
 
         #Handlers
         def on_text_hemw(text):
@@ -38,8 +40,17 @@ class CtrlHexaviewTest:
                 self.ctrl_workspace.set_action(action)
             else :
                 action = {"action": text}
+                
                 self.ctrl_workspace.set_action(action)
         self.hexaview.on_text = on_text_hemw
+
+        def on_mouse_press(x, y, button, modifiers):
+            """Handles mouse press"""
+            
+            self.mouse_x, self.mouse_y = x, y
+            self.focus_x, self.focus_y = self.hexa_memory.convert_allocentric_position_to_egocentric_translation(x,y)
+
+        self.hexaview.on_mouse_press = on_mouse_press
 
     def main(self,dt):
         """blaqbla"""

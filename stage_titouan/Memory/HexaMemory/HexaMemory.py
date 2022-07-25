@@ -383,3 +383,8 @@ class HexaMemory(HexaGrid):
         if status == "Frontier":
             print("HEXMEM : ", cell_x, cell_y)
         self.cells_changed_recently.append((cell_x,cell_y))
+
+
+    def apply_status_to_rectangle(self, center_x,center_y,width,height, status):
+        """Apply the given status to every cell in the rectangle defined by the given center and width/height"""
+        

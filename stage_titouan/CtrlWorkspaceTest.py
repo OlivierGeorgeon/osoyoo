@@ -5,7 +5,7 @@ class CtrlWorkspaceTest :
     def __init__(self,workspace):
         """Constructor"""
         self.workspace = workspace
-        self.workspace.agent = AgentCircle() #outcome = agent.result(enacted_interaction)
+        #self.workspace.agent = AgentCircle() #outcome = agent.result(enacted_interaction)
         self.synthesizer = self.workspace.synthesizer        
         self.flag_for_view_refresh = False
         self.enacted_interaction = {}
@@ -24,6 +24,7 @@ class CtrlWorkspaceTest :
         if self.has_new_outcome :            
             self.has_new_outcome = False
             # 2 We update the memories
+            self.workspace.memory.tick()
             self.send_phenom_info_to_memory()
             self.send_position_change_to_hexa_memory()
             self.send_position_change_to_memory()
@@ -40,6 +41,7 @@ class CtrlWorkspaceTest :
             self.has_new_outcome_been_treated = True
         if self.action is None and self.decider_mode == "auto" and self.has_new_outcome_been_treated and self.robot_ready :
             self.robot_ready = False
+            print("ksssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss")
             self.has_new_outcome_been_treated = False
             outcome_ag = self.workspace.agent.result(self.enacted_interaction)
             self.action = self.workspace.agent.action(outcome_ag, focus_lost)
@@ -55,14 +57,13 @@ class CtrlWorkspaceTest :
     def send_phenom_info_to_memory(self):
         """Send Enacted Interaction to Memory
         """
-        # phenom_info = self.enacted_interaction['phenom_info']
         echo_array = self.enacted_interaction['echo_array'] if 'echo_array' in self.enacted_interaction else None
-        #self.workspace.memory.update_memory(self.enacted_interaction['phenom_info'],echo_array)
         if self.workspace.memory is not None:
             self.workspace.memory.add_enacted_interaction(self.enacted_interaction)  # Added by Olivier 08/05/2022
-            # self.workspace.memory.add(phenom_info)
             if echo_array is not None :
                 self.workspace.memory.add_echo_array(echo_array)
+            if self.action is not None :
+                self.workspace.memory.add_action(self.action)
 
     def send_position_change_to_memory(self):
         """Send position changes (angle,distance) to the Memory
@@ -110,3 +111,7 @@ class CtrlWorkspaceTest :
             return
         self.enacted_interaction = outcome
         self.has_new_outcome = True
+    
+    def change_agent(self, agent):
+        self.agent = agent
+        self.workspace.agent = agent
