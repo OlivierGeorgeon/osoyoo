@@ -16,11 +16,6 @@ from . Memory.HexaMemory.HexaMemory import HexaMemory
 
 from . Robot.CtrlRobot import CtrlRobot
 
-from . Synthesizer.SynthesizerSemiAuto import SynthesizerSemiAuto
-from . Synthesizer.SynthesizerAuto import SynthesizerAuto
+from .Synthesizer.Synthesizer import Synthesizer
 
 from . Workspace import Workspace
-
-#from . CtrlWorkspace import CtrlWorkspace
-#from . CtrlWorkspace2 import CtrlWorkspace2
-

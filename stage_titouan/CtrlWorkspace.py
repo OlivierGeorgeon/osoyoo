@@ -1,11 +1,15 @@
-from stage_titouan.Agent.AgentCircle import AgentCircle
-class CtrlWorkspaceTest :
-    """Blabla"""
+class CtrlWorkspace :
+    """Handle the logic of the workspace
+    Is send the last enacted interaction by CtrlRobot and the last 
+    user interaction by CtrlHexaview
+    Use those data to:
+    1) update memory and hexa_memory 
+    2) get the synthesizer going
+    3) retrieve a new action to enact (which is retrieved by CtrlRobot externally)"""
 
     def __init__(self,workspace):
         """Constructor"""
         self.workspace = workspace
-        #self.workspace.agent = AgentCircle() #outcome = agent.result(enacted_interaction)
         self.synthesizer = self.workspace.synthesizer        
         self.flag_for_view_refresh = False
         self.enacted_interaction = {}
@@ -18,7 +22,9 @@ class CtrlWorkspaceTest :
         self.has_new_outcome_been_treated = True
         self.robot_ready = True
     def main(self,dt):
-        """Run the workspace"""
+        """1) update memory and hexa_memory 
+           2) get the synthesizer going
+           3) retrieve a new action to enact (which is retrieved by CtrlRobot externally)"""
         focus_lost = False
         # 1. We get the last outcome
         if self.has_new_outcome :            
@@ -29,11 +35,8 @@ class CtrlWorkspaceTest :
             self.send_position_change_to_hexa_memory()
             self.send_position_change_to_memory()
             self.flag_for_view_refresh = True
-            #3 We call Synthesizer.Act and get the results
+            #3 We call Synthesizer.Act and get the results, the synthesizer will update the hexa_memory
             synthesizer_action,synthesizer_results, focus_lost = self.workspace.synthesizer.act()
-            #4 We update the hexamemory
-            #self.workspace.hexa_memory.cells_changed_recently = self.workspace.hexa_memory.cells_changed_recently + [elem[0] for elem in synthesizer_results]
-            #self.workspace.hexa_memory.update(synthesizer_results)
             #4 If the synthesizer need an action done, we save it
             if synthesizer_action is not None :
                 self.action = synthesizer_action
@@ -41,16 +44,10 @@ class CtrlWorkspaceTest :
             self.has_new_outcome_been_treated = True
         if self.action is None and self.decider_mode == "auto" and self.has_new_outcome_been_treated and self.robot_ready :
             self.robot_ready = False
-            print("ksssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss")
             self.has_new_outcome_been_treated = False
             outcome_ag = self.workspace.agent.result(self.enacted_interaction)
             self.action = self.workspace.agent.action(outcome_ag, focus_lost)
-            if 'focus_x' in self.action :
-                self.workspace.synthesizer.last_action_had_focus = True
-                print("FOCUSUSSS")
-            else :
-                self.workspace.synthesizer.last_action_had_focus = False
-                print("PAFOCUSUSSUSU")
+            self.workspace.synthesizer.last_action_had_focus = 'focus_x' in self.action
             self.synthesizer.last_action = self.action
             self.has_new_action = True
             

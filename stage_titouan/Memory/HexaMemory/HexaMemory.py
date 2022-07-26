@@ -66,7 +66,7 @@ class HexaMemory(HexaGrid):
         self.orientation = 2
 
     def convert_pos_in_cell(self,pos_x, pos_y):
-        """j'essaie autre chose"""
+        """Convert an allocentric position to cell coordinates."""
         radius = self.cell_radius
         mini_radius = math.sqrt(radius**2 - (radius/2)**2)
         tmp_cell_x = self.width // 2
@@ -242,10 +242,7 @@ class HexaMemory(HexaGrid):
     def move(self, rotation, move_x, move_y,is_egocentric_translation= True):
         """Handle movement of the robot in the hexamemory"""
         self.rotate_robot(rotation)
-
         rota_radian = math.radians(self.robot_angle)
-        #move_x += self.robot_pos_x
-        #move_y += self.robot_pos_y
         x_prime = 0
         y_prime = 0
         if(is_egocentric_translation):
@@ -266,8 +263,6 @@ class HexaMemory(HexaGrid):
             self.robot_cell_y = self.height // 2
             self.robot_pos_x = 0
             self.robot_pos_y = 0
-
-
         if self.grid[self.robot_cell_x][self.robot_cell_y] != 'Frontier':
             self.grid[self.robot_cell_x][self.robot_cell_y].set_to('Free')
         self.grid[self.robot_cell_x][self.robot_cell_y].leave()
@@ -296,18 +291,13 @@ class HexaMemory(HexaGrid):
         while self.robot_angle < 0:
             self.robot_angle = 360 + self.robot_angle
         self.robot_angle = self.robot_angle % 360
-
         if(360-(self.robot_angle-90)  < self.azimuth -10 or 360-(self.robot_angle-90) > self.azimuth+10):
-            #print( " <HEXA_MEMORY> : correction erreur angle")
             self.robot_angle = 360 - self.azimuth +90
         self.update_orientation()
 
     def get_robot_pos(self):
+        """Return the position of the robot. (cell coordinates)"""
         return self.robot_cell_x, self.robot_cell_y
-
-    def get_robot_neighbors_with_direction(self):
-        """"""
-        return self.get_all_neighbors_with_direction(self.robot_cell_x, self.robot_cell_y)
 
 
     def apply_changes(self, start_x, start_y, end_x, end_y, status="Free"):
@@ -331,18 +321,12 @@ class HexaMemory(HexaGrid):
                 self.grid[cell_x][cell_y].status = status
             self.grid[cell_x][cell_y].leave()
             self.cells_changed_recently.append((cell_x, cell_y))
-            ####
             current_pos_x += step_x
             current_pos_y += step_y
-            """
-            if(abs(current_pos_x ) > abs(end_x)):
-                current_pos_x = end_x
-            if(abs(current_pos_y ) > abs(end_y)):
-                current_pos_y = end_y
-            """
 
 
     def change_cell(self, cell_x, cell_y,status):
+        """Change the status of the cell at the given coordinates"""
         self.grid[cell_x][cell_y].status = status
         self.cells_changed_recently.append((cell_x,cell_y))
 
@@ -364,24 +348,18 @@ class HexaMemory(HexaGrid):
         x_prime = int(translation_x * math.cos(rota_radian) - translation_y * math.sin(rota_radian))
         y_prime = int(translation_x * math.sin(rota_radian) + translation_y * math.cos(rota_radian))
         return x_prime,y_prime
+        
     def convert_egocentric_position_to_allocentric(self,position_x,position_y):
         """Convert the given position from egocentric to allocentric coordinates"""
-        #print("position_x,position_y",position_x,position_y)
         translation_x,translation_y = self.convert_egocentric_translation_to_allocentric(position_x,position_y)
-        #print("translation_x,translation_y",translation_x,translation_y)
-        
         return self.robot_pos_x + translation_x, self.robot_pos_y + translation_y
 
     def apply_translation_to_robot_pos(self,translation_x,translation_y):
         """Apply the given translation to the robot's position"""
         self.move(0,translation_x,translation_y,is_egocentric_translation = False)
-        #self.robot_pos_x += translation_x
-        #self.robot_pos_y += translation_y
 
     def apply_status_to_cell(self,cell_x, cell_y,status):
         self.grid[cell_x][cell_y].status = status
-        if status == "Frontier":
-            print("HEXMEM : ", cell_x, cell_y)
         self.cells_changed_recently.append((cell_x,cell_y))
 
 

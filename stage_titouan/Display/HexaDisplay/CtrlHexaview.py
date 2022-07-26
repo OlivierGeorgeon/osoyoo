@@ -1,9 +1,9 @@
 import pyglet
-from . HexaView import HexaView
-from ... Workspace import Workspace
-from ... Memory.HexaMemory.HexaMemory import HexaMemory
+from .HexaView import HexaView
+from ...Workspace import Workspace
+from ...Memory.HexaMemory.HexaMemory import HexaMemory
 
-class CtrlHexaviewTest:
+class CtrlHexaview:
 
     """Made to work with CtrlWorkspaceTest"""
 

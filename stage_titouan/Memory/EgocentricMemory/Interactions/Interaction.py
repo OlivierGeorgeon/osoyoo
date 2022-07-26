@@ -63,7 +63,6 @@ class Interaction:
 
         Return: The new durability after decay
         """
-        print("DECCCCCCCCCCAAAAAAAAAAAAAAY")
         self.actual_durability -= 1
         return self.actual_durability
 

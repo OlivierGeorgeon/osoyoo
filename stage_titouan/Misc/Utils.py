@@ -54,15 +54,13 @@ def rotate(x,y, radians):
 
 
 def hexaMemory_to_pyglet(hexaMemory,batch):
-    """blabla"""
+    """Convert the given hexaMemory to pyglet shapes"""
     grid = hexaMemory.grid
     shapesList = []
     x0 = 0
     y0 = 0
     #radius = 20
     radius = hexaMemory.cell_radius
-
-    
     hauteur = math.sqrt( (2*radius)**2 -radius**2 )
     for i in range(0, len(grid)):
         for j in range(0, len(grid[0])):
@@ -139,7 +137,8 @@ def hexaMemory_to_pyglet(hexaMemory,batch):
     return shapesList
 
 def recently_changed_to_pyglet(hexaMemory,batch,to_reset = [],projections = []):
-    """blabla"""
+    """Convert the cells in hexaMemory.cells_changed_recently,to_reset and projections 
+    to pyglet shapes"""
     cell_list = hexaMemory.cells_changed_recently + to_reset + projections
     shapesList = []
     x0 = 0

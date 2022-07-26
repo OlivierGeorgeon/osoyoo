@@ -8,10 +8,10 @@ import numpy as np
 from scipy.spatial.distance import cdist
 import math
 
-from . SynthesizerSubclasses.EchoObject import EchoObject
-from . SynthesizerSubclasses.EchoObjectValidateds import EchoObjectValidateds
-from . SynthesizerSubclasses.EchoObjectsToInvestigate import EchoObjectsToInvestigate
-class SynthesizerAuto:
+from .SynthesizerSubclasses.EchoObject import EchoObject
+from .SynthesizerSubclasses.EchoObjectValidateds import EchoObjectValidateds
+from .SynthesizerSubclasses.EchoObjectsToInvestigate import EchoObjectsToInvestigate
+class Synthesizer:
     """Synthesizer"""
     def __init__(self,memory,hexa_memory):
         """Constructor"""
@@ -24,19 +24,15 @@ class SynthesizerAuto:
         self.last_projection_for_context = []
         self.last_real_echos = []
         self.last_used_id = 0
-
         self.last_action_had_focus = False
         self.last_action = None
         
 
     def act(self):
-        """blabla"""
+        """Handle everything the synthesizer as to do, from getting the last interactions in the memory
+        to updating the hexa_memory"""
         self.interactions_list = [elem for elem in self.memory.interactions if (elem.id>self.last_used_id)]
-
         self.last_used_id = max([elem.id for elem in self.interactions_list],default = self.last_used_id)
-        if(len(self.interactions_list)<=0):
-            ""
-            #return None,[] DEBUGGO
         echoes = [elem for elem in self.interactions_list if elem.type == "Echo2"]
         real_echos = self.treat_echos(echoes)
         self.last_real_echos = real_echos
@@ -44,31 +40,28 @@ class SynthesizerAuto:
         cells_changed = []
         action_to_return = None
         if not focus_lost:
-
             real_echos += echo_focus
             real_echos,translation = self.echo_objects_valided.try_and_add(real_echos)
             self.apply_translation_to_hexa_memory(translation)
             real_echos = self.echo_objects_to_investigate.try_and_add(real_echos)
             objects_validated = self.echo_objects_to_investigate.validate()
             self.echo_objects_valided.add_objects(objects_validated)
-            
             self.echo_objects_to_investigate.create_news(real_echos)
-
             cells_changed = self.synthesize([elem for elem in self.interactions_list if elem.type != "Echo" and elem.type != "Echo2"])
             action_to_return = None
             if(self.echo_objects_to_investigate.need_more_sweeps()):
                 action_to_return = "-"
-
-            #print("RETURN SYNTHEAOUT ACT :",action_to_return)
-        else :
-            print("\n\nSYNTHE AUTO : FOCUS LOST, DOING A SWEEP, mais non j'ai viré, j'ai remplacé par un 3 pour voir , en fait je l'ai mis dans agent\n\n")
-            #action_to_return = "3"
         return action_to_return, cells_changed, focus_lost
 
         
 
     def treat_echos(self,echo_list):
-        """blabla"""
+        """In case of a sweep we obtain an array of echo, this function discretize 
+        it to try to find the real position of the objects that sent back the echo
+        
+        To do so use 'strikes' wich are series of consecutives echoes that are
+        close enough to be considered as the same object, and consider that the
+        real position of the object is at the middle of the strike"""
         if(len(echo_list) ==1):
             print(echo_list[0])
         echo_list = self.revert_echoes_to_angle_distance(echo_list)
@@ -96,12 +89,6 @@ class SynthesizerAuto:
                 streaks[current_id].append((angle,distance,interaction))
                 angle_dist[current_id].append((math.degrees(angle),distance))
         output = []
-        ########################################################################
-        streak_non_empty = [elem for elem in streaks if len(elem)>0]
-        """print("TREAT ECHOS NBR OF STRING : ", len(streak_non_empty))
-        for streak in streak_non_empty:
-            print("len streak : ", len(streak))"""
-        ########################################################################
         for streak in streaks :
             if len(streak) == 0 :
                 continue
@@ -116,7 +103,7 @@ class SynthesizerAuto:
                     output.append(streak[int(len(streak)/2)][2])
         return output
     def revert_echoes_to_angle_distance(self,echo_list):
-        """blabla"""
+        """Convert echo interaction to triples (angle,distance,interaction)"""
         output = []
         for elem in echo_list:
             #compute the angle using elem x and y
@@ -129,8 +116,7 @@ class SynthesizerAuto:
     def apply_translation_to_hexa_memory(self,translation_between_echo_and_context):
         "Convert the egocentric translation given as parameter to an allocentric one, and apply it to the hexa_memory"
         allocentric_translation_x,allocentric_translation_y = translation_between_echo_and_context
-        #allocentric_translation_x,allocentric_translation_y = self.hexa_memory.convert_egocentric_translation_to_allocentric(translation_x,translation_y)
-        print("SyntheContextV2 moves robot by",allocentric_translation_x,allocentric_translation_y)
+        #print("Synthesizer correct position by",allocentric_translation_x,allocentric_translation_y)
         self.hexa_memory.apply_translation_to_robot_pos(allocentric_translation_x,allocentric_translation_y)
 
 
@@ -140,24 +126,18 @@ class SynthesizerAuto:
         #corresponding cells of the hexamem
         cells_treated = []
         for elem in interactions_list:
-
             #Convert the interaction 
             status = translate_interaction_type_to_cell_status(elem.type)
-            print("Status: " + status  )
             #Apply the status to the hexamem
             allo_x,allo_y = self.get_allocentric_coordinates_of_interactions([elem])[0][0]
             cell_x, cell_y = self.hexa_memory.convert_pos_in_cell(allo_x,allo_y)
             cells_treated.append((cell_x,cell_y))
             self.hexa_memory.apply_status_to_cell(cell_x, cell_y,status)
-
         for object_valited in self.echo_objects_valided.list_objects :
             if not object_valited.printed :
                 object_valited.printed = True
                 x,y = object_valited.coord_x, object_valited.coord_y
-                #cells_treated.append((x,y))
-                print("ON A AJOUTE UNE ECHO A L'HEXAMEM : ", x, y)
                 self.hexa_memory.apply_status_to_cell(x,y,translate_interaction_type_to_cell_status("Echo"))
-                
         return cells_treated
 
 
@@ -179,9 +159,7 @@ class SynthesizerAuto:
         focus_lost = False
         if self.last_action_had_focus :
             distance = self.memory.last_enacted_interaction['echo_distance']
-            print("ECHO DIST CREATE FOCUS ECHO :", distance)
             if distance > 800 and (self.last_action is not None) and not (self.last_action == "-" or self.last_action['action'] == "-"):
-                print( "DIST > 800, FOCUS LOSTO")
                 focus_lost = True
             angle = self.memory.last_enacted_interaction['head_angle']
             x = int(distance * math.cos(math.radians(angle)))
