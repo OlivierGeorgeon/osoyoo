@@ -8,8 +8,11 @@ class CircleBehavior:
         self.focus = False
         self.echo_xy = None
 
-    def action(self, outcome):
+    def action(self, outcome, focus_lost=False):
         """ Choose the action on the basis of the previous outcome """
+        if focus_lost:
+            self.focus = False
+
         # If previous action was scanning then check if found focus
         if self._action == ACTION_SCAN:
             if outcome in [OUTCOME_LEFT, OUTCOME_FAR_LEFT]:

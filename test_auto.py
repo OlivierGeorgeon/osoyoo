@@ -24,7 +24,6 @@ ctrl_robot = CtrlRobot(robot_ip,ctrl_workspace)
 ctrl_view = CtrlView(ctrl_workspace)
 ctrl_hexaview = CtrlHexaview(ctrl_workspace)
 
-
 ctrl_workspace.workspace.agent.debug_mode = True
 #model.synthesizer.mode = "automatic"
 def mains(dt):

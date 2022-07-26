@@ -29,7 +29,7 @@ class PointOfInterest:
 
         if self.type == POINT_PLACE:
             # Place: LightGreen triangle
-            self.points = [20, 0, -20, -20, -20, 20]
+            self.points = [30, 0, -20, -20, -20, 20]
             self.shape = self.batch.add_indexed(3, gl.GL_TRIANGLES, self.group, [0, 1, 2], ('v2i', self.points),
                                                 ('c3B', 3 * name_to_rgb("LightGreen")))
         if self.type == POINT_ECHO:

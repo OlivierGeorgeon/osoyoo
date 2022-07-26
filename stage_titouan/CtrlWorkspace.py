@@ -10,7 +10,7 @@ class CtrlWorkspace :
     def __init__(self,workspace):
         """Constructor"""
         self.workspace = workspace
-        self.synthesizer = self.workspace.synthesizer        
+        self.synthesizer = self.workspace.synthesizer
         self.flag_for_view_refresh = False
         self.enacted_interaction = {}
         self.has_new_outcome = False
