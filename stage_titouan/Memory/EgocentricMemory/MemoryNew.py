@@ -8,7 +8,7 @@ from webcolors import name_to_rgb
 import math
 from pyrr import matrix44
 
-INTERACTION_PERSISTENCE = 20
+INTERACTION_PERSISTENCE = 5
 
 class MemoryNew:
     """This class play the role of a memory manager : it stocks Interaction objects,
@@ -26,6 +26,7 @@ class MemoryNew:
         #self.it = Interaction()
         
         self.last_enacted_interaction = None
+        self.actions = []
 
 
     def reset(self):
@@ -35,9 +36,8 @@ class MemoryNew:
     def add_enacted_interaction(self, enacted_interaction):  # Added by Olivier 08/05/2022
         """ Add interactions from the enacted interaction """
         self.last_enacted_interaction = enacted_interaction
-        print("MEMORY LAST ENACTIVATED INTERACTION Distance : ", self.last_enacted_interaction['echo_distance'])
         for p in enacted_interaction['points']:
-            interaction = Interaction(p[1], p[2], 10, 10, type=p[0], id=self.current_id)  # TODO Adjust the parameters
+            interaction = Interaction(p[1], p[2], 10, 10, type=p[0], id=self.current_id, durability = INTERACTION_PERSISTENCE)  # TODO Adjust the parameters
             self.interactions.append(interaction)
             self.current_id += 1
         
@@ -103,6 +103,11 @@ class MemoryNew:
         for interaction in self.interactions:
             interaction.displace(displacement_matrix)
 
+    def add_action(self, action):
+        self.actions.append(action)
+
+    def last_action(self):
+        return self.actions[-1] if len(self.actions)> 0 else None
         
 # Testing MemoryNew by displaying interactions in an EgoMemoryWindowNew
 if __name__ == "__main__":
@@ -133,3 +138,4 @@ if __name__ == "__main__":
         batch.draw()
 
     pyglet.app.run()
+

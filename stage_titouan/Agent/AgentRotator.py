@@ -19,8 +19,8 @@ class AgentRotator:
         self.debug_mode = False
 
 
-        self.borne_basse_dist = 200
-        self.borne_haute_dist = 500
+        self.borne_basse_dist = 150 #200
+        self.borne_haute_dist = 400 #500
 
         self.focus_x = None
         self.focus_y = None
@@ -37,10 +37,13 @@ class AgentRotator:
                 self.last_action = self.C1()
                 return self.last_action
         #self.last_action = self.C6()
-        if not focus_lost :
-            self.last_action = self.C6_bypass()
-        else :
-            self.last_action = self.Rotation_Focus_Lost()
+        if self.memory.last_enacted_interaction['floor'] == 0 :
+            if not focus_lost :
+                self.last_action = self.C6_bypass()
+            else :
+                self.last_action = self.Rotation_Focus_Lost()
+        else : 
+            self.last_action = self.Move_Line_Crossed()
         if type(self.last_action) is dict :
             return self.last_action
         else : 
@@ -158,3 +161,16 @@ class AgentRotator:
 
         print(" AGENT ROTATOR, ROTATION TO TRY TO GET FOCUS BACK")
         return self.action_with_focus("3", modif_focus_y = -20)
+
+    def Move_Line_Crossed(self):
+        """Move left with focus on the focus_object """
+        floor = self.memory.last_enacted_interaction['floor']
+        if floor == 1 :
+            return self.action_with_focus("4", modif_focus_y = 20)
+        return self.action_with_focus("4")
+        
+    def last_action_had_focus(self):
+        """Return True if the last action had focus"""
+
+        return type(self.last_action) is dict and 'focus_x' in self.last_action.keys()
+        #return self.memory.last_enacted_interaction['focus_x'] != None

@@ -1,19 +1,20 @@
-from . EgocentricView import EgocentricView
-from . PointOfInterest import *
+from .EgocentricView import EgocentricView
+from .PointOfInterest import *
 import pyglet
 from pyglet.window import key
-from ... Workspace import Workspace
+from ...Workspace import Workspace
 
 
 class CtrlView:
-    """blabla"""
+    """Handle the logic of the egocentric view, retrieve data from the memory and convert it
+    to points of interest that can be displayed in a pyglet window"""
     def __init__(self, ctrl_workspace):
         self.view = EgocentricView()
         self.ctrl_workspace = ctrl_workspace
         self.memory = ctrl_workspace.workspace.memory
-        self.synthesizer = ctrl_workspace.synthesizer
+        self.synthesizer = ctrl_workspace.workspace.synthesizer
         self.points_of_interest = []
-
+        self.last_action = None
         self.mouse_press_x = 0
         self.mouse_press_y = 0
         self.mouse_press_angle = 0
@@ -63,7 +64,7 @@ class CtrlView:
         interactions_list = [elem for elem in self.memory.interactions if elem.id > self.last_used_id]
         for interaction in interactions_list:
             if interaction.id > self.last_used_id:
-                self.last_used_id = interaction.id
+                self.last_used_id = max(interaction.id, self.last_used_id)
             poi = self.create_points_of_interest(interaction)
             self.points_of_interest.append(poi)
 
@@ -92,6 +93,39 @@ class CtrlView:
         # if 'compass_x' in self.ctrl_workspace.enacted_interaction:
         #     self.add_point_of_interest(self.ctrl_workspace.enacted_interaction['compass_x'],
         #                                self.ctrl_workspace.enacted_interaction['compass_y'], POINT_COMPASS)
+        poi_focus = self.create_poi_focus()
+        if poi_focus is not None:
+            self.points_of_interest.append(poi_focus)
+
+        # Make the points of interest fade out using the durability of the given interaction
+        if len(self.points_of_interest) > 0:
+            for poi in self.points_of_interest:
+                if poi is not None and poi.interaction is not None :
+                    
+                    if isinstance(poi.shape,pyglet.graphics.vertexdomain.IndexedVertexList)  :
+                        for s in poi.shape.colors :
+                            #print("sssddfsfsf " ,s)
+                            #s.opacity = poi.interaction.durability * 10
+                            #print("opacity : ",s.opacity)
+                            #TODO : CHANGE OPACITY OF VERTEX LIST
+                            ''
+                    else :
+                        poi.shape.opacity = min(poi.interaction.actual_durability * (255/poi.interaction.durability), 255)
+                    if poi.interaction.actual_durability <= 0 :
+                        poi.delete()
+                        self.points_of_interest.remove(poi)
+
+    def create_poi_focus(self):
+        """Create a point of interest corresponding to the focus"""
+        output = None
+        l_action = self.memory.last_action()
+        if l_action is not None and type(l_action) is dict and 'focus_x' in l_action:
+            ha = self.memory.last_enacted_interaction['head_angle']
+            dist = self.memory.last_enacted_interaction['echo_distance']
+            x= math.cos(math.radians(ha)) * dist
+            y= math.sin(math.radians(ha)) * dist
+            output = PointOfInterest(x,y, self.view.batch, self.view.foreground, POINT_PHENOMENON)
+        return output
 
     def create_points_of_interest(self, interaction):
         """Create a point of interest corresponding to the interaction given as parameter"""
@@ -113,47 +147,10 @@ class CtrlView:
         return None
 
     def main(self, dt):
-        """Blabla"""
+        """Called every frame, update the view"""
         if self.ctrl_workspace.flag_for_view_refresh:
-            self.points_of_interest = []
+            #self.points_of_interest = []
             self.update_points_of_interest()
-
-            # Add the focus
-            p = self.get_focus_phenomenon()
-            if self.ctrl_workspace.agent.focus:
-                if p is None:
-                    self.add_point_of_interest(self.ctrl_workspace.agent.echo_xy[0],
-                                               self.ctrl_workspace.agent.echo_xy[1], POINT_PHENOMENON)
-            else:
-                if p is not None:
-                    p.delete()
-                    self.points_of_interest.remove(p)
-
             if self.synthesizer is not None and len(self.synthesizer.last_real_echos) > 0:
-                ""
-
-
-
                 last_real_echos = []
-
             self.ctrl_workspace.flag_for_view_refresh = False
-
-
-# Displaying EgocentricView with points of interest
-# python3 -m stage_titouan.Display.EgocentricDisplay.CtrlViewNew
-if __name__ == "__main__":
-    workspace = Workspace()
-    ctrl_workspace = CtrlWorkspace(workspace)
-    ctrl_view = CtrlViewNew(ctrl_workspace)
-    ctrl_view.view.robot.rotate_head(-45)
-
-    # Add points of interest
-    ctrl_view.add_point_of_interest(0, 0, POINT_PLACE)
-    ctrl_view.add_point_of_interest(200, -200, POINT_COMPASS)
-
-    # Add an interaction
-    ctrl_workspace.enacted_interaction = {'status': '0', 'floor': 0, 'head_angle': 0, 'echo_distance': 221, 'ed-20': 249, 'ed-10': 247, 'ed0': 222, 'ed10': 230, 'ed20': 235, 'ed30': 874, 'ed50': 767, 'ed60': 640, 'ed70': 527, 'ed80': 467, 'ed90': 532, 'yaw': 0, 'compass_x': 76, 'compass_y': 223, 'azimuth': 251, 'duration1': 2862, 'duration': 3511, 'points': [('Echo', 301, 0)], 'echo_xy': [301, 0], 'translation': [0, 0]}
-    ctrl_workspace.send_phenom_info_to_memory()
-    ctrl_view.update_points_of_interest()
-
-    pyglet.app.run()
