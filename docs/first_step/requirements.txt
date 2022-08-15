@@ -5,3 +5,4 @@ pyglet==1.5.21
 pyrr==0.10.3
 Quaternion==3.5.2.post4
 six==1.16.0
+webcolors==1.12
