@@ -3,6 +3,7 @@ from .PointOfInterest import *
 import pyglet
 from pyglet.window import key
 from ...Workspace import Workspace
+from ...CtrlWorkspace import CtrlWorkspace
 
 
 class CtrlView:
@@ -19,6 +20,7 @@ class CtrlView:
         self.mouse_press_y = 0
         self.mouse_press_angle = 0
         self.last_used_id = -1
+
         def on_mouse_press(x, y, button, modifiers):
             """ Selecting or unselecting points of interest """
             self.mouse_press_x, self.mouse_press_y, self.mouse_press_angle = \
@@ -69,15 +71,15 @@ class CtrlView:
             self.points_of_interest.append(poi)
 
         real_echos_to_display = self.synthesizer.last_real_echos
-        # TODO: create pointe of interest from real_echos_to_display
+        # TODO: create point of interest from real_echos_to_display
         for real_echo in real_echos_to_display:
             ""
             poi = self.create_pointe_of_interest_from_real_echo(real_echo)
             self.points_of_interest.append(poi)
         self.synthesizer.last_real_echos = []
 
-
-        displacement_matrix = self.ctrl_workspace.enacted_interaction['displacement_matrix'] if 'displacement_matrix' in self.ctrl_workspace.enacted_interaction else None
+        displacement_matrix = self.ctrl_workspace.enacted_interaction['displacement_matrix'] if 'displacement_matrix' \
+            in self.ctrl_workspace.enacted_interaction else None
         for poi in self.points_of_interest:
             if poi.type != 6:  # Do not displace the compass points
                 poi.update(displacement_matrix)
@@ -109,9 +111,9 @@ class CtrlView:
                             #print("opacity : ",s.opacity)
                             #TODO : CHANGE OPACITY OF VERTEX LIST
                             ''
-                    else :
+                    else:
                         poi.shape.opacity = min(poi.interaction.actual_durability * (255/poi.interaction.durability), 255)
-                    if poi.interaction.actual_durability <= 0 :
+                    if poi.interaction.actual_durability <= 0:
                         poi.delete()
                         self.points_of_interest.remove(poi)
 
@@ -124,7 +126,7 @@ class CtrlView:
             dist = self.memory.last_enacted_interaction['echo_distance']
             x= math.cos(math.radians(ha)) * dist
             y= math.sin(math.radians(ha)) * dist
-            output = PointOfInterest(x,y, self.view.batch, self.view.foreground, POINT_PHENOMENON)
+            output = PointOfInterest(x, y, self.view.batch, self.view.foreground, POINT_PHENOMENON)
         return output
 
     def create_points_of_interest(self, interaction):
@@ -134,11 +136,12 @@ class CtrlView:
         return PointOfInterest(interaction.x, interaction.y, self.view.batch, self.view.foreground,
                                dict_interactions_to_poi[interaction.type], interaction=interaction)
 
-    def create_pointe_of_interest_from_real_echo(self,real_echo):
+    def create_pointe_of_interest_from_real_echo(self, real_echo):
         """Create a point of interest corresponding to the real echo given as parameter"""
         interaction = real_echo
         return PointOfInterest(interaction.x, interaction.y, self.view.batch, self.view.foreground,
                                POINT_ECHO, interaction=interaction)
+
     def get_focus_phenomenon(self):
         """ Returning the first selected phenomenon """
         for p in self.points_of_interest:
@@ -149,8 +152,23 @@ class CtrlView:
     def main(self, dt):
         """Called every frame, update the view"""
         if self.ctrl_workspace.flag_for_view_refresh:
-            #self.points_of_interest = []
+            # self.points_of_interest = []
             self.update_points_of_interest()
             if self.synthesizer is not None and len(self.synthesizer.last_real_echos) > 0:
                 last_real_echos = []
             self.ctrl_workspace.flag_for_view_refresh = False
+
+
+# Displaying EgocentricView with points of interest
+# py -m stage_titouan.Display.EgocentricDisplay.CtrlView
+if __name__ == "__main__":
+    workspace = Workspace()
+    workspace_controller = CtrlWorkspace(workspace)
+    controller = CtrlView(workspace_controller)
+    controller.view.robot.rotate_head(-45)
+
+    # Add points of interest
+    controller.add_point_of_interest(150, 0, POINT_TRESPASS)
+    controller.add_point_of_interest(300, -300, POINT_ECHO)
+
+    pyglet.app.run()
