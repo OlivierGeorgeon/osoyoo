@@ -15,9 +15,9 @@ ZOOM_IN_FACTOR = 1.2
 
 class HexaView(pyglet.window.Window):
     """blabla"""
-    def __init__(self, width=400, height=400, shapesList= [], cell_radius=20, hexa_memory = None, *args, **kwargs):
+    def __init__(self, width=400, height=400, shapesList=[], cell_radius=20, hexa_memory=None, *args, **kwargs):
         super().__init__(width, height, resizable=True, *args, **kwargs)
-        self.set_caption("Hexa Memory")
+        self.set_caption("Hexagonal Memory")
         self.set_minimum_size(150, 150)
         # glClearColor(0.2, 0.2, 0.7, 1.0)  # Make it look like hippocampus imaging
         glClearColor(1.0, 1.0, 1.0, 1.0)
@@ -51,11 +51,11 @@ class HexaView(pyglet.window.Window):
         self.nb_cell_y = memory.height
         self.cell_radius = memory.cell_radius
 
-    def extract_and_convert_recently_changed_cells(self,memory,to_reset = [],projections = []):
+    def extract_and_convert_recently_changed_cells(self, memory, to_reset=[],projections=[]):
         tmp = recently_changed_to_pyglet(memory, self.batch, projections = projections)
         self.shapesList.append( tmp)
 
-    def show_indecisive_cell(self,indecisive_cell): #(indecisive_cell,hexaMemory,batch)
+    def show_indecisive_cell(self, indecisive_cell): #(indecisive_cell,hexaMemory,batch)
         self.indecisive_cell_shape = []
         self.indecisive_cell_shape = translate_indecisive_cell_to_pyglet(indecisive_cell,self.hexa_memory,self.batch)
         
@@ -118,11 +118,11 @@ class HexaView(pyglet.window.Window):
 if __name__ == "__main__":
 
     # Create the hexa grid
-    hexa_memory = HexaMemory(width=30, height=100, cell_radius=50)
+    hexagonal_memory = HexaMemory(width=30, height=100, cell_radius=50)
 
-    hexaview = HexaView(hexa_memory=hexa_memory)
+    hexaview = HexaView(hexa_memory=hexagonal_memory)
 
     # Create the shapes to draw the cells
-    hexaview.extract_and_convert_interactions(hexa_memory)
+    hexaview.extract_and_convert_interactions(hexagonal_memory)
 
     pyglet.app.run()

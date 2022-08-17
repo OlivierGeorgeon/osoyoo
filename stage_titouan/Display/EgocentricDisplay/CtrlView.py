@@ -124,8 +124,8 @@ class CtrlView:
         if l_action is not None and type(l_action) is dict and 'focus_x' in l_action:
             ha = self.memory.last_enacted_interaction['head_angle']
             dist = self.memory.last_enacted_interaction['echo_distance']
-            x= math.cos(math.radians(ha)) * dist
-            y= math.sin(math.radians(ha)) * dist
+            x = math.cos(math.radians(ha)) * dist
+            y = math.sin(math.radians(ha)) * dist
             output = PointOfInterest(x, y, self.view.batch, self.view.foreground, POINT_PHENOMENON)
         return output
 
@@ -159,16 +159,29 @@ class CtrlView:
             self.ctrl_workspace.flag_for_view_refresh = False
 
 
-# Displaying EgocentricView with points of interest
+# Displaying EgocentricView with points of interest.
+# Allow selecting points of interest and inserting and deleting phenomena
 # py -m stage_titouan.Display.EgocentricDisplay.CtrlView
 if __name__ == "__main__":
     workspace = Workspace()
     workspace_controller = CtrlWorkspace(workspace)
-    controller = CtrlView(workspace_controller)
-    controller.view.robot.rotate_head(-45)
+    view_controller = CtrlView(workspace_controller)
+    view_controller.view.robot.rotate_head(-45)
 
-    # Add points of interest
-    controller.add_point_of_interest(150, 0, POINT_TRESPASS)
-    controller.add_point_of_interest(300, -300, POINT_ECHO)
+    # Add points of interest directly to the view_controller
+    view_controller.add_point_of_interest(150, 0, POINT_TRESPASS)
+    view_controller.add_point_of_interest(300, -300, POINT_ECHO)
+
+    # Add points of interest to the memory
+    view_controller.memory.add((0, 1, 0, 0, 0, 0))
+
+    # Update the list of points of interest from memory
+    last_used_id = -1
+    interactions_list = [elem for elem in view_controller.memory.interactions if elem.id > last_used_id]
+    for interaction in interactions_list:
+        if interaction.id > last_used_id:
+            last_used_id = max(interaction.id, last_used_id)
+        poi = view_controller.create_points_of_interest(interaction)
+        view_controller.points_of_interest.append(poi)
 
     pyglet.app.run()
