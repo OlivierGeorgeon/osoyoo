@@ -1,7 +1,7 @@
-import math
+########################################################################################
+# This agent can circle around an echo obstacle or a territory delimited by a line
+########################################################################################
 
-from . Interaction import Interaction
-from . CompositeInteraction import CompositeInteraction
 from . PredefinedInteractions import *
 
 
@@ -19,7 +19,7 @@ class AgentCircle:
         # Load the predefined behavior
         self.memory: list[CompositeInteraction] = CompositeInteraction.composite_interaction_list
 
-    def action(self, _outcome):
+    def action(self, _outcome, focus_lost=False):
         """ learning from the previous outcome and selecting the next action """
 
         # Recording previous experience
@@ -42,7 +42,7 @@ class AgentCircle:
 
         # Selecting the next action to enact
         self._action = ACTION_SCAN  # Good for circling around object behavior
-        proclivity_dict = {}  # dict.fromkeys(ACTION_LIST, 0)
+        # proclivity_dict = {}  # dict.fromkeys(ACTION_LIST, 0)
         # proclivity_dict = {ACTION_FORWARD: 0, ACTION_TURN_LEFT: 0, ACTION_TURN_RIGHT: 0} good for exploring terrain
         proclivity_dict = {ACTION_FORWARD: 0}  # Good for touring terrain
         if self.memory:
@@ -82,7 +82,7 @@ class AgentCircle:
             elif self.echo_xy[1] > -150:
                 outcome = OUTCOME_RIGHT     # Between 0 and -150 to the right
             else:
-                outcome = OUTCOME_FAR_RIGHT # More that -150 to the right
+                outcome = OUTCOME_FAR_RIGHT  # More that -150 to the right
 
         # Check if the agent lost the focus
         if self.focus:
@@ -93,7 +93,8 @@ class AgentCircle:
 
         # Catch focus
         if self._action in [ACTION_SCAN, ACTION_FORWARD]:
-            if outcome in [OUTCOME_LEFT, OUTCOME_FAR_LEFT, OUTCOME_RIGHT, OUTCOME_FAR_RIGHT, OUTCOME_FAR_FRONT, OUTCOME_CLOSE_FRONT]:
+            if outcome in [OUTCOME_LEFT, OUTCOME_FAR_LEFT, OUTCOME_RIGHT, OUTCOME_FAR_RIGHT, OUTCOME_FAR_FRONT,
+                           OUTCOME_CLOSE_FRONT]:
                 # Found focus
                 self.focus = True
 

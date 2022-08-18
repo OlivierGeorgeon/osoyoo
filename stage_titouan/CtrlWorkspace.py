@@ -1,4 +1,4 @@
-class CtrlWorkspace :
+class CtrlWorkspace:
     """Handle the logic of the workspace
     Is send the last enacted interaction by CtrlRobot and the last 
     user interaction by CtrlHexaview
@@ -7,7 +7,7 @@ class CtrlWorkspace :
     2) get the synthesizer going
     3) retrieve a new action to enact (which is retrieved by CtrlRobot externally)"""
 
-    def __init__(self,workspace):
+    def __init__(self, workspace):
         """Constructor"""
         self.workspace = workspace
         self.synthesizer = self.workspace.synthesizer
@@ -21,7 +21,8 @@ class CtrlWorkspace :
         self.agent = self.workspace.agent
         self.has_new_outcome_been_treated = True
         self.robot_ready = True
-    def main(self,dt):
+
+    def main(self, dt):
         """1) update memory and hexa_memory 
            2) get the synthesizer going
            3) retrieve a new action to enact (which is retrieved by CtrlRobot externally)"""
@@ -72,7 +73,8 @@ class CtrlWorkspace :
         """Apply movement to hexamem"""
         if self.workspace.hexa_memory is not None:
             self.workspace.hexa_memory.azimuth = self.enacted_interaction['azimuth']
-            self.workspace.hexa_memory.move(self.enacted_interaction['yaw'], self.enacted_interaction['translation'][0], self.enacted_interaction['translation'][1])
+            self.workspace.hexa_memory.move(self.enacted_interaction['yaw'], self.enacted_interaction['translation'][0],
+                                            self.enacted_interaction['translation'][1])
     
     def get_action_to_enact(self):
         """Return True,action_to_enact if there is a new action else
@@ -99,7 +101,6 @@ class CtrlWorkspace :
     def put_decider_to_manual(self):
         """Put the decider in manual mode"""
         self.decider_mode = "manual"
-    
 
     def update_outcome(self, outcome):
         "Update the enacted interaction"

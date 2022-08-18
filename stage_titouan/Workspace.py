@@ -2,15 +2,17 @@ from . Memory.EgocentricMemory.MemoryV1 import MemoryV1
 from . Memory.HexaMemory.HexaMemory import HexaMemory
 from .Synthesizer.Synthesizer import Synthesizer
 from .Agent.CircleBehavior import CircleBehavior
-class Workspace :
+
+
+class Workspace:
     """Contain all the data of the model : the two memories, the synthesizer and the agent"""
 
-    def __init__(self,hexamemory_size = (100,200), cell_radius = 20):
+    def __init__(self, hexamemory_size=(100, 200), cell_radius=20):
         self.memory = MemoryV1()
-        self.hexa_memory = HexaMemory(hexamemory_size[0],hexamemory_size[1],cell_radius = cell_radius)
-        self.synthesizer = Synthesizer(self.memory,self.hexa_memory)
+        self.hexa_memory = HexaMemory(hexamemory_size[0], hexamemory_size[1], cell_radius=cell_radius)
+        self.synthesizer = Synthesizer(self.memory, self.hexa_memory)
         self.user_action = None
-        #FLAGS :
+        # FLAGS:
         self.need_user_action = False
         self.enact_step = 0
         self.need_traitement_flag = False
@@ -42,14 +44,15 @@ class Workspace :
 
     def reset(self):
         self.action_reset()
+
     def action_reset(self):
-        print("A FAIRE") #TODO
+        print("A FAIRE")  # TODO
         self.synthesizer.reset()
         self.memory.reset()
         self.hexa_memory.reset()
         self.f_reset_flag = True
         self.user_action = None
-        #FLAGS :
+        # FLAGS:
         self.need_user_action = False
         self.enact_step = 0
         self.need_traitement_flag = False
@@ -68,7 +71,6 @@ class Workspace :
         self.CONTROL_MODE_AUTOMATIC = "auto"
         self.CONTROL_MODE_MANUAL = "manual"
         self.control_mode =  self.CONTROL_MODE_MANUAL
-
 
         self.enacted_interaction = {}
         self.f_enacted_interaction_has_changed = False
