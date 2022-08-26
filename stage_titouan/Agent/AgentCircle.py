@@ -19,6 +19,16 @@ class AgentCircle:
         # Load the predefined behavior
         self.memory: list[CompositeInteraction] = CompositeInteraction.composite_interaction_list
 
+    def propose_intended_interaction(self, enacted_interaction, lost_focus):
+        """Propose the next intended interaction from the previous enacted interaction.
+        This is the main method of the agent"""
+        # Compute a specific outcome suited for this agent
+        outcome = self.result(enacted_interaction)
+        # Compute the next action command for the robot
+        command = self.action(outcome)
+        # Compute the intended interaction possibly including the focus
+        return self.intended_interaction(command)
+
     def action(self, _outcome, focus_lost=False):
         """ learning from the previous outcome and selecting the next action """
 
@@ -90,12 +100,15 @@ class AgentCircle:
                 # The focus was lost, override the echo outcome
                 self.focus = False
                 outcome = OUTCOME_LOST_FOCUS
+                print("LOST FOCUS")
 
         # Catch focus
+        print("outcome", self._action, outcome)
         if self._action in [ACTION_SCAN, ACTION_FORWARD]:
             if outcome in [OUTCOME_LEFT, OUTCOME_FAR_LEFT, OUTCOME_RIGHT, OUTCOME_FAR_RIGHT, OUTCOME_FAR_FRONT,
                            OUTCOME_CLOSE_FRONT]:
                 # Found focus
+                print("CATCH FOCUS")
                 self.focus = True
 
         # If not focus then no circle behavior outcome

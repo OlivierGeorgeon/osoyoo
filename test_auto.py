@@ -23,7 +23,7 @@ ctrl_hexaview = CtrlHexaview(ctrl_workspace)
 
 # Select the agent
 # ctrl_workspace.change_agent(AgentRotator(ctrl_workspace.workspace.memory, ctrl_workspace.workspace.hexa_memory))
-ctrl_workspace.change_agent(AgentCircle())  # TODO fix the focus management
+ctrl_workspace.change_agent(AgentCircle())
 
 ctrl_workspace.workspace.agent.debug_mode = True
 # model.synthesizer.mode = "automatic"

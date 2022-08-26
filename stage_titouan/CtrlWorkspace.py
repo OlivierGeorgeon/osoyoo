@@ -51,8 +51,9 @@ class CtrlWorkspace:
                 and self.robot_ready:
             self.robot_ready = False
             self.has_new_outcome_been_treated = False
-            outcome_ag = self.workspace.agent.result(self.enacted_interaction)
-            self.action = self.workspace.agent.action(outcome_ag, focus_lost)
+            # outcome_ag = self.workspace.agent.result(self.enacted_interaction)
+            # self.action = self.workspace.agent.action(outcome_ag, focus_lost)
+            self.action = self.workspace.agent.propose_intended_interaction(self.enacted_interaction, focus_lost)
             self.workspace.synthesizer.last_action_had_focus = 'focus_x' in self.action
             self.synthesizer.last_action = self.action
             self.has_new_action = True
