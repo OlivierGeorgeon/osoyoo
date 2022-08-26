@@ -7,13 +7,14 @@ from stage_titouan.Robot.RobotDefine import *
 from stage_titouan.Robot.WifiInterface import WifiInterface
 from stage_titouan.Memory.EgocentricMemory.Interactions.Interaction import *
 
-class CtrlRobot :
+
+class CtrlRobot:
     """Handle the robot :
         - Get the robot data
-        -Command the robot
+        - Command the robot
         - Send the outcome to ctrl_workspace
         - Retrieve the action to enact from ctrl_workspace"""
-    def __init__(self,robot_ip,ctrl_workspace):
+    def __init__(self, robot_ip, ctrl_workspace):
         self.robot_ip = robot_ip
         self.wifiInterface = WifiInterface(robot_ip)
         self.intended_interaction = {'action': "8"}  # Need random initialization
@@ -62,12 +63,12 @@ class CtrlRobot :
             self.has_new_action_to_enact = False
             self.robot_has_started_acting = True
 
-
     def command_robot(self, intended_interaction):
         """ Creating an asynchronous thread to send the command to the robot and to wait for the outcome """
         self.outcome_bytes = "Waiting"
         if isinstance(intended_interaction, str):
             intended_interaction = {'action': intended_interaction}
+
         def enact_thread():
             """ Sending the command to the robot and waiting for the outcome """
             action_string = json.dumps(self.intended_interaction)
@@ -136,7 +137,7 @@ class CtrlRobot :
                 self.azimuth -= 360
             # Override the azimuth returned by the robot
             enacted_interaction['azimuth'] = int(self.azimuth)
-            #print("compass_x", enacted_interaction['compass_x'], "compass_y", enacted_interaction['compass_y'], "azimuth", int(self.azimuth))
+            # print("compass_x", enacted_interaction['compass_x'], "compass_y", enacted_interaction['compass_y'], "azimuth", int(self.azimuth))
 
         # Interaction trespassing
         if enacted_interaction['floor'] > 0:
@@ -232,6 +233,8 @@ class CtrlRobot :
                         enacted_interaction['echo_array'].append((tmp_x, tmp_y))
 
         self.enacted_interaction = enacted_interaction
+
+        print(enacted_interaction)
 
         return enacted_interaction
 

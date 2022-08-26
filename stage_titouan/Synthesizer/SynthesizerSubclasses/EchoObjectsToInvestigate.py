@@ -1,7 +1,10 @@
-from . EchoObject import  EchoObject
+from . EchoObject import EchoObject
+
+
 class EchoObjectsToInvestigate:
     """Echo objects to investigate"""
-    def __init__(self,number_of_try_before_removing,number_of_echo_before_validation,hexa_memory,acceptable_delta):
+    def __init__(self, number_of_try_before_removing, number_of_echo_before_validation, hexa_memory,
+                 acceptable_delta):
         """Constructor
         Parameters:
             number_of_try_before_removing: the number of try before removing an echo object from the list of echo objects to investigate
@@ -13,7 +16,7 @@ class EchoObjectsToInvestigate:
         self.hexa_memory = hexa_memory
         self.acceptable_delta = acceptable_delta
 
-    def create_news(self,real_echos):
+    def create_news(self, real_echos):
         """ blabla"""
         new_objets = []
         for echo in real_echos:
@@ -33,13 +36,13 @@ class EchoObjectsToInvestigate:
             #print("NEW OBJECTO")
             self.list_objects_to_investigate.append([objet,0])
 
-    def try_and_add(self,real_echos):
+    def try_and_add(self, real_echos):
         """Try to add the echo interactions to the objects to investigate"""
         echo_restantes = real_echos
         for echo in real_echos:
-            for objet,_ in self.list_objects_to_investigate:
+            for objet, _ in self.list_objects_to_investigate:
                 print("kssssssssssssssssssssssssssssssssssss")
-                if objet.try_and_add(echo) :
+                if objet.try_and_add(echo):
                     echo_restantes.remove(echo)
                     break
         return echo_restantes
@@ -50,12 +53,12 @@ class EchoObjectsToInvestigate:
         the objects that have been tried too much without meating the 
         threshold to be validated"""
         objet_validated = []
-        for i, [objet,count] in enumerate(self.list_objects_to_investigate):
+        for i, [objet, count] in enumerate(self.list_objects_to_investigate):
             objet.try_to_validate(self.number_of_echo_before_validation)
             if objet.has_been_validated:
                 objet_validated.append(objet)
                 self.list_objects_to_investigate.remove([objet,count])
-            else :
+            else:
                 self.list_objects_to_investigate[i][1]+=1
 
         for objet in self.list_objects_to_investigate:

@@ -42,8 +42,9 @@ class CtrlWorkspace:
 
             # 4 If the synthesizer need an action done, we save it
             if synthesizer_action is not None:
-                self.action = synthesizer_action
-                self.has_new_action = True
+                pass  # OG to prevent actions proposed by the synthesize
+                # self.action = synthesizer_action
+                # self.has_new_action = True
             self.has_new_outcome_been_treated = True
 
         if self.action is None and self.decider_mode == "auto" and self.has_new_outcome_been_treated \

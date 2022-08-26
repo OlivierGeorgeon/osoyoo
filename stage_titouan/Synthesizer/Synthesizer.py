@@ -44,7 +44,7 @@ class Synthesizer:
         action_to_return = None
         if not focus_lost:
             real_echos += echo_focus
-            real_echos,translation = self.echo_objects_valided.try_and_add(real_echos)
+            real_echos, translation = self.echo_objects_valided.try_and_add(real_echos)
             self.apply_translation_to_hexa_memory(translation)
             real_echos = self.echo_objects_to_investigate.try_and_add(real_echos)
             objects_validated = self.echo_objects_to_investigate.validate()
@@ -52,8 +52,8 @@ class Synthesizer:
             self.echo_objects_to_investigate.create_news(real_echos)
             cells_changed = self.synthesize([elem for elem in self.interactions_list if elem.type != "Echo" and elem.type != "Echo2"])
             action_to_return = None
-            if(self.echo_objects_to_investigate.need_more_sweeps()):
-                action_to_return = "-"
+            if self.echo_objects_to_investigate.need_more_sweeps():
+                action_to_return = "-"  # The synthesizer need to scan again
         return action_to_return, cells_changed, focus_lost
 
     def treat_echos(self, echo_list):
