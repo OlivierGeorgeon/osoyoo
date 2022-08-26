@@ -5,7 +5,7 @@ import math
 
 class AgentRotator:
     """aaaaaaaaa"""
-    def __init__(self,memory,hexa_memory):
+    def __init__(self, memory, hexa_memory):
         """aaa"""
         self.memory = memory
         self.hexa_memory = hexa_memory

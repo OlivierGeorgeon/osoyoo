@@ -110,7 +110,7 @@ class PointOfInterest:
             self.shape.x, self.shape.y = 0, 0  # Circle
 
     def displace(self, displacement_matrix):
-        """ Applying the displacement matrix to the phenomenon """
+        """ Applying the displacement matrix to the point of interest """
         #  Rotate and translate the position
         v = matrix44.apply_to_vector(displacement_matrix, [self.x, self.y, 0])
         self.x, self.y = v[0], v[1]

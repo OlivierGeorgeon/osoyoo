@@ -3,6 +3,7 @@
 ########################################################################################
 
 from . PredefinedInteractions import *
+from .. Robot.RobotDefine import FORWARD_SPEED
 
 
 class AgentCircle:
@@ -23,25 +24,23 @@ class AgentCircle:
         """Propose the next intended interaction from the previous enacted interaction.
         This is the main method of the agent"""
         # Compute a specific outcome suited for this agent
-        outcome = self.result(enacted_interaction)
-        # Compute the next action command for the robot
-        command = self.action(outcome)
+        outcome = self.outcome(enacted_interaction)
         # Compute the intended interaction possibly including the focus
-        return self.intended_interaction(command)
+        return self.intended_interaction(outcome)
 
-    def action(self, _outcome, focus_lost=False):
+    def intended_interaction(self, outcome, focus_lost=False):
         """ learning from the previous outcome and selecting the next action """
 
         # Recording previous experience
         self.previous_interaction = self.last_interaction
-        self.last_interaction = Interaction.create_or_retrieve(self._action, _outcome)
+        self.last_interaction = Interaction.create_or_retrieve(self._action, outcome)
 
         # Tracing the last interaction
         if self._action is not None:
             print("Action: " + str(self._action) +
                   ", Anticipation: " + str(self.anticipated_outcome) +
-                  ", Outcome: " + str(_outcome) +
-                  ", Satisfaction: (anticipation: " + str(self.anticipated_outcome == _outcome) +
+                  ", Outcome: " + str(outcome) +
+                  ", Satisfaction: (anticipation: " + str(self.anticipated_outcome == outcome) +
                   ", valence: " + str(self.last_interaction.valence) + ")")
 
         # Learning or reinforcing the last composite interaction
@@ -72,9 +71,14 @@ class AgentCircle:
         """ Computing the anticipation """
         self.anticipated_outcome = None
 
-        return self._action
+        intended_interaction = {'action': self._action, 'speed': FORWARD_SPEED}
+        if self.focus:
+            intended_interaction['focus_x'] = self.echo_xy[0]
+            intended_interaction['focus_y'] = self.echo_xy[1]
 
-    def result(self, enacted_interaction):
+        return intended_interaction
+
+    def outcome(self, enacted_interaction):
         """ Convert the enacted interaction into an outcome adapted to the circle behavior """
         outcome = OUTCOME_DEFAULT
 
@@ -126,15 +130,6 @@ class AgentCircle:
 
         return outcome
 
-    def intended_interaction(self, _action):
-        """ Construct the intended interaction from the circle behavior action """
-        intended_interaction = {'action': _action, 'speed': 180}
-        if self.focus:
-            intended_interaction['focus_x'] = self.echo_xy[0]
-            intended_interaction['focus_y'] = self.echo_xy[1]
-
-        return intended_interaction
-
 
 # Testing AgentCircle
 # py -m stage_titouan.Agent.AgentCircle
@@ -143,7 +138,7 @@ if __name__ == "__main__":
     _outcome = OUTCOME_LOST_FOCUS
 
     for i in range(20):
-        _action = a.action(_outcome)
-        print("Action: ", _action)
+        _intended_interaction = a.intended_interaction(_outcome, False)
+        print("Action: ", _intended_interaction)
         _outcome = input("Enter outcome: ").upper()
         print(" Outcome: ", _outcome)

@@ -43,5 +43,4 @@ if ROBOT_ID == 4:
     RETREAT_DISTANCE = 70   # (mm) Distance of the line after retreat
 
 
-
 SCAN_DISTANCE = 800

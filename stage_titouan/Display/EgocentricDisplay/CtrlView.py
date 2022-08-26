@@ -74,15 +74,19 @@ class CtrlView:
         # TODO: create point of interest from real_echos_to_display
         for real_echo in real_echos_to_display:
             ""
-            poi = self.create_pointe_of_interest_from_real_echo(real_echo)
-            self.points_of_interest.append(poi)
+            poi_real_echo = self.create_pointe_of_interest_from_real_echo(real_echo)
+            self.points_of_interest.append(poi_real_echo)
         self.synthesizer.last_real_echos = []
 
         displacement_matrix = self.ctrl_workspace.enacted_interaction['displacement_matrix'] if 'displacement_matrix' \
             in self.ctrl_workspace.enacted_interaction else None
-        for poi in self.points_of_interest:
-            if poi.type != 6:  # Do not displace the compass points
-                poi.update(displacement_matrix)
+
+        for poi_displace in self.points_of_interest:
+            if poi_displace.type != 6:  # Do not displace the compass points
+                poi_displace.update(displacement_matrix)
+            if poi_displace.type == 5:
+                self.points_of_interest.remove(poi_displace)
+                poi_displace.delete()
 
         # Mark the new position
         self.add_point_of_interest(0, 0, POINT_PLACE)
@@ -95,31 +99,34 @@ class CtrlView:
         # if 'compass_x' in self.ctrl_workspace.enacted_interaction:
         #     self.add_point_of_interest(self.ctrl_workspace.enacted_interaction['compass_x'],
         #                                self.ctrl_workspace.enacted_interaction['compass_y'], POINT_COMPASS)
+
+        # Point of interest focus
         poi_focus = self.create_poi_focus()
         if poi_focus is not None:
             self.points_of_interest.append(poi_focus)
 
         # Make the points of interest fade out using the durability of the given interaction
         if len(self.points_of_interest) > 0:
-            for poi in self.points_of_interest:
-                if poi is not None and poi.interaction is not None :
+            for poi_fade in self.points_of_interest:
+                if poi_fade is not None and poi_fade.interaction is not None :
                     
-                    if isinstance(poi.shape,pyglet.graphics.vertexdomain.IndexedVertexList)  :
-                        for s in poi.shape.colors :
+                    if isinstance(poi_fade.shape, pyglet.graphics.vertexdomain.IndexedVertexList):
+                        for s in poi_fade.shape.colors:
                             #print("sssddfsfsf " ,s)
                             #s.opacity = poi.interaction.durability * 10
                             #print("opacity : ",s.opacity)
-                            #TODO : CHANGE OPACITY OF VERTEX LIST
+                            # TODO : CHANGE OPACITY OF VERTEX LIST
                             ''
                     else:
-                        poi.shape.opacity = min(poi.interaction.actual_durability * (255/poi.interaction.durability), 255)
-                    if poi.interaction.actual_durability <= 0:
-                        poi.delete()
-                        self.points_of_interest.remove(poi)
+                        poi_fade.shape.opacity = min(poi_fade.interaction.actual_durability * (255/poi_fade.interaction.durability), 255)
+                    if poi_fade.interaction.actual_durability <= 0:
+                        poi_fade.delete()
+                        self.points_of_interest.remove(poi_fade)
 
     def create_poi_focus(self):
         """Create a point of interest corresponding to the focus"""
         output = None
+        # For AgentRotator
         l_action = self.memory.last_action()
         if l_action is not None and type(l_action) is dict and 'focus_x' in l_action:
             ha = self.memory.last_enacted_interaction['head_angle']
@@ -127,6 +134,12 @@ class CtrlView:
             x = math.cos(math.radians(ha)) * dist
             y = math.sin(math.radians(ha)) * dist
             output = PointOfInterest(x, y, self.view.batch, self.view.foreground, POINT_PHENOMENON)
+        # For AgentCircle
+        if hasattr(self.ctrl_workspace.workspace.agent, "focus"):
+            if self.ctrl_workspace.workspace.agent.focus:
+                x = self.ctrl_workspace.workspace.agent.echo_xy[0]
+                y = self.ctrl_workspace.workspace.agent.echo_xy[1]
+                output = PointOfInterest(x, y, self.view.batch, self.view.foreground, POINT_PHENOMENON)
         return output
 
     def create_points_of_interest(self, interaction):
@@ -177,11 +190,11 @@ if __name__ == "__main__":
 
     # Update the list of points of interest from memory
     last_used_id = -1
-    interactions_list = [elem for elem in view_controller.memory.interactions if elem.id > last_used_id]
-    for interaction in interactions_list:
-        if interaction.id > last_used_id:
-            last_used_id = max(interaction.id, last_used_id)
-        poi = view_controller.create_points_of_interest(interaction)
+    _interactions_list = [elem for elem in view_controller.memory.interactions if elem.id > last_used_id]
+    for _interaction in _interactions_list:
+        if _interaction.id > last_used_id:
+            last_used_id = max(_interaction.id, last_used_id)
+        poi = view_controller.create_points_of_interest(_interaction)
         view_controller.points_of_interest.append(poi)
 
     pyglet.app.run()
