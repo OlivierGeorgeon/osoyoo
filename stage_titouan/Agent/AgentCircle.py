@@ -1,5 +1,5 @@
 ########################################################################################
-# This agent can circle around an echo obstacle or a territory delimited by a line
+# This agent makes the robot circle around an echo object or a territory delimited by a line
 ########################################################################################
 
 from . PredefinedInteractions import *
@@ -65,7 +65,7 @@ class AgentCircle:
         return self._action
 
     def result(self, enacted_interaction):
-        """ Convert the enacted interaction into outcome adapted to the circle behavior """
+        """ Convert the enacted interaction into an outcome adapted to the circle behavior """
         outcome = OUTCOME_DEFAULT
 
         # If there is an echo, compute the echo outcome

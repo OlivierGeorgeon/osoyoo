@@ -7,13 +7,17 @@ from ..Memory.HexaMemory.HexaGrid import HexaGrid
 import numpy as np
 from scipy.spatial.distance import cdist
 import math
-
 from .SynthesizerSubclasses.EchoObject import EchoObject
 from .SynthesizerSubclasses.EchoObjectValidateds import EchoObjectValidateds
 from .SynthesizerSubclasses.EchoObjectsToInvestigate import EchoObjectsToInvestigate
+
+
 class Synthesizer:
-    """Synthesizer"""
-    def __init__(self,memory,hexa_memory):
+    """Synthesizer
+    (Involved in the focus)
+
+    """
+    def __init__(self, memory, hexa_memory):
         """Constructor"""
         self.memory = memory
         self.hexa_memory = hexa_memory
@@ -26,10 +30,9 @@ class Synthesizer:
         self.last_used_id = 0
         self.last_action_had_focus = False
         self.last_action = None
-        
 
     def act(self):
-        """Handle everything the synthesizer as to do, from getting the last interactions in the memory
+        """Handle everything the synthesizer has to do, from getting the last interactions in the memory
         to updating the hexa_memory"""
         self.interactions_list = [elem for elem in self.memory.interactions if (elem.id>self.last_used_id)]
         self.last_used_id = max([elem.id for elem in self.interactions_list],default = self.last_used_id)
@@ -53,9 +56,7 @@ class Synthesizer:
                 action_to_return = "-"
         return action_to_return, cells_changed, focus_lost
 
-        
-
-    def treat_echos(self,echo_list):
+    def treat_echos(self, echo_list):
         """In case of a sweep we obtain an array of echo, this function discretize 
         it to try to find the real position of the objects that sent back the echo
         
@@ -102,7 +103,8 @@ class Synthesizer:
                 else :
                     output.append(streak[int(len(streak)/2)][2])
         return output
-    def revert_echoes_to_angle_distance(self,echo_list):
+
+    def revert_echoes_to_angle_distance(self, echo_list):
         """Convert echo interaction to triples (angle,distance,interaction)"""
         output = []
         for elem in echo_list:
@@ -113,14 +115,13 @@ class Synthesizer:
             output.append((angle,distance,elem))
         return output
     
-    def apply_translation_to_hexa_memory(self,translation_between_echo_and_context):
+    def apply_translation_to_hexa_memory(self, translation_between_echo_and_context):
         "Convert the egocentric translation given as parameter to an allocentric one, and apply it to the hexa_memory"
         allocentric_translation_x,allocentric_translation_y = translation_between_echo_and_context
         #print("Synthesizer correct position by",allocentric_translation_x,allocentric_translation_y)
         self.hexa_memory.apply_translation_to_robot_pos(allocentric_translation_x,allocentric_translation_y)
 
-
-    def synthesize(self,interactions_list):
+    def synthesize(self, interactions_list):
         """Synthesize the interactions with the hexamem"""
         #Convert the interactions to an hexamem status and apply it to the
         #corresponding cells of the hexamem
@@ -140,8 +141,7 @@ class Synthesizer:
                 self.hexa_memory.apply_status_to_cell(x,y,translate_interaction_type_to_cell_status("Echo"))
         return cells_treated
 
-
-    def get_allocentric_coordinates_of_interactions(self,interaction_list):
+    def get_allocentric_coordinates_of_interactions(self, interaction_list):
         """ Compute allocentric coordinates for every interaction of the given type in self.interactions_list
         
         Return a list of ((x,y),interaction)"""
@@ -166,5 +166,5 @@ class Synthesizer:
             y = int(distance * math.sin(math.radians(angle)))
             interaction_focus = Interaction(x,y,width = 15,type = INTERACTION_ECHO2, shape = 'Circle', color = 'orange', durability = 5, decayIntensity = 1, id = 0)
             return [interaction_focus],focus_lost
-        else :
-            return [],focus_lost
+        else:
+            return [], focus_lost

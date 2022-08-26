@@ -1,11 +1,10 @@
 class CtrlWorkspace:
-    """Handle the logic of the workspace
-    Is send the last enacted interaction by CtrlRobot and the last 
-    user interaction by CtrlHexaview
-    Use those data to:
-    1) update memory and hexa_memory 
-    2) get the synthesizer going
-    3) retrieve a new action to enact (which is retrieved by CtrlRobot externally)"""
+    """The Workspace Controller provides the main logics of the Worskpace
+        - main(dt): Updates memory and hexa_memory. Get the synthesizer going
+        - update_outcome(): updates the enacted interaction (called by CtrlRobot)
+        - set_action(), put_decider_to_auto(), updated the user actions (called by CtrlHexaview)
+        - get_action_to_enact(): Update the action to enact (called by CtrlRobot) ??
+        """
 
     def __init__(self, workspace):
         """Constructor"""
@@ -28,22 +27,27 @@ class CtrlWorkspace:
            3) retrieve a new action to enact (which is retrieved by CtrlRobot externally)"""
         focus_lost = False
         # 1. We get the last outcome
-        if self.has_new_outcome :            
+        if self.has_new_outcome:
             self.has_new_outcome = False
+
             # 2 We update the memories
             self.workspace.memory.tick()
             self.send_phenom_info_to_memory()
             self.send_position_change_to_hexa_memory()
             self.send_position_change_to_memory()
             self.flag_for_view_refresh = True
-            #3 We call Synthesizer.Act and get the results, the synthesizer will update the hexa_memory
-            synthesizer_action,synthesizer_results, focus_lost = self.workspace.synthesizer.act()
-            #4 If the synthesizer need an action done, we save it
-            if synthesizer_action is not None :
+
+            # 3 We call Synthesizer.Act and get the results, the synthesizer will update the hexa_memory
+            synthesizer_action, synthesizer_results, focus_lost = self.workspace.synthesizer.act()
+
+            # 4 If the synthesizer need an action done, we save it
+            if synthesizer_action is not None:
                 self.action = synthesizer_action
                 self.has_new_action = True
             self.has_new_outcome_been_treated = True
-        if self.action is None and self.decider_mode == "auto" and self.has_new_outcome_been_treated and self.robot_ready :
+
+        if self.action is None and self.decider_mode == "auto" and self.has_new_outcome_been_treated \
+                and self.robot_ready:
             self.robot_ready = False
             self.has_new_outcome_been_treated = False
             outcome_ag = self.workspace.agent.result(self.enacted_interaction)
@@ -58,9 +62,9 @@ class CtrlWorkspace:
         echo_array = self.enacted_interaction['echo_array'] if 'echo_array' in self.enacted_interaction else None
         if self.workspace.memory is not None:
             self.workspace.memory.add_enacted_interaction(self.enacted_interaction)  # Added by Olivier 08/05/2022
-            if echo_array is not None :
+            if echo_array is not None:
                 self.workspace.memory.add_echo_array(echo_array)
-            if self.action is not None :
+            if self.action is not None:
                 self.workspace.memory.add_action(self.action)
 
     def send_position_change_to_memory(self):
@@ -77,37 +81,38 @@ class CtrlWorkspace:
                                             self.enacted_interaction['translation'][1])
     
     def get_action_to_enact(self):
-        """Return True,action_to_enact if there is a new action else
-        return False,None"""
-        if self.has_new_action :
+        """Return (True, action_to_enact) if there is a new action else
+        return (False, None)
+        Called by CtrlRobot"""
+        if self.has_new_action:
             self.has_new_action = False
-            if 'focus_x' in self.action :
+            if 'focus_x' in self.action:
                 self.workspace.synthesizer.last_action_had_focus = True
-            returno = True,self.action
+            returno = True, self.action
             self.action = None
             return returno
-        else :
-            return False,None
+        else:
+            return False, None
         
-    def set_action(self,action):
-        """Set the action to enact"""
+    def set_action(self, action):
+        """Set the action to enact (called by CtrlHexaview)"""
         self.action = action
         self.has_new_action = True
 
     def put_decider_to_auto(self):
-        """Put the decider in auto mode"""
+        """Put the decider in auto mode (called by CtrlHexaview)"""
         self.decider_mode = "auto"
 
     def put_decider_to_manual(self):
-        """Put the decider in manual mode"""
+        """Put the decider in manual mode (called by CtrlHexaview)"""
         self.decider_mode = "manual"
 
-    def update_outcome(self, outcome):
-        "Update the enacted interaction"
-        if "status" in outcome and outcome["status"] == "T":
+    def update_outcome(self, enacted_interaction):
+        """Update the enacted interaction (called by CtrlRobot)"""
+        if "status" in enacted_interaction and enacted_interaction["status"] == "T":
             print("CtrlWorkspaceTest received empty outcome")
             return
-        self.enacted_interaction = outcome
+        self.enacted_interaction = enacted_interaction
         self.has_new_outcome = True
     
     def change_agent(self, agent):
