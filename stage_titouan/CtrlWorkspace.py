@@ -1,9 +1,9 @@
 class CtrlWorkspace:
     """The Workspace Controller provides the main logics to controll the robot
         - main(dt): Updates memory and hexa_memory. Get the synthesizer going
+        - get_intended_interaction(): Update the intended_interaction (called by CtrlRobot) ??
         - update_enacted_interaction(): updates the enacted interaction (called by CtrlRobot)
         - set_action(), put_decider_to_auto(), updates the user actions (called by CtrlHexaview)
-        - get_action_to_enact(): Update the action to enact (called by CtrlRobot) ??
         """
 
     def __init__(self, workspace):
@@ -82,8 +82,8 @@ class CtrlWorkspace:
                                             self.enacted_interaction['translation'][1])
     
     def get_intended_interaction(self):
-        """Return (True, action_to_enact) if there is a new action else
-        return (False, None)
+        """Return (True, intended_interaction) if there is one, else (False, None)
+        Reset the intended_interaction
         Called by CtrlRobot"""
         if self.has_new_action:
             self.has_new_action = False

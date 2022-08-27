@@ -14,27 +14,32 @@ class CtrlRobot:
         - Command the robot
         - Send the outcome to ctrl_workspace
         - Retrieve the action to enact from ctrl_workspace"""
+
     def __init__(self, robot_ip, ctrl_workspace):
+
         self.robot_ip = robot_ip
+        self.ctrl_workspace = ctrl_workspace
         self.wifiInterface = WifiInterface(robot_ip)
-        self.intended_interaction = {'action': "8"}  # Need random initialization
-        self.enact_step = 0
-        self.outcome_bytes = b'{"status":"T"}'  # Default status T timeout
-        self.azimuth = 0
-        self.robot_has_started_acting = False
-        self.robot_has_finished_acting =False
-        self.enacted_interaction = {}
+        self.azimuth = 0  # Integrated from the yaw if the robot does not return compass data
+
+        self.has_new_action_to_enact = False
+        self.robot_has_finished_acting = False
+
+        # self.robot_has_started_acting = False
+        # self.has_new_outcome = False
+        # self.action_to_enact = None
+        # self.outcome = None
+        # self.enacted_interaction = {}
+
         self.forward_speed = [FORWARD_SPEED, 0]
         self.backward_speed = [-FORWARD_SPEED, 0]
         self.leftward_speed = [0, LATERAL_SPEED]
         self.rightward_speed = [0, -LATERAL_SPEED]
 
-        self.outcome = None
-        self.has_new_outcome = False
-        self.has_new_action_to_enact = False
-        self.action_to_enact = None
-
-        self.ctrl_workspace = ctrl_workspace
+        # Used in an asynchronous Thread
+        self.enact_step = 0
+        self.intended_interaction = None  # {'action': "8"}  # Need random initialization
+        self.outcome_bytes = None  # b'{"status":"T"}'  # Default status T timeout
 
     def main(self, dt):
         """Handle the communications with the robot."""
@@ -42,27 +47,27 @@ class CtrlRobot:
             ##########
             self.ctrl_workspace.robot_ready = True
             ##########
-            self.robot_has_started_acting = False
+            # self.robot_has_started_acting = False
             self.robot_has_finished_acting = True
             self.enact_step = 0
         if self.robot_has_finished_acting:
             self.robot_has_finished_acting = False
-            self.enacted_interaction = self.translate_robot_data()
-            self.outcome = self.enacted_interaction
-            self.has_new_outcome = True
-            self.ctrl_workspace.update_enacted_interaction(self.outcome)
+            enacted_interaction = self.translate_robot_data()
+            # self.outcome = self.enacted_interaction
+            # self.has_new_outcome = True
+            self.ctrl_workspace.update_enacted_interaction(enacted_interaction)
 
+        intended_interaction = None
         if not self.has_new_action_to_enact:
-            self.has_new_action_to_enact, self.action_to_enact = self.ctrl_workspace.get_intended_interaction()
+            self.has_new_action_to_enact, intended_interaction = self.ctrl_workspace.get_intended_interaction()
 
         if self.has_new_action_to_enact and self.enact_step == 0:
             ##########
             self.ctrl_workspace.robot_ready = False
             ##########
-            self.command_robot(self.action_to_enact)
-            self.action_to_enact = None
+            self.command_robot(intended_interaction)
             self.has_new_action_to_enact = False
-            self.robot_has_started_acting = True
+            # self.robot_has_started_acting = True
 
     def command_robot(self, intended_interaction):
         """ Creating an asynchronous thread to send the command to the robot and to wait for the outcome """
@@ -72,17 +77,17 @@ class CtrlRobot:
 
         def enact_thread():
             """ Sending the command to the robot and waiting for the outcome """
-            action_string = json.dumps(self.intended_interaction)
-            print("Sending: " + action_string)
-            self.outcome_bytes = self.wifiInterface.enact(action_string)
+            intended_interaction_string = json.dumps(self.intended_interaction)
+            print("Sending: " + intended_interaction_string)
+            self.outcome_bytes = self.wifiInterface.enact(intended_interaction_string)
             print("Receive: ", end="")
             print(self.outcome_bytes)
             self.enact_step = 2  # Now we have received the outcome from the robot
 
         # self.action = action
-        #print("COMMAND ROBOT : intended_interaction ", intended_interaction)
+        # print("COMMAND ROBOT : intended_interaction ", intended_interaction)
         self.intended_interaction = intended_interaction
-        self.enact_step = 1  # Now we send the command to the robot for enaction
+        self.enact_step = 1  # Now we send the intended interaction to the robot for enaction
         thread = threading.Thread(target=enact_thread)
         thread.start()
 
@@ -133,7 +138,7 @@ class CtrlRobot:
             enacted_interaction['compass_x'] -= COMPASS_X_OFFSET
             enacted_interaction['compass_y'] -= COMPASS_Y_OFFSET
             self.azimuth = math.degrees(math.atan2(enacted_interaction['compass_y'], enacted_interaction['compass_x']))
-            self.azimuth += 180;
+            self.azimuth += 180
             if self.azimuth >= 360:
                 self.azimuth -= 360
             # Override the azimuth returned by the robot
@@ -190,10 +195,10 @@ class CtrlRobot:
                                                           self.intended_interaction['focus_y'], 0])[0:2]
             # The distance between the echo and the expected focus position
             distance = int(math.dist(echo_xy, expected_focus_xy))
-            #print("Distance between echo and focus:", distance)
+            # print("Distance between echo and focus:", distance)
             if distance < 100:
                 additional_xy = expected_focus_xy - echo_xy
-                #print("additional translation:", additional_xy)
+                # print("additional translation:", additional_xy)
                 # The focus has been kept
                 enacted_interaction['focus'] = True
                 # Adjust the displacement
@@ -203,41 +208,41 @@ class CtrlRobot:
                 # Adjust the speed
                 if action == '8' and enacted_interaction['duration1'] >= 1000:
                     self.forward_speed = (self.forward_speed + translation) / 2
-                    #print("New forward speed:", self.forward_speed)
+                    # print("New forward speed:", self.forward_speed)
                 if action == '2' and enacted_interaction['duration1'] >= 1000:
                     self.backward_speed = (self.backward_speed + translation) / 2
-                    #print("New backward speed:", self.backward_speed)
+                    # print("New backward speed:", self.backward_speed)
                 if action == '4' and enacted_interaction['duration1'] >= 1000:
                     self.leftward_speed = (self.leftward_speed + translation) / 2
-                    #print("New leftward speed:", self.leftward_speed)
+                    # print("New leftward speed:", self.leftward_speed)
                 if action == '6' and enacted_interaction['duration1'] >= 1000:
                     self.rightward_speed = (self.rightward_speed + translation) / 2
-                    #print("New rightward speed:", self.rightward_speed)
+                    # print("New rightward speed:", self.rightward_speed)
             else:
                 ""
-                #print("Lost focus with distance:", distance)
+                # print("Lost focus with distance:", distance)
 
         # Return the displacement
         enacted_interaction['translation'] = translation
         enacted_interaction['displacement_matrix'] = displacement_matrix
 
         # The echo array
-        enacted_interaction["echo_array"] = [] if not "echo_array" in enacted_interaction.keys() else enacted_interaction["echo_array"]
-        for i in range(100,-99,-5):
-                    edstr = "ed"+str(i)
+        enacted_interaction["echo_array"] = [] if "echo_array" not in enacted_interaction.keys() \
+                                                  else enacted_interaction["echo_array"]
+        for i in range(100, -99, -5):
+            edstr = "ed"+str(i)
 
-                    if edstr in enacted_interaction:
-                        ha =i
-                        ed = enacted_interaction[edstr]
-                        tmp_x = ROBOT_HEAD_X + math.cos(math.radians(ha)) * ed
-                        tmp_y = math.sin(math.radians(ha)) * ed
-                        enacted_interaction['echo_array'].append((tmp_x, tmp_y))
+            if edstr in enacted_interaction:
+                ha = i
+                ed = enacted_interaction[edstr]
+                tmp_x = ROBOT_HEAD_X + math.cos(math.radians(ha)) * ed
+                tmp_y = math.sin(math.radians(ha)) * ed
+                enacted_interaction['echo_array'].append((tmp_x, tmp_y))
 
-        self.enacted_interaction = enacted_interaction
+        # self.enacted_interaction = enacted_interaction
 
         print(enacted_interaction)
 
         return enacted_interaction
 
-    def send_outcome(self) :
-        """Send the outcome of the last interaction to the workspace controller"""
+    # def send_outcome(self):
