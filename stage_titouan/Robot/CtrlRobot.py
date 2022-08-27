@@ -36,7 +36,7 @@ class CtrlRobot:
 
         self.ctrl_workspace = ctrl_workspace
 
-    def main(self,dt):
+    def main(self, dt):
         """Handle the communications with the robot."""
         if self.enact_step == 2:
             ##########
@@ -50,10 +50,11 @@ class CtrlRobot:
             self.enacted_interaction = self.translate_robot_data()
             self.outcome = self.enacted_interaction
             self.has_new_outcome = True
-            self.ctrl_workspace.update_outcome(self.outcome)
+            self.ctrl_workspace.update_enacted_interaction(self.outcome)
 
         if not self.has_new_action_to_enact:
-            self.has_new_action_to_enact, self.action_to_enact = self.ctrl_workspace.get_action_to_enact()
+            self.has_new_action_to_enact, self.action_to_enact = self.ctrl_workspace.get_intended_interaction()
+
         if self.has_new_action_to_enact and self.enact_step == 0:
             ##########
             self.ctrl_workspace.robot_ready = False
