@@ -153,7 +153,7 @@ class CtrlView:
         """Create a point of interest corresponding to the real echo given as parameter"""
         interaction = real_echo
         return PointOfInterest(interaction.x, interaction.y, self.view.batch, self.view.foreground,
-                               interaction.type, interaction=interaction)
+                               EXPERIENCE_CENTRAL_ECHO, interaction=interaction)
 
     def get_focus_phenomenon(self):
         """ Returning the first selected phenomenon """
@@ -182,8 +182,8 @@ if __name__ == "__main__":
     view_controller.view.robot.rotate_head(-45)
 
     # Add points of interest directly to the view_controller
-    view_controller.add_point_of_interest(150, 0, POINT_TRESPASS)
-    view_controller.add_point_of_interest(300, -300, POINT_ALIGNED_ECHO)
+    view_controller.add_point_of_interest(150, 0, EXPERIENCE_FLOOR)
+    view_controller.add_point_of_interest(300, -300, EXPERIENCE_ALIGNED_ECHO)
 
     # Add points of interest to the memory
     view_controller.memory.add((0, 1, 0, 0, 0, 0))

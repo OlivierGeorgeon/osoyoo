@@ -1,5 +1,5 @@
 from . Interactions.Interaction import Interaction
-from . Interactions.Interaction import EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_LOCAL_ECHO, EXPERIENCE_BLOCK, EXPERIENCE_SHOCK
+from . Interactions.Interaction import EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_LOCAL_ECHO, EXPERIENCE_BLOCK, EXPERIENCE_SHOCK, EXPERIENCE_CENTRAL_ECHO
 from webcolors import name_to_rgb
 import math
 from pyrr import matrix44
@@ -58,9 +58,11 @@ class MemoryNew:
                 shock_interaction = Interaction(110, -80, 20, 60, experience_type=EXPERIENCE_SHOCK,
                                                 durability=durability, decay_intensity=1, experience_id=self.current_id)
             if shock == 0b11:
-                shock_interaction = Interaction(110, 0, 20, 60, experience_type=EXPERIENCE_SHOCK, durability = durability, decay_intensity= 1, starArgs = 5, experience_id= self.current_id)
+                shock_interaction = Interaction(110, 0, 20, 60, experience_type=EXPERIENCE_SHOCK, durability=durability,
+                                                decay_intensity=1, experience_id=self.current_id)
             else:
-                shock_interaction = Interaction(110, 80, 20, 60, experience_type=EXPERIENCE_SHOCK, durability = durability, decay_intensity= 1, starArgs = 5, experience_id= self.current_id)
+                shock_interaction = Interaction(110, 80, 20, 60, experience_type=EXPERIENCE_SHOCK, durability=durability,
+                                                decay_intensity=1,  experience_id=self.current_id)
             self.interactions.append(shock_interaction)
         if blocked:
             block_interaction = Interaction(110, 0, 20, 60, experience_type=EXPERIENCE_BLOCK,
