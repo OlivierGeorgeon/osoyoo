@@ -39,7 +39,7 @@ class CtrlView:
                             self.memory.interactions.remove(p.interaction)
             if symbol == key.INSERT:
                 phenomenon = PointOfInterest(self.mouse_press_x, self.mouse_press_y, self.view.batch,
-                                             self.view.background, POINT_PHENOMENON)
+                                             self.view.background, EXPERIENCE_FOCUS)
                 self.points_of_interest.append(phenomenon)
                 phenomenon.is_selected = True
                 phenomenon.set_color('red')
@@ -63,28 +63,28 @@ class CtrlView:
             print("No ego memory update")
             return
 
-        interactions_list = [elem for elem in self.memory.interactions if elem.id > self.last_used_id]
-        for interaction in interactions_list:
+        # Create the new points of interest from the new experiences
+        new_experiences = [elem for elem in self.memory.interactions if elem.id > self.last_used_id]
+        for interaction in new_experiences:
             if interaction.id > self.last_used_id:
                 self.last_used_id = max(interaction.id, self.last_used_id)
             poi = self.create_points_of_interest(interaction)
             self.points_of_interest.append(poi)
 
-        real_echos_to_display = self.synthesizer.last_real_echos
-        # TODO: create point of interest from real_echos_to_display
-        for real_echo in real_echos_to_display:
-            ""
-            poi_real_echo = self.create_pointe_of_interest_from_real_echo(real_echo)
+        # The points of interest Central Echo from the list in the synthesizer
+        for experience_central_echo in self.synthesizer.experiences_central_echo:
+            poi_real_echo = self.create_point_of_interest_from_real_echo(experience_central_echo)
             self.points_of_interest.append(poi_real_echo)
-        self.synthesizer.last_real_echos = []
+        self.synthesizer.experiences_central_echo = []
 
         displacement_matrix = self.ctrl_workspace.enacted_interaction['displacement_matrix'] if 'displacement_matrix' \
             in self.ctrl_workspace.enacted_interaction else None
 
+        # Displace the points of interest
         for poi_displace in self.points_of_interest:
-            if poi_displace.type != 6:  # Do not displace the compass points
+            if poi_displace.type != POINT_COMPASS:  # Do not displace the compass points
                 poi_displace.update(displacement_matrix)
-            if poi_displace.type == 5:
+            if poi_displace.type == EXPERIENCE_FOCUS:
                 self.points_of_interest.remove(poi_displace)
                 poi_displace.delete()
 
@@ -127,29 +127,28 @@ class CtrlView:
         """Create a point of interest corresponding to the focus"""
         output = None
         # For AgentRotator
-        l_action = self.memory.last_action()
-        if l_action is not None and type(l_action) is dict and 'focus_x' in l_action:
-            ha = self.memory.last_enacted_interaction['head_angle']
-            dist = self.memory.last_enacted_interaction['echo_distance']
-            x = math.cos(math.radians(ha)) * dist
-            y = math.sin(math.radians(ha)) * dist
-            output = PointOfInterest(x, y, self.view.batch, self.view.foreground, POINT_PHENOMENON)
+        # l_action = self.memory.last_action()
+        # if l_action is not None and type(l_action) is dict and 'focus_x' in l_action:
+        #     ha = self.memory.last_enacted_interaction['head_angle']
+        #     dist = self.memory.last_enacted_interaction['echo_distance']
+        #     x = math.cos(math.radians(ha)) * dist
+        #     y = math.sin(math.radians(ha)) * dist
+        #     output = PointOfInterest(x, y, self.view.batch, self.view.foreground, EXPERIENCE_FOCUS)
+
         # For AgentCircle
         if hasattr(self.ctrl_workspace.workspace.agent, "focus"):
             if self.ctrl_workspace.workspace.agent.focus:
                 x = self.ctrl_workspace.workspace.agent.echo_xy[0]
                 y = self.ctrl_workspace.workspace.agent.echo_xy[1]
-                output = PointOfInterest(x, y, self.view.batch, self.view.foreground, POINT_PHENOMENON)
+                output = PointOfInterest(x, y, self.view.batch, self.view.foreground, EXPERIENCE_FOCUS)
         return output
 
     def create_points_of_interest(self, interaction):
         """Create a point of interest corresponding to the interaction given as parameter"""
-        # dict_interactions_to_poi = {"Shock": POINT_SHOCK, "Echo": POINT_ALIGNED_ECHO, "Echo2": POINT_LOCAL_ECHO,
-        #                             "Floor": POINT_TRESPASS, 'Block': POINT_BLOCK}
         return PointOfInterest(interaction.x, interaction.y, self.view.batch, self.view.foreground,
                                interaction.type, interaction=interaction)
 
-    def create_pointe_of_interest_from_real_echo(self, real_echo):
+    def create_point_of_interest_from_real_echo(self, real_echo):
         """Create a point of interest corresponding to the real echo given as parameter"""
         interaction = real_echo
         return PointOfInterest(interaction.x, interaction.y, self.view.batch, self.view.foreground,
@@ -158,7 +157,7 @@ class CtrlView:
     def get_focus_phenomenon(self):
         """ Returning the first selected phenomenon """
         for p in self.points_of_interest:
-            if p.type == POINT_PHENOMENON:  # and p.is_selected:
+            if p.type == EXPERIENCE_FOCUS:
                 return p
         return None
 
@@ -167,8 +166,8 @@ class CtrlView:
         if self.ctrl_workspace.flag_for_view_refresh:
             # self.points_of_interest = []
             self.update_points_of_interest()
-            if self.synthesizer is not None and len(self.synthesizer.last_real_echos) > 0:
-                last_real_echos = []
+            # if self.synthesizer is not None and len(self.synthesizer.last_real_echos) > 0:
+            #     last_real_echos = []
             self.ctrl_workspace.flag_for_view_refresh = False
 
 
@@ -186,7 +185,7 @@ if __name__ == "__main__":
     view_controller.add_point_of_interest(300, -300, EXPERIENCE_ALIGNED_ECHO)
 
     # Add points of interest to the memory
-    view_controller.memory.add((0, 1, 0, 0, 0, 0))
+    # view_controller.memory.add((0, 1, 0, 0, 0, 0))
 
     # Update the list of points of interest from memory
     last_used_id = -1
@@ -194,7 +193,7 @@ if __name__ == "__main__":
     for _interaction in _interactions_list:
         if _interaction.id > last_used_id:
             last_used_id = max(_interaction.id, last_used_id)
-        poi = view_controller.create_points_of_interest(_interaction)
-        view_controller.points_of_interest.append(poi)
+        _poi = view_controller.create_points_of_interest(_interaction)
+        view_controller.points_of_interest.append(_poi)
 
     pyglet.app.run()

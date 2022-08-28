@@ -1,8 +1,8 @@
 from ..Memory.HexaMemory.HexaGrid import HexaGrid
 from ..Misc.Utils import translate_interaction_type_to_cell_status
 from ..Memory.EgocentricMemory.Interactions.Interaction import EXPERIENCE_ALIGNED_ECHO
-from ..Memory.EgocentricMemory.Interactions.Interaction import EXPERIENCE_LOCAL_ECHO, EXPERIENCE_CENTRAL_ECHO
-from ..Memory.EgocentricMemory.Interactions.Interaction import Interaction
+# from ..Memory.EgocentricMemory.Interactions.Interaction import EXPERIENCE_LOCAL_ECHO, EXPERIENCE_CENTRAL_ECHO, EXPERIENCE_FOCUS
+from ..Memory.EgocentricMemory.Interactions.Interaction import *
 from ..Memory.HexaMemory.HexaGrid import HexaGrid
 import numpy as np
 from scipy.spatial.distance import cdist
@@ -26,7 +26,7 @@ class Synthesizer:
         self.echo_objects_to_investigate = EchoObjectsToInvestigate(3,2,self.hexa_memory,acceptable_delta = 700)
         self.echo_objects_valided = EchoObjectValidateds(hexa_memory)
         self.last_projection_for_context = []
-        self.last_real_echos = []
+        self.experiences_central_echo = []
         self.last_used_id = 0
         self.last_action_had_focus = False
         self.last_action = None
@@ -34,11 +34,11 @@ class Synthesizer:
     def act(self):
         """Handle everything the synthesizer has to do, from getting the last interactions in the memory
         to updating the hexa_memory"""
-        self.interactions_list = [elem for elem in self.memory.interactions if (elem.id>self.last_used_id)]
-        self.last_used_id = max([elem.id for elem in self.interactions_list],default = self.last_used_id)
+        self.interactions_list = [elem for elem in self.memory.interactions if (elem.id > self.last_used_id)]
+        self.last_used_id = max([elem.id for elem in self.interactions_list], default=self.last_used_id)
         echoes = [elem for elem in self.interactions_list if elem.type == EXPERIENCE_LOCAL_ECHO]
         real_echos = self.treat_echos(echoes)
-        self.last_real_echos = real_echos
+        self.experiences_central_echo = real_echos
         echo_focus, focus_lost = self.create_focus_echo()
         cells_changed = []
         action_to_return = None
@@ -63,56 +63,58 @@ class Synthesizer:
         To do so use 'strikes' which are series of consecutive echoes that are
         close enough to be considered as the same object, and consider that the
         real position of the object is at the middle of the strike"""
-        if(len(echo_list) ==1):
+        if len(echo_list) == 1:
             print(echo_list[0])
         echo_list = self.revert_echoes_to_angle_distance(echo_list)
         max_delta_dist = 160
         max_delta_angle = math.radians(20)
-        streaks = [[],[],[],[],[],[],[],[],[],[],[],[]]
-        angle_dist = [[],[],[],[],[],[],[],[],[],[],[],[]]
+        streaks = [[], [], [], [], [], [], [], [], [], [], [], []]
+        angle_dist = [[], [], [], [], [], [], [], [], [], [], [], []]
         current_id = 0
-        echo_list = sorted(echo_list, key=lambda elem: elem[0]) # on trie par angle, pour avoir les streak "préfaites"
-        for angle,distance,interaction in echo_list :
+        echo_list = sorted(echo_list, key=lambda elem: elem[0])  # on trie par angle, pour avoir les streak "préfaites"
+        for angle, distance, interaction in echo_list:
             check = False
-            for i,streak in enumerate(streaks):
+            for i, streak in enumerate(streaks):
                 if len(streak)> 0 and not check:
                     if any((abs(ele[1]-distance)<max_delta_dist and abs(angle - ele[0])<max_delta_angle) for ele in streak):
-                        streak.append((angle,distance,interaction))
-                        angle_dist[i].append((math.degrees(angle),distance))
+                        streak.append((angle, distance, interaction))
+                        angle_dist[i].append((math.degrees(angle), distance))
                         check = True
             if check:
                 continue
-            if (len(streaks[current_id]) == 0):
+            if len(streaks[current_id]) == 0:
                 streaks[current_id].append((angle,distance,interaction))
                 angle_dist[current_id].append((math.degrees(angle),distance))
             else :
                 current_id = (current_id + 1)
-                streaks[current_id].append((angle,distance,interaction))
-                angle_dist[current_id].append((math.degrees(angle),distance))
-        output = []
-        for streak in streaks :
-            if len(streak) == 0 :
+                streaks[current_id].append((angle, distance, interaction))
+                angle_dist[current_id].append((math.degrees(angle), distance))
+        experiences_central_echo = []
+        for streak in streaks:
+            if len(streak) == 0:
                 continue
-            else :
-                if len(streak)%2 == 0 :
-                    #Compute the means of x and y values for the two elements at the center of the array
+            else:
+                if len(streak) % 2 == 0:
+                    # Compute the means of x and y values for the two elements at the center of the array
                     x_mean = (streak[int(len(streak)/2)][2].x + streak[int(len(streak)/2)-1][2].x)/2
                     y_mean = (streak[int(len(streak)/2)][2].y + streak[int(len(streak)/2)-1][2].y)/2
-                    inte =Interaction(int(x_mean), int(y_mean), width=15, experience_type=EXPERIENCE_CENTRAL_ECHO, durability=5, decay_intensity=1, experience_id=0)
-                    output.append(inte)
+                    experience_central_echo = Interaction(int(x_mean), int(y_mean), width=15,
+                                                          experience_type=EXPERIENCE_CENTRAL_ECHO, durability=5,
+                                                          decay_intensity=1, experience_id=0)
+                    experiences_central_echo.append(experience_central_echo)
                 else:
-                    output.append(streak[int(len(streak)/2)][2])
-        return output
+                    experiences_central_echo.append(streak[int(len(streak)/2)][2])
+        return experiences_central_echo
 
     def revert_echoes_to_angle_distance(self, echo_list):
         """Convert echo interaction to triples (angle,distance,interaction)"""
         output = []
         for elem in echo_list:
-            #compute the angle using elem x and y
-            angle = math.atan2(elem.y,elem.x)
-            #compute the distance using elem x and y
+            # compute the angle using elem x and y
+            angle = math.atan2(elem.y, elem.x)
+            # compute the distance using elem x and y
             distance = math.sqrt(elem.x**2 + elem.y**2)
-            output.append((angle,distance,elem))
+            output.append((angle, distance, elem))
         return output
     
     def apply_translation_to_hexa_memory(self, translation_between_echo_and_context):
@@ -157,14 +159,14 @@ class Synthesizer:
     def create_focus_echo(self):
         """Create a echo interaction corresponding to the focus"""
         focus_lost = False
-        if self.last_action_had_focus :
+        if self.last_action_had_focus:
             distance = self.memory.last_enacted_interaction['echo_distance']
             if distance > 800 and (self.last_action is not None) and not (self.last_action == "-" or self.last_action['action'] == "-"):
                 focus_lost = True
             angle = self.memory.last_enacted_interaction['head_angle']
             x = int(distance * math.cos(math.radians(angle)))
             y = int(distance * math.sin(math.radians(angle)))
-            interaction_focus = Interaction(x, y, width = 15, experience_type= EXPERIENCE_LOCAL_ECHO, durability = 5, decay_intensity= 1, experience_id= 0)
-            return [interaction_focus],focus_lost
+            interaction_focus = Interaction(x, y, width=15, experience_type=EXPERIENCE_FOCUS, durability=5, decay_intensity=1, experience_id=0)
+            return [interaction_focus], focus_lost
         else:
             return [], focus_lost

@@ -16,7 +16,6 @@ class Workspace:
         self.agent = None
 
         self.user_action = None
-        # FLAGS:
         self.need_user_action = False
         self.enact_step = 0
         self.need_treatment_flag = False
@@ -29,15 +28,12 @@ class Workspace:
         self.f_reset_flag = False
 
         self.intended_interaction = {}
-        # self.agent_action = None
         self.f_agent_action_ready = False
-        # self.action_angle = None
 
         self.CONTROL_MODE_AUTOMATIC = "auto"
         self.CONTROL_MODE_MANUAL = "manual"
         self.control_mode = self.CONTROL_MODE_MANUAL
 
-        # self.enacted_interaction = {} Commenté par Olivier le 5/6/2022
         self.f_enacted_interaction_has_changed = False
         self.f_new_things_in_memory = False
         self.f_ready_for_next_loop = True

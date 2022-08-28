@@ -8,6 +8,7 @@ EXPERIENCE_CENTRAL_ECHO = 'Central_Echo'
 EXPERIENCE_BLOCK = 'Block'
 EXPERIENCE_SHOCK = 'Shock'
 EXPERIENCE_FLOOR = 'Floor'
+EXPERIENCE_FOCUS = 'Focus'
 
 
 class Interaction:

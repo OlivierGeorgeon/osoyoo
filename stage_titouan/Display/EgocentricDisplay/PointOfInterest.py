@@ -7,7 +7,7 @@ from ... Memory.EgocentricMemory.Interactions.Interaction import *
 # Points of interest that only exist in Egocentric Display
 # (points of interest attached to an interaction have the same type as their interactions)
 POINT_PLACE = 4
-POINT_PHENOMENON = 5
+# POINT_PHENOMENON = 5
 POINT_COMPASS = 6
 
 
@@ -53,8 +53,8 @@ class PointOfInterest:
             self.points = [0, 0, 40, -30, 40, 30]
             self.shape = self.batch.add_indexed(3, gl.GL_TRIANGLES, self.group, [0, 1, 2], ('v2i', self.points),
                                                 ('c3B', 3 * name_to_rgb("salmon")))
-        if self.type == POINT_PHENOMENON:
-            # Phenomenon: tomato
+        if self.type == EXPERIENCE_FOCUS:
+            # Focus: fireBrick hexagon
             self.points = [40, 0, 20, 34, -20, 34, -40, 0, -20, -34, 20, -34]
             self.shape = self.batch.add_indexed(6, gl.GL_TRIANGLES, group, [0, 1, 2, 0, 2, 3, 0, 3, 4, 0, 4, 5],
                                                 ('v2i', self.points), ('c4B', 6 * (*name_to_rgb("fireBrick"), 128)))
@@ -90,12 +90,12 @@ class PointOfInterest:
             if self.type == EXPERIENCE_BLOCK:
                 # Pushing: yellow triangle
                 self.shape.color = name_to_rgb("yellow")
-            if self.type == POINT_PHENOMENON:
+            if self.type == EXPERIENCE_FOCUS:
                 self.shape.colors[0:24] = 6 * (*name_to_rgb("fireBrick"), 128)
         else:
             if self.type == POINT_PLACE:
                 self.shape.colors[0:9] = 3 * name_to_rgb(color_name)
-            elif self.type == POINT_PHENOMENON:
+            elif self.type == EXPERIENCE_FOCUS:
                 self.shape.colors[0:24] = 6 * (*name_to_rgb(color_name), 200)
             else:
                 self.shape.color = name_to_rgb(color_name)
