@@ -1,7 +1,7 @@
 from ..Memory.HexaMemory.HexaGrid import HexaGrid
 from ..Misc.Utils import translate_interaction_type_to_cell_status
 from ..Memory.EgocentricMemory.Interactions.Interaction import EXPERIENCE_ALIGNED_ECHO
-from ..Memory.EgocentricMemory.Interactions.Interaction import EXPERIENCE_LOCAL_ECHO
+from ..Memory.EgocentricMemory.Interactions.Interaction import EXPERIENCE_LOCAL_ECHO, EXPERIENCE_CENTRAL_ECHO
 from ..Memory.EgocentricMemory.Interactions.Interaction import Interaction
 from ..Memory.HexaMemory.HexaGrid import HexaGrid
 import numpy as np
@@ -36,7 +36,7 @@ class Synthesizer:
         to updating the hexa_memory"""
         self.interactions_list = [elem for elem in self.memory.interactions if (elem.id>self.last_used_id)]
         self.last_used_id = max([elem.id for elem in self.interactions_list],default = self.last_used_id)
-        echoes = [elem for elem in self.interactions_list if elem.type == "Echo2"]
+        echoes = [elem for elem in self.interactions_list if elem.type == EXPERIENCE_LOCAL_ECHO]
         real_echos = self.treat_echos(echoes)
         self.last_real_echos = real_echos
         echo_focus, focus_lost = self.create_focus_echo()
@@ -50,7 +50,7 @@ class Synthesizer:
             objects_validated = self.echo_objects_to_investigate.validate()
             self.echo_objects_valided.add_objects(objects_validated)
             self.echo_objects_to_investigate.create_news(real_echos)
-            cells_changed = self.synthesize([elem for elem in self.interactions_list if elem.type != "Echo" and elem.type != "Echo2"])
+            cells_changed = self.synthesize([elem for elem in self.interactions_list if elem.type != "Echo" and elem.type != EXPERIENCE_LOCAL_ECHO])
             action_to_return = None
             if self.echo_objects_to_investigate.need_more_sweeps():
                 action_to_return = "-"  # The synthesizer need to scan again
@@ -60,7 +60,7 @@ class Synthesizer:
         """In case of a sweep we obtain an array of echo, this function discretize 
         it to try to find the real position of the objects that sent back the echo
         
-        To do so use 'strikes' wich are series of consecutives echoes that are
+        To do so use 'strikes' which are series of consecutive echoes that are
         close enough to be considered as the same object, and consider that the
         real position of the object is at the middle of the strike"""
         if(len(echo_list) ==1):
@@ -98,9 +98,9 @@ class Synthesizer:
                     #Compute the means of x and y values for the two elements at the center of the array
                     x_mean = (streak[int(len(streak)/2)][2].x + streak[int(len(streak)/2)-1][2].x)/2
                     y_mean = (streak[int(len(streak)/2)][2].y + streak[int(len(streak)/2)-1][2].y)/2
-                    inte =Interaction(int(x_mean), int(y_mean), width = 15, experience_type= EXPERIENCE_LOCAL_ECHO, shape ='Circle', color ='orange', durability = 5, decay_intensity= 1, experience_id= 0)
+                    inte =Interaction(int(x_mean), int(y_mean), width=15, experience_type=EXPERIENCE_CENTRAL_ECHO, durability=5, decay_intensity=1, experience_id=0)
                     output.append(inte)
-                else :
+                else:
                     output.append(streak[int(len(streak)/2)][2])
         return output
 

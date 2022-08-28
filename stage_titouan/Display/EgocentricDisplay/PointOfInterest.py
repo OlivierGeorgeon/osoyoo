@@ -4,14 +4,6 @@ from pyrr import matrix44, Quaternion
 from webcolors import name_to_rgb
 from ... Memory.EgocentricMemory.Interactions.Interaction import *
 
-# Points of interest that show experiences must have the same type
-# POINT_ALIGNED_ECHO = EXPERIENCE_ALIGNED_ECHO
-# POINT_LOCAL_ECHO = EXPERIENCE_LOCAL_ECHO
-# POINT_CENTRAL_ECHO = EXPERIENCE_CENTRAL_ECHO
-# POINT_TRESPASS = EXPERIENCE_FLOOR
-# POINT_SHOCK = EXPERIENCE_SHOCK
-# POINT_BLOCK = EXPERIENCE_BLOCK
-
 # Points of interest that only exist in Egocentric Display
 # (points of interest attached to an interaction have the same type as their interactions)
 POINT_PLACE = 4
@@ -41,10 +33,10 @@ class PointOfInterest:
             self.shape.group = group
         if self.type == EXPERIENCE_LOCAL_ECHO:
             # Echo: Orange circle
-            self.shape = shapes.Circle(0, 0, 7, color=name_to_rgb("DarkOrchid"), batch=self.batch)
+            self.shape = shapes.Circle(0, 0, 7, color=name_to_rgb("sienna"), batch=self.batch)
         if self.type == EXPERIENCE_CENTRAL_ECHO:
             # Echo: Orange circle
-            self.shape = shapes.Circle(0, 0, 20, color=name_to_rgb("DarkOrchid"), batch=self.batch)
+            self.shape = shapes.Circle(0, 0, 20, color=name_to_rgb("sienna"), batch=self.batch)
             self.shape.group = group
         if self.type == EXPERIENCE_FLOOR:
             # Trespassing: black dash
@@ -86,9 +78,9 @@ class PointOfInterest:
             if self.type == EXPERIENCE_ALIGNED_ECHO:
                 self.shape.color = name_to_rgb("orange")
             if self.type == EXPERIENCE_LOCAL_ECHO:
-                self.shape.color = name_to_rgb("DarkOrange")
+                self.shape.color = name_to_rgb("sienna")
             if self.type == EXPERIENCE_CENTRAL_ECHO:
-                self.shape.color = name_to_rgb("DarkOrange")
+                self.shape.color = name_to_rgb("sienna")
             if self.type == EXPERIENCE_FLOOR:
                 # Trespassing: black dash
                 self.shape.color = name_to_rgb("black")
