@@ -52,9 +52,9 @@ class CtrlHexaview:
 
     def main(self, dt):
         """blaqbla"""
-        if self.refresh_count > 500 :
+        if self.refresh_count > 500:
             self.refresh_count = 0
-        if self.refresh_count == 0 :
+        if self.refresh_count == 0:
             #print("RESET BASE HEXAVIEW")
             self.hexaview.shapesList = []
             self.hexaview.extract_and_convert_interactions(self.hexa_memory)

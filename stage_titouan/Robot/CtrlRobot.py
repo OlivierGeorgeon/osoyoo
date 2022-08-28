@@ -76,7 +76,16 @@ class CtrlRobot:
             print(self.outcome_bytes)
             self.enact_step = ENACT_STEP_END  # Now we have received the outcome from the robot
 
-        # print("COMMAND ROBOT : intended_interaction ", intended_interaction)
+        # Add the estimated speed to the intended_interaction
+        if intended_interaction['action'] == '8':
+            intended_interaction['speed'] = int(self.forward_speed[0])
+        if intended_interaction['action'] == '2':
+            intended_interaction['speed'] = -int(self.backward_speed[0])
+        if intended_interaction['action'] == '4':
+            intended_interaction['speed'] = int(self.leftward_speed[1])
+        if intended_interaction['action'] == '6':
+            intended_interaction['speed'] = -int(self.rightward_speed[1])
+
         self.intended_interaction = intended_interaction
         self.enact_step = ENACT_STEP_ENACTING  # Now we send the intended interaction to the robot for enaction
         thread = threading.Thread(target=enact_thread)
@@ -137,7 +146,7 @@ class CtrlRobot:
 
         # Interaction trespassing
         if enacted_interaction['floor'] > 0:
-            enacted_interaction['points'].append((INTERACTION_TRESPASSING, LINE_X, 0))
+            enacted_interaction['points'].append((EXPERIENCE_FLOOR, LINE_X, 0))
             # The resulting translation
             translation[0] -= RETREAT_DISTANCE
             if enacted_interaction['floor'] == 0b01:  # Black line on the right
@@ -153,23 +162,23 @@ class CtrlRobot:
                                  * enacted_interaction['echo_distance'])
                 echo_xy[1] = int(math.sin(math.radians(enacted_interaction['head_angle']))
                                  * enacted_interaction['echo_distance'])
-                enacted_interaction['points'].append((INTERACTION_ECHO, *echo_xy)) 
+                enacted_interaction['points'].append((EXPERIENCE_ALIGNED_ECHO, *echo_xy))
                 # Return the echo_xy to possibly use as focus
                 enacted_interaction['echo_xy'] = echo_xy
 
         # Interaction shock
         if 'shock' in enacted_interaction and action == '8':
             if enacted_interaction['shock'] == 0b01:  # Shock on the right
-                enacted_interaction['points'].append((INTERACTION_SHOCK, ROBOT_FRONT_X, -ROBOT_FRONT_Y))
+                enacted_interaction['points'].append((EXPERIENCE_SHOCK, ROBOT_FRONT_X, -ROBOT_FRONT_Y))
             if enacted_interaction['shock'] == 0b11:  # Shock on the front
-                enacted_interaction['points'].append((INTERACTION_SHOCK, ROBOT_FRONT_X, 0))
+                enacted_interaction['points'].append((EXPERIENCE_SHOCK, ROBOT_FRONT_X, 0))
             if enacted_interaction['shock'] == 0b10:  # Shock on the left
-                enacted_interaction['points'].append((INTERACTION_SHOCK, ROBOT_FRONT_X, ROBOT_FRONT_Y))
+                enacted_interaction['points'].append((EXPERIENCE_SHOCK, ROBOT_FRONT_X, ROBOT_FRONT_Y))
 
         # Interaction block
         if 'blocked' in enacted_interaction and action == '8':
             if enacted_interaction['blocked']:
-                enacted_interaction['points'].append((INTERACTION_BLOCK, ROBOT_FRONT_X, 0))
+                enacted_interaction['points'].append((EXPERIENCE_BLOCK, ROBOT_FRONT_X, 0))
                 translation[0] = 0  # Cancel forward translation
 
         # The estimated displacement of the environment relative to the robot caused by this interaction

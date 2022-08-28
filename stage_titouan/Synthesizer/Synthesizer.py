@@ -1,7 +1,7 @@
 from ..Memory.HexaMemory.HexaGrid import HexaGrid
 from ..Misc.Utils import translate_interaction_type_to_cell_status
-from ..Memory.EgocentricMemory.Interactions.Interaction import INTERACTION_ECHO
-from ..Memory.EgocentricMemory.Interactions.Interaction import INTERACTION_ECHO2
+from ..Memory.EgocentricMemory.Interactions.Interaction import EXPERIENCE_ALIGNED_ECHO
+from ..Memory.EgocentricMemory.Interactions.Interaction import EXPERIENCE_LOCAL_ECHO
 from ..Memory.EgocentricMemory.Interactions.Interaction import Interaction
 from ..Memory.HexaMemory.HexaGrid import HexaGrid
 import numpy as np
@@ -98,7 +98,7 @@ class Synthesizer:
                     #Compute the means of x and y values for the two elements at the center of the array
                     x_mean = (streak[int(len(streak)/2)][2].x + streak[int(len(streak)/2)-1][2].x)/2
                     y_mean = (streak[int(len(streak)/2)][2].y + streak[int(len(streak)/2)-1][2].y)/2
-                    inte =Interaction(int(x_mean),int(y_mean),width = 15,type = INTERACTION_ECHO2, shape = 'Circle', color = 'orange', durability = 5, decayIntensity = 1, id = 0)
+                    inte =Interaction(int(x_mean), int(y_mean), width = 15, experience_type= EXPERIENCE_LOCAL_ECHO, shape ='Circle', color ='orange', durability = 5, decay_intensity= 1, experience_id= 0)
                     output.append(inte)
                 else :
                     output.append(streak[int(len(streak)/2)][2])
@@ -164,7 +164,7 @@ class Synthesizer:
             angle = self.memory.last_enacted_interaction['head_angle']
             x = int(distance * math.cos(math.radians(angle)))
             y = int(distance * math.sin(math.radians(angle)))
-            interaction_focus = Interaction(x,y,width = 15,type = INTERACTION_ECHO2, shape = 'Circle', color = 'orange', durability = 5, decayIntensity = 1, id = 0)
+            interaction_focus = Interaction(x, y, width = 15, experience_type= EXPERIENCE_LOCAL_ECHO, durability = 5, decay_intensity= 1, experience_id= 0)
             return [interaction_focus],focus_lost
         else:
             return [], focus_lost

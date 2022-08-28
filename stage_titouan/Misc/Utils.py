@@ -1,6 +1,6 @@
 from pyglet.gl import *
 from pyglet import shapes
-from .. Memory.EgocentricMemory.Interactions.Interaction import Interaction,INTERACTION_TRESPASSING, INTERACTION_ECHO,INTERACTION_ECHO2, INTERACTION_BLOCK, INTERACTION_SHOCK
+from .. Memory.EgocentricMemory.Interactions.Interaction import Interaction,EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO,EXPERIENCE_LOCAL_ECHO, EXPERIENCE_BLOCK, EXPERIENCE_SHOCK
 from webcolors import name_to_rgb
 import math
 import random
@@ -40,7 +40,7 @@ def interaction_to_pyglet(interaction,batch):
          # Triangle: collision
          # Pressing interaction: orange triangle
          final = shapes.Star(x, y, width, height, num_spikes = p.starArgs, color=p.rgb, batch=batch)
-     final.opacity = (p.actual_durability/p.durability * 255)
+     final.opacity = (p.durability / p.durability * 255)
 
      final.rotation = p.rotation
      return final
@@ -225,13 +225,13 @@ def recently_changed_to_pyglet(hexaMemory,batch,to_reset = [],projections = []):
 
 def translate_interaction_type_to_cell_status(type):
     """Free Blocked Occupied Frontier Something"""
-    if(type == INTERACTION_TRESPASSING):
+    if(type == EXPERIENCE_FLOOR):
         return "Frontier"
-    elif(type == INTERACTION_SHOCK or type == INTERACTION_BLOCK):
+    elif(type == EXPERIENCE_SHOCK or type == EXPERIENCE_BLOCK):
         return "Blocked"
-    elif(type == INTERACTION_ECHO):
+    elif(type == EXPERIENCE_ALIGNED_ECHO):
         return "Something"
-    elif(type == INTERACTION_ECHO2):
+    elif(type == EXPERIENCE_LOCAL_ECHO):
         return "Something"
     print("Problemo problemo utils translate mauvaise interaction type : ", type)
     return "Free"

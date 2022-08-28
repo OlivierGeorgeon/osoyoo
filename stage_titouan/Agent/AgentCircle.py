@@ -71,7 +71,7 @@ class AgentCircle:
         """ Computing the anticipation """
         self.anticipated_outcome = None
 
-        intended_interaction = {'action': self._action, 'speed': FORWARD_SPEED}
+        intended_interaction = {'action': self._action}  # , 'speed': FORWARD_SPEED}
         if self.focus:
             intended_interaction['focus_x'] = self.echo_xy[0]
             intended_interaction['focus_y'] = self.echo_xy[1]
@@ -98,22 +98,25 @@ class AgentCircle:
             else:
                 outcome = OUTCOME_FAR_RIGHT  # More that -150 to the right
 
-        # Check if the agent lost the focus
+        # Manage the focus
         if self.focus:
+            # TODO Fix the display position of the focus
+            # if 'focus' in enacted_interaction:
+            #     if 'echo_xy' in enacted_interaction:
+
+            # Check if the agent lost the focus
             if 'focus' not in enacted_interaction:
                 # The focus was lost, override the echo outcome
                 self.focus = False
                 outcome = OUTCOME_LOST_FOCUS
                 print("LOST FOCUS")
-
-        # Catch focus
-        print("outcome", self._action, outcome)
-        if self._action in [ACTION_SCAN, ACTION_FORWARD]:
-            if outcome in [OUTCOME_LEFT, OUTCOME_FAR_LEFT, OUTCOME_RIGHT, OUTCOME_FAR_RIGHT, OUTCOME_FAR_FRONT,
-                           OUTCOME_CLOSE_FRONT]:
-                # Found focus
-                print("CATCH FOCUS")
-                self.focus = True
+        else:
+            if self._action in [ACTION_SCAN, ACTION_FORWARD]:
+                # Catch focus
+                if outcome in [OUTCOME_LEFT, OUTCOME_FAR_LEFT, OUTCOME_RIGHT, OUTCOME_FAR_RIGHT, OUTCOME_FAR_FRONT,
+                               OUTCOME_CLOSE_FRONT]:
+                    print("CATCH FOCUS")
+                    self.focus = True
 
         # If not focus then no circle behavior outcome
         # if not self.focus and outcome != OUTCOME_LOST_FOCUS:

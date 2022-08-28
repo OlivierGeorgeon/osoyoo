@@ -108,7 +108,7 @@ class CtrlView:
         # Make the points of interest fade out using the durability of the given interaction
         if len(self.points_of_interest) > 0:
             for poi_fade in self.points_of_interest:
-                if poi_fade is not None and poi_fade.interaction is not None :
+                if poi_fade is not None and poi_fade.interaction is not None:
                     
                     if isinstance(poi_fade.shape, pyglet.graphics.vertexdomain.IndexedVertexList):
                         for s in poi_fade.shape.colors:
@@ -144,16 +144,16 @@ class CtrlView:
 
     def create_points_of_interest(self, interaction):
         """Create a point of interest corresponding to the interaction given as parameter"""
-        dict_interactions_to_poi = {"Shock": POINT_SHOCK, "Echo": POINT_ECHO, "Echo2": POINT_TINY_ECHO,
-                                    "Trespassing": POINT_TRESPASS, 'Block': POINT_BLOCK}
+        # dict_interactions_to_poi = {"Shock": POINT_SHOCK, "Echo": POINT_ALIGNED_ECHO, "Echo2": POINT_LOCAL_ECHO,
+        #                             "Floor": POINT_TRESPASS, 'Block': POINT_BLOCK}
         return PointOfInterest(interaction.x, interaction.y, self.view.batch, self.view.foreground,
-                               dict_interactions_to_poi[interaction.type], interaction=interaction)
+                               interaction.type, interaction=interaction)
 
     def create_pointe_of_interest_from_real_echo(self, real_echo):
         """Create a point of interest corresponding to the real echo given as parameter"""
         interaction = real_echo
         return PointOfInterest(interaction.x, interaction.y, self.view.batch, self.view.foreground,
-                               POINT_ECHO, interaction=interaction)
+                               interaction.type, interaction=interaction)
 
     def get_focus_phenomenon(self):
         """ Returning the first selected phenomenon """
@@ -183,7 +183,7 @@ if __name__ == "__main__":
 
     # Add points of interest directly to the view_controller
     view_controller.add_point_of_interest(150, 0, POINT_TRESPASS)
-    view_controller.add_point_of_interest(300, -300, POINT_ECHO)
+    view_controller.add_point_of_interest(300, -300, POINT_ALIGNED_ECHO)
 
     # Add points of interest to the memory
     view_controller.memory.add((0, 1, 0, 0, 0, 0))

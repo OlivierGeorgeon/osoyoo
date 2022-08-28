@@ -1,5 +1,5 @@
 from . Interactions.Interaction import Interaction
-from . Interactions.Interaction import INTERACTION_TRESPASSING, INTERACTION_ECHO, INTERACTION_ECHO2, INTERACTION_BLOCK, INTERACTION_SHOCK
+from . Interactions.Interaction import EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_LOCAL_ECHO, EXPERIENCE_BLOCK, EXPERIENCE_SHOCK
 from webcolors import name_to_rgb
 import math
 from pyrr import matrix44
@@ -33,7 +33,7 @@ class MemoryNew:
         """ Add interactions from the enacted interaction """
         self.last_enacted_interaction = enacted_interaction
         for p in enacted_interaction['points']:
-            interaction = Interaction(p[1], p[2], 10, 10, type=p[0], id=self.current_id, durability = INTERACTION_PERSISTENCE)  # TODO Adjust the parameters
+            interaction = Interaction(p[1], p[2], 10, 10, experience_type=p[0], experience_id=self.current_id, durability = INTERACTION_PERSISTENCE)  # TODO Adjust the parameters
             self.interactions.append(interaction)
             self.current_id += 1
         
@@ -43,49 +43,47 @@ class MemoryNew:
             phenom_info : (floor,shock,blocked)
         Author : TKnockaert
         """
-        x = 10
-        y = 10
+        # x = 10
+        # y = 10
         floor, shock, blocked, obstacle, x, y = phenom_info
         durability = INTERACTION_PERSISTENCE
 
         if floor:
-            floorInter = Interaction(30, 0, 10, 60, type=INTERACTION_TRESPASSING, shape='Rectangle', color='black',
-                                     durability=durability, decayIntensity=1, id=self.current_id)
-            self.interactions.append(floorInter)
+            floor_interaction = Interaction(30, 0, 10, 60, experience_type=EXPERIENCE_FLOOR,
+                                            durability=durability, decay_intensity=1, experience_id=self.current_id)
+            self.interactions.append(floor_interaction)
         if shock:
-            shockInter = None
+            shock_interaction = None
             if shock == 0b01:
-                shockInter = Interaction(110, -80, 20, 60, type=INTERACTION_SHOCK, shape='Star', color='yellow',
-                                         durability=durability, decayIntensity=1, starArgs=5, id=self.current_id)
-                #Star(x, y, outer_radius, inner_radius, num_spikes, rotation=0, color=(255, 255, 255), batch=None, group=None)
+                shock_interaction = Interaction(110, -80, 20, 60, experience_type=EXPERIENCE_SHOCK,
+                                                durability=durability, decay_intensity=1, experience_id=self.current_id)
             if shock == 0b11:
-                shockInter = Interaction(110,0,20,60, type = INTERACTION_SHOCK, shape = 'Star',color = 'yellow', durability = durability, decayIntensity = 1, starArgs = 5, id = self.current_id)
+                shock_interaction = Interaction(110, 0, 20, 60, experience_type=EXPERIENCE_SHOCK, durability = durability, decay_intensity= 1, starArgs = 5, experience_id= self.current_id)
             else:
-                shockInter = Interaction(110,80,20,60, type = INTERACTION_SHOCK, shape = 'Star',color = 'yellow', durability = durability, decayIntensity = 1, starArgs = 5, id = self.current_id)
-            self.interactions.append(shockInter)
+                shock_interaction = Interaction(110, 80, 20, 60, experience_type=EXPERIENCE_SHOCK, durability = durability, decay_intensity= 1, starArgs = 5, experience_id= self.current_id)
+            self.interactions.append(shock_interaction)
         if blocked:
-            blockInter = Interaction(110, 0, 20, 60, type=INTERACTION_BLOCK, shape='Star', color='red',
-                                     durability=durability, decayIntensity=1, starArgs=6, id=self.current_id)
-            self.interactions.append(blockInter)
+            block_interaction = Interaction(110, 0, 20, 60, experience_type=EXPERIENCE_BLOCK,
+                                            durability=durability, decay_intensity=1, experience_id=self.current_id)
+            self.interactions.append(block_interaction)
 
         if obstacle:
-            obstacleInter = Interaction(x, y, width=5, type=INTERACTION_ECHO, shape='Circle', color='orange',
-                                        durability=durability, decayIntensity=1, id=self.current_id)
-            self.interactions.append(obstacleInter)
+            obstacle_interaction = Interaction(x, y, width=5, experience_type=EXPERIENCE_ALIGNED_ECHO,
+                                               durability=durability, decay_intensity=1, experience_id=self.current_id)
+            self.interactions.append(obstacle_interaction)
         
         self.current_id += 1
         
     def add_echo_array(self, echo_array):
         """Convert echo array given as parameter to a list of interaction objects and add it to  self.interactions"""
         durability = INTERACTION_PERSISTENCE
-        for _,echo in enumerate(echo_array):
+        for _, echo in enumerate(echo_array):
             x = echo[0]
             #print("add_echo_array, x :",x)
             y = echo[1]
-            obstacleInter = Interaction(x, y, width=15, type=INTERACTION_ECHO2, shape='Circle', color='orange',
-                                        durability=durability, decayIntensity=1, id=self.current_id)
-            # obstacleInter = Interaction(x,y,width = 15,type = INTERACTION_ECHO2, shape = 'Circle', color = 'orange', durability = durability, decayIntensity = 1, id = self.current_id)
-            self.interactions.append(obstacleInter)
+            local_echo_interaction = Interaction(x, y, width=15, experience_type=EXPERIENCE_LOCAL_ECHO,
+                                                 durability=durability, decay_intensity=1, experience_id=self.current_id)
+            self.interactions.append(local_echo_interaction)
             self.current_id += 1
 
     def tick(self):
