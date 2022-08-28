@@ -25,14 +25,8 @@ class CtrlRobot:
         self.wifiInterface = WifiInterface(robot_ip)
         self.azimuth = 0  # Integrated from the yaw if the robot does not return compass data
 
-        self.has_new_action_to_enact = False
-        self.robot_has_finished_acting = False
-
-        # self.robot_has_started_acting = False
-        # self.has_new_outcome = False
-        # self.action_to_enact = None
-        # self.outcome = None
-        # self.enacted_interaction = {}
+        # self.has_new_action_to_enact = False
+        # self.robot_has_finished_acting = False
 
         self.forward_speed = numpy.array([FORWARD_SPEED, 0])  # Need numpy arrays to compute average
         self.backward_speed = numpy.array([-FORWARD_SPEED, 0])
@@ -41,43 +35,37 @@ class CtrlRobot:
 
         # Used in an asynchronous Thread
         self.enact_step = ENACT_STEP_IDLE
-        self.intended_interaction = None  # {'action': "8"}  # Need random initialization
-        self.outcome_bytes = None  # b'{"status":"T"}'  # Default status T timeout
+        self.intended_interaction = None  # Need random initialization
+        self.outcome_bytes = None  # Default status T timeout
 
     def main(self, dt):
-        """Handle the communications with the robot."""
+        """Handle the communication with the robot."""
         if self.enact_step == ENACT_STEP_END:
-            ##########
             self.ctrl_workspace.robot_ready = True
-            ##########
-            # self.robot_has_started_acting = False
-            self.robot_has_finished_acting = True
+            # self.robot_has_finished_acting = True
             self.enact_step = ENACT_STEP_IDLE
-
-        if self.robot_has_finished_acting:
-            self.robot_has_finished_acting = False
+        # if self.robot_has_finished_acting:
+            # self.robot_has_finished_acting = False
             enacted_interaction = self.translate_robot_data()
-            # self.outcome = self.enacted_interaction
-            # self.has_new_outcome = True
             self.ctrl_workspace.update_enacted_interaction(enacted_interaction)
 
-        intended_interaction = None
-        if not self.has_new_action_to_enact:
-            self.has_new_action_to_enact, intended_interaction = self.ctrl_workspace.get_intended_interaction()
+        # intended_interaction = None
+        # if not self.has_new_action_to_enact:
+        #     self.has_new_action_to_enact, intended_interaction = self.ctrl_workspace.get_intended_interaction()
+        #
+        # if self.has_new_action_to_enact and self.enact_step == ENACT_STEP_IDLE:
+        #     self.ctrl_workspace.robot_ready = False
+        #     self.command_robot(intended_interaction)
+        #     self.has_new_action_to_enact = False
 
-        if self.has_new_action_to_enact and self.enact_step == ENACT_STEP_IDLE:
-            ##########
-            self.ctrl_workspace.robot_ready = False
-            ##########
-            self.command_robot(intended_interaction)
-            self.has_new_action_to_enact = False
-            # self.robot_has_started_acting = True
+        if self.enact_step == ENACT_STEP_IDLE:
+            # self.has_new_action_to_enact, intended_interaction = self.ctrl_workspace.get_intended_interaction()
+            intended_interaction = self.ctrl_workspace.get_intended_interaction()
+            if intended_interaction is not None:
+                self.command_robot(intended_interaction)
 
     def command_robot(self, intended_interaction):
         """ Creating an asynchronous thread to send the command to the robot and to wait for the outcome """
-        # self.outcome_bytes = "Waiting"
-        # if isinstance(intended_interaction, str):
-        #     intended_interaction = {'action': intended_interaction}
 
         def enact_thread():
             """ Sending the command to the robot and waiting for the outcome """
@@ -88,7 +76,6 @@ class CtrlRobot:
             print(self.outcome_bytes)
             self.enact_step = ENACT_STEP_END  # Now we have received the outcome from the robot
 
-        # self.action = action
         # print("COMMAND ROBOT : intended_interaction ", intended_interaction)
         self.intended_interaction = intended_interaction
         self.enact_step = ENACT_STEP_ENACTING  # Now we send the intended interaction to the robot for enaction
@@ -231,8 +218,7 @@ class CtrlRobot:
 
         # The echo array
         if "echo_array" not in enacted_interaction:
-            enacted_interaction["echo_array"] = []  # if "echo_array" not in enacted_interaction.keys() \
-                                                    # else enacted_interaction["echo_array"]
+            enacted_interaction["echo_array"] = []
         # Compute the position of each echo point in the echo array
         for i in range(100, -99, -5):
             ed_str = "ed"+str(i)
@@ -243,10 +229,6 @@ class CtrlRobot:
                 tmp_y = math.sin(math.radians(ha)) * ed
                 enacted_interaction['echo_array'].append((tmp_x, tmp_y))
 
-        # self.enacted_interaction = enacted_interaction
-
         print(enacted_interaction)
 
         return enacted_interaction
-
-    # def send_outcome(self):

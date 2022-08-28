@@ -89,12 +89,14 @@ class CtrlWorkspace:
             self.has_new_action = False
             if 'focus_x' in self.intended_interaction:
                 self.workspace.synthesizer.last_action_had_focus = True
-            returno = True, self.intended_interaction
+            # returno = True, self.intended_interaction
+            returno = self.intended_interaction
             self.intended_interaction = None
             return returno
         else:
-            return False, None
-        
+            # return False, None
+            return None
+
     def set_action(self, action):
         """Set the action to enact (called by CtrlHexaview)"""
         self.intended_interaction = action
