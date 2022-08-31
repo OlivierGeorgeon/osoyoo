@@ -94,16 +94,27 @@ class Synthesizer:
             if len(streak) == 0:
                 continue
             else:
+                x_mean, y_mean = 0, 0
                 if len(streak) % 2 == 0:
                     # Compute the means of x and y values for the two elements at the center of the array
                     x_mean = (streak[int(len(streak)/2)][2].x + streak[int(len(streak)/2)-1][2].x)/2
                     y_mean = (streak[int(len(streak)/2)][2].y + streak[int(len(streak)/2)-1][2].y)/2
-                    experience_central_echo = Interaction(int(x_mean), int(y_mean), width=15,
-                                                          experience_type=EXPERIENCE_CENTRAL_ECHO, durability=5,
-                                                          decay_intensity=1, experience_id=0)
-                    experiences_central_echo.append(experience_central_echo)
+                    # experience_central_echo = Interaction(int(x_mean), int(y_mean), width=15,
+                    #                                       experience_type=EXPERIENCE_CENTRAL_ECHO, durability=5,
+                    #                                       decay_intensity=1, experience_id=0)
+                    # experiences_central_echo.append(experience_central_echo)
+                    # self.memory.interactions.append(experience_central_echo)  # OG add to memory for displacement update
                 else:
-                    experiences_central_echo.append(streak[int(len(streak)/2)][2])
+                    # The x and y are at the center of the array
+                    x_mean = streak[int(len(streak) / 2)][2].x
+                    y_mean = streak[int(len(streak) / 2)][2].y
+                    # experiences_central_echo.append(streak[int(len(streak)/2)][2])
+                experience_central_echo = Interaction(int(x_mean), int(y_mean), width=15,
+                                                      experience_type=EXPERIENCE_CENTRAL_ECHO, durability=5,
+                                                      decay_intensity=1, experience_id=0)
+                experiences_central_echo.append(experience_central_echo)
+                self.memory.interactions.append(experience_central_echo)  # OG add to memory for displacement update
+
         return experiences_central_echo
 
     def revert_echoes_to_angle_distance(self, echo_list):

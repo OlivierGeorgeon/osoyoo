@@ -6,9 +6,8 @@ from ... Memory.EgocentricMemory.Interactions.Interaction import *
 
 # Points of interest that only exist in Egocentric Display
 # (points of interest attached to an interaction have the same type as their interactions)
-POINT_PLACE = 4
-# POINT_PHENOMENON = 5
-POINT_COMPASS = 6
+POINT_PLACE = 'Place'
+POINT_COMPASS = 'Compass'
 
 
 class PointOfInterest:
@@ -161,7 +160,7 @@ class PointOfInterest:
         """ Displace the point of interest to the position of its interaction
         or by the displacement_matrix provided as an argument"""
 
-        # If this point of interest is attached to an experience, the displacement matrix comes from this interaction
+        # If this point of interest has an experience, the displacement matrix comes from this interaction
         if self.interaction is not None:
             self.reset_position()
             # translation_matrix = matrix44.create_from_translation([self.interaction.x, self.interaction.y, 0])
@@ -171,3 +170,7 @@ class PointOfInterest:
 
         if displacement_matrix is not None:
             self.displace(displacement_matrix)
+
+    def __str__(self):
+        return "POI of type " + self.type + " at x=" + str(int(self.x)) + ", y=" + str(int(self.y)) + \
+               ", interaction: " + self.interaction.__str__()

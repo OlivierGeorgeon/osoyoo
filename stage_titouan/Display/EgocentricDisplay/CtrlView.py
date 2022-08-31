@@ -68,14 +68,15 @@ class CtrlView:
         for interaction in new_experiences:
             if interaction.id > self.last_used_id:
                 self.last_used_id = max(interaction.id, self.last_used_id)
-            poi = self.create_points_of_interest(interaction)
+            poi = self.create_point_of_interest(interaction)
             self.points_of_interest.append(poi)
 
         # The points of interest Central Echo from the list in the synthesizer
         for experience_central_echo in self.synthesizer.experiences_central_echo:
-            poi_real_echo = self.create_point_of_interest_from_real_echo(experience_central_echo)
-            self.points_of_interest.append(poi_real_echo)
-        self.synthesizer.experiences_central_echo = []
+            poi_central_echo = self.create_point_of_interest(experience_central_echo)
+            # print(poi_central_echo)
+            self.points_of_interest.append(poi_central_echo)
+        # self.synthesizer.experiences_central_echo = []
 
         displacement_matrix = self.ctrl_workspace.enacted_interaction['displacement_matrix'] if 'displacement_matrix' \
             in self.ctrl_workspace.enacted_interaction else None
@@ -143,16 +144,15 @@ class CtrlView:
                 output = PointOfInterest(x, y, self.view.batch, self.view.foreground, EXPERIENCE_FOCUS)
         return output
 
-    def create_points_of_interest(self, interaction):
+    def create_point_of_interest(self, interaction):
         """Create a point of interest corresponding to the interaction given as parameter"""
         return PointOfInterest(interaction.x, interaction.y, self.view.batch, self.view.foreground,
                                interaction.type, interaction=interaction)
 
-    def create_point_of_interest_from_real_echo(self, real_echo):
-        """Create a point of interest corresponding to the real echo given as parameter"""
-        interaction = real_echo
-        return PointOfInterest(interaction.x, interaction.y, self.view.batch, self.view.foreground,
-                               EXPERIENCE_CENTRAL_ECHO, interaction=interaction)
+    # def create_point_of_interest_from_real_echo(self, interaction):
+    #     """Create a point of interest corresponding to the real echo given as parameter"""
+    #     return PointOfInterest(interaction.x, interaction.y, self.view.batch, self.view.foreground,
+    #                            EXPERIENCE_CENTRAL_ECHO, interaction=interaction)
 
     def get_focus_phenomenon(self):
         """ Returning the first selected phenomenon """
@@ -193,7 +193,7 @@ if __name__ == "__main__":
     for _interaction in _interactions_list:
         if _interaction.id > last_used_id:
             last_used_id = max(_interaction.id, last_used_id)
-        _poi = view_controller.create_points_of_interest(_interaction)
+        _poi = view_controller.create_point_of_interest(_interaction)
         view_controller.points_of_interest.append(_poi)
 
     pyglet.app.run()

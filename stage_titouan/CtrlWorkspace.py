@@ -35,7 +35,6 @@ class CtrlWorkspace:
             self.send_phenom_info_to_memory()
             self.send_position_change_to_hexa_memory()
             self.send_position_change_to_memory()
-            # TODO send position changed to synthesizer (experience_central_echo)
             self.flag_for_view_refresh = True
 
             # 3 We call Synthesizer.Act and get the results, the synthesizer will update the hexa_memory
@@ -74,7 +73,7 @@ class CtrlWorkspace:
     def send_position_change_to_memory(self):
         """Send position changes (angle,distance) to the Memory
         """
-        if self.workspace.memory is not None :
+        if self.workspace.memory is not None:
             self.workspace.memory.move(self.enacted_interaction['yaw'], self.enacted_interaction['translation'])
 
     def send_position_change_to_hexa_memory(self):
