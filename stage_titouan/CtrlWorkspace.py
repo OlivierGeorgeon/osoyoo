@@ -2,12 +2,12 @@ from .Workspace import Workspace
 
 
 class CtrlWorkspace:
-    """The Workspace Controller provides the main logics to control the robot
+    """The Workspace Controller provides the main logics to control the robot:
         - main(dt): Updates memory and hexa_memory. Get the synthesizer going
         - get_intended_interaction(): Update the intended_interaction (called by CtrlRobot) ??
         - update_enacted_interaction(): updates the enacted interaction (called by CtrlRobot)
         - set_action(), put_decider_to_auto(), updates the user actions (called by CtrlHexaview)
-        """
+    """
 
     def __init__(self):
         """Constructor"""
@@ -27,7 +27,8 @@ class CtrlWorkspace:
         """1) If a new enacted_interaction has been received
              - update memory and hexa_memory
              - get the synthesizer going
-           3) If ready, ask for a new intended_interaction to enact"""
+           3) If ready, ask for a new intended_interaction to enact
+        """
         focus_lost = False
         # 1. If there is a new enacted interaction
         if self.has_new_enacted_interaction:
@@ -63,8 +64,7 @@ class CtrlWorkspace:
             self.has_new_action = True
             
     def send_phenom_info_to_memory(self):
-        """Send Enacted Interaction to Memory
-        """
+        """Send Enacted Interaction to Memory"""
         echo_array = self.enacted_interaction['echo_array'] if 'echo_array' in self.enacted_interaction else None
         if self.workspace.memory is not None:
             self.workspace.memory.add_enacted_interaction(self.enacted_interaction)  # Added by Olivier 08/05/2022
@@ -74,8 +74,7 @@ class CtrlWorkspace:
             #     self.workspace.memory.add_action(self.intended_interaction)
 
     def send_position_change_to_memory(self):
-        """Send position changes (angle,distance) to the Memory
-        """
+        """Send position changes (angle,distance) to the Memory"""
         if self.workspace.memory is not None:
             self.workspace.memory.move(self.enacted_interaction['yaw'], self.enacted_interaction['translation'])
 
@@ -89,7 +88,8 @@ class CtrlWorkspace:
     def get_intended_interaction(self):
         """Return (True, intended_interaction) if there is one, else (False, None)
         Reset the intended_interaction
-        Called by CtrlRobot"""
+        Called by CtrlRobot
+        """
         if self.has_new_action:
             self.has_new_action = False
             if 'focus_x' in self.intended_interaction:
@@ -122,4 +122,3 @@ class CtrlWorkspace:
             return
         self.enacted_interaction = enacted_interaction
         self.has_new_enacted_interaction = True
-

@@ -3,8 +3,8 @@
   Created by Olivier Georgeon, june 20 2021
   released into the public domain
 */
-#ifndef Head_echo_alignment_h
-#define Head_echo_alignment_h
+#ifndef Head_h
+#define Head_h
 #include "Arduino.h"
 #include <Servo.h>
 #include <Arduino_JSON.h>
@@ -28,10 +28,10 @@ struct significant_array {
         bool sign[180/SCAN_SACCADE_SPAN]{false};
         int size = 180/SCAN_SACCADE_SPAN;
     };
-class Head_echo_alignment
+class Head
 {
   public:
-    Head_echo_alignment();
+    Head();
     void setup();
     void beginEchoAlignment();
     void beginEchoScan();

@@ -1,13 +1,13 @@
-# .______        _______..__   __.
-# |   _  \      /       ||  \ |  |
-# |  |_)  |    |   (----`|   \|  |
-# |   _  <      \   \    |  . `  |
-# |  |_)  | .----)   |   |  |\   |
-# |______/  |_______/    |__| \__|
+#   ____  __ __  ______   ___     __   ____  ______
+#  /    ||  |  ||      | /   \   /  ] /    ||      |
+# |  o  ||  |  ||      ||     | /  / |  o  ||      |
+# |     ||  |  ||_|  |_||  O  |/  /  |     ||_|  |_|
+# |  _  ||  :  |  |  |  |     /   \_ |  _  |  |  |  
+# |  |  ||     |  |  |  |     \     ||  |  |  |  |  
+# |__|__| \__,_|  |__|   \___/ \____||__|__|  |__|  
 #
-#
-# Run the main program. Provide the robot's IP address:
-# > py main.py "192.168.1.20"
+# Run main.py with the robot's IP address:
+# py main.py "192.168.1.20"
 #
 #  Spring 2022
 #   Titoua Knockart, Université Claude Bernard (UCBL), France
@@ -15,9 +15,7 @@
 #   Aleksei Apostolou, Daniel Duval, Célien Fiorelli, Geordi Gampio, Julina Matouassiloua
 #  Teachers
 #   Raphaël Cazorla, Florian Tholin, Olivier Georgeon
-#
 #  Bachelor Sciences du Numérique. ESQESE. UCLy. France
-#
 
 import sys
 import pyglet
@@ -30,16 +28,16 @@ print("Robot IP:", robot_ip)
 
 ctrl_workspace = CtrlWorkspace()
 ctrl_robot = CtrlRobot(robot_ip, ctrl_workspace)
-ctrl_view = CtrlView(ctrl_workspace)
-ctrl_hexaview = CtrlHexaview(ctrl_workspace)
+ctrl_egocentric_view = CtrlView(ctrl_workspace)
+ctrl_allocentric_view = CtrlHexaview(ctrl_workspace)
 
 
 def update(dt):
     """The updates in the main loop"""
     ctrl_workspace.main(dt)
     ctrl_robot.main(dt)
-    ctrl_view.main(dt)
-    ctrl_hexaview.main(dt)
+    ctrl_egocentric_view.main(dt)
+    ctrl_allocentric_view.main(dt)
 
 
 pyglet.clock.schedule_interval(update, 0.1)

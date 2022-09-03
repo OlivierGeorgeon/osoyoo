@@ -13,10 +13,10 @@ ZOOM_IN_FACTOR = 1.2
 
 
 class HexaView(pyglet.window.Window):
-    """blabla"""
+    """Create the allocentric view"""
     def __init__(self, width=400, height=400, shapesList=[], cell_radius=20, hexa_memory=None, *args, **kwargs):
         super().__init__(width, height, resizable=True, *args, **kwargs)
-        self.set_caption("Hexagonal Memory")
+        self.set_caption("Allocentric Memory")
         self.set_minimum_size(150, 150)
         # glClearColor(0.2, 0.2, 0.7, 1.0)  # Make it look like hippocampus imaging
         glClearColor(1.0, 1.0, 1.0, 1.0)

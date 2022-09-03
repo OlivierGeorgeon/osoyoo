@@ -4,7 +4,7 @@
   released into the public domain
 */
 #include "Arduino.h"
-#include "Omny_wheel_motion.h"
+#include "Wheel.h"
 #include "Robot_define.h"
 
 //#define speedPinR 9   //  RIGHT WHEEL PWM pin D45 connect front MODEL-X ENA
@@ -21,10 +21,10 @@
 //#define LeftMotorDirPin2B 8  //Rear left Motor direction pin 2 to Back MODEL-X IN4  k3
 //#define speedPinLB 12    //   LEFT WHEEL  PWM pin D8 connect Rear MODEL-X ENB
 //
-Omny_wheel_motion::Omny_wheel_motion()
+Wheel::Wheel()
 {
 }
-void Omny_wheel_motion::setup()
+void Wheel::setup()
 {
   //Pins initialize
   pinMode(RightMotorDirPin1, OUTPUT);
@@ -46,57 +46,57 @@ void Omny_wheel_motion::setup()
   stopMotion();
 }
 
-void Omny_wheel_motion::turnInSpotLeft(int speed)
+void Wheel::turnInSpotLeft(int speed)
 {
   setMotion(-speed, -speed, speed, speed);
 }
-void Omny_wheel_motion::goBack(int speed)
+void Wheel::goBack(int speed)
 {
   setMotion(-speed, -speed, -speed, -speed);
 }
-void Omny_wheel_motion::turnInSpotRight(int speed)
+void Wheel::turnInSpotRight(int speed)
 {
   setMotion(speed, speed, -speed, -speed);
 }
-void Omny_wheel_motion::turnFrontLeft(int speed)
+void Wheel::turnFrontLeft(int speed)
 {
   setMotion(speed / 2, -speed, speed, speed / 2);
 }
-void Omny_wheel_motion::turnFrontRight(int speed)
+void Wheel::turnFrontRight(int speed)
 {
   setMotion(speed / 2, speed, -speed, speed / 2);
 }
-void Omny_wheel_motion::shiftLeft(int speed)
+void Wheel::shiftLeft(int speed)
 {
   setMotion( -speed, speed, -speed, speed);
 }
-void Omny_wheel_motion::shiftRight(int speed)
+void Wheel::shiftRight(int speed)
 {
   setMotion(speed, -speed, speed, -speed);
 }
-void Omny_wheel_motion::turnLeft(int speed)
+void Wheel::turnLeft(int speed)
 {
   setMotion( 0, speed, 0, speed);
   //setMotion(0, 0, speed, speed);
 }
-void Omny_wheel_motion::goForward(int speed)
+void Wheel::goForward(int speed)
 {
   setMotion(speed, speed, speed, speed);
 }
-void Omny_wheel_motion::turnRight(int speed)
+void Wheel::turnRight(int speed)
 {
   setMotion(speed, 0, speed, 0);
   //setMotion(speed, speed, 0, 0);
 }
 
-void Omny_wheel_motion::setMotion(int speed_fl, int speed_rl, int speed_rr, int speed_fr){
+void Wheel::setMotion(int speed_fl, int speed_rl, int speed_rr, int speed_fr){
   frontLeftWheel(speed_fl);
   rearLeftWheel(speed_rl);
   frontRightWheel(speed_fr);
   rearRightWheel(speed_rr);
 }
 
-void Omny_wheel_motion::stopMotion()    //Stop
+void Wheel::stopMotion()    //Stop
 {
   analogWrite(speedPinLB,0);
   analogWrite(speedPinRB,0);
@@ -105,7 +105,7 @@ void Omny_wheel_motion::stopMotion()    //Stop
 }
 
 /*motor control*/
-void Omny_wheel_motion::frontRightWheel(int speed)
+void Wheel::frontRightWheel(int speed)
 {
   if (speed > 0) {
     // Forward
@@ -119,7 +119,7 @@ void Omny_wheel_motion::frontRightWheel(int speed)
     analogWrite(speedPinR,-speed * ROBOT_FRONT_RIGHT_WHEEL_COEF);
   }
 }
-void Omny_wheel_motion::frontLeftWheel(int speed)
+void Wheel::frontLeftWheel(int speed)
 {
   if (speed > 0) {
     // Forward
@@ -133,7 +133,7 @@ void Omny_wheel_motion::frontLeftWheel(int speed)
     analogWrite(speedPinL,-speed * ROBOT_FRONT_LEFT_WHEEL_COEF);
   }
 }
-void Omny_wheel_motion::rearRightWheel(int speed)
+void Wheel::rearRightWheel(int speed)
 {
   if (speed > 0) {
     // Forward
@@ -147,7 +147,7 @@ void Omny_wheel_motion::rearRightWheel(int speed)
     analogWrite(speedPinRB,-speed * ROBOT_REAR_RIGHT_WHEEL_COEF); // corrective coefficient depends on robot
   }
 }
-void Omny_wheel_motion::rearLeftWheel(int speed)
+void Wheel::rearLeftWheel(int speed)
 {
   if (speed > 0) {
     // Forward

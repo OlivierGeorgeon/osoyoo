@@ -8,9 +8,10 @@ from .Synthesizer.Synthesizer import Synthesizer
 
 
 class Workspace:
-    """The Workspace serves as the general container of the cognitive architecture of the robot.
+    """The Workspace serves as the general container of the robot's cognitive architecture.
     It contains all the processes and the data of the cognitive architecture:
-        the agent, the two memories, and the synthesizer."""
+        the agent, the two memories, and the synthesizer.
+    """
 
     def __init__(self, hexamemory_size=(100, 200), cell_radius=40):
         self.agent = AgentCircle()

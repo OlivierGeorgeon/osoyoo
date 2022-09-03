@@ -1,5 +1,5 @@
 /*
-  Imu_control.cpp - library for controlling the GY521 / MPU6050 IMU
+  imu.cpp - library for controlling the GY521 / MPU6050 IMU
   Created by Olivier Georgeon, june 28 2021
   Uses Korneliusz Jarzebski's MPU6050 library provided in the ELEGOO kit
   https://github.com/jarzebski/Arduino-MPU6050
@@ -7,7 +7,7 @@
 */
 #include <Wire.h>
 #include "Arduino.h"
-#include "Imu_control.h"
+#include "Imu.h"
 #include "Robot_define.h"
 #include "src/lib/MPU6050.h"
 #include "Action_define.h"
@@ -15,13 +15,13 @@
   #include <HMC5883L.h>
 #endif
 
-Imu_control::Imu_control()
+Imu::Imu()
 {
   _next_imu_read_time = 0;
   _yaw = 0;
   //_debug_message = "";
 }
-void Imu_control::setup()
+void Imu::setup()
 {
   #if ROBOT_HAS_MPU6050 == true
   // Initialize MPU6050
@@ -81,7 +81,7 @@ void Imu_control::setup()
   compass.setOffset(COMPASS_X_OFFSET, COMPASS_Y_OFFSET);
   #endif
 }
-void Imu_control::begin()
+void Imu::begin()
 {
   _yaw = 0;
   _shock_measure = 0;
@@ -94,7 +94,7 @@ void Imu_control::begin()
   _xSpeed = 0;
   _xDistance = 0;
 }
-int Imu_control::update(int interaction_step)
+int Imu::update(int interaction_step)
 {
   unsigned long timer = millis();
   if (_next_imu_read_time < timer)
@@ -161,7 +161,7 @@ int Imu_control::update(int interaction_step)
   }
   return _shock_measure;
 }
-void Imu_control::outcome(JSONVar & outcome_object, char action)
+void Imu::outcome(JSONVar & outcome_object, char action)
 {
   #if ROBOT_HAS_MPU6050 == true
   outcome_object["yaw"] = (int) _yaw;
@@ -186,7 +186,7 @@ void Imu_control::outcome(JSONVar & outcome_object, char action)
 }
 
 #if ROBOT_HAS_HMC5883L == true
-void Imu_control::read_azimuth(JSONVar & outcome_object)
+void Imu::read_azimuth(JSONVar & outcome_object)
 {
   Vector norm = compass.readNormalize();
 

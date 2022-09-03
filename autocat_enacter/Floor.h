@@ -3,20 +3,20 @@
   Created by Olivier Georgeon, june 20 2021
   released into the public domain
 */
-#ifndef Floor_change_retreat_h
-#define Floor_change_retreat_h
+#ifndef Floor_h
+#define Floor_h
 
 #include "Arduino.h"
-#include "Omny_wheel_motion.h"
+#include "Wheel.h"
 #include <Arduino_JSON.h>
 
 #define RETREAT_DURATION 200
 #define RETREAT_EXTRA_DURATION 100
 
-class Floor_change_retreat
+class Floor
 {
   public:
-    Floor_change_retreat(Omny_wheel_motion _OWM);
+    Floor(Wheel _OWM);
     void update();
     int measureFloor();
     void extraDuration(int duration);
@@ -25,7 +25,7 @@ class Floor_change_retreat
     int _floor_outcome;
     // String _debug_message;
   private:
-    Omny_wheel_motion _OWM;
+    Wheel _OWM;
     int _previous_measure_floor;
     unsigned long _floor_change_retreat_end_time;
 };

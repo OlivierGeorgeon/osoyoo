@@ -5,10 +5,10 @@
 */
 #include "Arduino.h"
 #include "Robot_define.h"
-#include "head_echo_alignment.h"
+#include "Head.h"
 #include <Servo.h>
 
-Head_echo_alignment::Head_echo_alignment()
+Head::Head()
 {
   //Servo _head;
   _is_enacting_head_alignment = false;
@@ -23,7 +23,7 @@ Head_echo_alignment::Head_echo_alignment()
   _current_index = 0;
 }
 
-void Head_echo_alignment::setup()
+void Head::setup()
 {
   // init HC-SR04 ultrasonic Echo sensor
   pinMode(Trig_PIN, OUTPUT);
@@ -36,7 +36,7 @@ void Head_echo_alignment::setup()
   _head_angle_span = ALIGN_SACCADE_SPAN;
 }
 
-void Head_echo_alignment::beginEchoAlignment()
+void Head::beginEchoAlignment()
 {
   _is_enacting_head_alignment = true;
   _penultimate_ultrasonic_measure = 1;  // Reinitialize previous measures so it will not ...
@@ -46,7 +46,7 @@ void Head_echo_alignment::beginEchoAlignment()
   //turnHead(_head_angle - _head_angle_span);
   _next_saccade_time = millis() + SACCADE_DURATION;
 }
-void Head_echo_alignment::beginEchoScan()
+void Head::beginEchoScan()
 {
   _is_enacting_head_alignment = false; // Stop current head alignment if any
   _is_enacting_echo_scan = true;
@@ -66,7 +66,7 @@ void Head_echo_alignment::beginEchoScan()
   _current_index = 0;
 }
 
-void Head_echo_alignment::update()
+void Head::update()
 {
   if (millis() > _next_saccade_time )
   {
@@ -160,7 +160,7 @@ void Head_echo_alignment::update()
   }
 }
 
-void Head_echo_alignment::outcome(JSONVar & outcome_object)
+void Head::outcome(JSONVar & outcome_object)
 {
   outcome_object["head_angle"] = _head_angle;
 
@@ -168,7 +168,7 @@ void Head_echo_alignment::outcome(JSONVar & outcome_object)
   outcome_object["echo_distance"] = _min_ultrasonic_measure;
 }
 
-void Head_echo_alignment::outcome_complete(JSONVar & outcome_object)
+void Head::outcome_complete(JSONVar & outcome_object)
 {
     for (int i = 0; i < _sign_array.size; i++)
     {
@@ -212,14 +212,14 @@ void Head_echo_alignment::outcome_complete(JSONVar & outcome_object)
 
 }
 
-void Head_echo_alignment::turnHead(int head_angle)
+void Head::turnHead(int head_angle)
 {
   _head_angle = constrain(head_angle, -90, 90);
   Serial.println("Turning head to: " + String(head_angle));
   _head.write(_head_angle + 90);
 }
 
-int Head_echo_alignment::measureUltrasonicEcho()
+int Head::measureUltrasonicEcho()
 {
   long echo_distance;
   digitalWrite(Trig_PIN,LOW);
@@ -234,7 +234,7 @@ int Head_echo_alignment::measureUltrasonicEcho()
   return echo_distance;
 }
 
-int Head_echo_alignment::head_direction(int x, int y)
+int Head::head_direction(int x, int y)
 {
   if (x < ROBOT_HEAD_X)
   // The focus is behind the head

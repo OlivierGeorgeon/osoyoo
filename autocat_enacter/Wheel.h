@@ -3,8 +3,8 @@
   Created by Olivier Georgeon, june 20 2021
   released into the public domain
 */
-#ifndef Omny_wheel_motion_h
-#define Omny_wheel_motion_h
+#ifndef Wheel_h
+#define Wheel_h
 #include "Arduino.h"
 
 #define speedPinR 9            // RIGHT WHEEL PWM pin D45 connect front MODEL-X ENA
@@ -21,10 +21,10 @@
 #define LeftMotorDirPin2B 8    // Rear  left Motor direction pin 2 to Back MODEL-X IN4  (k3)
 #define speedPinLB 12          // LEFT  WHEEL PWM pin D8 connect Rear MODEL-X ENB
 
-class Omny_wheel_motion
+class Wheel
 {
   public:
-    Omny_wheel_motion();
+    Wheel();
     void setup();
     void turnInSpotLeft(int speed);
     void goBack(int speed);

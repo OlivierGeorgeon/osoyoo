@@ -4,8 +4,8 @@
   Uses Korneliusz Jarzebski's MPU6050 library provided in the ELEGOO kit
   released into the public domain
 */
-#ifndef Imu_control_h
-#define Imu_control_h
+#ifndef Imu_h
+#define Imu_h
 #include "Arduino.h"
 #include "Robot_define.h"
 #include <Wire.h>
@@ -17,10 +17,10 @@
 
 #define IMU_READ_PERIOD 50
 
-class Imu_control
+class Imu
 {
   public:
-    Imu_control();
+    Imu();
     void setup();
     void begin();
     int update(int interaction_step);

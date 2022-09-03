@@ -11,7 +11,7 @@ class EgocentricView(pyglet.window.Window):
     def __init__(self, width=400, height=400, *args, **kwargs):
         super().__init__(width, height, resizable=True, *args, **kwargs)
         self.is_north_up = True  # Reset to display the robot on the X axis
-        self.set_caption("Egocentric View")
+        self.set_caption("Egocentric Memory")
         self.set_minimum_size(150, 150)
 
         # Initialize OpenGL parameters

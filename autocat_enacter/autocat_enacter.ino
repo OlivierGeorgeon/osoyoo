@@ -1,28 +1,43 @@
-/*  ___   ___  ___  _   _  ___   ___   ____ ___  ____  
- * / _ \ /___)/ _ \| | | |/ _ \ / _ \ / ___) _ \|    \ 
- *| |_| |___ | |_| | |_| | |_| | |_| ( (__| |_| | | | |
- * \___/(___/ \___/ \__  |\___/ \___(_)____)___/|_|_|_|
- *                  (____/ 
- * Inspired form Arduino Mecanum Omni Direction Wheel Robot Car Lesson5 Wifi Control
- * Tutorial URL http://osoyoo.com/?p=30022
- *
- */
+/*
+   ____  __ __  ______   ___     __   ____  ______
+  /    ||  |  ||      | /   \   /  ] /    ||      |
+ |  o  ||  |  ||      ||     | /  / |  o  ||      |
+ |     ||  |  ||_|  |_||  O  |/  /  |     ||_|  |_|
+ |  _  ||  :  |  |  |  |     /   \_ |  _  |  |  |
+ |  |  ||     |  |  |  |     \     ||  |  |  |  |
+ |__|__| \__,_|  |__|   \___/ \____||__|__|  |__|
+
+ Download autocat_enacter.ino to the OSOYOO robot car
+
+  Spring 2022
+   Titoua Knockart, Université Claude Bernard (UCBL), France
+  BSN2 2021-2022
+   Aleksei Apostolou, Daniel Duval, Célien Fiorelli, Geordi Gampio, Julina Matouassiloua
+  Teachers
+   Raphaël Cazorla, Florian Tholin, Olivier Georgeon
+  Bachelor Sciences du Numérique. ESQESE. UCLy. France
+
+ Inspired form Arduino Mecanum Omni Direction Wheel Robot Car Lesson5 Wifi Control
+ Tutorial URL http://osoyoo.com/?p=30022
+*/
+
 #include <WiFiEsp.h>
 #include <WiFiEspUDP.h>
 #include <Arduino_JSON.h>
 
 #include "arduino_secrets.h"
 #include "Robot_define.h"
-#include "Floor_change_retreat.h"
-#include "Head_echo_alignment.h"
-//#include "Head_echo_complete_scan.h"
-#include "Imu_control.h"
+#include "Floor.h"
+#include "Head.h"
+#include "Imu.h"
 #include "Action_define.h"
+// "Wheel.h" is imported by Floor.h
+// #include "Head_echo_complete_scan.h"
 
-Omny_wheel_motion OWM;
-Floor_change_retreat FCR(OWM);
-Head_echo_alignment HEA;
-Imu_control IMU;
+Wheel OWM;
+Floor FCR(OWM);
+Head HEA;
+Imu IMU;
 //Head_echo_complete_scan HECS;
 char packetBuffer[100]; // Max number of characters received
 WiFiEspUDP Udp;

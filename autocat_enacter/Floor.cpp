@@ -4,8 +4,8 @@
   released into the public domain
 */
 #include "Arduino.h"
-#include "Floor_change_retreat.h"
-#include "Omny_wheel_motion.h"
+#include "Floor.h"
+#include "Wheel.h"
 
 #define sensor1   A4 // Left most sensor
 #define sensor2   A3 // 2nd Left sensor
@@ -13,7 +13,7 @@
 #define sensor4   A1 // 2nd right sensor
 #define sensor5   A0 // Right most sensor
 
-Floor_change_retreat::Floor_change_retreat(Omny_wheel_motion OWM)
+Floor::Floor(Wheel OWM)
 {
   _OWM = OWM;
   _is_enacting = false;
@@ -23,7 +23,7 @@ Floor_change_retreat::Floor_change_retreat(Omny_wheel_motion OWM)
   // _debug_message = "";
 }
 
-void Floor_change_retreat::update()
+void Floor::update()
 {
   // Detect change in the floor measure
   int current_measure_floor = measureFloor();
@@ -82,12 +82,12 @@ void Floor_change_retreat::update()
   }
 }
 
-void Floor_change_retreat::extraDuration(int duration)
+void Floor::extraDuration(int duration)
 {
   _floor_change_retreat_end_time += duration;
 }
 
-int Floor_change_retreat::measureFloor()
+int Floor::measureFloor()
 {
   int s0 = !digitalRead(sensor1); // Left sensor
   int s1 = !digitalRead(sensor2);
@@ -101,7 +101,7 @@ int Floor_change_retreat::measureFloor()
   return sensor_value;
 }
 
-void Floor_change_retreat::outcome(JSONVar & outcome_object)
+void Floor::outcome(JSONVar & outcome_object)
 {
   outcome_object["floor"] = _floor_outcome;
   // outcome_object["debug"] = _debug_message;
