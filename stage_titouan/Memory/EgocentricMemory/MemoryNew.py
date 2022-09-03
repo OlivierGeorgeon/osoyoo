@@ -103,6 +103,12 @@ class MemoryNew:
     def tick(self):
         for p in self.interactions:
             p.tick()
+        # Remove the interactions when they are too old
+        to_remove = []
+        for i in self.interactions:
+            if i.actual_durability <= 0:
+                to_remove.append(i)
+        self.interactions = [x for x in self.interactions if x not in to_remove]
 
     def empty(self):
         self.interactions.clear()

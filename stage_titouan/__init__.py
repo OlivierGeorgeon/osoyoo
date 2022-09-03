@@ -10,7 +10,7 @@ from . Display.HexaDisplay.HexaView import HexaView
 #from . Display.HexaDisplay.CtrlHexaview import CtrlHexaview
 #from . Display.HexaDisplay.CtrlHexaview2 import CtrlHexaview2
 
-from . Memory.EgocentricMemory.MemoryV1 import MemoryV1
+from . Memory.EgocentricMemory.MemoryNew import MemoryNew
 from . Memory.HexaMemory.HexaMemory import HexaMemory
 
 

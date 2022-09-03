@@ -4,54 +4,12 @@ from .. Memory.EgocentricMemory.Interactions.Interaction import Interaction,EXPE
 from webcolors import name_to_rgb
 import math
 import random
-#from .. Model.Interactions.Interaction import INTERACTION_TRESPASSING, INTERACTION_ECHO, INTERACTION_BLOCK, INTERACTION_SHOCK
 
 """Utils to make the project more modulable, if you decide to change the package
 used for the view you should just have to create a phenomList_to_whatev 
 and a phenom_to_whatev function and use it instead.
 """
 
-# def memory_to_pyglet(memory,batch):
-#     print("memoire len",len(memory.interactions))
-#     return interactionList_to_pyglet(memory.interactions,batch)
-
-# def interactionList_to_pyglet(liste,batch):
-#      shapesList = []
-#      for i in range(len(liste)):
-#          shapesList.append(interaction_to_pyglet(liste[i],batch))
-#      return shapesList
-
-# def interaction_to_pyglet(interaction,batch):
-#      p = interaction
-#      x = p.x
-#      y = p.y
-#      width = p.width
-#      height = p.height
-#      shape = p.shape
-#      final = None
-#      if shape == 'Circle':
-#          # Green circle: Echo
-#          final = shapes.Circle(x, y, width, color=p.rgb, batch=batch,)
-#      elif shape == 'Rectangle':
-#          # Red dash: black line
-#          final = shapes.Rectangle(x, y, width, height, color=p.rgb, batch=batch)
-#          final.anchor_position = 0, height/2  # 10, 30
-#      elif shape == 'Star':
-#          # Triangle: collision
-#          # Pressing interaction: orange triangle
-#          final = shapes.Star(x, y, width, height, num_spikes = p.starArgs, color=p.rgb, batch=batch)
-#      final.opacity = (p.durability / p.durability * 255)
-#
-#      final.rotation = p.rotation
-#      return final
-#
-# def rotate(x,y, radians):
-#     """Only rotate a point around the origin (0, 0)."""
-#     xx = x * math.cos(radians) + y * math.sin(radians)
-#     yy = -x * math.sin(radians) + y * math.cos(radians)
-#
-#     return xx, yy
-#
 
 def hexaMemory_to_pyglet(hexaMemory,batch):
     """Convert the given hexaMemory to pyglet shapes"""

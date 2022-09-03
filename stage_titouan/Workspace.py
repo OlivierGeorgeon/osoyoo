@@ -1,4 +1,4 @@
-from . Memory.EgocentricMemory.MemoryV1 import MemoryV1
+from . Memory.EgocentricMemory.MemoryNew import MemoryNew
 from . Memory.HexaMemory.HexaMemory import HexaMemory
 from .Synthesizer.Synthesizer import Synthesizer
 
@@ -10,7 +10,7 @@ class Workspace:
     It also contains the flags used to schedule the robot's cognitive processes"""
 
     def __init__(self, hexamemory_size=(100, 200), cell_radius=20):
-        self.memory = MemoryV1()
+        self.memory = MemoryNew()
         self.hexa_memory = HexaMemory(hexamemory_size[0], hexamemory_size[1], cell_radius=cell_radius)
         self.synthesizer = Synthesizer(self.memory, self.hexa_memory)
         self.agent = None

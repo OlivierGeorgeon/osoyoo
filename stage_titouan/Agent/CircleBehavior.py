@@ -1,5 +1,5 @@
 ########################################################################################
-# DEPRECATED. Hared coded circle behavior with focus
+# DEPRECATED. Hard coded circle behavior with focus
 ########################################################################################
 
 from . PredefinedInteractions import *
