@@ -40,10 +40,12 @@ class CtrlWorkspace:
             # We update the memories
             self.workspace.memory.tick()
             self.send_position_change_to_hexa_memory()
-            self.send_position_change_to_memory()
+            #self.send_position_change_to_memory()
+            self.workspace.memory.move(self.enacted_interaction['yaw'], self.enacted_interaction['translation'])
 
             # Add new experiences to memory
-            self.send_phenom_info_to_memory()
+            self.workspace.memory.add_enacted_interaction(self.enacted_interaction)
+            #self.send_phenom_info_to_memory()
             self.flag_for_view_refresh = True
 
             # We call Synthesizer.Act and get the results, the synthesizer will update the hexa_memory
@@ -69,16 +71,16 @@ class CtrlWorkspace:
             self.workspace.synthesizer.last_action = self.intended_interaction
             self.has_new_action = True
             
-    def send_phenom_info_to_memory(self):
-        """Send Enacted Interaction to Memory"""
-        self.workspace.memory.add_enacted_interaction(self.enacted_interaction)
-        if 'echo_array' in self.enacted_interaction:
-            self.workspace.memory.add_echo_array(self.enacted_interaction['echo_array'])
+    # def send_phenom_info_to_memory(self):
+    #     """Send Enacted Interaction to Memory"""
+    #     self.workspace.memory.add_enacted_interaction(self.enacted_interaction)
+        # if 'echo_array' in self.enacted_interaction:
+        #     self.workspace.memory.add_echo_array(self.enacted_interaction['echo_array'])
 
-    def send_position_change_to_memory(self):
-        """Send position changes (angle,distance) to the Memory"""
-        if self.workspace.memory is not None:
-            self.workspace.memory.move(self.enacted_interaction['yaw'], self.enacted_interaction['translation'])
+    # def send_position_change_to_memory(self):
+    #     """Send position changes (angle,distance) to the Memory"""
+    #     if self.workspace.memory is not None:
+    #         self.workspace.memory.move(self.enacted_interaction['yaw'], self.enacted_interaction['translation'])
 
     def send_position_change_to_hexa_memory(self):
         """Apply movement to hexamem"""

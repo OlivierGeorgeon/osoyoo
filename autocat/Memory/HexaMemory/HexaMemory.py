@@ -273,7 +273,6 @@ class HexaMemory(HexaGrid):
         self.cells_changed_recently.append((self.robot_cell_x, self.robot_cell_y))
         return x_prime, y_prime
 
-    
     def apply_phenomenon(self, phenomenon, pos_x, pos_y):
         """Apply a phenomenon to the grid
         Args :

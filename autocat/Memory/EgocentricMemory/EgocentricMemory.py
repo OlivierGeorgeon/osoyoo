@@ -36,9 +36,9 @@ class EgocentricMemory:
             self.interactions.append(interaction)
             self.current_id += 1
 
-    def add_echo_array(self, echo_array):
-        #if 'echo_array' in enacted_interaction:
-        #    echo_array = enacted_interaction['echo_array']
+    # def add_echo_array(self, echo_array):
+        if 'echo_array' in enacted_interaction:
+            echo_array = enacted_interaction['echo_array']
             for _, echo in enumerate(echo_array):
                 x = echo[0]
                 #print("add_echo_array, x :",x)
