@@ -2,7 +2,7 @@ from .Workspace import Workspace
 
 
 class CtrlWorkspace:
-    """The Workspace Controller provides the main logics to controll the robot
+    """The Workspace Controller provides the main logics to control the robot
         - main(dt): Updates memory and hexa_memory. Get the synthesizer going
         - get_intended_interaction(): Update the intended_interaction (called by CtrlRobot) ??
         - update_enacted_interaction(): updates the enacted interaction (called by CtrlRobot)
