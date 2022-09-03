@@ -1,7 +1,7 @@
-from .EgocentricView import EgocentricView
-from .PointOfInterest import *
 import pyglet
 from pyglet.window import key
+from .EgocentricView import EgocentricView
+from .PointOfInterest import *
 from ...Workspace import Workspace
 from ...CtrlWorkspace import CtrlWorkspace
 

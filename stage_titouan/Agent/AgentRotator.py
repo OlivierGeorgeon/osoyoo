@@ -15,7 +15,7 @@ class AgentRotator:
         self.angle_to_object = None
         self.distance_to_object = None
         self.last_action = "0"
-        self.debug_mode = False
+        self.debug_mode = True
 
         self.borne_basse_dist = 150  # 200
         self.borne_haute_dist = 400  # 500

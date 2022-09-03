@@ -1,3 +1,6 @@
+from .Workspace import Workspace
+
+
 class CtrlWorkspace:
     """The Workspace Controller provides the main logics to controll the robot
         - main(dt): Updates memory and hexa_memory. Get the synthesizer going
@@ -6,9 +9,9 @@ class CtrlWorkspace:
         - set_action(), put_decider_to_auto(), updates the user actions (called by CtrlHexaview)
         """
 
-    def __init__(self, workspace):
+    def __init__(self):
         """Constructor"""
-        self.workspace = workspace
+        self.workspace = Workspace()
         self.intended_interaction = None
         self.enacted_interaction = {}
 
@@ -119,7 +122,4 @@ class CtrlWorkspace:
             return
         self.enacted_interaction = enacted_interaction
         self.has_new_enacted_interaction = True
-    
-    def change_agent(self, agent):
-        # self.agent = agent
-        self.workspace.agent = agent
+

@@ -21,35 +21,26 @@
 
 import sys
 import pyglet
-from stage_titouan import Workspace, CtrlWorkspace, AgentCircle, CtrlView, CtrlRobot, CtrlHexaview, Synthesizer
+from stage_titouan import CtrlWorkspace, CtrlRobot, CtrlView, CtrlHexaview
 
 robot_ip = "192.168.8.189"
 if len(sys.argv) > 1:
     robot_ip = sys.argv[1]
 print("Robot IP:", robot_ip)
 
-workspace = Workspace(cell_radius=40)
-workspace.synthesizer = Synthesizer(workspace.memory, workspace.hexa_memory)
-ctrl_workspace = CtrlWorkspace(workspace)
+ctrl_workspace = CtrlWorkspace()
 ctrl_robot = CtrlRobot(robot_ip, ctrl_workspace)
 ctrl_view = CtrlView(ctrl_workspace)
 ctrl_hexaview = CtrlHexaview(ctrl_workspace)
 
-# Select the agent
-# ctrl_workspace.change_agent(AgentRotator(ctrl_workspace.workspace.memory, ctrl_workspace.workspace.hexa_memory))
-ctrl_workspace.change_agent(AgentCircle())
 
-ctrl_workspace.workspace.agent.debug_mode = True
-# model.synthesizer.mode = "automatic"
-
-
-def mains(dt):
-    """The main loop"""
+def update(dt):
+    """The updates in the main loop"""
     ctrl_workspace.main(dt)
     ctrl_robot.main(dt)
     ctrl_view.main(dt)
     ctrl_hexaview.main(dt)
 
 
-pyglet.clock.schedule_interval(mains, 0.1)
+pyglet.clock.schedule_interval(update, 0.1)
 pyglet.app.run()
