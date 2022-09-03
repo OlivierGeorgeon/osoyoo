@@ -1,13 +1,8 @@
-from ..Memory.HexaMemory.HexaGrid import HexaGrid
-from ..Misc.Utils import translate_interaction_type_to_cell_status
-from ..Memory.EgocentricMemory.Interactions.Interaction import EXPERIENCE_ALIGNED_ECHO
+from stage_titouan.Memory.HexaMemory.Utils import translate_interaction_type_to_cell_status
 # from ..Memory.EgocentricMemory.Interactions.Interaction import EXPERIENCE_LOCAL_ECHO, EXPERIENCE_CENTRAL_ECHO, EXPERIENCE_FOCUS
-from ..Memory.EgocentricMemory.Interactions.Interaction import *
+from stage_titouan.Memory.EgocentricMemory.Experience import *
 from ..Memory.HexaMemory.HexaGrid import HexaGrid
-import numpy as np
-from scipy.spatial.distance import cdist
 import math
-from .SynthesizerSubclasses.EchoObject import EchoObject
 from .SynthesizerSubclasses.EchoObjectValidateds import EchoObjectValidateds
 from .SynthesizerSubclasses.EchoObjectsToInvestigate import EchoObjectsToInvestigate
 
@@ -109,9 +104,9 @@ class Synthesizer:
                     x_mean = streak[int(len(streak) / 2)][2].x
                     y_mean = streak[int(len(streak) / 2)][2].y
                     # experiences_central_echo.append(streak[int(len(streak)/2)][2])
-                experience_central_echo = Interaction(int(x_mean), int(y_mean), width=15,
-                                                      experience_type=EXPERIENCE_CENTRAL_ECHO, durability=5,
-                                                      decay_intensity=1, experience_id=0)
+                experience_central_echo = Experience(int(x_mean), int(y_mean), width=15,
+                                                     experience_type=EXPERIENCE_CENTRAL_ECHO, durability=5,
+                                                     decay_intensity=1, experience_id=0)
                 experiences_central_echo.append(experience_central_echo)
                 self.memory.interactions.append(experience_central_echo)  # OG add to memory for displacement update
 
@@ -177,7 +172,7 @@ class Synthesizer:
             angle = self.memory.last_enacted_interaction['head_angle']
             x = int(distance * math.cos(math.radians(angle)))
             y = int(distance * math.sin(math.radians(angle)))
-            interaction_focus = Interaction(x, y, width=15, experience_type=EXPERIENCE_FOCUS, durability=5, decay_intensity=1, experience_id=0)
+            interaction_focus = Experience(x, y, width=15, experience_type=EXPERIENCE_FOCUS, durability=5, decay_intensity=1, experience_id=0)
             return [interaction_focus], focus_lost
         else:
             return [], focus_lost

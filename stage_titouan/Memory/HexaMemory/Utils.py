@@ -1,6 +1,5 @@
-from pyglet.gl import *
 from pyglet import shapes
-from .. Memory.EgocentricMemory.Interactions.Interaction import Interaction,EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO,EXPERIENCE_LOCAL_ECHO, EXPERIENCE_BLOCK, EXPERIENCE_SHOCK
+from stage_titouan.Memory.EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO,EXPERIENCE_LOCAL_ECHO, EXPERIENCE_BLOCK, EXPERIENCE_SHOCK
 from webcolors import name_to_rgb
 import math
 import random

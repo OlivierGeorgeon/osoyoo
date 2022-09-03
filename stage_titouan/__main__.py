@@ -49,6 +49,6 @@ def mains(dt):
 
 
 # Tests the module
-# py -m stage_titouan "IP robot"
+# py -m stage_titouan "192.168.1.20"
 pyglet.clock.schedule_interval(mains, 0.1)
 pyglet.app.run()

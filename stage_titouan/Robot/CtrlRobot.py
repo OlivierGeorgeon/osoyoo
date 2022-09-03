@@ -5,7 +5,7 @@ import threading
 # from pyrr import matrix44
 from stage_titouan.Robot.RobotDefine import *
 from stage_titouan.Robot.WifiInterface import WifiInterface
-from stage_titouan.Memory.EgocentricMemory.Interactions.Interaction import *
+from stage_titouan.Memory.EgocentricMemory.Experience import *
 
 ENACT_STEP_IDLE = 0
 ENACT_STEP_ENACTING = 1

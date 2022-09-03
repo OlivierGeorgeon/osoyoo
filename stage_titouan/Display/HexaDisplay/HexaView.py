@@ -1,10 +1,9 @@
 import pyglet
 from pyglet.gl import *
-from ... Misc.Utils import hexaMemory_to_pyglet
-from ... Misc.Utils import translate_indecisive_cell_to_pyglet
-from ... Misc.Utils import recently_changed_to_pyglet
+from stage_titouan.Memory.HexaMemory.Utils import hexaMemory_to_pyglet
+from stage_titouan.Memory.HexaMemory.Utils import translate_indecisive_cell_to_pyglet
+from stage_titouan.Memory.HexaMemory.Utils import recently_changed_to_pyglet
 from ... Memory.HexaMemory.HexaMemory import HexaMemory
-from webcolors import name_to_rgb
 
 NB_CELL_WIDTH = 30
 NB_CELL_HEIGHT = 100

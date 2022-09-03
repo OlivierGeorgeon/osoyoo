@@ -11,7 +11,7 @@ EXPERIENCE_FLOOR = 'Floor'
 EXPERIENCE_FOCUS = 'Focus'
 
 
-class Interaction:
+class Experience:
     """Experiences are instances of interactions
     along with the spatial and temporal information of where and when they were enacted"""
 

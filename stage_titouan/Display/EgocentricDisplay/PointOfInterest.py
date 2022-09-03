@@ -1,8 +1,6 @@
 from pyglet import shapes, gl
-import math
-from pyrr import matrix44, Quaternion
 from webcolors import name_to_rgb
-from ... Memory.EgocentricMemory.Interactions.Interaction import *
+from stage_titouan.Memory.EgocentricMemory.Experience import *
 
 # Points of interest that only exist in Egocentric Display
 # (points of interest attached to an interaction have the same type as their interactions)

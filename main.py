@@ -1,13 +1,27 @@
+# .______        _______..__   __.
+# |   _  \      /       ||  \ |  |
+# |  |_)  |    |   (----`|   \|  |
+# |   _  <      \   \    |  . `  |
+# |  |_)  | .----)   |   |  |\   |
+# |______/  |_______/    |__| \__|
+#
+#
+# Run the main program. Provide the robot's IP address:
+# > py main.py "192.168.1.20"
+#
+#  Spring 2022
+#   Titoua Knockart, Université Claude Bernard (UCBL), France
+#  BSN2 2021-2022
+#   Aleksei Apostolou, Daniel Duval, Célien Fiorelli, Geordi Gampio, Julina Matouassiloua
+#  Teachers
+#   Raphaël Cazorla, Florian Tholin, Olivier Georgeon
+#
+#  Bachelor Sciences du Numérique. ESQESE. UCLy. France
+#
+
 import sys
-from stage_titouan import *
-from stage_titouan.Display.EgocentricDisplay.CtrlView import CtrlView
-from stage_titouan import Workspace
-from stage_titouan import Synthesizer
-from stage_titouan.Robot.CtrlRobot import CtrlRobot
-from stage_titouan.CtrlWorkspace import CtrlWorkspace
-from stage_titouan.Display.HexaDisplay.CtrlHexaview import CtrlHexaview
-from stage_titouan.Agent.AgentRotator import AgentRotator
-from stage_titouan.Agent.AgentCircle import AgentCircle
+import pyglet
+from stage_titouan import Workspace, CtrlWorkspace, AgentCircle, CtrlView, CtrlRobot, CtrlHexaview, Synthesizer
 
 robot_ip = "192.168.8.189"
 if len(sys.argv) > 1:
