@@ -19,7 +19,7 @@
 
 import sys
 import pyglet
-from stage_titouan import CtrlWorkspace, CtrlRobot, CtrlView, CtrlHexaview
+from autocat import CtrlWorkspace, CtrlRobot, CtrlView, CtrlHexaview
 
 robot_ip = "192.168.8.189"
 if len(sys.argv) > 1:

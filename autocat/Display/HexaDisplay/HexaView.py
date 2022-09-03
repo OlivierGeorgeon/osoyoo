@@ -1,8 +1,8 @@
 import pyglet
 from pyglet.gl import *
-from stage_titouan.Memory.HexaMemory.Utils import hexaMemory_to_pyglet
-from stage_titouan.Memory.HexaMemory.Utils import translate_indecisive_cell_to_pyglet
-from stage_titouan.Memory.HexaMemory.Utils import recently_changed_to_pyglet
+from autocat.Memory.HexaMemory.Utils import hexaMemory_to_pyglet
+from autocat.Memory.HexaMemory.Utils import translate_indecisive_cell_to_pyglet
+from autocat.Memory.HexaMemory.Utils import recently_changed_to_pyglet
 from ... Memory.HexaMemory.HexaMemory import HexaMemory
 
 NB_CELL_WIDTH = 30

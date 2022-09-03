@@ -1,6 +1,6 @@
 from pyglet import shapes, gl
 from webcolors import name_to_rgb
-from stage_titouan.Memory.EgocentricMemory.Experience import *
+from autocat.Memory.EgocentricMemory.Experience import *
 
 # Points of interest that only exist in Egocentric Display
 # (points of interest attached to an interaction have the same type as their interactions)

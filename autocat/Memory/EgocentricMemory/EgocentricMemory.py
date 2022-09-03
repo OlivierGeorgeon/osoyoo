@@ -1,5 +1,5 @@
-from stage_titouan.Memory.EgocentricMemory.Experience import Experience
-from stage_titouan.Memory.EgocentricMemory.Experience import EXPERIENCE_LOCAL_ECHO
+from autocat.Memory.EgocentricMemory.Experience import Experience
+from autocat.Memory.EgocentricMemory.Experience import EXPERIENCE_LOCAL_ECHO
 import math
 from pyrr import matrix44
 
