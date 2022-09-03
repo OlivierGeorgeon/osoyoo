@@ -37,16 +37,17 @@ class EgocentricMemory:
             self.current_id += 1
 
     def add_echo_array(self, echo_array):
-        """Convert echo array given as parameter to a list of interaction objects and add it to  self.interactions"""
-        durability = INTERACTION_PERSISTENCE
-        for _, echo in enumerate(echo_array):
-            x = echo[0]
-            #print("add_echo_array, x :",x)
-            y = echo[1]
-            local_echo_interaction = Experience(x, y, width=15, experience_type=EXPERIENCE_LOCAL_ECHO,
-                                                durability=durability, decay_intensity=1, experience_id=self.current_id)
-            self.interactions.append(local_echo_interaction)
-            self.current_id += 1
+        #if 'echo_array' in enacted_interaction:
+        #    echo_array = enacted_interaction['echo_array']
+            for _, echo in enumerate(echo_array):
+                x = echo[0]
+                #print("add_echo_array, x :",x)
+                y = echo[1]
+                local_echo_interaction = Experience(x, y, width=15, experience_type=EXPERIENCE_LOCAL_ECHO,
+                                                    durability=INTERACTION_PERSISTENCE, decay_intensity=1,
+                                                    experience_id=self.current_id)
+                self.interactions.append(local_echo_interaction)
+                self.current_id += 1
 
     def tick(self):
         for p in self.interactions:
@@ -74,5 +75,3 @@ class EgocentricMemory:
         return self.actions[-1] if len(self.actions) > 0 else None
 
 
-# Test MemoryNew with CtrlView:
-# py -m stage_titouan.Display.EgocentricDisplay.CtrlView

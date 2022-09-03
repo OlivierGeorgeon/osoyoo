@@ -1,5 +1,8 @@
 from .Workspace import Workspace
 
+CONTROL_MODE_AUTOMATIC = "auto"
+CONTROL_MODE_MANUAL = "manual"
+
 
 class CtrlWorkspace:
     """The Workspace Controller provides the main logics to control the robot:
@@ -15,7 +18,7 @@ class CtrlWorkspace:
         self.intended_interaction = None
         self.enacted_interaction = {}
 
-        self.decider_mode = "manual"
+        self.decider_mode = CONTROL_MODE_MANUAL
         self.robot_ready = True
         self.flag_for_need_of_action = True
         self.has_new_action = False
@@ -30,48 +33,47 @@ class CtrlWorkspace:
            3) If ready, ask for a new intended_interaction to enact
         """
         focus_lost = False
-        # 1. If there is a new enacted interaction
+        # If there is a new enacted interaction
         if self.has_new_enacted_interaction:
             self.has_new_enacted_interaction = False
 
-            # 2 We update the memories
+            # We update the memories
             self.workspace.memory.tick()
-            self.send_phenom_info_to_memory()
             self.send_position_change_to_hexa_memory()
             self.send_position_change_to_memory()
+
+            # Add new experiences to memory
+            self.send_phenom_info_to_memory()
             self.flag_for_view_refresh = True
 
-            # 3 We call Synthesizer.Act and get the results, the synthesizer will update the hexa_memory
+            # We call Synthesizer.Act and get the results, the synthesizer will update the hexa_memory
             synthesizer_action, synthesizer_results, focus_lost = self.workspace.synthesizer.act()
 
-            # 4 If the synthesizer need an action done, we save it
+            # If the synthesizer need an action done, we save it
             if synthesizer_action is not None:
                 pass  # OG to prevent actions proposed by the synthesize
                 # self.action = synthesizer_action
                 # self.has_new_action = True
             self.has_new_outcome_been_treated = True
 
-        # 2 If ready, ask for a new intended interaction
-        if self.intended_interaction is None and self.decider_mode == "auto" and self.has_new_outcome_been_treated \
+        # If ready, ask for a new intended interaction
+        if self.intended_interaction is None and self.decider_mode == CONTROL_MODE_AUTOMATIC and self.has_new_outcome_been_treated \
                 and self.robot_ready:
             self.robot_ready = False
             self.has_new_outcome_been_treated = False
             # outcome_ag = self.workspace.agent.result(self.enacted_interaction)
             # self.action = self.workspace.agent.action(outcome_ag, focus_lost)
-            self.intended_interaction = self.workspace.agent.propose_intended_interaction(self.enacted_interaction, focus_lost)
+            self.intended_interaction = self.workspace.agent.propose_intended_interaction(self.enacted_interaction,
+                                                                                          focus_lost)
             self.workspace.synthesizer.last_action_had_focus = 'focus_x' in self.intended_interaction
             self.workspace.synthesizer.last_action = self.intended_interaction
             self.has_new_action = True
             
     def send_phenom_info_to_memory(self):
         """Send Enacted Interaction to Memory"""
-        echo_array = self.enacted_interaction['echo_array'] if 'echo_array' in self.enacted_interaction else None
-        if self.workspace.memory is not None:
-            self.workspace.memory.add_enacted_interaction(self.enacted_interaction)  # Added by Olivier 08/05/2022
-            if echo_array is not None:
-                self.workspace.memory.add_echo_array(echo_array)
-            # if self.intended_interaction is not None:
-            #     self.workspace.memory.add_action(self.intended_interaction)
+        self.workspace.memory.add_enacted_interaction(self.enacted_interaction)
+        if 'echo_array' in self.enacted_interaction:
+            self.workspace.memory.add_echo_array(self.enacted_interaction['echo_array'])
 
     def send_position_change_to_memory(self):
         """Send position changes (angle,distance) to the Memory"""
@@ -109,11 +111,11 @@ class CtrlWorkspace:
 
     def put_decider_to_auto(self):
         """Put the decider in auto mode (called by CtrlHexaview)"""
-        self.decider_mode = "auto"
+        self.decider_mode = CONTROL_MODE_AUTOMATIC
 
     def put_decider_to_manual(self):
         """Put the decider in manual mode (called by CtrlHexaview)"""
-        self.decider_mode = "manual"
+        self.decider_mode = CONTROL_MODE_MANUAL
 
     def update_enacted_interaction(self, enacted_interaction):
         """Update the enacted interaction (called by CtrlRobot)"""
