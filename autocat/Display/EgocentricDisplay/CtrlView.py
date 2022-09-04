@@ -12,7 +12,7 @@ class CtrlView:
     def __init__(self, ctrl_workspace):
         self.view = EgocentricView()
         self.ctrl_workspace = ctrl_workspace
-        self.memory = ctrl_workspace.workspace.memory
+        self.memory = ctrl_workspace.workspace.egocentric_memory
         self.synthesizer = ctrl_workspace.synthesizer
         self.points_of_interest = []
         self.last_action = None
@@ -126,10 +126,10 @@ class CtrlView:
     def create_poi_focus(self):
         """Create a point of interest corresponding to the focus"""
         output = None
-        if hasattr(self.ctrl_workspace.workspace.agent, "focus"):
-            if self.ctrl_workspace.workspace.agent.focus:
-                x = self.ctrl_workspace.workspace.agent.echo_xy[0]
-                y = self.ctrl_workspace.workspace.agent.echo_xy[1]
+        if hasattr(self.ctrl_workspace.agent, "focus"):
+            if self.ctrl_workspace.agent.focus:
+                x = self.ctrl_workspace.agent.echo_xy[0]
+                y = self.ctrl_workspace.agent.echo_xy[1]
                 output = PointOfInterest(x, y, self.view.batch, self.view.foreground, EXPERIENCE_FOCUS)
         return output
 

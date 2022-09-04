@@ -1,3 +1,4 @@
+from .Decider.AgentCircle import AgentCircle
 from .Workspace import Workspace
 from .Synthesizer.Synthesizer import Synthesizer
 
@@ -15,6 +16,7 @@ class CtrlWorkspace:
 
     def __init__(self):
         """Constructor"""
+        self.agent = AgentCircle()
         self.workspace = Workspace()
         self.synthesizer = Synthesizer(self)  # Moved from workspace by OG 04/09/2022
 
@@ -41,8 +43,8 @@ class CtrlWorkspace:
             self.has_new_enacted_interaction = False
 
             # Assimilate the enacted interaction in egocentric memory
-            self.workspace.memory.tick()  # TODO Improve the decay mechanism in egocentric memory
-            self.workspace.memory.assimilate(self.enacted_interaction)
+            self.workspace.egocentric_memory.tick()  # TODO Improve the decay mechanism in egocentric memory
+            self.workspace.egocentric_memory.assimilate(self.enacted_interaction)
 
             # Update position in hexa memory
             self.send_position_change_to_hexa_memory()
@@ -65,9 +67,7 @@ class CtrlWorkspace:
                 and self.robot_ready:
             self.robot_ready = False
             self.has_new_outcome_been_treated = False
-            # outcome_ag = self.workspace.agent.result(self.enacted_interaction)
-            # self.action = self.workspace.agent.action(outcome_ag, focus_lost)
-            self.intended_interaction = self.workspace.agent.propose_intended_interaction(self.enacted_interaction,
+            self.intended_interaction = self.agent.propose_intended_interaction(self.enacted_interaction,
                                                                                           focus_lost)
             self.synthesizer.last_action_had_focus = 'focus_x' in self.intended_interaction
             self.synthesizer.last_action = self.intended_interaction

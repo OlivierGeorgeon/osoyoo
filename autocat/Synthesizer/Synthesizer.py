@@ -14,9 +14,8 @@ class Synthesizer:
     def __init__(self, ctrlworkspace):
         """Constructor"""
         self.ctrlworkspace = ctrlworkspace
-        self.memory = ctrlworkspace.workspace.memory
+        self.egocentric_memory = ctrlworkspace.workspace.egocentric_memory
         self.hexa_memory = ctrlworkspace.workspace.hexa_memory
-        # self.internal_hexa_grid = self.internal_hexa_grid = HexaGrid(hexa_memory.width, hexa_memory.height)
         self.internal_hexa_grid = HexaGrid(self.hexa_memory.width, self.hexa_memory.height)
         self.interactions_list = []
         self.echo_objects_to_investigate = EchoObjectsToInvestigate(3, 2, self.hexa_memory, acceptable_delta=700)
@@ -30,7 +29,7 @@ class Synthesizer:
     def act(self):
         """Handle everything the synthesizer has to do, from getting the last interactions in the memory
         to updating the hexa_memory"""
-        self.interactions_list = [elem for elem in self.memory.interactions if (elem.id > self.last_used_id)]
+        self.interactions_list = [elem for elem in self.egocentric_memory.interactions if (elem.id > self.last_used_id)]
         self.last_used_id = max([elem.id for elem in self.interactions_list], default=self.last_used_id)
         echoes = [elem for elem in self.interactions_list if elem.type == EXPERIENCE_LOCAL_ECHO]
         real_echos = self.treat_echos(echoes)
@@ -95,21 +94,15 @@ class Synthesizer:
                     # Compute the means of x and y values for the two elements at the center of the array
                     x_mean = (streak[int(len(streak)/2)][2].x + streak[int(len(streak)/2)-1][2].x)/2
                     y_mean = (streak[int(len(streak)/2)][2].y + streak[int(len(streak)/2)-1][2].y)/2
-                    # experience_central_echo = Interaction(int(x_mean), int(y_mean), width=15,
-                    #                                       experience_type=EXPERIENCE_CENTRAL_ECHO, durability=5,
-                    #                                       decay_intensity=1, experience_id=0)
-                    # experiences_central_echo.append(experience_central_echo)
-                    # self.memory.interactions.append(experience_central_echo)  # OG add to memory for displacement update
                 else:
                     # The x and y are at the center of the array
                     x_mean = streak[int(len(streak) / 2)][2].x
                     y_mean = streak[int(len(streak) / 2)][2].y
-                    # experiences_central_echo.append(streak[int(len(streak)/2)][2])
                 experience_central_echo = Experience(int(x_mean), int(y_mean), width=15,
                                                      experience_type=EXPERIENCE_CENTRAL_ECHO, durability=5,
                                                      decay_intensity=1, experience_id=0)
                 experiences_central_echo.append(experience_central_echo)
-                self.memory.interactions.append(experience_central_echo)  # OG add to memory for displacement update
+                self.egocentric_memory.interactions.append(experience_central_echo)  # OG add to memory for displacement update
 
         return experiences_central_echo
 
