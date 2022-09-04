@@ -15,11 +15,11 @@ class Synthesizer:
         """Constructor"""
         self.workspace = workspace
         self.egocentric_memory = workspace.memory.egocentric_memory
-        self.hexa_memory = workspace.memory.hexa_memory
-        self.internal_hexa_grid = HexaGrid(self.hexa_memory.width, self.hexa_memory.height)
+        self.allocentric_memory = workspace.memory.allocentric_memory
+        self.internal_hexa_grid = HexaGrid(self.allocentric_memory.width, self.allocentric_memory.height)
         self.interactions_list = []
-        self.echo_objects_to_investigate = EchoObjectsToInvestigate(3, 2, self.hexa_memory, acceptable_delta=700)
-        self.echo_objects_valided = EchoObjectValidateds(self.hexa_memory)
+        self.echo_objects_to_investigate = EchoObjectsToInvestigate(3, 2, self.allocentric_memory, acceptable_delta=700)
+        self.echo_objects_valided = EchoObjectValidateds(self.allocentric_memory)
         self.last_projection_for_context = []
         self.experiences_central_echo = []
         self.last_used_id = 0
@@ -121,7 +121,7 @@ class Synthesizer:
         "Convert the egocentric translation given as parameter to an allocentric one, and apply it to the hexa_memory"
         allocentric_translation_x,allocentric_translation_y = translation_between_echo_and_context
         #print("Synthesizer correct position by",allocentric_translation_x,allocentric_translation_y)
-        self.hexa_memory.apply_translation_to_robot_pos(allocentric_translation_x,allocentric_translation_y)
+        self.allocentric_memory.apply_translation_to_robot_pos(allocentric_translation_x, allocentric_translation_y)
 
     def synthesize(self, interactions_list):
         """Synthesize the interactions with the hexamem"""
@@ -132,28 +132,28 @@ class Synthesizer:
             #Convert the interaction 
             status = translate_interaction_type_to_cell_status(elem.type)
             #Apply the status to the hexamem
-            allo_x,allo_y = self.get_allocentric_coordinates_of_interactions([elem])[0][0]
-            cell_x, cell_y = self.hexa_memory.convert_pos_in_cell(allo_x,allo_y)
-            cells_treated.append((cell_x,cell_y))
-            self.hexa_memory.apply_status_to_cell(cell_x, cell_y,status)
+            allo_x, allo_y = self.get_allocentric_coordinates_of_interactions([elem])[0][0]
+            cell_x, cell_y = self.allocentric_memory.convert_pos_in_cell(allo_x, allo_y)
+            cells_treated.append((cell_x, cell_y))
+            self.allocentric_memory.apply_status_to_cell(cell_x, cell_y, status)
         for object_valited in self.echo_objects_valided.list_objects :
             if not object_valited.printed :
                 object_valited.printed = True
                 x,y = object_valited.coord_x, object_valited.coord_y
-                self.hexa_memory.apply_status_to_cell(x,y,translate_interaction_type_to_cell_status("Echo"))
+                self.allocentric_memory.apply_status_to_cell(x, y, translate_interaction_type_to_cell_status("Echo"))
         return cells_treated
 
     def get_allocentric_coordinates_of_interactions(self, interaction_list):
         """ Compute allocentric coordinates for every interaction of the given type in self.interactions_list
         
         Return a list of ((x,y),interaction)"""
-        rota_radian = math.radians(self.hexa_memory.robot_angle)
+        rota_radian = math.radians(self.allocentric_memory.robot_angle)
         allocentric_coordinates = []
-        for _,interaction in enumerate(interaction_list):
-                corner_x,corner_y = interaction.x,interaction.y
-                x_prime = int(corner_x* math.cos(rota_radian) - corner_y * math.sin(rota_radian) + self.hexa_memory.robot_pos_x)
-                y_prime = int(corner_y * math.cos(rota_radian) + corner_x* math.sin(rota_radian) + self.hexa_memory.robot_pos_y)
-                allocentric_coordinates.append(((x_prime,y_prime),interaction))
+        for _, interaction in enumerate(interaction_list):
+            corner_x, corner_y = interaction.x,interaction.y
+            x_prime = int(corner_x * math.cos(rota_radian) - corner_y * math.sin(rota_radian) + self.allocentric_memory.robot_pos_x)
+            y_prime = int(corner_y * math.cos(rota_radian) + corner_x * math.sin(rota_radian) + self.allocentric_memory.robot_pos_y)
+            allocentric_coordinates.append(((x_prime,y_prime),interaction))
         return allocentric_coordinates
 
     def create_focus_echo(self):
