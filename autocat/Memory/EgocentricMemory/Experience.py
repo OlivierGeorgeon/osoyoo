@@ -14,7 +14,8 @@ class Experience:
     """Experiences are instances of interactions
     along with the spatial and temporal information of where and when they were enacted"""
 
-    def __init__(self, x, y, width=50, height=50, experience_type='None', durability=10, decay_intensity=1, experience_id=0):
+    def __init__(self, x, y, width=50, height=50, experience_type='None', durability=10, decay_intensity=1,
+                 experience_id=0):
         """Create an object to be placed in the memory.
         Args:
         x, y : coordinates relative the robot.
@@ -37,20 +38,21 @@ class Experience:
         self.tick_number = 0
         self.id = experience_id
 
-    def decay(self):
-        """Remove one decayIntensity from the durability of the object.
-        Return: The new durability after decay
-        """
-        self.actual_durability -= self.decay_intensity
-        return self.actual_durability
+    # def decay(self):
+    #     """Remove one decayIntensity from the durability of the object.
+    #     Return: The new durability after decay
+    #     """
+    #     self.actual_durability -= self.decay_intensity
+    #     return self.actual_durability
 
     def tick(self):
-        """Handle everything that happens to the phenomenon when a tick is done"""
+        """Updates the clock and decay of this interaction"""
         self.tick_number += 1
-        self.decay()
+        self.actual_durability -= self.decay_intensity
+        # self.decay()
 
     def displace(self, displacement_matrix):
-        """ Displace and rotate the interaction by the displacement_matrix """
+        """ Displace and rotate the experience by the displacement_matrix """
 
         assert displacement_matrix is not None
         self.position_matrix = matrix44.multiply(self.position_matrix, displacement_matrix)

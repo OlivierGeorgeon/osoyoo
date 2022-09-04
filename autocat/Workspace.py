@@ -42,14 +42,13 @@ class Workspace:
         if self.has_new_enacted_interaction:
             self.has_new_enacted_interaction = False
 
-            # Assimilate the enacted interaction in egocentric memory
-            self.memory.egocentric_memory.tick()  # TODO Improve the decay mechanism in egocentric memory
-            self.memory.egocentric_memory.assimilate(self.enacted_interaction)
+            # Move the memories and add new experiences to egocentric memory
+            # self.memory.egocentric_memory.tick()
+            # self.memory.egocentric_memory.update_and_add_experiences(self.enacted_interaction)
+            self.memory.update_and_add_experiences(self.enacted_interaction)
 
-            # Update position in hexa memory
-            self.send_position_change_to_hexa_memory()
+            # self.send_position_change_to_hexa_memory()
 
-            # Add new experiences to memory
             self.flag_for_view_refresh = True
 
             # We call Synthesizer.Act and get the results, the synthesizer will update the hexa_memory
@@ -73,17 +72,17 @@ class Workspace:
             self.synthesizer.last_action = self.intended_interaction
             self.has_new_action = True
             
-    def send_position_change_to_hexa_memory(self):
-        """Apply movement to hexamem"""
-        if self.memory.hexa_memory is not None:
-            self.memory.hexa_memory.azimuth = self.enacted_interaction['azimuth']
-            self.memory.hexa_memory.move(self.enacted_interaction['yaw'], self.enacted_interaction['translation'][0],
-                                         self.enacted_interaction['translation'][1])
+    # def send_position_change_to_hexa_memory(self):
+    #     """Apply movement to hexamem"""
+    #     if self.memory.hexa_memory is not None:
+    #         self.memory.hexa_memory.azimuth = self.enacted_interaction['azimuth']
+    #         self.memory.hexa_memory.move(self.enacted_interaction['yaw'], self.enacted_interaction['translation'][0],
+    #                                      self.enacted_interaction['translation'][1])
     
     def get_intended_interaction(self):
         """Return (True, intended_interaction) if there is one, else (False, None)
         Reset the intended_interaction
-        Called by CtrlRobot
+        (Called by CtrlRobot)
         """
         if self.has_new_action:
             self.has_new_action = False
@@ -97,6 +96,14 @@ class Workspace:
             # return False, None
             return None
 
+    def update_enacted_interaction(self, enacted_interaction):
+        """Update the enacted interaction (called by CtrlRobot)"""
+        if "status" in enacted_interaction and enacted_interaction["status"] == "T":
+            print("The workspace received an empty enacted interaction")
+            return
+        self.enacted_interaction = enacted_interaction
+        self.has_new_enacted_interaction = True
+
     def set_action(self, action):
         """Set the action to enact (called by CtrlHexaview)"""
         self.intended_interaction = action
@@ -109,11 +116,3 @@ class Workspace:
     def put_decider_to_manual(self):
         """Put the decider in manual mode (called by CtrlHexaview)"""
         self.decider_mode = CONTROL_MODE_MANUAL
-
-    def update_enacted_interaction(self, enacted_interaction):
-        """Update the enacted interaction (called by CtrlRobot)"""
-        if "status" in enacted_interaction and enacted_interaction["status"] == "T":
-            print("CtrlWorkspaceTest received empty outcome")
-            return
-        self.enacted_interaction = enacted_interaction
-        self.has_new_enacted_interaction = True
