@@ -1,20 +1,17 @@
 import pyglet
-from .HexaView import HexaView
-from ...Workspace import Workspace
+from .AllocentricView import AllocentricView
+from ...Memory import Memory
 from ...Memory.HexaMemory.HexaMemory import HexaMemory
 
 
-class CtrlHexaview:
-
-    """Made to work with CtrlWorkspaceTest"""
-
-    def __init__(self, ctrl_workspace):
+class CtrlAllocentricView:
+    def __init__(self, workspace):
         """blabla"""
-        self.ctrl_workspace = ctrl_workspace
-        self.hexaview = HexaView(hexa_memory=self.ctrl_workspace.workspace.hexa_memory)
+        self.workspace = workspace
+        self.hexaview = AllocentricView(hexa_memory=self.workspace.memory.hexa_memory)
         self.refresh_count = 0
         self.mouse_x, self.mouse_y = None, None
-        self.hexa_memory = ctrl_workspace.workspace.hexa_memory
+        self.hexa_memory = workspace.memory.hexa_memory
         self.to_reset = []
         self.focus_x = None
         self.focus_y = None
@@ -29,18 +26,18 @@ class CtrlHexaview:
             elif text.upper() == "A":
                 #TODO
                 ""
-                self.ctrl_workspace.put_decider_to_auto()
+                self.workspace.put_decider_to_auto()
             elif text.upper() == "M":
                 #TODO
                 ""
-                self.ctrl_workspace.put_decider_to_manual()
+                self.workspace.put_decider_to_manual()
             #CAS GENERAl
             elif text.upper() == "T":
-                self.ctrl_workspace.workspace.hexa_memory.apply_status_to_rectangle(-500, 600, 1000, 1000, "Frontier")
+                self.workspace.egocentric_memory.hexa_memory.apply_status_to_rectangle(-500, 600, 1000, 1000, "Frontier")
             else:
                 action = {"action": text}
                 
-                self.ctrl_workspace.set_action(action)
+                self.workspace.set_action(action)
         self.hexaview.on_text = on_text_hemw
 
         def on_mouse_press(x, y, button, modifiers):

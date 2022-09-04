@@ -11,11 +11,11 @@ class Synthesizer:
     """Synthesizer
     (Involved in the focus)
     """
-    def __init__(self, ctrlworkspace):
+    def __init__(self, workspace):
         """Constructor"""
-        self.ctrlworkspace = ctrlworkspace
-        self.egocentric_memory = ctrlworkspace.workspace.egocentric_memory
-        self.hexa_memory = ctrlworkspace.workspace.hexa_memory
+        self.workspace = workspace
+        self.egocentric_memory = workspace.memory.egocentric_memory
+        self.hexa_memory = workspace.memory.hexa_memory
         self.internal_hexa_grid = HexaGrid(self.hexa_memory.width, self.hexa_memory.height)
         self.interactions_list = []
         self.echo_objects_to_investigate = EchoObjectsToInvestigate(3, 2, self.hexa_memory, acceptable_delta=700)
@@ -29,7 +29,7 @@ class Synthesizer:
     def act(self):
         """Handle everything the synthesizer has to do, from getting the last interactions in the memory
         to updating the hexa_memory"""
-        self.interactions_list = [elem for elem in self.egocentric_memory.interactions if (elem.id > self.last_used_id)]
+        self.interactions_list = [elem for elem in self.egocentric_memory.experiences if (elem.id > self.last_used_id)]
         self.last_used_id = max([elem.id for elem in self.interactions_list], default=self.last_used_id)
         echoes = [elem for elem in self.interactions_list if elem.type == EXPERIENCE_LOCAL_ECHO]
         real_echos = self.treat_echos(echoes)
@@ -102,7 +102,7 @@ class Synthesizer:
                                                      experience_type=EXPERIENCE_CENTRAL_ECHO, durability=5,
                                                      decay_intensity=1, experience_id=0)
                 experiences_central_echo.append(experience_central_echo)
-                self.egocentric_memory.interactions.append(experience_central_echo)  # OG add to memory for displacement update
+                self.egocentric_memory.experiences.append(experience_central_echo)  # OG add to memory for displacement update
 
         return experiences_central_echo
 
@@ -161,11 +161,11 @@ class Synthesizer:
         focus_lost = False
         if self.last_action_had_focus:
             # distance = self.memory.last_enacted_interaction['echo_distance']  # OG 04/09/2022
-            distance = self.ctrlworkspace.enacted_interaction['echo_distance']
+            distance = self.workspace.enacted_interaction['echo_distance']
             if distance > 800 and (self.last_action is not None) and not (self.last_action == "-" or self.last_action['action'] == "-"):
                 focus_lost = True
             # angle = self.memory.last_enacted_interaction['head_angle']
-            angle = self.ctrlworkspace.enacted_interaction['head_angle']  # OG 04/09/2022
+            angle = self.workspace.enacted_interaction['head_angle']  # OG 04/09/2022
             x = int(distance * math.cos(math.radians(angle)))
             y = int(distance * math.sin(math.radians(angle)))
             interaction_focus = Experience(x, y, width=15, experience_type=EXPERIENCE_FOCUS, durability=5, decay_intensity=1, experience_id=0)

@@ -17,13 +17,11 @@ class EgocentricMemory:
     """
 
     def __init__(self):
-        self.interactions = []
+        self.experiences = []
         self.current_id = 0
-        # self.last_enacted_interaction = None
-        # self.experiences_focus = []
 
     def reset(self):
-        self.interactions = []
+        self.experiences = []
         self.current_id = 0
 
     def assimilate(self, enacted_interaction):
@@ -33,7 +31,7 @@ class EgocentricMemory:
         """
 
         # Move the existing interactions
-        for interaction in self.interactions:
+        for interaction in self.experiences:
             interaction.displace(enacted_interaction['displacement_matrix'])
 
         # self.last_enacted_interaction = enacted_interaction
@@ -41,7 +39,7 @@ class EgocentricMemory:
         for p in enacted_interaction['points']:
             interaction = Experience(p[1], p[2], 10, 10, experience_type=p[0], experience_id=self.current_id,
                                      durability=INTERACTION_PERSISTENCE)
-            self.interactions.append(interaction)
+            self.experiences.append(interaction)
             self.current_id += 1
 
     # def add_echo_array(self, echo_array):
@@ -54,21 +52,21 @@ class EgocentricMemory:
                 local_echo_interaction = Experience(x, y, width=15, experience_type=EXPERIENCE_LOCAL_ECHO,
                                                     durability=INTERACTION_PERSISTENCE, decay_intensity=1,
                                                     experience_id=self.current_id)
-                self.interactions.append(local_echo_interaction)
+                self.experiences.append(local_echo_interaction)
                 self.current_id += 1
 
     def tick(self):
-        for p in self.interactions:
+        for p in self.experiences:
             p.tick()
         # Remove the interactions when they are too old
         to_remove = []
-        for i in self.interactions:
+        for i in self.experiences:
             if i.actual_durability <= 0:
                 to_remove.append(i)
-        self.interactions = [x for x in self.interactions if x not in to_remove]
+        self.experiences = [x for x in self.experiences if x not in to_remove]
 
     def empty(self):
-        self.interactions.clear()
+        self.experiences.clear()
 
     # def move(self, rotation, translation):
     #     """ Compute the displacement matrix and apply it to the interactions """

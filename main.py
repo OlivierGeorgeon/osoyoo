@@ -19,22 +19,22 @@
 
 import sys
 import pyglet
-from autocat import CtrlWorkspace, CtrlRobot, CtrlView, CtrlHexaview
+from autocat import Workspace, CtrlRobot, CtrlEgocentricView, CtrlAllocentricView
 
 robot_ip = "192.168.8.189"
 if len(sys.argv) > 1:
     robot_ip = sys.argv[1]
 print("Robot IP:", robot_ip)
 
-ctrl_workspace = CtrlWorkspace()
-ctrl_robot = CtrlRobot(robot_ip, ctrl_workspace)
-ctrl_egocentric_view = CtrlView(ctrl_workspace)
-ctrl_allocentric_view = CtrlHexaview(ctrl_workspace)
+workspace = Workspace()
+ctrl_robot = CtrlRobot(robot_ip, workspace)
+ctrl_egocentric_view = CtrlEgocentricView(workspace)
+ctrl_allocentric_view = CtrlAllocentricView(workspace)
 
 
 def update(dt):
     """The updates in the main loop"""
-    ctrl_workspace.main(dt)
+    workspace.main(dt)
     ctrl_robot.main(dt)
     ctrl_egocentric_view.main(dt)
     ctrl_allocentric_view.main(dt)

@@ -1,7 +1,6 @@
 from pyrr import matrix44, Quaternion
 import math
 
-
 EXPERIENCE_ALIGNED_ECHO = 'Echo'
 EXPERIENCE_LOCAL_ECHO = 'Local_Echo'
 EXPERIENCE_CENTRAL_ECHO = 'Central_Echo'
@@ -37,18 +36,6 @@ class Experience:
         self.type = experience_type
         self.tick_number = 0
         self.id = experience_id
-        # self.corners = None
-        # self.compute_corners()
-
-    # def compute_corners(self):
-    #     """Compute the corners of the Interaction.
-    #     """
-    #     self.corners = [
-    #         (self.x, self.y),
-    #         (self.x + self.width, self.y),
-    #         (self.x + self.width, self.y + self.height),
-    #         (self.x, self.y + self.height),
-    #     ]
 
     def decay(self):
         """Remove one decayIntensity from the durability of the object.

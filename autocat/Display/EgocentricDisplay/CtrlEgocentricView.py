@@ -2,18 +2,18 @@ import pyglet
 from pyglet.window import key
 from .EgocentricView import EgocentricView
 from .PointOfInterest import *
+from ...Memory import Memory
 from ...Workspace import Workspace
-from ...CtrlWorkspace import CtrlWorkspace
 
 
-class CtrlView:
+class CtrlEgocentricView:
     """Handle the logic of the egocentric view, retrieve data from the memory and convert it
     to points of interest that can be displayed in a pyglet window"""
-    def __init__(self, ctrl_workspace):
+    def __init__(self, workspace):
         self.view = EgocentricView()
-        self.ctrl_workspace = ctrl_workspace
-        self.memory = ctrl_workspace.workspace.egocentric_memory
-        self.synthesizer = ctrl_workspace.synthesizer
+        self.workspace = workspace
+        self.egocentric_memory = workspace.memory.egocentric_memory
+        self.synthesizer = workspace.synthesizer
         self.points_of_interest = []
         self.last_action = None
         self.mouse_press_x = 0
@@ -36,7 +36,7 @@ class CtrlView:
                         p.delete()
                         self.points_of_interest.remove(p)
                         if p.interaction is not None:
-                            self.memory.interactions.remove(p.interaction)
+                            self.egocentric_memory.experiences.remove(p.interaction)
             if symbol == key.INSERT:
                 phenomenon = PointOfInterest(self.mouse_press_x, self.mouse_press_y, self.view.batch,
                                              self.view.background, EXPERIENCE_FOCUS)
@@ -59,12 +59,12 @@ class CtrlView:
         then update the shape of each POI"""
 
         # If timeout then no egocentric view update
-        if self.ctrl_workspace.enacted_interaction['status'] == "T":
+        if self.workspace.enacted_interaction['status'] == "T":
             print("No ego memory update")
             return
 
         # Create the new points of interest from the new experiences
-        new_experiences = [elem for elem in self.memory.interactions if elem.id > self.last_used_id]
+        new_experiences = [elem for elem in self.egocentric_memory.experiences if elem.id > self.last_used_id]
         for interaction in new_experiences:
             if interaction.id > self.last_used_id:
                 self.last_used_id = max(interaction.id, self.last_used_id)
@@ -77,8 +77,8 @@ class CtrlView:
             # print(poi_central_echo)
             self.points_of_interest.append(poi_central_echo)
 
-        displacement_matrix = self.ctrl_workspace.enacted_interaction['displacement_matrix'] if 'displacement_matrix' \
-            in self.ctrl_workspace.enacted_interaction else None
+        displacement_matrix = self.workspace.enacted_interaction['displacement_matrix'] if 'displacement_matrix' \
+                                                                                           in self.workspace.enacted_interaction else None
 
         # Displace the points of interest
         for poi_displace in self.points_of_interest:
@@ -92,8 +92,8 @@ class CtrlView:
         self.add_point_of_interest(0, 0, POINT_PLACE)
 
         # Update the robot's position
-        self.view.robot.rotate_head(self.ctrl_workspace.enacted_interaction['head_angle'])
-        self.view.azimuth = self.ctrl_workspace.enacted_interaction['azimuth']
+        self.view.robot.rotate_head(self.workspace.enacted_interaction['head_angle'])
+        self.view.azimuth = self.workspace.enacted_interaction['azimuth']
 
         # Point of interest compass
         # if 'compass_x' in self.ctrl_workspace.enacted_interaction:
@@ -126,10 +126,10 @@ class CtrlView:
     def create_poi_focus(self):
         """Create a point of interest corresponding to the focus"""
         output = None
-        if hasattr(self.ctrl_workspace.agent, "focus"):
-            if self.ctrl_workspace.agent.focus:
-                x = self.ctrl_workspace.agent.echo_xy[0]
-                y = self.ctrl_workspace.agent.echo_xy[1]
+        if hasattr(self.workspace.agent, "focus"):
+            if self.workspace.agent.focus:
+                x = self.workspace.agent.echo_xy[0]
+                y = self.workspace.agent.echo_xy[1]
                 output = PointOfInterest(x, y, self.view.batch, self.view.foreground, EXPERIENCE_FOCUS)
         return output
 
@@ -147,21 +147,21 @@ class CtrlView:
 
     def main(self, dt):
         """Called every frame, update the view"""
-        if self.ctrl_workspace.flag_for_view_refresh:
+        if self.workspace.flag_for_view_refresh:
             # self.points_of_interest = []
             self.update_points_of_interest()
             # if self.synthesizer is not None and len(self.synthesizer.last_real_echos) > 0:
             #     last_real_echos = []
-            self.ctrl_workspace.flag_for_view_refresh = False
+            self.workspace.flag_for_view_refresh = False
 
 
 # Displaying EgocentricView with points of interest.
 # Allow selecting points of interest and inserting and deleting phenomena
 # py -m stage_titouan.Display.EgocentricDisplay.CtrlView
 if __name__ == "__main__":
-    workspace = Workspace()
-    workspace_controller = CtrlWorkspace(workspace)
-    view_controller = CtrlView(workspace_controller)
+    memory = Memory()
+    _workspace = Workspace(memory)
+    view_controller = CtrlEgocentricView(_workspace)
     view_controller.view.robot.rotate_head(-45)
 
     # Add points of interest directly to the view_controller
@@ -173,7 +173,7 @@ if __name__ == "__main__":
 
     # Update the list of points of interest from memory
     last_used_id = -1
-    _interactions_list = [elem for elem in view_controller.memory.interactions if elem.id > last_used_id]
+    _interactions_list = [elem for elem in view_controller.egocentric_memory.experiences if elem.id > last_used_id]
     for _interaction in _interactions_list:
         if _interaction.id > last_used_id:
             last_used_id = max(_interaction.id, last_used_id)

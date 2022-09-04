@@ -12,7 +12,7 @@ CELL_RADIUS = 50
 ZOOM_IN_FACTOR = 1.2
 
 
-class HexaView(pyglet.window.Window):
+class AllocentricView(pyglet.window.Window):
     """Create the allocentric view"""
     def __init__(self, width=400, height=400, shapesList=[], cell_radius=20, hexa_memory=None, *args, **kwargs):
         super().__init__(width, height, resizable=True, *args, **kwargs)
@@ -119,7 +119,7 @@ if __name__ == "__main__":
     # Create the hexa grid
     hexagonal_memory = HexaMemory(width=30, height=100, cell_radius=50)
 
-    hexaview = HexaView(hexa_memory=hexagonal_memory)
+    hexaview = AllocentricView(hexa_memory=hexagonal_memory)
 
     # Create the shapes to draw the cells
     hexaview.extract_and_convert_interactions(hexagonal_memory)
