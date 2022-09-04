@@ -96,8 +96,8 @@ class EgocentricView(pyglet.window.Window):
     #     self.shapesList = memory_to_pyglet(memory, self.batch)
 
 
-# Displaying the EgocentricView with the robot in a pretty position, and the mouse click coordinates
-# py -m stage_titouan.Display.EgocentricDisplay.EgocentricView
+# Testing the EgocentricView by displaying the robot in a pretty position, and the mouse click coordinates
+# py -m autocat.Display.EgocentricDisplay.EgocentricView
 if __name__ == "__main__":
     view = EgocentricView()
     view.robot.rotate_head(-45)  # Turn head 45° to the right

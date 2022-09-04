@@ -1,14 +1,13 @@
 import pyglet
 from pyglet.gl import *
-from autocat.Memory.HexaMemory.Utils import hexaMemory_to_pyglet
-from autocat.Memory.HexaMemory.Utils import translate_indecisive_cell_to_pyglet
-from autocat.Memory.HexaMemory.Utils import recently_changed_to_pyglet
-from ... Memory.HexaMemory.HexaMemory import HexaMemory
+from ...Memory.HexaMemory.Utils import hexaMemory_to_pyglet
+from ...Memory.HexaMemory.Utils import translate_indecisive_cell_to_pyglet
+from ...Memory.HexaMemory.Utils import recently_changed_to_pyglet
+from ...Memory.HexaMemory.HexaMemory import HexaMemory
 
 NB_CELL_WIDTH = 30
 NB_CELL_HEIGHT = 100
 CELL_RADIUS = 50
-
 ZOOM_IN_FACTOR = 1.2
 
 
@@ -109,19 +108,3 @@ class AllocentricView(pyglet.window.Window):
         cell_x, cell_y = self.hexa_memory.convert_pos_in_cell(mouse_x, mouse_y)
         self.label.text = "Cell: " + str(cell_x) + ", " + str(cell_y)
         return cell_x, cell_y
-
-
-# Testing HexaView by displaying HexaMemory
-# Hover the grid to display the mouse position
-# py -m stage_titouan.Display.HexaDisplay.HexaView
-if __name__ == "__main__":
-
-    # Create the hexa grid
-    hexagonal_memory = HexaMemory(width=30, height=100, cell_radius=50)
-
-    hexaview = AllocentricView(hexa_memory=hexagonal_memory)
-
-    # Create the shapes to draw the cells
-    hexaview.extract_and_convert_interactions(hexagonal_memory)
-
-    pyglet.app.run()
