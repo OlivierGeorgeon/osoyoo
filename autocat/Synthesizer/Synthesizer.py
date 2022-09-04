@@ -10,16 +10,17 @@ from .SynthesizerSubclasses.EchoObjectsToInvestigate import EchoObjectsToInvesti
 class Synthesizer:
     """Synthesizer
     (Involved in the focus)
-
     """
-    def __init__(self, memory, hexa_memory):
+    def __init__(self, ctrlworkspace):
         """Constructor"""
-        self.memory = memory
-        self.hexa_memory = hexa_memory
-        self.internal_hexa_grid = self.internal_hexa_grid = HexaGrid(hexa_memory.width, hexa_memory.height)
+        self.ctrlworkspace = ctrlworkspace
+        self.memory = ctrlworkspace.workspace.memory
+        self.hexa_memory = ctrlworkspace.workspace.hexa_memory
+        # self.internal_hexa_grid = self.internal_hexa_grid = HexaGrid(hexa_memory.width, hexa_memory.height)
+        self.internal_hexa_grid = HexaGrid(self.hexa_memory.width, self.hexa_memory.height)
         self.interactions_list = []
-        self.echo_objects_to_investigate = EchoObjectsToInvestigate(3,2,self.hexa_memory,acceptable_delta = 700)
-        self.echo_objects_valided = EchoObjectValidateds(hexa_memory)
+        self.echo_objects_to_investigate = EchoObjectsToInvestigate(3, 2, self.hexa_memory, acceptable_delta=700)
+        self.echo_objects_valided = EchoObjectValidateds(self.hexa_memory)
         self.last_projection_for_context = []
         self.experiences_central_echo = []
         self.last_used_id = 0
@@ -166,10 +167,12 @@ class Synthesizer:
         """Create a echo interaction corresponding to the focus"""
         focus_lost = False
         if self.last_action_had_focus:
-            distance = self.memory.last_enacted_interaction['echo_distance']
+            # distance = self.memory.last_enacted_interaction['echo_distance']  # OG 04/09/2022
+            distance = self.ctrlworkspace.enacted_interaction['echo_distance']
             if distance > 800 and (self.last_action is not None) and not (self.last_action == "-" or self.last_action['action'] == "-"):
                 focus_lost = True
-            angle = self.memory.last_enacted_interaction['head_angle']
+            # angle = self.memory.last_enacted_interaction['head_angle']
+            angle = self.ctrlworkspace.enacted_interaction['head_angle']  # OG 04/09/2022
             x = int(distance * math.cos(math.radians(angle)))
             y = int(distance * math.sin(math.radians(angle)))
             interaction_focus = Experience(x, y, width=15, experience_type=EXPERIENCE_FOCUS, durability=5, decay_intensity=1, experience_id=0)

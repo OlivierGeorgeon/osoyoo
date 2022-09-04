@@ -1,11 +1,9 @@
 import json
-# import math
 import numpy
 import threading
-# from pyrr import matrix44
-from autocat.Robot.RobotDefine import *
-from autocat.Robot.WifiInterface import WifiInterface
-from autocat.Memory.EgocentricMemory.Experience import *
+from .RobotDefine import *
+from .WifiInterface import WifiInterface
+from ..Memory.EgocentricMemory.Experience import *
 
 ENACT_STEP_IDLE = 0
 ENACT_STEP_ENACTING = 1
@@ -16,7 +14,8 @@ class CtrlRobot:
     """Handle the communication with the robot:
         - When the workspace controller has an intended_interaction, compute the command string and send it to the robot
         - When the outcome string is received from the robot, compute the enacted_interaction and send it to the
-        workspace controller"""
+          workspace controller
+    """
 
     def __init__(self, robot_ip, ctrl_workspace):
 
@@ -48,15 +47,6 @@ class CtrlRobot:
             # self.robot_has_finished_acting = False
             enacted_interaction = self.translate_robot_data()
             self.ctrl_workspace.update_enacted_interaction(enacted_interaction)
-
-        # intended_interaction = None
-        # if not self.has_new_action_to_enact:
-        #     self.has_new_action_to_enact, intended_interaction = self.ctrl_workspace.get_intended_interaction()
-        #
-        # if self.has_new_action_to_enact and self.enact_step == ENACT_STEP_IDLE:
-        #     self.ctrl_workspace.robot_ready = False
-        #     self.command_robot(intended_interaction)
-        #     self.has_new_action_to_enact = False
 
         if self.enact_step == ENACT_STEP_IDLE:
             # self.has_new_action_to_enact, intended_interaction = self.ctrl_workspace.get_intended_interaction()

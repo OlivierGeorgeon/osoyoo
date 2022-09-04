@@ -19,16 +19,24 @@ class EgocentricMemory:
     def __init__(self):
         self.interactions = []
         self.current_id = 0
-        self.last_enacted_interaction = None
+        # self.last_enacted_interaction = None
         # self.experiences_focus = []
 
     def reset(self):
         self.interactions = []
         self.current_id = 0
 
-    def add_enacted_interaction(self, enacted_interaction):  # Added by Olivier 08/05/2022
-        """ Construct the experiences and add them to memory from the enacted_interaction """
-        self.last_enacted_interaction = enacted_interaction
+    def assimilate(self, enacted_interaction):
+        """ Process the enacted interaction to update the egocentric memory
+        - Move the previous interactions
+        - Add new interactions
+        """
+
+        # Move the existing interactions
+        for interaction in self.interactions:
+            interaction.displace(enacted_interaction['displacement_matrix'])
+
+        # self.last_enacted_interaction = enacted_interaction
         # Create experiences from points in the enacted_interaction
         for p in enacted_interaction['points']:
             interaction = Experience(p[1], p[2], 10, 10, experience_type=p[0], experience_id=self.current_id,
@@ -62,14 +70,14 @@ class EgocentricMemory:
     def empty(self):
         self.interactions.clear()
 
-    def move(self, rotation, translation):
-        """ Compute the displacement matrix and apply it to the interactions """
-        translation_matrix = matrix44.create_from_translation([-translation[0], -translation[1], 0])
-        rotation_matrix = matrix44.create_from_z_rotation(math.radians(rotation))
-        displacement_matrix = matrix44.multiply(rotation_matrix, translation_matrix)
-        # Translate and rotate all the interactions
-        for interaction in self.interactions:
-            interaction.displace(displacement_matrix)
+    # def move(self, rotation, translation):
+    #     """ Compute the displacement matrix and apply it to the interactions """
+    #     translation_matrix = matrix44.create_from_translation([-translation[0], -translation[1], 0])
+    #     rotation_matrix = matrix44.create_from_z_rotation(math.radians(rotation))
+    #     displacement_matrix = matrix44.multiply(rotation_matrix, translation_matrix)
+    #     # Translate and rotate all the interactions
+    #     for interaction in self.interactions:
+    #         interaction.displace(displacement_matrix)
 
     def last_action(self):
         return self.actions[-1] if len(self.actions) > 0 else None

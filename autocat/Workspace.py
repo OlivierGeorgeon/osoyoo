@@ -13,4 +13,4 @@ class Workspace:
         self.agent = AgentCircle()
         self.memory = EgocentricMemory()
         self.hexa_memory = HexaMemory(hexamemory_size[0], hexamemory_size[1], cell_radius=cell_radius)
-        self.synthesizer = Synthesizer(self.memory, self.hexa_memory)
+        # self.synthesizer = Synthesizer(self.memory, self.hexa_memory)

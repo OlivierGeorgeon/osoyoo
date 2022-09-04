@@ -1,4 +1,5 @@
 from .Workspace import Workspace
+from .Synthesizer.Synthesizer import Synthesizer
 
 CONTROL_MODE_AUTOMATIC = "auto"
 CONTROL_MODE_MANUAL = "manual"
@@ -15,6 +16,8 @@ class CtrlWorkspace:
     def __init__(self):
         """Constructor"""
         self.workspace = Workspace()
+        self.synthesizer = Synthesizer(self)  # Moved from workspace by OG 04/09/2022
+
         self.intended_interaction = None
         self.enacted_interaction = {}
 
@@ -37,19 +40,18 @@ class CtrlWorkspace:
         if self.has_new_enacted_interaction:
             self.has_new_enacted_interaction = False
 
-            # We update the memories
-            self.workspace.memory.tick()
+            # Assimilate the enacted interaction in egocentric memory
+            self.workspace.memory.tick()  # TODO Improve the decay mechanism in egocentric memory
+            self.workspace.memory.assimilate(self.enacted_interaction)
+
+            # Update position in hexa memory
             self.send_position_change_to_hexa_memory()
-            #self.send_position_change_to_memory()
-            self.workspace.memory.move(self.enacted_interaction['yaw'], self.enacted_interaction['translation'])
 
             # Add new experiences to memory
-            self.workspace.memory.add_enacted_interaction(self.enacted_interaction)
-            #self.send_phenom_info_to_memory()
             self.flag_for_view_refresh = True
 
             # We call Synthesizer.Act and get the results, the synthesizer will update the hexa_memory
-            synthesizer_action, synthesizer_results, focus_lost = self.workspace.synthesizer.act()
+            synthesizer_action, synthesizer_results, focus_lost = self.synthesizer.act()
 
             # If the synthesizer need an action done, we save it
             if synthesizer_action is not None:
@@ -67,21 +69,10 @@ class CtrlWorkspace:
             # self.action = self.workspace.agent.action(outcome_ag, focus_lost)
             self.intended_interaction = self.workspace.agent.propose_intended_interaction(self.enacted_interaction,
                                                                                           focus_lost)
-            self.workspace.synthesizer.last_action_had_focus = 'focus_x' in self.intended_interaction
-            self.workspace.synthesizer.last_action = self.intended_interaction
+            self.synthesizer.last_action_had_focus = 'focus_x' in self.intended_interaction
+            self.synthesizer.last_action = self.intended_interaction
             self.has_new_action = True
             
-    # def send_phenom_info_to_memory(self):
-    #     """Send Enacted Interaction to Memory"""
-    #     self.workspace.memory.add_enacted_interaction(self.enacted_interaction)
-        # if 'echo_array' in self.enacted_interaction:
-        #     self.workspace.memory.add_echo_array(self.enacted_interaction['echo_array'])
-
-    # def send_position_change_to_memory(self):
-    #     """Send position changes (angle,distance) to the Memory"""
-    #     if self.workspace.memory is not None:
-    #         self.workspace.memory.move(self.enacted_interaction['yaw'], self.enacted_interaction['translation'])
-
     def send_position_change_to_hexa_memory(self):
         """Apply movement to hexamem"""
         if self.workspace.hexa_memory is not None:
@@ -97,7 +88,7 @@ class CtrlWorkspace:
         if self.has_new_action:
             self.has_new_action = False
             if 'focus_x' in self.intended_interaction:
-                self.workspace.synthesizer.last_action_had_focus = True
+                self.synthesizer.last_action_had_focus = True
             # returno = True, self.intended_interaction
             returno = self.intended_interaction
             self.intended_interaction = None

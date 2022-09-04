@@ -13,7 +13,7 @@ class CtrlView:
         self.view = EgocentricView()
         self.ctrl_workspace = ctrl_workspace
         self.memory = ctrl_workspace.workspace.memory
-        self.synthesizer = ctrl_workspace.workspace.synthesizer
+        self.synthesizer = ctrl_workspace.synthesizer
         self.points_of_interest = []
         self.last_action = None
         self.mouse_press_x = 0
@@ -76,7 +76,6 @@ class CtrlView:
             poi_central_echo = self.create_point_of_interest(experience_central_echo)
             # print(poi_central_echo)
             self.points_of_interest.append(poi_central_echo)
-        # self.synthesizer.experiences_central_echo = []
 
         displacement_matrix = self.ctrl_workspace.enacted_interaction['displacement_matrix'] if 'displacement_matrix' \
             in self.ctrl_workspace.enacted_interaction else None
@@ -127,16 +126,6 @@ class CtrlView:
     def create_poi_focus(self):
         """Create a point of interest corresponding to the focus"""
         output = None
-        # For AgentRotator
-        # l_action = self.memory.last_action()
-        # if l_action is not None and type(l_action) is dict and 'focus_x' in l_action:
-        #     ha = self.memory.last_enacted_interaction['head_angle']
-        #     dist = self.memory.last_enacted_interaction['echo_distance']
-        #     x = math.cos(math.radians(ha)) * dist
-        #     y = math.sin(math.radians(ha)) * dist
-        #     output = PointOfInterest(x, y, self.view.batch, self.view.foreground, EXPERIENCE_FOCUS)
-
-        # For AgentCircle
         if hasattr(self.ctrl_workspace.workspace.agent, "focus"):
             if self.ctrl_workspace.workspace.agent.focus:
                 x = self.ctrl_workspace.workspace.agent.echo_xy[0]
@@ -148,11 +137,6 @@ class CtrlView:
         """Create a point of interest corresponding to the interaction given as parameter"""
         return PointOfInterest(interaction.x, interaction.y, self.view.batch, self.view.foreground,
                                interaction.type, interaction=interaction)
-
-    # def create_point_of_interest_from_real_echo(self, interaction):
-    #     """Create a point of interest corresponding to the real echo given as parameter"""
-    #     return PointOfInterest(interaction.x, interaction.y, self.view.batch, self.view.foreground,
-    #                            EXPERIENCE_CENTRAL_ECHO, interaction=interaction)
 
     def get_focus_phenomenon(self):
         """ Returning the first selected phenomenon """
