@@ -1,7 +1,3 @@
-import sys
-import os
-# sys.path.insert(1, os.path.join(sys.path[0], '..'))
-from ast import match_case
 import math
 from . HexaGrid import HexaGrid
 
@@ -46,7 +42,7 @@ class HexaMemory(HexaGrid):
         self.cells_changed_recently = []
 
     def update_orientation(self):
-        "update the orientation of the robot based on its angle"
+        """update the orientation of the robot based on its angle"""
         angle = self.robot_angle
         if angle <= 60:
             self.orientation = 1
@@ -65,7 +61,7 @@ class HexaMemory(HexaGrid):
             return
         self.orientation = 2
 
-    def convert_pos_in_cell(self,pos_x, pos_y):
+    def convert_pos_in_cell(self, pos_x, pos_y):
         """Convert an allocentric position to cell coordinates."""
         radius = self.cell_radius
         mini_radius = math.sqrt(radius**2 - (radius/2)**2)
@@ -76,12 +72,12 @@ class HexaMemory(HexaGrid):
         # Do the regular part of translation :
         # to go to the next cell on the right/left you move by 3*radius on the x axis.
         x_sign = 1
-        if pos_x < 0 :
+        if pos_x < 0:
             x_sign = -1
         y_sign = 1
-        if pos_y < 0 :
+        if pos_y < 0:
             y_sign = -1
-        while abs(pos_x) >= abs(3*radius) :
+        while abs(pos_x) >= abs(3*radius):
             tmp_cell_x += x_sign
             pos_x -= (3*radius) * x_sign
             tmp_cell_x_center += (3*radius) * x_sign
@@ -105,7 +101,7 @@ class HexaMemory(HexaGrid):
                 "on est dans g ou d"
                 return tmp_cell_x + x_sign, tmp_cell_y
 
-        if abs(pos_x) >= 2 * radius :
+        if abs(pos_x) >= 2 * radius:
             "on est dans hgg g bgg hg bg / hdd d bdd hd bd "
             if abs(pos_y) >= mini_radius :
                 "on est dans hgg-hg  bgg-bg  hdd-hd bd-bdd"
@@ -131,13 +127,13 @@ class HexaMemory(HexaGrid):
                 # il faut donc juste regarder si le y du point est inférieur ou supérieur au 
                 # y correspondant au x sur l'equation de droite
 
-            else : 
+            else:
                 "on est dans hd ou d (ou equivalent)"
                 # On trouve l'équation de la ligne de démarcation
                 x_depart = 2.5 * radius
                 y_depart = mini_radius
 
-                x_fin = 2* radius
+                x_fin = 2 * radius
                 y_fin = 0
 
                 slope = (y_fin - y_depart) / (x_fin - x_depart)
@@ -149,11 +145,11 @@ class HexaMemory(HexaGrid):
                 # il faut donc juste regarder si le y du point est inférieur ou supérieur au 
                 # y correspondant au x sur l'equation de droite
                 if abs(pos_y) >= abs(y_ref) :
-                   "on est dans hd"
-                   return self.find_coordinates_corner(tmp_cell_x,tmp_cell_y, x_sign,y_sign)
-                else :
-                   "on est dans d"
-                   return tmp_cell_x+ x_sign, tmp_cell_y
+                    "on est dans hd"
+                    return self.find_coordinates_corner(tmp_cell_x, tmp_cell_y, x_sign, y_sign)
+                else:
+                    "on est dans d"
+                    return tmp_cell_x + x_sign, tmp_cell_y
             
         if abs(pos_x)> radius and abs(pos_x)< 2*radius :
             "on est dans hd"
@@ -177,17 +173,13 @@ class HexaMemory(HexaGrid):
             offset2 = y2 - (slope2 * x2)
             y_ref2 = slope2 * pos_x + offset2
 
-
             if abs(pos_y) >= y_ref1 and abs(pos_y) <= y_ref2:
                 # on est dans hd
                 return self.find_coordinates_corner(tmp_cell_x,tmp_cell_y, x_sign,y_sign)
-        if abs(pos_y)>mini_radius :
+        if abs(pos_y) > mini_radius:
             return tmp_cell_x, tmp_cell_y + y_sign*2
-        else :
+        else:
             return tmp_cell_x, tmp_cell_y
-
-
-
 
     def convert_cell_to_pos(self,cell_x, cell_y):
         """Return the allocentric position of the center of the given cell."""
@@ -214,9 +206,10 @@ class HexaMemory(HexaGrid):
             pos_y += signe* mini_radius 
 
         return int(pos_x), int(pos_y)
-    def find_coordinates_corner(self,cell_x,cell_y,x_sign,y_sign):
+
+    def find_coordinates_corner(self, cell_x, cell_y, x_sign, y_sign):
         """aaaaaaaaa"""
-        f_x, f_y =0,0
+        f_x, f_y =0, 0
         y_even =cell_y % 2 == 0
         if(y_even):
             if(x_sign > 0):
@@ -224,7 +217,7 @@ class HexaMemory(HexaGrid):
             else :
                 f_x = cell_x - 1
 
-        else :
+        else:
             if(x_sign > 0):
                 f_x = cell_x+1
             else :
@@ -232,28 +225,27 @@ class HexaMemory(HexaGrid):
 
         if(y_sign > 0):
             f_y = cell_y +1 
-        else :
+        else:
             f_y = cell_y - 1
 
-        return f_x,f_y
-        
+        return f_x, f_y
 
-
-    def move(self, rotation, move_x, move_y,is_egocentric_translation= True):
-        """Handle movement of the robot in the hexamemory"""
+    def move(self, rotation, move_x, move_y, is_egocentric_translation=True):
+        """Handle movement of the robot in the hexamemory. Returns the new position"""
+        # Update orientation of the robot
         self.rotate_robot(rotation)
         rota_radian = math.radians(self.robot_angle)
         x_prime = 0
         y_prime = 0
-        if(is_egocentric_translation):
+        if is_egocentric_translation:
             x_prime = int(move_x * math.cos(rota_radian) - move_y * math.sin(rota_radian))  # OG 27/08/2022
             y_prime = int(move_x * math.sin(rota_radian) + move_y * math.cos(rota_radian))
-        else :
+        else:
             x_prime = move_x
             y_prime = move_y
         x_prime += self.robot_pos_x
         y_prime += self.robot_pos_y
-        try :
+        try:
             self.apply_changes(self.robot_pos_x, self.robot_pos_y, x_prime, y_prime)
             self.robot_pos_x = x_prime
             self.robot_pos_y = y_prime          
@@ -282,22 +274,24 @@ class HexaMemory(HexaGrid):
 
     def rotate_robot(self, rotation):
         """Rotate the representation of the robot by the given angle.
-
         :Parameters:
             `rotation` : int, degrees of rotation
         """
         self.robot_angle = (self.robot_angle + rotation)
+        # Keep it within [0, 360[
         while self.robot_angle < 0:
             self.robot_angle = 360 + self.robot_angle
         self.robot_angle = self.robot_angle % 360
-        if(360-(self.robot_angle-90)  < self.azimuth -10 or 360-(self.robot_angle-90) > self.azimuth+10):
-            self.robot_angle = 360 - self.azimuth +90
+
+        # Correction by the azimuth  # TODO move to a higher level of decision
+        if 360-(self.robot_angle-90) < self.azimuth - 10 or 360 - (self.robot_angle-90) > self.azimuth + 10:
+            self.robot_angle = 360 - self.azimuth + 90
+
         self.update_orientation()
 
     def get_robot_pos(self):
         """Return the position of the robot. (cell coordinates)"""
         return self.robot_cell_x, self.robot_cell_y
-
 
     def apply_changes(self, start_x, start_y, end_x, end_y, status="Free"):
         """Apply the given status (Free by default) to every cell between coordinates start_x,start_y and end_x,end_y"""
@@ -322,7 +316,6 @@ class HexaMemory(HexaGrid):
             self.cells_changed_recently.append((cell_x, cell_y))
             current_pos_x += step_x
             current_pos_y += step_y
-
 
     def change_cell(self, cell_x, cell_y,status):
         """Change the status of the cell at the given coordinates"""
@@ -360,7 +353,6 @@ class HexaMemory(HexaGrid):
     def apply_status_to_cell(self,cell_x, cell_y,status):
         self.grid[cell_x][cell_y].status = status
         self.cells_changed_recently.append((cell_x,cell_y))
-
 
     def apply_status_to_rectangle(self, center_x,center_y,width,height, status):
         """Apply the given status to every cell in the rectangle defined by the given center and width/height"""

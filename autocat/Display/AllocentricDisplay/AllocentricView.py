@@ -1,9 +1,8 @@
 import pyglet
 from pyglet.gl import *
-from ...Memory.HexaMemory.Utils import hexaMemory_to_pyglet
-from ...Memory.HexaMemory.Utils import translate_indecisive_cell_to_pyglet
-from ...Memory.HexaMemory.Utils import recently_changed_to_pyglet
-from ...Memory.HexaMemory.HexaMemory import HexaMemory
+from .Utils import hexaMemory_to_pyglet
+from .Utils import translate_indecisive_cell_to_pyglet
+from .Utils import recently_changed_to_pyglet
 
 NB_CELL_WIDTH = 30
 NB_CELL_HEIGHT = 100
@@ -42,20 +41,19 @@ class AllocentricView(pyglet.window.Window):
         self.shapesList = s
 
     def extract_and_convert_interactions(self, memory):
-        self.indecisive_cell_shape = []
+        # self.indecisive_cell_shape = []
         self.shapesList = hexaMemory_to_pyglet(memory, self.batch)
-        #print("ici")
         self.nb_cell_x = memory.width
         self.nb_cell_y = memory.height
         self.cell_radius = memory.cell_radius
 
-    def extract_and_convert_recently_changed_cells(self, memory, to_reset=[],projections=[]):
-        tmp = recently_changed_to_pyglet(memory, self.batch, projections = projections)
-        self.shapesList.append( tmp)
+    def extract_and_convert_recently_changed_cells(self, memory, to_reset=[], projections=[]):
+        tmp = recently_changed_to_pyglet(memory, self.batch, projections=projections)
+        self.shapesList.append(tmp)
 
-    def show_indecisive_cell(self, indecisive_cell): #(indecisive_cell,hexaMemory,batch)
-        self.indecisive_cell_shape = []
-        self.indecisive_cell_shape = translate_indecisive_cell_to_pyglet(indecisive_cell,self.hexa_memory,self.batch)
+    # def show_indecisive_cell(self, indecisive_cell): #(indecisive_cell,hexaMemory,batch)
+    #     self.indecisive_cell_shape = []
+    #     self.indecisive_cell_shape = translate_indecisive_cell_to_pyglet(indecisive_cell, self.hexa_memory, self.batch)
         
     def on_draw(self):
         """ Drawing the window """

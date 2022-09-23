@@ -1,6 +1,6 @@
-from autocat.Memory.HexaMemory.Utils import translate_interaction_type_to_cell_status
+from ..Display.AllocentricDisplay.Utils import translate_interaction_type_to_cell_status
 # from ..Memory.EgocentricMemory.Interactions.Interaction import EXPERIENCE_LOCAL_ECHO, EXPERIENCE_CENTRAL_ECHO, EXPERIENCE_FOCUS
-from autocat.Memory.EgocentricMemory.Experience import *
+from ..Memory.EgocentricMemory.Experience import *
 from ..Memory.HexaMemory.HexaGrid import HexaGrid
 import math
 from .SynthesizerSubclasses.EchoObjectValidateds import EchoObjectValidateds

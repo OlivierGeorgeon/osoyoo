@@ -10,27 +10,26 @@ and a phenom_to_whatev function and use it instead.
 """
 
 
-def hexaMemory_to_pyglet(hexaMemory,batch):
+def hexaMemory_to_pyglet(hexaMemory, batch):
     """Convert the given hexaMemory to pyglet shapes"""
     grid = hexaMemory.grid
     shapesList = []
     x0 = 0
     y0 = 0
-    #radius = 20
     radius = hexaMemory.cell_radius
-    hauteur = math.sqrt( (2*radius)**2 -radius**2 )
+    hauteur = math.sqrt( (2*radius)**2 - radius**2 )
     for i in range(0, len(grid)):
         for j in range(0, len(grid[0])):
             robot = False
             color_debug = (random.randint(0,255),random.randint(0,255),random.randint(0,255))
             cell = grid[i][j]
 
-            if cell.occupied :
+            if cell.occupied:
                 color = name_to_rgb("slateBlue")
                 robot = True
-            else : 
+            else:
                 color = name_to_rgb("white")
-                if(cell.status == "Free"):
+                if cell.status == "Free":
                     color = name_to_rgb("lightgreen")
                 elif(cell.status == "Occupied"):
                     color = name_to_rgb("yellow")
@@ -59,10 +58,6 @@ def hexaMemory_to_pyglet(hexaMemory,batch):
                 x1 = x0 + (1.5 * radius) + i * 3 * radius
                 y1 = y0 + (hauteur/2) + (j-1)/2 * hauteur
 
-            
-
-                
-            
             theta = 0
             theta = math.radians(theta)
             point1 = [x1 + math.cos(theta)*radius, y1 + math.sin(theta)*radius] 
@@ -84,16 +79,17 @@ def hexaMemory_to_pyglet(hexaMemory,batch):
 
             hexagon = shapes.Polygon(point1, point2, point3, point4, point5, point6,color = color, batch = batch)            
             shapesList.append(hexagon)
-            if(robot):
+            if robot:
                 theta = math.radians(hexaMemory.robot_angle)
                 x2 = radius * math.cos(theta) + x1
                 y2 = radius * math.sin(theta) + y1
-                line = shapes.Line(x1,y1,x2,y2,width = 15,color = name_to_rgb("yellow"), batch = batch)
+                line = shapes.Line(x1, y1, x2, y2, width=15, color=name_to_rgb("yellow"), batch=batch)
                 shapesList.append(line)
 
     return shapesList
 
-def recently_changed_to_pyglet(hexaMemory,batch,to_reset = [],projections = []):
+
+def recently_changed_to_pyglet(hexaMemory, batch, to_reset=[], projections=[]):
     """Convert the cells in hexaMemory.cells_changed_recently,to_reset and projections 
     to pyglet shapes"""
     cell_list = hexaMemory.cells_changed_recently + to_reset + projections
@@ -105,15 +101,15 @@ def recently_changed_to_pyglet(hexaMemory,batch,to_reset = [],projections = []):
     grid = hexaMemory.grid
     
     hauteur = math.sqrt( (2*radius)**2 -radius**2 )
-    for (i,j) in cell_list :
+    for (i, j) in cell_list:
             robot = False
             color_debug = (random.randint(0,255),random.randint(0,255),random.randint(0,255))
             cell = grid[i][j]
 
-            if cell.occupied :
+            if cell.occupied:
                 color = name_to_rgb("darkslateBlue")
                 robot = True
-            else : 
+            else:
                 color = name_to_rgb("white")
                 if(cell.status == "Free"):
                     color = name_to_rgb("lightgreen")
@@ -144,10 +140,6 @@ def recently_changed_to_pyglet(hexaMemory,batch,to_reset = [],projections = []):
                 x1 = x0 + (1.5 * radius) + i * 3 * radius
                 y1 = y0 + (hauteur/2) + (j-1)/2 * hauteur
 
-            
-
-                
-            
             theta = 0
             theta = math.radians(theta)
             point1 = [x1 + math.cos(theta)*radius, y1 + math.sin(theta)*radius] 
@@ -171,14 +163,16 @@ def recently_changed_to_pyglet(hexaMemory,batch,to_reset = [],projections = []):
                 print("PINKKKKKKKKKKKKK")
             hexagon = shapes.Polygon(point1, point2, point3, point4, point5, point6,color = color, batch = batch)            
             shapesList.append(hexagon)
-            if(robot):
+
+            if robot:
                 theta = math.radians(hexaMemory.robot_angle)
                 x2 = radius * math.cos(theta) + x1
                 y2 = radius * math.sin(theta) + y1
-                line = shapes.Line(x1,y1,x2,y2,width = 15,color = name_to_rgb("yellow"), batch = batch)
+                line = shapes.Line(x1, y1, x2, y2, width=15, color=name_to_rgb("yellow"), batch=batch)
                 shapesList.append(line)
 
     return shapesList
+
 
 def translate_interaction_type_to_cell_status(type):
     """Free Blocked Occupied Frontier Something"""
@@ -194,24 +188,20 @@ def translate_interaction_type_to_cell_status(type):
     return "Free"
 
 
-def translate_indecisive_cell_to_pyglet(indecisive_cell,hexaMemory,batch):
+def translate_indecisive_cell_to_pyglet(indecisive_cell, hexaMemory, batch):
     """blabla"""
     x0 = 0
     y0 = 0
-    (coord_x, coord_y),_, status = indecisive_cell
+    (coord_x, coord_y), _, status = indecisive_cell
     radius = hexaMemory.cell_radius
-    hauteur = math.sqrt( (2*radius)**2 -radius**2 )
-    if(coord_y%2 == 0):
+    hauteur = math.sqrt((2*radius)**2 - radius**2)
+    if coord_y % 2 == 0:
         x1 = x0 + coord_x * 3 * radius
-        y1 =y0 +  hauteur * (coord_y/2)
-    else :
+        y1 = y0 + hauteur * (coord_y/2)
+    else:
         x1 = x0 + (1.5 * radius) + coord_x * 3 * radius
         y1 = y0 + (hauteur/2) + (coord_y-1)/2 * hauteur
 
-    
-
-        
-    
     theta = 0
     theta = math.radians(theta)
     point1 = [x1 + math.cos(theta)*radius, y1 + math.sin(theta)*radius] 
