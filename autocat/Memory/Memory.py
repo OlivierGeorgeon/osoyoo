@@ -1,5 +1,6 @@
 from .EgocentricMemory.EgocentricMemory import EgocentricMemory
 from .HexaMemory.HexaMemory import HexaMemory
+from .BodyMemory import BodyMemory
 
 
 class Memory:
@@ -8,6 +9,7 @@ class Memory:
     """
 
     def __init__(self, hexagrid_size=(100, 200), cell_radius=40):
+        self.body_memory = BodyMemory()
         self.egocentric_memory = EgocentricMemory()
         self.allocentric_memory = HexaMemory(hexagrid_size[0], hexagrid_size[1], cell_radius=cell_radius)
 
@@ -17,11 +19,12 @@ class Memory:
         - Add new experiences in egocentric_memory
         - Move the robot in allocentric_memory
         """
+        self.body_memory.set_head_direction_degree(enacted_interaction['head_angle'])
+        self.body_memory.set_azimuth_degree(enacted_interaction['azimuth'])
+
         self.egocentric_memory.tick()  # TODO Improve the decay mechanism in egocentric memory
         self.egocentric_memory.update_and_add_experiences(enacted_interaction)
 
         self.allocentric_memory.azimuth = enacted_interaction['azimuth']
         self.allocentric_memory.move(enacted_interaction['yaw'], enacted_interaction['translation'][0],
                                      enacted_interaction['translation'][1])
-
-        # Cells in allocentric memory are updated by the Synthesizer

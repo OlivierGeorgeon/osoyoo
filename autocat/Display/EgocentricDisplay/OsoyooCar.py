@@ -29,8 +29,6 @@ class OsoyooCar:
         self.robotHead = shapes.Rectangle(self.head_x, self.head_y, 20, 50, color=ROBOT_HEAD_COLOR, batch=self.batch, group=self.group)
         self.robotHead.anchor_position = 0, 25
 
-        # self.azimuth = 0
-
     def rotate_head(self, head_angle):
         self.head_angle = head_angle
         self.robotHead.rotation = -self.head_angle  # head_angle is trigonometric while rotation is clockwise

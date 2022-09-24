@@ -24,7 +24,7 @@ class EgocentricView(pyglet.window.Window):
 
         # Define the robot
         self.robot = OsoyooCar(self.batch, self.background)
-        self.azimuth = 0
+        self.azimuth = 0  # Degree from north [0, 360]
 
         # Define the text area at the bottom of the view
         self.label = pyglet.text.Label('', font_name='Verdana', font_size=10, x=10, y=10)
@@ -90,10 +90,6 @@ class EgocentricView(pyglet.window.Window):
                           + ", angle:" + str(mouse_press_angle) + "°"
         # Return the click position to the controller
         return mouse_press_x, mouse_press_y, mouse_press_angle
-
-    # def extract_and_convert_interactions(self, memory):
-    #
-    #     self.shapesList = memory_to_pyglet(memory, self.batch)
 
 
 # Testing the EgocentricView by displaying the robot in a pretty position, and the mouse click coordinates

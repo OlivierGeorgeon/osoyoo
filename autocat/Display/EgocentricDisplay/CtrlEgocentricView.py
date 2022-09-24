@@ -2,8 +2,6 @@ import pyglet
 from pyglet.window import key
 from .EgocentricView import EgocentricView
 from .PointOfInterest import *
-from ...Memory import Memory
-from ...Workspace import Workspace
 
 
 class CtrlEgocentricView:
@@ -54,6 +52,11 @@ class CtrlEgocentricView:
         self.points_of_interest.append(point_of_interest)
         return point_of_interest
 
+    def update_body_robot(self):
+        """Updates the robot's body to display by the egocentric view"""
+        self.view.robot.rotate_head(self.workspace.memory.body_memory.head_direction_degree())
+        self.view.azimuth = self.workspace.memory.body_memory.azimuth_degree()
+
     def update_points_of_interest(self):
         """Retrieve all new interactions from the memory, create corresponding points of interest
         then update the shape of each POI"""
@@ -92,8 +95,8 @@ class CtrlEgocentricView:
         self.add_point_of_interest(0, 0, POINT_PLACE)
 
         # Update the robot's position
-        self.view.robot.rotate_head(self.workspace.enacted_interaction['head_angle'])
-        self.view.azimuth = self.workspace.enacted_interaction['azimuth']
+        # self.view.robot.rotate_head(self.workspace.enacted_interaction['head_angle'])
+        # self.view.azimuth = self.workspace.enacted_interaction['azimuth']
 
         # Point of interest compass
         # if 'compass_x' in self.ctrl_workspace.enacted_interaction:
@@ -149,4 +152,5 @@ class CtrlEgocentricView:
         """Called every frame, update the view"""
         if self.workspace.flag_for_view_refresh:
             self.update_points_of_interest()
+            self.update_body_robot()
             self.workspace.flag_for_view_refresh = False
