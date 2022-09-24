@@ -51,9 +51,9 @@ class CtrlAllocentricView:
         if self.refresh_count == 0:
             # print("RESET BASE HEXAVIEW")
             self.allocentric_view.shapesList = []
-            self.allocentric_view.extract_and_convert_interactions(self.allocentric_memory)
+            self.allocentric_view.extract_and_convert_interactions(self.workspace.memory)
             self.allocentric_memory.cells_changed_recently = []
         if len(self.allocentric_memory.cells_changed_recently) > 0:
-            self.allocentric_view.extract_and_convert_recently_changed_cells(self.allocentric_memory, self.to_reset, [])
+            self.allocentric_view.extract_and_convert_recently_changed_cells(self.workspace.memory, self.to_reset, [])
             self.allocentric_memory.cells_changed_recently = []
         self.refresh_count += 1

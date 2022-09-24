@@ -43,9 +43,9 @@ class AllocentricView(pyglet.window.Window):
     def extract_and_convert_interactions(self, memory):
         # self.indecisive_cell_shape = []
         self.shapesList = hexaMemory_to_pyglet(memory, self.batch)
-        self.nb_cell_x = memory.width
-        self.nb_cell_y = memory.height
-        self.cell_radius = memory.cell_radius
+        self.nb_cell_x = memory.allocentric_memory.width
+        self.nb_cell_y = memory.allocentric_memory.height
+        self.cell_radius = memory.allocentric_memory.cell_radius
 
     def extract_and_convert_recently_changed_cells(self, memory, to_reset=[], projections=[]):
         tmp = recently_changed_to_pyglet(memory, self.batch, projections=projections)

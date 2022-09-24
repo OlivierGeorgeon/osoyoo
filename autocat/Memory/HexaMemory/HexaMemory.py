@@ -21,10 +21,10 @@ class HexaMemory(HexaGrid):
         self.robot_pos_y = 0
         self.robot_width = robot_width
         self.grid[self.robot_cell_x][self.robot_cell_y].occupy()
-        self.robot_angle = 90
-        self.orientation = 0
-        self.update_orientation()
-        self.azimuth = 0
+        # self.robot_angle = 90
+        # self.orientation = 0
+        # self.update_orientation()
+        # self.azimuth = 0
         self.cells_changed_recently = []
 
     def reset(self):
@@ -36,30 +36,30 @@ class HexaMemory(HexaGrid):
         self.robot_pos_y = 0
         self.grid[self.robot_cell_x][self.robot_cell_y].occupy()
         self.robot_angle = 90
-        self.orientation = 0
+        # self.orientation = 0
         self.azimuth = 0
-        self.update_orientation()
+        # self.update_orientation()
         self.cells_changed_recently = []
 
-    def update_orientation(self):
-        """update the orientation of the robot based on its angle"""
-        angle = self.robot_angle
-        if angle <= 60:
-            self.orientation = 1
-            return
-        if angle <= 120:
-            self.orientation = 0
-            return
-        if angle <= 180:
-            self.orientation = 5
-            return
-        if angle <= 240:
-            self.orientation = 4
-            return
-        if angle <= 300:
-            self.orientation = 3
-            return
-        self.orientation = 2
+    # def update_orientation(self):
+    #     """update the orientation of the robot based on its angle"""
+    #     angle = self.robot_angle
+    #     if angle <= 60:
+    #         self.orientation = 1
+    #         return
+    #     if angle <= 120:
+    #         self.orientation = 0
+    #         return
+    #     if angle <= 180:
+    #         self.orientation = 5
+    #         return
+    #     if angle <= 240:
+    #         self.orientation = 4
+    #         return
+    #     if angle <= 300:
+    #         self.orientation = 3
+    #         return
+    #     self.orientation = 2
 
     def convert_pos_in_cell(self, pos_x, pos_y):
         """Convert an allocentric position to cell coordinates."""
@@ -230,11 +230,14 @@ class HexaMemory(HexaGrid):
 
         return f_x, f_y
 
-    def move(self, rotation, move_x, move_y, is_egocentric_translation=True):
+    # def move(self, rotation, move_x, move_y, is_egocentric_translation=True):
+    def move(self, body_direction_rad, translation, is_egocentric_translation=True):
         """Handle movement of the robot in the hexamemory. Returns the new position"""
         # Update orientation of the robot
-        self.rotate_robot(rotation)
-        rota_radian = math.radians(self.robot_angle)
+        # self.rotate_robot(rotation)
+        # rota_radian = math.radians(self.robot_angle)
+        rota_radian = body_direction_rad
+        move_x, move_y = translation[0], translation[1]
         x_prime = 0
         y_prime = 0
         if is_egocentric_translation:
@@ -272,22 +275,23 @@ class HexaMemory(HexaGrid):
             pos_x, pos_y : position of the phenomenon (relative to the robot's position)
         """
 
-    def rotate_robot(self, rotation):
-        """Rotate the representation of the robot by the given angle.
-        :Parameters:
-            `rotation` : int, degrees of rotation
-        """
-        self.robot_angle = (self.robot_angle + rotation)
-        # Keep it within [0, 360[
-        while self.robot_angle < 0:
-            self.robot_angle = 360 + self.robot_angle
-        self.robot_angle = self.robot_angle % 360
-
-        # Correction by the azimuth  # TODO move to a higher level of decision
-        if 360-(self.robot_angle-90) < self.azimuth - 10 or 360 - (self.robot_angle-90) > self.azimuth + 10:
-            self.robot_angle = 360 - self.azimuth + 90
-
-        self.update_orientation()
+    # def rotate_robot(self, rotation):
+    #     """Rotate the representation of the robot by the given angle.
+    #     :Parameters:
+    #         `rotation` : int, degrees of rotation
+    #     """
+    #     self.robot_angle = (self.robot_angle + rotation)
+    #     # Keep it within [0, 360[
+    #     while self.robot_angle < 0:
+    #         self.robot_angle = 360 + self.robot_angle
+    #     self.robot_angle = self.robot_angle % 360
+    #
+    #     # Correction by the azimuth  # TODO move to a higher level of decision
+    #     # If the robot_angle is too far from the azimuth then use the azimuth
+    #     if 360-(self.robot_angle-90) < self.azimuth - 10 or 360 - (self.robot_angle-90) > self.azimuth + 10:
+    #         self.robot_angle = 360 - self.azimuth + 90
+    #
+    #     # self.update_orientation()
 
     def get_robot_pos(self):
         """Return the position of the robot. (cell coordinates)"""
@@ -322,12 +326,12 @@ class HexaMemory(HexaGrid):
         self.grid[cell_x][cell_y].status = status
         self.cells_changed_recently.append((cell_x,cell_y))
 
-    def convert_egocentric_translation_to_allocentric(self,translation_x,translation_y):
-        """Convert the given translation from egocentric to allocentric coordinates"""
-        rota_radian = math.radians(self.robot_angle)
-        x_prime = int(translation_x * math.cos(rota_radian) - translation_y * math.sin(rota_radian))
-        y_prime = int(translation_x * math.sin(rota_radian) + translation_y * math.cos(rota_radian))
-        return x_prime,y_prime
+    # def convert_egocentric_translation_to_allocentric(self,translation_x,translation_y):
+    #     """Convert the given translation from egocentric to allocentric coordinates"""
+    #     rota_radian = math.radians(self.robot_angle)
+    #     x_prime = int(translation_x * math.cos(rota_radian) - translation_y * math.sin(rota_radian))
+    #     y_prime = int(translation_x * math.sin(rota_radian) + translation_y * math.cos(rota_radian))
+    #     return x_prime,y_prime
 
     def convert_allocentric_position_to_egocentric_translation(self,position_x,position_y):
         """Use the give position to compute an allocentric translation from the robot position, then convert This
@@ -341,14 +345,15 @@ class HexaMemory(HexaGrid):
         y_prime = int(translation_x * math.sin(rota_radian) + translation_y * math.cos(rota_radian))
         return x_prime,y_prime
         
-    def convert_egocentric_position_to_allocentric(self,position_x,position_y):
-        """Convert the given position from egocentric to allocentric coordinates"""
-        translation_x,translation_y = self.convert_egocentric_translation_to_allocentric(position_x,position_y)
-        return self.robot_pos_x + translation_x, self.robot_pos_y + translation_y
+    # def convert_egocentric_position_to_allocentric(self,position_x,position_y):
+    #     """Convert the given position from egocentric to allocentric coordinates"""
+    #     translation_x,translation_y = self.convert_egocentric_translation_to_allocentric(position_x,position_y)
+    #     return self.robot_pos_x + translation_x, self.robot_pos_y + translation_y
 
     def apply_translation_to_robot_pos(self,translation_x,translation_y):
-        """Apply the given translation to the robot's position"""
-        self.move(0,translation_x,translation_y,is_egocentric_translation = False)
+        """Apply the given translation to the robot's position (called by Synthesizer)"""
+        #self.move(0,translation_x,translation_y,is_egocentric_translation = False)
+        self.move(0, (translation_x, translation_y), is_egocentric_translation=False)
 
     def apply_status_to_cell(self,cell_x, cell_y,status):
         self.grid[cell_x][cell_y].status = status

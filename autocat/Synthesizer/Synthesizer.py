@@ -18,7 +18,7 @@ class Synthesizer:
         self.allocentric_memory = workspace.memory.allocentric_memory
         self.internal_hexa_grid = HexaGrid(self.allocentric_memory.width, self.allocentric_memory.height)
         self.interactions_list = []
-        self.echo_objects_to_investigate = EchoObjectsToInvestigate(3, 2, self.allocentric_memory, acceptable_delta=700)
+        self.echo_objects_to_investigate = EchoObjectsToInvestigate(3, 2, self.workspace.memory, acceptable_delta=700)
         self.echo_objects_valided = EchoObjectValidateds(self.allocentric_memory)
         self.last_projection_for_context = []
         self.experiences_central_echo = []

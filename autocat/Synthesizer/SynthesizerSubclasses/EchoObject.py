@@ -1,8 +1,10 @@
 import numpy as np
 import math
+
+
 class EchoObject:
     """Blabla"""
-    def __init__(self,echo_interaction, hexa_memory,acceptable_delta = 300):
+    def __init__(self, echo_interaction, memory, acceptable_delta=300):
         """Constructor
         Parameters:
             echo_interaction: the first echo interaction of the object phenomenon
@@ -10,7 +12,8 @@ class EchoObject:
             acceptable_delta: the acceptable delta between the allocentric coordinates of a new echo interaction and the center of the object phenomenon"""
         self.acceptable_delta = acceptable_delta
         self.echo_interactions = [echo_interaction]
-        self.hexa_memory = hexa_memory
+        self.memory = memory
+        self.hexa_memory = memory.allocentric_memory
         self.allo_coordinates =  [self.get_allocentric_coordinates_of_interactions([echo_interaction])[0][0]]
         #print("aLLLLLOOOOO",self.allo_coordinates)
         #self.center =self.hexa_memory.convert_pos_in_cell(self.allo_coordinates[0][0], self.allo_coordinates[0][1])
@@ -75,7 +78,8 @@ class EchoObject:
         """ Compute allocentric coordinates for every interaction of the given type in self.interactions_list
         
         Return a list of ((x,y),interaction)"""
-        rota_radian = math.radians(self.hexa_memory.robot_angle)
+        # rota_radian = math.radians(self.hexa_memory.robot_angle)
+        rota_radian = self.memory.body_memory.body_direction_rad
         allocentric_coordinates = []
         for _,interaction in enumerate(interaction_list):
                 corner_x,corner_y = interaction.x,interaction.y

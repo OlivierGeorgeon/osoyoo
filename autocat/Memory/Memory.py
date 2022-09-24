@@ -4,8 +4,8 @@ from .BodyMemory import BodyMemory
 
 
 class Memory:
-    """The Workspace serves as the general container of the robot's cognitive architecture.
-        It gathers: the agent, the two memories, and the synthesizer.
+    """The Memory serves as the general container of the three memories:
+        body memory, egocentric memory, and allocentric memory
     """
 
     def __init__(self, hexagrid_size=(100, 200), cell_radius=40):
@@ -20,11 +20,13 @@ class Memory:
         - Move the robot in allocentric_memory
         """
         self.body_memory.set_head_direction_degree(enacted_interaction['head_angle'])
-        self.body_memory.set_azimuth_degree(enacted_interaction['azimuth'])
+        # self.body_memory.set_body_direction_degree(enacted_interaction['azimuth'])
+        self.body_memory.rotate_degree(enacted_interaction['yaw'], enacted_interaction['azimuth'])
 
         self.egocentric_memory.tick()  # TODO Improve the decay mechanism in egocentric memory
         self.egocentric_memory.update_and_add_experiences(enacted_interaction)
 
-        self.allocentric_memory.azimuth = enacted_interaction['azimuth']
-        self.allocentric_memory.move(enacted_interaction['yaw'], enacted_interaction['translation'][0],
-                                     enacted_interaction['translation'][1])
+        # self.allocentric_memory.azimuth = enacted_interaction['azimuth']
+        # self.allocentric_memory.move(enacted_interaction['yaw'], enacted_interaction['translation'][0],
+        #                              enacted_interaction['translation'][1])
+        self.allocentric_memory.move(self.body_memory.body_direction_rad, enacted_interaction['translation'])

@@ -10,8 +10,9 @@ and a phenom_to_whatev function and use it instead.
 """
 
 
-def hexaMemory_to_pyglet(hexaMemory, batch):
+def hexaMemory_to_pyglet(memory, batch):
     """Convert the given hexaMemory to pyglet shapes"""
+    hexaMemory = memory.allocentric_memory
     grid = hexaMemory.grid
     shapesList = []
     x0 = 0
@@ -80,7 +81,8 @@ def hexaMemory_to_pyglet(hexaMemory, batch):
             hexagon = shapes.Polygon(point1, point2, point3, point4, point5, point6,color = color, batch = batch)            
             shapesList.append(hexagon)
             if robot:
-                theta = math.radians(hexaMemory.robot_angle)
+                # theta = math.radians(hexaMemory.robot_angle)
+                theta = memory.body_memory.body_direction_rad
                 x2 = radius * math.cos(theta) + x1
                 y2 = radius * math.sin(theta) + y1
                 line = shapes.Line(x1, y1, x2, y2, width=15, color=name_to_rgb("yellow"), batch=batch)
@@ -89,16 +91,16 @@ def hexaMemory_to_pyglet(hexaMemory, batch):
     return shapesList
 
 
-def recently_changed_to_pyglet(hexaMemory, batch, to_reset=[], projections=[]):
+def recently_changed_to_pyglet(memory, batch, to_reset=[], projections=[]):
     """Convert the cells in hexaMemory.cells_changed_recently,to_reset and projections 
     to pyglet shapes"""
-    cell_list = hexaMemory.cells_changed_recently + to_reset + projections
+    cell_list = memory.allocentric_memory.cells_changed_recently + to_reset + projections
     shapesList = []
     x0 = 0
     y0 = 0
     #radius = 20
-    radius = hexaMemory.cell_radius
-    grid = hexaMemory.grid
+    radius = memory.allocentric_memory.cell_radius
+    grid = memory.allocentric_memory.grid
     
     hauteur = math.sqrt( (2*radius)**2 -radius**2 )
     for (i, j) in cell_list:
@@ -124,7 +126,7 @@ def recently_changed_to_pyglet(hexaMemory, batch, to_reset=[], projections=[]):
                 elif(cell.status == "Something"):
                     color = name_to_rgb("orange")
                     r,g,b = color
-                    confidence = hexaMemory.grid[i][j].confidence
+                    confidence = memory.allocentric_memory.grid[i][j].confidence
                     factor = 10
                     r = min(255,r + confidence*factor)
                     g = min(255,g + confidence*factor)
@@ -165,7 +167,8 @@ def recently_changed_to_pyglet(hexaMemory, batch, to_reset=[], projections=[]):
             shapesList.append(hexagon)
 
             if robot:
-                theta = math.radians(hexaMemory.robot_angle)
+                # theta = math.radians(hexaMemory.robot_angle)
+                theta = memory.body_memory.body_direction_rad
                 x2 = radius * math.cos(theta) + x1
                 y2 = radius * math.sin(theta) + y1
                 line = shapes.Line(x1, y1, x2, y2, width=15, color=name_to_rgb("yellow"), batch=batch)

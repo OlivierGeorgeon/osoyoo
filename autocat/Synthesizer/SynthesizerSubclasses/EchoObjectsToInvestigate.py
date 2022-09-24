@@ -3,7 +3,7 @@ from . EchoObject import EchoObject
 
 class EchoObjectsToInvestigate:
     """Echo objects to investigate"""
-    def __init__(self, number_of_try_before_removing, number_of_echo_before_validation, hexa_memory,
+    def __init__(self, number_of_try_before_removing, number_of_echo_before_validation, memory,
                  acceptable_delta):
         """Constructor
         Parameters:
@@ -13,7 +13,8 @@ class EchoObjectsToInvestigate:
         self.validated_objects = []
         self.number_of_try_before_removing = number_of_try_before_removing
         self.number_of_echo_before_validation = number_of_echo_before_validation
-        self.hexa_memory = hexa_memory
+        self.memory = memory
+        self.hexa_memory = memory.allocentric_memory
         self.acceptable_delta = acceptable_delta
 
     def create_news(self, real_echos):
@@ -21,7 +22,7 @@ class EchoObjectsToInvestigate:
         new_objets = []
         for echo in real_echos:
             if len(new_objets) == 0:
-                new_objets.append(EchoObject(echo,self.hexa_memory,acceptable_delta=self.acceptable_delta))
+                new_objets.append(EchoObject(echo, self.memory, acceptable_delta=self.acceptable_delta))
             else :
                 clustered = False
                 for objet in new_objets:
@@ -31,7 +32,7 @@ class EchoObjectsToInvestigate:
     
                     print("NOCLUSTO")
                 if not clustered:
-                    new_objets.append(EchoObject(echo,self.hexa_memory,acceptable_delta=self.acceptable_delta))
+                    new_objets.append(EchoObject(echo, self.memory, acceptable_delta=self.acceptable_delta))
         for objet in new_objets:
             #print("NEW OBJECTO")
             self.list_objects_to_investigate.append([objet,0])

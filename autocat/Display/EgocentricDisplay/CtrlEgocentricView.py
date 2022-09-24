@@ -55,7 +55,7 @@ class CtrlEgocentricView:
     def update_body_robot(self):
         """Updates the robot's body to display by the egocentric view"""
         self.view.robot.rotate_head(self.workspace.memory.body_memory.head_direction_degree())
-        self.view.azimuth = self.workspace.memory.body_memory.azimuth_degree()
+        self.view.azimuth = self.workspace.memory.body_memory.body_azimuth_degree()
 
     def update_points_of_interest(self):
         """Retrieve all new interactions from the memory, create corresponding points of interest
