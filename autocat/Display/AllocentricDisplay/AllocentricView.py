@@ -1,9 +1,10 @@
 import pyglet
 from pyglet.gl import *
-from .Utils import hexaMemory_to_pyglet
-from .Utils import translate_indecisive_cell_to_pyglet
+# from .Utils import hexaMemory_to_pyglet
+# from .Utils import translate_indecisive_cell_to_pyglet
 from .Utils import recently_changed_to_pyglet
 from ..EgocentricDisplay.OsoyooCar import OsoyooCar
+import math
 from .Cell import Cell
 
 
@@ -35,8 +36,8 @@ class AllocentricView(pyglet.window.Window):
         self.mouse_press_angle = 0
         self.window = None
 
-        self.nb_cell_x = 30
-        self.nb_cell_y = 100
+        self.nb_cell_x = memory.allocentric_memory.width
+        self.nb_cell_y = memory.allocentric_memory.height
         self.cell_radius = memory.allocentric_memory.cell_radius
 
         self.mouse_press_x = 0
@@ -47,12 +48,32 @@ class AllocentricView(pyglet.window.Window):
 
         self.projections_for_context = []
 
-    def extract_and_convert_interactions(self, memory):
+    def extract_and_convert_interactions(self):
+        """Create the shapes from hexagonal memory"""
+        grid = self.memory.allocentric_memory.grid
+        radius = self.memory.allocentric_memory.cell_radius
+        height = math.sqrt((2 * radius) ** 2 - radius ** 2)
+        shape_list = []
+
+        for i in range(0, len(grid)):
+            for j in range(0, len(grid[0])):
+                # robot = False
+                cell = grid[i][j]
+                if cell.status != "Unknown":
+                    if j % 2 == 0:
+                        x = i * 3 * radius
+                        y = height * (j / 2)
+                    else:
+                        x = (1.5 * radius) + i * 3 * radius
+                        y = (height / 2) + (j - 1) / 2 * height
+                    hexagon = Cell(x, y, self.batch, None, radius, cell.status).shape
+                    shape_list.append(hexagon)
+        self.shapesList = shape_list
         # self.indecisive_cell_shape = []
-        self.shapesList = hexaMemory_to_pyglet(memory, self.batch)
-        self.nb_cell_x = memory.allocentric_memory.width
-        self.nb_cell_y = memory.allocentric_memory.height
-        self.cell_radius = memory.allocentric_memory.cell_radius
+        # self.shapesList = hexaMemory_to_pyglet(memory, self.batch)
+        # self.nb_cell_x = memory.allocentric_memory.width
+        # self.nb_cell_y = memory.allocentric_memory.height
+        # self.cell_radius = memory.allocentric_memory.cell_radius
 
     def extract_and_convert_recently_changed_cells(self, memory, to_reset=[], projections=[]):
         tmp = recently_changed_to_pyglet(memory, self.batch, projections=projections)
