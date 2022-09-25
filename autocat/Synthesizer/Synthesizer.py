@@ -118,10 +118,11 @@ class Synthesizer:
         return output
     
     def apply_translation_to_hexa_memory(self, translation_between_echo_and_context):
-        "Convert the egocentric translation given as parameter to an allocentric one, and apply it to the hexa_memory"
-        allocentric_translation_x,allocentric_translation_y = translation_between_echo_and_context
-        #print("Synthesizer correct position by",allocentric_translation_x,allocentric_translation_y)
-        self.allocentric_memory.apply_translation_to_robot_pos(allocentric_translation_x, allocentric_translation_y)
+        """Translate the robot in allocentric memory"""
+        # allocentric_translation_x,allocentric_translation_y = translation_between_echo_and_context
+        # print("Synthesizer correct position by",allocentric_translation_x,allocentric_translation_y)
+        # self.allocentric_memory.apply_translation_to_robot_pos(allocentric_translation_x, allocentric_translation_y)
+        self.allocentric_memory.move(0, translation_between_echo_and_context, is_egocentric_translation=False)
 
     def synthesize(self, interactions_list):
         """Synthesize the interactions with the hexamem"""

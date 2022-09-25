@@ -21,10 +21,6 @@ class HexaMemory(HexaGrid):
         self.robot_pos_y = 0
         self.robot_width = robot_width
         self.grid[self.robot_cell_x][self.robot_cell_y].occupy()
-        # self.robot_angle = 90
-        # self.orientation = 0
-        # self.update_orientation()
-        # self.azimuth = 0
         self.cells_changed_recently = []
 
     def reset(self):
@@ -40,26 +36,6 @@ class HexaMemory(HexaGrid):
         self.azimuth = 0
         # self.update_orientation()
         self.cells_changed_recently = []
-
-    # def update_orientation(self):
-    #     """update the orientation of the robot based on its angle"""
-    #     angle = self.robot_angle
-    #     if angle <= 60:
-    #         self.orientation = 1
-    #         return
-    #     if angle <= 120:
-    #         self.orientation = 0
-    #         return
-    #     if angle <= 180:
-    #         self.orientation = 5
-    #         return
-    #     if angle <= 240:
-    #         self.orientation = 4
-    #         return
-    #     if angle <= 300:
-    #         self.orientation = 3
-    #         return
-    #     self.orientation = 2
 
     def convert_pos_in_cell(self, pos_x, pos_y):
         """Convert an allocentric position to cell coordinates."""
@@ -81,7 +57,7 @@ class HexaMemory(HexaGrid):
             tmp_cell_x += x_sign
             pos_x -= (3*radius) * x_sign
             tmp_cell_x_center += (3*radius) * x_sign
-        #To move to the cell on the top/bottom you move by 2*mini_radius on the y axis. 
+        # To move to the cell on the top/bottom you move by 2*mini_radius on the y axis.
         while abs(pos_y) >= abs(2*mini_radius) :
             tmp_cell_y += 2*y_sign
             pos_y -= 2*mini_radius*y_sign
@@ -118,11 +94,11 @@ class HexaMemory(HexaGrid):
                 y_ref = abs(pos_x) * slope + offset
 
                 if abs(pos_y) <= abs(y_ref) :
-                   "on est dans hg hd bg bd"
-                   return self.find_coordinates_corner(tmp_cell_x,tmp_cell_y, x_sign,y_sign)
-                else :
-                   "on est dans hgg bgg hdd bdd"
-                   return tmp_cell_x+ x_sign, tmp_cell_y + 2*y_sign
+                    # on est dans hg hd bg bd
+                    return self.find_coordinates_corner(tmp_cell_x,tmp_cell_y, x_sign,y_sign)
+                else:
+                    "on est dans hgg bgg hdd bdd"
+                    return tmp_cell_x+ x_sign, tmp_cell_y + 2*y_sign
                 # sauf erreur, si on met tout en valeur absolue on obtient toujours une pente descendante
                 # il faut donc juste regarder si le y du point est inférieur ou supérieur au 
                 # y correspondant au x sur l'equation de droite
@@ -151,7 +127,7 @@ class HexaMemory(HexaGrid):
                     "on est dans d"
                     return tmp_cell_x + x_sign, tmp_cell_y
             
-        if abs(pos_x)> radius and abs(pos_x)< 2*radius :
+        if abs(pos_x)> radius and abs(pos_x)< 2*radius:
             "on est dans hd"
             return self.find_coordinates_corner(tmp_cell_x,tmp_cell_y, x_sign,y_sign)
         if abs(pos_x) > radius/2 and abs(pos_x)<= 2*radius:
@@ -181,7 +157,7 @@ class HexaMemory(HexaGrid):
         else:
             return tmp_cell_x, tmp_cell_y
 
-    def convert_cell_to_pos(self,cell_x, cell_y):
+    def convert_cell_to_pos(self, cell_x, cell_y):
         """Return the allocentric position of the center of the given cell."""
         radius = self.cell_radius
         mini_radius = math.sqrt(radius**2 - (radius/2)**2)
@@ -232,41 +208,49 @@ class HexaMemory(HexaGrid):
 
     # def move(self, rotation, move_x, move_y, is_egocentric_translation=True):
     def move(self, body_direction_rad, translation, is_egocentric_translation=True):
-        """Handle movement of the robot in the hexamemory. Returns the new position"""
+        """Move the robot in allocentric memory. mark the traversed cells Free. Returns the new position"""
         # Update orientation of the robot
         # self.rotate_robot(rotation)
         # rota_radian = math.radians(self.robot_angle)
-        rota_radian = body_direction_rad
-        move_x, move_y = translation[0], translation[1]
-        x_prime = .0
-        y_prime = .0
+        # rota_radian = body_direction_rad
+        # move_x, move_y = translation[0], translation[1]
+        destination_x = self.robot_pos_x
+        destination_y = self.robot_pos_y
         if is_egocentric_translation:
-            x_prime = round((move_x * math.cos(rota_radian) - move_y * math.sin(rota_radian)))  # OG 27/08/2022
-            y_prime = round((move_x * math.sin(rota_radian) + move_y * math.cos(rota_radian)))
+            destination_x += round((translation[0] * math.cos(body_direction_rad) -
+                                    translation[1] * math.sin(body_direction_rad)))
+            destination_y += round((translation[0] * math.sin(body_direction_rad) +
+                                    translation[1] * math.cos(body_direction_rad)))
         else:
-            x_prime = move_x
-            y_prime = move_y
-        x_prime += self.robot_pos_x
-        y_prime += self.robot_pos_y
+            destination_x += translation[0]
+            destination_y += translation[1]
+        # x_prime += self.robot_pos_x
+        # y_prime += self.robot_pos_y
+
         try:
-            self.apply_changes(self.robot_pos_x, self.robot_pos_y, x_prime, y_prime)
-            self.robot_pos_x = x_prime
-            self.robot_pos_y = y_prime          
+            self.apply_changes(self.robot_pos_x, self.robot_pos_y, destination_x, destination_y)
+            self.robot_pos_x = destination_x
+            self.robot_pos_y = destination_y
         except IndexError:
             print("IndexError")
             self.robot_cell_x = self.width // 2
             self.robot_cell_y = self.height // 2
             self.robot_pos_x = 0
             self.robot_pos_y = 0
+
+        # Leave the previous occupied cell
         if self.grid[self.robot_cell_x][self.robot_cell_y] != 'Frontier':
             self.grid[self.robot_cell_x][self.robot_cell_y].set_to('Free')
         self.grid[self.robot_cell_x][self.robot_cell_y].leave()
         self.cells_changed_recently.append((self.robot_cell_x, self.robot_cell_y))
+
+        # Mark the new occupied cell
         self.robot_cell_x, self.robot_cell_y = self.convert_pos_in_cell(
             self.robot_pos_x, self.robot_pos_y)
         self.grid[self.robot_cell_x][self.robot_cell_y].occupy()
         self.cells_changed_recently.append((self.robot_cell_x, self.robot_cell_y))
-        return x_prime, y_prime
+
+        return destination_x, destination_y
 
     def apply_phenomenon(self, phenomenon, pos_x, pos_y):
         """Apply a phenomenon to the grid
@@ -274,24 +258,6 @@ class HexaMemory(HexaGrid):
             phenomenon : type of phenomenon (TODO: but should be things like "line", "unmovable object", "movable object", etc.)
             pos_x, pos_y : position of the phenomenon (relative to the robot's position)
         """
-
-    # def rotate_robot(self, rotation):
-    #     """Rotate the representation of the robot by the given angle.
-    #     :Parameters:
-    #         `rotation` : int, degrees of rotation
-    #     """
-    #     self.robot_angle = (self.robot_angle + rotation)
-    #     # Keep it within [0, 360[
-    #     while self.robot_angle < 0:
-    #         self.robot_angle = 360 + self.robot_angle
-    #     self.robot_angle = self.robot_angle % 360
-    #
-    #     # Correction by the azimuth  # TODO move to a higher level of decision
-    #     # If the robot_angle is too far from the azimuth then use the azimuth
-    #     if 360-(self.robot_angle-90) < self.azimuth - 10 or 360 - (self.robot_angle-90) > self.azimuth + 10:
-    #         self.robot_angle = 360 - self.azimuth + 90
-    #
-    #     # self.update_orientation()
 
     def get_robot_pos(self):
         """Return the position of the robot. (cell coordinates)"""
@@ -303,7 +269,7 @@ class HexaMemory(HexaGrid):
         distance = math.sqrt((end_x - start_x)**2 + (end_y - start_y)**2)
         if distance == 0:
             return
-        nb_step = int(distance / (self.cell_radius))
+        nb_step = int(distance / self.cell_radius)
         if nb_step == 0:
             return
         step_x = int((end_x - start_x)/nb_step)
@@ -321,43 +287,31 @@ class HexaMemory(HexaGrid):
             current_pos_x += step_x
             current_pos_y += step_y
 
-    def change_cell(self, cell_x, cell_y,status):
-        """Change the status of the cell at the given coordinates"""
-        self.grid[cell_x][cell_y].status = status
-        self.cells_changed_recently.append((cell_x,cell_y))
+    # def change_cell(self, cell_x, cell_y,status):
+    #     """Change the status of the cell at the given coordinates"""
+    #     self.grid[cell_x][cell_y].status = status
+    #     self.cells_changed_recently.append((cell_x,cell_y))
 
-    # def convert_egocentric_translation_to_allocentric(self,translation_x,translation_y):
-    #     """Convert the given translation from egocentric to allocentric coordinates"""
-    #     rota_radian = math.radians(self.robot_angle)
+    # def convert_allocentric_position_to_egocentric_translation(self, position_x, position_y):
+    #     """Use the give position to compute an allocentric translation from the robot position, then convert This
+    #     allocentric translation to an egocentric translation"""
+    #     # Compute the allocentric translation
+    #     translation_x = position_x - self.robot_pos_x
+    #     translation_y = position_y - self.robot_pos_y
+    #     # Convert the allocentric translation to an egocentric translation
+    #     rota_radian = -math.radians(self.robot_angle)
     #     x_prime = int(translation_x * math.cos(rota_radian) - translation_y * math.sin(rota_radian))
     #     y_prime = int(translation_x * math.sin(rota_radian) + translation_y * math.cos(rota_radian))
-    #     return x_prime,y_prime
+    #     return x_prime, y_prime
+    #
+    # def apply_translation_to_robot_pos(self, translation_x, translation_y):
+    #     """Apply the given translation to the robot's position (called by Synthesizer)"""
+    #     #self.move(0,translation_x,translation_y,is_egocentric_translation = False)
+    #     self.move(0, (translation_x, translation_y), is_egocentric_translation=False)
 
-    def convert_allocentric_position_to_egocentric_translation(self, position_x, position_y):
-        """Use the give position to compute an allocentric translation from the robot position, then convert This
-        allocentric translation to an egocentric translation"""
-        #Compute the allocentric translation
-        translation_x = position_x - self.robot_pos_x
-        translation_y = position_y - self.robot_pos_y
-        #Convert the allocentric translation to an egocentric translation
-        rota_radian = -math.radians(self.robot_angle)
-        x_prime = int(translation_x * math.cos(rota_radian) - translation_y * math.sin(rota_radian))
-        y_prime = int(translation_x * math.sin(rota_radian) + translation_y * math.cos(rota_radian))
-        return x_prime, y_prime
-        
-    # def convert_egocentric_position_to_allocentric(self,position_x,position_y):
-    #     """Convert the given position from egocentric to allocentric coordinates"""
-    #     translation_x,translation_y = self.convert_egocentric_translation_to_allocentric(position_x,position_y)
-    #     return self.robot_pos_x + translation_x, self.robot_pos_y + translation_y
-
-    def apply_translation_to_robot_pos(self,translation_x,translation_y):
-        """Apply the given translation to the robot's position (called by Synthesizer)"""
-        #self.move(0,translation_x,translation_y,is_egocentric_translation = False)
-        self.move(0, (translation_x, translation_y), is_egocentric_translation=False)
-
-    def apply_status_to_cell(self,cell_x, cell_y,status):
+    def apply_status_to_cell(self, cell_x, cell_y, status):
         self.grid[cell_x][cell_y].status = status
-        self.cells_changed_recently.append((cell_x,cell_y))
+        self.cells_changed_recently.append((cell_x, cell_y))
 
     def apply_status_to_rectangle(self, center_x,center_y,width,height, status):
         """Apply the given status to every cell in the rectangle defined by the given center and width/height"""

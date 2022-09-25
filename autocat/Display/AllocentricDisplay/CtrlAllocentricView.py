@@ -5,13 +5,13 @@ class CtrlAllocentricView:
     def __init__(self, workspace):
         """Control the allocentric view"""
         self.workspace = workspace
+        self.allocentric_memory = workspace.memory.allocentric_memory
         self.allocentric_view = AllocentricView(self.workspace.memory)
         self.refresh_count = 0
-        self.mouse_x, self.mouse_y = None, None
-        self.allocentric_memory = workspace.memory.allocentric_memory
+        # self.mouse_x, self.mouse_y = None, None
         self.to_reset = []
-        self.focus_x = None
-        self.focus_y = None
+        # self.focus_x = None
+        # self.focus_y = None
 
         # Handlers
         def on_text_hemw(text):
@@ -38,12 +38,12 @@ class CtrlAllocentricView:
                 self.workspace.set_action(action)
         self.allocentric_view.on_text = on_text_hemw
 
-        def on_mouse_press(x, y, button, modifiers):
-            """Handles mouse press"""
-            self.mouse_x, self.mouse_y = x, y
-            self.focus_x, self.focus_y = self.allocentric_memory.convert_allocentric_position_to_egocentric_translation(x, y)
-
-        self.allocentric_view.on_mouse_press = on_mouse_press
+        # def on_mouse_press(x, y, button, modifiers):
+        #     """Handles mouse press"""
+        #     self.mouse_x, self.mouse_y = x, y
+        #     self.focus_x, self.focus_y = self.allocentric_memory.convert_allocentric_position_to_egocentric_translation(x, y)
+        #
+        # self.allocentric_view.on_mouse_press = on_mouse_press
 
     def main(self, dt):
         """Handle the refreshment of allocentric view"""

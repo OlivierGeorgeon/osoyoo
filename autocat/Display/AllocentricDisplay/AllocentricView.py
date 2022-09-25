@@ -4,6 +4,7 @@ from .Utils import hexaMemory_to_pyglet
 from .Utils import translate_indecisive_cell_to_pyglet
 from .Utils import recently_changed_to_pyglet
 from ..EgocentricDisplay.OsoyooCar import OsoyooCar
+from .Cell import Cell
 
 
 NB_CELL_WIDTH = 30
@@ -27,8 +28,9 @@ class AllocentricView(pyglet.window.Window):
         self.robot_batch = pyglet.graphics.Batch()
         self.robot = OsoyooCar(self.robot_batch, self.foreground)
 
+        # self.test_cell = Cell(0, 100, self.robot_batch, self.foreground, 50, 'Free')
+
         self.zoom_level = 4
-        # self.azimuth = 0
         self.shapesList = []
         self.mouse_press_angle = 0
         self.window = None
@@ -44,9 +46,6 @@ class AllocentricView(pyglet.window.Window):
         self.memory = memory
 
         self.projections_for_context = []
-
-    # def set_ShapesList(self,s):
-    #     self.shapesList = s
 
     def extract_and_convert_interactions(self, memory):
         # self.indecisive_cell_shape = []

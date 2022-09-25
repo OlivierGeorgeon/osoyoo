@@ -10,7 +10,7 @@ ZOOM_IN_FACTOR = 1.2
 class EgocentricView(pyglet.window.Window):
     def __init__(self, width=400, height=400, *args, **kwargs):
         super().__init__(width, height, resizable=True, *args, **kwargs)
-        self.is_north_up = True  # Reset to display the robot on the X axis
+        self.is_north_up = False  # Reset to display the robot on the X axis
         self.set_caption("Egocentric Memory")
         self.set_minimum_size(150, 150)
 
@@ -44,6 +44,8 @@ class EgocentricView(pyglet.window.Window):
         # Stack the rotation of the world so the robot's front is up
         if self.is_north_up:
             glRotatef(90 - self.azimuth, 0.0, 0.0, 1.0)
+        else:
+            glRotatef(90, 0.0, 0.0, 1.0)
 
         # Draw the robot and the points of interest
         self.batch.draw()
