@@ -35,7 +35,7 @@ class HexaMemory(HexaGrid):
         self.robot_pos_x = 0
         self.robot_pos_y = 0
         self.grid[self.robot_cell_x][self.robot_cell_y].occupy()
-        self.robot_angle = 90
+        # self.robot_angle = 90
         # self.orientation = 0
         self.azimuth = 0
         # self.update_orientation()
@@ -238,11 +238,11 @@ class HexaMemory(HexaGrid):
         # rota_radian = math.radians(self.robot_angle)
         rota_radian = body_direction_rad
         move_x, move_y = translation[0], translation[1]
-        x_prime = 0
-        y_prime = 0
+        x_prime = .0
+        y_prime = .0
         if is_egocentric_translation:
-            x_prime = int(move_x * math.cos(rota_radian) - move_y * math.sin(rota_radian))  # OG 27/08/2022
-            y_prime = int(move_x * math.sin(rota_radian) + move_y * math.cos(rota_radian))
+            x_prime = round((move_x * math.cos(rota_radian) - move_y * math.sin(rota_radian)))  # OG 27/08/2022
+            y_prime = round((move_x * math.sin(rota_radian) + move_y * math.cos(rota_radian)))
         else:
             x_prime = move_x
             y_prime = move_y
@@ -333,7 +333,7 @@ class HexaMemory(HexaGrid):
     #     y_prime = int(translation_x * math.sin(rota_radian) + translation_y * math.cos(rota_radian))
     #     return x_prime,y_prime
 
-    def convert_allocentric_position_to_egocentric_translation(self,position_x,position_y):
+    def convert_allocentric_position_to_egocentric_translation(self, position_x, position_y):
         """Use the give position to compute an allocentric translation from the robot position, then convert This
         allocentric translation to an egocentric translation"""
         #Compute the allocentric translation
@@ -343,7 +343,7 @@ class HexaMemory(HexaGrid):
         rota_radian = -math.radians(self.robot_angle)
         x_prime = int(translation_x * math.cos(rota_radian) - translation_y * math.sin(rota_radian))
         y_prime = int(translation_x * math.sin(rota_radian) + translation_y * math.cos(rota_radian))
-        return x_prime,y_prime
+        return x_prime, y_prime
         
     # def convert_egocentric_position_to_allocentric(self,position_x,position_y):
     #     """Convert the given position from egocentric to allocentric coordinates"""

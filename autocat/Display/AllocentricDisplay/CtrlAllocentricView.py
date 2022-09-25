@@ -3,9 +3,9 @@ from .AllocentricView import AllocentricView
 
 class CtrlAllocentricView:
     def __init__(self, workspace):
-        """blabla"""
+        """Control the allocentric view"""
         self.workspace = workspace
-        self.allocentric_view = AllocentricView(hexa_memory=self.workspace.memory.allocentric_memory)
+        self.allocentric_view = AllocentricView(self.workspace.memory)
         self.refresh_count = 0
         self.mouse_x, self.mouse_y = None, None
         self.allocentric_memory = workspace.memory.allocentric_memory
@@ -30,7 +30,8 @@ class CtrlAllocentricView:
                 self.workspace.put_decider_to_manual()
             # CAS GENERAl
             elif text.upper() == "T":
-                self.workspace.egocentric_memory.allocentric_memory.apply_status_to_rectangle(-500, 600, 1000, 1000, "Frontier")
+                self.workspace.egocentric_memory.allocentric_memory.apply_status_to_rectangle(-500, 600, 1000, 1000,
+                                                                                              "Frontier")
             else:
                 action = {"action": text}
                 
@@ -45,7 +46,7 @@ class CtrlAllocentricView:
         self.allocentric_view.on_mouse_press = on_mouse_press
 
     def main(self, dt):
-        """blaqbla"""
+        """Handle the refreshment of allocentric view"""
         if self.refresh_count > 500:
             self.refresh_count = 0
         if self.refresh_count == 0:

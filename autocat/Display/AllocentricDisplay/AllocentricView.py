@@ -3,6 +3,8 @@ from pyglet.gl import *
 from .Utils import hexaMemory_to_pyglet
 from .Utils import translate_indecisive_cell_to_pyglet
 from .Utils import recently_changed_to_pyglet
+from ..EgocentricDisplay.OsoyooCar import OsoyooCar
+
 
 NB_CELL_WIDTH = 30
 NB_CELL_HEIGHT = 100
@@ -12,33 +14,39 @@ ZOOM_IN_FACTOR = 1.2
 
 class AllocentricView(pyglet.window.Window):
     """Create the allocentric view"""
-    def __init__(self, width=400, height=400, shapesList=[], cell_radius=20, hexa_memory=None, *args, **kwargs):
+    def __init__(self, memory, width=400, height=400, *args, **kwargs):
         super().__init__(width, height, resizable=True, *args, **kwargs)
         self.set_caption("Allocentric Memory")
         self.set_minimum_size(150, 150)
         # glClearColor(0.2, 0.2, 0.7, 1.0)  # Make it look like hippocampus imaging
         glClearColor(1.0, 1.0, 1.0, 1.0)
         self.batch = pyglet.graphics.Batch()
+        self.background = pyglet.graphics.OrderedGroup(0)
+        self.foreground = pyglet.graphics.OrderedGroup(1)
+
+        self.robot_batch = pyglet.graphics.Batch()
+        self.robot = OsoyooCar(self.robot_batch, self.foreground)
+
         self.zoom_level = 4
-        self.azimuth = 0
-        self.shapesList = shapesList
+        # self.azimuth = 0
+        self.shapesList = []
         self.mouse_press_angle = 0
         self.window = None
 
         self.nb_cell_x = 30
         self.nb_cell_y = 100
-        self.cell_radius = cell_radius
+        self.cell_radius = memory.allocentric_memory.cell_radius
 
         self.mouse_press_x = 0
         self.mouse_press_y = 0
         self.label = pyglet.text.Label('', font_name='Arial', font_size=15, x=10, y=10)
-        self.label.color = (0,0,0,255)
-        self.hexa_memory = hexa_memory
+        self.label.color = (0, 0, 0, 255)
+        self.memory = memory
 
         self.projections_for_context = []
 
-    def set_ShapesList(self,s):
-        self.shapesList = s
+    # def set_ShapesList(self,s):
+    #     self.shapesList = s
 
     def extract_and_convert_interactions(self, memory):
         # self.indecisive_cell_shape = []
@@ -74,6 +82,14 @@ class AllocentricView(pyglet.window.Window):
         # Draw the grid
         self.batch.draw()
 
+        # Stack the transformation to position the robot
+        glTranslatef(-tx + self.memory.allocentric_memory.robot_pos_x, -ty + self.memory.allocentric_memory.robot_pos_y, 0)
+        # glTranslatef(-tx + 100, -ty + self.memory.allocentric_memory.robot_pos_y, 0)
+        glRotatef(90 - self.memory.body_memory.body_azimuth_degree(), 0.0, 0.0, 1.0)
+        # Draw the robot
+        self.robot.rotate_head(self.memory.body_memory.head_direction_degree())
+        self.robot_batch.draw()
+
         # Draw the text in the bottom left corner
         glLoadIdentity()
         glOrtho(0, self.width, 0, self.height, -1, 1)
@@ -103,6 +119,6 @@ class AllocentricView(pyglet.window.Window):
         """ Computes the cell coordinates from the screen coordinates """
         mouse_x = int((x - self.width/2) * self.zoom_level * 2)
         mouse_y = int((y - self.height/2) * self.zoom_level * 2)
-        cell_x, cell_y = self.hexa_memory.convert_pos_in_cell(mouse_x, mouse_y)
+        cell_x, cell_y = self.memory.allocentric_memory.convert_pos_in_cell(mouse_x, mouse_y)
         self.label.text = "Cell: " + str(cell_x) + ", " + str(cell_y)
         return cell_x, cell_y

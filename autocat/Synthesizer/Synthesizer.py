@@ -147,13 +147,16 @@ class Synthesizer:
         """ Compute allocentric coordinates for every interaction of the given type in self.interactions_list
         
         Return a list of ((x,y),interaction)"""
-        rota_radian = math.radians(self.allocentric_memory.robot_angle)
+        # rota_radian = math.radians(self.allocentric_memory.robot_angle)
+        rota_radian = self.workspace.memory.body_memory.body_direction_rad
         allocentric_coordinates = []
         for _, interaction in enumerate(interaction_list):
-            corner_x, corner_y = interaction.x,interaction.y
-            x_prime = int(corner_x * math.cos(rota_radian) - corner_y * math.sin(rota_radian) + self.allocentric_memory.robot_pos_x)
-            y_prime = int(corner_y * math.cos(rota_radian) + corner_x * math.sin(rota_radian) + self.allocentric_memory.robot_pos_y)
-            allocentric_coordinates.append(((x_prime,y_prime),interaction))
+            corner_x, corner_y = interaction.x, interaction.y
+            x_prime = int(interaction.x * math.cos(rota_radian) - interaction.y * math.sin(rota_radian) +
+                          self.allocentric_memory.robot_pos_x)
+            y_prime = int(interaction.y * math.cos(rota_radian) + interaction.x * math.sin(rota_radian) +
+                          self.allocentric_memory.robot_pos_y)
+            allocentric_coordinates.append(((x_prime, y_prime), interaction))
         return allocentric_coordinates
 
     def create_focus_echo(self):

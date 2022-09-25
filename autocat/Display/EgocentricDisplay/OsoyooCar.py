@@ -26,7 +26,8 @@ class OsoyooCar:
         # Create the head
         self.head_x, self.head_y = 80, 0
         self.head_angle = 0
-        self.robotHead = shapes.Rectangle(self.head_x, self.head_y, 20, 50, color=ROBOT_HEAD_COLOR, batch=self.batch, group=self.group)
+        self.robotHead = shapes.Rectangle(self.head_x, self.head_y, 20, 50, color=ROBOT_HEAD_COLOR, batch=self.batch,
+                                          group=self.group)
         self.robotHead.anchor_position = 0, 25
 
     def rotate_head(self, head_angle):

@@ -331,28 +331,28 @@ def test_move():
     hx = HexaMemory(20, 20, cell_radius=10)
     error = 0
 
-    # Sweep left from Origin (orientation North)
-    good_end_x, good_end_y = -20, 0  # OG 23/09/2022
+    # Sweep left from Origin (orientation East)
+    good_end_x, good_end_y = 0, 20  # OG 23/09/2022
     hx.robot_pos_x = 0
     hx.robot_pos_y = 0
     rotation, move_x, move_y = 0, 0, 20
-    end_x, end_y = hx.move(rotation, move_x, move_y)
+    end_x, end_y = hx.move(rotation, (move_x, move_y))
     try:
         assert(end_x == good_end_x and end_y == good_end_y)
     except AssertionError:
-        print("Cell incorrect after sweeping left: ", end_x, end_y, " should be", good_end_x, ",", good_end_y)
+        print("Position incorrect after sweeping left: ", end_x, end_y, " should be", good_end_x, ",", good_end_y)
         error = 1
 
-    # Turn -90° to orientation East and sweep left
+    # Turn South and sweep left
     try:
         hx.robot_pos_x = 0
         hx.robot_pos_y = 0
-        rotation, move_x, move_y = -90, 0, 20
-        end_x, end_y = hx.move(rotation, move_x, move_y)
-        good_end_x, good_end_y = 0, 20
+        rotation, move_x, move_y = -3.14/2, 0, 20
+        end_x, end_y = hx.move(rotation, (move_x, move_y))
+        good_end_x, good_end_y = 20, 0
         assert(end_x == good_end_x and end_y == good_end_y)
     except AssertionError:
-        print("Cell incorrect after rotate 90 and sweep left: ", end_x, end_y, " should be", good_end_x, ",",
+        print("Position incorrect after rotate south and sweep left: ", end_x, end_y, " should be", good_end_x, ",",
               good_end_y)
         error = 2
 
@@ -362,11 +362,11 @@ def test_move():
         hx.robot_pos_y = 0
         hx.robot_angle = 0
         rotation, move_x, move_y = 0, 20, 00
-        end_x, end_y = hx.move(rotation, move_x, move_y)
+        end_x, end_y = hx.move(rotation, (move_x, move_y))
         good_end_x, good_end_y = 20, 0
         assert(end_x == good_end_x and end_y == good_end_y)
     except AssertionError:
-        print("Cell incorrect after moving forward from origin: ", end_x, end_y, " should be", good_end_x, ",",
+        print("Position incorrect after moving forward from origin: ", end_x, end_y, " should be", good_end_x, ",",
               good_end_y)
         error = 3
 
