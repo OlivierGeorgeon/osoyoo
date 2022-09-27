@@ -47,6 +47,17 @@ class CtrlAllocentricView:
         #
         # self.allocentric_view.on_mouse_press = on_mouse_press
 
+    def extract_and_convert_interactions(self):
+        """Create the cells in the view from the status in the hexagonal grid"""
+        for i in range(0, len(self.allocentric_view.memory.allocentric_memory.grid)):
+            for j in range(0, len(self.allocentric_view.memory.allocentric_memory.grid[0])):
+                self.allocentric_view.add_cell(i, j)
+
+    def extract_and_convert_recently_changed_cells(self, to_reset=[], projections=[]):
+        cell_list = self.memory.allocentric_memory.cells_changed_recently + to_reset + projections
+        for (i, j) in cell_list:
+            self.allocentric_view.add_cell(i, j)
+
     def main(self, dt):
         """Refresh allocentric view"""
         if self.refresh_count > 500:
@@ -54,9 +65,9 @@ class CtrlAllocentricView:
         if self.refresh_count == 0:
             # Display all cells on initialization
             self.allocentric_view.shapesList = []
-            self.allocentric_view.extract_and_convert_interactions()
+            self.extract_and_convert_interactions()
             self.allocentric_memory.cells_changed_recently = []
         if len(self.allocentric_memory.cells_changed_recently) > 0:
-            self.allocentric_view.extract_and_convert_recently_changed_cells(self.workspace.memory, self.to_reset, [])
+            self.extract_and_convert_recently_changed_cells(self.to_reset, [])
             self.allocentric_memory.cells_changed_recently = []
         self.refresh_count += 1

@@ -1,7 +1,6 @@
 import pyglet
 from .CtrlEgocentricView import CtrlEgocentricView
 from .PointOfInterest import *
-from ...Memory.EgocentricMemory.EgocentricMemory import EgocentricMemory
 from ...Workspace import Workspace
 
 
@@ -9,7 +8,7 @@ from ...Workspace import Workspace
 # Allow selecting points of interest and inserting and deleting phenomena
 # py -m autocat.Display.EgocentricDisplay
 if __name__ == "__main__":
-    memory = EgocentricMemory()
+    # memory = EgocentricMemory()
     _workspace = Workspace()
     view_controller = CtrlEgocentricView(_workspace)
     view_controller.view.robot.rotate_head(-45)

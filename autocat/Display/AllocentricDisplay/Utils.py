@@ -43,91 +43,35 @@ and a phenom_to_whatev function and use it instead.
 #     return shape_list
 
 
-def recently_changed_to_pyglet(memory, batch, to_reset=[], projections=[]):
-    """Convert the cells in hexaMemory.cells_changed_recently,to_reset and projections 
-    to pyglet shapes"""
-    cell_list = memory.allocentric_memory.cells_changed_recently + to_reset + projections
-    shape_list = []
-    # x0 = 0
-    # y0 = 0
-    radius = memory.allocentric_memory.cell_radius
-    grid = memory.allocentric_memory.grid
-    
-    hauteur = math.sqrt((2*radius)**2 - radius**2)
-    for (i, j) in cell_list:
-        robot = False
-        # color_debug = (random.randint(0,255),random.randint(0,255),random.randint(0,255))
-        cell = grid[i][j]
-
-            # if cell.occupied:
-            #     color = name_to_rgb("darkslateBlue")
-            #     robot = True
-            # else:
-            #     color = name_to_rgb("white")
-            #     if(cell.status == "Free"):
-            #         color = name_to_rgb("lightgreen")
-            #     elif(cell.status == "Occupied"):
-            #         color = name_to_rgb("yellow")
-            #         robot = True
-            #
-            #     elif(cell.status == "Blocked"):
-            #         color = name_to_rgb("red")
-            #     elif(cell.status == "Frontier"):
-            #         color = name_to_rgb("black")
-            #     elif(cell.status == "Something"):
-            #         color = name_to_rgb("orange")
-            #         r,g,b = color
-            #         confidence = memory.allocentric_memory.grid[i][j].confidence
-            #         factor = 10
-            #         r = min(255,r + confidence*factor)
-            #         g = min(255,g + confidence*factor)
-            #         b = min(255,b + confidence*factor)
-            #         color = r,g,b
-
-        # x1 = x0
-        # y1 = y0
-        if j % 2 == 0:
-            x = i * 3 * radius
-            y = hauteur * (j/2)
-        else:
-            x = (1.5 * radius) + i * 3 * radius
-            y = (hauteur/2) + (j-1)/2 * hauteur
-
-            # theta = 0
-            # theta = math.radians(theta)
-            # point1 = [x1 + math.cos(theta)*radius, y1 + math.sin(theta)*radius]
-            # theta = 60
-            # theta = math.radians(theta)
-            # point2 = [x1 + math.cos(theta)*radius, y1 + math.sin(theta)*radius]
-            # theta = 120
-            # theta = math.radians(theta)
-            # point3 = [x1 + math.cos(theta)*radius, y1 + math.sin(theta)*radius]
-            # theta = 180
-            # theta = math.radians(theta)
-            # point4 = [x1 + math.cos(theta)*radius, y1 + math.sin(theta)*radius]
-            # theta = 240
-            # theta = math.radians(theta)
-            # point5 = [x1 + math.cos(theta)*radius, y1 + math.sin(theta)*radius]
-            # theta = 300
-            # theta = math.radians(theta)
-            # point6 = [x1 + math.cos(theta)*radius, y1 + math.sin(theta)*radius]
-            # if (i,j) in projections :
-            #     color = name_to_rgb("pink")
-            #     print("PINKKKKKKKKKKKKK")
-
-            # hexagon = shapes.Polygon(point1, point2, point3, point4, point5, point6,color = color, batch = batch)
-        hexagon = Cell(x, y, batch, None, radius, cell.status).shape
-        shape_list.append(hexagon)
-
-        if robot:
-            # theta = math.radians(hexaMemory.robot_angle)
-            theta = memory.body_memory.body_direction_rad
-            x2 = radius * math.cos(theta) + x
-            y2 = radius * math.sin(theta) + y
-            line = shapes.Line(x, y, x2, y2, width=15, color=name_to_rgb("yellow"), batch=batch)
-            shape_list.append(line)
-
-    return shape_list
+# def recently_changed_to_pyglet(memory, batch, to_reset=[], projections=[]):
+#     """Convert the cells in hexaMemory.cells_changed_recently,to_reset and projections
+#     to pyglet shapes"""
+#     cell_list = memory.allocentric_memory.cells_changed_recently + to_reset + projections
+#     radius = memory.allocentric_memory.cell_radius
+#     grid = memory.allocentric_memory.grid
+#     height = math.sqrt((2*radius)**2 - radius**2)
+#     shape_list = []
+#
+#     for (i, j) in cell_list:
+#         robot = False
+#         cell = grid[i][j]
+#         if j % 2 == 0:
+#             x = i * 3 * radius
+#             y = height * (j/2)
+#         else:
+#             x = (1.5 * radius) + i * 3 * radius
+#             y = (height/2) + (j-1)/2 * height
+#         hexagon = Cell(x, y, batch, None, radius, cell.status).shape
+#         shape_list.append(hexagon)
+#
+#         if robot:
+#             theta = memory.body_memory.body_direction_rad
+#             x2 = radius * math.cos(theta) + x
+#             y2 = radius * math.sin(theta) + y
+#             line = shapes.Line(x, y, x2, y2, width=15, color=name_to_rgb("yellow"), batch=batch)
+#             shape_list.append(line)
+#
+#     return shape_list
 
 
 def translate_interaction_type_to_cell_status(type):

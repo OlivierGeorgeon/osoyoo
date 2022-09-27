@@ -1,8 +1,5 @@
 import pyglet
 from pyglet.gl import *
-# from .Utils import hexaMemory_to_pyglet
-# from .Utils import translate_indecisive_cell_to_pyglet
-from .Utils import recently_changed_to_pyglet
 from ..EgocentricDisplay.OsoyooCar import OsoyooCar
 import math
 from .Cell import Cell
@@ -26,16 +23,19 @@ class AllocentricView(pyglet.window.Window):
         self.background = pyglet.graphics.OrderedGroup(0)
         self.foreground = pyglet.graphics.OrderedGroup(1)
 
+        self.cell_list = []
+
         self.robot_batch = pyglet.graphics.Batch()
-        self.robot = OsoyooCar(self.robot_batch, self.foreground)
+        self.robot = OsoyooCar(self.robot_batch, self.background)  # Rectangles seem not to respect ordered groups
 
         # self.test_cell = Cell(0, 100, self.robot_batch, self.foreground, 50, 'Free')
 
         self.zoom_level = 4
-        self.shapesList = []
+        # self.shapesList = []
         self.mouse_press_angle = 0
         self.window = None
 
+        self.memory = memory
         self.nb_cell_x = memory.allocentric_memory.width
         self.nb_cell_y = memory.allocentric_memory.height
         self.cell_radius = memory.allocentric_memory.cell_radius
@@ -44,45 +44,50 @@ class AllocentricView(pyglet.window.Window):
         self.mouse_press_y = 0
         self.label = pyglet.text.Label('', font_name='Arial', font_size=15, x=10, y=10)
         self.label.color = (0, 0, 0, 255)
-        self.memory = memory
 
         self.projections_for_context = []
 
-    def extract_and_convert_interactions(self):
-        """Create the shapes from hexagonal memory"""
-        grid = self.memory.allocentric_memory.grid
+    def add_cell(self, cell_x: int, cell_y: int):
+        cell = self.memory.allocentric_memory.grid[cell_x][cell_y]
         radius = self.memory.allocentric_memory.cell_radius
         height = math.sqrt((2 * radius) ** 2 - radius ** 2)
-        shape_list = []
+        if cell.status != "Unknown":
+            if cell_y % 2 == 0:
+                x = cell_x * 3 * radius
+                y = height * (cell_y / 2)
+            else:
+                x = (1.5 * radius) + cell_x * 3 * radius
+                y = (height / 2) + (cell_y - 1) / 2 * height
+            hexagon = Cell(x, y, self.batch, self.foreground, radius, cell.status).shape
+            self.cell_list.append(hexagon)
 
-        for i in range(0, len(grid)):
-            for j in range(0, len(grid[0])):
-                # robot = False
-                cell = grid[i][j]
-                if cell.status != "Unknown":
-                    if j % 2 == 0:
-                        x = i * 3 * radius
-                        y = height * (j / 2)
-                    else:
-                        x = (1.5 * radius) + i * 3 * radius
-                        y = (height / 2) + (j - 1) / 2 * height
-                    hexagon = Cell(x, y, self.batch, None, radius, cell.status).shape
-                    shape_list.append(hexagon)
-        self.shapesList = shape_list
-        # self.indecisive_cell_shape = []
-        # self.shapesList = hexaMemory_to_pyglet(memory, self.batch)
-        # self.nb_cell_x = memory.allocentric_memory.width
-        # self.nb_cell_y = memory.allocentric_memory.height
-        # self.cell_radius = memory.allocentric_memory.cell_radius
+    # def extract_and_convert_recently_changed_cells(self, to_reset=[], projections=[]):
+    #     cell_list = self.memory.allocentric_memory.cells_changed_recently + to_reset + projections
+    #     radius = self.memory.allocentric_memory.cell_radius
+    #     grid = self.memory.allocentric_memory.grid
+    #     height = math.sqrt((2 * radius) ** 2 - radius ** 2)
+    #     shape_list = []
+    #
+    #     for (i, j) in cell_list:
+    #         robot = False
+    #         cell = grid[i][j]
+    #         if j % 2 == 0:
+    #             x = i * 3 * radius
+    #             y = height * (j / 2)
+    #         else:
+    #             x = (1.5 * radius) + i * 3 * radius
+    #             y = (height / 2) + (j - 1) / 2 * height
+    #         hexagon = Cell(x, y, self.batch, None, radius, cell.status).shape
+    #         shape_list.append(hexagon)
+    #
+    #         # if robot:
+    #         #     theta = self.memory.body_memory.body_direction_rad
+    #         #     x2 = radius * math.cos(theta) + x
+    #         #     y2 = radius * math.sin(theta) + y
+    #         #     line = shapes.Line(x, y, x2, y2, width=15, color=name_to_rgb("yellow"), batch=batch)
+    #         #     shape_list.append(line)
+    #     # self.shapesList.append(shape_list)
 
-    def extract_and_convert_recently_changed_cells(self, memory, to_reset=[], projections=[]):
-        tmp = recently_changed_to_pyglet(memory, self.batch, projections=projections)
-        self.shapesList.append(tmp)
-
-    # def show_indecisive_cell(self, indecisive_cell): #(indecisive_cell,hexaMemory,batch)
-    #     self.indecisive_cell_shape = []
-    #     self.indecisive_cell_shape = translate_indecisive_cell_to_pyglet(indecisive_cell, self.hexa_memory, self.batch)
-        
     def on_draw(self):
         """ Drawing the window """
         glClear(GL_COLOR_BUFFER_BIT)

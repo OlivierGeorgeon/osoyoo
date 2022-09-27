@@ -1,21 +1,19 @@
 import pyglet
-from ...Memory.Memory import Memory
-from .AllocentricView import AllocentricView
+from ...Workspace import Workspace
+from .CtrlAllocentricView import CtrlAllocentricView
 
-# Testing AllocentricView by displaying HexaMemory
+# Testing CtrlAllocentricView by displaying Allocentric Hexagonal Memory
 # Hover the grid to display the mouse position
 # py -m autocat.Display.AllocentricDisplay
-if __name__ == "__main__":
 
-    # Create the hexa grid
-    memory = Memory()
-    memory.body_memory.set_body_direction_degree(60)
-    # allocentric_memory = HexaMemory(width=30, height=100, cell_radius=50)
-    # allocentric_memory.rotate_robot(-90)  # Rotate clockwise to align with x axis (no effect due to azimuth)
+workspace = Workspace()
+workspace.memory.body_memory.set_body_direction_degree(60)
 
-    allocentric_view = AllocentricView(memory)
+# Add an echo
+x, y = workspace.memory.allocentric_memory.convert_pos_in_cell(250, 0)
+workspace.memory.allocentric_memory.apply_status_to_cell(x, y, "Echo")
 
-    # Create the shapes to draw the cells
-    allocentric_view.extract_and_convert_interactions(memory)
+view_controller = CtrlAllocentricView(workspace)
+view_controller.extract_and_convert_interactions()
 
-    pyglet.app.run()
+pyglet.app.run()
