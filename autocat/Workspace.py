@@ -1,6 +1,6 @@
 from .Decider.AgentCircle import AgentCircle
 from .Memory.Memory import Memory
-from .Synthesizer.Synthesizer import Synthesizer
+from .Integrator.Synthesizer import Synthesizer
 
 CONTROL_MODE_AUTOMATIC = "auto"
 CONTROL_MODE_MANUAL = "manual"

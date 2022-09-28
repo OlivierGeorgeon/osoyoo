@@ -1,8 +1,8 @@
 from .HexaGrid import HexaGrid
-from .test_HexaMemory import test_move, test_convert_pos_in_cell
+from .test_AllocentricMemory import test_move, test_convert_pos_in_cell
 
 # Testing Allocentric Memory
-# py -m autocat.Memory.HexaMemory
+# py -m autocat.Memory.AllocentricMemory
 
 hx = HexaGrid(10, 10)
 # Displaying the hexagonal grid in the console.

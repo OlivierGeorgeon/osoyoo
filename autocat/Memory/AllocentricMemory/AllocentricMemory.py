@@ -2,7 +2,7 @@ import math
 from . HexaGrid import HexaGrid
 
 
-class HexaMemory(HexaGrid):
+class AllocentricMemory(HexaGrid):
     """Hexa memory is an allocentric memory, made with an hexagonal grid.
     You can find informations on the hexagonal grid coordinates system in the docs
     folder.

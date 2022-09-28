@@ -1,9 +1,9 @@
-from .HexaMemory import HexaMemory
+from .AllocentricMemory import AllocentricMemory
 
 
 def test_convert_pos_in_cell():
     """Test the function convert_pos_in_cell()"""
-    hx = HexaMemory(20, 20, cell_radius=10)
+    hx = AllocentricMemory(20, 20, cell_radius=10)
     error = 0
 
     # Test the initial position of the robot
@@ -328,7 +328,7 @@ def test_convert_pos_in_cell():
 
 def test_move():
     """Test the function move()"""
-    hx = HexaMemory(20, 20, cell_radius=10)
+    hx = AllocentricMemory(20, 20, cell_radius=10)
     error = 0
 
     # Sweep left from Origin (orientation East)

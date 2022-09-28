@@ -3,7 +3,6 @@ from autocat.Memory.EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIE
     EXPERIENCE_LOCAL_ECHO, EXPERIENCE_BLOCK, EXPERIENCE_SHOCK
 from webcolors import name_to_rgb
 import math
-from .Cell import Cell
 
 """Utils to make the project more modulable, if you decide to change the package
 used for the view you should just have to create a phenomList_to_whatev 

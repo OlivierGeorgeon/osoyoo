@@ -1,7 +1,7 @@
 from ..Display.AllocentricDisplay.Utils import translate_interaction_type_to_cell_status
 # from ..Memory.EgocentricMemory.Interactions.Interaction import EXPERIENCE_LOCAL_ECHO, EXPERIENCE_CENTRAL_ECHO, EXPERIENCE_FOCUS
 from ..Memory.EgocentricMemory.Experience import *
-from ..Memory.HexaMemory.HexaGrid import HexaGrid
+from ..Memory.AllocentricMemory.HexaGrid import HexaGrid
 import math
 from .SynthesizerSubclasses.EchoObjectValidateds import EchoObjectValidateds
 from .SynthesizerSubclasses.EchoObjectsToInvestigate import EchoObjectsToInvestigate

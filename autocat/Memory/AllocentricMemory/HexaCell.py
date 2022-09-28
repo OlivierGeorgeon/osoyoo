@@ -6,8 +6,7 @@ class HexaCell:
         """
         self.x = x
         self.y = y
-        self.status = "Unknown"  # Status : "Free" (when has been visited), "Occupied" (when robot is on it), "Blocked" (when object is on it), "Unknown" (when has not been visited)
-                              # "MovableObstacle" "Frontier"(when line) "Something"(when something echolocated) 
+        self.status = "Unknown"
         self.occupied = False  # True if the cell is occupied by the agent
         self.experiences = list()  # Used in Synthesizer to store the experiences that happened on the cell
         self.confidence = 1

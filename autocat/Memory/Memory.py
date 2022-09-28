@@ -1,5 +1,5 @@
 from .EgocentricMemory.EgocentricMemory import EgocentricMemory
-from .HexaMemory.HexaMemory import HexaMemory
+from .AllocentricMemory.AllocentricMemory import AllocentricMemory
 from .BodyMemory import BodyMemory
 
 
@@ -11,7 +11,7 @@ class Memory:
     def __init__(self, hexagrid_size=(100, 200), cell_radius=40):
         self.body_memory = BodyMemory()
         self.egocentric_memory = EgocentricMemory()
-        self.allocentric_memory = HexaMemory(hexagrid_size[0], hexagrid_size[1], cell_radius=cell_radius)
+        self.allocentric_memory = AllocentricMemory(hexagrid_size[0], hexagrid_size[1], cell_radius=cell_radius)
 
     def update_and_add_experiences(self, enacted_interaction):
         """ Process the enacted interaction to update the memory
