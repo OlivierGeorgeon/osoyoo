@@ -1,27 +1,34 @@
 import math
-from . HexaGrid import HexaGrid
+# from . HexaGrid import HexaGrid
+from . HexaCell import HexaCell
 
 
-class AllocentricMemory(HexaGrid):
-    """Hexa memory is an allocentric memory, made with an hexagonal grid.
-    You can find informations on the hexagonal grid coordinates system in the docs
-    folder.
-    """
+class AllocentricMemory:
+    """The agent's allocentric memory made with an hexagonal grid."""
 
-    def __init__(self, width, height, cell_radius=50, robot_width=200):
-        """Construct the HexaMemory of the robot, child class of HexaGrid
+    def __init__(self, width, height, cell_radius=50):
+        """Construct the allocentric memory of the robot, child class of HexaGrid
         with the addition of the robot at the center of the grid and a link between the
         software and the real word, cell_radius representing the radius of a cell in the real world (in millimeters)
         """
-        super().__init__(width, height)
+        self.grid = list()
+        self.width = width
+        self.height = height
+        for i in range(width):
+            self.grid.append(list())
+            for j in range(height):
+                self.grid[i].append(HexaCell(i, j))
+
+        # super().__init__(width, height)
         self.cell_radius = cell_radius
         self.robot_cell_x = self.width // 2
         self.robot_cell_y = self.height // 2
         self.robot_pos_x = 0
         self.robot_pos_y = 0
-        self.robot_width = robot_width
+        # self.robot_width = robot_width
         self.grid[self.robot_cell_x][self.robot_cell_y].occupy()
         self.cells_changed_recently = []
+
 
     def reset(self):
         """Reset the hexamemory"""
@@ -36,6 +43,17 @@ class AllocentricMemory(HexaGrid):
         self.azimuth = 0
         # self.update_orientation()
         self.cells_changed_recently = []
+
+    def __str__(self):
+        output = ""
+        for j in range(self.height-1, -1, -1):
+            if j % 2 == 1:
+                output += "-----"
+            for i in range(self.width):
+                output += str(self.grid[i][j])
+                output += "-----"
+            output += "\n"
+        return output
 
     def convert_pos_in_cell(self, pos_x, pos_y):
         """Convert an allocentric position to cell coordinates."""
@@ -64,16 +82,16 @@ class AllocentricMemory(HexaGrid):
             tmp_cell_y_center += 2*mini_radius*y_sign
         # Elimination pour trouver dans quel voisin de la cellule courante on est
         distance = math.sqrt(pos_x**2 + pos_y**2)
-        if(distance <= mini_radius): # On est forcement dans la bonne pos
+        if distance <= mini_radius:  # On est forcement dans la bonne pos
             return tmp_cell_x, tmp_cell_y
-        if distance <= radius :
+        if distance <= radius:
             "determiner la ligne qui risque d'etre traversée, et si on a passé la ligne ou non"
         if abs(pos_x) >= 2.5 * radius:
             "on est forcément dans g hgg bgg ou d hdd bdd"
             if abs(pos_y) >= mini_radius :
                 "on est forcement dans hgg bgg hdd bdd"
                 return tmp_cell_x+ x_sign, tmp_cell_y + 2*y_sign
-            else :
+            else:
                 "on est dans g ou d"
                 return tmp_cell_x + x_sign, tmp_cell_y
 
@@ -129,7 +147,7 @@ class AllocentricMemory(HexaGrid):
             
         if abs(pos_x)> radius and abs(pos_x)< 2*radius:
             "on est dans hd"
-            return self.find_coordinates_corner(tmp_cell_x,tmp_cell_y, x_sign,y_sign)
+            return self.find_coordinates_corner(tmp_cell_x, tmp_cell_y, x_sign, y_sign)
         if abs(pos_x) > radius/2 and abs(pos_x)<= 2*radius:
             # on est dans c, h ou hd
             x1 = radius
@@ -151,7 +169,7 @@ class AllocentricMemory(HexaGrid):
 
             if abs(pos_y) >= y_ref1 and abs(pos_y) <= y_ref2:
                 # on est dans hd
-                return self.find_coordinates_corner(tmp_cell_x,tmp_cell_y, x_sign,y_sign)
+                return self.find_coordinates_corner(tmp_cell_x, tmp_cell_y, x_sign,y_sign)
         if abs(pos_y) > mini_radius:
             return tmp_cell_x, tmp_cell_y + y_sign*2
         else:
@@ -161,21 +179,21 @@ class AllocentricMemory(HexaGrid):
         """Return the allocentric position of the center of the given cell."""
         radius = self.cell_radius
         mini_radius = math.sqrt(radius**2 - (radius/2)**2)
-        start_x = self.width //2
+        start_x = self.width // 2
         change_x = cell_x - start_x
-        start_y = self.height //2
+        start_y = self.height // 2
         change_y = cell_y - start_y
         pos_x = 3 * radius * change_x
         pos_y = 0
         reste = 0
-        if change_y % 2 == 0 :
+        if change_y % 2 == 0:
             pos_y = mini_radius * change_y
-        else :
-            signe =  (change_y/abs(change_y))
+        else:
+            signe = change_y/abs(change_y)
             pos_y = mini_radius * (change_y - signe)
             reste = signe
 
-        if reste != 0 :
+        if reste != 0:
             y_arrivee = (change_y - signe) + start_y
             signe_x = 1 if y_arrivee % 2 == 0 else -1
             pos_x += signe_x * (3/2)*radius
@@ -185,22 +203,21 @@ class AllocentricMemory(HexaGrid):
 
     def find_coordinates_corner(self, cell_x, cell_y, x_sign, y_sign):
         """aaaaaaaaa"""
-        f_x, f_y =0, 0
-        y_even =cell_y % 2 == 0
-        if(y_even):
-            if(x_sign > 0):
+        f_x, f_y = 0, 0
+        y_even = cell_y % 2 == 0
+        if y_even:
+            if x_sign > 0:
                 f_x = cell_x
             else :
                 f_x = cell_x - 1
-
         else:
-            if(x_sign > 0):
+            if x_sign > 0:
                 f_x = cell_x+1
-            else :
+            else:
                 f_x = cell_x
 
-        if(y_sign > 0):
-            f_y = cell_y +1 
+        if y_sign > 0:
+            f_y = cell_y + 1
         else:
             f_y = cell_y - 1
 
@@ -313,7 +330,7 @@ class AllocentricMemory(HexaGrid):
         self.grid[cell_x][cell_y].status = status
         self.cells_changed_recently.append((cell_x, cell_y))
 
-    def apply_status_to_rectangle(self, center_x,center_y,width,height, status):
+    def apply_status_to_rectangle(self, center_x, center_y, width, height, status):
         """Apply the given status to every cell in the rectangle defined by the given center and width/height"""
         max_x = center_x + width/2 if center_x + width / 2 < self.width/2 * self.cell_radius * 2 else self.width * self.cell_radius
         max_y = center_y + height/2 if center_y + height / 2 < self.height/2 * self.cell_radius * 1.7 else self.height * self.cell_radius
@@ -323,4 +340,3 @@ class AllocentricMemory(HexaGrid):
             for y in range(int(min_y), int(max_y), self.cell_radius):
                 cell_x, cell_y = self.convert_pos_in_cell(x, y)
                 self.apply_status_to_cell(cell_x, cell_y, status)
-

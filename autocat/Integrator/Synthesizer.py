@@ -1,7 +1,8 @@
 from ..Display.AllocentricDisplay.Utils import translate_interaction_type_to_cell_status
 # from ..Memory.EgocentricMemory.Interactions.Interaction import EXPERIENCE_LOCAL_ECHO, EXPERIENCE_CENTRAL_ECHO, EXPERIENCE_FOCUS
 from ..Memory.EgocentricMemory.Experience import *
-from ..Memory.AllocentricMemory.HexaGrid import HexaGrid
+# from ..Memory.AllocentricMemory.HexaGrid import HexaGrid
+from ..Memory.AllocentricMemory.AllocentricMemory import AllocentricMemory
 import math
 from .SynthesizerSubclasses.EchoObjectValidateds import EchoObjectValidateds
 from .SynthesizerSubclasses.EchoObjectsToInvestigate import EchoObjectsToInvestigate
@@ -16,7 +17,7 @@ class Synthesizer:
         self.workspace = workspace
         self.egocentric_memory = workspace.memory.egocentric_memory
         self.allocentric_memory = workspace.memory.allocentric_memory
-        self.internal_hexa_grid = HexaGrid(self.allocentric_memory.width, self.allocentric_memory.height)
+        self.internal_hexa_grid = AllocentricMemory(self.allocentric_memory.width, self.allocentric_memory.height)
         self.interactions_list = []
         self.echo_objects_to_investigate = EchoObjectsToInvestigate(3, 2, self.workspace.memory, acceptable_delta=700)
         self.echo_objects_valided = EchoObjectValidateds(self.allocentric_memory)
@@ -31,8 +32,10 @@ class Synthesizer:
         to updating the hexa_memory"""
         self.interactions_list = [elem for elem in self.egocentric_memory.experiences if (elem.id > self.last_used_id)]
         self.last_used_id = max([elem.id for elem in self.interactions_list], default=self.last_used_id)
+
         echoes = [elem for elem in self.interactions_list if elem.type == EXPERIENCE_LOCAL_ECHO]
         real_echos = self.treat_echos(echoes)
+
         self.experiences_central_echo = real_echos
         echo_focus, focus_lost = self.create_focus_echo()
         cells_changed = []

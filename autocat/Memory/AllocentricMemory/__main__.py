@@ -1,13 +1,14 @@
-from .HexaGrid import HexaGrid
+# from .HexaGrid import HexaGrid
+from .AllocentricMemory import AllocentricMemory
 from .test_AllocentricMemory import test_move, test_convert_pos_in_cell
 
 # Testing Allocentric Memory
 # py -m autocat.Memory.AllocentricMemory
 
-hx = HexaGrid(10, 10)
+allocentric_memory = AllocentricMemory(10, 10)
 # Displaying the hexagonal grid in the console.
-print(hx)
-print("North neighbor of (2,2):", hx.get_neighbor_in_direction(2, 2, 0))
+print(allocentric_memory)
+# print("North neighbor of (2,2):", hx.get_neighbor_in_direction(2, 2, 0))
 # print("All neighbors of 2,2 : ", hx.get_all_neighbors(2, 2))
 
 error = 0
