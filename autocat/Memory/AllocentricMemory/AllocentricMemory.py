@@ -1,6 +1,6 @@
 import math
-# from . HexaGrid import HexaGrid
 from . HexaCell import HexaCell
+from ..EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_PLACE
 
 
 class AllocentricMemory:
@@ -28,7 +28,6 @@ class AllocentricMemory:
         # self.robot_width = robot_width
         self.grid[self.robot_cell_x][self.robot_cell_y].occupy()
         self.cells_changed_recently = []
-
 
     def reset(self):
         """Reset the hexamemory"""
@@ -256,8 +255,8 @@ class AllocentricMemory:
             self.robot_pos_y = 0
 
         # Leave the previous occupied cell
-        if self.grid[self.robot_cell_x][self.robot_cell_y] != 'Frontier':
-            self.grid[self.robot_cell_x][self.robot_cell_y].set_to('Free')
+        if self.grid[self.robot_cell_x][self.robot_cell_y] != EXPERIENCE_FLOOR:
+            self.grid[self.robot_cell_x][self.robot_cell_y].set_to(EXPERIENCE_PLACE)
         self.grid[self.robot_cell_x][self.robot_cell_y].leave()
         self.cells_changed_recently.append((self.robot_cell_x, self.robot_cell_y))
 
@@ -269,12 +268,12 @@ class AllocentricMemory:
 
         return destination_x, destination_y
 
-    def apply_phenomenon(self, phenomenon, pos_x, pos_y):
-        """Apply a phenomenon to the grid
-        Args :
-            phenomenon : type of phenomenon (TODO: but should be things like "line", "unmovable object", "movable object", etc.)
-            pos_x, pos_y : position of the phenomenon (relative to the robot's position)
-        """
+    # def apply_phenomenon(self, phenomenon, pos_x, pos_y):
+    #     """Apply a phenomenon to the grid
+    #     Args :
+    #         phenomenon : type of phenomenon (TODO: but should be things like "line", "unmovable object", "movable object", etc.)
+    #         pos_x, pos_y : position of the phenomenon (relative to the robot's position)
+    #     """
 
     def get_robot_pos(self):
         """Return the position of the robot. (cell coordinates)"""

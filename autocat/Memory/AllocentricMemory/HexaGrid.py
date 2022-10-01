@@ -1,25 +1,25 @@
 from . HexaCell import HexaCell
 
 
-class HexaGrid:
-    """Inspired by http://roguebasin.com/?title=Hexagonal_Tiles#Coordinate_systems_with_a_hex_grid
-    """
-
-    def __init__(self, width, height):
-        """Create a grid with hexagonal cells.
-        Args : 
-            width : number of cells in width
-            height : number of cells in height
-
-        """
-        self.grid = list()
-        self.width = width
-        self.height = height
-        for i in range(width):
-            self.grid.append(list())
-            for j in range(height):
-                self.grid[i].append(HexaCell(i, j))
-    
+# class HexaGrid:
+#     """Inspired by http://roguebasin.com/?title=Hexagonal_Tiles#Coordinate_systems_with_a_hex_grid
+#     """
+#
+#     def __init__(self, width, height):
+#         """Create a grid with hexagonal cells.
+#         Args :
+#             width : number of cells in width
+#             height : number of cells in height
+#
+#         """
+#         self.grid = list()
+#         self.width = width
+#         self.height = height
+#         for i in range(width):
+#             self.grid.append(list())
+#             for j in range(height):
+#                 self.grid[i].append(HexaCell(i, j))
+#
     # def __str__(self):
     #     output = ""
     #     for j in range(self.height-1, -1, -1):

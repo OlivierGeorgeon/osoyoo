@@ -8,6 +8,7 @@ EXPERIENCE_BLOCK = 'Block'
 EXPERIENCE_SHOCK = 'Shock'
 EXPERIENCE_FLOOR = 'Floor'
 EXPERIENCE_FOCUS = 'Focus'
+EXPERIENCE_PLACE = 'Place'
 
 
 class Experience:

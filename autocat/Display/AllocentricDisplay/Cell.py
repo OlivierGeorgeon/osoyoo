@@ -1,7 +1,8 @@
 from pyglet import gl
 from webcolors import name_to_rgb
 import math
-from autocat.Memory.EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_BLOCK
+from autocat.Memory.EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_BLOCK, \
+    EXPERIENCE_FOCUS, EXPERIENCE_SHOCK
 
 
 class Cell:
@@ -34,8 +35,12 @@ class Cell:
             color = name_to_rgb('slateBlue')
         if status == EXPERIENCE_BLOCK:
             color = name_to_rgb('red')
+        if status == EXPERIENCE_SHOCK:
+            color = name_to_rgb('red')
         if status == EXPERIENCE_FLOOR:
             color = name_to_rgb('black')
         if status == EXPERIENCE_ALIGNED_ECHO:
             color = name_to_rgb('orange')
+        if status == EXPERIENCE_FOCUS:
+            color = name_to_rgb('fireBrick')
         self.shape.colors[0:24] = 6 * (*color, 128)

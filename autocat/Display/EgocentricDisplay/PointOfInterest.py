@@ -4,7 +4,7 @@ from autocat.Memory.EgocentricMemory.Experience import *
 
 # Points of interest that only exist in Egocentric Display
 # (points of interest attached to an interaction have the same type as their interactions)
-POINT_PLACE = 'Place'
+# POINT_PLACE = 'Place'
 POINT_COMPASS = 'Compass'
 
 
@@ -19,7 +19,7 @@ class PointOfInterest:
 
         self.is_selected = False
 
-        if self.type == POINT_PLACE:
+        if self.type == EXPERIENCE_PLACE:
             # Place: LightGreen triangle
             self.points = [30, 0, -20, -20, -20, 20]
             self.shape = self.batch.add_indexed(3, gl.GL_TRIANGLES, self.group, [0, 1, 2], ('v2i', self.points),
@@ -68,7 +68,7 @@ class PointOfInterest:
     def set_color(self, color_name=None):
         """ Set the color or reset it to its default value """
         if color_name is None:
-            if self.type == POINT_PLACE:
+            if self.type == EXPERIENCE_PLACE:
                 # Place: Blue circle
                 # self.shape.colors[0:9] = [144, 238, 144, 144, 238, 144, 144, 238, 144]
                 self.shape.colors[0:9] = 3 * name_to_rgb("LightGreen")
@@ -90,7 +90,7 @@ class PointOfInterest:
             if self.type == EXPERIENCE_FOCUS:
                 self.shape.colors[0:24] = 6 * (*name_to_rgb("fireBrick"), 128)
         else:
-            if self.type == POINT_PLACE:
+            if self.type == EXPERIENCE_PLACE:
                 self.shape.colors[0:9] = 3 * name_to_rgb(color_name)
             elif self.type == EXPERIENCE_FOCUS:
                 self.shape.colors[0:24] = 6 * (*name_to_rgb(color_name), 200)

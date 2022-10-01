@@ -1,7 +1,8 @@
 import pyglet
 from pyglet.window import key
 from .EgocentricView import EgocentricView
-from .PointOfInterest import *
+from .PointOfInterest import PointOfInterest, POINT_COMPASS
+from ...Memory.EgocentricMemory.Experience import EXPERIENCE_FOCUS, EXPERIENCE_PLACE
 
 
 class CtrlEgocentricView:
@@ -92,7 +93,7 @@ class CtrlEgocentricView:
                 poi_displace.delete()
 
         # Mark the new position
-        self.add_point_of_interest(0, 0, POINT_PLACE)
+        self.add_point_of_interest(0, 0, EXPERIENCE_PLACE)
 
         # Update the robot's position
         # self.view.robot.rotate_head(self.workspace.enacted_interaction['head_angle'])
