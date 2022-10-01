@@ -6,6 +6,7 @@ from ..Memory.AllocentricMemory.AllocentricMemory import AllocentricMemory
 import math
 from .SynthesizerSubclasses.EchoObjectValidateds import EchoObjectValidateds
 from .SynthesizerSubclasses.EchoObjectsToInvestigate import EchoObjectsToInvestigate
+from ..Robot.Echo import treat_echos
 
 
 class Synthesizer:
@@ -34,7 +35,9 @@ class Synthesizer:
         self.last_used_id = max([elem.id for elem in self.interactions_list], default=self.last_used_id)
 
         echoes = [elem for elem in self.interactions_list if elem.type == EXPERIENCE_LOCAL_ECHO]
-        real_echos = self.treat_echos(echoes)
+        real_echos = treat_echos(echoes)
+        for experience in real_echos:
+            self.egocentric_memory.experiences.append(experience)  # OG add to memory for displacement update
 
         self.experiences_central_echo = real_echos
         echo_focus, focus_lost = self.create_focus_echo()
@@ -54,72 +57,72 @@ class Synthesizer:
                 action_to_return = "-"  # The synthesizer need to scan again
         return action_to_return, cells_changed, focus_lost
 
-    def treat_echos(self, echo_list):
-        """In case of a sweep we obtain an array of echo, this function discretize 
-        it to try to find the real position of the objects that sent back the echo
-        
-        To do so use 'strikes' which are series of consecutive echoes that are
-        close enough to be considered as the same object, and consider that the
-        real position of the object is at the middle of the strike"""
-        if len(echo_list) == 1:
-            print(echo_list[0])
-        echo_list = self.revert_echoes_to_angle_distance(echo_list)
-        max_delta_dist = 160
-        max_delta_angle = math.radians(20)
-        streaks = [[], [], [], [], [], [], [], [], [], [], [], []]
-        angle_dist = [[], [], [], [], [], [], [], [], [], [], [], []]
-        current_id = 0
-        echo_list = sorted(echo_list, key=lambda elem: elem[0])  # on trie par angle, pour avoir les streak "préfaites"
-        for angle, distance, interaction in echo_list:
-            check = False
-            for i, streak in enumerate(streaks):
-                if len(streak)> 0 and not check:
-                    if any((abs(ele[1]-distance)<max_delta_dist and abs(angle - ele[0])<max_delta_angle) for ele in streak):
-                        streak.append((angle, distance, interaction))
-                        angle_dist[i].append((math.degrees(angle), distance))
-                        check = True
-            if check:
-                continue
-            if len(streaks[current_id]) == 0:
-                streaks[current_id].append((angle,distance,interaction))
-                angle_dist[current_id].append((math.degrees(angle),distance))
-            else :
-                current_id = (current_id + 1)
-                streaks[current_id].append((angle, distance, interaction))
-                angle_dist[current_id].append((math.degrees(angle), distance))
-        experiences_central_echo = []
-        for streak in streaks:
-            if len(streak) == 0:
-                continue
-            else:
-                x_mean, y_mean = 0, 0
-                if len(streak) % 2 == 0:
-                    # Compute the means of x and y values for the two elements at the center of the array
-                    x_mean = (streak[int(len(streak)/2)][2].x + streak[int(len(streak)/2)-1][2].x)/2
-                    y_mean = (streak[int(len(streak)/2)][2].y + streak[int(len(streak)/2)-1][2].y)/2
-                else:
-                    # The x and y are at the center of the array
-                    x_mean = streak[int(len(streak) / 2)][2].x
-                    y_mean = streak[int(len(streak) / 2)][2].y
-                experience_central_echo = Experience(int(x_mean), int(y_mean), width=15,
-                                                     experience_type=EXPERIENCE_CENTRAL_ECHO, durability=5,
-                                                     decay_intensity=1, experience_id=0)
-                experiences_central_echo.append(experience_central_echo)
-                self.egocentric_memory.experiences.append(experience_central_echo)  # OG add to memory for displacement update
-
-        return experiences_central_echo
-
-    def revert_echoes_to_angle_distance(self, echo_list):
-        """Convert echo interaction to triples (angle,distance,interaction)"""
-        output = []
-        for elem in echo_list:
-            # compute the angle using elem x and y
-            angle = math.atan2(elem.y, elem.x)
-            # compute the distance using elem x and y
-            distance = math.sqrt(elem.x**2 + elem.y**2)
-            output.append((angle, distance, elem))
-        return output
-    
+    # def treat_echos(self, echo_list):
+    #     """In case of a sweep we obtain an array of echo, this function discretize
+    #     it to try to find the real position of the objects that sent back the echo
+    #
+    #     To do so use 'strikes' which are series of consecutive echoes that are
+    #     close enough to be considered as the same object, and consider that the
+    #     real position of the object is at the middle of the strike"""
+    #     if len(echo_list) == 1:
+    #         print(echo_list[0])
+    #     echo_list = self.revert_echoes_to_angle_distance(echo_list)
+    #     max_delta_dist = 160
+    #     max_delta_angle = math.radians(20)
+    #     streaks = [[], [], [], [], [], [], [], [], [], [], [], []]
+    #     angle_dist = [[], [], [], [], [], [], [], [], [], [], [], []]
+    #     current_id = 0
+    #     echo_list = sorted(echo_list, key=lambda elem: elem[0])  # on trie par angle, pour avoir les streak "préfaites"
+    #     for angle, distance, interaction in echo_list:
+    #         check = False
+    #         for i, streak in enumerate(streaks):
+    #             if len(streak)> 0 and not check:
+    #                 if any((abs(ele[1]-distance)<max_delta_dist and abs(angle - ele[0])<max_delta_angle) for ele in streak):
+    #                     streak.append((angle, distance, interaction))
+    #                     angle_dist[i].append((math.degrees(angle), distance))
+    #                     check = True
+    #         if check:
+    #             continue
+    #         if len(streaks[current_id]) == 0:
+    #             streaks[current_id].append((angle,distance,interaction))
+    #             angle_dist[current_id].append((math.degrees(angle),distance))
+    #         else :
+    #             current_id = (current_id + 1)
+    #             streaks[current_id].append((angle, distance, interaction))
+    #             angle_dist[current_id].append((math.degrees(angle), distance))
+    #     experiences_central_echo = []
+    #     for streak in streaks:
+    #         if len(streak) == 0:
+    #             continue
+    #         else:
+    #             x_mean, y_mean = 0, 0
+    #             if len(streak) % 2 == 0:
+    #                 # Compute the means of x and y values for the two elements at the center of the array
+    #                 x_mean = (streak[int(len(streak)/2)][2].x + streak[int(len(streak)/2)-1][2].x)/2
+    #                 y_mean = (streak[int(len(streak)/2)][2].y + streak[int(len(streak)/2)-1][2].y)/2
+    #             else:
+    #                 # The x and y are at the center of the array
+    #                 x_mean = streak[int(len(streak) / 2)][2].x
+    #                 y_mean = streak[int(len(streak) / 2)][2].y
+    #             experience_central_echo = Experience(int(x_mean), int(y_mean), width=15,
+    #                                                  experience_type=EXPERIENCE_CENTRAL_ECHO, durability=5,
+    #                                                  decay_intensity=1, experience_id=0)
+    #             experiences_central_echo.append(experience_central_echo)
+    #             self.egocentric_memory.experiences.append(experience_central_echo)  # OG add to memory for displacement update
+    #
+    #     return experiences_central_echo
+    #
+    # def revert_echoes_to_angle_distance(self, echo_list):
+    #     """Convert echo interaction to triples (angle,distance,interaction)"""
+    #     output = []
+    #     for elem in echo_list:
+    #         # compute the angle using elem x and y
+    #         angle = math.atan2(elem.y, elem.x)
+    #         # compute the distance using elem x and y
+    #         distance = math.sqrt(elem.x**2 + elem.y**2)
+    #         output.append((angle, distance, elem))
+    #     return output
+    #
     def apply_translation_to_hexa_memory(self, translation_between_echo_and_context):
         """Translate the robot in allocentric memory"""
         # allocentric_translation_x,allocentric_translation_y = translation_between_echo_and_context
@@ -167,7 +170,8 @@ class Synthesizer:
         """Create a echo interaction corresponding to the focus"""
         focus_lost = False
         if self.last_action_had_focus:
-            # distance = self.memory.last_enacted_interaction['echo_distance']  # OG 04/09/2022
+            print("FOCUS")
+            # distance =m self.memory.last_enacted_interaction['echo_distance']  # OG 04/09/2022
             distance = self.workspace.enacted_interaction['echo_distance']
             if distance > 800 and (self.last_action is not None) and not (self.last_action == "-" or self.last_action['action'] == "-"):
                 focus_lost = True

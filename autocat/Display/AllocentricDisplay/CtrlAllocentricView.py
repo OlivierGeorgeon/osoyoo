@@ -54,7 +54,7 @@ class CtrlAllocentricView:
                 self.allocentric_view.add_cell(i, j)
 
     def extract_and_convert_recently_changed_cells(self, to_reset=[], projections=[]):
-        cell_list = self.memory.allocentric_memory.cells_changed_recently + to_reset + projections
+        cell_list = self.workspace.memory.allocentric_memory.cells_changed_recently + to_reset + projections
         for (i, j) in cell_list:
             self.allocentric_view.add_cell(i, j)
 
