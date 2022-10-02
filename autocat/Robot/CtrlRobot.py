@@ -9,6 +9,9 @@ ENACT_STEP_IDLE = 0
 ENACT_STEP_ENACTING = 1
 ENACT_STEP_END = 2
 
+KEY_EXPERIENCES = 'points'
+KEY_IMPACT = 'shock'
+
 
 class CtrlRobot:
     """Handle the communication with the robot:
@@ -45,20 +48,20 @@ class CtrlRobot:
             self.enact_step = ENACT_STEP_IDLE
         # if self.robot_has_finished_acting:
             # self.robot_has_finished_acting = False
-            enacted_interaction = self.translate_robot_data()
+            enacted_interaction = self.outcome_to_enacted_interaction()
             self.ctrl_workspace.update_enacted_interaction(enacted_interaction)
 
         if self.enact_step == ENACT_STEP_IDLE:
             # self.has_new_action_to_enact, intended_interaction = self.ctrl_workspace.get_intended_interaction()
             intended_interaction = self.ctrl_workspace.get_intended_interaction()
             if intended_interaction is not None:
-                self.command_robot(intended_interaction)
+                self.intended_interaction_to_action(intended_interaction)
 
-    def command_robot(self, intended_interaction):
-        """ Creating an asynchronous thread to send the command to the robot and to wait for the outcome """
+    def intended_interaction_to_action(self, intended_interaction):
+        """ Creating an asynchronous thread to send the action to the robot and to wait for the outcome """
 
         def enact_thread():
-            """ Sending the command to the robot and waiting for the outcome """
+            """ Sending the action to the robot and waiting for the outcome """
             intended_interaction_string = json.dumps(self.intended_interaction)
             print("Sending: " + intended_interaction_string)
             self.outcome_bytes = self.wifiInterface.enact(intended_interaction_string)
@@ -66,7 +69,7 @@ class CtrlRobot:
             print(self.outcome_bytes)
             self.enact_step = ENACT_STEP_END  # Now we have received the outcome from the robot
 
-        # Add the estimated speed to the intended_interaction
+        # Add the estimated speed to the action
         if intended_interaction['action'] == '8':
             intended_interaction['speed'] = int(self.forward_speed[0])
         if intended_interaction['action'] == '2':
@@ -81,12 +84,12 @@ class CtrlRobot:
         thread = threading.Thread(target=enact_thread)
         thread.start()
 
-    def translate_robot_data(self):
+    def outcome_to_enacted_interaction(self):
         """ Computes the enacted interaction from the robot's outcome data """
         action = self.intended_interaction.get('action')
         is_focussed = ('focus_x' in self.intended_interaction)  # The focus point was sent to the robot
         enacted_interaction = json.loads(self.outcome_bytes)
-        enacted_interaction['points'] = []
+        enacted_interaction[KEY_EXPERIENCES] = []
 
         # If timeout then we consider that there was no enacted interaction
         if enacted_interaction['status'] == "T":
@@ -134,9 +137,9 @@ class CtrlRobot:
             # Override the azimuth returned by the robot
             enacted_interaction['azimuth'] = int(self.azimuth)
 
-        # Interaction trespassing
+        # Interaction Floor line
         if enacted_interaction['floor'] > 0:
-            enacted_interaction['points'].append((EXPERIENCE_FLOOR, LINE_X, 0))
+            enacted_interaction[KEY_EXPERIENCES].append((EXPERIENCE_FLOOR, LINE_X, 0))
             # The resulting translation
             translation[0] -= RETREAT_DISTANCE
             if enacted_interaction['floor'] == 0b01:  # Black line on the right
@@ -152,23 +155,23 @@ class CtrlRobot:
                                  * enacted_interaction['echo_distance'])
                 echo_xy[1] = int(math.sin(math.radians(enacted_interaction['head_angle']))
                                  * enacted_interaction['echo_distance'])
-                enacted_interaction['points'].append((EXPERIENCE_ALIGNED_ECHO, *echo_xy))
+                enacted_interaction[KEY_EXPERIENCES].append((EXPERIENCE_ALIGNED_ECHO, *echo_xy))
                 # Return the echo_xy to possibly use as focus
                 enacted_interaction['echo_xy'] = echo_xy
 
         # Interaction shock
-        if 'shock' in enacted_interaction and action == '8':
-            if enacted_interaction['shock'] == 0b01:  # Shock on the right
-                enacted_interaction['points'].append((EXPERIENCE_SHOCK, ROBOT_FRONT_X, -ROBOT_FRONT_Y))
-            if enacted_interaction['shock'] == 0b11:  # Shock on the front
-                enacted_interaction['points'].append((EXPERIENCE_SHOCK, ROBOT_FRONT_X, 0))
-            if enacted_interaction['shock'] == 0b10:  # Shock on the left
-                enacted_interaction['points'].append((EXPERIENCE_SHOCK, ROBOT_FRONT_X, ROBOT_FRONT_Y))
+        if KEY_IMPACT in enacted_interaction and action == '8':
+            if enacted_interaction[KEY_IMPACT] == 0b01:  # Shock on the right
+                enacted_interaction[KEY_EXPERIENCES].append((EXPERIENCE_SHOCK, ROBOT_FRONT_X, -ROBOT_FRONT_Y))
+            if enacted_interaction[KEY_IMPACT] == 0b11:  # Shock on the front
+                enacted_interaction[KEY_EXPERIENCES].append((EXPERIENCE_SHOCK, ROBOT_FRONT_X, 0))
+            if enacted_interaction[KEY_IMPACT] == 0b10:  # Shock on the left
+                enacted_interaction[KEY_EXPERIENCES].append((EXPERIENCE_SHOCK, ROBOT_FRONT_X, ROBOT_FRONT_Y))
 
         # Interaction block
         if 'blocked' in enacted_interaction and action == '8':
             if enacted_interaction['blocked']:
-                enacted_interaction['points'].append((EXPERIENCE_BLOCK, ROBOT_FRONT_X, 0))
+                enacted_interaction[KEY_EXPERIENCES].append((EXPERIENCE_BLOCK, ROBOT_FRONT_X, 0))
                 translation[0] = 0  # Cancel forward translation
 
         # The estimated displacement of the environment relative to the robot caused by this interaction
@@ -226,7 +229,8 @@ class CtrlRobot:
                 ed = enacted_interaction[ed_str]
                 tmp_x = ROBOT_HEAD_X + math.cos(math.radians(ha)) * ed
                 tmp_y = math.sin(math.radians(ha)) * ed
-                enacted_interaction['echo_array'].append((tmp_x, tmp_y))
+                # enacted_interaction['echo_array'].append((tmp_x, tmp_y))
+                enacted_interaction[KEY_EXPERIENCES].append((EXPERIENCE_LOCAL_ECHO, tmp_x, tmp_y))
 
         print(enacted_interaction)
 

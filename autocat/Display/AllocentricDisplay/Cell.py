@@ -2,7 +2,7 @@ from pyglet import gl
 from webcolors import name_to_rgb
 import math
 from autocat.Memory.EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_BLOCK, \
-    EXPERIENCE_FOCUS, EXPERIENCE_SHOCK
+    EXPERIENCE_FOCUS, EXPERIENCE_SHOCK, EXPERIENCE_PLACE
 
 
 class Cell:
@@ -30,6 +30,8 @@ class Cell:
         """ Set the color from the status"""
         color = name_to_rgb('white')
         if status == 'Free':
+            color = name_to_rgb('LightGreen')
+        if status == EXPERIENCE_PLACE:
             color = name_to_rgb('LightGreen')
         if status == 'Occupied':
             color = name_to_rgb('slateBlue')

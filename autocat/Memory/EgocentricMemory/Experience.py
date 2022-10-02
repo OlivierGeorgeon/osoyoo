@@ -15,8 +15,7 @@ class Experience:
     """Experiences are instances of interactions
     along with the spatial and temporal information of where and when they were enacted"""
 
-    def __init__(self, x, y, width=50, height=50, experience_type='None', durability=10, decay_intensity=1,
-                 experience_id=0):
+    def __init__(self, x, y, experience_type='None', durability=10, decay_intensity=1, experience_id=0):
         """Create an object to be placed in the memory.
         Args:
         x, y : coordinates relative the robot.
@@ -30,21 +29,14 @@ class Experience:
         # Stores both the position and the rotation of the interaction
         self.position_matrix = matrix44.create_from_translation([x, y, 0]).astype('float64')
 
-        self.width = width
-        self.height = height
+        # self.width = width
+        # self.height = height
         self.durability = durability
         self.actual_durability = durability
         self.decay_intensity = decay_intensity
         self.type = experience_type
         self.tick_number = 0
         self.id = experience_id
-
-    # def decay(self):
-    #     """Remove one decayIntensity from the durability of the object.
-    #     Return: The new durability after decay
-    #     """
-    #     self.actual_durability -= self.decay_intensity
-    #     return self.actual_durability
 
     def tick(self):
         """Updates the clock and decay of this interaction"""

@@ -1,10 +1,9 @@
-# from autocat.Integrator.Utils import translate_interaction_type_to_cell_status
-from ..Memory.EgocentricMemory.Experience import *
+from ..Memory.EgocentricMemory.Experience import Experience, EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_LOCAL_ECHO, \
+    EXPERIENCE_FOCUS
 from ..Memory.AllocentricMemory.AllocentricMemory import AllocentricMemory
 import math
 from .SynthesizerSubclasses.EchoObjectValidateds import EchoObjectValidateds
 from .SynthesizerSubclasses.EchoObjectsToInvestigate import EchoObjectsToInvestigate
-from ..Robot.Echo import treat_echos
 
 
 class Synthesizer:
@@ -32,10 +31,11 @@ class Synthesizer:
         experiences = [elem for elem in self.egocentric_memory.experiences if (elem.id > self.last_used_id)]
         self.last_used_id = max([elem.id for elem in experiences], default=self.last_used_id)
 
-        echoes = [e for e in experiences if e.type == EXPERIENCE_LOCAL_ECHO]
-        self.experiences_central_echo = treat_echos(echoes)
-        for experience in self.experiences_central_echo:
-            self.egocentric_memory.experiences.append(experience)  # OG add to memory for displacement update
+        # # Add the central echos from the local echos
+        # echoes = [e for e in experiences if e.type == EXPERIENCE_LOCAL_ECHO]
+        # self.experiences_central_echo = treat_echos(echoes)
+        # for experience in self.experiences_central_echo:
+        #     self.egocentric_memory.experiences.append(experience)  # OG add to memory for displacement update
 
         # self.experiences_central_echo = real_echos
         focus_experiences, focus_lost = self.create_focus_echo()
@@ -43,7 +43,8 @@ class Synthesizer:
         action_to_return = None
         if not focus_lost:
             self.experiences_central_echo += focus_experiences
-            self.experiences_central_echo, translation = self.echo_objects_valided.try_and_add(self.experiences_central_echo)
+            self.experiences_central_echo, translation = self.echo_objects_valided.try_and_add(
+                self.experiences_central_echo)
             self.apply_translation_to_hexa_memory(translation)
             self.experiences_central_echo = self.echo_objects_to_investigate.try_and_add(self.experiences_central_echo)
             objects_validated = self.echo_objects_to_investigate.validate()
@@ -52,11 +53,11 @@ class Synthesizer:
             cells_changed = self.synthesize([elem for elem in experiences
                                              if elem.type != EXPERIENCE_ALIGNED_ECHO
                                              and elem.type != EXPERIENCE_LOCAL_ECHO])
-            # TODO process different types of interaction including focus
             action_to_return = None
             if self.echo_objects_to_investigate.need_more_sweeps():
                 action_to_return = "-"  # The synthesizer need to scan again
 
+        # Display focu cells OG 01/10/2022
         cells_changed += self.synthesize([elem for elem in focus_experiences if elem.type == EXPERIENCE_FOCUS])
 
         return action_to_return, cells_changed, focus_lost
@@ -89,7 +90,6 @@ class Synthesizer:
         """ Compute allocentric coordinates for every interaction of the given interactions_list
         
         Return a list of ((x,y),interaction)"""
-        # rota_radian = math.radians(self.allocentric_memory.robot_angle)
         rota_radian = self.workspace.memory.body_memory.body_direction_rad
         allocentric_coordinates = []
         for _, interaction in enumerate(interaction_list):
@@ -112,8 +112,8 @@ class Synthesizer:
             angle = self.workspace.enacted_interaction['head_angle']
             x = int(distance * math.cos(math.radians(angle)))
             y = int(distance * math.sin(math.radians(angle)))
-            experience_focus = Experience(x, y, width=15, experience_type=EXPERIENCE_FOCUS, durability=5,
-                                          decay_intensity=1, experience_id=0)
+            experience_focus = Experience(x, y, experience_type=EXPERIENCE_FOCUS, durability=5, decay_intensity=1,
+                                          experience_id=0)
             return [experience_focus], focus_lost
         else:
             return [], focus_lost
