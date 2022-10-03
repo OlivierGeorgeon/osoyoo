@@ -1,6 +1,6 @@
 from ..Memory.EgocentricMemory.Experience import Experience, EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_LOCAL_ECHO, \
     EXPERIENCE_FOCUS
-from ..Memory.AllocentricMemory.AllocentricMemory import AllocentricMemory
+# from ..Memory.AllocentricMemory.AllocentricMemory import AllocentricMemory
 import math
 from .SynthesizerSubclasses.EchoObjectValidateds import EchoObjectValidateds
 from .SynthesizerSubclasses.EchoObjectsToInvestigate import EchoObjectsToInvestigate
@@ -15,7 +15,7 @@ class Synthesizer:
         self.workspace = workspace
         self.egocentric_memory = workspace.memory.egocentric_memory
         self.allocentric_memory = workspace.memory.allocentric_memory
-        self.internal_hexa_grid = AllocentricMemory(self.allocentric_memory.width, self.allocentric_memory.height)
+        # self.internal_hexa_grid = AllocentricMemory(self.allocentric_memory.width, self.allocentric_memory.height)
         # self.interactions_list = []
         self.echo_objects_to_investigate = EchoObjectsToInvestigate(3, 2, self.workspace.memory, acceptable_delta=700)
         self.echo_objects_valided = EchoObjectValidateds(self.allocentric_memory)
@@ -57,7 +57,9 @@ class Synthesizer:
             if self.echo_objects_to_investigate.need_more_sweeps():
                 action_to_return = "-"  # The synthesizer need to scan again
 
-        # Display focu cells OG 01/10/2022
+        # TODO display line cells when focus lost
+        # Display focus cells OG 01/10/2022
+        print("Focus experience")  # TODO manage focus out of grid (when echo distance = 10000)
         cells_changed += self.synthesize([elem for elem in focus_experiences if elem.type == EXPERIENCE_FOCUS])
 
         return action_to_return, cells_changed, focus_lost
@@ -75,10 +77,19 @@ class Synthesizer:
         for experience in experiences:
             # status = translate_interaction_type_to_cell_status(experience.type)
             # Apply the status to the hexamem
-            allo_x, allo_y = self.get_allocentric_coordinates_of_interactions([experience])[0][0]
-            cell_x, cell_y = self.allocentric_memory.convert_pos_in_cell(allo_x, allo_y)
+            # allo_x, allo_y = self.get_allocentric_coordinates_of_interactions([experience])[0][0]
+            x, y = experience.get_allocentric_coordinates(self.workspace.memory.body_memory.body_direction_rad)
+            x += self.allocentric_memory.robot_pos_x
+            y += self.allocentric_memory.robot_pos_y
+            # try:
+            #     assert(abs(allo_x - x) <= 1 and abs(allo_y - y) <= 1)
+            # except AssertionError:
+            #     print("allo_x:", allo_x, "allo_y:", allo_y, "allo2_x:", x, "allo2_y:", y)
+            #     exit()
+            cell_x, cell_y = self.allocentric_memory.convert_pos_in_cell(x, y)
             cells_treated.append((cell_x, cell_y))
             self.allocentric_memory.apply_status_to_cell(cell_x, cell_y, experience.type)
+
         for object_valited in self.echo_objects_valided.list_objects:
             if not object_valited.printed:
                 object_valited.printed = True
@@ -86,20 +97,20 @@ class Synthesizer:
                 self.allocentric_memory.apply_status_to_cell(x, y, EXPERIENCE_ALIGNED_ECHO)
         return cells_treated
 
-    def get_allocentric_coordinates_of_interactions(self, interaction_list):
-        """ Compute allocentric coordinates for every interaction of the given interactions_list
-        
-        Return a list of ((x,y),interaction)"""
-        rota_radian = self.workspace.memory.body_memory.body_direction_rad
-        allocentric_coordinates = []
-        for _, interaction in enumerate(interaction_list):
-            corner_x, corner_y = interaction.x, interaction.y
-            x_prime = int(interaction.x * math.cos(rota_radian) - interaction.y * math.sin(rota_radian) +
-                          self.allocentric_memory.robot_pos_x)
-            y_prime = int(interaction.y * math.cos(rota_radian) + interaction.x * math.sin(rota_radian) +
-                          self.allocentric_memory.robot_pos_y)
-            allocentric_coordinates.append(((x_prime, y_prime), interaction))
-        return allocentric_coordinates
+    # def get_allocentric_coordinates_of_interactions(self, interaction_list):
+    #     """ Compute allocentric coordinates for every interaction of the given interactions_list
+    #
+    #     Return a list of ((x,y),interaction)"""
+    #     rota_radian = self.workspace.memory.body_memory.body_direction_rad
+    #     allocentric_coordinates = []
+    #     for _, interaction in enumerate(interaction_list):
+    #         corner_x, corner_y = interaction.x, interaction.y
+    #         x_prime = int(interaction.x * math.cos(rota_radian) - interaction.y * math.sin(rota_radian) +
+    #                       self.allocentric_memory.robot_pos_x)
+    #         y_prime = int(interaction.y * math.cos(rota_radian) + interaction.x * math.sin(rota_radian) +
+    #                       self.allocentric_memory.robot_pos_y)
+    #         allocentric_coordinates.append(((x_prime, y_prime), interaction))
+    #     return allocentric_coordinates
 
     def create_focus_echo(self):
         """Create focus experience"""

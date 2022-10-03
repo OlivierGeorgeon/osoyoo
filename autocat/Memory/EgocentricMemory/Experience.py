@@ -26,7 +26,7 @@ class Experience:
         self.x = x  # TODO Don't use x y and rotation but only position_matrix
         self.y = y
         self.rotation = 0
-        # Stores both the position and the rotation of the interaction
+        # Stores both the position and the rotation of the experience
         self.position_matrix = matrix44.create_from_translation([x, y, 0]).astype('float64')
 
         # self.width = width
@@ -60,3 +60,18 @@ class Experience:
             self.rotation += math.degrees(q.angle)
         else:  # Rotate around z axis downward
             self.rotation += math.degrees(-q.angle)
+
+    def get_allocentric_coordinates(self, body_direction_rad):
+        """ Compute allocentric coordinates of the experience given the body direction
+        Return a list of ((x,y),interaction)"""
+        # rota_radian = self.workspace.memory.body_memory.body_direction_rad
+        allocentric_coordinates = []
+        # for _, interaction in enumerate(interaction_list):
+        # corner_x, corner_y = interaction.x, interaction.y
+        x_prime = int(self.x * math.cos(body_direction_rad) - self.y * math.sin(body_direction_rad))
+                      # + self.allocentric_memory.robot_pos_x)
+        y_prime = int(self.y * math.cos(body_direction_rad) + self.x * math.sin(body_direction_rad))
+                      # + self.allocentric_memory.robot_pos_y)
+        # allocentric_coordinates.append(((x_prime, y_prime), interaction))
+
+        return x_prime, y_prime

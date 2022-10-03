@@ -326,8 +326,12 @@ class AllocentricMemory:
     #     self.move(0, (translation_x, translation_y), is_egocentric_translation=False)
 
     def apply_status_to_cell(self, cell_x, cell_y, status):
-        self.grid[cell_x][cell_y].status = status
-        self.cells_changed_recently.append((cell_x, cell_y))
+        try:
+            self.grid[cell_x][cell_y].status = status
+            self.cells_changed_recently.append((cell_x, cell_y))
+        except IndexError:
+            print("Error robot out of grid, cell_x:", cell_x, "cell_y:", cell_y)
+            exit()
 
     def apply_status_to_rectangle(self, center_x, center_y, width, height, status):
         """Apply the given status to every cell in the rectangle defined by the given center and width/height"""
