@@ -3,7 +3,6 @@
 ########################################################################################
 
 from . PredefinedInteractions import *
-from .. Robot.RobotDefine import FORWARD_SPEED
 
 
 class AgentCircle:
@@ -20,7 +19,7 @@ class AgentCircle:
         # Load the predefined behavior
         self.memory: list[CompositeInteraction] = CompositeInteraction.composite_interaction_list
 
-    def propose_intended_interaction(self, enacted_interaction, lost_focus):
+    def propose_intended_interaction(self, enacted_interaction):
         """Propose the next intended interaction from the previous enacted interaction.
         This is the main method of the agent"""
         # Compute a specific outcome suited for this agent
@@ -28,7 +27,7 @@ class AgentCircle:
         # Compute the intended interaction possibly including the focus
         return self.intended_interaction(outcome)
 
-    def intended_interaction(self, outcome, focus_lost=False):
+    def intended_interaction(self, outcome):
         """ learning from the previous outcome and selecting the next action """
 
         # Recording previous experience
@@ -141,7 +140,7 @@ if __name__ == "__main__":
     _outcome = OUTCOME_LOST_FOCUS
 
     for i in range(20):
-        _intended_interaction = a.intended_interaction(_outcome, False)
+        _intended_interaction = a.intended_interaction(_outcome)
         print("Action: ", _intended_interaction)
         _outcome = input("Enter outcome: ").upper()
         print(" Outcome: ", _outcome)

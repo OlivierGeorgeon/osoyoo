@@ -37,7 +37,7 @@ class Workspace:
              - get the synthesizer going
            3) If ready, ask for a new intended_interaction to enact
         """
-        focus_lost = False
+        # focus_lost = False
         # If there is a new enacted interaction
         if self.has_new_enacted_interaction:
             self.has_new_enacted_interaction = False
@@ -52,7 +52,7 @@ class Workspace:
             self.flag_for_view_refresh = True
 
             # We call Synthesizer.Act and get the results, the synthesizer will update the hexa_memory
-            synthesizer_action, synthesizer_results, focus_lost = self.synthesizer.act()
+            synthesizer_action, synthesizer_results = self.synthesizer.act()
 
             # If the synthesizer need an action done, we save it
             if synthesizer_action is not None:
@@ -66,19 +66,11 @@ class Workspace:
                 and self.robot_ready:
             self.robot_ready = False
             self.has_new_outcome_been_treated = False
-            self.intended_interaction = self.agent.propose_intended_interaction(self.enacted_interaction,
-                                                                                          focus_lost)
+            self.intended_interaction = self.agent.propose_intended_interaction(self.enacted_interaction)
             self.synthesizer.last_action_had_focus = 'focus_x' in self.intended_interaction
             self.synthesizer.last_action = self.intended_interaction
             self.has_new_action = True
             
-    # def send_position_change_to_hexa_memory(self):
-    #     """Apply movement to hexamem"""
-    #     if self.memory.hexa_memory is not None:
-    #         self.memory.hexa_memory.azimuth = self.enacted_interaction['azimuth']
-    #         self.memory.hexa_memory.move(self.enacted_interaction['yaw'], self.enacted_interaction['translation'][0],
-    #                                      self.enacted_interaction['translation'][1])
-    
     def get_intended_interaction(self):
         """Return (True, intended_interaction) if there is one, else (False, None)
         Reset the intended_interaction

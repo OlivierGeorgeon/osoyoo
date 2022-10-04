@@ -31,14 +31,8 @@ class Synthesizer:
         experiences = [elem for elem in self.egocentric_memory.experiences if (elem.id > self.last_used_id)]
         self.last_used_id = max([elem.id for elem in experiences], default=self.last_used_id)
 
-        # # Add the central echos from the local echos
-        # echoes = [e for e in experiences if e.type == EXPERIENCE_LOCAL_ECHO]
-        # self.experiences_central_echo = treat_echos(echoes)
-        # for experience in self.experiences_central_echo:
-        #     self.egocentric_memory.experiences.append(experience)  # OG add to memory for displacement update
-
-        # self.experiences_central_echo = real_echos
         focus_experiences, focus_lost = self.create_focus_echo()
+
         cells_changed = []
         action_to_return = None
         if not focus_lost:
@@ -62,7 +56,7 @@ class Synthesizer:
         print("Focus experience")  # TODO manage focus out of grid (when echo distance = 10000)
         cells_changed += self.synthesize([elem for elem in focus_experiences if elem.type == EXPERIENCE_FOCUS])
 
-        return action_to_return, cells_changed, focus_lost
+        return action_to_return, cells_changed
 
     def apply_translation_to_hexa_memory(self, translation_between_echo_and_context):
         """Translate the robot in allocentric memory"""
@@ -96,21 +90,6 @@ class Synthesizer:
                 x, y = object_valited.coord_x, object_valited.coord_y
                 self.allocentric_memory.apply_status_to_cell(x, y, EXPERIENCE_ALIGNED_ECHO)
         return cells_treated
-
-    # def get_allocentric_coordinates_of_interactions(self, interaction_list):
-    #     """ Compute allocentric coordinates for every interaction of the given interactions_list
-    #
-    #     Return a list of ((x,y),interaction)"""
-    #     rota_radian = self.workspace.memory.body_memory.body_direction_rad
-    #     allocentric_coordinates = []
-    #     for _, interaction in enumerate(interaction_list):
-    #         corner_x, corner_y = interaction.x, interaction.y
-    #         x_prime = int(interaction.x * math.cos(rota_radian) - interaction.y * math.sin(rota_radian) +
-    #                       self.allocentric_memory.robot_pos_x)
-    #         y_prime = int(interaction.y * math.cos(rota_radian) + interaction.x * math.sin(rota_radian) +
-    #                       self.allocentric_memory.robot_pos_y)
-    #         allocentric_coordinates.append(((x_prime, y_prime), interaction))
-    #     return allocentric_coordinates
 
     def create_focus_echo(self):
         """Create focus experience"""

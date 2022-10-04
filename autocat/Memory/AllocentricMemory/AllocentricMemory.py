@@ -39,7 +39,7 @@ class AllocentricMemory:
         self.grid[self.robot_cell_x][self.robot_cell_y].occupy()
         # self.robot_angle = 90
         # self.orientation = 0
-        self.azimuth = 0
+        # self.azimuth = 0
         # self.update_orientation()
         self.cells_changed_recently = []
 
@@ -330,7 +330,7 @@ class AllocentricMemory:
             self.grid[cell_x][cell_y].status = status
             self.cells_changed_recently.append((cell_x, cell_y))
         except IndexError:
-            print("Error robot out of grid, cell_x:", cell_x, "cell_y:", cell_y)
+            print("Error cell out of grid, cell_x:", cell_x, "cell_y:", cell_y, "Status:", status)
             exit()
 
     def apply_status_to_rectangle(self, center_x, center_y, width, height, status):

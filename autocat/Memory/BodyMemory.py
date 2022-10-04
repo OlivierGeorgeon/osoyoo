@@ -8,7 +8,7 @@ class BodyMemory:
         self.body_direction_rad = .0  # Radian relative to horizontal x axis (west-east) [-pi, pi]
 
     def set_head_direction_degree(self, head_direction_degree: int):
-        """Set the head direction from degree measure relative to x axis [-90,90]"""
+        """Set the head direction from degree measured relative to x axis [-90,90]"""
         assert(-90 <= head_direction_degree <= 90)
         self.head_direction_rad = math.radians(head_direction_degree)
 
@@ -32,7 +32,7 @@ class BodyMemory:
         return int(deg_north)
 
     def body_direction_degree(self):
-        """Return the azimuth in degree relative to north [0,360["""
+        """Return the body direction in degree relative to the x axis [-180,180["""
         return int(math.degrees(self.body_direction_rad))
 
     def rotate_degree(self, yaw_degree: int, azimuth_degree: int):
