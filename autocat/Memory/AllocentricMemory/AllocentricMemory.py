@@ -222,14 +222,8 @@ class AllocentricMemory:
 
         return f_x, f_y
 
-    # def move(self, rotation, move_x, move_y, is_egocentric_translation=True):
     def move(self, body_direction_rad, translation, is_egocentric_translation=True):
         """Move the robot in allocentric memory. mark the traversed cells Free. Returns the new position"""
-        # Update orientation of the robot
-        # self.rotate_robot(rotation)
-        # rota_radian = math.radians(self.robot_angle)
-        # rota_radian = body_direction_rad
-        # move_x, move_y = translation[0], translation[1]
         destination_x = self.robot_pos_x
         destination_y = self.robot_pos_y
         if is_egocentric_translation:
@@ -240,8 +234,6 @@ class AllocentricMemory:
         else:
             destination_x += translation[0]
             destination_y += translation[1]
-        # x_prime += self.robot_pos_x
-        # y_prime += self.robot_pos_y
 
         try:
             self.apply_changes(self.robot_pos_x, self.robot_pos_y, destination_x, destination_y)
@@ -302,28 +294,6 @@ class AllocentricMemory:
             self.cells_changed_recently.append((cell_x, cell_y))
             current_pos_x += step_x
             current_pos_y += step_y
-
-    # def change_cell(self, cell_x, cell_y,status):
-    #     """Change the status of the cell at the given coordinates"""
-    #     self.grid[cell_x][cell_y].status = status
-    #     self.cells_changed_recently.append((cell_x,cell_y))
-
-    # def convert_allocentric_position_to_egocentric_translation(self, position_x, position_y):
-    #     """Use the give position to compute an allocentric translation from the robot position, then convert This
-    #     allocentric translation to an egocentric translation"""
-    #     # Compute the allocentric translation
-    #     translation_x = position_x - self.robot_pos_x
-    #     translation_y = position_y - self.robot_pos_y
-    #     # Convert the allocentric translation to an egocentric translation
-    #     rota_radian = -math.radians(self.robot_angle)
-    #     x_prime = int(translation_x * math.cos(rota_radian) - translation_y * math.sin(rota_radian))
-    #     y_prime = int(translation_x * math.sin(rota_radian) + translation_y * math.cos(rota_radian))
-    #     return x_prime, y_prime
-    #
-    # def apply_translation_to_robot_pos(self, translation_x, translation_y):
-    #     """Apply the given translation to the robot's position (called by Synthesizer)"""
-    #     #self.move(0,translation_x,translation_y,is_egocentric_translation = False)
-    #     self.move(0, (translation_x, translation_y), is_egocentric_translation=False)
 
     def apply_status_to_cell(self, cell_x, cell_y, status):
         try:

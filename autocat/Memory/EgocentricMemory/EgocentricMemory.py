@@ -48,8 +48,6 @@ class EgocentricMemory:
         #         self.experiences.append(local_echo_experience)
         #         self.experience_id += 1
 
-        # Experiences of type central_echo are added by the synthesizer
-
     def tick(self):
         for e in self.experiences:
             e.tick()
@@ -123,6 +121,5 @@ class EgocentricMemory:
                                                      durability=5, decay_intensity=1, experience_id=self.experience_id)
                 self.experience_id += 1
                 experiences_central_echo.append(experience_central_echo)
-                # self.egocentric_memory.experiences.append(experience_central_echo)  # OG add to memory for displacement update
 
         return experiences_central_echo

@@ -26,7 +26,4 @@ class Memory:
         self.egocentric_memory.tick()  # TODO Improve the decay mechanism in egocentric memory
         self.egocentric_memory.update_and_add_experiences(enacted_interaction)
 
-        # self.allocentric_memory.azimuth = enacted_interaction['azimuth']
-        # self.allocentric_memory.move(enacted_interaction['yaw'], enacted_interaction['translation'][0],
-        #                              enacted_interaction['translation'][1])
         self.allocentric_memory.move(self.body_memory.body_direction_rad, enacted_interaction['translation'])

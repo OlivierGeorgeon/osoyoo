@@ -76,10 +76,10 @@ class CtrlEgocentricView:
             self.points_of_interest.append(poi)
 
         # The points of interest Central Echo from the list in the synthesizer
-        for experience_central_echo in self.synthesizer.experiences_central_echo:
-            poi_central_echo = self.create_point_of_interest(experience_central_echo)
-            # print(poi_central_echo)
-            self.points_of_interest.append(poi_central_echo)
+        # for experience_central_echo in self.synthesizer.experiences_central_echo:
+        #     poi_central_echo = self.create_point_of_interest(experience_central_echo)
+        #     # print(poi_central_echo)
+        #     self.points_of_interest.append(poi_central_echo)
 
         displacement_matrix = self.workspace.enacted_interaction['displacement_matrix'] if 'displacement_matrix' \
                                                                                            in self.workspace.enacted_interaction else None

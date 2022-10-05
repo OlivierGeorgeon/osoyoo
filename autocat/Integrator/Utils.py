@@ -1,33 +1,10 @@
 from pyglet import shapes
-from autocat.Memory.EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO, \
-    EXPERIENCE_LOCAL_ECHO, EXPERIENCE_BLOCK, EXPERIENCE_SHOCK, EXPERIENCE_FOCUS
 from webcolors import name_to_rgb
 import math
 
-"""Utils to make the project more modulable, if you decide to change the package
-used for the view you should just have to create a phenomList_to_whatev 
-and a phenom_to_whatev function and use it instead.
-"""
-
-
-# def translate_interaction_type_to_cell_status(type):
-#     """Free Blocked Occupied Frontier Something"""
-#     if type == EXPERIENCE_FLOOR:
-#         return EXPERIENCE_FLOOR
-#     elif type == EXPERIENCE_SHOCK or type == EXPERIENCE_BLOCK:
-#         return EXPERIENCE_SHOCK
-#     elif type == EXPERIENCE_ALIGNED_ECHO:
-#         return EXPERIENCE_ALIGNED_ECHO
-#     elif type == EXPERIENCE_LOCAL_ECHO:
-#         return EXPERIENCE_ALIGNED_ECHO
-#     elif type == EXPERIENCE_FOCUS:
-#         return EXPERIENCE_FOCUS
-#     print("Problemo problemo utils translate mauvaise interaction type : ", type)
-#     return "Free"
-
 
 def translate_indecisive_cell_to_pyglet(indecisive_cell, hexaMemory, batch):
-    """blabla"""
+    """Create a shape in the batch for the indecisive_cell"""
     x0 = 0
     y0 = 0
     (coord_x, coord_y), _, status = indecisive_cell
@@ -59,25 +36,23 @@ def translate_indecisive_cell_to_pyglet(indecisive_cell, hexaMemory, batch):
     theta = math.radians(theta)
     point6 = [x1 + math.cos(theta)*radius, y1 + math.sin(theta)*radius]
 
-
     color = name_to_rgb("white")
-    if(status == "Free"):
+    if status == "Free":
         color = name_to_rgb("lightgreen")
-    elif(status == "Occupied"):
+    elif status == "Occupied":
         color = name_to_rgb("yellow")
-    elif(status == "Blocked"):
+    elif status == "Blocked":
         color = name_to_rgb("red")
-    elif(status == "Frontier"):
+    elif status == "Frontier":
         color = name_to_rgb("black")
-    elif(status == "Something"):
+    elif status == "Something":
         color = name_to_rgb("orange")
 
-    lines = []
-    lines.append(shapes.Line(point1[0],point1[1],point2[0],point2[1],width = 5,color = color, batch = batch))
-    lines.append(shapes.Line(point2[0],point2[1],point3[0],point3[1],width = 5,color = color, batch = batch))
-    lines.append(shapes.Line(point3[0],point3[1],point4[0],point4[1],width = 5,color = color, batch = batch))
-    lines.append(shapes.Line(point4[0],point4[1],point5[0],point5[1],width = 5,color = color, batch = batch))
-    lines.append(shapes.Line(point5[0],point5[1],point6[0],point6[1],width = 5,color = color, batch = batch)) 
-    lines.append(shapes.Line(point6[0],point6[1],point1[0],point1[1],width = 5,color = color, batch = batch))
+    lines = [shapes.Line(point1[0], point1[1], point2[0], point2[1], width=5, color=color, batch=batch),
+             shapes.Line(point2[0], point2[1], point3[0], point3[1], width=5, color=color, batch=batch),
+             shapes.Line(point3[0], point3[1], point4[0], point4[1], width=5, color=color, batch=batch),
+             shapes.Line(point4[0], point4[1], point5[0], point5[1], width=5, color=color, batch=batch),
+             shapes.Line(point5[0], point5[1], point6[0], point6[1], width=5, color=color, batch=batch),
+             shapes.Line(point6[0], point6[1], point1[0], point1[1], width=5, color=color, batch=batch)]
     return lines
     
