@@ -41,10 +41,11 @@ class Synthesizer:
         if not focus_lost:
             # Add the new aligned echo experience
             self.experiences_central_echo += focus_experiences
+            # self.experiences_central_echo += experiences
             # Try to link the aligned echos with existing phenomena and remove it
             self.experiences_central_echo, translation = self.echo_objects_valided.try_and_add(
                 self.experiences_central_echo)
-            # Apply the translation if any
+            # Apply the correction of position relative to the phenomenon in focus
             self.apply_translation_to_hexa_memory(translation)
 
             self.experiences_central_echo = self.echo_objects_to_investigate.try_and_add(self.experiences_central_echo)
@@ -57,13 +58,11 @@ class Synthesizer:
                                              if elem.type != EXPERIENCE_ALIGNED_ECHO
                                              and elem.type != EXPERIENCE_LOCAL_ECHO])
             action_to_return = None
-            if self.echo_objects_to_investigate.need_more_sweeps():
-                action_to_return = "-"  # The synthesizer need to scan again
+            # if self.echo_objects_to_investigate.need_more_sweeps():
+            #     action_to_return = "-"  # The synthesizer need to scan again
 
-        # TODO display line cells when focus lost
         # Display focus cells OG 01/10/2022
-        print("Focus experience")  # TODO manage focus out of grid (when echo distance = 10000)
-        cells_changed += self.synthesize([elem for elem in focus_experiences if elem.type == EXPERIENCE_FOCUS])
+        # cells_changed += self.synthesize([elem for elem in focus_experiences if elem.type == EXPERIENCE_FOCUS])
 
         return action_to_return, cells_changed
 
@@ -100,7 +99,7 @@ class Synthesizer:
             angle = self.workspace.enacted_interaction['head_angle']
             x = int(distance * math.cos(math.radians(angle)))
             y = int(distance * math.sin(math.radians(angle)))
-            experience_focus = Experience(x, y, experience_type=EXPERIENCE_ALIGNED_ECHO, durability=5, decay_intensity=1,
+            experience_focus = Experience(x, y, experience_type=EXPERIENCE_FOCUS, durability=5, decay_intensity=1,
                                           experience_id=self.egocentric_memory.experience_id)
             self.egocentric_memory.experience_id += 1
             return [experience_focus], focus_lost

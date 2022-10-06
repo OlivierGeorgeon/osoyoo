@@ -18,7 +18,7 @@ class BodyMemory:
 
     def set_body_direction_degree(self, azimuth_degree: int):
         """Set the body direction from azimuth measure relative to north [0,360[ degree"""
-        assert(0 <= azimuth_degree < 360)
+        # assert(0 <= azimuth_degree <= 361)  #
         deg_trig = 90 - azimuth_degree  # Degree relative to x axis in trigonometric direction
         while deg_trig < -180:  # Keep within [-180, 180]
             deg_trig += 360
@@ -44,9 +44,9 @@ class BodyMemory:
         new_direction_degree = new_direction_degree % 360
 
         # If the direction is too far from the azimuth then use the azimuth
-        # TODO Improve: will trigger if each side of north
         # https://stackoverflow.com/questions/1878907/how-can-i-find-the-difference-between-two-angles
-        if abs(new_direction_degree - azimuth_degree) > 10:
-            new_direction_degree = azimuth_degree
+        if 10 < azimuth_degree < 350:  # Work if imu has no compass information
+            if abs(new_direction_degree - azimuth_degree) > 10:
+                new_direction_degree = azimuth_degree
 
         self.set_body_direction_degree(new_direction_degree)

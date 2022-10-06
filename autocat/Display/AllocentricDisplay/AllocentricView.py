@@ -18,7 +18,8 @@ class AllocentricView(pyglet.window.Window):
         self.set_caption("Allocentric Memory")
         self.set_minimum_size(150, 150)
         # glClearColor(0.2, 0.2, 0.7, 1.0)  # Make it look like hippocampus imaging
-        glClearColor(1.0, 1.0, 1.0, 1.0)
+        glClearColor(0.2, 0.2, 1.0, 1.0)  # For demonstration in Fête de la Science
+        # glClearColor(1.0, 1.0, 1.0, 1.0)
         self.batch = pyglet.graphics.Batch()
         self.background = pyglet.graphics.OrderedGroup(0)
         self.foreground = pyglet.graphics.OrderedGroup(1)
