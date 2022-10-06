@@ -2,7 +2,7 @@ import numpy as np
 import math
 
 
-class EchoObject:
+class Phenomenon:
     """An hypothetical phenomenon"""
     def __init__(self, echo_interaction, memory, acceptable_delta=300):
         """Constructor
@@ -59,16 +59,16 @@ class EchoObject:
         else:
             return False, None
 
-    def validate(self):
-        """Validate the object phenomenon, i.e. consider this object phenomenon as valid such that it can be used in the future
-        and can be added to the hexa_memory"""
-        self.has_been_validated = True
+    # def validate(self):
+    #     """Validate the object phenomenon, i.e. consider this object phenomenon as valid such that it can be used in the future
+    #     and can be added to the hexa_memory"""
+    #     self.has_been_validated = True
 
     def try_to_validate(self, number_of_echos_needed):
-        """Try to validate the object phenomenon, i.e. consider this object phenomenon as valid such that it can be used in the future
+        """Try to validate the phenomenon, i.e. consider this object phenomenon as valid such that it can be used in the future
         and can be added to the hexa_memory, to do so, the number of echo interactions needed to be added to the object phenomenon must be reached"""
-        if len(self.echo_interactions)>=number_of_echos_needed:
-            self.validate()
+        if len(self.echo_interactions) >= number_of_echos_needed:
+            self.has_been_validated = True
         return self.has_been_validated
 
     def get_allocentric_coordinates_of_interactions(self,interaction_list):
@@ -77,7 +77,7 @@ class EchoObject:
         # rota_radian = math.radians(self.hexa_memory.robot_angle)
         rota_radian = self.memory.body_memory.body_direction_rad
         allocentric_coordinates = []
-        for _,interaction in enumerate(interaction_list):
+        for _, interaction in enumerate(interaction_list):
                 corner_x,corner_y = interaction.x,interaction.y
                 x_prime = int(corner_x* math.cos(rota_radian) - corner_y * math.sin(rota_radian) + self.hexa_memory.robot_pos_x)
                 y_prime = int(corner_y * math.cos(rota_radian) + corner_x* math.sin(rota_radian) + self.hexa_memory.robot_pos_y)

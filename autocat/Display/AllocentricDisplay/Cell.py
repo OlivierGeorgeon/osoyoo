@@ -1,8 +1,9 @@
 from pyglet import gl
 from webcolors import name_to_rgb
 import math
-from autocat.Memory.EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_BLOCK, \
+from ...Memory.EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_BLOCK, \
     EXPERIENCE_FOCUS, EXPERIENCE_SHOCK, EXPERIENCE_PLACE, EXPERIENCE_CENTRAL_ECHO
+from ...Memory.AllocentricMemory.HexaCell import CELL_PHENOMENON
 
 
 class Cell:
@@ -47,4 +48,6 @@ class Cell:
             color = name_to_rgb('sienna')
         if status == EXPERIENCE_FOCUS:
             color = name_to_rgb('fireBrick')
+        if status == CELL_PHENOMENON:
+            color = name_to_rgb('yellow')
         self.shape.colors[0:24] = 6 * (*color, 128)

@@ -43,7 +43,17 @@ class CtrlEgocentricView:
                 phenomenon.is_selected = True
                 phenomenon.set_color('red')
 
-        self.view.push_handlers(on_mouse_press, on_key_press)
+        def on_text(text):
+            """Handles user input"""
+            if text.upper() == "A":
+                self.workspace.put_decider_to_auto()
+            elif text.upper() == "M":
+                self.workspace.put_decider_to_manual()
+            else:
+                action = {"action": text}
+                self.workspace.set_action(action)
+
+        self.view.push_handlers(on_mouse_press, on_key_press, on_text)
 
     def add_point_of_interest(self, x, y, point_type, group=None, interaction=None):
         """ Adding a point of interest to the view """
@@ -56,7 +66,7 @@ class CtrlEgocentricView:
     def update_body_robot(self):
         """Updates the robot's body to display by the egocentric view"""
         self.view.robot.rotate_head(self.workspace.memory.body_memory.head_direction_degree())
-        self.view.azimuth = self.workspace.memory.body_memory.body_azimuth_degree()
+        self.view.azimuth = self.workspace.memory.body_memory.body_azimuth()
 
     def update_points_of_interest(self):
         """Retrieve all new interactions from the memory, create corresponding points of interest

@@ -1,5 +1,7 @@
 from ..EgocentricMemory.Experience import EXPERIENCE_PLACE
 
+CELL_PHENOMENON = 'phenomenon'
+
 
 class HexaCell:
     """This class represents a cell in a hexagrid

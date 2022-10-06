@@ -1,4 +1,4 @@
-from . EchoObject import EchoObject
+from . Phenomenon import Phenomenon
 
 
 class EchoObjectsToInvestigate:
@@ -22,20 +22,19 @@ class EchoObjectsToInvestigate:
         new_objets = []
         for echo in real_echos:
             if len(new_objets) == 0:
-                new_objets.append(EchoObject(echo, self.memory, acceptable_delta=self.acceptable_delta))
-            else :
+                new_objets.append(Phenomenon(echo, self.memory, acceptable_delta=self.acceptable_delta))
+            else:
                 clustered = False
                 for objet in new_objets:
                     if objet.try_and_add(echo):
                         clustered = True
                         break
-    
                     print("NOCLUSTO")
                 if not clustered:
-                    new_objets.append(EchoObject(echo, self.memory, acceptable_delta=self.acceptable_delta))
+                    new_objets.append(Phenomenon(echo, self.memory, acceptable_delta=self.acceptable_delta))
         for objet in new_objets:
             #print("NEW OBJECTO")
-            self.list_objects_to_investigate.append([objet,0])
+            self.list_objects_to_investigate.append([objet, 0])
 
     def try_and_add(self, real_echos):
         """Try to add the echo experiences to the phenomena to investigate"""

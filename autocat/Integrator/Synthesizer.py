@@ -1,9 +1,9 @@
 from ..Memory.EgocentricMemory.Experience import Experience, EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_LOCAL_ECHO, \
     EXPERIENCE_FOCUS
-# from ..Memory.AllocentricMemory.AllocentricMemory import AllocentricMemory
-import math
+from ..Memory.AllocentricMemory.HexaCell import CELL_PHENOMENON
 from .SynthesizerSubclasses.EchoObjectValidateds import EchoObjectValidateds
 from .SynthesizerSubclasses.EchoObjectsToInvestigate import EchoObjectsToInvestigate
+import math
 
 
 class Synthesizer:
@@ -55,14 +55,17 @@ class Synthesizer:
 
             # Mark the new experiences in allocentric memory by changing the cell status
             cells_changed = self.synthesize([elem for elem in experiences
-                                             if elem.type != EXPERIENCE_ALIGNED_ECHO
-                                             and elem.type != EXPERIENCE_LOCAL_ECHO])
+                                             # if elem.type != EXPERIENCE_ALIGNED_ECHO
+                                             if elem.type != EXPERIENCE_LOCAL_ECHO])
             action_to_return = None
             # if self.echo_objects_to_investigate.need_more_sweeps():
             #     action_to_return = "-"  # The synthesizer need to scan again
 
         # Display focus cells OG 01/10/2022
-        # cells_changed += self.synthesize([elem for elem in focus_experiences if elem.type == EXPERIENCE_FOCUS])
+        cells_changed += self.synthesize([elem for elem in focus_experiences if elem.type == EXPERIENCE_FOCUS])
+
+        # Display the validated phenomena in the grid
+        self.display_validated_phenomena()
 
         return action_to_return, cells_changed
 
@@ -80,18 +83,20 @@ class Synthesizer:
             cell_x, cell_y = self.allocentric_memory.convert_pos_in_cell(x, y)
             cells_treated.append((cell_x, cell_y))
             self.allocentric_memory.apply_status_to_cell(cell_x, cell_y, experience.type)
-
-        for object_valited in self.echo_objects_valided.list_objects:
-            if not object_valited.printed:
-                object_valited.printed = True
-                x, y = object_valited.coord_x, object_valited.coord_y
-                self.allocentric_memory.apply_status_to_cell(x, y, EXPERIENCE_ALIGNED_ECHO)
         return cells_treated
+
+    def display_validated_phenomena(self):
+        # Display the validated phenomena in the grid
+        for validated_phenomenon in self.echo_objects_valided.list_objects:
+            # if not object_valited.printed:
+            #     object_valited.printed = True
+            x, y = validated_phenomenon.coord_x, validated_phenomenon.coord_y
+            self.allocentric_memory.apply_status_to_cell(x, y, CELL_PHENOMENON)
 
     def create_focus_echo(self):
         """Create an aligned echo experience and tell if the focus was lost"""
         focus_lost = False
-        if self.last_action_had_focus:
+        if self.last_action_had_focus and self.workspace.enacted_interaction['echo_distance'] < 1000:
             distance = self.workspace.enacted_interaction['echo_distance']
             if distance > 800 and (self.last_action is not None) \
                     and not (self.last_action == "-" or self.last_action['action'] == "-"):

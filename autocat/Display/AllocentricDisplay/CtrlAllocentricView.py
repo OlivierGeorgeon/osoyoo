@@ -18,17 +18,9 @@ class CtrlAllocentricView:
         # Handlers
         def on_text_hemw(text):
             """Handles user input"""
-            # CAS PARTICULIERS
-            if text.upper() == "R":
-                # TODO
-                ""
-            elif text.upper() == "A":
-                # TODO
-                ""
+            if text.upper() == "A":
                 self.workspace.put_decider_to_auto()
             elif text.upper() == "M":
-                # TODO
-                ""
                 self.workspace.put_decider_to_manual()
             # CAS GENERAl
             elif text.upper() == "T":
@@ -36,8 +28,8 @@ class CtrlAllocentricView:
                                                                                               "Frontier")
             else:
                 action = {"action": text}
-                
                 self.workspace.set_action(action)
+
         self.allocentric_view.on_text = on_text_hemw
 
         # def on_mouse_press(x, y, button, modifiers):
