@@ -54,6 +54,8 @@ class Workspace:
             # We call Synthesizer.Act and get the results, the synthesizer will update the hexa_memory
             synthesizer_action, synthesizer_results = self.synthesizer.act()
 
+            self.memory.allocentric_memory.place_robot(self.memory.body_memory)
+
             # If the synthesizer need an action done, we save it
             if synthesizer_action is not None:
                 pass  # OG to prevent actions proposed by the synthesize

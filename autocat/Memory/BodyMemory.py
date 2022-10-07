@@ -1,4 +1,5 @@
 import math
+from ..Robot.RobotDefine import ROBOT_FRONT_X, ROBOT_SIDE
 
 
 class BodyMemory:
@@ -50,3 +51,24 @@ class BodyMemory:
                 new_azimuth = azimuth_degree
 
         self.set_body_direction_from_azimuth(new_azimuth)
+
+    def is_inside_robot(self, x, y):
+        """Return True if the point is inside the robot"""
+        # https://stackoverflow.com/questions/2752725/finding-whether-a-point-lies-inside-a-rectangle-or-not
+        # The four points in counterclockwise order
+        x1 = ROBOT_FRONT_X * math.cos(self.body_direction_rad) - ROBOT_SIDE * math.sin(self.body_direction_rad)
+        y1 = ROBOT_FRONT_X * math.sin(self.body_direction_rad) + ROBOT_SIDE * math.cos(self.body_direction_rad)
+        x2 = -ROBOT_FRONT_X * math.cos(self.body_direction_rad) - ROBOT_SIDE * math.sin(self.body_direction_rad)
+        y2 = -ROBOT_FRONT_X * math.sin(self.body_direction_rad) + ROBOT_SIDE * math.cos(self.body_direction_rad)
+        x3 = -ROBOT_FRONT_X * math.cos(self.body_direction_rad) + ROBOT_SIDE * math.sin(self.body_direction_rad)
+        y3 = -ROBOT_FRONT_X * math.sin(self.body_direction_rad) - ROBOT_SIDE * math.cos(self.body_direction_rad)
+        x4 = ROBOT_FRONT_X * math.cos(self.body_direction_rad) + ROBOT_SIDE * math.sin(self.body_direction_rad)
+        y4 = ROBOT_FRONT_X * math.sin(self.body_direction_rad) - ROBOT_SIDE * math.cos(self.body_direction_rad)
+
+        # Check weather the point is on the left side of each edge of the polygon
+        d1 = (x2 - x1) * (y - y1) - (x - x1) * (y2 - y1)
+        d2 = (x3 - x2) * (y - y2) - (x - x2) * (y3 - y2)
+        d3 = (x4 - x3) * (y - y3) - (x - x3) * (y4 - y3)
+        d4 = (x1 - x4) * (y - y4) - (x - x4) * (y1 - y4)
+
+        return d1 > 0 and d2 > 0 and d3 > 0 and d4 > 0

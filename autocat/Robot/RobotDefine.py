@@ -9,6 +9,7 @@ ROBOT_ID = 4  # 1: UCLy's robot. 2: Titouan and Olivier's robot, 4: SHS's robot
 ROBOT_HEAD_X = 80           # (mm) The X position of the head pivot
 ROBOT_FRONT_X = 110         # (mm) The X position of the robot front
 ROBOT_FRONT_Y = 80          # (mm) The Y position of the robot front to mark lateral shocks
+ROBOT_SIDE = 120            # (mm) The Y position of the outside border of the robot
 
 FORWARD_SPEED = 180         # (mm/s) Forward translation speed. previous 120.
 LATERAL_SPEED = 110         # (mm/s) Lateral translation speed

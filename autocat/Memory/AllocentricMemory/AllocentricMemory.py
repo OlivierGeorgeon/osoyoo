@@ -14,18 +14,16 @@ class AllocentricMemory:
         self.grid = list()
         self.width = width
         self.height = height
-        for i in range(width):
+        for i in range(self.width):
             self.grid.append(list())
-            for j in range(height):
+            for j in range(self.height):
                 self.grid[i].append(HexaCell(i, j))
 
-        # super().__init__(width, height)
         self.cell_radius = cell_radius
         self.robot_cell_x = self.width // 2
         self.robot_cell_y = self.height // 2
         self.robot_pos_x = 0
         self.robot_pos_y = 0
-        # self.robot_width = robot_width
         self.grid[self.robot_cell_x][self.robot_cell_y].occupy()
         self.cells_changed_recently = []
 
@@ -37,10 +35,6 @@ class AllocentricMemory:
         self.robot_pos_x = 0
         self.robot_pos_y = 0
         self.grid[self.robot_cell_x][self.robot_cell_y].occupy()
-        # self.robot_angle = 90
-        # self.orientation = 0
-        # self.azimuth = 0
-        # self.update_orientation()
         self.cells_changed_recently = []
 
     def __str__(self):
@@ -110,9 +104,9 @@ class AllocentricMemory:
 
                 y_ref = abs(pos_x) * slope + offset
 
-                if abs(pos_y) <= abs(y_ref) :
+                if abs(pos_y) <= abs(y_ref):
                     # on est dans hg hd bg bd
-                    return self.find_coordinates_corner(tmp_cell_x,tmp_cell_y, x_sign,y_sign)
+                    return self.find_coordinates_corner(tmp_cell_x, tmp_cell_y, x_sign, y_sign)
                 else:
                     "on est dans hgg bgg hdd bdd"
                     return tmp_cell_x+ x_sign, tmp_cell_y + 2*y_sign
@@ -144,10 +138,10 @@ class AllocentricMemory:
                     "on est dans d"
                     return tmp_cell_x + x_sign, tmp_cell_y
             
-        if abs(pos_x)> radius and abs(pos_x)< 2*radius:
+        if radius < abs(pos_x) < 2 * radius:
             "on est dans hd"
             return self.find_coordinates_corner(tmp_cell_x, tmp_cell_y, x_sign, y_sign)
-        if abs(pos_x) > radius/2 and abs(pos_x)<= 2*radius:
+        if radius/2 < abs(pos_x) <= 2 * radius:
             # on est dans c, h ou hd
             x1 = radius
             y1 = 0
@@ -166,7 +160,7 @@ class AllocentricMemory:
             offset2 = y2 - (slope2 * x2)
             y_ref2 = slope2 * pos_x + offset2
 
-            if abs(pos_y) >= y_ref1 and abs(pos_y) <= y_ref2:
+            if y_ref1 <= abs(pos_y) <= y_ref2:
                 # on est dans hd
                 return self.find_coordinates_corner(tmp_cell_x, tmp_cell_y, x_sign,y_sign)
         if abs(pos_y) > mini_radius:
@@ -196,7 +190,7 @@ class AllocentricMemory:
             y_arrivee = (change_y - signe) + start_y
             signe_x = 1 if y_arrivee % 2 == 0 else -1
             pos_x += signe_x * (3/2)*radius
-            pos_y += signe* mini_radius 
+            pos_y += signe * mini_radius
 
         return int(pos_x), int(pos_y)
 
@@ -207,14 +201,13 @@ class AllocentricMemory:
         if y_even:
             if x_sign > 0:
                 f_x = cell_x
-            else :
+            else:
                 f_x = cell_x - 1
         else:
             if x_sign > 0:
                 f_x = cell_x+1
             else:
                 f_x = cell_x
-
         if y_sign > 0:
             f_y = cell_y + 1
         else:
@@ -259,6 +252,15 @@ class AllocentricMemory:
         self.cells_changed_recently.append((self.robot_cell_x, self.robot_cell_y))
 
         return destination_x, destination_y
+
+    def place_robot(self, body_memory):
+        """Apply the PLACE status to the cells at the position of the robot"""
+        for i in range(self.width):
+            for j in range(self.height):
+                pos_x, pos_y = self.convert_cell_to_pos(i, j)
+                if body_memory.is_inside_robot(pos_x - self.robot_pos_x, pos_y - self.robot_pos_y):
+                    self.apply_status_to_cell(i, j, EXPERIENCE_PLACE)
+
 
     # def apply_phenomenon(self, phenomenon, pos_x, pos_y):
     #     """Apply a phenomenon to the grid

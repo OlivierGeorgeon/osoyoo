@@ -20,10 +20,10 @@ class Memory:
         - Move the robot in allocentric_memory
         """
         self.body_memory.set_head_direction_degree(enacted_interaction['head_angle'])
-        # self.body_memory.set_body_direction_degree(enacted_interaction['azimuth'])
         self.body_memory.rotate_degree(enacted_interaction['yaw'], enacted_interaction['azimuth'])
 
         self.egocentric_memory.tick()  # TODO Improve the decay mechanism in egocentric memory
         self.egocentric_memory.update_and_add_experiences(enacted_interaction)
 
         self.allocentric_memory.move(self.body_memory.body_direction_rad, enacted_interaction['translation'])
+        # self.allocentric_memory.place_robot(self.body_memory)  # Must call it after synthesizer

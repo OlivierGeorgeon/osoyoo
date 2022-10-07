@@ -48,7 +48,10 @@ class CtrlAllocentricView:
     def extract_and_convert_recently_changed_cells(self, to_reset=[], projections=[]):
         cell_list = self.workspace.memory.allocentric_memory.cells_changed_recently + to_reset + projections
         for (i, j) in cell_list:
-            self.allocentric_view.add_cell(i, j)
+            if self.allocentric_view.cell_table[i][j] is None:
+                self.allocentric_view.add_cell(i, j)
+            else:
+                self.allocentric_view.cell_table[i][j].set_color(self.allocentric_memory.grid[i][j].status)
 
     def main(self, dt):
         """Refresh allocentric view"""
