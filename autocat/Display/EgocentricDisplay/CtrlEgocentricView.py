@@ -34,8 +34,8 @@ class CtrlEgocentricView:
                     if p.is_selected:
                         p.delete()
                         self.points_of_interest.remove(p)
-                        if p.interaction is not None:
-                            self.egocentric_memory.experiences.remove(p.interaction)
+                        if p.experience is not None:
+                            self.egocentric_memory.experiences.remove(p.experience)
             if symbol == key.INSERT:
                 phenomenon = PointOfInterest(self.mouse_press_x, self.mouse_press_y, self.view.batch,
                                              self.view.background, EXPERIENCE_FOCUS)
@@ -55,11 +55,11 @@ class CtrlEgocentricView:
 
         self.view.push_handlers(on_mouse_press, on_key_press, on_text)
 
-    def add_point_of_interest(self, x, y, point_type, group=None, interaction=None):
+    def add_point_of_interest(self, x, y, point_type, group=None, experience=None):
         """ Adding a point of interest to the view """
         if group is None:
             group = self.view.foreground
-        point_of_interest = PointOfInterest(x, y, self.view.batch, group, point_type, interaction=interaction)
+        point_of_interest = PointOfInterest(x, y, self.view.batch, group, point_type, experience=experience)
         self.points_of_interest.append(point_of_interest)
         return point_of_interest
 
@@ -85,14 +85,8 @@ class CtrlEgocentricView:
             poi = self.create_point_of_interest(interaction)
             self.points_of_interest.append(poi)
 
-        # The points of interest Central Echo from the list in the synthesizer
-        # for experience_central_echo in self.synthesizer.experiences_central_echo:
-        #     poi_central_echo = self.create_point_of_interest(experience_central_echo)
-        #     # print(poi_central_echo)
-        #     self.points_of_interest.append(poi_central_echo)
-
         displacement_matrix = self.workspace.enacted_interaction['displacement_matrix'] if 'displacement_matrix' \
-                                                                                           in self.workspace.enacted_interaction else None
+                                                                                        in self.workspace.enacted_interaction else None
 
         # Displace the points of interest
         for poi_displace in self.points_of_interest:
@@ -122,7 +116,7 @@ class CtrlEgocentricView:
         # Make the points of interest fade out using the durability of the given interaction
         if len(self.points_of_interest) > 0:
             for poi_fade in self.points_of_interest:
-                if poi_fade is not None and poi_fade.interaction is not None:
+                if poi_fade is not None and poi_fade.experience is not None:
                     
                     if isinstance(poi_fade.shape, pyglet.graphics.vertexdomain.IndexedVertexList):
                         for s in poi_fade.shape.colors:
@@ -132,8 +126,8 @@ class CtrlEgocentricView:
                             # TODO : CHANGE OPACITY OF VERTEX LIST
                             ''
                     else:
-                        poi_fade.shape.opacity = min(poi_fade.interaction.actual_durability * (255/poi_fade.interaction.durability), 255)
-                    if poi_fade.interaction.actual_durability <= 0:
+                        poi_fade.shape.opacity = min(poi_fade.experience.actual_durability * (255 / poi_fade.experience.durability), 255)
+                    if poi_fade.experience.actual_durability <= 0:
                         poi_fade.delete()
                         self.points_of_interest.remove(poi_fade)
 
@@ -150,7 +144,7 @@ class CtrlEgocentricView:
     def create_point_of_interest(self, interaction):
         """Create a point of interest corresponding to the interaction given as parameter"""
         return PointOfInterest(interaction.x, interaction.y, self.view.batch, self.view.foreground,
-                               interaction.type, interaction=interaction)
+                               interaction.type, experience=interaction)
 
     def get_focus_phenomenon(self):
         """ Returning the first selected phenomenon """

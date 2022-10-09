@@ -1,4 +1,5 @@
 import math
+from pyrr import matrix44
 from ..Robot.RobotDefine import ROBOT_FRONT_X, ROBOT_SIDE
 
 
@@ -36,6 +37,10 @@ class BodyMemory:
         """Return the body direction in degree relative to the x axis [-180,180["""
         return int(math.degrees(self.body_direction_rad))
 
+    def body_direction_matrix(self):
+        """Return the opposite body direction matrix to apply to experiences"""
+        return matrix44.create_from_z_rotation(-self.body_direction_rad)
+
     def rotate_degree(self, yaw_degree: int, azimuth_degree: int):
         """Rotate the robot's body by the yaw or prevent drift using azimuth."""
         new_azimuth = self.body_azimuth() - yaw_degree  # Yaw is counterclockwise
@@ -53,8 +58,8 @@ class BodyMemory:
         self.set_body_direction_from_azimuth(new_azimuth)
 
     def is_inside_robot(self, x, y):
-        """Return True if the point is inside the robot"""
-        # https://stackoverflow.com/questions/2752725/finding-whether-a-point-lies-inside-a-rectangle-or-not
+        """Return True if the point is inside the robot.
+        Use robot-centric/north coordinates"""
         # The four points in counterclockwise order
         x1 = ROBOT_FRONT_X * math.cos(self.body_direction_rad) - ROBOT_SIDE * math.sin(self.body_direction_rad)
         y1 = ROBOT_FRONT_X * math.sin(self.body_direction_rad) + ROBOT_SIDE * math.cos(self.body_direction_rad)
@@ -66,6 +71,7 @@ class BodyMemory:
         y4 = ROBOT_FRONT_X * math.sin(self.body_direction_rad) - ROBOT_SIDE * math.cos(self.body_direction_rad)
 
         # Check weather the point is on the left side of each edge of the polygon
+        # https://stackoverflow.com/questions/2752725/finding-whether-a-point-lies-inside-a-rectangle-or-not
         d1 = (x2 - x1) * (y - y1) - (x - x1) * (y2 - y1)
         d2 = (x3 - x2) * (y - y2) - (x - x2) * (y3 - y2)
         d3 = (x4 - x3) * (y - y3) - (x - x3) * (y4 - y3)

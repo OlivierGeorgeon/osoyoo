@@ -77,9 +77,14 @@ class Synthesizer:
         """Mark the interaction in the cells of allocentric Memory"""
         cells_treated = []
         for experience in experiences:
-            x, y = experience.get_allocentric_coordinates(self.workspace.memory.body_memory.body_direction_rad)
-            x += self.allocentric_memory.robot_pos_x
-            y += self.allocentric_memory.robot_pos_y
+            # x, y = experience.get_allocentric_coordinates(self.workspace.memory.body_memory.body_direction_rad)
+            # m = self.workspace.memory.body_memory.body_direction_matrix
+            #x, y = experience.east_coordinates_from_body_direction_matrix(
+            #    self.workspace.memory.body_memory.body_direction_matrix())
+            #x += self.allocentric_memory.robot_pos_x
+            #y += self.allocentric_memory.robot_pos_y
+            x, y = experience.allocentric_from_matrices(self.workspace.memory.body_memory.body_direction_matrix(),
+                                                        self.allocentric_memory.body_position_matrix())
             cell_x, cell_y = self.allocentric_memory.convert_pos_in_cell(x, y)
             cells_treated.append((cell_x, cell_y))
             self.allocentric_memory.apply_status_to_cell(cell_x, cell_y, experience.type)

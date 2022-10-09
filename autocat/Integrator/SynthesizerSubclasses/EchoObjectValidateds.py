@@ -27,10 +27,10 @@ class EchoObjectValidateds:
         translation_y = sum_translation_y/number_of_add if number_of_add > 0 else 0
         return echo_restantes, (translation_x, translation_y)
 
-    def add_object(self, echo_object):
-        """Add an phenomenon to the list of validated phenomena"""
-        self.list_objects.append(echo_object)
-
+    # def add_object(self, echo_object):
+    #     """Add an phenomenon to the list of validated phenomena"""
+    #     self.list_objects.append(echo_object)
+    #
     def add_objects(self, objects):
         """Add a list of phenomena to the list of validated phenomena"""
         self.list_objects.extend(objects)

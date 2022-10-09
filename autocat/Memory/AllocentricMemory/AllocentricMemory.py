@@ -1,4 +1,5 @@
 import math
+from pyrr import matrix44
 from . HexaCell import HexaCell
 from ..EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_PLACE
 
@@ -150,7 +151,7 @@ class AllocentricMemory:
             y2 = mini_radius
 
             x3 = radius
-            y3= 2*mini_radius
+            y3 = 2*mini_radius
 
             slope1 = (y1 - y2) / (x1 - x2)
             offset1 = y2 - (slope1 * x2)
@@ -305,13 +306,17 @@ class AllocentricMemory:
             print("Error cell out of grid, cell_x:", cell_x, "cell_y:", cell_y, "Status:", status)
             exit()
 
-    def apply_status_to_rectangle(self, center_x, center_y, width, height, status):
-        """Apply the given status to every cell in the rectangle defined by the given center and width/height"""
-        max_x = center_x + width/2 if center_x + width / 2 < self.width/2 * self.cell_radius * 2 else self.width * self.cell_radius
-        max_y = center_y + height/2 if center_y + height / 2 < self.height/2 * self.cell_radius * 1.7 else self.height * self.cell_radius
-        min_x = center_x - width/2 if center_x - width / 2 > 0 - self.width/2 * self.cell_radius * 2  else 0 - self.width/2 * self.cell_radius * 2
-        min_y = center_y - height/2 if center_y - height / 2 > 0 - self.height/2 * self.cell_radius * 1.7 else 0 - self.height/2 * self.cell_radius * 1.7
-        for x in range(int(min_x), int(max_x), self.cell_radius):
-            for y in range(int(min_y), int(max_y), self.cell_radius):
-                cell_x, cell_y = self.convert_pos_in_cell(x, y)
-                self.apply_status_to_cell(cell_x, cell_y, status)
+    def body_position_matrix(self):
+        return matrix44.create_from_translation([self.robot_pos_x, self.robot_pos_y, 0])
+
+
+    # def apply_status_to_rectangle(self, center_x, center_y, width, height, status):
+    #     """Apply the given status to every cell in the rectangle defined by the given center and width/height"""
+    #     max_x = center_x + width/2 if center_x + width / 2 < self.width/2 * self.cell_radius * 2 else self.width * self.cell_radius
+    #     max_y = center_y + height/2 if center_y + height / 2 < self.height/2 * self.cell_radius * 1.7 else self.height * self.cell_radius
+    #     min_x = center_x - width/2 if center_x - width / 2 > 0 - self.width/2 * self.cell_radius * 2  else 0 - self.width/2 * self.cell_radius * 2
+    #     min_y = center_y - height/2 if center_y - height / 2 > 0 - self.height/2 * self.cell_radius * 1.7 else 0 - self.height/2 * self.cell_radius * 1.7
+    #     for x in range(int(min_x), int(max_x), self.cell_radius):
+    #         for y in range(int(min_y), int(max_y), self.cell_radius):
+    #             cell_x, cell_y = self.convert_pos_in_cell(x, y)
+    #             self.apply_status_to_cell(cell_x, cell_y, status)

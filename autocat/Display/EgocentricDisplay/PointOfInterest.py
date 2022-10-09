@@ -9,8 +9,8 @@ POINT_COMPASS = 'Compass'
 
 
 class PointOfInterest:
-    def __init__(self, x, y, batch, group, point_type, interaction=None):
-        self.interaction = interaction
+    def __init__(self, x, y, batch, group, point_type, experience=None):
+        self.experience = experience
         self.x, self.y = 0, 0  # will be displaced
         self.batch = batch
         self.group = group
@@ -159,16 +159,16 @@ class PointOfInterest:
         or by the displacement_matrix provided as an argument"""
 
         # If this point of interest has an experience, the displacement matrix comes from this interaction
-        if self.interaction is not None:
+        if self.experience is not None:
             self.reset_position()
             # translation_matrix = matrix44.create_from_translation([self.interaction.x, self.interaction.y, 0])
             # rotation_matrix = matrix44.create_from_z_rotation(math.radians(self.interaction.rotation))
             # displacement_matrix = matrix44.multiply(rotation_matrix, translation_matrix)
-            displacement_matrix = self.interaction.position_matrix
+            displacement_matrix = self.experience.position_matrix
 
         if displacement_matrix is not None:
             self.displace(displacement_matrix)
 
     def __str__(self):
         return "POI of type " + self.type + " at x=" + str(int(self.x)) + ", y=" + str(int(self.y)) + \
-               ", interaction: " + self.interaction.__str__()
+               ", interaction: " + self.experience.__str__()

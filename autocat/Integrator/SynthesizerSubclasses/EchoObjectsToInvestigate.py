@@ -67,6 +67,6 @@ class EchoObjectsToInvestigate:
 
         return objet_validated
 
-    def need_more_sweeps(self):
-        """Return True if there are still objects to investigate"""
-        return len(self.list_objects_to_investigate) > 0
+    # def need_more_sweeps(self):
+    #     """Return True if there are still objects to investigate"""
+    #     return len(self.list_objects_to_investigate) > 0

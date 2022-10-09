@@ -1,6 +1,6 @@
 from .AllocentricView import AllocentricView
 import math
-from .Cell import Cell
+# from .Cell import Cell
 
 
 class CtrlAllocentricView:
@@ -23,9 +23,9 @@ class CtrlAllocentricView:
             elif text.upper() == "M":
                 self.workspace.put_decider_to_manual()
             # CAS GENERAl
-            elif text.upper() == "T":
-                self.workspace.egocentric_memory.allocentric_memory.apply_status_to_rectangle(-500, 600, 1000, 1000,
-                                                                                              "Frontier")
+            # elif text.upper() == "T":
+            #     self.workspace.egocentric_memory.allocentric_memory.apply_status_to_rectangle(-500, 600, 1000, 1000,
+            #                                                                                   "Frontier")
             else:
                 action = {"action": text}
                 self.workspace.set_action(action)
