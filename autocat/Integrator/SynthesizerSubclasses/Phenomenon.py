@@ -1,10 +1,11 @@
 import numpy as np
 import math
+from pyrr import matrix44
 
 
 class Phenomenon:
     """An hypothetical phenomenon"""
-    def __init__(self, echo_experience, memory, acceptable_delta=300):
+    def __init__(self, echo_experience, position_matrix, acceptable_delta=300):
         """Constructor
         Parameters:
             echo_experience: the first echo interaction of the object phenomenon
@@ -13,26 +14,32 @@ class Phenomenon:
             and the center of the object phenomenon"""
         self.acceptable_delta = acceptable_delta
         self.experiences = [echo_experience]
-        self.memory = memory
-        self.hexa_memory = memory.allocentric_memory
+        # self.memory = memory
+        # self.hexa_memory = memory.allocentric_memory
         # x, y = echo_interaction.get_allocentric_coordinates(self.memory.body_memory.body_direction_rad)
         #x, y = echo_interaction.east_coordinates_from_body_direction_matrix(
         #    self.memory.body_memory.body_direction_matrix())
         #x += self.hexa_memory.robot_pos_x
         #y += self.hexa_memory.robot_pos_y
-        x, y = echo_experience.allocentric_from_matrices(self.memory.body_memory.body_direction_matrix(),
-                                                         self.hexa_memory.body_position_matrix())
+        # The matrix to place the phenomenon from allocentric memory origin
+        # self.position_matrix = echo_experience.allocentric_position_matrix(
+        #     self.memory.body_memory.body_direction_matrix(),
+        #     self.hexa_memory.body_position_matrix())
+        self.position_matrix = position_matrix
+        x, y, _ = matrix44.apply_to_vector(self.position_matrix, [0, 0, 0])
+
+        # x, y = echo_experience.allocentric_from_matrices(self.memory.body_memory.body_direction_matrix(),
+        #                                                  self.hexa_memory.body_position_matrix())
 
         self.allo_coordinates = [(x, y)]
-        #print("aLLLLLOOOOO",self.allo_coordinates)
-        #self.center =self.hexa_memory.convert_pos_in_cell(self.allo_coordinates[0][0], self.allo_coordinates[0][1])
         self.center = [x, y]
+        # self.cell_i = -1
+        # self.cell_j = -1
+
         self.has_been_validated = False
         self.printed = False
-        self.coord_x = -1
-        self.coord_y = -1
-        
-    def add_echo(self, experience):
+
+    def add_echo(self, experience, position_matrix):
         """Add an echo experience to the object phenomenon,
         change the center to the average of all the echo interactions allocentric coordinates"""
         self.experiences.append(experience)
@@ -42,8 +49,9 @@ class Phenomenon:
         #    self.memory.body_memory.body_direction_matrix())
         #x += self.hexa_memory.robot_pos_x
         #y += self.hexa_memory.robot_pos_y
-        x, y = experience.allocentric_from_matrices(self.memory.body_memory.body_direction_matrix(),
-                                                    self.hexa_memory.body_position_matrix())
+        # x, y = experience.allocentric_from_matrices(self.memory.body_memory.body_direction_matrix(),
+        #                                             self.hexa_memory.body_position_matrix())
+        x, y, _ = matrix44.apply_to_vector(position_matrix, [0, 0, 0])
         self.allo_coordinates.append((x, y))
 
         if not self.has_been_validated:
@@ -60,9 +68,9 @@ class Phenomenon:
             sum_y += allo_coord[1]
             i += 1
         self.center = (int(sum_x/i), int(sum_y/i))
-        self.coord_x, self.coord_y = self.hexa_memory.convert_pos_in_cell(self.center[0], self.center[1])
+        # self.cell_i, self.cell_j = self.hexa_memory.convert_pos_in_cell(self.center[0], self.center[1])
 
-    def try_and_add(self, experience):
+    def try_and_add(self, experience, position_matrix):
         """Test if the echo interaction is in the acceptable delta of the center of the phenomenon,
         if yes, add it to the phenomenon"""
         # coord_tuple = self.get_allocentric_coordinates_of_interactions([echo_interaction])[0][0]
@@ -71,14 +79,15 @@ class Phenomenon:
         #    self.memory.body_memory.body_direction_matrix())
         #x += self.hexa_memory.robot_pos_x
         #y += self.hexa_memory.robot_pos_y
-        x, y = experience.allocentric_from_matrices(self.memory.body_memory.body_direction_matrix(),
-                                                    self.hexa_memory.body_position_matrix())
+        # x, y = experience.allocentric_from_matrices(self.memory.body_memory.body_direction_matrix(),
+        #                                             self.hexa_memory.body_position_matrix())
+        x, y, _ = matrix44.apply_to_vector(position_matrix, [0, 0, 0])
         allocentric_coordinates = [x, y]
         ##print("DISTANCE TRY AND ADD : ", math.dist(allocentric_coordinates,self.center), "\n", "ALLO COORD :", allocentric_coordinates, "CENTER :", self.center)
         if math.dist(allocentric_coordinates, self.center) < self.acceptable_delta:
             dist_x = self.center[0]-allocentric_coordinates[0]
             dist_y = self.center[1]-allocentric_coordinates[1]
-            self.add_echo(experience)
+            self.add_echo(experience, position_matrix)
             return True, (dist_x, dist_y)
         else:
             return False, None

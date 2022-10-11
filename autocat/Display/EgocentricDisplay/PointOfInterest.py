@@ -155,19 +155,16 @@ class PointOfInterest:
             self.is_selected = False
 
     def update(self, displacement_matrix):
-        """ Displace the point of interest to the position of its interaction
+        """ Displace the point of interest to the position of its experience
         or by the displacement_matrix provided as an argument"""
 
-        # If this point of interest has an experience, the displacement matrix comes from this interaction
+        # If this point of interest has an experience, the displacement matrix comes from this experience
         if self.experience is not None:
             self.reset_position()
-            # translation_matrix = matrix44.create_from_translation([self.interaction.x, self.interaction.y, 0])
-            # rotation_matrix = matrix44.create_from_z_rotation(math.radians(self.interaction.rotation))
-            # displacement_matrix = matrix44.multiply(rotation_matrix, translation_matrix)
             displacement_matrix = self.experience.position_matrix
 
-        if displacement_matrix is not None:
-            self.displace(displacement_matrix)
+        # if displacement_matrix is not None:
+        self.displace(displacement_matrix)
 
     def __str__(self):
         return "POI of type " + self.type + " at x=" + str(int(self.x)) + ", y=" + str(int(self.y)) + \

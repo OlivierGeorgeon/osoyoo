@@ -18,7 +18,7 @@ class Synthesizer:
         # self.internal_hexa_grid = AllocentricMemory(self.allocentric_memory.width, self.allocentric_memory.height)
         # self.interactions_list = []
         self.echo_objects_to_investigate = EchoObjectsToInvestigate(3, 2, self.workspace.memory, acceptable_delta=700)
-        self.echo_objects_valided = EchoObjectValidateds(self.allocentric_memory)
+        self.echo_objects_valided = EchoObjectValidateds(self.workspace.memory)
         self.last_projection_for_context = []
         self.experiences_central_echo = []
         self.last_used_id = 0
@@ -77,12 +77,6 @@ class Synthesizer:
         """Mark the interaction in the cells of allocentric Memory"""
         cells_treated = []
         for experience in experiences:
-            # x, y = experience.get_allocentric_coordinates(self.workspace.memory.body_memory.body_direction_rad)
-            # m = self.workspace.memory.body_memory.body_direction_matrix
-            #x, y = experience.east_coordinates_from_body_direction_matrix(
-            #    self.workspace.memory.body_memory.body_direction_matrix())
-            #x += self.allocentric_memory.robot_pos_x
-            #y += self.allocentric_memory.robot_pos_y
             x, y = experience.allocentric_from_matrices(self.workspace.memory.body_memory.body_direction_matrix(),
                                                         self.allocentric_memory.body_position_matrix())
             cell_x, cell_y = self.allocentric_memory.convert_pos_in_cell(x, y)
@@ -91,12 +85,14 @@ class Synthesizer:
         return cells_treated
 
     def display_validated_phenomena(self):
-        # Display the validated phenomena in the grid
+        """Mark the phenomena in the cells of allocentric memory"""
         for validated_phenomenon in self.echo_objects_valided.list_objects:
             # if not object_valited.printed:
             #     object_valited.printed = True
-            x, y = validated_phenomenon.coord_x, validated_phenomenon.coord_y
-            self.allocentric_memory.apply_status_to_cell(x, y, CELL_PHENOMENON)
+            # x, y = validated_phenomenon.cell_i, validated_phenomenon.cell_j
+            cell_i, cell_j = self.allocentric_memory.convert_pos_in_cell(validated_phenomenon.center[0],
+                                                                         validated_phenomenon.center[1])
+            self.allocentric_memory.apply_status_to_cell(cell_i, cell_j, CELL_PHENOMENON)
 
     def create_focus_echo(self):
         """Create an aligned echo experience and tell if the focus was lost"""

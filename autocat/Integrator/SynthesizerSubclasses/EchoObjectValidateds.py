@@ -4,9 +4,10 @@ from this import d
 class EchoObjectValidateds:
     """List of phenomena that have been validated"""
 
-    def __init__(self, hexa_memory):
+    def __init__(self, memory):
         self.list_objects = []
-        self.hexa_mememory = hexa_memory
+        self.memory = memory
+        self.allocentric_memory = memory.allocentric_memory
 
     def try_and_add(self, real_echos):
         """Try to find an existing validated phenomenon to link the echo with"""
@@ -15,7 +16,10 @@ class EchoObjectValidateds:
         echo_restantes = real_echos
         for echo in real_echos:
             for objet in self.list_objects:
-                boule, translation = objet.try_and_add(echo)
+                position_matrix = echo.allocentric_position_matrix(
+                    self.memory.body_memory.body_direction_matrix(),
+                    self.allocentric_memory.body_position_matrix())
+                boule, translation = objet.try_and_add(echo, position_matrix)
                 if boule:
                     #print("BOULE CEST VALIDEEEE OUAI OUAI")
                     sum_translation_x += translation[0]

@@ -14,7 +14,7 @@ class EchoObjectsToInvestigate:
         self.number_of_try_before_removing = number_of_try_before_removing
         self.number_of_echo_before_validation = number_of_echo_before_validation
         self.memory = memory
-        self.hexa_memory = memory.allocentric_memory
+        self.allocentric_memory = memory.allocentric_memory
         self.acceptable_delta = acceptable_delta
 
     def create_news(self, real_echos):
@@ -22,16 +22,25 @@ class EchoObjectsToInvestigate:
         new_objets = []
         for echo in real_echos:
             if len(new_objets) == 0:
-                new_objets.append(Phenomenon(echo, self.memory, acceptable_delta=self.acceptable_delta))
+                position_matrix = echo.allocentric_position_matrix(
+                    self.memory.body_memory.body_direction_matrix(),
+                    self.allocentric_memory.body_position_matrix())
+                new_objets.append(Phenomenon(echo, position_matrix, acceptable_delta=self.acceptable_delta))
             else:
                 clustered = False
                 for objet in new_objets:
-                    if objet.try_and_add(echo):
+                    position_matrix = echo.allocentric_position_matrix(
+                        self.memory.body_memory.body_direction_matrix(),
+                        self.allocentric_memory.body_position_matrix())
+                    if objet.try_and_add(echo, position_matrix):
                         clustered = True
                         break
                     print("NOCLUSTO")
                 if not clustered:
-                    new_objets.append(Phenomenon(echo, self.memory, acceptable_delta=self.acceptable_delta))
+                    position_matrix = echo.allocentric_position_matrix(
+                        self.memory.body_memory.body_direction_matrix(),
+                        self.allocentric_memory.body_position_matrix())
+                    new_objets.append(Phenomenon(echo, position_matrix, acceptable_delta=self.acceptable_delta))
         for objet in new_objets:
             #print("NEW OBJECTO")
             self.list_objects_to_investigate.append([objet, 0])
@@ -42,7 +51,10 @@ class EchoObjectsToInvestigate:
         for echo in real_echos:
             for objet, _ in self.list_objects_to_investigate:
                 print("kssssssssssssssssssssssssssssssssssss")
-                if objet.try_and_add(echo):
+                position_matrix = echo.allocentric_position_matrix(
+                    self.memory.body_memory.body_direction_matrix(),
+                    self.allocentric_memory.body_position_matrix())
+                if objet.try_and_add(echo, position_matrix):
                     echo_restantes.remove(echo)
                     break
         return echo_restantes

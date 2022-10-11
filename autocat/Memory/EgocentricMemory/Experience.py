@@ -25,8 +25,7 @@ class Experience:
         """
         self.x = x
         self.y = y
-        # self.rotation = 0
-        # Stores both the position and the rotation of the experience
+        # Stores the displacement from origin to place the interaction in egocentric coordinates
         self.position_matrix = matrix44.create_from_translation([x, y, 0]).astype('float64')
 
         self.durability = durability
@@ -48,7 +47,8 @@ class Experience:
         self.position_matrix = matrix44.multiply(self.position_matrix, displacement_matrix)
 
         # Recompute the x, y coordinates in robot-centric coordinates
-        v = matrix44.apply_to_vector(displacement_matrix, [self.x, self.y, 0])
+        # v = matrix44.apply_to_vector(displacement_matrix, [self.x, self.y, 0])
+        v = matrix44.apply_to_vector(self.position_matrix, [0, 0, 0])
         self.x, self.y = v[0], v[1]
 
         # # Compute the rotation of the experience
@@ -58,7 +58,10 @@ class Experience:
         # else:  # Rotate around z axis downward
         #     self.rotation += math.degrees(-q.angle)
 
-    def get_rotation_degree(self):
+    def position_vector(self):
+        return matrix44.apply_to_vector(self.position_matrix, [0, 0, 0])
+
+    def rotation_degree(self):
         """Return the rotation of the interaction relative to the robot in degree"""
         q = Quaternion(self.position_matrix)
         if q.axis[2] > 0:  # Rotate around z axis upwards
@@ -79,6 +82,12 @@ class Experience:
         return v[0], v[1]
 
     def allocentric_from_matrices(self, body_direction_matrix, body_position_matrix):
+        """ The allocentric coordinates of the experience given the body direction and position matrices"""
         displacement_matrix = matrix44.multiply(body_direction_matrix, body_position_matrix)
         v = matrix44.apply_to_vector(displacement_matrix, [self.x, self.y, 0])
         return v[0], v[1]
+
+    def allocentric_position_matrix(self, body_direction_matrix, body_position_matrix):
+        """ The position matrix to place this experience in allocentric memory"""
+        displacement_matrix = matrix44.multiply(body_direction_matrix, body_position_matrix)
+        return matrix44.multiply(self.position_matrix, displacement_matrix)

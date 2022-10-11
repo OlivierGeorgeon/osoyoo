@@ -141,10 +141,10 @@ class CtrlEgocentricView:
                 output = PointOfInterest(x, y, self.view.batch, self.view.foreground, EXPERIENCE_FOCUS)
         return output
 
-    def create_point_of_interest(self, interaction):
+    def create_point_of_interest(self, experience):
         """Create a point of interest corresponding to the interaction given as parameter"""
-        return PointOfInterest(interaction.x, interaction.y, self.view.batch, self.view.foreground,
-                               interaction.type, experience=interaction)
+        return PointOfInterest(experience.x, experience.y, self.view.batch, self.view.foreground,
+                               experience.type, experience=experience)
 
     def get_focus_phenomenon(self):
         """ Returning the first selected phenomenon """
