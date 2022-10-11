@@ -262,7 +262,6 @@ class AllocentricMemory:
                 if body_memory.is_inside_robot(pos_x - self.robot_pos_x, pos_y - self.robot_pos_y):
                     self.apply_status_to_cell(i, j, EXPERIENCE_PLACE)
 
-
     # def apply_phenomenon(self, phenomenon, pos_x, pos_y):
     #     """Apply a phenomenon to the grid
     #     Args :
@@ -270,9 +269,9 @@ class AllocentricMemory:
     #         pos_x, pos_y : position of the phenomenon (relative to the robot's position)
     #     """
 
-    def get_robot_pos(self):
-        """Return the position of the robot. (cell coordinates)"""
-        return self.robot_cell_x, self.robot_cell_y
+    # def get_robot_pos(self):
+    #     """Return the position of the robot. (cell coordinates)"""
+    #     return self.robot_cell_x, self.robot_cell_y
 
     def apply_changes(self, start_x, start_y, end_x, end_y, status="Free"):
         """Apply the given status (Free by default) to every cell between coordinates start_x,start_y and end_x,end_y"""
@@ -308,15 +307,3 @@ class AllocentricMemory:
 
     def body_position_matrix(self):
         return matrix44.create_from_translation([self.robot_pos_x, self.robot_pos_y, 0])
-
-
-    # def apply_status_to_rectangle(self, center_x, center_y, width, height, status):
-    #     """Apply the given status to every cell in the rectangle defined by the given center and width/height"""
-    #     max_x = center_x + width/2 if center_x + width / 2 < self.width/2 * self.cell_radius * 2 else self.width * self.cell_radius
-    #     max_y = center_y + height/2 if center_y + height / 2 < self.height/2 * self.cell_radius * 1.7 else self.height * self.cell_radius
-    #     min_x = center_x - width/2 if center_x - width / 2 > 0 - self.width/2 * self.cell_radius * 2  else 0 - self.width/2 * self.cell_radius * 2
-    #     min_y = center_y - height/2 if center_y - height / 2 > 0 - self.height/2 * self.cell_radius * 1.7 else 0 - self.height/2 * self.cell_radius * 1.7
-    #     for x in range(int(min_x), int(max_x), self.cell_radius):
-    #         for y in range(int(min_y), int(max_y), self.cell_radius):
-    #             cell_x, cell_y = self.convert_pos_in_cell(x, y)
-    #             self.apply_status_to_cell(cell_x, cell_y, status)

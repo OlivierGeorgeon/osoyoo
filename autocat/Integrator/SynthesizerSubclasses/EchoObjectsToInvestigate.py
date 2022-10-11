@@ -17,47 +17,39 @@ class EchoObjectsToInvestigate:
         self.allocentric_memory = memory.allocentric_memory
         self.acceptable_delta = acceptable_delta
 
-    def create_news(self, real_echos):
+    def create_hypothetical_phenomena(self, experiences):
         """Create new phenomena to investigate from the list of central echos"""
-        new_objets = []
-        for echo in real_echos:
-            if len(new_objets) == 0:
-                position_matrix = echo.allocentric_position_matrix(
-                    self.memory.body_memory.body_direction_matrix(),
-                    self.allocentric_memory.body_position_matrix())
-                new_objets.append(Phenomenon(echo, position_matrix, acceptable_delta=self.acceptable_delta))
+        new_phenomena = []
+        for experience in experiences:
+            position_matrix = experience.allocentric_position_matrix(self.memory.body_memory.body_direction_matrix(),
+                                                                     self.allocentric_memory.body_position_matrix())
+            if len(new_phenomena) == 0:
+                new_phenomena.append(Phenomenon(experience, position_matrix, acceptable_delta=self.acceptable_delta))
             else:
                 clustered = False
-                for objet in new_objets:
-                    position_matrix = echo.allocentric_position_matrix(
-                        self.memory.body_memory.body_direction_matrix(),
-                        self.allocentric_memory.body_position_matrix())
-                    if objet.try_and_add(echo, position_matrix):
+                for new_phenomenon in new_phenomena:
+                    if new_phenomenon.try_and_add(experience, position_matrix):
                         clustered = True
                         break
                     print("NOCLUSTO")
                 if not clustered:
-                    position_matrix = echo.allocentric_position_matrix(
-                        self.memory.body_memory.body_direction_matrix(),
-                        self.allocentric_memory.body_position_matrix())
-                    new_objets.append(Phenomenon(echo, position_matrix, acceptable_delta=self.acceptable_delta))
-        for objet in new_objets:
-            #print("NEW OBJECTO")
-            self.list_objects_to_investigate.append([objet, 0])
+                    new_phenomena.append(Phenomenon(experience, position_matrix, acceptable_delta=self.acceptable_delta))
+        for p in new_phenomena:
+            print("New hypothetical phenomenon")
+            self.list_objects_to_investigate.append([p, 0])
 
-    def try_and_add(self, real_echos):
+    def try_and_add(self, experiences):
         """Try to add the echo experiences to the phenomena to investigate"""
-        echo_restantes = real_echos
-        for echo in real_echos:
-            for objet, _ in self.list_objects_to_investigate:
-                print("kssssssssssssssssssssssssssssssssssss")
-                position_matrix = echo.allocentric_position_matrix(
-                    self.memory.body_memory.body_direction_matrix(),
-                    self.allocentric_memory.body_position_matrix())
-                if objet.try_and_add(echo, position_matrix):
-                    echo_restantes.remove(echo)
+        remaining_experiences = experiences.copy()
+        for experience in experiences:
+            position_matrix = experience.allocentric_position_matrix(self.memory.body_memory.body_direction_matrix(),
+                                                                     self.allocentric_memory.body_position_matrix())
+            for phenomenon, _ in self.list_objects_to_investigate:
+                print("A phenomenon is beeing investigated")
+                if phenomenon.try_and_add(experience, position_matrix):
+                    remaining_experiences.remove(experience)
                     break
-        return echo_restantes
+        return remaining_experiences
 
     def validate(self):
         """Try to validate the objects to investigate
