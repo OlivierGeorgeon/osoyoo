@@ -1,8 +1,9 @@
 import pyglet
 from pyglet.gl import *
 from ..EgocentricDisplay.OsoyooCar import OsoyooCar
-import math
-from .Cell import Cell
+from .HexagonalCell import HexagonalCell
+from ...Memory.EgocentricMemory.Experience import EXPERIENCE_FOCUS
+from ...Memory.AllocentricMemory.GridCell import CELL_UNKNOWN
 
 
 NB_CELL_WIDTH = 30
@@ -30,7 +31,6 @@ class AllocentricView(pyglet.window.Window):
         # self.test_cell = Cell(0, 100, self.robot_batch, self.foreground, 50, 'Free')
 
         self.zoom_level = 4
-        # self.shapesList = []
         self.mouse_press_angle = 0
         self.window = None
 
@@ -39,31 +39,46 @@ class AllocentricView(pyglet.window.Window):
         self.nb_cell_y = memory.allocentric_memory.height
         self.cell_radius = memory.allocentric_memory.cell_radius
 
-        # self.cell_list = []
         self.cell_table = [[None for y in range(self.nb_cell_y)] for x in range(self.nb_cell_x)]
+        self.focus_cell = None
 
         self.mouse_press_x = 0
         self.mouse_press_y = 0
         self.label = pyglet.text.Label('', font_name='Arial', font_size=15, x=10, y=10)
         self.label.color = (0, 0, 0, 255)
 
-        self.projections_for_context = []
+        # self.projections_for_context = []
 
     def add_cell(self, cell_x: int, cell_y: int):
         """Add a new cell. Called by CtrlAllocentricView"""
         cell = self.memory.allocentric_memory.grid[cell_x][cell_y]
         radius = self.memory.allocentric_memory.cell_radius
-        height = math.sqrt((2 * radius) ** 2 - radius ** 2)
-        if cell.status != "Unknown":
-            if cell_y % 2 == 0:
-                x = cell_x * 3 * radius
-                y = height * (cell_y / 2)
-            else:
-                x = (1.5 * radius) + cell_x * 3 * radius
-                y = (height / 2) + (cell_y - 1) / 2 * height
-            new_cell = Cell(x, y, self.batch, self.foreground, radius, cell.status)
-            # self.cell_list.append(new_cell.shape)
+        # height = math.sqrt((2 * radius) ** 2 - radius ** 2)
+        if cell.status != CELL_UNKNOWN:
+        #     if cell_y % 2 == 0:
+        #         x = cell_x * 3 * radius
+        #         y = height * (cell_y / 2)
+        #     else:
+        #         x = (1.5 * radius) + cell_x * 3 * radius
+        #         y = (height / 2) + (cell_y - 1) / 2 * height
+            new_cell = HexagonalCell(cell_x, cell_y, self.batch, self.background, radius, cell.status, 0.8)
             self.cell_table[cell_x][cell_y] = new_cell
+
+    def remove_focus_cell(self):
+        if self.focus_cell is not None:
+            self.focus_cell.shape.delete()
+        self.focus_cell = None
+
+    def add_focus_cell(self, cell_x, cell_y):
+        radius = self.memory.allocentric_memory.cell_radius
+        # height = math.sqrt((2 * radius) ** 2 - radius ** 2)
+        # if cell_y % 2 == 0:
+        #     i = cell_x * 3 * radius
+        #     j = height * (cell_y / 2)
+        # else:
+        #     i = (1.5 * radius) + cell_x * 3 * radius
+        #     j = (height / 2) + (cell_y - 1) / 2 * height
+        self.focus_cell = HexagonalCell(cell_x, cell_y, self.batch, self.foreground, radius, EXPERIENCE_FOCUS, 0.5)
 
     def on_draw(self):
         """ Drawing the window """

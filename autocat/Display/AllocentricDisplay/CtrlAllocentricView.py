@@ -1,6 +1,5 @@
+from pyrr import matrix44
 from .AllocentricView import AllocentricView
-import math
-# from .Cell import Cell
 
 
 class CtrlAllocentricView:
@@ -46,12 +45,29 @@ class CtrlAllocentricView:
                 self.allocentric_view.add_cell(i, j)
 
     def extract_and_convert_recently_changed_cells(self, to_reset=[], projections=[]):
+        """Create or update cells from recently changed experiences in egocentric memory"""
         cell_list = self.workspace.memory.allocentric_memory.cells_changed_recently + to_reset + projections
         for (i, j) in cell_list:
             if self.allocentric_view.cell_table[i][j] is None:
                 self.allocentric_view.add_cell(i, j)
             else:
                 self.allocentric_view.cell_table[i][j].set_color(self.allocentric_memory.grid[i][j].status)
+
+        self.add_focus_cell()
+
+    def add_focus_cell(self):
+        """Create a cell corresponding to the focus"""
+        # Remove the previous focus cell
+        self.allocentric_view.remove_focus_cell()
+        # Recreate the focus cell if agent has focus
+        if hasattr(self.workspace.agent, "focus"):
+            if self.workspace.agent.focus:
+                displacement_matrix = matrix44.multiply(self.workspace.memory.body_memory.body_direction_matrix(),
+                                                        self.allocentric_memory.body_position_matrix())
+                v = matrix44.apply_to_vector(displacement_matrix, [self.workspace.agent.focus_xy[0],
+                                                                   self.workspace.agent.focus_xy[1], 0])
+                i, j = self.allocentric_memory.convert_pos_in_cell(v[0], v[1])
+                self.allocentric_view.add_focus_cell(i, j)
 
     def main(self, dt):
         """Refresh allocentric view"""

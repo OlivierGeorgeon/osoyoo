@@ -13,7 +13,7 @@ class AgentCircle:
         self.previous_interaction = None
         self.last_interaction = None
 
-        self.echo_xy = None
+        self.focus_xy = None
         self.focus = False
 
         # Load the predefined behavior
@@ -72,8 +72,8 @@ class AgentCircle:
 
         intended_interaction = {'action': self._action}  # , 'speed': FORWARD_SPEED}
         if self.focus:
-            intended_interaction['focus_x'] = self.echo_xy[0]
-            intended_interaction['focus_y'] = self.echo_xy[1]
+            intended_interaction['focus_x'] = self.focus_xy[0]
+            intended_interaction['focus_y'] = self.focus_xy[1]
 
         return intended_interaction
 
@@ -83,26 +83,23 @@ class AgentCircle:
 
         # If there is an echo, compute the echo outcome
         if 'echo_xy' in enacted_interaction:
-            self.echo_xy = enacted_interaction['echo_xy']
-            if self.echo_xy[0] < 50:
+            # The focus point is set to the aligned echo
+            self.focus_xy = enacted_interaction['echo_xy']
+            if self.focus_xy[0] < 50:
                 outcome = OUTCOME_CLOSE_FRONT
-            elif self.echo_xy[0] > 400:     # Must be farther than the forward speed m
+            elif self.focus_xy[0] > 400:     # Must be farther than the forward speed m
                 outcome = OUTCOME_FAR_FRONT
-            elif self.echo_xy[1] > 150:
+            elif self.focus_xy[1] > 150:
                 outcome = OUTCOME_FAR_LEFT  # More that 150 to the left
-            elif self.echo_xy[1] > 0:
+            elif self.focus_xy[1] > 0:
                 outcome = OUTCOME_LEFT      # between 0 and 150 to the left
-            elif self.echo_xy[1] > -150:
+            elif self.focus_xy[1] > -150:
                 outcome = OUTCOME_RIGHT     # Between 0 and -150 to the right
             else:
                 outcome = OUTCOME_FAR_RIGHT  # More that -150 to the right
 
-        # Manage the focus
+        # Manage focus catch and lost
         if self.focus:
-            # TODO Fix the display position of the focus
-            # if 'focus' in enacted_interaction:
-            #     if 'echo_xy' in enacted_interaction:
-
             # Check if the agent lost the focus
             if 'focus' not in enacted_interaction:
                 # The focus was lost, override the echo outcome

@@ -85,8 +85,8 @@ class CtrlEgocentricView:
             poi = self.create_point_of_interest(interaction)
             self.points_of_interest.append(poi)
 
-        displacement_matrix = self.workspace.enacted_interaction['displacement_matrix'] if 'displacement_matrix' \
-                                                                                        in self.workspace.enacted_interaction else None
+        displacement_matrix = self.workspace.enacted_interaction['displacement_matrix'] \
+            # if 'displacement_matrix' in self.workspace.enacted_interaction else None
 
         # Displace the points of interest
         for poi_displace in self.points_of_interest:
@@ -136,25 +136,25 @@ class CtrlEgocentricView:
         output = None
         if hasattr(self.workspace.agent, "focus"):
             if self.workspace.agent.focus:
-                x = self.workspace.agent.echo_xy[0]
-                y = self.workspace.agent.echo_xy[1]
+                x = self.workspace.agent.focus_xy[0]
+                y = self.workspace.agent.focus_xy[1]
                 output = PointOfInterest(x, y, self.view.batch, self.view.foreground, EXPERIENCE_FOCUS)
         return output
 
     def create_point_of_interest(self, experience):
-        """Create a point of interest corresponding to the interaction given as parameter"""
+        """Create a point of interest corresponding to the experience given as parameter"""
         return PointOfInterest(experience.x, experience.y, self.view.batch, self.view.foreground,
                                experience.type, experience=experience)
 
-    def get_focus_phenomenon(self):
-        """ Returning the first selected phenomenon """
-        for p in self.points_of_interest:
-            if p.type == EXPERIENCE_FOCUS:
-                return p
-        return None
-
+    # def get_focus_phenomenon(self):
+    #     """ Returning the first selected phenomenon """
+    #     for p in self.points_of_interest:
+    #         if p.type == EXPERIENCE_FOCUS:
+    #             return p
+    #     return None
+    #
     def main(self, dt):
-        """Called every frame, update the view"""
+        """Called every frame. Update the egocentric view"""
         if self.workspace.flag_for_view_refresh:
             self.update_points_of_interest()
             self.update_body_robot()

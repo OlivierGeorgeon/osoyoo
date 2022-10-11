@@ -1,9 +1,10 @@
 from ..EgocentricMemory.Experience import EXPERIENCE_PLACE
 
 CELL_PHENOMENON = 'phenomenon'
+CELL_UNKNOWN = 'Unknown'
 
 
-class HexaCell:
+class GridCell:
     """This class represents a cell in a hexagrid
     """
     def __init__(self, x, y):
@@ -11,7 +12,7 @@ class HexaCell:
         """
         self.x = x
         self.y = y
-        self.status = "Unknown"
+        self.status = CELL_UNKNOWN
         self.occupied = False  # True if the cell is occupied by the agent
         self.experiences = list()  # Used in Synthesizer to store the experiences that happened on the cell
         self.confidence = 1
@@ -36,7 +37,6 @@ class HexaCell:
     def set_to(self, status):
         """Change the cell status, print an error if the status is invalid.
         """
-        assert(status == "Blocked" or status == "Unknown" or status == "Line" or
+        assert(status == "Blocked" or status == CELL_UNKNOWN or status == "Line" or
                status == "Something" or status == EXPERIENCE_PLACE)
         self.status = status
-        # print("Unknown status : \" ", status, ", existing status : \"Free\" (when has been visited), \"Occupied\" (when robot is on it), \"Blocked\" (when object is on it), \"Unknown\" (when has not been visited)")

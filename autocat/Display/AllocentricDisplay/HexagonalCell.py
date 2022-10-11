@@ -3,27 +3,37 @@ from webcolors import name_to_rgb
 import math
 from ...Memory.EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_BLOCK, \
     EXPERIENCE_FOCUS, EXPERIENCE_SHOCK, EXPERIENCE_PLACE, EXPERIENCE_CENTRAL_ECHO
-from ...Memory.AllocentricMemory.HexaCell import CELL_PHENOMENON
+from ...Memory.AllocentricMemory.GridCell import CELL_PHENOMENON
 
 
-class Cell:
+class HexagonalCell:
     """A cell in the hexagonal grid"""
-    def __init__(self, x, y, batch, group, radius, status):
-        self.x, self.y = x, y
-        self.batch = batch
-        self.group = group
-        self.radius = radius * 0.8
-        self.status = status
+    def __init__(self, cell_x, cell_y, batch, group, radius, status, scale):
+        # self.x, self.y = x, y
+        # self.batch = batch
+        # self.group = group
+        # self.radius = radius * scale
+        # self.status = status
 
+        # The position of the center in the allocentric view
+        height = math.sqrt((2 * radius) ** 2 - radius ** 2)
+        if cell_y % 2 == 0:
+            x = cell_x * 3 * radius
+            y = height * (cell_y / 2)
+        else:
+            x = (1.5 * radius) + cell_x * 3 * radius
+            y = (height / 2) + (cell_y - 1) / 2 * height
+
+        # The position of the points in the allocentric view
         points = []
         theta = 0
         for i in range(0, 12, 2):
-            points.append(int(x + math.cos(theta) * self.radius))
-            points.append(int(y + math.sin(theta) * self.radius))
+            points.append(int(x + math.cos(theta) * radius * scale))
+            points.append(int(y + math.sin(theta) * radius * scale))
             theta += math.pi/3
 
-        self.shape = self.batch.add_indexed(6, gl.GL_TRIANGLES, group, [0, 1, 2, 0, 2, 3, 0, 3, 4, 0, 4, 5],
-                                            ('v2i', points), ('c4B', 6 * (*name_to_rgb('white'), 128)))
+        self.shape = batch.add_indexed(6, gl.GL_TRIANGLES, group, [0, 1, 2, 0, 2, 3, 0, 3, 4, 0, 4, 5],
+                                       ('v2f', points), ('c4B', 6 * (*name_to_rgb('white'), 128)))
 
         self.set_color(status)
 
@@ -50,4 +60,5 @@ class Cell:
             color = name_to_rgb('fireBrick')
         if status == CELL_PHENOMENON:
             color = name_to_rgb('yellow')
+        # Reset the color of the shape
         self.shape.colors[0:24] = 6 * (*color, 128)

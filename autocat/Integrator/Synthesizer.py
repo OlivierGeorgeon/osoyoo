@@ -1,6 +1,6 @@
 from ..Memory.EgocentricMemory.Experience import Experience, EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_LOCAL_ECHO, \
     EXPERIENCE_FOCUS
-from ..Memory.AllocentricMemory.HexaCell import CELL_PHENOMENON
+from ..Memory.AllocentricMemory.GridCell import CELL_PHENOMENON
 # from .SynthesizerSubclasses.EchoObjectValidateds import EchoObjectValidateds
 from .SynthesizerSubclasses.EchoObjectsToInvestigate import EchoObjectsToInvestigate
 import math
@@ -103,7 +103,7 @@ class Synthesizer:
             angle = self.workspace.enacted_interaction['head_angle']
             x = int(distance * math.cos(math.radians(angle)))
             y = int(distance * math.sin(math.radians(angle)))
-            experience_focus = Experience(x, y, experience_type=EXPERIENCE_FOCUS, durability=5, decay_intensity=1,
+            experience_focus = Experience(x, y, experience_type=EXPERIENCE_ALIGNED_ECHO, durability=5, decay_intensity=1,
                                           experience_id=self.egocentric_memory.experience_id)
             self.egocentric_memory.experience_id += 1
             return [experience_focus], focus_lost

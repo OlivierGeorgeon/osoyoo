@@ -1,6 +1,6 @@
 import math
 from pyrr import matrix44
-from . HexaCell import HexaCell
+from . GridCell import GridCell
 from ..EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_PLACE
 
 
@@ -18,7 +18,7 @@ class AllocentricMemory:
         for i in range(self.width):
             self.grid.append(list())
             for j in range(self.height):
-                self.grid[i].append(HexaCell(i, j))
+                self.grid[i].append(GridCell(i, j))
 
         self.cell_radius = cell_radius
         self.robot_cell_x = self.width // 2
