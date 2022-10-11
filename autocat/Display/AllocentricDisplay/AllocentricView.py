@@ -47,37 +47,23 @@ class AllocentricView(pyglet.window.Window):
         self.label = pyglet.text.Label('', font_name='Arial', font_size=15, x=10, y=10)
         self.label.color = (0, 0, 0, 255)
 
-        # self.projections_for_context = []
-
     def add_cell(self, cell_x: int, cell_y: int):
-        """Add a new cell. Called by CtrlAllocentricView"""
+        """Add a new grid cell to allocentric view. Called by CtrlAllocentricView"""
         cell = self.memory.allocentric_memory.grid[cell_x][cell_y]
         radius = self.memory.allocentric_memory.cell_radius
-        # height = math.sqrt((2 * radius) ** 2 - radius ** 2)
         if cell.status != CELL_UNKNOWN:
-        #     if cell_y % 2 == 0:
-        #         x = cell_x * 3 * radius
-        #         y = height * (cell_y / 2)
-        #     else:
-        #         x = (1.5 * radius) + cell_x * 3 * radius
-        #         y = (height / 2) + (cell_y - 1) / 2 * height
             new_cell = HexagonalCell(cell_x, cell_y, self.batch, self.background, radius, cell.status, 0.8)
             self.cell_table[cell_x][cell_y] = new_cell
 
     def remove_focus_cell(self):
+        """Remove the focus cell from allocentric view"""
         if self.focus_cell is not None:
             self.focus_cell.shape.delete()
         self.focus_cell = None
 
     def add_focus_cell(self, cell_x, cell_y):
+        """Add the focus cell to allocentric view"""
         radius = self.memory.allocentric_memory.cell_radius
-        # height = math.sqrt((2 * radius) ** 2 - radius ** 2)
-        # if cell_y % 2 == 0:
-        #     i = cell_x * 3 * radius
-        #     j = height * (cell_y / 2)
-        # else:
-        #     i = (1.5 * radius) + cell_x * 3 * radius
-        #     j = (height / 2) + (cell_y - 1) / 2 * height
         self.focus_cell = HexagonalCell(cell_x, cell_y, self.batch, self.foreground, radius, EXPERIENCE_FOCUS, 0.5)
 
     def on_draw(self):

@@ -51,8 +51,8 @@ class Workspace:
 
             self.flag_for_view_refresh = True
 
-            # We call Synthesizer.Act and get the results, the synthesizer will update the hexa_memory
-            synthesizer_action, synthesizer_results = self.synthesizer.act()
+            # Call the synthesizer. Could return an action (not used)
+            synthesizer_action = self.synthesizer.integrate()
 
             self.memory.allocentric_memory.place_robot(self.memory.body_memory)
 
