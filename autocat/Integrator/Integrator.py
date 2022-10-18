@@ -1,21 +1,18 @@
 from ..Memory.EgocentricMemory.Experience import EXPERIENCE_LOCAL_ECHO, EXPERIENCE_CENTRAL_ECHO, EXPERIENCE_ALIGNED_ECHO
 from ..Memory.AllocentricMemory.GridCell import CELL_PHENOMENON
-from .SynthesizerSubclasses.EchoObjectsToInvestigate import EchoObjectsToInvestigate
+from .PhenomenaToInvestigate import PhenomenaToInvestigate
 
 
-class Synthesizer:
-    """Synthesizer"""
+class Integrator:
+    """The integrator creates the phenomena"""
     def __init__(self, workspace):
         """Constructor"""
         self.workspace = workspace
         self.egocentric_memory = workspace.memory.egocentric_memory
         self.allocentric_memory = workspace.memory.allocentric_memory
-        # self.internal_hexa_grid = AllocentricMemory(self.allocentric_memory.width, self.allocentric_memory.height)
-        # self.interactions_list = []
-        self.echo_objects_to_investigate = EchoObjectsToInvestigate(3, 3, self.workspace.memory, acceptable_delta=700)
+        self.echo_objects_to_investigate = PhenomenaToInvestigate(3, 3, self.workspace.memory, acceptable_delta=700)
         self.phenomena = []
         self.last_projection_for_context = []
-        # self.experiences_central_echo = []
         self.last_used_id = 0
         self.last_action_had_focus = False
         self.last_action = None
@@ -32,7 +29,8 @@ class Synthesizer:
                                                                e.type == EXPERIENCE_ALIGNED_ECHO)]
         experiences_central_echo, translation = self.try_and_add(experiences_central_echo)
         # Apply the correction of position relative to the phenomenon in focus
-        self.apply_translation_to_hexa_memory(translation)
+        # self.apply_translation_to_hexa_memory(translation)
+        self.allocentric_memory.move(0, translation, is_egocentric_translation=False)
 
         # Try to attach the central echos to not yet validated phenomena and remove these central echos
         experiences_central_echo = self.echo_objects_to_investigate.try_and_add(experiences_central_echo)
@@ -79,10 +77,10 @@ class Synthesizer:
 
         return action_to_return
 
-    def apply_translation_to_hexa_memory(self, translation_between_echo_and_context):
-        """Translate the robot in allocentric memory"""
-        self.allocentric_memory.move(0, translation_between_echo_and_context, is_egocentric_translation=False)
-
+    # def apply_translation_to_hexa_memory(self, translation_between_echo_and_context):
+    #     """Translate the robot in allocentric memory"""
+    #     self.allocentric_memory.move(0, translation_between_echo_and_context, is_egocentric_translation=False)
+    #
     def apply_status_experience_to_cells(self, experiences):
         """Mark the experiences in the cells of allocentric Memory"""
         cells_treated = []
@@ -101,24 +99,6 @@ class Synthesizer:
                                                                          validated_phenomenon.center[1])
             self.allocentric_memory.apply_status_to_cell(cell_i, cell_j, CELL_PHENOMENON)
 
-    # def create_focus_echo(self):
-    #     """Create an aligned echo experience and tell if the focus was lost"""
-    #     focus_lost = False
-    #     if self.last_action_had_focus and self.workspace.enacted_interaction['echo_distance'] < 1000:  # OG
-    #         distance = self.workspace.enacted_interaction['echo_distance']
-    #         if distance > 800 and (self.last_action is not None) \
-    #                 and not (self.last_action == "-" or self.last_action['action'] == "-"):
-    #             focus_lost = True
-    #         angle = self.workspace.enacted_interaction['head_angle']
-    #         x = int(distance * math.cos(math.radians(angle)))
-    #         y = int(distance * math.sin(math.radians(angle)))
-    #         experience_focus = Experience(x, y, experience_type=EXPERIENCE_ALIGNED_ECHO, durability=5, decay_intensity=1,
-    #                                       experience_id=self.egocentric_memory.experience_id)
-    #         self.egocentric_memory.experience_id += 1
-    #         return [experience_focus], focus_lost
-    #     else:
-    #         return [], focus_lost
-    #
     def try_and_add(self, experiences):
         """Attach the experiences to existing phenomena if possible.
         Returns the experiences that have not been attached, and the average translation"""

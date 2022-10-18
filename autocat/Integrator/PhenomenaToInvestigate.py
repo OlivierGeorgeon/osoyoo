@@ -1,7 +1,7 @@
-from . Phenomenon import Phenomenon
+from autocat.Integrator.Phenomenon import Phenomenon
 
 
-class EchoObjectsToInvestigate:
+class PhenomenaToInvestigate:
     """List of phenomena to investigate"""
     def __init__(self, number_of_try_before_removing, number_of_echo_before_validation, memory,
                  acceptable_delta):

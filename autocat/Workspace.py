@@ -1,6 +1,6 @@
 from .Decider.AgentCircle import AgentCircle
 from .Memory.Memory import Memory
-from .Integrator.Synthesizer import Synthesizer
+from .Integrator.Integrator import Integrator
 
 CONTROL_MODE_AUTOMATIC = "auto"
 CONTROL_MODE_MANUAL = "manual"
@@ -18,7 +18,7 @@ class Workspace:
         """Constructor"""
         self.agent = AgentCircle()
         self.memory = Memory()
-        self.synthesizer = Synthesizer(self)  # Moved from workspace by OG 04/09/2022
+        self.synthesizer = Integrator(self)  # Moved from workspace by OG 04/09/2022
 
         self.intended_interaction = None
         self.enacted_interaction = {}
