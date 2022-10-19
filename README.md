@@ -19,7 +19,7 @@ to generate life-like behaviors.
 
 * Download the autocat_enacter.ino file to the robot
 * Check the robot's ip address in the arduino ide terminal
-* Run the autocat python application on your desktop, with the robot's ip adress as an argument
+* Run the autocat python application on your desktop, with the robot's IP adress as an argument
 
 ## More information 
 

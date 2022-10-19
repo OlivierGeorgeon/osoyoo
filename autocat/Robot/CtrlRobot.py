@@ -163,12 +163,12 @@ class CtrlRobot:
 
         # Interaction shock
         if KEY_IMPACT in enacted_interaction and action == '8':
-            if enacted_interaction[KEY_IMPACT] == 0b01:  # Shock on the right
-                enacted_interaction[KEY_EXPERIENCES].append((EXPERIENCE_SHOCK, ROBOT_FRONT_X, -ROBOT_FRONT_Y))
-            if enacted_interaction[KEY_IMPACT] == 0b11:  # Shock on the front
-                enacted_interaction[KEY_EXPERIENCES].append((EXPERIENCE_SHOCK, ROBOT_FRONT_X, 0))
-            if enacted_interaction[KEY_IMPACT] == 0b10:  # Shock on the left
-                enacted_interaction[KEY_EXPERIENCES].append((EXPERIENCE_SHOCK, ROBOT_FRONT_X, ROBOT_FRONT_Y))
+            if enacted_interaction[KEY_IMPACT] == 0b01:  # Impact on the right
+                enacted_interaction[KEY_EXPERIENCES].append((EXPERIENCE_IMPACT, ROBOT_FRONT_X, -ROBOT_FRONT_Y))
+            if enacted_interaction[KEY_IMPACT] == 0b11:  # Impact on the front
+                enacted_interaction[KEY_EXPERIENCES].append((EXPERIENCE_IMPACT, ROBOT_FRONT_X, 0))
+            if enacted_interaction[KEY_IMPACT] == 0b10:  # Impact on the left
+                enacted_interaction[KEY_EXPERIENCES].append((EXPERIENCE_IMPACT, ROBOT_FRONT_X, ROBOT_FRONT_Y))
 
         # Interaction block
         if 'blocked' in enacted_interaction and action == '8':

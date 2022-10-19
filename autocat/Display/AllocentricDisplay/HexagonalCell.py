@@ -2,7 +2,7 @@ from pyglet import gl
 from webcolors import name_to_rgb
 import math
 from ...Memory.EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_BLOCK, \
-    EXPERIENCE_FOCUS, EXPERIENCE_SHOCK, EXPERIENCE_PLACE, EXPERIENCE_CENTRAL_ECHO
+    EXPERIENCE_FOCUS, EXPERIENCE_IMPACT, EXPERIENCE_PLACE, EXPERIENCE_CENTRAL_ECHO
 from ...Memory.AllocentricMemory.GridCell import CELL_PHENOMENON
 
 
@@ -48,7 +48,7 @@ class HexagonalCell:
             color = name_to_rgb('slateBlue')
         if status == EXPERIENCE_BLOCK:
             color = name_to_rgb('red')
-        if status == EXPERIENCE_SHOCK:
+        if status == EXPERIENCE_IMPACT:
             color = name_to_rgb('red')
         if status == EXPERIENCE_FLOOR:
             color = name_to_rgb('black')

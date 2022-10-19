@@ -40,7 +40,7 @@ class PointOfInterest:
             self.points = [-5, -30, -5, 30, 5, 30, 5, -30]
             self.shape = self.batch.add_indexed(4, gl.GL_TRIANGLES, self.group, [0, 1, 2, 0, 2, 3],
                                         ('v2i', self.points), ('c4B', 4 * (*name_to_rgb("black"), self.opacity)))
-        if self.type == EXPERIENCE_SHOCK:
+        if self.type == EXPERIENCE_IMPACT:
             # Chock interaction: red triangle
             self.points = [0, 0, 40, -30, 40, 30]
             self.shape = self.batch.add_indexed(3, gl.GL_TRIANGLES, self.group, [0, 1, 2], ('v2i', self.points),
@@ -69,9 +69,7 @@ class PointOfInterest:
         """ Set the color or reset it to its default value """
         if color_name is None:
             if self.type == EXPERIENCE_PLACE:
-                # Place: Blue circle
-                # self.shape.colors[0:9] = [144, 238, 144, 144, 238, 144, 144, 238, 144]
-                self.shape.colors[0:9] = 3 * name_to_rgb("LightGreen")
+                self.shape.colors[0:12] = 3 * (*name_to_rgb("LightGreen"), self.opacity)
             if self.type == EXPERIENCE_ALIGNED_ECHO:
                 self.shape.color = name_to_rgb("orange")
             if self.type == EXPERIENCE_LOCAL_ECHO:
@@ -79,21 +77,24 @@ class PointOfInterest:
             if self.type == EXPERIENCE_CENTRAL_ECHO:
                 self.shape.color = name_to_rgb("sienna")
             if self.type == EXPERIENCE_FLOOR:
-                # Trespassing: black dash
                 self.shape.color = name_to_rgb("black")
-            if self.type == EXPERIENCE_SHOCK:
-                # Chock interaction: red triangle
+                self.shape.colors[0:16] = 4 * (*name_to_rgb("black"), self.opacity)
+            if self.type == EXPERIENCE_IMPACT:
                 self.shape.color = name_to_rgb("red")
+                self.shape.colors[0:12] = 3 * (*name_to_rgb("red"), self.opacity)
             if self.type == EXPERIENCE_BLOCK:
-                # Pushing: yellow triangle
-                self.shape.color = name_to_rgb("yellow")
+                self.shape.colors[0:12] = 3 * (*name_to_rgb("salmon"), self.opacity)
             if self.type == EXPERIENCE_FOCUS:
-                self.shape.colors[0:24] = 6 * (*name_to_rgb("fireBrick"), 128)
+                self.shape.colors[0:24] = 6 * (*name_to_rgb("fireBrick"), self.opacity)
+            if self.type == POINT_COMPASS:
+                self.shape.colors[0:16] = 4 * (*name_to_rgb("RoyalBlue"), self.opacity)
         else:
-            if self.type == EXPERIENCE_PLACE:
-                self.shape.colors[0:9] = 3 * name_to_rgb(color_name)
+            if self.type in [EXPERIENCE_PLACE, EXPERIENCE_IMPACT, EXPERIENCE_BLOCK]:
+                self.shape.colors[0:12] = 3 * (*name_to_rgb(color_name), self.opacity)
+            if self.type in [EXPERIENCE_FLOOR, POINT_COMPASS]:
+                self.shape.colors[0:16] = 4 * (*name_to_rgb(color_name), self.opacity)
             elif self.type == EXPERIENCE_FOCUS:
-                self.shape.colors[0:24] = 6 * (*name_to_rgb(color_name), 200)
+                self.shape.colors[0:24] = 6 * (*name_to_rgb(color_name), self.opacity)
             else:
                 self.shape.color = name_to_rgb(color_name)
 
@@ -129,7 +130,7 @@ class PointOfInterest:
                 self.shape.rotation += math.degrees(q.angle)
             else:  # Rotate around z axis downward
                 self.shape.rotation += math.degrees(-q.angle)
-        if self.type == EXPERIENCE_BLOCK or self.type == EXPERIENCE_SHOCK:
+        if self.type == EXPERIENCE_BLOCK or self.type == EXPERIENCE_IMPACT:
             # Rotate and translate the other points of the triangle
             v = matrix44.apply_to_vector(displacement_matrix, [self.shape.x2, self.shape.y2, 0])
             self.shape.x2, self.shape.y2 = v[0], v[1]
@@ -161,6 +162,18 @@ class PointOfInterest:
 
         # if displacement_matrix is not None:
         self.displace(displacement_matrix)
+
+    def fade(self):
+        """Decrease the opacity of this point of interest"""
+        if self.experience is None:
+            self.opacity = max(self.opacity - 10, 0)
+        else:
+            self.opacity = int(min(self.experience.actual_durability * (255 / self.experience.durability), 255))
+        if hasattr(self.shape, 'vertices'):
+            # Update the opacity
+            self.set_color(None)
+        else:
+            self.shape.opacity = self.opacity
 
     def __str__(self):
         return "POI of type " + self.type + " at x=" + str(int(self.x)) + ", y=" + str(int(self.y)) + \

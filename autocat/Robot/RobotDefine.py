@@ -38,8 +38,8 @@ if ROBOT_ID == 2:
 
 # Robot 4 chezOlivier
 if ROBOT_ID == 4:
-    COMPASS_X_OFFSET = 0
-    COMPASS_Y_OFFSET = 0
+    COMPASS_X_OFFSET = -55
+    COMPASS_Y_OFFSET = 43
     FORWARD_SPEED = 120     # (mm/s) Forward translation speed.
     RETREAT_DISTANCE = 70   # (mm) Distance of the line after retreat
 

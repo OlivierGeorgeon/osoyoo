@@ -86,7 +86,6 @@ class CtrlEgocentricView:
             self.points_of_interest.append(poi)
 
         displacement_matrix = self.workspace.enacted_interaction['displacement_matrix'] \
-            # if 'displacement_matrix' in self.workspace.enacted_interaction else None
 
         # Displace the points of interest
         for poi_displace in self.points_of_interest:
@@ -99,37 +98,29 @@ class CtrlEgocentricView:
         # Mark the new position
         self.add_point_of_interest(0, 0, EXPERIENCE_PLACE)
 
-        # Update the robot's position
-        # self.view.robot.rotate_head(self.workspace.enacted_interaction['head_angle'])
-        # self.view.azimuth = self.workspace.enacted_interaction['azimuth']
-
-        # Point of interest compass
-        # if 'compass_x' in self.ctrl_workspace.enacted_interaction:
-        #     self.add_point_of_interest(self.ctrl_workspace.enacted_interaction['compass_x'],
-        #                                self.ctrl_workspace.enacted_interaction['compass_y'], POINT_COMPASS)
-
         # Point of interest focus
         poi_focus = self.create_poi_focus()
         if poi_focus is not None:
             self.points_of_interest.append(poi_focus)
 
         # Make the points of interest fade out using the durability of the given interaction
-        if len(self.points_of_interest) > 0:
-            for poi_fade in self.points_of_interest:
-                if poi_fade is not None and poi_fade.experience is not None:
-                    
-                    if isinstance(poi_fade.shape, pyglet.graphics.vertexdomain.IndexedVertexList):
-                        for s in poi_fade.shape.colors:
-                            #print("sssddfsfsf " ,s)
-                            #s.opacity = poi.interaction.durability * 10
-                            #print("opacity : ",s.opacity)
-                            # TODO : CHANGE OPACITY OF VERTEX LIST
-                            ''
-                    else:
-                        poi_fade.shape.opacity = min(poi_fade.experience.actual_durability * (255 / poi_fade.experience.durability), 255)
-                    if poi_fade.experience.actual_durability <= 0:
-                        poi_fade.delete()
-                        self.points_of_interest.remove(poi_fade)
+        # if len(self.points_of_interest) > 0:
+        for poi_fade in self.points_of_interest:
+            poi_fade.fade()
+                # if poi_fade is not None and poi_fade.experience is not None:
+                #
+                #     if isinstance(poi_fade.shape, pyglet.graphics.vertexdomain.IndexedVertexList):
+                #         for s in poi_fade.shape.colors:
+                #             #print("sssddfsfsf " ,s)
+                #             #s.opacity = poi.interaction.durability * 10
+                #             #print("opacity : ",s.opacity)
+                #             # TODO : CHANGE OPACITY OF VERTEX LIST
+                #             ''
+                #     else:
+                #         poi_fade.shape.opacity = min(poi_fade.experience.actual_durability * (255 / poi_fade.experience.durability), 255)
+                #     if poi_fade.experience.actual_durability <= 0:
+                #         poi_fade.delete()
+                #         self.points_of_interest.remove(poi_fade)
 
     def create_poi_focus(self):
         """Create a point of interest corresponding to the focus"""

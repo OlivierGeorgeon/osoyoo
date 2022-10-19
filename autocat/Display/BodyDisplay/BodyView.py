@@ -2,6 +2,7 @@ import pyglet
 from pyglet.gl import *
 import math
 import numpy
+from pyrr import matrix44
 from ..EgocentricDisplay.OsoyooCar import OsoyooCar
 from ..InteractiveDisplay import InteractiveDisplay
 
@@ -28,6 +29,7 @@ class BodyView(InteractiveDisplay):
         self.robot_batch = pyglet.graphics.Batch()
         self.robot = OsoyooCar(self.robot_batch, self.background)
         self.azimuth = 0  # Degree from north [0, 360]
+        self.body_rotation_matrix = matrix44.create_identity()  # The matrix representing the robot's body rotation
 
         # Define the text area at the bottom of the view
         self.label = pyglet.text.Label('', font_name='Verdana', font_size=10, x=10, y=10)
@@ -58,30 +60,34 @@ class BodyView(InteractiveDisplay):
         # Draw the text in the bottom left corner
         self.label.draw()
 
-    def get_mouse_press_coordinate(self, x, y, button, modifiers):
+    def on_mouse_press(self, x, y, button, modifiers):
         """ Computing the position of the mouse click relative to the robot in mm and degrees """
         window_press_x = (x - self.width / 2) * self.zoom_level * 2
         window_press_y = (y - self.height / 2) * self.zoom_level * 2
-        # Polar coordinates from the window center
-        r = numpy.hypot(window_press_x, window_press_y)
-        theta_window = math.atan2(window_press_y, window_press_x)
 
-        theta_robot = theta_window
-        # Polar angle from the robot axis
-        if self.is_north_up:
-            theta_robot = theta_window + math.radians(self.azimuth - 90) + 2 * math.pi
-            theta_robot %= 2 * math.pi
-            if theta_robot > math.pi:
-                theta_robot -= 2 * math.pi
-        # Cartesian coordinates from the robot axis
-        z = r * numpy.exp(1j * theta_robot)
-        mouse_press_x, mouse_press_y = int(z.real), int(z.imag)
-        mouse_press_angle = int(math.degrees(theta_robot))
-        # Display the mouse click coordinates at the bottom of the view
-        self.label.text = "Click: x:" + str(mouse_press_x) + ", y:" + str(mouse_press_y) \
-                          + ", angle:" + str(mouse_press_angle) + "°"
-        # Return the click position to the controller
-        return mouse_press_x, mouse_press_y, mouse_press_angle
+        # Rotate the click point by the opposite rotation of the robot
+        # Use the transposed of the robot's body rotation matrix
+        v = matrix44.apply_to_vector(self.body_rotation_matrix.T, [window_press_x, window_press_y, 0])
+        t = int(math.degrees(math.atan2(v[1], v[0])))
+
+        self.label.text = "Click: x:" + str(int(v[0])) + ", y:" + str(int(v[1])) + ", angle:" + str(t) + "°"
+
+        # # Polar coordinates from the window center
+        # r = numpy.hypot(window_press_x, window_press_y)
+        # theta_window = math.atan2(window_press_y, window_press_x)
+        #
+        # # Polar angle from the robot axis
+        # theta_robot = theta_window + math.radians(self.azimuth - 90) + 2 * math.pi
+        # theta_robot %= 2 * math.pi
+        # if theta_robot > math.pi:
+        #     theta_robot -= 2 * math.pi
+        # # Cartesian coordinates from the robot axis
+        # z = r * numpy.exp(1j * theta_robot)
+        # mouse_press_x, mouse_press_y = int(z.real), int(z.imag)
+        # mouse_press_angle = int(math.degrees(theta_robot))
+        # # Display the mouse click coordinates at the bottom of the view
+        # self.label.text = "Click: x:" + str(mouse_press_x) + ", y:" + str(mouse_press_y) \
+        #                   + ", angle:" + str(mouse_press_angle) + "°"
 
 
 # Testing the EgocentricView by displaying the robot in a pretty position, and the mouse click coordinates
@@ -90,9 +96,5 @@ if __name__ == "__main__":
     view = BodyView()
     view.robot.rotate_head(-45)  # Turn head 45° to the right
     view.azimuth = 350           # Turn robot 10° to the left
-
-    @view.event
-    def on_mouse_press(x, y, button, modifiers):
-        view.get_mouse_press_coordinate(x, y, button, modifiers)  # Display mouse click coordinates
 
     pyglet.app.run()
