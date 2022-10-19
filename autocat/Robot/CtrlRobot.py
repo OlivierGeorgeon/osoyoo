@@ -131,10 +131,12 @@ class CtrlRobot:
             enacted_interaction['compass_x'] -= COMPASS_X_OFFSET
             enacted_interaction['compass_y'] -= COMPASS_Y_OFFSET
             self.azimuth = math.degrees(math.atan2(enacted_interaction['compass_y'], enacted_interaction['compass_x']))
+            # The compass point indicates the south so we must rotate it of 180° to obtain the azimuth
             self.azimuth += 180
             if self.azimuth >= 360:
                 self.azimuth -= 360
-            # Override the azimuth returned by the robot
+            # Override the azimuth returned by the robot.
+            # (They are equal unless COMPASS_X_OFFSET or COMPASS_X_OFFSET are non zero)
             enacted_interaction['azimuth'] = int(self.azimuth)
 
         # Interaction Floor line

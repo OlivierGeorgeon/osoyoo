@@ -2,7 +2,7 @@
 
 The Autocat project aims at controlling the 
 [osoyoo robot car](https://osoyoo.com/2019/11/08/omni-direction-mecanum-wheel-robotic-kit-v1/) 
-to generate animal-like behaviors. 
+to generate life-like behaviors. 
 
 ## Repository architecture
 

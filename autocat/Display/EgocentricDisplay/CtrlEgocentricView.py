@@ -146,16 +146,9 @@ class CtrlEgocentricView:
         return PointOfInterest(experience.x, experience.y, self.view.batch, self.view.foreground,
                                experience.type, experience=experience)
 
-    # def get_focus_phenomenon(self):
-    #     """ Returning the first selected phenomenon """
-    #     for p in self.points_of_interest:
-    #         if p.type == EXPERIENCE_FOCUS:
-    #             return p
-    #     return None
-    #
     def main(self, dt):
         """Called every frame. Update the egocentric view"""
         if self.workspace.flag_for_view_refresh:
             self.update_points_of_interest()
             self.update_body_robot()
-            self.workspace.flag_for_view_refresh = False
+            # self.workspace.flag_for_view_refresh = False  # Reset by CtrlBodyView

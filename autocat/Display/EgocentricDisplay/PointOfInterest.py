@@ -4,7 +4,6 @@ from autocat.Memory.EgocentricMemory.Experience import *
 
 # Points of interest that only exist in Egocentric Display
 # (points of interest attached to an interaction have the same type as their interactions)
-# POINT_PLACE = 'Place'
 POINT_COMPASS = 'Compass'
 
 
@@ -16,6 +15,7 @@ class PointOfInterest:
         self.group = group
         self.type = point_type
         self.points = []
+        self.opacity = 255
 
         self.is_selected = False
 
@@ -23,7 +23,7 @@ class PointOfInterest:
             # Place: LightGreen triangle
             self.points = [30, 0, -20, -20, -20, 20]
             self.shape = self.batch.add_indexed(3, gl.GL_TRIANGLES, self.group, [0, 1, 2], ('v2i', self.points),
-                                                ('c3B', 3 * name_to_rgb("LightGreen")))
+                                                ('c4B', 3 * (*name_to_rgb("LightGreen"), self.opacity)))
         if self.type == EXPERIENCE_ALIGNED_ECHO:
             # Echo: Orange circle
             self.shape = shapes.Circle(0, 0, 20, color=name_to_rgb("orange"), batch=self.batch)
@@ -39,27 +39,27 @@ class PointOfInterest:
             # Trespassing: black dash
             self.points = [-5, -30, -5, 30, 5, 30, 5, -30]
             self.shape = self.batch.add_indexed(4, gl.GL_TRIANGLES, self.group, [0, 1, 2, 0, 2, 3],
-                                                ('v2i', self.points), ('c3B', 4 * name_to_rgb("black")))
+                                        ('v2i', self.points), ('c4B', 4 * (*name_to_rgb("black"), self.opacity)))
         if self.type == EXPERIENCE_SHOCK:
             # Chock interaction: red triangle
             self.points = [0, 0, 40, -30, 40, 30]
             self.shape = self.batch.add_indexed(3, gl.GL_TRIANGLES, self.group, [0, 1, 2], ('v2i', self.points),
-                                                ('c3B', 3 * name_to_rgb("red")))
+                                                ('c4B', 3 * (*name_to_rgb("red"), self.opacity)))
         if self.type == EXPERIENCE_BLOCK:
             # Pushing: salmon triangle
             self.points = [0, 0, 40, -30, 40, 30]
             self.shape = self.batch.add_indexed(3, gl.GL_TRIANGLES, self.group, [0, 1, 2], ('v2i', self.points),
-                                                ('c3B', 3 * name_to_rgb("salmon")))
+                                                ('c4B', 3 * (*name_to_rgb("salmon"), self.opacity)))
         if self.type == EXPERIENCE_FOCUS:
             # Focus: fireBrick hexagon
             self.points = [40, 0, 20, 34, -20, 34, -40, 0, -20, -34, 20, -34]
             self.shape = self.batch.add_indexed(6, gl.GL_TRIANGLES, group, [0, 1, 2, 0, 2, 3, 0, 3, 4, 0, 4, 5],
-                                                ('v2i', self.points), ('c4B', 6 * (*name_to_rgb("fireBrick"), 128)))
+                          ('v2i', self.points), ('c4B', 6 * (*name_to_rgb("fireBrick"), self.opacity)))
         if self.type == POINT_COMPASS:
             # Compass: RoyalBlue square
             self.points = [10, 0, 0, -10, 0, 10, -10, 0]
             self.shape = self.batch.add_indexed(4, gl.GL_TRIANGLES, self.group, [0, 1, 2, 1, 2, 3],
-                                                ('v2i', self.points), ('c3B', 4 * name_to_rgb("RoyalBlue")))
+                          ('v2i', self.points), ('c4B', 4 * (*name_to_rgb("RoyalBlue"), self.opacity)))
 
         # Move the point of interest to its position
         position_matrix = matrix44.create_from_translation([x, y, 0]).astype('float64')
@@ -111,10 +111,6 @@ class PointOfInterest:
         #  Rotate and translate the position
         v = matrix44.apply_to_vector(displacement_matrix, [self.x, self.y, 0])
         self.x, self.y = v[0], v[1]
-
-        # If compass don't displace
-        # if self.type == POINT_COMPASS:
-        #     return
 
         # If the shape has a list of vertices (POINT PLACE)
         if hasattr(self.shape, 'vertices'):

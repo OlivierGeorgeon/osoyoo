@@ -4,6 +4,7 @@ from ..EgocentricDisplay.OsoyooCar import OsoyooCar
 from .HexagonalCell import HexagonalCell
 from ...Memory.EgocentricMemory.Experience import EXPERIENCE_FOCUS
 from ...Memory.AllocentricMemory.GridCell import CELL_UNKNOWN
+from ..InteractiveDisplay import InteractiveDisplay
 
 
 NB_CELL_WIDTH = 30
@@ -12,7 +13,7 @@ CELL_RADIUS = 50
 ZOOM_IN_FACTOR = 1.2
 
 
-class AllocentricView(pyglet.window.Window):
+class AllocentricView(InteractiveDisplay):
     """Create the allocentric view"""
     def __init__(self, memory, width=400, height=400, *args, **kwargs):
         super().__init__(width, height, resizable=True, *args, **kwargs)
@@ -98,19 +99,19 @@ class AllocentricView(pyglet.window.Window):
         glOrtho(0, self.width, 0, self.height, -1, 1)
         self.label.draw()
 
-    def on_resize(self, width, height):
-        """ Adjusting the viewport when resizing the window """
-        # Always display in the whole window
-        glViewport(0, 0, width, height)        # For standard screen
-        # glViewport(0, 0, width * 2, height * 2)  # For retina screen on Mac
-
-    def on_mouse_scroll(self, x, y, dx, dy):
-        """ Zooming the window """
-        # Inspired by https://www.py4u.net/discuss/148957
-        f = ZOOM_IN_FACTOR if dy > 0 else 1/ZOOM_IN_FACTOR if dy < 0 else 1
-        # if .4 < self.zoom_level * f < 5:  # Olivier
-        self.zoom_level *= f
-
+    # def on_resize(self, width, height):
+    #     """ Adjusting the viewport when resizing the window """
+    #     # Always display in the whole window
+    #     glViewport(0, 0, width, height)        # For standard screen
+    #     # glViewport(0, 0, width * 2, height * 2)  # For retina screen on Mac
+    #
+    # def on_mouse_scroll(self, x, y, dx, dy):
+    #     """ Zooming the window """
+    #     # Inspired by https://www.py4u.net/discuss/148957
+    #     f = ZOOM_IN_FACTOR if dy > 0 else 1/ZOOM_IN_FACTOR if dy < 0 else 1
+    #     # if .4 < self.zoom_level * f < 5:  # Olivier
+    #     self.zoom_level *= f
+    #
     def on_mouse_motion(self, x, y, dx, dy):
         # mouse_x = int((x - self.width/2) * self.zoom_level * 2)
         # mouse_y = int((y - self.height/2) * self.zoom_level * 2)
