@@ -1,4 +1,5 @@
 from ..EgocentricMemory.Experience import EXPERIENCE_PLACE
+from ...Integrator.Phenomenon import Phenomenon
 
 CELL_PHENOMENON = 'phenomenon'
 CELL_UNKNOWN = 'Unknown'
@@ -16,6 +17,7 @@ class GridCell:
         self.occupied = False  # True if the cell is occupied by the agent
         self.experiences = list()  # Used in Synthesizer to store the experiences that happened on the cell
         self.confidence = 1
+        self.phenomenon = None
 
     def __str__(self):
         return "(" + str(self.x)+','+str(self.y) + ")"
@@ -35,8 +37,11 @@ class GridCell:
     #         self.experiences.append(experience)
 
     def set_to(self, status):
-        """Change the cell status, print an error if the status is invalid.
-        """
-        assert(status == "Blocked" or status == CELL_UNKNOWN or status == "Line" or
-               status == "Something" or status == EXPERIENCE_PLACE)
+        """Change the cell status, print an error if the status is invalid."""
+        assert(status in ["Blocked", CELL_UNKNOWN, "Line", "Something", EXPERIENCE_PLACE, CELL_PHENOMENON])
         self.status = status
+
+    def allocate_phenomenon(self, phenomenon: Phenomenon):
+        """Allocate a phenomenon to this cell"""
+        self.phenomenon = phenomenon
+        self.set_to(CELL_PHENOMENON)

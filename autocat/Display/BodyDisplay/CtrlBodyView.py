@@ -2,7 +2,7 @@ import pyglet
 from pyrr import matrix44
 import math
 from .BodyView import BodyView
-from ..EgocentricDisplay.PointOfInterest import PointOfInterest, POINT_COMPASS
+from ..EgocentricDisplay.PointOfInterest import PointOfInterest, POINT_COMPASS, POINT_AZIMUTH
 
 
 class CtrlBodyView:
@@ -57,16 +57,18 @@ class CtrlBodyView:
             return
 
         # Rotate the previous compass points so they remain at the south of the view
-        if self.rotate_compass_points:
-            yaw = self.workspace.enacted_interaction['yaw']
-            displacement_matrix = matrix44.create_from_z_rotation(math.radians(yaw))
-            for poi_displace in self.points_of_interest:
-                poi_displace.update(displacement_matrix)
+        yaw = self.workspace.enacted_interaction['yaw']
+        displacement_matrix = matrix44.create_from_z_rotation(math.radians(yaw))
+        for poi in [p for p in self.points_of_interest if p.type == POINT_COMPASS]:
+            poi.update(displacement_matrix)
 
-        # Add the new compass point
+        # Add the new points
         if 'azimuth' in self.workspace.enacted_interaction:
             self.add_point_of_interest(self.workspace.enacted_interaction['compass_x'],
                                        self.workspace.enacted_interaction['compass_y'], POINT_COMPASS)
+            self.add_point_of_interest(self.workspace.enacted_interaction['compass_x'],
+                                       self.workspace.enacted_interaction['compass_y'], POINT_AZIMUTH,
+                                       self.view.background)
             self.view.label.text = "Azimuth measured: " + str(self.workspace.enacted_interaction['azimuth']) + "°"
         else:
             self.view.label.text = "Azimuth measured: None"

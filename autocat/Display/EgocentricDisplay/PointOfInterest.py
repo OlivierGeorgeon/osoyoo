@@ -5,6 +5,7 @@ from autocat.Memory.EgocentricMemory.Experience import *
 # Points of interest that only exist in Egocentric Display
 # (points of interest attached to an interaction have the same type as their interactions)
 POINT_COMPASS = 'Compass'
+POINT_AZIMUTH = 'Azimuth'
 
 
 class PointOfInterest:
@@ -16,50 +17,57 @@ class PointOfInterest:
         self.type = point_type
         self.points = []
         self.opacity = 255
+        self.color = name_to_rgb("gray")
 
         self.is_selected = False
 
         if self.type == EXPERIENCE_PLACE:
             # Place: LightGreen triangle
             self.points = [30, 0, -20, -20, -20, 20]
+            self.color = name_to_rgb("LightGreen")
             self.shape = self.batch.add_indexed(3, gl.GL_TRIANGLES, self.group, [0, 1, 2], ('v2i', self.points),
-                                                ('c4B', 3 * (*name_to_rgb("LightGreen"), self.opacity)))
+                                                ('c4B', 3 * (*self.color, self.opacity)))
         if self.type == EXPERIENCE_ALIGNED_ECHO:
-            # Echo: Orange circle
-            self.shape = shapes.Circle(0, 0, 20, color=name_to_rgb("orange"), batch=self.batch)
+            self.color = name_to_rgb("orange")
+            self.shape = shapes.Circle(0, 0, 20, color=self.color, batch=self.batch)
             self.shape.group = group
         if self.type == EXPERIENCE_LOCAL_ECHO:
-            # Echo: Orange circle
-            self.shape = shapes.Circle(0, 0, 7, color=name_to_rgb("sienna"), batch=self.batch)
+            self.color = name_to_rgb("sienna")
+            self.shape = shapes.Circle(0, 0, 7, color=self.color, batch=self.batch)
         if self.type == EXPERIENCE_CENTRAL_ECHO:
-            # Echo: Orange circle
-            self.shape = shapes.Circle(0, 0, 20, color=name_to_rgb("sienna"), batch=self.batch)
+            self.color = name_to_rgb("sienna")
+            self.shape = shapes.Circle(0, 0, 20, color=self.color, batch=self.batch)
             self.shape.group = group
         if self.type == EXPERIENCE_FLOOR:
-            # Trespassing: black dash
+            self.color = name_to_rgb("black")
             self.points = [-5, -30, -5, 30, 5, 30, 5, -30]
             self.shape = self.batch.add_indexed(4, gl.GL_TRIANGLES, self.group, [0, 1, 2, 0, 2, 3],
-                                        ('v2i', self.points), ('c4B', 4 * (*name_to_rgb("black"), self.opacity)))
+                                        ('v2i', self.points), ('c4B', 4 * (*self.color, self.opacity)))
         if self.type == EXPERIENCE_IMPACT:
-            # Chock interaction: red triangle
+            self.color = name_to_rgb("red")
             self.points = [0, 0, 40, -30, 40, 30]
             self.shape = self.batch.add_indexed(3, gl.GL_TRIANGLES, self.group, [0, 1, 2], ('v2i', self.points),
-                                                ('c4B', 3 * (*name_to_rgb("red"), self.opacity)))
+                                                ('c4B', 3 * (*self.color, self.opacity)))
         if self.type == EXPERIENCE_BLOCK:
-            # Pushing: salmon triangle
+            self.color = name_to_rgb("salmon")
             self.points = [0, 0, 40, -30, 40, 30]
             self.shape = self.batch.add_indexed(3, gl.GL_TRIANGLES, self.group, [0, 1, 2], ('v2i', self.points),
-                                                ('c4B', 3 * (*name_to_rgb("salmon"), self.opacity)))
+                                                ('c4B', 3 * (*self.color, self.opacity)))
         if self.type == EXPERIENCE_FOCUS:
-            # Focus: fireBrick hexagon
+            self.color = name_to_rgb("fireBrick")
             self.points = [40, 0, 20, 34, -20, 34, -40, 0, -20, -34, 20, -34]
             self.shape = self.batch.add_indexed(6, gl.GL_TRIANGLES, group, [0, 1, 2, 0, 2, 3, 0, 3, 4, 0, 4, 5],
-                          ('v2i', self.points), ('c4B', 6 * (*name_to_rgb("fireBrick"), self.opacity)))
+                                                ('v2i', self.points), ('c4B', 6 * (*self.color, self.opacity)))
         if self.type == POINT_COMPASS:
-            # Compass: RoyalBlue square
+            self.color = name_to_rgb("RoyalBlue")
             self.points = [10, 0, 0, -10, 0, 10, -10, 0]
             self.shape = self.batch.add_indexed(4, gl.GL_TRIANGLES, self.group, [0, 1, 2, 1, 2, 3],
-                          ('v2i', self.points), ('c4B', 4 * (*name_to_rgb("RoyalBlue"), self.opacity)))
+                                                ('v2i', self.points), ('c4B', 4 * (*self.color, self.opacity)))
+        if self.type == POINT_AZIMUTH:
+            self.color = name_to_rgb("SteelBlue")
+            self.points = [20, 0, 0, -20, 0, 20, -20, 0]
+            self.shape = self.batch.add_indexed(4, gl.GL_TRIANGLES, self.group, [0, 1, 2, 1, 2, 3],
+                                                ('v2i', self.points), ('c4B', 4 * (*self.color, self.opacity)))
 
         # Move the point of interest to its position
         position_matrix = matrix44.create_from_translation([x, y, 0]).astype('float64')
@@ -68,30 +76,18 @@ class PointOfInterest:
     def set_color(self, color_name=None):
         """ Set the color or reset it to its default value """
         if color_name is None:
-            if self.type == EXPERIENCE_PLACE:
-                self.shape.colors[0:12] = 3 * (*name_to_rgb("LightGreen"), self.opacity)
-            if self.type == EXPERIENCE_ALIGNED_ECHO:
-                self.shape.color = name_to_rgb("orange")
-            if self.type == EXPERIENCE_LOCAL_ECHO:
-                self.shape.color = name_to_rgb("sienna")
-            if self.type == EXPERIENCE_CENTRAL_ECHO:
-                self.shape.color = name_to_rgb("sienna")
-            if self.type == EXPERIENCE_FLOOR:
-                self.shape.color = name_to_rgb("black")
-                self.shape.colors[0:16] = 4 * (*name_to_rgb("black"), self.opacity)
-            if self.type == EXPERIENCE_IMPACT:
-                self.shape.color = name_to_rgb("red")
-                self.shape.colors[0:12] = 3 * (*name_to_rgb("red"), self.opacity)
-            if self.type == EXPERIENCE_BLOCK:
-                self.shape.colors[0:12] = 3 * (*name_to_rgb("salmon"), self.opacity)
+            if self.type in [EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_LOCAL_ECHO, EXPERIENCE_CENTRAL_ECHO]:
+                self.shape.color = self.color
+            if self.type == [EXPERIENCE_PLACE, EXPERIENCE_IMPACT, EXPERIENCE_BLOCK]:
+                self.shape.colors[0:12] = 3 * (*self.color, self.opacity)
+            if self.type == [EXPERIENCE_FLOOR, POINT_COMPASS, POINT_AZIMUTH]:
+                self.shape.colors[0:16] = 4 * (*self.color, self.opacity)
             if self.type == EXPERIENCE_FOCUS:
-                self.shape.colors[0:24] = 6 * (*name_to_rgb("fireBrick"), self.opacity)
-            if self.type == POINT_COMPASS:
-                self.shape.colors[0:16] = 4 * (*name_to_rgb("RoyalBlue"), self.opacity)
+                self.shape.colors[0:24] = 6 * (*self.color, self.opacity)
         else:
             if self.type in [EXPERIENCE_PLACE, EXPERIENCE_IMPACT, EXPERIENCE_BLOCK]:
                 self.shape.colors[0:12] = 3 * (*name_to_rgb(color_name), self.opacity)
-            if self.type in [EXPERIENCE_FLOOR, POINT_COMPASS]:
+            if self.type in [EXPERIENCE_FLOOR, POINT_COMPASS, POINT_AZIMUTH]:
                 self.shape.colors[0:16] = 4 * (*name_to_rgb(color_name), self.opacity)
             elif self.type == EXPERIENCE_FOCUS:
                 self.shape.colors[0:24] = 6 * (*name_to_rgb(color_name), self.opacity)

@@ -31,15 +31,15 @@ if ROBOT_ID == 1:
 
 # Robot 2 in ROOM A327.
 if ROBOT_ID == 2:
-    COMPASS_X_OFFSET = 0  # The offset is configured in the C++ code.
+    COMPASS_X_OFFSET = 0    # X offset can also be added into the C++ code.
     COMPASS_Y_OFFSET = 0
-    FORWARD_SPEED = 230  # (mm/s) Forward translation speed.
-    LATERAL_SPEED = 140  # (mm/s) Lateral translation speed.
+    FORWARD_SPEED = 230     # (mm/s) Forward translation speed.
+    LATERAL_SPEED = 140     # (mm/s) Lateral translation speed.
 
 # Robot 4 chezOlivier
 if ROBOT_ID == 4:
-    COMPASS_X_OFFSET = -55
-    COMPASS_Y_OFFSET = 43
+    COMPASS_X_OFFSET = 0    # (Compass unit) X offset of the compass measure
+    COMPASS_Y_OFFSET = 0    # (Compass unit) Y offset of the compass measrue
     FORWARD_SPEED = 120     # (mm/s) Forward translation speed.
     RETREAT_DISTANCE = 70   # (mm) Distance of the line after retreat
 

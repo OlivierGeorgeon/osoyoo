@@ -73,7 +73,7 @@ class Integrator:
         # cells_changed += self.synthesize([elem for elem in focus_experiences if elem.type == EXPERIENCE_FOCUS])
 
         # Display the validated phenomena in the grid
-        self.apply_status_phenomena_to_cells()
+        self.attach_phenomena_to_cells()
 
         return action_to_return
 
@@ -92,12 +92,11 @@ class Integrator:
             self.allocentric_memory.apply_status_to_cell(cell_x, cell_y, experience.type)
         return cells_treated
 
-    def apply_status_phenomena_to_cells(self):
-        """Mark the phenomena in the cells of allocentric memory"""
-        for validated_phenomenon in self.phenomena:
-            cell_i, cell_j = self.allocentric_memory.convert_pos_in_cell(validated_phenomenon.center[0],
-                                                                         validated_phenomenon.center[1])
-            self.allocentric_memory.apply_status_to_cell(cell_i, cell_j, CELL_PHENOMENON)
+    def attach_phenomena_to_cells(self):
+        """Allocate the phenomena to the cells of allocentric memory"""
+        for p in self.phenomena:
+            cell_i, cell_j = self.allocentric_memory.convert_pos_in_cell(p.center[0], p.center[1])
+            self.allocentric_memory.grid[cell_i][cell_j].allocate_phenomenon(p)
 
     def try_and_add(self, experiences):
         """Attach the experiences to existing phenomena if possible.

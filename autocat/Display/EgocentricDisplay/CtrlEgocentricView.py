@@ -69,8 +69,7 @@ class CtrlEgocentricView:
         self.view.azimuth = self.workspace.memory.body_memory.body_azimuth()
 
     def update_points_of_interest(self):
-        """Retrieve all new interactions from the memory, create corresponding points of interest
-        then update the shape of each POI"""
+        """Retrieve all new experiences from the memory, create and update the corresponding points of interest"""
 
         # If timeout then no egocentric view update
         if self.workspace.enacted_interaction['status'] == "T":
@@ -79,10 +78,10 @@ class CtrlEgocentricView:
 
         # Create the new points of interest from the new experiences
         new_experiences = [elem for elem in self.egocentric_memory.experiences if elem.id > self.last_used_id]
-        for interaction in new_experiences:
-            if interaction.id > self.last_used_id:
-                self.last_used_id = max(interaction.id, self.last_used_id)
-            poi = self.create_point_of_interest(interaction)
+        for e in new_experiences:
+            if e.id > self.last_used_id:
+                self.last_used_id = max(e.id, self.last_used_id)
+            poi = self.create_point_of_interest(e)
             self.points_of_interest.append(poi)
 
         displacement_matrix = self.workspace.enacted_interaction['displacement_matrix'] \
@@ -107,20 +106,6 @@ class CtrlEgocentricView:
         # if len(self.points_of_interest) > 0:
         for poi_fade in self.points_of_interest:
             poi_fade.fade()
-                # if poi_fade is not None and poi_fade.experience is not None:
-                #
-                #     if isinstance(poi_fade.shape, pyglet.graphics.vertexdomain.IndexedVertexList):
-                #         for s in poi_fade.shape.colors:
-                #             #print("sssddfsfsf " ,s)
-                #             #s.opacity = poi.interaction.durability * 10
-                #             #print("opacity : ",s.opacity)
-                #             # TODO : CHANGE OPACITY OF VERTEX LIST
-                #             ''
-                #     else:
-                #         poi_fade.shape.opacity = min(poi_fade.experience.actual_durability * (255 / poi_fade.experience.durability), 255)
-                #     if poi_fade.experience.actual_durability <= 0:
-                #         poi_fade.delete()
-                #         self.points_of_interest.remove(poi_fade)
 
     def create_poi_focus(self):
         """Create a point of interest corresponding to the focus"""

@@ -41,8 +41,8 @@
 #define TURN_SPOT_MAX_DURATION 2400
 #define TURN_SPOT_ENDING_DELAY 200  // Rotation speed is about 1° per 10ms
 #define TURN_SPOT_ENDING_ANGLE 10
-#define COMPASS_X_OFFSET 1435
-#define COMPASS_Y_OFFSET -1645
+#define COMPASS_X_OFFSET 1431  //  1435
+#define COMPASS_Y_OFFSET -1601 // -1645
 #define ACCELERATION_X_OFFSET 550 //
 #define ACCELERATION_SHOCK_THRESHOLD -400 // Below the threshold it is a strong deceleration = shock
 #define ACCELERATION_BLOCK_THRESHOLD 60 // Below the threshold, the robot is blocked
@@ -81,8 +81,8 @@
 #define TURN_SPOT_MAX_DURATION 2400
 #define TURN_SPOT_ENDING_DELAY 200
 #define TURN_SPOT_ENDING_ANGLE 3
-#define COMPASS_X_OFFSET 1060 // 1020
-#define COMPASS_Y_OFFSET -1290 // -1300
+#define COMPASS_X_OFFSET 1005  //  1020,  1060
+#define COMPASS_Y_OFFSET -1247 // -1300, -1290
 #define ACCELERATION_X_OFFSET 35
 #define ACCELERATION_SHOCK_THRESHOLD -200 // TODO set this value
 #define ACCELERATION_BLOCK_THRESHOLD 30 // TODO set this value

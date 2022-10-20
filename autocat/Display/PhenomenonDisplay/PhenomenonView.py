@@ -1,7 +1,7 @@
 import pyglet
 from pyglet.gl import *
+from pyglet.math import Mat4
 import math
-# import numpy
 from pyrr import matrix44
 from ..EgocentricDisplay.OsoyooCar import OsoyooCar
 from ..InteractiveDisplay import InteractiveDisplay
@@ -9,16 +9,16 @@ from ..InteractiveDisplay import InteractiveDisplay
 ZOOM_IN_FACTOR = 1.2
 
 
-class BodyView(InteractiveDisplay):
-    """Display the information in body memory"""
+class PhenomenonView(InteractiveDisplay):
+    """Display a phenomenon"""
     def __init__(self, width=350, height=350, *args, **kwargs):
         super().__init__(width, height, resizable=True, *args, **kwargs)
-        self.set_caption("Body Memory")
+        self.set_caption("Phenomenon View")
         self.set_minimum_size(150, 150)
 
         # Initialize OpenGL parameters
         # https://www.w3schools.com/cssref/css_colors.asp
-        glClearColor(255./256., 235.0/256., 205.0/256., 1.0)
+        glClearColor(1.0, 1.0, 1.0, 1.0)
         pyglet.gl.glEnable(pyglet.gl.GL_BLEND)
         self.batch = pyglet.graphics.Batch()
         self.background = pyglet.graphics.OrderedGroup(0)
@@ -29,7 +29,8 @@ class BodyView(InteractiveDisplay):
         self.robot_batch = pyglet.graphics.Batch()
         self.robot = OsoyooCar(self.robot_batch, self.background)
         self.azimuth = 0  # Degree from north [0, 360]
-        self.body_rotation_matrix = matrix44.create_identity()  # The matrix representing the robot's body rotation
+        self.robot_pos_x = 0
+        self.robot_pos_y = 0
 
         # Define the text area at the bottom of the view
         self.label = pyglet.text.Label('', font_name='Verdana', font_size=10, x=10, y=10)
@@ -46,11 +47,15 @@ class BodyView(InteractiveDisplay):
         glOrtho(-self.width * self.zoom_level, self.width * self.zoom_level, -self.height * self.zoom_level,
                 self.height * self.zoom_level, 1, -1)
 
-        # Stack the rotation of the robot body
-        glRotatef(90 - self.azimuth, 0.0, 0.0, 1.0)
-        # Draw compass points
+        # Draw the phenomenon
         self.batch.draw()
+
+        # Stack the rotation of the robot body
+        # glRotatef(90 - self.azimuth, 0.0, 0.0, 1.0)
+
         # Draw the robot
+        glTranslatef(self.robot_pos_x, self.robot_pos_y, 0)
+        glRotatef(90 - self.azimuth, 0.0, 0.0, 1.0)
         self.robot_batch.draw()
 
         # Reset the projection to Identity to cancel the projection of the text
@@ -74,10 +79,11 @@ class BodyView(InteractiveDisplay):
 
 
 # Testing the EgocentricView by displaying the robot in a pretty position, and the mouse click coordinates
-# py -m autocat.Display.BodyDisplay.BodyView
+# py -m autocat.Display.PhenomenonDisplay.PhenomenonView
 if __name__ == "__main__":
-    view = BodyView()
-    view.robot.rotate_head(-45)  # Turn head 45° to the right
-    view.azimuth = 350           # Turn robot 10° to the left
+    view = PhenomenonView()
+    view.azimuth = 45
+    view.robot_pos_x = -150
+    view.robot_pos_y = -150
 
     pyglet.app.run()

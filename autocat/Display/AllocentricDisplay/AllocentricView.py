@@ -79,16 +79,15 @@ class AllocentricView(InteractiveDisplay):
                 self.height * self.zoom_level, 1, -1)
 
         # Stack the translation to center the grid in the widow
-        tx = -self.nb_cell_x * 30 * self.cell_radius / 20
-        ty = -self.nb_cell_y * 8.66 * self.cell_radius / 20
-        glTranslatef(tx, ty, 0)
+        tx = self.nb_cell_x * 30 * self.cell_radius / 20
+        ty = self.nb_cell_y * 8.66 * self.cell_radius / 20
+        glTranslatef(-tx, -ty, 0)
 
         # Draw the grid
         self.batch.draw()
 
         # Stack the transformation to position the robot
-        glTranslatef(-tx + self.memory.allocentric_memory.robot_pos_x, -ty + self.memory.allocentric_memory.robot_pos_y, 0)
-        # glTranslatef(-tx + 100, -ty + self.memory.allocentric_memory.robot_pos_y, 0)
+        glTranslatef(tx + self.memory.allocentric_memory.robot_pos_x, ty + self.memory.allocentric_memory.robot_pos_y, 0)
         glRotatef(90 - self.memory.body_memory.body_azimuth(), 0.0, 0.0, 1.0)
         # Draw the robot
         self.robot.rotate_head(self.memory.body_memory.head_direction_degree())
