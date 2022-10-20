@@ -65,6 +65,7 @@ class PointOfInterest:
                                                 ('v2i', self.points), ('c4B', 4 * (*self.color, self.opacity)))
         if self.type == POINT_AZIMUTH:
             self.color = name_to_rgb("SteelBlue")
+            # self.shape = shapes.Circle(0, 0, 20, color=self.color, batch=self.batch)
             self.points = [20, 0, 0, -20, 0, 20, -20, 0]
             self.shape = self.batch.add_indexed(4, gl.GL_TRIANGLES, self.group, [0, 1, 2, 1, 2, 3],
                                                 ('v2i', self.points), ('c4B', 4 * (*self.color, self.opacity)))
@@ -76,23 +77,29 @@ class PointOfInterest:
     def set_color(self, color_name=None):
         """ Set the color or reset it to its default value """
         if color_name is None:
-            if self.type in [EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_LOCAL_ECHO, EXPERIENCE_CENTRAL_ECHO]:
+            if hasattr(self.shape, 'vertices'):
+                nb_points = int(len(self.shape.vertices) / 2)
+                self.shape.colors[0: nb_points*4] = nb_points * (*self.color, self.opacity)
+            else:
                 self.shape.color = self.color
-            if self.type == [EXPERIENCE_PLACE, EXPERIENCE_IMPACT, EXPERIENCE_BLOCK]:
-                self.shape.colors[0:12] = 3 * (*self.color, self.opacity)
-            if self.type == [EXPERIENCE_FLOOR, POINT_COMPASS, POINT_AZIMUTH]:
-                self.shape.colors[0:16] = 4 * (*self.color, self.opacity)
-            if self.type == EXPERIENCE_FOCUS:
-                self.shape.colors[0:24] = 6 * (*self.color, self.opacity)
+            # if self.type == [EXPERIENCE_PLACE, EXPERIENCE_IMPACT, EXPERIENCE_BLOCK]:
+            #     self.shape.colors[0:12] = 3 * (*self.color, self.opacity)
+            # if self.type == [EXPERIENCE_FLOOR, POINT_COMPASS]:
+            #     self.shape.colors[0:16] = 4 * (*self.color, self.opacity)
+            # if self.type == EXPERIENCE_FOCUS:
+            #     self.shape.colors[0:24] = 6 * (*self.color, self.opacity)
         else:
-            if self.type in [EXPERIENCE_PLACE, EXPERIENCE_IMPACT, EXPERIENCE_BLOCK]:
-                self.shape.colors[0:12] = 3 * (*name_to_rgb(color_name), self.opacity)
-            if self.type in [EXPERIENCE_FLOOR, POINT_COMPASS, POINT_AZIMUTH]:
-                self.shape.colors[0:16] = 4 * (*name_to_rgb(color_name), self.opacity)
-            elif self.type == EXPERIENCE_FOCUS:
-                self.shape.colors[0:24] = 6 * (*name_to_rgb(color_name), self.opacity)
+            if hasattr(self.shape, 'vertices'):
+                nb_points = int(len(self.shape.vertices) / 2)
+                self.shape.colors[0: nb_points*4] = nb_points * (*name_to_rgb(color_name), self.opacity)
             else:
                 self.shape.color = name_to_rgb(color_name)
+            # if self.type in [EXPERIENCE_PLACE, EXPERIENCE_IMPACT, EXPERIENCE_BLOCK]:
+            #     self.shape.colors[0:12] = 3 * (*name_to_rgb(color_name), self.opacity)
+            # if self.type in [EXPERIENCE_FLOOR, POINT_COMPASS]:
+            #     self.shape.colors[0:16] = 4 * (*name_to_rgb(color_name), self.opacity)
+            # elif self.type == EXPERIENCE_FOCUS:
+            #     self.shape.colors[0:24] = 6 * (*name_to_rgb(color_name), self.opacity)
 
     def reset_position(self):
         """ Reset the position of the point of interest """

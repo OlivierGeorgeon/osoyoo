@@ -28,7 +28,7 @@ class BodyView(InteractiveDisplay):
         # Define the robot
         self.robot_batch = pyglet.graphics.Batch()
         self.robot = OsoyooCar(self.robot_batch, self.background)
-        self.azimuth = 0  # Degree from north [0, 360]
+        self.azimuth = 90  # Degree from north [0, 360] Initialized on the x axis
         self.body_rotation_matrix = matrix44.create_identity()  # The matrix representing the robot's body rotation
 
         # Define the text area at the bottom of the view

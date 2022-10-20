@@ -25,10 +25,7 @@ class CtrlRobot:
         self.robot_ip = robot_ip
         self.ctrl_workspace = ctrl_workspace
         self.wifiInterface = WifiInterface(robot_ip)
-        self.azimuth = 0  # Integrated from the yaw if the robot does not return compass data
-
-        # self.has_new_action_to_enact = False
-        # self.robot_has_finished_acting = False
+        # self.azimuth = 0  # Integrated from the yaw if the robot does not return compass data
 
         self.forward_speed = numpy.array([FORWARD_SPEED, 0])  # Need numpy arrays to compute average
         self.backward_speed = numpy.array([-FORWARD_SPEED, 0])
@@ -120,24 +117,24 @@ class CtrlRobot:
         else:
             enacted_interaction['yaw'] = yaw
 
-        # If the robot does not return the azimuth then sum it from the yaw
+        # If the robot does not return the azimuth then return 0. The azimuth will be computed by BodyMemory
         if 'azimuth' not in enacted_interaction:
-            self.azimuth -= yaw  # yaw is counterclockwise, azimuth is clockwise
-            enacted_interaction['azimuth'] = self.azimuth
+             # self.azimuth = 0  # yaw  # yaw is counterclockwise, azimuth is clockwise
+             enacted_interaction['azimuth'] = 0  # self.azimuth
 
         # If the robot returns compass_x and compass_y then recompute the azimuth
         if 'compass_x' in enacted_interaction:
             # Subtract the offset from robot_define.py
             enacted_interaction['compass_x'] -= COMPASS_X_OFFSET
             enacted_interaction['compass_y'] -= COMPASS_Y_OFFSET
-            self.azimuth = math.degrees(math.atan2(enacted_interaction['compass_y'], enacted_interaction['compass_x']))
+            azimuth = math.degrees(math.atan2(enacted_interaction['compass_y'], enacted_interaction['compass_x']))
             # The compass point indicates the south so we must rotate it of 180° to obtain the azimuth
-            self.azimuth += 180
-            if self.azimuth >= 360:
-                self.azimuth -= 360
+            azimuth += 180
+            if azimuth >= 360:
+                azimuth -= 360
             # Override the azimuth returned by the robot.
             # (They are equal unless COMPASS_X_OFFSET or COMPASS_X_OFFSET are non zero)
-            enacted_interaction['azimuth'] = int(self.azimuth)
+            enacted_interaction['azimuth'] = int(azimuth)
 
         # Interaction Floor line
         if enacted_interaction['floor'] > 0:
