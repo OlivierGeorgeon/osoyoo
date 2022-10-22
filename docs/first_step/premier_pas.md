@@ -45,15 +45,10 @@ Compiler le sketch `osoyoo_car_enacter.ino`.
 
 (Si erreur de compliation "Serial1 is undefined in this scope", alors vérifier que vous compilez bien pour la bonne carte)
 
-## Etape 3: L'initialisation du robot
+## Etape 3: La connexion au robot
 
-Téléverser le script principal `autocat_enacter.ino` (via l'IDE Arduino) dans le robot.
-
-## Etape 4: La connexion au robot
-
-Vous devez créer un fichier `arduino_secrets.h` qui contient les paramètres wifi du robot. 
-
-Placez-le dans le répartoire `autocat_enacter`, à coté du fichier `autocat_enacter.ino`.
+Copier le fichier `docs/first_step/arduino_secrets.h` dans le répertoire `autocat_enacter/`. 
+Modifiez le pour configurer votre wifi.
 
 Vous avez le choix entre deux modes de connexion:
 
@@ -75,19 +70,32 @@ Vous avez le choix entre deux modes de connexion:
 #define SECRET_WIFI_TYPE "AP"
 ```
 
+## Etape 4: Executer l'application autocat
+
+Téléverser le script principal `autocat_enacter.ino` (via l'IDE Arduino) dans le robot.
+
+Sur votre PC, exécuter `main.py`.
+
 ## Etape 5: Utiliser le robot
 
-Lancer le script python main.py.
-#### Commandes de éplacements et d'action : 
-    - Avancer = 8
-    - Reculer = 2
-    - Tourner a Gauche = 1
-    - Tourner a Droite = 3
-    - Arret = 5
-    - Avancer jusqu'a une ligne noir = 0
-    - Scan = '-'
+#### Appuyer sur les touches suivantes pour commander le robot : 
+    - Avancer: 8
+    - Reculer: 2
+    - Tourner a Gauche: 1
+    - Tourner a Droite: 3
+    - Arret: 5
+    - Scan: '-'
+    - Passage en mode automatique: A
+    - Passage en mode manuel: M
 
 ####  Interagir avec la fenêtre Egocentrique
     - Click: select an interaction
     - Insert: Insérer un phénomène
     - Suppr: Supprimer une interaction ou un phénomène
+
+## Etape 6: Réglez les paramètres de votre robot
+
+Configurer les paramètres de votre robot dans les fichiers 
+
+    - autocat-enacter/Robot_define.h
+    - autocat/Robot/RobotDefine.py

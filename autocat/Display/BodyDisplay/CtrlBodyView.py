@@ -1,4 +1,3 @@
-import pyglet
 from pyrr import matrix44
 import math
 from .BodyView import BodyView
@@ -16,11 +15,6 @@ class CtrlBodyView:
         self.mouse_press_y = 0
         self.mouse_press_angle = 0
         self.last_used_id = -1
-
-        # Set rotate_compass_points according to what you want to visualize:
-        #   False: to visualize the compass offset
-        #   True: To visualize the drift in the yaw
-        self.rotate_compass_points = True
 
         def on_text(text):
             """Handles user input"""
@@ -41,21 +35,18 @@ class CtrlBodyView:
         point_of_interest = PointOfInterest(x, y, self.view.batch, group, point_type, experience=None)
         self.points_of_interest.append(point_of_interest)
 
-    # def update_body_robot(self):
-    #     """Updates the robot's body to display in body view"""
-
     def update_body_view(self):
         """Add and update points of interest from the latest enacted interaction """
-
-        # Update the position of the robot
-        self.view.robot.rotate_head(self.workspace.memory.body_memory.head_direction_degree())
-        self.view.azimuth = self.workspace.memory.body_memory.body_azimuth()
-        self.view.body_rotation_matrix = self.workspace.memory.body_memory.body_direction_matrix()
 
         # If timeout then no body view update
         if self.workspace.enacted_interaction['status'] == "T":
             print("No body memory update")
             return
+
+        # Update the position of the robot
+        self.view.robot.rotate_head(self.workspace.memory.body_memory.head_direction_degree())
+        self.view.azimuth = self.workspace.memory.body_memory.body_azimuth()
+        self.view.body_rotation_matrix = self.workspace.memory.body_memory.body_direction_matrix()
 
         # Rotate the previous compass points so they remain at the south of the view
         yaw = self.workspace.enacted_interaction['yaw']

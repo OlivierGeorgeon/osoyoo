@@ -42,12 +42,12 @@ class CtrlPhenomenonView:
 
     def update_points_of_interest(self, phenomenon):
         """Retrieve all the experiences in a phenomenon and create the corresponding points of interest"""
-
         # Create the new points of interest from the new experiences
         for e in [elem for elem in phenomenon.experiences if elem.id > self.last_used_id]:
             if e.id > self.last_used_id:
                 self.last_used_id = max(e.id, self.last_used_id)
             poi = self.create_point_of_interest(e)
+            print("create POI")
             self.points_of_interest.append(poi)
 
     def create_poi_focus(self):

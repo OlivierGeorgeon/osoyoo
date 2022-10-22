@@ -78,7 +78,7 @@ class PhenomenonView(InteractiveDisplay):
         self.label.text = "Click: x:" + str(int(v[0])) + ", y:" + str(int(v[1])) + ", angle:" + str(t) + "°"
 
 
-# Testing the EgocentricView by displaying the robot in a pretty position, and the mouse click coordinates
+# Testing the Phenomenon View by displaying the robot in a pretty position
 # py -m autocat.Display.PhenomenonDisplay.PhenomenonView
 if __name__ == "__main__":
     view = PhenomenonView()

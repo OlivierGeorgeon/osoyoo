@@ -11,15 +11,22 @@ to generate life-like behaviors.
 ├── autocat         # The python application
 ├── autocat_enacter # The arduino application
 ├── docs            # Documentation
-├── main.py         # Run this program             
+├── main.py         # Run this program on your PC            
 └── README.md       # This file. Read it all!
 ```
 
 ## Getting started
 
-* Download the autocat_enacter.ino file to the robot
-* Check the robot's ip address in the arduino ide terminal
-* Run the autocat python application on your desktop, with the robot's IP adress as an argument
+* Move file `docs/first_step/arduino_secrets.h` into folder `autocat_enacter/` and specify your wifi parameters in it. 
+* Download file `autocat_enacter.ino` to the robot using the arduino IDE.
+* Read the robot's IP address in the arduino IDE terminal.
+* Run the python application (`main.py`) on your desktop, providing the robot's IP adress as an argument.
+
+## Tuning
+
+Specify the parameters of your robot in the files: 
+* `autocat_enacter/Robot_define.h` 
+* `autocat/Robot/RobotDefine.py`
 
 ## More information 
 

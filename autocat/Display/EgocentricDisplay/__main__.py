@@ -2,31 +2,32 @@ import pyglet
 from .CtrlEgocentricView import CtrlEgocentricView
 from .PointOfInterest import *
 from ...Workspace import Workspace
+from ...Memory.EgocentricMemory.Experience import Experience, EXPERIENCE_FLOOR
 
 
 # Displaying EgocentricView with points of interest.
 # Allow selecting points of interest and inserting and deleting phenomena
 # py -m autocat.Display.EgocentricDisplay
-if __name__ == "__main__":
-    # memory = EgocentricMemory()
-    _workspace = Workspace()
-    view_controller = CtrlEgocentricView(_workspace)
-    view_controller.view.robot.rotate_head(-45)
+workspace = Workspace()
+controller = CtrlEgocentricView(workspace)
 
-    # Add points of interest directly to the view_controller
-    view_controller.add_point_of_interest(150, 0, EXPERIENCE_FLOOR)
-    view_controller.add_point_of_interest(300, -300, EXPERIENCE_ALIGNED_ECHO)
+# The body position in body memory
+workspace.memory.body_memory.set_head_direction_degree(-45)
+controller.update_body_robot()
 
-    # Add points of interest to the memory
-    # view_controller.memory.add((0, 1, 0, 0, 0, 0))
+# Add experiences
+experience1 = Experience(150, 0, EXPERIENCE_FLOOR, experience_id=0)
+experience2 = Experience(300, -300, EXPERIENCE_ALIGNED_ECHO, experience_id=1)
+controller.create_point_of_interest(experience1)
+controller.create_point_of_interest(experience2)
 
-    # Update the list of points of interest from memory
-    last_used_id = -1
-    _interactions_list = [elem for elem in view_controller.egocentric_memory.experiences if elem.id > last_used_id]
-    for _interaction in _interactions_list:
-        if _interaction.id > last_used_id:
-            last_used_id = max(_interaction.id, last_used_id)
-        _poi = view_controller.create_point_of_interest(_interaction)
-        view_controller.points_of_interest.append(_poi)
+# Update the list of points of interest from memory
+# last_used_id = -1
+# experiences = [elem for elem in controller.egocentric_memory.experiences if elem.id > last_used_id]
+# for experience in experiences:
+#     if experience.id > last_used_id:
+#         last_used_id = max(experience.id, last_used_id)
+#     _poi = controller.create_point_of_interest(experience)
+#     controller.points_of_interest.append(_poi)
 
-    pyglet.app.run()
+pyglet.app.run()
