@@ -1,12 +1,13 @@
 import pyglet
 from pyglet.window import key
+from pyrr import matrix44
 from .PhenomenonView import PhenomenonView
-from ..EgocentricDisplay.PointOfInterest import PointOfInterest, POINT_COMPASS
-from ...Memory.EgocentricMemory.Experience import EXPERIENCE_FOCUS, EXPERIENCE_PLACE
+from ..EgocentricDisplay.PointOfInterest import PointOfInterest
+from ...Memory.EgocentricMemory.Experience import EXPERIENCE_FOCUS, EXPERIENCE_PLACE, EXPERIENCE_ALIGNED_ECHO
 
 
 class CtrlPhenomenonView:
-    """Handle the logic of the egocentric view, retrieve data from the memory and convert it
+    """Handle the logic of the phenomenon view, retrieve data from the phenomenon and convert it
     to points of interest that can be displayed in a pyglet window"""
     def __init__(self, workspace):
         self.view = PhenomenonView()
@@ -43,10 +44,10 @@ class CtrlPhenomenonView:
     def update_points_of_interest(self, phenomenon):
         """Retrieve all the experiences in a phenomenon and create the corresponding points of interest"""
         # Create the new points of interest from the new experiences
-        for e in [elem for elem in phenomenon.experiences if elem.id > self.last_used_id]:
-            if e.id > self.last_used_id:
-                self.last_used_id = max(e.id, self.last_used_id)
-            poi = self.create_point_of_interest(e)
+        for a in [elem for elem in phenomenon.affordances if elem.experience.id > self.last_used_id]:
+            if a.experience.id > self.last_used_id:
+                self.last_used_id = max(a.experience.id, self.last_used_id)
+            poi = self.create_point_of_interest(a)
             print("create POI")
             self.points_of_interest.append(poi)
 
@@ -60,13 +61,19 @@ class CtrlPhenomenonView:
                 output = PointOfInterest(x, y, self.view.robot_batch, self.view.foreground, EXPERIENCE_FOCUS)
         return output
 
-    def create_point_of_interest(self, experience):
+    def create_point_of_interest(self, affordance):
         """Create a point of interest corresponding to the experience given as parameter"""
-        return PointOfInterest(experience.x, experience.y, self.view.batch, self.view.foreground,
-                               experience.type, experience=experience)
+        # x, y = 0, 0  # The position relative to the phenomenon center
+        # x, y, _ = matrix44.apply_to_vector(affordance.position_matrix, [0, 0, 0])
+        poi = PointOfInterest(affordance.x, affordance.y, self.view.batch, self.view.foreground, affordance.experience.type, experience=affordance.experience)
+        # poi.displace(affordance.experience.position_matrix)
+        # the position of the sensor
+        if affordance.experience.type == EXPERIENCE_ALIGNED_ECHO:
+            poi_sensor = PointOfInterest(affordance.experience.sensor_x, affordance.experience.sensor_y, self.view.batch, self.view.foreground, EXPERIENCE_PLACE, experience=affordance.experience)
+        return poi
 
     def main(self, dt):
-        """Called every frame. Update the egocentric view"""
+        """Called every frame. Update the phenomenon view"""
         if self.workspace.flag_for_view_refresh:
             self.update_points_of_interest()
             self.update_body_robot()

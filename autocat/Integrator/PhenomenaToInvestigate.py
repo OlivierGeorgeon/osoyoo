@@ -28,6 +28,7 @@ class PhenomenaToInvestigate:
             else:
                 clustered = False
                 for new_phenomenon in new_phenomena:
+                    # TODO compute the position matrix relative to the phenomenon position
                     if new_phenomenon.try_and_add(experience, position_matrix):
                         clustered = True
                         break

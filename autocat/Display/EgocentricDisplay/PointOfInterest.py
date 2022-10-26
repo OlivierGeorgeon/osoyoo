@@ -1,8 +1,9 @@
+import math
 from pyglet import shapes, gl
 from webcolors import name_to_rgb
 from autocat.Memory.EgocentricMemory.Experience import *
 
-# Points of interest that only exist in Egocentric Display
+# Points of interest that only exist in Body Display
 # (points of interest attached to an interaction have the same type as their interactions)
 POINT_COMPASS = 'Compass'
 POINT_AZIMUTH = 'Azimuth'
@@ -22,7 +23,6 @@ class PointOfInterest:
         self.is_selected = False
 
         if self.type == EXPERIENCE_PLACE:
-            # Place: LightGreen triangle
             self.points = [30, 0, -20, -20, -20, 20]
             self.color = name_to_rgb("LightGreen")
             self.shape = self.batch.add_indexed(3, gl.GL_TRIANGLES, self.group, [0, 1, 2], ('v2i', self.points),
@@ -42,7 +42,7 @@ class PointOfInterest:
             self.color = name_to_rgb("black")
             self.points = [-5, -30, -5, 30, 5, 30, 5, -30]
             self.shape = self.batch.add_indexed(4, gl.GL_TRIANGLES, self.group, [0, 1, 2, 0, 2, 3],
-                                        ('v2i', self.points), ('c4B', 4 * (*self.color, self.opacity)))
+                                                ('v2i', self.points), ('c4B', 4 * (*self.color, self.opacity)))
         if self.type == EXPERIENCE_IMPACT:
             self.color = name_to_rgb("red")
             self.points = [0, 0, 40, -30, 40, 30]
@@ -65,7 +65,6 @@ class PointOfInterest:
                                                 ('v2i', self.points), ('c4B', 4 * (*self.color, self.opacity)))
         if self.type == POINT_AZIMUTH:
             self.color = name_to_rgb("SteelBlue")
-            # self.shape = shapes.Circle(0, 0, 20, color=self.color, batch=self.batch)
             self.points = [20, 0, 0, -20, 0, 20, -20, 0]
             self.shape = self.batch.add_indexed(4, gl.GL_TRIANGLES, self.group, [0, 1, 2, 1, 2, 3],
                                                 ('v2i', self.points), ('c4B', 4 * (*self.color, self.opacity)))
@@ -82,24 +81,12 @@ class PointOfInterest:
                 self.shape.colors[0: nb_points*4] = nb_points * (*self.color, self.opacity)
             else:
                 self.shape.color = self.color
-            # if self.type == [EXPERIENCE_PLACE, EXPERIENCE_IMPACT, EXPERIENCE_BLOCK]:
-            #     self.shape.colors[0:12] = 3 * (*self.color, self.opacity)
-            # if self.type == [EXPERIENCE_FLOOR, POINT_COMPASS]:
-            #     self.shape.colors[0:16] = 4 * (*self.color, self.opacity)
-            # if self.type == EXPERIENCE_FOCUS:
-            #     self.shape.colors[0:24] = 6 * (*self.color, self.opacity)
         else:
             if hasattr(self.shape, 'vertices'):
                 nb_points = int(len(self.shape.vertices) / 2)
                 self.shape.colors[0: nb_points*4] = nb_points * (*name_to_rgb(color_name), self.opacity)
             else:
                 self.shape.color = name_to_rgb(color_name)
-            # if self.type in [EXPERIENCE_PLACE, EXPERIENCE_IMPACT, EXPERIENCE_BLOCK]:
-            #     self.shape.colors[0:12] = 3 * (*name_to_rgb(color_name), self.opacity)
-            # if self.type in [EXPERIENCE_FLOOR, POINT_COMPASS]:
-            #     self.shape.colors[0:16] = 4 * (*name_to_rgb(color_name), self.opacity)
-            # elif self.type == EXPERIENCE_FOCUS:
-            #     self.shape.colors[0:24] = 6 * (*name_to_rgb(color_name), self.opacity)
 
     def reset_position(self):
         """ Reset the position of the point of interest """
@@ -117,28 +104,29 @@ class PointOfInterest:
         self.x, self.y = v[0], v[1]
 
         # If the shape has a list of vertices (POINT PLACE)
+        # then apply the displacement matrix to each point. This will rotate the shape
         if hasattr(self.shape, 'vertices'):
             for i in range(0, len(self.shape.vertices)-1, 2):
                 v = matrix44.apply_to_vector(displacement_matrix, [self.shape.vertices[i], self.shape.vertices[i+1], 0])
                 self.shape.vertices[i], self.shape.vertices[i+1] = int(v[0]), int(v[1])
             return
 
-        # Other points of interest have x and y (Circles)
+        # Points of interest that use pyglet shapes have x and y (Circles)
         self.shape.x, self.shape.y = self.x, self.y
 
-        # Rotate the shapes
-        if self.type == EXPERIENCE_FLOOR:  # Rotate the rectangle
+        # Rotate the pyglet shapes (rectangles)
+        if self.type == EXPERIENCE_FLOOR:
             q = Quaternion(displacement_matrix)
             if q.axis[2] > 0:  # Rotate around z axis upwards
                 self.shape.rotation += math.degrees(q.angle)
             else:  # Rotate around z axis downward
                 self.shape.rotation += math.degrees(-q.angle)
-        if self.type == EXPERIENCE_BLOCK or self.type == EXPERIENCE_IMPACT:
-            # Rotate and translate the other points of the triangle
-            v = matrix44.apply_to_vector(displacement_matrix, [self.shape.x2, self.shape.y2, 0])
-            self.shape.x2, self.shape.y2 = v[0], v[1]
-            v = matrix44.apply_to_vector(displacement_matrix, [self.shape.x3, self.shape.y3, 0])
-            self.shape.x3, self.shape.y3 = v[0], v[1]
+        # if self.type == EXPERIENCE_BLOCK or self.type == EXPERIENCE_IMPACT:
+        #     # Rotate and translate the other points of the triangle
+        #     v = matrix44.apply_to_vector(displacement_matrix, [self.shape.x2, self.shape.y2, 0])
+        #     self.shape.x2, self.shape.y2 = v[0], v[1]
+        #     v = matrix44.apply_to_vector(displacement_matrix, [self.shape.x3, self.shape.y3, 0])
+        #     self.shape.x3, self.shape.y3 = v[0], v[1]
 
     def delete(self):
         """ Delete the shape to remove it from the batch """
@@ -146,7 +134,6 @@ class PointOfInterest:
 
     def select_if_near(self, x, y):
         """ If the point is near the x y coordinate, select this point and return True """
-        # is_near = math.dist([x, y], [self.x, self.y]) < 20
         if math.dist([x, y], [self.x, self.y]) < 20:
             self.set_color('red')
             self.is_selected = True
@@ -160,10 +147,11 @@ class PointOfInterest:
 
         # If this point of interest has an experience, the displacement matrix comes from this experience
         if self.experience is not None:
-            self.reset_position()
-            displacement_matrix = self.experience.position_matrix
+            self.reset_position()  # Reset the points to their origin position
+            displacement_matrix = self.experience.position_matrix  # Move the points to the position of the experience
 
         # if displacement_matrix is not None:
+        # the apply a relative displacement
         self.displace(displacement_matrix)
 
     def fade(self):
