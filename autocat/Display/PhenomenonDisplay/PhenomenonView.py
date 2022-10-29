@@ -1,6 +1,7 @@
 import pyglet
 from pyglet.gl import *
 from pyglet.math import Mat4
+from webcolors import name_to_rgb
 import math
 from pyrr import matrix44
 from ..EgocentricDisplay.OsoyooCar import OsoyooCar
@@ -70,12 +71,17 @@ class PhenomenonView(InteractiveDisplay):
         window_press_x = (x - self.width / 2) * self.zoom_level * 2
         window_press_y = (y - self.height / 2) * self.zoom_level * 2
 
-        # Rotate the click point by the opposite rotation of the robot
-        # Use the transposed of the robot's body rotation matrix
-        v = matrix44.apply_to_vector(self.body_rotation_matrix.T, [window_press_x, window_press_y, 0])
-        t = int(math.degrees(math.atan2(v[1], v[0])))
+        self.label.text = "Click: x:" + str(int(window_press_x)) + ", y:" + str(int(window_press_y))
 
-        self.label.text = "Click: x:" + str(int(v[0])) + ", y:" + str(int(v[1])) + ", angle:" + str(t) + "°"
+    def add_polygon(self, points, color_string):
+        """Add a polygon to the background of the view"""
+        nb_points = int(len(points) / 2)
+        nb_index = (nb_points-2) * 3
+        v_index = [0, 1, 2, 0, 2, 3, 0, 3, 4, 0, 4, 5][0:nb_index]
+        color = name_to_rgb(color_string)
+        opacity = 255
+        self.batch.add_indexed(3, gl.GL_TRIANGLES, self.background, v_index, ('v2i', points),
+                               ('c4B', nb_points * (*color, opacity)))
 
 
 # Testing the Phenomenon View by displaying the robot in a pretty position

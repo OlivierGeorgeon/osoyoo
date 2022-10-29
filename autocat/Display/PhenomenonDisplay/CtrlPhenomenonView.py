@@ -1,5 +1,3 @@
-import pyglet
-from pyglet.window import key
 from pyrr import matrix44
 from .PhenomenonView import PhenomenonView
 from ..EgocentricDisplay.PointOfInterest import PointOfInterest
@@ -43,12 +41,10 @@ class CtrlPhenomenonView:
 
     def update_points_of_interest(self, phenomenon):
         """Retrieve all the experiences in a phenomenon and create the corresponding points of interest"""
-        # Create the new points of interest from the new experiences
         for a in [elem for elem in phenomenon.affordances if elem.experience.id > self.last_used_id]:
             if a.experience.id > self.last_used_id:
                 self.last_used_id = max(a.experience.id, self.last_used_id)
             poi = self.create_point_of_interest(a)
-            print("create POI")
             self.points_of_interest.append(poi)
 
     def create_poi_focus(self):
@@ -63,13 +59,15 @@ class CtrlPhenomenonView:
 
     def create_point_of_interest(self, affordance):
         """Create a point of interest corresponding to the experience given as parameter"""
-        # x, y = 0, 0  # The position relative to the phenomenon center
-        # x, y, _ = matrix44.apply_to_vector(affordance.position_matrix, [0, 0, 0])
-        poi = PointOfInterest(affordance.x, affordance.y, self.view.batch, self.view.foreground, affordance.experience.type, experience=affordance.experience)
-        # poi.displace(affordance.experience.position_matrix)
-        # the position of the sensor
-        if affordance.experience.type == EXPERIENCE_ALIGNED_ECHO:
-            poi_sensor = PointOfInterest(affordance.experience.sensor_x, affordance.experience.sensor_y, self.view.batch, self.view.foreground, EXPERIENCE_PLACE, experience=affordance.experience)
+        x, y, _ = matrix44.apply_to_vector(affordance.position_matrix, [0., 0., 0.])
+        poi = PointOfInterest(x, y, self.view.batch, self.view.foreground, affordance.experience.type,
+                              experience=affordance.experience)
+
+        # Show the position of the sensor
+        points = affordance.sensor_triangle()
+        if points is not None:
+            self.view.add_polygon(points, "Bisque")
+
         return poi
 
     def main(self, dt):

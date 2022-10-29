@@ -12,7 +12,7 @@ class Phenomenon:
             position_matrix: the matrix to place the phenomenon in allocentric memory
             acceptable_delta: the acceptable delta between the allocentric coordinates of a new echo interaction
             and the center of the object phenomenon"""
-        self.experiences = [echo_experience]
+        # self.experiences = [echo_experience]
         self.position_matrix = position_matrix
 
         # Record the first affordance of the phenomenon
@@ -22,7 +22,7 @@ class Phenomenon:
 
         # The coordinates of this phenomenon in allocentric memory
         x, y, _ = matrix44.apply_to_vector(self.position_matrix, [0, 0, 0])
-        self.allo_coordinates = [(x, y)]
+        # self.allo_coordinates = [(x, y)]
         self.center = [x, y]
 
         self.has_been_validated = False
@@ -30,12 +30,13 @@ class Phenomenon:
 
     def add_affordance(self, x, y, experience):
         """Add an affordance made from this experience at this position"""
-        self.experiences.append(experience)
-        self.allo_coordinates.append((x, y))
+        # self.experiences.append(experience)
+        # self.allo_coordinates.append((x, y))
         self.affordances.append(Affordance(x, y, experience))
 
         if not self.has_been_validated:
-            self.compute_center()
+            pass
+            # self.compute_center()
 
     def compute_center(self):
         """Compute the center of the object phenomenon"""
@@ -48,7 +49,6 @@ class Phenomenon:
             sum_y += allo_coord[1]
             i += 1
         self.center = (int(sum_x/i), int(sum_y/i))
-        # self.cell_i, self.cell_j = self.hexa_memory.convert_pos_in_cell(self.center[0], self.center[1])
 
     def try_and_add(self, experience, position_matrix):
         """Test if the echo interaction is in the acceptable delta of the center of the phenomenon,
@@ -66,6 +66,6 @@ class Phenomenon:
     def try_to_validate(self, number_of_echos_needed):
         """Try to validate the phenomenon, i.e. consider this phenomenon as valid.
         To do so, the number of echo interactions needed to be added must be reached"""
-        if len(self.experiences) >= number_of_echos_needed:
+        if len(self.affordances) >= number_of_echos_needed:
             self.has_been_validated = True
         return self.has_been_validated

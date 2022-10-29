@@ -36,7 +36,7 @@ class Experience:
         orientation_matrix = matrix44.create_from_z_rotation(-direction_rad)  # opposite azimuth
         # Apply the opposite azimuth to the opposite position to find the position of the sensor relative to the exp.
         self.sensor_matrix = matrix44.multiply(opposite_translation_matrix, orientation_matrix)
-        self.sensor_x, self.sensor_y, _ = matrix44.apply_to_vector(self.sensor_matrix, [0, 0, 0])
+        # self.sensor_x, self.sensor_y, _ = matrix44.apply_to_vector(self.sensor_matrix, [0, 0, 0])
 
         self.durability = durability
         self.actual_durability = durability
