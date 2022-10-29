@@ -18,19 +18,21 @@ class Workspace:
         """Constructor"""
         self.agent = AgentCircle()
         self.memory = Memory()
-        self.synthesizer = Integrator(self)  # Moved from workspace by OG 04/09/2022
+        self.integrator = Integrator(self)  # Moved from workspace by OG 04/09/2022
 
         self.intended_interaction = None
         self.enacted_interaction = {}
 
         self.decider_mode = CONTROL_MODE_MANUAL
-        self.trust_mode = TRUST_POSITION_ROBOT
+        self.trust_mode = TRUST_POSITION_PHENOMENON
         self.robot_ready = True
         self.flag_for_need_of_action = True
         self.has_new_action = False
         self.has_new_enacted_interaction = False
         self.has_new_outcome_been_treated = True
         self.flag_for_view_refresh = False
+
+        self.ctrl_phenomenon_view = None
 
     def main(self, dt):
         """1) If a new enacted_interaction has been received
@@ -53,7 +55,7 @@ class Workspace:
             self.flag_for_view_refresh = True
 
             # Call the synthesizer. Could return an action (not used)
-            synthesizer_action = self.synthesizer.integrate()
+            synthesizer_action = self.integrator.integrate()
 
             self.memory.allocentric_memory.place_robot(self.memory.body_memory)
 
@@ -70,8 +72,8 @@ class Workspace:
             self.robot_ready = False
             self.has_new_outcome_been_treated = False
             self.intended_interaction = self.agent.propose_intended_interaction(self.enacted_interaction)
-            self.synthesizer.last_action_had_focus = 'focus_x' in self.intended_interaction
-            self.synthesizer.last_action = self.intended_interaction
+            self.integrator.last_action_had_focus = 'focus_x' in self.intended_interaction
+            self.integrator.last_action = self.intended_interaction
             self.has_new_action = True
             
     def get_intended_interaction(self):
@@ -82,7 +84,7 @@ class Workspace:
         if self.has_new_action:
             self.has_new_action = False
             if 'focus_x' in self.intended_interaction:
-                self.synthesizer.last_action_had_focus = True
+                self.integrator.last_action_had_focus = True
             # returno = True, self.intended_interaction
             returno = self.intended_interaction
             self.intended_interaction = None

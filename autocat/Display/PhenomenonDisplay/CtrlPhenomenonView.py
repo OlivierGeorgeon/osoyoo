@@ -13,6 +13,7 @@ class CtrlPhenomenonView:
         self.egocentric_memory = workspace.memory.egocentric_memory
         self.points_of_interest = []
         self.last_used_id = -1
+        self.phenomenon = None
 
         def on_text(text):
             """Send user keypress to the workspace to handle"""
@@ -40,6 +41,9 @@ class CtrlPhenomenonView:
         self.view.robot.rotate_head(self.workspace.memory.body_memory.head_direction_degree())
         self.view.azimuth = self.workspace.memory.body_memory.body_azimuth()
         # TODO compute the robot's position relative to the phenomenon
+        if self.phenomenon is not None:
+            self.view.robot_pos_x = self.workspace.memory.allocentric_memory.robot_pos_x - self.phenomenon.x
+            self.view.robot_pos_y = self.workspace.memory.allocentric_memory.robot_pos_y - self.phenomenon.y
 
     def update_points_of_interest(self, phenomenon):
         """Retrieve all the experiences in a phenomenon and create the corresponding points of interest"""
@@ -68,13 +72,16 @@ class CtrlPhenomenonView:
         # Show the position of the sensor
         points = affordance.sensor_triangle()
         if points is not None:
-            self.view.add_polygon(points, "Gainsboro")
+            self.view.add_polygon(points, "CadetBlue")
 
         return poi
 
     def main(self, dt):
         """Called every frame. Update the phenomenon view"""
         if self.workspace.flag_for_view_refresh:
-            self.update_points_of_interest()
+            # Display in phenomenon view
+            if len(self.workspace.integrator.phenomena) > 0:
+                self.phenomenon = self.workspace.integrator.phenomena[0]
+                self.update_points_of_interest(self.phenomenon)
             self.update_body_robot()
-            # self.workspace.flag_for_view_refresh = False  # Reset by CtrlBodyView
+            self.workspace.flag_for_view_refresh = False  # Reset by CtrlBodyView

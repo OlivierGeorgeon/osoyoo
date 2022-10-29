@@ -83,5 +83,4 @@ class CtrlBodyView:
         """Called every frame. Update the body view"""
         if self.workspace.flag_for_view_refresh:
             self.update_body_view()
-            # self.update_body_robot()
-            self.workspace.flag_for_view_refresh = False
+            # self.workspace.flag_for_view_refresh = False   # Reset by CtrlBodyView

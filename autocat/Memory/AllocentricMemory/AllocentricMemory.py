@@ -262,17 +262,6 @@ class AllocentricMemory:
                 if body_memory.is_inside_robot(pos_x - self.robot_pos_x, pos_y - self.robot_pos_y):
                     self.apply_status_to_cell(i, j, EXPERIENCE_PLACE)
 
-    # def apply_phenomenon(self, phenomenon, pos_x, pos_y):
-    #     """Apply a phenomenon to the grid
-    #     Args :
-    #         phenomenon : type of phenomenon (TODO: but should be things like "line", "unmovable object", "movable object", etc.)
-    #         pos_x, pos_y : position of the phenomenon (relative to the robot's position)
-    #     """
-
-    # def get_robot_pos(self):
-    #     """Return the position of the robot. (cell coordinates)"""
-    #     return self.robot_cell_x, self.robot_cell_y
-
     def apply_changes(self, start_x, start_y, end_x, end_y, status="Free"):
         """Apply the given status (Free by default) to every cell between coordinates start_x,start_y and end_x,end_y"""
 

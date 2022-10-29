@@ -12,7 +12,7 @@ class EgocentricMemory:
         self.experiences = []
         self.experience_id = 0  # A unique ID for each experience in memory
 
-    def update_and_add_experiences(self, enacted_interaction):
+    def update_and_add_experiences(self, enacted_interaction, body_direction_rad):
         """ Process the enacted interaction to update the egocentric memory
         - Move the previous experiences
         - Add new experiences
@@ -26,7 +26,7 @@ class EgocentricMemory:
         new_experiences = []
         for p in enacted_interaction[KEY_EXPERIENCES]:
             experience = Experience(p[1], p[2], experience_type=p[0], durability=EXPERIENCE_PERSISTENCE,
-                                    experience_id=self.experience_id)
+                                    experience_id=self.experience_id, direction_rad=body_direction_rad)
             new_experiences.append(experience)
             self.experience_id += 1
 

@@ -6,6 +6,7 @@ from .RobotDefine import *
 from .WifiInterface import WifiInterface
 from ..Memory.EgocentricMemory.Experience import *
 from ..Integrator.Integrator import TRUST_POSITION_PHENOMENON
+from ..Integrator.Phenomenon import PHENOMENON_DELTA
 
 ENACT_STEP_IDLE = 0
 ENACT_STEP_ENACTING = 1
@@ -14,6 +15,7 @@ ENACT_STEP_END = 2
 KEY_EXPERIENCES = 'points'
 KEY_IMPACT = 'shock'
 
+FOCUS_DELTA = 300  # (mm) Maximum delta to keep focus
 
 class CtrlRobot:
     """Handle the communication with the robot:
@@ -187,9 +189,8 @@ class CtrlRobot:
                                                          [self.intended_interaction['focus_x'],
                                                           self.intended_interaction['focus_y'], 0])[0:2]
             # The distance between the echo and the expected focus position
-            distance = int(math.dist(echo_xy, expected_focus_xy))
             # print("Distance between echo and focus:", distance)
-            if distance < 100:
+            if math.dist(echo_xy, expected_focus_xy) < FOCUS_DELTA:
                 additional_xy = expected_focus_xy - echo_xy
                 # print("additional translation:", additional_xy)
                 # The focus has been kept

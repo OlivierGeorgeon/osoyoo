@@ -2,10 +2,12 @@ import math
 from pyrr import matrix44
 from .Affordance import Affordance
 
+PHENOMENON_DELTA = 300  # (mm) distance between experiences to be considered the same phenomenon
+
 
 class Phenomenon:
     """An hypothetical phenomenon"""
-    def __init__(self, echo_experience, position_matrix, acceptable_delta=300):
+    def __init__(self, echo_experience, position_matrix):
         """Constructor
         Parameters:
             echo_experience: the first echo interaction of the object phenomenon
@@ -18,12 +20,10 @@ class Phenomenon:
         # Record the first affordance of the phenomenon
         self.affordances = [Affordance(0, 0, echo_experience)]
 
-        self.acceptable_delta = acceptable_delta
-
         # The coordinates of this phenomenon in allocentric memory
-        x, y, _ = matrix44.apply_to_vector(self.position_matrix, [0, 0, 0])
+        self.x, self.y, _ = matrix44.apply_to_vector(self.position_matrix, [0, 0, 0])
         # self.allo_coordinates = [(x, y)]
-        self.center = [x, y]
+        # self.center = [x, y]
 
         self.has_been_validated = False
         self.printed = False
@@ -48,16 +48,14 @@ class Phenomenon:
             sum_x += allo_coord[0]
             sum_y += allo_coord[1]
             i += 1
-        self.center = (int(sum_x/i), int(sum_y/i))
+        # self.center = (int(sum_x/i), int(sum_y/i))
 
     def try_and_add(self, experience, position_matrix):
         """Test if the echo interaction is in the acceptable delta of the center of the phenomenon,
         if yes, add it to the phenomenon"""
         x, y, _ = matrix44.apply_to_vector(position_matrix, [0, 0, 0])
-        allocentric_coordinates = [x, y]
-        if math.dist(allocentric_coordinates, self.center) < self.acceptable_delta:
-            dist_x = allocentric_coordinates[0] - self.center[0]
-            dist_y = allocentric_coordinates[1] - self.center[1]
+        if math.dist([x, y], [self.x, self.y]) < PHENOMENON_DELTA:
+            dist_x, dist_y = x - self.x, y - self.y
             self.add_affordance(dist_x, dist_y, experience)
             return True, (-dist_x, -dist_y)
         else:

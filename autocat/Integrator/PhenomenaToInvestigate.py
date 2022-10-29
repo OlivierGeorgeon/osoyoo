@@ -3,8 +3,7 @@ from autocat.Integrator.Phenomenon import Phenomenon
 
 class PhenomenaToInvestigate:
     """List of phenomena to investigate"""
-    def __init__(self, number_of_try_before_removing, number_of_echo_before_validation, memory,
-                 acceptable_delta):
+    def __init__(self, number_of_try_before_removing, number_of_echo_before_validation, memory):
         """Constructor
         Parameters:
             number_of_try_before_removing: the number of try before removing a phenomenon from the list
@@ -15,7 +14,6 @@ class PhenomenaToInvestigate:
         self.number_of_echo_before_validation = number_of_echo_before_validation
         self.memory = memory
         self.allocentric_memory = memory.allocentric_memory
-        self.acceptable_delta = acceptable_delta
 
     def create_hypothetical_phenomena(self, experiences):
         """Create new phenomena to investigate from the list of central echos"""
@@ -24,7 +22,7 @@ class PhenomenaToInvestigate:
             position_matrix = experience.allocentric_position_matrix(self.memory.body_memory.body_direction_matrix(),
                                                                      self.allocentric_memory.body_position_matrix())
             if len(new_phenomena) == 0:
-                new_phenomena.append(Phenomenon(experience, position_matrix, acceptable_delta=self.acceptable_delta))
+                new_phenomena.append(Phenomenon(experience, position_matrix))
             else:
                 clustered = False
                 for new_phenomenon in new_phenomena:
@@ -34,7 +32,7 @@ class PhenomenaToInvestigate:
                         break
                     print("NOCLUSTO")
                 if not clustered:
-                    new_phenomena.append(Phenomenon(experience, position_matrix, acceptable_delta=self.acceptable_delta))
+                    new_phenomena.append(Phenomenon(experience, position_matrix))
         for p in new_phenomena:
             print("New hypothetical phenomenon")
             self.list_objects_to_investigate.append([p, 0])

@@ -15,7 +15,7 @@ class Experience:
     """Experiences are instances of interactions
     along with the spatial and temporal information of where and when they were enacted"""
 
-    def __init__(self, x, y, experience_type='None', durability=10, decay_intensity=1, experience_id=0, direction_rad=0):
+    def __init__(self, x, y, experience_type='None', durability=10, decay_intensity=1, experience_id=0, direction_rad = 0):
         """Create an experience to be placed in the memory.
         Args:
         x, y : coordinates relative the robot.
@@ -33,6 +33,7 @@ class Experience:
         # The sensor matrix is applied to the vertices to display the sensor in phenomenon view relative the experience
         # For echo experiences only yet
         opposite_translation_matrix = matrix44.create_from_translation([-x + ROBOT_HEAD_X, -y, 0])  # opposite position
+        # opposite_translation_matrix = matrix44.create_from_translation([-x, -y, 0])  # opposite position
         orientation_matrix = matrix44.create_from_z_rotation(-direction_rad)  # opposite azimuth
         # Apply the opposite azimuth to the opposite position to find the position of the sensor relative to the exp.
         self.sensor_matrix = matrix44.multiply(opposite_translation_matrix, orientation_matrix)

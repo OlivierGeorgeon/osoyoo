@@ -52,12 +52,10 @@ class PhenomenonView(InteractiveDisplay):
         self.batch.draw()
 
         # Stack the rotation of the robot body
-        # glRotatef(90 - self.azimuth, 0.0, 0.0, 1.0)
-
-        # Draw the robot
         glTranslatef(self.robot_pos_x, self.robot_pos_y, 0)
         glRotatef(90 - self.azimuth, 0.0, 0.0, 1.0)
-        # self.robot_batch.draw()
+        # Draw the robot
+        self.robot_batch.draw()
 
         # Reset the projection to Identity to cancel the projection of the text
         glLoadIdentity()
@@ -79,7 +77,7 @@ class PhenomenonView(InteractiveDisplay):
         nb_index = (nb_points-2) * 3
         v_index = [0, 1, 2, 0, 2, 3, 0, 3, 4, 0, 4, 5][0:nb_index]
         color = name_to_rgb(color_string)
-        opacity = 128
+        opacity = 64
         self.batch.add_indexed(3, gl.GL_TRIANGLES, self.background, v_index, ('v2i', points),
                                ('c4B', nb_points * (*color, opacity)))
 

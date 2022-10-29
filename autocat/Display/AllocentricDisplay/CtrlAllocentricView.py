@@ -16,13 +16,6 @@ class CtrlAllocentricView:
         def on_text(text):
             """Send user keypress to the workspace to handle"""
             self.workspace.process_user_key(text)
-            # if text.upper() == "A":
-            #     self.workspace.put_decider_to_auto()
-            # elif text.upper() == "M":
-            #     self.workspace.put_decider_to_manual()
-            # else:
-            #     action = {"action": text}
-            #     self.workspace.set_action(action)
 
         self.allocentric_view.on_text = on_text
 
@@ -32,9 +25,10 @@ class CtrlAllocentricView:
             phenomenon = self.allocentric_memory.grid[cell_x][cell_y].phenomenon
             if phenomenon is not None:
                 print("Displaying Phenomenon", phenomenon)
-                ctrl_phenomenon_view = CtrlPhenomenonView(workspace)
-                ctrl_phenomenon_view.update_body_robot()
-                ctrl_phenomenon_view.update_points_of_interest(phenomenon)
+                self.workspace.ctrl_phenomenon_view.phenomenon = phenomenon
+                # ctrl_phenomenon_view = CtrlPhenomenonView(workspace)
+                # ctrl_phenomenon_view.update_body_robot()
+                # ctrl_phenomenon_view.update_points_of_interest(phenomenon)
 
         self.allocentric_view.on_mouse_press = on_mouse_press
 

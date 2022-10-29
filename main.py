@@ -19,7 +19,7 @@
 
 import sys
 import pyglet
-from autocat import Workspace, CtrlRobot, CtrlEgocentricView, CtrlAllocentricView, CtrlBodyView
+from autocat import Workspace, CtrlRobot, CtrlEgocentricView, CtrlAllocentricView, CtrlBodyView, CtrlPhenomenonView
 
 robot_ip = "192.168.8.189"
 if len(sys.argv) > 1:
@@ -31,6 +31,8 @@ ctrl_robot = CtrlRobot(robot_ip, workspace)
 ctrl_egocentric_view = CtrlEgocentricView(workspace)
 ctrl_allocentric_view = CtrlAllocentricView(workspace)
 ctrl_body_view = CtrlBodyView(workspace)
+ctrl_phenomenon_view = CtrlPhenomenonView(workspace)
+workspace.ctrl_phenomenon_view = ctrl_phenomenon_view
 
 
 def update(dt):
@@ -40,6 +42,7 @@ def update(dt):
     ctrl_egocentric_view.main(dt)
     ctrl_allocentric_view.main(dt)
     ctrl_body_view.main(dt)
+    ctrl_phenomenon_view.main(dt)
 
 
 pyglet.clock.schedule_interval(update, 0.1)

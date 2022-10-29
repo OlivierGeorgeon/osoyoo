@@ -28,8 +28,8 @@ class HexagonalCell:
         points = []
         theta = 0
         for i in range(0, 12, 2):
-            points.append(int(x + math.cos(theta) * radius * scale))
-            points.append(int(y + math.sin(theta) * radius * scale))
+            points.append((x + math.cos(theta) * radius * scale))  # int
+            points.append((y + math.sin(theta) * radius * scale))  # int
             theta += math.pi/3
 
         self.shape = batch.add_indexed(6, gl.GL_TRIANGLES, group, [0, 1, 2, 0, 2, 3, 0, 3, 4, 0, 4, 5],

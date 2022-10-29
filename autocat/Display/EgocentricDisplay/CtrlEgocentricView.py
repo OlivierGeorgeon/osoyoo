@@ -12,7 +12,7 @@ class CtrlEgocentricView:
         self.view = EgocentricView()
         self.workspace = workspace
         self.egocentric_memory = workspace.memory.egocentric_memory
-        self.synthesizer = workspace.synthesizer
+        self.synthesizer = workspace.integrator
         self.points_of_interest = []
         self.last_action = None
         self.mouse_press_x = 0

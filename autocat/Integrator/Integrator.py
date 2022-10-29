@@ -3,6 +3,7 @@ from .PhenomenaToInvestigate import PhenomenaToInvestigate
 
 TRUST_POSITION_PHENOMENON = "Phenomenon"
 TRUST_POSITION_ROBOT = "Robot"
+PHENOMENON_DELTA = 300
 
 
 class Integrator:
@@ -12,7 +13,7 @@ class Integrator:
         self.workspace = workspace
         self.egocentric_memory = workspace.memory.egocentric_memory
         self.allocentric_memory = workspace.memory.allocentric_memory
-        self.echo_objects_to_investigate = PhenomenaToInvestigate(3, 3, self.workspace.memory, acceptable_delta=700)
+        self.echo_objects_to_investigate = PhenomenaToInvestigate(3, 3, self.workspace.memory)
         self.phenomena = []
         self.last_projection_for_context = []
         self.last_used_id = 0
@@ -41,6 +42,7 @@ class Integrator:
         validated_phenomena = self.echo_objects_to_investigate.validate()
         # Add the validated phenomena to the list
         self.phenomena.extend(validated_phenomena)
+
         # Create new hypothetical phenomena from remaining central echo experiences
         self.echo_objects_to_investigate.create_hypothetical_phenomena(experiences_central_echo)
 
@@ -80,10 +82,6 @@ class Integrator:
 
         return action_to_return
 
-    # def apply_translation_to_hexa_memory(self, translation_between_echo_and_context):
-    #     """Translate the robot in allocentric memory"""
-    #     self.allocentric_memory.move(0, translation_between_echo_and_context, is_egocentric_translation=False)
-    #
     def apply_status_experience_to_cells(self, experiences):
         """Mark the experiences in the cells of allocentric Memory"""
         cells_treated = []
@@ -98,11 +96,11 @@ class Integrator:
     def attach_phenomena_to_cells(self):
         """Allocate the phenomena to the cells of allocentric memory"""
         for p in self.phenomena:
-            cell_i, cell_j = self.allocentric_memory.convert_pos_in_cell(p.center[0], p.center[1])
+            cell_i, cell_j = self.allocentric_memory.convert_pos_in_cell(p.x, p.y)
             self.allocentric_memory.grid[cell_i][cell_j].allocate_phenomenon(p)
 
     def try_and_add(self, experiences):
-        """Attach the experiences to existing phenomena if possible.
+        """Try to attach a list of central echos to phenomena  in the list .
         Returns the experiences that have not been attached, and the average translation"""
         translation_x, translation_y = 0, 0
         sum_translation_x, sum_translation_y = 0, 0
