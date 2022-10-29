@@ -44,14 +44,15 @@ class CtrlEgocentricView:
                 phenomenon.set_color('red')
 
         def on_text(text):
-            """Handles user input"""
-            if text.upper() == "A":
-                self.workspace.put_decider_to_auto()
-            elif text.upper() == "M":
-                self.workspace.put_decider_to_manual()
-            else:
-                action = {"action": text}
-                self.workspace.set_action(action)
+            """Send user keypress to the workspace to handle"""
+            self.workspace.process_user_key(text)
+            # if text.upper() == "A":
+            #     self.workspace.put_decider_to_auto()
+            # elif text.upper() == "M":
+            #     self.workspace.put_decider_to_manual()
+            # else:
+            #     action = {"action": text}
+            #     self.workspace.set_action(action)
 
         self.view.push_handlers(on_mouse_press, on_key_press, on_text)
 

@@ -5,6 +5,7 @@ from .HexagonalCell import HexagonalCell
 from ...Memory.EgocentricMemory.Experience import EXPERIENCE_FOCUS
 from ...Memory.AllocentricMemory.GridCell import CELL_UNKNOWN
 from ..InteractiveDisplay import InteractiveDisplay
+from ...Integrator.Integrator import TRUST_POSITION_PHENOMENON, TRUST_POSITION_ROBOT
 
 
 NB_CELL_WIDTH = 30
@@ -45,8 +46,12 @@ class AllocentricView(InteractiveDisplay):
 
         self.mouse_press_x = 0
         self.mouse_press_y = 0
-        self.label = pyglet.text.Label('', font_name='Arial', font_size=15, x=10, y=10)
-        self.label.color = (0, 0, 0, 255)
+        self.label = pyglet.text.Label('', font_name='Verdana', font_size=10, x=10, y=10)
+        self.label.color = (255, 255, 255, 255)
+
+        self.trust_position_mode = TRUST_POSITION_ROBOT
+        self.label_trust_mode = pyglet.text.Label('Trust position: ', font_name='Verdana', font_size=10, x=10, y=30)
+        self.label_trust_mode.color = (255, 255, 255, 255)
 
     def add_cell(self, cell_x: int, cell_y: int):
         """Add a new grid cell to allocentric view. Called by CtrlAllocentricView"""
@@ -97,20 +102,8 @@ class AllocentricView(InteractiveDisplay):
         glLoadIdentity()
         glOrtho(0, self.width, 0, self.height, -1, 1)
         self.label.draw()
+        self.label_trust_mode.draw()
 
-    # def on_resize(self, width, height):
-    #     """ Adjusting the viewport when resizing the window """
-    #     # Always display in the whole window
-    #     glViewport(0, 0, width, height)        # For standard screen
-    #     # glViewport(0, 0, width * 2, height * 2)  # For retina screen on Mac
-    #
-    # def on_mouse_scroll(self, x, y, dx, dy):
-    #     """ Zooming the window """
-    #     # Inspired by https://www.py4u.net/discuss/148957
-    #     f = ZOOM_IN_FACTOR if dy > 0 else 1/ZOOM_IN_FACTOR if dy < 0 else 1
-    #     # if .4 < self.zoom_level * f < 5:  # Olivier
-    #     self.zoom_level *= f
-    #
     def on_mouse_motion(self, x, y, dx, dy):
         # mouse_x = int((x - self.width/2) * self.zoom_level * 2)
         # mouse_y = int((y - self.height/2) * self.zoom_level * 2)

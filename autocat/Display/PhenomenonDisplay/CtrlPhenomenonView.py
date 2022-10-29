@@ -15,14 +15,15 @@ class CtrlPhenomenonView:
         self.last_used_id = -1
 
         def on_text(text):
-            """Handles user input"""
-            if text.upper() == "A":
-                self.workspace.put_decider_to_auto()
-            elif text.upper() == "M":
-                self.workspace.put_decider_to_manual()
-            else:
-                action = {"action": text}
-                self.workspace.set_action(action)
+            """Send user keypress to the workspace to handle"""
+            self.workspace.process_user_key(text)
+            # if text.upper() == "A":
+            #     self.workspace.put_decider_to_auto()
+            # elif text.upper() == "M":
+            #     self.workspace.put_decider_to_manual()
+            # else:
+            #     action = {"action": text}
+            #     self.workspace.set_action(action)
 
         self.view.push_handlers(on_text)
 
@@ -38,6 +39,7 @@ class CtrlPhenomenonView:
         """Updates the robot's body to display by the egocentric view"""
         self.view.robot.rotate_head(self.workspace.memory.body_memory.head_direction_degree())
         self.view.azimuth = self.workspace.memory.body_memory.body_azimuth()
+        # TODO compute the robot's position relative to the phenomenon
 
     def update_points_of_interest(self, phenomenon):
         """Retrieve all the experiences in a phenomenon and create the corresponding points of interest"""
@@ -66,7 +68,7 @@ class CtrlPhenomenonView:
         # Show the position of the sensor
         points = affordance.sensor_triangle()
         if points is not None:
-            self.view.add_polygon(points, "Bisque")
+            self.view.add_polygon(points, "Gainsboro")
 
         return poi
 

@@ -56,10 +56,10 @@ class Phenomenon:
         x, y, _ = matrix44.apply_to_vector(position_matrix, [0, 0, 0])
         allocentric_coordinates = [x, y]
         if math.dist(allocentric_coordinates, self.center) < self.acceptable_delta:
-            dist_x = self.center[0]-allocentric_coordinates[0]
-            dist_y = self.center[1]-allocentric_coordinates[1]
-            self.add_affordance(experience, position_matrix)
-            return True, (dist_x, dist_y)
+            dist_x = allocentric_coordinates[0] - self.center[0]
+            dist_y = allocentric_coordinates[1] - self.center[1]
+            self.add_affordance(dist_x, dist_y, experience)
+            return True, (-dist_x, -dist_y)
         else:
             return False, None
 

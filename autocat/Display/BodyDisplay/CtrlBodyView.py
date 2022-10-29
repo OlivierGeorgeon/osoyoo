@@ -17,14 +17,15 @@ class CtrlBodyView:
         self.last_used_id = -1
 
         def on_text(text):
-            """Handles user input"""
-            if text.upper() == "A":
-                self.workspace.put_decider_to_auto()
-            elif text.upper() == "M":
-                self.workspace.put_decider_to_manual()
-            else:
-                action = {"action": text}
-                self.workspace.set_action(action)
+            """Send user keypress to the workspace to handle"""
+            self.workspace.process_user_key(text)
+            # if text.upper() == "A":
+            #     self.workspace.put_decider_to_auto()
+            # elif text.upper() == "M":
+            #     self.workspace.put_decider_to_manual()
+            # else:
+            #     action = {"action": text}
+            #     self.workspace.set_action(action)
 
         self.view.push_handlers(on_text)
 

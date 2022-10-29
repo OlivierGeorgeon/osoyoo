@@ -1,6 +1,6 @@
 from .Decider.AgentCircle import AgentCircle
 from .Memory.Memory import Memory
-from .Integrator.Integrator import Integrator
+from .Integrator.Integrator import Integrator, TRUST_POSITION_PHENOMENON, TRUST_POSITION_ROBOT
 
 CONTROL_MODE_AUTOMATIC = "auto"
 CONTROL_MODE_MANUAL = "manual"
@@ -24,6 +24,7 @@ class Workspace:
         self.enacted_interaction = {}
 
         self.decider_mode = CONTROL_MODE_MANUAL
+        self.trust_mode = TRUST_POSITION_ROBOT
         self.robot_ready = True
         self.flag_for_need_of_action = True
         self.has_new_action = False
@@ -98,15 +99,29 @@ class Workspace:
         self.enacted_interaction = enacted_interaction
         self.has_new_enacted_interaction = True
 
-    def set_action(self, action):
-        """Set the action to enact (called by CtrlHexaview)"""
-        self.intended_interaction = action
-        self.has_new_action = True
+    def process_user_key(self, user_key):
+        if user_key.upper() == "A":
+            self.decider_mode = CONTROL_MODE_AUTOMATIC
+        elif user_key.upper() == "M":
+            self.decider_mode = CONTROL_MODE_MANUAL
+        elif user_key.upper() == "R":
+            self.trust_mode = TRUST_POSITION_ROBOT
+        elif user_key.upper() == "P":
+            self.trust_mode = TRUST_POSITION_PHENOMENON
+        else:
+            action = {"action": user_key}
+            self.intended_interaction = action
+            self.has_new_action = True
 
-    def put_decider_to_auto(self):
-        """Put the decider in auto mode (called by CtrlHexaview)"""
-        self.decider_mode = CONTROL_MODE_AUTOMATIC
-
-    def put_decider_to_manual(self):
-        """Put the decider in manual mode (called by CtrlHexaview)"""
-        self.decider_mode = CONTROL_MODE_MANUAL
+    # def set_action(self, action):
+    #     """Set the action to enact (called by CtrlHexaview)"""
+    #     self.intended_interaction = action
+    #     self.has_new_action = True
+    #
+    # def put_decider_to_auto(self):
+    #     """Put the decider in auto mode (called by CtrlHexaview)"""
+    #     self.decider_mode = CONTROL_MODE_AUTOMATIC
+    #
+    # def put_decider_to_manual(self):
+    #     """Put the decider in manual mode (called by CtrlHexaview)"""
+    #     self.decider_mode = CONTROL_MODE_MANUAL

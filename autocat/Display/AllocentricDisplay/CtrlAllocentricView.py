@@ -1,5 +1,6 @@
 from pyrr import matrix44
 from .AllocentricView import AllocentricView
+from ..PhenomenonDisplay.CtrlPhenomenonView import CtrlPhenomenonView
 
 
 class CtrlAllocentricView:
@@ -9,34 +10,33 @@ class CtrlAllocentricView:
         self.allocentric_memory = workspace.memory.allocentric_memory
         self.allocentric_view = AllocentricView(self.workspace.memory)
         self.refresh_count = 0
-        # self.mouse_x, self.mouse_y = None, None
         self.to_reset = []
-        # self.focus_x = None
-        # self.focus_y = None
 
         # Handlers
-        def on_text_hemw(text):
-            """Handles user input"""
-            if text.upper() == "A":
-                self.workspace.put_decider_to_auto()
-            elif text.upper() == "M":
-                self.workspace.put_decider_to_manual()
-            # CAS GENERAl
-            # elif text.upper() == "T":
-            #     self.workspace.egocentric_memory.allocentric_memory.apply_status_to_rectangle(-500, 600, 1000, 1000,
-            #                                                                                   "Frontier")
-            else:
-                action = {"action": text}
-                self.workspace.set_action(action)
+        def on_text(text):
+            """Send user keypress to the workspace to handle"""
+            self.workspace.process_user_key(text)
+            # if text.upper() == "A":
+            #     self.workspace.put_decider_to_auto()
+            # elif text.upper() == "M":
+            #     self.workspace.put_decider_to_manual()
+            # else:
+            #     action = {"action": text}
+            #     self.workspace.set_action(action)
 
-        self.allocentric_view.on_text = on_text_hemw
+        self.allocentric_view.on_text = on_text
 
-        # def on_mouse_press(x, y, button, modifiers):
-        #     """Handles mouse press"""
-        #     self.mouse_x, self.mouse_y = x, y
-        #     self.focus_x, self.focus_y = self.allocentric_memory.convert_allocentric_position_to_egocentric_translation(x, y)
-        #
-        # self.allocentric_view.on_mouse_press = on_mouse_press
+        def on_mouse_press(x, y, button, modifiers):
+            """Open a phenomenon view based on the phenomenon on this cell"""
+            cell_x, cell_y = self.allocentric_view.cell_from_screen_coordinate(x, y)
+            phenomenon = self.allocentric_memory.grid[cell_x][cell_y].phenomenon
+            if phenomenon is not None:
+                print("Displaying Phenomenon", phenomenon)
+                ctrl_phenomenon_view = CtrlPhenomenonView(workspace)
+                ctrl_phenomenon_view.update_body_robot()
+                ctrl_phenomenon_view.update_points_of_interest(phenomenon)
+
+        self.allocentric_view.on_mouse_press = on_mouse_press
 
     def extract_and_convert_interactions(self):
         """Create the cells in the view from the status in the hexagonal grid"""
@@ -71,6 +71,7 @@ class CtrlAllocentricView:
 
     def main(self, dt):
         """Refresh allocentric view"""
+        self.allocentric_view.label_trust_mode.text = "Trust position: " + self.workspace.trust_mode
         if self.refresh_count > 500:
             self.refresh_count = 0
         if self.refresh_count == 0:

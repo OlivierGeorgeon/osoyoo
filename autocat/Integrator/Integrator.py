@@ -1,6 +1,8 @@
 from ..Memory.EgocentricMemory.Experience import EXPERIENCE_LOCAL_ECHO, EXPERIENCE_CENTRAL_ECHO, EXPERIENCE_ALIGNED_ECHO
-from ..Memory.AllocentricMemory.GridCell import CELL_PHENOMENON
 from .PhenomenaToInvestigate import PhenomenaToInvestigate
+
+TRUST_POSITION_PHENOMENON = "Phenomenon"
+TRUST_POSITION_ROBOT = "Robot"
 
 
 class Integrator:
@@ -28,9 +30,10 @@ class Integrator:
         experiences_central_echo = [e for e in experiences if (e.type == EXPERIENCE_CENTRAL_ECHO or
                                                                e.type == EXPERIENCE_ALIGNED_ECHO)]
         experiences_central_echo, translation = self.try_and_add(experiences_central_echo)
-        # Apply the correction of position relative to the phenomenon in focus
-        # self.apply_translation_to_hexa_memory(translation)
-        self.allocentric_memory.move(0, translation, is_egocentric_translation=False)
+
+        # If trust the phenomenon position then adjust the robot's position in allocentric memory
+        if self.workspace.trust_mode == TRUST_POSITION_PHENOMENON:
+            self.allocentric_memory.move(0, translation, is_egocentric_translation=False)
 
         # Try to attach the central echos to not yet validated phenomena and remove these central echos
         experiences_central_echo = self.echo_objects_to_investigate.try_and_add(experiences_central_echo)

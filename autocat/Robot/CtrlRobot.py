@@ -5,6 +5,7 @@ import math
 from .RobotDefine import *
 from .WifiInterface import WifiInterface
 from ..Memory.EgocentricMemory.Experience import *
+from ..Integrator.Integrator import TRUST_POSITION_PHENOMENON
 
 ENACT_STEP_IDLE = 0
 ENACT_STEP_ENACTING = 1
@@ -21,10 +22,10 @@ class CtrlRobot:
           workspace controller
     """
 
-    def __init__(self, robot_ip, ctrl_workspace):
+    def __init__(self, robot_ip, workspace):
 
         self.robot_ip = robot_ip
-        self.ctrl_workspace = ctrl_workspace
+        self.workspace = workspace
         self.wifiInterface = WifiInterface(robot_ip)
         # self.azimuth = 0  # Integrated from the yaw if the robot does not return compass data
 
@@ -41,17 +42,17 @@ class CtrlRobot:
     def main(self, dt):
         """Handle the communication with the robot."""
         if self.enact_step == ENACT_STEP_END:
-            self.ctrl_workspace.robot_ready = True
+            self.workspace.robot_ready = True
             # self.robot_has_finished_acting = True
             self.enact_step = ENACT_STEP_IDLE
         # if self.robot_has_finished_acting:
             # self.robot_has_finished_acting = False
             enacted_interaction = self.outcome_to_enacted_interaction()
-            self.ctrl_workspace.update_enacted_interaction(enacted_interaction)
+            self.workspace.update_enacted_interaction(enacted_interaction)
 
         if self.enact_step == ENACT_STEP_IDLE:
             # self.has_new_action_to_enact, intended_interaction = self.ctrl_workspace.get_intended_interaction()
-            intended_interaction = self.ctrl_workspace.get_intended_interaction()
+            intended_interaction = self.workspace.get_intended_interaction()
             if intended_interaction is not None:
                 self.intended_interaction_to_action(intended_interaction)
 
@@ -193,23 +194,25 @@ class CtrlRobot:
                 # print("additional translation:", additional_xy)
                 # The focus has been kept
                 enacted_interaction['focus'] = True
-                # Adjust the displacement
-                translation += additional_xy
-                translation_matrix = matrix44.create_from_translation([-translation[0], -translation[1], 0])
-                displacement_matrix = matrix44.multiply(rotation_matrix, translation_matrix)
-                # Adjust the speed
-                if action == '8' and enacted_interaction['duration1'] >= 1000:
-                    self.forward_speed = (self.forward_speed + translation) / 2
-                    # print("New forward speed:", self.forward_speed)
-                if action == '2' and enacted_interaction['duration1'] >= 1000:
-                    self.backward_speed = (self.backward_speed + translation) / 2
-                    # print("New backward speed:", self.backward_speed)
-                if action == '4' and enacted_interaction['duration1'] >= 1000:
-                    self.leftward_speed = (self.leftward_speed + translation) / 2
-                    # print("New leftward speed:", self.leftward_speed)
-                if action == '6' and enacted_interaction['duration1'] >= 1000:
-                    self.rightward_speed = (self.rightward_speed + translation) / 2
-                    # print("New rightward speed:", self.rightward_speed)
+
+                # If trust the phenomenon then adjust the displacement
+                if self.workspace.trust_mode == TRUST_POSITION_PHENOMENON:
+                    translation += additional_xy
+                    translation_matrix = matrix44.create_from_translation([-translation[0], -translation[1], 0])
+                    displacement_matrix = matrix44.multiply(rotation_matrix, translation_matrix)
+                    # Adjust the speed
+                    if action == '8' and enacted_interaction['duration1'] >= 1000:
+                        self.forward_speed = (self.forward_speed + translation) / 2
+                        # print("New forward speed:", self.forward_speed)
+                    if action == '2' and enacted_interaction['duration1'] >= 1000:
+                        self.backward_speed = (self.backward_speed + translation) / 2
+                        # print("New backward speed:", self.backward_speed)
+                    if action == '4' and enacted_interaction['duration1'] >= 1000:
+                        self.leftward_speed = (self.leftward_speed + translation) / 2
+                        # print("New leftward speed:", self.leftward_speed)
+                    if action == '6' and enacted_interaction['duration1'] >= 1000:
+                        self.rightward_speed = (self.rightward_speed + translation) / 2
+                        # print("New rightward speed:", self.rightward_speed)
             else:
                 ""
                 # print("Lost focus with distance:", distance)
