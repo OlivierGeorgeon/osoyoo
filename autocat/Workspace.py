@@ -4,6 +4,8 @@ from .Integrator.Integrator import Integrator, TRUST_POSITION_PHENOMENON, TRUST_
 
 CONTROL_MODE_AUTOMATIC = "auto"
 CONTROL_MODE_MANUAL = "manual"
+# TRUST_POSITION_PHENOMENON = "Phenomenon"
+# TRUST_POSITION_ROBOT = "Robot"
 
 
 class Workspace:
@@ -13,7 +15,6 @@ class Workspace:
         - update_enacted_interaction(): updates the enacted interaction (called by CtrlRobot)
         - set_action(), put_decider_to_auto(), updates the user actions (called by CtrlHexaview)
     """
-
     def __init__(self):
         """Constructor"""
         self.memory = Memory()
@@ -34,7 +35,6 @@ class Workspace:
 
         self.focus_xy = None
         self.prompt_xy = None
-        # self.ctrl_phenomenon_view = None
 
     def main(self, dt):
         """1) If a new enacted_interaction has been received

@@ -30,33 +30,39 @@ class Phenomenon:
 
     def add_affordance(self, x, y, experience):
         """Add an affordance made from this experience at this position"""
-        # self.experiences.append(experience)
-        # self.allo_coordinates.append((x, y))
         self.affordances.append(Affordance(x, y, experience))
 
-        if not self.has_been_validated:
-            pass
-            # self.compute_center()
+        # if not self.has_been_validated:
+        self.compute_center()
 
     def compute_center(self):
         """Compute the center of the object phenomenon"""
-        sum_x = 0
-        sum_y = 0
-        i = 0
+        sum_x = 0.
+        sum_y = 0.
+        i = 0.
         # self.center = np.mean(self.allo_coordinates,axis=0)
-        for allo_coord in self.allo_coordinates:
-            sum_x += allo_coord[0]
-            sum_y += allo_coord[1]
+        for affordance in self.affordances:
+            sum_x += affordance.position_matrix[3, 0]
+            sum_y += affordance.position_matrix[3, 1]
             i += 1
-        # self.center = (int(sum_x/i), int(sum_y/i))
+        # Move the phenomenon's position to the center of the affordances
+        self.position_matrix[3, 0] += int(sum_x/i)
+        self.position_matrix[3, 1] += int(sum_y/i)
+        # Adjust the affordances' position
+        for affordance in self.affordances:
+            affordance.position_matrix[3, 0] -= int(sum_x/i)
+            affordance.position_matrix[3, 1] -= int(sum_y/i)
 
-    def try_and_add(self, experience, position_matrix):
+    def try_and_add(self, experience, position_matrix, trust_mode):
         """Test if the echo interaction is in the acceptable delta of the center of the phenomenon,
         if yes, add it to the phenomenon"""
         x, y, _ = matrix44.apply_to_vector(position_matrix, [0, 0, 0])
         if math.dist([x, y], [self.x, self.y]) < PHENOMENON_DELTA:
             dist_x, dist_y = x - self.x, y - self.y
-            self.add_affordance(dist_x, dist_y, experience)
+            if trust_mode:
+                self.add_affordance(0, 0, experience)
+            else:
+                self.add_affordance(dist_x, dist_y, experience)
             return True, (-dist_x, -dist_y)
         else:
             return False, None

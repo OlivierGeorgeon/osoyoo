@@ -13,7 +13,7 @@ class Integrator:
         self.workspace = workspace
         self.egocentric_memory = workspace.memory.egocentric_memory
         self.allocentric_memory = workspace.memory.allocentric_memory
-        self.echo_objects_to_investigate = PhenomenaToInvestigate(3, 3, self.workspace.memory)
+        self.phenomena_to_investigate = PhenomenaToInvestigate(3, 3, self.workspace)
         self.phenomena = []
         self.last_projection_for_context = []
         self.last_used_id = 0
@@ -37,14 +37,14 @@ class Integrator:
             self.allocentric_memory.move(0, translation, is_egocentric_translation=False)
 
         # Try to attach the central echos to not yet validated phenomena and remove these central echos
-        experiences_central_echo = self.echo_objects_to_investigate.try_and_add(experiences_central_echo)
+        experiences_central_echo = self.phenomena_to_investigate.try_and_add(experiences_central_echo, self.workspace.trust_mode == TRUST_POSITION_PHENOMENON)
         # Try to validate existing phenomena to investigate
-        validated_phenomena = self.echo_objects_to_investigate.validate()
+        validated_phenomena = self.phenomena_to_investigate.validate()
         # Add the validated phenomena to the list
         self.phenomena.extend(validated_phenomena)
 
         # Create new hypothetical phenomena from remaining central echo experiences
-        self.echo_objects_to_investigate.create_hypothetical_phenomena(experiences_central_echo)
+        self.phenomena_to_investigate.create_hypothetical_phenomena(experiences_central_echo, self.workspace.trust_mode == TRUST_POSITION_PHENOMENON)
 
         # Create a new experience based on the aligned echo and tell if the focus was lost
         # focus_experiences, focus_lost = self.create_focus_echo()
@@ -111,7 +111,8 @@ class Integrator:
                 position_matrix = echo.allocentric_position_matrix(
                     self.workspace.memory.body_memory.body_direction_matrix(),
                     self.allocentric_memory.body_position_matrix())
-                is_added, translation = phenomenon.try_and_add(echo, position_matrix)
+                is_added, translation = phenomenon.try_and_add(echo, position_matrix,
+                                                               self.workspace.trust_mode == TRUST_POSITION_PHENOMENON)
                 if is_added:
                     sum_translation_x += translation[0]
                     sum_translation_y += translation[1]

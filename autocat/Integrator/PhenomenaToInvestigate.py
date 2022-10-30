@@ -1,9 +1,9 @@
-from autocat.Integrator.Phenomenon import Phenomenon
+from .Phenomenon import Phenomenon
 
 
 class PhenomenaToInvestigate:
     """List of phenomena to investigate"""
-    def __init__(self, number_of_try_before_removing, number_of_echo_before_validation, memory):
+    def __init__(self, number_of_try_before_removing, number_of_echo_before_validation, workspace):
         """Constructor
         Parameters:
             number_of_try_before_removing: the number of try before removing a phenomenon from the list
@@ -12,10 +12,11 @@ class PhenomenaToInvestigate:
         self.validated_objects = []
         self.number_of_try_before_removing = number_of_try_before_removing
         self.number_of_echo_before_validation = number_of_echo_before_validation
-        self.memory = memory
-        self.allocentric_memory = memory.allocentric_memory
+        self.workspace = workspace
+        self.memory = workspace.memory
+        self.allocentric_memory = workspace.memory.allocentric_memory
 
-    def create_hypothetical_phenomena(self, experiences):
+    def create_hypothetical_phenomena(self, experiences, trust_mode):
         """Create new phenomena to investigate from the list of central echos"""
         new_phenomena = []
         for experience in experiences:
@@ -27,7 +28,7 @@ class PhenomenaToInvestigate:
                 clustered = False
                 for new_phenomenon in new_phenomena:
                     # TODO compute the position matrix relative to the phenomenon position
-                    if new_phenomenon.try_and_add(experience, position_matrix):
+                    if new_phenomenon.try_and_add(experience, position_matrix, trust_mode):
                         clustered = True
                         break
                     print("NOCLUSTO")
@@ -37,7 +38,7 @@ class PhenomenaToInvestigate:
             print("New hypothetical phenomenon")
             self.list_objects_to_investigate.append([p, 0])
 
-    def try_and_add(self, experiences):
+    def try_and_add(self, experiences, trust_mode):
         """Try to add the echo experiences to the phenomena to investigate"""
         remaining_experiences = experiences.copy()
         for experience in experiences:
@@ -45,7 +46,7 @@ class PhenomenaToInvestigate:
                                                                      self.allocentric_memory.body_position_matrix())
             for phenomenon, _ in self.list_objects_to_investigate:
                 print("A phenomenon is beeing investigated")
-                if phenomenon.try_and_add(experience, position_matrix):
+                if phenomenon.try_and_add(experience, position_matrix, trust_mode):
                     remaining_experiences.remove(experience)
                     break
         return remaining_experiences

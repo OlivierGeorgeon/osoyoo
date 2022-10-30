@@ -1,5 +1,5 @@
 from ..EgocentricMemory.Experience import EXPERIENCE_PLACE
-from ...Integrator.Phenomenon import Phenomenon
+# from ...Integrator.Phenomenon import Phenomenon
 
 CELL_PHENOMENON = 'phenomenon'
 CELL_UNKNOWN = 'Unknown'
@@ -41,7 +41,7 @@ class GridCell:
         assert(status in ["Blocked", CELL_UNKNOWN, "Line", "Something", EXPERIENCE_PLACE, CELL_PHENOMENON])
         self.status = status
 
-    def allocate_phenomenon(self, phenomenon: Phenomenon):
+    def allocate_phenomenon(self, phenomenon):
         """Allocate a phenomenon to this cell"""
         self.phenomenon = phenomenon
         self.set_to(CELL_PHENOMENON)

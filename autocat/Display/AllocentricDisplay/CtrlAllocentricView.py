@@ -54,14 +54,14 @@ class CtrlAllocentricView:
         # Remove the previous focus cell
         self.allocentric_view.remove_focus_cell()
         # Recreate the focus cell if agent has focus
-        if hasattr(self.workspace.agent, "focus"):
-            if self.workspace.agent.is_focussed:
-                displacement_matrix = matrix44.multiply(self.workspace.memory.body_memory.body_direction_matrix(),
-                                                        self.allocentric_memory.body_position_matrix())
-                v = matrix44.apply_to_vector(displacement_matrix, [self.workspace.agent.focus_xy[0],
-                                                                   self.workspace.agent.focus_xy[1], 0])
-                i, j = self.allocentric_memory.convert_pos_in_cell(v[0], v[1])
-                self.allocentric_view.add_focus_cell(i, j)
+        # if hasattr(self.workspace.agent, "focus"):
+        if self.workspace.focus_xy is not None:
+            displacement_matrix = matrix44.multiply(self.workspace.memory.body_memory.body_direction_matrix(),
+                                                    self.allocentric_memory.body_position_matrix())
+            v = matrix44.apply_to_vector(displacement_matrix,
+                                         [self.workspace.focus_xy[0], self.workspace.focus_xy[1], 0])
+            i, j = self.allocentric_memory.convert_pos_in_cell(v[0], v[1])
+            self.allocentric_view.add_focus_cell(i, j)
 
     def main(self, dt):
         """Refresh allocentric view"""

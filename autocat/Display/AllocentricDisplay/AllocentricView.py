@@ -5,7 +5,7 @@ from .HexagonalCell import HexagonalCell
 from ...Memory.EgocentricMemory.Experience import EXPERIENCE_FOCUS
 from ...Memory.AllocentricMemory.GridCell import CELL_UNKNOWN
 from ..InteractiveDisplay import InteractiveDisplay
-from ...Integrator.Integrator import TRUST_POSITION_PHENOMENON, TRUST_POSITION_ROBOT
+from ...Workspace import TRUST_POSITION_ROBOT
 
 
 NB_CELL_WIDTH = 30
@@ -50,7 +50,6 @@ class AllocentricView(InteractiveDisplay):
         self.label = pyglet.text.Label('', font_name='Verdana', font_size=10, x=10, y=30)
         self.label.color = (255, 255, 255, 255)
 
-        self.trust_position_mode = TRUST_POSITION_ROBOT
         self.label_trust_mode = pyglet.text.Label('Trust position: ', font_name='Verdana', font_size=10, x=10, y=10)
         self.label_trust_mode.color = (255, 255, 255, 255)
 
