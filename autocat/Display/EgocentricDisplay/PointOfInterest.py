@@ -7,6 +7,7 @@ from autocat.Memory.EgocentricMemory.Experience import *
 # (points of interest attached to an interaction have the same type as their interactions)
 POINT_COMPASS = 'Compass'
 POINT_AZIMUTH = 'Azimuth'
+POINT_PROMPT = 'Prompt'
 
 
 class PointOfInterest:
@@ -68,6 +69,11 @@ class PointOfInterest:
             self.points = [20, 0, 0, -20, 0, 20, -20, 0]
             self.shape = self.batch.add_indexed(4, gl.GL_TRIANGLES, self.group, [0, 1, 2, 1, 2, 3],
                                                 ('v2i', self.points), ('c4B', 4 * (*self.color, self.opacity)))
+        if self.type == POINT_PROMPT:
+            self.color = name_to_rgb("Orchid")
+            self.points = [40, 0, 20, 34, -20, 34, -40, 0, -20, -34, 20, -34]
+            self.shape = self.batch.add_indexed(6, gl.GL_TRIANGLES, group, [0, 1, 2, 0, 2, 3, 0, 3, 4, 0, 4, 5],
+                                                ('v2i', self.points), ('c4B', 6 * (*self.color, self.opacity)))
 
         # Move the point of interest to its position
         position_matrix = matrix44.create_from_translation([x, y, 0]).astype('float64')

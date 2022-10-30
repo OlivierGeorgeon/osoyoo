@@ -57,7 +57,7 @@ class CtrlPhenomenonView:
         """Create a point of interest corresponding to the focus in the reference of the robot"""
         output = None
         if hasattr(self.workspace.agent, "focus"):
-            if self.workspace.agent.focus:
+            if self.workspace.agent.is_focussed:
                 x = self.workspace.agent.focus_xy[0]
                 y = self.workspace.agent.focus_xy[1]
                 output = PointOfInterest(x, y, self.view.robot_batch, self.view.foreground, EXPERIENCE_FOCUS)

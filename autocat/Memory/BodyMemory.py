@@ -1,13 +1,20 @@
 import math
+import numpy
 from pyrr import matrix44
-from ..Robot.RobotDefine import ROBOT_FRONT_X, ROBOT_SIDE
+from ..Robot.RobotDefine import ROBOT_FRONT_X, ROBOT_SIDE, FORWARD_SPEED, LATERAL_SPEED
 
 
 class BodyMemory:
     """Memory of body position"""
     def __init__(self, ):
-        self.head_direction_rad = .0  # Radian relative to the robot's x axis [-pi/2, pi/2]
-        self.body_direction_rad = .0  # Radian relative to horizontal x axis (west-east) [-pi, pi]
+        """Initialize the body position and speed variables"""
+        self.head_direction_rad = .0  # [-pi/2, pi/2] Radian relative to the robot's x axis
+        self.body_direction_rad = .0  # [-pi, pi] Radian relative to horizontal x axis (west-east)
+
+        self.forward_speed = numpy.array([FORWARD_SPEED, 0])  # Need numpy arrays to compute average
+        self.backward_speed = numpy.array([-FORWARD_SPEED, 0])
+        self.leftward_speed = numpy.array([0, LATERAL_SPEED])
+        self.rightward_speed = numpy.array([0, -LATERAL_SPEED])
 
     def set_head_direction_degree(self, head_direction_degree: int):
         """Set the head direction from degree measured relative to x axis [-90,90]"""
@@ -24,7 +31,8 @@ class BodyMemory:
         deg_trig = 90 - azimuth_degree  # Degree relative to x axis in trigonometric direction
         while deg_trig < -180:  # Keep within [-180, 180]
             deg_trig += 360
-        self.body_direction_rad = math.pi / 2 - math.radians(azimuth_degree)
+        # self.body_direction_rad = math.pi / 2 - math.radians(azimuth_degree)
+        self.body_direction_rad = math.radians(deg_trig)
 
     def body_azimuth(self):
         """Return the azimuth in degree relative to north [0,360["""
@@ -42,7 +50,7 @@ class BodyMemory:
         return matrix44.create_from_z_rotation(-self.body_direction_rad)
 
     def rotate_degree(self, yaw_degree: int, azimuth_degree: int):
-        """Rotate the robot's body by the yaw or prevent drift using azimuth."""
+        """Rotate the robot's body by the yaw and correct drift using azimuth if out of bound."""
         new_azimuth = self.body_azimuth() - yaw_degree  # Yaw is counterclockwise
         # Keep it within [0, 360[
         while new_azimuth < 0:
@@ -59,7 +67,7 @@ class BodyMemory:
 
     def is_inside_robot(self, x, y):
         """Return True if the point is inside the robot.
-        Use robot-centric/north coordinates"""
+        Use robot-centric/east-north coordinates"""
         # The four points in counterclockwise order
         x1 = ROBOT_FRONT_X * math.cos(self.body_direction_rad) - ROBOT_SIDE * math.sin(self.body_direction_rad)
         y1 = ROBOT_FRONT_X * math.sin(self.body_direction_rad) + ROBOT_SIDE * math.cos(self.body_direction_rad)

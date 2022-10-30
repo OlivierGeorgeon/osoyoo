@@ -16,9 +16,9 @@ class Workspace:
 
     def __init__(self):
         """Constructor"""
-        self.agent = AgentCircle()
         self.memory = Memory()
-        self.integrator = Integrator(self)  # Moved from workspace by OG 04/09/2022
+        self.agent = AgentCircle(self)
+        self.integrator = Integrator(self)
 
         self.intended_interaction = None
         self.enacted_interaction = {}
@@ -27,12 +27,14 @@ class Workspace:
         self.trust_mode = TRUST_POSITION_PHENOMENON
         self.robot_ready = True
         self.flag_for_need_of_action = True
-        self.has_new_action = False
+        self.has_new_intended_interaction = False
         self.has_new_enacted_interaction = False
         self.has_new_outcome_been_treated = True
         self.flag_for_view_refresh = False
 
-        self.ctrl_phenomenon_view = None
+        self.focus_xy = None
+        self.prompt_xy = None
+        # self.ctrl_phenomenon_view = None
 
     def main(self, dt):
         """1) If a new enacted_interaction has been received
@@ -40,31 +42,24 @@ class Workspace:
              - get the synthesizer going
            3) If ready, ask for a new intended_interaction to enact
         """
-        # focus_lost = False
         # If there is a new enacted interaction
         if self.has_new_enacted_interaction:
-            self.has_new_enacted_interaction = False
-
             # Move the memories and add new experiences to egocentric memory
-            # self.memory.egocentric_memory.tick()
-            # self.memory.egocentric_memory.update_and_add_experiences(self.enacted_interaction)
             self.memory.update_and_add_experiences(self.enacted_interaction)
-
-            # self.send_position_change_to_hexa_memory()
-
             self.flag_for_view_refresh = True
 
-            # Call the synthesizer. Could return an action (not used)
-            synthesizer_action = self.integrator.integrate()
-
+            # Call the integrator. Could return an action (not used)
+            integrator_action = self.integrator.integrate()
+            # Update the robot's place in allocentric memory in case the Integrator has changed it
             self.memory.allocentric_memory.place_robot(self.memory.body_memory)
-
-            # If the synthesizer need an action done, we save it
-            if synthesizer_action is not None:
+            # If the integrator need an action done, we save it
+            if integrator_action is not None:
                 pass  # OG to prevent actions proposed by the synthesize
-                # self.action = synthesizer_action
+                # self.action = integrator_action
                 # self.has_new_action = True
+
             self.has_new_outcome_been_treated = True
+            self.has_new_enacted_interaction = False
 
         # If ready, ask for a new intended interaction
         if self.intended_interaction is None and self.decider_mode == CONTROL_MODE_AUTOMATIC and self.has_new_outcome_been_treated \
@@ -72,25 +67,22 @@ class Workspace:
             self.robot_ready = False
             self.has_new_outcome_been_treated = False
             self.intended_interaction = self.agent.propose_intended_interaction(self.enacted_interaction)
-            self.integrator.last_action_had_focus = 'focus_x' in self.intended_interaction
-            self.integrator.last_action = self.intended_interaction
-            self.has_new_action = True
+            # self.integrator.last_action_had_focus = 'focus_x' in self.intended_interaction
+            # self.integrator.last_action = self.intended_interaction
+            self.has_new_intended_interaction = True
             
     def get_intended_interaction(self):
-        """Return (True, intended_interaction) if there is one, else (False, None)
-        Reset the intended_interaction
-        (Called by CtrlRobot)
+        """If the workspace has a new intended interaction then return it, otherwise return None
+        Reset the intended_interaction. (Called by CtrlRobot)
         """
-        if self.has_new_action:
-            self.has_new_action = False
-            if 'focus_x' in self.intended_interaction:
-                self.integrator.last_action_had_focus = True
-            # returno = True, self.intended_interaction
-            returno = self.intended_interaction
-            self.intended_interaction = None
-            return returno
+        if self.has_new_intended_interaction:
+            self.has_new_intended_interaction = False
+            # if 'focus_x' in self.intended_interaction:
+            #     self.integrator.last_action_had_focus = True
+            intended_interaction = self.intended_interaction
+            # self.intended_interaction = None
+            return intended_interaction
         else:
-            # return False, None
             return None
 
     def update_enacted_interaction(self, enacted_interaction):
@@ -98,8 +90,30 @@ class Workspace:
         if "status" in enacted_interaction and enacted_interaction["status"] == "T":
             print("The workspace received an empty enacted interaction")
             return
+
+        # Manage focus catch and lost
+        if self.focus_xy is not None:
+            # If the focus was kept then update it
+            if 'focus' in enacted_interaction:
+                self.focus_xy = enacted_interaction['echo_xy']
+            # If the focus was lost then reset it
+            if 'focus' not in enacted_interaction:
+                # The focus was lost, override the echo outcome
+                self.focus_xy = None
+                # outcome = OUTCOME_LOST_FOCUS
+                print("LOST FOCUS")
+        else:
+            if self.intended_interaction['action'] in ["-", "8"]:
+                # Catch focus
+                if 'echo_xy' in enacted_interaction:
+                    # if outcome in [OUTCOME_LEFT, OUTCOME_FAR_LEFT, OUTCOME_RIGHT, OUTCOME_FAR_RIGHT, OUTCOME_FAR_FRONT,
+                    #            OUTCOME_CLOSE_FRONT]:
+                    print("CATCH FOCUS")
+                    self.focus_xy = enacted_interaction['echo_xy']
+
         self.enacted_interaction = enacted_interaction
         self.has_new_enacted_interaction = True
+        self.intended_interaction = None
 
     def process_user_key(self, user_key):
         if user_key.upper() == "A":
@@ -112,18 +126,8 @@ class Workspace:
             self.trust_mode = TRUST_POSITION_PHENOMENON
         else:
             action = {"action": user_key}
+            if self.focus_xy is not None:
+                action['focus_x'] = int(self.focus_xy[0])
+                action['focus_y'] = int(self.focus_xy[1])
             self.intended_interaction = action
-            self.has_new_action = True
-
-    # def set_action(self, action):
-    #     """Set the action to enact (called by CtrlHexaview)"""
-    #     self.intended_interaction = action
-    #     self.has_new_action = True
-    #
-    # def put_decider_to_auto(self):
-    #     """Put the decider in auto mode (called by CtrlHexaview)"""
-    #     self.decider_mode = CONTROL_MODE_AUTOMATIC
-    #
-    # def put_decider_to_manual(self):
-    #     """Put the decider in manual mode (called by CtrlHexaview)"""
-    #     self.decider_mode = CONTROL_MODE_MANUAL
+            self.has_new_intended_interaction = True

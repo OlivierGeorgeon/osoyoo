@@ -1,12 +1,10 @@
 import json
-import numpy
 import threading
 import math
-from .RobotDefine import *
+from .RobotDefine import DEFAULT_YAW, RETREAT_DISTANCE, COMPASS_X_OFFSET, COMPASS_Y_OFFSET, RETREAT_DISTANCE_Y, \
+    LINE_X, ROBOT_FRONT_X, ROBOT_FRONT_Y
 from .WifiInterface import WifiInterface
 from ..Memory.EgocentricMemory.Experience import *
-from ..Integrator.Integrator import TRUST_POSITION_PHENOMENON
-from ..Integrator.Phenomenon import PHENOMENON_DELTA
 
 ENACT_STEP_IDLE = 0
 ENACT_STEP_ENACTING = 1
@@ -15,7 +13,8 @@ ENACT_STEP_END = 2
 KEY_EXPERIENCES = 'points'
 KEY_IMPACT = 'shock'
 
-FOCUS_DELTA = 300  # (mm) Maximum delta to keep focus
+FOCUS_MAX_DELTA = 100  # (mm) Maximum delta to keep focus
+
 
 class CtrlRobot:
     """Handle the communication with the robot:
@@ -29,34 +28,31 @@ class CtrlRobot:
         self.robot_ip = robot_ip
         self.workspace = workspace
         self.wifiInterface = WifiInterface(robot_ip)
-        # self.azimuth = 0  # Integrated from the yaw if the robot does not return compass data
 
-        self.forward_speed = numpy.array([FORWARD_SPEED, 0])  # Need numpy arrays to compute average
-        self.backward_speed = numpy.array([-FORWARD_SPEED, 0])
-        self.leftward_speed = numpy.array([0, LATERAL_SPEED])
-        self.rightward_speed = numpy.array([0, -LATERAL_SPEED])
+        # self.forward_speed = numpy.array([FORWARD_SPEED, 0])  # Need numpy arrays to compute average
+        # self.backward_speed = numpy.array([-FORWARD_SPEED, 0])
+        # self.leftward_speed = numpy.array([0, LATERAL_SPEED])
+        # self.rightward_speed = numpy.array([0, -LATERAL_SPEED])
 
-        # Used in an asynchronous Thread
+        # Class variables used in an asynchronous Thread
         self.enact_step = ENACT_STEP_IDLE
-        self.intended_interaction = None  # Need random initialization
-        self.outcome_bytes = None  # Default status T timeout
+        self.intended_interaction = None
+        self.outcome_bytes = None
 
     def main(self, dt):
         """Handle the communication with the robot."""
-        if self.enact_step == ENACT_STEP_END:
-            self.workspace.robot_ready = True
-            # self.robot_has_finished_acting = True
-            self.enact_step = ENACT_STEP_IDLE
-        # if self.robot_has_finished_acting:
-            # self.robot_has_finished_acting = False
-            enacted_interaction = self.outcome_to_enacted_interaction()
-            self.workspace.update_enacted_interaction(enacted_interaction)
-
+        # Wait for the presence of an intended interaction in the workspace and then send the action
         if self.enact_step == ENACT_STEP_IDLE:
-            # self.has_new_action_to_enact, intended_interaction = self.ctrl_workspace.get_intended_interaction()
             intended_interaction = self.workspace.get_intended_interaction()
             if intended_interaction is not None:
                 self.intended_interaction_to_action(intended_interaction)
+
+        # Wait to receive an outcome from the robot and then write it to the workspace
+        if self.enact_step == ENACT_STEP_END:
+            self.workspace.robot_ready = True
+            self.enact_step = ENACT_STEP_IDLE
+            enacted_interaction = self.outcome_to_enacted_interaction()
+            self.workspace.update_enacted_interaction(enacted_interaction)
 
     def intended_interaction_to_action(self, intended_interaction):
         """ Creating an asynchronous thread to send the action to the robot and to wait for the outcome """
@@ -72,13 +68,13 @@ class CtrlRobot:
 
         # Add the estimated speed to the action
         if intended_interaction['action'] == '8':
-            intended_interaction['speed'] = int(self.forward_speed[0])
+            intended_interaction['speed'] = int(self.workspace.memory.body_memory.forward_speed[0])
         if intended_interaction['action'] == '2':
-            intended_interaction['speed'] = -int(self.backward_speed[0])
+            intended_interaction['speed'] = -int(self.workspace.memory.body_memory.backward_speed[0])
         if intended_interaction['action'] == '4':
-            intended_interaction['speed'] = int(self.leftward_speed[1])
+            intended_interaction['speed'] = int(self.workspace.memory.body_memory.leftward_speed[1])
         if intended_interaction['action'] == '6':
-            intended_interaction['speed'] = -int(self.rightward_speed[1])
+            intended_interaction['speed'] = -int(self.workspace.memory.body_memory.rightward_speed[1])
 
         self.intended_interaction = intended_interaction
         self.enact_step = ENACT_STEP_ENACTING  # Now we send the intended interaction to the robot for enaction
@@ -102,18 +98,22 @@ class CtrlRobot:
             yaw = DEFAULT_YAW
         if action == "2":
             # translation = self.backward_speed * (enacted_interaction['duration1'] / 1000)
-            translation = [i * enacted_interaction['duration1'] / 1000 for i in self.backward_speed]
+            translation = [i * enacted_interaction['duration1'] / 1000 for i in
+                           self.workspace.memory.body_memory.backward_speed]
         if action == "3":
             yaw = -DEFAULT_YAW
         if action == "4":
             # translation = self.leftward_speed * (enacted_interaction['duration1'] / 1000)
-            translation = [i * enacted_interaction['duration1'] / 1000 for i in self.leftward_speed]
+            translation = [i * enacted_interaction['duration1'] / 1000 for i in
+                           self.workspace.memory.body_memory.leftward_speed]
         if action == "6":
             # translation = self.rightward_speed * (enacted_interaction['duration1'] / 1000)
-            translation = [i * enacted_interaction['duration1'] / 1000 for i in self.rightward_speed]
+            translation = [i * enacted_interaction['duration1'] / 1000 for i in
+                           self.workspace.memory.body_memory.rightward_speed]
         if action == "8":
             # translation = self.forward_speed * (enacted_interaction['duration1'] / 1000)
-            translation = [i * enacted_interaction['duration1'] / 1000 for i in self.forward_speed]
+            translation = [i * enacted_interaction['duration1'] / 1000 for i in
+                           self.workspace.memory.body_memory.forward_speed]
 
         # If the robot returns yaw then use it
         if 'yaw' in enacted_interaction:
@@ -123,8 +123,7 @@ class CtrlRobot:
 
         # If the robot does not return the azimuth then return 0. The azimuth will be computed by BodyMemory
         if 'azimuth' not in enacted_interaction:
-             # self.azimuth = 0  # yaw  # yaw is counterclockwise, azimuth is clockwise
-             enacted_interaction['azimuth'] = 0  # self.azimuth
+            enacted_interaction['azimuth'] = 0
 
         # If the robot returns compass_x and compass_y then recompute the azimuth
         if 'compass_x' in enacted_interaction:
@@ -143,8 +142,9 @@ class CtrlRobot:
         # Interaction Floor line
         if enacted_interaction['floor'] > 0:
             enacted_interaction[KEY_EXPERIENCES].append((EXPERIENCE_FLOOR, LINE_X, 0))
-            # The resulting translation
+            # Update the x translation
             translation[0] -= RETREAT_DISTANCE
+            # Set the y translation
             if enacted_interaction['floor'] == 0b01:  # Black line on the right
                 translation[1] = RETREAT_DISTANCE_Y
             if enacted_interaction['floor'] == 0b10:  # Black line on the left
@@ -188,35 +188,42 @@ class CtrlRobot:
             expected_focus_xy = matrix44.apply_to_vector(displacement_matrix,
                                                          [self.intended_interaction['focus_x'],
                                                           self.intended_interaction['focus_y'], 0])[0:2]
-            # The distance between the echo and the expected focus position
-            # print("Distance between echo and focus:", distance)
-            if math.dist(echo_xy, expected_focus_xy) < FOCUS_DELTA:
-                additional_xy = expected_focus_xy - echo_xy
-                # print("additional translation:", additional_xy)
+            # The delta between the expected and the actual position of the echo
+            delta_xy = expected_focus_xy - echo_xy
+
+            if math.dist(echo_xy, expected_focus_xy) < FOCUS_MAX_DELTA:
                 # The focus has been kept
                 enacted_interaction['focus'] = True
 
-                # If trust the phenomenon then adjust the displacement
-                if self.workspace.trust_mode == TRUST_POSITION_PHENOMENON:
-                    translation += additional_xy
-                    translation_matrix = matrix44.create_from_translation([-translation[0], -translation[1], 0])
-                    displacement_matrix = matrix44.multiply(rotation_matrix, translation_matrix)
-                    # Adjust the speed
-                    if action == '8' and enacted_interaction['duration1'] >= 1000:
-                        self.forward_speed = (self.forward_speed + translation) / 2
-                        # print("New forward speed:", self.forward_speed)
-                    if action == '2' and enacted_interaction['duration1'] >= 1000:
-                        self.backward_speed = (self.backward_speed + translation) / 2
-                        # print("New backward speed:", self.backward_speed)
-                    if action == '4' and enacted_interaction['duration1'] >= 1000:
-                        self.leftward_speed = (self.leftward_speed + translation) / 2
-                        # print("New leftward speed:", self.leftward_speed)
-                    if action == '6' and enacted_interaction['duration1'] >= 1000:
-                        self.rightward_speed = (self.rightward_speed + translation) / 2
-                        # print("New rightward speed:", self.rightward_speed)
+                # Correct the displacement by the delta and adjust the speed
+                if enacted_interaction['duration1'] >= 1000:
+                    # If the head is forward then correct longitudinal displacements
+                    if -20 < enacted_interaction['head_angle'] < 20:
+                        translation += delta_xy
+                        translation_matrix = matrix44.create_from_translation([-translation[0], -translation[1], 0])
+                        displacement_matrix = matrix44.multiply(rotation_matrix, translation_matrix)
+                        if action == '8':
+                            self.workspace.memory.body_memory.forward_speed = \
+                                (self.workspace.memory.body_memory.forward_speed + translation) / 2
+                        if action == '2':
+                            self.workspace.memory.body_memory.backward_speed = \
+                                (self.workspace.memory.body_memory.backward_speed + translation) / 2
+                    # If the head is sideways then correct lateral displacements
+                    if 60 < enacted_interaction['head_angle'] or enacted_interaction['head_angle'] < -60:
+                        translation += delta_xy
+                        translation_matrix = matrix44.create_from_translation([-translation[0], -translation[1], 0])
+                        displacement_matrix = matrix44.multiply(rotation_matrix, translation_matrix)
+                        if action == '4':
+                            self.workspace.memory.body_memory.leftward_speed = \
+                                (self.workspace.memory.body_memory.leftward_speed + translation) / 2
+                        if action == '6':
+                            self.workspace.memory.body_memory.rightward_speed = \
+                                (self.workspace.memory.body_memory.rightward_speed + translation) / 2
+
             else:
-                ""
-                # print("Lost focus with distance:", distance)
+                # The focus has been lost
+                enacted_interaction['lost_focus'] = True
+                print("Lost focus with delta:", delta_xy)
 
         # Return the displacement
         enacted_interaction['translation'] = translation

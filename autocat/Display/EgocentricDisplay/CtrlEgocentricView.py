@@ -1,7 +1,7 @@
 import pyglet
 from pyglet.window import key
 from .EgocentricView import EgocentricView
-from .PointOfInterest import PointOfInterest, POINT_COMPASS
+from .PointOfInterest import PointOfInterest, POINT_PROMPT
 from ...Memory.EgocentricMemory.Experience import EXPERIENCE_FOCUS, EXPERIENCE_PLACE
 
 
@@ -32,27 +32,27 @@ class CtrlEgocentricView:
             if symbol == key.DELETE:
                 for p in self.points_of_interest:
                     if p.is_selected:
+                        if p.experience is not None:
+                            # Remove the corresponding experience from egocentric memory
+                            self.egocentric_memory.experiences.remove(p.experience)
+                        if p.type == POINT_PROMPT:
+                            self.workspace.prompt_xy = None
                         p.delete()
                         self.points_of_interest.remove(p)
-                        if p.experience is not None:
-                            self.egocentric_memory.experiences.remove(p.experience)
             if symbol == key.INSERT:
-                phenomenon = PointOfInterest(self.mouse_press_x, self.mouse_press_y, self.view.batch,
-                                             self.view.background, EXPERIENCE_FOCUS)
-                self.points_of_interest.append(phenomenon)
-                phenomenon.is_selected = True
-                phenomenon.set_color('red')
+                # Set the agent's focus to the user prompt
+                self.workspace.focus_xy = [self.mouse_press_x, self.mouse_press_y]
+                # Mark the prompt
+                self.workspace.prompt_xy = [self.mouse_press_x, self.mouse_press_y]
+                focus_point = PointOfInterest(self.mouse_press_x, self.mouse_press_y, self.view.batch,
+                                              self.view.background, POINT_PROMPT)
+                self.points_of_interest.append(focus_point)
+                # focus_point.is_selected = True
+                # focus_point.set_color('red')
 
         def on_text(text):
             """Send user keypress to the workspace to handle"""
             self.workspace.process_user_key(text)
-            # if text.upper() == "A":
-            #     self.workspace.put_decider_to_auto()
-            # elif text.upper() == "M":
-            #     self.workspace.put_decider_to_manual()
-            # else:
-            #     action = {"action": text}
-            #     self.workspace.set_action(action)
 
         self.view.push_handlers(on_mouse_press, on_key_press, on_text)
 
@@ -68,9 +68,15 @@ class CtrlEgocentricView:
         """Updates the robot's body to display by the egocentric view"""
         self.view.robot.rotate_head(self.workspace.memory.body_memory.head_direction_degree())
         self.view.azimuth = self.workspace.memory.body_memory.body_azimuth()
+        self.view.label_speed.text = "Forward speed x: " \
+                                     + str(int(self.workspace.memory.body_memory.forward_speed[0])) + "mm/s, y: " \
+                                     + str(int(self.workspace.memory.body_memory.forward_speed[1])) + "mm/s."
+        self.view.label_left_speed.text = "Leftward speed x: " + \
+                                          str(int(self.workspace.memory.body_memory.leftward_speed[0])) + "mm/s, y: " \
+                                          + str(int(self.workspace.memory.body_memory.leftward_speed[1])) + "mm/s."
 
     def update_points_of_interest(self):
-        """Retrieve all new experiences from the memory, create and update the corresponding points of interest"""
+        """Retrieve all new experiences from memory, create and update the corresponding points of interest"""
 
         # If timeout then no egocentric view update
         if self.workspace.enacted_interaction['status'] == "T":
@@ -89,19 +95,22 @@ class CtrlEgocentricView:
 
         # Displace the points of interest
         for poi_displace in self.points_of_interest:
-            if poi_displace.type != POINT_COMPASS:  # Do not displace the compass points
-                poi_displace.update(displacement_matrix)
+            poi_displace.update(displacement_matrix)
+            # Update the point of attention if any
+            # if poi_displace.type == POINT_PROMPT:
+            #     self.workspace.prompt_xy = [poi_displace.x, poi_displace.y]
+            # Remove the agent's focus. It will be recreated if needed
             if poi_displace.type == EXPERIENCE_FOCUS:
                 self.points_of_interest.remove(poi_displace)
                 poi_displace.delete()
 
-        # Mark the new position
-        self.add_point_of_interest(0, 0, EXPERIENCE_PLACE)
-
-        # Point of interest focus
+        # Mark the agent's focus
         poi_focus = self.create_poi_focus()
         if poi_focus is not None:
             self.points_of_interest.append(poi_focus)
+
+        # Mark the new position
+        self.add_point_of_interest(0, 0, EXPERIENCE_PLACE)
 
         # Make the points of interest fade out using the durability of the given interaction
         # if len(self.points_of_interest) > 0:
@@ -110,13 +119,13 @@ class CtrlEgocentricView:
 
     def create_poi_focus(self):
         """Create a point of interest corresponding to the focus"""
-        output = None
-        if hasattr(self.workspace.agent, "focus"):
-            if self.workspace.agent.focus:
-                x = self.workspace.agent.focus_xy[0]
-                y = self.workspace.agent.focus_xy[1]
-                output = PointOfInterest(x, y, self.view.batch, self.view.foreground, EXPERIENCE_FOCUS)
-        return output
+        agent_focus_point = None
+        # if hasattr(self.workspace.agent, "is_focussed"):
+        if self.workspace.focus_xy is not None:
+            x = self.workspace.focus_xy[0]
+            y = self.workspace.focus_xy[1]
+            agent_focus_point = PointOfInterest(x, y, self.view.batch, self.view.foreground, EXPERIENCE_FOCUS)
+        return agent_focus_point
 
     def create_point_of_interest(self, experience):
         """Create a point of interest corresponding to the experience given as parameter"""

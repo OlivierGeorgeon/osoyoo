@@ -28,12 +28,12 @@ class HexagonalCell:
         points = []
         theta = 0
         for i in range(0, 12, 2):
-            points.append((x + math.cos(theta) * radius * scale))  # int
-            points.append((y + math.sin(theta) * radius * scale))  # int
+            points.append(int(x + math.cos(theta) * radius * scale))  # int
+            points.append(int(y + math.sin(theta) * radius * scale))  # int
             theta += math.pi/3
 
         self.shape = batch.add_indexed(6, gl.GL_TRIANGLES, group, [0, 1, 2, 0, 2, 3, 0, 3, 4, 0, 4, 5],
-                                       ('v2f', points), ('c4B', 6 * (*name_to_rgb('white'), 128)))
+                                       ('v2i', points), ('c4B', 6 * (*name_to_rgb('white'), 255)))
 
         self.set_color(status)
 
@@ -61,4 +61,4 @@ class HexagonalCell:
         if status == CELL_PHENOMENON:
             color = name_to_rgb('yellow')
         # Reset the color of the shape
-        self.shape.colors[0:24] = 6 * (*color, 128)
+        self.shape.colors[0:24] = 6 * (*color, 255)

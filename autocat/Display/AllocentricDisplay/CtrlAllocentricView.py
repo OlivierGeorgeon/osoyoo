@@ -55,7 +55,7 @@ class CtrlAllocentricView:
         self.allocentric_view.remove_focus_cell()
         # Recreate the focus cell if agent has focus
         if hasattr(self.workspace.agent, "focus"):
-            if self.workspace.agent.focus:
+            if self.workspace.agent.is_focussed:
                 displacement_matrix = matrix44.multiply(self.workspace.memory.body_memory.body_direction_matrix(),
                                                         self.allocentric_memory.body_position_matrix())
                 v = matrix44.apply_to_vector(displacement_matrix, [self.workspace.agent.focus_xy[0],

@@ -23,6 +23,7 @@ class AllocentricView(InteractiveDisplay):
         # glClearColor(0.2, 0.2, 0.7, 1.0)  # Make it look like hippocampus imaging
         glClearColor(0.2, 0.2, 1.0, 1.0)  # For demonstration in Fête de la Science
         # glClearColor(1.0, 1.0, 1.0, 1.0)
+        pyglet.gl.glEnable(pyglet.gl.GL_BLEND)
         self.batch = pyglet.graphics.Batch()
         self.background = pyglet.graphics.OrderedGroup(0)
         self.foreground = pyglet.graphics.OrderedGroup(1)
@@ -46,20 +47,20 @@ class AllocentricView(InteractiveDisplay):
 
         self.mouse_press_x = 0
         self.mouse_press_y = 0
-        self.label = pyglet.text.Label('', font_name='Verdana', font_size=10, x=10, y=10)
+        self.label = pyglet.text.Label('', font_name='Verdana', font_size=10, x=10, y=30)
         self.label.color = (255, 255, 255, 255)
 
         self.trust_position_mode = TRUST_POSITION_ROBOT
-        self.label_trust_mode = pyglet.text.Label('Trust position: ', font_name='Verdana', font_size=10, x=10, y=30)
+        self.label_trust_mode = pyglet.text.Label('Trust position: ', font_name='Verdana', font_size=10, x=10, y=10)
         self.label_trust_mode.color = (255, 255, 255, 255)
 
-    def add_cell(self, cell_x: int, cell_y: int):
+    def add_cell(self, i: int, j: int):
         """Add a new grid cell to allocentric view. Called by CtrlAllocentricView"""
-        cell = self.memory.allocentric_memory.grid[cell_x][cell_y]
+        cell = self.memory.allocentric_memory.grid[i][j]
         radius = self.memory.allocentric_memory.cell_radius
         if cell.status != CELL_UNKNOWN:
-            new_cell = HexagonalCell(cell_x, cell_y, self.batch, self.background, radius, cell.status, 0.8)
-            self.cell_table[cell_x][cell_y] = new_cell
+            new_cell = HexagonalCell(i, j, self.batch, self.background, radius, cell.status, 0.8)
+            self.cell_table[i][j] = new_cell
 
     def remove_focus_cell(self):
         """Remove the focus cell from allocentric view"""
@@ -105,8 +106,6 @@ class AllocentricView(InteractiveDisplay):
         self.label_trust_mode.draw()
 
     def on_mouse_motion(self, x, y, dx, dy):
-        # mouse_x = int((x - self.width/2) * self.zoom_level * 2)
-        # mouse_y = int((y - self.height/2) * self.zoom_level * 2)
         # Find the cell
         cell_x, cell_y = self.cell_from_screen_coordinate(x, y)
         self.label.text = "Cell: " + str(cell_x) + ", " + str(cell_y)
