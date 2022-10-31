@@ -30,15 +30,21 @@ class PointOfInterest:
                                                 ('c4B', 3 * (*self.color, self.opacity)))
         if self.type == EXPERIENCE_ALIGNED_ECHO:
             self.color = name_to_rgb("orange")
-            self.shape = shapes.Circle(0, 0, 20, color=self.color, batch=self.batch)
-            self.shape.group = group
+            # self.shape = shapes.Circle(0, 0, 20, color=self.color, batch=self.batch)
+            # self.shape.group = group
+            self.points = [-20, 0, -11, 20, 1, 27, 1, -27, -11, -20]
+            self.shape = self.batch.add_indexed(5, gl.GL_TRIANGLES, self.group, [0, 1, 2, 0, 2, 3, 0, 3, 4],
+                                                ('v2i', self.points), ('c4B', 5 * (*self.color, self.opacity)))
         if self.type == EXPERIENCE_LOCAL_ECHO:
             self.color = name_to_rgb("sienna")
             self.shape = shapes.Circle(0, 0, 7, color=self.color, batch=self.batch)
         if self.type == EXPERIENCE_CENTRAL_ECHO:
             self.color = name_to_rgb("sienna")
-            self.shape = shapes.Circle(0, 0, 20, color=self.color, batch=self.batch)
-            self.shape.group = group
+            # self.shape = shapes.Circle(0, 0, 20, color=self.color, batch=self.batch)
+            # self.shape.group = group
+            self.points = [-20, 0, -11, 20, 1, 27, 1, -27, -11, -20]
+            self.shape = self.batch.add_indexed(5, gl.GL_TRIANGLES, self.group, [0, 1, 2, 0, 2, 3, 0, 3, 4],
+                                                ('v2i', self.points), ('c4B', 5 * (*self.color, self.opacity)))
         if self.type == EXPERIENCE_FLOOR:
             self.color = name_to_rgb("black")
             self.points = [-5, -30, -5, 30, 5, 30, 5, -30]
@@ -109,7 +115,7 @@ class PointOfInterest:
         v = matrix44.apply_to_vector(displacement_matrix, [self.x, self.y, 0])
         self.x, self.y = v[0], v[1]
 
-        # If the shape has a list of vertices (POINT PLACE)
+        # If the shape has a list of vertices
         # then apply the displacement matrix to each point. This will rotate the shape
         if hasattr(self.shape, 'vertices'):
             for i in range(0, len(self.shape.vertices)-1, 2):
@@ -121,12 +127,12 @@ class PointOfInterest:
         self.shape.x, self.shape.y = self.x, self.y
 
         # Rotate the pyglet shapes (rectangles)
-        if self.type == EXPERIENCE_FLOOR:
-            q = Quaternion(displacement_matrix)
-            if q.axis[2] > 0:  # Rotate around z axis upwards
-                self.shape.rotation += math.degrees(q.angle)
-            else:  # Rotate around z axis downward
-                self.shape.rotation += math.degrees(-q.angle)
+        # if self.type == EXPERIENCE_FLOOR:
+        #     q = Quaternion(displacement_matrix)
+        #     if q.axis[2] > 0:  # Rotate around z axis upwards
+        #         self.shape.rotation += math.degrees(q.angle)
+        #     else:  # Rotate around z axis downward
+        #         self.shape.rotation += math.degrees(-q.angle)
         # if self.type == EXPERIENCE_BLOCK or self.type == EXPERIENCE_IMPACT:
         #     # Rotate and translate the other points of the triangle
         #     v = matrix44.apply_to_vector(displacement_matrix, [self.shape.x2, self.shape.y2, 0])

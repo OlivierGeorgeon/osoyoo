@@ -17,8 +17,6 @@ class Integrator:
         self.phenomena = []
         self.last_projection_for_context = []
         self.last_used_id = 0
-        # self.last_action_had_focus = False
-        # self.last_action = None
 
     def integrate(self):
         """Create phenomena and update cells in allocentric memory"""

@@ -18,13 +18,6 @@ class CtrlPhenomenonView:
         def on_text(text):
             """Send user keypress to the workspace to handle"""
             self.workspace.process_user_key(text)
-            # if text.upper() == "A":
-            #     self.workspace.put_decider_to_auto()
-            # elif text.upper() == "M":
-            #     self.workspace.put_decider_to_manual()
-            # else:
-            #     action = {"action": text}
-            #     self.workspace.set_action(action)
 
         self.view.push_handlers(on_text)
 
@@ -64,16 +57,18 @@ class CtrlPhenomenonView:
         return output
 
     def create_point_of_interest(self, affordance):
-        """Create a point of interest corresponding to the experience given as parameter"""
-        x, y, _ = matrix44.apply_to_vector(affordance.position_matrix, [0., 0., 0.])
-        poi = PointOfInterest(x, y, self.view.batch, self.view.foreground, affordance.experience.type,
+        """Create a point of interest corresponding to the affordance given as parameter"""
+        # x, y, _ = matrix44.apply_to_vector(affordance.position_matrix, [0., 0., 0.])
+        poi = PointOfInterest(0, 0, self.view.batch, self.view.foreground, affordance.experience.type,
                               experience=affordance.experience)
-
+        # poi.displace(affordance.rotation_matrix)  # Rotate the shape on itself
+        # poi.displace(affordance.position_matrix)  # and then translate
+        # Rotate the shape on itself and then translate
+        poi.displace(matrix44.multiply(affordance.rotation_matrix, affordance.position_matrix))
         # Show the position of the sensor
         points = affordance.sensor_triangle()
         if points is not None:
             self.view.add_polygon(points, "CadetBlue")
-
         return poi
 
     def main(self, dt):

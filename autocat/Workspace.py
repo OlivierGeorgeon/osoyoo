@@ -26,8 +26,8 @@ class Workspace:
 
         self.decider_mode = CONTROL_MODE_MANUAL
         self.trust_mode = TRUST_POSITION_PHENOMENON
-        self.robot_ready = True
-        self.flag_for_need_of_action = True
+        # self.robot_ready = True
+        # self.flag_for_need_of_action = True
         self.has_new_intended_interaction = False
         self.has_new_enacted_interaction = False
         self.has_new_outcome_been_treated = True
@@ -62,9 +62,9 @@ class Workspace:
             self.has_new_enacted_interaction = False
 
         # If ready, ask for a new intended interaction
-        if self.intended_interaction is None and self.decider_mode == CONTROL_MODE_AUTOMATIC and self.has_new_outcome_been_treated \
-                and self.robot_ready:
-            self.robot_ready = False
+        if self.intended_interaction is None and self.decider_mode == CONTROL_MODE_AUTOMATIC and self.has_new_outcome_been_treated:
+                # and self.robot_ready:
+            # self.robot_ready = False
             self.has_new_outcome_been_treated = False
             self.intended_interaction = self.agent.propose_intended_interaction(self.enacted_interaction)
             # self.integrator.last_action_had_focus = 'focus_x' in self.intended_interaction
@@ -77,11 +77,8 @@ class Workspace:
         """
         if self.has_new_intended_interaction:
             self.has_new_intended_interaction = False
-            # if 'focus_x' in self.intended_interaction:
-            #     self.integrator.last_action_had_focus = True
-            intended_interaction = self.intended_interaction
-            # self.intended_interaction = None
-            return intended_interaction
+            return self.intended_interaction
+            # return intended_interaction
         else:
             return None
 
@@ -100,14 +97,11 @@ class Workspace:
             if 'focus' not in enacted_interaction:
                 # The focus was lost, override the echo outcome
                 self.focus_xy = None
-                # outcome = OUTCOME_LOST_FOCUS
                 print("LOST FOCUS")
         else:
             if self.intended_interaction['action'] in ["-", "8"]:
                 # Catch focus
                 if 'echo_xy' in enacted_interaction:
-                    # if outcome in [OUTCOME_LEFT, OUTCOME_FAR_LEFT, OUTCOME_RIGHT, OUTCOME_FAR_RIGHT, OUTCOME_FAR_FRONT,
-                    #            OUTCOME_CLOSE_FRONT]:
                     print("CATCH FOCUS")
                     self.focus_xy = enacted_interaction['echo_xy']
 
@@ -125,9 +119,8 @@ class Workspace:
         elif user_key.upper() == "P":
             self.trust_mode = TRUST_POSITION_PHENOMENON
         else:
-            action = {"action": user_key}
+            self.intended_interaction = {"action": user_key}
             if self.focus_xy is not None:
-                action['focus_x'] = int(self.focus_xy[0])
-                action['focus_y'] = int(self.focus_xy[1])
-            self.intended_interaction = action
+                self.intended_interaction['focus_x'] = int(self.focus_xy[0])
+                self.intended_interaction['focus_y'] = int(self.focus_xy[1])
             self.has_new_intended_interaction = True

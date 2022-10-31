@@ -32,11 +32,11 @@ class Phenomenon:
         """Add an affordance made from this experience at this position"""
         self.affordances.append(Affordance(x, y, experience))
 
-        # if not self.has_been_validated:
-        self.compute_center()
+        # TODO: Adjust the center of the phenomenon when we can move it in phenomenon view
+        # self.compute_center()
 
     def compute_center(self):
-        """Compute the center of the object phenomenon"""
+        """Adjust the center of the phenomenon and the relative position of affordances"""
         sum_x = 0.
         sum_y = 0.
         i = 0.

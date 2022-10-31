@@ -1,13 +1,23 @@
 import math
-from pyrr import matrix44
+from pyrr import matrix44, Quaternion
 from ..Memory.EgocentricMemory.Experience import EXPERIENCE_ALIGNED_ECHO
 
 
 class Affordance:
     """An affordance is an experience localized relative to a phenomenon"""
     def __init__(self, x, y, experience):
-        self.position_matrix = matrix44.create_from_translation([x, y, 0])
+        self.position_matrix = matrix44.create_from_translation([x, y, 0]).astype('float64')
         self.experience = experience
+        # # q = Quaternion(matrix44.multiply(self.experience.sensor_matrix, self.position_matrix))
+        # q = Quaternion(self.experience.sensor_matrix)
+        # print("Affordance " + self.experience.type + " angle: ", math.degrees(q.angle))
+        # self.rotation_matrix = matrix44.create_from_quaternion(q)
+
+        sensor_position_matrix = matrix44.multiply(self.experience.sensor_matrix, self.position_matrix)
+        p1x, p1y, _ = matrix44.apply_to_vector(sensor_position_matrix, [0, 0, 0])
+        angle_sensor = math.atan2(p1y, p1x)
+        print("Affordance " + self.experience.type + " angle: ", int(math.degrees(angle_sensor)))
+        self.rotation_matrix = matrix44.create_from_z_rotation(math.pi - angle_sensor)
 
     def sensor_triangle(self):
         """The set of points to display the sensor in phenomenon view"""

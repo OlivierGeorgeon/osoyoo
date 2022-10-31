@@ -25,14 +25,14 @@ class EgocentricMemory:
         # Create new experiences from points in the enacted_interaction
         new_experiences = []
         for p in enacted_interaction[KEY_EXPERIENCES]:
-            experience = Experience(p[1], p[2], experience_type=p[0], durability=EXPERIENCE_PERSISTENCE,
-                                    experience_id=self.experience_id, direction_rad=body_direction_rad)
+            experience = Experience(p[1], p[2], experience_type=p[0], direction_rad=body_direction_rad,
+                                    durability=EXPERIENCE_PERSISTENCE, experience_id=self.experience_id)
             new_experiences.append(experience)
             self.experience_id += 1
 
         # Add the central echos from the local echos
-        new_central_echos = self.Compute_central_echo([e for e in new_experiences if e.type == EXPERIENCE_LOCAL_ECHO])
-
+        new_central_echos = self.Compute_central_echo([e for e in new_experiences if e.type == EXPERIENCE_LOCAL_ECHO],
+                                                      body_direction_rad)
         self.experiences += new_experiences
         self.experiences += new_central_echos
 
@@ -69,7 +69,7 @@ class EgocentricMemory:
             output.append((angle, distance, elem))
         return output
 
-    def Compute_central_echo(self, echo_list):
+    def Compute_central_echo(self, echo_list, body_direction_rad):
         """In case of a sweep we obtain an array of echo, this function discretize
         it to try to find the real position of the objects that sent back the echo
 
@@ -118,7 +118,8 @@ class EgocentricMemory:
                     x_mean = streak[int(len(streak) / 2)][2].x
                     y_mean = streak[int(len(streak) / 2)][2].y
                 experience_central_echo = Experience(int(x_mean), int(y_mean), experience_type=EXPERIENCE_CENTRAL_ECHO,
-                                                     durability=5, decay_intensity=1, experience_id=self.experience_id)
+                                                     direction_rad=body_direction_rad,
+                                                     durability=5, experience_id=self.experience_id)
                 self.experience_id += 1
                 experiences_central_echo.append(experience_central_echo)
 

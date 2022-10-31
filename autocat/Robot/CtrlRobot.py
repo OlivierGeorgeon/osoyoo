@@ -49,7 +49,7 @@ class CtrlRobot:
 
         # Wait to receive an outcome from the robot and then write it to the workspace
         if self.enact_step == ENACT_STEP_END:
-            self.workspace.robot_ready = True
+            # self.workspace.robot_ready = True
             self.enact_step = ENACT_STEP_IDLE
             enacted_interaction = self.outcome_to_enacted_interaction()
             self.workspace.update_enacted_interaction(enacted_interaction)
