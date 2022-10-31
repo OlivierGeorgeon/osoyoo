@@ -49,21 +49,21 @@ class BodyMemory:
         """Return the opposite body direction matrix to apply to experiences"""
         return matrix44.create_from_z_rotation(-self.body_direction_rad)
 
-    def rotate_degree(self, yaw_degree: int, azimuth_degree: int):
+    def rotate_degree(self, yaw_degree: int, compass_azimuth: int):
         """Rotate the robot's body by the yaw and correct drift using azimuth if out of bound."""
-        new_azimuth = self.body_azimuth() - yaw_degree  # Yaw is counterclockwise
+        azimuth = self.body_azimuth() - yaw_degree  # Yaw is counterclockwise
         # Keep it within [0, 360[
-        while new_azimuth < 0:
-            new_azimuth += 360
-        new_azimuth = new_azimuth % 360
+        while azimuth < 0:
+            azimuth += 360
+        azimuth = azimuth % 360
 
         # If the direction is too far from the azimuth then use the azimuth
         # https://stackoverflow.com/questions/1878907/how-can-i-find-the-difference-between-two-angles
-        if 10 < azimuth_degree < 350:  # Don't apply if imu has no compass information
-            if abs(new_azimuth - azimuth_degree) > 10:
-                new_azimuth = azimuth_degree
+        if compass_azimuth > 10:  # Don't apply if imu has no compass information
+            if 10 < abs(azimuth - compass_azimuth) < 350:  # More than 350 means both close to north
+                azimuth = compass_azimuth
 
-        self.set_body_direction_from_azimuth(new_azimuth)
+        self.set_body_direction_from_azimuth(azimuth)
 
     def is_inside_robot(self, x, y):
         """Return True if the point is inside the robot.

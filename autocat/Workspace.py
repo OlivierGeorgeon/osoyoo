@@ -92,7 +92,8 @@ class Workspace:
         if self.focus_xy is not None:
             # If the focus was kept then update it
             if 'focus' in enacted_interaction:
-                self.focus_xy = enacted_interaction['echo_xy']
+                if 'echo_xy' in enacted_interaction:  # Not sure why this is necessary
+                    self.focus_xy = enacted_interaction['echo_xy']
             # If the focus was lost then reset it
             if 'focus' not in enacted_interaction:
                 # The focus was lost, override the echo outcome

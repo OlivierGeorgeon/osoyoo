@@ -8,15 +8,15 @@ class PhenomenaToInvestigate:
         Parameters:
             number_of_try_before_removing: the number of try before removing a phenomenon from the list
             number_of_echo_before_validation: the number of echo interactions needed to be added to an echo object to validate it"""
-        self.list_objects_to_investigate = []
-        self.validated_objects = []
+        self.phenomena_to_investigate = []
+        self.validated_phenomena = []
         self.number_of_try_before_removing = number_of_try_before_removing
         self.number_of_echo_before_validation = number_of_echo_before_validation
         self.workspace = workspace
         self.memory = workspace.memory
         self.allocentric_memory = workspace.memory.allocentric_memory
 
-    def create_hypothetical_phenomena(self, experiences, trust_mode):
+    def create_hypothetical_phenomena(self, experiences, trust_phenomenon):
         """Create new phenomena to investigate from the list of central echos"""
         new_phenomena = []
         for experience in experiences:
@@ -28,7 +28,7 @@ class PhenomenaToInvestigate:
                 clustered = False
                 for new_phenomenon in new_phenomena:
                     # TODO compute the position matrix relative to the phenomenon position
-                    if new_phenomenon.try_and_add(experience, position_matrix, trust_mode):
+                    if new_phenomenon.try_and_add(experience, position_matrix, trust_phenomenon):
                         clustered = True
                         break
                     print("NOCLUSTO")
@@ -36,7 +36,7 @@ class PhenomenaToInvestigate:
                     new_phenomena.append(Phenomenon(experience, position_matrix))
         for p in new_phenomena:
             print("New hypothetical phenomenon")
-            self.list_objects_to_investigate.append([p, 0])
+            self.phenomena_to_investigate.append([p, 0])
 
     def try_and_add(self, experiences, trust_mode):
         """Try to add the echo experiences to the phenomena to investigate"""
@@ -44,7 +44,7 @@ class PhenomenaToInvestigate:
         for experience in experiences:
             position_matrix = experience.allocentric_position_matrix(self.memory.body_memory.body_direction_matrix(),
                                                                      self.allocentric_memory.body_position_matrix())
-            for phenomenon, _ in self.list_objects_to_investigate:
+            for phenomenon, _ in self.phenomena_to_investigate:
                 print("A phenomenon is beeing investigated")
                 if phenomenon.try_and_add(experience, position_matrix, trust_mode):
                     remaining_experiences.remove(experience)
@@ -57,17 +57,17 @@ class PhenomenaToInvestigate:
         the objects that have been tried too much without meeting the
         threshold to be validated"""
         objet_validated = []
-        for i, [objet, count] in enumerate(self.list_objects_to_investigate):
+        for i, [objet, count] in enumerate(self.phenomena_to_investigate):
             objet.try_to_validate(self.number_of_echo_before_validation)
             if objet.has_been_validated:
                 objet_validated.append(objet)
-                self.list_objects_to_investigate.remove([objet, count])
+                self.phenomena_to_investigate.remove([objet, count])
             else:
-                self.list_objects_to_investigate[i][1] += 1
+                self.phenomena_to_investigate[i][1] += 1
 
-        for objet in self.list_objects_to_investigate:
+        for objet in self.phenomena_to_investigate:
             if objet[1] > self.number_of_try_before_removing:
-                self.list_objects_to_investigate.remove(objet)
+                self.phenomena_to_investigate.remove(objet)
 
         return objet_validated
 

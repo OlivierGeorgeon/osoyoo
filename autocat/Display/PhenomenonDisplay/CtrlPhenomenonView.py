@@ -39,12 +39,15 @@ class CtrlPhenomenonView:
             self.view.robot_pos_y = self.workspace.memory.allocentric_memory.robot_pos_y - self.phenomenon.y
 
     def update_points_of_interest(self, phenomenon):
-        """Retrieve all the experiences in a phenomenon and create the corresponding points of interest"""
+        """Retrieve the new affordances in a phenomenon and create the corresponding points of interest"""
         for a in [elem for elem in phenomenon.affordances if elem.experience.id > self.last_used_id]:
             if a.experience.id > self.last_used_id:
                 self.last_used_id = max(a.experience.id, self.last_used_id)
             poi = self.create_point_of_interest(a)
             self.points_of_interest.append(poi)
+
+        # Draw the phenomenon outline
+        self.view.add_lines(phenomenon.points(), "black")
 
     def create_poi_focus(self):
         """Create a point of interest corresponding to the focus in the reference of the robot"""

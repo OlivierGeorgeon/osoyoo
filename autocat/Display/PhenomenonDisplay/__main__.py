@@ -19,12 +19,14 @@ position_matrix = matrix44.create_identity()
 phenomenon = Phenomenon(experience1, position_matrix)
 
 # Add a second affordance
-# experience2 = Experience(150, 0, EXPERIENCE_FLOOR, experience_id=1)
-# position_matrix2 = matrix44.create_from_z_rotation(math.pi/4)
-# experience2.displace(position_matrix2)
-# phenomenon.add_affordance(-20, 0, experience2)
-experience2 = Experience(300, 0, EXPERIENCE_ALIGNED_ECHO, direction_rad=3 * math.pi / 4, experience_id=0)
-phenomenon.add_affordance(100, 0, experience2)
+experience2 = Experience(200, 0, EXPERIENCE_ALIGNED_ECHO, direction_rad=-math.pi / 2, experience_id=0)
+phenomenon.add_affordance(10, 50, experience2)
+
+experience2bis = Experience(200, 0, EXPERIENCE_ALIGNED_ECHO, direction_rad=-math.pi / 2, experience_id=0)
+phenomenon.add_affordance(100, 50, experience2bis)
+
+experience3 = Experience(300, 0, EXPERIENCE_ALIGNED_ECHO, direction_rad=3 * math.pi / 4, experience_id=0)
+phenomenon.add_affordance(100, 0, experience3)
 
 # Update the phenomenon view
 controller.update_points_of_interest(phenomenon)

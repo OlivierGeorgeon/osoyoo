@@ -6,7 +6,7 @@ PHENOMENON_DELTA = 300  # (mm) distance between experiences to be considered the
 
 
 class Phenomenon:
-    """An hypothetical phenomenon"""
+    """A hypothetical phenomenon"""
     def __init__(self, echo_experience, position_matrix):
         """Constructor
         Parameters:
@@ -14,7 +14,6 @@ class Phenomenon:
             position_matrix: the matrix to place the phenomenon in allocentric memory
             acceptable_delta: the acceptable delta between the allocentric coordinates of a new echo interaction
             and the center of the object phenomenon"""
-        # self.experiences = [echo_experience]
         self.position_matrix = position_matrix
 
         # Record the first affordance of the phenomenon
@@ -22,11 +21,9 @@ class Phenomenon:
 
         # The coordinates of this phenomenon in allocentric memory
         self.x, self.y, _ = matrix44.apply_to_vector(self.position_matrix, [0, 0, 0])
-        # self.allo_coordinates = [(x, y)]
-        # self.center = [x, y]
 
         self.has_been_validated = False
-        self.printed = False
+        # self.printed = False
 
     def add_affordance(self, x, y, experience):
         """Add an affordance made from this experience at this position"""
@@ -53,17 +50,17 @@ class Phenomenon:
             affordance.position_matrix[3, 0] -= int(sum_x/i)
             affordance.position_matrix[3, 1] -= int(sum_y/i)
 
-    def try_and_add(self, experience, position_matrix, trust_mode):
-        """Test if the echo interaction is in the acceptable delta of the center of the phenomenon,
-        if yes, add it to the phenomenon"""
+    def try_and_add(self, experience, position_matrix, trust_phenomenon):
+        """Test if the experience is within the acceptable delta from the center of the phenomenon,
+        if yes, add the affordance to the phenomenon, and return the delta."""
         x, y, _ = matrix44.apply_to_vector(position_matrix, [0, 0, 0])
         if math.dist([x, y], [self.x, self.y]) < PHENOMENON_DELTA:
-            dist_x, dist_y = x - self.x, y - self.y
-            if trust_mode:
+            delta_x, delta_y = x - self.x, y - self.y
+            if trust_phenomenon:
                 self.add_affordance(0, 0, experience)
             else:
-                self.add_affordance(dist_x, dist_y, experience)
-            return True, (-dist_x, -dist_y)
+                self.add_affordance(delta_x, delta_y, experience)
+            return True, (-delta_x, -delta_y)
         else:
             return False, None
 
@@ -73,3 +70,11 @@ class Phenomenon:
         if len(self.affordances) >= number_of_echos_needed:
             self.has_been_validated = True
         return self.has_been_validated
+
+    def points(self):
+        points = []
+        for a in self.affordances:
+            x, y, _ = matrix44.apply_to_vector(a.position_matrix, [0, 0, 0])
+            points.append(int(x))
+            points.append(int(y))
+        return points

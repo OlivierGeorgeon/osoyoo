@@ -76,12 +76,32 @@ class PhenomenonView(InteractiveDisplay):
     def add_polygon(self, points, color_string):
         """Add a polygon to the background of the view"""
         nb_points = int(len(points) / 2)
-        nb_index = (nb_points-2) * 3
-        v_index = [0, 1, 2, 0, 2, 3, 0, 3, 4, 0, 4, 5][0:nb_index]
-        color = name_to_rgb(color_string)
-        opacity = 64
-        self.batch.add_indexed(3, gl.GL_TRIANGLES, self.background, v_index, ('v2i', points),
-                               ('c4B', nb_points * (*color, opacity)))
+        if 3 <= nb_points <= 6:
+            nb_index = (nb_points - 2) * 3
+            v_index = [0, 1, 2, 0, 2, 3, 0, 3, 4, 0, 4, 5, 0, 6, 7, 0, 7, 8][0:nb_index]
+            color = name_to_rgb(color_string)
+            opacity = 64
+            self.batch.add_indexed(nb_points, gl.GL_TRIANGLES, self.background, v_index, ('v2i', points),
+                                   ('c4B', nb_points * (*color, opacity)))
+
+    def add_lines(self, points, color_string):
+        """Add a polygon to the background of the view"""
+        points += points[0:2]  # Loop back to the last point
+        nb_points = int(len(points) / 2)
+        print("phenomenon points: ", points)
+        if 2 <= nb_points:
+            print("Phenomenon nb points", nb_points)
+            nb_index = (nb_points - 1) * 2 - 1
+            # v_index = [0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9][0:nb_index]
+            v_index = [0]
+            for i in range(1, nb_points):
+                v_index += [i, i]
+            v_index += [0]  # Close the loop
+            print("v_index: ", v_index)
+            color = name_to_rgb(color_string)
+            opacity = 255
+            self.batch.add_indexed(nb_points, gl.GL_LINES, self.foreground, v_index, ('v2i', points),
+                                   ('c4B', nb_points * (*color, opacity)))
 
 
 # Testing the Phenomenon View by displaying the robot in a pretty position
