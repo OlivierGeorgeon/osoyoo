@@ -33,6 +33,8 @@ class PhenomenonView(InteractiveDisplay):
         self.robot_pos_x = 0
         self.robot_pos_y = 0
 
+        self.outline = None
+
         # Define the text area at the bottom of the view
         self.label = pyglet.text.Label('', font_name='Verdana', font_size=10, x=10, y=10)
         self.label.color = (0, 0, 0, 255)
@@ -86,20 +88,19 @@ class PhenomenonView(InteractiveDisplay):
 
     def add_lines(self, points, color_string):
         """Add the outline of a polygon to the foreground of the view"""
-        points += points[0:2]  # Loop back to the last point
-        nb_points = int(len(points) / 2)
-        # print("phenomenon points: ", points)
-        if 2 <= nb_points:
-            # print("Phenomenon nb points", nb_points)
-            v_index = [0]  # The initial point
-            for i in range(1, nb_points):
-                v_index += [i, i]
-            v_index += [0]  # Close the loop
-            # print("v_index: ", v_index)
-            # color = name_to_rgb(color_string)
-            # opacity = 255
-            self.batch.add_indexed(nb_points, gl.GL_LINES, self.foreground, v_index, ('v2i', points),
-                                   ('c4B', nb_points * (*name_to_rgb(color_string), 255)))
+        if self.outline is not None:
+            self.outline.delete()
+
+        if points is not None:
+            points += points[0:2]  # Loop back to the last point
+            nb_points = int(len(points) / 2)
+            if 2 <= nb_points:
+                v_index = [0]  # The initial point
+                for i in range(1, nb_points):
+                    v_index += [i, i]
+                v_index += [0]  # Close the loop
+                self.outline = self.batch.add_indexed(nb_points, gl.GL_LINES, self.foreground, v_index, ('v2i', points),
+                                       ('c4B', nb_points * (*name_to_rgb(color_string), 255)))
 
 
 # Testing the Phenomenon View by displaying the robot in a pretty position

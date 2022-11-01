@@ -47,7 +47,7 @@ class CtrlPhenomenonView:
             self.points_of_interest.append(poi)
 
         # Draw the phenomenon outline
-        self.view.add_lines(phenomenon.points(), "black")
+        self.view.add_lines(phenomenon.convex_hull(), "black")
 
     def create_poi_focus(self):
         """Create a point of interest corresponding to the focus in the reference of the robot"""
