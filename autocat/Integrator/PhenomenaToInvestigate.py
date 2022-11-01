@@ -16,7 +16,7 @@ class PhenomenaToInvestigate:
         self.memory = workspace.memory
         self.allocentric_memory = workspace.memory.allocentric_memory
 
-    def create_hypothetical_phenomena(self, experiences, trust_phenomenon):
+    def create_hypothetical_phenomena(self, experiences, trust_robot_proportion):
         """Create new phenomena to investigate from the list of central echos"""
         new_phenomena = []
         for experience in experiences:
@@ -27,8 +27,7 @@ class PhenomenaToInvestigate:
             else:
                 clustered = False
                 for new_phenomenon in new_phenomena:
-                    # TODO compute the position matrix relative to the phenomenon position
-                    if new_phenomenon.try_and_add(experience, position_matrix, trust_phenomenon):
+                    if new_phenomenon.try_and_add(experience, position_matrix, trust_robot_proportion):
                         clustered = True
                         break
                     print("NOCLUSTO")
@@ -38,7 +37,7 @@ class PhenomenaToInvestigate:
             print("New hypothetical phenomenon")
             self.phenomena_to_investigate.append([p, 0])
 
-    def try_and_add(self, experiences, trust_mode):
+    def try_and_add(self, experiences, trust_robot_proportion):
         """Try to add the echo experiences to the phenomena to investigate"""
         remaining_experiences = experiences.copy()
         for experience in experiences:
@@ -46,7 +45,7 @@ class PhenomenaToInvestigate:
                                                                      self.allocentric_memory.body_position_matrix())
             for phenomenon, _ in self.phenomena_to_investigate:
                 print("A phenomenon is beeing investigated")
-                if phenomenon.try_and_add(experience, position_matrix, trust_mode):
+                if phenomenon.try_and_add(experience, position_matrix, trust_robot_proportion):
                     remaining_experiences.remove(experience)
                     break
         return remaining_experiences

@@ -74,7 +74,7 @@ class PhenomenonView(InteractiveDisplay):
                           + ", angle:" + str(int(math.degrees(angle))) + "°."
 
     def add_polygon(self, points, color_string):
-        """Add a polygon to the background of the view"""
+        """Add a plain polygon to the background of the view"""
         nb_points = int(len(points) / 2)
         if 3 <= nb_points <= 6:
             nb_index = (nb_points - 2) * 3
@@ -85,23 +85,21 @@ class PhenomenonView(InteractiveDisplay):
                                    ('c4B', nb_points * (*color, opacity)))
 
     def add_lines(self, points, color_string):
-        """Add a polygon to the background of the view"""
+        """Add the outline of a polygon to the foreground of the view"""
         points += points[0:2]  # Loop back to the last point
         nb_points = int(len(points) / 2)
-        print("phenomenon points: ", points)
+        # print("phenomenon points: ", points)
         if 2 <= nb_points:
-            print("Phenomenon nb points", nb_points)
-            nb_index = (nb_points - 1) * 2 - 1
-            # v_index = [0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9][0:nb_index]
-            v_index = [0]
+            # print("Phenomenon nb points", nb_points)
+            v_index = [0]  # The initial point
             for i in range(1, nb_points):
                 v_index += [i, i]
             v_index += [0]  # Close the loop
-            print("v_index: ", v_index)
-            color = name_to_rgb(color_string)
-            opacity = 255
+            # print("v_index: ", v_index)
+            # color = name_to_rgb(color_string)
+            # opacity = 255
             self.batch.add_indexed(nb_points, gl.GL_LINES, self.foreground, v_index, ('v2i', points),
-                                   ('c4B', nb_points * (*color, opacity)))
+                                   ('c4B', nb_points * (*name_to_rgb(color_string), 255)))
 
 
 # Testing the Phenomenon View by displaying the robot in a pretty position

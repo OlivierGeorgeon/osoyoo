@@ -1,8 +1,17 @@
 import math
+import numpy
 from pyrr import matrix44
 from .Affordance import Affordance
 
 PHENOMENON_DELTA = 300  # (mm) distance between experiences to be considered the same phenomenon
+
+
+# https://stackoverflow.com/questions/61341712/calculate-projected-point-location-x-y-on-given-line-startx-y-endx-y
+def point_on_line(a, b, p):
+    ap = p - a
+    ab = b - a
+    result = a + numpy.dot(ap, ab) / numpy.dot(ab, ab) * ab
+    return result
 
 
 class Phenomenon:
@@ -50,17 +59,25 @@ class Phenomenon:
             affordance.position_matrix[3, 0] -= int(sum_x/i)
             affordance.position_matrix[3, 1] -= int(sum_y/i)
 
-    def try_and_add(self, experience, position_matrix, trust_phenomenon):
+    def try_and_add(self, experience, position_matrix, trust_robot_proportion):
         """Test if the experience is within the acceptable delta from the center of the phenomenon,
         if yes, add the affordance to the phenomenon, and return the delta."""
-        x, y, _ = matrix44.apply_to_vector(position_matrix, [0, 0, 0])
-        if math.dist([x, y], [self.x, self.y]) < PHENOMENON_DELTA:
-            delta_x, delta_y = x - self.x, y - self.y
-            if trust_phenomenon:
-                self.add_affordance(0, 0, experience)
-            else:
-                self.add_affordance(delta_x, delta_y, experience)
-            return True, (-delta_x, -delta_y)
+        phenomenon_point = numpy.array([self.x, self.y])
+        # x, y, _ = matrix44.apply_to_vector(position_matrix, [0, 0, 0])
+        experience_point = numpy.array(matrix44.apply_to_vector(position_matrix, [0, 0, 0])[0:2])
+
+        if math.dist(experience_point, phenomenon_point) < PHENOMENON_DELTA:
+            delta = experience_point - phenomenon_point  # delta_x, delta_y = x - self.x, y - self.y
+            delta_affordance = trust_robot_proportion * delta
+            # self.add_affordance(delta_affordance[0], delta_affordance[1], experience)
+            self.add_affordance(*delta_affordance, experience)
+            # if trust_phenomenon:
+            #     self.add_affordance(0, 0, experience)
+            # else:
+            #     self.add_affordance(delta_x, delta_y, experience)
+            delta_robot = (1 - trust_robot_proportion) * delta  # If trust robot's position then don't correct it
+            return True, -delta_robot
+            # return True, (-delta[0], -delta[1])
         else:
             return False, None
 
@@ -72,9 +89,27 @@ class Phenomenon:
         return self.has_been_validated
 
     def points(self):
+        """Return the list of points to display in phenomenon view."""
         points = []
         for a in self.affordances:
             x, y, _ = matrix44.apply_to_vector(a.position_matrix, [0, 0, 0])
             points.append(int(x))
             points.append(int(y))
         return points
+
+    def is_inside(self, x, y):
+        """Return True if the point is inside the phenomenon"""
+        p = numpy.array([x, y])
+        is_inside = True
+        if len(self.affordances) >= 2:
+            for i in range(0, len(self.affordances)-1):
+                # Lines must be clockwise
+                p1 = numpy.array(matrix44.apply_to_vector(self.affordances[i].position_matrix, [0, 0, 0])[0:2])
+                p2 = numpy.array(matrix44.apply_to_vector(self.affordances[i+1].position_matrix, [0, 0, 0])[0:2])
+                # Negative distance is on the right of the line, meaning inside the phenomenon assuming it is convex
+                distance = numpy.cross(p2-p1, p-p1)
+                is_inside = is_inside and (distance < 0)
+                projected = point_on_line(p1, p2, p)
+
+        print("Is inside: ", is_inside)
+        return is_inside
