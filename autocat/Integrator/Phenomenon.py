@@ -22,7 +22,6 @@ class Phenomenon:
         Parameters:
             echo_experience: the first echo interaction of the object phenomenon
             position_matrix: the matrix to place the phenomenon in allocentric memory
-            acceptable_delta: the acceptable delta between the allocentric coordinates of a new echo interaction
             and the center of the object phenomenon"""
         self.position_matrix = position_matrix
 
@@ -31,7 +30,9 @@ class Phenomenon:
 
         # The coordinates of this phenomenon in allocentric memory
         self.x, self.y, _ = matrix44.apply_to_vector(self.position_matrix, [0, 0, 0])
+        self.position_point = numpy.array([self.x, self.y, 0])
 
+        self.confidence = 0
         self.has_been_validated = False
         # self.printed = False
 
@@ -67,34 +68,38 @@ class Phenomenon:
         #     affordance.position_matrix[3, 0] -= int(sum_x/i)
         #     affordance.position_matrix[3, 1] -= int(sum_y/i)
 
-    def try_and_add(self, experience, position_matrix, trust_robot_proportion):
+    def try_and_add(self, experience, position_matrix):
         """Test if the experience is within the acceptable delta from the position of the phenomenon,
         if yes, add the affordance to the phenomenon, and return the robot's position adjustment."""
-        phenomenon_point = numpy.array([self.x, self.y])
-        affordance_point = numpy.array(matrix44.apply_to_vector(position_matrix, [0, 0, 0])[0:2]) - phenomenon_point
+        # phenomenon_point = numpy.array([self.x, self.y, 0])
+        # affordance_point = numpy.array(matrix44.apply_to_vector(position_matrix, [0, 0, 0])[0:2]) - phenomenon_point
+        # Convert coordinates to phenomenon-allocentric
+        affordance_point = numpy.array(matrix44.apply_to_vector(position_matrix, [0, 0, 0])) - self.position_point
 
         # The affordance nearest to the head
-        head_point = numpy.array(matrix44.apply_to_vector(experience.sensor_matrix, [0, 0, 0])[0:2])
-        phenomenon_points = numpy.array([a.position_matrix[3, 0:2] for a in self.affordances])  # + phenomenon_point
+        # head_point = numpy.array(matrix44.apply_to_vector(experience.sensor_matrix, [0, 0, 0])[0:2])
+        head_point = numpy.array(matrix44.apply_to_vector(experience.sensor_matrix, [0, 0, 0]))
+        # phenomenon_points = numpy.array([a.position_matrix[3, 0:2] for a in self.affordances])
+        phenomenon_points = numpy.array([a.position_point for a in self.affordances])
         dist2 = numpy.sum((phenomenon_points - head_point)**2, axis=1)
-        nearest_point = phenomenon_points[dist2.argmin()]  # + phenomenon_point  # In allocentric coordinates
+        nearest_affordance_point = phenomenon_points[dist2.argmin()]
 
-        if math.dist(affordance_point, nearest_point) < PHENOMENON_DELTA:
-            # affordance_point_relative_to_p = affordance_point  # - phenomenon_point
-            delta = nearest_point - affordance_point
-            adjustment = (1 - trust_robot_proportion) * delta
-            # If total trust in the phenomenon's position:
+        if math.dist(affordance_point, nearest_affordance_point) < PHENOMENON_DELTA:
+            delta = nearest_affordance_point - affordance_point
+            # adjustment = (1 - trust_robot_proportion) * delta
+            adjustment = self.confidence * delta
+            # If total confidence in the phenomenon's position:
             # - the affordance is placed at the previous point : nearest_point
             # - the robot is moved by the delta
-            # If total trust in the robot's position:
+            # If total confidence in the robot's position:
             # - the affordance is placed where it is measured: affordance_point
             # - The robot is not moved
             # TODO: adjust the phenomenon's position
             affordance_point += adjustment
-            self.add_affordance(*affordance_point, experience)
-            return True, adjustment
+            self.add_affordance(*affordance_point[0:2], experience)
+            return adjustment
         else:
-            return False, None
+            return None
 
     def try_to_validate(self, number_of_echos_needed):
         """Try to validate the phenomenon, i.e. consider this phenomenon as valid.

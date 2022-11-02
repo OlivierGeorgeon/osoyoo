@@ -17,14 +17,19 @@ class CtrlPhenomenonView:
 
         def on_text(text):
             """Send user keypress to the workspace to handle"""
-            self.workspace.process_user_key(text)
+            if text.upper() == "R":
+                self.phenomenon.confidence = 0.
+            elif text.upper() == "P":
+                self.phenomenon.confidence = 0.5
+            else:
+                self.workspace.process_user_key(text)
 
         self.view.push_handlers(on_text)
 
     def add_point_of_interest(self, x, y, point_type, group=None, experience=None):
         """ Adding a point of interest to the view """
         if group is None:
-            group = self.view.foreground
+            group = self.view.forefront
         point_of_interest = PointOfInterest(x, y, self.view.batch, group, point_type, experience=experience)
         self.points_of_interest.append(point_of_interest)
         return point_of_interest
@@ -56,18 +61,18 @@ class CtrlPhenomenonView:
             if self.workspace.agent.is_focussed:
                 x = self.workspace.agent.focus_xy[0]
                 y = self.workspace.agent.focus_xy[1]
-                output = PointOfInterest(x, y, self.view.robot_batch, self.view.foreground, EXPERIENCE_FOCUS)
+                output = PointOfInterest(x, y, self.view.robot_batch, self.view.forefront, EXPERIENCE_FOCUS)
         return output
 
     def create_point_of_interest(self, affordance):
         """Create a point of interest corresponding to the affordance given as parameter"""
         # x, y, _ = matrix44.apply_to_vector(affordance.position_matrix, [0., 0., 0.])
-        poi = PointOfInterest(0, 0, self.view.batch, self.view.foreground, affordance.experience.type,
+        poi = PointOfInterest(0, 0, self.view.batch, self.view.forefront, affordance.experience.type,
                               experience=affordance.experience)
         # poi.displace(affordance.rotation_matrix)  # Rotate the shape on itself
         # poi.displace(affordance.position_matrix)  # and then translate
         # Rotate the shape on itself and then translate
-        poi.displace(matrix44.multiply(affordance.rotation_matrix, affordance.position_matrix))
+        poi.displace(matrix44.multiply(affordance.experience.rotation_matrix, affordance.position_matrix))
         # Show the position of the sensor
         points = affordance.sensor_triangle()
         if points is not None:
@@ -76,6 +81,8 @@ class CtrlPhenomenonView:
 
     def main(self, dt):
         """Called every frame. Update the phenomenon view"""
+        if self.phenomenon is not None:
+            self.view.label_confidence.text = "Confidence: " + str(int(self.phenomenon.confidence * 100)) + "%"
         if self.workspace.flag_for_view_refresh:
             # Display in phenomenon view
             if len(self.workspace.integrator.phenomena) > 0:

@@ -28,12 +28,16 @@ class EgocentricView(InteractiveDisplay):
         self.azimuth = 0  # Degree from north [0, 360]
 
         # Define the text area at the bottom of the view
+        self.label_batch = pyglet.graphics.Batch()
         self.label = pyglet.text.Label('', font_name='Verdana', font_size=10, x=10, y=50)
         self.label.color = (0, 0, 0, 255)
+        self.label.batch = self.label_batch
         self.label_speed = pyglet.text.Label('Forward speed: ', font_name='Verdana', font_size=10, x=10, y=30)
         self.label_speed.color = (0, 0, 0, 255)
+        self.label_speed.batch = self.label_batch
         self.label_left_speed = pyglet.text.Label('Leftward speed: ', font_name='Verdana', font_size=10, x=10, y=10)
         self.label_left_speed.color = (0, 0, 0, 255)
+        self.label_left_speed.batch = self.label_batch
 
     def on_draw(self):
         """ Drawing the view """
@@ -55,12 +59,13 @@ class EgocentricView(InteractiveDisplay):
         # Draw the robot and the points of interest
         self.batch.draw()
 
-        # Draw the text in the bottom left corner
+        # Draw the text at the bottom left corner
         glLoadIdentity()
         glOrtho(0, self.width, 0, self.height, -1, 1)
-        self.label.draw()
-        self.label_speed.draw()
-        self.label_left_speed.draw()
+        self.label_batch.draw()
+        # self.label.draw()
+        # self.label_speed.draw()
+        # self.label_left_speed.draw()
 
     def get_mouse_press_coordinate(self, x, y, button, modifiers):
         """ Computing the position of the mouse click relative to the robot in mm and degrees """

@@ -5,7 +5,7 @@ from .HexagonalCell import HexagonalCell
 from ...Memory.EgocentricMemory.Experience import EXPERIENCE_FOCUS
 from ...Memory.AllocentricMemory.GridCell import CELL_UNKNOWN
 from ..InteractiveDisplay import InteractiveDisplay
-from ...Workspace import TRUST_POSITION_ROBOT
+# from ...Workspace import TRUST_POSITION_ROBOT
 
 
 NB_CELL_WIDTH = 30
@@ -47,11 +47,15 @@ class AllocentricView(InteractiveDisplay):
 
         self.mouse_press_x = 0
         self.mouse_press_y = 0
-        self.label = pyglet.text.Label('', font_name='Verdana', font_size=10, x=10, y=30)
-        self.label.color = (255, 255, 255, 255)
 
-        self.label_trust_mode = pyglet.text.Label('Trust position: ', font_name='Verdana', font_size=10, x=10, y=10)
-        self.label_trust_mode.color = (255, 255, 255, 255)
+        # The text at the bottom left
+        self.label_batch = pyglet.graphics.Batch()
+        self.label = pyglet.text.Label('', font_name='Verdana', font_size=10, x=10, y=10)  # y=30
+        self.label.color = (255, 255, 255, 255)
+        self.label.batch = self.label_batch
+        # self.label_trust_mode = pyglet.text.Label('Trust position: ', font_name='Verdana', font_size=10, x=10, y=10)
+        # self.label_trust_mode.color = (255, 255, 255, 255)
+        # self.label_trust_mode.batch = self.label_batch
 
     def add_cell(self, i: int, j: int):
         """Add a new grid cell to allocentric view. Called by CtrlAllocentricView"""
@@ -98,11 +102,12 @@ class AllocentricView(InteractiveDisplay):
         self.robot.rotate_head(self.memory.body_memory.head_direction_degree())
         self.robot_batch.draw()
 
-        # Draw the text in the bottom left corner
+        # Draw the text at the bottom left corner
         glLoadIdentity()
         glOrtho(0, self.width, 0, self.height, -1, 1)
-        self.label.draw()
-        self.label_trust_mode.draw()
+        self.label_batch.draw()
+        # self.label.draw()
+        # self.label_trust_mode.draw()
 
     def on_mouse_motion(self, x, y, dx, dy):
         # Find the cell

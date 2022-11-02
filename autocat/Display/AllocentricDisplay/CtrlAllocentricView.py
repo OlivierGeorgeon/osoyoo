@@ -65,7 +65,7 @@ class CtrlAllocentricView:
 
     def main(self, dt):
         """Refresh allocentric view"""
-        self.allocentric_view.label_trust_mode.text = "Trust position: " + self.workspace.trust_mode
+#         self.allocentric_view.label_trust_mode.text = "Trust position: " + self.workspace.trust_mode
         if self.refresh_count > 500:
             self.refresh_count = 0
         if self.refresh_count == 0:

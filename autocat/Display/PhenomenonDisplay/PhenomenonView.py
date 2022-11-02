@@ -1,9 +1,7 @@
 import pyglet
 from pyglet.gl import *
-from pyglet.math import Mat4
 from webcolors import name_to_rgb
 import math
-from pyrr import matrix44
 from ..EgocentricDisplay.OsoyooCar import OsoyooCar
 from ..InteractiveDisplay import InteractiveDisplay
 
@@ -23,7 +21,7 @@ class PhenomenonView(InteractiveDisplay):
         pyglet.gl.glEnable(pyglet.gl.GL_BLEND)
         self.batch = pyglet.graphics.Batch()
         self.background = pyglet.graphics.OrderedGroup(0)
-        self.foreground = pyglet.graphics.OrderedGroup(1)
+        self.forefront = pyglet.graphics.OrderedGroup(1)
         self.zoom_level = 1.3
 
         # Define the robot
@@ -33,11 +31,16 @@ class PhenomenonView(InteractiveDisplay):
         self.robot_pos_x = 0
         self.robot_pos_y = 0
 
-        self.outline = None
+        self.hull_line = None
 
         # Define the text area at the bottom of the view
-        self.label = pyglet.text.Label('', font_name='Verdana', font_size=10, x=10, y=10)
+        self.label_batch = pyglet.graphics.Batch()
+        self.label = pyglet.text.Label('', font_name='Verdana', font_size=10, x=10, y=30)
         self.label.color = (0, 0, 0, 255)
+        self.label.batch = self.label_batch
+        self.label_confidence = pyglet.text.Label('Confidence: None', font_name='Verdana', font_size=10, x=10, y=10)
+        self.label_confidence.color = (0, 0, 0, 255)
+        self.label_confidence.batch = self.label_batch
 
     def on_draw(self):
         """ Drawing the view """
@@ -64,7 +67,7 @@ class PhenomenonView(InteractiveDisplay):
         # Stack the projection of the text
         glOrtho(0, self.width, 0, self.height, -1, 1)
         # Draw the text in the bottom left corner
-        self.label.draw()
+        self.label_batch.draw()
 
     def on_mouse_press(self, x, y, button, modifiers):
         """ Computing the position of the mouse click relative to the robot in mm and degrees """
@@ -87,9 +90,9 @@ class PhenomenonView(InteractiveDisplay):
                                    ('c4B', nb_points * (*color, opacity)))
 
     def add_lines(self, points, color_string):
-        """Add the outline of a polygon to the foreground of the view"""
-        if self.outline is not None:
-            self.outline.delete()
+        """Update the hull at the forefront of the view"""
+        if self.hull_line is not None:
+            self.hull_line.delete()
 
         if points is not None:
             points += points[0:2]  # Loop back to the last point
@@ -99,8 +102,9 @@ class PhenomenonView(InteractiveDisplay):
                 for i in range(1, nb_points):
                     v_index += [i, i]
                 v_index += [0]  # Close the loop
-                self.outline = self.batch.add_indexed(nb_points, gl.GL_LINES, self.foreground, v_index, ('v2i', points),
-                                       ('c4B', nb_points * (*name_to_rgb(color_string), 255)))
+                self.hull_line = self.batch.add_indexed(nb_points, gl.GL_LINES, self.forefront, v_index,
+                                                        ('v2i', points),
+                                                        ('c4B', nb_points * (*name_to_rgb(color_string), 255)))
 
 
 # Testing the Phenomenon View by displaying the robot in a pretty position

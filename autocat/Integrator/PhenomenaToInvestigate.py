@@ -16,7 +16,7 @@ class PhenomenaToInvestigate:
         self.memory = workspace.memory
         self.allocentric_memory = workspace.memory.allocentric_memory
 
-    def create_hypothetical_phenomena(self, experiences, trust_robot_proportion):
+    def create_hypothetical_phenomena(self, experiences):
         """Create new phenomena to investigate from the list of central echos"""
         new_phenomena = []
         for experience in experiences:
@@ -27,7 +27,7 @@ class PhenomenaToInvestigate:
             else:
                 clustered = False
                 for new_phenomenon in new_phenomena:
-                    if new_phenomenon.try_and_add(experience, position_matrix, trust_robot_proportion):
+                    if new_phenomenon.try_and_add(experience, position_matrix) is not None:
                         clustered = True
                         break
                     print("NOCLUSTO")
@@ -37,15 +37,15 @@ class PhenomenaToInvestigate:
             print("New hypothetical phenomenon")
             self.phenomena_to_investigate.append([p, 0])
 
-    def try_and_add(self, experiences, trust_robot_proportion):
+    def try_and_add(self, experiences):
         """Try to add the echo experiences to the phenomena to investigate"""
         remaining_experiences = experiences.copy()
         for experience in experiences:
             position_matrix = experience.allocentric_position_matrix(self.memory.body_memory.body_direction_matrix(),
                                                                      self.allocentric_memory.body_position_matrix())
             for phenomenon, _ in self.phenomena_to_investigate:
-                print("A phenomenon is beeing investigated")
-                if phenomenon.try_and_add(experience, position_matrix, trust_robot_proportion):
+                print("A phenomenon is being investigated")
+                if phenomenon.try_and_add(experience, position_matrix) is not None:
                     remaining_experiences.remove(experience)
                     break
         return remaining_experiences

@@ -1,8 +1,8 @@
 from ..Memory.EgocentricMemory.Experience import EXPERIENCE_LOCAL_ECHO, EXPERIENCE_CENTRAL_ECHO, EXPERIENCE_ALIGNED_ECHO
 from .PhenomenaToInvestigate import PhenomenaToInvestigate
 
-TRUST_POSITION_PHENOMENON = "Phenomenon"
-TRUST_POSITION_ROBOT = "Robot"
+# TRUST_POSITION_PHENOMENON = "Phenomenon"
+# TRUST_POSITION_ROBOT = "Robot"
 PHENOMENON_DELTA = 300
 
 
@@ -29,28 +29,26 @@ class Integrator:
         experiences_central_echo = [e for e in experiences if (e.type == EXPERIENCE_CENTRAL_ECHO or
                                                                e.type == EXPERIENCE_ALIGNED_ECHO)]
 
-        trust_robot_proportion = 0 if self.workspace.trust_mode == TRUST_POSITION_PHENOMENON else 0.5
-        experiences_central_echo, delta_robot = self.try_and_add(experiences_central_echo, trust_robot_proportion)
-
-        # If trust the phenomenon position then adjust the robot's position in allocentric memory
-        # if self.workspace.trust_mode == TRUST_POSITION_PHENOMENON:
+        # trust_robot_proportion = 0 if self.workspace.trust_mode == TRUST_POSITION_PHENOMENON else 0.5
+        experiences_central_echo, delta_robot = self.try_and_add(experiences_central_echo)
+        # Adjust the robot's position in allocentric memory if any
         self.allocentric_memory.move(0, delta_robot, is_egocentric_translation=False)
 
         # Try to attach the central echos to not yet validated phenomena and remove these central echos
-        experiences_central_echo = self.phenomena_to_investigate.try_and_add(experiences_central_echo, trust_robot_proportion)
+        experiences_central_echo = self.phenomena_to_investigate.try_and_add(experiences_central_echo)
         # Try to validate existing phenomena to investigate
         validated_phenomena = self.phenomena_to_investigate.validate()
         # Add the validated phenomena to the list
         self.phenomena.extend(validated_phenomena)
 
         # Create new hypothetical phenomena from remaining central echo experiences
-        self.phenomena_to_investigate.create_hypothetical_phenomena(experiences_central_echo, trust_robot_proportion)
+        self.phenomena_to_investigate.create_hypothetical_phenomena(experiences_central_echo)
 
         # Create a new experience based on the aligned echo and tell if the focus was lost
         # focus_experiences, focus_lost = self.create_focus_echo()
 
-        cells_changed = []
-        action_to_return = None
+        # cells_changed = []
+        # action_to_return = None
 
         # # If the focus is kept
         # if not focus_lost:
@@ -71,8 +69,8 @@ class Integrator:
         # Mark the new experiences in allocentric memory by changing the cell status
         self.apply_status_experience_to_cells([e for e in experiences if e.type != EXPERIENCE_LOCAL_ECHO])
         action_to_return = None
-            # if self.echo_objects_to_investigate.need_more_sweeps():
-            #     action_to_return = "-"  # The synthesizer need to scan again
+        # if self.echo_objects_to_investigate.need_more_sweeps():
+        #     action_to_return = "-"  # The synthesizer need to scan again
 
         # Display focus cells OG 01/10/2022
         # cells_changed += self.synthesize([elem for elem in focus_experiences if elem.type == EXPERIENCE_FOCUS])
@@ -99,7 +97,7 @@ class Integrator:
             cell_i, cell_j = self.allocentric_memory.convert_pos_in_cell(p.x, p.y)
             self.allocentric_memory.grid[cell_i][cell_j].allocate_phenomenon(p)
 
-    def try_and_add(self, experiences, trust_robot_proportion):
+    def try_and_add(self, experiences):
         """Try to attach a list of central echos to phenomena  in the list .
         Returns the experiences that have not been attached, and the average translation"""
         translation_x, translation_y = 0, 0
@@ -111,8 +109,8 @@ class Integrator:
                 position_matrix = echo.allocentric_position_matrix(
                     self.workspace.memory.body_memory.body_direction_matrix(),
                     self.allocentric_memory.body_position_matrix())
-                is_added, translation = phenomenon.try_and_add(echo, position_matrix, trust_robot_proportion)
-                if is_added:
+                translation = phenomenon.try_and_add(echo, position_matrix)
+                if translation is not None:
                     sum_translation_x += translation[0]
                     sum_translation_y += translation[1]
                     number_of_add += 1
