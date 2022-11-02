@@ -65,6 +65,9 @@ class BodyMemory:
 
         self.set_body_direction_from_azimuth(azimuth)
 
+    def head_absolute_direction(self):
+        return self.body_direction_rad + self.head_direction_rad
+
     def is_inside_robot(self, x, y):
         """Return True if the point is inside the robot.
         Use robot-centric/east-north coordinates"""

@@ -1,23 +1,17 @@
 import math
 import numpy
 from pyrr import matrix44
-from scipy.spatial import ConvexHull, QhullError
+from scipy.spatial import ConvexHull, QhullError, Delaunay
 from .Affordance import Affordance
 
 PHENOMENON_DELTA = 300  # (mm) distance between experiences to be considered the same phenomenon
-
-
-# https://stackoverflow.com/questions/61341712/calculate-projected-point-location-x-y-on-given-line-startx-y-endx-y
-# def point_on_line(a, b, p):
-#     ap = p - a
-#     ab = b - a
-#     result = a + numpy.dot(ap, ab) / numpy.dot(ab, ab) * ab
-#     return result
+PHENOMENON_CONFIDENCE_LOW = 0.2
+# PHENOMENON_CONFIDENCE_HIGH = 0.7
 
 
 class Phenomenon:
     """A hypothetical phenomenon"""
-    def __init__(self, echo_experience, position_matrix):
+    def __init__(self, echo_experience, position_matrix, head_direction):
         """Constructor
         Parameters:
             echo_experience: the first echo interaction of the object phenomenon
@@ -32,9 +26,13 @@ class Phenomenon:
         self.x, self.y, _ = matrix44.apply_to_vector(self.position_matrix, [0, 0, 0])
         self.position_point = numpy.array([self.x, self.y, 0])
 
-        self.confidence = 0
+        self.hull_array = None
+
+        self.confidence = PHENOMENON_CONFIDENCE_LOW
+        # self.sum_rotation = 0.
+        self.initial_head_direction = head_direction
+        # self.passed_reference_point = False
         self.has_been_validated = False
-        # self.printed = False
 
     def add_affordance(self, x, y, experience):
         """Add an affordance made from this experience at this position"""
@@ -68,35 +66,49 @@ class Phenomenon:
         #     affordance.position_matrix[3, 0] -= int(sum_x/i)
         #     affordance.position_matrix[3, 1] -= int(sum_y/i)
 
-    def try_and_add(self, experience, position_matrix):
+    def try_and_add(self, experience, position_matrix, head_direction):
         """Test if the experience is within the acceptable delta from the position of the phenomenon,
         if yes, add the affordance to the phenomenon, and return the robot's position adjustment."""
-        # phenomenon_point = numpy.array([self.x, self.y, 0])
-        # affordance_point = numpy.array(matrix44.apply_to_vector(position_matrix, [0, 0, 0])[0:2]) - phenomenon_point
         # Convert coordinates to phenomenon-allocentric
         affordance_point = numpy.array(matrix44.apply_to_vector(position_matrix, [0, 0, 0])) - self.position_point
 
+        # If near initial head direction
+        if abs(head_direction - self.initial_head_direction) < math.radians(15):
+            if math.dist(affordance_point, [0,0,0]) < PHENOMENON_DELTA:
+                print("Near reference point: head: " + str(int(math.degrees(head_direction))) + "° initial: " + str(int(math.degrees(self.initial_head_direction))) + "°")
+                self.add_affordance(*affordance_point[0:2], experience)
+                return -affordance_point
+
         # The affordance nearest to the head
-        # head_point = numpy.array(matrix44.apply_to_vector(experience.sensor_matrix, [0, 0, 0])[0:2])
         head_point = numpy.array(matrix44.apply_to_vector(experience.sensor_matrix, [0, 0, 0]))
-        # phenomenon_points = numpy.array([a.position_matrix[3, 0:2] for a in self.affordances])
         phenomenon_points = numpy.array([a.position_point for a in self.affordances])
         dist2 = numpy.sum((phenomenon_points - head_point)**2, axis=1)
         nearest_affordance_point = phenomenon_points[dist2.argmin()]
 
         if math.dist(affordance_point, nearest_affordance_point) < PHENOMENON_DELTA:
             delta = nearest_affordance_point - affordance_point
-            # adjustment = (1 - trust_robot_proportion) * delta
-            adjustment = self.confidence * delta
-            # If total confidence in the phenomenon's position:
-            # - the affordance is placed at the previous point : nearest_point
-            # - the robot is moved by the delta
-            # If total confidence in the robot's position:
+            # If low phenomenon confidence:
             # - the affordance is placed where it is measured: affordance_point
             # - The robot is not moved
-            # TODO: adjust the phenomenon's position
+            # - TODO: The phenomenon's position should be adjusted
+            # If high phenomenon confidence :
+            # - the affordance is placed at the previous point : nearest_point
+            # - the robot is moved by the delta
+            adjustment = self.confidence * delta
             affordance_point += adjustment
+            # If the new affordance is inside then remove the nearest point. Should prevent from growing indefinitely
+            # if self.is_inside(affordance_point):
+            #     print("is inside. Delta: ", delta)
+            if self.confidence > 0.5:
+                nb_affordance = len(self.affordances)
+                #     # self.affordances = [a for a in self.affordances if
+                #     #             numpy.linalg.norm(a.position_point - nearest_affordance_point) > numpy.linalg.norm(adjustment-2)]
+                self.affordances = [a for a in self.affordances if
+                             numpy.linalg.norm(a.position_point - head_point) > numpy.linalg.norm(affordance_point - head_point - 2)]
+                print("removed: ", nb_affordance - len(self.affordances), "affordances")
+
             self.add_affordance(*affordance_point[0:2], experience)
+
             return adjustment
         else:
             return None
@@ -113,28 +125,24 @@ class Phenomenon:
         hull_points = None
         # ConvexHull triggers errors if points are flat
         try:
-            points = numpy.array([a.position_matrix[3, 0:2] for a in self.affordances])
+            points = numpy.array([a.position_point[0:2] for a in self.affordances])
             hull = ConvexHull(points)
-            hull_points = numpy.array([points[vertex] for vertex in hull.vertices]).flatten().astype("int").tolist()
-        except QhullError:
+            self.hull_array = numpy.array([points[vertex] for vertex in hull.vertices])
+            hull_points = self.hull_array.flatten().astype("int").tolist()
+        except QhullError as e:
             print("Error computing the convex hull: probably not enough points.")
+        except IndexError as e:
+            print("Error computing the convex hull: probably not enough points.", e)
         return hull_points
 
-    # def is_inside(self, x, y):
-    #     """Return True if the point is inside the phenomenon"""
-    # https://stackoverflow.com/questions/16750618/whats-an-efficient-way-to-find-if-a-point-lies-in-the-convex-hull-of-a-point-cl
-    # https://stackoverflow.com/questions/23937076/distance-to-convexhull
-    #     p = numpy.array([x, y])
-    #     is_inside = True
-    #     if len(self.affordances) >= 2:
-    #         for i in range(0, len(self.affordances)-1):
-    #             # Lines must be clockwise
-    #             p1 = numpy.array(matrix44.apply_to_vector(self.affordances[i].position_matrix, [0, 0, 0])[0:2])
-    #             p2 = numpy.array(matrix44.apply_to_vector(self.affordances[i+1].position_matrix, [0, 0, 0])[0:2])
-    #             # Negative distance is on the right of the line, meaning inside the phenomenon assuming it is convex
-    #             distance = numpy.cross(p2-p1, p-p1)
-    #             is_inside = is_inside and (distance < 0)
-    #             projected = point_on_line(p1, p2, p)
-    #
-    #     print("Is inside: ", is_inside)
-    #     return is_inside
+    def is_inside(self, p):
+        """True if p is inside the convex hull"""
+        # https://stackoverflow.com/questions/16750618/whats-an-efficient-way-to-find-if-a-point-lies-in-the-convex-hull-of-a-point-cl
+        is_inside = False
+        try:
+            # Must reduce to 2 dimensions otherwise the point is not found inside
+            d = Delaunay(self.hull_array)  # The hull array is computed at the end of the previous cycle
+            is_inside = (d.find_simplex(p[0:2]) >= 0)
+        except IndexError as e:
+            print("Error computing the Delaunay: ", e)
+        return is_inside

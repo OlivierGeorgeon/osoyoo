@@ -109,7 +109,7 @@ class Integrator:
                 position_matrix = echo.allocentric_position_matrix(
                     self.workspace.memory.body_memory.body_direction_matrix(),
                     self.allocentric_memory.body_position_matrix())
-                translation = phenomenon.try_and_add(echo, position_matrix)
+                translation = phenomenon.try_and_add(echo, position_matrix, self.workspace.memory.body_memory.head_absolute_direction())
                 if translation is not None:
                     sum_translation_x += translation[0]
                     sum_translation_y += translation[1]

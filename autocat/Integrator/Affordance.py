@@ -6,14 +6,11 @@ from ..Memory.EgocentricMemory.Experience import EXPERIENCE_ALIGNED_ECHO
 
 class Affordance:
     """An affordance is an experience localized relative to a phenomenon"""
-    def __init__(self, x, y, experience):
+    def __init__(self, x: int, y: int, experience):
+        """Position should be integer to facilitate search"""
         self.position_point = numpy.array([x, y, 0])
         self.position_matrix = matrix44.create_from_translation(self.position_point).astype('float64')
         self.experience = experience
-
-        # p1x, p1y, _ = matrix44.apply_to_vector(self.experience.sensor_matrix, [0, 0, 0])
-        # angle_sensor = math.atan2(p1y, p1x)
-        # self.rotation_matrix = matrix44.create_from_z_rotation(math.pi - angle_sensor)  # Don't know why need flipping
 
     def sensor_triangle(self):
         """The set of points to display the sensor in phenomenon view"""

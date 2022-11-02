@@ -4,8 +4,6 @@ from .Integrator.Integrator import Integrator
 
 CONTROL_MODE_AUTOMATIC = "auto"
 CONTROL_MODE_MANUAL = "manual"
-# TRUST_POSITION_PHENOMENON = "Phenomenon"
-# TRUST_POSITION_ROBOT = "Robot"
 
 
 class Workspace:
@@ -25,9 +23,6 @@ class Workspace:
         self.enacted_interaction = {}
 
         self.decider_mode = CONTROL_MODE_MANUAL
-        # self.trust_mode = TRUST_POSITION_PHENOMENON
-        # self.robot_ready = True
-        # self.flag_for_need_of_action = True
         self.has_new_intended_interaction = False
         self.has_new_enacted_interaction = False
         self.has_new_outcome_been_treated = True
@@ -115,14 +110,6 @@ class Workspace:
             self.decider_mode = CONTROL_MODE_AUTOMATIC
         elif user_key.upper() == "M":
             self.decider_mode = CONTROL_MODE_MANUAL
-        # elif user_key.upper() == "R":
-        #     # self.trust_mode = TRUST_POSITION_ROBOT
-        #     for phenomenon in self.integrator.phenomena:
-        #         phenomenon.confidence = 0.
-        # elif user_key.upper() == "P":
-        #     # self.trust_mode = TRUST_POSITION_PHENOMENON
-        #     for phenomenon in self.integrator.phenomena:
-        #         phenomenon.confidence = 0.5
         else:
             self.intended_interaction = {"action": user_key}
             if self.focus_xy is not None:

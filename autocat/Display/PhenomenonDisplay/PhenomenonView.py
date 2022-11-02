@@ -81,18 +81,21 @@ class PhenomenonView(InteractiveDisplay):
     def add_polygon(self, points, color_string):
         """Add a plain polygon to the background of the view"""
         nb_points = int(len(points) / 2)
+        cone = None
         if 3 <= nb_points <= 6:
             nb_index = (nb_points - 2) * 3
             v_index = [0, 1, 2, 0, 2, 3, 0, 3, 4, 0, 4, 5, 0, 6, 7, 0, 7, 8][0:nb_index]
             color = name_to_rgb(color_string)
             opacity = 64
-            self.batch.add_indexed(nb_points, gl.GL_TRIANGLES, self.background, v_index, ('v2i', points),
+            cone = self.batch.add_indexed(nb_points, gl.GL_TRIANGLES, self.background, v_index, ('v2i', points),
                                    ('c4B', nb_points * (*color, opacity)))
+        return cone
 
     def add_lines(self, points, color_string):
         """Update the hull at the forefront of the view"""
         if self.hull_line is not None:
             self.hull_line.delete()
+            self.hull_line = None
 
         if points is not None:
             points += points[0:2]  # Loop back to the last point

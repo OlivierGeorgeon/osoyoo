@@ -23,16 +23,16 @@ class PhenomenaToInvestigate:
             position_matrix = experience.allocentric_position_matrix(self.memory.body_memory.body_direction_matrix(),
                                                                      self.allocentric_memory.body_position_matrix())
             if len(new_phenomena) == 0:
-                new_phenomena.append(Phenomenon(experience, position_matrix))
+                new_phenomena.append(Phenomenon(experience, position_matrix, self.workspace.memory.body_memory.head_absolute_direction()))
             else:
                 clustered = False
                 for new_phenomenon in new_phenomena:
-                    if new_phenomenon.try_and_add(experience, position_matrix) is not None:
+                    if new_phenomenon.try_and_add(experience, position_matrix, self.workspace.memory.body_memory.head_absolute_direction()) is not None:
                         clustered = True
                         break
                     print("NOCLUSTO")
                 if not clustered:
-                    new_phenomena.append(Phenomenon(experience, position_matrix))
+                    new_phenomena.append(Phenomenon(experience, position_matrix, self.workspace.memory.body_memory.head_absolute_direction()))
         for p in new_phenomena:
             print("New hypothetical phenomenon")
             self.phenomena_to_investigate.append([p, 0])
@@ -45,7 +45,7 @@ class PhenomenaToInvestigate:
                                                                      self.allocentric_memory.body_position_matrix())
             for phenomenon, _ in self.phenomena_to_investigate:
                 print("A phenomenon is being investigated")
-                if phenomenon.try_and_add(experience, position_matrix) is not None:
+                if phenomenon.try_and_add(experience, position_matrix, self.workspace.memory.body_memory.head_absolute_direction()) is not None:
                     remaining_experiences.remove(experience)
                     break
         return remaining_experiences
