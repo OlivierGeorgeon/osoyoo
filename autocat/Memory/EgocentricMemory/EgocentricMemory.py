@@ -25,7 +25,7 @@ class EgocentricMemory:
         # Create new experiences from points in the enacted_interaction
         new_experiences = []
         for p in enacted_interaction[KEY_EXPERIENCES]:
-            experience = Experience(p[1], p[2], experience_type=p[0], direction_rad=body_direction_rad,
+            experience = Experience(p[1], p[2], p[0], body_direction_rad,
                                     durability=EXPERIENCE_PERSISTENCE, experience_id=self.experience_id)
             new_experiences.append(experience)
             self.experience_id += 1
@@ -117,9 +117,8 @@ class EgocentricMemory:
                     # The x and y are at the center of the array
                     x_mean = streak[int(len(streak) / 2)][2].x
                     y_mean = streak[int(len(streak) / 2)][2].y
-                experience_central_echo = Experience(int(x_mean), int(y_mean), experience_type=EXPERIENCE_CENTRAL_ECHO,
-                                                     direction_rad=body_direction_rad,
-                                                     durability=5, experience_id=self.experience_id)
+                experience_central_echo = Experience(int(x_mean), int(y_mean), EXPERIENCE_CENTRAL_ECHO,
+                                                     body_direction_rad, durability=5, experience_id=self.experience_id)
                 self.experience_id += 1
                 experiences_central_echo.append(experience_central_echo)
 

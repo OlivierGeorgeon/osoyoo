@@ -2,6 +2,7 @@ import math
 import numpy
 from pyrr import matrix44
 from ..Robot.RobotDefine import ROBOT_FRONT_X, ROBOT_SIDE, FORWARD_SPEED, LATERAL_SPEED
+from ..Utils import assert_almost_equal_angles
 
 
 class BodyMemory:
@@ -57,10 +58,10 @@ class BodyMemory:
             azimuth += 360
         azimuth = azimuth % 360
 
-        # If the direction is too far from the azimuth then use the azimuth
-        # https://stackoverflow.com/questions/1878907/how-can-i-find-the-difference-between-two-angles
-        if compass_azimuth > 10:  # Don't apply if imu has no compass information
-            if 10 < abs(azimuth - compass_azimuth) < 350:  # More than 350 means both close to north
+        # If the direction is too far from the azimuth then use the compass azimuth
+        if compass_azimuth > 0:  # Don't apply if imu has no compass information
+            # if 10 < abs(azimuth - compass_azimuth) < 350:  # More than 350 means both close to north
+            if not assert_almost_equal_angles(math.radians(azimuth), math.radians(compass_azimuth), 10):
                 azimuth = compass_azimuth
 
         self.set_body_direction_from_azimuth(azimuth)

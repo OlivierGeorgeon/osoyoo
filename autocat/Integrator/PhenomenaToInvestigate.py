@@ -1,3 +1,4 @@
+import numpy
 from .Phenomenon import Phenomenon
 
 
@@ -20,19 +21,21 @@ class PhenomenaToInvestigate:
         """Create new phenomena to investigate from the list of central echos"""
         new_phenomena = []
         for experience in experiences:
-            position_matrix = experience.allocentric_position_matrix(self.memory.body_memory.body_direction_matrix(),
-                                                                     self.allocentric_memory.body_position_matrix())
+            # position_matrix = experience.allocentric_position_matrix(self.memory.body_memory.body_direction_matrix(),
+            #                                                          self.allocentric_memory.body_position_matrix())
+            affordance_point = experience.allocentric_from_matrices(self.memory.body_memory.body_direction_matrix(),
+                                                                    self.allocentric_memory.body_position_matrix())
             if len(new_phenomena) == 0:
-                new_phenomena.append(Phenomenon(experience, position_matrix, self.workspace.memory.body_memory.head_absolute_direction()))
+                new_phenomena.append(Phenomenon(experience, affordance_point))
             else:
                 clustered = False
                 for new_phenomenon in new_phenomena:
-                    if new_phenomenon.try_and_add(experience, position_matrix, self.workspace.memory.body_memory.head_absolute_direction()) is not None:
+                    if new_phenomenon.try_and_add(experience, affordance_point) is not None:
                         clustered = True
                         break
                     print("NOCLUSTO")
                 if not clustered:
-                    new_phenomena.append(Phenomenon(experience, position_matrix, self.workspace.memory.body_memory.head_absolute_direction()))
+                    new_phenomena.append(Phenomenon(experience, affordance_point))
         for p in new_phenomena:
             print("New hypothetical phenomenon")
             self.phenomena_to_investigate.append([p, 0])
@@ -41,11 +44,13 @@ class PhenomenaToInvestigate:
         """Try to add the echo experiences to the phenomena to investigate"""
         remaining_experiences = experiences.copy()
         for experience in experiences:
-            position_matrix = experience.allocentric_position_matrix(self.memory.body_memory.body_direction_matrix(),
-                                                                     self.allocentric_memory.body_position_matrix())
+            # position_matrix = experience.allocentric_position_matrix(self.memory.body_memory.body_direction_matrix(),
+            #                                                          self.allocentric_memory.body_position_matrix())
+            affordance_point = experience.allocentric_from_matrices(self.memory.body_memory.body_direction_matrix(),
+                                                                    self.allocentric_memory.body_position_matrix())
             for phenomenon, _ in self.phenomena_to_investigate:
                 print("A phenomenon is being investigated")
-                if phenomenon.try_and_add(experience, position_matrix, self.workspace.memory.body_memory.head_absolute_direction()) is not None:
+                if phenomenon.try_and_add(experience, affordance_point) is not None:
                     remaining_experiences.remove(experience)
                     break
         return remaining_experiences

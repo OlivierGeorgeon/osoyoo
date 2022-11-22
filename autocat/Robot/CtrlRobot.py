@@ -85,7 +85,7 @@ class CtrlRobot:
         """ Computes the enacted interaction from the robot's outcome data """
         action = self.intended_interaction.get('action')
         is_focussed = ('focus_x' in self.intended_interaction)  # The focus point was sent to the robot
-        enacted_interaction = json.loads(self.outcome_bytes)
+        enacted_interaction = json.loads(self.outcome_bytes)  # TODO Check sometimes it's None
         enacted_interaction[KEY_EXPERIENCES] = []
 
         # If timeout then we consider that there was no enacted interaction

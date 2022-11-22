@@ -42,8 +42,8 @@ class CtrlPhenomenonView:
         self.view.azimuth = self.workspace.memory.body_memory.body_azimuth()
         # TODO compute the robot's position relative to the phenomenon
         if self.phenomenon is not None:
-            self.view.robot_pos_x = self.workspace.memory.allocentric_memory.robot_pos_x - self.phenomenon.x
-            self.view.robot_pos_y = self.workspace.memory.allocentric_memory.robot_pos_y - self.phenomenon.y
+            self.view.robot_pos_x = self.workspace.memory.allocentric_memory.robot_pos_x - self.phenomenon.point[0]
+            self.view.robot_pos_y = self.workspace.memory.allocentric_memory.robot_pos_y - self.phenomenon.point[1]
 
     def update_points_of_interest(self, phenomenon):
         """Retrieve the new affordances in a phenomenon and create the corresponding points of interest"""

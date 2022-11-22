@@ -84,9 +84,9 @@ class Integrator:
         """Mark the experiences in the cells of allocentric Memory"""
         cells_treated = []
         for experience in experiences:
-            x, y = experience.allocentric_from_matrices(self.workspace.memory.body_memory.body_direction_matrix(),
-                                                        self.allocentric_memory.body_position_matrix())
-            cell_x, cell_y = self.allocentric_memory.convert_pos_in_cell(x, y)
+            point = experience.allocentric_from_matrices(self.workspace.memory.body_memory.body_direction_matrix(),
+                                                         self.allocentric_memory.body_position_matrix())
+            cell_x, cell_y = self.allocentric_memory.convert_pos_in_cell(point[0], point[1])
             cells_treated.append((cell_x, cell_y))
             self.allocentric_memory.apply_status_to_cell(cell_x, cell_y, experience.type)
         return cells_treated
@@ -94,7 +94,7 @@ class Integrator:
     def attach_phenomena_to_cells(self):
         """Allocate the phenomena to the cells of allocentric memory"""
         for p in self.phenomena:
-            cell_i, cell_j = self.allocentric_memory.convert_pos_in_cell(p.x, p.y)
+            cell_i, cell_j = self.allocentric_memory.convert_pos_in_cell(p.point[0], p.point[1])
             self.allocentric_memory.grid[cell_i][cell_j].allocate_phenomenon(p)
 
     def try_and_add(self, experiences):
@@ -106,10 +106,12 @@ class Integrator:
         remaining_experiences = experiences.copy()
         for echo in experiences:
             for phenomenon in self.phenomena:
-                position_matrix = echo.allocentric_position_matrix(
-                    self.workspace.memory.body_memory.body_direction_matrix(),
-                    self.allocentric_memory.body_position_matrix())
-                translation = phenomenon.try_and_add(echo, position_matrix, self.workspace.memory.body_memory.head_absolute_direction())
+                # position_matrix = echo.allocentric_position_matrix(
+                #     self.workspace.memory.body_memory.body_direction_matrix(),
+                #     self.allocentric_memory.body_position_matrix())
+                affordance_point = echo.allocentric_from_matrices(self.workspace.memory.body_memory.body_direction_matrix(),
+                                                                  self.allocentric_memory.body_position_matrix())
+                translation = phenomenon.try_and_add(echo, affordance_point)
                 if translation is not None:
                     sum_translation_x += translation[0]
                     sum_translation_y += translation[1]
