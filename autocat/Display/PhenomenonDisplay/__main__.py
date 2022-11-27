@@ -17,20 +17,26 @@ controller = CtrlPhenomenonView(workspace)
 experience1 = Experience(200, 0, EXPERIENCE_ALIGNED_ECHO, math.pi / 4, experience_id=0)
 # The position to place the phenomenon at the center of allocentric memory
 # position_matrix = matrix44.create_identity()
-phenomenon = Phenomenon(experience1, numpy.array([0, 0, 0]))
+affordance1 = Affordance(numpy.array([0, 0, 0], dtype=numpy.int16), experience1)
+phenomenon = Phenomenon(affordance1)
 
 # Add a second affordance
 experience2 = Experience(200, 0, EXPERIENCE_ALIGNED_ECHO, -math.pi / 2, experience_id=0)
-# phenomenon.add_affordance(10, 50, experience2)
-phenomenon.affordances.append(Affordance(numpy.array([10, 50, 0]), experience2))
+# phenomenon.affordances.append(Affordance(numpy.array([10, 50, 0], dtype=numpy.int16), experience2))
+# phenomenon.try_and_add(Affordance(numpy.array([10, 50, 0], dtype=numpy.int16), experience2))
+affordance2 = Affordance(numpy.array([10, 50, 0], dtype=numpy.int16), experience2)
+phenomenon.try_and_add(affordance2)
+# phenomenon.try_and_add(experience2, numpy.array([10, 50, 0], dtype=numpy.int16))
 
-experience2bis = Experience(200, -50, EXPERIENCE_ALIGNED_ECHO, -math.pi / 2, experience_id=0)
-# phenomenon.add_affordance(100, 50, experience2bis)
-phenomenon.affordances.append(Affordance(numpy.array([100, 50, 0]), experience2bis))
+experience3 = Experience(200, -50, EXPERIENCE_ALIGNED_ECHO, -math.pi / 2, experience_id=0)
+affordance3 = Affordance(numpy.array([100, 50, 0], dtype=numpy.int16), experience3)
+phenomenon.try_and_add(affordance3)
+# phenomenon.affordances.append(Affordance(numpy.array([100, 50, 0], dtype=numpy.int16), experience3))
 
-experience3 = Experience(300, 0, EXPERIENCE_ALIGNED_ECHO, 3 * math.pi / 4, experience_id=0)
-# phenomenon.add_affordance(100, 0, experience3)
-phenomenon.affordances.append(Affordance(numpy.array([100, 0, 0]), experience3))
+experience4 = Experience(300, 0, EXPERIENCE_ALIGNED_ECHO, 3 * math.pi / 4, experience_id=0)
+affordance4 = Affordance(numpy.array([100, 0, 0], dtype=numpy.int16), experience4)
+phenomenon.try_and_add(affordance4)
+# phenomenon.affordances.append(Affordance(numpy.array([100, 0, 0], dtype=numpy.int16), experience4))
 
 # Test is_inside
 print("Point [-1, -1] is inside: ", phenomenon.is_inside(numpy.array([-1, -1])))

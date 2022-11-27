@@ -84,7 +84,8 @@ class CtrlPhenomenonView:
         # poi.displace(affordance.rotation_matrix)  # Rotate the shape on itself
         # poi.displace(affordance.position_matrix)  # and then translate
         # Rotate the shape on itself and then translate
-        poi.displace(matrix44.multiply(affordance.experience.rotation_matrix, affordance.position_matrix))
+        poi.displace(matrix44.multiply(affordance.experience.rotation_matrix,
+                                       matrix44.create_from_translation(affordance.point).astype('float64')))
         # Show the position of the sensor
         points = affordance.sensor_triangle()
         if points is not None:

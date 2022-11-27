@@ -10,20 +10,20 @@ PHENOMENON_INITIAL_CONFIDENCE = 0.2  # Initial confidence in the phenomenon
 
 class Phenomenon:
     """A hypothetical phenomenon"""
-    def __init__(self, echo_experience, point):
+    def __init__(self, affordance):
         """Constructor
         Parameters:
             echo_experience: the first echo interaction of the object phenomenon
             position_matrix: the matrix to place the phenomenon in allocentric memory
             and the center of the object phenomenon"""
-        self.point = point
+        self.point = affordance.point  # The position of the phenomenon = position of the first affordance
 
         # Record the first affordance of the phenomenon
-        self.affordances = [Affordance(numpy.array([0, 0, 0]), echo_experience)]
+        affordance.point = numpy.array([0, 0, 0], dtype=numpy.int16)  # Position of the first affordance is reset
+        self.affordances = [affordance]
 
         # The coordinates of this phenomenon in allocentric memory
         # self.x, self.y, _ = matrix44.apply_to_vector(self.position_matrix, [0, 0, 0])
-        # self.position_point = numpy.array([self.x, self.y, 0])
 
         self.hull_array = None
 
@@ -43,7 +43,8 @@ class Phenomenon:
     def compute_center(self):
         """Recompute the center of the phenomenon as the mean of the affordance position"""
         # https://stackoverflow.com/questions/4355894/how-to-get-center-of-set-of-points-using-python
-        points = numpy.array([a.position_matrix[3, 0:2] for a in self.affordances])
+        # points = numpy.array([a.position_matrix[3, 0:2] for a in self.affordances])
+        points = numpy.array([a.point for a in self.affordances])
         centroid = points.mean(axis=0)
         # print("centroid", centroid)
         return centroid
@@ -65,36 +66,38 @@ class Phenomenon:
         #     affordance.position_matrix[3, 0] -= int(sum_x/i)
         #     affordance.position_matrix[3, 1] -= int(sum_y/i)
 
-    def try_and_add(self, experience, point):
-        # def try_and_add(self, affordance):
+    # def try_and_add(self, experience, point):
+    def try_and_add(self, affordance):
         """Test if the experience is within the acceptable delta from the position of the phenomenon,
         if yes, add the affordance to the phenomenon, and return the robot's position adjustment."""
         # Convert coordinates to phenomenon-allocentric
         # affordance_point = numpy.array(matrix44.apply_to_vector(position_matrix, [0, 0, 0])) - self.point
         # affordance_point = numpy.subtract(point, self.point)
-        affordance_point = point - self.point
-        new_affordance = Affordance(affordance_point, experience)
+        # affordance_point = point - self.point
+        affordance.point -= self.point
+
+        # new_affordance = Affordance(affordance_point, experience)
 
         # The affordance nearest to the head
-        head_point = numpy.array(matrix44.apply_to_vector(experience.sensor_matrix, [0, 0, 0]))
+        head_point = numpy.array(matrix44.apply_to_vector(affordance.experience.sensor_matrix, [0, 0, 0]))
         phenomenon_points = numpy.array([a.point for a in self.affordances])
         dist2 = numpy.sum((phenomenon_points - head_point)**2, axis=1)
         nearest_affordance_point = phenomenon_points[dist2.argmin()]
-        delta = nearest_affordance_point - affordance_point
+        delta = nearest_affordance_point - affordance.point
 
         # If the new affordance is attributed to this phenomenon
         # if math.dist(affordance_point, nearest_affordance_point) < PHENOMENON_DELTA:
         if numpy.linalg.norm(delta) < PHENOMENON_DELTA:
             # If the affordance is near the origin affordance
             # if abs(head_direction - self.initial_head_direction) < math.radians(15):
-            if new_affordance.similar_to(self.affordances[0]):
+            if affordance.similar_to(self.affordances[0]):
                 # if math.dist(affordance_point, [0, 0, 0]) < PHENOMENON_DELTA:
                 # print("Near origin: new direction: " + str(int(math.degrees(experience.absolute_direction_rad))) +
                 #       "° initial: " +
                 #       str(int(math.degrees(self.affordances[0].experience.absolute_direction_rad))) + "°")
                 # self.add_affordance(new_affordance)
-                self.affordances.append(new_affordance)
-                position_correction = -affordance_point
+                self.affordances.append(affordance)
+                position_correction = -affordance.point
                 # return -affordance_point
             else:
                 # if math.dist(affordance_point, nearest_affordance_point) < PHENOMENON_DELTA:
@@ -105,8 +108,8 @@ class Phenomenon:
                 # If high phenomenon confidence :
                 # - the affordance is placed at the previous point : nearest_point
                 # - the robot is moved by the delta
-                position_correction = self.confidence * delta
-                affordance_point += position_correction
+                position_correction = numpy.array(self.confidence * delta, dtype=numpy.int16)
+                affordance.point += position_correction
                 # If the new affordance is inside then remove the nearest point. Should prevent from growing indefinitely
                 # if self.is_inside(affordance_point):
                 #     print("is inside. Delta: ", delta)
@@ -115,12 +118,11 @@ class Phenomenon:
                     #     # self.affordances = [a for a in self.affordances if
                     #     #             numpy.linalg.norm(a.position_point - nearest_affordance_point) > numpy.linalg.norm(adjustment-2)]
                     self.affordances = [a for a in self.affordances if
-                                        numpy.linalg.norm(a.point - head_point) > numpy.linalg.norm(affordance_point - head_point - 2)]
+                                        numpy.linalg.norm(a.point - head_point) > numpy.linalg.norm(affordance.point - head_point - 2)]
                     print("removed: ", nb_affordance - len(self.affordances), "affordances")
 
-            # self.add_affordance(*affordance_point[0:2], experience)
-            new_affordance = Affordance(affordance_point, experience)
-            self.affordances.append(new_affordance)
+                # new_affordance = Affordance(affordance_point, experience)
+                self.affordances.append(affordance)
 
             return position_correction
         else:

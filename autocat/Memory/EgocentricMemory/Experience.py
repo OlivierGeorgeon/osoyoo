@@ -83,7 +83,7 @@ class Experience:
     def allocentric_from_matrices(self, body_direction_matrix, body_position_matrix):
         """ The allocentric coordinates of the experience given the body direction and position matrices"""
         displacement_matrix = matrix44.multiply(body_direction_matrix, body_position_matrix)
-        return numpy.array(matrix44.apply_to_vector(displacement_matrix, [self.x, self.y, 0]))
+        return numpy.array(matrix44.apply_to_vector(displacement_matrix, [self.x, self.y, 0]), dtype=numpy.int16)
 
     def allocentric_position_matrix(self, body_direction_matrix, body_position_matrix):
         """ The position matrix to place this experience in allocentric memory"""

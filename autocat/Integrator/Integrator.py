@@ -1,5 +1,6 @@
 from ..Memory.EgocentricMemory.Experience import EXPERIENCE_LOCAL_ECHO, EXPERIENCE_CENTRAL_ECHO, EXPERIENCE_ALIGNED_ECHO
 from .PhenomenaToInvestigate import PhenomenaToInvestigate
+from .Affordance import Affordance
 
 # TRUST_POSITION_PHENOMENON = "Phenomenon"
 # TRUST_POSITION_ROBOT = "Robot"
@@ -111,7 +112,8 @@ class Integrator:
                 #     self.allocentric_memory.body_position_matrix())
                 affordance_point = echo.allocentric_from_matrices(self.workspace.memory.body_memory.body_direction_matrix(),
                                                                   self.allocentric_memory.body_position_matrix())
-                translation = phenomenon.try_and_add(echo, affordance_point)
+                affordance = Affordance(affordance_point, echo)
+                translation = phenomenon.try_and_add(affordance)
                 if translation is not None:
                     sum_translation_x += translation[0]
                     sum_translation_y += translation[1]

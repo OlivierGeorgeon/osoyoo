@@ -1,5 +1,6 @@
 import numpy
 from .Phenomenon import Phenomenon
+from .Affordance import Affordance
 
 
 class PhenomenaToInvestigate:
@@ -25,17 +26,18 @@ class PhenomenaToInvestigate:
             #                                                          self.allocentric_memory.body_position_matrix())
             affordance_point = experience.allocentric_from_matrices(self.memory.body_memory.body_direction_matrix(),
                                                                     self.allocentric_memory.body_position_matrix())
+            affordance = Affordance(affordance_point, experience)
             if len(new_phenomena) == 0:
-                new_phenomena.append(Phenomenon(experience, affordance_point))
+                new_phenomena.append(Phenomenon(affordance))
             else:
                 clustered = False
                 for new_phenomenon in new_phenomena:
-                    if new_phenomenon.try_and_add(experience, affordance_point) is not None:
+                    if new_phenomenon.try_and_add(affordance) is not None:
                         clustered = True
                         break
                     print("NOCLUSTO")
                 if not clustered:
-                    new_phenomena.append(Phenomenon(experience, affordance_point))
+                    new_phenomena.append(Phenomenon(affordance))
         for p in new_phenomena:
             print("New hypothetical phenomenon")
             self.phenomena_to_investigate.append([p, 0])
@@ -48,9 +50,10 @@ class PhenomenaToInvestigate:
             #                                                          self.allocentric_memory.body_position_matrix())
             affordance_point = experience.allocentric_from_matrices(self.memory.body_memory.body_direction_matrix(),
                                                                     self.allocentric_memory.body_position_matrix())
+            affordance = Affordance(affordance_point, experience)
             for phenomenon, _ in self.phenomena_to_investigate:
                 print("A phenomenon is being investigated")
-                if phenomenon.try_and_add(experience, affordance_point) is not None:
+                if phenomenon.try_and_add(affordance) is not None:
                     remaining_experiences.remove(experience)
                     break
         return remaining_experiences
