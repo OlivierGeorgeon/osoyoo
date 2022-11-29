@@ -16,14 +16,14 @@ class Workspace:
     def __init__(self):
         """Constructor"""
         self.memory = Memory()
-        self.agent = AgentCircle(self)
+        self.decider = AgentCircle(self)
         self.integrator = Integrator(self)
 
         self.intended_interaction = None
         self.enacted_interaction = {}
 
-        self.decider_mode = CONTROL_MODE_MANUAL
-        self.has_new_intended_interaction = False
+        self.control_mode = CONTROL_MODE_MANUAL
+        self.intended_interaction_is_ready_to_send = False
         self.has_new_enacted_interaction = False
         self.has_new_outcome_been_treated = True
         self.flag_for_view_refresh = False
@@ -37,50 +37,46 @@ class Workspace:
              - get the synthesizer going
            3) If ready, ask for a new intended_interaction to enact
         """
+        # If AUTOMATIC mode then ask the Decider for the intended interaction
+        if self.control_mode == CONTROL_MODE_AUTOMATIC:
+            # If ready, ask the decider for a new intended interaction
+            if self.intended_interaction is None and self.has_new_outcome_been_treated:
+                self.intended_interaction = self.decider.propose_intended_interaction(self.enacted_interaction)
+                self.has_new_outcome_been_treated = False
+                self.intended_interaction_is_ready_to_send = True
+
         # If there is a new enacted interaction
         if self.has_new_enacted_interaction:
-            # Move the memories and add new experiences to egocentric memory
+            # Update body memory and egocentric memory
             self.memory.update_and_add_experiences(self.enacted_interaction)
+
+            # Call the integrator to create and update the phenomena.
+            self.integrator.integrate()
+
+            # Update allocentric memory: robot, phénomena
+            # self.memory.allocentric_memory.place_robot(self.memory.body_memory)
+            self.memory.update_allocentric(self.integrator.phenomena)
+
             self.flag_for_view_refresh = True
-
-            # Call the integrator. Could return an action (not used)
-            integrator_action = self.integrator.integrate()
-            # Update the robot's place in allocentric memory in case the Integrator has changed it
-            self.memory.allocentric_memory.place_robot(self.memory.body_memory)
-            # If the integrator need an action done, we save it
-            if integrator_action is not None:
-                pass  # OG to prevent actions proposed by the synthesize
-                # self.action = integrator_action
-                # self.has_new_action = True
-
             self.has_new_outcome_been_treated = True
             self.has_new_enacted_interaction = False
 
-        # If ready, ask for a new intended interaction
-        if self.intended_interaction is None and self.decider_mode == CONTROL_MODE_AUTOMATIC and self.has_new_outcome_been_treated:
-                # and self.robot_ready:
-            # self.robot_ready = False
-            self.has_new_outcome_been_treated = False
-            self.intended_interaction = self.agent.propose_intended_interaction(self.enacted_interaction)
-            # self.integrator.last_action_had_focus = 'focus_x' in self.intended_interaction
-            # self.integrator.last_action = self.intended_interaction
-            self.has_new_intended_interaction = True
-            
     def get_intended_interaction(self):
         """If the workspace has a new intended interaction then return it, otherwise return None
         Reset the intended_interaction. (Called by CtrlRobot)
         """
-        if self.has_new_intended_interaction:
-            self.has_new_intended_interaction = False
+        if self.intended_interaction_is_ready_to_send:
+            self.intended_interaction_is_ready_to_send = False
             return self.intended_interaction
-            # return intended_interaction
-        else:
-            return None
+
+        return None
 
     def update_enacted_interaction(self, enacted_interaction):
         """Update the enacted interaction (called by CtrlRobot)"""
         if "status" in enacted_interaction and enacted_interaction["status"] == "T":
             print("The workspace received an empty enacted interaction")
+            # Will immediately resend the same intended interaction unless the user has set another one
+            self.intended_interaction_is_ready_to_send = True
             return
 
         # Manage focus catch and lost
@@ -107,12 +103,12 @@ class Workspace:
 
     def process_user_key(self, user_key):
         if user_key.upper() == "A":
-            self.decider_mode = CONTROL_MODE_AUTOMATIC
+            self.control_mode = CONTROL_MODE_AUTOMATIC
         elif user_key.upper() == "M":
-            self.decider_mode = CONTROL_MODE_MANUAL
+            self.control_mode = CONTROL_MODE_MANUAL
         else:
             self.intended_interaction = {"action": user_key}
             if self.focus_xy is not None:
                 self.intended_interaction['focus_x'] = int(self.focus_xy[0])
                 self.intended_interaction['focus_y'] = int(self.focus_xy[1])
-            self.has_new_intended_interaction = True
+            self.intended_interaction_is_ready_to_send = True

@@ -13,7 +13,6 @@ class Affordance:
     def __init__(self, point, experience):
         """Position should be integer to facilitate search"""
         self.point = point
-        # self.position_matrix = matrix44.create_from_translation(self.point).astype('float64')
         self.experience = experience
 
     def similar_to(self, other_affordance):

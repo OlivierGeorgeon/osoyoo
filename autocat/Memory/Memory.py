@@ -15,6 +15,7 @@ class Memory:
 
     def update_and_add_experiences(self, enacted_interaction):
         """ Process the enacted interaction to update the memory
+        - Move the robot in body memory
         - Move the previous experiences in egocentric_memory
         - Add new experiences in egocentric_memory
         - Move the robot in allocentric_memory
@@ -27,3 +28,13 @@ class Memory:
 
         self.allocentric_memory.move(self.body_memory.body_direction_rad, enacted_interaction['translation'])
         # self.allocentric_memory.place_robot(self.body_memory)  # Must call it after synthesizer
+
+    def update_allocentric(self, phenomena):
+        """Allocate the phenomena to the cells of allocentric memory"""
+        # Place the phenomena
+        for p in phenomena:
+            cell_i, cell_j = self.allocentric_memory.convert_pos_in_cell(p.point[0], p.point[1])
+            self.allocentric_memory.grid[cell_i][cell_j].allocate_phenomenon(p)
+        # Place the robot
+        self.allocentric_memory.place_robot(self.body_memory)
+        # TODO Place the affordances

@@ -71,6 +71,7 @@ class Phenomenon:
             affordance.point += position_correction
 
             # Prune: remove the affordances that are nearer or equal to the sensor
+            # TODO improve the Prune algorithm
             if self.confidence > PHENOMENON_CONFIDENCE_PRUNE:
                 nb_affordance = len(self.affordances)
                 self.affordances = [a for a in self.affordances if
@@ -86,12 +87,12 @@ class Phenomenon:
             # This affordance does not belong to this phenomenon
             return None
 
-    def try_to_validate(self, number_of_echos_needed):
-        """Try to validate the phenomenon, i.e. consider this phenomenon as valid.
-        To do so, the number of echo interactions needed to be added must be reached"""
-        if len(self.affordances) >= number_of_echos_needed:
-            return True
-        return False
+    # def try_to_validate(self, number_of_echos_needed):
+    #     """Try to validate the phenomenon, i.e. consider this phenomenon as valid.
+    #     To do so, the number of echo interactions needed to be added must be reached"""
+    #     if len(self.affordances) >= number_of_echos_needed:
+    #         return True
+    #     return False
 
     def convex_hull(self):
         """Return the points of the convex hull containing the phenomenon as a flat list"""
