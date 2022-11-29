@@ -12,6 +12,7 @@ class AllocentricMemory:
         with the addition of the robot at the center of the grid and a link between the
         software and the real word, cell_radius representing the radius of a cell in the real world (in millimeters)
         """
+        self.affordances = []
         self.grid = list()
         self.width = width
         self.height = height

@@ -33,8 +33,15 @@ class Memory:
         """Allocate the phenomena to the cells of allocentric memory"""
         # Place the phenomena
         for p in phenomena:
+            for a in p.affordances:
+                cell_x, cell_y = self.allocentric_memory.convert_pos_in_cell(a.point[0]+p.point[0],
+                                                                             a.point[1]+p.point[1])
+            self.allocentric_memory.apply_status_to_cell(cell_x, cell_y, a.experience.type)
             cell_i, cell_j = self.allocentric_memory.convert_pos_in_cell(p.point[0], p.point[1])
             self.allocentric_memory.grid[cell_i][cell_j].allocate_phenomenon(p)
+        # Place the affordances that are not attached to phenomena
+        for affordance in self.allocentric_memory.affordances:
+            cell_x, cell_y = self.allocentric_memory.convert_pos_in_cell(affordance.point[0], affordance.point[1])
+            self.allocentric_memory.apply_status_to_cell(cell_x, cell_y, affordance.experience.type)
         # Place the robot
         self.allocentric_memory.place_robot(self.body_memory)
-        # TODO Place the affordances
