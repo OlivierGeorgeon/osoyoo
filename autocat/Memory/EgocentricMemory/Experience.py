@@ -39,7 +39,8 @@ class Experience:
         if self.type in [EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_CENTRAL_ECHO]:
             # The position of the echo incorporating the rotation from the head
             head_direction_rad = math.atan2(y, x-ROBOT_HEAD_X)
-            self.absolute_direction_rad += head_direction_rad  # The absolute direction of the sensor
+            self.absolute_direction_rad += head_direction_rad  # The absolute direction of the sensor...
+            self.absolute_direction_rad = numpy.mod(self.absolute_direction_rad, 2*math.pi)  # ...within [0,2pi]
             print("Absolute direction rad:", round(math.degrees(self.absolute_direction_rad)), "°")
             translation_from_head_matrix = matrix44.create_from_translation([math.sqrt((x-ROBOT_HEAD_X)**2 + y**2),
                                                                              0, 0])

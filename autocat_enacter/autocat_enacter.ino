@@ -33,6 +33,7 @@
 #include "Action_define.h"
 // "Wheel.h" is imported by Floor.h
 // #include "Head_echo_complete_scan.h"
+#define WIFI_CHANNEL = 10 // 10 was the original value in the Osoyoo demo
 
 Wheel OWM;
 Floor FCR(OWM);
@@ -70,7 +71,7 @@ void setup()
     char ssid[] = "osoyoo_robot";
     Serial.print("Attempting to start AP ");
     Serial.println(ssid);
-    status = WiFi.beginAP(ssid, 10, "", 0);
+    status = WiFi.beginAP(ssid, WIFI_CHANNEL, "", 0);
   } else {
     // Connecting to wifi as a Station (STA)
     char ssid[] = SECRET_SSID;

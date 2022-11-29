@@ -35,12 +35,16 @@ class PhenomenonView(InteractiveDisplay):
 
         # Define the text area at the bottom of the view
         self.label_batch = pyglet.graphics.Batch()
-        self.label = pyglet.text.Label('', font_name='Verdana', font_size=10, x=10, y=30)
+        self.label = pyglet.text.Label('', font_name='Verdana', font_size=10, x=10, y=50)
         self.label.color = (0, 0, 0, 255)
         self.label.batch = self.label_batch
-        self.label_confidence = pyglet.text.Label('Confidence: None', font_name='Verdana', font_size=10, x=10, y=10)
+        self.label_confidence = pyglet.text.Label('Confidence: None', font_name='Verdana', font_size=10, x=10, y=30)
         self.label_confidence.color = (0, 0, 0, 255)
         self.label_confidence.batch = self.label_batch
+        self.label_origin_direction = pyglet.text.Label('Origin direction: None',
+                                                        font_name='Verdana', font_size=10, x=10, y=10)
+        self.label_origin_direction.color = (0, 0, 0, 255)
+        self.label_origin_direction.batch = self.label_batch
 
     def on_draw(self):
         """ Drawing the view """

@@ -5,6 +5,7 @@ from ..Utils import assert_almost_equal_angles
 
 AFFORDANCE_MAX_DISTANCE = 300  # (mm) Max distance within which affordances are similar
 AFFORDANCE_MAX_DIRECTION = 15  # (degrees) Max angle within which affordances are similar
+AFFORDANCE_MIN_OPPOSITE_DIRECTION = 160  # (degrees) Min angle to tell affordances are in opposite directions
 
 
 class Affordance:
@@ -27,6 +28,16 @@ class Affordance:
                 return True
         return False
 
+    def opposite_to(self, other_affordance):
+        """Affordances are opposite to if their absolute directions are near to opposite directions"""
+        if not assert_almost_equal_angles(self.experience.absolute_direction_rad,
+                                          other_affordance.experience.absolute_direction_rad,
+                                          AFFORDANCE_MIN_OPPOSITE_DIRECTION):
+            print("Opposite affordance: direction 1:", int(math.degrees(self.experience.absolute_direction_rad)),
+                  "°, direction 2: ", int(math.degrees(other_affordance.experience.absolute_direction_rad)), "°")
+            return True
+        return False
+
     def sensor_triangle(self):
         """The set of points to display the sensor in phenomenon view"""
         points = None
@@ -46,4 +57,5 @@ class Affordance:
             p3x, p3y, _ = matrix44.apply_to_vector(p3_matrix, [0, 0, 0]) + self.point
 
             points = [int(p1x), int(p1y), int(p2x), int(p2y), int(p3x), int(p3y)]
+
         return points

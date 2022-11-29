@@ -63,20 +63,20 @@ class PhenomenaToInvestigate:
         Remove the objects that have been validated and 
         the objects that have been tried too much without meeting the
         threshold to be validated"""
-        objet_validated = []
-        for i, [objet, count] in enumerate(self.phenomena_to_investigate):
-            objet.try_to_validate(self.number_of_echo_before_validation)
-            if objet.has_been_validated:
-                objet_validated.append(objet)
-                self.phenomena_to_investigate.remove([objet, count])
+        validated_phenomenon = []
+        for i, [phenomenon, count] in enumerate(self.phenomena_to_investigate):
+            has_been_validated = phenomenon.try_to_validate(self.number_of_echo_before_validation)
+            if has_been_validated:
+                validated_phenomenon.append(phenomenon)
+                self.phenomena_to_investigate.remove([phenomenon, count])
             else:
                 self.phenomena_to_investigate[i][1] += 1
 
-        for objet in self.phenomena_to_investigate:
-            if objet[1] > self.number_of_try_before_removing:
-                self.phenomena_to_investigate.remove(objet)
+        for phenomenon in self.phenomena_to_investigate:
+            if phenomenon[1] > self.number_of_try_before_removing:
+                self.phenomena_to_investigate.remove(phenomenon)
 
-        return objet_validated
+        return validated_phenomenon
 
     # def need_more_sweeps(self):
     #     """Return True if there are still objects to investigate"""
