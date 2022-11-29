@@ -4,6 +4,7 @@ from scipy.spatial import ConvexHull, QhullError, Delaunay
 
 PHENOMENON_DELTA = 300  # (mm) Distance between affordances to be considered the same phenomenon
 PHENOMENON_INITIAL_CONFIDENCE = 0.2  # Initial confidence in the phenomenon
+PHENOMENON_CONFIDENCE_PRUNE = 0.7  # Confidence threshold above which prune
 
 
 class Phenomenon:
@@ -55,27 +56,27 @@ class Phenomenon:
             # If the affordance is similar to the origin affordance (near position and direction)
             if affordance.similar_to(self.affordances[0]):
                 position_correction = -affordance.point
-
+                # If a new tour has been completed then increase confidence
                 if self.tour_started:
-                    # If a new tour has been completed then increase confidence
                     self.tour_started = False
                     self.nb_tour += 1
                     self.confidence = min(self.confidence + 0.2, 1.)
             else:
                 position_correction = numpy.array(self.confidence * delta, dtype=numpy.int16)
-                affordance.point += position_correction
-
-                # Check if a new tour
+                # Check if a new tour has started when reaching opposite direction
                 if affordance.opposite_to(self.affordances[0]):
                     self.tour_started = True
 
-            # Prune: remove the affordances that are nearer or equal from the head
-            if self.confidence > 0.5:
+            # Correct the new affordance's position
+            affordance.point += position_correction
+
+            # Prune: remove the affordances that are nearer or equal to the sensor
+            if self.confidence > PHENOMENON_CONFIDENCE_PRUNE:
                 nb_affordance = len(self.affordances)
                 self.affordances = [a for a in self.affordances if
                                     numpy.linalg.norm(a.point - head_point) >
-                                    numpy.linalg.norm(affordance.point - head_point - 2)]
-                print("Prune: ", nb_affordance - len(self.affordances), "affordances removed.")
+                                    numpy.linalg.norm(affordance.point - head_point)]
+                print("Prune:", nb_affordance - len(self.affordances), "affordances removed.")
 
             self.affordances.append(affordance)
 
@@ -101,7 +102,7 @@ class Phenomenon:
             hull = ConvexHull(points)
             self.hull_array = numpy.array([points[vertex] for vertex in hull.vertices])
             hull_points = self.hull_array.flatten().astype("int").tolist()
-        except QhullError as e:
+        except QhullError:
             print("Error computing the convex hull: probably not enough points.")
         except IndexError as e:
             print("Error computing the convex hull: probably not enough points.", e)
@@ -118,8 +119,3 @@ class Phenomenon:
         except IndexError as e:
             print("Error computing the Delaunay: ", e)
         return is_inside
-
-    def increase_confidence(self, affordance):
-        """Manage the increase of confidence in this phenomenon"""
-
-

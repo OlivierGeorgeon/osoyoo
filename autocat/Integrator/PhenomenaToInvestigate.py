@@ -22,8 +22,6 @@ class PhenomenaToInvestigate:
         """Create new phenomena to investigate from the list of central echos"""
         new_phenomena = []
         for experience in experiences:
-            # position_matrix = experience.allocentric_position_matrix(self.memory.body_memory.body_direction_matrix(),
-            #                                                          self.allocentric_memory.body_position_matrix())
             affordance_point = experience.allocentric_from_matrices(self.memory.body_memory.body_direction_matrix(),
                                                                     self.allocentric_memory.body_position_matrix())
             affordance = Affordance(affordance_point, experience)
@@ -77,7 +75,3 @@ class PhenomenaToInvestigate:
                 self.phenomena_to_investigate.remove(phenomenon)
 
         return validated_phenomenon
-
-    # def need_more_sweeps(self):
-    #     """Return True if there are still objects to investigate"""
-    #     return len(self.list_objects_to_investigate) > 0
