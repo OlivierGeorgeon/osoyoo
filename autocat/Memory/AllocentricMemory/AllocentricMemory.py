@@ -1,6 +1,6 @@
 import math
 from pyrr import matrix44
-from . GridCell import GridCell
+from . GridCell import GridCell, CELL_UNKNOWN
 from ..EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_PLACE
 
 
@@ -26,7 +26,7 @@ class AllocentricMemory:
         self.robot_cell_y = self.height // 2
         self.robot_pos_x = 0
         self.robot_pos_y = 0
-        self.grid[self.robot_cell_x][self.robot_cell_y].occupy()
+        # self.grid[self.robot_cell_x][self.robot_cell_y].occupy()
         self.cells_changed_recently = []
 
     def reset(self):
@@ -36,7 +36,7 @@ class AllocentricMemory:
         self.robot_cell_y = self.height // 2
         self.robot_pos_x = 0
         self.robot_pos_y = 0
-        self.grid[self.robot_cell_x][self.robot_cell_y].occupy()
+        # self.grid[self.robot_cell_x][self.robot_cell_y].occupy()
         self.cells_changed_recently = []
 
     def __str__(self):
@@ -244,13 +244,13 @@ class AllocentricMemory:
         # Leave the previous occupied cell
         if self.grid[self.robot_cell_x][self.robot_cell_y] != EXPERIENCE_FLOOR:
             self.grid[self.robot_cell_x][self.robot_cell_y].set_to(EXPERIENCE_PLACE)
-        self.grid[self.robot_cell_x][self.robot_cell_y].leave()
+        # self.grid[self.robot_cell_x][self.robot_cell_y].leave()
         self.cells_changed_recently.append((self.robot_cell_x, self.robot_cell_y))
 
         # Mark the new occupied cell
         self.robot_cell_x, self.robot_cell_y = self.convert_pos_in_cell(
             self.robot_pos_x, self.robot_pos_y)
-        self.grid[self.robot_cell_x][self.robot_cell_y].occupy()
+        # self.grid[self.robot_cell_x][self.robot_cell_y].occupy()
         self.cells_changed_recently.append((self.robot_cell_x, self.robot_cell_y))
 
         return destination_x, destination_y
@@ -262,6 +262,14 @@ class AllocentricMemory:
                 pos_x, pos_y = self.convert_cell_to_pos(i, j)
                 if body_memory.is_inside_robot(pos_x - self.robot_pos_x, pos_y - self.robot_pos_y):
                     self.apply_status_to_cell(i, j, EXPERIENCE_PLACE)
+
+    def clear_phenomena(self):
+        """Reset the phenomena from cells"""
+        for i in range(self.width):
+            for j in range(self.height):
+                if self.grid[i][j].phenomenon is not None:
+                    self.apply_status_to_cell(i, j, CELL_UNKNOWN)
+                    self.grid[i][j].phenomenon = None
 
     def apply_changes(self, start_x, start_y, end_x, end_y, status="Free"):
         """Apply the given status (Free by default) to every cell between coordinates start_x,start_y and end_x,end_y"""
@@ -282,12 +290,13 @@ class AllocentricMemory:
             # if(self.grid[cell_x][cell_y].status == "Unknown"):
             if self.grid[cell_x][cell_y].status != "Frontier":
                 self.grid[cell_x][cell_y].status = status
-            self.grid[cell_x][cell_y].leave()
+            # self.grid[cell_x][cell_y].leave()
             self.cells_changed_recently.append((cell_x, cell_y))
             current_pos_x += step_x
             current_pos_y += step_y
 
     def apply_status_to_cell(self, cell_x, cell_y, status):
+        """Change the cell status and add the coordinates to the cells_changed_recently list"""
         try:
             self.grid[cell_x][cell_y].status = status
             self.cells_changed_recently.append((cell_x, cell_y))

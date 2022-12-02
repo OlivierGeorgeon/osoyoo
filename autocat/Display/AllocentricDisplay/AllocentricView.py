@@ -5,7 +5,6 @@ from .HexagonalCell import HexagonalCell
 from ...Memory.EgocentricMemory.Experience import EXPERIENCE_FOCUS
 from ...Memory.AllocentricMemory.GridCell import CELL_UNKNOWN
 from ..InteractiveDisplay import InteractiveDisplay
-# from ...Workspace import TRUST_POSITION_ROBOT
 
 
 NB_CELL_WIDTH = 30
@@ -57,13 +56,13 @@ class AllocentricView(InteractiveDisplay):
         # self.label_trust_mode.color = (255, 255, 255, 255)
         # self.label_trust_mode.batch = self.label_batch
 
-    def add_cell(self, i: int, j: int):
-        """Add a new grid cell to allocentric view. Called by CtrlAllocentricView"""
+    def add_hexagon(self, i: int, j: int):
+        """Add a new hexagon cell to allocentric view if the status is not unknown. Called by CtrlAllocentricView"""
         cell = self.memory.allocentric_memory.grid[i][j]
         radius = self.memory.allocentric_memory.cell_radius
         if cell.status != CELL_UNKNOWN:
-            new_cell = HexagonalCell(i, j, self.batch, self.background, radius, cell.status, 0.8)
-            self.cell_table[i][j] = new_cell
+            new_hexagon_cell = HexagonalCell(i, j, self.batch, self.background, radius, cell.status, 0.8)
+            self.cell_table[i][j] = new_hexagon_cell
 
     def remove_focus_cell(self):
         """Remove the focus cell from allocentric view"""

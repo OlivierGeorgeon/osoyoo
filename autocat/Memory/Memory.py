@@ -1,6 +1,7 @@
 from .EgocentricMemory.EgocentricMemory import EgocentricMemory
 from .AllocentricMemory.AllocentricMemory import AllocentricMemory
 from .BodyMemory import BodyMemory
+from .AllocentricMemory.GridCell import CELL_UNKNOWN, CELL_PHENOMENON
 
 
 class Memory:
@@ -31,17 +32,25 @@ class Memory:
 
     def update_allocentric(self, phenomena):
         """Allocate the phenomena to the cells of allocentric memory"""
-        # Place the phenomena
+        # Clear the previous phenomena
+        self.allocentric_memory.clear_phenomena()
+        # Place the phenomena again
         for p in phenomena:
             for a in p.affordances:
+                # Attribute the status of the affordance
                 cell_x, cell_y = self.allocentric_memory.convert_pos_in_cell(a.point[0]+p.point[0],
                                                                              a.point[1]+p.point[1])
-            self.allocentric_memory.apply_status_to_cell(cell_x, cell_y, a.experience.type)
+                self.allocentric_memory.apply_status_to_cell(cell_x, cell_y, a.experience.type)
+                # Attribute this phenomenon to this cell
+                self.allocentric_memory.grid[cell_x][cell_y].phenomenon = p
             cell_i, cell_j = self.allocentric_memory.convert_pos_in_cell(p.point[0], p.point[1])
-            self.allocentric_memory.grid[cell_i][cell_j].allocate_phenomenon(p)
+            self.allocentric_memory.apply_status_to_cell(cell_i, cell_j, CELL_PHENOMENON)  # Mark the origin
+            # self.allocentric_memory.grid[cell_i][cell_j].allocate_phenomenon(p)  # Mark the origin of the phenomenon
+
         # Place the affordances that are not attached to phenomena
         for affordance in self.allocentric_memory.affordances:
             cell_x, cell_y = self.allocentric_memory.convert_pos_in_cell(affordance.point[0], affordance.point[1])
             self.allocentric_memory.apply_status_to_cell(cell_x, cell_y, affordance.experience.type)
-        # Place the robot
+
+        # Mark the cells where is the robot
         self.allocentric_memory.place_robot(self.body_memory)

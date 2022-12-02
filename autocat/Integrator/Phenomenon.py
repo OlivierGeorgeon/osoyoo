@@ -40,13 +40,10 @@ class Phenomenon:
         """Test if the affordance is within the acceptable delta from the position of the phenomenon,
         if yes, add the affordance to the phenomenon, and return the robot's position adjustment."""
 
-        # The affordance repositioned in reference to the phenomenon
+        # The affordance is repositioned in reference to the phenomenon
         affordance.point -= self.point
 
-        # Find the previous affordance nearest to the head
-        # head_point = numpy.array(matrix44.apply_to_vector(affordance.experience.sensor_matrix, [0, 0, 0]))
-        # phenomenon_points = numpy.array([a.point for a in self.affordances])
-        # dist2 = numpy.sum((phenomenon_points - head_point)**2, axis=1)
+        # Find the reference affordance
         nearest_affordance = self.reference_affordance(affordance)
         reference_affordance_point = nearest_affordance.point
         # Reference point based on similarity of affordances TODO choose between nearest or similar
@@ -79,21 +76,7 @@ class Phenomenon:
 
             # Prune: remove the affordances that are nearer or equal to the sensor
             self.prune(affordance)
-            # if self.confidence > PHENOMENON_CONFIDENCE_PRUNE:
-            #     nb_affordance = len(self.affordances)
-            #     # self.affordances = [a for a in self.affordances if
-            #     #                     numpy.linalg.norm(a.point - head_point) >
-            #     #                     numpy.linalg.norm(affordance.point - head_point)]
-            #     # self.affordances.remove(nearest_affordance)
-            #     for a in self.affordances:
-            #         # if numpy.linalg.norm(a.point - head_point) < numpy.linalg.norm(affordance.point - head_point):
-            #         #     self.affordances.remove(a)
-            #         #     break  # Remove only the first similar affordance found
-            #         if a.similar_to(affordance):
-            #             self.affordances.remove(a)
-            #             break  # Remove only the first similar affordance found
-            #     print("Prune:", nb_affordance - len(self.affordances), "affordances removed.")
-
+            # Append the new affordance
             self.affordances.append(affordance)
 
             # Return the correction to apply to the robot's position

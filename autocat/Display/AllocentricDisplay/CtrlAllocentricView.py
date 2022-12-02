@@ -10,7 +10,7 @@ class CtrlAllocentricView:
         self.allocentric_memory = workspace.memory.allocentric_memory
         self.allocentric_view = AllocentricView(self.workspace.memory)
         self.refresh_count = 0
-        self.to_reset = []
+        # self.to_reset = []
 
         # Handlers
         def on_text(text):
@@ -36,14 +36,14 @@ class CtrlAllocentricView:
         """Create the cells in the view from the status in the hexagonal grid"""
         for i in range(0, len(self.allocentric_view.memory.allocentric_memory.grid)):
             for j in range(0, len(self.allocentric_view.memory.allocentric_memory.grid[0])):
-                self.allocentric_view.add_cell(i, j)
+                self.allocentric_view.add_hexagon(i, j)
 
-    def extract_and_convert_recently_changed_cells(self, to_reset=[], projections=[]):
+    def extract_and_convert_recently_changed_cells(self):
         """Create or update cells from recently changed experiences in egocentric memory"""
-        cell_list = self.workspace.memory.allocentric_memory.cells_changed_recently + to_reset + projections
+        cell_list = self.workspace.memory.allocentric_memory.cells_changed_recently
         for (i, j) in cell_list:
             if self.allocentric_view.cell_table[i][j] is None:
-                self.allocentric_view.add_cell(i, j)
+                self.allocentric_view.add_hexagon(i, j)
             else:
                 self.allocentric_view.cell_table[i][j].set_color(self.allocentric_memory.grid[i][j].status)
 
@@ -54,7 +54,6 @@ class CtrlAllocentricView:
         # Remove the previous focus cell
         self.allocentric_view.remove_focus_cell()
         # Recreate the focus cell if agent has focus
-        # if hasattr(self.workspace.agent, "focus"):
         if self.workspace.focus_xy is not None:
             displacement_matrix = matrix44.multiply(self.workspace.memory.body_memory.body_direction_matrix(),
                                                     self.allocentric_memory.body_position_matrix())
@@ -74,6 +73,6 @@ class CtrlAllocentricView:
             self.extract_and_convert_interactions()
             self.allocentric_memory.cells_changed_recently = []
         if len(self.allocentric_memory.cells_changed_recently) > 0:
-            self.extract_and_convert_recently_changed_cells(self.to_reset, [])
+            self.extract_and_convert_recently_changed_cells()
             self.allocentric_memory.cells_changed_recently = []
         self.refresh_count += 1

@@ -3,18 +3,12 @@ from webcolors import name_to_rgb
 import math
 from ...Memory.EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_BLOCK, \
     EXPERIENCE_FOCUS, EXPERIENCE_IMPACT, EXPERIENCE_PLACE, EXPERIENCE_CENTRAL_ECHO
-from ...Memory.AllocentricMemory.GridCell import CELL_PHENOMENON
+from ...Memory.AllocentricMemory.GridCell import CELL_PHENOMENON, CELL_UNKNOWN
 
 
 class HexagonalCell:
     """A cell in the hexagonal grid"""
     def __init__(self, cell_x, cell_y, batch, group, radius, status, scale):
-        # self.x, self.y = x, y
-        # self.batch = batch
-        # self.group = group
-        # self.radius = radius * scale
-        # self.status = status
-
         # The position of the center in the allocentric view
         height = math.sqrt((2 * radius) ** 2 - radius ** 2)
         if cell_y % 2 == 0:
@@ -40,12 +34,12 @@ class HexagonalCell:
     def set_color(self, status):
         """ Set the color from the status"""
         color = name_to_rgb('white')
-        if status == 'Free':
-            color = name_to_rgb('LightGreen')
+        if status == CELL_UNKNOWN:
+            color = name_to_rgb('grey')
         if status == EXPERIENCE_PLACE:
             color = name_to_rgb('LightGreen')
-        if status == 'Occupied':
-            color = name_to_rgb('slateBlue')
+        # if status == 'Occupied':
+        #     color = name_to_rgb('slateBlue')
         if status == EXPERIENCE_BLOCK:
             color = name_to_rgb('red')
         if status == EXPERIENCE_IMPACT:
