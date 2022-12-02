@@ -56,10 +56,10 @@ class Experience:
             # Move the head position by the azimuth
             self.sensor_matrix = matrix44.multiply(opposite_translation_matrix, orientation_matrix)
 
-            # The rotation matrix to display the experience in phenomenon view
-            p1x, p1y, _ = matrix44.apply_to_vector(self.sensor_matrix, [0, 0, 0])
-            angle_sensor = math.atan2(p1y, p1x)
-            self.rotation_matrix = matrix44.create_from_z_rotation(math.pi - angle_sensor)  # Don't know why need flip
+        # The rotation matrix to display the experience in phenomenon view
+        p1x, p1y, _ = matrix44.apply_to_vector(self.sensor_matrix, [0, 0, 0])
+        angle_sensor = math.atan2(p1y, p1x)
+        self.rotation_matrix = matrix44.create_from_z_rotation(math.pi - angle_sensor)  # Don't know why need flip
 
         self.durability = durability
         self.actual_durability = durability

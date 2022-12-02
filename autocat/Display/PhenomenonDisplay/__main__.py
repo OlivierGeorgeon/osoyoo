@@ -20,19 +20,19 @@ phenomenon = Phenomenon(affordance1)
 # Add a second affordance
 experience2 = Experience(200, 0, EXPERIENCE_ALIGNED_ECHO, -math.pi / 2, experience_id=0)
 affordance2 = Affordance(numpy.array([10, 50, 0], dtype=numpy.int16), experience2)
-phenomenon.try_and_add(affordance2)
+phenomenon.update(affordance2)
 
 experience3 = Experience(200, -50, EXPERIENCE_ALIGNED_ECHO, -math.pi / 2, experience_id=0)
 affordance3 = Affordance(numpy.array([100, 50, 0], dtype=numpy.int16), experience3)
-phenomenon.try_and_add(affordance3)
+phenomenon.update(affordance3)
 
 experience4 = Experience(300, 0, EXPERIENCE_ALIGNED_ECHO, 3 * math.pi / 4, experience_id=0)
 affordance4 = Affordance(numpy.array([100, 0, 0], dtype=numpy.int16), experience4)
-phenomenon.try_and_add(affordance4)
+phenomenon.update(affordance4)
 
 experience5 = Experience(300, 0, EXPERIENCE_ALIGNED_ECHO, 3 * math.pi / 4, experience_id=0)
 affordance5 = Affordance(numpy.array([60, 0, 0], dtype=numpy.int16), experience4)
-phenomenon.try_and_add(affordance5)
+phenomenon.update(affordance5)
 
 # Test is_inside
 print("Point [-1, -1] is inside: ", phenomenon.is_inside(numpy.array([-1, -1])))

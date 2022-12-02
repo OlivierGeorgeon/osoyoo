@@ -4,7 +4,7 @@ from scipy.spatial import ConvexHull, QhullError, Delaunay
 
 PHENOMENON_DELTA = 300  # (mm) Distance between affordances to be considered the same phenomenon
 PHENOMENON_INITIAL_CONFIDENCE = 0.2  # Initial confidence in the phenomenon
-PHENOMENON_CONFIDENCE_PRUNE = 0.7  # Confidence threshold above which prune
+PHENOMENON_CONFIDENCE_PRUNE = 0.3  # Confidence threshold above which prune
 
 
 class Phenomenon:
@@ -21,6 +21,7 @@ class Phenomenon:
         affordance.point = numpy.array([0, 0, 0], dtype=numpy.int16)  # Position of the first affordance is reset
         self.affordances = [affordance]
         self.origin_absolute_direction = affordance.experience.absolute_direction_rad
+        self.origin_affordance = affordance  # In case affordances[0] is pruned
 
         self.nb_tour = 0
         self.tour_started = False
@@ -35,7 +36,7 @@ class Phenomenon:
         centroid = points.mean(axis=0)
         return centroid
 
-    def try_and_add(self, affordance):
+    def update(self, affordance):
         """Test if the affordance is within the acceptable delta from the position of the phenomenon,
         if yes, add the affordance to the phenomenon, and return the robot's position adjustment."""
 
@@ -43,19 +44,25 @@ class Phenomenon:
         affordance.point -= self.point
 
         # Find the previous affordance nearest to the head
-        head_point = numpy.array(matrix44.apply_to_vector(affordance.experience.sensor_matrix, [0, 0, 0]))
-        phenomenon_points = numpy.array([a.point for a in self.affordances])
-        dist2 = numpy.sum((phenomenon_points - head_point)**2, axis=1)
-        nearest_affordance_point = phenomenon_points[dist2.argmin()]
+        # head_point = numpy.array(matrix44.apply_to_vector(affordance.experience.sensor_matrix, [0, 0, 0]))
+        # phenomenon_points = numpy.array([a.point for a in self.affordances])
+        # dist2 = numpy.sum((phenomenon_points - head_point)**2, axis=1)
+        nearest_affordance = self.reference_affordance(affordance)
+        reference_affordance_point = nearest_affordance.point
+        # Reference point based on similarity of affordances TODO choose between nearest or similar
+        similar_affordance_points = numpy.array([a.point for a in self.affordances if a.similar_to(affordance)])
+        if similar_affordance_points.size > 0:
+            print("Correct from similar affordances")
+            reference_affordance_point = similar_affordance_points.mean(axis=0)
 
-        # The delta of position from the previous affordance nearest to the head
-        delta = nearest_affordance_point - affordance.point
+        # The delta of position from the reference affordance point
+        delta = reference_affordance_point - affordance.point
 
         # If the new affordance is attributed to this phenomenon
         if numpy.linalg.norm(delta) < PHENOMENON_DELTA:
             # If the affordance is similar to the origin affordance (near position and direction)
-            if affordance.similar_to(self.affordances[0]):
-                position_correction = -affordance.point
+            if affordance.similar_to(self.origin_affordance):
+                position_correction = -affordance.point  # The affordance in (0,0) and correct the robot's position
                 # If a new tour has been completed then increase confidence
                 if self.tour_started:
                     self.tour_started = False
@@ -64,20 +71,28 @@ class Phenomenon:
             else:
                 position_correction = numpy.array(self.confidence * delta, dtype=numpy.int16)
                 # Check if a new tour has started when reaching opposite direction
-                if affordance.opposite_to(self.affordances[0]):
+                if affordance.opposite_to(self.origin_affordance):
                     self.tour_started = True
 
             # Correct the new affordance's position
             affordance.point += position_correction
 
             # Prune: remove the affordances that are nearer or equal to the sensor
-            # TODO improve the Prune algorithm
-            if self.confidence > PHENOMENON_CONFIDENCE_PRUNE:
-                nb_affordance = len(self.affordances)
-                self.affordances = [a for a in self.affordances if
-                                    numpy.linalg.norm(a.point - head_point) >
-                                    numpy.linalg.norm(affordance.point - head_point)]
-                print("Prune:", nb_affordance - len(self.affordances), "affordances removed.")
+            self.prune(affordance)
+            # if self.confidence > PHENOMENON_CONFIDENCE_PRUNE:
+            #     nb_affordance = len(self.affordances)
+            #     # self.affordances = [a for a in self.affordances if
+            #     #                     numpy.linalg.norm(a.point - head_point) >
+            #     #                     numpy.linalg.norm(affordance.point - head_point)]
+            #     # self.affordances.remove(nearest_affordance)
+            #     for a in self.affordances:
+            #         # if numpy.linalg.norm(a.point - head_point) < numpy.linalg.norm(affordance.point - head_point):
+            #         #     self.affordances.remove(a)
+            #         #     break  # Remove only the first similar affordance found
+            #         if a.similar_to(affordance):
+            #             self.affordances.remove(a)
+            #             break  # Remove only the first similar affordance found
+            #     print("Prune:", nb_affordance - len(self.affordances), "affordances removed.")
 
             self.affordances.append(affordance)
 
@@ -87,12 +102,32 @@ class Phenomenon:
             # This affordance does not belong to this phenomenon
             return None
 
-    # def try_to_validate(self, number_of_echos_needed):
-    #     """Try to validate the phenomenon, i.e. consider this phenomenon as valid.
-    #     To do so, the number of echo interactions needed to be added must be reached"""
-    #     if len(self.affordances) >= number_of_echos_needed:
-    #         return True
-    #     return False
+    def reference_affordance(self, affordance):
+        """Find the previous affordance that serves as the reference to correct the position"""
+        # TODO the reference algorithm must be improved
+        # In this implementation the reference affordance is the affordance closest to the head
+        phenomenon_points = numpy.array([a.point for a in self.affordances])
+        head_point = numpy.array(matrix44.apply_to_vector(affordance.experience.sensor_matrix, [0, 0, 0]))
+        dist2 = numpy.sum((phenomenon_points - head_point)**2, axis=1)
+        return self.affordances[dist2.argmin()]
+
+    def prune(self, affordance):
+        """Remove previous affordances to keep their number under control"""
+        # TODO The Prune algorithm must be improved
+        if self.confidence > PHENOMENON_CONFIDENCE_PRUNE:
+            nb_affordance = len(self.affordances)
+            # self.affordances = [a for a in self.affordances if
+            #                     numpy.linalg.norm(a.point - head_point) >
+            #                     numpy.linalg.norm(affordance.point - head_point)]
+            # self.affordances.remove(nearest_affordance)
+            for a in self.affordances:
+                # if numpy.linalg.norm(a.point - head_point) < numpy.linalg.norm(affordance.point - head_point):
+                #     self.affordances.remove(a)
+                #     break  # Remove only the first similar affordance found
+                if a.similar_to(affordance):
+                    self.affordances.remove(a)
+                    break  # Remove only the first similar affordance found
+            print("Prune:", nb_affordance - len(self.affordances), "affordances removed.")
 
     def convex_hull(self):
         """Return the points of the convex hull containing the phenomenon as a flat list"""
