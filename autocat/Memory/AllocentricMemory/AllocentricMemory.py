@@ -71,7 +71,7 @@ class AllocentricMemory:
             pos_x -= (3*radius) * x_sign
             tmp_cell_x_center += (3*radius) * x_sign
         # To move to the cell on the top/bottom you move by 2*mini_radius on the y axis.
-        while abs(pos_y) >= abs(2*mini_radius) :
+        while abs(pos_y) >= abs(2*mini_radius):
             tmp_cell_y += 2*y_sign
             pos_y -= 2*mini_radius*y_sign
             tmp_cell_y_center += 2*mini_radius*y_sign
@@ -83,23 +83,23 @@ class AllocentricMemory:
             "determiner la ligne qui risque d'etre traversée, et si on a passé la ligne ou non"
         if abs(pos_x) >= 2.5 * radius:
             "on est forcément dans g hgg bgg ou d hdd bdd"
-            if abs(pos_y) >= mini_radius :
+            if abs(pos_y) >= mini_radius:
                 "on est forcement dans hgg bgg hdd bdd"
-                return tmp_cell_x+ x_sign, tmp_cell_y + 2*y_sign
+                return tmp_cell_x + x_sign, tmp_cell_y + 2*y_sign
             else:
                 "on est dans g ou d"
                 return tmp_cell_x + x_sign, tmp_cell_y
 
         if abs(pos_x) >= 2 * radius:
             "on est dans hgg g bgg hg bg / hdd d bdd hd bd "
-            if abs(pos_y) >= mini_radius :
+            if abs(pos_y) >= mini_radius:
                 "on est dans hgg-hg  bgg-bg  hdd-hd bd-bdd"
                 # On trouve l'équation de la ligne de démarcation
                 x_depart = 2.5 * radius
                 y_depart = mini_radius
 
-                x_fin = 2* radius
-                y_fin = 2*mini_radius
+                x_fin = 2 * radius
+                y_fin = 2 * mini_radius
 
                 slope = (y_fin - y_depart) / (x_fin - x_depart)
                 offset = y_depart - (slope * x_depart)

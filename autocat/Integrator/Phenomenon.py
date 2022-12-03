@@ -16,6 +16,7 @@ class Phenomenon:
             """
         self.point = affordance.point.copy()  # The position of the phenomenon = position of the first affordance
         self.confidence = PHENOMENON_INITIAL_CONFIDENCE
+        print("Phenomenon:", affordance.experience.type, ", point:", self.point)
 
         # Record the first affordance of the phenomenon
         affordance.point = numpy.array([0, 0, 0], dtype=numpy.int16)  # Position of the first affordance is reset
@@ -41,11 +42,12 @@ class Phenomenon:
         if yes, add the affordance to the phenomenon, and return the robot's position adjustment."""
 
         # The affordance is repositioned in reference to the phenomenon
-        affordance.point -= self.point
+        # (Do not modify the affordance if it does not belong to this phenomenon)
+        relative_affordance_point = numpy.array(affordance.point - self.point, dtype=numpy.int16)
 
         # Find the reference affordance
         nearest_affordance = self.reference_affordance(affordance)
-        reference_affordance_point = nearest_affordance.point.copy()  # Not if copy is necessary
+        reference_affordance_point = nearest_affordance.point
         # Reference point based on similarity of affordances TODO choose between nearest or similar
         similar_affordance_points = numpy.array([a.point for a in self.affordances if a.similar_to(affordance)])
         if similar_affordance_points.size > 0:
@@ -53,13 +55,13 @@ class Phenomenon:
             reference_affordance_point = similar_affordance_points.mean(axis=0)
 
         # The delta of position from the reference affordance point
-        delta = reference_affordance_point - affordance.point
+        delta = reference_affordance_point - relative_affordance_point
 
         # If the new affordance is attributed to this phenomenon
         if numpy.linalg.norm(delta) < PHENOMENON_DELTA:
             # If the affordance is similar to the origin affordance (near position and direction)
             if affordance.similar_to(self.origin_affordance):
-                position_correction = -affordance.point.copy()  # The affordance in (0,0) and correct the robot's position
+                position_correction = -relative_affordance_point  # The affordance in (0,0) and correct the robot's position
                 # If a new tour has been completed then increase confidence
                 if self.tour_started:
                     self.tour_started = False
@@ -71,8 +73,8 @@ class Phenomenon:
                 if affordance.opposite_to(self.origin_affordance):
                     self.tour_started = True
 
-            # Correct the new affordance's position
-            affordance.point += position_correction
+            # Move the new affordance's position to relative reference
+            affordance.point = relative_affordance_point + position_correction
 
             # Prune: remove the affordances that are nearer or equal to the sensor
             self.prune(affordance)

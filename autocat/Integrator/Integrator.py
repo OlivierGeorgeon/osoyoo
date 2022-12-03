@@ -15,8 +15,7 @@ class Integrator:
         self.allocentric_memory = workspace.memory.allocentric_memory
         self.body_memory = workspace.memory.body_memory
         self.phenomena = []
-        # self.last_projection_for_context = []
-        self.last_used_id = 0
+        self.last_used_id = -1  # Don't miss the first experience number 0
 
     def integrate(self):
         """Create phenomena and update cells in allocentric memory"""
@@ -32,10 +31,7 @@ class Integrator:
                 affordance_point = e.allocentric_from_matrices(self.workspace.memory.body_memory.body_direction_matrix(),
                                                                self.allocentric_memory.body_position_matrix())
                 new_affordances.append(Affordance(affordance_point, e))
-
-        # Keep only echo affordances (for now)
-        # affordances_echo = [a for a in new_affordances if (a.experience.type == EXPERIENCE_CENTRAL_ECHO or
-        #                                                    a.experience.type == EXPERIENCE_ALIGNED_ECHO)]
+                print("Experience:", e.type, ", point:", affordance_point)
 
         # Try to attach the new affordances to existing phenomena and remove these affordances
         new_affordances, position_correction = self.update_phenomena(new_affordances)
@@ -44,16 +40,10 @@ class Integrator:
         self.allocentric_memory.move(0, position_correction, is_egocentric_translation=False)
 
         # Create new hypothetical phenomena from remaining affordances
-        # self.create_phenomena(new_affordances)
+        self.create_phenomena(new_affordances)
 
         # Stores the remaining new affordances in allocentric memory
         self.allocentric_memory.affordances.extend(new_affordances)
-
-        # Mark the new experiences in allocentric memory by changing the cell status
-        # self.apply_status_experience_to_cells([e for e in new_experiences if e.type != EXPERIENCE_LOCAL_ECHO])
-
-        # Display the validated phenomena in the grid
-        # self.allocentric_memory.attach_phenomena_to_cells()
 
         return None
 
@@ -79,7 +69,7 @@ class Integrator:
         return remaining_affordances, position_correction
 
     def create_phenomena(self, affordances):
-        """Create new phenomena from the list of experiences"""
+        """Create new phenomena from the list of affordances"""
         new_phenomena = []
         for affordance in affordances:
             if len(new_phenomena) == 0:

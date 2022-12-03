@@ -38,6 +38,7 @@ class CtrlAllocentricView:
         for i in range(0, len(self.allocentric_view.memory.allocentric_memory.grid)):
             for j in range(0, len(self.allocentric_view.memory.allocentric_memory.grid[0])):
                 self.allocentric_view.update_hexagon(i, j)
+        self.add_focus_cell()
 
     # def extract_and_convert_recently_changed_cells(self):
     #     """Create or update cells from recently changed experiences in egocentric memory"""
