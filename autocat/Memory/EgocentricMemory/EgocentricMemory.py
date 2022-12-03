@@ -2,7 +2,7 @@ from ...Memory.EgocentricMemory.Experience import Experience, EXPERIENCE_LOCAL_E
 from ...Robot.CtrlRobot import KEY_EXPERIENCES
 import math
 
-EXPERIENCE_PERSISTENCE = 5
+EXPERIENCE_PERSISTENCE = 10
 
 
 class EgocentricMemory:
@@ -35,18 +35,6 @@ class EgocentricMemory:
                                                       body_direction_rad)
         self.experiences += new_experiences
         self.experiences += new_central_echos
-
-        # Create new experiences of type local_echo from echos in the echo_array
-        # if 'echo_array' in enacted_interaction:
-        #     echo_array = enacted_interaction['echo_array']
-        #     for _, echo in enumerate(echo_array):
-        #         x = echo[0]
-        #         y = echo[1]
-        #         local_echo_experience = Experience(x, y, width=15, experience_type=EXPERIENCE_LOCAL_ECHO,
-        #                                            durability=EXPERIENCE_PERSISTENCE, decay_intensity=1,
-        #                                            experience_id=self.experience_id)
-        #         self.experiences.append(local_echo_experience)
-        #         self.experience_id += 1
 
     def tick(self):
         for e in self.experiences:

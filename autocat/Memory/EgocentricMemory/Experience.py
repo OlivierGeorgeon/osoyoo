@@ -31,9 +31,9 @@ class Experience:
         # The position matrix is applied to the vertices of the point_of_interest to display
         # the point of interest at the position of the experience in egocentric view
         self.position_matrix = matrix44.create_from_translation([x, y, 0]).astype('float64')
-        # The sensor matrix is applied to the vertices to display the sensor in phenomenon view relative the experience
-        self.sensor_matrix = matrix44.create_identity()
-        # The absolute direction of this affordance used to count the number of tours around phenomena
+        # The position of the robot relative to the experience
+        opposite_translation_matrix = matrix44.create_from_translation([-x, -y, 0]).astype('float64')
+        # The absolute direction of this affordance
         self.absolute_direction_rad = body_direction_rad
 
         if self.type in [EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_CENTRAL_ECHO]:
@@ -51,10 +51,11 @@ class Experience:
                                                      .astype('float64'))
             # The position of the head relative to the echo in allocentric coordinates
             opposite_translation_matrix = matrix44.create_from_translation([-x + ROBOT_HEAD_X, -y, 0])
-            # opposite azimuth
-            orientation_matrix = matrix44.create_from_z_rotation(-body_direction_rad)
-            # Move the head position by the azimuth
-            self.sensor_matrix = matrix44.multiply(opposite_translation_matrix, orientation_matrix)
+
+        # opposite azimuth
+        orientation_matrix = matrix44.create_from_z_rotation(-body_direction_rad)
+        # Move the head position by the azimuth
+        self.sensor_matrix = matrix44.multiply(opposite_translation_matrix, orientation_matrix)
 
         # The rotation matrix to display the experience in phenomenon view
         p1x, p1y, _ = matrix44.apply_to_vector(self.sensor_matrix, [0, 0, 0])

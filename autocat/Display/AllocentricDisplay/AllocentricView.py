@@ -41,7 +41,7 @@ class AllocentricView(InteractiveDisplay):
         self.nb_cell_y = memory.allocentric_memory.height
         self.cell_radius = memory.allocentric_memory.cell_radius
 
-        self.cell_table = [[None for y in range(self.nb_cell_y)] for x in range(self.nb_cell_x)]
+        self.hexagons = [[None for y in range(self.nb_cell_y)] for x in range(self.nb_cell_x)]
         self.focus_cell = None
 
         self.mouse_press_x = 0
@@ -56,13 +56,16 @@ class AllocentricView(InteractiveDisplay):
         # self.label_trust_mode.color = (255, 255, 255, 255)
         # self.label_trust_mode.batch = self.label_batch
 
-    def add_hexagon(self, i: int, j: int):
-        """Add a new hexagon cell to allocentric view if the status is not unknown. Called by CtrlAllocentricView"""
+    def update_hexagon(self, i: int, j: int):
+        """Update or create an hexagon in allocentric view."""
         cell = self.memory.allocentric_memory.grid[i][j]
         radius = self.memory.allocentric_memory.cell_radius
-        if cell.status != CELL_UNKNOWN:
-            new_hexagon_cell = HexagonalCell(i, j, self.batch, self.background, radius, cell.status, 0.8)
-            self.cell_table[i][j] = new_hexagon_cell
+        if self.hexagons[i][j] is not None:
+            self.hexagons[i][j].set_color(cell.status)
+        else:
+            if cell.status != CELL_UNKNOWN:
+                new_hexagon = HexagonalCell(i, j, self.batch, self.background, radius, cell.status, 0.8)
+                self.hexagons[i][j] = new_hexagon
 
     def remove_focus_cell(self):
         """Remove the focus cell from allocentric view"""

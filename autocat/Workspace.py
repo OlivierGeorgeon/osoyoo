@@ -31,6 +31,9 @@ class Workspace:
         self.focus_xy = None
         self.prompt_xy = None
 
+        # Controls which phenomenon to display
+        self.ctrl_phenomenon_view = None
+
     def main(self, dt):
         """1) If a new enacted_interaction has been received
              - update memory and hexa_memory

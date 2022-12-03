@@ -12,10 +12,14 @@ from ...Memory.EgocentricMemory.Experience import Experience, EXPERIENCE_FLOOR, 
 workspace = Workspace()
 controller = CtrlPhenomenonView(workspace)
 
+experience0 = Experience(50, 0, EXPERIENCE_FLOOR, math.pi / 4, experience_id=0)
+affordance0 = Affordance(numpy.array([0, 0, 0], dtype=numpy.int16), experience0)
+phenomenon = Phenomenon(affordance0)
+
 # Create a phenomenon
 experience1 = Experience(200, 0, EXPERIENCE_ALIGNED_ECHO, math.pi / 4, experience_id=0)
 affordance1 = Affordance(numpy.array([0, 0, 0], dtype=numpy.int16), experience1)
-phenomenon = Phenomenon(affordance1)
+# phenomenon = Phenomenon(affordance1)
 
 # Add a second affordance
 experience2 = Experience(200, 0, EXPERIENCE_ALIGNED_ECHO, -math.pi / 2, experience_id=0)

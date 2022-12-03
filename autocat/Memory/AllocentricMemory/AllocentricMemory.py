@@ -27,7 +27,7 @@ class AllocentricMemory:
         self.robot_pos_x = 0
         self.robot_pos_y = 0
         # self.grid[self.robot_cell_x][self.robot_cell_y].occupy()
-        self.cells_changed_recently = []
+        # self.cells_changed_recently = []
 
     def reset(self):
         """Reset the hexamemory"""
@@ -37,7 +37,7 @@ class AllocentricMemory:
         self.robot_pos_x = 0
         self.robot_pos_y = 0
         # self.grid[self.robot_cell_x][self.robot_cell_y].occupy()
-        self.cells_changed_recently = []
+        # self.cells_changed_recently = []
 
     def __str__(self):
         output = ""
@@ -245,13 +245,13 @@ class AllocentricMemory:
         if self.grid[self.robot_cell_x][self.robot_cell_y] != EXPERIENCE_FLOOR:
             self.grid[self.robot_cell_x][self.robot_cell_y].set_to(EXPERIENCE_PLACE)
         # self.grid[self.robot_cell_x][self.robot_cell_y].leave()
-        self.cells_changed_recently.append((self.robot_cell_x, self.robot_cell_y))
+        # self.cells_changed_recently.append((self.robot_cell_x, self.robot_cell_y))
 
         # Mark the new occupied cell
         self.robot_cell_x, self.robot_cell_y = self.convert_pos_in_cell(
             self.robot_pos_x, self.robot_pos_y)
         # self.grid[self.robot_cell_x][self.robot_cell_y].occupy()
-        self.cells_changed_recently.append((self.robot_cell_x, self.robot_cell_y))
+        # self.cells_changed_recently.append((self.robot_cell_x, self.robot_cell_y))
 
         return destination_x, destination_y
 
@@ -271,7 +271,7 @@ class AllocentricMemory:
                     self.apply_status_to_cell(i, j, CELL_UNKNOWN)
                     self.grid[i][j].phenomenon = None
 
-    def apply_changes(self, start_x, start_y, end_x, end_y, status="Free"):
+    def apply_changes(self, start_x, start_y, end_x, end_y, status=EXPERIENCE_PLACE):
         """Apply the given status (Free by default) to every cell between coordinates start_x,start_y and end_x,end_y"""
 
         distance = math.sqrt((end_x - start_x)**2 + (end_y - start_y)**2)
@@ -285,13 +285,11 @@ class AllocentricMemory:
         current_pos_x = start_x
         current_pos_y = start_y
         for _ in range(nb_step):
-            cell_x, cell_y = self.convert_pos_in_cell(
-                current_pos_x, current_pos_y)
-            # if(self.grid[cell_x][cell_y].status == "Unknown"):
-            if self.grid[cell_x][cell_y].status != "Frontier":
-                self.grid[cell_x][cell_y].status = status
+            cell_x, cell_y = self.convert_pos_in_cell(current_pos_x, current_pos_y)
+            # if self.grid[cell_x][cell_y].status != "Frontier":
+            self.grid[cell_x][cell_y].status = status
             # self.grid[cell_x][cell_y].leave()
-            self.cells_changed_recently.append((cell_x, cell_y))
+            # self.cells_changed_recently.append((cell_x, cell_y))
             current_pos_x += step_x
             current_pos_y += step_y
 
@@ -299,7 +297,7 @@ class AllocentricMemory:
         """Change the cell status and add the coordinates to the cells_changed_recently list"""
         try:
             self.grid[cell_x][cell_y].status = status
-            self.cells_changed_recently.append((cell_x, cell_y))
+            # self.cells_changed_recently.append((cell_x, cell_y))
         except IndexError:
             print("Error cell out of grid, cell_x:", cell_x, "cell_y:", cell_y, "Status:", status)
             exit()

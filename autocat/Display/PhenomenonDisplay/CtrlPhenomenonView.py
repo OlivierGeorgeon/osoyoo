@@ -81,8 +81,9 @@ class CtrlPhenomenonView:
                 str(self.phenomenon.nb_tour)
         if self.workspace.flag_for_view_refresh:
             # Display in phenomenon view
-            if len(self.workspace.integrator.phenomena) > 0:
-                self.phenomenon = self.workspace.integrator.phenomena[0]
+            # if len(self.workspace.integrator.phenomena) > 0:
+            #     self.phenomenon = self.workspace.integrator.phenomena[0]
+            if self.phenomenon is not None:
                 self.update_points_of_interest(self.phenomenon)
             self.update_body_robot()
             self.workspace.flag_for_view_refresh = False  # Reset by CtrlBodyView

@@ -3,7 +3,7 @@ from pyrr import matrix44
 from scipy.spatial import ConvexHull, QhullError, Delaunay
 
 PHENOMENON_DELTA = 300  # (mm) Distance between affordances to be considered the same phenomenon
-PHENOMENON_INITIAL_CONFIDENCE = 0.2  # Initial confidence in the phenomenon
+PHENOMENON_INITIAL_CONFIDENCE = 0.2  # 0.2 Initial confidence in the phenomenon
 PHENOMENON_CONFIDENCE_PRUNE = 0.3  # Confidence threshold above which prune
 
 
@@ -14,7 +14,7 @@ class Phenomenon:
         Parameters:
             affordance: the first affordance that serves as the origin of the phenomenon
             """
-        self.point = affordance.point  # The position of the phenomenon = position of the first affordance
+        self.point = affordance.point.copy()  # The position of the phenomenon = position of the first affordance
         self.confidence = PHENOMENON_INITIAL_CONFIDENCE
 
         # Record the first affordance of the phenomenon
@@ -45,7 +45,7 @@ class Phenomenon:
 
         # Find the reference affordance
         nearest_affordance = self.reference_affordance(affordance)
-        reference_affordance_point = nearest_affordance.point
+        reference_affordance_point = nearest_affordance.point.copy()  # Not if copy is necessary
         # Reference point based on similarity of affordances TODO choose between nearest or similar
         similar_affordance_points = numpy.array([a.point for a in self.affordances if a.similar_to(affordance)])
         if similar_affordance_points.size > 0:
@@ -59,7 +59,7 @@ class Phenomenon:
         if numpy.linalg.norm(delta) < PHENOMENON_DELTA:
             # If the affordance is similar to the origin affordance (near position and direction)
             if affordance.similar_to(self.origin_affordance):
-                position_correction = -affordance.point  # The affordance in (0,0) and correct the robot's position
+                position_correction = -affordance.point.copy()  # The affordance in (0,0) and correct the robot's position
                 # If a new tour has been completed then increase confidence
                 if self.tour_started:
                     self.tour_started = False

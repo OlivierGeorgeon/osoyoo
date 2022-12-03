@@ -44,7 +44,7 @@ class Integrator:
         self.allocentric_memory.move(0, position_correction, is_egocentric_translation=False)
 
         # Create new hypothetical phenomena from remaining affordances
-        self.create_phenomena(new_affordances)
+        # self.create_phenomena(new_affordances)
 
         # Stores the remaining new affordances in allocentric memory
         self.allocentric_memory.affordances.extend(new_affordances)
@@ -57,16 +57,8 @@ class Integrator:
 
         return None
 
-    # def apply_status_experience_to_cells(self, experiences):
-    #     """Mark the experiences in the cells of allocentric Memory"""
-    #     for experience in experiences:
-    #         point = experience.allocentric_from_matrices(self.workspace.memory.body_memory.body_direction_matrix(),
-    #                                                      self.allocentric_memory.body_position_matrix())
-    #         cell_x, cell_y = self.allocentric_memory.convert_pos_in_cell(point[0], point[1])
-    #         self.allocentric_memory.apply_status_to_cell(cell_x, cell_y, experience.type)
-
     def update_phenomena(self, affordances):
-        """Try to attach a list of affordances to phenomena  in the list .
+        """Try to attach a list of affordances to phenomena in the list .
         Returns the affordances that have not been attached, and the average translation"""
         position_correction = numpy.array([0, 0, 0], dtype=numpy.int16)
         sum_translation = numpy.array([0, 0, 0], dtype=numpy.int16)
