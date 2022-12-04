@@ -11,7 +11,7 @@ POINT_PROMPT = 'Prompt'
 
 
 class PointOfInterest:
-    def __init__(self, x, y, batch, group, point_type, experience=None):
+    def __init__(self, x, y, batch, group, point_type, clock, experience=None):
         self.experience = experience
         self.x, self.y = 0, 0  # will be displaced
         self.batch = batch
@@ -20,8 +20,12 @@ class PointOfInterest:
         self.points = []
         self.opacity = 255
         self.color = name_to_rgb("gray")
+        if experience is None:
+            self.clock = clock
+        else:
+            self.clock = experience.clock
 
-        self.is_selected = False
+        # self.is_selected = False
 
         if self.type == EXPERIENCE_PLACE:
             self.points = [30, 0, -20, -20, -20, 20]
@@ -146,12 +150,14 @@ class PointOfInterest:
 
     def select_if_near(self, x, y):
         """ If the point is near the x y coordinate, select this point and return True """
-        if math.dist([x, y], [self.x, self.y]) < 20:
+        if math.dist([x, y], [self.x, self.y]) < 15:
             self.set_color('red')
-            self.is_selected = True
+            return True
+            # self.is_selected = True
         else:
             self.set_color()
-            self.is_selected = False
+            return False
+            # self.is_selected = False
 
     def update(self, displacement_matrix):
         """ Displace the point of interest to the position of its experience

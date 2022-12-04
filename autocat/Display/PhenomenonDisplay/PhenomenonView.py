@@ -73,14 +73,14 @@ class PhenomenonView(InteractiveDisplay):
         # Draw the text in the bottom left corner
         self.label_batch.draw()
 
-    def on_mouse_press(self, x, y, button, modifiers):
-        """ Computing the position of the mouse click relative to the robot in mm and degrees """
-        window_press_x = (x - self.width / 2) * self.zoom_level * 2
-        window_press_y = (y - self.height / 2) * self.zoom_level * 2
-        angle = math.atan2(window_press_y, window_press_x)
-
-        self.label.text = "Click: x:" + str(int(window_press_x)) + ", y:" + str(int(window_press_y)) \
-                          + ", angle:" + str(int(math.degrees(angle))) + "°."
+    # def on_mouse_press(self, x, y, button, modifiers):
+    #     """ Computing the position of the mouse click relative to the robot in mm and degrees """
+    #     window_press_x = (x - self.width / 2) * self.zoom_level * 2
+    #     window_press_y = (y - self.height / 2) * self.zoom_level * 2
+    #     angle = math.atan2(window_press_y, window_press_x)
+    #
+    #     self.label.text = "Click: x:" + str(int(window_press_x)) + ", y:" + str(int(window_press_y)) \
+    #                       + ", angle:" + str(int(math.degrees(angle))) + "°."
 
     def add_polygon(self, points, color_string):
         """Add a plain polygon to the background of the view"""

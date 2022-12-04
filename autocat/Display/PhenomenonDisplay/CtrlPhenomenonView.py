@@ -26,7 +26,20 @@ class CtrlPhenomenonView:
                 # Other keypress are handled by the workspace
                 self.workspace.process_user_key(text)
 
-        self.view.push_handlers(on_text)
+        def on_mouse_press(x, y, button, modifiers):
+            """ Computing the position of the mouse click relative to the robot in mm and degrees """
+            # window_press_x = (x - self.view.width / 2) * self.view.zoom_level * 2
+            # window_press_y = (y - self.view.height / 2) * self.view.zoom_level * 2
+            # angle = math.atan2(window_press_y, window_press_x)
+            window_press_x, window_press_y, angle, _ = self.view.get_allocentric_coordinates(x, y)
+            self.view.label.text = "Click: x:" + str(int(window_press_x)) + ", y:" + str(int(window_press_y)) \
+                                   + ", angle:" + str(int(math.degrees(angle))) + "°."
+            for p in self.points_of_interest:
+                is_near = p.select_if_near(window_press_x, window_press_y)
+                if is_near:
+                    self.view.label_origin_direction.text = "Clock: " + str(p.clock)
+
+        self.view.push_handlers(on_text, on_mouse_press)
 
     def update_body_robot(self):
         """Updates the robot's body to display by the egocentric view"""
@@ -61,7 +74,7 @@ class CtrlPhenomenonView:
     def create_point_of_interest(self, affordance):
         """Create a point of interest corresponding to the affordance given as parameter"""
         # Create the point of interest at origin
-        poi = PointOfInterest(0, 0, self.view.batch, self.view.forefront, affordance.experience.type,
+        poi = PointOfInterest(0, 0, self.view.batch, self.view.forefront, affordance.experience.type, self.workspace.clock,
                               experience=affordance.experience)
         # Displace the point of interest to its position relative to the phenomenon and absolute direction
         poi.displace(matrix44.multiply(affordance.experience.rotation_matrix,
@@ -76,14 +89,14 @@ class CtrlPhenomenonView:
         """Called every frame. Update the phenomenon view"""
         if self.phenomenon is not None:
             self.view.label_confidence.text = "Confidence: " + str(round(self.phenomenon.confidence * 100)) + "%"
-            self.view.label_origin_direction.text = "Origin direction: " + \
-                str(round(math.degrees(self.phenomenon.origin_absolute_direction))) + "°. Nb tours:" + \
-                str(self.phenomenon.nb_tour)
         if self.workspace.flag_for_view_refresh:
             # Display in phenomenon view
             # if len(self.workspace.integrator.phenomena) > 0:
             #     self.phenomenon = self.workspace.integrator.phenomena[0]
             if self.phenomenon is not None:
                 self.update_points_of_interest(self.phenomenon)
+                self.view.label_origin_direction.text = "Origin direction: " + \
+                    str(round(math.degrees(self.phenomenon.origin_absolute_direction))) + "°. Nb tours:" + \
+                    str(self.phenomenon.nb_tour)
             self.update_body_robot()
             self.workspace.flag_for_view_refresh = False  # Reset by CtrlBodyView

@@ -17,7 +17,7 @@ class Experience:
     """Experiences are instances of interactions
     along with the spatial and temporal information of where and when they were enacted"""
 
-    def __init__(self, x, y, experience_type, body_direction_rad, durability=10, experience_id=0):
+    def __init__(self, x, y, experience_type, body_direction_rad, clock, durability=10, experience_id=0):
         """Create an experience to be placed in the memory.
         Args:
         x, y : coordinates relative the robot.
@@ -27,6 +27,7 @@ class Experience:
         self.x = x
         self.y = y
         self.type = experience_type
+        self.clock = clock
 
         # The position matrix is applied to the vertices of the point_of_interest to display
         # the point of interest at the position of the experience in egocentric view

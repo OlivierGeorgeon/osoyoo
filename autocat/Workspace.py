@@ -34,6 +34,8 @@ class Workspace:
         # Controls which phenomenon to display
         self.ctrl_phenomenon_view = None
 
+        self.clock = 0
+
     def main(self, dt):
         """1) If a new enacted_interaction has been received
              - update memory and hexa_memory
@@ -76,6 +78,9 @@ class Workspace:
 
     def update_enacted_interaction(self, enacted_interaction):
         """Update the enacted interaction (called by CtrlRobot)"""
+        self.clock += 1
+        enacted_interaction["clock"] = self.clock
+
         if "status" in enacted_interaction and enacted_interaction["status"] == "T":
             print("The workspace received an empty enacted interaction")
             # Will immediately resend the same intended interaction unless the user has set another one

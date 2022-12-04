@@ -25,7 +25,9 @@ class CtrlEgocentricView:
             self.mouse_press_x, self.mouse_press_y, self.mouse_press_angle = \
                 self.view.get_mouse_press_coordinate(x, y, button, modifiers)
             for p in self.points_of_interest:
-                p.select_if_near(self.mouse_press_x, self.mouse_press_y)
+                is_near = p.select_if_near(self.mouse_press_x, self.mouse_press_y)
+                if is_near:
+                    self.view.label_speed.text = "Clock: " + str(p.clock)
 
         def on_key_press(symbol, modifiers):
             """ Deleting or inserting points of interest """
@@ -45,7 +47,7 @@ class CtrlEgocentricView:
                 # Mark the prompt
                 self.workspace.prompt_xy = [self.mouse_press_x, self.mouse_press_y]
                 focus_point = PointOfInterest(self.mouse_press_x, self.mouse_press_y, self.view.batch,
-                                              self.view.background, POINT_PROMPT)
+                                              self.view.background, POINT_PROMPT, self.workspace.clock)
                 self.points_of_interest.append(focus_point)
                 # focus_point.is_selected = True
                 # focus_point.set_color('red')
@@ -60,7 +62,7 @@ class CtrlEgocentricView:
         """ Adding a point of interest to the view """
         if group is None:
             group = self.view.foreground
-        point_of_interest = PointOfInterest(x, y, self.view.batch, group, point_type, experience=experience)
+        point_of_interest = PointOfInterest(x, y, self.view.batch, group, point_type, self.workspace.clock, experience=experience)
         self.points_of_interest.append(point_of_interest)
         return point_of_interest
 
@@ -96,9 +98,6 @@ class CtrlEgocentricView:
         # Displace the points of interest
         for poi_displace in self.points_of_interest:
             poi_displace.update(displacement_matrix)
-            # Update the point of attention if any
-            # if poi_displace.type == POINT_PROMPT:
-            #     self.workspace.prompt_xy = [poi_displace.x, poi_displace.y]
             # Remove the agent's focus. It will be recreated if needed
             if poi_displace.type == EXPERIENCE_FOCUS:
                 self.points_of_interest.remove(poi_displace)
@@ -124,13 +123,13 @@ class CtrlEgocentricView:
         if self.workspace.focus_xy is not None:
             x = self.workspace.focus_xy[0]
             y = self.workspace.focus_xy[1]
-            agent_focus_point = PointOfInterest(x, y, self.view.batch, self.view.foreground, EXPERIENCE_FOCUS)
+            agent_focus_point = PointOfInterest(x, y, self.view.batch, self.view.foreground, EXPERIENCE_FOCUS, self.workspace.clock)
         return agent_focus_point
 
     def create_point_of_interest(self, experience):
         """Create a point of interest corresponding to the experience given as parameter"""
         return PointOfInterest(experience.x, experience.y, self.view.batch, self.view.foreground,
-                               experience.type, experience=experience)
+                               experience.type, self.workspace.clock, experience=experience)
 
     def main(self, dt):
         """Called every frame. Update the egocentric view"""
