@@ -2,6 +2,7 @@ import math
 from pyrr import matrix44
 from .PhenomenonView import PhenomenonView
 from ..EgocentricDisplay.PointOfInterest import PointOfInterest
+from ...Workspace import INTERACTION_STEP_REFRESHING, INTERACTION_STEP_IDLE
 
 
 class CtrlPhenomenonView:
@@ -89,7 +90,8 @@ class CtrlPhenomenonView:
         """Called every frame. Update the phenomenon view"""
         if self.phenomenon is not None:
             self.view.label_confidence.text = "Confidence: " + str(round(self.phenomenon.confidence * 100)) + "%"
-        if self.workspace.flag_for_view_refresh:
+        # if self.workspace.flag_for_view_refresh:
+        if self.workspace.interaction_step == INTERACTION_STEP_REFRESHING:
             # Display in phenomenon view
             # if len(self.workspace.integrator.phenomena) > 0:
             #     self.phenomenon = self.workspace.integrator.phenomena[0]
@@ -99,4 +101,7 @@ class CtrlPhenomenonView:
                     str(round(math.degrees(self.phenomenon.origin_absolute_direction))) + "°. Nb tours:" + \
                     str(self.phenomenon.nb_tour)
             self.update_body_robot()
-            self.workspace.flag_for_view_refresh = False  # Reset by CtrlBodyView
+            # self.workspace.flag_for_view_refresh = False  # Reset by CtrlBodyView
+
+            # Last view to refresh
+            self.workspace.interaction_step = INTERACTION_STEP_IDLE

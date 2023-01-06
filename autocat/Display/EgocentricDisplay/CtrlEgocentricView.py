@@ -3,6 +3,7 @@ from pyglet.window import key
 from .EgocentricView import EgocentricView
 from .PointOfInterest import PointOfInterest, POINT_PROMPT
 from ...Memory.EgocentricMemory.Experience import EXPERIENCE_FOCUS, EXPERIENCE_PLACE
+from ...Workspace import INTERACTION_STEP_REFRESHING
 
 
 class CtrlEgocentricView:
@@ -133,7 +134,8 @@ class CtrlEgocentricView:
 
     def main(self, dt):
         """Called every frame. Update the egocentric view"""
-        if self.workspace.flag_for_view_refresh:
+        # if self.workspace.flag_for_view_refresh:
+        if self.workspace.interaction_step == INTERACTION_STEP_REFRESHING:
             self.update_points_of_interest()
             # self.workspace.flag_for_view_refresh = False  # Reset by CtrlBodyView
 

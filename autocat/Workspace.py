@@ -6,9 +6,10 @@ CONTROL_MODE_AUTOMATIC = "auto"
 CONTROL_MODE_MANUAL = "manual"
 
 INTERACTION_STEP_IDLE = 0
-INTERACTION_STEP_INTENDED = 1
+INTERACTION_STEP_INTENDING = 1
 INTERACTION_STEP_ENACTING = 2
-INTERACTION_STEP_ENACTED = 3
+INTERACTION_STEP_INTEGRATING = 3
+INTERACTION_STEP_REFRESHING = 4
 
 
 class Workspace:
@@ -24,10 +25,7 @@ class Workspace:
 
         self.control_mode = CONTROL_MODE_MANUAL
         self.interaction_step = INTERACTION_STEP_IDLE
-        self.intended_interaction_is_ready_to_send = False
-        self.has_new_enacted_interaction = False
-        self.has_new_outcome_been_treated = True
-        self.flag_for_view_refresh = False
+        # self.flag_for_view_refresh = False
 
         self.focus_xy = None
         self.prompt_xy = None
@@ -43,40 +41,30 @@ class Workspace:
         # If AUTOMATIC mode then ask the Decider for the intended interaction
         if self.control_mode == CONTROL_MODE_AUTOMATIC:
             # If ready, ask the decider for a new intended interaction
-            if self.intended_interaction is None and self.has_new_outcome_been_treated:
-                if self.interaction_step == INTERACTION_STEP_IDLE:
-                    self.intended_interaction = self.decider.propose_intended_interaction(self.enacted_interaction)
-                    self.has_new_outcome_been_treated = False
-                    self.intended_interaction_is_ready_to_send = True
-                    self.interaction_step = INTERACTION_STEP_INTENDED
+            if self.interaction_step == INTERACTION_STEP_IDLE:
+                self.intended_interaction = self.decider.propose_intended_interaction(self.enacted_interaction)
+                self.interaction_step = INTERACTION_STEP_INTENDING
 
         # If there is a new enacted interaction
-        if self.has_new_enacted_interaction:
-            if self.interaction_step == INTERACTION_STEP_ENACTED:
-                # Update body memory and egocentric memory
-                self.memory.update_and_add_experiences(self.enacted_interaction)
+        if self.interaction_step == INTERACTION_STEP_INTEGRATING:
+            # Update body memory and egocentric memory
+            self.memory.update_and_add_experiences(self.enacted_interaction)
 
-                # Call the integrator to create and update the phenomena.
-                self.integrator.integrate()
+            # Call the integrator to create and update the phenomena.
+            self.integrator.integrate()
 
-                # Update allocentric memory: robot, phénomena
-                # self.memory.allocentric_memory.place_robot(self.memory.body_memory)
-                self.memory.update_allocentric(self.integrator.phenomena)
+            # Update allocentric memory: robot, phénomena
+            self.memory.update_allocentric(self.integrator.phenomena)
 
-                self.flag_for_view_refresh = True
-                self.has_new_outcome_been_treated = True
-                self.has_new_enacted_interaction = False
-                self.interaction_step = INTERACTION_STEP_IDLE
+            self.interaction_step = INTERACTION_STEP_REFRESHING
 
     def get_intended_interaction(self):
         """If the workspace has a new intended interaction then return it, otherwise return None
         Reset the intended_interaction. (Called by CtrlRobot)
         """
-        if self.intended_interaction_is_ready_to_send:
-            if self.interaction_step == INTERACTION_STEP_INTENDED:
-                self.intended_interaction_is_ready_to_send = False
-                self.interaction_step = INTERACTION_STEP_ENACTING
-                return self.intended_interaction
+        if self.interaction_step == INTERACTION_STEP_INTENDING:
+            self.interaction_step = INTERACTION_STEP_ENACTING
+            return self.intended_interaction
 
         return None
 
@@ -89,8 +77,7 @@ class Workspace:
             print("The workspace received an empty enacted interaction")
             # If CONTROL_MODE_AUTOMATIC resend the same intended interaction unless the user has set another one
             if self.control_mode == CONTROL_MODE_AUTOMATIC:
-                self.intended_interaction_is_ready_to_send = True
-                self.interaction_step = INTERACTION_STEP_INTENDED
+                self.interaction_step = INTERACTION_STEP_INTENDING
             else:
                 self.interaction_step = INTERACTION_STEP_IDLE
             return
@@ -114,9 +101,8 @@ class Workspace:
                     self.focus_xy = enacted_interaction['echo_xy']
 
         self.enacted_interaction = enacted_interaction
-        self.has_new_enacted_interaction = True
         self.intended_interaction = None
-        self.interaction_step = INTERACTION_STEP_ENACTED
+        self.interaction_step = INTERACTION_STEP_INTEGRATING
 
     def process_user_key(self, user_key):
         """Process the keypress on the view windows (called by the views)"""
@@ -125,10 +111,9 @@ class Workspace:
         elif user_key.upper() == "M":
             self.control_mode = CONTROL_MODE_MANUAL
         else:
-            self.intended_interaction = {"action": user_key}
-            if self.focus_xy is not None:
-                self.intended_interaction['focus_x'] = int(self.focus_xy[0])
-                self.intended_interaction['focus_y'] = int(self.focus_xy[1])
-            self.intended_interaction_is_ready_to_send = True
             if self.interaction_step == INTERACTION_STEP_IDLE:
-                self.interaction_step = INTERACTION_STEP_INTENDED
+                self.intended_interaction = {"action": user_key}
+                if self.focus_xy is not None:
+                    self.intended_interaction['focus_x'] = int(self.focus_xy[0])
+                    self.intended_interaction['focus_y'] = int(self.focus_xy[1])
+                self.interaction_step = INTERACTION_STEP_INTENDING

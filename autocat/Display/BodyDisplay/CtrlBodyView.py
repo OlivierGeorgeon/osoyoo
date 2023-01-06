@@ -2,6 +2,7 @@ from pyrr import matrix44
 import math
 from .BodyView import BodyView
 from ..EgocentricDisplay.PointOfInterest import PointOfInterest, POINT_COMPASS, POINT_AZIMUTH
+from ...Workspace import INTERACTION_STEP_REFRESHING
 
 
 class CtrlBodyView:
@@ -74,7 +75,8 @@ class CtrlBodyView:
 
     def main(self, dt):
         """Called every frame. Update the body view"""
-        if self.workspace.flag_for_view_refresh:
+        # if self.workspace.flag_for_view_refresh:
+        if self.workspace.interaction_step == INTERACTION_STEP_REFRESHING:
             self.update_body_view()
             self.view.label.text = "Clock: " + str(self.workspace.clock)
             # self.workspace.flag_for_view_refresh = False   # Reset by CtrlBodyView

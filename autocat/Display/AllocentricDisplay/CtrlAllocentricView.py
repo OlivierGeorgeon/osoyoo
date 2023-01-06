@@ -1,5 +1,6 @@
 from pyrr import matrix44
 from .AllocentricView import AllocentricView
+from ...Workspace import INTERACTION_STEP_REFRESHING
 from ..PhenomenonDisplay.CtrlPhenomenonView import CtrlPhenomenonView
 
 
@@ -77,5 +78,7 @@ class CtrlAllocentricView:
         #     self.extract_and_convert_recently_changed_cells()
         #     self.allocentric_memory.cells_changed_recently = []
         # self.refresh_count += 1
-        if self.workspace.flag_for_view_refresh:
+
+        # if self.workspace.flag_for_view_refresh:
+        if self.workspace.interaction_step == INTERACTION_STEP_REFRESHING:
             self.extract_and_convert_interactions()
