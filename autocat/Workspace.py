@@ -38,14 +38,17 @@ class Workspace:
     def main(self, dt):
         """The main handler of the interaction cycle:
         organize the generation of the intended_interaction and the processing of the enacted_interaction."""
-        # If AUTOMATIC mode then ask the Decider for the intended interaction
-        if self.control_mode == CONTROL_MODE_AUTOMATIC:
-            # If ready, ask the decider for a new intended interaction
-            if self.interaction_step == INTERACTION_STEP_IDLE:
+        # If ready and automatic, ask the decider for a new intended interaction
+        if self.interaction_step == INTERACTION_STEP_IDLE:
+            if self.control_mode == CONTROL_MODE_AUTOMATIC:
                 self.intended_interaction = self.decider.propose_intended_interaction(self.enacted_interaction)
                 self.interaction_step = INTERACTION_STEP_INTENDING
 
-        # If there is a new enacted interaction
+        # While enacting update body memory
+        if self.interaction_step == INTERACTION_STEP_ENACTING:
+            pass
+
+        # Integrate the new enacted interaction
         if self.interaction_step == INTERACTION_STEP_INTEGRATING:
             # Update body memory and egocentric memory
             self.memory.update_and_add_experiences(self.enacted_interaction)

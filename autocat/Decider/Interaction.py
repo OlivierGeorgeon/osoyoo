@@ -1,4 +1,5 @@
-# This resource is useful for Agent4
+from . Action import Action
+
 
 class Interaction:
     interaction_list = []
@@ -14,7 +15,7 @@ class Interaction:
 
     def __hash__(self):
         """ The hash is necessary to use interactions as keys in a dictionary """
-        return self.action * 10 + self.outcome
+        return self.action.__hash__() * 10 + self.outcome.__hash__()
 
     def __eq__(self, other):
         """ Interactions are equal if they have the same action and the same outcome """
@@ -32,16 +33,18 @@ class Interaction:
             i = cls.interaction_list.index(interaction)
             if valence is not None:
                 cls.interaction_list[i].valence = valence  # Update the valence
-            # print("Retrieving ", end="")
-            # print(cls.interaction_list[i])
+            print("Retrieving ", end="")
+            print(cls.interaction_list[i])
             return cls.interaction_list[i]
         else:
-            # print("Creating ", end="")
-            # print(interaction)
+            print("Creating ", end="")
+            print(interaction)
             cls.interaction_list.append(interaction)
             return interaction
 
 
+# Testing Action
+# py -m autocat.Decider.Interaction
 if __name__ == '__main__':
     """ demonstrate the usage of Interaction.create_or_retrieve() """
     interaction00 = Interaction.create_or_retrieve(0, 0)  # Create
@@ -49,3 +52,7 @@ if __name__ == '__main__':
     interaction10 = Interaction.create_or_retrieve(1, 0)  # Create
     interaction11 = Interaction.create_or_retrieve(1, 1)  # Create
     interaction00 = Interaction.create_or_retrieve(0, 0)  # Retrieve
+
+    for a in Action.action_dict.values():
+        Interaction.create_or_retrieve(a, 0)
+        Interaction.create_or_retrieve(a, 1)

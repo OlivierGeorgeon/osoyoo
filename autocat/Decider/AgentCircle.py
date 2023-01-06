@@ -9,13 +9,10 @@ class AgentCircle:
     def __init__(self, workspace):
         """ Creating our agent """
         self.workspace = workspace
-        self._action = 0
+        self._action = action_forward  # Random initialization
         self.anticipated_outcome = None
         self.previous_interaction = None
         self.last_interaction = None
-
-        # self.focus_xy = None
-        # self.is_focussed = False
 
         # Load the predefined behavior
         self.procedural_memory: list[CompositeInteraction] = CompositeInteraction.composite_interaction_list
@@ -50,10 +47,10 @@ class AgentCircle:
             self.procedural_memory.append(composite_interaction)
 
         # Selecting the next action to enact
-        self._action = ACTION_SCAN  # Good for circling around object behavior
+        self._action = action_scan  # Good for circling around object behavior
         # proclivity_dict = {}  # dict.fromkeys(ACTION_LIST, 0)
         # proclivity_dict = {ACTION_FORWARD: 0, ACTION_TURN_LEFT: 0, ACTION_TURN_RIGHT: 0} good for exploring terrain
-        proclivity_dict = {ACTION_FORWARD: 0}  # Good for touring terrain
+        proclivity_dict = {action_forward: 0}  # Good for touring terrain
         if self.procedural_memory:
             activated_interactions = [ci for ci in self.procedural_memory if ci.pre_interaction == self.last_interaction]
             for ai in activated_interactions:
@@ -71,7 +68,7 @@ class AgentCircle:
         """ Computing the anticipation """
         self.anticipated_outcome = None
 
-        intended_interaction = {'action': self._action}  # , 'speed': FORWARD_SPEED}
+        intended_interaction = {'action': self._action.action_code}  # , 'speed': FORWARD_SPEED}
         if self.workspace.focus_xy is not None:
             intended_interaction['focus_x'] = self.workspace.focus_xy[0]
             intended_interaction['focus_y'] = self.workspace.focus_xy[1]
@@ -84,8 +81,6 @@ class AgentCircle:
 
         # If there is an echo, compute the echo outcome
         if 'echo_xy' in enacted_interaction:
-            # The focus point is set to the aligned echo
-            # focus_xy = enacted_interaction['echo_xy']
             if enacted_interaction['echo_xy'][0] < 50:
                 outcome = OUTCOME_CLOSE_FRONT
             elif enacted_interaction['echo_xy'][0] > 400:  # Must be farther than the forward speed
@@ -98,25 +93,6 @@ class AgentCircle:
                 outcome = OUTCOME_RIGHT     # Between 0 and -150 to the right
             else:
                 outcome = OUTCOME_FAR_RIGHT  # More that -150 to the right
-
-        # # Manage focus catch and lost
-        # if self.workspace.focus_xy is not None:
-        #     # If the focus was kept then update it
-        #     if 'focus' in enacted_interaction:
-        #         self.workspace.focus_xy = enacted_interaction['echo_xy']
-        #     # If the focus was lost then reset it
-        #     if 'focus' not in enacted_interaction:
-        #         # The focus was lost, override the echo outcome
-        #         self.workspace.focus_xy = None
-        #         outcome = OUTCOME_LOST_FOCUS
-        #         print("LOST FOCUS")
-        # else:
-        #     if self._action in [ACTION_SCAN, ACTION_FORWARD]:
-        #         # Catch focus
-        #         if outcome in [OUTCOME_LEFT, OUTCOME_FAR_LEFT, OUTCOME_RIGHT, OUTCOME_FAR_RIGHT, OUTCOME_FAR_FRONT,
-        #                        OUTCOME_CLOSE_FRONT]:
-        #             print("CATCH FOCUS")
-        #             self.workspace.focus_xy = enacted_interaction['echo_xy']
 
         if 'lost_focus' in enacted_interaction:
             outcome = OUTCOME_LOST_FOCUS
@@ -134,7 +110,7 @@ class AgentCircle:
 
 
 # Testing AgentCircle
-# py -m stage_titouan.Agent.AgentCircle
+# py -m autocat.Decider.AgentCircle
 if __name__ == "__main__":
     a = AgentCircle()
     _outcome = OUTCOME_LOST_FOCUS
