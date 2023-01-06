@@ -29,27 +29,21 @@ class CtrlRobot:
         self.workspace = workspace
         self.wifiInterface = WifiInterface(robot_ip)
 
-        # self.forward_speed = numpy.array([FORWARD_SPEED, 0])  # Need numpy arrays to compute average
-        # self.backward_speed = numpy.array([-FORWARD_SPEED, 0])
-        # self.leftward_speed = numpy.array([0, LATERAL_SPEED])
-        # self.rightward_speed = numpy.array([0, -LATERAL_SPEED])
-
         # Class variables used in an asynchronous Thread
         self.enact_step = ENACT_STEP_IDLE
         self.intended_interaction = None
         self.outcome_bytes = None
 
     def main(self, dt):
-        """Handle the communication with the robot."""
-        # Wait for the presence of an intended interaction in the workspace and then send the action
+        """The main handler of the communication to and from the robot."""
+        # If the robot is idle, check for an intended interaction in the workspace and then send the action
         if self.enact_step == ENACT_STEP_IDLE:
             intended_interaction = self.workspace.get_intended_interaction()
             if intended_interaction is not None:
                 self.intended_interaction_to_action(intended_interaction)
 
-        # Wait to receive an outcome from the robot and then write it to the workspace
+        # When the outcome has been received, write write the enacted interaction to the workspace
         if self.enact_step == ENACT_STEP_END:
-            # self.workspace.robot_ready = True
             self.enact_step = ENACT_STEP_IDLE
             enacted_interaction = self.outcome_to_enacted_interaction()
             self.workspace.update_enacted_interaction(enacted_interaction)
@@ -82,7 +76,7 @@ class CtrlRobot:
         thread.start()
 
     def outcome_to_enacted_interaction(self):
-        """ Computes the enacted interaction from the robot's outcome data """
+        """ Computes the enacted interaction from the robot's outcome data."""
         action = self.intended_interaction.get('action')
         is_focussed = ('focus_x' in self.intended_interaction)  # The focus point was sent to the robot
         enacted_interaction = json.loads(self.outcome_bytes)  # TODO Check sometimes it's None

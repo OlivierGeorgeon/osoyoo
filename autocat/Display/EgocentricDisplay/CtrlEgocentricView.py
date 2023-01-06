@@ -135,5 +135,7 @@ class CtrlEgocentricView:
         """Called every frame. Update the egocentric view"""
         if self.workspace.flag_for_view_refresh:
             self.update_points_of_interest()
-            self.update_body_robot()
             # self.workspace.flag_for_view_refresh = False  # Reset by CtrlBodyView
+
+        # Update every frame to simulate the robot's displacement
+        self.update_body_robot()
