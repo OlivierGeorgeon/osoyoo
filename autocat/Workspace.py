@@ -1,4 +1,5 @@
 from .Decider.AgentCircle import AgentCircle
+from .Decider.Action import create_actions
 from .Memory.Memory import Memory
 from .Integrator.Integrator import Integrator
 
@@ -16,6 +17,8 @@ class Workspace:
     """The Workspace supervises the interaction cycle. It produces the intended_interaction
     and processes the enacted interaction """
     def __init__(self):
+        self.actions = create_actions()
+
         self.memory = Memory()
         self.decider = AgentCircle(self)
         self.integrator = Integrator(self)
@@ -25,7 +28,6 @@ class Workspace:
 
         self.control_mode = CONTROL_MODE_MANUAL
         self.interaction_step = INTERACTION_STEP_IDLE
-        # self.flag_for_view_refresh = False
 
         self.focus_xy = None
         self.prompt_xy = None

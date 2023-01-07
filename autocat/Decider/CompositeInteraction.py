@@ -59,6 +59,8 @@ class CompositeInteraction:
             return interaction
 
 
+# Testing CompositeInteraction
+# py -m autocat.Decider.CompositeInteraction
 if __name__ == '__main__':
     """ demonstrate the usage of CompositeInteraction.create_or_retrieve() """
     interaction00 = Interaction.create_or_retrieve(0, 0)  # Create

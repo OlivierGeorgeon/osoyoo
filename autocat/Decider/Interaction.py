@@ -43,7 +43,7 @@ class Interaction:
             return interaction
 
 
-# Testing Action
+# Testing Interaction
 # py -m autocat.Decider.Interaction
 if __name__ == '__main__':
     """ demonstrate the usage of Interaction.create_or_retrieve() """

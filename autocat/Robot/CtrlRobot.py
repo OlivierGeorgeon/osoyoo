@@ -77,7 +77,7 @@ class CtrlRobot:
 
     def outcome_to_enacted_interaction(self):
         """ Computes the enacted interaction from the robot's outcome data."""
-        action = self.intended_interaction.get('action')
+        action_code = self.intended_interaction.get('action')
         is_focussed = ('focus_x' in self.intended_interaction)  # The focus point was sent to the robot
         enacted_interaction = json.loads(self.outcome_bytes)  # TODO Check sometimes it's None
         enacted_interaction[KEY_EXPERIENCES] = []
@@ -88,26 +88,29 @@ class CtrlRobot:
 
         # Presupposed displacement of the robot relative to the environment
         translation, yaw = [0, 0], 0
-        if action == "1":
+        # translation = self.workspace.actions[action_code].translation_speed * (enacted_interaction['duration1'] / 1000)
+        # yaw = self.workspace.actions[action_code].rotation_target
+
+        if action_code == "1":
             yaw = DEFAULT_YAW
-        if action == "2":
-            # translation = self.backward_speed * (enacted_interaction['duration1'] / 1000)
-            translation = [i * enacted_interaction['duration1'] / 1000 for i in
-                           self.workspace.memory.body_memory.backward_speed]
-        if action == "3":
+        if action_code == "2":
+            translation = self.workspace.memory.body_memory.backward_speed * (enacted_interaction['duration1'] / 1000)
+            # translation = [i * enacted_interaction['duration1'] / 1000 for i in
+            #                self.workspace.memory.body_memory.backward_speed]
+        if action_code == "3":
             yaw = -DEFAULT_YAW
-        if action == "4":
-            # translation = self.leftward_speed * (enacted_interaction['duration1'] / 1000)
-            translation = [i * enacted_interaction['duration1'] / 1000 for i in
-                           self.workspace.memory.body_memory.leftward_speed]
-        if action == "6":
-            # translation = self.rightward_speed * (enacted_interaction['duration1'] / 1000)
-            translation = [i * enacted_interaction['duration1'] / 1000 for i in
-                           self.workspace.memory.body_memory.rightward_speed]
-        if action == "8":
-            # translation = self.forward_speed * (enacted_interaction['duration1'] / 1000)
-            translation = [i * enacted_interaction['duration1'] / 1000 for i in
-                           self.workspace.memory.body_memory.forward_speed]
+        if action_code == "4":
+            translation = self.workspace.memory.body_memory.leftward_speed * (enacted_interaction['duration1'] / 1000)
+            # translation = [i * enacted_interaction['duration1'] / 1000 for i in
+            #                self.workspace.memory.body_memory.leftward_speed]
+        if action_code == "6":
+            translation = self.workspace.memory.body_memory.rightward_speed * (enacted_interaction['duration1'] / 1000)
+            # translation = [i * enacted_interaction['duration1'] / 1000 for i in
+            #                self.workspace.memory.body_memory.rightward_speed]
+        if action_code == "8":
+            translation = self.workspace.memory.body_memory.forward_speed * (enacted_interaction['duration1'] / 1000)
+            # translation = [i * enacted_interaction['duration1'] / 1000 for i in
+            #                self.workspace.memory.body_memory.forward_speed]
 
         # If the robot returns yaw then use it
         if 'yaw' in enacted_interaction:
@@ -146,7 +149,7 @@ class CtrlRobot:
 
         # Interaction ECHO for actions involving scanning
         echo_xy = [0, 0]
-        if action in ['-', '*', '+', '8', '2', '1', '3', '4', '6']:
+        if action_code in ['-', '*', '+', '8', '2', '1', '3', '4', '6']:
             if enacted_interaction['echo_distance'] < 10000:
                 echo_xy[0] = int(ROBOT_HEAD_X + math.cos(math.radians(enacted_interaction['head_angle']))
                                  * enacted_interaction['echo_distance'])
@@ -157,7 +160,7 @@ class CtrlRobot:
                 enacted_interaction['echo_xy'] = echo_xy
 
         # Interaction shock
-        if KEY_IMPACT in enacted_interaction and action == '8':
+        if KEY_IMPACT in enacted_interaction and action_code == '8':
             if enacted_interaction[KEY_IMPACT] == 0b01:  # Impact on the right
                 enacted_interaction[KEY_EXPERIENCES].append((EXPERIENCE_IMPACT, ROBOT_FRONT_X, -ROBOT_FRONT_Y))
             if enacted_interaction[KEY_IMPACT] == 0b11:  # Impact on the front
@@ -166,7 +169,7 @@ class CtrlRobot:
                 enacted_interaction[KEY_EXPERIENCES].append((EXPERIENCE_IMPACT, ROBOT_FRONT_X, ROBOT_FRONT_Y))
 
         # Interaction block
-        if 'blocked' in enacted_interaction and action == '8':
+        if 'blocked' in enacted_interaction and action_code == '8':
             if enacted_interaction['blocked']:
                 enacted_interaction[KEY_EXPERIENCES].append((EXPERIENCE_BLOCK, ROBOT_FRONT_X, 0))
                 translation[0] = 0  # Cancel forward translation
@@ -196,10 +199,10 @@ class CtrlRobot:
                         translation += delta_xy
                         translation_matrix = matrix44.create_from_translation([-translation[0], -translation[1], 0])
                         displacement_matrix = matrix44.multiply(rotation_matrix, translation_matrix)
-                        if action == '8':
+                        if action_code == '8':
                             self.workspace.memory.body_memory.forward_speed = \
                                 (self.workspace.memory.body_memory.forward_speed + translation) / 2
-                        if action == '2':
+                        if action_code == '2':
                             self.workspace.memory.body_memory.backward_speed = \
                                 (self.workspace.memory.body_memory.backward_speed + translation) / 2
                     # If the head is sideways then correct lateral displacements
@@ -207,10 +210,10 @@ class CtrlRobot:
                         translation += delta_xy
                         translation_matrix = matrix44.create_from_translation([-translation[0], -translation[1], 0])
                         displacement_matrix = matrix44.multiply(rotation_matrix, translation_matrix)
-                        if action == '4':
+                        if action_code == '4':
                             self.workspace.memory.body_memory.leftward_speed = \
                                 (self.workspace.memory.body_memory.leftward_speed + translation) / 2
-                        if action == '6':
+                        if action_code == '6':
                             self.workspace.memory.body_memory.rightward_speed = \
                                 (self.workspace.memory.body_memory.rightward_speed + translation) / 2
 

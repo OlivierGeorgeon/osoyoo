@@ -2,20 +2,25 @@
 # This agent makes the robot circle around an echo object or a territory delimited by a line
 ########################################################################################
 
-from . PredefinedInteractions import *
+from . Action import ACTION_FORWARD, ACTION_SCAN
+from . Interaction import Interaction
+from . CompositeInteraction import CompositeInteraction
+from . PredefinedInteractions import create_interactions, OUTCOME_LOST_FOCUS, OUTCOME_DEFAULT, OUTCOME_CLOSE_FRONT, \
+    OUTCOME_FAR_FRONT, OUTCOME_FAR_LEFT, OUTCOME_LEFT, OUTCOME_RIGHT, OUTCOME_FAR_RIGHT, OUTCOME_FLOOR_LEFT, \
+    OUTCOME_FLOOR_FRONT, OUTCOME_FLOOR_RIGHT
 
 
 class AgentCircle:
     def __init__(self, workspace):
         """ Creating our agent """
         self.workspace = workspace
-        self._action = action_forward  # Random initialization
         self.anticipated_outcome = None
         self.previous_interaction = None
         self.last_interaction = None
 
         # Load the predefined behavior
-        self.procedural_memory: list[CompositeInteraction] = CompositeInteraction.composite_interaction_list
+        self.procedural_memory = create_interactions(self.workspace.actions)
+        self._action = self.workspace.actions[ACTION_FORWARD]
 
     def propose_intended_interaction(self, enacted_interaction):
         """Propose the next intended interaction from the previous enacted interaction.
@@ -47,10 +52,10 @@ class AgentCircle:
             self.procedural_memory.append(composite_interaction)
 
         # Selecting the next action to enact
-        self._action = action_scan  # Good for circling around object behavior
+        self._action = self.workspace.actions[ACTION_SCAN]  # Good for circling around object behavior
         # proclivity_dict = {}  # dict.fromkeys(ACTION_LIST, 0)
         # proclivity_dict = {ACTION_FORWARD: 0, ACTION_TURN_LEFT: 0, ACTION_TURN_RIGHT: 0} good for exploring terrain
-        proclivity_dict = {action_forward: 0}  # Good for touring terrain
+        proclivity_dict = {self.workspace.actions[ACTION_FORWARD]: 0}  # Good for touring terrain
         if self.procedural_memory:
             activated_interactions = [ci for ci in self.procedural_memory if ci.pre_interaction == self.last_interaction]
             for ai in activated_interactions:

@@ -12,10 +12,10 @@ class BodyMemory:
         self.head_direction_rad = .0  # [-pi/2, pi/2] Radian relative to the robot's x axis
         self.body_direction_rad = .0  # [-pi, pi] Radian relative to horizontal x axis (west-east)
 
-        self.forward_speed = numpy.array([FORWARD_SPEED, 0])  # Need numpy arrays to compute average
-        self.backward_speed = numpy.array([-FORWARD_SPEED, 0])
-        self.leftward_speed = numpy.array([0, LATERAL_SPEED])
-        self.rightward_speed = numpy.array([0, -LATERAL_SPEED])
+        self.forward_speed = numpy.array([FORWARD_SPEED, 0], dtype=float)  # Need numpy arrays to compute average
+        self.backward_speed = numpy.array([-FORWARD_SPEED, 0], dtype=float)
+        self.leftward_speed = numpy.array([0, LATERAL_SPEED], dtype=float)
+        self.rightward_speed = numpy.array([0, -LATERAL_SPEED], dtype=float)
 
     def set_head_direction_degree(self, head_direction_degree: int):
         """Set the head direction from degree measured relative to x axis [-90,90]"""
@@ -28,23 +28,22 @@ class BodyMemory:
 
     def set_body_direction_from_azimuth(self, azimuth_degree: int):
         """Set the body direction from azimuth measure relative to north [0,360[ degree"""
-        # assert(0 <= azimuth_degree <= 361)  #
-        deg_trig = 90 - azimuth_degree  # Degree relative to x axis in trigonometric direction
-        while deg_trig < -180:  # Keep within [-180, 180]
-            deg_trig += 360
-        # self.body_direction_rad = math.pi / 2 - math.radians(azimuth_degree)
-        self.body_direction_rad = math.radians(deg_trig)
+        body_direction_degree = 90 - azimuth_degree  # Degree relative to x axis in trigonometric direction
+        while body_direction_degree < -180:  # Keep within [-180, 180]
+            body_direction_degree += 360
+        self.body_direction_rad = math.radians(body_direction_degree)
 
     def body_azimuth(self):
         """Return the azimuth in degree relative to north [0,360["""
-        deg_north = 90 - math.degrees(self.body_direction_rad)
-        while deg_north < 0:  # Keep within [0, 360]
-            deg_north += 360
-        return int(deg_north)
+        return round((90 - math.degrees(self.body_direction_rad)) % 360)
+        # deg_north = 90 - math.degrees(self.body_direction_rad)
+        # while deg_north < 0:  # Keep within [0, 360]
+        #     deg_north += 360
+        # return round(deg_north)
 
     def body_direction_degree(self):
         """Return the body direction in degree relative to the x axis [-180,180["""
-        return int(math.degrees(self.body_direction_rad))
+        return round(math.degrees(self.body_direction_rad))
 
     def body_direction_matrix(self):
         """Return the opposite body direction matrix to apply to experiences"""
@@ -54,9 +53,9 @@ class BodyMemory:
         """Rotate the robot's body by the yaw and correct drift using azimuth if out of bound."""
         azimuth = self.body_azimuth() - yaw_degree  # Yaw is counterclockwise
         # Keep it within [0, 360[
-        while azimuth < 0:
-            azimuth += 360
-        azimuth = azimuth % 360
+        # while azimuth < 0:
+        #     azimuth += 360
+        azimuth %= 360
 
         # If the direction is too far from the azimuth then use the compass azimuth
         if compass_azimuth > 0:  # Don't apply if imu has no compass information
