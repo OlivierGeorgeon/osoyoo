@@ -4,6 +4,7 @@ from .EgocentricView import EgocentricView
 from .PointOfInterest import PointOfInterest, POINT_PROMPT
 from ...Memory.EgocentricMemory.Experience import EXPERIENCE_FOCUS, EXPERIENCE_PLACE
 from ...Workspace import INTERACTION_STEP_REFRESHING
+from ...Decider.Action import ACTION_FORWARD, ACTION_LEFTWARD
 
 
 class CtrlEgocentricView:
@@ -72,11 +73,11 @@ class CtrlEgocentricView:
         self.view.robot.rotate_head(self.workspace.memory.body_memory.head_direction_degree())
         self.view.azimuth = self.workspace.memory.body_memory.body_azimuth()
         self.view.label_speed.text = "Forward speed x: " \
-                                     + str(int(self.workspace.memory.body_memory.forward_speed[0])) + "mm/s, y: " \
-                                     + str(int(self.workspace.memory.body_memory.forward_speed[1])) + "mm/s."
-        self.view.label_left_speed.text = "Leftward speed x: " + \
-                                          str(int(self.workspace.memory.body_memory.leftward_speed[0])) + "mm/s, y: " \
-                                          + str(int(self.workspace.memory.body_memory.leftward_speed[1])) + "mm/s."
+            + str(int(self.workspace.actions[ACTION_FORWARD].translation_speed[0])) + "mm/s, y: " \
+            + str(int(self.workspace.actions[ACTION_FORWARD].translation_speed[1])) + "mm/s."
+        self.view.label_left_speed.text = "Leftward speed x: " \
+            + str(int(self.workspace.actions[ACTION_LEFTWARD].translation_speed[0])) + "mm/s, y: " \
+            + str(int(self.workspace.actions[ACTION_LEFTWARD].translation_speed[1])) + "mm/s."
 
     def update_points_of_interest(self):
         """Retrieve all new experiences from memory, create and update the corresponding points of interest"""

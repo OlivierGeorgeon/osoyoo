@@ -12,7 +12,7 @@ ACTION_SCAN = '-'
 
 
 class Action:
-    action_dict = {}
+    # action_dict = {}
 
     def __init__(self, action_code, translation_speed, rotation_speed, rotation_target):
         self.action_code = action_code
@@ -36,37 +36,37 @@ class Action:
         else:
             return False
 
-    @classmethod
-    def create_or_retrieve(cls, action_code, translation_speed, rotation_speed, rotation_target):
-        """ Use this methode to create a new action or to retrieve it if it already exists """
-
-        if action_code in cls.action_dict.keys():
-            action = cls.action_dict[action_code]
-            if __name__ == '__main__':
-                print("Retrieve action", action, "of speed", action.translation_speed)
-        else:
-            action = Action(action_code, translation_speed, rotation_speed, rotation_target)
-            cls.action_dict[action_code] = action
-            if __name__ == '__main__':
-                print("Create action", action, "of speed", action.translation_speed)
-
-        return action
+    # @classmethod
+    # def create_or_retrieve(cls, action_code, translation_speed, rotation_speed, rotation_target):
+    #     """ Use this methode to create a new action or to retrieve it if it already exists """
+    #
+    #     if action_code in cls.action_dict.keys():
+    #         action = cls.action_dict[action_code]
+    #         if __name__ == '__main__':
+    #             print("Retrieve action", action, "of speed", action.translation_speed)
+    #     else:
+    #         action = Action(action_code, translation_speed, rotation_speed, rotation_target)
+    #         cls.action_dict[action_code] = action
+    #         if __name__ == '__main__':
+    #             print("Create action", action, "of speed", action.translation_speed)
+    #
+    #     return action
 
 
 def create_actions():
     """Create all actions"""
     action_dictionary = {}
 
-    forward_speed = np.array([-FORWARD_SPEED, 0, 0], dtype=float)
+    forward_speed = np.array([FORWARD_SPEED, 0, 0], dtype=float)
     action_dictionary[ACTION_FORWARD] = Action(ACTION_FORWARD, forward_speed, 0, 0)
 
-    backward_speed = np.array([FORWARD_SPEED, 0, 0], dtype=float)
+    backward_speed = np.array([-FORWARD_SPEED, 0, 0], dtype=float)
     action_dictionary[ACTION_BACKWARD] = Action(ACTION_BACKWARD, backward_speed, 0, 0)
 
-    leftward_speed = np.array([0, -LATERAL_SPEED, 0], dtype=float)
+    leftward_speed = np.array([0, LATERAL_SPEED, 0], dtype=float)
     action_dictionary[ACTION_LEFTWARD] = Action(ACTION_LEFTWARD, leftward_speed, 0, 0)
 
-    rightward_speed = np.array([0, LATERAL_SPEED, 0], dtype=float)
+    rightward_speed = np.array([0, -LATERAL_SPEED, 0], dtype=float)
     action_dictionary[ACTION_RIGHTWARD] = Action(ACTION_RIGHTWARD, rightward_speed, 0, 0)
 
     null_speed = np.array([0, 0, 0], dtype=float)
