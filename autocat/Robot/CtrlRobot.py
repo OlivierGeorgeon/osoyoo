@@ -1,7 +1,6 @@
 import json
 import threading
-import math
-from .RobotDefine import DEFAULT_YAW, RETREAT_DISTANCE, COMPASS_X_OFFSET, COMPASS_Y_OFFSET, RETREAT_DISTANCE_Y, \
+from .RobotDefine import RETREAT_DISTANCE, COMPASS_X_OFFSET, COMPASS_Y_OFFSET, RETREAT_DISTANCE_Y, \
     LINE_X, ROBOT_FRONT_X, ROBOT_FRONT_Y
 from .WifiInterface import WifiInterface
 from ..Memory.EgocentricMemory.Experience import *
@@ -90,7 +89,7 @@ class CtrlRobot:
         # Presupposed displacement of the robot relative to the environment
         # translation, yaw = [0, 0], 0
         translation = self.workspace.actions[action_code].translation_speed * (enacted_interaction['duration1'] / 1000)
-        yaw = self.workspace.actions[action_code].rotation_target
+        yaw = self.workspace.actions[action_code].target_yaw
 
         # if action_code == "1":
         #     yaw = DEFAULT_YAW

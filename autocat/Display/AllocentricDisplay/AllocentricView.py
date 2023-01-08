@@ -109,8 +109,6 @@ class AllocentricView(InteractiveDisplay):
         glLoadIdentity()
         glOrtho(0, self.width, 0, self.height, -1, 1)
         self.label_batch.draw()
-        # self.label.draw()
-        # self.label_trust_mode.draw()
 
     def on_mouse_motion(self, x, y, dx, dy):
         # Find the cell

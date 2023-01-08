@@ -8,7 +8,7 @@ from ...Workspace import INTERACTION_STEP_REFRESHING
 class CtrlBodyView:
     """Controls the body view"""
     def __init__(self, workspace):
-        self.view = BodyView()
+        self.view = BodyView(workspace.memory)
         self.workspace = workspace
         self.points_of_interest = []
         self.last_action = None
@@ -40,7 +40,7 @@ class CtrlBodyView:
 
         # Update the position of the robot
         self.view.robot.rotate_head(self.workspace.memory.body_memory.head_direction_degree())
-        self.view.azimuth = self.workspace.memory.body_memory.body_azimuth()
+        azimuth = self.workspace.memory.body_memory.body_azimuth()
         self.view.body_rotation_matrix = self.workspace.memory.body_memory.body_direction_matrix()
 
         # Rotate the previous compass points so they remain at the south of the view
@@ -58,16 +58,16 @@ class CtrlBodyView:
                                        self.view.background)
             self.view.label.text = "Azimuth compass: " + str(self.workspace.enacted_interaction['azimuth']) + "°"
         else:
-            self.view.azimuth = self.workspace.memory.body_memory.body_azimuth()
-            x = 300 * math.cos(math.radians(self.view.azimuth + 180))
-            y = 300 * math.sin(math.radians(self.view.azimuth + 180))
+            # azimuth = self.workspace.memory.body_memory.body_azimuth()
+            x = 300 * math.cos(math.radians(azimuth + 180))
+            y = 300 * math.sin(math.radians(azimuth + 180))
             self.add_point_of_interest(x, y, POINT_COMPASS)
-            x = 330 * math.cos(math.radians(self.view.azimuth + 180))
-            y = 330 * math.sin(math.radians(self.view.azimuth + 180))
+            x = 330 * math.cos(math.radians(azimuth + 180))
+            y = 330 * math.sin(math.radians(azimuth + 180))
             self.add_point_of_interest(x, y, POINT_AZIMUTH, self.view.background)
             self.view.label.text = "Azimuth compass: None"
 
-        self.view.label.text += ", corrected: " + str(self.view.azimuth) + "°"
+        self.view.label.text += ", corrected: " + str(azimuth) + "°"
 
         # Fade the points of interest
         for poi in self.points_of_interest:
@@ -75,8 +75,6 @@ class CtrlBodyView:
 
     def main(self, dt):
         """Called every frame. Update the body view"""
-        # if self.workspace.flag_for_view_refresh:
         if self.workspace.interaction_step == INTERACTION_STEP_REFRESHING:
             self.update_body_view()
             self.view.label.text = "Clock: " + str(self.workspace.clock)
-            # self.workspace.flag_for_view_refresh = False   # Reset by CtrlBodyView

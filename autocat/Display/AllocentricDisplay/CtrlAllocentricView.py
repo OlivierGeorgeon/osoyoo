@@ -11,7 +11,6 @@ class CtrlAllocentricView:
         self.allocentric_memory = workspace.memory.allocentric_memory
         self.allocentric_view = AllocentricView(self.workspace.memory)
         self.refresh_count = 0
-        # self.to_reset = []
 
         # Handlers
         def on_text(text):
@@ -27,7 +26,7 @@ class CtrlAllocentricView:
             if phenomenon is not None:
                 print("Displaying Phenomenon", phenomenon)
                 self.workspace.ctrl_phenomenon_view.phenomenon = phenomenon
-                self.workspace.flag_for_view_refresh = True
+                # self.workspace.flag_for_view_refresh = True
                 # ctrl_phenomenon_view = CtrlPhenomenonView(workspace)
                 # ctrl_phenomenon_view.update_body_robot()
                 # ctrl_phenomenon_view.update_points_of_interest(phenomenon)
@@ -41,17 +40,6 @@ class CtrlAllocentricView:
                 self.allocentric_view.update_hexagon(i, j)
         self.add_focus_cell()
 
-    # def extract_and_convert_recently_changed_cells(self):
-    #     """Create or update cells from recently changed experiences in egocentric memory"""
-    #     cell_list = self.workspace.memory.allocentric_memory.cells_changed_recently
-    #     for (i, j) in cell_list:
-    #         if self.allocentric_view.hexagons[i][j] is None:
-    #             self.allocentric_view.update_hexagon(i, j)
-    #         else:
-    #             self.allocentric_view.hexagons[i][j].set_color(self.allocentric_memory.grid[i][j].status)
-    #
-    #     self.add_focus_cell()
-    #
     def add_focus_cell(self):
         """Create a cell corresponding to the focus"""
         # Remove the previous focus cell
@@ -67,18 +55,5 @@ class CtrlAllocentricView:
 
     def main(self, dt):
         """Refresh allocentric view"""
-        # if self.refresh_count > 500:
-        #     self.refresh_count = 0
-        # if self.refresh_count == 0:
-        #     # Display all cells on initialization
-        #     self.allocentric_view.shapesList = []
-        #     self.extract_and_convert_interactions()
-        #     self.allocentric_memory.cells_changed_recently = []
-        # if len(self.allocentric_memory.cells_changed_recently) > 0:
-        #     self.extract_and_convert_recently_changed_cells()
-        #     self.allocentric_memory.cells_changed_recently = []
-        # self.refresh_count += 1
-
-        # if self.workspace.flag_for_view_refresh:
         if self.workspace.interaction_step == INTERACTION_STEP_REFRESHING:
             self.extract_and_convert_interactions()

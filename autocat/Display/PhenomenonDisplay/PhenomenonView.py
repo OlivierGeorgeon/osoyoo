@@ -1,7 +1,6 @@
 import pyglet
 from pyglet.gl import *
 from webcolors import name_to_rgb
-import math
 from ..EgocentricDisplay.OsoyooCar import OsoyooCar
 from ..InteractiveDisplay import InteractiveDisplay
 
@@ -10,7 +9,7 @@ ZOOM_IN_FACTOR = 1.2
 
 class PhenomenonView(InteractiveDisplay):
     """Display a phenomenon"""
-    def __init__(self, width=350, height=350, *args, **kwargs):
+    def __init__(self, memory, width=350, height=350, *args, **kwargs):
         super().__init__(width, height, resizable=True, *args, **kwargs)
         self.set_caption("Phenomenon View")
         self.set_minimum_size(150, 150)
@@ -27,7 +26,7 @@ class PhenomenonView(InteractiveDisplay):
         # Define the robot
         self.robot_batch = pyglet.graphics.Batch()
         self.robot = OsoyooCar(self.robot_batch, self.background)
-        self.azimuth = 0  # Degree from north [0, 360]
+        self.memory = memory
         self.robot_pos_x = 0
         self.robot_pos_y = 0
 
@@ -62,7 +61,8 @@ class PhenomenonView(InteractiveDisplay):
 
         # Stack the rotation of the robot body
         glTranslatef(self.robot_pos_x, self.robot_pos_y, 0)
-        glRotatef(90 - self.azimuth, 0.0, 0.0, 1.0)
+        # glRotatef(90 - self.azimuth, 0.0, 0.0, 1.0)
+        glRotatef(90 - self.memory.body_memory.body_azimuth(), 0.0, 0.0, 1.0)
         # Draw the robot
         self.robot_batch.draw()
 
@@ -72,15 +72,6 @@ class PhenomenonView(InteractiveDisplay):
         glOrtho(0, self.width, 0, self.height, -1, 1)
         # Draw the text in the bottom left corner
         self.label_batch.draw()
-
-    # def on_mouse_press(self, x, y, button, modifiers):
-    #     """ Computing the position of the mouse click relative to the robot in mm and degrees """
-    #     window_press_x = (x - self.width / 2) * self.zoom_level * 2
-    #     window_press_y = (y - self.height / 2) * self.zoom_level * 2
-    #     angle = math.atan2(window_press_y, window_press_x)
-    #
-    #     self.label.text = "Click: x:" + str(int(window_press_x)) + ", y:" + str(int(window_press_y)) \
-    #                       + ", angle:" + str(int(math.degrees(angle))) + "°."
 
     def add_polygon(self, points, color_string):
         """Add a plain polygon to the background of the view"""
@@ -116,10 +107,10 @@ class PhenomenonView(InteractiveDisplay):
 
 # Testing the Phenomenon View by displaying the robot in a pretty position
 # py -m autocat.Display.PhenomenonDisplay.PhenomenonView
-if __name__ == "__main__":
-    view = PhenomenonView()
-    view.azimuth = 45
-    view.robot_pos_x = -150
-    view.robot_pos_y = -150
-
-    pyglet.app.run()
+# if __name__ == "__main__":
+#     view = PhenomenonView()
+#     view.azimuth = 45
+#     view.robot_pos_x = -150
+#     view.robot_pos_y = -150
+#
+#     pyglet.app.run()

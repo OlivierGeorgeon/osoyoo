@@ -36,6 +36,7 @@ class Workspace:
         self.ctrl_phenomenon_view = None
 
         self.clock = 0
+        self.initial_body_direction_rad = 0.
 
     def main(self, dt):
         """The main handler of the interaction cycle:
@@ -48,10 +49,13 @@ class Workspace:
 
         # While enacting update body memory
         if self.interaction_step == INTERACTION_STEP_ENACTING:
+            self.memory.body_memory.body_direction_rad += \
+                self.actions[self.intended_interaction['action']].rotation_speed_rad * dt
             pass
 
         # Integrate the new enacted interaction
         if self.interaction_step == INTERACTION_STEP_INTEGRATING:
+            self.memory.body_memory.body_direction_rad = self.initial_body_direction_rad  # Retrieve the direction
             # Update body memory and egocentric memory
             self.memory.update_and_add_experiences(self.enacted_interaction)
 
@@ -69,6 +73,7 @@ class Workspace:
         """
         if self.interaction_step == INTERACTION_STEP_INTENDING:
             self.interaction_step = INTERACTION_STEP_ENACTING
+            self.initial_body_direction_rad = self.memory.body_memory.body_direction_rad  # Memorize the direction
             return self.intended_interaction
 
         return None
@@ -80,6 +85,7 @@ class Workspace:
 
         if "status" in enacted_interaction and enacted_interaction["status"] == "T":
             print("The workspace received an empty enacted interaction")
+            self.memory.body_memory.body_direction_rad = self.initial_body_direction_rad  # Retrieve the direction
             # If CONTROL_MODE_AUTOMATIC resend the same intended interaction unless the user has set another one
             if self.control_mode == CONTROL_MODE_AUTOMATIC:
                 self.interaction_step = INTERACTION_STEP_INTENDING

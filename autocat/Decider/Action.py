@@ -12,13 +12,13 @@ ACTION_SCAN = '-'
 
 
 class Action:
-    # action_dict = {}
+    """A primitive action that the robot can perform"""
 
-    def __init__(self, action_code, translation_speed, rotation_speed, rotation_target):
+    def __init__(self, action_code, translation_speed, rotation_speed, target_yaw):
         self.action_code = action_code
         self.translation_speed = translation_speed
-        self.rotation_speed = rotation_speed
-        self.rotation_target = rotation_target
+        self.rotation_speed_rad = rotation_speed
+        self.target_yaw = target_yaw
         print("Create action", self, "of speed", self.translation_speed)
 
     def __str__(self):
@@ -35,22 +35,6 @@ class Action:
             return self.action_code == other.action_code
         else:
             return False
-
-    # @classmethod
-    # def create_or_retrieve(cls, action_code, translation_speed, rotation_speed, rotation_target):
-    #     """ Use this methode to create a new action or to retrieve it if it already exists """
-    #
-    #     if action_code in cls.action_dict.keys():
-    #         action = cls.action_dict[action_code]
-    #         if __name__ == '__main__':
-    #             print("Retrieve action", action, "of speed", action.translation_speed)
-    #     else:
-    #         action = Action(action_code, translation_speed, rotation_speed, rotation_target)
-    #         cls.action_dict[action_code] = action
-    #         if __name__ == '__main__':
-    #             print("Create action", action, "of speed", action.translation_speed)
-    #
-    #     return action
 
 
 def create_actions():
@@ -70,9 +54,10 @@ def create_actions():
     action_dictionary[ACTION_RIGHTWARD] = Action(ACTION_RIGHTWARD, rightward_speed, 0, 0)
 
     null_speed = np.array([0, 0, 0], dtype=float)
-    action_dictionary[ACTION_TURN_LEFT] = Action(ACTION_TURN_LEFT, null_speed, DEFAULT_YAW, DEFAULT_YAW)
+    rotation_speed = math.radians(DEFAULT_YAW) / 2.  # Based on estimated turn duration
+    action_dictionary[ACTION_TURN_LEFT] = Action(ACTION_TURN_LEFT, null_speed, rotation_speed, DEFAULT_YAW)
 
-    action_dictionary[ACTION_TURN_RIGHT] = Action(ACTION_TURN_RIGHT, null_speed, -DEFAULT_YAW, -DEFAULT_YAW)
+    action_dictionary[ACTION_TURN_RIGHT] = Action(ACTION_TURN_RIGHT, null_speed, -rotation_speed, -DEFAULT_YAW)
 
     action_dictionary[ACTION_SCAN] = Action(ACTION_SCAN, null_speed, 0, 0)
 

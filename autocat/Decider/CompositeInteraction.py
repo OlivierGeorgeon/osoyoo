@@ -67,7 +67,7 @@ if __name__ == '__main__':
     interaction01 = Interaction.create_or_retrieve(0, 1)  # Create
     interaction10 = Interaction.create_or_retrieve(1, 0)  # Create
     interaction11 = Interaction.create_or_retrieve(1, 1)  # Create
-    interaction00 = Interaction.create_or_retrieve(0, 0)  # Retrieve
+    interaction00b = Interaction.create_or_retrieve(0, 0)  # Retrieve
 
     interaction0000 = CompositeInteraction.create_or_retrieve(interaction00, interaction00)  # Create
     print(interaction0000)

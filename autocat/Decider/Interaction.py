@@ -1,4 +1,3 @@
-from . Action import Action
 
 
 class Interaction:
@@ -51,8 +50,4 @@ if __name__ == '__main__':
     interaction01 = Interaction.create_or_retrieve(0, 1)  # Create
     interaction10 = Interaction.create_or_retrieve(1, 0)  # Create
     interaction11 = Interaction.create_or_retrieve(1, 1)  # Create
-    interaction00 = Interaction.create_or_retrieve(0, 0)  # Retrieve
-
-    for a in Action.action_dict.values():
-        Interaction.create_or_retrieve(a, 0)
-        Interaction.create_or_retrieve(a, 1)
+    interaction00b = Interaction.create_or_retrieve(0, 0)  # Retrieve

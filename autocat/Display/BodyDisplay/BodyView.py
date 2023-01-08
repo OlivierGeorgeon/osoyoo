@@ -11,10 +11,12 @@ ZOOM_IN_FACTOR = 1.2
 
 class BodyView(InteractiveDisplay):
     """Display the information in body memory"""
-    def __init__(self, width=350, height=350, *args, **kwargs):
+    def __init__(self, memory, width=350, height=350, *args, **kwargs):
         super().__init__(width, height, resizable=True, *args, **kwargs)
         self.set_caption("Body Memory")
         self.set_minimum_size(150, 150)
+
+        self.memory = memory
 
         # Initialize OpenGL parameters
         # https://www.w3schools.com/cssref/css_colors.asp
@@ -28,7 +30,7 @@ class BodyView(InteractiveDisplay):
         # Define the robot
         self.robot_batch = pyglet.graphics.Batch()
         self.robot = OsoyooCar(self.robot_batch, self.background)
-        self.azimuth = 90  # Degree from north [0, 360] Initialized on the x axis
+        # self.azimuth = 90  # Degree from north [0, 360] Initialized on the x axis
         self.body_rotation_matrix = matrix44.create_identity()  # The matrix representing the robot's body rotation
 
         # Define the text area at the bottom of the view
@@ -47,7 +49,8 @@ class BodyView(InteractiveDisplay):
                 self.height * self.zoom_level, 1, -1)
 
         # Stack the rotation of the robot body
-        glRotatef(90 - self.azimuth, 0.0, 0.0, 1.0)
+        # glRotatef(90 - self.azimuth, 0.0, 0.0, 1.0)
+        glRotatef(90 - self.memory.body_memory.body_azimuth(), 0.0, 0.0, 1.0)
         # Draw compass points
         self.batch.draw()
         # Draw the robot
@@ -75,9 +78,9 @@ class BodyView(InteractiveDisplay):
 
 # Testing the EgocentricView by displaying the robot in a pretty position, and the mouse click coordinates
 # py -m autocat.Display.BodyDisplay.BodyView
-if __name__ == "__main__":
-    view = BodyView()
-    view.robot.rotate_head(-45)  # Turn head 45° to the right
-    view.azimuth = 350           # Turn robot 10° to the left
-
-    pyglet.app.run()
+# if __name__ == "__main__":
+#     view = BodyView()
+#     view.robot.rotate_head(-45)  # Turn head 45° to the right
+#     view.azimuth = 350           # Turn robot 10° to the left
+#
+#     pyglet.app.run()

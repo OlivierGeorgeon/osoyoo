@@ -9,12 +9,11 @@ class CtrlPhenomenonView:
     """Handle the logic of the phenomenon view, retrieve data from the phenomenon and convert it
     to points of interest that can be displayed in a pyglet window"""
     def __init__(self, workspace):
-        self.view = PhenomenonView()
+        self.view = PhenomenonView(workspace.memory)
         self.workspace = workspace
         self.egocentric_memory = workspace.memory.egocentric_memory
         self.points_of_interest = []
         self.cones = []
-        # self.last_used_id = -1
         self.phenomenon = None
 
         def on_text(text):
@@ -45,7 +44,7 @@ class CtrlPhenomenonView:
     def update_body_robot(self):
         """Updates the robot's body to display by the egocentric view"""
         self.view.robot.rotate_head(self.workspace.memory.body_memory.head_direction_degree())
-        self.view.azimuth = self.workspace.memory.body_memory.body_azimuth()
+        # self.view.azimuth = self.workspace.memory.body_memory.body_azimuth()
         # TODO compute the robot's position relative to the phenomenon
         if self.phenomenon is not None:
             self.view.robot_pos_x = self.workspace.memory.allocentric_memory.robot_pos_x - self.phenomenon.point[0]
@@ -101,7 +100,6 @@ class CtrlPhenomenonView:
                     str(round(math.degrees(self.phenomenon.origin_absolute_direction))) + "°. Nb tours:" + \
                     str(self.phenomenon.nb_tour)
             self.update_body_robot()
-            # self.workspace.flag_for_view_refresh = False  # Reset by CtrlBodyView
 
             # Last view to refresh
             self.workspace.interaction_step = INTERACTION_STEP_IDLE
