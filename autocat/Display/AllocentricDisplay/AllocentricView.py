@@ -98,8 +98,8 @@ class AllocentricView(InteractiveDisplay):
         self.batch.draw()
 
         # Stack the transformation to position the robot
-        glTranslatef(tx + self.memory.allocentric_memory.robot_pos_x, ty + self.memory.allocentric_memory.robot_pos_y,
-                     0)
+        glTranslatef(tx + self.memory.allocentric_memory.robot_point[0],
+                     ty + self.memory.allocentric_memory.robot_point[1], 0)
         glRotatef(90 - self.memory.body_memory.body_azimuth(), 0.0, 0.0, 1.0)
         # Draw the robot
         self.robot.rotate_head(self.memory.body_memory.head_direction_degree())

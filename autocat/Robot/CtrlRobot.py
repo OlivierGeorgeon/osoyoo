@@ -87,7 +87,6 @@ class CtrlRobot:
             return enacted_interaction
 
         # Presupposed displacement of the robot relative to the environment
-        # translation, yaw = [0, 0], 0
         translation = self.workspace.actions[action_code].translation_speed * (enacted_interaction['duration1'] / 1000)
         yaw = self.workspace.actions[action_code].target_yaw
 
@@ -148,16 +147,16 @@ class CtrlRobot:
                 translation[1] = -RETREAT_DISTANCE_Y
 
         # Interaction ECHO for actions involving scanning
-        echo_xy = [0, 0, 0]
+        echo_point = [0, 0, 0]
         if action_code in ['-', '*', '+', '8', '2', '1', '3', '4', '6']:
             if enacted_interaction['echo_distance'] < 10000:
-                echo_xy[0] = int(ROBOT_HEAD_X + math.cos(math.radians(enacted_interaction['head_angle']))
+                echo_point[0] = int(ROBOT_HEAD_X + math.cos(math.radians(enacted_interaction['head_angle']))
                                  * enacted_interaction['echo_distance'])
-                echo_xy[1] = int(math.sin(math.radians(enacted_interaction['head_angle']))
+                echo_point[1] = int(math.sin(math.radians(enacted_interaction['head_angle']))
                                  * enacted_interaction['echo_distance'])
-                enacted_interaction[KEY_EXPERIENCES].append((EXPERIENCE_ALIGNED_ECHO, *echo_xy))
+                enacted_interaction[KEY_EXPERIENCES].append((EXPERIENCE_ALIGNED_ECHO, *echo_point))
                 # Return the echo_xy to possibly use as focus
-                enacted_interaction['echo_xy'] = echo_xy
+                enacted_interaction['echo_xy'] = echo_point
 
         # Interaction shock
         if KEY_IMPACT in enacted_interaction and action_code == ACTION_FORWARD:
@@ -182,13 +181,13 @@ class CtrlRobot:
         # If focussed then adjust the displacement
         if is_focussed:
             # The new estimated position of the focus point
-            expected_focus_xy = matrix44.apply_to_vector(displacement_matrix,
+            prediction_focus_point = matrix44.apply_to_vector(displacement_matrix,
                                                          [self.intended_interaction['focus_x'],
                                                           self.intended_interaction['focus_y'], 0])  # [0:2]
             # The delta between the expected and the actual position of the echo
-            delta_xy = expected_focus_xy - echo_xy
+            prediction_error_focus = prediction_focus_point - echo_point
 
-            if math.dist(echo_xy, expected_focus_xy) < FOCUS_MAX_DELTA:
+            if math.dist(echo_point, prediction_focus_point) < FOCUS_MAX_DELTA:
                 # The focus has been kept
                 enacted_interaction['focus'] = True
 
@@ -196,7 +195,7 @@ class CtrlRobot:
                 if enacted_interaction['duration1'] >= 1000:
                     # If the head is forward then correct longitudinal displacements
                     if -20 < enacted_interaction['head_angle'] < 20:
-                        translation += delta_xy
+                        translation += prediction_error_focus
                         translation_matrix = matrix44.create_from_translation([-translation[0], -translation[1], 0])
                         displacement_matrix = matrix44.multiply(rotation_matrix, translation_matrix)
                         if action_code in [ACTION_FORWARD, ACTION_BACKWARD]:  # Maybe not necessary
@@ -210,7 +209,7 @@ class CtrlRobot:
                         #         (self.workspace.memory.body_memory.backward_speed + translation) / 2
                     # If the head is sideways then correct lateral displacements
                     if 60 < enacted_interaction['head_angle'] or enacted_interaction['head_angle'] < -60:
-                        translation += delta_xy
+                        translation += prediction_error_focus
                         translation_matrix = matrix44.create_from_translation([-translation[0], -translation[1], 0])
                         displacement_matrix = matrix44.multiply(rotation_matrix, translation_matrix)
                         if action_code in [ACTION_LEFTWARD, ACTION_RIGHTWARD]:
@@ -226,7 +225,7 @@ class CtrlRobot:
             else:
                 # The focus has been lost
                 enacted_interaction['lost_focus'] = True
-                print("Lost focus with delta:", delta_xy)
+                print("Lost focus with delta:", prediction_error_focus)
 
         # Return the displacement
         enacted_interaction['translation'] = translation

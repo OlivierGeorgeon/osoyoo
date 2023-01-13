@@ -1,3 +1,4 @@
+import numpy
 import pyglet
 from pyglet.gl import *
 from webcolors import name_to_rgb
@@ -27,8 +28,9 @@ class PhenomenonView(InteractiveDisplay):
         self.robot_batch = pyglet.graphics.Batch()
         self.robot = OsoyooCar(self.robot_batch, self.background)
         self.memory = memory
-        self.robot_pos_x = 0
-        self.robot_pos_y = 0
+        # self.robot_pos_x = 0
+        # self.robot_pos_y = 0
+        self.phenomenon_point = numpy.array([0, 0, 0], dtype=float)
 
         self.hull_line = None
 
@@ -59,8 +61,9 @@ class PhenomenonView(InteractiveDisplay):
         # Draw the phenomenon
         self.batch.draw()
 
-        # Stack the rotation of the robot body
-        glTranslatef(self.robot_pos_x, self.robot_pos_y, 0)
+        # Stack the rotation and translation of the robot body
+        # glTranslatef(self.robot_pos_x, self.robot_pos_y, 0)
+        glTranslatef(*(self.memory.allocentric_memory.robot_point - self.phenomenon_point))
         # glRotatef(90 - self.azimuth, 0.0, 0.0, 1.0)
         glRotatef(90 - self.memory.body_memory.body_azimuth(), 0.0, 0.0, 1.0)
         # Draw the robot

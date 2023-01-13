@@ -1,3 +1,5 @@
+import numpy as np
+
 from .Decider.AgentCircle import AgentCircle
 from .Decider.Action import create_actions
 from .Memory.Memory import Memory
@@ -36,7 +38,8 @@ class Workspace:
         self.ctrl_phenomenon_view = None
 
         self.clock = 0
-        self.initial_body_direction_rad = 0.
+        self.initial_body_direction_rad = 0.  # Memorize the initial body direction before enaction
+        self.initial_robot_point = np.array([0, 0, 0], dtype=float)
 
     def main(self, dt):
         """The main handler of the interaction cycle:
@@ -47,15 +50,19 @@ class Workspace:
                 self.intended_interaction = self.decider.propose_intended_interaction(self.enacted_interaction)
                 self.interaction_step = INTERACTION_STEP_INTENDING
 
-        # While enacting update body memory
+        # While enacting, update body memory
         if self.interaction_step == INTERACTION_STEP_ENACTING:
             self.memory.body_memory.body_direction_rad += \
                 self.actions[self.intended_interaction['action']].rotation_speed_rad * dt
-            pass
+            self.memory.allocentric_memory.robot_point = \
+                self.memory.allocentric_memory.translate(self.memory.body_memory.body_direction_rad,
+                self.actions[self.intended_interaction['action']].translation_speed * dt * 0.75)  # estimated coef
+                #     self.actions[self.intended_interaction['action']].translation_speed * dt
 
         # Integrate the new enacted interaction
         if self.interaction_step == INTERACTION_STEP_INTEGRATING:
             self.memory.body_memory.body_direction_rad = self.initial_body_direction_rad  # Retrieve the direction
+            self.memory.allocentric_memory.robot_point = self.initial_robot_point
             # Update body memory and egocentric memory
             self.memory.update_and_add_experiences(self.enacted_interaction)
 
@@ -74,6 +81,7 @@ class Workspace:
         if self.interaction_step == INTERACTION_STEP_INTENDING:
             self.interaction_step = INTERACTION_STEP_ENACTING
             self.initial_body_direction_rad = self.memory.body_memory.body_direction_rad  # Memorize the direction
+            self.initial_robot_point = self.memory.allocentric_memory.robot_point.copy()
             return self.intended_interaction
 
         return None
@@ -86,6 +94,7 @@ class Workspace:
         if "status" in enacted_interaction and enacted_interaction["status"] == "T":
             print("The workspace received an empty enacted interaction")
             self.memory.body_memory.body_direction_rad = self.initial_body_direction_rad  # Retrieve the direction
+            self.memory.allocentric_memory.robot_point = self.initial_robot_point.copy()
             # If CONTROL_MODE_AUTOMATIC resend the same intended interaction unless the user has set another one
             if self.control_mode == CONTROL_MODE_AUTOMATIC:
                 self.interaction_step = INTERACTION_STEP_INTENDING

@@ -8,10 +8,10 @@ def test_convert_pos_in_cell():
 
     # Test the initial position of the robot
     try:
-        assert(hx.robot_pos_x == 0 and hx.robot_pos_y == 0)
+        assert(round(hx.robot_point[0]) == 0 and round(hx.robot_point[1]) == 0)
     except AssertionError:
         error = 1
-        print("Pos of the robot incorrect : ", hx.robot_pos_x, hx.robot_pos_y, " should be 0,0")
+        print("Pos of the robot incorrect : ", round(hx.robot_point[0]), round(hx.robot_point[1]), " should be 0,0")
         
     # Test the initial cell of the robot
     try:
@@ -21,9 +21,8 @@ def test_convert_pos_in_cell():
         print("Cell of the robot at origin incorrect : ", hx.robot_cell_x, hx.robot_cell_y, " should be 10,10")
 
     # Robot 10mm up from origin
-    hx.robot_pos_x = 0
-    hx.robot_pos_y = 10
-    end_x, end_y = hx.convert_pos_in_cell(hx.robot_pos_x, hx.robot_pos_y)
+    hx.robot_point = [0, 10, 0]
+    end_x, end_y = hx.convert_pos_in_cell(round(hx.robot_point[0]), round(hx.robot_point[1]))
     try:
         assert(end_x == 10 and end_y == 12)
     except AssertionError:
@@ -32,9 +31,8 @@ def test_convert_pos_in_cell():
         
     # Robot at origin
     try:
-        hx.robot_pos_x = 0
-        hx.robot_pos_y = 0
-        end_x, end_y = hx.convert_pos_in_cell(hx.robot_pos_x, hx.robot_pos_y)
+        hx.robot_point = [0, 0, 0]
+        end_x, end_y = hx.convert_pos_in_cell(round(hx.robot_point[0]), round(hx.robot_point[1]))
         assert(end_x == 10 and end_y == 10)
     except AssertionError:
         error = 4
@@ -42,22 +40,19 @@ def test_convert_pos_in_cell():
 
     # Robot 10mm down from origin
     try:
-        hx.robot_pos_x = 0
-        hx.robot_pos_y = -10
-        end_x, end_y = hx.convert_pos_in_cell(hx.robot_pos_x, hx.robot_pos_y)
+        hx.robot_point = [0, -10, 0]
+        end_x, end_y = hx.convert_pos_in_cell(round(hx.robot_point[0]), round(hx.robot_point[1]))
         assert(end_x == 10 and end_y == 8)
     except AssertionError:
         error = 5
         print("Cell of the robot 10mm down incorrect: ", end_x, end_y, " should be 10,8")
         
-    hx.robot_pos_x = 0
-    hx.robot_pos_y = 0
+    hx.robot_point = [0, 0, 0]
 
     # Robot 20mm down from origin
     try:
-        hx.robot_pos_x = 0
-        hx.robot_pos_y = -20
-        end_x, end_y = hx.convert_pos_in_cell(hx.robot_pos_x, hx.robot_pos_y)
+        hx.robot_point = [0, -20, 0]
+        end_x, end_y = hx.convert_pos_in_cell(round(hx.robot_point[0]), round(hx.robot_point[1]))
         assert(end_x == 10 and end_y == 8)
     except AssertionError:
         error = 6
@@ -65,9 +60,8 @@ def test_convert_pos_in_cell():
 
     # Robot 25mm down from origin
     try:
-        hx.robot_pos_x = 0
-        hx.robot_pos_y = -25
-        end_x, end_y = hx.convert_pos_in_cell(hx.robot_pos_x, hx.robot_pos_y)
+        hx.robot_point = [0, -25, 0]
+        end_x, end_y = hx.convert_pos_in_cell(round(hx.robot_point[0]), round(hx.robot_point[1]))
         assert(end_x == 10 and end_y == 8)
     except AssertionError:
         error = 7
@@ -76,9 +70,8 @@ def test_convert_pos_in_cell():
 
     # Robot 27mm down from origin
     try:
-        hx.robot_pos_x = 0
-        hx.robot_pos_y = -27
-        end_x, end_y = hx.convert_pos_in_cell(hx.robot_pos_x, hx.robot_pos_y)
+        hx.robot_point = [0, -27, 0]
+        end_x, end_y = hx.convert_pos_in_cell(round(hx.robot_point[0]), round(hx.robot_point[1]))
         assert(end_x == 10 and end_y == 6)
     except AssertionError:
         error = 8
@@ -86,9 +79,8 @@ def test_convert_pos_in_cell():
 
     # Robot 26mm up from origin
     try:
-        hx.robot_pos_x = 0
-        hx.robot_pos_y = 26
-        end_x, end_y = hx.convert_pos_in_cell(hx.robot_pos_x, hx.robot_pos_y)
+        hx.robot_point = [0, 26, 0]
+        end_x, end_y = hx.convert_pos_in_cell(round(hx.robot_point[0]), round(hx.robot_point[1]))
         assert(end_x == 10 and end_y == 14)
     except AssertionError:
         error = 9
@@ -96,9 +88,8 @@ def test_convert_pos_in_cell():
 
     # Robot 11mm right from origin
     try:
-        hx.robot_pos_x = 11
-        hx.robot_pos_y = 0
-        end_x, end_y = hx.convert_pos_in_cell(hx.robot_pos_x, hx.robot_pos_y)
+        hx.robot_point = [11, 0, 0]
+        end_x, end_y = hx.convert_pos_in_cell(round(hx.robot_point[0]), round(hx.robot_point[1]))
         assert(end_x == 10 and end_y == 11)
     except AssertionError:
         error = 10
@@ -106,9 +97,8 @@ def test_convert_pos_in_cell():
 
     # Robot 25mm right from origin
     try:
-        hx.robot_pos_x = 25
-        hx.robot_pos_y = 0
-        end_x, end_y = hx.convert_pos_in_cell(hx.robot_pos_x, hx.robot_pos_y)
+        hx.robot_point = [25, 0, 0]
+        end_x, end_y = hx.convert_pos_in_cell(round(hx.robot_point[0]), round(hx.robot_point[1]))
         assert(end_x == 11 and end_y == 10)
     except AssertionError:
         error = 11
@@ -116,9 +106,8 @@ def test_convert_pos_in_cell():
         
     # Robot 21mm right from origin
     try:
-        hx.robot_pos_x = 21
-        hx.robot_pos_y = 0
-        end_x, end_y = hx.convert_pos_in_cell(hx.robot_pos_x, hx.robot_pos_y)
+        hx.robot_point = [21, 0, 0]
+        end_x, end_y = hx.convert_pos_in_cell(round(hx.robot_point[0]), round(hx.robot_point[1]))
         assert(end_x == 11 and end_y == 10)
     except AssertionError:
         error = 12.1
@@ -126,9 +115,8 @@ def test_convert_pos_in_cell():
     
     # Robot 26mm right from origin
     try:
-        hx.robot_pos_x = 26
-        hx.robot_pos_y = 0
-        end_x, end_y = hx.convert_pos_in_cell(hx.robot_pos_x, hx.robot_pos_y)
+        hx.robot_point = [26, 0, 0]
+        end_x, end_y = hx.convert_pos_in_cell(round(hx.robot_point[0]), round(hx.robot_point[1]))
         assert(end_x == 11 and end_y == 10)
     except AssertionError:
         error = 12.11
@@ -136,9 +124,8 @@ def test_convert_pos_in_cell():
         
     # Robot 41mm right from origin
     try:
-        hx.robot_pos_x = 41
-        hx.robot_pos_y = 0
-        end_x, end_y = hx.convert_pos_in_cell(hx.robot_pos_x, hx.robot_pos_y)
+        hx.robot_point = [41, 0, 0]
+        end_x, end_y = hx.convert_pos_in_cell(round(hx.robot_point[0]), round(hx.robot_point[1]))
         assert(end_x == 11 and end_y == 11)
     except AssertionError:
         error = 12.2
@@ -146,9 +133,8 @@ def test_convert_pos_in_cell():
 
     # Robot 49mm right from origin
     try:
-        hx.robot_pos_x = 49
-        hx.robot_pos_y = 0
-        end_x, end_y = hx.convert_pos_in_cell(hx.robot_pos_x, hx.robot_pos_y)
+        hx.robot_point = [49, 0, 0]
+        end_x, end_y = hx.convert_pos_in_cell(round(hx.robot_point[0]), round(hx.robot_point[1]))
         assert(end_x == 11 and end_y == 11)
     except AssertionError:
         error = 12.3
@@ -156,9 +142,8 @@ def test_convert_pos_in_cell():
     
     # Robot 50mm right from origin
     try:
-        hx.robot_pos_x = 50
-        hx.robot_pos_y = 0
-        end_x, end_y = hx.convert_pos_in_cell(hx.robot_pos_x, hx.robot_pos_y)
+        hx.robot_point = [50, 0, 0]
+        end_x, end_y = hx.convert_pos_in_cell(round(hx.robot_point[0]), round(hx.robot_point[1]))
         assert(end_x == 11 and end_y == 11)
     except AssertionError:
         error = 12.5
@@ -166,9 +151,8 @@ def test_convert_pos_in_cell():
         
     # Robot 52mm right from origin
     try:
-        hx.robot_pos_x = 52
-        hx.robot_pos_y = 0
-        end_x, end_y = hx.convert_pos_in_cell(hx.robot_pos_x, hx.robot_pos_y)
+        hx.robot_point = [52, 0, 0]
+        end_x, end_y = hx.convert_pos_in_cell(round(hx.robot_point[0]), round(hx.robot_point[1]))
         assert(end_x == 12 and end_y == 10)
     except AssertionError:
         error = 13
@@ -176,9 +160,8 @@ def test_convert_pos_in_cell():
 
     # Robot 8mm right from origin
     try:
-        hx.robot_pos_x = 8
-        hx.robot_pos_y = 0
-        end_x, end_y = hx.convert_pos_in_cell(hx.robot_pos_x, hx.robot_pos_y)
+        hx.robot_point = [8, 0, 0]
+        end_x, end_y = hx.convert_pos_in_cell(round(hx.robot_point[0]), round(hx.robot_point[1]))
         assert(end_x == 10 and end_y == 10)
     except AssertionError:
         error = 14
@@ -186,9 +169,8 @@ def test_convert_pos_in_cell():
 
     # Robot 8mm left from origin
     try:
-        hx.robot_pos_x = -8
-        hx.robot_pos_y = 0
-        end_x, end_y = hx.convert_pos_in_cell(hx.robot_pos_x, hx.robot_pos_y)
+        hx.robot_point = [-8, 0, 0]
+        end_x, end_y = hx.convert_pos_in_cell(round(hx.robot_point[0]), round(hx.robot_point[1]))
         assert(end_x == 10 and end_y == 10)
     except AssertionError:
         error = 15
@@ -196,9 +178,8 @@ def test_convert_pos_in_cell():
 
     # Robot 11mm left from origin
     try:
-        hx.robot_pos_x = -11
-        hx.robot_pos_y = 0
-        end_x, end_y = hx.convert_pos_in_cell(hx.robot_pos_x, hx.robot_pos_y)
+        hx.robot_point = [-11, 0, 0]
+        end_x, end_y = hx.convert_pos_in_cell(round(hx.robot_point[0]), round(hx.robot_point[1]))
         assert(end_x == 9 and end_y == 11)
     except AssertionError:
         error = 16
@@ -206,9 +187,8 @@ def test_convert_pos_in_cell():
 
     # Robot 21mm left from origin
     try:
-        hx.robot_pos_x = -21
-        hx.robot_pos_y = 0
-        end_x, end_y = hx.convert_pos_in_cell(hx.robot_pos_x, hx.robot_pos_y)
+        hx.robot_point = [-21, 0, 0]
+        end_x, end_y = hx.convert_pos_in_cell(round(hx.robot_point[0]), round(hx.robot_point[1]))
         assert(end_x == 9 and end_y == 10)
     except AssertionError:
         error = 17
@@ -216,9 +196,8 @@ def test_convert_pos_in_cell():
 
     # Robot 41mm left from origin
     try:
-        hx.robot_pos_x = -41
-        hx.robot_pos_y = 0
-        end_x, end_y = hx.convert_pos_in_cell(hx.robot_pos_x, hx.robot_pos_y)
+        hx.robot_point = [-41, 0, 0]
+        end_x, end_y = hx.convert_pos_in_cell(round(hx.robot_point[0]), round(hx.robot_point[1]))
         assert(end_x == 8 and end_y == 11)
     except AssertionError:
         error = 18
@@ -226,9 +205,8 @@ def test_convert_pos_in_cell():
 
     # Robot 11mm right and 10mm up from origin
     try:
-        hx.robot_pos_x = 11
-        hx.robot_pos_y = 10
-        end_x, end_y = hx.convert_pos_in_cell(hx.robot_pos_x, hx.robot_pos_y)
+        hx.robot_point = [11, 10, 0]
+        end_x, end_y = hx.convert_pos_in_cell(round(hx.robot_point[0]), round(hx.robot_point[1]))
         assert(end_x == 10 and end_y == 11)
     except AssertionError:
         error = 19
@@ -236,9 +214,8 @@ def test_convert_pos_in_cell():
 
     # Robot 21mm right and 10mm up from origin
     try:
-        hx.robot_pos_x = 21
-        hx.robot_pos_y = 10
-        end_x, end_y = hx.convert_pos_in_cell(hx.robot_pos_x, hx.robot_pos_y)
+        hx.robot_point = [21, 10, 0]
+        end_x, end_y = hx.convert_pos_in_cell(round(hx.robot_point[0]), round(hx.robot_point[1]))
         assert(end_x == 10 and end_y == 11)
     except AssertionError:
         error = 20
@@ -246,9 +223,8 @@ def test_convert_pos_in_cell():
 
     # Robot 21mm right and 10mm down from origin
     try:
-        hx.robot_pos_x = 11
-        hx.robot_pos_y = -10
-        end_x, end_y = hx.convert_pos_in_cell(hx.robot_pos_x, hx.robot_pos_y)
+        hx.robot_point = [11, -10, 0]
+        end_x, end_y = hx.convert_pos_in_cell(round(hx.robot_point[0]), round(hx.robot_point[1]))
         assert(end_x == 10 and end_y == 9)
     except AssertionError:
         error = 21
@@ -256,9 +232,8 @@ def test_convert_pos_in_cell():
 
     # Robot 11mm left and 10mm down from origin
     good_end_x, good_end_y = 9, 9
-    hx.robot_pos_x = -11
-    hx.robot_pos_y = -10
-    end_x, end_y = hx.convert_pos_in_cell(hx.robot_pos_x, hx.robot_pos_y)
+    hx.robot_point = [-11, -10, 0]
+    end_x, end_y = hx.convert_pos_in_cell(round(hx.robot_point[0]), round(hx.robot_point[1]))
     try:
         assert(end_x == good_end_x and end_y == good_end_y)
     except AssertionError:
@@ -268,9 +243,8 @@ def test_convert_pos_in_cell():
 
     # Robot 11mm left and 10mm up from origin
     try:
-        hx.robot_pos_x = -11
-        hx.robot_pos_y = 10
-        end_x, end_y = hx.convert_pos_in_cell(hx.robot_pos_x, hx.robot_pos_y)
+        hx.robot_point = [-11, 10, 0]
+        end_x, end_y = hx.convert_pos_in_cell(round(hx.robot_point[0]), round(hx.robot_point[1]))
         good_end_x, good_end_y = 9, 11
         assert(end_x == good_end_x and end_y == good_end_y)
     except AssertionError:
@@ -280,9 +254,8 @@ def test_convert_pos_in_cell():
 
     # Robot 15mm right and 30mm up from origin
     try:
-        hx.robot_pos_x = 15
-        hx.robot_pos_y = 30
-        end_x, end_y = hx.convert_pos_in_cell(hx.robot_pos_x, hx.robot_pos_y)
+        hx.robot_point = [15, 30, 0]
+        end_x, end_y = hx.convert_pos_in_cell(round(hx.robot_point[0]), round(hx.robot_point[1]))
         good_end_x, good_end_y = 10, 13
         assert(end_x == good_end_x and end_y == good_end_y)
     except AssertionError:
@@ -291,9 +264,8 @@ def test_convert_pos_in_cell():
               good_end_y, " error : ", error)
 
     try:
-        hx.robot_pos_x = -15
-        hx.robot_pos_y = 30
-        end_x, end_y = hx.convert_pos_in_cell(hx.robot_pos_x, hx.robot_pos_y)
+        hx.robot_point = [-15, 30, 0]
+        end_x, end_y = hx.convert_pos_in_cell(round(hx.robot_point[0]), round(hx.robot_point[1]))
         good_end_x, good_end_y = 9, 13
         assert(end_x == good_end_x and end_y == good_end_y)
     except AssertionError:
@@ -302,9 +274,8 @@ def test_convert_pos_in_cell():
               good_end_y, " error : ", error)
         
     try:
-        hx.robot_pos_x = 6
-        hx.robot_pos_y = 12
-        end_x, end_y = hx.convert_pos_in_cell(hx.robot_pos_x, hx.robot_pos_y)
+        hx.robot_point = [6, 12, 0]
+        end_x, end_y = hx.convert_pos_in_cell(round(hx.robot_point[0]), round(hx.robot_point[1]))
         good_end_x, good_end_y = 10, 12
         assert(end_x == good_end_x and end_y == good_end_y)
     except AssertionError:
@@ -313,9 +284,8 @@ def test_convert_pos_in_cell():
               good_end_y, " error : ", error)
 
     try:
-        hx.robot_pos_x = 7
-        hx.robot_pos_y = 12
-        end_x, end_y = hx.convert_pos_in_cell(hx.robot_pos_x, hx.robot_pos_y)
+        hx.robot_point = [7, 12, 0]
+        end_x, end_y = hx.convert_pos_in_cell(round(hx.robot_point[0]), round(hx.robot_point[1]))
         good_end_x, good_end_y = 10, 11
         assert(end_x == good_end_x and end_y == good_end_y)
     except AssertionError:
@@ -333,8 +303,7 @@ def test_move():
 
     # Sweep left from Origin (orientation East)
     good_end_x, good_end_y = 0, 20  # OG 23/09/2022
-    hx.robot_pos_x = 0
-    hx.robot_pos_y = 0
+    hx.robot_point = [0, 0, 0]
     rotation, move_x, move_y = 0, 0, 20
     end_x, end_y = hx.move(rotation, (move_x, move_y))
     try:
@@ -345,8 +314,7 @@ def test_move():
 
     # Turn South and sweep left
     try:
-        hx.robot_pos_x = 0
-        hx.robot_pos_y = 0
+        hx.robot_point = [0, 0, 0]
         rotation, move_x, move_y = -3.14/2, 0, 20
         end_x, end_y = hx.move(rotation, (move_x, move_y))
         good_end_x, good_end_y = 20, 0
@@ -358,8 +326,7 @@ def test_move():
 
     # Move forward from Origin
     try:
-        hx.robot_pos_x = 0
-        hx.robot_pos_y = 0
+        hx.robot_point = [0, 0, 0]
         hx.robot_angle = 0
         rotation, move_x, move_y = 0, 20, 00
         end_x, end_y = hx.move(rotation, (move_x, move_y))
