@@ -304,8 +304,9 @@ def test_move():
     # Sweep left from Origin (orientation East)
     good_end_x, good_end_y = 0, 20  # OG 23/09/2022
     hx.robot_point = [0, 0, 0]
-    rotation, move_x, move_y = 0, 0, 20
-    end_x, end_y = hx.move(rotation, (move_x, move_y))
+    rotation = 0
+    move = [0, 20, 0]
+    end_x, end_y, _ = hx.move(rotation, move)
     try:
         assert(end_x == good_end_x and end_y == good_end_y)
     except AssertionError:
@@ -315,8 +316,9 @@ def test_move():
     # Turn South and sweep left
     try:
         hx.robot_point = [0, 0, 0]
-        rotation, move_x, move_y = -3.14/2, 0, 20
-        end_x, end_y = hx.move(rotation, (move_x, move_y))
+        rotation = -3.14/2
+        move = [0, 20, 0]
+        end_x, end_y, _ = hx.move(rotation, move)
         good_end_x, good_end_y = 20, 0
         assert(end_x == good_end_x and end_y == good_end_y)
     except AssertionError:
@@ -328,8 +330,9 @@ def test_move():
     try:
         hx.robot_point = [0, 0, 0]
         hx.robot_angle = 0
-        rotation, move_x, move_y = 0, 20, 00
-        end_x, end_y = hx.move(rotation, (move_x, move_y))
+        rotation = 0
+        move = [20, 0, 0]
+        end_x, end_y, _ = hx.move(rotation, move)
         good_end_x, good_end_y = 20, 0
         assert(end_x == good_end_x and end_y == good_end_y)
     except AssertionError:

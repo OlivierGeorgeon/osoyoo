@@ -11,6 +11,9 @@ def assert_almost_equal_angles(angle1, angle2, difference_degrees):
 
 
 def rotate_vector_z(vector, angle):
-    """Return another vector 3D representing Vector rotated by Angle along the z axis"""
-    rotation_matrix = pyrr.Matrix44.from_z_rotation(angle)
-    return pyrr.vector3.apply_matrix(vector, rotation_matrix)
+    """Return another vector 3D representing Vector rotated by Angle in trigonometric direction"""
+    # Must take the opposite angle to rotate in the trigonometric direction
+    # Apparently, pyrr uses a left-handed coordinate system:
+    # https://www.evl.uic.edu/ralph/508S98/coordinates.html
+    rotation_matrix = pyrr.Matrix44.from_z_rotation(-angle)
+    return pyrr.matrix44.apply_to_vector(rotation_matrix, vector)

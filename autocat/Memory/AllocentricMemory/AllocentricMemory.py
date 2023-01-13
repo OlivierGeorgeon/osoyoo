@@ -3,6 +3,7 @@ import numpy as np
 from pyrr import matrix44
 from . GridCell import GridCell, CELL_UNKNOWN
 from ..EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_PLACE
+from ...Utils import rotate_vector_z
 
 
 class AllocentricMemory:
@@ -219,52 +220,48 @@ class AllocentricMemory:
 
     def move(self, body_direction_rad, translation, is_egocentric_translation=True):
         """Move the robot in allocentric memory. Mark the traversed cells Free. Returns the new position"""
-        destination_x = self.robot_point[0]  # self.robot_pos_x
-        destination_y = self.robot_point[1]  # self.robot_pos_y
+        # destination_x = self.robot_point[0]  # self.robot_pos_x
+        # destination_y = self.robot_point[1]  # self.robot_pos_y
         if is_egocentric_translation:
-            destination_x, destination_y, _ = self.robot_point + self.translate(body_direction_rad, translation)
-            # destination_x += round((translation[0] * math.cos(body_direction_rad) -
-            #                         translation[1] * math.sin(body_direction_rad)))
-            # destination_y += round((translation[0] * math.sin(body_direction_rad) +
-            #                         translation[1] * math.cos(body_direction_rad)))
+            # destination_point = self.robot_point + self.translate(body_direction_rad, translation)
+            destination_point = self.robot_point + rotate_vector_z(translation, body_direction_rad)
         else:
-            destination_x += translation[0]
-            destination_y += translation[1]
+            destination_point = self.robot_point + translation
+            # destination_x += translation[0]
+            # destination_y += translation[1]
 
         try:
             # self.apply_changes(self.robot_pos_x, self.robot_pos_y, destination_x, destination_y)
-            self.apply_changes(self.robot_point[0], self.robot_point[1], destination_x, destination_y)
-            self.robot_point[0] = destination_x
-            self.robot_point[1] = destination_y
+            self.apply_changes(self.robot_point, destination_point)
+            self.robot_point = destination_point
+            # self.robot_point[0] = destination_x
+            # self.robot_point[1] = destination_y
         except IndexError:
             print("IndexError")
             self.robot_cell_x = self.width // 2
             self.robot_cell_y = self.height // 2
-            self.robot_point[0] = 0
-            self.robot_point[1] = 0
+            self.robot_point = np.array([0, 0, 0], dtype=float)
+            # self.robot_point[0] = 0
+            # self.robot_point[1] = 0
 
         # Leave the previous occupied cell
         if self.grid[self.robot_cell_x][self.robot_cell_y] != EXPERIENCE_FLOOR:
             self.grid[self.robot_cell_x][self.robot_cell_y].set_to(EXPERIENCE_PLACE)
-        # self.grid[self.robot_cell_x][self.robot_cell_y].leave()
-        # self.cells_changed_recently.append((self.robot_cell_x, self.robot_cell_y))
 
         # Mark the new occupied cell
         self.robot_cell_x, self.robot_cell_y = self.convert_pos_in_cell(
             self.robot_point[0], self.robot_point[1])
-        # self.grid[self.robot_cell_x][self.robot_cell_y].occupy()
-        # self.cells_changed_recently.append((self.robot_cell_x, self.robot_cell_y))
 
-        return destination_x, destination_y
+        return np.round(destination_point)
 
-    def translate(self, body_direction_rad, translation):
-        """Compute the allocentric displacement from direction and translation"""
-        rotation_matrix = matrix44.create_from_z_rotation(-body_direction_rad)  # not sure why must take the opposite
-        # translation_matrix = matrix44.create_from_translation(translation)
-        # multiply the translation by the rotation
-        # displacement_matrix = matrix44.multiply(translation_matrix, rotation_matrix)
-        # return matrix44.apply_to_vector(displacement_matrix, [0, 0, 0])
-        return matrix44.apply_to_vector(rotation_matrix, translation)
+    # def translate(self, body_direction_rad, translation):
+    #     """Compute the allocentric displacement from direction and translation"""
+    #     rotation_matrix = matrix44.create_from_z_rotation(-body_direction_rad)  # not sure why must take the opposite
+    #     # translation_matrix = matrix44.create_from_translation(translation)
+    #     # multiply the translation by the rotation
+    #     # displacement_matrix = matrix44.multiply(translation_matrix, rotation_matrix)
+    #     # return matrix44.apply_to_vector(displacement_matrix, [0, 0, 0])
+    #     return matrix44.apply_to_vector(rotation_matrix, translation)
 
     def place_robot(self, body_memory):
         """Apply the PLACE status to the cells at the position of the robot"""
@@ -283,19 +280,20 @@ class AllocentricMemory:
                     self.apply_status_to_cell(i, j, CELL_UNKNOWN)
                     self.grid[i][j].phenomenon = None
 
-    def apply_changes(self, start_x, start_y, end_x, end_y, status=EXPERIENCE_PLACE):
+    def apply_changes(self, start, end, status=EXPERIENCE_PLACE):
         """Apply the given status (Free by default) to every cell between coordinates start_x,start_y and end_x,end_y"""
 
-        distance = math.sqrt((end_x - start_x)**2 + (end_y - start_y)**2)
+        # distance = math.sqrt((end_x - start_x)**2 + (end_y - start_y)**2)
+        distance = math.dist(start, end)
         if distance == 0:
             return
         nb_step = int(distance / self.cell_radius)
         if nb_step == 0:
             return
-        step_x = int((end_x - start_x)/nb_step)
-        step_y = int((end_y - start_y)/nb_step)
-        current_pos_x = start_x
-        current_pos_y = start_y
+        step_x = int((end[0] - start[0])/nb_step)
+        step_y = int((end[1] - start[1])/nb_step)
+        current_pos_x = start[0]
+        current_pos_y = start[1]
         for _ in range(nb_step):
             cell_x, cell_y = self.convert_pos_in_cell(current_pos_x, current_pos_y)
             self.grid[cell_x][cell_y].status = status

@@ -113,12 +113,13 @@ class AllocentricView(InteractiveDisplay):
     def on_mouse_motion(self, x, y, dx, dy):
         # Find the cell
         cell_x, cell_y = self.cell_from_screen_coordinate(x, y)
-        self.label.text = "Cell: " + str(cell_x) + ", " + str(cell_y)
+        # self.label.text = "Cell: " + str(cell_x) + ", " + str(cell_y)
 
     def cell_from_screen_coordinate(self, x, y):
         """ Computes the cell coordinates from the screen coordinates """
         mouse_x = int((x - self.width/2) * self.zoom_level * 2)
         mouse_y = int((y - self.height/2) * self.zoom_level * 2)
         cell_x, cell_y = self.memory.allocentric_memory.convert_pos_in_cell(mouse_x, mouse_y)
-        self.label.text = "Cell: " + str(cell_x) + ", " + str(cell_y)
+        self.label.text = "Pos: " + str(round(mouse_x)) + ", " + str(round(mouse_y))
+        self.label.text += " Cell: " + str(cell_x) + ", " + str(cell_y)
         return cell_x, cell_y

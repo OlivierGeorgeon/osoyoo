@@ -4,6 +4,7 @@ from .Decider.AgentCircle import AgentCircle
 from .Decider.Action import create_actions
 from .Memory.Memory import Memory
 from .Integrator.Integrator import Integrator
+from .Utils import rotate_vector_z
 
 CONTROL_MODE_AUTOMATIC = "auto"
 CONTROL_MODE_MANUAL = "manual"
@@ -13,6 +14,9 @@ INTERACTION_STEP_INTENDING = 1
 INTERACTION_STEP_ENACTING = 2
 INTERACTION_STEP_INTEGRATING = 3
 INTERACTION_STEP_REFRESHING = 4
+
+SIMULATION_SPEED_RATIO = 0.5   # The simulation speed as slower than the real speed because ...
+SIMULATION_TURN_RATION = 0.75  # ... it covers the wifi communication time
 
 
 class Workspace:
@@ -53,11 +57,10 @@ class Workspace:
         # While enacting, update body memory
         if self.interaction_step == INTERACTION_STEP_ENACTING:
             self.memory.body_memory.body_direction_rad += \
-                self.actions[self.intended_interaction['action']].rotation_speed_rad * dt
-            self.memory.allocentric_memory.robot_point = \
-                self.memory.allocentric_memory.translate(self.memory.body_memory.body_direction_rad,
-                self.actions[self.intended_interaction['action']].translation_speed * dt * 0.75)  # estimated coef
-                #     self.actions[self.intended_interaction['action']].translation_speed * dt
+                self.actions[self.intended_interaction['action']].rotation_speed_rad * dt * SIMULATION_TURN_RATION
+            self.memory.allocentric_memory.robot_point += \
+                rotate_vector_z(self.actions[self.intended_interaction['action']].translation_speed * dt
+                                * SIMULATION_SPEED_RATIO, self.memory.body_memory.body_direction_rad)
 
         # Integrate the new enacted interaction
         if self.interaction_step == INTERACTION_STEP_INTEGRATING:

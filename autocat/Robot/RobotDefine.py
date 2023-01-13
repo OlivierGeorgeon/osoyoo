@@ -14,6 +14,7 @@ ROBOT_SIDE = 120            # (mm) The Y position of the outside border of the r
 FORWARD_SPEED = 180         # (mm/s) Forward translation speed. previous 120.
 LATERAL_SPEED = 110         # (mm/s) Lateral translation speed
 DEFAULT_YAW = 45            # (degree) Default rotation when yaw is not returned by the robot
+TURN_DURATION = 1.500       # (s) The duration of turn left and turn right actions
 RETREAT_DISTANCE = 90       # (mm) Distance travelled during retreat
 RETREAT_DISTANCE_Y = 20     # (mm) Y displacement when line is detected on the side
 LINE_X = 160                # (mm) X coordinate of the line after retreat

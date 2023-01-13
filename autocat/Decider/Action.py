@@ -1,6 +1,6 @@
 import math
 import numpy as np
-from ..Robot.RobotDefine import FORWARD_SPEED, LATERAL_SPEED, DEFAULT_YAW
+from ..Robot.RobotDefine import FORWARD_SPEED, LATERAL_SPEED, DEFAULT_YAW, TURN_DURATION
 
 ACTION_FORWARD = '8'
 ACTION_BACKWARD = '2'
@@ -54,7 +54,7 @@ def create_actions():
     action_dictionary[ACTION_RIGHTWARD] = Action(ACTION_RIGHTWARD, rightward_speed, 0, 0)
 
     null_speed = np.array([0, 0, 0], dtype=float)
-    rotation_speed = math.radians(DEFAULT_YAW) / 2.  # Based on estimated turn duration
+    rotation_speed = math.radians(DEFAULT_YAW) / TURN_DURATION
     action_dictionary[ACTION_TURN_LEFT] = Action(ACTION_TURN_LEFT, null_speed, rotation_speed, DEFAULT_YAW)
 
     action_dictionary[ACTION_TURN_RIGHT] = Action(ACTION_TURN_RIGHT, null_speed, -rotation_speed, -DEFAULT_YAW)
