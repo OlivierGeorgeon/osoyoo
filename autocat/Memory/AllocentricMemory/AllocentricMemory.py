@@ -18,17 +18,17 @@ class AllocentricMemory:
         self.grid = list()
         self.width = width
         self.height = height
+        self.cell_radius = cell_radius
+
+        # Fill the grid with cells
         for i in range(self.width):
             self.grid.append(list())
             for j in range(self.height):
                 self.grid[i].append(GridCell(i, j))
 
-        self.cell_radius = cell_radius
+        # Allocentric memory is initialized with the robot at its center
         self.robot_cell_x = self.width // 2
         self.robot_cell_y = self.height // 2
-        # Allocentric memory is initialized with the robot at its center
-        # self.robot_pos_x = 0
-        # self.robot_pos_y = 0
         self.robot_point = np.array([0, 0, 0], dtype=float)
 
     def reset(self):
@@ -220,29 +220,20 @@ class AllocentricMemory:
 
     def move(self, body_direction_rad, translation, is_egocentric_translation=True):
         """Move the robot in allocentric memory. Mark the traversed cells Free. Returns the new position"""
-        # destination_x = self.robot_point[0]  # self.robot_pos_x
-        # destination_y = self.robot_point[1]  # self.robot_pos_y
+        # Compute the robot destination point
         if is_egocentric_translation:
-            # destination_point = self.robot_point + self.translate(body_direction_rad, translation)
             destination_point = self.robot_point + rotate_vector_z(translation, body_direction_rad)
         else:
             destination_point = self.robot_point + translation
-            # destination_x += translation[0]
-            # destination_y += translation[1]
-
+        # Check that the robot remains within allocentric memory limits
         try:
-            # self.apply_changes(self.robot_pos_x, self.robot_pos_y, destination_x, destination_y)
             self.apply_changes(self.robot_point, destination_point)
             self.robot_point = destination_point
-            # self.robot_point[0] = destination_x
-            # self.robot_point[1] = destination_y
         except IndexError:
             print("IndexError")
             self.robot_cell_x = self.width // 2
             self.robot_cell_y = self.height // 2
             self.robot_point = np.array([0, 0, 0], dtype=float)
-            # self.robot_point[0] = 0
-            # self.robot_point[1] = 0
 
         # Leave the previous occupied cell
         if self.grid[self.robot_cell_x][self.robot_cell_y] != EXPERIENCE_FLOOR:
@@ -253,15 +244,6 @@ class AllocentricMemory:
             self.robot_point[0], self.robot_point[1])
 
         return np.round(destination_point)
-
-    # def translate(self, body_direction_rad, translation):
-    #     """Compute the allocentric displacement from direction and translation"""
-    #     rotation_matrix = matrix44.create_from_z_rotation(-body_direction_rad)  # not sure why must take the opposite
-    #     # translation_matrix = matrix44.create_from_translation(translation)
-    #     # multiply the translation by the rotation
-    #     # displacement_matrix = matrix44.multiply(translation_matrix, rotation_matrix)
-    #     # return matrix44.apply_to_vector(displacement_matrix, [0, 0, 0])
-    #     return matrix44.apply_to_vector(rotation_matrix, translation)
 
     def place_robot(self, body_memory):
         """Apply the PLACE status to the cells at the position of the robot"""

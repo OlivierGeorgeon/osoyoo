@@ -85,14 +85,14 @@ class Workspace:
             self.interaction_step = INTERACTION_STEP_ENACTING
             self.initial_body_direction_rad = self.memory.body_memory.body_direction_rad  # Memorize the direction
             self.initial_robot_point = self.memory.allocentric_memory.robot_point.copy()
+            self.intended_interaction["clock"] = self.clock
             return self.intended_interaction
 
         return None
 
     def update_enacted_interaction(self, enacted_interaction):
         """Update the enacted interaction (called by CtrlRobot)"""
-        self.clock += 1
-        enacted_interaction["clock"] = self.clock
+        # enacted_interaction["clock"] = self.clock  # sent by the robot
 
         if "status" in enacted_interaction and enacted_interaction["status"] == "T":
             print("The workspace received an empty enacted interaction")
@@ -104,6 +104,9 @@ class Workspace:
             else:
                 self.interaction_step = INTERACTION_STEP_IDLE
             return
+
+        # Increment the clock if the enacted interaction was properly received
+        self.clock += 1
 
         # Manage focus catch and lost
         if self.focus_xy is not None:

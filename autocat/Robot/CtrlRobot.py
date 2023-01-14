@@ -77,39 +77,22 @@ class CtrlRobot:
 
     def outcome_to_enacted_interaction(self):
         """ Computes the enacted interaction from the robot's outcome data."""
-        action_code = self.intended_interaction.get('action')
         is_focussed = ('focus_x' in self.intended_interaction)  # The focus point was sent to the robot
         enacted_interaction = json.loads(self.outcome_bytes)  # TODO Check sometimes it's None
+        if 'action' in enacted_interaction:
+            action_code = enacted_interaction['action']
+        else:
+            action_code = self.intended_interaction.get('action')
+
         enacted_interaction[KEY_EXPERIENCES] = []
 
         # If timeout then we consider that there was no enacted interaction
         if enacted_interaction['status'] == "T":
             return enacted_interaction
 
-        # Presupposed displacement of the robot relative to the environment
+        # Presupposed displacement of the robot associated with the action
         translation = self.workspace.actions[action_code].translation_speed * (enacted_interaction['duration1'] / 1000)
         yaw = self.workspace.actions[action_code].target_yaw
-
-        # if action_code == "1":
-        #     yaw = DEFAULT_YAW
-        # if action_code == "2":
-        #     translation = self.workspace.memory.body_memory.backward_speed * (enacted_interaction['duration1'] / 1000)
-        #     # translation = [i * enacted_interaction['duration1'] / 1000 for i in
-        #     #                self.workspace.memory.body_memory.backward_speed]
-        # if action_code == "3":
-        #     yaw = -DEFAULT_YAW
-        # if action_code == "4":
-        #     translation = self.workspace.memory.body_memory.leftward_speed * (enacted_interaction['duration1'] / 1000)
-        #     # translation = [i * enacted_interaction['duration1'] / 1000 for i in
-        #     #                self.workspace.memory.body_memory.leftward_speed]
-        # if action_code == "6":
-        #     translation = self.workspace.memory.body_memory.rightward_speed * (enacted_interaction['duration1'] / 1000)
-        #     # translation = [i * enacted_interaction['duration1'] / 1000 for i in
-        #     #                self.workspace.memory.body_memory.rightward_speed]
-        # if action_code == "8":
-        #     translation = self.workspace.memory.body_memory.forward_speed * (enacted_interaction['duration1'] / 1000)
-        #     # translation = [i * enacted_interaction['duration1'] / 1000 for i in
-        #     #                self.workspace.memory.body_memory.forward_speed]
 
         # If the robot returns yaw then use it
         if 'yaw' in enacted_interaction:
@@ -150,10 +133,10 @@ class CtrlRobot:
         echo_point = [0, 0, 0]
         if action_code in ['-', '*', '+', '8', '2', '1', '3', '4', '6']:
             if enacted_interaction['echo_distance'] < 10000:
-                echo_point[0] = int(ROBOT_HEAD_X + math.cos(math.radians(enacted_interaction['head_angle']))
-                                 * enacted_interaction['echo_distance'])
-                echo_point[1] = int(math.sin(math.radians(enacted_interaction['head_angle']))
-                                 * enacted_interaction['echo_distance'])
+                echo_point[0] = round(ROBOT_HEAD_X + math.cos(math.radians(enacted_interaction['head_angle']))
+                                      * enacted_interaction['echo_distance'])
+                echo_point[1] = round(math.sin(math.radians(enacted_interaction['head_angle']))
+                                      * enacted_interaction['echo_distance'])
                 enacted_interaction[KEY_EXPERIENCES].append((EXPERIENCE_ALIGNED_ECHO, *echo_point))
                 # Return the echo_xy to possibly use as focus
                 enacted_interaction['echo_xy'] = echo_point
