@@ -1,4 +1,3 @@
-import math
 from pyglet import shapes, gl
 from webcolors import name_to_rgb
 from autocat.Memory.EgocentricMemory.Experience import *
@@ -25,8 +24,6 @@ class PointOfInterest:
         else:
             self.clock = experience.clock
 
-        # self.is_selected = False
-
         if self.type == EXPERIENCE_PLACE:
             self.points = [30, 0, -20, -20, -20, 20]
             self.color = name_to_rgb("LightGreen")
@@ -34,8 +31,6 @@ class PointOfInterest:
                                                 ('c4B', 3 * (*self.color, self.opacity)))
         if self.type == EXPERIENCE_ALIGNED_ECHO:
             self.color = name_to_rgb("orange")
-            # self.shape = shapes.Circle(0, 0, 20, color=self.color, batch=self.batch)
-            # self.shape.group = group
             self.points = [-20, 0, -11, 20, 1, 27, 1, -27, -11, -20]
             self.shape = self.batch.add_indexed(5, gl.GL_TRIANGLES, self.group, [0, 1, 2, 0, 2, 3, 0, 3, 4],
                                                 ('v2i', self.points), ('c4B', 5 * (*self.color, self.opacity)))
@@ -44,8 +39,6 @@ class PointOfInterest:
             self.shape = shapes.Circle(0, 0, 7, color=self.color, batch=self.batch)
         if self.type == EXPERIENCE_CENTRAL_ECHO:
             self.color = name_to_rgb("sienna")
-            # self.shape = shapes.Circle(0, 0, 20, color=self.color, batch=self.batch)
-            # self.shape.group = group
             self.points = [-20, 0, -11, 20, 1, 27, 1, -27, -11, -20]
             self.shape = self.batch.add_indexed(5, gl.GL_TRIANGLES, self.group, [0, 1, 2, 0, 2, 3, 0, 3, 4],
                                                 ('v2i', self.points), ('c4B', 5 * (*self.color, self.opacity)))
@@ -130,20 +123,6 @@ class PointOfInterest:
         # Points of interest that use pyglet shapes have x and y (Circles)
         self.shape.x, self.shape.y = self.x, self.y
 
-        # Rotate the pyglet shapes (rectangles)
-        # if self.type == EXPERIENCE_FLOOR:
-        #     q = Quaternion(displacement_matrix)
-        #     if q.axis[2] > 0:  # Rotate around z axis upwards
-        #         self.shape.rotation += math.degrees(q.angle)
-        #     else:  # Rotate around z axis downward
-        #         self.shape.rotation += math.degrees(-q.angle)
-        # if self.type == EXPERIENCE_BLOCK or self.type == EXPERIENCE_IMPACT:
-        #     # Rotate and translate the other points of the triangle
-        #     v = matrix44.apply_to_vector(displacement_matrix, [self.shape.x2, self.shape.y2, 0])
-        #     self.shape.x2, self.shape.y2 = v[0], v[1]
-        #     v = matrix44.apply_to_vector(displacement_matrix, [self.shape.x3, self.shape.y3, 0])
-        #     self.shape.x3, self.shape.y3 = v[0], v[1]
-
     def delete(self):
         """ Delete the shape to remove it from the batch """
         self.shape.delete()  # Not sure whether it is necessary or not
@@ -153,11 +132,9 @@ class PointOfInterest:
         if math.dist([x, y], [self.x, self.y]) < 15:
             self.set_color('red')
             return True
-            # self.is_selected = True
         else:
             self.set_color()
             return False
-            # self.is_selected = False
 
     def update(self, displacement_matrix):
         """ Displace the point of interest to the position of its experience
@@ -172,12 +149,15 @@ class PointOfInterest:
         # the apply a relative displacement
         self.displace(displacement_matrix)
 
-    def fade(self):
+    def fade(self, clock):
         """Decrease the opacity of this point of interest"""
+        # Opacity 0 is transparent, 255 is opaque
         if self.experience is None:
             self.opacity = max(self.opacity - 10, 0)
         else:
-            self.opacity = int(min(self.experience.actual_durability * (255 / self.experience.durability), 255))
+            # self.opacity = int(min(self.experience.actual_durability * (255 / self.experience.durability), 255))
+            self.opacity = int(max(255 * (self.experience.durability - clock + self.experience.clock)
+                                   / self.experience.durability, 0))
         if hasattr(self.shape, 'vertices'):
             # Update the opacity
             self.set_color(None)

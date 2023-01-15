@@ -68,6 +68,7 @@ class Workspace:
             self.memory.allocentric_memory.robot_point = self.initial_robot_point
             # Update body memory and egocentric memory
             self.memory.update_and_add_experiences(self.enacted_interaction)
+            self.memory.decay(self.clock)
 
             # Call the integrator to create and update the phenomena.
             self.integrator.integrate()

@@ -39,19 +39,18 @@ class Affordance:
 
     def is_clockwise_from(self, other_affordance):
         """this affordance is in clockwise direction (within pi/4) from the other affordance in argument"""
-        this_angle = self.experience.absolute_direction_rad % (2 * math.pi)
-        other_angle = other_affordance.experience.absolute_direction_rad % (2 * math.pi)
-        if other_angle > this_angle:
-            if (other_angle - this_angle) <= math.pi / 4:  # Clockwise and within pi/4
-                print("Clockwise: new direction:", round(math.degrees(this_angle)),
-                      "°, from origin direction: ", round(math.degrees(other_angle)), "°")
+        new_affordance_angle = self.experience.absolute_direction_rad % (2 * math.pi)
+        origin_angle = other_affordance.experience.absolute_direction_rad % (2 * math.pi)
+        if origin_angle > new_affordance_angle:
+            if (origin_angle - new_affordance_angle) <= math.pi / 4:  # Clockwise and within pi/4
+                print("Clockwise: new direction:", round(math.degrees(new_affordance_angle)),
+                      "°, from origin direction: ", round(math.degrees(origin_angle)), "°")
                 return True
         else:
-            if (this_angle - other_angle) <= math.pi - math.pi / 4:
-                return False
-            else:
-                print("Clockwise: new direction:", round(math.degrees(this_angle)),
-                      "°, from origin direction: ", round(math.degrees(other_angle)), "°")
+            # new_affordance_angle > origin_angle
+            if (new_affordance_angle - origin_angle) >= 7 * math.pi / 4:  # 2pi-pi/4 = 315°
+                print("Clockwise: new direction:", round(math.degrees(new_affordance_angle)),
+                      "°, from origin direction: ", round(math.degrees(origin_angle)), "°")
                 return True
         return False
 

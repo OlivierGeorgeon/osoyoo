@@ -15,14 +15,15 @@ class Integrator:
         self.allocentric_memory = workspace.memory.allocentric_memory
         self.body_memory = workspace.memory.body_memory
         self.phenomena = []
-        self.last_used_id = -1  # Don't miss the first experience number 0
+        # self.last_used_id = -1  # Don't miss the first experience number 0
 
     def integrate(self):
         """Create phenomena and update cells in allocentric memory"""
 
         # The new experiences generated during this round
-        new_experiences = [e for e in self.egocentric_memory.experiences if (e.id > self.last_used_id)]
-        self.last_used_id = max([e.id for e in new_experiences], default=self.last_used_id)
+        # new_experiences = [e for e in self.egocentric_memory.experiences if (e.id > self.last_used_id)]
+        new_experiences = [e for e in self.egocentric_memory.experiences if (e.clock >= self.workspace.clock - 1)]
+        # self.last_used_id = max([e.id for e in new_experiences], default=self.last_used_id)
 
         # The new affordances
         new_affordances = []
@@ -43,7 +44,7 @@ class Integrator:
         self.create_phenomena(new_affordances)
 
         # Stores the remaining new affordances in allocentric memory
-        self.allocentric_memory.affordances.extend(new_affordances)
+        # self.allocentric_memory.affordances.extend(new_affordances) Not sure why
 
         return None
 

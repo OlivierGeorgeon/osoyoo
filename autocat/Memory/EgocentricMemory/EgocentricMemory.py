@@ -37,15 +37,18 @@ class EgocentricMemory:
         self.experiences += new_experiences
         self.experiences += new_central_echos
 
-    def tick(self):
-        for e in self.experiences:
-            e.tick()
-        # Remove the experiences when they are too old
-        to_remove = []
-        for e in self.experiences:
-            if e.actual_durability <= 0:
-                to_remove.append(e)
-        self.experiences = [x for x in self.experiences if x not in to_remove]
+    # def tick(self):
+    #     for e in self.experiences:
+    #         e.tick()
+    #     # Remove the experiences when they are too old
+    #     to_remove = []
+    #     for e in self.experiences:
+    #         if e.actual_durability <= 0:
+    #             to_remove.append(e)
+    #     self.experiences = [x for x in self.experiences if x not in to_remove]
+
+    def decay(self, clock):
+        self.experiences = [e for e in self.experiences if e.clock >= clock - e.durability]
 
     def revert_echoes_to_angle_distance(self, echo_list):
         """Convert echo interaction to triples (angle,distance,interaction)"""

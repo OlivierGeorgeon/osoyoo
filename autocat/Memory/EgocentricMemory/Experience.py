@@ -64,14 +64,14 @@ class Experience:
         self.rotation_matrix = matrix44.create_from_z_rotation(math.pi - angle_sensor)  # Don't know why need flip
 
         self.durability = durability
-        self.actual_durability = durability
-        self.tick_number = 0
+        # self.actual_durability = durability
+        # self.tick_number = 0
         self.id = experience_id
 
-    def tick(self):
-        """Updates the clock and decay of this interaction"""
-        self.tick_number += 1
-        self.actual_durability -= 1
+    # def tick(self):
+    #     """Updates the clock and decay of this interaction"""
+    #     self.tick_number += 1
+    #     self.actual_durability -= 1
 
     def displace(self, displacement_matrix):
         """Displace the experience by the displacement_matrix"""

@@ -24,7 +24,7 @@ class Memory:
         self.body_memory.set_head_direction_degree(enacted_interaction['head_angle'])
         self.body_memory.rotate_degree(enacted_interaction['yaw'], enacted_interaction['azimuth'])
 
-        self.egocentric_memory.tick()  # TODO Improve the decay mechanism in egocentric memory
+        # self.egocentric_memory.tick()
         self.egocentric_memory.update_and_add_experiences(enacted_interaction, self.body_memory.body_direction_rad)
 
         self.allocentric_memory.move(self.body_memory.body_direction_rad, enacted_interaction['translation'])
@@ -54,3 +54,7 @@ class Memory:
 
         # Mark the cells where is the robot
         self.allocentric_memory.place_robot(self.body_memory)
+
+    def decay(self, clock):
+        """Remove the experiences from egocentric memory when they are two lod"""
+        self.egocentric_memory.decay(clock)

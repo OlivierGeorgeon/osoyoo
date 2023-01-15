@@ -71,7 +71,7 @@ class CtrlBodyView:
 
         # Fade the points of interest
         for poi in self.points_of_interest:
-            poi.fade()
+            poi.fade(self.workspace.clock)
 
     def main(self, dt):
         """Called every frame. Update the body view"""

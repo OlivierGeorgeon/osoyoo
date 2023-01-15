@@ -114,9 +114,8 @@ class CtrlEgocentricView:
         self.add_point_of_interest(0, 0, EXPERIENCE_PLACE)
 
         # Make the points of interest fade out using the durability of the given interaction
-        # if len(self.points_of_interest) > 0:
         for poi_fade in self.points_of_interest:
-            poi_fade.fade()
+            poi_fade.fade(self.workspace.clock)
 
     def create_poi_focus(self):
         """Create a point of interest corresponding to the focus"""
