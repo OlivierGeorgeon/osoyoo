@@ -49,7 +49,7 @@ class Phenomenon:
         nearest_affordance = self.reference_affordance(affordance)
         reference_affordance_point = nearest_affordance.point
         # Reference point based on similarity of affordances TODO choose between nearest or similar
-        similar_affordance_points = numpy.array([a.point for a in self.affordances if a.similar_to(affordance)])
+        similar_affordance_points = numpy.array([a.point for a in self.affordances if a.is_similar_to(affordance)])
         if similar_affordance_points.size > 0:
             print("Correct from similar affordances")
             reference_affordance_point = similar_affordance_points.mean(axis=0)
@@ -60,18 +60,20 @@ class Phenomenon:
         # If the new affordance is attributed to this phenomenon
         if numpy.linalg.norm(delta) < PHENOMENON_DELTA:
             # If the affordance is similar to the origin affordance (near position and direction)
-            if affordance.similar_to(self.origin_affordance):
-                position_correction = -relative_affordance_point  # The affordance in (0,0) and correct the robot's position
-                # If a new tour has been completed then increase confidence
-                if self.tour_started:
-                    self.tour_started = False
-                    self.nb_tour += 1
-                    self.confidence = min(self.confidence + 0.2, 1.)
+            if affordance.is_similar_to(self.origin_affordance):
+                # The affordance in (0,0) and correct the robot's position
+                position_correction = -relative_affordance_point
             else:
                 position_correction = numpy.array(self.confidence * delta, dtype=numpy.int16)
-                # Check if a new tour has started when reaching opposite direction
-                if affordance.opposite_to(self.origin_affordance):
-                    self.tour_started = True
+
+            # Check if a new tour has started when reaching opposite direction
+            if affordance.is_opposite_to(self.origin_affordance):
+                self.tour_started = True
+            # If a new tour has been completed then increase confidence
+            if self.tour_started and affordance.is_clockwise_from(self.origin_affordance):
+                self.tour_started = False
+                self.nb_tour += 1
+                self.confidence = min(self.confidence + 0.2, 1.)
 
             # Move the new affordance's position to relative reference
             affordance.point = relative_affordance_point + position_correction
@@ -109,7 +111,7 @@ class Phenomenon:
                 # if numpy.linalg.norm(a.point - head_point) < numpy.linalg.norm(affordance.point - head_point):
                 #     self.affordances.remove(a)
                 #     break  # Remove only the first similar affordance found
-                if a.similar_to(affordance):
+                if a.is_similar_to(affordance):
                     self.affordances.remove(a)
                     break  # Remove only the first similar affordance found
             print("Prune:", nb_affordance - len(self.affordances), "affordances removed.")

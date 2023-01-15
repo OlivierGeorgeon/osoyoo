@@ -3,9 +3,9 @@ from pyrr import matrix44
 from ..Memory.EgocentricMemory.Experience import EXPERIENCE_ALIGNED_ECHO
 from ..Utils import assert_almost_equal_angles
 
-AFFORDANCE_MAX_DISTANCE = 300  # (mm) Max distance within which affordances are similar
-AFFORDANCE_MAX_DIRECTION = 15  # (degrees) Max angle within which affordances are similar
-AFFORDANCE_MIN_OPPOSITE_DIRECTION = 160  # (degrees) Min angle to tell affordances are in opposite directions
+MAX_SIMILAR_DISTANCE = 300  # (mm) Max distance within which affordances are similar
+MAX_SIMILAR_DIRECTION = 15  # (degrees) Max angle within which affordances are similar
+MIN_OPPOSITE_DIRECTION = 135  # (degrees) Min angle to tell affordances are in opposite directions
 
 
 class Affordance:
@@ -15,26 +15,44 @@ class Affordance:
         self.point = point
         self.experience = experience
 
-    def similar_to(self, other_affordance):
+    def is_similar_to(self, other_affordance):
         """Affordances are similar if they have similar point and their experience have similar absolute direction"""
-        if math.dist(self.point, other_affordance.point) < AFFORDANCE_MAX_DISTANCE:
+        if math.dist(self.point, other_affordance.point) < MAX_SIMILAR_DISTANCE:
             if assert_almost_equal_angles(self.experience.absolute_direction_rad,
                                           other_affordance.experience.absolute_direction_rad,
-                                          AFFORDANCE_MAX_DIRECTION):
+                                          MAX_SIMILAR_DIRECTION):
                 print("Near affordance: point 1:", self.point, ", point 2:", other_affordance.point,
                       ", direction 1: ", round(math.degrees(self.experience.absolute_direction_rad)),
                       "°, direction 2: ", round(math.degrees(other_affordance.experience.absolute_direction_rad)), "°")
                 return True
         return False
 
-    def opposite_to(self, other_affordance):
-        """Affordances are opposite to if their absolute directions are near to opposite directions"""
+    def is_opposite_to(self, other_affordance):
+        """Affordances are opposite to if their absolute directions are not close to each other"""
         if not assert_almost_equal_angles(self.experience.absolute_direction_rad,
                                           other_affordance.experience.absolute_direction_rad,
-                                          AFFORDANCE_MIN_OPPOSITE_DIRECTION):
+                                          MIN_OPPOSITE_DIRECTION):
             print("Opposite affordance: direction 1:", round(math.degrees(self.experience.absolute_direction_rad)),
                   "°, direction 2: ", round(math.degrees(other_affordance.experience.absolute_direction_rad)), "°")
             return True
+        return False
+
+    def is_clockwise_from(self, other_affordance):
+        """this affordance is in clockwise direction (within pi/4) from the other affordance in argument"""
+        this_angle = self.experience.absolute_direction_rad % (2 * math.pi)
+        other_angle = other_affordance.experience.absolute_direction_rad % (2 * math.pi)
+        if other_angle > this_angle:
+            if (other_angle - this_angle) <= math.pi / 4:  # Clockwise and within pi/4
+                print("Clockwise: new direction:", round(math.degrees(this_angle)),
+                      "°, from origin direction: ", round(math.degrees(other_angle)), "°")
+                return True
+        else:
+            if (this_angle - other_angle) <= math.pi - math.pi / 4:
+                return False
+            else:
+                print("Clockwise: new direction:", round(math.degrees(this_angle)),
+                      "°, from origin direction: ", round(math.degrees(other_angle)), "°")
+                return True
         return False
 
     def sensor_triangle(self):
