@@ -1,5 +1,6 @@
 import json
 import threading
+import numpy as np
 from .RobotDefine import RETREAT_DISTANCE, COMPASS_X_OFFSET, COMPASS_Y_OFFSET, RETREAT_DISTANCE_Y, \
     LINE_X, ROBOT_FRONT_X, ROBOT_FRONT_Y
 from .WifiInterface import WifiInterface
@@ -90,11 +91,11 @@ class CtrlRobot:
         if enacted_interaction['status'] == "T":
             return enacted_interaction
 
-        # Presupposed displacement of the robot associated with the action
+        # Translation integrated from the action's speed multiplied by the duration1
         translation = self.workspace.actions[action_code].translation_speed * (enacted_interaction['duration1'] / 1000)
-        yaw = self.workspace.actions[action_code].target_yaw
 
-        # If the robot returns yaw then use it
+        # Yaw presupposed or returned by the robot
+        yaw = self.workspace.actions[action_code].target_yaw
         if 'yaw' in enacted_interaction:
             yaw = enacted_interaction['yaw']
         else:
@@ -105,18 +106,17 @@ class CtrlRobot:
             enacted_interaction['azimuth'] = 0
 
         # If the robot returns compass_x and compass_y then recompute the azimuth
+        # (They are equal unless COMPASS_X_OFFSET or COMPASS_X_OFFSET are non zero)
         if 'compass_x' in enacted_interaction:
             # Subtract the offset from robot_define.py
             enacted_interaction['compass_x'] -= COMPASS_X_OFFSET
             enacted_interaction['compass_y'] -= COMPASS_Y_OFFSET
             azimuth = math.degrees(math.atan2(enacted_interaction['compass_y'], enacted_interaction['compass_x']))
             # The compass point indicates the south so we must rotate it of 180° to obtain the azimuth
-            azimuth += 180
-            if azimuth >= 360:
-                azimuth -= 360
-            # Override the azimuth returned by the robot.
-            # (They are equal unless COMPASS_X_OFFSET or COMPASS_X_OFFSET are non zero)
-            enacted_interaction['azimuth'] = int(azimuth)
+            azimuth = round(azimuth + 180) % 360
+            # if azimuth >= 360:
+            #    azimuth -= 360
+            enacted_interaction['azimuth'] = azimuth
 
         # Interaction Floor line
         if enacted_interaction['floor'] > 0:
@@ -141,7 +141,8 @@ class CtrlRobot:
                 # Return the echo_xy to possibly use as focus
                 enacted_interaction['echo_xy'] = echo_point
 
-        # Interaction shock
+        # Interaction impact
+        # (The forward translation is already correct since it is integrated during duration1)
         if KEY_IMPACT in enacted_interaction and action_code == ACTION_FORWARD:
             if enacted_interaction[KEY_IMPACT] == 0b01:  # Impact on the right
                 enacted_interaction[KEY_EXPERIENCES].append((EXPERIENCE_IMPACT, ROBOT_FRONT_X, -ROBOT_FRONT_Y))
@@ -150,14 +151,14 @@ class CtrlRobot:
             if enacted_interaction[KEY_IMPACT] == 0b10:  # Impact on the left
                 enacted_interaction[KEY_EXPERIENCES].append((EXPERIENCE_IMPACT, ROBOT_FRONT_X, ROBOT_FRONT_Y))
 
-        # Interaction block
+        # Interaction blocked
         if 'blocked' in enacted_interaction and action_code == ACTION_FORWARD:
             if enacted_interaction['blocked']:
                 enacted_interaction[KEY_EXPERIENCES].append((EXPERIENCE_BLOCK, ROBOT_FRONT_X, 0))
-                translation[0] = 0  # Cancel forward translation
+                translation = np.array([0, 0, 0], dtype=float)  # Reset the translation
 
         # The estimated displacement of the environment relative to the robot caused by this interaction
-        translation_matrix = matrix44.create_from_translation([-translation[0], -translation[1], 0])
+        translation_matrix = matrix44.create_from_translation(-translation)
         rotation_matrix = matrix44.create_from_z_rotation(math.radians(yaw))
         displacement_matrix = matrix44.multiply(rotation_matrix, translation_matrix)
 
@@ -184,12 +185,6 @@ class CtrlRobot:
                         if action_code in [ACTION_FORWARD, ACTION_BACKWARD]:  # Maybe not necessary
                             self.workspace.actions[action_code].translation_speed = \
                                 (self.workspace.actions[action_code].translation_speed + translation) / 2
-                        # if action_code == '8':
-                        #     self.workspace.memory.body_memory.forward_speed = \
-                        #         (self.workspace.memory.body_memory.forward_speed + translation) / 2
-                        # if action_code == '2':
-                        #     self.workspace.memory.body_memory.backward_speed = \
-                        #         (self.workspace.memory.body_memory.backward_speed + translation) / 2
                     # If the head is sideways then correct lateral displacements
                     if 60 < enacted_interaction['head_angle'] or enacted_interaction['head_angle'] < -60:
                         translation += prediction_error_focus
@@ -198,13 +193,6 @@ class CtrlRobot:
                         if action_code in [ACTION_LEFTWARD, ACTION_RIGHTWARD]:
                             self.workspace.actions[action_code].translation_speed = \
                                 (self.workspace.actions[action_code].translation_speed + translation) / 2
-                        # if action_code == '4':
-                        #     self.workspace.memory.body_memory.leftward_speed = \
-                        #         (self.workspace.memory.body_memory.leftward_speed + translation) / 2
-                        # if action_code == '6':
-                        #     self.workspace.memory.body_memory.rightward_speed = \
-                        #         (self.workspace.memory.body_memory.rightward_speed + translation) / 2
-
             else:
                 # The focus has been lost
                 enacted_interaction['lost_focus'] = True

@@ -6,8 +6,11 @@ from .Memory.Memory import Memory
 from .Integrator.Integrator import Integrator
 from .Utils import rotate_vector_z
 
-CONTROL_MODE_AUTOMATIC = "auto"
-CONTROL_MODE_MANUAL = "manual"
+DECIDER_KEY_CIRCLE = "A"  # Automatic mode: controlled by AgentCircle
+DECIDER_KEY_USER = "M"  # Manual mode : controlled by the user
+
+ENGAGEMENT_KEY_ROBOT = "R"  # The application controls the robot
+ENGAGEMENT_KEY_IMAGINARY = "I"  # The application imagines the interaction
 
 INTERACTION_STEP_IDLE = 0
 INTERACTION_STEP_INTENDING = 1
@@ -32,7 +35,8 @@ class Workspace:
         self.intended_interaction = None
         self.enacted_interaction = {}
 
-        self.control_mode = CONTROL_MODE_MANUAL
+        self.decider_mode = DECIDER_KEY_USER
+        self.engagement_mode = ENGAGEMENT_KEY_ROBOT
         self.interaction_step = INTERACTION_STEP_IDLE
 
         self.focus_xy = None
@@ -50,7 +54,7 @@ class Workspace:
         organize the generation of the intended_interaction and the processing of the enacted_interaction."""
         # If ready and automatic, ask the decider for a new intended interaction
         if self.interaction_step == INTERACTION_STEP_IDLE:
-            if self.control_mode == CONTROL_MODE_AUTOMATIC:
+            if self.decider_mode == DECIDER_KEY_CIRCLE:
                 self.intended_interaction = self.decider.propose_intended_interaction(self.enacted_interaction)
                 self.interaction_step = INTERACTION_STEP_INTENDING
 
@@ -100,7 +104,7 @@ class Workspace:
             self.memory.body_memory.body_direction_rad = self.initial_body_direction_rad  # Retrieve the direction
             self.memory.allocentric_memory.robot_point = self.initial_robot_point.copy()
             # If CONTROL_MODE_AUTOMATIC resend the same intended interaction unless the user has set another one
-            if self.control_mode == CONTROL_MODE_AUTOMATIC:
+            if self.decider_mode == DECIDER_KEY_CIRCLE:
                 self.interaction_step = INTERACTION_STEP_INTENDING
             else:
                 self.interaction_step = INTERACTION_STEP_IDLE
@@ -133,11 +137,12 @@ class Workspace:
 
     def process_user_key(self, user_key):
         """Process the keypress on the view windows (called by the views)"""
-        if user_key.upper() == "A":
-            self.control_mode = CONTROL_MODE_AUTOMATIC
-        elif user_key.upper() == "M":
-            self.control_mode = CONTROL_MODE_MANUAL
+        if user_key.upper() in [DECIDER_KEY_CIRCLE, DECIDER_KEY_USER]:
+            self.decider_mode = user_key.upper()
+        elif user_key.upper() in [ENGAGEMENT_KEY_ROBOT, ENGAGEMENT_KEY_IMAGINARY]:
+            self.engagement_mode = user_key.upper()
         else:
+            # Other keys are considered actions and sent to the robot
             if self.interaction_step == INTERACTION_STEP_IDLE:
                 self.intended_interaction = {"action": user_key}
                 if self.focus_xy is not None:

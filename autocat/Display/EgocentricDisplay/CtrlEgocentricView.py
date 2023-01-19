@@ -72,12 +72,6 @@ class CtrlEgocentricView:
         """Updates the robot's body to display by the egocentric view"""
         self.view.robot.rotate_head(self.workspace.memory.body_memory.head_direction_degree())
         self.view.azimuth = self.workspace.memory.body_memory.body_azimuth()
-        self.view.label_speed.text = "Forward speed x: " \
-            + str(int(self.workspace.actions[ACTION_FORWARD].translation_speed[0])) + "mm/s, y: " \
-            + str(int(self.workspace.actions[ACTION_FORWARD].translation_speed[1])) + "mm/s."
-        self.view.label_left_speed.text = "Leftward speed x: " \
-            + str(int(self.workspace.actions[ACTION_LEFTWARD].translation_speed[0])) + "mm/s, y: " \
-            + str(int(self.workspace.actions[ACTION_LEFTWARD].translation_speed[1])) + "mm/s."
 
     def update_points_of_interest(self):
         """Retrieve all new experiences from memory, create and update the corresponding points of interest"""

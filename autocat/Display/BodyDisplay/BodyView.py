@@ -34,8 +34,16 @@ class BodyView(InteractiveDisplay):
         self.body_rotation_matrix = matrix44.create_identity()  # The matrix representing the robot's body rotation
 
         # Define the text area at the bottom of the view
-        self.label = pyglet.text.Label('', font_name='Verdana', font_size=10, x=10, y=10)
+        self.label_batch = pyglet.graphics.Batch()
+        self.label_clock = pyglet.text.Label('Clock: ', font_name='Verdana', font_size=10, x=10, y=50)
+        self.label_clock.color = (0, 0, 0, 255)
+        self.label_clock.batch = self.label_batch
+        self.label = pyglet.text.Label('', font_name='Verdana', font_size=10, x=10, y=30)
         self.label.color = (0, 0, 0, 255)
+        self.label.batch = self.label_batch
+        self.label_speed = pyglet.text.Label('Speed: ', font_name='Verdana', font_size=10, x=10, y=10)
+        self.label_speed.color = (0, 0, 0, 255)
+        self.label_speed.batch = self.label_batch
 
     def on_draw(self):
         """ Drawing the view """
@@ -61,7 +69,8 @@ class BodyView(InteractiveDisplay):
         # Stack the projection of the text
         glOrtho(0, self.width, 0, self.height, -1, 1)
         # Draw the text in the bottom left corner
-        self.label.draw()
+        # self.label.draw()
+        self.label_batch.draw()
 
     def on_mouse_press(self, x, y, button, modifiers):
         """ Computing the position of the mouse click relative to the robot in mm and degrees """
