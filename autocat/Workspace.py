@@ -1,10 +1,11 @@
 import numpy as np
+import math
+from pyrr import matrix44
 
 from .Decider.AgentCircle import AgentCircle
 from .Decider.Action import create_actions
 from .Memory.Memory import Memory
 from .Integrator.Integrator import Integrator
-from .Utils import rotate_vector_z
 
 DECIDER_KEY_CIRCLE = "A"  # Automatic mode: controlled by AgentCircle
 DECIDER_KEY_USER = "M"  # Manual mode : controlled by the user
@@ -13,10 +14,11 @@ ENGAGEMENT_KEY_ROBOT = "R"  # The application controls the robot
 ENGAGEMENT_KEY_IMAGINARY = "I"  # The application imagines the interaction
 
 INTERACTION_STEP_IDLE = 0
-INTERACTION_STEP_INTENDING = 1
-INTERACTION_STEP_ENACTING = 2
-INTERACTION_STEP_INTEGRATING = 3
-INTERACTION_STEP_REFRESHING = 4
+INTERACTION_STEP_ENGAGING = 1
+INTERACTION_STEP_INTENDING = 2
+INTERACTION_STEP_ENACTING = 3
+INTERACTION_STEP_INTEGRATING = 4
+INTERACTION_STEP_REFRESHING = 5
 
 
 class Workspace:
@@ -49,12 +51,24 @@ class Workspace:
     def main(self, dt):
         """The main handler of the interaction cycle:
         organize the generation of the intended_interaction and the processing of the enacted_interaction."""
-        # IDLE: If ready and automatic, ask the decider for a new intended interaction
+        # IDLE: Ready to choose the next intended interaction
         if self.interaction_step == INTERACTION_STEP_IDLE:
             if self.decider_mode == DECIDER_KEY_CIRCLE:
+                # The decider chooses the next interaction
                 self.intended_interaction = self.decider.propose_intended_interaction(self.enacted_interaction)
-                self.interaction_step = INTERACTION_STEP_INTENDING
+                self.interaction_step = INTERACTION_STEP_ENGAGING
             # Case DECIDER_KEY_USER is handled by self.process_user_key()
+
+        # ENGAGING: Preparing the simulation and the enaction
+        if self.interaction_step == INTERACTION_STEP_ENGAGING:
+            self.actions[self.intended_interaction['action']].is_simulating = True
+            self.initial_body_direction_rad = self.memory.body_memory.body_direction_rad  # Memorize the direction
+            self.initial_robot_point = self.memory.allocentric_memory.robot_point.copy()
+            self.intended_interaction["clock"] = self.clock
+            if self.engagement_mode == ENGAGEMENT_KEY_ROBOT:
+                self.interaction_step = INTERACTION_STEP_INTENDING
+            else:
+                self.interaction_step = INTERACTION_STEP_ENACTING
 
         # INTENDING: is handled by CtrlRobot
 
@@ -62,14 +76,15 @@ class Workspace:
         if self.interaction_step == INTERACTION_STEP_ENACTING:
             if self.actions[self.intended_interaction['action']].is_simulating:
                 self.actions[self.intended_interaction['action']].simulate(self.memory, dt)
-            # self.memory.body_memory.body_direction_rad += \
-            #     self.actions[self.intended_interaction['action']].rotation_speed_rad * dt * SIMULATION_TURN_RATIO
-            # self.memory.allocentric_memory.robot_point += \
-            #     rotate_vector_z(self.actions[self.intended_interaction['action']].translation_speed * dt
-            #                     * SIMULATION_SPEED_RATIO, self.memory.body_memory.body_direction_rad)
+            else:
+                if self.engagement_mode == ENGAGEMENT_KEY_IMAGINARY:
+                    # Compute an imaginary enacted_interaction
+                    self.imagine()
+                    self.interaction_step = INTERACTION_STEP_INTEGRATING
 
         # INTEGRATING: the new enacted interaction
         if self.interaction_step == INTERACTION_STEP_INTEGRATING:
+            # if self.engagement_mode == ENGAGEMENT_KEY_ROBOT:
             self.memory.body_memory.body_direction_rad = self.initial_body_direction_rad  # Retrieve the direction
             self.memory.allocentric_memory.robot_point = self.initial_robot_point
             # Update body memory and egocentric memory
@@ -92,10 +107,10 @@ class Workspace:
         """
         if self.interaction_step == INTERACTION_STEP_INTENDING:
             self.interaction_step = INTERACTION_STEP_ENACTING
-            self.actions[self.intended_interaction['action']].is_simulating = True
-            self.initial_body_direction_rad = self.memory.body_memory.body_direction_rad  # Memorize the direction
-            self.initial_robot_point = self.memory.allocentric_memory.robot_point.copy()
-            self.intended_interaction["clock"] = self.clock
+            # self.actions[self.intended_interaction['action']].is_simulating = True
+            # self.initial_body_direction_rad = self.memory.body_memory.body_direction_rad  # Memorize the direction
+            # self.initial_robot_point = self.memory.allocentric_memory.robot_point.copy()
+            # self.intended_interaction["clock"] = self.clock
             return self.intended_interaction
 
         return None
@@ -156,4 +171,26 @@ class Workspace:
                 if self.focus_xy is not None:
                     self.intended_interaction['focus_x'] = int(self.focus_xy[0])
                     self.intended_interaction['focus_y'] = int(self.focus_xy[1])
-                self.interaction_step = INTERACTION_STEP_INTENDING
+                self.interaction_step = INTERACTION_STEP_ENGAGING
+
+    def imagine(self):
+        self.enacted_interaction = self.intended_interaction.copy()
+        action_code = self.intended_interaction['action']
+
+        # displacement
+        translation = self.actions[action_code].translation_speed
+        yaw = self.actions[action_code].target_yaw
+
+        translation_matrix = matrix44.create_from_translation(-translation)
+        rotation_matrix = matrix44.create_from_z_rotation(math.radians(yaw))
+        displacement_matrix = matrix44.multiply(rotation_matrix, translation_matrix)
+
+        self.enacted_interaction['translation'] = translation
+        self.enacted_interaction['yaw'] = yaw
+        self.enacted_interaction['azimuth'] = 0  # Is computed by bodymemory
+        self.enacted_interaction['displacement_matrix'] = displacement_matrix
+        self.enacted_interaction['head_angle'] = 0
+        self.enacted_interaction['points'] = []
+
+        print("intended interaction", self.intended_interaction)
+        print("enacted interaction", self.enacted_interaction)
