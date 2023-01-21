@@ -33,11 +33,6 @@ class CtrlBodyView:
     def update_body_view(self):
         """Add and update points of interest from the latest enacted interaction """
 
-        # # If timeout then no body view update
-        # if self.workspace.enacted_interaction['status'] == "T":
-        #     print("No body memory update")
-        #     return
-
         # Update the position of the robot
         self.view.robot.rotate_head(self.workspace.memory.body_memory.head_direction_degree())
         azimuth = self.workspace.memory.body_memory.body_azimuth()
@@ -45,7 +40,7 @@ class CtrlBodyView:
 
         self.view.label.text = "Azimuth: " + str(azimuth) + "°"
 
-            # Rotate the previous compass points so they remain at the south of the view
+        # Rotate the previous compass points so they remain at the south of the view
         yaw = self.workspace.enacted_interaction['yaw']
         displacement_matrix = matrix44.create_from_z_rotation(math.radians(yaw))
         for poi in [p for p in self.points_of_interest if p.type == POINT_COMPASS]:

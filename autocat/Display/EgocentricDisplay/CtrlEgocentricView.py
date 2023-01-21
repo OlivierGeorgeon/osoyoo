@@ -76,17 +76,9 @@ class CtrlEgocentricView:
     def update_points_of_interest(self):
         """Retrieve all new experiences from memory, create and update the corresponding points of interest"""
 
-        # If timeout then no egocentric view update
-        # if self.workspace.enacted_interaction['status'] == "T":
-        #     print("No ego memory update")
-        #     return
-
         # Create the new points of interest from the new experiences
-        # new_experiences = [elem for elem in self.egocentric_memory.experiences if elem.id > self.last_used_id]
         new_experiences = [e for e in self.egocentric_memory.experiences if (e.clock >= self.workspace.clock - 1)]
         for e in new_experiences:
-            # if e.id > self.last_used_id:
-            #     self.last_used_id = max(e.id, self.last_used_id)
             poi = self.create_point_of_interest(e)
             self.points_of_interest.append(poi)
 
@@ -131,10 +123,8 @@ class CtrlEgocentricView:
 
     def main(self, dt):
         """Called every frame. Update the egocentric view"""
-        # if self.workspace.flag_for_view_refresh:
         if self.workspace.interaction_step == INTERACTION_STEP_REFRESHING:
             self.update_points_of_interest()
-            # self.workspace.flag_for_view_refresh = False  # Reset by CtrlBodyView
 
         # Update every frame to simulate the robot's displacement
         self.update_body_robot()

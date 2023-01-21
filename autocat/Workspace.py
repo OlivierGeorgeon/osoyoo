@@ -18,9 +18,6 @@ INTERACTION_STEP_ENACTING = 2
 INTERACTION_STEP_INTEGRATING = 3
 INTERACTION_STEP_REFRESHING = 4
 
-SIMULATION_SPEED_RATIO = 0.5   # The simulation speed as slower than the real speed because ...
-SIMULATION_TURN_RATION = 0.75  # ... it covers the wifi communication time
-
 
 class Workspace:
     """The Workspace supervises the interaction cycle. It produces the intended_interaction
@@ -52,21 +49,26 @@ class Workspace:
     def main(self, dt):
         """The main handler of the interaction cycle:
         organize the generation of the intended_interaction and the processing of the enacted_interaction."""
-        # If ready and automatic, ask the decider for a new intended interaction
+        # IDLE: If ready and automatic, ask the decider for a new intended interaction
         if self.interaction_step == INTERACTION_STEP_IDLE:
             if self.decider_mode == DECIDER_KEY_CIRCLE:
                 self.intended_interaction = self.decider.propose_intended_interaction(self.enacted_interaction)
                 self.interaction_step = INTERACTION_STEP_INTENDING
+            # Case DECIDER_KEY_USER is handled by self.process_user_key()
 
-        # While enacting, update body memory
+        # INTENDING: is handled by CtrlRobot
+
+        # ENACTING: update body memory until CtrlRobot returns the outcome
         if self.interaction_step == INTERACTION_STEP_ENACTING:
-            self.memory.body_memory.body_direction_rad += \
-                self.actions[self.intended_interaction['action']].rotation_speed_rad * dt * SIMULATION_TURN_RATION
-            self.memory.allocentric_memory.robot_point += \
-                rotate_vector_z(self.actions[self.intended_interaction['action']].translation_speed * dt
-                                * SIMULATION_SPEED_RATIO, self.memory.body_memory.body_direction_rad)
+            if self.actions[self.intended_interaction['action']].is_simulating:
+                self.actions[self.intended_interaction['action']].simulate(self.memory, dt)
+            # self.memory.body_memory.body_direction_rad += \
+            #     self.actions[self.intended_interaction['action']].rotation_speed_rad * dt * SIMULATION_TURN_RATIO
+            # self.memory.allocentric_memory.robot_point += \
+            #     rotate_vector_z(self.actions[self.intended_interaction['action']].translation_speed * dt
+            #                     * SIMULATION_SPEED_RATIO, self.memory.body_memory.body_direction_rad)
 
-        # Integrate the new enacted interaction
+        # INTEGRATING: the new enacted interaction
         if self.interaction_step == INTERACTION_STEP_INTEGRATING:
             self.memory.body_memory.body_direction_rad = self.initial_body_direction_rad  # Retrieve the direction
             self.memory.allocentric_memory.robot_point = self.initial_robot_point
@@ -82,12 +84,15 @@ class Workspace:
 
             self.interaction_step = INTERACTION_STEP_REFRESHING
 
+        # REFRESHING: is handle by views and reset by CtrlPhenomenonDisplay
+
     def get_intended_interaction(self):
         """If the workspace has a new intended interaction then return it, otherwise return None
         Reset the intended_interaction. (Called by CtrlRobot)
         """
         if self.interaction_step == INTERACTION_STEP_INTENDING:
             self.interaction_step = INTERACTION_STEP_ENACTING
+            self.actions[self.intended_interaction['action']].is_simulating = True
             self.initial_body_direction_rad = self.memory.body_memory.body_direction_rad  # Memorize the direction
             self.initial_robot_point = self.memory.allocentric_memory.robot_point.copy()
             self.intended_interaction["clock"] = self.clock
@@ -103,10 +108,13 @@ class Workspace:
             print("The workspace received an empty enacted interaction")
             self.memory.body_memory.body_direction_rad = self.initial_body_direction_rad  # Retrieve the direction
             self.memory.allocentric_memory.robot_point = self.initial_robot_point.copy()
-            # If CONTROL_MODE_AUTOMATIC resend the same intended interaction unless the user has set another one
+
+            # Reset the interaction step
             if self.decider_mode == DECIDER_KEY_CIRCLE:
+                # If automatic mode then resend the same intended interaction unless the user has set another one
                 self.interaction_step = INTERACTION_STEP_INTENDING
             else:
+                # If user mode then abort the enaction and wait for a new action but don't increment the clock
                 self.interaction_step = INTERACTION_STEP_IDLE
             return
 

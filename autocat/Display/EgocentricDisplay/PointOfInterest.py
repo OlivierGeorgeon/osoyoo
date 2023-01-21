@@ -155,20 +155,10 @@ class PointOfInterest:
 
     def fade(self, clock):
         """Decrease the opacity of this point of interest as it gets older"""
-        # Opacity 0 is transparent, 255 is opaque
-        # if self.experience is None:
-        #     self.opacity = max(self.opacity - 10, 0)
-        # else:
-        #     self.opacity = int(max(255 * (self.experience.durability - clock + self.experience.clock)
-        #                            / self.experience.durability, 0))
+        # Opacity: 0 is transparent, 255 is opaque
         self.opacity = int(max(255 * (self.durability - clock + self.clock) / self.durability, 0))
         # Reset the opacity of the shape
         self.set_color(None)
-        # if hasattr(self.shape, 'vertices'):
-        #     # Update the opacity
-        #     self.set_color(None)
-        # else:
-        #     self.shape.opacity = self.opacity
         # When the durability is elapsed, delete the shape from the batch
         if clock > self.clock + self.durability:
             self.shape.delete()
