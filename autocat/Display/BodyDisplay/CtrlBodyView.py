@@ -27,23 +27,25 @@ class CtrlBodyView:
         """ Adding a point of interest to the view """
         if group is None:
             group = self.view.foreground
-        point_of_interest = PointOfInterest(x, y, self.view.batch, group, point_type, self.workspace.clock, experience=None)
+        point_of_interest = PointOfInterest(x, y, self.view.batch, group, point_type, self.workspace.clock)
         self.points_of_interest.append(point_of_interest)
 
     def update_body_view(self):
         """Add and update points of interest from the latest enacted interaction """
 
-        # If timeout then no body view update
-        if self.workspace.enacted_interaction['status'] == "T":
-            print("No body memory update")
-            return
+        # # If timeout then no body view update
+        # if self.workspace.enacted_interaction['status'] == "T":
+        #     print("No body memory update")
+        #     return
 
         # Update the position of the robot
         self.view.robot.rotate_head(self.workspace.memory.body_memory.head_direction_degree())
         azimuth = self.workspace.memory.body_memory.body_azimuth()
         self.view.body_rotation_matrix = self.workspace.memory.body_memory.body_direction_matrix()
 
-        # Rotate the previous compass points so they remain at the south of the view
+        self.view.label.text = "Azimuth: " + str(azimuth) + "°"
+
+            # Rotate the previous compass points so they remain at the south of the view
         yaw = self.workspace.enacted_interaction['yaw']
         displacement_matrix = matrix44.create_from_z_rotation(math.radians(yaw))
         for poi in [p for p in self.points_of_interest if p.type == POINT_COMPASS]:
@@ -56,27 +58,27 @@ class CtrlBodyView:
             self.add_point_of_interest(self.workspace.enacted_interaction['compass_x'],
                                        self.workspace.enacted_interaction['compass_y'], POINT_AZIMUTH,
                                        self.view.background)
-            self.view.label.text = "Azimuth compass: " + str(self.workspace.enacted_interaction['azimuth']) + "°"
+            self.view.label.text += ", compass: " + str(self.workspace.enacted_interaction['azimuth']) + "°"
         else:
-            # azimuth = self.workspace.memory.body_memory.body_azimuth()
             x = 300 * math.cos(math.radians(azimuth + 180))
             y = 300 * math.sin(math.radians(azimuth + 180))
             self.add_point_of_interest(x, y, POINT_COMPASS)
             x = 330 * math.cos(math.radians(azimuth + 180))
             y = 330 * math.sin(math.radians(azimuth + 180))
             self.add_point_of_interest(x, y, POINT_AZIMUTH, self.view.background)
-            self.view.label.text = "Azimuth compass: None"
-
-        self.view.label.text += ", corrected: " + str(azimuth) + "°"
 
         # Fade the points of interest
         for poi in self.points_of_interest:
             poi.fade(self.workspace.clock)
+        # Keep only the points of interest during their durability
+        self.points_of_interest = [p for p in self.points_of_interest if p.clock + p.durability > self.workspace.clock]
 
     def main(self, dt):
         """Called every frame. Update the body view"""
         if self.workspace.interaction_step == INTERACTION_STEP_ENACTING:
-            self.view.label_clock.text = "Clock: " + str(self.workspace.clock)
+            self.view.label_clock.text = "Clock: " + str(self.workspace.clock) \
+                                         + ", Decider: " + self.workspace.decider_mode \
+                                         + ", Engagement: " + self.workspace.engagement_mode
             action_code = self.workspace.intended_interaction['action']
             rotation_speed = "{:.2f}".format(math.degrees(self.workspace.actions[action_code].rotation_speed_rad))
             self.view.label_speed.text = "Speed x: " \

@@ -21,8 +21,10 @@ class PointOfInterest:
         self.color = name_to_rgb("gray")
         if experience is None:
             self.clock = clock
+            self.durability = 10
         else:
             self.clock = experience.clock
+            self.durability = experience.durability
 
         if self.type == EXPERIENCE_PLACE:
             self.points = [30, 0, -20, -20, -20, 20]
@@ -83,18 +85,20 @@ class PointOfInterest:
         self.displace(position_matrix)
 
     def set_color(self, color_name=None):
-        """ Set the color or reset it to its default value """
+        """ Set the color or reset it to its default value. Also reset the opacity. """
         if color_name is None:
             if hasattr(self.shape, 'vertices'):
                 nb_points = int(len(self.shape.vertices) / 2)
                 self.shape.colors[0: nb_points*4] = nb_points * (*self.color, self.opacity)
             else:
+                self.shape.opacity = self.opacity
                 self.shape.color = self.color
         else:
             if hasattr(self.shape, 'vertices'):
                 nb_points = int(len(self.shape.vertices) / 2)
                 self.shape.colors[0: nb_points*4] = nb_points * (*name_to_rgb(color_name), self.opacity)
             else:
+                self.shape.opacity = self.opacity
                 self.shape.color = name_to_rgb(color_name)
 
     def reset_position(self):
@@ -150,19 +154,24 @@ class PointOfInterest:
         self.displace(displacement_matrix)
 
     def fade(self, clock):
-        """Decrease the opacity of this point of interest"""
+        """Decrease the opacity of this point of interest as it gets older"""
         # Opacity 0 is transparent, 255 is opaque
-        if self.experience is None:
-            self.opacity = max(self.opacity - 10, 0)
-        else:
-            # self.opacity = int(min(self.experience.actual_durability * (255 / self.experience.durability), 255))
-            self.opacity = int(max(255 * (self.experience.durability - clock + self.experience.clock)
-                                   / self.experience.durability, 0))
-        if hasattr(self.shape, 'vertices'):
-            # Update the opacity
-            self.set_color(None)
-        else:
-            self.shape.opacity = self.opacity
+        # if self.experience is None:
+        #     self.opacity = max(self.opacity - 10, 0)
+        # else:
+        #     self.opacity = int(max(255 * (self.experience.durability - clock + self.experience.clock)
+        #                            / self.experience.durability, 0))
+        self.opacity = int(max(255 * (self.durability - clock + self.clock) / self.durability, 0))
+        # Reset the opacity of the shape
+        self.set_color(None)
+        # if hasattr(self.shape, 'vertices'):
+        #     # Update the opacity
+        #     self.set_color(None)
+        # else:
+        #     self.shape.opacity = self.opacity
+        # When the durability is elapsed, delete the shape from the batch
+        if clock > self.clock + self.durability:
+            self.shape.delete()
 
     def __str__(self):
         return "POI of type " + self.type + " at x=" + str(int(self.x)) + ", y=" + str(int(self.y)) + \

@@ -20,7 +20,7 @@ class CtrlEgocentricView:
         self.mouse_press_x = 0
         self.mouse_press_y = 0
         self.mouse_press_angle = 0
-        self.last_used_id = -1
+        # self.last_used_id = -1
 
         def on_mouse_press(x, y, button, modifiers):
             """ Selecting or unselecting points of interest """
@@ -77,15 +77,16 @@ class CtrlEgocentricView:
         """Retrieve all new experiences from memory, create and update the corresponding points of interest"""
 
         # If timeout then no egocentric view update
-        if self.workspace.enacted_interaction['status'] == "T":
-            print("No ego memory update")
-            return
+        # if self.workspace.enacted_interaction['status'] == "T":
+        #     print("No ego memory update")
+        #     return
 
         # Create the new points of interest from the new experiences
-        new_experiences = [elem for elem in self.egocentric_memory.experiences if elem.id > self.last_used_id]
+        # new_experiences = [elem for elem in self.egocentric_memory.experiences if elem.id > self.last_used_id]
+        new_experiences = [e for e in self.egocentric_memory.experiences if (e.clock >= self.workspace.clock - 1)]
         for e in new_experiences:
-            if e.id > self.last_used_id:
-                self.last_used_id = max(e.id, self.last_used_id)
+            # if e.id > self.last_used_id:
+            #     self.last_used_id = max(e.id, self.last_used_id)
             poi = self.create_point_of_interest(e)
             self.points_of_interest.append(poi)
 
@@ -107,9 +108,11 @@ class CtrlEgocentricView:
         # Mark the new position
         self.add_point_of_interest(0, 0, EXPERIENCE_PLACE)
 
-        # Make the points of interest fade out using the durability of the given interaction
+        # Make the points of interest fade out as they get older
         for poi_fade in self.points_of_interest:
             poi_fade.fade(self.workspace.clock)
+        # Keep only the points of interest during their durability
+        self.points_of_interest = [p for p in self.points_of_interest if p.clock + p.durability > self.workspace.clock]
 
     def create_poi_focus(self):
         """Create a point of interest corresponding to the focus"""

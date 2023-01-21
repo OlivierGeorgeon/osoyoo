@@ -19,7 +19,7 @@ class Action:
         self.translation_speed = translation_speed
         self.rotation_speed_rad = rotation_speed
         self.target_yaw = target_yaw
-        print("Create action", self, "of speed", self.translation_speed)
+        # print("Create action", self, "of speed", self.translation_speed)
 
     def __str__(self):
         """ Print the action as its action_code"""
@@ -35,6 +35,17 @@ class Action:
             return self.action_code == other.action_code
         else:
             return False
+
+    def adjust_translation_speed(self, translation):
+        """Adjust the translation speed depending on the action"""
+        if self.action_code in [ACTION_FORWARD, ACTION_BACKWARD]:
+            self.translation_speed[0] = (self.translation_speed[0] + translation[0]) / 2
+            print("adjusting x speed: correction:", round(translation[0]),
+                  "new x speed:", round(self.translation_speed[0]))
+        if self.action_code in [ACTION_LEFTWARD, ACTION_RIGHTWARD]:
+            self.translation_speed[1] = (self.translation_speed[1] + translation[1]) / 2
+            print("adjusting y speed: correction:", round(translation[1]),
+                  "new y speed:", round(self.translation_speed[1]))
 
 
 def create_actions():
