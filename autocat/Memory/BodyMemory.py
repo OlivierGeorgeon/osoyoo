@@ -12,11 +12,6 @@ class BodyMemory:
         self.head_direction_rad = .0  # [-pi/2, pi/2] Radian relative to the robot's x axis
         self.body_direction_rad = .0  # [-pi, pi] Radian relative to horizontal x axis (west-east)
 
-        # self.forward_speed = numpy.array([FORWARD_SPEED, 0], dtype=float)  # Need numpy arrays to compute average
-        # self.backward_speed = numpy.array([-FORWARD_SPEED, 0], dtype=float)
-        # self.leftward_speed = numpy.array([0, LATERAL_SPEED], dtype=float)
-        # self.rightward_speed = numpy.array([0, -LATERAL_SPEED], dtype=float)
-
     def set_head_direction_degree(self, head_direction_degree: int):
         """Set the head direction from degree measured relative to x axis [-90,90]"""
         assert(-90 <= head_direction_degree <= 90)
@@ -36,10 +31,6 @@ class BodyMemory:
     def body_azimuth(self):
         """Return the azimuth in degree relative to north [0,360["""
         return round((90 - math.degrees(self.body_direction_rad)) % 360)
-        # deg_north = 90 - math.degrees(self.body_direction_rad)
-        # while deg_north < 0:  # Keep within [0, 360]
-        #     deg_north += 360
-        # return round(deg_north)
 
     def body_direction_degree(self):
         """Return the body direction in degree relative to the x axis [-180,180["""

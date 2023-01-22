@@ -1,5 +1,6 @@
 import numpy as np
 import math
+import copy
 from pyrr import matrix44
 
 from .Decider.AgentCircle import AgentCircle
@@ -45,8 +46,11 @@ class Workspace:
         self.ctrl_phenomenon_view = None
 
         self.clock = 0
-        self.initial_body_direction_rad = 0.  # Memorize the initial body direction before enaction
-        self.initial_robot_point = np.array([0, 0, 0], dtype=float)
+        # self.initial_body_direction_rad = 0.  # Memorize the initial body direction before enaction
+        # self.initial_robot_point = np.array([0, 0, 0], dtype=float)
+        self.memory_for_simulation = copy.deepcopy(self.memory)
+        self.memory_for_imaginary = None
+        self.is_imagining = False
 
     def main(self, dt):
         """The main handler of the interaction cycle:
@@ -61,32 +65,50 @@ class Workspace:
 
         # ENGAGING: Preparing the simulation and the enaction
         if self.interaction_step == INTERACTION_STEP_ENGAGING:
-            self.actions[self.intended_interaction['action']].is_simulating = True
-            self.initial_body_direction_rad = self.memory.body_memory.body_direction_rad  # Memorize the direction
-            self.initial_robot_point = self.memory.allocentric_memory.robot_point.copy()
+            # Add intended_interaction fields that are common to all deciders
             self.intended_interaction["clock"] = self.clock
+            # Save a snapshot of memory
+            self.actions[self.intended_interaction['action']].is_simulating = True
+            # self.initial_body_direction_rad = self.memory.body_memory.body_direction_rad  # Memorize the direction
+            # self.initial_robot_point = self.memory.allocentric_memory.robot_point.copy()
             if self.engagement_mode == ENGAGEMENT_KEY_ROBOT:
+                # If engagement robot then send the command to the robot
                 self.interaction_step = INTERACTION_STEP_INTENDING
+                if self.is_imagining:
+                    # Stop imagining and restore memory
+                    self.memory.body_memory.body_direction_rad = self.memory_for_imaginary.body_memory.body_direction_rad
+                    self.memory.allocentric_memory.robot_point = self.memory_for_imaginary.allocentric_memory.robot_point
+                    self.is_imagining = False
             else:
+                # If imagining then proceed to simulating the enaction
                 self.interaction_step = INTERACTION_STEP_ENACTING
+                if not self.is_imagining:
+                    # Start imagining, save the memory
+                    self.memory_for_imaginary = copy.deepcopy(self.memory)
+                    self.is_imagining = True
+            self.memory_for_simulation = copy.deepcopy(self.memory)
 
         # INTENDING: is handled by CtrlRobot
 
-        # ENACTING: update body memory until CtrlRobot returns the outcome
+        # ENACTING: update body memory during the robot enaction or the imaginary simulation
         if self.interaction_step == INTERACTION_STEP_ENACTING:
             if self.actions[self.intended_interaction['action']].is_simulating:
                 self.actions[self.intended_interaction['action']].simulate(self.memory, dt)
             else:
+                # End of the simulation
                 if self.engagement_mode == ENGAGEMENT_KEY_IMAGINARY:
-                    # Compute an imaginary enacted_interaction
+                    # Compute an imaginary enacted_interaction and proceed to integrating
                     self.imagine()
                     self.interaction_step = INTERACTION_STEP_INTEGRATING
 
         # INTEGRATING: the new enacted interaction
         if self.interaction_step == INTERACTION_STEP_INTEGRATING:
             # if self.engagement_mode == ENGAGEMENT_KEY_ROBOT:
-            self.memory.body_memory.body_direction_rad = self.initial_body_direction_rad  # Retrieve the direction
-            self.memory.allocentric_memory.robot_point = self.initial_robot_point
+            # self.memory.body_memory.body_direction_rad = self.initial_body_direction_rad  # Retrieve the direction
+            # self.memory.allocentric_memory.robot_point = self.initial_robot_point
+            self.memory.body_memory.body_direction_rad = self.memory_for_simulation.body_memory.body_direction_rad
+            self.memory.allocentric_memory.robot_point = self.memory_for_simulation.allocentric_memory.robot_point
+
             # Update body memory and egocentric memory
             self.memory.update_and_add_experiences(self.enacted_interaction)
             self.memory.decay(self.clock)
@@ -96,6 +118,9 @@ class Workspace:
 
             # Update allocentric memory: robot, phénomena
             self.memory.update_allocentric(self.integrator.phenomena)
+
+            # Save memory for future simulations
+            # self.memory_for_simulation = copy.deepcopy(self.memory)
 
             self.interaction_step = INTERACTION_STEP_REFRESHING
 
@@ -121,8 +146,10 @@ class Workspace:
 
         if "status" in enacted_interaction and enacted_interaction["status"] == "T":
             print("The workspace received an empty enacted interaction")
-            self.memory.body_memory.body_direction_rad = self.initial_body_direction_rad  # Retrieve the direction
-            self.memory.allocentric_memory.robot_point = self.initial_robot_point.copy()
+            # self.memory.body_memory.body_direction_rad = self.initial_body_direction_rad  # Retrieve the direction
+            # self.memory.allocentric_memory.robot_point = self.initial_robot_point.copy()
+            self.memory.body_memory.body_direction_rad = self.memory_for_simulation.body_memory.body_direction_rad  # Retrieve the direction
+            self.memory.allocentric_memory.robot_point = self.memory_for_simulation.allocentric_memory.robot_point
 
             # Reset the interaction step
             if self.decider_mode == DECIDER_KEY_CIRCLE:

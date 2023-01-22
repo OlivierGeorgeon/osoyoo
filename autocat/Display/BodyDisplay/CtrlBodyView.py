@@ -70,10 +70,10 @@ class CtrlBodyView:
 
     def main(self, dt):
         """Called every frame. Update the body view"""
+        self.view.label_clock.text = "Clock: " + str(self.workspace.clock) \
+                                     + ", Decider: " + self.workspace.decider_mode \
+                                     + ", Engagement: " + self.workspace.engagement_mode
         if self.workspace.interaction_step == INTERACTION_STEP_ENACTING:
-            self.view.label_clock.text = "Clock: " + str(self.workspace.clock) \
-                                         + ", Decider: " + self.workspace.decider_mode \
-                                         + ", Engagement: " + self.workspace.engagement_mode
             action_code = self.workspace.intended_interaction['action']
             rotation_speed = "{:.2f}".format(math.degrees(self.workspace.actions[action_code].rotation_speed_rad))
             self.view.label_speed.text = "Speed x: " \

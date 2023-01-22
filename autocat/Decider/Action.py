@@ -27,7 +27,7 @@ class Action:
 
         self.is_simulating = False
         self.simulation_target = 0.
-        print("Create action", self, "of speed", self.translation_speed, "rotation speed", self.rotation_speed_rad)
+        # print("Create action", self, "of speed", self.translation_speed, "rotation speed", self.rotation_speed_rad)
 
     def __str__(self):
         """ Print the action as its action_code"""
