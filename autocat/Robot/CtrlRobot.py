@@ -12,7 +12,7 @@ ENACT_STEP_ENACTING = 1
 ENACT_STEP_END = 2
 
 KEY_EXPERIENCES = 'points'
-KEY_IMPACT = 'shock'
+KEY_IMPACT = 'impact'
 
 FOCUS_MAX_DELTA = 100  # (mm) Maximum delta to keep focus
 
@@ -114,8 +114,6 @@ class CtrlRobot:
             azimuth = math.degrees(math.atan2(enacted_interaction['compass_y'], enacted_interaction['compass_x']))
             # The compass point indicates the south so we must rotate it of 180° to obtain the azimuth
             azimuth = round(azimuth + 180) % 360
-            # if azimuth >= 360:
-            #    azimuth -= 360
             enacted_interaction['azimuth'] = azimuth
 
         # Interaction Floor line
@@ -213,7 +211,6 @@ class CtrlRobot:
                 ed = enacted_interaction[ed_str]
                 tmp_x = ROBOT_HEAD_X + math.cos(math.radians(ha)) * ed
                 tmp_y = math.sin(math.radians(ha)) * ed
-                # enacted_interaction['echo_array'].append((tmp_x, tmp_y))
                 enacted_interaction[KEY_EXPERIENCES].append((EXPERIENCE_LOCAL_ECHO, tmp_x, tmp_y))
 
         print(enacted_interaction)

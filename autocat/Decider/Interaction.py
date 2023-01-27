@@ -32,12 +32,10 @@ class Interaction:
             i = cls.interaction_list.index(interaction)
             if valence is not None:
                 cls.interaction_list[i].valence = valence  # Update the valence
-            print("Retrieving ", end="")
-            print(cls.interaction_list[i])
+            # print("Retrieving ", cls.interaction_list[i])
             return cls.interaction_list[i]
         else:
-            print("Creating ", end="")
-            print(interaction)
+            # print("Creating ", interaction)
             cls.interaction_list.append(interaction)
             return interaction
 

@@ -44,9 +44,6 @@ class BodyMemory:
         """Rotate the robot's body by the yaw and correct drift using azimuth if out of bound."""
         # Integrate the azimuth from the yaw
         azimuth = self.body_azimuth() - yaw_degree  # Yaw is counterclockwise
-        # Keep it within [0, 360[
-        # while azimuth < 0:
-        #     azimuth += 360
         azimuth %= 360
 
         # If integrated azimuth is too far from the compass azimuth then use the compass azimuth

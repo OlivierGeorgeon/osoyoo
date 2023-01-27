@@ -42,7 +42,7 @@ class Experience:
             head_direction_rad = math.atan2(y, x-ROBOT_HEAD_X)
             self.absolute_direction_rad += head_direction_rad  # The absolute direction of the sensor...
             self.absolute_direction_rad = numpy.mod(self.absolute_direction_rad, 2*math.pi)  # ...within [0,2pi]
-            print("Absolute direction rad:", round(math.degrees(self.absolute_direction_rad)), "°")
+            # print("Absolute direction rad:", round(math.degrees(self.absolute_direction_rad)), "°")
             translation_from_head_matrix = matrix44.create_from_translation([math.sqrt((x-ROBOT_HEAD_X)**2 + y**2),
                                                                              0, 0])
             position_from_head_matrix = matrix44.multiply(translation_from_head_matrix,
@@ -64,14 +64,7 @@ class Experience:
         self.rotation_matrix = matrix44.create_from_z_rotation(math.pi - angle_sensor)  # Don't know why need flip
 
         self.durability = durability
-        # self.actual_durability = durability
-        # self.tick_number = 0
         self.id = experience_id
-
-    # def tick(self):
-    #     """Updates the clock and decay of this interaction"""
-    #     self.tick_number += 1
-    #     self.actual_durability -= 1
 
     def displace(self, displacement_matrix):
         """Displace the experience by the displacement_matrix"""

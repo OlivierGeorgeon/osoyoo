@@ -210,7 +210,7 @@ void loop()
       }
       else
       {
-
+          previous_clock = clock;
           action_start_time = millis();
           action_end_time = action_start_time + 1000;
           interaction_step = 1;
@@ -549,7 +549,7 @@ void loop()
 
   // STEP 3: Ending of interaction:
   // Send the outcome and go back to Step 0
-  if ((interaction_step == 3))
+  if (interaction_step == 3)
   {
     // Compute the outcome message
     JSONVar outcome_object;

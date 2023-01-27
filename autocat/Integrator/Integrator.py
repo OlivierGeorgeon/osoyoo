@@ -29,7 +29,7 @@ class Integrator:
                 affordance_point = e.allocentric_from_matrices(self.workspace.memory.body_memory.body_direction_matrix(),
                                                                self.allocentric_memory.body_position_matrix())
                 new_affordances.append(Affordance(affordance_point, e))
-                print("Experience:", e.type, ", point:", affordance_point)
+                # print("Experience:", e.type, ", point:", affordance_point)
 
         # Try to attach the new affordances to existing phenomena and remove these affordances
         new_affordances, position_correction = self.update_phenomena(new_affordances)

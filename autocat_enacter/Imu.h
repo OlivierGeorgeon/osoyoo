@@ -15,7 +15,8 @@
 #endif
 #include <Arduino_JSON.h>
 
-#define IMU_READ_PERIOD 50
+#define IMU_READ_PERIOD 50  // (ms)
+#define IMU_ACCELERATION_CYCLES 5  // number of cycles of imu read during acceration phase
 
 class Imu
 {

@@ -16,7 +16,7 @@ class Phenomenon:
             """
         self.point = affordance.point.copy()  # The position of the phenomenon = position of the first affordance
         self.confidence = PHENOMENON_INITIAL_CONFIDENCE
-        print("Phenomenon:", affordance.experience.type, ", point:", self.point)
+        # print("Phenomenon:", affordance.experience.type, ", point:", self.point)
 
         # Record the first affordance of the phenomenon
         affordance.point = numpy.array([0, 0, 0], dtype=numpy.int16)  # Position of the first affordance is reset
@@ -32,7 +32,6 @@ class Phenomenon:
     def compute_center(self):
         """Recompute the center of the phenomenon as the mean of the affordance position"""
         # https://stackoverflow.com/questions/4355894/how-to-get-center-of-set-of-points-using-python
-        # points = numpy.array([a.position_matrix[3, 0:2] for a in self.affordances])
         points = numpy.array([a.point for a in self.affordances])
         centroid = points.mean(axis=0)
         return centroid
