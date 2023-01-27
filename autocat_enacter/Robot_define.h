@@ -1,8 +1,8 @@
 #define ROBOT_ID 4 // 0: regular Osoyoo robot, 1: robot BSN, 2: robot UCBL, 3: robot SHS, 4: SHS with GY86 chez Olivier
 
 #define ROBOT_HEAD_X 80                 // (mm) X position of the head
-#define SPEED 100
-#define TURN_SPEED 100
+#define SPEED 120
+#define TURN_SPEED 110
 #define SHIFT_SPEED 130
 #define TURN_TIME 500                   // (ms)
 #define MOVE_TIME 500
@@ -74,10 +74,10 @@
 #warning "Compiling for SHS's robot with GY-86"
 #define ROBOT_HAS_MPU6050  true
 #define ROBOT_HAS_HMC5883L true
-#define ROBOT_REAR_RIGHT_WHEEL_COEF 0.9
-#define ROBOT_REAR_LEFT_WHEEL_COEF 1
-#define ROBOT_FRONT_RIGHT_WHEEL_COEF 1.2 // 1.1 29/05/2022
+#define ROBOT_REAR_LEFT_WHEEL_COEF 1.1 // 1
 #define ROBOT_FRONT_LEFT_WHEEL_COEF 1.2
+#define ROBOT_REAR_RIGHT_WHEEL_COEF 0.9
+#define ROBOT_FRONT_RIGHT_WHEEL_COEF 1.1 // 1.2 29/05/2022
 #define TURN_SPOT_MAX_DURATION 2400
 #define TURN_SPOT_ENDING_DELAY 200
 #define TURN_SPOT_ENDING_ANGLE 3

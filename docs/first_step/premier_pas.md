@@ -74,7 +74,7 @@ Vous avez le choix entre deux modes de connexion:
 
 Téléverser le script principal `autocat_enacter.ino` (via l'IDE Arduino) dans le robot.
 
-Sur votre PC, exécuter `main.py`.
+Sur votre PC, exécuter `py -m main "<ip du robot>""`.
 
 ## Etape 5: Utiliser le robot
 
@@ -87,6 +87,8 @@ Sur votre PC, exécuter `main.py`.
     - Scan: '-'
     - Passage en mode automatique: A
     - Passage en mode manuel: M
+    - Passage en mode simulateur: I
+    - Passage en mode robot : R
 
 ####  Interagir avec la fenêtre Egocentrique
     - Click: select an interaction

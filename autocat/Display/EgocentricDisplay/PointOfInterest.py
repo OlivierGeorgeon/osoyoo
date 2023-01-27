@@ -154,7 +154,7 @@ class PointOfInterest:
         self.displace(displacement_matrix)
 
     def fade(self, clock):
-        """Decrease the opacity of this point of interest as it gets older"""
+        """Decrease the opacity of this point of interest as it gets older, and then delete it"""
         # Opacity: 0 is transparent, 255 is opaque
         self.opacity = int(max(255 * (self.durability - clock + self.clock) / self.durability, 0))
         # Reset the opacity of the shape

@@ -29,12 +29,12 @@ class EgocentricView(InteractiveDisplay):
 
         # Define the text area at the bottom of the view
         self.label_batch = pyglet.graphics.Batch()
-        self.label = pyglet.text.Label('', font_name='Verdana', font_size=10, x=10, y=10)
-        self.label.color = (0, 0, 0, 255)
-        self.label.batch = self.label_batch
-        # self.label_speed = pyglet.text.Label('Forward speed: ', font_name='Verdana', font_size=10, x=10, y=30)
-        # self.label_speed.color = (0, 0, 0, 255)
-        # self.label_speed.batch = self.label_batch
+        self.label1 = pyglet.text.Label('', font_name='Verdana', font_size=10, x=10, y=10)
+        self.label1.color = (0, 0, 0, 255)
+        self.label1.batch = self.label_batch
+        self.label2 = pyglet.text.Label('', font_name='Verdana', font_size=10, x=10, y=30)
+        self.label2.color = (0, 0, 0, 255)
+        self.label2.batch = self.label_batch
         # self.label_left_speed = pyglet.text.Label('Leftward speed: ', font_name='Verdana', font_size=10, x=10, y=10)
         # self.label_left_speed.color = (0, 0, 0, 255)
         # self.label_left_speed.batch = self.label_batch
@@ -90,7 +90,7 @@ class EgocentricView(InteractiveDisplay):
         mouse_press_x, mouse_press_y = int(z.real), int(z.imag)
         mouse_press_angle = int(math.degrees(theta_robot))
         # Display the mouse click coordinates at the bottom of the view
-        self.label.text = "Click: x:" + str(mouse_press_x) + ", y:" + str(mouse_press_y) \
+        self.label1.text = "Click: x:" + str(mouse_press_x) + ", y:" + str(mouse_press_y) \
                           + ", angle:" + str(mouse_press_angle) + "°"
         # Return the click position to the controller
         return mouse_press_x, mouse_press_y, mouse_press_angle

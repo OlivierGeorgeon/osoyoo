@@ -29,7 +29,7 @@ class CtrlEgocentricView:
             for p in self.points_of_interest:
                 is_near = p.select_if_near(self.mouse_press_x, self.mouse_press_y)
                 if is_near:
-                    self.view.label_speed.text = "Clock: " + str(p.clock)
+                    self.view.label2.text = "Experience clock: " + str(p.clock)
 
         def on_key_press(symbol, modifiers):
             """ Deleting or inserting points of interest """
