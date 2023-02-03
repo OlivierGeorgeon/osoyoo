@@ -3,7 +3,7 @@ from webcolors import name_to_rgb
 import math
 from ...Memory.EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_BLOCK, \
     EXPERIENCE_FOCUS, EXPERIENCE_IMPACT, EXPERIENCE_PLACE, EXPERIENCE_CENTRAL_ECHO
-from ...Memory.AllocentricMemory.GridCell import CELL_PHENOMENON, CELL_UNKNOWN
+from ...Memory.AllocentricMemory.GridCell import CELL_PHENOMENON, CELL_UNKNOWN, CELL_NO_ECHO
 
 
 class HexagonalCell:
@@ -54,5 +54,7 @@ class HexagonalCell:
             color = name_to_rgb('fireBrick')
         if status == CELL_PHENOMENON:
             color = name_to_rgb('yellow')
+        if status == CELL_NO_ECHO:
+            color = name_to_rgb('CadetBlue')
         # Reset the color of the shape
         self.shape.colors[0:24] = 6 * (*color, 255)

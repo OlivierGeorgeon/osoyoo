@@ -210,113 +210,113 @@ void loop()
       }
       else
       {
-          previous_clock = clock;
-          action_start_time = millis();
-          action_end_time = action_start_time + 1000;
-          interaction_step = 1;
-          IMU.begin();
-          shock_event = 0; // reset event from previous interaction
-          FCR._floor_outcome = 0; // Reset possible floor change when the robot was placed on the floor
-          //digitalWrite(LED_BUILTIN, LOW); // for debug
-          status = "0";
-          switch (action)
-          {
-            case ACTION_TURN_IN_SPOT_LEFT:
-              HEA._next_saccade_time = action_end_time - SACCADE_DURATION;  // Inhibit HEA during the interaction
-              action_end_time = millis() + TURN_SPOT_MAX_DURATION;
-              robot_destination_angle = TURN_SPOT_ANGLE;
-              if (is_focussed) {
-                head_destination_angle = HEA.head_direction(focus_x, focus_y); // Look at the focus phenomenon
-              } else {
-                head_destination_angle = robot_destination_angle;}
-              // HEA.turnHead(head_destination_angle); // Look at destination angle
-              OWM.turnInSpotLeft(TURN_SPEED);
-              break;
-            case ACTION_GO_BACK:
-              HEA._next_saccade_time = action_end_time - SACCADE_DURATION;  // Inhibit HEA during the interaction
-              if (is_focussed) {
-                HEA.turnHead(HEA.head_direction(focus_x, focus_y));} // Turn head towards the focus point in step 1
-              OWM.goBack(SPEED);
-              break;
-            case ACTION_TURN_IN_SPOT_RIGHT:
-              HEA._next_saccade_time = action_end_time - SACCADE_DURATION;  // Inhibit HEA during the interaction
-              action_end_time = millis() + TURN_SPOT_MAX_DURATION;
-              robot_destination_angle = -TURN_SPOT_ANGLE;
-              if (is_focussed) {
-                head_destination_angle = HEA.head_direction(focus_x, focus_y); // Look at the focus phenomenon
-              } else {
-                head_destination_angle = robot_destination_angle;}
-              //HEA.turnHead(head_destination_angle); // Look at destination angle in step 1
-              OWM.turnInSpotRight(TURN_SPEED);
-              break;
-            case ACTION_SHIFT_LEFT:
-              HEA._next_saccade_time = action_end_time - SACCADE_DURATION;  // Inhibit HEA during the interaction
-              OWM.shiftLeft(SHIFT_SPEED);
-              //action_end_time = millis() + 5000;
-              break;
-            case ACTION_STOP:
-              OWM.stopMotion();
-              break;
-            case ACTION_SHIFT_RIGHT:
-              HEA._next_saccade_time = action_end_time - SACCADE_DURATION;  // Inhibit HEA during the interaction
-              //action_end_time = millis() + 5000;
-              OWM.shiftRight(SHIFT_SPEED);
-              break;
-            case ACTION_TURN_LEFT:
-              action_end_time = millis() + 250;
-              OWM.turnLeft(SPEED);
-              break;
-            case ACTION_GO_ADVANCE:
-              HEA._next_saccade_time = action_end_time - SACCADE_DURATION;  // Inhibit HEA during the interaction
-              //if (is_focussed) {
-              //  HEA.turnHead(HEA.head_direction(focus_x, focus_y));} // Turn head towards the focus point
-              OWM.goForward(SPEED);
-              break;
-            case ACTION_TURN_RIGHT:
-              action_end_time = millis() + 250;
-              OWM.turnRight(SPEED);
-              break;
-            case ACTION_ALIGN_HEAD:
-              HEA.beginEchoAlignment();
-              action_end_time = millis() + 2000;
-              break;
-            case ACTION_SCAN_DIRECTION:
-              if (is_focussed) {
-                HEA.turnHead(HEA.head_direction(focus_x, focus_y));  // Look to the focussed phenomenon
-              } else {
-                HEA.turnHead(action_angle);}  // look parallel to the direction
-              HEA.beginEchoAlignment();
-              break;
-            case ACTION_ECHO_SCAN:
-              HEA.beginEchoScan();
-              action_end_time = millis() + 2000;
-              break;
+        previous_clock = clock;
+        action_start_time = millis();
+        action_end_time = action_start_time + 1000;
+        interaction_step = 1;
+        IMU.begin();
+        shock_event = 0; // reset event from previous interaction
+        FCR._floor_outcome = 0; // Reset possible floor change when the robot was placed on the floor
+        //digitalWrite(LED_BUILTIN, LOW); // for debug
+        status = "0";
+        switch (action)
+        {
+          case ACTION_TURN_IN_SPOT_LEFT:
+            HEA._next_saccade_time = action_end_time - SACCADE_DURATION;  // Inhibit HEA during the interaction
+            action_end_time = millis() + TURN_SPOT_MAX_DURATION;
+            robot_destination_angle = TURN_SPOT_ANGLE;
+            if (is_focussed) {
+              head_destination_angle = HEA.head_direction(focus_x, focus_y); // Look at the focus phenomenon
+            } else {
+              head_destination_angle = robot_destination_angle;}
+            // HEA.turnHead(head_destination_angle); // Look at destination angle
+            OWM.turnInSpotLeft(TURN_SPEED);
+            break;
+          case ACTION_GO_BACK:
+            HEA._next_saccade_time = action_end_time - SACCADE_DURATION;  // Inhibit HEA during the interaction
+            if (is_focussed) {
+              HEA.turnHead(HEA.head_direction(focus_x, focus_y));} // Turn head towards the focus point in step 1
+            OWM.goBack(SPEED);
+            break;
+          case ACTION_TURN_IN_SPOT_RIGHT:
+            HEA._next_saccade_time = action_end_time - SACCADE_DURATION;  // Inhibit HEA during the interaction
+            action_end_time = millis() + TURN_SPOT_MAX_DURATION;
+            robot_destination_angle = -TURN_SPOT_ANGLE;
+            if (is_focussed) {
+              head_destination_angle = HEA.head_direction(focus_x, focus_y); // Look at the focus phenomenon
+            } else {
+              head_destination_angle = robot_destination_angle;}
+            //HEA.turnHead(head_destination_angle); // Look at destination angle in step 1
+            OWM.turnInSpotRight(TURN_SPEED);
+            break;
+          case ACTION_SHIFT_LEFT:
+            HEA._next_saccade_time = action_end_time - SACCADE_DURATION;  // Inhibit HEA during the interaction
+            OWM.shiftLeft(SHIFT_SPEED);
+            //action_end_time = millis() + 5000;
+            break;
+          case ACTION_STOP:
+            OWM.stopMotion();
+            break;
+          case ACTION_SHIFT_RIGHT:
+            HEA._next_saccade_time = action_end_time - SACCADE_DURATION;  // Inhibit HEA during the interaction
+            //action_end_time = millis() + 5000;
+            OWM.shiftRight(SHIFT_SPEED);
+            break;
+          case ACTION_TURN_LEFT:
+            action_end_time = millis() + 250;
+            OWM.turnLeft(SPEED);
+            break;
+          case ACTION_GO_ADVANCE:
+            HEA._next_saccade_time = action_end_time - SACCADE_DURATION;  // Inhibit HEA during the interaction
+            //if (is_focussed) {
+            //  HEA.turnHead(HEA.head_direction(focus_x, focus_y));} // Turn head towards the focus point
+            OWM.goForward(SPEED);
+            break;
+          case ACTION_TURN_RIGHT:
+            action_end_time = millis() + 250;
+            OWM.turnRight(SPEED);
+            break;
+          case ACTION_ALIGN_HEAD:
+            HEA.beginEchoAlignment();
+            action_end_time = millis() + 2000;
+            break;
+          case ACTION_SCAN_DIRECTION:
+            if (is_focussed) {
+              HEA.turnHead(HEA.head_direction(focus_x, focus_y));  // Look to the focussed phenomenon
+            } else {
+              HEA.turnHead(action_angle);}  // look parallel to the direction
+            HEA.beginEchoAlignment();
+            break;
+          case ACTION_ECHO_SCAN:
+            HEA.beginEchoScan();
+            action_end_time = millis() + 2000;
+            break;
 
-            /*case ACTION_ECHO_COMPLETE:
-              HECS.beginEchoScan();
-              action_end_time = millis() + 5000;
-              break;*/
-            case ACTION_ALIGN_ROBOT:
-              action_end_time = millis() + 5000;
-              robot_destination_angle = action_angle;
-              Serial.println("Begin align robot angle : " + String(robot_destination_angle));
-              HEA._next_saccade_time = action_end_time - SACCADE_DURATION;  // Inhibit HEA during the interaction
-              //if (is_focussed) {
-              //  HEA.turnHead(HEA.head_direction(focus_x, focus_y));  // Look to the focussed phenomenon
-              //} else {
-              //  HEA.turnHead(robot_destination_angle);}  // look parallel to the direction
-              if ( robot_destination_angle < - TURN_FRONT_ENDING_ANGLE){
-                OWM.turnInSpotRight(TURN_SPEED);
-                //OWM.turnFrontRight(SPEED);
-              }
-              if ( robot_destination_angle > TURN_FRONT_ENDING_ANGLE){
-                OWM.turnInSpotLeft(TURN_SPEED);
-                //OWM.turnFrontLeft(SPEED);
-              }
-              break;
-            default:
-              break;
-          }
+          /*case ACTION_ECHO_COMPLETE:
+            HECS.beginEchoScan();
+            action_end_time = millis() + 5000;
+            break;*/
+          case ACTION_ALIGN_ROBOT:
+            action_end_time = millis() + 5000;
+            robot_destination_angle = action_angle;
+            Serial.println("Begin align robot angle : " + String(robot_destination_angle));
+            HEA._next_saccade_time = action_end_time - SACCADE_DURATION;  // Inhibit HEA during the interaction
+            //if (is_focussed) {
+            //  HEA.turnHead(HEA.head_direction(focus_x, focus_y));  // Look to the focussed phenomenon
+            //} else {
+            //  HEA.turnHead(robot_destination_angle);}  // look parallel to the direction
+            if ( robot_destination_angle < - TURN_FRONT_ENDING_ANGLE){
+              OWM.turnInSpotRight(TURN_SPEED);
+              //OWM.turnFrontRight(SPEED);
+            }
+            if ( robot_destination_angle > TURN_FRONT_ENDING_ANGLE){
+              OWM.turnInSpotLeft(TURN_SPEED);
+              //OWM.turnFrontLeft(SPEED);
+            }
+            break;
+          default:
+            break;
+        }
       }
     }
   }

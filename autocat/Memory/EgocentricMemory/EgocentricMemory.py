@@ -37,21 +37,13 @@ class EgocentricMemory:
         self.experiences += new_experiences
         self.experiences += new_central_echos
 
-    # def tick(self):
-    #     for e in self.experiences:
-    #         e.tick()
-    #     # Remove the experiences when they are too old
-    #     to_remove = []
-    #     for e in self.experiences:
-    #         if e.actual_durability <= 0:
-    #             to_remove.append(e)
-    #     self.experiences = [x for x in self.experiences if x not in to_remove]
-
-    def decay(self, clock):
-        self.experiences = [e for e in self.experiences if e.clock >= clock - e.durability]
+    # def decay(self, clock):
+        # Remove the experiences from egocentric memory when they are two old
+        self.experiences = [e for e in self.experiences if e.clock >= enacted_interaction["clock"] - e.durability]
 
     def revert_echoes_to_angle_distance(self, echo_list):
         """Convert echo interaction to triples (angle,distance,interaction)"""
+        # TODO use the angle and the distance from the head
         output = []
         for elem in echo_list:
             # compute the angle using elem x and y
@@ -62,7 +54,7 @@ class EgocentricMemory:
         return output
 
     def Compute_central_echo(self, echo_list, body_direction_rad, clock):
-        """In case of a sweep we obtain an array of echo, this function discretize
+        """In case of a sweep we obtain an array of echo, this function discretizes
         it to try to find the real position of the objects that sent back the echo
 
         To do so use 'strikes' which are series of consecutive echoes that are

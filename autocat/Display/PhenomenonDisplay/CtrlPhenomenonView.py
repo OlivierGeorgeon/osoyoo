@@ -44,11 +44,7 @@ class CtrlPhenomenonView:
     def update_body_robot(self):
         """Updates the robot's body to display by the phenomenon view"""
         self.view.robot.rotate_head(self.workspace.memory.body_memory.head_direction_degree())
-        # self.view.azimuth = self.workspace.memory.body_memory.body_azimuth()
-        # TODO compute the robot's position relative to the phenomenon
         if self.phenomenon is not None:
-            # self.view.robot_pos_x = self.workspace.memory.allocentric_memory.robot_pos_x - self.phenomenon.point[0]
-            # self.view.robot_pos_y = self.workspace.memory.allocentric_memory.robot_pos_y - self.phenomenon.point[1]
             self.view.phenomenon_point = self.phenomenon.point
 
     def update_points_of_interest(self, phenomenon):
@@ -64,8 +60,6 @@ class CtrlPhenomenonView:
 
         # Recreate all the points of interest
         for a in phenomenon.affordances:
-            # if a.experience.id > self.last_used_id:
-            #     self.last_used_id = max(a.experience.id, self.last_used_id)
             poi = self.create_point_of_interest(a)
             self.points_of_interest.append(poi)
 

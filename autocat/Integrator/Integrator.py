@@ -1,5 +1,5 @@
 import numpy
-from ..Memory.EgocentricMemory.Experience import EXPERIENCE_LOCAL_ECHO
+from ..Memory.EgocentricMemory.Experience import EXPERIENCE_LOCAL_ECHO, EXPERIENCE_CENTRAL_ECHO, EXPERIENCE_ALIGNED_ECHO
 from .Affordance import Affordance
 from .Phenomenon import Phenomenon
 
@@ -26,10 +26,15 @@ class Integrator:
         new_affordances = []
         for e in new_experiences:
             if e.type != EXPERIENCE_LOCAL_ECHO:
+                # The position of the affordance in allocentric memory
                 affordance_point = e.allocentric_from_matrices(self.workspace.memory.body_memory.body_direction_matrix(),
                                                                self.allocentric_memory.body_position_matrix())
                 new_affordances.append(Affordance(affordance_point, e))
                 # print("Experience:", e.type, ", point:", affordance_point)
+
+        # Mark the area covered by the echo in allocentric memory
+        for a in [a for a in new_affordances if a.experience.type in [EXPERIENCE_CENTRAL_ECHO, EXPERIENCE_ALIGNED_ECHO]]:
+            self.allocentric_memory.mark_echo_area(a)
 
         # Try to attach the new affordances to existing phenomena and remove these affordances
         new_affordances, position_correction = self.update_phenomena(new_affordances)

@@ -1,8 +1,10 @@
 import math
 import numpy as np
 from pyrr import matrix44
+import time
 from . GridCell import GridCell, CELL_UNKNOWN
 from ..EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_PLACE
+from ..AllocentricMemory.GridCell import CELL_NO_ECHO
 from ...Utils import rotate_vector_z
 
 
@@ -25,6 +27,8 @@ class AllocentricMemory:
             self.grid.append(list())
             for j in range(self.height):
                 self.grid[i].append(GridCell(i, j))
+                pos = self.convert_cell_to_pos(i, j)
+                self.grid[i][j].point = np.array([*pos, 0], dtype=int)
 
         # Allocentric memory is initialized with the robot at its center
         self.robot_cell_x = self.width // 2
@@ -247,12 +251,16 @@ class AllocentricMemory:
 
     def place_robot(self, body_memory):
         """Apply the PLACE status to the cells at the position of the robot"""
-        for i in range(self.width):
-            for j in range(self.height):
-                pos_x, pos_y = self.convert_cell_to_pos(i, j)
-                # if body_memory.is_inside_robot(pos_x - self.robot_pos_x, pos_y - self.robot_pos_y):
-                if body_memory.is_inside_robot(pos_x - self.robot_point[0], pos_y - self.robot_point[1]):
-                    self.apply_status_to_cell(i, j, EXPERIENCE_PLACE)
+        start_time = time.time()
+        # for i in range(self.width):
+        #     for j in range(self.height):
+        #         pos_x, pos_y = self.convert_cell_to_pos(i, j)
+        #         if body_memory.is_inside_robot(pos_x - self.robot_point[0], pos_y - self.robot_point[1]):
+        #             self.apply_status_to_cell(i, j, EXPERIENCE_PLACE)
+        polygon = body_memory.polygon(self.robot_point)
+        for c in [c for line in self.grid for c in line if c.is_inside(polygon)]:
+            self.apply_status_to_cell(c.i, c.j, EXPERIENCE_PLACE)
+        print("Place robot time:", time.time() - start_time, "seconds")
 
     def clear_phenomena(self):
         """Reset the phenomena from cells"""
@@ -286,11 +294,17 @@ class AllocentricMemory:
         """Change the cell status and add the coordinates to the cells_changed_recently list"""
         try:
             self.grid[cell_x][cell_y].status = status
-            # self.cells_changed_recently.append((cell_x, cell_y))
         except IndexError:
             print("Error cell out of grid, cell_x:", cell_x, "cell_y:", cell_y, "Status:", status)
             exit()
 
     def body_position_matrix(self):
-        # return matrix44.create_from_translation([self.robot_pos_x, self.robot_pos_y, 0])
         return matrix44.create_from_translation(self.robot_point)
+
+    def mark_echo_area(self, affordance):
+        # start_time = time.time()
+        points = affordance.sensor_triangle()
+        triangle = np.array([points[0:2], points[2:4], points[4:6]])
+        for c in [c for line in self.grid for c in line if c.is_inside(triangle)]:
+            self.apply_status_to_cell(c.i, c.j, CELL_NO_ECHO)
+        # print("Place echo time:", time.time() - start_time, "seconds")

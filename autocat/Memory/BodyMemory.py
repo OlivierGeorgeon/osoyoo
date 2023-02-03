@@ -1,5 +1,5 @@
 import math
-import numpy
+import numpy as np
 from pyrr import matrix44
 from ..Robot.RobotDefine import ROBOT_FRONT_X, ROBOT_SIDE
 from ..Utils import assert_almost_equal_angles
@@ -57,35 +57,46 @@ class BodyMemory:
     def head_absolute_direction(self):
         return self.body_direction_rad + self.head_direction_rad
 
-    def is_inside_robot(self, x, y):
-        """Return True if the point is inside the robot.
-        Use robot-centric/east-north coordinates"""
-        # The four points in counterclockwise order
-        x1 = ROBOT_FRONT_X * math.cos(self.body_direction_rad) - ROBOT_SIDE * math.sin(self.body_direction_rad)
-        y1 = ROBOT_FRONT_X * math.sin(self.body_direction_rad) + ROBOT_SIDE * math.cos(self.body_direction_rad)
-        x2 = -ROBOT_FRONT_X * math.cos(self.body_direction_rad) - ROBOT_SIDE * math.sin(self.body_direction_rad)
-        y2 = -ROBOT_FRONT_X * math.sin(self.body_direction_rad) + ROBOT_SIDE * math.cos(self.body_direction_rad)
-        x3 = -ROBOT_FRONT_X * math.cos(self.body_direction_rad) + ROBOT_SIDE * math.sin(self.body_direction_rad)
-        y3 = -ROBOT_FRONT_X * math.sin(self.body_direction_rad) - ROBOT_SIDE * math.cos(self.body_direction_rad)
-        # x4 = ROBOT_FRONT_X * math.cos(self.body_direction_rad) + ROBOT_SIDE * math.sin(self.body_direction_rad)
-        # y4 = ROBOT_FRONT_X * math.sin(self.body_direction_rad) - ROBOT_SIDE * math.cos(self.body_direction_rad)
+    def polygon(self, robot_point):
+        """The rectangle occupied by the robot's body in absolute position in egocentric memory"""
+        x1 = ROBOT_FRONT_X * math.cos(self.body_direction_rad) - ROBOT_SIDE * math.sin(self.body_direction_rad) \
+            + robot_point[0]
+        y1 = ROBOT_FRONT_X * math.sin(self.body_direction_rad) + ROBOT_SIDE * math.cos(self.body_direction_rad) \
+            + robot_point[1]
+        x2 = -ROBOT_FRONT_X * math.cos(self.body_direction_rad) - ROBOT_SIDE * math.sin(self.body_direction_rad) \
+            + robot_point[0]
+        y2 = -ROBOT_FRONT_X * math.sin(self.body_direction_rad) + ROBOT_SIDE * math.cos(self.body_direction_rad) \
+            + robot_point[1]
+        x3 = -ROBOT_FRONT_X * math.cos(self.body_direction_rad) + ROBOT_SIDE * math.sin(self.body_direction_rad) \
+            + robot_point[0]
+        y3 = -ROBOT_FRONT_X * math.sin(self.body_direction_rad) - ROBOT_SIDE * math.cos(self.body_direction_rad) \
+            + robot_point[1]
+        x4 = ROBOT_FRONT_X * math.cos(self.body_direction_rad) + ROBOT_SIDE * math.sin(self.body_direction_rad) \
+            + robot_point[0]
+        y4 = ROBOT_FRONT_X * math.sin(self.body_direction_rad) - ROBOT_SIDE * math.cos(self.body_direction_rad) \
+            + robot_point[1]
+        return np.array([[x1, y1], [x2, y2], [x3, y3], [x4, y4]])
 
-        # Positive distance is on the left of the line, meaning inside the polygon
-        # https://stackoverflow.com/questions/2752725/finding-whether-a-point-lies-inside-a-rectangle-or-not
-        # d1 = (x2 - x1) * (y - y1) - (x - x1) * (y2 - y1)
-        # d2 = (x3 - x2) * (y - y2) - (x - x2) * (y3 - y2)
-        # d3 = (x4 - x3) * (y - y3) - (x - x3) * (y4 - y3)
-        # d4 = (x1 - x4) * (y - y4) - (x - x4) * (y1 - y4)
-
-        # return d1 > 0 and d2 > 0 and d3 > 0 and d4 > 0
-
-        p = numpy.array([x, y])
-        p1 = numpy.array([x1, y1])
-        p2 = numpy.array([x2, y2])
-        p3 = numpy.array([x3, y3])
-        # p4 = numpy.array([x4, y4])
-        d1 = numpy.dot(p2-p1, p-p1)
-        d2 = numpy.dot(p2-p1, p2-p1)
-        d3 = numpy.dot(p3-p2, p-p2)
-        d4 = numpy.dot(p3-p2, p3-p2)
-        return 0 <= d1 <= d2 and 0 <= d3 <= d4
+    # def is_inside_robot(self, x, y):
+    #     """Return True if the point is inside the robot.
+    #     Use robot-centric/east-north coordinates"""
+    #     # The four points in counterclockwise order
+    #     x1 = ROBOT_FRONT_X * math.cos(self.body_direction_rad) - ROBOT_SIDE * math.sin(self.body_direction_rad)
+    #     y1 = ROBOT_FRONT_X * math.sin(self.body_direction_rad) + ROBOT_SIDE * math.cos(self.body_direction_rad)
+    #     x2 = -ROBOT_FRONT_X * math.cos(self.body_direction_rad) - ROBOT_SIDE * math.sin(self.body_direction_rad)
+    #     y2 = -ROBOT_FRONT_X * math.sin(self.body_direction_rad) + ROBOT_SIDE * math.cos(self.body_direction_rad)
+    #     x3 = -ROBOT_FRONT_X * math.cos(self.body_direction_rad) + ROBOT_SIDE * math.sin(self.body_direction_rad)
+    #     y3 = -ROBOT_FRONT_X * math.sin(self.body_direction_rad) - ROBOT_SIDE * math.cos(self.body_direction_rad)
+    #     # x4 = ROBOT_FRONT_X * math.cos(self.body_direction_rad) + ROBOT_SIDE * math.sin(self.body_direction_rad)
+    #     # y4 = ROBOT_FRONT_X * math.sin(self.body_direction_rad) - ROBOT_SIDE * math.cos(self.body_direction_rad)
+    #
+    #     p = np.array([x, y])
+    #     p1 = np.array([x1, y1])
+    #     p2 = np.array([x2, y2])
+    #     p3 = np.array([x3, y3])
+    #     # p4 = numpy.array([x4, y4])
+    #     d1 = np.dot(p2-p1, p-p1)
+    #     d2 = np.dot(p2-p1, p2-p1)
+    #     d3 = np.dot(p3-p2, p-p2)
+    #     d4 = np.dot(p3-p2, p3-p2)
+    #     return 0 <= d1 <= d2 and 0 <= d3 <= d4

@@ -46,8 +46,6 @@ class Workspace:
         self.ctrl_phenomenon_view = None
 
         self.clock = 0
-        # self.initial_body_direction_rad = 0.  # Memorize the initial body direction before enaction
-        # self.initial_robot_point = np.array([0, 0, 0], dtype=float)
         self.memory_for_simulation = copy.deepcopy(self.memory)
         self.memory_for_imaginary = None
         self.is_imagining = False
@@ -69,8 +67,6 @@ class Workspace:
             self.intended_interaction["clock"] = self.clock
             # Save a snapshot of memory
             self.actions[self.intended_interaction['action']].is_simulating = True
-            # self.initial_body_direction_rad = self.memory.body_memory.body_direction_rad  # Memorize the direction
-            # self.initial_robot_point = self.memory.allocentric_memory.robot_point.copy()
             if self.engagement_mode == ENGAGEMENT_KEY_ROBOT:
                 # If engagement robot then send the command to the robot
                 self.interaction_step = INTERACTION_STEP_INTENDING
@@ -103,24 +99,19 @@ class Workspace:
 
         # INTEGRATING: the new enacted interaction
         if self.interaction_step == INTERACTION_STEP_INTEGRATING:
-            # if self.engagement_mode == ENGAGEMENT_KEY_ROBOT:
-            # self.memory.body_memory.body_direction_rad = self.initial_body_direction_rad  # Retrieve the direction
-            # self.memory.allocentric_memory.robot_point = self.initial_robot_point
+            # Retrieve the memory before simulation
             self.memory.body_memory.body_direction_rad = self.memory_for_simulation.body_memory.body_direction_rad
             self.memory.allocentric_memory.robot_point = self.memory_for_simulation.allocentric_memory.robot_point
 
             # Update body memory and egocentric memory
             self.memory.update_and_add_experiences(self.enacted_interaction)
-            self.memory.decay(self.clock)
+            # self.memory.decay(self.clock)
 
             # Call the integrator to create and update the phenomena.
             self.integrator.integrate()
 
             # Update allocentric memory: robot, phénomena
             self.memory.update_allocentric(self.integrator.phenomena)
-
-            # Save memory for future simulations
-            # self.memory_for_simulation = copy.deepcopy(self.memory)
 
             self.interaction_step = INTERACTION_STEP_REFRESHING
 

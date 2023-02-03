@@ -55,6 +55,6 @@ class Memory:
         # Mark the cells where is the robot
         self.allocentric_memory.place_robot(self.body_memory)
 
-    def decay(self, clock):
-        """Remove the experiences from egocentric memory when they are two lod"""
-        self.egocentric_memory.decay(clock)
+    # def decay(self, clock):
+    #     """Remove the experiences from egocentric memory when they are two lod"""
+    #     self.egocentric_memory.decay(clock)

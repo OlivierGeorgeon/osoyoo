@@ -28,8 +28,6 @@ class PhenomenonView(InteractiveDisplay):
         self.robot_batch = pyglet.graphics.Batch()
         self.robot = OsoyooCar(self.robot_batch, self.background)
         self.memory = memory
-        # self.robot_pos_x = 0
-        # self.robot_pos_y = 0
         self.phenomenon_point = numpy.array([0, 0, 0], dtype=float)
 
         self.hull_line = None
@@ -86,7 +84,7 @@ class PhenomenonView(InteractiveDisplay):
             color = name_to_rgb(color_string)
             opacity = 64
             cone = self.batch.add_indexed(nb_points, gl.GL_TRIANGLES, self.background, v_index, ('v2i', points),
-                                   ('c4B', nb_points * (*color, opacity)))
+                                          ('c4B', nb_points * (*color, opacity)))
         return cone
 
     def add_lines(self, points, color_string):

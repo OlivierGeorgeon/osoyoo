@@ -34,7 +34,7 @@ class Experience:
         self.position_matrix = matrix44.create_from_translation([x, y, 0]).astype('float64')
         # The position of the robot relative to the experience
         opposite_translation_matrix = matrix44.create_from_translation([-x, -y, 0]).astype('float64')
-        # The absolute direction of this affordance
+        # The absolute direction of this experience
         self.absolute_direction_rad = body_direction_rad
 
         if self.type in [EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_CENTRAL_ECHO]:
