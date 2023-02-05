@@ -74,9 +74,9 @@ class AgentCircle:
         self.anticipated_outcome = None
 
         intended_interaction = {'action': self._action.action_code}  # , 'speed': FORWARD_SPEED}
-        if self.workspace.focus_xy is not None:
-            intended_interaction['focus_x'] = self.workspace.focus_xy[0]
-            intended_interaction['focus_y'] = self.workspace.focus_xy[1]
+        if self.workspace.focus_point is not None:
+            intended_interaction['focus_x'] = int(self.workspace.focus_point[0])
+            intended_interaction['focus_y'] = int(self.workspace.focus_point[1])
 
         return intended_interaction
 

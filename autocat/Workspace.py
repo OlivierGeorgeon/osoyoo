@@ -39,7 +39,8 @@ class Workspace:
         self.engagement_mode = ENGAGEMENT_KEY_ROBOT
         self.interaction_step = INTERACTION_STEP_IDLE
 
-        self.focus_xy = None
+        # self.focus_xy = None
+        self.focus_point = None
         self.prompt_xy = None
 
         # Controls which phenomenon to display
@@ -149,22 +150,24 @@ class Workspace:
             self.clock += 1
 
         # Manage focus catch and lost
-        if self.focus_xy is not None:
+        if self.focus_point is not None:
             # If the focus was kept then update it
             if 'focus' in enacted_interaction:
                 if 'echo_xy' in enacted_interaction:  # Not sure why this is necessary
-                    self.focus_xy = enacted_interaction['echo_xy']
+                    self.focus_point = np.array([enacted_interaction['echo_xy'][0],
+                                                 enacted_interaction['echo_xy'][1], 0])
             # If the focus was lost then reset it
             if 'focus' not in enacted_interaction:
                 # The focus was lost, override the echo outcome
-                self.focus_xy = None
+                self.focus_point = None
                 print("LOST FOCUS")
         else:
             if self.intended_interaction['action'] in ["-", "8"]:
                 # Catch focus
                 if 'echo_xy' in enacted_interaction:
                     print("CATCH FOCUS")
-                    self.focus_xy = enacted_interaction['echo_xy']
+                    self.focus_point = np.array([enacted_interaction['echo_xy'][0],
+                                                 enacted_interaction['echo_xy'][1], 0])
 
         self.enacted_interaction = enacted_interaction
         self.intended_interaction = None
@@ -180,9 +183,9 @@ class Workspace:
             # Other keys are considered actions and sent to the robot
             if self.interaction_step == INTERACTION_STEP_IDLE:
                 self.intended_interaction = {"action": user_key}
-                if self.focus_xy is not None:
-                    self.intended_interaction['focus_x'] = int(self.focus_xy[0])
-                    self.intended_interaction['focus_y'] = int(self.focus_xy[1])
+                if self.focus_point is not None:
+                    self.intended_interaction['focus_x'] = int(self.focus_point[0])  # Convert to python int
+                    self.intended_interaction['focus_y'] = int(self.focus_point[1])
                 self.interaction_step = INTERACTION_STEP_ENGAGING
 
     def imagine(self):

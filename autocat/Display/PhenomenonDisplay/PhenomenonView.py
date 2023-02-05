@@ -1,4 +1,4 @@
-import numpy
+import numpy as np
 import pyglet
 from pyglet.gl import *
 from webcolors import name_to_rgb
@@ -28,7 +28,7 @@ class PhenomenonView(InteractiveDisplay):
         self.robot_batch = pyglet.graphics.Batch()
         self.robot = OsoyooCar(self.robot_batch, self.background)
         self.memory = memory
-        self.phenomenon_point = numpy.array([0, 0, 0], dtype=float)
+        self.phenomenon_point = np.array([0, 0, 0], dtype=float)
 
         self.hull_line = None
 
@@ -76,7 +76,10 @@ class PhenomenonView(InteractiveDisplay):
 
     def add_polygon(self, points, color_string):
         """Add a plain polygon to the background of the view"""
-        nb_points = int(len(points) / 2)
+        nb_points = int(len(points))
+        # Must convert the numpy array of points into a 2D flat list of integers
+        points = np.array([p[0:2] for p in points]).flatten().astype("int").tolist()
+        # nb_points = int(len(points) / 2)
         cone = None
         if 3 <= nb_points <= 6:
             nb_index = (nb_points - 2) * 3

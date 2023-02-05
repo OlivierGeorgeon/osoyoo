@@ -1,4 +1,5 @@
 import pyglet
+import numpy as np
 from pyglet.window import key
 from .EgocentricView import EgocentricView
 from .PointOfInterest import PointOfInterest, POINT_PROMPT
@@ -45,7 +46,8 @@ class CtrlEgocentricView:
                         self.points_of_interest.remove(p)
             if symbol == key.INSERT:
                 # Set the agent's focus to the user prompt
-                self.workspace.focus_xy = [self.mouse_press_x, self.mouse_press_y]
+                # self.workspace.focus_xy = [self.mouse_press_x, self.mouse_press_y]
+                self.workspace.focus_point = np.array([self.mouse_press_x, self.mouse_press_y, 0])
                 # Mark the prompt
                 self.workspace.prompt_xy = [self.mouse_press_x, self.mouse_press_y]
                 focus_point = PointOfInterest(self.mouse_press_x, self.mouse_press_y, self.view.batch,
@@ -110,9 +112,9 @@ class CtrlEgocentricView:
         """Create a point of interest corresponding to the focus"""
         agent_focus_point = None
         # if hasattr(self.workspace.agent, "is_focussed"):
-        if self.workspace.focus_xy is not None:
-            x = self.workspace.focus_xy[0]
-            y = self.workspace.focus_xy[1]
+        if self.workspace.focus_point is not None:
+            x = self.workspace.focus_point[0]
+            y = self.workspace.focus_point[1]
             agent_focus_point = PointOfInterest(x, y, self.view.batch, self.view.foreground, EXPERIENCE_FOCUS, self.workspace.clock)
         return agent_focus_point
 

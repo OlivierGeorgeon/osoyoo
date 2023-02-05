@@ -302,9 +302,11 @@ class AllocentricMemory:
         return matrix44.create_from_translation(self.robot_point)
 
     def mark_echo_area(self, affordance):
+        """Mark the area covered by the echolocalization sensor in allocentric memory"""
         # start_time = time.time()
         points = affordance.sensor_triangle()
-        triangle = np.array([points[0:2], points[2:4], points[4:6]])
+        # triangle = np.array([points[0:2], points[2:4], points[4:6]])
+        triangle = [p[0:2] for p in points]
         for c in [c for line in self.grid for c in line if c.is_inside(triangle)]:
             self.apply_status_to_cell(c.i, c.j, CELL_NO_ECHO)
         # print("Place echo time:", time.time() - start_time, "seconds")
