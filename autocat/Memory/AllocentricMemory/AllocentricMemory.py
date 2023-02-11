@@ -18,16 +18,16 @@ class AllocentricMemory:
         """
         self.affordances = []
         self.grid = list()
-        self.width = width
-        self.height = height
+        self.width = width  # Nb cells width
+        self.height = height  # Nb cells height
         self.cell_radius = cell_radius
 
         # Fill the grid with cells
         for i in range(self.width):
             self.grid.append(list())
             for j in range(self.height):
-                self.grid[i].append(GridCell(i, j))
-                pos = self.convert_cell_to_pos(i, j)
+                self.grid[i].append(GridCell(i, j, self.cell_radius))
+                pos = self.convert_cell_to_pos(i, j)  # TODO correct point by offset instead or replacing it
                 self.grid[i][j].point = np.array([*pos, 0], dtype=int)
 
         # Allocentric memory is initialized with the robot at its center
@@ -239,13 +239,13 @@ class AllocentricMemory:
             self.robot_cell_y = self.height // 2
             self.robot_point = np.array([0, 0, 0], dtype=float)
 
-        # Leave the previous occupied cell
-        if self.grid[self.robot_cell_x][self.robot_cell_y] != EXPERIENCE_FLOOR:
-            self.grid[self.robot_cell_x][self.robot_cell_y].set_to(EXPERIENCE_PLACE)
-
-        # Mark the new occupied cell
-        self.robot_cell_x, self.robot_cell_y = self.convert_pos_in_cell(
-            self.robot_point[0], self.robot_point[1])
+        # # Leave the previous occupied cell
+        # if self.grid[self.robot_cell_x][self.robot_cell_y] != EXPERIENCE_FLOOR:
+        #     self.grid[self.robot_cell_x][self.robot_cell_y].set_to(EXPERIENCE_PLACE)
+        #
+        # # Mark the new occupied cell
+        # self.robot_cell_x, self.robot_cell_y = self.convert_pos_in_cell(
+        #     self.robot_point[0], self.robot_point[1])
 
         return np.round(destination_point)
 
@@ -286,14 +286,14 @@ class AllocentricMemory:
         current_pos_y = start[1]
         for _ in range(nb_step):
             cell_x, cell_y = self.convert_pos_in_cell(current_pos_x, current_pos_y)
-            self.grid[cell_x][cell_y].status = status
+            self.grid[cell_x][cell_y].status[1] = status
             current_pos_x += step_x
             current_pos_y += step_y
 
     def apply_status_to_cell(self, cell_x, cell_y, status):
         """Change the cell status and add the coordinates to the cells_changed_recently list"""
         try:
-            self.grid[cell_x][cell_y].status = status
+            self.grid[cell_x][cell_y].status[1] = status
         except IndexError:
             print("Error cell out of grid, cell_x:", cell_x, "cell_y:", cell_y, "Status:", status)
             exit()
@@ -305,8 +305,8 @@ class AllocentricMemory:
         """Mark the area covered by the echolocalization sensor in allocentric memory"""
         # start_time = time.time()
         points = affordance.sensor_triangle()
-        # triangle = np.array([points[0:2], points[2:4], points[4:6]])
         triangle = [p[0:2] for p in points]
         for c in [c for line in self.grid for c in line if c.is_inside(triangle)]:
-            self.apply_status_to_cell(c.i, c.j, CELL_NO_ECHO)
+            c.status[2] = CELL_NO_ECHO
+            # self.apply_status_to_cell(c.i, c.j, CELL_NO_ECHO)
         # print("Place echo time:", time.time() - start_time, "seconds")

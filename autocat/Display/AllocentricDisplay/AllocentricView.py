@@ -24,11 +24,12 @@ class AllocentricView(InteractiveDisplay):
         # glClearColor(1.0, 1.0, 1.0, 1.0)
         pyglet.gl.glEnable(pyglet.gl.GL_BLEND)
         self.batch = pyglet.graphics.Batch()
-        self.background = pyglet.graphics.OrderedGroup(0)
-        self.foreground = pyglet.graphics.OrderedGroup(1)
+        self.group1 = pyglet.graphics.OrderedGroup(1)
+        self.group2 = pyglet.graphics.OrderedGroup(2)
+        self.foreground = pyglet.graphics.OrderedGroup(3)
 
         self.robot_batch = pyglet.graphics.Batch()
-        self.robot = OsoyooCar(self.robot_batch, self.background)  # Rectangles seem not to respect ordered groups
+        self.robot = OsoyooCar(self.robot_batch, self.foreground)  # Rectangles seem not to respect ordered groups
 
         # self.test_cell = Cell(0, 100, self.robot_batch, self.foreground, 50, 'Free')
 
@@ -42,7 +43,6 @@ class AllocentricView(InteractiveDisplay):
         self.cell_radius = memory.allocentric_memory.cell_radius
 
         self.hexagons = [[None for _ in range(self.nb_cell_y)] for _ in range(self.nb_cell_x)]
-        self.focus_cell = None
 
         self.mouse_press_x = 0
         self.mouse_press_y = 0
@@ -59,24 +59,24 @@ class AllocentricView(InteractiveDisplay):
     def update_hexagon(self, i: int, j: int):
         """Update or create an hexagon in allocentric view."""
         cell = self.memory.allocentric_memory.grid[i][j]
-        radius = self.memory.allocentric_memory.cell_radius
         if self.hexagons[i][j] is not None:
-            self.hexagons[i][j].set_color(cell.status)
+            self.hexagons[i][j].update_color()
         else:
-            if cell.status != CELL_UNKNOWN:
-                new_hexagon = HexagonalCell(i, j, self.batch, self.background, radius, cell.status, 0.8)
-                self.hexagons[i][j] = new_hexagon
+            if cell.status[1] != CELL_UNKNOWN or cell.status[2] != CELL_UNKNOWN:
+                self.hexagons[i][j] = HexagonalCell(cell, self.batch, self.group1, self.group2)
 
     def remove_focus_cell(self):
         """Remove the focus cell from allocentric view"""
         if self.focus_cell is not None:
-            self.focus_cell.shape.delete()
+            self.memory.allocentric_memory.grid[self.focus_cell[0]][self.focus_cell[1]].status[3] = CELL_UNKNOWN
         self.focus_cell = None
 
-    def add_focus_cell(self, cell_x, cell_y):
+    def add_focus_cell(self, i, j):
         """Add the focus cell to allocentric view"""
-        radius = self.memory.allocentric_memory.cell_radius
-        self.focus_cell = HexagonalCell(cell_x, cell_y, self.batch, self.foreground, radius, EXPERIENCE_FOCUS, 0.5)
+        self.memory.allocentric_memory.grid[i][j].status[3] = EXPERIENCE_FOCUS
+        self.update_hexagon(i, j)
+        self.focus_cell = (i, j)
+        #self.focus_cell = HexagonalCell(cell_x, cell_y, self.batch, self.group1, self.group2, radius, EXPERIENCE_FOCUS)
 
     def on_draw(self):
         """ Drawing the window """
@@ -111,9 +111,8 @@ class AllocentricView(InteractiveDisplay):
         self.label_batch.draw()
 
     def on_mouse_motion(self, x, y, dx, dy):
-        # Find the cell
-        cell_x, cell_y = self.cell_from_screen_coordinate(x, y)
-        # self.label.text = "Cell: " + str(cell_x) + ", " + str(cell_y)
+        """Display the position in allocentric memory and the cell in the grid"""
+        self.cell_from_screen_coordinate(x, y)
 
     def cell_from_screen_coordinate(self, x, y):
         """ Computes the cell coordinates from the screen coordinates """

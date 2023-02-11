@@ -38,19 +38,19 @@ class CtrlAllocentricView:
         for i in range(0, len(self.allocentric_view.memory.allocentric_memory.grid)):
             for j in range(0, len(self.allocentric_view.memory.allocentric_memory.grid[0])):
                 self.allocentric_view.update_hexagon(i, j)
-        self.add_focus_cell()
+        # self.add_focus_cell()
 
-    def add_focus_cell(self):
-        """Create a cell corresponding to the focus"""
-        # Remove the previous focus cell
-        self.allocentric_view.remove_focus_cell()
-        # Recreate the focus cell if agent has focus
-        if self.workspace.focus_point is not None:
-            displacement_matrix = matrix44.multiply(self.workspace.memory.body_memory.body_direction_matrix(),
-                                                    self.allocentric_memory.body_position_matrix())
-            v = matrix44.apply_to_vector(displacement_matrix, self.workspace.focus_point)
-            i, j = self.allocentric_memory.convert_pos_in_cell(v[0], v[1])
-            self.allocentric_view.add_focus_cell(i, j)
+    # def add_focus_cell(self):
+    #     """Create a cell corresponding to the focus"""
+    #     # Remove the previous focus cell
+    #     self.allocentric_view.remove_focus_cell()
+    #     # Recreate the focus cell if agent has focus
+    #     if self.workspace.focus_point is not None:
+    #         displacement_matrix = matrix44.multiply(self.workspace.memory.body_memory.body_direction_matrix(),
+    #                                                 self.allocentric_memory.body_position_matrix())
+    #         v = matrix44.apply_to_vector(displacement_matrix, self.workspace.focus_point)
+    #         i, j = self.allocentric_memory.convert_pos_in_cell(v[0], v[1])
+    #         self.allocentric_view.add_focus_cell(i, j)
 
     def main(self, dt):
         """Refresh allocentric view"""

@@ -58,27 +58,19 @@ class Affordance:
         points = None
         if self.experience.type in [EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_CENTRAL_ECHO]:
             # The position of the sensor
-            # p1x, p1y, _ = matrix44.apply_to_vector(self.experience.sensor_matrix, [0, 0, 0]) + self.point
-            p1 = matrix44.apply_to_vector(self.experience.sensor_matrix, [0, 0, 0])  # + self.point
+            p1 = matrix44.apply_to_vector(self.experience.sensor_matrix, [0, 0, 0])
             # Second point of the triangle
             orthogonal_rotation = matrix44.create_from_z_rotation(math.pi/2)
             p2_matrix = matrix44.multiply(self.experience.sensor_matrix, orthogonal_rotation)
             p2_matrix[3, 0] *= 0.4
             p2_matrix[3, 1] *= 0.4
-            # p2x, p2y, _ = matrix44.apply_to_vector(p2_matrix, [0, 0, 0]) + self.point
-            p2 = matrix44.apply_to_vector(p2_matrix, [0, 0, 0])  # + self.point
+            p2 = matrix44.apply_to_vector(p2_matrix, [0, 0, 0])
             # Third point of the triangle
             p3_matrix = matrix44.multiply(self.experience.sensor_matrix, orthogonal_rotation)
             p3_matrix[3, 0] *= -0.4
             p3_matrix[3, 1] *= -0.4
-            # p3x, p3y, _ = matrix44.apply_to_vector(p3_matrix, [0, 0, 0]) + self.point
-            p3 = matrix44.apply_to_vector(p3_matrix, [0, 0, 0])  # + self.point
-
-            # points = [int(p1x), int(p1y), int(p2x), int(p2y), int(p3x), int(p3y)]
+            p3 = matrix44.apply_to_vector(p3_matrix, [0, 0, 0])
 
             # Add the position of the affordance to the position of the triangle
             points = [p1, p2, p3] + self.point
-            # Convert to a list in order to display in allocentric and phenomenon memory
-            # points = np.array([p[0:2] for p in points]).flatten().astype("int").tolist()
-
         return points
