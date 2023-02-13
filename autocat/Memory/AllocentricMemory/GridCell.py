@@ -16,6 +16,7 @@ class GridCell:
         self.j = j
         self.radius = cell_radius
 
+        # Compute the position of this cell
         cell_height = math.sqrt((2 * cell_radius) ** 2 - cell_radius ** 2)
         if j % 2 == 0:
             x = i * 3 * cell_radius
@@ -23,21 +24,22 @@ class GridCell:
         else:
             x = (1.5 * cell_radius) + i * 3 * cell_radius
             y = (cell_height / 2) + (j - 1) / 2 * cell_height
-        self.center_point = np.array([x, y, 0])  # TODO move the center point to the center of allocentric memory
-        self.point = np.array([0, 0, 0])  # Is initialized just after the creation of the cell
+        self.point = np.array([x, y, 0])
+
+        # self.point = np.array([0, 0, 0])  # Is initialized just after the creation of the cell
 
         self.status = [CELL_UNKNOWN, CELL_UNKNOWN, CELL_UNKNOWN, CELL_UNKNOWN]
         self.experiences = list()  # Used in Synthesizer to store the experiences that happened on the cell
-        # self.confidence = 1
         self.phenomenon = None
 
     def __str__(self):
-        return "(" + str(self.i)+','+str(self.j) + ")"
+        # return "(" + "%+d" % self.i + ',' + "%+d" % self.j + ")"
+        return "(%+d,%+d)" % (self.i, self.j)
 
-    def set_to(self, status):
-        """Change the cell status, print an error if the status is invalid."""
-        assert(status in ["Blocked", CELL_UNKNOWN, "Line", "Something", EXPERIENCE_PLACE, CELL_PHENOMENON])
-        self.status[1] = status
+    # def set_to(self, status):
+    #     """Change the cell status, print an error if the status is invalid."""
+    #     assert(status in ["Blocked", CELL_UNKNOWN, "Line", "Something", EXPERIENCE_PLACE, CELL_PHENOMENON])
+    #     self.status[1] = status
 
     def is_inside(self, polygon):
         """True if this cell is inside the polygon"""

@@ -19,10 +19,11 @@ workspace.memory.allocentric_memory.apply_status_to_cell(i, j, EXPERIENCE_ALIGNE
 # Add focus
 workspace.memory.allocentric_memory.grid[i][j].status[3] = EXPERIENCE_FOCUS
 # Add no echo
-workspace.memory.allocentric_memory.grid[51][105].status[2] = CELL_NO_ECHO
+workspace.memory.allocentric_memory.grid[1][5].status[2] = CELL_NO_ECHO
 
 # Add place
-workspace.memory.allocentric_memory.apply_status_to_cell(51, 100, EXPERIENCE_PLACE)
+workspace.memory.allocentric_memory.apply_status_to_cell(1, 0, EXPERIENCE_PLACE)
+workspace.memory.allocentric_memory.apply_status_to_cell(-1, -2, EXPERIENCE_PLACE)
 
 view_controller = CtrlAllocentricView(workspace)
 view_controller.extract_and_convert_interactions()

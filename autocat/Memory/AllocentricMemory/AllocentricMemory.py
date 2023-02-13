@@ -20,15 +20,32 @@ class AllocentricMemory:
         self.grid = list()
         self.width = width  # Nb cells width
         self.height = height  # Nb cells height
+        self.min_i = -width // 2 + 1
+        self.max_i = width // 2
+        self.min_j = -height // 2 + 1
+        self.max_j = height // 2
         self.cell_radius = cell_radius
 
         # Fill the grid with cells
+        # Use negative grid index for negative positions
+        # cell_height = math.sqrt(self.cell_radius ** 2 - (self.cell_radius / 2) ** 2)
+        # cell_offset = np.array([(self.width // 2) * 3 * self.cell_radius, (self.height // 2) * cell_height, 0])
         for i in range(self.width):
             self.grid.append(list())
+            if i <= self.width // 2:
+                cell_i = i
+            else:
+                cell_i = -self.width + i
             for j in range(self.height):
-                self.grid[i].append(GridCell(i, j, self.cell_radius))
-                pos = self.convert_cell_to_pos(i, j)  # TODO correct point by offset instead or replacing it
-                self.grid[i][j].point = np.array([*pos, 0], dtype=int)
+                if j <= self.height // 2:
+                    cell_j = j
+                else:
+                    cell_j = -self.height + j
+                self.grid[i].append(GridCell(cell_i, cell_j, self.cell_radius))
+                # pos = self.convert_cell_to_pos(i, j)
+                # self.grid[i][j].point = np.array([*pos, 0], dtype=int)
+                # self.grid[i][j].point = self.grid[i][j].center_point  # - cell_offset
+                # self.grid[i][j].point = self.grid[i][j].center_point
 
         # Allocentric memory is initialized with the robot at its center
         self.robot_point = np.array([0, 0, 0], dtype=float)
@@ -46,10 +63,14 @@ class AllocentricMemory:
 
     def __str__(self):
         output = ""
-        for j in range(self.height-1, -1, -1):
+        for j in range(self.max_j, self.min_j - 1, -1):
+            # for j in range(int(self.height / 2), -self.height // 2, -1):
+            # for j in range(int(self.height / 2), int(-self.height / 2), -1):
             if j % 2 == 1:
                 output += "-----"
-            for i in range(self.width):
+            for i in range(self.min_i, self.max_i + 1):
+                # for i in range(-self.width // 2 + 1, self.width // 2 + 1):
+                # for i in range(int(-self.width / 2), int(self.width / 2) + 1):
                 output += str(self.grid[i][j])
                 output += "-----"
             output += "\n"
@@ -59,8 +80,8 @@ class AllocentricMemory:
         """Convert an allocentric position to cell coordinates."""
         radius = self.cell_radius
         mini_radius = math.sqrt(radius**2 - (radius/2)**2)
-        tmp_cell_x = self.width // 2
-        tmp_cell_y = self.height // 2
+        tmp_cell_x = 0  # self.width // 2  # The offset x
+        tmp_cell_y = 0  # self.height // 2  # The offset y
         tmp_cell_x_center = 0
         tmp_cell_y_center = 0
         # Do the regular part of translation :
@@ -116,7 +137,7 @@ class AllocentricMemory:
                     return self.find_coordinates_corner(tmp_cell_x, tmp_cell_y, x_sign, y_sign)
                 else:
                     "on est dans hgg bgg hdd bdd"
-                    return tmp_cell_x+ x_sign, tmp_cell_y + 2*y_sign
+                    return tmp_cell_x + x_sign, tmp_cell_y + 2*y_sign
                 # sauf erreur, si on met tout en valeur absolue on obtient toujours une pente descendante
                 # il faut donc juste regarder si le y du point est inférieur ou supérieur au 
                 # y correspondant au x sur l'equation de droite
@@ -138,7 +159,7 @@ class AllocentricMemory:
                 # sauf erreur, si on met tout en valeur absolue on obtient toujours une pente ascendante
                 # il faut donc juste regarder si le y du point est inférieur ou supérieur au 
                 # y correspondant au x sur l'equation de droite
-                if abs(pos_y) >= abs(y_ref) :
+                if abs(pos_y) >= abs(y_ref):
                     "on est dans hd"
                     return self.find_coordinates_corner(tmp_cell_x, tmp_cell_y, x_sign, y_sign)
                 else:
@@ -169,37 +190,37 @@ class AllocentricMemory:
 
             if y_ref1 <= abs(pos_y) <= y_ref2:
                 # on est dans hd
-                return self.find_coordinates_corner(tmp_cell_x, tmp_cell_y, x_sign,y_sign)
+                return self.find_coordinates_corner(tmp_cell_x, tmp_cell_y, x_sign, y_sign)
         if abs(pos_y) > mini_radius:
             return tmp_cell_x, tmp_cell_y + y_sign*2
         else:
             return tmp_cell_x, tmp_cell_y
 
-    def convert_cell_to_pos(self, cell_x, cell_y):
-        """Return the allocentric position of the center of the given cell."""
-        radius = self.cell_radius
-        mini_radius = math.sqrt(radius**2 - (radius/2)**2)
-        start_x = self.width // 2
-        change_x = cell_x - start_x
-        start_y = self.height // 2
-        change_y = cell_y - start_y
-        pos_x = 3 * radius * change_x
-        pos_y = 0
-        reste = 0
-        if change_y % 2 == 0:
-            pos_y = mini_radius * change_y
-        else:
-            signe = change_y/abs(change_y)
-            pos_y = mini_radius * (change_y - signe)
-            reste = signe
-
-        if reste != 0:
-            y_arrivee = (change_y - signe) + start_y
-            signe_x = 1 if y_arrivee % 2 == 0 else -1
-            pos_x += signe_x * (3/2)*radius
-            pos_y += signe * mini_radius
-
-        return int(pos_x), int(pos_y)
+    # def convert_cell_to_pos(self, cell_x, cell_y):
+    #     """Return the allocentric position of the center of the given cell."""
+    #     radius = self.cell_radius
+    #     mini_radius = math.sqrt(radius**2 - (radius/2)**2)
+    #     start_x = self.width // 2
+    #     change_x = cell_x - start_x
+    #     start_y = self.height // 2
+    #     change_y = cell_y - start_y
+    #     pos_x = 3 * radius * change_x
+    #     pos_y = 0
+    #     reste = 0
+    #     if change_y % 2 == 0:
+    #         pos_y = mini_radius * change_y
+    #     else:
+    #         signe = change_y/abs(change_y)
+    #         pos_y = mini_radius * (change_y - signe)
+    #         reste = signe
+    #
+    #     if reste != 0:
+    #         y_arrivee = (change_y - signe) + start_y
+    #         signe_x = 1 if y_arrivee % 2 == 0 else -1
+    #         pos_x += signe_x * (3/2)*radius
+    #         pos_y += signe * mini_radius
+    #
+    #     return int(pos_x), int(pos_y)
 
     def find_coordinates_corner(self, cell_x, cell_y, x_sign, y_sign):
         """aaaaaaaaa"""
@@ -230,14 +251,14 @@ class AllocentricMemory:
         else:
             destination_point = self.robot_point + translation
         # Check that the robot remains within allocentric memory limits
-        try:
-            self.apply_changes(self.robot_point, destination_point)
-            self.robot_point = destination_point
-        except IndexError:
-            print("IndexError")
-            self.robot_cell_x = self.width // 2
-            self.robot_cell_y = self.height // 2
-            self.robot_point = np.array([0, 0, 0], dtype=float)
+        # try:
+        self.apply_changes(self.robot_point, destination_point)
+        self.robot_point = destination_point
+        # except IndexError:
+        #     print("IndexError")
+        #     self.robot_cell_x = self.width // 2
+        #     self.robot_cell_y = self.height // 2
+        #     self.robot_point = np.array([0, 0, 0], dtype=float)
 
         # # Leave the previous occupied cell
         # if self.grid[self.robot_cell_x][self.robot_cell_y] != EXPERIENCE_FLOOR:
@@ -282,20 +303,17 @@ class AllocentricMemory:
         current_pos_y = start[1]
         for _ in range(nb_step):
             cell_x, cell_y = self.convert_pos_in_cell(current_pos_x, current_pos_y)
-            self.grid[cell_x][cell_y].status[1] = status
+            # self.grid[cell_x][cell_y].status[1] = status
+            self.apply_status_to_cell(cell_x, cell_y, status)
             current_pos_x += step_x
             current_pos_y += step_y
 
-    def apply_status_to_cell(self, cell_x, cell_y, status):
-        """Change the cell status and add the coordinates to the cells_changed_recently list"""
-        try:
-            self.grid[cell_x][cell_y].status[1] = status
-        except IndexError:
-            print("Error cell out of grid, cell_x:", cell_x, "cell_y:", cell_y, "Status:", status)
-            exit()
-
-    # def body_position_matrix(self):
-    #     return matrix44.create_from_translation(self.robot_point)
+    def apply_status_to_cell(self, i, j, status):
+        """Change the cell status"""
+        if (self.min_i <= i <= self.max_i) and (self.min_j <= j <= self.max_j):
+            self.grid[i][j].status[1] = status
+        else:
+            print("Error: cell out of grid, i:", i, "j:", j, "Status:", status)
 
     def mark_echo_area(self, affordance):
         """Mark the area covered by the echolocalization sensor in allocentric memory"""

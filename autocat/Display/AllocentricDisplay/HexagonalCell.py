@@ -34,7 +34,7 @@ class HexagonalCell:
         for i in range(0, 5):
             point = matrix44.apply_to_vector(rotation_matrix, point)
             points.append(point)
-        points += self.cell.center_point
+        points += self.cell.point
 
         points = np.array([p[0:2] for p in points]).flatten().astype("int").tolist()
         return self.batch.add_indexed(6, gl.GL_TRIANGLES, group, [0, 1, 2, 0, 2, 3, 0, 3, 4, 0, 4, 5],

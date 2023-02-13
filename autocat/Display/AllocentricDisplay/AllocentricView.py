@@ -92,14 +92,14 @@ class AllocentricView(InteractiveDisplay):
         # Stack the translation to center the grid in the widow
         tx = self.nb_cell_x * 30 * self.cell_radius / 20
         ty = self.nb_cell_y * 8.66 * self.cell_radius / 20
-        glTranslatef(-tx, -ty, 0)
+        # glTranslatef(-tx, -ty, 0)
 
         # Draw the grid
         self.batch.draw()
 
         # Stack the transformation to position the robot
-        glTranslatef(tx + self.memory.allocentric_memory.robot_point[0],
-                     ty + self.memory.allocentric_memory.robot_point[1], 0)
+        glTranslatef(self.memory.allocentric_memory.robot_point[0],
+                     self.memory.allocentric_memory.robot_point[1], 0)
         glRotatef(90 - self.memory.body_memory.body_azimuth(), 0.0, 0.0, 1.0)
         # Draw the robot
         self.robot.rotate_head(self.memory.body_memory.head_direction_degree())
@@ -119,6 +119,8 @@ class AllocentricView(InteractiveDisplay):
         mouse_x = int((x - self.width/2) * self.zoom_level * 2)
         mouse_y = int((y - self.height/2) * self.zoom_level * 2)
         cell_x, cell_y = self.memory.allocentric_memory.convert_pos_in_cell(mouse_x, mouse_y)
-        self.label.text = "Pos: " + str(round(mouse_x)) + ", " + str(round(mouse_y))
-        self.label.text += " Cell: " + str(cell_x) + ", " + str(cell_y)
+        self.label.text = "Mouse pos.: " + str(round(mouse_x)) + ", " + str(round(mouse_y))
+        self.label.text += ", Cell: " + str(cell_x) + ", " + str(cell_y)
+        self.label.text += ", Cell Pos.: " + str(round(self.memory.allocentric_memory.grid[cell_x][cell_y].point[0])) + ", " + \
+                           str(round(self.memory.allocentric_memory.grid[cell_x][cell_y].point[1]))
         return cell_x, cell_y
