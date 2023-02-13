@@ -3,6 +3,7 @@ from .EgocentricMemory.EgocentricMemory import EgocentricMemory
 from .AllocentricMemory.AllocentricMemory import AllocentricMemory
 from .BodyMemory import BodyMemory
 from .AllocentricMemory.GridCell import CELL_UNKNOWN, CELL_PHENOMENON
+from .EgocentricMemory.Experience import EXPERIENCE_FOCUS
 
 
 class Memory:
@@ -14,6 +15,9 @@ class Memory:
         self.body_memory = BodyMemory()
         self.egocentric_memory = EgocentricMemory()
         self.allocentric_memory = AllocentricMemory(hexagrid_size[0], hexagrid_size[1], cell_radius=cell_radius)
+
+        self.focus_i = None  # It may rather belong to allocentric memory
+        self.focus_j = None
 
     def update_and_add_experiences(self, enacted_interaction):
         """ Process the enacted interaction to update the memory
@@ -30,7 +34,7 @@ class Memory:
         self.allocentric_memory.move(self.body_memory.body_direction_rad, enacted_interaction['translation'])
         # self.allocentric_memory.place_robot(self.body_memory)  # Must call it after synthesizer
 
-    def update_allocentric(self, phenomena):
+    def update_allocentric(self, phenomena, focus_point):
         """Allocate the phenomena to the cells of allocentric memory"""
         # Clear the previous phenomena
         self.allocentric_memory.clear_phenomena()
@@ -45,7 +49,6 @@ class Memory:
                 self.allocentric_memory.grid[cell_x][cell_y].phenomenon = p
             cell_i, cell_j = self.allocentric_memory.convert_pos_in_cell(p.point[0], p.point[1])
             self.allocentric_memory.apply_status_to_cell(cell_i, cell_j, CELL_PHENOMENON)  # Mark the origin
-            # self.allocentric_memory.grid[cell_i][cell_j].allocate_phenomenon(p)  # Mark the origin of the phenomenon
 
         # Place the affordances that are not attached to phenomena
         for affordance in self.allocentric_memory.affordances:
@@ -55,7 +58,16 @@ class Memory:
         # Mark the cells where is the robot
         self.allocentric_memory.place_robot(self.body_memory)
 
+        # Update the focus in allocentric memory
+        if self.focus_i is not None:
+            self.allocentric_memory.grid[self.focus_i][self.focus_j].status[3] = CELL_UNKNOWN
+        if focus_point is not None:
+            allo_focus = self.egocentric_to_allocentric(focus_point)
+            self.focus_i, self.focus_j = self.allocentric_memory.convert_pos_in_cell(allo_focus[0], allo_focus[1])
+            self.allocentric_memory.grid[self.focus_i][self.focus_j].status[3] = EXPERIENCE_FOCUS
+
     def egocentric_to_allocentric(self, point):
-        """Convert the point from egocentric to allocentric coordinates"""
-        m = matrix44.multiply(self.body_memory.body_direction_matrix(), self.allocentric_memory.body_position_matrix())
-        return matrix44.apply_to_vector(m, point)
+        """Return the point in allocentric coordinates from the point in egocentric coordinates"""
+        # Rotate the point by the body direction and add the body position
+        return matrix44.apply_to_vector(self.body_memory.body_direction_matrix(), point) \
+            + self.allocentric_memory.robot_point

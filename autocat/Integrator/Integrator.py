@@ -27,8 +27,9 @@ class Integrator:
         for e in new_experiences:
             if e.type != EXPERIENCE_LOCAL_ECHO:
                 # The position of the affordance in allocentric memory
-                affordance_point = e.allocentric_from_matrices(self.workspace.memory.body_memory.body_direction_matrix(),
-                                                               self.allocentric_memory.body_position_matrix())
+                # affordance_point = e.allocentric_from_matrices(self.workspace.memory.body_memory.body_direction_matrix(),
+                #                                                self.allocentric_memory.body_position_matrix())
+                affordance_point = self.workspace.memory.egocentric_to_allocentric(e.point)
                 new_affordances.append(Affordance(affordance_point, e))
                 # print("Experience:", e.type, ", point:", affordance_point)
 

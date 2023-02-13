@@ -57,46 +57,16 @@ class BodyMemory:
     def head_absolute_direction(self):
         return self.body_direction_rad + self.head_direction_rad
 
-    def polygon(self, robot_point):
-        """The rectangle occupied by the robot's body in absolute position in egocentric memory"""
-        x1 = ROBOT_FRONT_X * math.cos(self.body_direction_rad) - ROBOT_SIDE * math.sin(self.body_direction_rad) \
-            + robot_point[0]
-        y1 = ROBOT_FRONT_X * math.sin(self.body_direction_rad) + ROBOT_SIDE * math.cos(self.body_direction_rad) \
-            + robot_point[1]
-        x2 = -ROBOT_FRONT_X * math.cos(self.body_direction_rad) - ROBOT_SIDE * math.sin(self.body_direction_rad) \
-            + robot_point[0]
-        y2 = -ROBOT_FRONT_X * math.sin(self.body_direction_rad) + ROBOT_SIDE * math.cos(self.body_direction_rad) \
-            + robot_point[1]
-        x3 = -ROBOT_FRONT_X * math.cos(self.body_direction_rad) + ROBOT_SIDE * math.sin(self.body_direction_rad) \
-            + robot_point[0]
-        y3 = -ROBOT_FRONT_X * math.sin(self.body_direction_rad) - ROBOT_SIDE * math.cos(self.body_direction_rad) \
-            + robot_point[1]
-        x4 = ROBOT_FRONT_X * math.cos(self.body_direction_rad) + ROBOT_SIDE * math.sin(self.body_direction_rad) \
-            + robot_point[0]
-        y4 = ROBOT_FRONT_X * math.sin(self.body_direction_rad) - ROBOT_SIDE * math.cos(self.body_direction_rad) \
-            + robot_point[1]
-        return np.array([[x1, y1], [x2, y2], [x3, y3], [x4, y4]])
+    def outline(self):
+        """The rectangle occupied by the robot's body - North up"""
+        # outline = [[ROBOT_FRONT_X, ROBOT_SIDE, 0], [-ROBOT_FRONT_X, ROBOT_SIDE, 0],
+        #            [-ROBOT_FRONT_X, -ROBOT_SIDE, 0], [ROBOT_FRONT_X, -ROBOT_SIDE, 0]]
+        # return matrix44.apply_to_vector(self.body_direction_matrix(), outline)
+        # Apply to array of vectors is not working:
+        # Pyrr 0.10.3 installed different from https://github.com/adamlwgriffiths/Pyrr/blob/master/pyrr/matrix44.py
+        p1 = matrix44.apply_to_vector(self.body_direction_matrix(), [ROBOT_FRONT_X, ROBOT_SIDE, 0])
+        p2 = matrix44.apply_to_vector(self.body_direction_matrix(), [-ROBOT_FRONT_X, ROBOT_SIDE, 0])
+        p3 = matrix44.apply_to_vector(self.body_direction_matrix(), [-ROBOT_FRONT_X, -ROBOT_SIDE, 0])
+        p4 = matrix44.apply_to_vector(self.body_direction_matrix(), [ROBOT_FRONT_X, -ROBOT_SIDE, 0])
 
-    # def is_inside_robot(self, x, y):
-    #     """Return True if the point is inside the robot.
-    #     Use robot-centric/east-north coordinates"""
-    #     # The four points in counterclockwise order
-    #     x1 = ROBOT_FRONT_X * math.cos(self.body_direction_rad) - ROBOT_SIDE * math.sin(self.body_direction_rad)
-    #     y1 = ROBOT_FRONT_X * math.sin(self.body_direction_rad) + ROBOT_SIDE * math.cos(self.body_direction_rad)
-    #     x2 = -ROBOT_FRONT_X * math.cos(self.body_direction_rad) - ROBOT_SIDE * math.sin(self.body_direction_rad)
-    #     y2 = -ROBOT_FRONT_X * math.sin(self.body_direction_rad) + ROBOT_SIDE * math.cos(self.body_direction_rad)
-    #     x3 = -ROBOT_FRONT_X * math.cos(self.body_direction_rad) + ROBOT_SIDE * math.sin(self.body_direction_rad)
-    #     y3 = -ROBOT_FRONT_X * math.sin(self.body_direction_rad) - ROBOT_SIDE * math.cos(self.body_direction_rad)
-    #     # x4 = ROBOT_FRONT_X * math.cos(self.body_direction_rad) + ROBOT_SIDE * math.sin(self.body_direction_rad)
-    #     # y4 = ROBOT_FRONT_X * math.sin(self.body_direction_rad) - ROBOT_SIDE * math.cos(self.body_direction_rad)
-    #
-    #     p = np.array([x, y])
-    #     p1 = np.array([x1, y1])
-    #     p2 = np.array([x2, y2])
-    #     p3 = np.array([x3, y3])
-    #     # p4 = numpy.array([x4, y4])
-    #     d1 = np.dot(p2-p1, p-p1)
-    #     d2 = np.dot(p2-p1, p2-p1)
-    #     d3 = np.dot(p3-p2, p-p2)
-    #     d4 = np.dot(p3-p2, p3-p2)
-    #     return 0 <= d1 <= d2 and 0 <= d3 <= d4
+        return np.array([p1, p2, p3, p4])

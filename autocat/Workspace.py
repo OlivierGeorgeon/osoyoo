@@ -42,7 +42,6 @@ class Workspace:
         self.engagement_mode = ENGAGEMENT_KEY_ROBOT
         self.interaction_step = INTERACTION_STEP_IDLE
 
-        # self.focus_xy = None
         self.focus_point = None
         self.focus_i = None
         self.focus_j = None
@@ -111,13 +110,12 @@ class Workspace:
 
             # Update body memory and egocentric memory
             self.memory.update_and_add_experiences(self.enacted_interaction)
-            # self.memory.decay(self.clock)
 
-            # Call the integrator to create and update the phenomena.
+            # Call the integrator to create and update the phenomena
             self.integrator.integrate()
 
-            # Update allocentric memory: robot, phénomena
-            self.memory.update_allocentric(self.integrator.phenomena)
+            # Update allocentric memory: robot, phenomena, focus
+            self.memory.update_allocentric(self.integrator.phenomena, self.focus_point)
 
             self.interaction_step = INTERACTION_STEP_REFRESHING
 
@@ -157,16 +155,14 @@ class Workspace:
         # Manage focus catch and lost
         if self.focus_point is not None:
             # If the focus was kept then update it
-            # TODO clearn up
-            self.memory.allocentric_memory.grid[self.focus_i][self.focus_j].status[3] = CELL_UNKNOWN
+            # self.memory.allocentric_memory.grid[self.focus_i][self.focus_j].status[3] = CELL_UNKNOWN
             if 'focus' in enacted_interaction:
                 if 'echo_xy' in enacted_interaction:  # Not sure why this is necessary
                     self.focus_point = np.array([enacted_interaction['echo_xy'][0],
                                                  enacted_interaction['echo_xy'][1], 0])
-                    # TODO update allocentric memory
-                    allo_focus = self.memory.egocentric_to_allocentric(self.focus_point)
-                    self.focus_i, self.focus_j = self.memory.allocentric_memory.convert_pos_in_cell(allo_focus[0], allo_focus[1])
-                    self.memory.allocentric_memory.grid[self.focus_i][self.focus_j].status[3] = EXPERIENCE_FOCUS
+                    # allo_focus = self.memory.egocentric_to_allocentric(self.focus_point)
+                    # self.focus_i, self.focus_j = self.memory.allocentric_memory.convert_pos_in_cell(allo_focus[0], allo_focus[1])
+                    # self.memory.allocentric_memory.grid[self.focus_i][self.focus_j].status[3] = EXPERIENCE_FOCUS
             # If the focus was lost then reset it
             if 'focus' not in enacted_interaction:
                 # The focus was lost, override the echo outcome
@@ -179,10 +175,9 @@ class Workspace:
                     print("CATCH FOCUS")
                     self.focus_point = np.array([enacted_interaction['echo_xy'][0],
                                                  enacted_interaction['echo_xy'][1], 0])
-                    # TODO clean un the display of focus in allocentric memory
-                    allo_focus = self.memory.egocentric_to_allocentric(self.focus_point)
-                    self.focus_i, self.focus_j = self.memory.allocentric_memory.convert_pos_in_cell(allo_focus[0], allo_focus[1])
-                    self.memory.allocentric_memory.grid[self.focus_i][self.focus_j].status[3] = EXPERIENCE_FOCUS
+                    # allo_focus = self.memory.egocentric_to_allocentric(self.focus_point)
+                    # self.focus_i, self.focus_j = self.memory.allocentric_memory.convert_pos_in_cell(allo_focus[0], allo_focus[1])
+                    # self.memory.allocentric_memory.grid[self.focus_i][self.focus_j].status[3] = EXPERIENCE_FOCUS
 
         self.enacted_interaction = enacted_interaction
         self.intended_interaction = None

@@ -120,7 +120,7 @@ class CtrlEgocentricView:
 
     def create_point_of_interest(self, experience):
         """Create a point of interest corresponding to the experience given as parameter"""
-        return PointOfInterest(experience.x, experience.y, self.view.batch, self.view.foreground,
+        return PointOfInterest(experience.point[0], experience.point[1], self.view.batch, self.view.foreground,
                                experience.type, self.workspace.clock, experience=experience)
 
     def main(self, dt):

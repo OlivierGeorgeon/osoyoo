@@ -1,5 +1,5 @@
 from pyrr import matrix44
-import numpy
+import numpy as np
 import math
 from ...Robot.RobotDefine import ROBOT_HEAD_X
 
@@ -24,16 +24,17 @@ class Experience:
         type : type of experience (i.e. Chock, Block, Echolocalisation, Line etc)
         durability : durability of the experience, when it reach zero the experience should be removed from the memory.
         """
-        self.x = x
-        self.y = y
+        # self.x = x
+        # self.y = y
+        self.point = np.array([x, y, 0])
         self.type = experience_type
         self.clock = clock
 
         # The position matrix is applied to the vertices of the point_of_interest to display
         # the point of interest at the position of the experience in egocentric view
-        self.position_matrix = matrix44.create_from_translation([x, y, 0]).astype('float64')
+        self.position_matrix = matrix44.create_from_translation(self.point).astype('float64')
         # The position of the robot relative to the experience
-        opposite_translation_matrix = matrix44.create_from_translation([-x, -y, 0]).astype('float64')
+        opposite_translation_matrix = matrix44.create_from_translation(-self.point).astype('float64')
         # The absolute direction of this experience
         self.absolute_direction_rad = body_direction_rad
 
@@ -41,7 +42,7 @@ class Experience:
             # The position of the echo incorporating the rotation from the head
             head_direction_rad = math.atan2(y, x-ROBOT_HEAD_X)
             self.absolute_direction_rad += head_direction_rad  # The absolute direction of the sensor...
-            self.absolute_direction_rad = numpy.mod(self.absolute_direction_rad, 2*math.pi)  # ...within [0,2pi]
+            self.absolute_direction_rad = np.mod(self.absolute_direction_rad, 2*math.pi)  # ...within [0,2pi]
             # print("Absolute direction rad:", round(math.degrees(self.absolute_direction_rad)), "°")
             translation_from_head_matrix = matrix44.create_from_translation([math.sqrt((x-ROBOT_HEAD_X)**2 + y**2),
                                                                              0, 0])
@@ -73,13 +74,13 @@ class Experience:
         # by miraculously multiplying the position_matrix by the displacement_matrix
         self.position_matrix = matrix44.multiply(self.position_matrix, displacement_matrix)
 
-        # Recompute the x, y coordinates in robot-centric coordinates
-        self.x, self.y, _ = matrix44.apply_to_vector(self.position_matrix, [0, 0, 0])
+        # Recompute the experience's coordinates in robot-centric coordinates
+        self.point = matrix44.apply_to_vector(self.position_matrix, [0, 0, 0])
 
-    def allocentric_from_matrices(self, body_direction_matrix, body_position_matrix):
-        """ The allocentric coordinates of the experience given the body direction and position matrices"""
-        displacement_matrix = matrix44.multiply(body_direction_matrix, body_position_matrix)
-        return numpy.array(matrix44.apply_to_vector(displacement_matrix, [self.x, self.y, 0]), dtype=numpy.int16)
+    # def allocentric_from_matrices(self, body_direction_matrix, body_position_matrix):
+    #     """ The allocentric coordinates of the experience given the body direction and position matrices"""
+    #     displacement_matrix = matrix44.multiply(body_direction_matrix, body_position_matrix)
+    #     return numpy.array(matrix44.apply_to_vector(displacement_matrix, [self.x, self.y, 0]), dtype=numpy.int16)
 
     # def allocentric_position_matrix(self, body_direction_matrix, body_position_matrix):
     #     """ The position matrix to place this experience in allocentric memory"""

@@ -47,9 +47,9 @@ class EgocentricMemory:
         output = []
         for elem in echo_list:
             # compute the angle using elem x and y
-            angle = math.atan2(elem.y, elem.x)
+            angle = math.atan2(elem.point[1], elem.point[0])
             # compute the distance using elem x and y
-            distance = math.sqrt(elem.x ** 2 + elem.y ** 2)
+            distance = math.sqrt(elem.point[0] ** 2 + elem.point[1] ** 2)
             output.append((angle, distance, elem))
         return output
 
@@ -95,12 +95,12 @@ class EgocentricMemory:
                 x_mean, y_mean = 0, 0
                 if len(streak) % 2 == 0:
                     # Compute the means of x and y values for the two elements at the center of the array
-                    x_mean = (streak[int(len(streak) / 2)][2].x + streak[int(len(streak) / 2) - 1][2].x) / 2
-                    y_mean = (streak[int(len(streak) / 2)][2].y + streak[int(len(streak) / 2) - 1][2].y) / 2
+                    x_mean = (streak[int(len(streak) / 2)][2].point[0] + streak[int(len(streak) / 2) - 1][2].point[0]) / 2
+                    y_mean = (streak[int(len(streak) / 2)][2].point[1] + streak[int(len(streak) / 2) - 1][2].point[1]) / 2
                 else:
                     # The x and y are at the center of the array
-                    x_mean = streak[int(len(streak) / 2)][2].x
-                    y_mean = streak[int(len(streak) / 2)][2].y
+                    x_mean = streak[int(len(streak) / 2)][2].point[0]
+                    y_mean = streak[int(len(streak) / 2)][2].point[1]
                 experience_central_echo = Experience(int(x_mean), int(y_mean), EXPERIENCE_CENTRAL_ECHO,
                                                      body_direction_rad, clock, durability=5, experience_id=self.experience_id)
                 self.experience_id += 1
