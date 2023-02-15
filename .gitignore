@@ -1,4 +1,4 @@
-/autocat_enacter/arduino_secrets.h
+/autocat_enacter/src/wifi/arduino_secrets.h
 __pycache__/
 .idea/
 venv/
