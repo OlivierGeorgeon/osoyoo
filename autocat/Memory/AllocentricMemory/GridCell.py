@@ -28,18 +28,17 @@ class GridCell:
 
         # self.point = np.array([0, 0, 0])  # Is initialized just after the creation of the cell
 
-        self.status = [CELL_UNKNOWN, CELL_UNKNOWN, CELL_UNKNOWN, CELL_UNKNOWN]
+        self.status = [CELL_UNKNOWN,  # Place
+                       CELL_UNKNOWN,  # Interaction
+                       CELL_UNKNOWN,  # No echo
+                       CELL_UNKNOWN]  # Focus
+        self.clocks = [0, 0, 0, 0]  # The latest clocks attached with each layer
         self.experiences = list()  # Used in Synthesizer to store the experiences that happened on the cell
         self.phenomenon = None
 
     def __str__(self):
-        # return "(" + "%+d" % self.i + ',' + "%+d" % self.j + ")"
+        """String representation of the cell for console display"""
         return "(%+d,%+d)" % (self.i, self.j)
-
-    # def set_to(self, status):
-    #     """Change the cell status, print an error if the status is invalid."""
-    #     assert(status in ["Blocked", CELL_UNKNOWN, "Line", "Something", EXPERIENCE_PLACE, CELL_PHENOMENON])
-    #     self.status[1] = status
 
     def is_inside(self, polygon):
         """True if this cell is inside the polygon"""

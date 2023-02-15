@@ -1,5 +1,5 @@
 /*
-  Omny_wheel_motion.h - library for Osoyoo car motion command.
+  Wheel.h - library for Osoyoo car motion command.
   Created by Olivier Georgeon, june 20 2021
   released into the public domain
 */

@@ -78,6 +78,7 @@ class Action:
         return True
 
     def start_simulation(self):
+        """Initialize the simulation of the action"""
         if self.action_code in [ACTION_FORWARD, ACTION_BACKWARD, ACTION_RIGHTWARD, ACTION_LEFTWARD]:
             self.simulation_target = self.target_duration
         if self.action_code in [ACTION_TURN_RIGHT, ACTION_TURN_LEFT]:

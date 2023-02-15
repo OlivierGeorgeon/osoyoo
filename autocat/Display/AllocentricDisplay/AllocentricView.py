@@ -24,8 +24,9 @@ class AllocentricView(InteractiveDisplay):
         # glClearColor(1.0, 1.0, 1.0, 1.0)
         pyglet.gl.glEnable(pyglet.gl.GL_BLEND)
         self.batch = pyglet.graphics.Batch()
-        self.group1 = pyglet.graphics.OrderedGroup(1)
-        self.group2 = pyglet.graphics.OrderedGroup(2)
+        self.groups = [pyglet.graphics.OrderedGroup(0),
+                       pyglet.graphics.OrderedGroup(1),
+                       pyglet.graphics.OrderedGroup(2)]
         self.foreground = pyglet.graphics.OrderedGroup(3)
 
         self.robot_batch = pyglet.graphics.Batch()
@@ -62,8 +63,8 @@ class AllocentricView(InteractiveDisplay):
         if self.hexagons[i][j] is not None:
             self.hexagons[i][j].update_color()
         else:
-            if cell.status[1] != CELL_UNKNOWN or cell.status[2] != CELL_UNKNOWN:
-                self.hexagons[i][j] = HexagonalCell(cell, self.batch, self.group1, self.group2)
+            if cell.status[0] != CELL_UNKNOWN or cell.status[1] != CELL_UNKNOWN or cell.status[2] != CELL_UNKNOWN:
+                self.hexagons[i][j] = HexagonalCell(cell, self.batch, self.groups)
 
     def remove_focus_cell(self):
         """Remove the focus cell from allocentric view"""

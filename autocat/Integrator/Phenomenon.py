@@ -3,7 +3,7 @@ from pyrr import matrix44
 from scipy.spatial import ConvexHull, QhullError, Delaunay
 
 PHENOMENON_DELTA = 300  # (mm) Distance between affordances to be considered the same phenomenon
-PHENOMENON_INITIAL_CONFIDENCE = 0.2  # 0.2 Initial confidence in the phenomenon
+PHENOMENON_INITIAL_CONFIDENCE = 0.0  # 0.2 Initial confidence in the phenomenon
 PHENOMENON_CONFIDENCE_PRUNE = 0.3  # Confidence threshold above which prune
 
 
@@ -61,6 +61,7 @@ class Phenomenon:
             # If the affordance is similar to the origin affordance (near position and direction)
             if affordance.is_similar_to(self.origin_affordance):
                 # The affordance in (0,0) and correct the robot's position
+                # TODO: only if a new tour has been completed
                 position_correction = -relative_affordance_point
             else:
                 position_correction = numpy.array(self.confidence * delta, dtype=numpy.int16)

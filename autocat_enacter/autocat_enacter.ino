@@ -9,8 +9,10 @@
 
  Download autocat_enacter.ino to the OSOYOO robot car
 
+  Spring 2023
+    Olivier Georgeon
   Spring 2022
-   Titoua Knockart, Université Claude Bernard (UCBL), France
+   Titouan Knockart, Université Claude Bernard (UCBL), France
   BSN2 2021-2022
    Aleksei Apostolou, Daniel Duval, Célien Fiorelli, Geordi Gampio, Julina Matouassiloua
   Teachers
@@ -21,8 +23,6 @@
  Tutorial URL http://osoyoo.com/?p=30022
 */
 
-#include <WiFiEsp.h>
-#include <WiFiEspUDP.h>
 #include <Arduino_JSON.h>
 
 #include "arduino_secrets.h"
@@ -31,9 +31,10 @@
 #include "Head.h"
 #include "Imu.h"
 #include "Action_define.h"
+#include "WifiCat.h"
+
 // "Wheel.h" is imported by Floor.h
 // #include "Head_echo_complete_scan.h"
-#define WIFI_CHANNEL 10 // 10 was the original value in the Osoyoo demo
 
 Wheel OWM;
 Floor FCR(OWM);
@@ -41,8 +42,7 @@ Head HEA;
 Imu IMU;
 //Head_echo_complete_scan HECS;
 char packetBuffer[100]; // Max number of characters received
-WiFiEspUDP Udp;
-unsigned int localPort = 8888;  // local port to listen on
+WifiCat WifiCat;
 
 void setup()
 {
@@ -51,43 +51,7 @@ void setup()
   Serial.println("Serial initialized");
 
   // Connect to the wifi board
-  Serial1.begin(115200);
-  Serial1.write("AT+UART_DEF=9600,8,1,0,0\r\n");
-  delay(200);
-  Serial1.write("AT+RST\r\n");
-  delay(200);
-  Serial1.begin(9600);    // initialize serial for ESP module
-  WiFi.init(&Serial1);    // initialize ESP module
-  // check for the presence of the shield
-  if (WiFi.status() == WL_NO_SHIELD) {
-    Serial.println("WiFi shield not present");
-    // don't continue
-    while (true);
-  }
-  // Connect to the wifi network
-  int status = WL_IDLE_STATUS;
-  if (SECRET_WIFI_TYPE == "AP") { // Wifi parameters in arduino_secret.h
-    // Connecting to wifi as an Access Point (AP)
-    char ssid[] = "osoyoo_robot";
-    Serial.print("Attempting to start AP ");
-    Serial.println(ssid);
-    status = WiFi.beginAP(ssid, WIFI_CHANNEL, "", 0);
-  } else {
-    // Connecting to wifi as a Station (STA)
-    char ssid[] = SECRET_SSID;
-    char pass[] = SECRET_PASS;
-    while (status != WL_CONNECTED) {
-      Serial.print("Attempting to connect to WPA SSID: ");
-      Serial.println(ssid);
-      status = WiFi.begin(ssid, pass);
-    }
-  }
-  Udp.begin(localPort);
-
-  Serial.print("IP Address: ");
-  Serial.println(WiFi.localIP());
-  Serial.print("Listening on port: ");
-  Serial.println(localPort);
+  WifiCat.begin();
 
   // Initialize the automatic behaviors
   OWM.setup();
@@ -159,11 +123,11 @@ void loop()
   if (interaction_step == 0 )
   {
     // Watch the wifi for new action
-    int packetSize = Udp.parsePacket();
+    int packetSize = WifiCat.Udp.parsePacket();
     // If the received packet exceeds the size of packetBuffer defined above, Arduino will crash
     if (packetSize) {
       action_angle = 0;
-      int len = Udp.read(packetBuffer, 512);
+      int len = WifiCat.Udp.read(packetBuffer, 512);
       packetBuffer[len] = 0;
       //Serial.print("Received action ");
       if (len == 1) {
@@ -198,7 +162,7 @@ void loop()
         }
       }
       //Serial.print(" from ");
-      IPAddress remoteIp = Udp.remoteIP();
+      //IPAddress remoteIp = Udp.remoteIP();
       //Serial.print(remoteIp);
       //Serial.print("/");
       //Serial.println(Udp.remotePort());
@@ -570,9 +534,9 @@ void loop()
 
     digitalWrite(LED_BUILTIN, HIGH); // light the led during transfer
     // Send the outcome to the IP address and port that sent the action
-    Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
-    Udp.print(outcome_json_string);
-    Udp.endPacket();
+    WifiCat.Udp.beginPacket(WifiCat.Udp.remoteIP(), WifiCat.Udp.remotePort());
+    WifiCat.Udp.print(outcome_json_string);
+    WifiCat.Udp.endPacket();
     digitalWrite(LED_BUILTIN, LOW);
 
     // Ready to begin a new interaction

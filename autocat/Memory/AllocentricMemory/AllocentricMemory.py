@@ -28,8 +28,6 @@ class AllocentricMemory:
 
         # Fill the grid with cells
         # Use negative grid index for negative positions
-        # cell_height = math.sqrt(self.cell_radius ** 2 - (self.cell_radius / 2) ** 2)
-        # cell_offset = np.array([(self.width // 2) * 3 * self.cell_radius, (self.height // 2) * cell_height, 0])
         for i in range(self.width):
             self.grid.append(list())
             if i <= self.width // 2:
@@ -42,37 +40,29 @@ class AllocentricMemory:
                 else:
                     cell_j = -self.height + j
                 self.grid[i].append(GridCell(cell_i, cell_j, self.cell_radius))
-                # pos = self.convert_cell_to_pos(i, j)
-                # self.grid[i][j].point = np.array([*pos, 0], dtype=int)
-                # self.grid[i][j].point = self.grid[i][j].center_point  # - cell_offset
-                # self.grid[i][j].point = self.grid[i][j].center_point
 
         # Allocentric memory is initialized with the robot at its center
         self.robot_point = np.array([0, 0, 0], dtype=float)
-        self.robot_cell_x = self.width // 2
-        self.robot_cell_y = self.height // 2
+        # self.robot_cell_x = self.width // 2
+        # self.robot_cell_y = self.height // 2
 
-    def reset(self):
-        """Reset the hexamemory"""
-        super().__init__(self.width, self.height)
-        self.robot_cell_x = self.width // 2
-        self.robot_cell_y = self.height // 2
-        self.robot_point = np.array([0, 0, 0], dtype=float)
-        # self.grid[self.robot_cell_x][self.robot_cell_y].occupy()
-        # self.cells_changed_recently = []
+    # def reset(self):
+    #     """Reset the hexamemory"""
+    #     super().__init__(self.width, self.height)
+    #     # self.robot_cell_x = self.width // 2
+    #     # self.robot_cell_y = self.height // 2
+    #     self.robot_point = np.array([0, 0, 0], dtype=float)
+    #     # self.grid[self.robot_cell_x][self.robot_cell_y].occupy()
+    #     # self.cells_changed_recently = []
 
     def __str__(self):
         output = ""
         for j in range(self.max_j, self.min_j - 1, -1):
-            # for j in range(int(self.height / 2), -self.height // 2, -1):
-            # for j in range(int(self.height / 2), int(-self.height / 2), -1):
             if j % 2 == 1:
                 output += "-----"
             for i in range(self.min_i, self.max_i + 1):
-                # for i in range(-self.width // 2 + 1, self.width // 2 + 1):
-                # for i in range(int(-self.width / 2), int(self.width / 2) + 1):
-                output += str(self.grid[i][j])
-                output += "-----"
+                output += str(self.grid[i][j]) + "-----"
+                # output += "-----"
             output += "\n"
         return output
 
@@ -196,32 +186,6 @@ class AllocentricMemory:
         else:
             return tmp_cell_x, tmp_cell_y
 
-    # def convert_cell_to_pos(self, cell_x, cell_y):
-    #     """Return the allocentric position of the center of the given cell."""
-    #     radius = self.cell_radius
-    #     mini_radius = math.sqrt(radius**2 - (radius/2)**2)
-    #     start_x = self.width // 2
-    #     change_x = cell_x - start_x
-    #     start_y = self.height // 2
-    #     change_y = cell_y - start_y
-    #     pos_x = 3 * radius * change_x
-    #     pos_y = 0
-    #     reste = 0
-    #     if change_y % 2 == 0:
-    #         pos_y = mini_radius * change_y
-    #     else:
-    #         signe = change_y/abs(change_y)
-    #         pos_y = mini_radius * (change_y - signe)
-    #         reste = signe
-    #
-    #     if reste != 0:
-    #         y_arrivee = (change_y - signe) + start_y
-    #         signe_x = 1 if y_arrivee % 2 == 0 else -1
-    #         pos_x += signe_x * (3/2)*radius
-    #         pos_y += signe * mini_radius
-    #
-    #     return int(pos_x), int(pos_y)
-
     def find_coordinates_corner(self, cell_x, cell_y, x_sign, y_sign):
         """aaaaaaaaa"""
         f_x, f_y = 0, 0
@@ -243,7 +207,7 @@ class AllocentricMemory:
 
         return f_x, f_y
 
-    def move(self, body_direction_rad, translation, is_egocentric_translation=True):
+    def move(self, body_direction_rad, translation, clock, is_egocentric_translation=True):
         """Move the robot in allocentric memory. Mark the traversed cells Free. Returns the new position"""
         # Compute the robot destination point
         if is_egocentric_translation:
@@ -252,7 +216,7 @@ class AllocentricMemory:
             destination_point = self.robot_point + translation
         # Check that the robot remains within allocentric memory limits
         # try:
-        self.apply_changes(self.robot_point, destination_point)
+        self.apply_changes(self.robot_point, destination_point, clock)
         self.robot_point = destination_point
         # except IndexError:
         #     print("IndexError")
@@ -270,26 +234,30 @@ class AllocentricMemory:
 
         return np.round(destination_point)
 
-    def place_robot(self, body_memory):
+    def place_robot(self, body_memory, clock):
         """Apply the PLACE status to the cells at the position of the robot"""
         # start_time = time.time()
         outline = body_memory.outline() + self.robot_point
         polygon = [p[0:2] for p in outline]
         for c in [c for line in self.grid for c in line if c.is_inside(polygon)]:
-            self.apply_status_to_cell(c.i, c.j, EXPERIENCE_PLACE)
+            c.status[0] = EXPERIENCE_PLACE
+            c.clocks[0] = clock
+            # self.apply_status_to_cell(c.i, c.j, EXPERIENCE_PLACE)
         # print("Place robot time:", time.time() - start_time, "seconds")
 
     def clear_phenomena(self):
         """Reset the phenomena from cells"""
-        for i in range(self.width):
-            for j in range(self.height):
-                if self.grid[i][j].phenomenon is not None:
-                    self.apply_status_to_cell(i, j, CELL_UNKNOWN)
-                    self.grid[i][j].phenomenon = None
+        # for i in range(self.width):
+        #     for j in range(self.height):
+        #         if self.grid[i][j].phenomenon is not None:
+        for c in [c for line in self.grid for c in line if c.phenomenon is not None]:
+            # self.apply_status_to_cell(i, j, CELL_UNKNOWN)
+            c.status[1] = CELL_UNKNOWN
+            c.clocks[1] = 0
+            c.phenomenon = None
 
-    def apply_changes(self, start, end, status=EXPERIENCE_PLACE):
-        """Apply the given status (Free by default) to every cell between coordinates start_x,start_y and end_x,end_y"""
-
+    def apply_changes(self, start, end, clock):
+        """Mark the cells traversed by the robot"""
         # distance = math.sqrt((end_x - start_x)**2 + (end_y - start_y)**2)
         distance = math.dist(start, end)
         if distance == 0:
@@ -304,14 +272,19 @@ class AllocentricMemory:
         for _ in range(nb_step):
             cell_x, cell_y = self.convert_pos_in_cell(current_pos_x, current_pos_y)
             # self.grid[cell_x][cell_y].status[1] = status
-            self.apply_status_to_cell(cell_x, cell_y, status)
+            self.apply_status_to_cell(cell_x, cell_y, EXPERIENCE_PLACE, clock)
             current_pos_x += step_x
             current_pos_y += step_y
 
-    def apply_status_to_cell(self, i, j, status):
+    def apply_status_to_cell(self, i, j, status, clock):
         """Change the cell status"""
         if (self.min_i <= i <= self.max_i) and (self.min_j <= j <= self.max_j):
-            self.grid[i][j].status[1] = status
+            if status == EXPERIENCE_FLOOR:
+                self.grid[i][j].status[0] = status
+                self.grid[i][j].clocks[0] = clock
+            else:
+                self.grid[i][j].status[1] = status
+                self.grid[i][j].clocks[1] = clock
         else:
             print("Error: cell out of grid, i:", i, "j:", j, "Status:", status)
 
@@ -322,4 +295,5 @@ class AllocentricMemory:
         triangle = [p[0:2] for p in points]
         for c in [c for line in self.grid for c in line if c.is_inside(triangle)]:
             c.status[2] = CELL_NO_ECHO
+            c.clocks[2] = affordance.experience.clock
         # print("Place echo time:", time.time() - start_time, "seconds")

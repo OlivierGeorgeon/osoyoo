@@ -31,10 +31,10 @@ class Memory:
 
         self.egocentric_memory.update_and_add_experiences(enacted_interaction, self.body_memory.body_direction_rad)
 
-        self.allocentric_memory.move(self.body_memory.body_direction_rad, enacted_interaction['translation'])
+        self.allocentric_memory.move(self.body_memory.body_direction_rad, enacted_interaction['translation'], enacted_interaction['clock'])
         # self.allocentric_memory.place_robot(self.body_memory)  # Must call it after synthesizer
 
-    def update_allocentric(self, phenomena, focus_point):
+    def update_allocentric(self, phenomena, focus_point, clock):
         """Allocate the phenomena to the cells of allocentric memory"""
         # Clear the previous phenomena
         self.allocentric_memory.clear_phenomena()
@@ -44,19 +44,19 @@ class Memory:
                 # Attribute the status of the affordance
                 cell_x, cell_y = self.allocentric_memory.convert_pos_in_cell(a.point[0]+p.point[0],
                                                                              a.point[1]+p.point[1])
-                self.allocentric_memory.apply_status_to_cell(cell_x, cell_y, a.experience.type)
+                self.allocentric_memory.apply_status_to_cell(cell_x, cell_y, a.experience.type, a.experience.clock)
                 # Attribute this phenomenon to this cell
                 self.allocentric_memory.grid[cell_x][cell_y].phenomenon = p
             cell_i, cell_j = self.allocentric_memory.convert_pos_in_cell(p.point[0], p.point[1])
-            self.allocentric_memory.apply_status_to_cell(cell_i, cell_j, CELL_PHENOMENON)  # Mark the origin
+            self.allocentric_memory.apply_status_to_cell(cell_i, cell_j, CELL_PHENOMENON, clock)  # Mark the origin
 
         # Place the affordances that are not attached to phenomena
         for affordance in self.allocentric_memory.affordances:
             cell_x, cell_y = self.allocentric_memory.convert_pos_in_cell(affordance.point[0], affordance.point[1])
-            self.allocentric_memory.apply_status_to_cell(cell_x, cell_y, affordance.experience.type)
+            self.allocentric_memory.apply_status_to_cell(cell_x, cell_y, affordance.experience.type, clock)
 
         # Mark the cells where is the robot
-        self.allocentric_memory.place_robot(self.body_memory)
+        self.allocentric_memory.place_robot(self.body_memory, clock)
 
         # Update the focus in allocentric memory
         if self.focus_i is not None:
