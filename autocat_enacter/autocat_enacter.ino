@@ -24,7 +24,6 @@
 */
 
 #include <Arduino_JSON.h>
-
 #include "arduino_secrets.h"
 #include "Robot_define.h"
 #include "Floor.h"
@@ -32,6 +31,8 @@
 #include "Imu.h"
 #include "Action_define.h"
 #include "WifiCat.h"
+#include "Led.h"
+#include "Step0.h"
 
 // "Wheel.h" is imported by Floor.h
 // #include "Head_echo_complete_scan.h"
@@ -43,6 +44,7 @@ Imu IMU;
 //Head_echo_complete_scan HECS;
 char packetBuffer[100]; // Max number of characters received
 WifiCat WifiCat;
+Led LED;
 
 void setup()
 {
@@ -80,9 +82,8 @@ char action =' ';
 String status = "0"; // The outcome information used for sequential learning
 int robot_destination_angle = 0;
 int head_destination_angle = 0;
-int action_angle = 0;
-unsigned long blink_end_time = 0;
-bool blink_on = true;
+int target_angle = 0;
+int target_duration = 1000;
 bool is_focussed = false;
 int focus_x = 0;
 int focus_y = 0;
@@ -92,17 +93,8 @@ int previous_clock = -1;
 
 void loop()
 {
-  // Display a flashing led to check whether something is freezing the main loop
-  if (millis()> blink_end_time){
-    if (blink_on) {
-      digitalWrite(LED_BUILTIN, HIGH); // for debug
-      blink_on = false;
-    }else {
-      digitalWrite(LED_BUILTIN, LOW); // for debug
-      blink_on = true;
-    }
-    blink_end_time = millis() + 50;
-  }
+  // Make the built-in led blink to show that the main loop is running properly
+  LED.blink();
 
   // Behavior floor change retreat
   FCR.update();
@@ -120,16 +112,16 @@ void loop()
 
   // STEP 0: no interaction being enacted
   // Watching for message sent from PC
-  if (interaction_step == 0 )
+  if (interaction_step == 0)
   {
+    Step0();
     // Watch the wifi for new action
-    int packetSize = WifiCat.Udp.parsePacket();
     // If the received packet exceeds the size of packetBuffer defined above, Arduino will crash
-    if (packetSize) {
-      action_angle = 0;
-      int len = WifiCat.Udp.read(packetBuffer, 512);
-      packetBuffer[len] = 0;
+    int len = WifiCat.read(packetBuffer);
+    if (len) {
       //Serial.print("Received action ");
+      target_angle = 0;
+      target_duration = 1000;
       if (len == 1) {
         // Single character is the action
         action = packetBuffer[0];
@@ -138,17 +130,17 @@ void loop()
         // Multiple characters is json
         // https://github.com/arduino-libraries/Arduino_JSON/blob/master/examples/JSONObject/JSONObject.ino
         JSONVar myObject = JSON.parse(packetBuffer);
-        Serial.println(myObject);
+        // Serial.println(myObject);
         if (myObject.hasOwnProperty("action")) {
           action = ((const char*) myObject["action"])[0];
         }
         if (myObject.hasOwnProperty("angle")) {
-          action_angle = (int)myObject["angle"]; // for non-focussed
+          target_angle = (int)myObject["angle"]; // for non-focussed
         }
         if (myObject.hasOwnProperty("focus_x")) {
           focus_x = (int)myObject["focus_x"];
           focus_y = (int)myObject["focus_y"];
-          action_angle = atan2(focus_y, focus_x) * 180.0 / M_PI; // Direction of the focus relative to the robot
+          target_angle = atan2(focus_y, focus_x) * 180.0 / M_PI; // Direction of the focus relative to the robot
           // action_head_angle = HEA.head_direction(focus_x, focus_y);  // Direction of the focus from the head
           is_focussed = true;
         } else {
@@ -157,15 +149,13 @@ void loop()
         if (myObject.hasOwnProperty("speed")) {
           focus_speed = (int)myObject["speed"]; // Must be positive otherwise multiplication with unsigned long fails
         }
+        if (myObject.hasOwnProperty("duration")) {
+          target_duration = (int)myObject["duration"]; // for non-focussed
+        }
         if (myObject.hasOwnProperty("clock")) {
           clock = (int)myObject["clock"];
         }
       }
-      //Serial.print(" from ");
-      //IPAddress remoteIp = Udp.remoteIP();
-      //Serial.print(remoteIp);
-      //Serial.print("/");
-      //Serial.println(Udp.remotePort());
 
       // If received the same action (same clock) then resend the outcome
       // (The previous outcome was sent but the PC did not receive it)
@@ -198,8 +188,9 @@ void loop()
             break;
           case ACTION_GO_BACK:
             HEA._next_saccade_time = action_end_time - SACCADE_DURATION;  // Inhibit HEA during the interaction
-            if (is_focussed) {
-              HEA.turnHead(HEA.head_direction(focus_x, focus_y));} // Turn head towards the focus point in step 1
+            // if (is_focussed) {
+            //  HEA.turnHead(HEA.head_direction(focus_x, focus_y));} // Turn head towards the focus point in step 1
+            action_end_time = millis() + target_duration;
             OWM.goBack(SPEED);
             break;
           case ACTION_TURN_IN_SPOT_RIGHT:
@@ -232,8 +223,7 @@ void loop()
             break;
           case ACTION_GO_ADVANCE:
             HEA._next_saccade_time = action_end_time - SACCADE_DURATION;  // Inhibit HEA during the interaction
-            //if (is_focussed) {
-            //  HEA.turnHead(HEA.head_direction(focus_x, focus_y));} // Turn head towards the focus point
+            action_end_time = millis() + target_duration;
             OWM.goForward(SPEED);
             break;
           case ACTION_TURN_RIGHT:
@@ -248,7 +238,7 @@ void loop()
             if (is_focussed) {
               HEA.turnHead(HEA.head_direction(focus_x, focus_y));  // Look to the focussed phenomenon
             } else {
-              HEA.turnHead(action_angle);}  // look parallel to the direction
+              HEA.turnHead(target_angle);}  // look parallel to the direction
             HEA.beginEchoAlignment();
             break;
           case ACTION_ECHO_SCAN:
@@ -262,7 +252,7 @@ void loop()
             break;*/
           case ACTION_ALIGN_ROBOT:
             action_end_time = millis() + 5000;
-            robot_destination_angle = action_angle;
+            robot_destination_angle = target_angle;
             Serial.println("Begin align robot angle : " + String(robot_destination_angle));
             HEA._next_saccade_time = action_end_time - SACCADE_DURATION;  // Inhibit HEA during the interaction
             //if (is_focussed) {
@@ -402,7 +392,7 @@ void loop()
         // Keep head aligned with destination angle
         if (is_focussed){
           //float current_robot_direction = (head_destination_angle - IMU._yaw) * M_PI / 180.0;
-          float current_focus_direction = (action_angle - IMU._yaw) * M_PI / 180.0; // relative to robot
+          float current_focus_direction = (target_angle - IMU._yaw) * M_PI / 180.0; // relative to robot
           float r = sqrt(sq((float)focus_x) + sq((float)focus_y));  // conversion to float is necessary for some reason
           float current_head_direction = HEA.head_direction(cos(current_focus_direction) * r, sin(current_focus_direction) * r);
           // Serial.println("Directions robot: " + String(current_robot_direction) + ", head: " + String((int)current_head_direction) + ", dist: " + String((int)r));
@@ -424,7 +414,7 @@ void loop()
         // Keep head aligned with destination angle
         if (is_focussed){
           // float current_robot_direction = (head_destination_angle - IMU._yaw) * M_PI / 180.0;
-          float current_focus_direction = (action_angle - IMU._yaw) * M_PI / 180.0;
+          float current_focus_direction = (target_angle - IMU._yaw) * M_PI / 180.0;
           float r = sqrt(sq((float)focus_x) + sq((float)focus_y));  // conversion to float is necessary for some reason
           float current_head_direction = HEA.head_direction(cos(current_focus_direction) * r, sin(current_focus_direction) * r);
           // Serial.println("Directions robot: " + String(current_robot_direction) + ", head: " + String((int)current_head_direction) + ", dist: " + String((int)r));
@@ -525,18 +515,14 @@ void loop()
     HEA.outcome_complete(outcome_object);
     IMU.outcome(outcome_object, action);
 
-    //HECS.outcome(outcome_object);
+    // HECS.outcome(outcome_object);
     outcome_object["duration1"] = duration1;
     outcome_object["duration"] = millis() - action_start_time;
+
+    // Send the outcome to the PC
     String outcome_json_string = JSON.stringify(outcome_object);
-
-    Serial.println("Outcome string " + outcome_json_string);
-
     digitalWrite(LED_BUILTIN, HIGH); // light the led during transfer
-    // Send the outcome to the IP address and port that sent the action
-    WifiCat.Udp.beginPacket(WifiCat.Udp.remoteIP(), WifiCat.Udp.remotePort());
-    WifiCat.Udp.print(outcome_json_string);
-    WifiCat.Udp.endPacket();
+    WifiCat.send(outcome_json_string);
     digitalWrite(LED_BUILTIN, LOW);
 
     // Ready to begin a new interaction

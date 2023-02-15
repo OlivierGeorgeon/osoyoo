@@ -1,7 +1,7 @@
 /*
-  WifiCat.cpp - library for Robot wifi control.
-  Created by Celien Fiorelli, june 20 2021
-  released into the public domain
+  WifiCat.cpp - library for PetitCat robot wifi control.
+  Created Olivier Georgeon February 15 2023
+  Released into the public domain
 */
 #include <WiFiEsp.h>
 #include <WiFiEspUDP.h>
@@ -58,4 +58,33 @@ void WifiCat::begin()
   Serial.println(WiFi.localIP());
   Serial.print("Listening on port: ");
   Serial.println(PORT);
+}
+
+// Read up tp 512 characters from the current packet and place them to the buffer
+// Returns the number of bytes read, or 0 if none are available
+int WifiCat::read(char* packetBuffer)
+{
+  int len = 0;
+  if (Udp.parsePacket())
+  {
+    len = Udp.read(packetBuffer, 512);
+    packetBuffer[len] = 0;
+    Serial.print("Income string: ");
+    Serial.println(packetBuffer);
+
+    //Serial.print("From ");
+    //Serial.print(Udp.remoteIP());
+    //Serial.print("/");
+    //Serial.println(Udp.remotePort());
+  }
+  return len;
+}
+
+// Send the outcome to the IP address and port that sent the action
+void WifiCat::send(String outcome_json_string)
+{
+  Serial.println("Outcome string: " + outcome_json_string);
+  Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
+  Udp.print(outcome_json_string);
+  Udp.endPacket();
 }
