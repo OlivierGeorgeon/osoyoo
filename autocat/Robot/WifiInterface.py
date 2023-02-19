@@ -14,13 +14,13 @@ class WifiInterface:
         self.IP = ip
         self.port = port
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.socket.settimeout(UDP_TIMEOUT)
+        # self.socket.settimeout(UDP_TIMEOUT)
         # self.socket.connect((UDP_IP, UDP_PORT))  # Not necessary
 
-    def enact(self, action):
+    def enact(self, action, timeout):
         """ Sending the action string, waiting for the outcome, and returning the outcome bytes """
         outcome = b'{"status":"T"}'  # Default status T if timeout
-        #print("sending " + action)
+        self.socket.settimeout(timeout)
         self.socket.sendto(bytes(action, 'utf-8'), (self.IP, self.port))
         try:
             outcome, address = self.socket.recvfrom(512)

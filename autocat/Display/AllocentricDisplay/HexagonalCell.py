@@ -4,7 +4,7 @@ from pyrr import matrix44
 import math
 import numpy as np
 from ...Memory.EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_BLOCK, \
-    EXPERIENCE_FOCUS, EXPERIENCE_IMPACT, EXPERIENCE_PLACE, EXPERIENCE_CENTRAL_ECHO
+    EXPERIENCE_FOCUS, EXPERIENCE_IMPACT, EXPERIENCE_PLACE, EXPERIENCE_CENTRAL_ECHO, EXPERIENCE_PROMPT
 from ...Memory.AllocentricMemory.GridCell import CELL_PHENOMENON, CELL_UNKNOWN, CELL_NO_ECHO
 
 SCALE_LEVEL_0 = 0.9
@@ -87,6 +87,8 @@ class HexagonalCell:
         opacity2 = 255
         if self.cell.status[3] == EXPERIENCE_FOCUS:
             color2 = name_to_rgb('fireBrick')
+        elif self.cell.status[3] == EXPERIENCE_PROMPT:
+            color2 = name_to_rgb('Orchid')
         else:
             if self.cell.status[2] == CELL_NO_ECHO:
                 color2 = name_to_rgb('CadetBlue')

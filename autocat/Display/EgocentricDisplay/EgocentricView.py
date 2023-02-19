@@ -2,6 +2,7 @@ import pyglet
 from pyglet.gl import *
 import math
 import numpy
+from pyrr import matrix44
 from . OsoyooCar import OsoyooCar
 from ..InteractiveDisplay import InteractiveDisplay
 
@@ -64,36 +65,36 @@ class EgocentricView(InteractiveDisplay):
         glOrtho(0, self.width, 0, self.height, -1, 1)
         self.label_batch.draw()
 
-    def get_mouse_press_coordinate(self, x, y, button, modifiers):
+    def get_prompt_point(self, x, y, button, modifiers):
         """ Computing the position of the mouse click relative to the robot in mm and degrees """
-        # window_press_x = (x - self.width / 2) * self.zoom_level * 2
-        # window_press_y = (y - self.height / 2) * self.zoom_level * 2
-        # # Polar coordinates from the window center
-        # theta_window = math.atan2(window_press_y, window_press_x)
-        # r = numpy.hypot(window_press_x, window_press_y)
-        window_press_x, window_press_y, theta_window, r = self.get_allocentric_coordinates(x, y)
+        prompt_point = self.mouse_coordinates_to_point(x, y)
 
-        theta_robot = theta_window
+        # theta_robot = theta_window
         # Polar angle from the robot axis
         if self.is_north_up:
-            theta_robot = theta_window + math.radians(self.azimuth - 90) + 2 * math.pi
-            theta_robot %= 2 * math.pi
-            if theta_robot > math.pi:
-                theta_robot -= 2 * math.pi
+            # TODO test this
+            rotation_matrix = matrix44.create_from_z_rotation(-math.radians(self.azimuth - 90))
+            # theta_robot = theta_window + math.radians(self.azimuth - 90) + 2 * math.pi
+            # theta_robot %= 2 * math.pi
+            # if theta_robot > math.pi:
+            #     theta_robot -= 2 * math.pi
         else:
-            theta_robot = theta_window + math.radians(-90) + 2 * math.pi
-            theta_robot %= 2 * math.pi
-            if theta_robot > math.pi:
-                theta_robot -= 2 * math.pi
+            # theta_robot = theta_window + math.radians(-90) + 2 * math.pi
+            # theta_robot %= 2 * math.pi
+            # if theta_robot > math.pi:
+            #     theta_robot -= 2 * math.pi
+            rotation_matrix = matrix44.create_from_z_rotation(math.pi/2)
+        prompt_point = matrix44.apply_to_vector(rotation_matrix, prompt_point).astype(int)
+
         # Cartesian coordinates from the robot axis
-        z = r * numpy.exp(1j * theta_robot)
-        mouse_press_x, mouse_press_y = int(z.real), int(z.imag)
-        mouse_press_angle = int(math.degrees(theta_robot))
+        # z = r * numpy.exp(1j * theta_robot)
+        # mouse_press_x, mouse_press_y = int(z.real), int(z.imag)
+        prompt_polar_angle = int(math.degrees(math.atan2(prompt_point[1], prompt_point[0])))
         # Display the mouse click coordinates at the bottom of the view
-        self.label1.text = "Click: x:" + str(mouse_press_x) + ", y:" + str(mouse_press_y) \
-                          + ", angle:" + str(mouse_press_angle) + "°"
+        self.label1.text = "Click: x:" + str(prompt_point[0]) + ", y:" + str(prompt_point[1]) \
+                           + ", angle:" + str(prompt_polar_angle) + "°"
         # Return the click position to the controller
-        return mouse_press_x, mouse_press_y, mouse_press_angle
+        return prompt_point  # , prompt_polar_angle, r
 
 
 # Testing the EgocentricView by displaying the robot in a pretty position, and the mouse click coordinates
@@ -105,6 +106,6 @@ if __name__ == "__main__":
 
     @view.event
     def on_mouse_press(x, y, button, modifiers):
-        view.get_mouse_press_coordinate(x, y, button, modifiers)  # Display mouse click coordinates
+        view.get_prompt_point(x, y, button, modifiers)  # Display mouse click coordinates
 
     pyglet.app.run()

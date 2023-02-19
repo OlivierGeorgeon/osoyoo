@@ -6,6 +6,7 @@ from .RobotDefine import RETREAT_DISTANCE, COMPASS_X_OFFSET, COMPASS_Y_OFFSET, R
 from .WifiInterface import WifiInterface
 from ..Memory.EgocentricMemory.Experience import *
 from ..Decider.Action import ACTION_FORWARD, ACTION_BACKWARD, ACTION_RIGHTWARD, ACTION_LEFTWARD
+from .WifiInterface import UDP_TIMEOUT
 
 ENACT_STEP_IDLE = 0
 ENACT_STEP_ENACTING = 1
@@ -56,7 +57,10 @@ class CtrlRobot:
             """ Sending the action to the robot and waiting for the outcome """
             intended_interaction_string = json.dumps(self.intended_interaction)
             print("Sending: " + intended_interaction_string)
-            self.outcome_bytes = self.wifiInterface.enact(intended_interaction_string)
+            timeout = UDP_TIMEOUT
+            if 'duration' in intended_interaction:
+                timeout = intended_interaction['duration'] / 1000.0 + 3.0
+            self.outcome_bytes = self.wifiInterface.enact(intended_interaction_string, timeout)
             print("Receive: ", end="")
             print(self.outcome_bytes)
             self.enact_step = ENACT_STEP_END  # Now we have received the outcome from the robot
@@ -95,7 +99,7 @@ class CtrlRobot:
         translation = self.workspace.actions[action_code].translation_speed * (enacted_interaction['duration1'] / 1000)
 
         # Yaw presupposed or returned by the robot
-        yaw = self.workspace.actions[action_code].target_yaw
+        yaw = self.workspace.actions[action_code].target_duration * self.workspace.actions[action_code].rotation_speed_rad
         if 'yaw' in enacted_interaction:
             yaw = enacted_interaction['yaw']
         else:

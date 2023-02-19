@@ -11,6 +11,7 @@ EXPERIENCE_IMPACT = 'Shock'
 EXPERIENCE_FLOOR = 'Floor'
 EXPERIENCE_FOCUS = 'Focus'
 EXPERIENCE_PLACE = 'Place'
+EXPERIENCE_PROMPT = 'Prompt'
 
 
 class Experience:

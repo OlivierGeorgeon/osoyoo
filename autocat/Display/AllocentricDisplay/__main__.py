@@ -15,7 +15,7 @@ workspace.memory.body_memory.body_direction_rad = math.pi / 4
 
 # Add an echo
 i, j = workspace.memory.allocentric_memory.convert_pos_in_cell(250, 200)
-workspace.memory.allocentric_memory.apply_status_to_cell(i, j, EXPERIENCE_ALIGNED_ECHO)
+workspace.memory.allocentric_memory.apply_status_to_cell(i, j, EXPERIENCE_ALIGNED_ECHO, 0)
 # Add focus
 workspace.memory.allocentric_memory.grid[i][j].status[3] = EXPERIENCE_FOCUS
 # Add no echo
@@ -28,6 +28,6 @@ workspace.memory.allocentric_memory.grid[-1][-2].status[0] = EXPERIENCE_PLACE
 workspace.memory.allocentric_memory.grid[-1][-3].status[0] = EXPERIENCE_PLACE
 
 view_controller = CtrlAllocentricView(workspace)
-view_controller.extract_and_convert_interactions()
+view_controller.update()
 
 pyglet.app.run()

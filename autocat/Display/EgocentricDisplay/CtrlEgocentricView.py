@@ -5,7 +5,6 @@ from .EgocentricView import EgocentricView
 from .PointOfInterest import PointOfInterest, POINT_PROMPT
 from ...Memory.EgocentricMemory.Experience import EXPERIENCE_FOCUS, EXPERIENCE_PLACE
 from ...Workspace import INTERACTION_STEP_REFRESHING
-from ...Decider.Action import ACTION_FORWARD, ACTION_LEFTWARD
 
 
 class CtrlEgocentricView:
@@ -18,18 +17,18 @@ class CtrlEgocentricView:
         self.synthesizer = workspace.integrator
         self.points_of_interest = []
         self.last_action = None
-        self.mouse_press_x = 0
-        self.mouse_press_y = 0
-        self.mouse_press_angle = 0
-        # self.last_used_id = -1
+        self.click_point = None
+        # self.mouse_press_x = 0
+        # self.mouse_press_y = 0
+        # self.mouse_press_angle = 0
+        # self.mouse_press_radius = 0
 
         def on_mouse_press(x, y, button, modifiers):
             """ Selecting or unselecting points of interest """
-            self.mouse_press_x, self.mouse_press_y, self.mouse_press_angle = \
-                self.view.get_mouse_press_coordinate(x, y, button, modifiers)
+            self.click_point = self.view.get_prompt_point(x, y, button, modifiers)
             for p in self.points_of_interest:
-                is_near = p.select_if_near(self.mouse_press_x, self.mouse_press_y)
-                if is_near:
+                if p.select_if_near(self.click_point):
+                    # if is_near:
                     self.view.label2.text = "Experience clock: " + str(p.clock)
 
         def on_key_press(symbol, modifiers):
@@ -37,22 +36,24 @@ class CtrlEgocentricView:
             if symbol == key.DELETE:
                 for p in self.points_of_interest:
                     if p.is_selected:
-                        if p.experience is not None:
-                            # Remove the corresponding experience from egocentric memory
-                            self.egocentric_memory.experiences.remove(p.experience)
+                        # if p.experience is not None:
+                        # Remove the corresponding experience from egocentric memory
+                        #     self.egocentric_memory.experiences.remove(p.experience)
                         if p.type == POINT_PROMPT:
-                            self.workspace.prompt_xy = None
+                            self.workspace.prompt_point = None
                         p.delete()
                         self.points_of_interest.remove(p)
             if symbol == key.INSERT:
                 # Set the agent's focus to the user prompt
                 # self.workspace.focus_xy = [self.mouse_press_x, self.mouse_press_y]
-                self.workspace.focus_point = np.array([self.mouse_press_x, self.mouse_press_y, 0])
+                # self.workspace.focus_point = np.array([self.mouse_press_x, self.mouse_press_y, 0])
+                self.workspace.focus_point = self.click_point
+
                 # Mark the prompt
-                self.workspace.prompt_xy = [self.mouse_press_x, self.mouse_press_y]
-                focus_point = PointOfInterest(self.mouse_press_x, self.mouse_press_y, self.view.batch,
-                                              self.view.background, POINT_PROMPT, self.workspace.clock)
-                self.points_of_interest.append(focus_point)
+                self.workspace.prompt_point = self.click_point  # [self.mouse_press_x, self.mouse_press_y]
+                focus_poi = PointOfInterest(self.click_point[0], self.click_point[1], self.view.batch,
+                                            self.view.background, POINT_PROMPT, self.workspace.clock)
+                self.points_of_interest.append(focus_poi)
                 # focus_point.is_selected = True
                 # focus_point.set_color('red')
 
@@ -66,7 +67,8 @@ class CtrlEgocentricView:
         """ Adding a point of interest to the view """
         if group is None:
             group = self.view.foreground
-        point_of_interest = PointOfInterest(x, y, self.view.batch, group, point_type, self.workspace.clock, experience=experience)
+        point_of_interest = PointOfInterest(x, y, self.view.batch, group, point_type, self.workspace.clock,
+                                            experience=experience)
         self.points_of_interest.append(point_of_interest)
         return point_of_interest
 
@@ -90,14 +92,20 @@ class CtrlEgocentricView:
         for poi_displace in self.points_of_interest:
             poi_displace.update(displacement_matrix)
             # Remove the agent's focus. It will be recreated if needed
-            if poi_displace.type == EXPERIENCE_FOCUS:
+            if poi_displace.type in [EXPERIENCE_FOCUS, POINT_PROMPT]:
                 self.points_of_interest.remove(poi_displace)
                 poi_displace.delete()
 
-        # Mark the agent's focus
+        # Re-create the focus point
         poi_focus = self.create_poi_focus()
         if poi_focus is not None:
             self.points_of_interest.append(poi_focus)
+
+        # Re-create the prompt point
+        if self.workspace.prompt_point is not None:
+            prompt_poi = PointOfInterest(self.workspace.prompt_point[0], self.workspace.prompt_point[1],
+                                         self.view.batch, self.view.background, POINT_PROMPT, self.workspace.clock)
+            self.points_of_interest.append(prompt_poi)
 
         # Mark the new position
         self.add_point_of_interest(0, 0, EXPERIENCE_PLACE)
@@ -111,11 +119,11 @@ class CtrlEgocentricView:
     def create_poi_focus(self):
         """Create a point of interest corresponding to the focus"""
         agent_focus_point = None
-        # if hasattr(self.workspace.agent, "is_focussed"):
         if self.workspace.focus_point is not None:
             x = self.workspace.focus_point[0]
             y = self.workspace.focus_point[1]
-            agent_focus_point = PointOfInterest(x, y, self.view.batch, self.view.foreground, EXPERIENCE_FOCUS, self.workspace.clock)
+            agent_focus_point = PointOfInterest(x, y, self.view.batch, self.view.foreground, EXPERIENCE_FOCUS,
+                                                self.workspace.clock)
         return agent_focus_point
 
     def create_point_of_interest(self, experience):

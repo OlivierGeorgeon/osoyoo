@@ -37,7 +37,8 @@ class BodyMemory:
         return round(math.degrees(self.body_direction_rad))
 
     def body_direction_matrix(self):
-        """Return the opposite body direction matrix to apply to experiences"""
+        """Return the body direction matrix to apply to experiences"""
+        # opposite direction because pyrr is left-handed
         return matrix44.create_from_z_rotation(-self.body_direction_rad)
 
     def rotate_degree(self, yaw_degree: int, compass_azimuth: int):

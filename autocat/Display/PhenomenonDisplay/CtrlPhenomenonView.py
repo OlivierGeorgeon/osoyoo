@@ -31,7 +31,7 @@ class CtrlPhenomenonView:
             # window_press_x = (x - self.view.width / 2) * self.view.zoom_level * 2
             # window_press_y = (y - self.view.height / 2) * self.view.zoom_level * 2
             # angle = math.atan2(window_press_y, window_press_x)
-            window_press_x, window_press_y, angle, _ = self.view.get_allocentric_coordinates(x, y)
+            window_press_x, window_press_y, angle, _ = self.view.mouse_coordinates_to_point(x, y)
             self.view.label.text = "Click: x:" + str(int(window_press_x)) + ", y:" + str(int(window_press_y)) \
                                    + ", angle:" + str(int(math.degrees(angle))) + "°."
             for p in self.points_of_interest:

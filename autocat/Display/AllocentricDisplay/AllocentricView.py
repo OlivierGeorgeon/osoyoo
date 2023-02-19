@@ -2,7 +2,6 @@ import pyglet
 from pyglet.gl import *
 from ..EgocentricDisplay.OsoyooCar import OsoyooCar
 from .HexagonalCell import HexagonalCell
-from ...Memory.EgocentricMemory.Experience import EXPERIENCE_FOCUS
 from ...Memory.AllocentricMemory.GridCell import CELL_UNKNOWN
 from ..InteractiveDisplay import InteractiveDisplay
 
@@ -57,27 +56,28 @@ class AllocentricView(InteractiveDisplay):
         # self.label_trust_mode.color = (255, 255, 255, 255)
         # self.label_trust_mode.batch = self.label_batch
 
-    def update_hexagon(self, i: int, j: int):
+    def update_hexagon(self, cell):
         """Update or create an hexagon in allocentric view."""
-        cell = self.memory.allocentric_memory.grid[i][j]
-        if self.hexagons[i][j] is not None:
-            self.hexagons[i][j].update_color()
+        # cell = self.memory.allocentric_memory.grid[i][j]
+        if self.hexagons[cell.i][cell.j] is not None:
+            self.hexagons[cell.i][cell.j].update_color()
         else:
-            if cell.status[0] != CELL_UNKNOWN or cell.status[1] != CELL_UNKNOWN or cell.status[2] != CELL_UNKNOWN:
-                self.hexagons[i][j] = HexagonalCell(cell, self.batch, self.groups)
+            if cell.status[0] != CELL_UNKNOWN or cell.status[1] != CELL_UNKNOWN or cell.status[2] != CELL_UNKNOWN \
+                    or cell.status[3] != CELL_UNKNOWN:
+                self.hexagons[cell.i][cell.j] = HexagonalCell(cell, self.batch, self.groups)
 
-    def remove_focus_cell(self):
-        """Remove the focus cell from allocentric view"""
-        if self.focus_cell is not None:
-            self.memory.allocentric_memory.grid[self.focus_cell[0]][self.focus_cell[1]].status[3] = CELL_UNKNOWN
-        self.focus_cell = None
-
-    def add_focus_cell(self, i, j):
-        """Add the focus cell to allocentric view"""
-        self.memory.allocentric_memory.grid[i][j].status[3] = EXPERIENCE_FOCUS
-        self.update_hexagon(i, j)
-        self.focus_cell = (i, j)
-        #self.focus_cell = HexagonalCell(cell_x, cell_y, self.batch, self.group1, self.group2, radius, EXPERIENCE_FOCUS)
+    # def remove_focus_cell(self):
+    #     """Remove the focus cell from allocentric view"""
+    #     if self.focus_cell is not None:
+    #         self.memory.allocentric_memory.grid[self.focus_cell[0]][self.focus_cell[1]].status[3] = CELL_UNKNOWN
+    #     self.focus_cell = None
+    #
+    # def add_focus_cell(self, i, j):
+    #     """Add the focus cell to allocentric view"""
+    #     self.memory.allocentric_memory.grid[i][j].status[3] = EXPERIENCE_FOCUS
+    #     self.update_hexagon(i, j)
+    #     self.focus_cell = (i, j)
+    #     #self.focus_cell = HexagonalCell(cell_x, cell_y, self.batch, self.group1, self.group2, radius, EXPERIENCE_FOCUS)
 
     def on_draw(self):
         """ Drawing the window """
@@ -91,8 +91,8 @@ class AllocentricView(InteractiveDisplay):
                 self.height * self.zoom_level, 1, -1)
 
         # Stack the translation to center the grid in the widow
-        tx = self.nb_cell_x * 30 * self.cell_radius / 20
-        ty = self.nb_cell_y * 8.66 * self.cell_radius / 20
+        # tx = self.nb_cell_x * 30 * self.cell_radius / 20
+        # ty = self.nb_cell_y * 8.66 * self.cell_radius / 20
         # glTranslatef(-tx, -ty, 0)
 
         # Draw the grid
@@ -113,15 +113,16 @@ class AllocentricView(InteractiveDisplay):
 
     def on_mouse_motion(self, x, y, dx, dy):
         """Display the position in allocentric memory and the cell in the grid"""
-        self.cell_from_screen_coordinate(x, y)
+        self.mouse_coordinate_to_cell(x, y)
 
-    def cell_from_screen_coordinate(self, x, y):
+    def mouse_coordinate_to_cell(self, x, y):
         """ Computes the cell coordinates from the screen coordinates """
-        mouse_x = int((x - self.width/2) * self.zoom_level * 2)
-        mouse_y = int((y - self.height/2) * self.zoom_level * 2)
-        cell_x, cell_y = self.memory.allocentric_memory.convert_pos_in_cell(mouse_x, mouse_y)
-        self.label.text = "Mouse pos.: " + str(round(mouse_x)) + ", " + str(round(mouse_y))
+        # mouse_x = int((x - self.width/2) * self.zoom_level * 2)
+        # mouse_y = int((y - self.height/2) * self.zoom_level * 2)
+        prompt_point = self.mouse_coordinates_to_point(x, y)
+        cell_x, cell_y = self.memory.allocentric_memory.convert_pos_in_cell(prompt_point[0], prompt_point[1])
+        self.label.text = "Mouse pos.: " + str(prompt_point[0]) + ", " + str(prompt_point[1])
         self.label.text += ", Cell: " + str(cell_x) + ", " + str(cell_y)
-        self.label.text += ", Cell Pos.: " + str(round(self.memory.allocentric_memory.grid[cell_x][cell_y].point[0])) + ", " + \
-                           str(round(self.memory.allocentric_memory.grid[cell_x][cell_y].point[1]))
+        self.label.text += ", Cell Pos.: " + str(round(self.memory.allocentric_memory.grid[cell_x][cell_y].point[0])) \
+                           + ", " + str(round(self.memory.allocentric_memory.grid[cell_x][cell_y].point[1]))
         return cell_x, cell_y

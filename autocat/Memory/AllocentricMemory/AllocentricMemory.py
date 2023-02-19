@@ -6,6 +6,7 @@ from . GridCell import GridCell, CELL_UNKNOWN
 from ..EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_PLACE
 from ..AllocentricMemory.GridCell import CELL_NO_ECHO
 from ...Utils import rotate_vector_z
+from ..EgocentricMemory.Experience import EXPERIENCE_FOCUS, EXPERIENCE_PROMPT
 
 
 class AllocentricMemory:
@@ -25,6 +26,11 @@ class AllocentricMemory:
         self.min_j = -height // 2 + 1
         self.max_j = height // 2
         self.cell_radius = cell_radius
+
+        self.focus_i = None
+        self.focus_j = None
+        self.prompt_i = None
+        self.prompt_j = None
 
         # Fill the grid with cells
         # Use negative grid index for negative positions
@@ -297,3 +303,25 @@ class AllocentricMemory:
             c.status[2] = CELL_NO_ECHO
             c.clocks[2] = affordance.experience.clock
         # print("Place echo time:", time.time() - start_time, "seconds")
+
+    def update_focus(self, allo_focus):
+        """Update the focus in allocentric memory"""
+        # Clear the previous focus cell
+        if self.focus_i is not None:
+            self.grid[self.focus_i][self.focus_j].status[3] = CELL_UNKNOWN
+        # Add the new focus cell
+        if allo_focus is not None:
+            self.focus_i, self.focus_j = self.convert_pos_in_cell(allo_focus[0], allo_focus[1])
+            self.grid[self.focus_i][self.focus_j].status[3] = EXPERIENCE_FOCUS
+            # print("Focus in cell", self.focus_i, ", ", self.focus_j)
+
+    def update_prompt(self, allo_prompt):
+        """Update the prompt in allocentric memory"""
+        # Clear the previous focus cell
+        if self.prompt_i is not None:
+            self.grid[self.prompt_i][self.prompt_j].status[3] = CELL_UNKNOWN
+        # Add the new prompt cell
+        if allo_prompt is not None:
+            self.prompt_i, self.prompt_j = self.convert_pos_in_cell(allo_prompt[0], allo_prompt[1])
+            self.grid[self.prompt_i][self.prompt_j].status[3] = EXPERIENCE_PROMPT
+            print("Prompt in cell", self.prompt_i, ", ", self.prompt_j)

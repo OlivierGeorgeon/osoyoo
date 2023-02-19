@@ -19,6 +19,8 @@ class PointOfInterest:
         self.points = []
         self.opacity = 255
         self.color = name_to_rgb("gray")
+        self.is_selected = False
+
         if experience is None:
             self.clock = clock
             self.durability = 10
@@ -131,13 +133,15 @@ class PointOfInterest:
         """ Delete the shape to remove it from the batch """
         self.shape.delete()  # Not sure whether it is necessary or not
 
-    def select_if_near(self, x, y):
+    def select_if_near(self, point):
         """ If the point is near the x y coordinate, select this point and return True """
-        if math.dist([x, y], [self.x, self.y]) < 15:
+        if math.dist([point[0], point[1]], [self.x, self.y]) < 15:
             self.set_color('red')
+            self.is_selected = True
             return True
         else:
             self.set_color()
+            self.is_selected = False
             return False
 
     def update(self, displacement_matrix):

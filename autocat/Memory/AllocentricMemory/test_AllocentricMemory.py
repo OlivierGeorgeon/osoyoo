@@ -306,7 +306,7 @@ def test_move():
     hx.robot_point = [0, 0, 0]
     rotation = 0
     move = [0, 20, 0]
-    end_x, end_y, _ = hx.move(rotation, move)
+    end_x, end_y, _ = hx.move(rotation, move, 0)
     try:
         assert(end_x == good_end_x and end_y == good_end_y)
     except AssertionError:
@@ -318,7 +318,7 @@ def test_move():
         hx.robot_point = [0, 0, 0]
         rotation = -3.14/2
         move = [0, 20, 0]
-        end_x, end_y, _ = hx.move(rotation, move)
+        end_x, end_y, _ = hx.move(rotation, move, 0)
         good_end_x, good_end_y = 20, 0
         assert(end_x == good_end_x and end_y == good_end_y)
     except AssertionError:
@@ -332,7 +332,7 @@ def test_move():
         hx.robot_angle = 0
         rotation = 0
         move = [20, 0, 0]
-        end_x, end_y, _ = hx.move(rotation, move)
+        end_x, end_y, _ = hx.move(rotation, move, 0)
         good_end_x, good_end_y = 20, 0
         assert(end_x == good_end_x and end_y == good_end_y)
     except AssertionError:
