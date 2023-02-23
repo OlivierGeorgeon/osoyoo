@@ -74,3 +74,7 @@ class Affordance:
             # Add the position of the affordance to the position of the triangle
             points = [p1, p2, p3] + self.point
         return points
+
+    def save(self):
+        """Return a saved affordance to save a snapshot of memory"""
+        return Affordance(self.point.copy(), self.experience.save())

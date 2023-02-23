@@ -17,8 +17,7 @@ class AllocentricMemory:
         with the addition of the robot at the center of the grid and a link between the
         software and the real word, cell_radius representing the radius of a cell in the real world (in millimeters)
         """
-        self.affordances = []
-        self.grid = list()
+        # The grid of cells
         self.width = width  # Nb cells width
         self.height = height  # Nb cells height
         self.min_i = -width // 2 + 1
@@ -27,12 +26,19 @@ class AllocentricMemory:
         self.max_j = height // 2
         self.cell_radius = cell_radius
 
+        # Allocentric memory is initialized with the robot at its center
+        self.robot_point = np.array([0, 0, 0], dtype=float)
+
         self.focus_i = None
         self.focus_j = None
         self.prompt_i = None
         self.prompt_j = None
 
+        # The affordances
+        self.affordances = []
+
         # Fill the grid with cells
+        self.grid = list()
         # Use negative grid index for negative positions
         for i in range(self.width):
             self.grid.append(list())
@@ -46,20 +52,6 @@ class AllocentricMemory:
                 else:
                     cell_j = -self.height + j
                 self.grid[i].append(GridCell(cell_i, cell_j, self.cell_radius))
-
-        # Allocentric memory is initialized with the robot at its center
-        self.robot_point = np.array([0, 0, 0], dtype=float)
-        # self.robot_cell_x = self.width // 2
-        # self.robot_cell_y = self.height // 2
-
-    # def reset(self):
-    #     """Reset the hexamemory"""
-    #     super().__init__(self.width, self.height)
-    #     # self.robot_cell_x = self.width // 2
-    #     # self.robot_cell_y = self.height // 2
-    #     self.robot_point = np.array([0, 0, 0], dtype=float)
-    #     # self.grid[self.robot_cell_x][self.robot_cell_y].occupy()
-    #     # self.cells_changed_recently = []
 
     def __str__(self):
         output = ""
@@ -253,9 +245,6 @@ class AllocentricMemory:
 
     def clear_phenomena(self):
         """Reset the phenomena from cells"""
-        # for i in range(self.width):
-        #     for j in range(self.height):
-        #         if self.grid[i][j].phenomenon is not None:
         for c in [c for line in self.grid for c in line if c.phenomenon is not None]:
             # self.apply_status_to_cell(i, j, CELL_UNKNOWN)
             c.status[1] = CELL_UNKNOWN
@@ -325,3 +314,15 @@ class AllocentricMemory:
             self.prompt_i, self.prompt_j = self.convert_pos_in_cell(allo_prompt[0], allo_prompt[1])
             self.grid[self.prompt_i][self.prompt_j].status[3] = EXPERIENCE_PROMPT
             print("Prompt in cell", self.prompt_i, ", ", self.prompt_j)
+
+    def save(self):
+        saved_allocentric_memory = AllocentricMemory(self.width, self.height, self.cell_radius)
+        saved_allocentric_memory.robot_point = self.robot_point.copy()
+        saved_allocentric_memory.focus_i = self.focus_i
+        saved_allocentric_memory.focus_j = self.focus_j
+        saved_allocentric_memory.prompt_i = self.prompt_i
+        saved_allocentric_memory.prompt_j = self.prompt_j
+        saved_allocentric_memory.affordances = [a.save() for a in self.affordances]
+        saved_allocentric_memory.grid = [[c.save() for c in line] for line in self.grid]
+
+        return saved_allocentric_memory

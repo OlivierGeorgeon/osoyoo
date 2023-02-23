@@ -48,7 +48,8 @@ class Workspace:
         self.ctrl_phenomenon_view = None
 
         self.clock = 0
-        self.memory_for_simulation = copy.deepcopy(self.memory)
+        # TODO use the same saved memory for simulation and for imaginary
+        self.memory_for_simulation = None  # copy.deepcopy(self.memory)
         self.memory_for_imaginary = None
         self.is_imagining = False
 
@@ -76,15 +77,17 @@ class Workspace:
                     # Stop imagining and restore memory
                     self.memory.body_memory.body_direction_rad = self.memory_for_imaginary.body_memory.body_direction_rad
                     self.memory.allocentric_memory.robot_point = self.memory_for_imaginary.allocentric_memory.robot_point
+                    # self.memory.body_memory.body_direction_rad = self.memory_for_simulation.body_memory.body_direction_rad
+                    # self.memory.allocentric_memory.robot_point = self.memory_for_simulation.allocentric_memory.robot_point
                     self.is_imagining = False
             else:
                 # If imagining then proceed to simulating the enaction
                 self.interaction_step = INTERACTION_STEP_ENACTING
                 if not self.is_imagining:
                     # Start imagining, save the memory
-                    self.memory_for_imaginary = copy.deepcopy(self.memory)
+                    self.memory_for_imaginary = self.memory.save()
                     self.is_imagining = True
-            self.memory_for_simulation = copy.deepcopy(self.memory)
+            self.memory_for_simulation = self.memory.save()
 
         # INTENDING: is handled by CtrlRobot
 

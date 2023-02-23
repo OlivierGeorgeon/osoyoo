@@ -4,19 +4,20 @@ from .AllocentricMemory.AllocentricMemory import AllocentricMemory
 from .BodyMemory import BodyMemory
 from .AllocentricMemory.GridCell import CELL_UNKNOWN, CELL_PHENOMENON
 
+HEXAGRID_WIDTH = 100
+HEXAGRID_HEIGHT = 200
+CELL_RADIUS = 40
+
 
 class Memory:
     """The Memory serves as the general container of the three memories:
         body memory, egocentric memory, and allocentric memory
     """
 
-    def __init__(self, hexagrid_size=(100, 200), cell_radius=40):
+    def __init__(self):
         self.body_memory = BodyMemory()
         self.egocentric_memory = EgocentricMemory()
-        self.allocentric_memory = AllocentricMemory(hexagrid_size[0], hexagrid_size[1], cell_radius=cell_radius)
-
-        # self.focus_i = None  # It may rather belong to allocentric memory
-        # self.focus_j = None
+        self.allocentric_memory = AllocentricMemory(HEXAGRID_WIDTH, HEXAGRID_HEIGHT, cell_radius=CELL_RADIUS)
 
     def update_and_add_experiences(self, enacted_interaction):
         """ Process the enacted interaction to update the memory
@@ -30,8 +31,9 @@ class Memory:
 
         self.egocentric_memory.update_and_add_experiences(enacted_interaction, self.body_memory.body_direction_rad)
 
-        self.allocentric_memory.move(self.body_memory.body_direction_rad, enacted_interaction['translation'], enacted_interaction['clock'])
-        # self.allocentric_memory.place_robot(self.body_memory)  # Must call it after synthesizer
+        self.allocentric_memory.move(self.body_memory.body_direction_rad, enacted_interaction['translation'],
+                                     enacted_interaction['clock'])
+        # The integrator may subsequently update the robot's position
 
     def update_allocentric(self, phenomena, focus_point, prompt_point, clock):
         """Allocate the phenomena to the cells of allocentric memory"""
@@ -80,3 +82,21 @@ class Memory:
         ego_point = point - self.allocentric_memory.robot_point
         rotation_matrix = matrix44.create_from_z_rotation(self.body_memory.body_direction_rad)
         return matrix44.apply_to_vector(rotation_matrix, ego_point)
+
+    def save(self):
+        """Return a clone of memory to save a snapshot"""
+        saved_memory = Memory()
+        # Copy body memory
+        saved_memory.body_memory = self.body_memory.save()
+        # saved_memory.body_memory.head_direction_rad = self.body_memory.head_direction_rad
+        # saved_memory.body_memory.body_direction_rad = self.body_memory.body_direction_rad
+
+        # Copy egocentric memory
+        saved_memory.egocentric_memory = self.egocentric_memory.save()
+
+        # Copy allocentric memory
+        # saved_memory.allocentric_memory.robot_point = self.allocentric_memory.robot_point.copy()
+        # TODO use the experiences that were cloned in saved egocentric memory
+        saved_memory.allocentric_memory = self.allocentric_memory.save()
+
+        return saved_memory

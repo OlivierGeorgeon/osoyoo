@@ -1,7 +1,6 @@
 import math
 import numpy as np
 import matplotlib.path as mpath
-from ..EgocentricMemory.Experience import EXPERIENCE_PLACE
 
 CELL_PHENOMENON = 'phenomenon'
 CELL_UNKNOWN = 'Unknown'
@@ -24,9 +23,7 @@ class GridCell:
         else:
             x = (1.5 * cell_radius) + i * 3 * cell_radius
             y = (cell_height / 2) + (j - 1) / 2 * cell_height
-        self.point = np.array([x, y, 0])
-
-        # self.point = np.array([0, 0, 0])  # Is initialized just after the creation of the cell
+        self.point = np.array([x, y, 0], dtype=int)
 
         self.status = [CELL_UNKNOWN,  # Place
                        CELL_UNKNOWN,  # Interaction
@@ -44,3 +41,14 @@ class GridCell:
         """True if this cell is inside the polygon"""
         path = mpath.Path(polygon)
         return path.contains_point(self.point[0:2])
+
+    def save(self):
+        """Return a clone of the cell to save a snapshot of allocentric memory"""
+        saved_cell = GridCell(self.i, self.j, self.radius)
+        # Clone the content
+        saved_cell.status = [s for s in self.status]
+        saved_cell.clocks = [c for c in self.clocks]
+        saved_cell.experiences = [e.save() for e in self.experiences]
+        if self.phenomenon is not None:
+            saved_cell.phenomenon = self.phenomenon.save()
+        return saved_cell

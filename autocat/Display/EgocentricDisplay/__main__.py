@@ -23,13 +23,7 @@ controller.points_of_interest.append(poi1)
 poi2 = controller.create_point_of_interest(experience2)
 controller.points_of_interest.append(poi2)
 
-# Update the list of points of interest from memory
-# last_used_id = -1
-# experiences = [elem for elem in controller.egocentric_memory.experiences if elem.id > last_used_id]
-# for experience in experiences:
-#     if experience.id > last_used_id:
-#         last_used_id = max(experience.id, last_used_id)
-#     _poi = controller.create_point_of_interest(experience)
-#     controller.points_of_interest.append(_poi)
+# Test the save method
+experience3 = experience1.save()
 
 pyglet.app.run()

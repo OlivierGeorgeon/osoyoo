@@ -71,3 +71,10 @@ class BodyMemory:
         p4 = matrix44.apply_to_vector(self.body_direction_matrix(), [ROBOT_FRONT_X, -ROBOT_SIDE, 0])
 
         return np.array([p1, p2, p3, p4])
+
+    def save(self):
+        """Return a clone of bodymemory to save a snapshot of memory"""
+        saved_body_memory = BodyMemory()
+        saved_body_memory.head_direction_rad = self.head_direction_rad
+        saved_body_memory.body_direction_rad = self.body_direction_rad
+        return saved_body_memory

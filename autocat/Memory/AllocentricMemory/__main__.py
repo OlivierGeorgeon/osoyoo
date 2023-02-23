@@ -8,6 +8,9 @@ from .test_AllocentricMemory import test_move, test_convert_pos_in_cell
 allocentric_memory = AllocentricMemory(10, 11)
 # Displaying the hexagonal grid in the console.
 print(allocentric_memory)
+
+# print("Copy: ")
+# print(allocentric_memory.save())
 # print("North neighbor of (2,2):", hx.get_neighbor_in_direction(2, 2, 0))
 # print("All neighbors of 2,2 : ", hx.get_all_neighbors(2, 2))
 

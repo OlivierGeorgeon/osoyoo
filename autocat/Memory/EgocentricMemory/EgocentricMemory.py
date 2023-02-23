@@ -107,3 +107,10 @@ class EgocentricMemory:
                 experiences_central_echo.append(experience_central_echo)
 
         return experiences_central_echo
+
+    def save(self):
+        """Return a clone of egocentric memory to save a memory snapshot"""
+        saved_egocentric_memory = EgocentricMemory()
+        saved_egocentric_memory.experiences = [e.save() for e in self.experiences]
+        saved_egocentric_memory.experience_id = self.experience_id
+        return saved_egocentric_memory

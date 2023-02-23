@@ -25,8 +25,6 @@ class Experience:
         type : type of experience (i.e. Chock, Block, Echolocalisation, Line etc)
         durability : durability of the experience, when it reach zero the experience should be removed from the memory.
         """
-        # self.x = x
-        # self.y = y
         self.point = np.array([x, y, 0])
         self.type = experience_type
         self.clock = clock
@@ -70,7 +68,6 @@ class Experience:
 
     def displace(self, displacement_matrix):
         """Displace the experience by the displacement_matrix"""
-
         # Update the position matrix in robot-centric coordinates
         # by miraculously multiplying the position_matrix by the displacement_matrix
         self.position_matrix = matrix44.multiply(self.position_matrix, displacement_matrix)
@@ -78,12 +75,14 @@ class Experience:
         # Recompute the experience's coordinates in robot-centric coordinates
         self.point = matrix44.apply_to_vector(self.position_matrix, [0, 0, 0])
 
-    # def allocentric_from_matrices(self, body_direction_matrix, body_position_matrix):
-    #     """ The allocentric coordinates of the experience given the body direction and position matrices"""
-    #     displacement_matrix = matrix44.multiply(body_direction_matrix, body_position_matrix)
-    #     return numpy.array(matrix44.apply_to_vector(displacement_matrix, [self.x, self.y, 0]), dtype=numpy.int16)
+    def save(self):
+        """Create a copy of the experience to save a snapshot of memory"""
+        saved_experience = Experience(self.point[0], self.point[1], self.type, 0, self.clock, self.durability, self.id)
+        # Clone the position matrix so they can be updated separately
+        saved_experience.position_matrix = self.position_matrix.copy()
 
-    # def allocentric_position_matrix(self, body_direction_matrix, body_position_matrix):
-    #     """ The position matrix to place this experience in allocentric memory"""
-    #     displacement_matrix = matrix44.multiply(body_direction_matrix, body_position_matrix)
-    #     return matrix44.multiply(self.position_matrix, displacement_matrix)
+        # Absolute relative sensor position do not change and are the same
+        saved_experience.absolute_direction_rad = self.absolute_direction_rad
+        saved_experience.sensor_matrix = self.sensor_matrix
+        saved_experience.rotation_matrix = self.rotation_matrix
+        return saved_experience
