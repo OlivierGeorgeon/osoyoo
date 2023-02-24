@@ -1,3 +1,4 @@
+import numpy as np
 from pyglet import shapes, gl
 from webcolors import name_to_rgb
 from autocat.Memory.EgocentricMemory.Experience import *
@@ -12,7 +13,8 @@ POINT_PROMPT = 'Prompt'
 class PointOfInterest:
     def __init__(self, x, y, batch, group, point_type, clock, experience=None):
         self.experience = experience
-        self.x, self.y = 0, 0  # will be displaced
+        # self.x, self.y = 0, 0  # will be displaced
+        self.point = np.array([x, y, 0], dtype=int)
         self.batch = batch
         self.group = group
         self.type = point_type
@@ -105,7 +107,8 @@ class PointOfInterest:
 
     def reset_position(self):
         """ Reset the position of the point of interest """
-        self.x, self.y = 0, 0
+        # self.x, self.y = 0, 0
+        self.point = np.array([0, 0, 0], dtype=int)
         # If the shape has a list of vertices then reset it
         if hasattr(self.shape, 'vertices'):
             self.shape.vertices = self.points
@@ -115,8 +118,9 @@ class PointOfInterest:
     def displace(self, displacement_matrix):
         """ Applying the displacement matrix to the point of interest """
         #  Rotate and translate the position
-        v = matrix44.apply_to_vector(displacement_matrix, [self.x, self.y, 0])
-        self.x, self.y = v[0], v[1]
+        self.point = matrix44.apply_to_vector(displacement_matrix, self.point)
+        # v = matrix44.apply_to_vector(displacement_matrix, [self.x, self.y, 0])
+        # self.x, self.y = v[0], v[1]
 
         # If the shape has a list of vertices
         # then apply the displacement matrix to each point. This will rotate the shape
@@ -127,7 +131,8 @@ class PointOfInterest:
             return
 
         # Points of interest that use pyglet shapes have x and y (Circles)
-        self.shape.x, self.shape.y = self.x, self.y
+        # self.shape.x, self.shape.y = self.x, self.y
+        self.shape.x, self.shape.y = self.point[0], self.point[1]
 
     def delete(self):
         """ Delete the shape to remove it from the batch """
@@ -135,7 +140,8 @@ class PointOfInterest:
 
     def select_if_near(self, point):
         """ If the point is near the x y coordinate, select this point and return True """
-        if math.dist([point[0], point[1]], [self.x, self.y]) < 15:
+        # if math.dist([point[0], point[1]], [self.x, self.y]) < 15:
+        if math.dist(point, self.point) < 15:
             self.set_color('red')
             self.is_selected = True
             return True
@@ -168,5 +174,5 @@ class PointOfInterest:
             self.shape.delete()
 
     def __str__(self):
-        return "POI of type " + self.type + " at x=" + str(int(self.x)) + ", y=" + str(int(self.y)) + \
+        return "POI of type " + self.type + " at x=" + str(int(self.point[0])) + ", y=" + str(int(self.point[1])) + \
                ", interaction: " + self.experience.__str__()

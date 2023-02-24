@@ -97,3 +97,9 @@ class HexagonalCell:
                 opacity2 = 0
         # Reset the color of the shape2
         self.shape2.colors[0:24] = 6 * (*color2, opacity2)
+
+    def delete(self):
+        """Delete the hexagon from the view"""
+        self.shape0.delete()
+        self.shape1.delete()
+        self.shape2.delete()

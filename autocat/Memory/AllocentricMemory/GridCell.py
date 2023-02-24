@@ -37,6 +37,11 @@ class GridCell:
         """String representation of the cell for console display"""
         return "(%+d,%+d)" % (self.i, self.j)
 
+    def is_known(self):
+        """Return True if something is known in this cell"""
+        return self.status[0] != CELL_UNKNOWN or self.status[1] != CELL_UNKNOWN or self.status[2] != CELL_UNKNOWN \
+            or self.status[3] != CELL_UNKNOWN
+
     def is_inside(self, polygon):
         """True if this cell is inside the polygon"""
         path = mpath.Path(polygon)

@@ -19,6 +19,10 @@ class Memory:
         self.egocentric_memory = EgocentricMemory()
         self.allocentric_memory = AllocentricMemory(HEXAGRID_WIDTH, HEXAGRID_HEIGHT, cell_radius=CELL_RADIUS)
 
+    def __str__(self):
+        return "Memory Robot position (" + str(round(self.allocentric_memory.robot_point[0])) + "," +\
+                                           str(round(self.allocentric_memory.robot_point[1])) + ")"
+
     def update_and_add_experiences(self, enacted_interaction):
         """ Process the enacted interaction to update the memory
         - Move the robot in body memory

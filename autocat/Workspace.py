@@ -75,10 +75,12 @@ class Workspace:
                 self.interaction_step = INTERACTION_STEP_INTENDING
                 if self.is_imagining:
                     # Stop imagining and restore memory
-                    self.memory.body_memory.body_direction_rad = self.memory_for_imaginary.body_memory.body_direction_rad
-                    self.memory.allocentric_memory.robot_point = self.memory_for_imaginary.allocentric_memory.robot_point
+                    # self.memory.body_memory.body_direction_rad = self.memory_for_imaginary.body_memory.body_direction_rad
+                    # self.memory.allocentric_memory.robot_point = self.memory_for_imaginary.allocentric_memory.robot_point
                     # self.memory.body_memory.body_direction_rad = self.memory_for_simulation.body_memory.body_direction_rad
                     # self.memory.allocentric_memory.robot_point = self.memory_for_simulation.allocentric_memory.robot_point
+                    self.memory = self.memory_for_imaginary
+                    # print("Restored", self.memory)
                     self.is_imagining = False
             else:
                 # If imagining then proceed to simulating the enaction
@@ -152,6 +154,7 @@ class Workspace:
             else:
                 # If user mode then abort the enaction and wait for a new action but don't increment the clock
                 self.interaction_step = INTERACTION_STEP_IDLE
+                # TODO # Refresh the views to show memory before simulation
             return
 
         # # Increment the clock if the enacted interaction was properly received
