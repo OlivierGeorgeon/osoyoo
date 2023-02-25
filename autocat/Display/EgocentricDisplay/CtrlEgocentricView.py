@@ -13,23 +13,21 @@ class CtrlEgocentricView:
     def __init__(self, workspace):
         self.view = EgocentricView()
         self.workspace = workspace
-        # self.egocentric_memory = workspace.memory.egocentric_memory
         self.synthesizer = workspace.integrator
         self.points_of_interest = []
         self.last_action = None
         self.click_point = None
-        # self.mouse_press_x = 0
-        # self.mouse_press_y = 0
-        # self.mouse_press_angle = 0
-        # self.mouse_press_radius = 0
 
         def on_mouse_press(x, y, button, modifiers):
             """ Selecting or unselecting points of interest """
             self.click_point = self.view.get_prompt_point(x, y, button, modifiers)
-            for p in self.points_of_interest:
-                if p.select_if_near(self.click_point):
-                    # if is_near:
-                    self.view.label2.text = "Experience clock: " + str(p.clock)
+            for p in [p for p in self.points_of_interest if p.select_if_near(self.click_point)]:
+                self.view.label2.text = "Point clock: " + str(p.clock)
+
+            # for p in self.points_of_interest:
+            #     if p.select_if_near(self.click_point):
+            #         # if is_near:
+            #         self.view.label2.text = "Experience clock: " + str(p.clock)
 
         def on_key_press(symbol, modifiers):
             """ Deleting or inserting points of interest """
@@ -67,8 +65,7 @@ class CtrlEgocentricView:
         """ Adding a point of interest to the view """
         if group is None:
             group = self.view.foreground
-        point_of_interest = PointOfInterest(x, y, self.view.batch, group, point_type, self.workspace.clock,
-                                            experience=experience)
+        point_of_interest = PointOfInterest(x, y, self.view.batch, group, point_type, self.workspace.clock)
         self.points_of_interest.append(point_of_interest)
         return point_of_interest
 
@@ -80,25 +77,30 @@ class CtrlEgocentricView:
     def update_points_of_interest(self):
         """Retrieve all new experiences from memory, create and update the corresponding points of interest"""
 
-        # Create the new points of interest from the new experiences
-        # print("Looking for new experiences")
-        # for e in self.workspace.memory.egocentric_memory.experiences:
-        #     print(e)
+        # Keep only the points of interest Place not expired
+        self.points_of_interest = [p for p in self.points_of_interest if p.keep_or_delete(self.workspace.clock)]
+        #                            (p.clock + p.durability > self.workspace.clock) and p.type == EXPERIENCE_PLACE]
 
-        new_experiences = [e for e in self.workspace.memory.egocentric_memory.experiences.values() if (e.clock >= self.workspace.clock - 1)]
-        for e in new_experiences:
-            poi = self.create_point_of_interest(e)
+        # Displace and fade the remaining points of interest
+        for poi_displace in self.points_of_interest:
+            poi_displace.displace(self.workspace.enacted_interaction['displacement_matrix'])
+            poi_displace.fade(self.workspace.clock)
+
+        # Recreate the points of interest from experiences
+        for e in [e for e in self.workspace.memory.egocentric_memory.experiences.values()
+                  if (e.clock + e.durability >= self.workspace.clock - 1)]:
+            poi = PointOfInterest(0, 0, self.view.batch, self.view.foreground, e.type, e.clock)
+            poi.displace(e.position_matrix)
+            poi.fade(self.workspace.clock)
             self.points_of_interest.append(poi)
 
-        displacement_matrix = self.workspace.enacted_interaction['displacement_matrix'] \
-
-        # Displace the points of interest
-        for poi_displace in self.points_of_interest:
-            poi_displace.update(displacement_matrix)
-            # Remove the agent's focus. It will be recreated if needed
-            if poi_displace.type in [EXPERIENCE_FOCUS, POINT_PROMPT]:
-                self.points_of_interest.remove(poi_displace)
-                poi_displace.delete()
+        # # Displace the points of interest
+        # for poi_displace in self.points_of_interest:
+        #     poi_displace.update(displacement_matrix)
+        #     # Remove the agent's focus. It will be recreated if needed
+        #     if poi_displace.type in [EXPERIENCE_FOCUS, POINT_PROMPT]:
+        #         self.points_of_interest.remove(poi_displace)
+        #         poi_displace.delete()
 
         # Re-create the focus point
         poi_focus = self.create_poi_focus()
@@ -114,11 +116,11 @@ class CtrlEgocentricView:
         # Mark the new position
         self.add_point_of_interest(0, 0, EXPERIENCE_PLACE)
 
-        # Make the points of interest fade out as they get older
-        for poi_fade in self.points_of_interest:
-            poi_fade.fade(self.workspace.clock)
-        # Keep only the points of interest during their durability
-        self.points_of_interest = [p for p in self.points_of_interest if p.clock + p.durability > self.workspace.clock]
+        # # Make the points of interest fade out as they get older
+        # for poi_fade in self.points_of_interest:
+        #     poi_fade.fade(self.workspace.clock)
+        # # Keep only the points of interest during their durability
+        # self.points_of_interest = [p for p in self.points_of_interest if p.clock + p.durability > self.workspace.clock]
 
     def create_poi_focus(self):
         """Create a point of interest corresponding to the focus"""
@@ -130,10 +132,10 @@ class CtrlEgocentricView:
                                                 self.workspace.clock)
         return agent_focus_point
 
-    def create_point_of_interest(self, experience):
-        """Create a point of interest corresponding to the experience given as parameter"""
-        return PointOfInterest(experience.point[0], experience.point[1], self.view.batch, self.view.foreground,
-                               experience.type, self.workspace.clock, experience=experience)
+    # def create_point_of_interest(self, experience):
+    #     """Create a point of interest corresponding to the experience given as parameter"""
+    #     return PointOfInterest(experience.point[0], experience.point[1], self.view.batch, self.view.foreground,
+    #                            experience.type, self.workspace.clock, experience=experience)
 
     def main(self, dt):
         """Called every frame. Update the egocentric view"""

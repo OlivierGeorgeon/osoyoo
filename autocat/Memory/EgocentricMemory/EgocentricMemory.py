@@ -29,9 +29,8 @@ class EgocentricMemory:
                                     durability=EXPERIENCE_PERSISTENCE,
                                     experience_id=self.experience_id)
             new_experiences.append(experience)
+            self.experiences[experience.id] = experience
             self.experience_id += 1
-        for e in new_experiences:
-            self.experiences[e.id] = e
 
         # Add the central echos from the local echos
         new_central_echos = self.Compute_central_echo([e for e in new_experiences if e.type == EXPERIENCE_LOCAL_ECHO],
@@ -115,7 +114,6 @@ class EgocentricMemory:
     def save(self):
         """Return a deep clone of egocentric memory for simulation"""
         saved_egocentric_memory = EgocentricMemory()
-        # saved_egocentric_memory.experiences = [e.save() for e in self.experiences]
-        saved_egocentric_memory.experiences = {k: e.save() for k, e in self.experiences.items()}
+        saved_egocentric_memory.experiences = {key: e.save() for key, e in self.experiences.items()}
         saved_egocentric_memory.experience_id = self.experience_id
         return saved_egocentric_memory

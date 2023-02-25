@@ -14,6 +14,8 @@ ACTION_ALIGN_ROBOT = '/'
 ACTION_ALIGN_HEAD = '*'
 
 SIMULATION_TIME_RATIO = 1  # 0.5   # The simulation speed is slower than the real speed because ...
+SIMULATION_STEP_OFF = 0
+SIMULATION_STEP_ON = 1  # More step will be used to take wifi transmission time into account
 
 
 class Action:
@@ -23,10 +25,12 @@ class Action:
         self.action_code = action_code
         self.translation_speed = translation_speed
         self.rotation_speed_rad = rotation_speed
-        # self.target_yaw = target_yaw
         self.target_duration = target_duration
 
-        self.is_simulating = False
+        self.simulation_duration = target_duration
+        self.simulation_rotation_speed = rotation_speed
+
+        self.simulation_step = 0
         self.simulation_time = 0.
         print("Create action", self, "of speed", self.translation_speed, "rotation speed", self.rotation_speed_rad)
 
@@ -58,44 +62,48 @@ class Action:
             print("adjusting y speed: correction:", round(translation[1]),
                   "new y speed:", round(self.translation_speed[1]))
 
-    def simulate(self, memory, intended_interaction, dt):
+    def simulate(self, memory, dt):
         """Simulate the action in memory. Return True during the simulation, and False when it ends"""
         # Check the target
-        target_duration = self.target_duration
-        rotation_speed = self. rotation_speed_rad
-        if self.action_code == ACTION_FORWARD:
-            if 'duration' in intended_interaction:
-                target_duration = intended_interaction['duration'] / 1000
-        if intended_interaction['action'] == ACTION_ALIGN_ROBOT:
-            if 'angle' in intended_interaction:
-                target_duration = math.fabs(intended_interaction['angle']) * TURN_DURATION / DEFAULT_YAW
-                if intended_interaction['angle'] < 0:
-                    rotation_speed = -self.rotation_speed_rad
+        # target_duration = self.target_duration
+        # rotation_speed = self. rotation_speed_rad
+        # if self.action_code == ACTION_FORWARD:
+        #     if 'duration' in intended_interaction:
+        #         target_duration = intended_interaction['duration'] / 1000
+        # if intended_interaction['action'] == ACTION_ALIGN_ROBOT:
+        #     if 'angle' in intended_interaction:
+        #         target_duration = math.fabs(intended_interaction['angle']) * TURN_DURATION / DEFAULT_YAW
+        #         if intended_interaction['angle'] < 0:
+        #             rotation_speed = -self.rotation_speed_rad
 
         self.simulation_time += dt
-        if self.simulation_time > target_duration * SIMULATION_TIME_RATIO:
-            self.simulation_time = 0
-            self.is_simulating = False
+        if self.simulation_time > self.simulation_duration:
+            self.simulation_time = 0.
+            self.simulation_step = SIMULATION_STEP_OFF
             return False
-        # if self.action_code in [ACTION_TURN_LEFT, ACTION_TURN_RIGHT]:
-        #     self.simulation_time += dt * math.fabs(self.rotation_speed_rad)
-        #     if self.simulation_time >= math.radians(math.fabs(self.target_yaw)):
-        #         self.simulation_time = 0
-        #         self.is_simulating = False
-        #         return False
 
         # simulate the action in memory
-        memory.body_memory.body_direction_rad += rotation_speed * dt * SIMULATION_TIME_RATIO
+        memory.body_memory.body_direction_rad += self.simulation_rotation_speed * dt
         memory.allocentric_memory.robot_point += rotate_vector_z(self.translation_speed * dt * SIMULATION_TIME_RATIO,
                                                                  memory.body_memory.body_direction_rad)
         return True
 
-    # def start_simulation(self):
-    #     """Initialize the simulation of the action"""
-    #     if self.action_code in [ACTION_FORWARD, ACTION_BACKWARD, ACTION_RIGHTWARD, ACTION_LEFTWARD]:
-    #         self.simulation_time = self.target_duration
-    #     if self.action_code in [ACTION_TURN_RIGHT, ACTION_TURN_LEFT]:
-    #         self.simulation_time = self.target_yaw
+    def start_simulation(self, intended_interaction):
+        """Initialize the simulation of the intended interaction"""
+        self.simulation_step = SIMULATION_STEP_ON
+        # Compute the duration and the speed depending and the intended interaction
+        self.simulation_duration = self.target_duration
+        self.simulation_rotation_speed = self. rotation_speed_rad
+        if self.action_code == ACTION_FORWARD:
+            if 'duration' in intended_interaction:
+                self.simulation_duration = intended_interaction['duration'] / 1000
+        if intended_interaction['action'] == ACTION_ALIGN_ROBOT:
+            if 'angle' in intended_interaction:
+                self.simulation_duration = math.fabs(intended_interaction['angle']) * TURN_DURATION / DEFAULT_YAW
+                if intended_interaction['angle'] < 0:
+                    self.simulation_rotation_speed = -self.rotation_speed_rad
+        self.simulation_duration *= SIMULATION_TIME_RATIO
+        self.simulation_rotation_speed *= SIMULATION_TIME_RATIO
 
 
 def create_actions():

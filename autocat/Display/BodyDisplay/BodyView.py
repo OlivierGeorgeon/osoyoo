@@ -11,12 +11,12 @@ ZOOM_IN_FACTOR = 1.2
 
 class BodyView(InteractiveDisplay):
     """Display the information in body memory"""
-    def __init__(self, memory, width=350, height=350, *args, **kwargs):
+    def __init__(self, workspace, width=350, height=350, *args, **kwargs):
         super().__init__(width, height, resizable=True, *args, **kwargs)
         self.set_caption("Body Memory")
         self.set_minimum_size(150, 150)
 
-        self.memory = memory
+        self.workspace = workspace
 
         # Initialize OpenGL parameters
         # https://www.w3schools.com/cssref/css_colors.asp
@@ -58,7 +58,7 @@ class BodyView(InteractiveDisplay):
 
         # Stack the rotation of the robot body
         # glRotatef(90 - self.azimuth, 0.0, 0.0, 1.0)
-        glRotatef(90 - self.memory.body_memory.body_azimuth(), 0.0, 0.0, 1.0)
+        glRotatef(90 - self.workspace.memory.body_memory.body_azimuth(), 0.0, 0.0, 1.0)
         # Draw compass points
         self.batch.draw()
         # Draw the robot

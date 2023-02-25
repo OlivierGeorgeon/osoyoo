@@ -1,4 +1,3 @@
-import numpy as np
 from pyglet import shapes, gl
 from webcolors import name_to_rgb
 from autocat.Memory.EgocentricMemory.Experience import *
@@ -11,9 +10,8 @@ POINT_PROMPT = 'Prompt'
 
 
 class PointOfInterest:
-    def __init__(self, x, y, batch, group, point_type, clock, experience=None):
-        self.experience = experience
-        # self.x, self.y = 0, 0  # will be displaced
+    def __init__(self, x, y, batch, group, point_type, clock, durability=10):
+        # self.experience = experience
         self.point = np.array([x, y, 0], dtype=int)
         self.batch = batch
         self.group = group
@@ -22,13 +20,8 @@ class PointOfInterest:
         self.opacity = 255
         self.color = name_to_rgb("gray")
         self.is_selected = False
-
-        if experience is None:
-            self.clock = clock
-            self.durability = 10
-        else:
-            self.clock = experience.clock
-            self.durability = experience.durability
+        self.clock = clock
+        self.durability = durability
 
         if self.type == EXPERIENCE_PLACE:
             self.points = [30, 0, -20, -20, -20, 20]
@@ -107,10 +100,10 @@ class PointOfInterest:
 
     def reset_position(self):
         """ Reset the position of the point of interest """
-        # self.x, self.y = 0, 0
         self.point = np.array([0, 0, 0], dtype=int)
-        # If the shape has a list of vertices then reset it
+        # Reset the position of all the points
         if hasattr(self.shape, 'vertices'):
+            # If the shape has a list of vertices then reset it
             self.shape.vertices = self.points
         else:
             self.shape.x, self.shape.y = 0, 0  # Circle
@@ -119,8 +112,6 @@ class PointOfInterest:
         """ Applying the displacement matrix to the point of interest """
         #  Rotate and translate the position
         self.point = matrix44.apply_to_vector(displacement_matrix, self.point)
-        # v = matrix44.apply_to_vector(displacement_matrix, [self.x, self.y, 0])
-        # self.x, self.y = v[0], v[1]
 
         # If the shape has a list of vertices
         # then apply the displacement matrix to each point. This will rotate the shape
@@ -131,16 +122,23 @@ class PointOfInterest:
             return
 
         # Points of interest that use pyglet shapes have x and y (Circles)
-        # self.shape.x, self.shape.y = self.x, self.y
         self.shape.x, self.shape.y = self.point[0], self.point[1]
 
     def delete(self):
         """ Delete the shape to remove it from the batch """
         self.shape.delete()  # Not sure whether it is necessary or not
 
+    def keep_or_delete(self, clock):
+        """Return True if keep, delete otherwise"""
+        # Keep points of interest Place that are not expired
+        if (self.clock + self.durability > clock) and self.type == EXPERIENCE_PLACE:
+            return True
+        else:
+            self.shape.delete()
+            return False
+
     def select_if_near(self, point):
         """ If the point is near the x y coordinate, select this point and return True """
-        # if math.dist([point[0], point[1]], [self.x, self.y]) < 15:
         if math.dist(point, self.point) < 15:
             self.set_color('red')
             self.is_selected = True
@@ -150,18 +148,18 @@ class PointOfInterest:
             self.is_selected = False
             return False
 
-    def update(self, displacement_matrix):
-        """ Displace the point of interest to the position of its experience
-        or by the displacement_matrix provided as an argument"""
-
-        # If this point of interest has an experience, the displacement matrix comes from this experience
-        if self.experience is not None:
-            self.reset_position()  # Reset the points to their origin position
-            displacement_matrix = self.experience.position_matrix  # Move the points to the position of the experience
-
-        # if displacement_matrix is not None:
-        # the apply a relative displacement
-        self.displace(displacement_matrix)
+    # def update(self, displacement_matrix):
+    #     """ Displace the point of interest to the position of its experience
+    #     or by the displacement_matrix provided as an argument"""
+    #
+    #     # If this point of interest has an experience, the displacement matrix comes from this experience
+    #     if self.experience is not None:
+    #         self.reset_position()  # Reset the points to their origin position
+    #         displacement_matrix = self.experience.position_matrix  # Move the points to the position of the experience
+    #
+    #     # if displacement_matrix is not None:
+    #     # the apply a relative displacement
+    #     self.displace(displacement_matrix)
 
     def fade(self, clock):
         """Decrease the opacity of this point of interest as it gets older, and then delete it"""
@@ -174,5 +172,4 @@ class PointOfInterest:
             self.shape.delete()
 
     def __str__(self):
-        return "POI of type " + self.type + " at x=" + str(int(self.point[0])) + ", y=" + str(int(self.point[1])) + \
-               ", interaction: " + self.experience.__str__()
+        return "POI of type " + self.type + " at x=" + str(int(self.point[0])) + ", y=" + str(int(self.point[1]))

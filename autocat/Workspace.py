@@ -1,10 +1,9 @@
 import numpy as np
 import math
-import copy
 from pyrr import matrix44
 
 from .Decider.AgentCircle import AgentCircle
-from .Decider.Action import create_actions, ACTION_FORWARD, ACTION_ALIGN_ROBOT, ACTION_SCAN
+from .Decider.Action import create_actions, ACTION_FORWARD, ACTION_ALIGN_ROBOT, ACTION_SCAN, SIMULATION_STEP_OFF
 from .Memory.Memory import Memory
 from .Integrator.Integrator import Integrator
 from .Robot.RobotDefine import DEFAULT_YAW, TURN_DURATION
@@ -69,7 +68,7 @@ class Workspace:
             # Add intended_interaction fields that are common to all deciders
             self.intended_interaction["clock"] = self.clock
             # Initialize the simulation of the action
-            self.actions[self.intended_interaction['action']].is_simulating = True
+            self.actions[self.intended_interaction['action']].start_simulation(self.intended_interaction)
 
             # Manage the memory snapshot
             if self.is_imagining:
@@ -99,9 +98,9 @@ class Workspace:
 
         # ENACTING: update body memory during the robot enaction or the imaginary simulation
         if self.interaction_step == INTERACTION_STEP_ENACTING:
-            if self.actions[self.intended_interaction['action']].is_simulating:
-                target_duration = None
-                self.actions[self.intended_interaction['action']].simulate(self.memory, self.intended_interaction, dt)
+            if self.actions[self.intended_interaction['action']].simulation_step != SIMULATION_STEP_OFF:
+                # target_duration = None
+                self.actions[self.intended_interaction['action']].simulate(self.memory, dt)
             else:
                 # End of the simulation
                 # if self.engagement_mode == ENGAGEMENT_KEY_IMAGINARY:

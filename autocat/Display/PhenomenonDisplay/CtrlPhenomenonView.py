@@ -30,14 +30,13 @@ class CtrlPhenomenonView:
             """ Computing the position of the mouse click relative to the robot in mm and degrees """
             # window_press_x = (x - self.view.width / 2) * self.view.zoom_level * 2
             # window_press_y = (y - self.view.height / 2) * self.view.zoom_level * 2
-            # angle = math.atan2(window_press_y, window_press_x)
-            window_press_x, window_press_y, angle, _ = self.view.mouse_coordinates_to_point(x, y)
-            self.view.label.text = "Click: x:" + str(int(window_press_x)) + ", y:" + str(int(window_press_y)) \
-                                   + ", angle:" + str(int(math.degrees(angle))) + "°."
-            for p in self.points_of_interest:
-                is_near = p.select_if_near(window_press_x, window_press_y)
-                if is_near:
-                    self.view.label_origin_direction.text = "Clock: " + str(p.clock)
+            point = self.view.mouse_coordinates_to_point(x, y)
+            angle = math.atan2(point[1], point[0])
+            self.view.label.text = "Click: x:" + str(round(point[0])) + ", y:" + str(round(point[1])) \
+                                   + ", angle:" + str(round(math.degrees(angle))) + "°."
+            for p in [p for p in self.points_of_interest if p.select_if_near(point)]:
+                # if p.select_if_near(point):
+                self.view.label_origin_direction.text = "Clock: " + str(p.clock)
 
         self.view.push_handlers(on_text, on_mouse_press)
 

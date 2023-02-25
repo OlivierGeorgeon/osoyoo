@@ -8,7 +8,7 @@ from ...Workspace import INTERACTION_STEP_REFRESHING, INTERACTION_STEP_ENACTING
 class CtrlBodyView:
     """Controls the body view"""
     def __init__(self, workspace):
-        self.view = BodyView(workspace.memory)
+        self.view = BodyView(workspace)
         self.workspace = workspace
         self.points_of_interest = []
         self.last_action = None
@@ -44,7 +44,7 @@ class CtrlBodyView:
         yaw = self.workspace.enacted_interaction['yaw']
         displacement_matrix = matrix44.create_from_z_rotation(math.radians(yaw))
         for poi in [p for p in self.points_of_interest if p.type == POINT_COMPASS]:
-            poi.update(displacement_matrix)
+            poi.displace(displacement_matrix)
 
         # Add the new points that indicate the south relative to the robot
         if 'compass_x' in self.workspace.enacted_interaction:
