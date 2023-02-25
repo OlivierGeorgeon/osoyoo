@@ -47,13 +47,14 @@ class GridCell:
         path = mpath.Path(polygon)
         return path.contains_point(self.point[0:2])
 
-    def save(self):
+    def save(self, experiences):
         """Return a clone of the cell to save a snapshot of allocentric memory"""
+        # Use the experiences cloned when saving egocentric memory
         saved_cell = GridCell(self.i, self.j, self.radius)
         # Clone the content
         saved_cell.status = [s for s in self.status]
         saved_cell.clocks = [c for c in self.clocks]
-        saved_cell.experiences = [e.save() for e in self.experiences]
+        saved_cell.experiences = [experiences[e.id] for e in self.experiences]
         if self.phenomenon is not None:
-            saved_cell.phenomenon = self.phenomenon.save()
+            saved_cell.phenomenon = self.phenomenon.save(experiences)
         return saved_cell

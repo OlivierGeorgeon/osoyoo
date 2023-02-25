@@ -77,7 +77,8 @@ class Workspace:
                 if self.engagement_mode == ENGAGEMENT_KEY_ROBOT:
                     self.memory = self.memory_snapshot.save()  # Keep the snapshot saved
                     self.is_imagining = False
-                    print("Restored", self.memory)
+                    # TODO update the views
+                    # print("Restored", self.memory)
                 # (If continue imagining then keep the previous snapshot)
             else:
                 # If was not previously imagining then take a new memory snapshot
@@ -254,7 +255,7 @@ class Workspace:
 
         enacted_interaction['translation'] = translation
         enacted_interaction['yaw'] = round(math.degrees(yaw_rad))
-        enacted_interaction['azimuth'] = 0  # Is computed by bodymemory
+        enacted_interaction['azimuth'] = 0  # Is computed by body_memory
         enacted_interaction['displacement_matrix'] = displacement_matrix
         enacted_interaction['head_angle'] = 0
         enacted_interaction['points'] = []

@@ -9,7 +9,7 @@ class EgocentricMemory:
     """Stores and manages the egocentric memory"""
 
     def __init__(self):
-        self.experiences = []
+        self.experiences = {}
         self.experience_id = 0  # A unique ID for each experience in memory
 
     def update_and_add_experiences(self, enacted_interaction, body_direction_rad):
@@ -19,7 +19,7 @@ class EgocentricMemory:
         """
 
         # Move the existing experiences
-        for experience in self.experiences:
+        for experience in self.experiences.values():
             experience.displace(enacted_interaction['displacement_matrix'])
 
         # Create new experiences from points in the enacted_interaction
@@ -30,16 +30,20 @@ class EgocentricMemory:
                                     experience_id=self.experience_id)
             new_experiences.append(experience)
             self.experience_id += 1
+        for e in new_experiences:
+            self.experiences[e.id] = e
 
         # Add the central echos from the local echos
         new_central_echos = self.Compute_central_echo([e for e in new_experiences if e.type == EXPERIENCE_LOCAL_ECHO],
                                                       body_direction_rad, enacted_interaction["clock"])
-        self.experiences += new_experiences
-        self.experiences += new_central_echos
+        for e in new_central_echos:
+            self.experiences[e.id] = e
 
-    # def decay(self, clock):
+        # self.experiences += new_experiences
+        # self.experiences += new_central_echos
+
         # Remove the experiences from egocentric memory when they are two old
-        self.experiences = [e for e in self.experiences if e.clock >= enacted_interaction["clock"] - e.durability]
+        # self.experiences = [e for e in self.experiences if e.clock >= enacted_interaction["clock"] - e.durability]
 
     def revert_echoes_to_angle_distance(self, echo_list):
         """Convert echo interaction to triples (angle,distance,interaction)"""
@@ -111,7 +115,7 @@ class EgocentricMemory:
     def save(self):
         """Return a deep clone of egocentric memory for simulation"""
         saved_egocentric_memory = EgocentricMemory()
-        saved_egocentric_memory.experiences = [e.save() for e in self.experiences]
-        # TODO use dictionary new_dic = {k:v for k,v in mydict.items()}
+        # saved_egocentric_memory.experiences = [e.save() for e in self.experiences]
+        saved_egocentric_memory.experiences = {k: e.save() for k, e in self.experiences.items()}
         saved_egocentric_memory.experience_id = self.experience_id
         return saved_egocentric_memory

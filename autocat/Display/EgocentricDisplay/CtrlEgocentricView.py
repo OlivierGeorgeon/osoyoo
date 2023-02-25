@@ -13,7 +13,7 @@ class CtrlEgocentricView:
     def __init__(self, workspace):
         self.view = EgocentricView()
         self.workspace = workspace
-        self.egocentric_memory = workspace.memory.egocentric_memory
+        # self.egocentric_memory = workspace.memory.egocentric_memory
         self.synthesizer = workspace.integrator
         self.points_of_interest = []
         self.last_action = None
@@ -81,7 +81,11 @@ class CtrlEgocentricView:
         """Retrieve all new experiences from memory, create and update the corresponding points of interest"""
 
         # Create the new points of interest from the new experiences
-        new_experiences = [e for e in self.egocentric_memory.experiences if (e.clock >= self.workspace.clock - 1)]
+        # print("Looking for new experiences")
+        # for e in self.workspace.memory.egocentric_memory.experiences:
+        #     print(e)
+
+        new_experiences = [e for e in self.workspace.memory.egocentric_memory.experiences.values() if (e.clock >= self.workspace.clock - 1)]
         for e in new_experiences:
             poi = self.create_point_of_interest(e)
             self.points_of_interest.append(poi)

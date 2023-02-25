@@ -143,12 +143,13 @@ class Phenomenon:
             print("Error computing the Delaunay: ", e)
         return is_inside
 
-    def save(self):
-        """Return a clone of the phenomenon to save a snapshot of memory"""
+    def save(self, experiences):
+        """Return a clone of the phenomenon for memory snapshot"""
+        # Use the experiences cloned when saving egocentric memory
         saved_phenomenon = Phenomenon(self.origin_affordance)
         saved_phenomenon.point = self.point.copy()
         saved_phenomenon.confidence = self.confidence
         saved_phenomenon.nb_tour = self.nb_tour
         saved_phenomenon.tour_started = self.tour_started
-        saved_phenomenon.affordances = [a.save() for a in self.affordances]
+        saved_phenomenon.affordances = [a.save(experiences[a.experience.id]) for a in self.affordances]
         return saved_phenomenon

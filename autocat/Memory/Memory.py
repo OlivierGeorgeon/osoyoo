@@ -100,7 +100,6 @@ class Memory:
 
         # Copy allocentric memory
         # saved_memory.allocentric_memory.robot_point = self.allocentric_memory.robot_point.copy()
-        # TODO use the experiences that were cloned in saved egocentric memory
-        saved_memory.allocentric_memory = self.allocentric_memory.save()
+        saved_memory.allocentric_memory = self.allocentric_memory.save(saved_memory.egocentric_memory.experiences)
 
         return saved_memory

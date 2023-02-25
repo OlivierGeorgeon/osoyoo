@@ -11,16 +11,16 @@ class Integrator:
     def __init__(self, workspace):
         """Constructor"""
         self.workspace = workspace
-        self.egocentric_memory = workspace.memory.egocentric_memory
-        self.allocentric_memory = workspace.memory.allocentric_memory
-        self.body_memory = workspace.memory.body_memory
+        # self.egocentric_memory = workspace.memory.egocentric_memory
+        # self.allocentric_memory = workspace.memory.allocentric_memory
+        # self.body_memory = workspace.memory.body_memory
         self.phenomena = []
 
     def integrate(self):
         """Create phenomena and update cells in allocentric memory"""
 
         # The new experiences generated during this round
-        new_experiences = [e for e in self.egocentric_memory.experiences if (e.clock >= self.workspace.clock - 1)]
+        new_experiences = [e for e in self.workspace.memory.egocentric_memory.experiences.values() if (e.clock >= self.workspace.clock - 1)]
 
         # The new affordances
         new_affordances = []
@@ -35,13 +35,13 @@ class Integrator:
 
         # Mark the area covered by the echo in allocentric memory
         for a in [a for a in new_affordances if a.experience.type in [EXPERIENCE_CENTRAL_ECHO, EXPERIENCE_ALIGNED_ECHO]]:
-            self.allocentric_memory.mark_echo_area(a)
+            self.workspace.memory.allocentric_memory.mark_echo_area(a)
 
         # Try to attach the new affordances to existing phenomena and remove these affordances
         new_affordances, position_correction = self.update_phenomena(new_affordances)
 
         # Adjust the robot's position in allocentric memory
-        self.allocentric_memory.move(0, position_correction, self.workspace.clock, is_egocentric_translation=False)
+        self.workspace.memory.allocentric_memory.move(0, position_correction, self.workspace.clock, is_egocentric_translation=False)
 
         # Create new hypothetical phenomena from remaining affordances
         self.create_phenomena(new_affordances)

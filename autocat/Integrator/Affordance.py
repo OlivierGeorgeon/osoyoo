@@ -75,6 +75,7 @@ class Affordance:
             points = [p1, p2, p3] + self.point
         return points
 
-    def save(self):
-        """Return a saved affordance to save a snapshot of memory"""
-        return Affordance(self.point.copy(), self.experience.save())
+    def save(self, experience):
+        """Return a cloned affordance for memory snapshot"""
+        # Use the experience cloned when saving egocentric memory
+        return Affordance(self.point.copy(), experience)

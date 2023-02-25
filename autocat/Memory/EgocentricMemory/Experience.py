@@ -66,6 +66,9 @@ class Experience:
         self.durability = durability
         self.id = experience_id
 
+    def __str__(self):
+        return "(id:" + str(self.id) + ",clock:" + str(self.clock) + ")"
+
     def displace(self, displacement_matrix):
         """Displace the experience by the displacement_matrix"""
         # Update the position matrix in robot-centric coordinates
@@ -81,7 +84,7 @@ class Experience:
         # Clone the position matrix so they can be updated separately
         saved_experience.position_matrix = self.position_matrix.copy()
 
-        # Absolute relative sensor position do not change and are the same
+        # Absolute relative sensor position do not change
         saved_experience.absolute_direction_rad = self.absolute_direction_rad
         saved_experience.sensor_matrix = self.sensor_matrix
         saved_experience.rotation_matrix = self.rotation_matrix

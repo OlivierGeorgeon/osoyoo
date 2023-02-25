@@ -315,14 +315,16 @@ class AllocentricMemory:
             self.grid[self.prompt_i][self.prompt_j].status[3] = EXPERIENCE_PROMPT
             print("Prompt in cell", self.prompt_i, ", ", self.prompt_j)
 
-    def save(self):
+    def save(self, experiences):
+        """Retun a clone of allocentric memory for memory snapshot"""
+        # Use the list of experiences cloned when saving egocentric memory
         saved_allocentric_memory = AllocentricMemory(self.width, self.height, self.cell_radius)
         saved_allocentric_memory.robot_point = self.robot_point.copy()
         saved_allocentric_memory.focus_i = self.focus_i
         saved_allocentric_memory.focus_j = self.focus_j
         saved_allocentric_memory.prompt_i = self.prompt_i
         saved_allocentric_memory.prompt_j = self.prompt_j
-        saved_allocentric_memory.affordances = [a.save() for a in self.affordances]
-        saved_allocentric_memory.grid = [[c.save() for c in line] for line in self.grid]
+        saved_allocentric_memory.affordances = [a.save(experiences[a.experience.id]) for a in self.affordances]
+        saved_allocentric_memory.grid = [[c.save(experiences) for c in line] for line in self.grid]
 
         return saved_allocentric_memory
