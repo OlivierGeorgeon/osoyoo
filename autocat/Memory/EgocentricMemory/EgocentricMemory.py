@@ -109,8 +109,9 @@ class EgocentricMemory:
         return experiences_central_echo
 
     def save(self):
-        """Return a clone of egocentric memory to save a memory snapshot"""
+        """Return a deep clone of egocentric memory for simulation"""
         saved_egocentric_memory = EgocentricMemory()
         saved_egocentric_memory.experiences = [e.save() for e in self.experiences]
+        # TODO use dictionary new_dic = {k:v for k,v in mydict.items()}
         saved_egocentric_memory.experience_id = self.experience_id
         return saved_egocentric_memory

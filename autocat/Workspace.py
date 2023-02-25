@@ -49,8 +49,8 @@ class Workspace:
 
         self.clock = 0
         # TODO use the same saved memory for simulation and for imaginary
-        self.memory_for_simulation = None  # copy.deepcopy(self.memory)
-        self.memory_for_imaginary = None
+        # self.memory_for_simulation = None  # copy.deepcopy(self.memory)
+        self.memory_snapshot = None
         self.is_imagining = False
 
     def main(self, dt):
@@ -68,28 +68,31 @@ class Workspace:
         if self.interaction_step == INTERACTION_STEP_ENGAGING:
             # Add intended_interaction fields that are common to all deciders
             self.intended_interaction["clock"] = self.clock
-            # Save a snapshot of memory
+            # Initialize the simulation of the action
             self.actions[self.intended_interaction['action']].is_simulating = True
-            if self.engagement_mode == ENGAGEMENT_KEY_ROBOT:
-                # If engagement robot then send the command to the robot
-                self.interaction_step = INTERACTION_STEP_INTENDING
-                if self.is_imagining:
-                    # Stop imagining and restore memory
-                    # self.memory.body_memory.body_direction_rad = self.memory_for_imaginary.body_memory.body_direction_rad
-                    # self.memory.allocentric_memory.robot_point = self.memory_for_imaginary.allocentric_memory.robot_point
-                    # self.memory.body_memory.body_direction_rad = self.memory_for_simulation.body_memory.body_direction_rad
-                    # self.memory.allocentric_memory.robot_point = self.memory_for_simulation.allocentric_memory.robot_point
-                    self.memory = self.memory_for_imaginary
-                    # print("Restored", self.memory)
+
+            # Manage the memory snapshot
+            if self.is_imagining:
+                # If stop imagining then restore memory from the snapshot
+                if self.engagement_mode == ENGAGEMENT_KEY_ROBOT:
+                    self.memory = self.memory_snapshot.save()  # Keep the snapshot saved
                     self.is_imagining = False
+                    print("Restored", self.memory)
+                # (If continue imagining then keep the previous snapshot)
             else:
+                # If was not previously imagining then take a new memory snapshot
+                self.memory_snapshot = self.memory.save()
+                if self.engagement_mode == ENGAGEMENT_KEY_IMAGINARY:
+                    # Start imagining
+                    self.is_imagining = True
+
+            # Manage the imaginary mode
+            if self.is_imagining:
                 # If imagining then proceed to simulating the enaction
                 self.interaction_step = INTERACTION_STEP_ENACTING
-                if not self.is_imagining:
-                    # Start imagining, save the memory
-                    self.memory_for_imaginary = self.memory.save()
-                    self.is_imagining = True
-            self.memory_for_simulation = self.memory.save()
+            else:
+                # If engagement robot then send the command to the robot
+                self.interaction_step = INTERACTION_STEP_INTENDING
 
         # INTENDING: is handled by CtrlRobot
 
@@ -100,7 +103,8 @@ class Workspace:
                 self.actions[self.intended_interaction['action']].simulate(self.memory, self.intended_interaction, dt)
             else:
                 # End of the simulation
-                if self.engagement_mode == ENGAGEMENT_KEY_IMAGINARY:
+                # if self.engagement_mode == ENGAGEMENT_KEY_IMAGINARY:
+                if self.is_imagining:
                     # Compute an imaginary enacted_interaction and proceed to integrating
                     self.update_enacted_interaction(self.imagine())
                     self.interaction_step = INTERACTION_STEP_INTEGRATING
@@ -109,8 +113,13 @@ class Workspace:
         # INTEGRATING: the new enacted interaction
         if self.interaction_step == INTERACTION_STEP_INTEGRATING:
             # Retrieve the memory before simulation
-            self.memory.body_memory.body_direction_rad = self.memory_for_simulation.body_memory.body_direction_rad
-            self.memory.allocentric_memory.robot_point = self.memory_for_simulation.allocentric_memory.robot_point
+            # self.memory.body_memory.body_direction_rad = self.memory_for_simulation.body_memory.body_direction_rad
+            # self.memory.allocentric_memory.robot_point = self.memory_for_simulation.allocentric_memory.robot_point
+
+            # If not imagining then restore the memory from the snapshot
+            if not self.is_imagining:
+                self.memory = self.memory_snapshot
+            # (If imagining then keep the imagined memory until back to robot engagement mode)
 
             # Update body memory and egocentric memory
             self.memory.update_and_add_experiences(self.enacted_interaction)
@@ -144,8 +153,10 @@ class Workspace:
 
         if "status" in enacted_interaction and enacted_interaction["status"] == "T":
             print("The workspace received an empty enacted interaction")
-            self.memory.body_memory.body_direction_rad = self.memory_for_simulation.body_memory.body_direction_rad
-            self.memory.allocentric_memory.robot_point = self.memory_for_simulation.allocentric_memory.robot_point
+            # self.memory.body_memory.body_direction_rad = self.memory_for_simulation.body_memory.body_direction_rad
+            # self.memory.allocentric_memory.robot_point = self.memory_for_simulation.allocentric_memory.robot_point
+            # restore memory from snapshot
+            self.memory = self.memory_snapshot
 
             # Reset the interaction step
             if self.decider_mode == DECIDER_KEY_CIRCLE:
@@ -231,8 +242,11 @@ class Workspace:
                     rotation_speed = -self.actions[action_code].rotation_speed_rad
 
         # displacement
-        translation = self.actions[action_code].translation_speed * target_duration
-        yaw_rad = rotation_speed * target_duration
+        # translation = self.actions[action_code].translation_speed * target_duration
+        # yaw_rad = rotation_speed * target_duration
+        # No additional displacement because the displacement was already simulated
+        translation = np.array([0, 0, 0], dtype=float)
+        yaw_rad = 0
 
         translation_matrix = matrix44.create_from_translation(-translation)
         rotation_matrix = matrix44.create_from_z_rotation(yaw_rad)
