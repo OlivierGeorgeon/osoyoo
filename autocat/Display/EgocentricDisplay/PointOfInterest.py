@@ -11,7 +11,6 @@ POINT_PROMPT = 'Prompt'
 
 class PointOfInterest:
     def __init__(self, x, y, batch, group, point_type, clock, durability=10):
-        # self.experience = experience
         self.point = np.array([x, y, 0], dtype=int)
         self.batch = batch
         self.group = group
@@ -98,15 +97,15 @@ class PointOfInterest:
                 self.shape.opacity = self.opacity
                 self.shape.color = name_to_rgb(color_name)
 
-    def reset_position(self):
-        """ Reset the position of the point of interest """
-        self.point = np.array([0, 0, 0], dtype=int)
-        # Reset the position of all the points
-        if hasattr(self.shape, 'vertices'):
-            # If the shape has a list of vertices then reset it
-            self.shape.vertices = self.points
-        else:
-            self.shape.x, self.shape.y = 0, 0  # Circle
+    # def reset_position(self):
+    #     """ Reset the position of the point of interest """
+    #     self.point = np.array([0, 0, 0], dtype=int)
+    #     # Reset the position of all the points
+    #     if hasattr(self.shape, 'vertices'):
+    #         # If the shape has a list of vertices then reset it
+    #         self.shape.vertices = self.points
+    #     else:
+    #         self.shape.x, self.shape.y = 0, 0  # Circle
 
     def displace(self, displacement_matrix):
         """ Applying the displacement matrix to the point of interest """
@@ -128,10 +127,14 @@ class PointOfInterest:
         """ Delete the shape to remove it from the batch """
         self.shape.delete()  # Not sure whether it is necessary or not
 
+    def is_expired(self, clock):
+        """Return True if the age has exceeded the durability"""
+        return self.clock + self.durability < clock
+
     def keep_or_delete(self, clock):
-        """Return True if keep, delete otherwise"""
+        """Return True if keep, delete otherwise. Used to refresh egocentric memory"""
         # Keep points of interest Place that are not expired
-        if (self.clock + self.durability > clock) and self.type == EXPERIENCE_PLACE:
+        if self.type == EXPERIENCE_PLACE and not self.is_expired(clock):
             return True
         else:
             self.shape.delete()
@@ -148,28 +151,15 @@ class PointOfInterest:
             self.is_selected = False
             return False
 
-    # def update(self, displacement_matrix):
-    #     """ Displace the point of interest to the position of its experience
-    #     or by the displacement_matrix provided as an argument"""
-    #
-    #     # If this point of interest has an experience, the displacement matrix comes from this experience
-    #     if self.experience is not None:
-    #         self.reset_position()  # Reset the points to their origin position
-    #         displacement_matrix = self.experience.position_matrix  # Move the points to the position of the experience
-    #
-    #     # if displacement_matrix is not None:
-    #     # the apply a relative displacement
-    #     self.displace(displacement_matrix)
-
     def fade(self, clock):
         """Decrease the opacity of this point of interest as it gets older, and then delete it"""
         # Opacity: 0 is transparent, 255 is opaque
         self.opacity = int(max(255 * (self.durability - clock + self.clock) / self.durability, 0))
         # Reset the opacity of the shape
         self.set_color(None)
-        # When the durability is elapsed, delete the shape from the batch
-        if clock > self.clock + self.durability:
-            self.shape.delete()
+        # The shape will be deleted by keep_and_delete
+        # if self.is_expired(clock):
+        #     self.shape.delete()
 
     def __str__(self):
         return "POI of type " + self.type + " at x=" + str(int(self.point[0])) + ", y=" + str(int(self.point[1]))

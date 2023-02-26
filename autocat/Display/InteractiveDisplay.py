@@ -12,6 +12,13 @@ class InteractiveDisplay(pyglet.window.Window):
         super().__init__(width, height, *args, **kwargs)
         self.zoom_level = 1.0
 
+        # Initialize OpenGL parameters
+        # https://www.w3schools.com/cssref/css_colors.asp
+        pyglet.gl.glEnable(pyglet.gl.GL_BLEND)
+        self.batch = pyglet.graphics.Batch()
+        self.background = pyglet.graphics.OrderedGroup(0)
+        self.forefront = pyglet.graphics.OrderedGroup(3)
+
     def on_resize(self, width, height):
         """ Adjusting the viewport when resizing the window """
         # Always display in the whole window

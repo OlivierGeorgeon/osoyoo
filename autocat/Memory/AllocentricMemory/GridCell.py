@@ -52,8 +52,8 @@ class GridCell:
         # Use the experiences cloned when saving egocentric memory
         saved_cell = GridCell(self.i, self.j, self.radius)
         # Clone the content
-        saved_cell.status = [s for s in self.status]
-        saved_cell.clocks = [c for c in self.clocks]
+        saved_cell.status = self.status.copy()
+        saved_cell.clocks = self.clocks.copy()
         saved_cell.experiences = [experiences[e.id] for e in self.experiences]
         if self.phenomenon is not None:
             saved_cell.phenomenon = self.phenomenon.save(experiences)

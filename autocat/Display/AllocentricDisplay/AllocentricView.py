@@ -1,7 +1,7 @@
 import pyglet
 from pyglet.gl import *
 from ..EgocentricDisplay.OsoyooCar import OsoyooCar
-from .HexagonalCell import HexagonalCell
+from .CellDisplay import CellDisplay
 from ...Memory.AllocentricMemory.GridCell import CELL_UNKNOWN
 from ..InteractiveDisplay import InteractiveDisplay
 
@@ -21,15 +21,15 @@ class AllocentricView(InteractiveDisplay):
         # glClearColor(0.2, 0.2, 0.7, 1.0)  # Make it look like hippocampus imaging
         glClearColor(0.2, 0.2, 1.0, 1.0)  # For demonstration in Fête de la Science
         # glClearColor(1.0, 1.0, 1.0, 1.0)
-        pyglet.gl.glEnable(pyglet.gl.GL_BLEND)
-        self.batch = pyglet.graphics.Batch()
+        # pyglet.gl.glEnable(pyglet.gl.GL_BLEND)
+        # self.batch = pyglet.graphics.Batch()
         self.groups = [pyglet.graphics.OrderedGroup(0),
                        pyglet.graphics.OrderedGroup(1),
                        pyglet.graphics.OrderedGroup(2)]
-        self.foreground = pyglet.graphics.OrderedGroup(3)
+        # self.foreground = pyglet.graphics.OrderedGroup(3)
 
         self.robot_batch = pyglet.graphics.Batch()
-        self.robot = OsoyooCar(self.robot_batch, self.foreground)  # Rectangles seem not to respect ordered groups
+        self.robot = OsoyooCar(self.robot_batch, self.forefront)  # Rectangles seem not to respect ordered groups
 
         # self.test_cell = Cell(0, 100, self.robot_batch, self.foreground, 50, 'Free')
 
@@ -58,11 +58,11 @@ class AllocentricView(InteractiveDisplay):
         if self.hexagons[cell.i][cell.j] is None:
             if cell.is_known():
                 # Create the hexagon
-                self.hexagons[cell.i][cell.j] = HexagonalCell(cell, self.batch, self.groups)
+                self.hexagons[cell.i][cell.j] = CellDisplay(cell, self.batch, self.groups)
         else:
             if cell.is_known():
                 # Update the hexagon
-                self.hexagons[cell.i][cell.j].update_color()
+                self.hexagons[cell.i][cell.j].update_color(cell.status)
             else:
                 # Delete the hexagon
                 self.hexagons[cell.i][cell.j].delete()

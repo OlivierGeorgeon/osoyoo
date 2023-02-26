@@ -9,11 +9,14 @@ from .Integrator.Integrator import Integrator
 from .Robot.RobotDefine import DEFAULT_YAW, TURN_DURATION
 
 
-DECIDER_KEY_CIRCLE = "A"  # Automatic mode: controlled by AgentCircle
-DECIDER_KEY_USER = "M"  # Manual mode : controlled by the user
+KEY_DECIDER_CIRCLE = "A"  # Automatic mode: controlled by AgentCircle
+KEY_DECIDER_USER = "M"  # Manual mode : controlled by the user
 
-ENGAGEMENT_KEY_ROBOT = "R"  # The application controls the robot
-ENGAGEMENT_KEY_IMAGINARY = "I"  # The application imagines the interaction
+KEY_ENGAGEMENT_ROBOT = "R"  # The application controls the robot
+KEY_ENGAGEMENT_IMAGINARY = "I"  # The application imagines the interaction
+
+KEY_DECREASE_CONFIDENCE = "D"
+KEY_INCREASE_CONFIDENCE = "P"
 
 INTERACTION_STEP_IDLE = 0
 INTERACTION_STEP_ENGAGING = 1
@@ -36,8 +39,8 @@ class Workspace:
         self.intended_interaction = None
         self.enacted_interaction = {}
 
-        self.decider_mode = DECIDER_KEY_USER
-        self.engagement_mode = ENGAGEMENT_KEY_ROBOT
+        self.decider_mode = KEY_DECIDER_USER
+        self.engagement_mode = KEY_ENGAGEMENT_ROBOT
         self.interaction_step = INTERACTION_STEP_IDLE
 
         self.focus_point = None  # The point where the agent is focusing
@@ -57,7 +60,7 @@ class Workspace:
         organize the generation of the intended_interaction and the processing of the enacted_interaction."""
         # IDLE: Ready to choose the next intended interaction
         if self.interaction_step == INTERACTION_STEP_IDLE:
-            if self.decider_mode == DECIDER_KEY_CIRCLE:
+            if self.decider_mode == KEY_DECIDER_CIRCLE:
                 # The decider chooses the next interaction
                 self.intended_interaction = self.decider.propose_intended_interaction(self.enacted_interaction)
                 self.interaction_step = INTERACTION_STEP_ENGAGING
@@ -73,7 +76,7 @@ class Workspace:
             # Manage the memory snapshot
             if self.is_imagining:
                 # If stop imagining then restore memory from the snapshot
-                if self.engagement_mode == ENGAGEMENT_KEY_ROBOT:
+                if self.engagement_mode == KEY_ENGAGEMENT_ROBOT:
                     self.memory = self.memory_snapshot.save()  # Keep the snapshot saved
                     self.is_imagining = False
                     # TODO update the views
@@ -82,7 +85,7 @@ class Workspace:
             else:
                 # If was not previously imagining then take a new memory snapshot
                 self.memory_snapshot = self.memory.save()
-                if self.engagement_mode == ENGAGEMENT_KEY_IMAGINARY:
+                if self.engagement_mode == KEY_ENGAGEMENT_IMAGINARY:
                     # Start imagining
                     self.is_imagining = True
 
@@ -159,7 +162,7 @@ class Workspace:
             self.memory = self.memory_snapshot
 
             # Reset the interaction step
-            if self.decider_mode == DECIDER_KEY_CIRCLE:
+            if self.decider_mode == KEY_DECIDER_CIRCLE:
                 # If automatic mode then resend the same intended interaction unless the user has set another one
                 self.interaction_step = INTERACTION_STEP_INTENDING
             else:
@@ -202,9 +205,9 @@ class Workspace:
 
     def process_user_key(self, user_key):
         """Process the keypress on the view windows (called by the views)"""
-        if user_key.upper() in [DECIDER_KEY_CIRCLE, DECIDER_KEY_USER]:
+        if user_key.upper() in [KEY_DECIDER_CIRCLE, KEY_DECIDER_USER]:
             self.decider_mode = user_key.upper()
-        elif user_key.upper() in [ENGAGEMENT_KEY_ROBOT, ENGAGEMENT_KEY_IMAGINARY]:
+        elif user_key.upper() in [KEY_ENGAGEMENT_ROBOT, KEY_ENGAGEMENT_IMAGINARY]:
             self.engagement_mode = user_key.upper()
         else:
             # Other keys are considered actions and sent to the robot

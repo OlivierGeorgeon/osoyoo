@@ -18,10 +18,10 @@ class EgocentricView(InteractiveDisplay):
 
         # Initialize OpenGL parameters
         glClearColor(1.0, 1.0, 1.0, 1.0)
-        pyglet.gl.glEnable(pyglet.gl.GL_BLEND)
-        self.batch = pyglet.graphics.Batch()
-        self.background = pyglet.graphics.OrderedGroup(0)
-        self.foreground = pyglet.graphics.OrderedGroup(1)
+        # pyglet.gl.glEnable(pyglet.gl.GL_BLEND)
+        # self.batch = pyglet.graphics.Batch()
+        # self.background = pyglet.graphics.OrderedGroup(0)
+        # self.foreground = pyglet.graphics.OrderedGroup(1)
         # self.zoom_level = 1
 
         # Define the robot
@@ -68,21 +68,10 @@ class EgocentricView(InteractiveDisplay):
     def get_prompt_point(self, x, y, button, modifiers):
         """ Computing the position of the mouse click relative to the robot in mm and degrees """
         prompt_point = self.mouse_coordinates_to_point(x, y)
-
-        # theta_robot = theta_window
-        # Polar angle from the robot axis
         if self.is_north_up:
             # TODO test this
             rotation_matrix = matrix44.create_from_z_rotation(-math.radians(self.azimuth - 90))
-            # theta_robot = theta_window + math.radians(self.azimuth - 90) + 2 * math.pi
-            # theta_robot %= 2 * math.pi
-            # if theta_robot > math.pi:
-            #     theta_robot -= 2 * math.pi
         else:
-            # theta_robot = theta_window + math.radians(-90) + 2 * math.pi
-            # theta_robot %= 2 * math.pi
-            # if theta_robot > math.pi:
-            #     theta_robot -= 2 * math.pi
             rotation_matrix = matrix44.create_from_z_rotation(math.pi/2)
         prompt_point = matrix44.apply_to_vector(rotation_matrix, prompt_point).astype(int)
 
@@ -94,7 +83,7 @@ class EgocentricView(InteractiveDisplay):
         self.label1.text = "Click: x:" + str(prompt_point[0]) + ", y:" + str(prompt_point[1]) \
                            + ", angle:" + str(prompt_polar_angle) + "°"
         # Return the click position to the controller
-        return prompt_point  # , prompt_polar_angle, r
+        return prompt_point
 
 
 # Testing the EgocentricView by displaying the robot in a pretty position, and the mouse click coordinates

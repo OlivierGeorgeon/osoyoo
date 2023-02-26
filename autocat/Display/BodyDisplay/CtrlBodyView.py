@@ -26,7 +26,7 @@ class CtrlBodyView:
     def add_point_of_interest(self, x, y, point_type, group=None):
         """ Adding a point of interest to the view """
         if group is None:
-            group = self.view.foreground
+            group = self.view.forefront
         point_of_interest = PointOfInterest(x, y, self.view.batch, group, point_type, self.workspace.clock)
         self.points_of_interest.append(point_of_interest)
 
@@ -41,6 +41,7 @@ class CtrlBodyView:
         self.view.label.text = "Azimuth: " + str(azimuth) + "°"
 
         # Rotate the previous compass points so they remain at the south of the view
+        # TODO rotate the compass points when imagining
         yaw = self.workspace.enacted_interaction['yaw']
         displacement_matrix = matrix44.create_from_z_rotation(math.radians(yaw))
         for poi in [p for p in self.points_of_interest if p.type == POINT_COMPASS]:
@@ -55,9 +56,9 @@ class CtrlBodyView:
                                        self.view.background)
             self.view.label.text += ", compass: " + str(self.workspace.enacted_interaction['azimuth']) + "°"
         else:
-            x = 300 * math.cos(math.radians(azimuth + 180))
-            y = 300 * math.sin(math.radians(azimuth + 180))
-            self.add_point_of_interest(x, y, POINT_COMPASS)
+            # x = 300 * math.cos(math.radians(azimuth + 180))
+            # y = 300 * math.sin(math.radians(azimuth + 180))
+            # self.add_point_of_interest(x, y, POINT_COMPASS)
             x = 330 * math.cos(math.radians(azimuth + 180))
             y = 330 * math.sin(math.radians(azimuth + 180))
             self.add_point_of_interest(x, y, POINT_AZIMUTH, self.view.background)
