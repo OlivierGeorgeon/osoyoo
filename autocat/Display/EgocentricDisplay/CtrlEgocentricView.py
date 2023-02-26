@@ -1,8 +1,6 @@
-import pyglet
-import numpy as np
 from pyglet.window import key
 from .EgocentricView import EgocentricView
-from .PointOfInterest import PointOfInterest, POINT_PROMPT
+from autocat.Display.PointOfInterest import PointOfInterest, POINT_PROMPT
 from ...Memory.EgocentricMemory.Experience import EXPERIENCE_FOCUS, EXPERIENCE_PLACE
 from ...Workspace import INTERACTION_STEP_REFRESHING
 

@@ -11,9 +11,6 @@ class Integrator:
     def __init__(self, workspace):
         """Constructor"""
         self.workspace = workspace
-        # self.egocentric_memory = workspace.memory.egocentric_memory
-        # self.allocentric_memory = workspace.memory.allocentric_memory
-        # self.body_memory = workspace.memory.body_memory
         self.phenomena = []
 
     def integrate(self):
@@ -27,8 +24,6 @@ class Integrator:
         for e in new_experiences:
             if e.type != EXPERIENCE_LOCAL_ECHO:
                 # The position of the affordance in allocentric memory
-                # affordance_point = e.allocentric_from_matrices(self.workspace.memory.body_memory.body_direction_matrix(),
-                #                                                self.allocentric_memory.body_position_matrix())
                 affordance_point = self.workspace.memory.egocentric_to_allocentric(e.point)
                 new_affordances.append(Affordance(affordance_point, e))
                 # print("Experience:", e.type, ", point:", affordance_point)
@@ -41,6 +36,7 @@ class Integrator:
         new_affordances, position_correction = self.update_phenomena(new_affordances)
 
         # Adjust the robot's position in allocentric memory
+        print("Position correction", position_correction)
         self.workspace.memory.allocentric_memory.move(0, position_correction, self.workspace.clock, is_egocentric_translation=False)
 
         # Create new hypothetical phenomena from remaining affordances

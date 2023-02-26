@@ -1,6 +1,6 @@
 import numpy as np
 import pyglet
-from ..EgocentricDisplay.PointOfInterest import PointOfInterest
+from autocat.Display.PointOfInterest import PointOfInterest
 from webcolors import name_to_rgb
 
 

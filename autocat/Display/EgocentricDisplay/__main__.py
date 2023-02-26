@@ -1,6 +1,6 @@
 import pyglet
 from .CtrlEgocentricView import CtrlEgocentricView
-from .PointOfInterest import *
+from autocat.Display.PointOfInterest import *
 from ...Workspace import Workspace
 from ...Memory.EgocentricMemory.Experience import Experience, EXPERIENCE_FLOOR
 

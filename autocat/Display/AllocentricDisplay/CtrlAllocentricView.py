@@ -1,15 +1,14 @@
 from pyglet.window import key
 from .AllocentricView import AllocentricView
-from ...Workspace import INTERACTION_STEP_REFRESHING
+from ...Workspace import INTERACTION_STEP_REFRESHING, INTERACTION_STEP_ENACTING
 
 
 class CtrlAllocentricView:
     def __init__(self, workspace):
         """Control the allocentric view"""
         self.workspace = workspace
-        # self.allocentric_memory = workspace.memory.allocentric_memory
         self.allocentric_view = AllocentricView(self.workspace)
-        self.refresh_count = 0
+        # self.refresh_count = 0
         self.prompt_point = None
 
         # Handlers
@@ -38,11 +37,11 @@ class CtrlAllocentricView:
             if symbol == key.DELETE:
                 self.workspace.prompt_point = None
                 self.workspace.memory.allocentric_memory.update_prompt(None)
-                self.update()
+                self.update_view()
             if symbol == key.INSERT:
                 # Mark the prompt
                 self.workspace.memory.allocentric_memory.update_prompt(self.prompt_point)
-                self.update()
+                self.update_view()
                 ego_point = self.workspace.memory.allocentric_to_egocentric(self.prompt_point)
                 self.workspace.prompt_point = ego_point
                 # Set the agent's focus to the user prompt
@@ -50,12 +49,13 @@ class CtrlAllocentricView:
 
         self.allocentric_view.on_key_press = on_key_press
 
-    def update_hexagons(self):
-        """Create the hexagons in the view from the status in the allocentric grid cells"""
+    def update_view(self):
+        """Update the allocentric view from the status in the allocentric grid cells"""
         for c in [c for line in self.workspace.memory.allocentric_memory.grid for c in line]:
             self.allocentric_view.update_hexagon(c)
 
     def main(self, dt):
         """Refresh allocentric view"""
-        if self.workspace.interaction_step == INTERACTION_STEP_REFRESHING:
-            self.update_hexagons()
+        # Refresh during the simulation and at the end of the cycle
+        if self.workspace.interaction_step in [INTERACTION_STEP_ENACTING, INTERACTION_STEP_REFRESHING]:
+            self.update_view()

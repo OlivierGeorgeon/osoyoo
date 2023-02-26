@@ -209,6 +209,7 @@ class AllocentricMemory:
         """Move the robot in allocentric memory. Mark the traversed cells Free. Returns the new position"""
         # Compute the robot destination point
         if is_egocentric_translation:
+            # TODO Translate between the initial direction and the final direction
             destination_point = self.robot_point + rotate_vector_z(translation, body_direction_rad)
         else:
             destination_point = self.robot_point + translation
@@ -240,7 +241,6 @@ class AllocentricMemory:
         for c in [c for line in self.grid for c in line if c.is_inside(polygon)]:
             c.status[0] = EXPERIENCE_PLACE
             c.clocks[0] = clock
-            # self.apply_status_to_cell(c.i, c.j, EXPERIENCE_PLACE)
         # print("Place robot time:", time.time() - start_time, "seconds")
 
     def clear_phenomena(self):
@@ -253,7 +253,6 @@ class AllocentricMemory:
 
     def apply_changes(self, start, end, clock):
         """Mark the cells traversed by the robot"""
-        # distance = math.sqrt((end_x - start_x)**2 + (end_y - start_y)**2)
         distance = math.dist(start, end)
         if distance == 0:
             return

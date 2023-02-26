@@ -64,18 +64,7 @@ class Action:
 
     def simulate(self, memory, dt):
         """Simulate the action in memory. Return True during the simulation, and False when it ends"""
-        # Check the target
-        # target_duration = self.target_duration
-        # rotation_speed = self. rotation_speed_rad
-        # if self.action_code == ACTION_FORWARD:
-        #     if 'duration' in intended_interaction:
-        #         target_duration = intended_interaction['duration'] / 1000
-        # if intended_interaction['action'] == ACTION_ALIGN_ROBOT:
-        #     if 'angle' in intended_interaction:
-        #         target_duration = math.fabs(intended_interaction['angle']) * TURN_DURATION / DEFAULT_YAW
-        #         if intended_interaction['angle'] < 0:
-        #             rotation_speed = -self.rotation_speed_rad
-
+        # Check the target time
         self.simulation_time += dt
         if self.simulation_time > self.simulation_duration:
             self.simulation_time = 0.
@@ -86,6 +75,8 @@ class Action:
         memory.body_memory.body_direction_rad += self.simulation_rotation_speed * dt
         memory.allocentric_memory.robot_point += rotate_vector_z(self.translation_speed * dt * SIMULATION_TIME_RATIO,
                                                                  memory.body_memory.body_direction_rad)
+        memory.allocentric_memory.place_robot(memory.body_memory, 0)  # TODO add the clock
+
         return True
 
     def start_simulation(self, intended_interaction):

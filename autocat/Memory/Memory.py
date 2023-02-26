@@ -31,12 +31,18 @@ class Memory:
         - Move the robot in allocentric_memory
         """
         self.body_memory.set_head_direction_degree(enacted_interaction['head_angle'])
+        # TODO Keep the simulation and adjust the robot position
+        # Translate the robot before applying the yaw
+        self.allocentric_memory.move(self.body_memory.body_direction_rad, enacted_interaction['translation'],
+                                     enacted_interaction['clock'])
         self.body_memory.rotate_degree(enacted_interaction['yaw'], enacted_interaction['azimuth'])
 
         self.egocentric_memory.update_and_add_experiences(enacted_interaction, self.body_memory.body_direction_rad)
 
-        self.allocentric_memory.move(self.body_memory.body_direction_rad, enacted_interaction['translation'],
-                                     enacted_interaction['clock'])
+        # # TODO Keep the simulation and adjust the robot position
+        # self.allocentric_memory.move(self.body_memory.body_direction_rad, enacted_interaction['translation'],
+        #                              enacted_interaction['clock'])
+
         # The integrator may subsequently update the robot's position
 
     def update_allocentric(self, phenomena, focus_point, prompt_point, clock):
@@ -82,24 +88,23 @@ class Memory:
         """Return the point in egocentric coordinates from the point in allocentric coordinates"""
         if point is None:
             return None
-        # Subtract the body position and rotate the point by the opposite body direction
+        # Subtract the body position
         ego_point = point - self.allocentric_memory.robot_point
         rotation_matrix = matrix44.create_from_z_rotation(self.body_memory.body_direction_rad)
-        return matrix44.apply_to_vector(rotation_matrix, ego_point)
+        # return matrix44.apply_to_vector(rotation_matrix, ego_point)
+        # Rotate the point by the opposite body direction using the transposed rotation matrix
+        return matrix44.apply_to_vector(self.body_memory.body_direction_matrix().T, ego_point)
 
     def save(self):
-        """Return a clone of memory to save a snapshot"""
+        """Return a clone of memory for memory snapshot"""
         saved_memory = Memory()
-        # Copy body memory
+        # Clone body memory
         saved_memory.body_memory = self.body_memory.save()
-        # saved_memory.body_memory.head_direction_rad = self.body_memory.head_direction_rad
-        # saved_memory.body_memory.body_direction_rad = self.body_memory.body_direction_rad
 
-        # Copy egocentric memory
+        # Clone egocentric memory
         saved_memory.egocentric_memory = self.egocentric_memory.save()
 
-        # Copy allocentric memory
-        # saved_memory.allocentric_memory.robot_point = self.allocentric_memory.robot_point.copy()
+        # Clone allocentric memory
         saved_memory.allocentric_memory = self.allocentric_memory.save(saved_memory.egocentric_memory.experiences)
 
         return saved_memory

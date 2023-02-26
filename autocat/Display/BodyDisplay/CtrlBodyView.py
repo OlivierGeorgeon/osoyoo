@@ -1,7 +1,7 @@
 from pyrr import matrix44
 import math
 from .BodyView import BodyView
-from ..EgocentricDisplay.PointOfInterest import PointOfInterest, POINT_COMPASS, POINT_AZIMUTH
+from autocat.Display.PointOfInterest import PointOfInterest, POINT_COMPASS, POINT_AZIMUTH
 from ...Workspace import INTERACTION_STEP_REFRESHING, INTERACTION_STEP_ENACTING
 
 
