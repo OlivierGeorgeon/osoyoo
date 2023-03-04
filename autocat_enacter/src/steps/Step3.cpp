@@ -7,30 +7,17 @@
 #include "../../Head.h"
 #include "../../Imu.h"
 
-extern Wheel OWM;
+extern String status; // The outcome information used for sequential learning
+extern char action;
+extern int clock;
 extern Floor FCR;
 extern Head HEA;
 extern Imu IMU;
-extern WifiCat WifiCat;
-extern char packetBuffer[100];
-
-extern unsigned long action_start_time;
 extern unsigned long duration1;
-extern unsigned long action_end_time;
+extern unsigned long action_start_time;
 extern int interaction_step;
-extern char action;
-extern String status; // The outcome information used for sequential learning
-extern int robot_destination_angle;
-extern int head_destination_angle;
-extern int target_angle;
-extern int target_duration;
-extern bool is_focussed;
-extern int focus_x;
-extern int focus_y;
-extern int focus_speed;
-extern int clock;
-extern int previous_clock;
-extern int shock_event;
+extern WifiCat WifiCat;
+
 
 
 // Wait for the interaction to terminate and proceed to Step 3

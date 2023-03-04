@@ -28,8 +28,8 @@ extern bool is_focussed;
 extern int focus_x;
 extern int focus_y;
 extern int focus_speed;
-extern int clock;
-extern int previous_clock;
+//extern int clock;
+//extern int previous_clock;
 extern int shock_event;
 
 

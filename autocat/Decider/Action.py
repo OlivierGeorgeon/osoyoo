@@ -1,5 +1,6 @@
 import math
 import numpy as np
+from pyrr import matrix44
 from ..Robot.RobotDefine import FORWARD_SPEED, LATERAL_SPEED, DEFAULT_YAW, TURN_DURATION, TRANSLATE_DURATION
 from ..Utils import rotate_vector_z
 
@@ -71,8 +72,15 @@ class Action:
             self.simulation_step = SIMULATION_STEP_OFF
             return False
 
-        # simulate the action in memory
+        # Simulate the displacement in egocentric memory
+        translation_matrix = matrix44.create_from_translation(-self.translation_speed * dt * SIMULATION_TIME_RATIO)
+        rotation_matrix = matrix44.create_from_z_rotation(self.simulation_rotation_speed * dt)
+        displacement_matrix = matrix44.multiply(rotation_matrix, translation_matrix)
+        for experience in memory.egocentric_memory.experiences.values():
+            experience.displace(displacement_matrix)
+        # Displacement in body memory
         memory.body_memory.body_direction_rad += self.simulation_rotation_speed * dt
+        # Update allocentric memory
         memory.allocentric_memory.robot_point += rotate_vector_z(self.translation_speed * dt * SIMULATION_TIME_RATIO,
                                                                  memory.body_memory.body_direction_rad)
         memory.allocentric_memory.place_robot(memory.body_memory, 0)  # TODO add the clock

@@ -79,7 +79,7 @@ class Experience:
         self.point = matrix44.apply_to_vector(self.position_matrix, [0, 0, 0])
 
     def save(self):
-        """Create a copy of the experience to save a snapshot of memory"""
+        """Create a copy of the experience for memory snapshot"""
         saved_experience = Experience(self.point[0], self.point[1], self.type, 0, self.clock, self.durability, self.id)
         # Clone the position matrix so they can be updated separately
         saved_experience.position_matrix = self.position_matrix.copy()

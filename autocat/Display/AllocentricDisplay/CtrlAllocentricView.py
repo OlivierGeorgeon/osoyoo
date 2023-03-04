@@ -1,3 +1,4 @@
+import time
 from pyglet.window import key
 from .AllocentricView import AllocentricView
 from ...Workspace import INTERACTION_STEP_REFRESHING, INTERACTION_STEP_ENACTING
@@ -8,7 +9,7 @@ class CtrlAllocentricView:
         """Control the allocentric view"""
         self.workspace = workspace
         self.allocentric_view = AllocentricView(self.workspace)
-        # self.refresh_count = 0
+        self.next_time_refresh = 0
         self.prompt_point = None
 
         # Handlers
@@ -56,6 +57,10 @@ class CtrlAllocentricView:
 
     def main(self, dt):
         """Refresh allocentric view"""
-        # Refresh during the simulation and at the end of the cycle
-        if self.workspace.interaction_step in [INTERACTION_STEP_ENACTING, INTERACTION_STEP_REFRESHING]:
+        # Refresh during the simulation very 250 millisecond
+        if self.workspace.interaction_step == INTERACTION_STEP_ENACTING and time.time() > self.next_time_refresh:
+            self.next_time_refresh = time.time() + 0.250
+            self.update_view()
+        # Refresh at the end of the interaction cycle
+        if self.workspace.interaction_step == INTERACTION_STEP_REFRESHING:
             self.update_view()

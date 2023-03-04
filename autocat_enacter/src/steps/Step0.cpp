@@ -60,8 +60,7 @@ void Step0()
       if (myObject.hasOwnProperty("focus_x")) {
         focus_x = (int)myObject["focus_x"];
         focus_y = (int)myObject["focus_y"];
-        target_angle = atan2(focus_y, focus_x) * 180.0 / M_PI; // Direction of the focus relative to the robot
-        // action_head_angle = HEA.head_direction(focus_x, focus_y);  // Direction of the focus from the head
+        //target_angle = atan2(focus_y, focus_x) * 180.0 / M_PI; // Direction of the focus relative to the robot
         is_focussed = true;
       } else {
         is_focussed = false;

@@ -2,7 +2,7 @@ from pyglet.window import key
 from .EgocentricView import EgocentricView
 from autocat.Display.PointOfInterest import PointOfInterest, POINT_PROMPT
 from ...Memory.EgocentricMemory.Experience import EXPERIENCE_FOCUS, EXPERIENCE_PLACE
-from ...Workspace import INTERACTION_STEP_REFRESHING
+from ...Workspace import INTERACTION_STEP_REFRESHING, INTERACTION_STEP_ENACTING
 
 
 class CtrlEgocentricView:
@@ -98,7 +98,7 @@ class CtrlEgocentricView:
             self.points_of_interest.append(prompt_poi)
 
         # Mark the new position
-        self.add_point_of_interest(0, 0, EXPERIENCE_PLACE)
+        # self.add_point_of_interest(0, 0, EXPERIENCE_PLACE)
 
     def create_poi_focus(self):
         """Create a point of interest corresponding to the focus"""
@@ -112,6 +112,11 @@ class CtrlEgocentricView:
 
     def main(self, dt):
         """Called every frame. Update the egocentric view"""
+
+        if self.workspace.interaction_step == INTERACTION_STEP_ENACTING:
+            self.update_points_of_interest()
+
+        # Update during simulation and at the end of the interaction cicle
         if self.workspace.interaction_step == INTERACTION_STEP_REFRESHING:
             self.update_points_of_interest()
 

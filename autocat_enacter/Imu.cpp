@@ -195,7 +195,7 @@ void Imu::read_azimuth(JSONVar & outcome_object)
   // Serial.println("compass_x: " + String((int)norm.XAxis) + ", compass_y: " + String((int)norm.YAxis));
 
   // Convert to degrees
-  int headingDegrees = heading * 180.0/M_PI;
+  int headingDegrees = round(heading * 180.0/M_PI);
 
   // Set declination angle on your location and fix heading
   // You can find your declination on: http://magnetic-declination.com/

@@ -38,9 +38,6 @@ class EgocentricMemory:
         for e in new_central_echos:
             self.experiences[e.id] = e
 
-        # self.experiences += new_experiences
-        # self.experiences += new_central_echos
-
         # Remove the experiences from egocentric memory when they are two old
         # self.experiences = [e for e in self.experiences if e.clock >= enacted_interaction["clock"] - e.durability]
 

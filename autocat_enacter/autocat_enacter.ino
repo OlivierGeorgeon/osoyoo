@@ -48,6 +48,24 @@ char packetBuffer[100]; // Max number of characters received
 WifiCat WifiCat;
 Led LED;
 
+unsigned long action_start_time = 0;
+unsigned long duration1 = 0;
+unsigned long action_end_time = 0;
+int interaction_step = 0;
+char action =' ';
+String status = "0"; // The outcome information used for sequential learning
+int robot_destination_angle = 0;
+int head_destination_angle = 0;
+int target_angle = 0;
+int target_duration = 1000;
+bool is_focussed = false;
+int focus_x = 0;
+int focus_y = 0;
+int focus_speed = 180;
+int clock = 0;
+int previous_clock = -1;
+int shock_event = 0;
+
 void setup()
 {
   // Initialize serial for debugging
@@ -76,24 +94,6 @@ void setup()
   //digitalWrite(LED_BUILTIN, HIGH);
 }
 
-unsigned long action_start_time = 0;
-unsigned long duration1 = 0;
-unsigned long action_end_time = 0;
-int interaction_step = 0;
-char action =' ';
-String status = "0"; // The outcome information used for sequential learning
-int robot_destination_angle = 0;
-int head_destination_angle = 0;
-int target_angle = 0;
-int target_duration = 1000;
-bool is_focussed = false;
-int focus_x = 0;
-int focus_y = 0;
-int focus_speed = 180;
-int clock = 0;
-int previous_clock = -1;
-int shock_event = 0;
-
 void loop()
 {
   // Make the built-in led blink to show that the main loop is running properly
@@ -109,12 +109,10 @@ void loop()
   //HECS.update();
 
   // Behavior IMU
-  //digitalWrite(LED_BUILTIN, LOW); // for debug
   shock_event = IMU.update(interaction_step);
-  // if (blink_on) {digitalWrite(LED_BUILTIN, HIGH);} // for debug
 
   // STEP 0: no interaction being enacted
-  // Watching for message received from PC
+  // Watching for message received from PC. If yes, starts the interaction
   if (interaction_step == 0)
   {
     Step0();
@@ -127,9 +125,7 @@ void loop()
     Step1();
   }
 
-  // STEP 2: Enacting the termination of the interaction:
-  // - Floor change retreat
-  // - Stabilisation time
+  // STEP 2: Enacting the termination of the interaction: Floor change retreat, Stabilisation time
   // When the terminations are finished, proceed to Step 3
   if (interaction_step == 2)
   {

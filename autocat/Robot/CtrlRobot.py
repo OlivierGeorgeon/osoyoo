@@ -2,7 +2,7 @@ import json
 import threading
 import numpy as np
 from .RobotDefine import RETREAT_DISTANCE, COMPASS_X_OFFSET, COMPASS_Y_OFFSET, RETREAT_DISTANCE_Y, \
-    LINE_X, ROBOT_FRONT_X, ROBOT_FRONT_Y
+    LINE_X, ROBOT_FRONT_X, ROBOT_FRONT_Y, DEFAULT_YAW
 from .WifiInterface import WifiInterface
 from ..Memory.EgocentricMemory.Experience import *
 from ..Decider.Action import ACTION_FORWARD, ACTION_BACKWARD, ACTION_RIGHTWARD, ACTION_LEFTWARD
@@ -60,6 +60,8 @@ class CtrlRobot:
             timeout = UDP_TIMEOUT
             if 'duration' in intended_interaction:
                 timeout = intended_interaction['duration'] / 1000.0 + 3.0
+            if 'angle' in intended_interaction:
+                timeout = math.fabs(intended_interaction['angle']) / DEFAULT_YAW + 3.0  # Turn speed = 45°/s
             self.outcome_bytes = self.wifiInterface.enact(intended_interaction_string, timeout)
             print("Receive: ", end="")
             print(self.outcome_bytes)
