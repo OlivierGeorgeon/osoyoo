@@ -3,7 +3,8 @@ import math
 from pyrr import matrix44
 
 from .Decider.AgentCircle import AgentCircle
-from .Decider.Action import create_actions, ACTION_FORWARD, ACTION_ALIGN_ROBOT, ACTION_SCAN, SIMULATION_STEP_OFF
+from .Decider.Action import create_actions, ACTION_FORWARD, ACTION_ALIGN_ROBOT, ACTION_SCAN, SIMULATION_STEP_OFF, \
+    ACTION_BACKWARD
 from .Memory.Memory import Memory
 from .Integrator.Integrator import Integrator
 from .Robot.RobotDefine import DEFAULT_YAW, TURN_DURATION
@@ -50,8 +51,6 @@ class Workspace:
         self.ctrl_phenomenon_view = None
 
         self.clock = 0
-        # TODO use the same saved memory for simulation and for imaginary
-        # self.memory_for_simulation = None  # copy.deepcopy(self.memory)
         self.memory_snapshot = None
         self.is_imagining = False
 
@@ -79,7 +78,6 @@ class Workspace:
                 if self.engagement_mode == KEY_ENGAGEMENT_ROBOT:
                     self.memory = self.memory_snapshot.save()  # Keep the snapshot saved
                     self.is_imagining = False
-                    # TODO update the views
                     # print("Restored", self.memory)
                 # (If continue imagining then keep the previous snapshot)
             else:
@@ -215,7 +213,7 @@ class Workspace:
                 self.intended_interaction = {"action": user_key}
                 # Go to the prompt point
                 if self.prompt_point is not None:
-                    if user_key == ACTION_FORWARD:
+                    if user_key in [ACTION_FORWARD, ACTION_BACKWARD]:
                         duration = np.linalg.norm(self.prompt_point) / self.actions[ACTION_FORWARD].translation_speed[0]
                         self.intended_interaction['duration'] = int(duration * 1000)
                     if user_key == ACTION_ALIGN_ROBOT:
@@ -235,14 +233,14 @@ class Workspace:
         # TODO retrieve the position from memory
         target_duration = self.actions[action_code].target_duration
         rotation_speed = self. actions[action_code].rotation_speed_rad
-        if action_code == ACTION_FORWARD:
-            if 'duration' in self.intended_interaction:
-                target_duration = self.intended_interaction['duration'] / 1000
-        if action_code == ACTION_ALIGN_ROBOT:
-            if 'angle' in self.intended_interaction:
-                target_duration = math.fabs(self.intended_interaction['angle']) * TURN_DURATION / DEFAULT_YAW
-                if self.intended_interaction['angle'] < 0:
-                    rotation_speed = -self.actions[action_code].rotation_speed_rad
+        # if action_code == ACTION_FORWARD:
+        if 'duration' in self.intended_interaction:
+            target_duration = self.intended_interaction['duration'] / 1000
+        # if action_code == ACTION_ALIGN_ROBOT:
+        if 'angle' in self.intended_interaction:
+            target_duration = math.fabs(self.intended_interaction['angle']) * TURN_DURATION / DEFAULT_YAW
+            if self.intended_interaction['angle'] < 0:
+                rotation_speed = -self.actions[action_code].rotation_speed_rad
 
         # displacement
         # translation = self.actions[action_code].translation_speed * target_duration

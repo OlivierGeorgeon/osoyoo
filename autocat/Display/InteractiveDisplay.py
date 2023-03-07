@@ -1,9 +1,26 @@
 import numpy as np
-import math
+import platform
+import subprocess
 import pyglet
 from pyglet.gl import *
 
 ZOOM_IN_FACTOR = 1.2
+
+
+def screen_scale():
+    """Return 1 on normal screens, and 2 on mac for retina displays """
+    # Not sure how to deal with a Mac that has a non-retina additional screen
+    # TODO test with a Mac
+    if platform.system() != 'Darwin':
+        # This is not a Mac
+        return 1
+
+    output = subprocess.check_output('/usr/sbin/system_profiler SPDisplaysDataType', shell=True)
+    output = output.decode('utf-8')
+    for line in output.splitlines():
+        if 'Retina' in line:
+            return 2
+    return 1
 
 
 class InteractiveDisplay(pyglet.window.Window):
@@ -18,11 +35,12 @@ class InteractiveDisplay(pyglet.window.Window):
         self.batch = pyglet.graphics.Batch()
         self.background = pyglet.graphics.OrderedGroup(0)
         self.forefront = pyglet.graphics.OrderedGroup(3)
+        self.screen_scale = screen_scale()
 
     def on_resize(self, width, height):
         """ Adjusting the viewport when resizing the window """
-        # Always display in the whole window
-        glViewport(0, 0, width, height)      # For standard display
+        # Always display in the whole window. Scale for Mac.
+        glViewport(0, 0, width * self.screen_scale, height * self.screen_scale)
         # glViewport(0, 0, width*2, height*2)  # For retina display on Mac
 
     def on_mouse_scroll(self, x, y, dx, dy):
@@ -37,7 +55,3 @@ class InteractiveDisplay(pyglet.window.Window):
         point_x = (x - self.width / 2) * self.zoom_level * 2
         point_y = (y - self.height / 2) * self.zoom_level * 2
         return np.array([point_x, point_y, 0], dtype=int)
-        # Polar coordinates from the window center
-        # theta_window = math.atan2(prompt_y, prompt_x)
-        # radius = np.hypot(prompt_x, prompt_y)
-        # return point  # , theta_window, radius

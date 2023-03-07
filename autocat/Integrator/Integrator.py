@@ -1,7 +1,7 @@
 import numpy
 from ..Memory.EgocentricMemory.Experience import EXPERIENCE_LOCAL_ECHO, EXPERIENCE_CENTRAL_ECHO, EXPERIENCE_ALIGNED_ECHO
 from .Affordance import Affordance
-from .Phenomenon import Phenomenon
+from .PhenomenonBox import PhenomenonBox
 
 PHENOMENON_DELTA = 300
 
@@ -17,7 +17,8 @@ class Integrator:
         """Create phenomena and update cells in allocentric memory"""
 
         # The new experiences generated during this round
-        new_experiences = [e for e in self.workspace.memory.egocentric_memory.experiences.values() if (e.clock >= self.workspace.clock - 1)]
+        new_experiences = [e for e in self.workspace.memory.egocentric_memory.experiences.values()
+                           if (e.clock >= self.workspace.clock - 1)]
 
         # The new affordances
         new_affordances = []
@@ -29,15 +30,16 @@ class Integrator:
                 # print("Experience:", e.type, ", point:", affordance_point)
 
         # Mark the area covered by the echo in allocentric memory
-        for a in [a for a in new_affordances if a.experience.type in [EXPERIENCE_CENTRAL_ECHO, EXPERIENCE_ALIGNED_ECHO]]:
+        for a in [a for a in new_affordances if a.experience.type
+                  in [EXPERIENCE_CENTRAL_ECHO, EXPERIENCE_ALIGNED_ECHO]]:
             self.workspace.memory.allocentric_memory.mark_echo_area(a)
 
         # Try to attach the new affordances to existing phenomena and remove these affordances
         new_affordances, position_correction = self.update_phenomena(new_affordances)
 
         # Adjust the robot's position in allocentric memory
-        print("Position correction", position_correction)
-        self.workspace.memory.allocentric_memory.move(0, position_correction, self.workspace.clock, is_egocentric_translation=False)
+        self.workspace.memory.allocentric_memory.move(0, position_correction, self.workspace.clock,
+                                                      is_egocentric_translation=False)
 
         # Create new hypothetical phenomena from remaining affordances
         self.create_phenomena(new_affordances)
@@ -48,10 +50,10 @@ class Integrator:
         return None
 
     def update_phenomena(self, affordances):
-        """Try to attach a list of affordances to phenomena in the list .
+        """Try to attach a list of affordances to phenomena in the list.
         Returns the affordances that have not been attached, and the average translation"""
-        position_correction = numpy.array([0, 0, 0], dtype=numpy.int16)
-        sum_translation = numpy.array([0, 0, 0], dtype=numpy.int16)
+        position_correction = numpy.array([0, 0, 0], dtype=int)
+        sum_translation = numpy.array([0, 0, 0], dtype=int)
         number_of_add = 0
         remaining_affordances = affordances.copy()
 
@@ -73,7 +75,7 @@ class Integrator:
         new_phenomena = []
         for affordance in affordances:
             if len(new_phenomena) == 0:
-                new_phenomena.append(Phenomenon(affordance))
+                new_phenomena.append(PhenomenonBox(affordance))
             else:
                 clustered = False
                 # Look if the new affordance can be attached to an existing new phenomenon
@@ -82,6 +84,6 @@ class Integrator:
                         clustered = True
                         break
                 if not clustered:
-                    new_phenomena.append(Phenomenon(affordance))
+                    new_phenomena.append(PhenomenonBox(affordance))
 
         self.phenomena.extend(new_phenomena)

@@ -3,7 +3,7 @@ import numpy
 import pyglet
 from .CtrlPhenomenonView import CtrlPhenomenonView
 from ...Workspace import Workspace
-from ...Integrator.Phenomenon import Phenomenon
+from ...Integrator.PhenomenonBox import PhenomenonBox
 from ...Integrator.Affordance import Affordance
 from ...Memory.EgocentricMemory.Experience import Experience, EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO
 
@@ -14,7 +14,7 @@ controller = CtrlPhenomenonView(workspace)
 
 experience0 = Experience(50, 0, EXPERIENCE_FLOOR, math.pi / 4, 0, experience_id=0)
 affordance0 = Affordance(numpy.array([0, 0, 0], dtype=numpy.int16), experience0)
-phenomenon = Phenomenon(affordance0)
+phenomenon = PhenomenonBox(affordance0)
 
 # Create a phenomenon
 experience1 = Experience(200, 0, EXPERIENCE_ALIGNED_ECHO, math.pi / 4, 0, experience_id=1)

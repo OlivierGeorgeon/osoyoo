@@ -94,8 +94,8 @@ class CtrlPhenomenonView:
             if self.phenomenon is not None:
                 self.update_points_of_interest(self.phenomenon)
                 self.view.label3.text = "Origin direction: " + \
-                                        str(round(math.degrees(self.phenomenon.origin_absolute_direction))) + "°. Nb tours:" + \
-                                        str(self.phenomenon.nb_tour)
+                    str(round(math.degrees(self.phenomenon.origin_affordance.experience.absolute_direction_rad))) + \
+                    "°. Nb tours:" + str(self.phenomenon.nb_tour)
             self.update_body_robot()
 
             # Last view to refresh

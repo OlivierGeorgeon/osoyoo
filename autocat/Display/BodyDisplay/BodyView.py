@@ -20,10 +20,6 @@ class BodyView(InteractiveDisplay):
 
         # Initialize OpenGL parameters
         glClearColor(1.0, 235.0/256., 205.0/256., 1.0)
-        # pyglet.gl.glEnable(pyglet.gl.GL_BLEND)
-        # self.batch = pyglet.graphics.Batch()
-        # self.background = pyglet.graphics.OrderedGroup(0)
-        # self.foreground = pyglet.graphics.OrderedGroup(1)
         self.zoom_level = 1.3
 
         # Define the robot
@@ -72,8 +68,6 @@ class BodyView(InteractiveDisplay):
 
     def on_mouse_press(self, x, y, button, modifiers):
         """ Computing the position of the mouse click relative to the robot in mm and degrees """
-        # window_press_x = (x - self.width / 2) * self.zoom_level * 2
-        # window_press_y = (y - self.height / 2) * self.zoom_level * 2
         point = self.mouse_coordinates_to_point(x, y)
         # Rotate the click point by the opposite rotation of the robot
         # Use the transposed of the robot's body rotation matrix

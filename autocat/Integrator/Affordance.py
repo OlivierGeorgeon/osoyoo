@@ -21,9 +21,9 @@ class Affordance:
             if assert_almost_equal_angles(self.experience.absolute_direction_rad,
                                           other_affordance.experience.absolute_direction_rad,
                                           MAX_SIMILAR_DIRECTION):
-                print("Near affordance: point 1:", self.point, ", point 2:", other_affordance.point,
-                      ", direction 1: ", round(math.degrees(self.experience.absolute_direction_rad)),
-                      "°, direction 2: ", round(math.degrees(other_affordance.experience.absolute_direction_rad)), "°")
+                # print("Near affordance: point 1:", self.point, ", point 2:", other_affordance.point,
+                #       ", direction 1: ", round(math.degrees(self.experience.absolute_direction_rad)),
+                #       "°, direction 2: ", round(math.degrees(other_affordance.experience.absolute_direction_rad)), "°")
                 return True
         return False
 

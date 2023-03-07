@@ -219,6 +219,6 @@ class CtrlRobot:
                 tmp_y = math.sin(math.radians(ha)) * ed
                 enacted_interaction[KEY_EXPERIENCES].append((EXPERIENCE_LOCAL_ECHO, tmp_x, tmp_y))
 
-        print(enacted_interaction)
+        # print(enacted_interaction)
 
         return enacted_interaction
