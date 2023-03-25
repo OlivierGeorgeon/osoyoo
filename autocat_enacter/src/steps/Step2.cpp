@@ -6,9 +6,11 @@
 #include "../../Floor.h"
 #include "../../Head.h"
 #include "../../Imu.h"
+#include "../../Color.h"
 
 extern Head HEA;
 extern Floor FCR;
+extern Color TCS;
 extern unsigned long action_end_time;
 extern int interaction_step;
 
@@ -19,6 +21,7 @@ void Step2()
 {
   if (action_end_time < millis() &&  !FCR._is_enacting && !HEA._is_enacting_head_alignment /*&& !HECS._is_enacting_echo_scan*/)
   {
+    TCS.read();
     interaction_step = 3;
   }
 }

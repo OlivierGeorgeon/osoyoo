@@ -24,12 +24,11 @@ extern int robot_destination_angle;
 extern int head_destination_angle;
 extern int target_angle;
 extern int target_duration;
+extern int target_focus_angle;
 extern bool is_focussed;
 extern int focus_x;
 extern int focus_y;
 extern int focus_speed;
-//extern int clock;
-//extern int previous_clock;
 extern int shock_event;
 
 
@@ -148,7 +147,7 @@ void Step1()
       // Keep head aligned with destination angle
       if (is_focussed){
         //float current_robot_direction = (head_destination_angle - IMU._yaw) * M_PI / 180.0;
-        float current_focus_direction = (target_angle - IMU._yaw) * M_PI / 180.0; // relative to robot
+        float current_focus_direction = (target_focus_angle - IMU._yaw) * M_PI / 180.0; // relative to robot
         float r = sqrt(sq((float)focus_x) + sq((float)focus_y));  // conversion to float is necessary for some reason
         float current_head_direction = HEA.head_direction(cos(current_focus_direction) * r, sin(current_focus_direction) * r);
         // Serial.println("Directions robot: " + String(current_robot_direction) + ", head: " + String((int)current_head_direction) + ", dist: " + String((int)r));
@@ -170,7 +169,7 @@ void Step1()
       // Keep head aligned with destination angle
       if (is_focussed){
         // float current_robot_direction = (head_destination_angle - IMU._yaw) * M_PI / 180.0;
-        float current_focus_direction = (target_angle - IMU._yaw) * M_PI / 180.0;
+        float current_focus_direction = (target_focus_angle - IMU._yaw) * M_PI / 180.0;
         float r = sqrt(sq((float)focus_x) + sq((float)focus_y));  // conversion to float is necessary for some reason
         float current_head_direction = HEA.head_direction(cos(current_focus_direction) * r, sin(current_focus_direction) * r);
         // Serial.println("Directions robot: " + String(current_robot_direction) + ", head: " + String((int)current_head_direction) + ", dist: " + String((int)r));

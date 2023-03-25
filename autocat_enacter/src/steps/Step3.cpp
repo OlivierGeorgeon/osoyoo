@@ -6,6 +6,7 @@
 #include "../../Floor.h"
 #include "../../Head.h"
 #include "../../Imu.h"
+#include "../../Color.h"
 
 extern String status; // The outcome information used for sequential learning
 extern char action;
@@ -13,6 +14,7 @@ extern int clock;
 extern Floor FCR;
 extern Head HEA;
 extern Imu IMU;
+extern Color TCS;
 extern unsigned long duration1;
 extern unsigned long action_start_time;
 extern int interaction_step;
@@ -33,6 +35,7 @@ void Step3()
   HEA.outcome(outcome_object);
   HEA.outcome_complete(outcome_object);
   IMU.outcome(outcome_object, action);
+  TCS.outcome(outcome_object);
 
   // HECS.outcome(outcome_object);
   outcome_object["duration1"] = duration1;

@@ -1,5 +1,5 @@
 /*
-  Led.h - library to control the build in LED.
+  Led.cpp - library to control the build in LED.
   Created Olivier Georgeon February 15 2023
   Released into the public domain
 */

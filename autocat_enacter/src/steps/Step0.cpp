@@ -24,6 +24,7 @@ extern int robot_destination_angle;
 extern int head_destination_angle;
 extern int target_angle;
 extern int target_duration;
+extern int target_focus_angle;
 extern bool is_focussed;
 extern int focus_x;
 extern int focus_y;
@@ -60,7 +61,7 @@ void Step0()
       if (myObject.hasOwnProperty("focus_x")) {
         focus_x = (int)myObject["focus_x"];
         focus_y = (int)myObject["focus_y"];
-        //target_angle = atan2(focus_y, focus_x) * 180.0 / M_PI; // Direction of the focus relative to the robot
+        target_focus_angle = atan2(focus_y, focus_x) * 180.0 / M_PI; // Direction of the focus relative to the robot
         is_focussed = true;
       } else {
         is_focussed = false;

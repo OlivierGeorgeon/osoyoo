@@ -28,6 +28,7 @@
 #include "Floor.h"
 #include "Head.h"
 #include "Imu.h"
+#include "Color.h"
 #include "Action_define.h"
 #include "src/wifi/WifiCat.h"
 #include "Led.h"
@@ -47,6 +48,7 @@ Imu IMU;
 char packetBuffer[100]; // Max number of characters received
 WifiCat WifiCat;
 Led LED;
+Color TCS;
 
 unsigned long action_start_time = 0;
 unsigned long duration1 = 0;
@@ -58,6 +60,7 @@ int robot_destination_angle = 0;
 int head_destination_angle = 0;
 int target_angle = 0;
 int target_duration = 1000;
+int target_focus_angle = 0;
 bool is_focussed = false;
 int focus_x = 0;
 int focus_y = 0;
@@ -86,6 +89,7 @@ void setup()
   IMU.setup();
   delay(100);
   IMU.setup();
+  TCS.setup(); // TODO Test
 
   Serial.println("--- Robot initialized ---");
 
