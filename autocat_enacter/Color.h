@@ -6,7 +6,7 @@
 #ifndef Color_h
 #define Color_h
 
-#define Led_PIN 11
+#define Led_PIN 53
 #include <Arduino_JSON.h>
 #include <Adafruit_TCS34725.h>
 
@@ -20,9 +20,10 @@ class Color
   private:
     Adafruit_TCS34725 tcs;
     bool is_initialized;
-    float red;
-    float green;
-    float blue;
+    uint16_t r;
+    uint16_t g;
+    uint16_t b;
+    uint16_t c;
 };
 
 #endif

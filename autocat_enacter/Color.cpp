@@ -12,9 +12,10 @@
 Color::Color()
 {
   Adafruit_TCS34725 tcs = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_24MS, TCS34725_GAIN_16X);
-  red = 0;
-  green = 0;
-  blue = 0;
+  r = 0;
+  g = 0;
+  b = 0;
+  c = 0;
   is_initialized = false;
 }
 
@@ -43,9 +44,9 @@ void Color::read()
     digitalWrite(Led_PIN, HIGH);
 
     // TODO : don't block the loop
-    delay(30);  // takes 50ms to read
+    delay(50);  // takes 50ms to read
 
-    tcs.getRGB(&red, &green, &blue);
+    tcs.getRawData(&r, &g, &b, &c);
 
     digitalWrite(Led_PIN, LOW);
   }
@@ -56,27 +57,32 @@ void Color::outcome(JSONVar & outcome_object)
 
   if (is_initialized){
     // Scale the measure
-    red = constrain(red, 90, 190);
-    red = map(red, 90, 190, 0, 255);
-    green = constrain(green, 90, 130);
-    green = map(green, 90, 130, 0, 255);
-    blue = constrain(blue, 80, 120);
-    blue = map(blue, 80, 120, 0, 255);
+    //red = constrain(red, 90, 190);
+    //red = map(red, 90, 190, 0, 255);
+    //green = constrain(green, 90, 130);
+    //green = map(green, 90, 130, 0, 255);
+    //blue = constrain(blue, 80, 120);
+    //blue = map(blue, 80, 120, 0, 255);
 
-    outcome_object["red"] = (int)red;
-    outcome_object["green"] = (int)green;
-    outcome_object["blue"] = (int)blue;
+    uint16_t colorTemp = tcs.calculateColorTemperature_dn40(r, g, b, c);
+    int red;
+    int green;
+    int blue;
 
-    // TODO Test that
+    if (c == 0) {
+      red = green = blue = 0;
+    } else {
+      red = (int)((float)r / (float)c * 255.0);
+      green = (int)((float)g / (float)c * 255.0);
+      blue = (int)((float)b / (float)c * 255.0);
+    }
+
     JSONVar colorArray;
-    colorArray["red"] = (int)red;
-    colorArray["green"] = (int)green;
-    colorArray["blue"] = (int)blue;
+    colorArray["red"] = red;
+    colorArray["green"] = green;
+    colorArray["blue"] = blue;
+    colorArray["temp"] = colorTemp;
+    colorArray["clear"] = c;
     outcome_object["colors"] = colorArray;
-
-//  JSONVar colorTest = outcome_object.createNestedObject();
-//  colorTest["red"] = (int)red;
-//  colorTest["green"] = (int)green;
-//  colorTest["blue"] = (int)blue;
   }
 }
