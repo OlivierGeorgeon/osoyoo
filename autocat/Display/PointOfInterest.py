@@ -97,6 +97,15 @@ class PointOfInterest:
                 self.shape.opacity = self.opacity
                 self.shape.color = name_to_rgb(color_name)
 
+    # def set_color_value(self, color_value=None):
+    #     """ Set the color or reset it to its default value. Also reset the opacity. """
+    #     if hasattr(self.shape, 'vertices'):
+    #         nb_points = int(len(self.shape.vertices) / 2)
+    #         self.shape.colors[0: nb_points*4] = nb_points * (*color_value, self.opacity)
+    #     else:
+    #         self.shape.opacity = self.opacity
+    #         self.shape.color = color_value
+
     # def reset_position(self):
     #     """ Reset the position of the point of interest """
     #     self.point = np.array([0, 0, 0], dtype=int)
@@ -134,11 +143,10 @@ class PointOfInterest:
     def keep_or_delete(self, clock):
         """Return True if keep, delete otherwise. Used to refresh egocentric memory"""
         # Keep points of interest Place that are not expired
-        if self.type == EXPERIENCE_PLACE and not self.is_expired(clock):
-            return True
-        else:
-            self.shape.delete()
-            return False
+        # if self.type == EXPERIENCE_PLACE and not self.is_expired(clock):
+        #     return True
+        self.shape.delete()
+        return False
 
     def select_if_near(self, point):
         """ If the point is near the x y coordinate, select this point and return True """

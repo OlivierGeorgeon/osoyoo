@@ -28,6 +28,7 @@ class Experience:
         self.point = np.array([x, y, 0])
         self.type = experience_type
         self.clock = clock
+        self.color = None
 
         # The position matrix is applied to the vertices of the point_of_interest to display
         # the point of interest at the position of the experience in egocentric view
@@ -82,6 +83,7 @@ class Experience:
         """Create a copy of the experience for memory snapshot"""
         saved_experience = Experience(self.point[0], self.point[1], self.type, 0, self.clock, self.durability, self.id)
         # Clone the position matrix so they can be updated separately
+        saved_experience.color = self.color  # At some point may need to be cloned
         saved_experience.position_matrix = self.position_matrix.copy()
 
         # Absolute relative sensor position do not change

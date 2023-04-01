@@ -71,17 +71,20 @@ class CtrlEgocentricView:
         """Retrieve all new experiences from memory, create and update the corresponding points of interest"""
 
         # Keep only the points of interest Place not expired
+        # TODO delete all points of interest
         self.points_of_interest = [p for p in self.points_of_interest if p.keep_or_delete(self.workspace.clock)]
 
-        # Displace and fade the remaining points of interest
-        for poi_displace in self.points_of_interest:
-            poi_displace.displace(self.workspace.enacted_interaction['displacement_matrix'])
-            poi_displace.fade(self.workspace.clock)
+        # # Displace and fade the remaining points of interest
+        # for poi_displace in self.points_of_interest:
+        #     poi_displace.displace(self.workspace.enacted_interaction['displacement_matrix'])
+        #     poi_displace.fade(self.workspace.clock)
 
         # Recreate the points of interest from experiences
         for e in [e for e in self.workspace.memory.egocentric_memory.experiences.values()
                   if (e.clock + e.durability >= self.workspace.clock - 1)]:
             poi = PointOfInterest(0, 0, self.view.batch, self.view.forefront, e.type, e.clock)
+            if e.color is not None:
+                poi.color = e.color
             poi.displace(e.position_matrix)
             poi.fade(self.workspace.clock)
             self.points_of_interest.append(poi)

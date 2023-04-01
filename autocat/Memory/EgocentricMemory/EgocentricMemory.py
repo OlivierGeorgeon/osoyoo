@@ -1,6 +1,9 @@
-from ...Memory.EgocentricMemory.Experience import Experience, EXPERIENCE_LOCAL_ECHO, EXPERIENCE_CENTRAL_ECHO
+from ...Memory.EgocentricMemory.Experience import Experience, EXPERIENCE_LOCAL_ECHO, EXPERIENCE_CENTRAL_ECHO, \
+    EXPERIENCE_PLACE
 from ...Robot.CtrlRobot import KEY_EXPERIENCES
+from ...Robot.RobotDefine import ROBOT_COLOR_X
 import math
+import colorsys
 
 EXPERIENCE_PERSISTENCE = 10
 
@@ -37,6 +40,19 @@ class EgocentricMemory:
                                                       body_direction_rad, enacted_interaction["clock"])
         for e in new_central_echos:
             self.experiences[e.id] = e
+
+        # Add an experience for the color
+        color_exp = Experience(ROBOT_COLOR_X, 0, EXPERIENCE_PLACE, body_direction_rad, enacted_interaction["clock"],
+                               durability=EXPERIENCE_PERSISTENCE, experience_id=self.experience_id)
+        color_exp.color = (enacted_interaction['color']['red'], enacted_interaction['color']['green'],
+                           enacted_interaction['color']['blue'])
+        # Tried to display the hue only
+        # hsv = colorsys.rgb_to_hsv(float(color_exp.color[0])/256.0, float(color_exp.color[1])/256.0, float(color_exp.color[2])/256.0)
+        # rgb = colorsys.hsv_to_rgb(hsv[0], 1.0, 0.5)
+        # color_exp.color = (int(rgb[0] * 256.0), int(rgb[1] * 256.0), int(rgb[2] * 256.0))
+        new_experiences.append(color_exp)
+        self.experiences[color_exp.id] = color_exp
+        self.experience_id += 1
 
         # Remove the experiences from egocentric memory when they are two old
         # self.experiences = [e for e in self.experiences if e.clock >= enacted_interaction["clock"] - e.durability]

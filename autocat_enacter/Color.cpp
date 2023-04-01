@@ -83,6 +83,6 @@ void Color::outcome(JSONVar & outcome_object)
     colorArray["blue"] = blue;
     colorArray["temp"] = colorTemp;
     colorArray["clear"] = c;
-    outcome_object["colors"] = colorArray;
+    outcome_object["color"] = colorArray;
   }
 }
