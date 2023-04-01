@@ -3,7 +3,9 @@ from ...Memory.EgocentricMemory.Experience import Experience, EXPERIENCE_LOCAL_E
 from ...Robot.CtrlRobot import KEY_EXPERIENCES
 from ...Robot.RobotDefine import ROBOT_COLOR_X
 import math
+# from .Color import category_color
 import colorsys
+from webcolors import name_to_rgb
 
 EXPERIENCE_PERSISTENCE = 10
 
@@ -44,12 +46,14 @@ class EgocentricMemory:
         # Add an experience for the color
         color_exp = Experience(ROBOT_COLOR_X, 0, EXPERIENCE_PLACE, body_direction_rad, enacted_interaction["clock"],
                                durability=EXPERIENCE_PERSISTENCE, experience_id=self.experience_id)
-        color_exp.color = (enacted_interaction['color']['red'], enacted_interaction['color']['green'],
-                           enacted_interaction['color']['blue'])
+        # color_exp.color = (enacted_interaction['color']['red'], enacted_interaction['color']['green'],
+        #                   enacted_interaction['color']['blue'])
         # Tried to display the hue only
         # hsv = colorsys.rgb_to_hsv(float(color_exp.color[0])/256.0, float(color_exp.color[1])/256.0, float(color_exp.color[2])/256.0)
-        # rgb = colorsys.hsv_to_rgb(hsv[0], 1.0, 0.5)
+        # rgb = colorsys.hsv_to_rgb(hsv[0], 1.0, 1.0)
         # color_exp.color = (int(rgb[0] * 256.0), int(rgb[1] * 256.0), int(rgb[2] * 256.0))
+        color_exp.color = category_color(enacted_interaction['color'])
+
         new_experiences.append(color_exp)
         self.experiences[color_exp.id] = color_exp
         self.experience_id += 1
@@ -130,3 +134,44 @@ class EgocentricMemory:
         saved_egocentric_memory.experiences = {key: e.save() for key, e in self.experiences.items()}
         saved_egocentric_memory.experience_id = self.experience_id
         return saved_egocentric_memory
+
+
+def category_color(color_sensor):
+    """Categorize the color from the sensor measure"""
+    # https://www.colorspire.com/rgb-color-wheel/
+    # https://www.pinterest.fr/pin/521713938063708448/
+    hsv = colorsys.rgb_to_hsv(float(color_sensor['red']) / 256.0, float(color_sensor['green']) / 256.0,
+                              float(color_sensor['blue']) / 256.0)
+    color = "LightSlateGrey"
+
+    if hsv[1] > 0.48:
+
+        # if color_sensor['temp'] < 2800:
+        if hsv[0] < 0.1:
+            color = 'red'  # Hue = 0
+        # elif color_sensor['temp'] < 3150:
+        elif hsv[0] < 0.2:
+            color = 'orange'  # Hue = 0.13, 0.16
+        # elif color_sensor['temp'] < 3800:  #
+        elif hsv[0] < 0.3:
+            color = 'yellow'  # Hue = 0.25, 0.26
+        # elif color_sensor['temp'] < 8000:
+        elif hsv[0] < 0.5:
+            color = 'green'  # Hue = 0.38, 0.35, 0.37
+        else:
+            if hsv[0] < 0.9:
+                if hsv[1] > 0.68:
+                    color = 'blue'  # Hue = 0.571, 0.592
+                else:
+                    color = 'violet'  # Hue = 0.582, 0.61
+            else:
+                color = 'red'  # Hue = 0
+
+        # elif color_sensor['temp'] > 13000:
+        #     color = 'blue'  # Hue = 0.571, 0.592
+        # else:
+        #     color = 'violet'  # Hue = 0.582, 0.61
+
+    print("Color: ", hsv, color)
+
+    return name_to_rgb(color)
