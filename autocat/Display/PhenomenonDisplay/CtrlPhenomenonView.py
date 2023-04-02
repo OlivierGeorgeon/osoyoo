@@ -13,8 +13,7 @@ class CtrlPhenomenonView:
         self.view = PhenomenonView()
         self.workspace = workspace
         self.egocentric_memory = workspace.memory.egocentric_memory
-        self.points_of_interest = []
-        # self.cones = []
+        self.affordance_displays = []
         self.phenomenon = None
 
         def on_text(text):
@@ -33,7 +32,7 @@ class CtrlPhenomenonView:
             angle = math.atan2(point[1], point[0])
             self.view.label1.text = "Click: x:" + str(round(point[0])) + ", y:" + str(round(point[1])) \
                                     + ", angle:" + str(round(math.degrees(angle))) + "°."
-            for p in [p for p in self.points_of_interest if p.select_if_near(point)]:
+            for p in [p for p in self.affordance_displays if p.select_if_near(point)]:
                 self.view.label3.text = "Clock: " + str(p.clock)
 
         self.view.push_handlers(on_text, on_mouse_press)
@@ -44,30 +43,32 @@ class CtrlPhenomenonView:
         if self.phenomenon is not None:
             self.view.phenomenon_point = self.phenomenon.point
 
-    def update_points_of_interest(self, phenomenon):
+    def update_affordance_displays(self, phenomenon):
         """Retrieve the new affordances in a phenomenon and create the corresponding points of interest"""
 
-        # Remove all the points of interest
-        for poi in self.points_of_interest:
+        # Delete the points of interest
+        # Crash seem to try to delete twice the shape
+        # self.affordance_displays = [p for p in self.affordance_displays if not p.delete()]
+        for poi in self.affordance_displays:
             poi.delete()
-        self.points_of_interest = []
+        self.affordance_displays = []
         # for cone in self.cones:
         #     cone.delete()
         # self.cones = []
 
-        # Recreate all the points of interest
+        # Recreate all affordance displays
         for a in phenomenon.affordances:
-            poi = self.create_point_of_interest(a)
-            self.points_of_interest.append(poi)
+            ad = self.create_affordance_display(a)
+            self.affordance_displays.append(ad)
 
         # Draw the phenomenon outline
         self.view.add_lines(phenomenon.convex_hull(), "black")
 
-    def create_point_of_interest(self, affordance):
+    def create_affordance_display(self, affordance):
         """Create a point of interest corresponding to the affordance given as parameter"""
         # Create the point of interest at origin
         poi = AffordanceDisplay(0, 0, self.view.batch, self.view.forefront, self.view.background,
-                                affordance.experience.type, self.workspace.clock)
+                                affordance.experience.type, self.workspace.clock, affordance.experience.color)
         # Displace the point of interest to its position relative to the phenomenon and absolute direction
         poi.displace(matrix44.multiply(affordance.experience.rotation_matrix,
                                        matrix44.create_from_translation(affordance.point).astype('float64')))
@@ -76,7 +77,6 @@ class CtrlPhenomenonView:
         # if the affordance has a polygon then add it to the AffordanceDisplay
         if points is not None:
             poi.add_cone(points, "CadetBlue")
-        #     self.cones.append(self.view.add_polygon(points, "CadetBlue"))
         return poi
 
     def main(self, dt):
@@ -92,7 +92,7 @@ class CtrlPhenomenonView:
             # if len(self.workspace.integrator.phenomena) > 0:
             #     self.phenomenon = self.workspace.integrator.phenomena[0]
             if self.phenomenon is not None:
-                self.update_points_of_interest(self.phenomenon)
+                self.update_affordance_displays(self.phenomenon)
                 self.view.label3.text = "Origin direction: " + \
                     str(round(math.degrees(self.phenomenon.origin_affordance.experience.absolute_direction_rad))) + \
                     "°. Nb tours:" + str(self.phenomenon.nb_tour)

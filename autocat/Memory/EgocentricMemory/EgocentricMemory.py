@@ -31,8 +31,7 @@ class EgocentricMemory:
         new_experiences = []
         for p in enacted_interaction[KEY_EXPERIENCES]:
             experience = Experience(p[1], p[2], p[0], body_direction_rad, enacted_interaction["clock"],
-                                    durability=EXPERIENCE_PERSISTENCE,
-                                    experience_id=self.experience_id)
+                                    experience_id=self.experience_id, durability=EXPERIENCE_PERSISTENCE)
             new_experiences.append(experience)
             self.experiences[experience.id] = experience
             self.experience_id += 1
@@ -45,14 +44,15 @@ class EgocentricMemory:
 
         # Add an experience for the color
         color_exp = Experience(ROBOT_COLOR_X, 0, EXPERIENCE_PLACE, body_direction_rad, enacted_interaction["clock"],
-                               durability=EXPERIENCE_PERSISTENCE, experience_id=self.experience_id)
+                               self.experience_id, durability=EXPERIENCE_PERSISTENCE,
+                               color=category_color(enacted_interaction['color']))
         # color_exp.color = (enacted_interaction['color']['red'], enacted_interaction['color']['green'],
         #                   enacted_interaction['color']['blue'])
         # Tried to display the hue only
         # hsv = colorsys.rgb_to_hsv(float(color_exp.color[0])/256.0, float(color_exp.color[1])/256.0, float(color_exp.color[2])/256.0)
         # rgb = colorsys.hsv_to_rgb(hsv[0], 1.0, 1.0)
         # color_exp.color = (int(rgb[0] * 256.0), int(rgb[1] * 256.0), int(rgb[2] * 256.0))
-        color_exp.color = category_color(enacted_interaction['color'])
+        # color_exp.color = category_color(enacted_interaction['color'])
 
         new_experiences.append(color_exp)
         self.experiences[color_exp.id] = color_exp
@@ -122,7 +122,8 @@ class EgocentricMemory:
                     x_mean = streak[int(len(streak) / 2)][2].point[0]
                     y_mean = streak[int(len(streak) / 2)][2].point[1]
                 experience_central_echo = Experience(int(x_mean), int(y_mean), EXPERIENCE_CENTRAL_ECHO,
-                                                     body_direction_rad, clock, durability=5, experience_id=self.experience_id)
+                                                     body_direction_rad, clock, experience_id=self.experience_id,
+                                                     durability=5)
                 self.experience_id += 1
                 experiences_central_echo.append(experience_central_echo)
 
@@ -151,19 +152,19 @@ def category_color(color_sensor):
             color = 'red'  # Hue = 0
         # elif color_sensor['temp'] < 3150:
         elif hsv[0] < 0.2:
-            color = 'orange'  # Hue = 0.13, 0.16
+            color = 'darkorange'  # Hue = 0.13, 0.16
         # elif color_sensor['temp'] < 3800:  #
         elif hsv[0] < 0.3:
-            color = 'yellow'  # Hue = 0.25, 0.26
+            color = 'gold'  # Hue = 0.25, 0.26
         # elif color_sensor['temp'] < 8000:
         elif hsv[0] < 0.5:
-            color = 'green'  # Hue = 0.38, 0.35, 0.37
+            color = 'seagreen'  # Hue = 0.38, 0.35, 0.37
         else:
             if hsv[0] < 0.9:
                 if hsv[1] > 0.68:
-                    color = 'blue'  # Hue = 0.571, 0.592
+                    color = 'royalblue'  # Hue = 0.571, 0.592
                 else:
-                    color = 'violet'  # Hue = 0.582, 0.61
+                    color = 'blueviolet'  # Hue = 0.582, 0.61
             else:
                 color = 'red'  # Hue = 0
 

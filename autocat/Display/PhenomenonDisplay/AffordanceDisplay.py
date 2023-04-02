@@ -6,8 +6,8 @@ from webcolors import name_to_rgb
 
 class AffordanceDisplay(PointOfInterest):
     """Display an affordance: the experience plus the cone"""
-    def __init__(self, x, y, batch, group, background_group, point_type, clock, durability=10):
-        super().__init__(x, y, batch, group, point_type, clock, durability)
+    def __init__(self, x, y, batch, group, background_group, point_type, clock, color=(128, 128, 128), durability=10):
+        super().__init__(x, y, batch, group, point_type, clock, color, durability)
         self.background_group = background_group
         self.cone = None
 

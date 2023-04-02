@@ -14,7 +14,6 @@ def screen_scale():
     if platform.system() != 'Darwin':
         # This is not a Mac
         return 1
-
     output = subprocess.check_output('/usr/sbin/system_profiler SPDisplaysDataType', shell=True)
     output = output.decode('utf-8')
     for line in output.splitlines():

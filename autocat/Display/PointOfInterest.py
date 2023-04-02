@@ -10,21 +10,21 @@ POINT_PROMPT = 'Prompt'
 
 
 class PointOfInterest:
-    def __init__(self, x, y, batch, group, point_type, clock, durability=10):
+    def __init__(self, x, y, batch, group, point_type, clock, color=(128, 128, 128), durability=10):
         self.point = np.array([x, y, 0], dtype=int)
         self.batch = batch
         self.group = group
         self.type = point_type
         self.points = []
         self.opacity = 255
-        self.color = name_to_rgb("gray")
+        self.color = color  # name_to_rgb("gray")
         self.is_selected = False
         self.clock = clock
         self.durability = durability
 
         if self.type == EXPERIENCE_PLACE:
             self.points = [30, 0, -20, -20, -20, 20]
-            self.color = name_to_rgb("LightGreen")
+            # self.color = name_to_rgb("LightGreen")
             self.shape = self.batch.add_indexed(3, gl.GL_TRIANGLES, self.group, [0, 1, 2], ('v2i', self.points),
                                                 ('c4B', 3 * (*self.color, self.opacity)))
         if self.type == EXPERIENCE_ALIGNED_ECHO:
@@ -47,12 +47,12 @@ class PointOfInterest:
                                                 ('v2i', self.points), ('c4B', 4 * (*self.color, self.opacity)))
         if self.type == EXPERIENCE_IMPACT:
             self.color = name_to_rgb("red")
-            self.points = [0, 0, 40, -30, 40, 30]
+            self.points = [0, 0, 30, -30, 30, 30]
             self.shape = self.batch.add_indexed(3, gl.GL_TRIANGLES, self.group, [0, 1, 2], ('v2i', self.points),
                                                 ('c4B', 3 * (*self.color, self.opacity)))
         if self.type == EXPERIENCE_BLOCK:
             self.color = name_to_rgb("salmon")
-            self.points = [0, 0, 40, -30, 40, 30]
+            self.points = [0, 0, 30, -30, 30, 30]
             self.shape = self.batch.add_indexed(3, gl.GL_TRIANGLES, self.group, [0, 1, 2], ('v2i', self.points),
                                                 ('c4B', 3 * (*self.color, self.opacity)))
         if self.type == EXPERIENCE_FOCUS:
@@ -133,20 +133,22 @@ class PointOfInterest:
         self.shape.x, self.shape.y = self.point[0], self.point[1]
 
     def delete(self):
-        """ Delete the shape to remove it from the batch """
-        self.shape.delete()  # Not sure whether it is necessary or not
+        """ Delete the shape to remove it from the batch. Return True when deleted """
+        self.shape.delete()
+        return True
 
     def is_expired(self, clock):
         """Return True if the age has exceeded the durability"""
         return self.clock + self.durability < clock
 
-    def keep_or_delete(self, clock):
-        """Return True if keep, delete otherwise. Used to refresh egocentric memory"""
-        # Keep points of interest Place that are not expired
-        # if self.type == EXPERIENCE_PLACE and not self.is_expired(clock):
-        #     return True
-        self.shape.delete()
-        return False
+    # def keep_or_delete(self, clock):
+    #     """Return True if keep, delete otherwise. Used to refresh egocentric memory"""
+    #     # Keep points of interest Place that are not expired
+    #     # if self.type == EXPERIENCE_PLACE and not self.is_expired(clock):
+    #     if not self.is_expired(clock):
+    #         return True
+    #     self.shape.delete()
+    #     return False
 
     def select_if_near(self, point):
         """ If the point is near the x y coordinate, select this point and return True """
