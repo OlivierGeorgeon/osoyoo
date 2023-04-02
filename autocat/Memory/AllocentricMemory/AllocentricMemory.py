@@ -214,22 +214,8 @@ class AllocentricMemory:
         else:
             destination_point = self.robot_point + translation
         # Check that the robot remains within allocentric memory limits
-        # try:
         self.apply_changes(self.robot_point, destination_point, clock)
         self.robot_point = destination_point
-        # except IndexError:
-        #     print("IndexError")
-        #     self.robot_cell_x = self.width // 2
-        #     self.robot_cell_y = self.height // 2
-        #     self.robot_point = np.array([0, 0, 0], dtype=float)
-
-        # # Leave the previous occupied cell
-        # if self.grid[self.robot_cell_x][self.robot_cell_y] != EXPERIENCE_FLOOR:
-        #     self.grid[self.robot_cell_x][self.robot_cell_y].set_to(EXPERIENCE_PLACE)
-        #
-        # # Mark the new occupied cell
-        # self.robot_cell_x, self.robot_cell_y = self.convert_pos_in_cell(
-        #     self.robot_point[0], self.robot_point[1])
 
         return np.round(destination_point)
 

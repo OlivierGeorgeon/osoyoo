@@ -68,7 +68,7 @@ class CtrlPhenomenonView:
         """Create a point of interest corresponding to the affordance given as parameter"""
         # Create the point of interest at origin
         poi = AffordanceDisplay(0, 0, self.view.batch, self.view.forefront, self.view.background,
-                                affordance.experience.type, self.workspace.clock, affordance.experience.color)
+                                affordance.experience.type, affordance.experience.clock, affordance.experience.color)
         # Displace the point of interest to its position relative to the phenomenon and absolute direction
         poi.displace(matrix44.multiply(affordance.experience.rotation_matrix,
                                        matrix44.create_from_translation(affordance.point).astype('float64')))

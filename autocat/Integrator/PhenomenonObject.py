@@ -1,16 +1,24 @@
 import numpy as np
 from pyrr import matrix44
 from .Phenomenon import Phenomenon, PHENOMENON_DELTA, PHENOMENON_CONFIDENCE_PRUNE
+from ..Memory.EgocentricMemory.Experience import EXPERIENCE_CENTRAL_ECHO, EXPERIENCE_ALIGNED_ECHO
+
+OBJECT_EXPERIENCE_TYPES = [EXPERIENCE_CENTRAL_ECHO, EXPERIENCE_ALIGNED_ECHO]
 
 
-class PhenomenonBox(Phenomenon):
+class PhenomenonObject(Phenomenon):
     """A hypothetical phenomenon related to echo localization"""
     def __init__(self, affordance):
         super().__init__(affordance)
+        print("New phenomenon Object")
 
     def update(self, affordance):
         """Test if the affordance is within the acceptable delta from the position of the phenomenon,
-        if yes, add the affordance to the phenomenon, and return the robot's position adjustment."""
+        if yes, add the affordance to the phenomenon, and return the robot's position correction."""
+
+        # Only echo experiences
+        if affordance.experience.type not in OBJECT_EXPERIENCE_TYPES:
+            return None  # Must return None to check if this affordance can be associated with another phenomenon
 
         position_correction = np.array([0, 0, 0], dtype=int)
         # The affordance is repositioned in reference to the phenomenon
@@ -62,7 +70,7 @@ class PhenomenonBox(Phenomenon):
             return position_correction
         else:
             # This affordance does not belong to this phenomenon
-            return None
+            return None  # Must return None to check if this affordance can be associated with another phenomenon
 
     def reference_affordance(self, affordance):
         """Find the previous affordance that serves as the reference to correct the position"""
@@ -94,11 +102,6 @@ class PhenomenonBox(Phenomenon):
     def save(self, experiences):
         """Return a clone of the phenomenon for memory snapshot"""
         # Use the experiences cloned when saving egocentric memory
-        saved_phenomenon = PhenomenonBox(self.origin_affordance)
+        saved_phenomenon = PhenomenonObject(self.origin_affordance)
         super().save(saved_phenomenon, experiences)
-        # saved_phenomenon.point = self.point.copy()
-        # saved_phenomenon.confidence = self.confidence
-        # saved_phenomenon.nb_tour = self.nb_tour
-        # saved_phenomenon.tour_started = self.tour_started
-        # saved_phenomenon.affordances = [a.save(experiences[a.experience.id]) for a in self.affordances]
         return saved_phenomenon

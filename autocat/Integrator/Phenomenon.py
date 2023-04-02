@@ -8,7 +8,7 @@ PHENOMENON_CONFIDENCE_PRUNE = 0.3  # Confidence threshold above which prune
 
 
 class Phenomenon:
-    """The parent class of allphenomena types"""
+    """The parent class of all phenomena types"""
     def __init__(self, affordance):
         """Constructor
         Parameters:
@@ -21,7 +21,6 @@ class Phenomenon:
         # Record the first affordance of the phenomenon
         affordance.point = np.array([0, 0, 0], dtype=int)  # Position of the first affordance is reset
         self.affordances = [affordance]
-        # self.origin_absolute_direction = affordance.experience.absolute_direction_rad
         self.origin_affordance = affordance  # In case affordances[0] is pruned
 
         self.nb_tour = 0

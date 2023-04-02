@@ -19,11 +19,7 @@ FOCUS_MAX_DELTA = 100  # (mm) Maximum delta to keep focus
 
 
 class CtrlRobot:
-    """Handle the communication with the robot:
-        - When the workspace controller has an intended_interaction, compute the command string and send it to the robot
-        - When the outcome string is received from the robot, compute the enacted_interaction and send it to the
-          workspace controller
-    """
+    """The interface between the Workspace and the robot"""
 
     def __init__(self, robot_ip, workspace):
 
@@ -219,6 +215,6 @@ class CtrlRobot:
                 tmp_y = math.sin(math.radians(ha)) * ed
                 enacted_interaction[KEY_EXPERIENCES].append((EXPERIENCE_LOCAL_ECHO, tmp_x, tmp_y))
 
-        print(enacted_interaction)
+        # print(enacted_interaction)
 
         return enacted_interaction

@@ -1,9 +1,18 @@
 import numpy
 from ..Memory.EgocentricMemory.Experience import EXPERIENCE_LOCAL_ECHO, EXPERIENCE_CENTRAL_ECHO, EXPERIENCE_ALIGNED_ECHO
 from .Affordance import Affordance
-from .PhenomenonBox import PhenomenonBox
+from .PhenomenonObject import PhenomenonObject, OBJECT_EXPERIENCE_TYPES
+from .PhenomenonTerrain import PhenomenonTerrain, TERRAIN_EXPERIENCE_TYPES
 
 PHENOMENON_DELTA = 300
+
+
+def create_phenomenon(affordance):
+    """Create a new phenomenon depending of the type of the affordance"""
+    if affordance.experience.type in OBJECT_EXPERIENCE_TYPES:
+        return PhenomenonObject(affordance)
+    if affordance.experience.type in TERRAIN_EXPERIENCE_TYPES:
+        return PhenomenonTerrain(affordance)
 
 
 class Integrator:
@@ -18,7 +27,7 @@ class Integrator:
 
         # The new experiences generated during this round
         new_experiences = [e for e in self.workspace.memory.egocentric_memory.experiences.values()
-                           if (e.clock >= self.workspace.clock - 1)]
+                           if (e.clock >= self.workspace.clock)]
 
         # The new affordances
         new_affordances = []
@@ -75,15 +84,16 @@ class Integrator:
         new_phenomena = []
         for affordance in affordances:
             if len(new_phenomena) == 0:
-                new_phenomena.append(PhenomenonBox(affordance))
+                new_phenomena.append(create_phenomenon(affordance))
             else:
                 clustered = False
                 # Look if the new affordance can be attached to an existing new phenomenon
                 for new_phenomenon in new_phenomena:
+                    print("Update new phenomenon")
                     if new_phenomenon.update(affordance) is not None:
                         clustered = True
                         break
                 if not clustered:
-                    new_phenomena.append(PhenomenonBox(affordance))
+                    new_phenomena.append(create_phenomenon(affordance))
 
         self.phenomena.extend(new_phenomena)
