@@ -3,7 +3,6 @@ from ...Memory.EgocentricMemory.Experience import Experience, EXPERIENCE_LOCAL_E
 from ...Robot.CtrlRobot import KEY_EXPERIENCES
 from ...Robot.RobotDefine import ROBOT_COLOR_X
 import math
-# from .Color import category_color
 import colorsys
 from webcolors import name_to_rgb
 
@@ -139,39 +138,34 @@ class EgocentricMemory:
 
 def category_color(color_sensor):
     """Categorize the color from the sensor measure"""
+    # https://www.w3.org/wiki/CSS/Properties/color/keywords
     # https://www.colorspire.com/rgb-color-wheel/
     # https://www.pinterest.fr/pin/521713938063708448/
     hsv = colorsys.rgb_to_hsv(float(color_sensor['red']) / 256.0, float(color_sensor['green']) / 256.0,
                               float(color_sensor['blue']) / 256.0)
-    color = "LightSlateGrey"
 
-    if hsv[1] > 0.48:
-
-        # if color_sensor['temp'] < 2800:
-        if hsv[0] < 0.1:
-            color = 'red'  # Hue = 0
-        # elif color_sensor['temp'] < 3150:
-        elif hsv[0] < 0.2:
-            color = 'darkorange'  # Hue = 0.13, 0.16
-        # elif color_sensor['temp'] < 3800:  #
-        elif hsv[0] < 0.3:
-            color = 'gold'  # Hue = 0.25, 0.26
-        # elif color_sensor['temp'] < 8000:
-        elif hsv[0] < 0.5:
-            color = 'seagreen'  # Hue = 0.38, 0.35, 0.37
+    if hsv[1] < 0.48:
+        if hsv[0] < 0.6:
+            # Not saturate, not violet
+            color = "LightSlateGrey"  # Saturation: Table 0.16, Sol bureau 0.17
         else:
-            if hsv[0] < 0.9:
-                if hsv[1] > 0.68:
-                    color = 'royalblue'  # Hue = 0.571, 0.592
-                else:
-                    color = 'blueviolet'  # Hue = 0.582, 0.61
-            else:
-                color = 'red'  # Hue = 0
-
-        # elif color_sensor['temp'] > 13000:
-        #     color = 'blue'  # Hue = 0.571, 0.592
-        # else:
-        #     color = 'violet'  # Hue = 0.582, 0.61
+            # Not saturate but violet
+            color = 'orchid'  # Hue = 0.66, Saturation = 0.34, 0.2
+    else:
+        color = 'red'  # Hue = 0 -- 0.0, 0.0
+        if hsv[0] < 0.98:
+            if hsv[0] > 0.9:
+                color = 'deepPink'  # Hue = 0.94, 0.94, 0.94, 0.96
+            elif hsv[0] > 0.6:
+                color = 'orchid'  # Hue = 0.66
+            elif hsv[0] > 0.5:
+                color = 'deepSkyBlue'  # Hue = 0.59 -- 0.57, 0.58
+            elif hsv[0] > 0.28:
+                color = 'limeGreen'  # Hue = 0.38, 0.35, 0.37 -- 0.29, 0.33, 0.29, 0.33
+            elif hsv[0] > 0.175:
+                color = 'gold'  # Hue = 0.25, 0.26 -- 0.20 -- 0.20, 0.20, 0.184, 0.2
+            elif hsv[0] > 0.05:
+                color = 'darkOrange'  # Hue = 0.13, 0.16 -- 0.06, 0.08, 0.09, 0.08
 
     print("Color: ", hsv, color)
 
