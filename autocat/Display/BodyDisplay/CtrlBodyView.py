@@ -30,15 +30,15 @@ class CtrlBodyView:
                 if points.shape[0] > 2:
                     # Find the center of the circle made by the compass points
                     xc, yc, r, sigma = cf.taubinSVD(points)
-                    print("Fit circle", xc, yc, r, sigma)
+                    # print("Fit circle", xc, yc, r, sigma)
                     if 200 < r < 300:
-                        # If the radius seems good then we can recalibrate the compass
+                        # If the radius is in bound then we can update de compass offset
                         delta_offset = np.array([xc, yc, 0], dtype=int)
                         self.workspace.memory.body_memory.compass_offset += delta_offset
-                        self.view.label.text = "Compass offset adjusted by (" + str(round(xc)) + "," + str(round(yc)) + ")"
                         position_matrix = matrix44.create_from_translation(-delta_offset).astype('float64')
-                        for p in [p for p in self.points_of_interest if (p.type == POINT_AZIMUTH)]:
+                        for p in self.points_of_interest:
                             p.displace(position_matrix)
+                        self.view.label.text = "Compass offset adjusted by (" + str(round(xc)) + "," + str(round(yc)) + ")"
                     else:
                         self.view.label.text = "Compass calibration failed. Radius out of bound: " + str(round(r))
                 else:
@@ -94,7 +94,7 @@ class CtrlBodyView:
         # Keep only the points of interest during their durability
         for p in self.points_of_interest:
             if p.is_expired(self.workspace.clock):
-                p.delete
+                p.delete()
         self.points_of_interest = [p for p in self.points_of_interest if not p.is_expired(self.workspace.clock)]
 
     def main(self, dt):

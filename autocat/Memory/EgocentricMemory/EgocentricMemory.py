@@ -136,28 +136,28 @@ def category_color(color_sensor):
     hsv = colorsys.rgb_to_hsv(float(color_sensor['red']) / 256.0, float(color_sensor['green']) / 256.0,
                               float(color_sensor['blue']) / 256.0)
 
-    if hsv[1] < 0.40:
+    if hsv[1] < 0.45:
         if hsv[0] < 0.6:
             # Not saturate, not violet
-            color = "LightSlateGrey"  # Saturation: Table bureau 0.16. Sol bureau 0.17, table olivier 0.21
+            color = "LightSlateGrey"  # Saturation: Table bureau 0.16. Sol bureau 0.17, table olivier 0.21, sol olivier: 0.4, 0.33
         else:
             # Not saturate but violet
             color = 'orchid'  # Hue = 0.66 -- 0.66, Saturation = 0.34, 0.2 -- 0.2
     else:
-        color = 'red'  # Hue = 0 -- 0.0, 0.0
+        color = 'red'  # Hue = 0 -- 0.0, 0.0, sat 0.59
         if hsv[0] < 0.98:
             if hsv[0] > 0.9:
-                color = 'deepPink'  # Hue = 0.94, 0.94, 0.94, 0.96, 0.95
+                color = 'deepPink'  # Hue = 0.94, 0.94, 0.94, 0.96, 0.95, sat 0.54
             elif hsv[0] > 0.6:
                 color = 'orchid'  # Hue = 0.66
             elif hsv[0] > 0.5:
-                color = 'deepSkyBlue'  # Hue = 0.59 -- 0.57, 0.58 -- 0.58
+                color = 'deepSkyBlue'  # Hue = 0.59 -- 0.57, 0.58 -- 0.58, sat 0.86
             elif hsv[0] > 0.28:
-                color = 'limeGreen'  # Hue = 0.38, 0.35, 0.37 -- 0.29, 0.33, 0.29, 0.33 -- 0.36
+                color = 'limeGreen'  # Hue = 0.38, 0.35, 0.37 -- 0.29, 0.33, 0.29, 0.33 -- 0.36, sat 0.68
             elif hsv[0] > 0.175:
-                color = 'gold'  # Hue = 0.25, 0.26 -- 0.20 -- 0.20, 0.20, 0.184, 0.2 -- 0.24
+                color = 'gold'  # Hue = 0.25, 0.26 -- 0.20 -- 0.20, 0.20, 0.184, 0.2 -- 0.24, sat 0.68
             elif hsv[0] > 0.05:
-                color = 'darkOrange'  # Hue = 0.13, 0.16 -- 0.06, 0.08, 0.09, 0.08 -- 0.11
+                color = 'darkOrange'  # Hue = 0.13, 0.16, 0.15 -- 0.06, 0.08, 0.09, 0.08 -- 0.11, sat 0.56
 
     print("Color: ", hsv, color)
 

@@ -11,7 +11,7 @@ class PhenomenonObject(Phenomenon):
     """A hypothetical phenomenon related to echo localization"""
     def __init__(self, affordance):
         super().__init__(affordance)
-        print("New phenomenon Object")
+        # print("New phenomenon Object")
 
     def update(self, affordance):
         """Test if the affordance is within the acceptable delta from the position of the phenomenon,
