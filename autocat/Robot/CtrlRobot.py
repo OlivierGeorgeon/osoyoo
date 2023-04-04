@@ -111,8 +111,10 @@ class CtrlRobot:
         # (They are equal unless COMPASS_X_OFFSET or COMPASS_X_OFFSET are non zero)
         if 'compass_x' in enacted_interaction:
             # Subtract the offset from robot_define.py
-            enacted_interaction['compass_x'] -= COMPASS_X_OFFSET
-            enacted_interaction['compass_y'] -= COMPASS_Y_OFFSET
+            enacted_interaction['compass_x'] -= self.workspace.memory.body_memory.compass_offset[0]
+            enacted_interaction['compass_y'] -= self.workspace.memory.body_memory.compass_offset[1]
+            # cp = np.array([enacted_interaction['compass_x'], enacted_interaction['compass_y'], 0], dtype=int) + \
+            #              self.workspace.memory.body_memory.compass_offset
             azimuth = math.degrees(math.atan2(enacted_interaction['compass_y'], enacted_interaction['compass_x']))
             # The compass point indicates the south so we must rotate it of 180° to obtain the azimuth
             azimuth = round(azimuth + 180) % 360

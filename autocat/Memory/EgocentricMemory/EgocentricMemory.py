@@ -45,14 +45,6 @@ class EgocentricMemory:
         color_exp = Experience(ROBOT_COLOR_X, 0, EXPERIENCE_PLACE, body_direction_rad, enacted_interaction["clock"],
                                self.experience_id, durability=EXPERIENCE_PERSISTENCE,
                                color=category_color(enacted_interaction['color']))
-        # color_exp.color = (enacted_interaction['color']['red'], enacted_interaction['color']['green'],
-        #                   enacted_interaction['color']['blue'])
-        # Tried to display the hue only
-        # hsv = colorsys.rgb_to_hsv(float(color_exp.color[0])/256.0, float(color_exp.color[1])/256.0, float(color_exp.color[2])/256.0)
-        # rgb = colorsys.hsv_to_rgb(hsv[0], 1.0, 1.0)
-        # color_exp.color = (int(rgb[0] * 256.0), int(rgb[1] * 256.0), int(rgb[2] * 256.0))
-        # color_exp.color = category_color(enacted_interaction['color'])
-
         new_experiences.append(color_exp)
         self.experiences[color_exp.id] = color_exp
         self.experience_id += 1
@@ -144,28 +136,28 @@ def category_color(color_sensor):
     hsv = colorsys.rgb_to_hsv(float(color_sensor['red']) / 256.0, float(color_sensor['green']) / 256.0,
                               float(color_sensor['blue']) / 256.0)
 
-    if hsv[1] < 0.48:
+    if hsv[1] < 0.40:
         if hsv[0] < 0.6:
             # Not saturate, not violet
-            color = "LightSlateGrey"  # Saturation: Table 0.16, Sol bureau 0.17
+            color = "LightSlateGrey"  # Saturation: Table bureau 0.16. Sol bureau 0.17, table olivier 0.21
         else:
             # Not saturate but violet
-            color = 'orchid'  # Hue = 0.66, Saturation = 0.34, 0.2
+            color = 'orchid'  # Hue = 0.66 -- 0.66, Saturation = 0.34, 0.2 -- 0.2
     else:
         color = 'red'  # Hue = 0 -- 0.0, 0.0
         if hsv[0] < 0.98:
             if hsv[0] > 0.9:
-                color = 'deepPink'  # Hue = 0.94, 0.94, 0.94, 0.96
+                color = 'deepPink'  # Hue = 0.94, 0.94, 0.94, 0.96, 0.95
             elif hsv[0] > 0.6:
                 color = 'orchid'  # Hue = 0.66
             elif hsv[0] > 0.5:
-                color = 'deepSkyBlue'  # Hue = 0.59 -- 0.57, 0.58
+                color = 'deepSkyBlue'  # Hue = 0.59 -- 0.57, 0.58 -- 0.58
             elif hsv[0] > 0.28:
-                color = 'limeGreen'  # Hue = 0.38, 0.35, 0.37 -- 0.29, 0.33, 0.29, 0.33
+                color = 'limeGreen'  # Hue = 0.38, 0.35, 0.37 -- 0.29, 0.33, 0.29, 0.33 -- 0.36
             elif hsv[0] > 0.175:
-                color = 'gold'  # Hue = 0.25, 0.26 -- 0.20 -- 0.20, 0.20, 0.184, 0.2
+                color = 'gold'  # Hue = 0.25, 0.26 -- 0.20 -- 0.20, 0.20, 0.184, 0.2 -- 0.24
             elif hsv[0] > 0.05:
-                color = 'darkOrange'  # Hue = 0.13, 0.16 -- 0.06, 0.08, 0.09, 0.08
+                color = 'darkOrange'  # Hue = 0.13, 0.16 -- 0.06, 0.08, 0.09, 0.08 -- 0.11
 
     print("Color: ", hsv, color)
 

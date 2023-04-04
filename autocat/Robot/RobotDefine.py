@@ -41,8 +41,8 @@ if ROBOT_ID == 2:
 
 # Robot 4 chezOlivier
 if ROBOT_ID == 4:
-    COMPASS_X_OFFSET = 0    # (Compass unit) X offset of the compass measure
-    COMPASS_Y_OFFSET = 0    # (Compass unit) Y offset of the compass measrue
+    COMPASS_X_OFFSET = 0  # -70    # (Compass unit) X offset of the compass measure
+    COMPASS_Y_OFFSET = 0  # 63   # (Compass unit) Y offset of the compass measrue
     FORWARD_SPEED = 190     # (mm/s) Forward translation speed.
     RETREAT_DISTANCE = 70   # (mm) Distance of the line after retreat
 

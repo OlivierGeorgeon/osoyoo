@@ -9,10 +9,10 @@ PHENOMENON_DELTA = 300
 
 def create_phenomenon(affordance):
     """Create a new phenomenon depending of the type of the affordance"""
-    if affordance.experience.type in OBJECT_EXPERIENCE_TYPES:
-        return PhenomenonObject(affordance)
     if affordance.experience.type in TERRAIN_EXPERIENCE_TYPES:
         return PhenomenonTerrain(affordance)
+    else:
+        return PhenomenonObject(affordance)
 
 
 class Integrator:

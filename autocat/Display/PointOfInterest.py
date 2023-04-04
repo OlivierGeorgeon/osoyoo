@@ -11,7 +11,7 @@ POINT_PROMPT = 'Prompt'
 
 class PointOfInterest:
     def __init__(self, x, y, batch, group, point_type, clock, color=(128, 128, 128), durability=10):
-        self.point = np.array([x, y, 0], dtype=int)
+        self.point = np.array([0, 0, 0], dtype=int)  # Will be moved to its position
         self.batch = batch
         self.group = group
         self.type = point_type

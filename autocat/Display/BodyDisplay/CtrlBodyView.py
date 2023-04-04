@@ -3,6 +3,10 @@ import math
 from .BodyView import BodyView
 from autocat.Display.PointOfInterest import PointOfInterest, POINT_COMPASS, POINT_AZIMUTH
 from ...Workspace import INTERACTION_STEP_REFRESHING, INTERACTION_STEP_ENACTING
+import numpy as np
+import circle_fit as cf
+
+KEY_OFFSET = 'O'
 
 
 class CtrlBodyView:
@@ -19,7 +23,28 @@ class CtrlBodyView:
 
         def on_text(text):
             """Send user keypress to the workspace to handle"""
-            self.workspace.process_user_key(text)
+            if text.upper() == KEY_OFFSET:
+                # Calibrate the compass
+                points = np.array([[p.point[0], p.point[1]] for p in self.points_of_interest if (p.type == POINT_AZIMUTH)])
+                print(repr(points))
+                if points.shape[0] > 2:
+                    # Find the center of the circle made by the compass points
+                    xc, yc, r, sigma = cf.taubinSVD(points)
+                    print("Fit circle", xc, yc, r, sigma)
+                    if 200 < r < 300:
+                        # If the radius seems good then we can recalibrate the compass
+                        delta_offset = np.array([xc, yc, 0], dtype=int)
+                        self.workspace.memory.body_memory.compass_offset += delta_offset
+                        self.view.label.text = "Compass offset adjusted by (" + str(round(xc)) + "," + str(round(yc)) + ")"
+                        position_matrix = matrix44.create_from_translation(-delta_offset).astype('float64')
+                        for p in [p for p in self.points_of_interest if (p.type == POINT_AZIMUTH)]:
+                            p.displace(position_matrix)
+                    else:
+                        self.view.label.text = "Compass calibration failed. Radius out of bound: " + str(round(r))
+                else:
+                    self.view.label.text = "Compass calibration failed. Insufficient points: " + str(points.shape[0])
+            else:
+                self.workspace.process_user_key(text)
 
         self.view.push_handlers(on_text)
 
@@ -67,7 +92,10 @@ class CtrlBodyView:
         for poi in self.points_of_interest:
             poi.fade(self.workspace.clock)
         # Keep only the points of interest during their durability
-        self.points_of_interest = [p for p in self.points_of_interest if p.clock + p.durability > self.workspace.clock]
+        for p in self.points_of_interest:
+            if p.is_expired(self.workspace.clock):
+                p.delete
+        self.points_of_interest = [p for p in self.points_of_interest if not p.is_expired(self.workspace.clock)]
 
     def main(self, dt):
         """Called every frame. Update the body view"""

@@ -1,7 +1,7 @@
 import math
 import numpy as np
 from pyrr import matrix44
-from ..Robot.RobotDefine import ROBOT_FRONT_X, ROBOT_SIDE
+from ..Robot.RobotDefine import ROBOT_FRONT_X, ROBOT_SIDE, COMPASS_X_OFFSET, COMPASS_Y_OFFSET
 from ..Utils import assert_almost_equal_angles
 
 
@@ -11,6 +11,7 @@ class BodyMemory:
         """Initialize the body position and speed variables"""
         self.head_direction_rad = .0  # [-pi/2, pi/2] Radian relative to the robot's x axis
         self.body_direction_rad = .0  # [-pi, pi] Radian relative to horizontal x axis (west-east)
+        self.compass_offset = np.array([COMPASS_X_OFFSET, COMPASS_Y_OFFSET, 0], dtype=int)
 
     def set_head_direction_degree(self, head_direction_degree: int):
         """Set the head direction from degree measured relative to x axis [-90,90]"""
@@ -77,4 +78,5 @@ class BodyMemory:
         saved_body_memory = BodyMemory()
         saved_body_memory.head_direction_rad = self.head_direction_rad
         saved_body_memory.body_direction_rad = self.body_direction_rad
+        saved_body_memory.compass_offset = self.compass_offset.copy()
         return saved_body_memory
