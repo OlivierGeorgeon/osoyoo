@@ -8,12 +8,15 @@
 #define Imu_h
 #include "Arduino.h"
 #include "Robot_define.h"
-#include <Wire.h>
 #include "src/lib/MPU6050.h"
-#if ROBOT_HAS_HMC5883L == true
-  #include <HMC5883L.h>
-#endif
 #include <Arduino_JSON.h>
+#include <Wire.h>
+#if ROBOT_COMPASS_TYPE == 1
+#include <HMC5883L.h>
+#endif
+#if ROBOT_COMPASS_TYPE == 2
+#include "src/lib/MMC5883.h"
+#endif
 
 #define IMU_READ_PERIOD 50  // (ms)
 #define IMU_ACCELERATION_CYCLES 5  // number of cycles of imu read during acceration phase
@@ -29,14 +32,19 @@ class Imu
     float _yaw;
     float _xSpeed;
     float _xDistance;
-    #if ROBOT_HAS_HMC5883L == true
-      void read_azimuth(JSONVar & outcome_object);
+    #ifdef ROBOT_COMPASS_TYPE > 0
+    void read_azimuth(JSONVar & outcome_object);
     #endif
     //String _debug_message;
   private:
     MPU6050 _mpu;
-    #if ROBOT_HAS_HMC5883L == true
-      HMC5883L compass;
+    #if ROBOT_COMPASS_TYPE == 1
+    #warning "Compiling for HMC5883L"
+    HMC5883L compass;
+    #endif
+    #if ROBOT_COMPASS_TYPE == 2
+    #warning "Compiling for MMC5883"
+    MMC5883MA compass;
     #endif
     unsigned long _next_imu_read_time;
     int _max_acceleration;

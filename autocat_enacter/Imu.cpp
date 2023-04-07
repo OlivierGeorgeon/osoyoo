@@ -11,8 +11,11 @@
 #include "Robot_define.h"
 #include "src/lib/MPU6050.h"
 #include "Action_define.h"
-#if ROBOT_HAS_HMC5883L == true
-  #include <HMC5883L.h>
+#if ROBOT_COMPASS_TYPE == 1
+#include <HMC5883L.h>
+#endif
+#if ROBOT_COMPASS_TYPE == 2
+#include "src/lib/MMC5883.h"
 #endif
 
 Imu::Imu()
@@ -52,13 +55,18 @@ void Imu::setup()
     #warning "No MPU6050"
   #endif
 
-  #if ROBOT_HAS_HMC5883L == true
+  #if ROBOT_COMPASS_TYPE > 0
 
   // Initialize HMC5883L
   _mpu.setI2CMasterModeEnabled(false);
   _mpu.setI2CBypassEnabled(true) ;
   _mpu.setSleepEnabled(false);
-  // Serial.println("Initialize HMC5883L");
+  Serial.println("Initialize compass");
+
+  #endif
+
+  #if ROBOT_COMPASS_TYPE == 1
+
   while (!compass.begin())
   {
     Serial.println("Could not find a valid HMC5883L sensor, check wiring!");
@@ -78,6 +86,12 @@ void Imu::setup()
   compass.setSamples(HMC5883L_SAMPLES_4); // HMC5883L_SAMPLES_8
 
   // Set calibration offset. See HMC5883L_calibration.ino
+  compass.setOffset(COMPASS_X_OFFSET, COMPASS_Y_OFFSET);
+  #endif
+
+  #if ROBOT_COMPASS_TYPE == 2
+  Serial.println("Initializing MMC5883");
+  compass.begin();
   compass.setOffset(COMPASS_X_OFFSET, COMPASS_Y_OFFSET);
   #endif
 }
@@ -180,12 +194,12 @@ void Imu::outcome(JSONVar & outcome_object, char action)
   //outcome_object["debug"] = _debug_message;
   //_debug_message = "";
 
-  #if ROBOT_HAS_HMC5883L == true
+  #if ROBOT_COMPASS_TYPE > 0
   read_azimuth(outcome_object);
   #endif
 }
 
-#if ROBOT_HAS_HMC5883L == true
+#if ROBOT_COMPASS_TYPE > 0
 void Imu::read_azimuth(JSONVar & outcome_object)
 {
   Vector norm = compass.readNormalize();

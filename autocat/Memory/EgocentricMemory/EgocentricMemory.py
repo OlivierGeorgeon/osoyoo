@@ -42,12 +42,13 @@ class EgocentricMemory:
             self.experiences[e.id] = e
 
         # Add an experience for the color
-        color_exp = Experience(ROBOT_COLOR_X, 0, EXPERIENCE_PLACE, body_direction_rad, enacted_interaction["clock"],
-                               self.experience_id, durability=EXPERIENCE_PERSISTENCE,
-                               color=category_color(enacted_interaction['color']))
-        new_experiences.append(color_exp)
-        self.experiences[color_exp.id] = color_exp
-        self.experience_id += 1
+        if 'color' in enacted_interaction:
+            color_exp = Experience(ROBOT_COLOR_X, 0, EXPERIENCE_PLACE, body_direction_rad, enacted_interaction["clock"],
+                                   self.experience_id, durability=EXPERIENCE_PERSISTENCE,
+                                   color=category_color(enacted_interaction['color']))
+            new_experiences.append(color_exp)
+            self.experiences[color_exp.id] = color_exp
+            self.experience_id += 1
 
         # Remove the experiences from egocentric memory when they are two old
         # self.experiences = [e for e in self.experiences if e.clock >= enacted_interaction["clock"] - e.durability]

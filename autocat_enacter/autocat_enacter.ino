@@ -80,8 +80,11 @@ void setup()
 
   // Initialize the automatic behaviors
   OWM.setup();
+  Serial.println("Wheels intialized");
   HEA.setup();
+  Serial.println("HEAD intialized");
   IMU.setup();
+  Serial.println("IMU1 intialized");
   //HECS.setup();
   // Setup the imu twice otherwise the calibration is wrong. I don't know why.
   // Probably something to do with the order in which the imu registers are written.
@@ -89,7 +92,10 @@ void setup()
   IMU.setup();
   delay(100);
   IMU.setup();
+  Serial.println("IMU intialized");
   TCS.setup(); // TODO Test
+  Serial.println("Color sensor intialized");
+
 
   Serial.println("--- Robot initialized ---");
 
