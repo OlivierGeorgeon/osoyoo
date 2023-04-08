@@ -67,7 +67,7 @@ public:
     long sz;
 	// Olivier
 	Vector readNormalize(void);
-	void  setOffset(int xo, int yo);
+	void setOffset(int xo, int yo);
 	int xOffset, yOffset;
 	Vector v;
 

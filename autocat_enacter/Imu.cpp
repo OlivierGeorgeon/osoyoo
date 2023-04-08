@@ -225,8 +225,8 @@ void Imu::read_azimuth(JSONVar & outcome_object)
     headingDegrees -= 360;
   }
 
-  outcome_object["compass_x"] = (int)norm.XAxis;
-  outcome_object["compass_y"] = (int)norm.YAxis;
+  outcome_object["compass_x"] = round(norm.XAxis);
+  outcome_object["compass_y"] = round(norm.YAxis);
   outcome_object["azimuth"] = headingDegrees;
 
   // return headingDegrees;

@@ -10,6 +10,9 @@ MMC5883MA::MMC5883MA(){
 
 void MMC5883MA::begin()
 {
+    // Olivier: Avoids freezing the main loop
+    wire->setWireTimeout( 25000, true);
+
     wire->beginTransmission(MMC_ADDRESS);
     // the address of the register is written first
     // in this case CONTROL REGISTER 0
@@ -246,20 +249,19 @@ String MMC5883MA::readData()
     return value;
 }
 
-// Olivier Georgeon for comptability with HMC5883
+// Olivier Georgeon for compatibility with HMC5883
 void MMC5883MA::setOffset(int xo, int yo)
 {
     xOffset = xo;
     yOffset = yo;
 }
 
-// Olivier Georgeon for comptability with HMC5883
+// Olivier Georgeon for compatibility with HMC5883
 Vector MMC5883MA::readNormalize(void)
 {
     update();
-    v.XAxis = (float)((int)sx - xOffset)/5.0;
-    v.YAxis = (float)((int)sy - yOffset)/5.0;
+    v.XAxis = (float)sx/5.0 - xOffset;
+    v.YAxis = (float)sy/5.0 - yOffset;
     v.ZAxis = (float)sy;
-
     return v;
 }

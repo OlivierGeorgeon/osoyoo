@@ -1,4 +1,4 @@
-#define ROBOT_ID 1 // 0: regular Osoyoo robot, 1: robot BSN, 2: robot UCBL, 3: robot SHS, 4: SHS with GY86 chez Olivier
+#define ROBOT_ID 3 // 0: regular Osoyoo robot, 1: robot BSN, 2: robot UCBL, 3: robot SHS, 4: SHS with GY86 chez Olivier
 
 #define AP_SSID "osoyoo_robot"          // The wifi SSID of this robot in Access Point
 #define ROBOT_HEAD_X 80                 // (mm) X position of the head
@@ -25,8 +25,8 @@
 #define TURN_SPOT_ENDING_DELAY 500
 #define TURN_SPOT_ENDING_ANGLE 25 // Don't know why this robot is so fast
 #define ACCELERATION_X_OFFSET -40
-#define COMPASS_X_OFFSET 35110 // 35500
-#define COMPASS_Y_OFFSET 36680  // 36500
+#define COMPASS_X_OFFSET 7051 // 7022  // 35110 // 35500
+#define COMPASS_Y_OFFSET 7306 // 7336  // 36680 // 36500
 #define ACCELERATION_SHOCK_THRESHOLD -200
 #define ACCELERATION_BLOCK_THRESHOLD 60  // TODO depends whether the interaction starts when the robot is immobile
 #define GYRO_COEF 1.2  //  1 // IMU is upright. If turns too much, increase this value
@@ -52,7 +52,7 @@
 #define GYRO_COEF 1.35 // UMI is upright
 #define ROBOT_SERVO_PIN 4
 
-#elif ROBOT_ID == 4
+#elif ROBOT_ID == 3
 
 #warning "Compiling for SHS's robot with GY-86"
 #define ROBOT_HAS_MPU6050  true
