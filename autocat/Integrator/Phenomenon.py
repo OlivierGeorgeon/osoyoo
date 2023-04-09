@@ -69,5 +69,5 @@ class Phenomenon:
         saved_phenomenon.confidence = self.confidence
         saved_phenomenon.nb_tour = self.nb_tour
         saved_phenomenon.tour_started = self.tour_started
-        saved_phenomenon.affordances = [a.save(experiences[a.experience.id]) for a in self.affordances]
+        saved_phenomenon.affordances = [a.save(experiences) for a in self.affordances]
         return

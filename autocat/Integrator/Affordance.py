@@ -68,28 +68,38 @@ class Affordance:
         return False
 
     def sensor_triangle(self):
-        """The set of points to display the sensor in phenomenon view"""
+        """The set of points to display the echolocalization cone"""
         points = None
         if self.experience.type in [EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_CENTRAL_ECHO]:
-            # The position of the sensor
-            p1 = matrix44.apply_to_vector(self.experience.sensor_matrix, [0, 0, 0])
+            # The position of the sensor from the position of the affordance
+            # p1 = matrix44.apply_to_vector(self.experience.sensor_matrix, [0, 0, 0])
+            p1 = self.experience.sensor_point.copy()
             # Second point of the triangle
             orthogonal_rotation = matrix44.create_from_z_rotation(math.pi/2)
-            p2_matrix = matrix44.multiply(self.experience.sensor_matrix, orthogonal_rotation)
-            p2_matrix[3, 0] *= 0.4
-            p2_matrix[3, 1] *= 0.4
-            p2 = matrix44.apply_to_vector(p2_matrix, [0, 0, 0])
+            # p2_matrix = matrix44.multiply(self.experience.sensor_matrix, orthogonal_rotation)
+            # p2_matrix[3, 0] *= 0.4
+            # p2_matrix[3, 1] *= 0.4
+            # p2 = matrix44.apply_to_vector(p2_matrix, [0, 0, 0])
+            # The direction of p2 is orthogonal to the direction of the sensor
+            p2 = matrix44.apply_to_vector(orthogonal_rotation, p1) * 0.4
             # Third point of the triangle
-            p3_matrix = matrix44.multiply(self.experience.sensor_matrix, orthogonal_rotation)
-            p3_matrix[3, 0] *= -0.4
-            p3_matrix[3, 1] *= -0.4
-            p3 = matrix44.apply_to_vector(p3_matrix, [0, 0, 0])
+            # p3_matrix = matrix44.multiply(self.experience.sensor_matrix, orthogonal_rotation)
+            # p3_matrix[3, 0] *= -0.4
+            # p3_matrix[3, 1] *= -0.4
+            # p3 = matrix44.apply_to_vector(p3_matrix, [0, 0, 0])
+            # p3 = matrix44.apply_to_vector(orthogonal_rotation, p1) * -0.4
+            # p3 is opposite to p2 from the porisition of the affordance
+            p3 = p2 * -0.8
 
             # Add the position of the affordance to the position of the triangle
             points = [p1, p2, p3] + self.point
         return points
 
-    def save(self, experience):
+    def color_position(self, color_index):
+        """Return the position in allocentric memory of the color patch"""
+        point = self.point.copy()
+
+    def save(self, experiences):
         """Return a cloned affordance for memory snapshot"""
-        # Use the experience cloned when saving egocentric memory
-        return Affordance(self.point.copy(), experience)
+        # Use the experiences cloned when saving egocentric memory
+        return Affordance(self.point.copy(), experiences[self.experience.id])

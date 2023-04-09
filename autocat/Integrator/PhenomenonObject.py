@@ -78,8 +78,9 @@ class PhenomenonObject(Phenomenon):
         # TODO the reference algorithm must be improved
         # In this implementation the reference affordance is the affordance closest to the head
         phenomenon_points = np.array([a.point for a in self.affordances])
-        head_point = np.array(matrix44.apply_to_vector(affordance.experience.sensor_matrix, [0, 0, 0]))
-        dist2 = np.sum((phenomenon_points - head_point)**2, axis=1)
+        # head_point = np.array(matrix44.apply_to_vector(affordance.experience.sensor_matrix, [0, 0, 0]))
+        # head_point = affordance.experience.sensor_point.copy()
+        dist2 = np.sum((phenomenon_points - affordance.experience.sensor_point)**2, axis=1)
         return self.affordances[dist2.argmin()]
 
     def prune(self, affordance):

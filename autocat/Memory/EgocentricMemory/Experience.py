@@ -28,17 +28,20 @@ class Experience:
         """
         self.point = np.array([x, y, 0])
         self.type = experience_type
+        self.absolute_direction_rad = body_direction_rad
         self.clock = clock
+        self.id = experience_id
+        self.durability = durability
         self.color = color
 
-        # The position matrix is applied to the vertices of the point_of_interest to display
-        # To compute the position of the experience relative to the robot in egocentric memory
+        # The position matrix will cumulate the rotation and translations of the robot
+        # Used to compute the position of the experience relative to the robot in egocentric memory
         self.position_matrix = matrix44.create_from_translation(self.point).astype('float64')
         # The position of the robot relative to the experience
-        # To compute the position of the robot relative to the experience
-        opposite_translation_matrix = matrix44.create_from_translation(-self.point).astype('float64')
+        # Used to compute the position of the robot relative to the experience
+        # opposite_position_matrix = matrix44.create_from_translation(-self.point).astype('float64')
+        relative_sensor_point = -self.point  # By default the center of the robot
         # The absolute direction of this experience
-        self.absolute_direction_rad = body_direction_rad
 
         if self.type in [EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_CENTRAL_ECHO]:
             # The position of the echo incorporating the rotation from the head
@@ -50,24 +53,26 @@ class Experience:
                                                                              0, 0])
             position_from_head_matrix = matrix44.multiply(translation_from_head_matrix,
                                                           matrix44.create_from_z_rotation(-head_direction_rad))
+            # The position matrix initialized with rotation from the head rather than from the center of the robot
             self.position_matrix = matrix44.multiply(position_from_head_matrix,
                                                      matrix44.create_from_translation([ROBOT_HEAD_X, 0, 0])
                                                      .astype('float64'))
             # The position of the head relative to the echo in allocentric coordinates
-            opposite_translation_matrix = matrix44.create_from_translation([-x + ROBOT_HEAD_X, -y, 0])
+            # opposite_position_matrix = matrix44.create_from_translation([-x + ROBOT_HEAD_X, -y, 0])
+            relative_sensor_point = np.array([-x + ROBOT_HEAD_X, -y, 0])
 
         # opposite azimuth
-        orientation_matrix = matrix44.create_from_z_rotation(-body_direction_rad)
+        body_direction_matrix = matrix44.create_from_z_rotation(-body_direction_rad)
         # Move the head position by the azimuth
-        self.sensor_matrix = matrix44.multiply(opposite_translation_matrix, orientation_matrix)
+        # sensor_matrix = matrix44.multiply(opposite_position_matrix, body_direction_matrix)
+        # self.sensor_point = matrix44.apply_to_vector(sensor_matrix, [0, 0, 0])
 
-        # The rotation matrix to display the experience in phenomenon view
-        p1x, p1y, _ = matrix44.apply_to_vector(self.sensor_matrix, [0, 0, 0])
-        angle_sensor = math.atan2(p1y, p1x)
-        self.rotation_matrix = matrix44.create_from_z_rotation(math.pi - angle_sensor)  # Don't know why need flip
+        # The allocentric position of the sensor relative to the allocentric position of the experience
+        self.sensor_point = matrix44.apply_to_vector(body_direction_matrix, relative_sensor_point)
 
-        self.durability = durability
-        self.id = experience_id
+        # The rotation matrix to display the affordance in phenomenon view
+        angle_sensor = math.atan2(self.sensor_point[1], self.sensor_point[0])
+        self.rotation_matrix = matrix44.create_from_z_rotation(math.pi - angle_sensor)
 
     def __str__(self):
         return "(id:" + str(self.id) + ",clock:" + str(self.clock) + ")"
@@ -90,6 +95,6 @@ class Experience:
 
         # Absolute relative sensor position do not change
         saved_experience.absolute_direction_rad = self.absolute_direction_rad
-        saved_experience.sensor_matrix = self.sensor_matrix
+        # saved_experience.sensor_matrix = self.sensor_matrix
         saved_experience.rotation_matrix = self.rotation_matrix
         return saved_experience
