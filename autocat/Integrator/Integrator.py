@@ -1,5 +1,6 @@
 import numpy
-from ..Memory.EgocentricMemory.Experience import EXPERIENCE_LOCAL_ECHO, EXPERIENCE_CENTRAL_ECHO, EXPERIENCE_ALIGNED_ECHO
+from ..Memory.EgocentricMemory.Experience import EXPERIENCE_LOCAL_ECHO, EXPERIENCE_CENTRAL_ECHO, \
+    EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_FLOOR
 from .Affordance import Affordance
 from .PhenomenonObject import PhenomenonObject, OBJECT_EXPERIENCE_TYPES
 from .PhenomenonTerrain import PhenomenonTerrain, TERRAIN_EXPERIENCE_TYPES
@@ -9,6 +10,7 @@ PHENOMENON_DELTA = 300
 
 def create_phenomenon(affordance):
     """Create a new phenomenon depending of the type of the affordance"""
+    # Must always return a phenomenon
     if affordance.experience.type in TERRAIN_EXPERIENCE_TYPES:
         return PhenomenonTerrain(affordance)
     else:
@@ -47,6 +49,7 @@ class Integrator:
         new_affordances, position_correction = self.update_phenomena(new_affordances)
 
         # Adjust the robot's position in allocentric memory
+        print("Position correction du to phenomenon update", position_correction)
         self.workspace.memory.allocentric_memory.move(0, position_correction, self.workspace.clock,
                                                       is_egocentric_translation=False)
 

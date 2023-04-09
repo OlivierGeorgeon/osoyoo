@@ -12,6 +12,7 @@ EXPERIENCE_FLOOR = 'Floor'
 EXPERIENCE_FOCUS = 'Focus'
 EXPERIENCE_PLACE = 'Place'
 EXPERIENCE_PROMPT = 'Prompt'
+COLOR_FLOOR = "LightSlateGrey"
 
 
 class Experience:
@@ -31,9 +32,10 @@ class Experience:
         self.color = color
 
         # The position matrix is applied to the vertices of the point_of_interest to display
-        # the point of interest at the position of the experience in egocentric view
+        # To compute the position of the experience relative to the robot in egocentric memory
         self.position_matrix = matrix44.create_from_translation(self.point).astype('float64')
         # The position of the robot relative to the experience
+        # To compute the position of the robot relative to the experience
         opposite_translation_matrix = matrix44.create_from_translation(-self.point).astype('float64')
         # The absolute direction of this experience
         self.absolute_direction_rad = body_direction_rad

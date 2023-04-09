@@ -1,5 +1,5 @@
 from ...Memory.EgocentricMemory.Experience import Experience, EXPERIENCE_LOCAL_ECHO, EXPERIENCE_CENTRAL_ECHO, \
-    EXPERIENCE_PLACE
+    EXPERIENCE_PLACE, COLOR_FLOOR
 from ...Robot.CtrlRobot import KEY_EXPERIENCES
 from ...Robot.RobotDefine import ROBOT_COLOR_X
 import math
@@ -22,33 +22,34 @@ class EgocentricMemory:
         - Add new experiences
         """
 
+        last_experience_id = self.experience_id
         # Move the existing experiences
         for experience in self.experiences.values():
             experience.displace(enacted_interaction['displacement_matrix'])
 
+        # Add the PLACE experience with the sensed color
+        color = None
+        if 'color' in enacted_interaction:
+            color = category_color(enacted_interaction['color'])
+            color_exp = Experience(ROBOT_COLOR_X, 0, EXPERIENCE_PLACE, body_direction_rad, enacted_interaction["clock"],
+                                   self.experience_id, durability=EXPERIENCE_PERSISTENCE, color=color)
+            self.experiences[color_exp.id] = color_exp
+            self.experience_id += 1
+
         # Create new experiences from points in the enacted_interaction
-        new_experiences = []
+        # new_experiences = []
         for p in enacted_interaction[KEY_EXPERIENCES]:
             experience = Experience(p[1], p[2], p[0], body_direction_rad, enacted_interaction["clock"],
-                                    experience_id=self.experience_id, durability=EXPERIENCE_PERSISTENCE)
-            new_experiences.append(experience)
+                                    experience_id=self.experience_id, durability=EXPERIENCE_PERSISTENCE, color=color)
+            # new_experiences.append(experience)
             self.experiences[experience.id] = experience
             self.experience_id += 1
 
         # Add the central echos from the local echos
-        new_central_echos = self.Compute_central_echo([e for e in new_experiences if e.type == EXPERIENCE_LOCAL_ECHO],
-                                                      body_direction_rad, enacted_interaction["clock"])
+        echos = [e for e in self.experiences.values() if e.type == EXPERIENCE_LOCAL_ECHO and e.id > last_experience_id]
+        new_central_echos = self.Compute_central_echo(echos)
         for e in new_central_echos:
             self.experiences[e.id] = e
-
-        # Add an experience for the color
-        if 'color' in enacted_interaction:
-            color_exp = Experience(ROBOT_COLOR_X, 0, EXPERIENCE_PLACE, body_direction_rad, enacted_interaction["clock"],
-                                   self.experience_id, durability=EXPERIENCE_PERSISTENCE,
-                                   color=category_color(enacted_interaction['color']))
-            new_experiences.append(color_exp)
-            self.experiences[color_exp.id] = color_exp
-            self.experience_id += 1
 
         # Remove the experiences from egocentric memory when they are two old
         # self.experiences = [e for e in self.experiences if e.clock >= enacted_interaction["clock"] - e.durability]
@@ -65,23 +66,26 @@ class EgocentricMemory:
             output.append((angle, distance, elem))
         return output
 
-    def Compute_central_echo(self, echo_list, body_direction_rad, clock):
+    def Compute_central_echo(self, echos):
         """In case of a sweep we obtain an array of echo, this function discretizes
         it to try to find the real position of the objects that sent back the echo
 
         To do so use 'strikes' which are series of consecutive echoes that are
         close enough to be considered as the same object, and consider that the
         real position of the object is at the middle of the strike"""
-        if len(echo_list) == 1:
-            print(echo_list[0])
-        echo_list = self.revert_echoes_to_angle_distance(echo_list)
+        experiences_central_echo = []
+        if len(echos) == 0:
+            return experiences_central_echo
+        body_direction_rad = echos[0].absolute_direction_rad
+        clock = echos[0].clock
+        echos = self.revert_echoes_to_angle_distance(echos)
         max_delta_dist = 160
         max_delta_angle = math.radians(20)
         streaks = [[], [], [], [], [], [], [], [], [], [], [], []]
         angle_dist = [[], [], [], [], [], [], [], [], [], [], [], []]
         current_id = 0
-        echo_list = sorted(echo_list, key=lambda elem: elem[0])  # on trie par angle, pour avoir les streak "préfaites"
-        for angle, distance, interaction in echo_list:
+        echos = sorted(echos, key=lambda elem: elem[0])  # on trie par angle, pour avoir les streak "préfaites"
+        for angle, distance, interaction in echos:
             check = False
             for i, streak in enumerate(streaks):
                 if len(streak) > 0 and not check:
@@ -99,7 +103,6 @@ class EgocentricMemory:
                 current_id = (current_id + 1)
                 streaks[current_id].append((angle, distance, interaction))
                 angle_dist[current_id].append((math.degrees(angle), distance))
-        experiences_central_echo = []
         for streak in streaks:
             if len(streak) == 0:
                 continue
@@ -140,7 +143,7 @@ def category_color(color_sensor):
     if hsv[1] < 0.45:
         if hsv[0] < 0.6:
             # Not saturate, not violet
-            color = "LightSlateGrey"  # Saturation: Table bureau 0.16. Sol bureau 0.17, table olivier 0.21, sol olivier: 0.4, 0.33
+            color = COLOR_FLOOR  # Saturation: Table bureau 0.16. Sol bureau 0.17, table olivier 0.21, sol olivier: 0.4, 0.33
         else:
             # Not saturate but violet
             color = 'orchid'  # Hue = 0.66 -- 0.66, Saturation = 0.34, 0.2 -- 0.2

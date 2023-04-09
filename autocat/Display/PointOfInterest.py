@@ -10,21 +10,22 @@ POINT_PROMPT = 'Prompt'
 
 
 class PointOfInterest:
-    def __init__(self, x, y, batch, group, point_type, clock, color=(128, 128, 128), durability=10):
+    def __init__(self, x, y, batch, group, point_type, clock, color=None, durability=10):
         self.point = np.array([0, 0, 0], dtype=int)  # Will be moved to its position
         self.batch = batch
         self.group = group
         self.type = point_type
         self.points = []
         self.opacity = 255
-        self.color = color  # name_to_rgb("gray")
+        self.color = color
         self.is_selected = False
         self.clock = clock
         self.durability = durability
 
         if self.type == EXPERIENCE_PLACE:
             self.points = [30, 0, -20, -20, -20, 20]
-            # self.color = name_to_rgb("LightGreen")
+            if self.color is None:
+                self.color = name_to_rgb("LightGreen")
             self.shape = self.batch.add_indexed(3, gl.GL_TRIANGLES, self.group, [0, 1, 2], ('v2i', self.points),
                                                 ('c4B', 3 * (*self.color, self.opacity)))
         if self.type == EXPERIENCE_ALIGNED_ECHO:
@@ -41,7 +42,8 @@ class PointOfInterest:
             self.shape = self.batch.add_indexed(5, gl.GL_TRIANGLES, self.group, [0, 1, 2, 0, 2, 3, 0, 3, 4],
                                                 ('v2i', self.points), ('c4B', 5 * (*self.color, self.opacity)))
         if self.type == EXPERIENCE_FLOOR:
-            self.color = name_to_rgb("black")
+            if color == name_to_rgb(COLOR_FLOOR):
+                self.color = name_to_rgb("black")
             self.points = [-5, -30, -5, 30, 5, 30, 5, -30]
             self.shape = self.batch.add_indexed(4, gl.GL_TRIANGLES, self.group, [0, 1, 2, 0, 2, 3],
                                                 ('v2i', self.points), ('c4B', 4 * (*self.color, self.opacity)))

@@ -3,7 +3,7 @@ from pyrr import matrix44
 from scipy.spatial import ConvexHull, QhullError, Delaunay
 
 PHENOMENON_DELTA = 300  # (mm) Distance between affordances to be considered the same phenomenon
-PHENOMENON_INITIAL_CONFIDENCE = 0.2  # 0.2 Initial confidence in the phenomenon
+PHENOMENON_INITIAL_CONFIDENCE = 0.0  # 0.2 Initial confidence in the phenomenon
 PHENOMENON_CONFIDENCE_PRUNE = 0.3  # Confidence threshold above which prune
 
 

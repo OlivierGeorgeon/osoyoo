@@ -1,7 +1,10 @@
 import math
 from pyrr import matrix44
-from ..Memory.EgocentricMemory.Experience import EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_CENTRAL_ECHO
+from webcolors import name_to_rgb
+from ..Memory.EgocentricMemory.Experience import EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_CENTRAL_ECHO, EXPERIENCE_FLOOR, \
+    COLOR_FLOOR
 from ..Utils import assert_almost_equal_angles
+from .PhenomenonTerrain import TERRAIN_EXPERIENCE_TYPES
 
 MAX_SIMILAR_DISTANCE = 300  # (mm) Max distance within which affordances are similar
 MAX_SIMILAR_DIRECTION = 15  # (degrees) Max angle within which affordances are similar
@@ -16,15 +19,26 @@ class Affordance:
         self.experience = experience
 
     def is_similar_to(self, other_affordance):
-        """Affordances are similar if they have similar point and their experience have similar absolute direction"""
-        if math.dist(self.point, other_affordance.point) < MAX_SIMILAR_DISTANCE:
-            if assert_almost_equal_angles(self.experience.absolute_direction_rad,
-                                          other_affordance.experience.absolute_direction_rad,
-                                          MAX_SIMILAR_DIRECTION):
-                # print("Near affordance: point 1:", self.point, ", point 2:", other_affordance.point,
-                #       ", direction 1: ", round(math.degrees(self.experience.absolute_direction_rad)),
-                #       "°, direction 2: ", round(math.degrees(other_affordance.experience.absolute_direction_rad)), "°")
+        """Return True if the the two interactions are similar"""
+
+        # Echo affordances
+        if self.experience.type in [EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_CENTRAL_ECHO]:
+            # Similar if they have similar point and their experience have similar absolute direction
+            if other_affordance.experience.type in [EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_CENTRAL_ECHO]:
+                if math.dist(self.point, other_affordance.point) < MAX_SIMILAR_DISTANCE:
+                    if assert_almost_equal_angles(self.experience.absolute_direction_rad,
+                                                  other_affordance.experience.absolute_direction_rad,
+                                                  MAX_SIMILAR_DIRECTION):
+                        # print("Near affordance: point 1:", self.point, ", point 2:", other_affordance.point,
+                        #       ", direction 1: ", round(math.degrees(self.experience.absolute_direction_rad)),
+                        #       "°, direction 2: ", round(math.degrees(other_affordance.experience.absolute_direction_rad)), "°")
+                        return True
+        # Floor affordances colored
+        if self.experience.type == EXPERIENCE_FLOOR and self.experience.color != name_to_rgb(COLOR_FLOOR):
+            if other_affordance.experience.type in TERRAIN_EXPERIENCE_TYPES and self.experience.color != name_to_rgb(COLOR_FLOOR):
+                print("Similar Floor affordances")
                 return True
+
         return False
 
     def is_opposite_to(self, other_affordance):
