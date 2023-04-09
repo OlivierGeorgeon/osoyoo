@@ -1,8 +1,7 @@
 import numpy as np
 from pyrr import matrix44
-from webcolors import name_to_rgb
 from .Phenomenon import Phenomenon
-from ..Memory.EgocentricMemory.Experience import EXPERIENCE_PLACE, EXPERIENCE_FLOOR, COLOR_FLOOR
+from ..Memory.EgocentricMemory.Experience import EXPERIENCE_PLACE, EXPERIENCE_FLOOR
 
 TERRAIN_EXPERIENCE_TYPES = [EXPERIENCE_PLACE, EXPERIENCE_FLOOR]
 
@@ -17,10 +16,14 @@ class PhenomenonTerrain(Phenomenon):
         """Test if the affordance is within the acceptable delta from the position of the phenomenon,
         if yes, add the affordance to the phenomenon, and return the robot's position correction."""
 
-        # If the origin affordance is not a color floor and this affordance is then this affordance becomes the origin affordance
-        if affordance.experience.type == EXPERIENCE_FLOOR and affordance.experience.color == name_to_rgb(COLOR_FLOOR):
-            if self.origin_affordance.experience.type != EXPERIENCE_FLOOR or affordance.experience.color != name_to_rgb(COLOR_FLOOR):
+        # If this affordance is a color floor and the the previous origin was not then make this affordance the origin
+        if affordance.experience.type == EXPERIENCE_FLOOR and affordance.experience.color_index > 0:
+            if self.origin_affordance.experience.type != EXPERIENCE_FLOOR or self.origin_affordance.experience.color_index == 0:
                 self.origin_affordance = affordance
+                for a in self.affordances:
+                    a.point -= affordance.point.astype(int) - self.point.astype(int)
+                self.point = affordance.point.copy()
+                # The phenomenon point does not change
                 # TODO perhaps move the phenomenon point of reference
 
         # All terrain affordances are always added
@@ -29,10 +32,13 @@ class PhenomenonTerrain(Phenomenon):
             # TODO Perhaps clone the affordance
             position_correction = np.array([0, 0, 0], dtype=int)
             self.affordances.append(affordance)
-            if affordance.is_similar_to(self.origin_affordance):
-                # Correct the robot's position
-                # position_correction = self.origin_affordance.point - affordance.point
-                print("Near origin affordance")
+            if affordance.experience.type == EXPERIENCE_FLOOR:
+                if affordance.is_similar_to(self.origin_affordance):
+                    # Correct the robot's position
+                    # position_correction = self.origin_affordance.point - affordance.point
+                    print("Near origin affordance")
+                    position_correction = self.origin_affordance.color_position(affordance.experience.color_index) - affordance.point
+                    affordance.point += position_correction
             return position_correction
         # No position correction
         return None  # Must return None to check if this affordance can be associated with another phenomenon

@@ -81,7 +81,8 @@ class CtrlEgocentricView:
         # Recreate the points of interest from experiences
         for e in [e for e in self.workspace.memory.egocentric_memory.experiences.values()
                   if (e.clock + e.durability >= self.workspace.clock - 1)]:
-            poi = PointOfInterest(0, 0, self.view.batch, self.view.forefront, e.type, e.clock, color=e.color)
+            poi = PointOfInterest(0, 0, self.view.batch, self.view.forefront, e.type, e.clock,
+                                  color_index=e.color_index)
             # if e.color is not None:
             #     poi.color = e.color
             poi.displace(e.position_matrix)

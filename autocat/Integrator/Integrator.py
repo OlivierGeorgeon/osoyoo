@@ -49,7 +49,7 @@ class Integrator:
         new_affordances, position_correction = self.update_phenomena(new_affordances)
 
         # Adjust the robot's position in allocentric memory
-        print("Position correction du to phenomenon update", position_correction)
+        print("Position correction due to phenomenon update", position_correction)
         self.workspace.memory.allocentric_memory.move(0, position_correction, self.workspace.clock,
                                                       is_egocentric_translation=False)
 

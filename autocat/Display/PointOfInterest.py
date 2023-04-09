@@ -10,22 +10,25 @@ POINT_PROMPT = 'Prompt'
 
 
 class PointOfInterest:
-    def __init__(self, x, y, batch, group, point_type, clock, color=None, durability=10):
+    def __init__(self, x, y, batch, group, point_type, clock, color_index=None, durability=10):
         self.point = np.array([0, 0, 0], dtype=int)  # Will be moved to its position
         self.batch = batch
         self.group = group
         self.type = point_type
         self.points = []
         self.opacity = 255
-        self.color = color
+        if color_index is None:
+            self.color = name_to_rgb(FLOOR_COLORS[0])
+        else:
+            self.color = name_to_rgb(FLOOR_COLORS[color_index])
         self.is_selected = False
         self.clock = clock
         self.durability = durability
 
         if self.type == EXPERIENCE_PLACE:
             self.points = [30, 0, -20, -20, -20, 20]
-            if self.color is None:
-                self.color = name_to_rgb("LightGreen")
+            # if self.color is None:
+            #     self.color = name_to_rgb("LightGreen")
             self.shape = self.batch.add_indexed(3, gl.GL_TRIANGLES, self.group, [0, 1, 2], ('v2i', self.points),
                                                 ('c4B', 3 * (*self.color, self.opacity)))
         if self.type == EXPERIENCE_ALIGNED_ECHO:
@@ -42,7 +45,7 @@ class PointOfInterest:
             self.shape = self.batch.add_indexed(5, gl.GL_TRIANGLES, self.group, [0, 1, 2, 0, 2, 3, 0, 3, 4],
                                                 ('v2i', self.points), ('c4B', 5 * (*self.color, self.opacity)))
         if self.type == EXPERIENCE_FLOOR:
-            if color == name_to_rgb(COLOR_FLOOR):
+            if color_index == 0:
                 self.color = name_to_rgb("black")
             self.points = [-5, -30, -5, 30, 5, 30, 5, -30]
             self.shape = self.batch.add_indexed(4, gl.GL_TRIANGLES, self.group, [0, 1, 2, 0, 2, 3],
@@ -90,23 +93,14 @@ class PointOfInterest:
                 self.shape.colors[0: nb_points*4] = nb_points * (*self.color, self.opacity)
             else:
                 self.shape.opacity = self.opacity
-                self.shape.color = self.color
+                self.shape.color_index = self.color
         else:
             if hasattr(self.shape, 'vertices'):
                 nb_points = int(len(self.shape.vertices) / 2)
                 self.shape.colors[0: nb_points*4] = nb_points * (*name_to_rgb(color_name), self.opacity)
             else:
                 self.shape.opacity = self.opacity
-                self.shape.color = name_to_rgb(color_name)
-
-    # def set_color_value(self, color_value=None):
-    #     """ Set the color or reset it to its default value. Also reset the opacity. """
-    #     if hasattr(self.shape, 'vertices'):
-    #         nb_points = int(len(self.shape.vertices) / 2)
-    #         self.shape.colors[0: nb_points*4] = nb_points * (*color_value, self.opacity)
-    #     else:
-    #         self.shape.opacity = self.opacity
-    #         self.shape.color = color_value
+                self.shape.color_index = name_to_rgb(color_name)
 
     # def reset_position(self):
     #     """ Reset the position of the point of interest """

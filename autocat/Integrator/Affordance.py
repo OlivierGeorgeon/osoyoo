@@ -1,14 +1,15 @@
 import math
+import numpy as np
 from pyrr import matrix44
 from webcolors import name_to_rgb
-from ..Memory.EgocentricMemory.Experience import EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_CENTRAL_ECHO, EXPERIENCE_FLOOR, \
-    COLOR_FLOOR
+from ..Memory.EgocentricMemory.Experience import EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_CENTRAL_ECHO, EXPERIENCE_FLOOR
 from ..Utils import assert_almost_equal_angles
 from .PhenomenonTerrain import TERRAIN_EXPERIENCE_TYPES
 
-MAX_SIMILAR_DISTANCE = 300  # (mm) Max distance within which affordances are similar
-MAX_SIMILAR_DIRECTION = 15  # (degrees) Max angle within which affordances are similar
+MAX_SIMILAR_DISTANCE = 300    # (mm) Max distance within which affordances are similar
+MAX_SIMILAR_DIRECTION = 15    # (degrees) Max angle within which affordances are similar
 MIN_OPPOSITE_DIRECTION = 135  # (degrees) Min angle to tell affordances are in opposite directions
+COLOR_DISTANCE = 40           # (mm) The distance between patches of colors
 
 
 class Affordance:
@@ -34,8 +35,8 @@ class Affordance:
                         #       "°, direction 2: ", round(math.degrees(other_affordance.experience.absolute_direction_rad)), "°")
                         return True
         # Floor affordances colored
-        if self.experience.type == EXPERIENCE_FLOOR and self.experience.color != name_to_rgb(COLOR_FLOOR):
-            if other_affordance.experience.type in TERRAIN_EXPERIENCE_TYPES and self.experience.color != name_to_rgb(COLOR_FLOOR):
+        if self.experience.type == EXPERIENCE_FLOOR and self.experience.color_index > 0:
+            if other_affordance.experience.type == EXPERIENCE_FLOOR and self.experience.color_index > 0:
                 print("Similar Floor affordances")
                 return True
 
@@ -68,36 +69,30 @@ class Affordance:
         return False
 
     def sensor_triangle(self):
-        """The set of points to display the echolocalization cone"""
+        """Return the set of points to display the echolocalization cone"""
         points = None
         if self.experience.type in [EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_CENTRAL_ECHO]:
-            # The position of the sensor from the position of the affordance
-            # p1 = matrix44.apply_to_vector(self.experience.sensor_matrix, [0, 0, 0])
+            # The position of the head from the position of the affordance
             p1 = self.experience.sensor_point.copy()
-            # Second point of the triangle
-            orthogonal_rotation = matrix44.create_from_z_rotation(math.pi/2)
-            # p2_matrix = matrix44.multiply(self.experience.sensor_matrix, orthogonal_rotation)
-            # p2_matrix[3, 0] *= 0.4
-            # p2_matrix[3, 1] *= 0.4
-            # p2 = matrix44.apply_to_vector(p2_matrix, [0, 0, 0])
             # The direction of p2 is orthogonal to the direction of the sensor
+            orthogonal_rotation = matrix44.create_from_z_rotation(math.pi/2)
             p2 = matrix44.apply_to_vector(orthogonal_rotation, p1) * 0.4
-            # Third point of the triangle
-            # p3_matrix = matrix44.multiply(self.experience.sensor_matrix, orthogonal_rotation)
-            # p3_matrix[3, 0] *= -0.4
-            # p3_matrix[3, 1] *= -0.4
-            # p3 = matrix44.apply_to_vector(p3_matrix, [0, 0, 0])
-            # p3 = matrix44.apply_to_vector(orthogonal_rotation, p1) * -0.4
-            # p3 is opposite to p2 from the porisition of the affordance
+            # p3 is opposite to p2 from the position of the affordance
             p3 = p2 * -0.8
-
             # Add the position of the affordance to the position of the triangle
             points = [p1, p2, p3] + self.point
         return points
 
     def color_position(self, color_index):
         """Return the position in allocentric memory of the color patch"""
-        point = self.point.copy()
+        # Orthogonal vector
+        om = matrix44.create_from_z_rotation(-math.pi / 2)
+        vo = matrix44.apply_to_vector(om, self.experience.sensor_point) / np.linalg.norm(self.experience.sensor_point)
+        # Distance along the orthogonal vector
+        color_distance = np.array((color_index - self.experience.color_index) * vo * COLOR_DISTANCE, dtype=int)
+        # print("Origin position:", self.point, "color index:", self.experience.color_index)
+        # print("Color position:", color_distance + self.point, "color index:", color_index)
+        return color_distance + self.point
 
     def save(self, experiences):
         """Return a cloned affordance for memory snapshot"""

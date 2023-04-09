@@ -12,14 +12,17 @@ EXPERIENCE_FLOOR = 'Floor'
 EXPERIENCE_FOCUS = 'Focus'
 EXPERIENCE_PLACE = 'Place'
 EXPERIENCE_PROMPT = 'Prompt'
-COLOR_FLOOR = "LightSlateGrey"
+# COLOR_FLOOR = "LightSlateGrey"
+FLOOR_COLORS = {0: 'LightSlateGrey', 1: 'red', 2: 'darkOrange', 3: 'gold', 4: 'limeGreen', 5: 'deepSkyBlue',
+                6: 'orchid', 7: 'deepPink'}
 
 
 class Experience:
     """Experiences are instances of interactions
     along with the spatial and temporal information of where and when they were enacted"""
 
-    def __init__(self, x, y, experience_type, body_direction_rad, clock, experience_id, durability=10, color=None):
+    def __init__(self, x, y, experience_type, body_direction_rad, clock, experience_id, durability=10,
+                 color_index=None):
         """Create an experience to be placed in the memory.
         Args:
         x, y : coordinates relative the robot.
@@ -32,7 +35,7 @@ class Experience:
         self.clock = clock
         self.id = experience_id
         self.durability = durability
-        self.color = color
+        self.color_index = color_index
 
         # The position matrix will cumulate the rotation and translations of the robot
         # Used to compute the position of the experience relative to the robot in egocentric memory
@@ -90,7 +93,7 @@ class Experience:
         """Create a copy of the experience for memory snapshot"""
         saved_experience = Experience(self.point[0], self.point[1], self.type, 0, self.clock, self.id, self.durability)
         # Clone the position matrix so they can be updated separately
-        saved_experience.color = self.color  # At some point may need to be cloned
+        saved_experience.color_index = self.color_index
         saved_experience.position_matrix = self.position_matrix.copy()
 
         # Absolute relative sensor position do not change
