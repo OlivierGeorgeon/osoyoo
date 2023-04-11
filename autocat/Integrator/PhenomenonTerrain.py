@@ -3,6 +3,7 @@ from pyrr import matrix44
 from .Phenomenon import Phenomenon
 from ..Memory.EgocentricMemory.Experience import EXPERIENCE_PLACE, EXPERIENCE_FLOOR
 
+
 TERRAIN_EXPERIENCE_TYPES = [EXPERIENCE_PLACE, EXPERIENCE_FLOOR]
 
 
@@ -11,6 +12,7 @@ class PhenomenonTerrain(Phenomenon):
     def __init__(self, affordance):
         super().__init__(affordance)
         # print("New phenomenon terrain with experience clock:", affordance.experience.clock)
+        self.confidence = 0.1  # Must not be null to allow position correction
 
     def update(self, affordance):
         """Test if the affordance is within the acceptable delta from the position of the phenomenon,
@@ -38,7 +40,17 @@ class PhenomenonTerrain(Phenomenon):
                     # position_correction = self.origin_affordance.point - affordance.point
                     print("Near origin affordance")
                     position_correction = self.origin_affordance.color_position(affordance.experience.color_index) - affordance.point
-                    affordance.point += position_correction
+
+                    # Correct the position of the affordances
+                    print("Origin affordance clock:", self.origin_affordance.experience.clock)
+                    print("Current Affordance clock", affordance.experience.clock)
+                    for a in [a for a in self.affordances if a.experience.clock > self.origin_affordance.experience.clock]:
+                        coef = (a.experience.clock - self.origin_affordance.experience.clock)/(affordance.experience.clock - self.origin_affordance.experience.clock)
+                        ac = np.array(position_correction * coef, dtype=int)
+                        a.point += ac
+                        print("Affordance clock:", a.experience.clock, "corrected by:", ac, "coef:", coef)
+
+                    # affordance.point += position_correction
             return position_correction
         # No position correction
         return None  # Must return None to check if this affordance can be associated with another phenomenon

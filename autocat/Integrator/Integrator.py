@@ -1,4 +1,4 @@
-import numpy
+import numpy as np
 from ..Memory.EgocentricMemory.Experience import EXPERIENCE_LOCAL_ECHO, EXPERIENCE_CENTRAL_ECHO, \
     EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_FLOOR
 from .Affordance import Affordance
@@ -64,8 +64,8 @@ class Integrator:
     def update_phenomena(self, affordances):
         """Try to attach a list of affordances to phenomena in the list.
         Returns the affordances that have not been attached, and the average translation"""
-        position_correction = numpy.array([0, 0, 0], dtype=int)
-        sum_translation = numpy.array([0, 0, 0], dtype=int)
+        position_correction = np.array([0, 0, 0], dtype=int)
+        sum_translation = np.array([0, 0, 0], dtype=int)
         number_of_add = 0
         remaining_affordances = affordances.copy()
 
@@ -73,12 +73,15 @@ class Integrator:
             for phenomenon in self.phenomena:
                 delta = phenomenon.update(affordance)
                 if delta is not None:
-                    sum_translation += delta
-                    number_of_add += 1
                     remaining_affordances.remove(affordance)
+                    # Null correction do not count (to be improved)
+                    if round(np.linalg.norm(delta)) > 0:
+                        sum_translation += delta
+                        number_of_add += 1
+                    # Don't look the other phenomena
                     break
         if number_of_add > 0:
-            position_correction = numpy.divide(sum_translation, number_of_add)
+            position_correction = np.divide(sum_translation, number_of_add)
 
         return remaining_affordances, position_correction
 

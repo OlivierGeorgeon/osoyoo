@@ -4,7 +4,7 @@
 #
 
 # 0: No robot
-ROBOT_ID = 4  # 1: robot BSN. 2: robot UCBL, 4: robot SHS chez Olivier
+ROBOT_ID = 3  # 1: robot BSN. 2: robot UCBL, 3: robot SHS chez Olivier
 
 ROBOT_HEAD_X = 80           # (mm) The X position of the head pivot
 ROBOT_FRONT_X = 110         # (mm) The X position of the robot front
@@ -39,8 +39,8 @@ if ROBOT_ID == 2:
     FORWARD_SPEED = 230     # (mm/s) Forward translation speed.
     LATERAL_SPEED = 140     # (mm/s) Lateral translation speed.
 
-# Robot 4 chezOlivier
-if ROBOT_ID == 4:
+# Robot 3 chezOlivier
+if ROBOT_ID == 3:
     COMPASS_X_OFFSET = 0  # -70    # (Compass unit) X offset of the compass measure
     COMPASS_Y_OFFSET = 0  # 63   # (Compass unit) Y offset of the compass measrue
     FORWARD_SPEED = 190     # (mm/s) Forward translation speed.

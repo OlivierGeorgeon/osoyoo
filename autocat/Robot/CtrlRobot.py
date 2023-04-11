@@ -55,9 +55,9 @@ class CtrlRobot:
             print("Sending: " + intended_interaction_string)
             timeout = UDP_TIMEOUT
             if 'duration' in intended_interaction:
-                timeout = intended_interaction['duration'] / 1000.0 + 3.0
+                timeout = intended_interaction['duration'] / 1000.0 + 4.0
             if 'angle' in intended_interaction:
-                timeout = math.fabs(intended_interaction['angle']) / DEFAULT_YAW + 3.0  # Turn speed = 45°/s
+                timeout = math.fabs(intended_interaction['angle']) / DEFAULT_YAW + 4.0  # Turn speed = 45°/s
             self.outcome_bytes = self.wifiInterface.enact(intended_interaction_string, timeout)
             print("Receive: ", end="")
             print(self.outcome_bytes)

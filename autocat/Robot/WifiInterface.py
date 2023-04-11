@@ -3,8 +3,8 @@ import keyboard
 import sys
 from autocat.Robot.RobotDefine import ROBOT_ID
 
-UDP_IP = "192.168.8.189"  # AP mode routeur margit
-UDP_TIMEOUT = 5  # Seconds
+UDP_IP = "192.168.8.189"  # AP mode router margit
+UDP_TIMEOUT = 6  # Seconds
 if ROBOT_ID == 0:
     UDP_TIMEOUT = 0
 
