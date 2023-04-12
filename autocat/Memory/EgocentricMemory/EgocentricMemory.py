@@ -30,11 +30,13 @@ class EgocentricMemory:
         # Add the PLACE experience with the sensed color
         color = None
         if 'color' in enacted_interaction:
-            color = category_color(enacted_interaction['color'])
-            color_exp = Experience(ROBOT_COLOR_X, 0, EXPERIENCE_PLACE, body_direction_rad, enacted_interaction["clock"],
-                                   self.experience_id, durability=EXPERIENCE_PERSISTENCE, color_index=color)
-            self.experiences[color_exp.id] = color_exp
-            self.experience_id += 1
+            color_index = category_color(enacted_interaction['color'])
+        else:
+            color_index = 0
+        color_exp = Experience(ROBOT_COLOR_X, 0, EXPERIENCE_PLACE, body_direction_rad, enacted_interaction["clock"],
+                               self.experience_id, durability=EXPERIENCE_PERSISTENCE, color_index=color_index)
+        self.experiences[color_exp.id] = color_exp
+        self.experience_id += 1
 
         # Create new experiences from points in the enacted_interaction
         # new_experiences = []

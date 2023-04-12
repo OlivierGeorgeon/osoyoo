@@ -4,7 +4,7 @@ from pyrr import matrix44
 
 from .Decider.AgentCircle import AgentCircle
 from .Decider.Action import create_actions, ACTION_FORWARD, ACTION_ALIGN_ROBOT, ACTION_SCAN, SIMULATION_STEP_OFF, \
-    ACTION_BACKWARD
+    ACTION_BACKWARD, ACTIONS
 from .Memory.Memory import Memory
 from .Integrator.Integrator import Integrator
 from .Robot.RobotDefine import DEFAULT_YAW, TURN_DURATION
@@ -207,7 +207,7 @@ class Workspace:
             self.decider_mode = user_key.upper()
         elif user_key.upper() in [KEY_ENGAGEMENT_ROBOT, KEY_ENGAGEMENT_IMAGINARY]:
             self.engagement_mode = user_key.upper()
-        else:
+        elif user_key.upper() in ACTIONS:
             # Other keys are considered actions and sent to the robot
             if self.interaction_step == INTERACTION_STEP_IDLE:
                 self.intended_interaction = {"action": user_key}

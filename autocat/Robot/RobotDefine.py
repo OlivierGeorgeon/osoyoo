@@ -4,7 +4,7 @@
 #
 
 # 0: No robot
-ROBOT_ID = 3  # 1: robot BSN. 2: robot UCBL, 3: robot SHS chez Olivier
+ROBOT_ID = 1  # 1: robot BSN. 2: robot UCBL, 3: robot SHS chez Olivier
 
 ROBOT_HEAD_X = 80           # (mm) The X position of the head pivot
 ROBOT_FRONT_X = 110         # (mm) The X position of the robot front
@@ -31,6 +31,8 @@ LINE_X = 160                # (mm) X coordinate of the line after retreat
 if ROBOT_ID == 1:
     FORWARD_SPEED = 300  # (mm/s) Forward translation speed.
     LATERAL_SPEED = 260  # (mm/s) Lateral translation speed.
+    COMPASS_X_OFFSET = 0    # X offset can also be added into the C++ code.
+    COMPASS_Y_OFFSET = 0
 
 # Robot 2 in ROOM A327.
 if ROBOT_ID == 2:
