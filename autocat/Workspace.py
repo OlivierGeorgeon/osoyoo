@@ -1,5 +1,6 @@
 import numpy as np
 import math
+from playsound import playsound
 from pyrr import matrix44
 
 from .Decider.AgentCircle import AgentCircle
@@ -184,12 +185,14 @@ class Workspace:
             if 'focus' not in enacted_interaction:
                 # The focus was lost, override the echo outcome
                 self.focus_point = None
+                playsound('autocat/Assets/R5.wav', False)
                 print("LOST FOCUS")
         else:
             if self.intended_interaction['action'] in [ACTION_SCAN, ACTION_FORWARD]:
                 # Catch focus
                 if 'echo_xy' in enacted_interaction:
                     print("CATCH FOCUS")
+                    playsound('autocat/Assets/R11.wav', False)
                     self.focus_point = np.array([enacted_interaction['echo_xy'][0],
                                                  enacted_interaction['echo_xy'][1], 0])
 
@@ -224,6 +227,9 @@ class Workspace:
                     self.intended_interaction['focus_x'] = int(self.focus_point[0])  # Convert to python int
                     self.intended_interaction['focus_y'] = int(self.focus_point[1])
                 self.interaction_step = INTERACTION_STEP_ENGAGING
+        if user_key.upper() == 'S':
+            playsound('autocat/Assets/R3.wav', False)
+            print("played")
 
     def imagine(self):
         """Return the imaginary enacted interaction"""

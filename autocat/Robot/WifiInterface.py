@@ -15,7 +15,7 @@ class WifiInterface:
         self.port = port
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         # self.socket.settimeout(UDP_TIMEOUT)
-        # self.socket.connect((UDP_IP, UDP_PORT))  # Not necessary
+        # self.socket.connect((UDP_IP, UDP_PORT))  # Not necessary for UDP
 
     def enact(self, action, timeout):
         """ Sending the action string, waiting for the outcome, and returning the outcome bytes """

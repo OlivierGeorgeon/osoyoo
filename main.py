@@ -20,6 +20,7 @@
 import sys
 import pyglet
 from autocat import Workspace, CtrlRobot, CtrlEgocentricView, CtrlAllocentricView, CtrlBodyView, CtrlPhenomenonView
+from playsound import playsound
 
 robot_ip = "192.168.8.189"
 if len(sys.argv) > 1:
@@ -45,5 +46,6 @@ def update(dt):
     ctrl_phenomenon_view.main(dt)
 
 
+playsound('autocat/Assets/R5.wav', False)
 pyglet.clock.schedule_interval(update, 0.1)
 pyglet.app.run()
