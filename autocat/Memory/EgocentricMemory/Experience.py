@@ -21,8 +21,7 @@ class Experience:
     """Experiences are instances of interactions
     along with the spatial and temporal information of where and when they were enacted"""
 
-    def __init__(self, x, y, experience_type, body_direction_rad, clock, experience_id, durability=10,
-                 color_index=None):
+    def __init__(self, x, y, experience_type, body_direction_rad, clock, experience_id, durability=10, color_index=0):
         """Create an experience to be placed in the memory.
         Args:
         x, y : coordinates relative the robot.
@@ -91,9 +90,9 @@ class Experience:
 
     def save(self):
         """Create a copy of the experience for memory snapshot"""
-        saved_experience = Experience(self.point[0], self.point[1], self.type, 0, self.clock, self.id, self.durability)
+        saved_experience = Experience(self.point[0], self.point[1], self.type, 0, self.clock, self.id, self.durability, self.color_index)
         # Clone the position matrix so they can be updated separately
-        saved_experience.color_index = self.color_index
+        # saved_experience.color_index = self.color_index
         saved_experience.position_matrix = self.position_matrix.copy()
 
         # Absolute relative sensor position do not change

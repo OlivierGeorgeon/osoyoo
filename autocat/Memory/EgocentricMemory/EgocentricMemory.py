@@ -28,7 +28,7 @@ class EgocentricMemory:
             experience.displace(enacted_interaction['displacement_matrix'])
 
         # Add the PLACE experience with the sensed color
-        color = None
+        # color = None
         if 'color' in enacted_interaction:
             color_index = category_color(enacted_interaction['color'])
         else:
@@ -43,7 +43,7 @@ class EgocentricMemory:
         for p in enacted_interaction[KEY_EXPERIENCES]:
             experience = Experience(p[1], p[2], p[0], body_direction_rad, enacted_interaction["clock"],
                                     experience_id=self.experience_id, durability=EXPERIENCE_PERSISTENCE,
-                                    color_index=color)
+                                    color_index=color_index)
             # new_experiences.append(experience)
             self.experiences[experience.id] = experience
             self.experience_id += 1

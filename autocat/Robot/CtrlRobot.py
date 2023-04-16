@@ -1,12 +1,10 @@
 import json
-import threading
+import time
 import socket
 import numpy as np
 from .RobotDefine import RETREAT_DISTANCE, RETREAT_DISTANCE_Y, LINE_X, ROBOT_FRONT_X, ROBOT_FRONT_Y, DEFAULT_YAW
-from .WifiInterface import WifiInterface
 from ..Memory.EgocentricMemory.Experience import *
 from ..Decider.Action import ACTION_FORWARD, ACTION_BACKWARD, ACTION_RIGHTWARD, ACTION_LEFTWARD
-# from .WifiInterface import UDP_TIMEOUT
 
 ENACT_STEP_IDLE = 0
 ENACT_STEP_ENACTING = 1
@@ -30,11 +28,13 @@ class CtrlRobot:
         self.port = 8888
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.socket.connect((self.robot_ip, self.port))  # Not necessary for UDP
+        self.socket.settimeout(0)
 
         # Class variables used in an asynchronous Thread
         self.enact_step = ENACT_STEP_IDLE
         self.intended_interaction = None
         self.outcome_bytes = None
+        self.expected_outcome_time = 0.
 
     def main(self, dt):
         """The main handler of the communication to and from the robot."""
@@ -45,6 +45,27 @@ class CtrlRobot:
                 self.intended_interaction_to_action(intended_interaction)
 
         # Check if an outcome was received
+        if self.enact_step == ENACT_STEP_ENACTING:
+            if time.time() < self.expected_outcome_time:
+                try:
+                    outcome, address = self.socket.recvfrom(512)
+                    if outcome is not None:
+                        self.outcome_bytes = outcome
+                        print("Receive:", self.outcome_bytes)
+                        self.enact_step = ENACT_STEP_END  # Now we have received the outcome from the robot
+                except socket.timeout:   # Time out error if outcome not yet received
+                    print("Waiting ...")
+                except OSError as e:
+                    if e.args[0] == 10035:
+                        print("Waiting ...")
+                    else:
+                        print(e)
+                except socket.error as error:
+                    print(error)
+            else:
+                self.outcome_bytes = b'{"status":"T"}'  # Default status T if timeout
+                print("Receive: No outcome")
+                self.enact_step = ENACT_STEP_END  # Now we have received the outcome from the robot
 
         # When the outcome has been received, write the enacted interaction to the workspace
         if self.enact_step == ENACT_STEP_END:
@@ -71,7 +92,7 @@ class CtrlRobot:
             outcome = b'{"status":"T"}'  # Default status T if timeout
             try:
                 outcome, address = self.socket.recvfrom(512)
-            except self.socket.error as error:  # Time out error when robot is not connected
+            except socket.error as error:  # Time out error when robot is not connected
                 print(error)
             self.outcome_bytes = outcome
             print("Receive: ", end="")
@@ -98,8 +119,9 @@ class CtrlRobot:
         if 'angle' in intended_interaction:
             timeout = math.fabs(intended_interaction['angle']) / DEFAULT_YAW + 4.0  # Turn speed = 45°/s
         self.socket.sendto(bytes(intended_interaction_string, 'utf-8'), (self.robot_ip, self.port))
-        thread = threading.Thread(target=enact_thread)
-        thread.start()
+        self.expected_outcome_time = time.time() + timeout
+        # thread = threading.Thread(target=enact_thread)
+        # thread.start()
 
     def outcome_to_enacted_interaction(self):
         """ Computes the enacted interaction from the robot's outcome data."""
