@@ -38,8 +38,9 @@ workspace.ctrl_phenomenon_view = ctrl_phenomenon_view
 
 def update(dt):
     """The updates in the main loop"""
+    ctrl_robot.main(dt)  # Check if enacted interaction received from the robot
     workspace.main(dt)
-    ctrl_robot.main(dt)
+    ctrl_robot.main(dt)  # Check if intended interaction to send to the robot
     ctrl_egocentric_view.main(dt)
     ctrl_allocentric_view.main(dt)
     ctrl_body_view.main(dt)
