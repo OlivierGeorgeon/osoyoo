@@ -4,7 +4,7 @@
 #
 
 # 0: No robot
-ROBOT_ID = 1  # 1: robot BSN. 2: robot UCBL, 3: robot SHS chez Olivier
+ROBOT_ID = 3  # 1: robot BSN. 2: robot UCBL, 3: robot SHS chez Olivier
 
 ROBOT_HEAD_X = 80           # (mm) The X position of the head pivot
 ROBOT_FRONT_X = 110         # (mm) The X position of the robot front

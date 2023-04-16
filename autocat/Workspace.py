@@ -114,10 +114,6 @@ class Workspace:
 
         # INTEGRATING: the new enacted interaction
         if self.interaction_step == INTERACTION_STEP_INTEGRATING:
-            # Retrieve the memory before simulation
-            # self.memory.body_memory.body_direction_rad = self.memory_for_simulation.body_memory.body_direction_rad
-            # self.memory.allocentric_memory.robot_point = self.memory_for_simulation.allocentric_memory.robot_point
-
             # If not imagining then restore the memory from the snapshot
             if not self.is_imagining:
                 self.memory = self.memory_snapshot
@@ -138,7 +134,7 @@ class Workspace:
 
             self.interaction_step = INTERACTION_STEP_REFRESHING
 
-        # REFRESHING: is handle by views and reset by CtrlPhenomenonDisplay
+        # REFRESHING: is handled by views and reset by CtrlPhenomenonDisplay
 
     def get_intended_interaction(self):
         """If the workspace has a new intended interaction then return it, otherwise return None
@@ -155,8 +151,6 @@ class Workspace:
 
         if "status" in enacted_interaction and enacted_interaction["status"] == "T":
             print("The workspace received an empty enacted interaction")
-            # self.memory.body_memory.body_direction_rad = self.memory_for_simulation.body_memory.body_direction_rad
-            # self.memory.allocentric_memory.robot_point = self.memory_for_simulation.allocentric_memory.robot_point
             # restore memory from snapshot
             self.memory = self.memory_snapshot
 

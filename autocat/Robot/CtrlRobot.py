@@ -1,12 +1,12 @@
 import json
 import threading
+import socket
 import numpy as np
-from .RobotDefine import RETREAT_DISTANCE, COMPASS_X_OFFSET, COMPASS_Y_OFFSET, RETREAT_DISTANCE_Y, \
-    LINE_X, ROBOT_FRONT_X, ROBOT_FRONT_Y, DEFAULT_YAW
+from .RobotDefine import RETREAT_DISTANCE, RETREAT_DISTANCE_Y, LINE_X, ROBOT_FRONT_X, ROBOT_FRONT_Y, DEFAULT_YAW
 from .WifiInterface import WifiInterface
 from ..Memory.EgocentricMemory.Experience import *
 from ..Decider.Action import ACTION_FORWARD, ACTION_BACKWARD, ACTION_RIGHTWARD, ACTION_LEFTWARD
-from .WifiInterface import UDP_TIMEOUT
+# from .WifiInterface import UDP_TIMEOUT
 
 ENACT_STEP_IDLE = 0
 ENACT_STEP_ENACTING = 1
@@ -16,6 +16,7 @@ KEY_EXPERIENCES = 'points'
 KEY_IMPACT = 'impact'
 
 FOCUS_MAX_DELTA = 100  # (mm) Maximum delta to keep focus
+UDP_TIMEOUT = 6  # Seconds
 
 
 class CtrlRobot:
@@ -25,7 +26,10 @@ class CtrlRobot:
 
         self.robot_ip = robot_ip
         self.workspace = workspace
-        self.wifiInterface = WifiInterface(robot_ip)
+        # self.wifiInterface = WifiInterface(robot_ip)
+        self.port = 8888
+        self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self.socket.connect((self.robot_ip, self.port))  # Not necessary for UDP
 
         # Class variables used in an asynchronous Thread
         self.enact_step = ENACT_STEP_IDLE
@@ -40,7 +44,9 @@ class CtrlRobot:
             if intended_interaction is not None:
                 self.intended_interaction_to_action(intended_interaction)
 
-        # When the outcome has been received, write write the enacted interaction to the workspace
+        # Check if an outcome was received
+
+        # When the outcome has been received, write the enacted interaction to the workspace
         if self.enact_step == ENACT_STEP_END:
             self.enact_step = ENACT_STEP_IDLE
             enacted_interaction = self.outcome_to_enacted_interaction()
@@ -51,14 +57,23 @@ class CtrlRobot:
 
         def enact_thread():
             """ Sending the action to the robot and waiting for the outcome """
-            intended_interaction_string = json.dumps(self.intended_interaction)
-            print("Sending: " + intended_interaction_string)
-            timeout = UDP_TIMEOUT
-            if 'duration' in intended_interaction:
-                timeout = intended_interaction['duration'] / 1000.0 + 4.0
-            if 'angle' in intended_interaction:
-                timeout = math.fabs(intended_interaction['angle']) / DEFAULT_YAW + 4.0  # Turn speed = 45°/s
-            self.outcome_bytes = self.wifiInterface.enact(intended_interaction_string, timeout)
+            # intended_interaction_string = json.dumps(self.intended_interaction)
+            # print("Sending: " + intended_interaction_string)
+            # timeout = UDP_TIMEOUT
+            # if 'duration' in intended_interaction:
+            #     timeout = intended_interaction['duration'] / 1000.0 + 4.0
+            # if 'angle' in intended_interaction:
+            #     timeout = math.fabs(intended_interaction['angle']) / DEFAULT_YAW + 4.0  # Turn speed = 45°/s
+            # self.socket.settimeout(timeout)
+            # self.socket.sendto(bytes(intended_interaction_string, 'utf-8'), (self.robot_ip, self.port))
+#            self.outcome_bytes = self.wifiInterface.enact(intended_interaction_string, timeout)
+            self.socket.settimeout(timeout)
+            outcome = b'{"status":"T"}'  # Default status T if timeout
+            try:
+                outcome, address = self.socket.recvfrom(512)
+            except self.socket.error as error:  # Time out error when robot is not connected
+                print(error)
+            self.outcome_bytes = outcome
             print("Receive: ", end="")
             print(self.outcome_bytes)
             self.enact_step = ENACT_STEP_END  # Now we have received the outcome from the robot
@@ -75,6 +90,14 @@ class CtrlRobot:
 
         self.intended_interaction = intended_interaction
         self.enact_step = ENACT_STEP_ENACTING  # Now we send the intended interaction to the robot for enaction
+        intended_interaction_string = json.dumps(self.intended_interaction)
+        print("Sending: " + intended_interaction_string)
+        timeout = UDP_TIMEOUT
+        if 'duration' in intended_interaction:
+            timeout = intended_interaction['duration'] / 1000.0 + 4.0
+        if 'angle' in intended_interaction:
+            timeout = math.fabs(intended_interaction['angle']) / DEFAULT_YAW + 4.0  # Turn speed = 45°/s
+        self.socket.sendto(bytes(intended_interaction_string, 'utf-8'), (self.robot_ip, self.port))
         thread = threading.Thread(target=enact_thread)
         thread.start()
 

@@ -14,14 +14,22 @@ class WifiInterface:
         self.IP = ip
         self.port = port
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        # self.socket.settimeout(UDP_TIMEOUT)
-        # self.socket.connect((UDP_IP, UDP_PORT))  # Not necessary for UDP
+        self.socket.connect((self.IP, self.port))  # Not necessary for UDP
+
+        self.socket.settimeout(1)
+        # self.socket.bind((self.IP, self.port))
+        try:
+            outcome, address = self.socket.recvfrom(512)
+            print("Received data", outcome, "From address", address)
+            quit()  # TODO check what happens when there is some data in the buffer on startup
+        except socket.error as error:  # Time out error when robot is not connected
+            print("Initial read socket", error)
 
     def enact(self, action, timeout):
         """ Sending the action string, waiting for the outcome, and returning the outcome bytes """
+        # self.socket.settimeout(timeout)
+        # self.socket.sendto(bytes(action, 'utf-8'), (self.IP, self.port))
         outcome = b'{"status":"T"}'  # Default status T if timeout
-        self.socket.settimeout(timeout)
-        self.socket.sendto(bytes(action, 'utf-8'), (self.IP, self.port))
         try:
             outcome, address = self.socket.recvfrom(512)
         except socket.error as error:  # Time out error when robot is not connected
