@@ -12,7 +12,6 @@ from ..Decider.Action import ACTION_FORWARD, ACTION_BACKWARD, ACTION_RIGHTWARD, 
 
 ENACT_STEP_IDLE = 0
 ENACT_STEP_ENACTING = 1
-# ENACT_STEP_END = 2
 
 KEY_EXPERIENCES = 'points'
 KEY_IMPACT = 'impact'
@@ -28,7 +27,6 @@ class CtrlRobot:
 
         self.robot_ip = robot_ip
         self.workspace = workspace
-        # self.wifiInterface = WifiInterface(robot_ip)
         self.port = 8888
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.socket.connect((self.robot_ip, self.port))  # Not necessary for UDP
@@ -36,9 +34,7 @@ class CtrlRobot:
 
         # Class variables used in an asynchronous Thread
         self.enact_step = ENACT_STEP_IDLE
-        # self.intended_interaction = None
-        self.focus_point = None
-        # self.outcome_bytes = None
+        # self.focus_point = None
         self.expected_outcome_time = 0.
 
     def main(self, dt):
@@ -74,47 +70,27 @@ class CtrlRobot:
                 print("Receive: No outcome")
                 self.enact_step = ENACT_STEP_IDLE
 
-        # When the outcome has been received, write the enacted interaction to the workspace
-        # if self.enact_step == ENACT_STEP_END:
-        #     self.enact_step = ENACT_STEP_IDLE
-            # enacted_interaction = self.send_enacted_interaction_to_workspace()
-            # self.workspace.update_enacted_interaction(enacted_interaction)
-
     def send_intended_interaction_to_robot(self, intended_interaction):
         """Convert the intended interaction into an action string and send it to the robot """
 
-        # def enact_thread():
-        #     """ Sending the action to the robot and waiting for the outcome """
-        #     self.socket.settimeout(timeout)
-        #     outcome = b'{"status":"T"}'  # Default status T if timeout
-        #     try:
-        #         outcome, address = self.socket.recvfrom(512)
-        #     except socket.error as error:  # Time out error when robot is not connected
-        #         print(error)
-        #     self.outcome_bytes = outcome
-        #     print("Receive: ", end="")
-        #     print(self.outcome_bytes)
-        #     self.enact_step = ENACT_STEP_END  # Now we have received the outcome from the robot
+        # # If the intended interaction contains a focus point then memorize it
+        # if 'focus_x' in intended_interaction:
+        #     self.focus_point = np.array([intended_interaction['focus_x'], intended_interaction['focus_y'], 0])
+        # else:
+        #     self.focus_point = None
 
-        # If the intended interaction contains a focus point then memorize it
-        if 'focus_x' in intended_interaction:
-            self.focus_point = np.array([intended_interaction['focus_x'], intended_interaction['focus_y'], 0])
-        else:
-            self.focus_point = None
+        # # Add the estimated speed to the interaction
+        # if intended_interaction.action.action_code == ACTION_FORWARD:
+        #     intended_interaction.modifier['speed'] = int(self.workspace.actions[ACTION_FORWARD].translation_speed[0])
+        # if intended_interaction.action.action_code == ACTION_BACKWARD:
+        #     intended_interaction.modifier['speed'] = -int(self.workspace.actions[ACTION_BACKWARD].translation_speed[0])
+        # if intended_interaction.action.action_code == ACTION_LEFTWARD:
+        #     intended_interaction.modifier['speed'] = int(self.workspace.actions[ACTION_LEFTWARD].translation_speed[1])
+        # if intended_interaction.action.action_code == ACTION_RIGHTWARD:
+        #     intended_interaction.modifier['speed'] = -int(self.workspace.actions[ACTION_RIGHTWARD].translation_speed[1])
 
-        # Add the estimated speed to the action
-        if intended_interaction['action'] == ACTION_FORWARD:
-            intended_interaction['speed'] = int(self.workspace.actions[ACTION_FORWARD].translation_speed[0])
-        if intended_interaction['action'] == ACTION_BACKWARD:
-            intended_interaction['speed'] = -int(self.workspace.actions[ACTION_BACKWARD].translation_speed[0])
-        if intended_interaction['action'] == ACTION_LEFTWARD:
-            intended_interaction['speed'] = int(self.workspace.actions[ACTION_LEFTWARD].translation_speed[1])
-        if intended_interaction['action'] == ACTION_RIGHTWARD:
-            intended_interaction['speed'] = -int(self.workspace.actions[ACTION_RIGHTWARD].translation_speed[1])
-
-        # self.intended_interaction = intended_interaction
         self.enact_step = ENACT_STEP_ENACTING  # Now we send the intended interaction to the robot for enaction
-        intended_interaction_string = json.dumps(intended_interaction)
+        intended_interaction_string = intended_interaction.serialize()
         print("Sending: " + intended_interaction_string)
 
         # Send the intended interaction string to the robot
@@ -122,22 +98,15 @@ class CtrlRobot:
 
         # Initialize the timeout
         timeout = ENACTION_DEFAULT_TIMEOUT
-        if 'duration' in intended_interaction:
-            timeout = intended_interaction['duration'] / 1000.0 + 4.0
-        if 'angle' in intended_interaction:
-            timeout = math.fabs(intended_interaction['angle']) / DEFAULT_YAW + 4.0  # Turn speed = 45°/s
+        if 'duration' in intended_interaction.modifier:
+            timeout = intended_interaction.modifier['duration'] / 1000.0 + 4.0
+        if 'angle' in intended_interaction.modifier:
+            timeout = math.fabs(intended_interaction.modifier['angle']) / DEFAULT_YAW + 4.0  # Turn speed = 45°/s
         self.expected_outcome_time = time.time() + timeout
-        # thread = threading.Thread(target=enact_thread)
-        # thread.start()
 
     def send_enacted_interaction_to_workspace(self, outcome):
         """ Computes the enacted interaction from the robot's outcome data."""
-        # is_focussed = ('focus_x' in self.intended_interaction)  # The focus point was sent to the robot
         enacted_interaction = json.loads(outcome)
-        # if 'action' in enacted_interaction:
-        #     action_code = enacted_interaction['action']
-        # else:
-        #     action_code = self.intended_interaction.get('action')
 
         enacted_interaction[KEY_EXPERIENCES] = []
 
@@ -217,9 +186,9 @@ class CtrlRobot:
         displacement_matrix = matrix44.multiply(rotation_matrix, translation_matrix)
 
         # If focussed then adjust the displacement
-        if self.focus_point is not None:
+        if self.workspace.focus_point is not None:
             # The new estimated position of the focus point
-            prediction_focus_point = matrix44.apply_to_vector(displacement_matrix, self.focus_point)
+            prediction_focus_point = matrix44.apply_to_vector(displacement_matrix, self.workspace.focus_point)
             # The error between the expected and the actual position of the echo
             prediction_error_focus = prediction_focus_point - echo_point
 
@@ -265,4 +234,3 @@ class CtrlRobot:
         # print(enacted_interaction)
 
         self.workspace.update_enacted_interaction(enacted_interaction)
-        # return enacted_interaction

@@ -1,3 +1,6 @@
+import json
+
+OUTCOME_DEFAULT = '0'
 
 
 class Interaction:
@@ -7,6 +10,7 @@ class Interaction:
         self.action = action
         self.outcome = outcome
         self.valence = valence
+        self.modifier = {}
 
     def __str__(self):
         """ Print interaction in the form <action><outcome>(<valence>) """
@@ -22,6 +26,12 @@ class Interaction:
             return (self.action == other.action) and (self.outcome == other.outcome)
         else:
             return False
+
+    def serialize(self):
+        """Return the serial representation to send to the robot"""
+        serial = dict(self.modifier)
+        serial['action'] = self.action.action_code
+        return json.dumps(serial)
 
     @classmethod
     def create_or_retrieve(cls, action, outcome, valence=None):
@@ -44,8 +54,8 @@ class Interaction:
 # py -m autocat.Decider.Interaction
 if __name__ == '__main__':
     """ demonstrate the usage of Interaction.create_or_retrieve() """
-    interaction00 = Interaction.create_or_retrieve(0, 0)  # Create
+    interaction00 = Interaction.create_or_retrieve(0, OUTCOME_DEFAULT)  # Create
     interaction01 = Interaction.create_or_retrieve(0, 1)  # Create
-    interaction10 = Interaction.create_or_retrieve(1, 0)  # Create
+    interaction10 = Interaction.create_or_retrieve(1, OUTCOME_DEFAULT)  # Create
     interaction11 = Interaction.create_or_retrieve(1, 1)  # Create
-    interaction00b = Interaction.create_or_retrieve(0, 0)  # Retrieve
+    interaction00b = Interaction.create_or_retrieve(0, OUTCOME_DEFAULT)  # Retrieve

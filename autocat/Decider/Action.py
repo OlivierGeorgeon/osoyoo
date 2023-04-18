@@ -95,13 +95,11 @@ class Action:
         # Compute the duration and the speed depending and the intended interaction
         self.simulation_duration = self.target_duration
         self.simulation_rotation_speed = self. rotation_speed_rad
-        # if self.action_code in [ACTION_FORWARD, ACTION_BACKWARD]:
-        if 'duration' in intended_interaction:
-            self.simulation_duration = intended_interaction['duration'] / 1000
-        # if intended_interaction['action'] == ACTION_ALIGN_ROBOT:
-        if 'angle' in intended_interaction:
-            self.simulation_duration = math.fabs(intended_interaction['angle']) * TURN_DURATION / DEFAULT_YAW
-            if intended_interaction['angle'] < 0:
+        if 'duration' in intended_interaction.modifier:
+            self.simulation_duration = intended_interaction.modifier['duration'] / 1000
+        if 'angle' in intended_interaction.modifier:
+            self.simulation_duration = math.fabs(intended_interaction.modifier['angle']) * TURN_DURATION / DEFAULT_YAW
+            if intended_interaction.modifier['angle'] < 0:
                 self.simulation_rotation_speed = -self.rotation_speed_rad
         self.simulation_duration *= SIMULATION_TIME_RATIO
         self.simulation_rotation_speed *= SIMULATION_TIME_RATIO

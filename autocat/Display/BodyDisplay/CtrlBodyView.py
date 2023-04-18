@@ -103,11 +103,11 @@ class CtrlBodyView:
                                      + ", Decider: " + self.workspace.decider_mode \
                                      + ", Engagement: " + self.workspace.engagement_mode
         if self.workspace.interaction_step == INTERACTION_STEP_ENACTING:
-            action_code = self.workspace.intended_interaction['action']
-            rotation_speed = "{:.2f}".format(math.degrees(self.workspace.actions[action_code].rotation_speed_rad))
+            # action_code = self.workspace.intended_interaction['action']
+            rotation_speed = "{:.2f}".format(math.degrees(self.workspace.intended_interaction.action.rotation_speed_rad))
             self.view.label_speed.text = "Speed x: " \
-                + str(int(self.workspace.actions[action_code].translation_speed[0])) + "mm/s, y: " \
-                + str(int(self.workspace.actions[action_code].translation_speed[1])) + "mm/s, rotation:" \
+                + str(int(self.workspace.intended_interaction.action.translation_speed[0])) + "mm/s, y: " \
+                + str(int(self.workspace.intended_interaction.action.translation_speed[1])) + "mm/s, rotation:" \
                 + rotation_speed + "°/s"
         if self.workspace.interaction_step == INTERACTION_STEP_REFRESHING:
             self.update_body_view()

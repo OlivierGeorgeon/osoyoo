@@ -3,9 +3,9 @@
 ########################################################################################
 
 from . Action import ACTION_FORWARD, ACTION_SCAN
-from . Interaction import Interaction
+from . Interaction import Interaction, OUTCOME_DEFAULT
 from . CompositeInteraction import CompositeInteraction
-from . PredefinedInteractions import create_interactions, OUTCOME_LOST_FOCUS, OUTCOME_DEFAULT, OUTCOME_CLOSE_FRONT, \
+from . PredefinedInteractions import create_interactions, OUTCOME_LOST_FOCUS, OUTCOME_CLOSE_FRONT, \
     OUTCOME_FAR_FRONT, OUTCOME_FAR_LEFT, OUTCOME_LEFT, OUTCOME_RIGHT, OUTCOME_FAR_RIGHT, OUTCOME_FLOOR_LEFT, \
     OUTCOME_FLOOR_FRONT, OUTCOME_FLOOR_RIGHT
 
@@ -71,14 +71,17 @@ class AgentCircle:
             self._action = max(proclivity_dict, key=proclivity_dict.get)
 
         """ Computing the anticipation """
-        self.anticipated_outcome = None
+        # TODO compute the anticipated outcome
+        self.anticipated_outcome = OUTCOME_DEFAULT
 
-        intended_interaction = {'action': self._action.action_code}  # , 'speed': FORWARD_SPEED}
-        if self.workspace.focus_point is not None:
-            intended_interaction['focus_x'] = int(self.workspace.focus_point[0])
-            intended_interaction['focus_y'] = int(self.workspace.focus_point[1])
+        return Interaction.create_or_retrieve(self._action, self.anticipated_outcome)
 
-        return intended_interaction
+        # intended_interaction = {'action': self._action.action_code}  # , 'speed': FORWARD_SPEED}
+        # if self.workspace.focus_point is not None:
+        #     intended_interaction['focus_x'] = int(self.workspace.focus_point[0])
+        #     intended_interaction['focus_y'] = int(self.workspace.focus_point[1])
+        #
+        # return intended_interaction
 
     def outcome(self, enacted_interaction):
         """ Convert the enacted interaction into an outcome adapted to the circle behavior """
