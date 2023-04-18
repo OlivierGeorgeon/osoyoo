@@ -10,6 +10,7 @@ from .Decider.Interaction import Interaction, OUTCOME_DEFAULT
 from .Memory.Memory import Memory
 from .Integrator.Integrator import Integrator
 from .Robot.RobotDefine import DEFAULT_YAW, TURN_DURATION
+from .Robot.Enaction import Enaction
 
 
 KEY_DECIDER_CIRCLE = "A"  # Automatic mode: controlled by AgentCircle
@@ -71,25 +72,25 @@ class Workspace:
         if self.interaction_step == INTERACTION_STEP_ENGAGING:
             # Add intended_interaction fields that are common to all deciders
             # self.intended_interaction["clock"] = self.clock
-            self.intended_interaction.modifier["clock"] = self.clock
-            if self.focus_point is not None:
-                self.intended_interaction.modifier['focus_x'] = int(self.focus_point[0])
-                self.intended_interaction.modifier['focus_y'] = int(self.focus_point[1])
+            # self.intended_interaction.modifier["clock"] = self.clock
+            # if self.focus_point is not None:
+            #     self.intended_interaction.modifier['focus_x'] = int(self.focus_point[0])
+            #     self.intended_interaction.modifier['focus_y'] = int(self.focus_point[1])
             # Add the estimated speed to the interaction
-            if self.intended_interaction.action.action_code == ACTION_FORWARD:
-                self.intended_interaction.modifier['speed'] = int(
-                    self.actions[ACTION_FORWARD].translation_speed[0])
-            if self.intended_interaction.action.action_code == ACTION_BACKWARD:
-                self.intended_interaction.modifier['speed'] = -int(
-                    self.actions[ACTION_BACKWARD].translation_speed[0])
-            if self.intended_interaction.action.action_code == ACTION_LEFTWARD:
-                self.intended_interaction.modifier['speed'] = int(
-                    self.actions[ACTION_LEFTWARD].translation_speed[1])
-            if self.intended_interaction.action.action_code == ACTION_RIGHTWARD:
-                self.intended_interaction.modifier['speed'] = -int(
-                    self.actions[ACTION_RIGHTWARD].translation_speed[1])
+            # if self.intended_interaction.action.action_code == ACTION_FORWARD:
+            #     self.intended_interaction.modifier['speed'] = int(
+            #         self.actions[ACTION_FORWARD].translation_speed[0])
+            # if self.intended_interaction.action.action_code == ACTION_BACKWARD:
+            #     self.intended_interaction.modifier['speed'] = -int(
+            #         self.actions[ACTION_BACKWARD].translation_speed[0])
+            # if self.intended_interaction.action.action_code == ACTION_LEFTWARD:
+            #     self.intended_interaction.modifier['speed'] = int(
+            #         self.actions[ACTION_LEFTWARD].translation_speed[1])
+            # if self.intended_interaction.action.action_code == ACTION_RIGHTWARD:
+            #     self.intended_interaction.modifier['speed'] = -int(
+            #         self.actions[ACTION_RIGHTWARD].translation_speed[1])
             # Initialize the simulation of the action
-            self.intended_interaction.action.start_simulation(self.intended_interaction)
+            self.intended_interaction.interaction.action.start_simulation(self.intended_interaction)
 
             # Manage the memory snapshot
             if self.is_imagining:
@@ -118,9 +119,9 @@ class Workspace:
 
         # ENACTING: update body memory during the robot enaction or the imaginary simulation
         if self.interaction_step == INTERACTION_STEP_ENACTING:
-            if self.intended_interaction.action.simulation_step != SIMULATION_STEP_OFF:
+            if self.intended_interaction.interaction.action.simulation_step != SIMULATION_STEP_OFF:
                 # target_duration = None
-                self.intended_interaction.action.simulate(self.memory, dt)
+                self.intended_interaction.interaction.action.simulate(self.memory, dt)
             else:
                 # End of the simulation
                 # if self.engagement_mode == ENGAGEMENT_KEY_IMAGINARY:
@@ -200,7 +201,7 @@ class Workspace:
                 playsound('autocat/Assets/R5.wav', False)
                 print("LOST FOCUS")
         else:
-            if self.intended_interaction.action.action_code in [ACTION_SCAN, ACTION_FORWARD]:
+            if enacted_interaction['action'] in [ACTION_SCAN, ACTION_FORWARD]:
                 # Catch focus
                 if 'echo_xy' in enacted_interaction:
                     print("CATCH FOCUS")
@@ -225,16 +226,16 @@ class Workspace:
         elif user_key.upper() in ACTIONS:
             # Other keys are considered actions and sent to the robot
             if self.interaction_step == INTERACTION_STEP_IDLE:
-                # self.intended_interaction = {"action": user_key}
-                self.intended_interaction = Interaction.create_or_retrieve(self.actions[user_key], OUTCOME_DEFAULT)
-                # Go to the prompt point
-                if self.prompt_point is not None:
-                    if user_key in [ACTION_FORWARD, ACTION_BACKWARD]:
-                        duration = np.linalg.norm(self.prompt_point) / self.actions[ACTION_FORWARD].translation_speed[0]
-                        self.intended_interaction.modifier['duration'] = int(duration * 1000)
-                    if user_key == ACTION_ALIGN_ROBOT:
-                        angle = math.atan2(self.prompt_point[1], self.prompt_point[0])
-                        self.intended_interaction.modifier['angle'] = int(math.degrees(angle))
+                intended_interaction = Interaction.create_or_retrieve(self.actions[user_key], OUTCOME_DEFAULT)
+                self.intended_interaction = Enaction(intended_interaction, self.clock, self.focus_point, self.prompt_point)
+                # # Go to the prompt point
+                # if self.prompt_point is not None:
+                #     if user_key in [ACTION_FORWARD, ACTION_BACKWARD]:
+                #         duration = np.linalg.norm(self.prompt_point) / self.actions[ACTION_FORWARD].translation_speed[0]
+                #         self.intended_interaction.modifier['duration'] = int(duration * 1000)
+                #     if user_key == ACTION_ALIGN_ROBOT:
+                #         angle = math.atan2(self.prompt_point[1], self.prompt_point[0])
+                #         self.intended_interaction.modifier['angle'] = int(math.degrees(angle))
                 # Focus on the focus point
                 # if self.focus_point is not None:
                 #     self.intended_interaction['focus_x'] = int(self.focus_point[0])  # Convert to python int
@@ -247,22 +248,22 @@ class Workspace:
     def imagine(self):
         """Return the imaginary enacted interaction"""
         # enacted_interaction = self.intended_interaction.copy()
-        enacted_interaction = {'action': self.intended_interaction.action.action_code,
-                               'clock': self.intended_interaction.modifier['clock']}
+        enacted_interaction = {'action': self.intended_interaction.interaction.action.action_code,
+                               'clock': self.intended_interaction.clock}
 
         # action_code = self.intended_interaction['action']
 
         # TODO retrieve the position from memory
-        target_duration = self.intended_interaction.action.target_duration
-        rotation_speed = self.intended_interaction.action.rotation_speed_rad
-        # if action_code == ACTION_FORWARD:
-        if 'duration' in self.intended_interaction.modifier:
-            target_duration = self.intended_interaction.modifier['duration'] / 1000
-        # if action_code == ACTION_ALIGN_ROBOT:
-        if 'angle' in self.intended_interaction.modifier:
-            target_duration = math.fabs(self.intended_interaction.modifier['angle']) * TURN_DURATION / DEFAULT_YAW
-            if self.intended_interaction.modifier['angle'] < 0:
-                rotation_speed = -self.intended_interaction.action.rotation_speed_rad
+        # target_duration = self.intended_interaction.action.target_duration
+        # rotation_speed = self.intended_interaction.action.rotation_speed_rad
+        # # if action_code == ACTION_FORWARD:
+        # if 'duration' in self.intended_interaction.modifier:
+        #     target_duration = self.intended_interaction.modifier['duration'] / 1000
+        # # if action_code == ACTION_ALIGN_ROBOT:
+        # if 'angle' in self.intended_interaction.modifier:
+        #     target_duration = math.fabs(self.intended_interaction.modifier['angle']) * TURN_DURATION / DEFAULT_YAW
+        #     if self.intended_interaction.modifier['angle'] < 0:
+        #         rotation_speed = -self.intended_interaction.action.rotation_speed_rad
 
         # displacement
         # translation = self.actions[action_code].translation_speed * target_duration

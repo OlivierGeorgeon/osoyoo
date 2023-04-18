@@ -44,6 +44,7 @@ class CtrlRobot:
             intended_interaction = self.workspace.get_intended_interaction()
             if intended_interaction is not None:
                 self.send_intended_interaction_to_robot(intended_interaction)
+                self.enact_step = ENACT_STEP_ENACTING
 
         # While the robot is enacting the interaction, check for the outcome
         if self.enact_step == ENACT_STEP_ENACTING:
@@ -65,44 +66,26 @@ class CtrlRobot:
                 # except socket.error as error:
                 #     print(error)
             else:
-                # self.outcome_bytes = b'{"status":"T"}'  # Default status T if timeout
                 self.send_enacted_interaction_to_workspace(b'{"status":"T"}')
                 print("Receive: No outcome")
                 self.enact_step = ENACT_STEP_IDLE
 
-    def send_intended_interaction_to_robot(self, intended_interaction):
+    def send_intended_interaction_to_robot(self, intended_enaction):
         """Convert the intended interaction into an action string and send it to the robot """
-
-        # # If the intended interaction contains a focus point then memorize it
-        # if 'focus_x' in intended_interaction:
-        #     self.focus_point = np.array([intended_interaction['focus_x'], intended_interaction['focus_y'], 0])
-        # else:
-        #     self.focus_point = None
-
-        # # Add the estimated speed to the interaction
-        # if intended_interaction.action.action_code == ACTION_FORWARD:
-        #     intended_interaction.modifier['speed'] = int(self.workspace.actions[ACTION_FORWARD].translation_speed[0])
-        # if intended_interaction.action.action_code == ACTION_BACKWARD:
-        #     intended_interaction.modifier['speed'] = -int(self.workspace.actions[ACTION_BACKWARD].translation_speed[0])
-        # if intended_interaction.action.action_code == ACTION_LEFTWARD:
-        #     intended_interaction.modifier['speed'] = int(self.workspace.actions[ACTION_LEFTWARD].translation_speed[1])
-        # if intended_interaction.action.action_code == ACTION_RIGHTWARD:
-        #     intended_interaction.modifier['speed'] = -int(self.workspace.actions[ACTION_RIGHTWARD].translation_speed[1])
-
-        self.enact_step = ENACT_STEP_ENACTING  # Now we send the intended interaction to the robot for enaction
-        intended_interaction_string = intended_interaction.serialize()
+        intended_interaction_string = intended_enaction.serialize()
         print("Sending: " + intended_interaction_string)
 
         # Send the intended interaction string to the robot
         self.socket.sendto(bytes(intended_interaction_string, 'utf-8'), (self.robot_ip, self.port))
 
         # Initialize the timeout
-        timeout = ENACTION_DEFAULT_TIMEOUT
-        if 'duration' in intended_interaction.modifier:
-            timeout = intended_interaction.modifier['duration'] / 1000.0 + 4.0
-        if 'angle' in intended_interaction.modifier:
-            timeout = math.fabs(intended_interaction.modifier['angle']) / DEFAULT_YAW + 4.0  # Turn speed = 45°/s
-        self.expected_outcome_time = time.time() + timeout
+        # timeout = ENACTION_DEFAULT_TIMEOUT
+        # if 'duration' in intended_interaction.modifier:
+        #     timeout = intended_interaction.modifier['duration'] / 1000.0 + 4.0
+        # if 'angle' in intended_interaction.modifier:
+        #     timeout = math.fabs(intended_interaction.modifier['angle']) / DEFAULT_YAW + 4.0  # Turn speed = 45°/s
+        # self.expected_outcome_time = time.time() + timeout
+        self.expected_outcome_time = time.time() + intended_enaction.timeout()
 
     def send_enacted_interaction_to_workspace(self, outcome):
         """ Computes the enacted interaction from the robot's outcome data."""

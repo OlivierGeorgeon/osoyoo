@@ -8,6 +8,7 @@ from . CompositeInteraction import CompositeInteraction
 from . PredefinedInteractions import create_interactions, OUTCOME_LOST_FOCUS, OUTCOME_CLOSE_FRONT, \
     OUTCOME_FAR_FRONT, OUTCOME_FAR_LEFT, OUTCOME_LEFT, OUTCOME_RIGHT, OUTCOME_FAR_RIGHT, OUTCOME_FLOOR_LEFT, \
     OUTCOME_FLOOR_FRONT, OUTCOME_FLOOR_RIGHT
+from ..Robot.Enaction import Enaction
 
 
 class AgentCircle:
@@ -74,7 +75,9 @@ class AgentCircle:
         # TODO compute the anticipated outcome
         self.anticipated_outcome = OUTCOME_DEFAULT
 
-        return Interaction.create_or_retrieve(self._action, self.anticipated_outcome)
+        ii = Interaction.create_or_retrieve(self._action, self.anticipated_outcome)
+
+        return Enaction(ii, self.workspace.clock, self.workspace.focus_point, None)
 
         # intended_interaction = {'action': self._action.action_code}  # , 'speed': FORWARD_SPEED}
         # if self.workspace.focus_point is not None:
