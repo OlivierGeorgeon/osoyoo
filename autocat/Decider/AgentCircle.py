@@ -23,16 +23,16 @@ class AgentCircle:
         self.procedural_memory = create_interactions(self.workspace.actions)
         self._action = self.workspace.actions[ACTION_FORWARD]
 
-    def propose_intended_interaction(self, enacted_interaction):
+    def propose_intended_enaction(self, enacted_interaction):
         """Propose the next intended interaction from the previous enacted interaction.
         This is the main method of the agent"""
         # Compute a specific outcome suited for this agent
         outcome = self.outcome(enacted_interaction)
         # Compute the intended interaction possibly including the focus
-        return self.intended_interaction(outcome)
+        return self.intended_enaction(outcome)
 
-    def intended_interaction(self, outcome):
-        """ learning from the previous outcome and selecting the next action """
+    def intended_enaction(self, outcome):
+        """Learning from the previous outcome and selecting the next enaction"""
 
         # Recording previous experience
         self.previous_interaction = self.last_interaction
@@ -75,16 +75,9 @@ class AgentCircle:
         # TODO compute the anticipated outcome
         self.anticipated_outcome = OUTCOME_DEFAULT
 
+        # The intended enaction
         ii = Interaction.create_or_retrieve(self._action, self.anticipated_outcome)
-
         return Enaction(ii, self.workspace.clock, self.workspace.focus_point, None)
-
-        # intended_interaction = {'action': self._action.action_code}  # , 'speed': FORWARD_SPEED}
-        # if self.workspace.focus_point is not None:
-        #     intended_interaction['focus_x'] = int(self.workspace.focus_point[0])
-        #     intended_interaction['focus_y'] = int(self.workspace.focus_point[1])
-        #
-        # return intended_interaction
 
     def outcome(self, enacted_interaction):
         """ Convert the enacted interaction into an outcome adapted to the circle behavior """

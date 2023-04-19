@@ -1,4 +1,4 @@
-import json
+# import json
 
 OUTCOME_DEFAULT = '0'
 
@@ -10,7 +10,7 @@ class Interaction:
         self.action = action
         self.outcome = outcome
         self.valence = valence
-        self.modifier = {}
+        # self.modifier = {}
 
     def __str__(self):
         """ Print interaction in the form <action><outcome>(<valence>) """
@@ -27,11 +27,11 @@ class Interaction:
         else:
             return False
 
-    def serialize(self):
-        """Return the serial representation to send to the robot"""
-        serial = dict(self.modifier)
-        serial['action'] = self.action.action_code
-        return json.dumps(serial)
+    # def serialize(self):
+    #     """Return the serial representation to send to the robot"""
+    #     serial = dict(self.modifier)
+    #     serial['action'] = self.action.action_code
+    #     return json.dumps(serial)
 
     @classmethod
     def create_or_retrieve(cls, action, outcome, valence=None):

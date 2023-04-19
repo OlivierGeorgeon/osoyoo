@@ -43,7 +43,7 @@ class CtrlRobot:
         if self.enact_step == ENACT_STEP_IDLE:
             intended_interaction = self.workspace.get_intended_interaction()
             if intended_interaction is not None:
-                self.send_intended_interaction_to_robot(intended_interaction)
+                self.send_enaction_to_robot(intended_interaction)
                 self.enact_step = ENACT_STEP_ENACTING
 
         # While the robot is enacting the interaction, check for the outcome
@@ -52,15 +52,15 @@ class CtrlRobot:
                 try:
                     outcome, address = self.socket.recvfrom(512)
                     if outcome is not None:  # Sometimes it receives a None outcome. I don't know why
-                        # self.outcome_bytes = outcome
+                        print()
                         print("Receive:", outcome)
                         self.send_enacted_interaction_to_workspace(outcome)
                         self.enact_step = ENACT_STEP_IDLE  # Now we have received the outcome from the robot
                 except socket.timeout:   # Time out error if outcome not yet received
-                    print("Waiting ...")
+                    print(".", end='')
                 except OSError as e:
                     if e.args[0] == 10035:
-                        print("Waiting ...")
+                        print(".", end='')
                     else:
                         print(e)
                 # except socket.error as error:
@@ -70,22 +70,16 @@ class CtrlRobot:
                 print("Receive: No outcome")
                 self.enact_step = ENACT_STEP_IDLE
 
-    def send_intended_interaction_to_robot(self, intended_enaction):
-        """Convert the intended interaction into an action string and send it to the robot """
-        intended_interaction_string = intended_enaction.serialize()
-        print("Sending: " + intended_interaction_string)
+    def send_enaction_to_robot(self, enaction):
+        """Send the enaction string to the robot and set the timeout"""
+        enaction_string = enaction.serialize()
+        print("Sending: " + enaction_string)
 
         # Send the intended interaction string to the robot
-        self.socket.sendto(bytes(intended_interaction_string, 'utf-8'), (self.robot_ip, self.port))
+        self.socket.sendto(bytes(enaction_string, 'utf-8'), (self.robot_ip, self.port))
 
         # Initialize the timeout
-        # timeout = ENACTION_DEFAULT_TIMEOUT
-        # if 'duration' in intended_interaction.modifier:
-        #     timeout = intended_interaction.modifier['duration'] / 1000.0 + 4.0
-        # if 'angle' in intended_interaction.modifier:
-        #     timeout = math.fabs(intended_interaction.modifier['angle']) / DEFAULT_YAW + 4.0  # Turn speed = 45°/s
-        # self.expected_outcome_time = time.time() + timeout
-        self.expected_outcome_time = time.time() + intended_enaction.timeout()
+        self.expected_outcome_time = time.time() + enaction.timeout()
 
     def send_enacted_interaction_to_workspace(self, outcome):
         """ Computes the enacted interaction from the robot's outcome data."""

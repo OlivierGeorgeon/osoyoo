@@ -36,9 +36,9 @@ class BodyView(InteractiveDisplay):
         self.label = pyglet.text.Label('', font_name='Verdana', font_size=10, x=10, y=30)
         self.label.color = (0, 0, 0, 255)
         self.label.batch = self.label_batch
-        self.label_speed = pyglet.text.Label('Speed: ', font_name='Verdana', font_size=10, x=10, y=10)
-        self.label_speed.color = (0, 0, 0, 255)
-        self.label_speed.batch = self.label_batch
+        self.label_enaction = pyglet.text.Label('Speed: ', font_name='Verdana', font_size=10, x=10, y=10)
+        self.label_enaction.color = (0, 0, 0, 255)
+        self.label_enaction.batch = self.label_batch
 
     def on_draw(self):
         """ Drawing the view """

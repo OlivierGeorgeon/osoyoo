@@ -4,14 +4,12 @@ from playsound import playsound
 from pyrr import matrix44
 
 from .Decider.AgentCircle import AgentCircle
-from .Decider.Action import create_actions, ACTION_FORWARD, ACTION_ALIGN_ROBOT, ACTION_SCAN, SIMULATION_STEP_OFF, \
-    ACTION_BACKWARD, ACTIONS, ACTION_LEFTWARD, ACTION_RIGHTWARD
+from .Decider.Action import create_actions, ACTION_FORWARD, ACTION_SCAN, ACTIONS
 from .Decider.Interaction import Interaction, OUTCOME_DEFAULT
 from .Memory.Memory import Memory
 from .Integrator.Integrator import Integrator
 from .Robot.RobotDefine import DEFAULT_YAW, TURN_DURATION
-from .Robot.Enaction import Enaction
-
+from .Robot.Enaction import Enaction, SIMULATION_STEP_OFF
 
 KEY_DECIDER_CIRCLE = "A"  # Automatic mode: controlled by AgentCircle
 KEY_DECIDER_USER = "M"  # Manual mode : controlled by the user
@@ -40,7 +38,7 @@ class Workspace:
         self.decider = AgentCircle(self)
         self.integrator = Integrator(self)
 
-        self.intended_interaction = None
+        self.intended_enaction = None
         self.enacted_interaction = {}
 
         self.decider_mode = KEY_DECIDER_USER
@@ -64,33 +62,15 @@ class Workspace:
         if self.interaction_step == INTERACTION_STEP_IDLE:
             if self.decider_mode == KEY_DECIDER_CIRCLE:
                 # The decider chooses the next interaction
-                self.intended_interaction = self.decider.propose_intended_interaction(self.enacted_interaction)
+                self.intended_enaction = self.decider.propose_intended_enaction(self.enacted_interaction)
                 self.interaction_step = INTERACTION_STEP_ENGAGING
             # Case DECIDER_KEY_USER is handled by self.process_user_key()
 
         # ENGAGING: Preparing the simulation and the enaction
         if self.interaction_step == INTERACTION_STEP_ENGAGING:
-            # Add intended_interaction fields that are common to all deciders
-            # self.intended_interaction["clock"] = self.clock
-            # self.intended_interaction.modifier["clock"] = self.clock
-            # if self.focus_point is not None:
-            #     self.intended_interaction.modifier['focus_x'] = int(self.focus_point[0])
-            #     self.intended_interaction.modifier['focus_y'] = int(self.focus_point[1])
-            # Add the estimated speed to the interaction
-            # if self.intended_interaction.action.action_code == ACTION_FORWARD:
-            #     self.intended_interaction.modifier['speed'] = int(
-            #         self.actions[ACTION_FORWARD].translation_speed[0])
-            # if self.intended_interaction.action.action_code == ACTION_BACKWARD:
-            #     self.intended_interaction.modifier['speed'] = -int(
-            #         self.actions[ACTION_BACKWARD].translation_speed[0])
-            # if self.intended_interaction.action.action_code == ACTION_LEFTWARD:
-            #     self.intended_interaction.modifier['speed'] = int(
-            #         self.actions[ACTION_LEFTWARD].translation_speed[1])
-            # if self.intended_interaction.action.action_code == ACTION_RIGHTWARD:
-            #     self.intended_interaction.modifier['speed'] = -int(
-            #         self.actions[ACTION_RIGHTWARD].translation_speed[1])
             # Initialize the simulation of the action
-            self.intended_interaction.interaction.action.start_simulation(self.intended_interaction)
+            # self.intended_interaction.interaction.action.start_simulation(self.intended_interaction)
+            self.intended_enaction.start_simulation()
 
             # Manage the memory snapshot
             if self.is_imagining:
@@ -119,9 +99,10 @@ class Workspace:
 
         # ENACTING: update body memory during the robot enaction or the imaginary simulation
         if self.interaction_step == INTERACTION_STEP_ENACTING:
-            if self.intended_interaction.interaction.action.simulation_step != SIMULATION_STEP_OFF:
+            if self.intended_enaction.simulation_step != SIMULATION_STEP_OFF:
                 # target_duration = None
-                self.intended_interaction.interaction.action.simulate(self.memory, dt)
+                # self.intended_interaction.interaction.action.simulate(self.memory, dt)
+                self.intended_enaction.simulate(self.memory, dt)
             else:
                 # End of the simulation
                 # if self.engagement_mode == ENGAGEMENT_KEY_IMAGINARY:
@@ -161,7 +142,7 @@ class Workspace:
         """
         if self.interaction_step == INTERACTION_STEP_INTENDING:
             self.interaction_step = INTERACTION_STEP_ENACTING
-            return self.intended_interaction
+            return self.intended_enaction
 
         return None
 
@@ -214,7 +195,7 @@ class Workspace:
             self.prompt_point = matrix44.apply_to_vector(enacted_interaction['displacement_matrix'], self.prompt_point)
 
         self.enacted_interaction = enacted_interaction
-        self.intended_interaction = None
+        self.intended_enaction = None
         self.interaction_step = INTERACTION_STEP_INTEGRATING
 
     def process_user_key(self, user_key):
@@ -227,31 +208,19 @@ class Workspace:
             # Other keys are considered actions and sent to the robot
             if self.interaction_step == INTERACTION_STEP_IDLE:
                 intended_interaction = Interaction.create_or_retrieve(self.actions[user_key], OUTCOME_DEFAULT)
-                self.intended_interaction = Enaction(intended_interaction, self.clock, self.focus_point, self.prompt_point)
-                # # Go to the prompt point
-                # if self.prompt_point is not None:
-                #     if user_key in [ACTION_FORWARD, ACTION_BACKWARD]:
-                #         duration = np.linalg.norm(self.prompt_point) / self.actions[ACTION_FORWARD].translation_speed[0]
-                #         self.intended_interaction.modifier['duration'] = int(duration * 1000)
-                #     if user_key == ACTION_ALIGN_ROBOT:
-                #         angle = math.atan2(self.prompt_point[1], self.prompt_point[0])
-                #         self.intended_interaction.modifier['angle'] = int(math.degrees(angle))
-                # Focus on the focus point
-                # if self.focus_point is not None:
-                #     self.intended_interaction['focus_x'] = int(self.focus_point[0])  # Convert to python int
-                #     self.intended_interaction['focus_y'] = int(self.focus_point[1])
+                self.intended_enaction = Enaction(intended_interaction, self.clock, self.focus_point,
+                                                  self.prompt_point)
                 self.interaction_step = INTERACTION_STEP_ENGAGING
         if user_key.upper() == 'S':
+            # Test playsound
             playsound('autocat/Assets/R3.wav', False)
             print("played")
 
     def imagine(self):
         """Return the imaginary enacted interaction"""
         # enacted_interaction = self.intended_interaction.copy()
-        enacted_interaction = {'action': self.intended_interaction.interaction.action.action_code,
-                               'clock': self.intended_interaction.clock}
-
-        # action_code = self.intended_interaction['action']
+        enacted_interaction = {'action': self.intended_enaction.interaction.action.action_code,
+                               'clock': self.intended_enaction.clock}
 
         # TODO retrieve the position from memory
         # target_duration = self.intended_interaction.action.target_duration
@@ -283,7 +252,7 @@ class Workspace:
         enacted_interaction['head_angle'] = 0
         enacted_interaction['points'] = []
 
-        print("intended interaction", self.intended_interaction)
+        print("intended interaction", self.intended_enaction)
         print("enacted interaction", enacted_interaction)
 
         return enacted_interaction
