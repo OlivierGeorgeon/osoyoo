@@ -4,20 +4,21 @@ import socket
 import math
 import numpy as np
 from pyrr import matrix44
-from .RobotDefine import RETREAT_DISTANCE, RETREAT_DISTANCE_Y, LINE_X, ROBOT_FRONT_X, ROBOT_FRONT_Y, DEFAULT_YAW, \
-    ROBOT_HEAD_X
+from .RobotDefine import RETREAT_DISTANCE, RETREAT_DISTANCE_Y, LINE_X, ROBOT_FRONT_X, ROBOT_FRONT_Y, ROBOT_HEAD_X
 from ..Memory.EgocentricMemory.Experience import EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_FLOOR, EXPERIENCE_IMPACT, \
     EXPERIENCE_LOCAL_ECHO, EXPERIENCE_BLOCK
 from ..Decider.Action import ACTION_FORWARD, ACTION_BACKWARD, ACTION_RIGHTWARD, ACTION_LEFTWARD
 
 ENACT_STEP_IDLE = 0
 ENACT_STEP_ENACTING = 1
+INTERACTION_STEP_INTENDING = 2
+INTERACTION_STEP_ENACTING = 3
 
 KEY_EXPERIENCES = 'points'
 KEY_IMPACT = 'impact'
 
 FOCUS_MAX_DELTA = 100  # (mm) Maximum delta to keep focus
-ENACTION_DEFAULT_TIMEOUT = 6  # Seconds
+# ENACTION_DEFAULT_TIMEOUT = 6  # Seconds
 
 
 class CtrlRobot:
@@ -41,9 +42,11 @@ class CtrlRobot:
         """The main handler of the communication to and from the robot."""
         # If the robot is idle, check for an intended interaction in the workspace and send it to the robot
         if self.enact_step == ENACT_STEP_IDLE:
-            intended_interaction = self.workspace.get_intended_interaction()
-            if intended_interaction is not None:
-                self.send_enaction_to_robot(intended_interaction)
+            if self.workspace.interaction_step == INTERACTION_STEP_INTENDING:
+                self.workspace.interaction_step = INTERACTION_STEP_ENACTING
+                # enaction = self.workspace.intended_enaction
+                # if enaction is not None:
+                self.send_enaction_to_robot(self.workspace.intended_enaction)
                 self.enact_step = ENACT_STEP_ENACTING
 
         # While the robot is enacting the interaction, check for the outcome

@@ -99,6 +99,9 @@ void Step0()
           HEA._next_saccade_time = action_end_time - SACCADE_DURATION;  // Inhibit HEA during the interaction
           action_end_time = millis() + TURN_SPOT_MAX_DURATION;
           robot_destination_angle = TURN_SPOT_ANGLE;
+          if (target_angle > 0) {  // Received positive angle overrides the default rotation angle
+            robot_destination_angle = target_angle;
+          }
           if (is_focussed) {
             head_destination_angle = HEA.head_direction(focus_x, focus_y); // Look at the focus phenomenon
           } else {
@@ -117,6 +120,9 @@ void Step0()
           HEA._next_saccade_time = action_end_time - SACCADE_DURATION;  // Inhibit HEA during the interaction
           action_end_time = millis() + TURN_SPOT_MAX_DURATION;
           robot_destination_angle = -TURN_SPOT_ANGLE;
+          if (target_angle < 0) {  // Received negative angle overrides the default rotation angle
+            robot_destination_angle = target_angle;
+          }
           if (is_focussed) {
             head_destination_angle = HEA.head_direction(focus_x, focus_y); // Look at the focus phenomenon
           } else {

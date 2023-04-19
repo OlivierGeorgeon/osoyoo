@@ -4,12 +4,13 @@ from playsound import playsound
 from pyrr import matrix44
 
 from .Decider.AgentCircle import AgentCircle
-from .Decider.Action import create_actions, ACTION_FORWARD, ACTION_SCAN, ACTIONS
+from .Decider.Action import create_actions, ACTION_FORWARD, ACTION_SCAN, ACTIONS, ACTION_ALIGN_ROBOT
 from .Decider.Interaction import Interaction, OUTCOME_DEFAULT
 from .Memory.Memory import Memory
 from .Integrator.Integrator import Integrator
 from .Robot.RobotDefine import DEFAULT_YAW, TURN_DURATION
 from .Robot.Enaction import Enaction, SIMULATION_STEP_OFF
+from .Robot.CtrlRobot import INTERACTION_STEP_INTENDING, INTERACTION_STEP_ENACTING
 
 KEY_DECIDER_CIRCLE = "A"  # Automatic mode: controlled by AgentCircle
 KEY_DECIDER_USER = "M"  # Manual mode : controlled by the user
@@ -22,8 +23,8 @@ KEY_INCREASE_CONFIDENCE = "P"
 
 INTERACTION_STEP_IDLE = 0
 INTERACTION_STEP_ENGAGING = 1
-INTERACTION_STEP_INTENDING = 2
-INTERACTION_STEP_ENACTING = 3
+# INTERACTION_STEP_INTENDING = 2
+# INTERACTION_STEP_ENACTING = 3
 INTERACTION_STEP_INTEGRATING = 4
 INTERACTION_STEP_REFRESHING = 5
 
@@ -39,14 +40,15 @@ class Workspace:
         self.integrator = Integrator(self)
 
         self.intended_enaction = None
+        self.enactions = {}
         self.enacted_interaction = {}
 
         self.decider_mode = KEY_DECIDER_USER
         self.engagement_mode = KEY_ENGAGEMENT_ROBOT
         self.interaction_step = INTERACTION_STEP_IDLE
 
-        self.focus_point = None  # The point where the agent is focusing
-        self.prompt_point = None  # The point where the agent is prompted do go
+        # self.focus_point = None  # The point where the agent is focusing
+        # self.prompt_point = None  # The point where the agent is prompted do go
 
         # Controls which phenomenon to display
         self.ctrl_phenomenon_view = None
@@ -62,7 +64,12 @@ class Workspace:
         if self.interaction_step == INTERACTION_STEP_IDLE:
             if self.decider_mode == KEY_DECIDER_CIRCLE:
                 # The decider chooses the next interaction
-                self.intended_enaction = self.decider.propose_intended_enaction(self.enacted_interaction)
+                # self.intended_enaction = self.decider.propose_intended_enaction(self.enacted_interaction)
+                self.enactions[self.clock] = self.decider.propose_intended_enaction(self.enacted_interaction)
+                # self.interaction_step = INTERACTION_STEP_ENGAGING
+            if self.clock in self.enactions:
+                # Take the nextenaction from the stack
+                self.intended_enaction = self.enactions[self.clock]
                 self.interaction_step = INTERACTION_STEP_ENGAGING
             # Case DECIDER_KEY_USER is handled by self.process_user_key()
 
@@ -136,15 +143,15 @@ class Workspace:
 
         # REFRESHING: is handled by views and reset by CtrlPhenomenonDisplay
 
-    def get_intended_interaction(self):
-        """If the workspace has a new intended interaction then return it, otherwise return None
-        Reset the intended_interaction. (Called by CtrlRobot)
-        """
-        if self.interaction_step == INTERACTION_STEP_INTENDING:
-            self.interaction_step = INTERACTION_STEP_ENACTING
-            return self.intended_enaction
-
-        return None
+    # def get_intended_interaction(self):
+    #     """If the workspace has a new intended interaction then return it, otherwise return None
+    #     Reset the intended_interaction. (Called by CtrlRobot)
+    #     """
+    #     if self.interaction_step == INTERACTION_STEP_INTENDING:
+    #         self.interaction_step = INTERACTION_STEP_ENACTING
+    #         return self.intended_enaction
+    #
+    #     return None
 
     def update_enacted_interaction(self, enacted_interaction):
         """Update the enacted interaction (called by CtrlRobot)"""
@@ -205,12 +212,15 @@ class Workspace:
         elif user_key.upper() in [KEY_ENGAGEMENT_ROBOT, KEY_ENGAGEMENT_IMAGINARY]:
             self.engagement_mode = user_key.upper()
         elif user_key.upper() in ACTIONS:
-            # Other keys are considered actions and sent to the robot
+            # Keys that correspond to actions
             if self.interaction_step == INTERACTION_STEP_IDLE:
-                intended_interaction = Interaction.create_or_retrieve(self.actions[user_key], OUTCOME_DEFAULT)
-                self.intended_enaction = Enaction(intended_interaction, self.clock, self.focus_point,
-                                                  self.prompt_point)
-                self.interaction_step = INTERACTION_STEP_ENGAGING
+                ii = Interaction.create_or_retrieve(self.actions[user_key], OUTCOME_DEFAULT)
+                self.enactions[self.clock] = Enaction(ii, self.clock, self.focus_point, self.prompt_point)
+                # self.interaction_step = INTERACTION_STEP_ENGAGING
+                if user_key.upper() == ACTION_ALIGN_ROBOT and self.prompt_point is not None:
+                    ii2 = Interaction.create_or_retrieve(self.actions[ACTION_FORWARD], OUTCOME_DEFAULT)
+                    self.enactions[self.clock + 1] = Enaction(ii2, self.clock + 1, self.focus_point, self.prompt_point)
+
         if user_key.upper() == 'S':
             # Test playsound
             playsound('autocat/Assets/R3.wav', False)

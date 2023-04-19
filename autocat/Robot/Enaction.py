@@ -2,8 +2,9 @@ import json
 import math
 import numpy as np
 from pyrr import matrix44
-from ..Decider.Action import ACTION_FORWARD, ACTION_BACKWARD, ACTION_ALIGN_ROBOT, ACTION_LEFTWARD, ACTION_RIGHTWARD
-from .RobotDefine import FORWARD_SPEED, LATERAL_SPEED, DEFAULT_YAW, TURN_DURATION, TRANSLATE_DURATION
+from ..Decider.Action import ACTION_FORWARD, ACTION_BACKWARD, ACTION_ALIGN_ROBOT, ACTION_LEFTWARD, ACTION_RIGHTWARD, \
+    ACTION_TURN_LEFT, ACTION_TURN_RIGHT
+from .RobotDefine import DEFAULT_YAW, TURN_DURATION
 from ..Utils import rotate_vector_z
 
 ENACTION_DEFAULT_TIMEOUT = 6  # Seconds
@@ -21,8 +22,9 @@ class Enaction:
         self.angle = None
         if prompt_point is not None:
             if self.interaction.action.action_code in [ACTION_FORWARD, ACTION_BACKWARD]:
-                self.duration = int(np.linalg.norm(prompt_point) / math.fabs(self.interaction.action.translation_speed[0]) * 1000)
-            if self.interaction.action.action_code == ACTION_ALIGN_ROBOT:
+                self.duration = int(np.linalg.norm(prompt_point) /
+                                    math.fabs(self.interaction.action.translation_speed[0]) * 1000)
+            if self.interaction.action.action_code in [ACTION_ALIGN_ROBOT, ACTION_TURN_RIGHT, ACTION_TURN_LEFT]:
                 self.angle = int(math.degrees(math.atan2(prompt_point[1], prompt_point[0])))
 
         self.simulation_duration = 0
@@ -69,7 +71,7 @@ class Enaction:
             self.simulation_duration = self.duration / 1000
         if self.angle is not None:
             self.simulation_duration = math.fabs(self.angle) * TURN_DURATION / DEFAULT_YAW
-            if self.interaction.action.angle < 0:
+            if self.angle < 0:
                 self.simulation_rotation_speed = -self.interaction.action.rotation_speed_rad
         self.simulation_duration *= SIMULATION_TIME_RATIO
         self.simulation_rotation_speed *= SIMULATION_TIME_RATIO

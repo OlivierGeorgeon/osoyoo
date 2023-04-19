@@ -13,6 +13,8 @@ class EgocentricMemory:
     """Stores and manages the egocentric memory"""
 
     def __init__(self):
+        self.focus_point = None  # The point where the agent is focusing
+        self.prompt_point = None  # The point where the agent is prompted do go
         self.experiences = {}
         self.experience_id = 0  # A unique ID for each experience in memory
 
