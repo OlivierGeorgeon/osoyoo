@@ -17,14 +17,20 @@ class Enaction:
     def __init__(self, interaction, clock, focus_point, prompt_point):
         self.interaction = interaction
         self.clock = clock
-        self.focus_point = focus_point
+        self.focus_point = None
+        if focus_point is not None:
+            self.focus_point = focus_point.copy()
         self.duration = None
         self.angle = None
         if prompt_point is not None:
             if self.interaction.action.action_code in [ACTION_FORWARD, ACTION_BACKWARD]:
                 self.duration = int(np.linalg.norm(prompt_point) /
                                     math.fabs(self.interaction.action.translation_speed[0]) * 1000)
-            if self.interaction.action.action_code in [ACTION_ALIGN_ROBOT, ACTION_TURN_RIGHT, ACTION_TURN_LEFT]:
+            if self.interaction.action.action_code == ACTION_ALIGN_ROBOT:
+                self.angle = int(math.degrees(math.atan2(prompt_point[1], prompt_point[0])))
+            if (self.interaction.action.action_code == ACTION_TURN_RIGHT) and prompt_point[1] < 0:
+                self.angle = int(math.degrees(math.atan2(prompt_point[1], prompt_point[0])))
+            if (self.interaction.action.action_code == ACTION_TURN_LEFT) and prompt_point[1] > 0:
                 self.angle = int(math.degrees(math.atan2(prompt_point[1], prompt_point[0])))
 
         self.simulation_duration = 0
@@ -71,7 +77,7 @@ class Enaction:
             self.simulation_duration = self.duration / 1000
         if self.angle is not None:
             self.simulation_duration = math.fabs(self.angle) * TURN_DURATION / DEFAULT_YAW
-            if self.angle < 0:
+            if self.angle < 0 and self.interaction.action.action_code != ACTION_TURN_RIGHT:  # TODO fix turn right with prompt
                 self.simulation_rotation_speed = -self.interaction.action.rotation_speed_rad
         self.simulation_duration *= SIMULATION_TIME_RATIO
         self.simulation_rotation_speed *= SIMULATION_TIME_RATIO
@@ -92,6 +98,13 @@ class Enaction:
         displacement_matrix = matrix44.multiply(rotation_matrix, translation_matrix)
         for experience in memory.egocentric_memory.experiences.values():
             experience.displace(displacement_matrix)
+        # Simulate the displacement of the focus and prompt
+        if memory.egocentric_memory.focus_point is not None:
+            memory.egocentric_memory.focus_point = matrix44.apply_to_vector(displacement_matrix,
+                                                                            memory.egocentric_memory.focus_point)
+        if memory.egocentric_memory.prompt_point is not None:
+            memory.egocentric_memory.prompt_point = matrix44.apply_to_vector(displacement_matrix,
+                                                                             memory.egocentric_memory.prompt_point)
         # Displacement in body memory
         memory.body_memory.body_direction_rad += self.simulation_rotation_speed * dt
         # Update allocentric memory

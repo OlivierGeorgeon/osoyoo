@@ -4,11 +4,10 @@ from playsound import playsound
 from pyrr import matrix44
 
 from .Decider.AgentCircle import AgentCircle
-from .Decider.Action import create_actions, ACTION_FORWARD, ACTION_SCAN, ACTIONS, ACTION_ALIGN_ROBOT
+from .Decider.Action import create_actions, ACTION_FORWARD, ACTIONS, ACTION_ALIGN_ROBOT
 from .Decider.Interaction import Interaction, OUTCOME_DEFAULT
 from .Memory.Memory import Memory
 from .Integrator.Integrator import Integrator
-from .Robot.RobotDefine import DEFAULT_YAW, TURN_DURATION
 from .Robot.Enaction import Enaction, SIMULATION_STEP_OFF
 from .Robot.CtrlRobot import INTERACTION_STEP_INTENDING, INTERACTION_STEP_ENACTING
 
@@ -133,7 +132,7 @@ class Workspace:
             self.integrator.integrate()
 
             # Update allocentric memory: robot, phenomena, focus
-            self.memory.update_allocentric(self.integrator.phenomena, self.focus_point, self.prompt_point, self.clock)
+            self.memory.update_allocentric(self.integrator.phenomena, self.clock)
 
             # Increment the clock if the enacted interaction was properly received
             if self.enacted_interaction['clock'] >= self.clock:  # don't increment if the robot is behind
@@ -175,31 +174,34 @@ class Workspace:
         # if enacted_interaction['clock'] >= self.clock:  # don't increment if the robot is behind
         #     self.clock += 1
 
-        # Manage focus catch and lost
-        if self.focus_point is not None:
-            # If the focus was kept then update it
-            if 'focus' in enacted_interaction:
-                if 'echo_xy' in enacted_interaction:  # Not sure why this is necessary
-                    self.focus_point = np.array([enacted_interaction['echo_xy'][0],
-                                                 enacted_interaction['echo_xy'][1], 0])
-            # If the focus was lost then reset it
-            if 'focus' not in enacted_interaction:
-                # The focus was lost, override the echo outcome
-                self.focus_point = None
-                playsound('autocat/Assets/R5.wav', False)
-                print("LOST FOCUS")
-        else:
-            if enacted_interaction['action'] in [ACTION_SCAN, ACTION_FORWARD]:
-                # Catch focus
-                if 'echo_xy' in enacted_interaction:
-                    print("CATCH FOCUS")
-                    playsound('autocat/Assets/R11.wav', False)
-                    self.focus_point = np.array([enacted_interaction['echo_xy'][0],
-                                                 enacted_interaction['echo_xy'][1], 0])
-
-        # Move the prompt
-        if self.prompt_point is not None:
-            self.prompt_point = matrix44.apply_to_vector(enacted_interaction['displacement_matrix'], self.prompt_point)
+        # # Manage focus catch and lost
+        # if self.memory.egocentric_memory.focus_point is not None:
+        #     # If the focus was kept then update it
+        #     if 'focus' in enacted_interaction:
+        #         if 'echo_xy' in enacted_interaction:  # Not sure why this is necessary
+        #             self.memory.egocentric_memory.focus_point = np.array([enacted_interaction['echo_xy'][0],
+        #                                          enacted_interaction['echo_xy'][1], 0])
+        #             print("UPDATE FOCUS", self.memory.egocentric_memory.focus_point)
+        #     # If the focus was lost then reset it
+        #     if 'focus' not in enacted_interaction:
+        #         # The focus was lost, override the echo outcome
+        #         print("LOST FOCUS", self.memory.egocentric_memory.focus_point)
+        #         self.memory.egocentric_memory.focus_point = None
+        #         playsound('autocat/Assets/R5.wav', False)
+        # else:
+        #     if enacted_interaction['action'] in [ACTION_SCAN, ACTION_FORWARD]:
+        #         # Catch focus
+        #         if 'echo_xy' in enacted_interaction:
+        #             playsound('autocat/Assets/R11.wav', False)
+        #             # Create the focus in the memory snapshot that will be retrieved at the INTEGRETING step
+        #             self.memory_snapshot.egocentric_memory.focus_point = np.array([enacted_interaction['echo_xy'][0],
+        #                                                                   enacted_interaction['echo_xy'][1], 0])
+        #             print("CATCH FOCUS", self.memory.egocentric_memory.focus_point)
+        #
+        # # Move the prompt
+        # if self.memory.egocentric_memory.prompt_point is not None:
+        #     self.memory.egocentric_memory.prompt_point = matrix44.apply_to_vector(enacted_interaction['displacement_matrix'], self.memory.egocentric_memory.prompt_point)
+        #     print("Prompt moved", self.memory.egocentric_memory.prompt_point)
 
         self.enacted_interaction = enacted_interaction
         self.intended_enaction = None
@@ -215,11 +217,11 @@ class Workspace:
             # Keys that correspond to actions
             if self.interaction_step == INTERACTION_STEP_IDLE:
                 ii = Interaction.create_or_retrieve(self.actions[user_key], OUTCOME_DEFAULT)
-                self.enactions[self.clock] = Enaction(ii, self.clock, self.focus_point, self.prompt_point)
+                self.enactions[self.clock] = Enaction(ii, self.clock, self.memory.egocentric_memory.focus_point, self.memory.egocentric_memory.prompt_point)
                 # self.interaction_step = INTERACTION_STEP_ENGAGING
-                if user_key.upper() == ACTION_ALIGN_ROBOT and self.prompt_point is not None:
+                if user_key.upper() == ACTION_ALIGN_ROBOT and self.memory.egocentric_memory.prompt_point is not None:
                     ii2 = Interaction.create_or_retrieve(self.actions[ACTION_FORWARD], OUTCOME_DEFAULT)
-                    self.enactions[self.clock + 1] = Enaction(ii2, self.clock + 1, self.focus_point, self.prompt_point)
+                    self.enactions[self.clock + 1] = Enaction(ii2, self.clock + 1, self.memory.egocentric_memory.focus_point, self.memory.egocentric_memory.prompt_point)
 
         if user_key.upper() == 'S':
             # Test playsound

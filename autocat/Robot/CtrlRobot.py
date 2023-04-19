@@ -35,7 +35,6 @@ class CtrlRobot:
 
         # Class variables used in an asynchronous Thread
         self.enact_step = ENACT_STEP_IDLE
-        # self.focus_point = None
         self.expected_outcome_time = 0.
 
     def main(self, dt):
@@ -166,13 +165,16 @@ class CtrlRobot:
         displacement_matrix = matrix44.multiply(rotation_matrix, translation_matrix)
 
         # If focussed then adjust the displacement
-        if self.workspace.focus_point is not None:
+        if self.workspace.memory.egocentric_memory.focus_point is not None:
             # The new estimated position of the focus point
-            prediction_focus_point = matrix44.apply_to_vector(displacement_matrix, self.workspace.focus_point)
+            # prediction_focus_point = matrix44.apply_to_vector(displacement_matrix, self.workspace.memory.egocentric_memory.focus_point)
             # The error between the expected and the actual position of the echo
-            prediction_error_focus = prediction_focus_point - echo_point
+            # prediction_error_focus = prediction_focus_point - echo_point
+            # The focus displacement was simulated in egocentric memory
+            prediction_error_focus = self.workspace.memory.egocentric_memory.focus_point - echo_point
 
-            if math.dist(echo_point, prediction_focus_point) < FOCUS_MAX_DELTA:
+            # if math.dist(echo_point, prediction_focus_point) < FOCUS_MAX_DELTA:
+            if np.linalg.norm(prediction_error_focus) < FOCUS_MAX_DELTA:
                 # The focus has been kept
                 enacted_interaction['focus'] = True
                 # If the action has been completed

@@ -30,6 +30,8 @@ class Memory:
         - Add new experiences in egocentric_memory
         - Move the robot in allocentric_memory
         """
+        self.egocentric_memory.manage_focus(enacted_interaction)
+
         self.body_memory.set_head_direction_degree(enacted_interaction['head_angle'])
         # TODO Keep the simulation and adjust the robot position
         # Translate the robot before applying the yaw
@@ -45,7 +47,7 @@ class Memory:
 
         # The integrator may subsequently update the robot's position
 
-    def update_allocentric(self, phenomena, focus_point, prompt_point, clock):
+    def update_allocentric(self, phenomena, clock):
         """Allocate the phenomena to the cells of allocentric memory"""
         # Clear the previous phenomena
         self.allocentric_memory.clear_phenomena()
@@ -70,10 +72,10 @@ class Memory:
         self.allocentric_memory.place_robot(self.body_memory, clock)
 
         # Update the focus in allocentric memory
-        allo_focus = self.egocentric_to_allocentric(focus_point)
+        allo_focus = self.egocentric_to_allocentric(self.egocentric_memory.focus_point)
         self.allocentric_memory.update_focus(allo_focus)
         # Update the prompt in allocentric memory
-        allo_prompt = self.egocentric_to_allocentric(prompt_point)
+        allo_prompt = self.egocentric_to_allocentric(self.egocentric_memory.prompt_point)
         self.allocentric_memory.update_prompt(allo_prompt)
 
     def egocentric_to_allocentric(self, point):

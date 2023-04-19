@@ -77,7 +77,7 @@ class AgentCircle:
 
         # The intended enaction
         ii = Interaction.create_or_retrieve(self._action, self.anticipated_outcome)
-        return Enaction(ii, self.workspace.clock, self.workspace.focus_point, None)
+        return Enaction(ii, self.workspace.clock, self.workspace.memory.egocentric_memory.focus_point, None)
 
     def outcome(self, enacted_interaction):
         """ Convert the enacted interaction into an outcome adapted to the circle behavior """

@@ -36,17 +36,16 @@ class CtrlAllocentricView:
         def on_key_press(symbol, modifiers):
             """ Deleting or inserting points of interest """
             if symbol == key.DELETE:
-                self.workspace.prompt_point = None
+                self.workspace.memory.egocentric_memory.prompt_point = None
                 self.workspace.memory.allocentric_memory.update_prompt(None)
                 self.update_view()
             if symbol == key.INSERT:
-                # Mark the prompt
+                # Mark the prompt in allocentric view
                 self.workspace.memory.allocentric_memory.update_prompt(self.prompt_point)
                 self.update_view()
+                # Store the prompt in egocentric memory
                 ego_point = self.workspace.memory.allocentric_to_egocentric(self.prompt_point)
-                self.workspace.prompt_point = ego_point
-                # Set the agent's focus to the user prompt
-                # self.workspace.focus_point = ego_point
+                self.workspace.memory.egocentric_memory.prompt_point = ego_point
 
         self.allocentric_view.on_key_press = on_key_press
 

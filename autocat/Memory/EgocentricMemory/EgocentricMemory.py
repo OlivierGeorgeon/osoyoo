@@ -1,10 +1,13 @@
+import numpy as np
+from playsound import playsound
+from pyrr import matrix44
 from ...Memory.EgocentricMemory.Experience import Experience, EXPERIENCE_LOCAL_ECHO, EXPERIENCE_CENTRAL_ECHO, \
     EXPERIENCE_PLACE, FLOOR_COLORS
 from ...Robot.CtrlRobot import KEY_EXPERIENCES
 from ...Robot.RobotDefine import ROBOT_COLOR_X
+from ...Decider.Action import ACTION_SCAN, ACTION_FORWARD
 import math
 import colorsys
-# from webcolors import name_to_rgb
 
 EXPERIENCE_PERSISTENCE = 10
 
@@ -17,6 +20,36 @@ class EgocentricMemory:
         self.prompt_point = None  # The point where the agent is prompted do go
         self.experiences = {}
         self.experience_id = 0  # A unique ID for each experience in memory
+
+    def manage_focus(self, enacted_interaction):
+        """Manage focus catch and lost"""
+        if self.focus_point is not None:
+            # If the focus was kept then update it
+            if 'focus' in enacted_interaction:
+                if 'echo_xy' in enacted_interaction:  # Not sure why this is necessary
+                    self.focus_point = np.array([enacted_interaction['echo_xy'][0],
+                                                 enacted_interaction['echo_xy'][1], 0])
+                    print("UPDATE FOCUS", self.focus_point)
+            # If the focus was lost then reset it
+            if 'focus' not in enacted_interaction:
+                # The focus was lost, override the echo outcome
+                print("LOST FOCUS", self.focus_point)
+                self.focus_point = None
+                playsound('autocat/Assets/R5.wav', False)
+        else:
+            if enacted_interaction['action'] in [ACTION_SCAN, ACTION_FORWARD]:
+                # Catch focus
+                if 'echo_xy' in enacted_interaction:
+                    playsound('autocat/Assets/R11.wav', False)
+                    # Create the focus in the memory snapshot that will be retrieved at the INTEGRETING step
+                    self.focus_point = np.array([enacted_interaction['echo_xy'][0],
+                                                 enacted_interaction['echo_xy'][1], 0])
+                    print("CATCH FOCUS", self.focus_point)
+
+        # Move the prompt
+        if self.prompt_point is not None:
+            self.prompt_point = matrix44.apply_to_vector(enacted_interaction['displacement_matrix'], self.prompt_point)
+            print("Prompt moved", self.prompt_point)
 
     def update_and_add_experiences(self, enacted_interaction, body_direction_rad):
         """ Process the enacted interaction to update the egocentric memory
@@ -132,6 +165,10 @@ class EgocentricMemory:
     def save(self):
         """Return a deep clone of egocentric memory for simulation"""
         saved_egocentric_memory = EgocentricMemory()
+        if self.focus_point is not None:
+            saved_egocentric_memory.focus_point = self.focus_point.copy()
+        if self.prompt_point is not None:
+            saved_egocentric_memory.prompt_point = self.prompt_point.copy()
         saved_egocentric_memory.experiences = {key: e.save() for key, e in self.experiences.items()}
         saved_egocentric_memory.experience_id = self.experience_id
         return saved_egocentric_memory
