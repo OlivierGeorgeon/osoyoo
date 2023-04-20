@@ -30,46 +30,58 @@ class EgocentricMemory:
             displacement_matrix = enacted_interaction['displacement_matrix']
             translation = enacted_interaction['translation']
             rotation_matrix = enacted_interaction['rotation_matrix']
-            echo_point = enacted_interaction['echo_xy']  # May be 10000 if no echo received
-            action_code = enacted_interaction['action']
-            prediction_focus_point = matrix44.apply_to_vector(displacement_matrix, self.focus_point)
-            # The error between the expected and the actual position of the echo
-            prediction_error_focus = prediction_focus_point - echo_point
-            # The focus displacement was simulated in egocentric memory
-            # prediction_error_focus = self.workspace.memory.egocentric_memory.focus_point - echo_point
+            if 'echo_xy' in enacted_interaction:
+                # echo_point = enacted_interaction['echo_xy']  # May be 10000 if no echo received
+                action_code = enacted_interaction['action']
+                prediction_focus_point = matrix44.apply_to_vector(displacement_matrix, self.focus_point)
+                # The error between the expected and the actual position of the echo
+                # prediction_error_focus = prediction_focus_point - echo_point
+                prediction_error_focus = prediction_focus_point - enacted_interaction['echo_xy']
+                # The focus displacement was simulated in egocentric memory
+                # prediction_error_focus = self.workspace.memory.egocentric_memory.focus_point - echo_point
 
-            # if math.dist(echo_point, prediction_focus_point) < FOCUS_MAX_DELTA:
-            if np.linalg.norm(prediction_error_focus) < FOCUS_MAX_DELTA:
-                # The focus has been kept
-                enacted_interaction['focus'] = True
-                # If the action has been completed
-                if enacted_interaction['duration1'] >= 1000:
-                    # If the head is forward then correct longitudinal displacements
-                    if -20 < enacted_interaction['head_angle'] < 20:
-                        if action_code in [ACTION_FORWARD, ACTION_BACKWARD]:
-                            translation[0] = translation[0] + prediction_error_focus[0]
-                            self.workspace.actions[action_code].adjust_translation_speed(translation)
-                    # If the head is sideways then correct lateral displacements
-                    if 60 < enacted_interaction['head_angle'] or enacted_interaction['head_angle'] < -60:
-                        if action_code in [ACTION_LEFTWARD, ACTION_RIGHTWARD]:
-                            translation[1] = translation[1] + prediction_error_focus[1]
-                            self.workspace.actions[action_code].adjust_translation_speed(translation)
-                    # Update the displacement matrix according to the new translation
-                    translation_matrix = matrix44.create_from_translation(-translation)
-                    displacement_matrix = matrix44.multiply(rotation_matrix, translation_matrix)
-                    enacted_interaction['translation'] = translation
-                    enacted_interaction['displacement_matrix'] = displacement_matrix
+                # if math.dist(echo_point, prediction_focus_point) < FOCUS_MAX_DELTA:
+                if np.linalg.norm(prediction_error_focus) < FOCUS_MAX_DELTA:
+                    # The focus has been kept
+                    enacted_interaction['focus'] = True
+                    # If the action has been completed
+                    if enacted_interaction['duration1'] >= 1000:
+                        # If the head is forward then correct longitudinal displacements
+                        if -20 < enacted_interaction['head_angle'] < 20:
+                            if action_code in [ACTION_FORWARD, ACTION_BACKWARD]:
+                                translation[0] = translation[0] + prediction_error_focus[0]
+                                # TODO pass the action to correct the estimated speed:
+                                # self.workspace.actions[action_code].adjust_translation_speed(translation)
+                        # If the head is sideways then correct lateral displacements
+                        if 60 < enacted_interaction['head_angle'] or enacted_interaction['head_angle'] < -60:
+                            if action_code in [ACTION_LEFTWARD, ACTION_RIGHTWARD]:
+                                translation[1] = translation[1] + prediction_error_focus[1]
+                                # TODO pass the action to correct the estimated speed:
+                                # self.workspace.actions[action_code].adjust_translation_speed(translation)
+                        # Update the displacement matrix according to the new translation
+                        translation_matrix = matrix44.create_from_translation(-translation)
+                        displacement_matrix = matrix44.multiply(rotation_matrix, translation_matrix)
+                        enacted_interaction['translation'] = translation
+                        enacted_interaction['displacement_matrix'] = displacement_matrix
 
-            # If the focus was kept then update it
-            if 'focus' in enacted_interaction:
-                if 'echo_xy' in enacted_interaction:  # Not sure why this is necessary
-                    self.focus_point = np.array([enacted_interaction['echo_xy'][0],
-                                                 enacted_interaction['echo_xy'][1], 0])
-                    print("UPDATE FOCUS", self.focus_point)
-            # If the focus was lost then reset it
-            else:  # if 'focus' not in enacted_interaction:
+                        # If the focus was kept then update it
+                        # if 'focus' in enacted_interaction:
+                        # if 'echo_xy' in enacted_interaction:  # Not sure why this is necessary
+                        # self.focus_point = np.array([enacted_interaction['echo_xy'][0],
+                        #                              enacted_interaction['echo_xy'][1], 0])
+                    self.focus_point = enacted_interaction['echo_xy']
+                    print("UPDATE FOCUS by delta", prediction_error_focus)
+                    # If the focus was lost then reset it
+                else:
+                    # The focus was lost, override the echo outcome
+                    print("LOST FOCUS due to delta", prediction_error_focus)
+                    enacted_interaction['lost_focus'] = True  # Used by agent_circle
+                    self.focus_point = None
+                    playsound('autocat/Assets/R5.wav', False)
+            else:
                 # The focus was lost, override the echo outcome
-                print("LOST FOCUS", self.focus_point)
+                print("LOST FOCUS due to no echo")
+                enacted_interaction['lost_focus'] = True  # Used by agent_circle
                 self.focus_point = None
                 playsound('autocat/Assets/R5.wav', False)
         else:
@@ -78,8 +90,9 @@ class EgocentricMemory:
                 if 'echo_xy' in enacted_interaction:
                     playsound('autocat/Assets/R11.wav', False)
                     # Create the focus in the memory snapshot that will be retrieved at the INTEGRETING step
-                    self.focus_point = np.array([enacted_interaction['echo_xy'][0],
-                                                 enacted_interaction['echo_xy'][1], 0])
+                    # self.focus_point = np.array([enacted_interaction['echo_xy'][0],
+                    #                              enacted_interaction['echo_xy'][1], 0])
+                    self.focus_point = enacted_interaction['echo_xy']
                     print("CATCH FOCUS", self.focus_point)
 
         # Move the prompt

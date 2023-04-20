@@ -49,7 +49,7 @@ class CtrlRobot:
             # self.enact_step = ENACT_STEP_ENACTING
 
         # While the robot is enacting the interaction, check for the outcome
-        if self.workspace.interaction_step == INTERACTION_STEP_ENACTING:
+        if self.workspace.interaction_step == INTERACTION_STEP_ENACTING and not self.workspace.is_imagining:
             # if self.enact_step == ENACT_STEP_ENACTING:
             if time.time() < self.expected_outcome_time:
                 try:
@@ -133,16 +133,16 @@ class CtrlRobot:
                 translation[1] = -RETREAT_DISTANCE_Y
 
         # Interaction ECHO for actions involving scanning
-        echo_point = [0, 0, 0]
         # if action_code in ['-', '*', '+', '8', '2', '1', '3', '4', '6']:
-        echo_point[0] = round(ROBOT_HEAD_X + math.cos(math.radians(enacted_interaction['head_angle']))
-                              * enacted_interaction['echo_distance'])
-        echo_point[1] = round(math.sin(math.radians(enacted_interaction['head_angle']))
-                              * enacted_interaction['echo_distance'])
         if enacted_interaction['echo_distance'] < 10000:
+            echo_point = np.array([0, 0, 0], dtype=int)
+            echo_point[0] = round(ROBOT_HEAD_X + math.cos(math.radians(enacted_interaction['head_angle']))
+                                  * enacted_interaction['echo_distance'])
+            echo_point[1] = round(math.sin(math.radians(enacted_interaction['head_angle']))
+                                  * enacted_interaction['echo_distance'])
             enacted_interaction[KEY_EXPERIENCES].append((EXPERIENCE_ALIGNED_ECHO, *echo_point))
-        # Return the echo_xy to possibly use as focus
-        enacted_interaction['echo_xy'] = echo_point
+            # Return the echo_xy to possibly use as focus
+            enacted_interaction['echo_xy'] = echo_point
 
         # Interaction impact
         # (The forward translation is already correct since it is integrated during duration1)

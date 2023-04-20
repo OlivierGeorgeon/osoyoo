@@ -97,4 +97,7 @@ class Affordance:
     def save(self, experiences):
         """Return a cloned affordance for memory snapshot"""
         # Use the experiences cloned when saving egocentric memory
+        # if self.experience.id not in experiences:
+        #     print("Missing experience", self.experience, 'in')
+        #     print(experiences)
         return Affordance(self.point.copy(), experiences[self.experience.id])

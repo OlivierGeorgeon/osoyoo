@@ -83,7 +83,7 @@ class Workspace:
                 # (If continue imagining then keep the previous snapshot)
             else:
                 # If was not previously imagining then take a new memory snapshot
-                self.memory_snapshot = self.memory.save()
+                self.memory_snapshot = self.memory.save()  # Fail when trying to save an affordance created during imaginary
                 if self.engagement_mode == KEY_ENGAGEMENT_IMAGINARY:
                     # Start imagining
                     self.is_imagining = True
@@ -121,7 +121,10 @@ class Workspace:
             self.memory.update_and_add_experiences(self.enacted_interaction)
 
             # Call the integrator to create and update the phenomena
-            self.integrator.integrate()
+            # Currently we don't create phenomena in imaginary mode because phenomena are not saved in memory
+            # TODO save the phenomena in memory so they can be created during imaginary mode
+            if not self.is_imagining:
+                self.integrator.integrate()
 
             # Update allocentric memory: robot, phenomena, focus
             self.memory.update_allocentric(self.integrator.phenomena, self.clock)
@@ -180,44 +183,3 @@ class Workspace:
             # Clear the stack of enactions
             playsound('autocat/Assets/R3.wav', False)
             self.enactions = {}
-
-    # def imagine(self):
-    #     """Return the imaginary enacted interaction"""
-    #     # enacted_interaction = self.intended_interaction.copy()
-    #     enacted_interaction = {'action': self.intended_enaction.interaction.action.action_code,
-    #                            'clock': self.intended_enaction.clock}
-    #
-    #     # TODO retrieve the position from memory
-    #     # target_duration = self.intended_interaction.action.target_duration
-    #     # rotation_speed = self.intended_interaction.action.rotation_speed_rad
-    #     # # if action_code == ACTION_FORWARD:
-    #     # if 'duration' in self.intended_interaction.modifier:
-    #     #     target_duration = self.intended_interaction.modifier['duration'] / 1000
-    #     # # if action_code == ACTION_ALIGN_ROBOT:
-    #     # if 'angle' in self.intended_interaction.modifier:
-    #     #     target_duration = math.fabs(self.intended_interaction.modifier['angle']) * TURN_DURATION / DEFAULT_YAW
-    #     #     if self.intended_interaction.modifier['angle'] < 0:
-    #     #         rotation_speed = -self.intended_interaction.action.rotation_speed_rad
-    #
-    #     # displacement
-    #     # translation = self.actions[action_code].translation_speed * target_duration
-    #     # yaw_rad = rotation_speed * target_duration
-    #     # No additional displacement because the displacement was already simulated
-    #     translation = np.array([0, 0, 0], dtype=float)
-    #     yaw_rad = 0
-    #
-    #     translation_matrix = matrix44.create_from_translation(-translation)
-    #     rotation_matrix = matrix44.create_from_z_rotation(yaw_rad)
-    #     displacement_matrix = matrix44.multiply(rotation_matrix, translation_matrix)
-    #
-    #     enacted_interaction['translation'] = translation
-    #     enacted_interaction['yaw'] = round(math.degrees(yaw_rad))
-    #     enacted_interaction['azimuth'] = 0  # Is computed by body_memory
-    #     enacted_interaction['displacement_matrix'] = displacement_matrix
-    #     enacted_interaction['head_angle'] = 0
-    #     enacted_interaction['points'] = []
-    #
-    #     print("intended interaction", self.intended_enaction)
-    #     print("enacted interaction", enacted_interaction)
-    #
-    #     return enacted_interaction

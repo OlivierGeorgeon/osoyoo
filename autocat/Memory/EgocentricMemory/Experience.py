@@ -78,7 +78,7 @@ class Experience:
         self.rotation_matrix = matrix44.create_from_z_rotation(math.pi - angle_sensor)
 
     def __str__(self):
-        return "(id:" + str(self.id) + ",clock:" + str(self.clock) + ")"
+        return "(id:" + str(self.id) + ",clock:" + str(self.clock) + ", type:" + self.type + ")"
 
     def displace(self, displacement_matrix):
         """Displace the experience by the displacement_matrix"""
@@ -114,35 +114,34 @@ def category_color(color_sensor):
     if hsv[1] < 0.45:
         if hsv[0] < 0.6:
             # Not saturate, not violet
-            # color = COLOR_FLOOR  # Saturation: Table bureau 0.16. Sol bureau 0.17, table olivier 0.21, sol olivier: 0.4, 0.33
+            # Floor. Saturation: Table bureau 0.16. Sol bureau 0.17, table olivier 0.21, sol olivier: 0.4, 0.33
             color_index = 0
         else:
             # Not saturate but violet
             color = 'orchid'  # Hue = 0.66 -- 0.66, Saturation = 0.34, 0.2 -- 0.2
             color_index = 6
     else:
-        color = 'red'  # Hue = 0 -- 0.0, 0.0, sat 0.59
+        # 'red'  # Hue = 0 -- 0.0, 0.0, sat 0.59
         color_index = 1
         if hsv[0] < 0.98:
             if hsv[0] > 0.9:
-                color = 'deepPink'  # Hue = 0.94, 0.94, 0.94, 0.96, 0.95, sat 0.54
+                # 'deepPink'  # Hue = 0.94, 0.94, 0.94, 0.96, 0.95, sat 0.54
                 color_index = 7
             elif hsv[0] > 0.6:
-                color = 'orchid'  # Hue = 0.66
+                # 'orchid'  # Hue = 0.66
                 color_index = 6
             elif hsv[0] > 0.5:
-                color = 'deepSkyBlue'  # Hue = 0.59 -- 0.57, 0.58 -- 0.58, sat 0.86
+                # 'deepSkyBlue'  # Hue = 0.59 -- 0.57, 0.58 -- 0.58, sat 0.86
                 color_index = 5
             elif hsv[0] > 0.28:
-                color = 'limeGreen'  # Hue = 0.38, 0.35, 0.37 -- 0.29, 0.33, 0.29, 0.33 -- 0.36, sat 0.68
+                # 'limeGreen'  # Hue = 0.38, 0.35, 0.37 -- 0.29, 0.33, 0.29, 0.33 -- 0.36, sat 0.68
                 color_index = 4
             elif hsv[0] > 0.175:
-                color = 'gold'  # Hue = 0.25, 0.26 -- 0.20 -- 0.20, 0.20, 0.184, 0.2 -- 0.24, sat 0.68
+                # 'gold'  # Hue = 0.25, 0.26 -- 0.20 -- 0.20, 0.20, 0.184, 0.2 -- 0.24, sat 0.68
                 color_index = 3
             elif hsv[0] > 0.05:
-                color = 'darkOrange'  # Hue = 0.13, 0.16, 0.15 -- 0.06, 0.08, 0.09, 0.08 -- 0.11, sat 0.56
+                # 'darkOrange'  # Hue = 0.13, 0.16, 0.15 -- 0.06, 0.08, 0.09, 0.08 -- 0.11, sat 0.56
                 color_index = 2
 
-    print("Color: ", hsv, FLOOR_COLORS[color_index])
-
+    # print("Color: ", hsv, FLOOR_COLORS[color_index])
     return color_index

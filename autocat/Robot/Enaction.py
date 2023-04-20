@@ -154,10 +154,11 @@ class Enaction:
         enacted_interaction['yaw'] = round(math.degrees(yaw_rad))
         enacted_interaction['azimuth'] = 0  # Is computed by body_memory
         enacted_interaction['displacement_matrix'] = displacement_matrix
+        enacted_interaction['rotation_matrix'] = rotation_matrix
         enacted_interaction['head_angle'] = 0
         enacted_interaction['points'] = []
 
         # print("intended interaction", self.intended_enaction)
-        print("enacted interaction", enacted_interaction)
+        print("Imaginary enacted interaction", enacted_interaction)
 
         return enacted_interaction

@@ -65,7 +65,7 @@ class AgentCircle:
                 else:
                     proclivity_dict[ai.post_interaction.action] = ai.weight * ai.post_interaction.valence
 
-        print("Proclivity dictionary:", proclivity_dict)
+        # print("Proclivity dictionary:", proclivity_dict)
         # Select the action that has the highest proclivity value
         if proclivity_dict:
             # See https://pythonguides.com/python-find-max-value-in-a-dictionary/
