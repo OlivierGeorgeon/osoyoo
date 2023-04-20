@@ -13,12 +13,11 @@ from .Robot.CtrlRobot import INTERACTION_STEP_INTENDING, INTERACTION_STEP_ENACTI
 
 KEY_DECIDER_CIRCLE = "A"  # Automatic mode: controlled by AgentCircle
 KEY_DECIDER_USER = "M"  # Manual mode : controlled by the user
-
 KEY_ENGAGEMENT_ROBOT = "R"  # The application controls the robot
 KEY_ENGAGEMENT_IMAGINARY = "I"  # The application imagines the interaction
-
 KEY_DECREASE_CONFIDENCE = "D"
 KEY_INCREASE_CONFIDENCE = "P"
+KEY_CLEAR = "C"
 
 INTERACTION_STEP_IDLE = 0
 INTERACTION_STEP_ENGAGING = 1
@@ -39,15 +38,12 @@ class Workspace:
         self.integrator = Integrator(self)
 
         self.intended_enaction = None
-        self.enactions = {}
+        self.enactions = {}  # The stack of enactions to enact next
         self.enacted_interaction = {}
 
         self.decider_mode = KEY_DECIDER_USER
         self.engagement_mode = KEY_ENGAGEMENT_ROBOT
         self.interaction_step = INTERACTION_STEP_IDLE
-
-        # self.focus_point = None  # The point where the agent is focusing
-        # self.prompt_point = None  # The point where the agent is prompted do go
 
         # Controls which phenomenon to display
         self.ctrl_phenomenon_view = None
@@ -75,7 +71,6 @@ class Workspace:
         # ENGAGING: Preparing the simulation and the enaction
         if self.interaction_step == INTERACTION_STEP_ENGAGING:
             # Initialize the simulation of the action
-            # self.intended_interaction.interaction.action.start_simulation(self.intended_interaction)
             self.intended_enaction.start_simulation()
 
             # Manage the memory snapshot
@@ -106,15 +101,12 @@ class Workspace:
         # ENACTING: update body memory during the robot enaction or the imaginary simulation
         if self.interaction_step == INTERACTION_STEP_ENACTING:
             if self.intended_enaction.simulation_step != SIMULATION_STEP_OFF:
-                # target_duration = None
-                # self.intended_interaction.interaction.action.simulate(self.memory, dt)
                 self.intended_enaction.simulate(self.memory, dt)
             else:
                 # End of the simulation
-                # if self.engagement_mode == ENGAGEMENT_KEY_IMAGINARY:
                 if self.is_imagining:
                     # Compute an imaginary enacted_interaction and proceed to integrating
-                    self.update_enacted_interaction(self.imagine())
+                    self.update_enacted_interaction(self.intended_enaction.imagine())
                     self.interaction_step = INTERACTION_STEP_INTEGRATING
                     # self.interaction_step = INTERACTION_STEP_REFRESHING
 
@@ -142,16 +134,6 @@ class Workspace:
 
         # REFRESHING: is handled by views and reset by CtrlPhenomenonDisplay
 
-    # def get_intended_interaction(self):
-    #     """If the workspace has a new intended interaction then return it, otherwise return None
-    #     Reset the intended_interaction. (Called by CtrlRobot)
-    #     """
-    #     if self.interaction_step == INTERACTION_STEP_INTENDING:
-    #         self.interaction_step = INTERACTION_STEP_ENACTING
-    #         return self.intended_enaction
-    #
-    #     return None
-
     def update_enacted_interaction(self, enacted_interaction):
         """Update the enacted interaction (called by CtrlRobot)"""
 
@@ -174,35 +156,6 @@ class Workspace:
         # if enacted_interaction['clock'] >= self.clock:  # don't increment if the robot is behind
         #     self.clock += 1
 
-        # # Manage focus catch and lost
-        # if self.memory.egocentric_memory.focus_point is not None:
-        #     # If the focus was kept then update it
-        #     if 'focus' in enacted_interaction:
-        #         if 'echo_xy' in enacted_interaction:  # Not sure why this is necessary
-        #             self.memory.egocentric_memory.focus_point = np.array([enacted_interaction['echo_xy'][0],
-        #                                          enacted_interaction['echo_xy'][1], 0])
-        #             print("UPDATE FOCUS", self.memory.egocentric_memory.focus_point)
-        #     # If the focus was lost then reset it
-        #     if 'focus' not in enacted_interaction:
-        #         # The focus was lost, override the echo outcome
-        #         print("LOST FOCUS", self.memory.egocentric_memory.focus_point)
-        #         self.memory.egocentric_memory.focus_point = None
-        #         playsound('autocat/Assets/R5.wav', False)
-        # else:
-        #     if enacted_interaction['action'] in [ACTION_SCAN, ACTION_FORWARD]:
-        #         # Catch focus
-        #         if 'echo_xy' in enacted_interaction:
-        #             playsound('autocat/Assets/R11.wav', False)
-        #             # Create the focus in the memory snapshot that will be retrieved at the INTEGRETING step
-        #             self.memory_snapshot.egocentric_memory.focus_point = np.array([enacted_interaction['echo_xy'][0],
-        #                                                                   enacted_interaction['echo_xy'][1], 0])
-        #             print("CATCH FOCUS", self.memory.egocentric_memory.focus_point)
-        #
-        # # Move the prompt
-        # if self.memory.egocentric_memory.prompt_point is not None:
-        #     self.memory.egocentric_memory.prompt_point = matrix44.apply_to_vector(enacted_interaction['displacement_matrix'], self.memory.egocentric_memory.prompt_point)
-        #     print("Prompt moved", self.memory.egocentric_memory.prompt_point)
-
         self.enacted_interaction = enacted_interaction
         self.intended_enaction = None
         self.interaction_step = INTERACTION_STEP_INTEGRATING
@@ -223,48 +176,48 @@ class Workspace:
                     ii2 = Interaction.create_or_retrieve(self.actions[ACTION_FORWARD], OUTCOME_DEFAULT)
                     self.enactions[self.clock + 1] = Enaction(ii2, self.clock + 1, self.memory.egocentric_memory.focus_point, self.memory.egocentric_memory.prompt_point)
 
-        if user_key.upper() == 'S':
-            # Test playsound
+        if user_key.upper() == KEY_CLEAR:
+            # Clear the stack of enactions
             playsound('autocat/Assets/R3.wav', False)
-            print("played")
+            self.enactions = {}
 
-    def imagine(self):
-        """Return the imaginary enacted interaction"""
-        # enacted_interaction = self.intended_interaction.copy()
-        enacted_interaction = {'action': self.intended_enaction.interaction.action.action_code,
-                               'clock': self.intended_enaction.clock}
-
-        # TODO retrieve the position from memory
-        # target_duration = self.intended_interaction.action.target_duration
-        # rotation_speed = self.intended_interaction.action.rotation_speed_rad
-        # # if action_code == ACTION_FORWARD:
-        # if 'duration' in self.intended_interaction.modifier:
-        #     target_duration = self.intended_interaction.modifier['duration'] / 1000
-        # # if action_code == ACTION_ALIGN_ROBOT:
-        # if 'angle' in self.intended_interaction.modifier:
-        #     target_duration = math.fabs(self.intended_interaction.modifier['angle']) * TURN_DURATION / DEFAULT_YAW
-        #     if self.intended_interaction.modifier['angle'] < 0:
-        #         rotation_speed = -self.intended_interaction.action.rotation_speed_rad
-
-        # displacement
-        # translation = self.actions[action_code].translation_speed * target_duration
-        # yaw_rad = rotation_speed * target_duration
-        # No additional displacement because the displacement was already simulated
-        translation = np.array([0, 0, 0], dtype=float)
-        yaw_rad = 0
-
-        translation_matrix = matrix44.create_from_translation(-translation)
-        rotation_matrix = matrix44.create_from_z_rotation(yaw_rad)
-        displacement_matrix = matrix44.multiply(rotation_matrix, translation_matrix)
-
-        enacted_interaction['translation'] = translation
-        enacted_interaction['yaw'] = round(math.degrees(yaw_rad))
-        enacted_interaction['azimuth'] = 0  # Is computed by body_memory
-        enacted_interaction['displacement_matrix'] = displacement_matrix
-        enacted_interaction['head_angle'] = 0
-        enacted_interaction['points'] = []
-
-        print("intended interaction", self.intended_enaction)
-        print("enacted interaction", enacted_interaction)
-
-        return enacted_interaction
+    # def imagine(self):
+    #     """Return the imaginary enacted interaction"""
+    #     # enacted_interaction = self.intended_interaction.copy()
+    #     enacted_interaction = {'action': self.intended_enaction.interaction.action.action_code,
+    #                            'clock': self.intended_enaction.clock}
+    #
+    #     # TODO retrieve the position from memory
+    #     # target_duration = self.intended_interaction.action.target_duration
+    #     # rotation_speed = self.intended_interaction.action.rotation_speed_rad
+    #     # # if action_code == ACTION_FORWARD:
+    #     # if 'duration' in self.intended_interaction.modifier:
+    #     #     target_duration = self.intended_interaction.modifier['duration'] / 1000
+    #     # # if action_code == ACTION_ALIGN_ROBOT:
+    #     # if 'angle' in self.intended_interaction.modifier:
+    #     #     target_duration = math.fabs(self.intended_interaction.modifier['angle']) * TURN_DURATION / DEFAULT_YAW
+    #     #     if self.intended_interaction.modifier['angle'] < 0:
+    #     #         rotation_speed = -self.intended_interaction.action.rotation_speed_rad
+    #
+    #     # displacement
+    #     # translation = self.actions[action_code].translation_speed * target_duration
+    #     # yaw_rad = rotation_speed * target_duration
+    #     # No additional displacement because the displacement was already simulated
+    #     translation = np.array([0, 0, 0], dtype=float)
+    #     yaw_rad = 0
+    #
+    #     translation_matrix = matrix44.create_from_translation(-translation)
+    #     rotation_matrix = matrix44.create_from_z_rotation(yaw_rad)
+    #     displacement_matrix = matrix44.multiply(rotation_matrix, translation_matrix)
+    #
+    #     enacted_interaction['translation'] = translation
+    #     enacted_interaction['yaw'] = round(math.degrees(yaw_rad))
+    #     enacted_interaction['azimuth'] = 0  # Is computed by body_memory
+    #     enacted_interaction['displacement_matrix'] = displacement_matrix
+    #     enacted_interaction['head_angle'] = 0
+    #     enacted_interaction['points'] = []
+    #
+    #     print("intended interaction", self.intended_enaction)
+    #     print("enacted interaction", enacted_interaction)
+    #
+    #     return enacted_interaction

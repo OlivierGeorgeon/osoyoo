@@ -100,7 +100,6 @@ class CtrlEgocentricView:
         if self.workspace.memory.egocentric_memory.focus_point is not None:
             x = self.workspace.memory.egocentric_memory.focus_point[0]
             y = self.workspace.memory.egocentric_memory.focus_point[1]
-            print("Focus point created", x, y)
             agent_focus_point = PointOfInterest(x, y, self.view.batch, self.view.forefront, EXPERIENCE_FOCUS,
                                                 self.workspace.clock)
         return agent_focus_point

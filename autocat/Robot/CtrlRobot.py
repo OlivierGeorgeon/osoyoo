@@ -9,8 +9,8 @@ from ..Memory.EgocentricMemory.Experience import EXPERIENCE_ALIGNED_ECHO, EXPERI
     EXPERIENCE_LOCAL_ECHO, EXPERIENCE_BLOCK
 from ..Decider.Action import ACTION_FORWARD, ACTION_BACKWARD, ACTION_RIGHTWARD, ACTION_LEFTWARD
 
-ENACT_STEP_IDLE = 0
-ENACT_STEP_ENACTING = 1
+# ENACT_STEP_IDLE = 0
+# ENACT_STEP_ENACTING = 1
 INTERACTION_STEP_INTENDING = 2
 INTERACTION_STEP_ENACTING = 3
 
@@ -34,22 +34,23 @@ class CtrlRobot:
         self.socket.settimeout(0)
 
         # Class variables used in an asynchronous Thread
-        self.enact_step = ENACT_STEP_IDLE
+        # self.enact_step = ENACT_STEP_IDLE
         self.expected_outcome_time = 0.
 
     def main(self, dt):
         """The main handler of the communication to and from the robot."""
         # If the robot is idle, check for an intended interaction in the workspace and send it to the robot
-        if self.enact_step == ENACT_STEP_IDLE:
-            if self.workspace.interaction_step == INTERACTION_STEP_INTENDING:
-                self.workspace.interaction_step = INTERACTION_STEP_ENACTING
-                # enaction = self.workspace.intended_enaction
-                # if enaction is not None:
-                self.send_enaction_to_robot(self.workspace.intended_enaction)
-                self.enact_step = ENACT_STEP_ENACTING
+        # if self.enact_step == ENACT_STEP_IDLE:
+        if self.workspace.interaction_step == INTERACTION_STEP_INTENDING:
+            self.workspace.interaction_step = INTERACTION_STEP_ENACTING
+            # enaction = self.workspace.intended_enaction
+            # if enaction is not None:
+            self.send_enaction_to_robot(self.workspace.intended_enaction)
+            # self.enact_step = ENACT_STEP_ENACTING
 
         # While the robot is enacting the interaction, check for the outcome
-        if self.enact_step == ENACT_STEP_ENACTING:
+        if self.workspace.interaction_step == INTERACTION_STEP_ENACTING:
+            # if self.enact_step == ENACT_STEP_ENACTING:
             if time.time() < self.expected_outcome_time:
                 try:
                     outcome, address = self.socket.recvfrom(512)
@@ -57,7 +58,7 @@ class CtrlRobot:
                         print()
                         print("Receive:", outcome)
                         self.send_enacted_interaction_to_workspace(outcome)
-                        self.enact_step = ENACT_STEP_IDLE  # Now we have received the outcome from the robot
+                        # self.enact_step = ENACT_STEP_IDLE  # Now we have received the outcome from the robot
                 except socket.timeout:   # Time out error if outcome not yet received
                     print(".", end='')
                 except OSError as e:
@@ -70,7 +71,7 @@ class CtrlRobot:
             else:
                 self.send_enacted_interaction_to_workspace(b'{"status":"T"}')
                 print("Receive: No outcome")
-                self.enact_step = ENACT_STEP_IDLE
+                # self.enact_step = ENACT_STEP_IDLE
 
     def send_enaction_to_robot(self, enaction):
         """Send the enaction string to the robot and set the timeout"""
@@ -133,15 +134,15 @@ class CtrlRobot:
 
         # Interaction ECHO for actions involving scanning
         echo_point = [0, 0, 0]
-        if action_code in ['-', '*', '+', '8', '2', '1', '3', '4', '6']:
-            if enacted_interaction['echo_distance'] < 10000:
-                echo_point[0] = round(ROBOT_HEAD_X + math.cos(math.radians(enacted_interaction['head_angle']))
-                                      * enacted_interaction['echo_distance'])
-                echo_point[1] = round(math.sin(math.radians(enacted_interaction['head_angle']))
-                                      * enacted_interaction['echo_distance'])
-                enacted_interaction[KEY_EXPERIENCES].append((EXPERIENCE_ALIGNED_ECHO, *echo_point))
-                # Return the echo_xy to possibly use as focus
-                enacted_interaction['echo_xy'] = echo_point
+        # if action_code in ['-', '*', '+', '8', '2', '1', '3', '4', '6']:
+        echo_point[0] = round(ROBOT_HEAD_X + math.cos(math.radians(enacted_interaction['head_angle']))
+                              * enacted_interaction['echo_distance'])
+        echo_point[1] = round(math.sin(math.radians(enacted_interaction['head_angle']))
+                              * enacted_interaction['echo_distance'])
+        if enacted_interaction['echo_distance'] < 10000:
+            enacted_interaction[KEY_EXPERIENCES].append((EXPERIENCE_ALIGNED_ECHO, *echo_point))
+        # Return the echo_xy to possibly use as focus
+        enacted_interaction['echo_xy'] = echo_point
 
         # Interaction impact
         # (The forward translation is already correct since it is integrated during duration1)
@@ -164,41 +165,42 @@ class CtrlRobot:
         rotation_matrix = matrix44.create_from_z_rotation(math.radians(yaw))
         displacement_matrix = matrix44.multiply(rotation_matrix, translation_matrix)
 
-        # If focussed then adjust the displacement
-        if self.workspace.memory.egocentric_memory.focus_point is not None:
-            # The new estimated position of the focus point
-            # prediction_focus_point = matrix44.apply_to_vector(displacement_matrix, self.workspace.memory.egocentric_memory.focus_point)
-            # The error between the expected and the actual position of the echo
-            # prediction_error_focus = prediction_focus_point - echo_point
-            # The focus displacement was simulated in egocentric memory
-            prediction_error_focus = self.workspace.memory.egocentric_memory.focus_point - echo_point
-
-            # if math.dist(echo_point, prediction_focus_point) < FOCUS_MAX_DELTA:
-            if np.linalg.norm(prediction_error_focus) < FOCUS_MAX_DELTA:
-                # The focus has been kept
-                enacted_interaction['focus'] = True
-                # If the action has been completed
-                if enacted_interaction['duration1'] >= 1000:
-                    # If the head is forward then correct longitudinal displacements
-                    if -20 < enacted_interaction['head_angle'] < 20:
-                        if action_code in [ACTION_FORWARD, ACTION_BACKWARD]:
-                            translation[0] = translation[0] + prediction_error_focus[0]
-                            self.workspace.actions[action_code].adjust_translation_speed(translation)
-                    # If the head is sideways then correct lateral displacements
-                    if 60 < enacted_interaction['head_angle'] or enacted_interaction['head_angle'] < -60:
-                        if action_code in [ACTION_LEFTWARD, ACTION_RIGHTWARD]:
-                            translation[1] = translation[1] + prediction_error_focus[1]
-                            self.workspace.actions[action_code].adjust_translation_speed(translation)
-                    # Update the displacement matrix according to the new translation
-                    translation_matrix = matrix44.create_from_translation(-translation)
-                    displacement_matrix = matrix44.multiply(rotation_matrix, translation_matrix)
-            else:
-                # The focus has been lost
-                enacted_interaction['lost_focus'] = True
-                print("Lost focus with prediction error:", prediction_error_focus)
+        # # If focussed then adjust the displacement
+        # if self.workspace.memory.egocentric_memory.focus_point is not None:
+        #     # The new estimated position of the focus point
+        #     # prediction_focus_point = matrix44.apply_to_vector(displacement_matrix, self.workspace.memory.egocentric_memory.focus_point)
+        #     # The error between the expected and the actual position of the echo
+        #     # prediction_error_focus = prediction_focus_point - echo_point
+        #     # The focus displacement was simulated in egocentric memory
+        #     prediction_error_focus = self.workspace.memory.egocentric_memory.focus_point - echo_point
+        #
+        #     # if math.dist(echo_point, prediction_focus_point) < FOCUS_MAX_DELTA:
+        #     if np.linalg.norm(prediction_error_focus) < FOCUS_MAX_DELTA:
+        #         # The focus has been kept
+        #         enacted_interaction['focus'] = True
+        #         # If the action has been completed
+        #         if enacted_interaction['duration1'] >= 1000:
+        #             # If the head is forward then correct longitudinal displacements
+        #             if -20 < enacted_interaction['head_angle'] < 20:
+        #                 if action_code in [ACTION_FORWARD, ACTION_BACKWARD]:
+        #                     translation[0] = translation[0] + prediction_error_focus[0]
+        #                     self.workspace.actions[action_code].adjust_translation_speed(translation)
+        #             # If the head is sideways then correct lateral displacements
+        #             if 60 < enacted_interaction['head_angle'] or enacted_interaction['head_angle'] < -60:
+        #                 if action_code in [ACTION_LEFTWARD, ACTION_RIGHTWARD]:
+        #                     translation[1] = translation[1] + prediction_error_focus[1]
+        #                     self.workspace.actions[action_code].adjust_translation_speed(translation)
+        #             # Update the displacement matrix according to the new translation
+        #             translation_matrix = matrix44.create_from_translation(-translation)
+        #             displacement_matrix = matrix44.multiply(rotation_matrix, translation_matrix)
+        #     else:
+        #         # The focus has been lost
+        #         # enacted_interaction['lost_focus'] = True
+        #         print("Lost focus with prediction error:", prediction_error_focus)
 
         # Return the displacement
         enacted_interaction['translation'] = translation
+        enacted_interaction['rotation_matrix'] = rotation_matrix
         enacted_interaction['displacement_matrix'] = displacement_matrix
 
         # The echo array
