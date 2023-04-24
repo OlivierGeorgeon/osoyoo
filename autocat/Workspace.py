@@ -57,36 +57,64 @@ class Workspace:
         organize the generation of the intended_interaction and the processing of the enacted_interaction."""
         # IDLE: Ready to choose the next intended interaction
         if self.interaction_step == INTERACTION_STEP_IDLE:
-            if self.decider_mode == KEY_DECIDER_CIRCLE:
-                # The decider chooses the next interaction
-                # self.intended_enaction = self.decider.propose_intended_enaction(self.enacted_interaction)
-                self.enactions[self.clock] = self.decider.propose_intended_enaction(self.enacted_interaction)
-                # self.interaction_step = INTERACTION_STEP_ENGAGING
-            if self.clock in self.enactions:
-                # Take the nextenaction from the stack
-                self.intended_enaction = self.enactions[self.clock]
-                self.interaction_step = INTERACTION_STEP_ENGAGING
-            # Case DECIDER_KEY_USER is handled by self.process_user_key()
-
-        # ENGAGING: Preparing the simulation and the enaction
-        if self.interaction_step == INTERACTION_STEP_ENGAGING:
-            # Initialize the simulation of the action
-            self.intended_enaction.start_simulation()
-
             # Manage the memory snapshot
             if self.is_imagining:
                 # If stop imagining then restore memory from the snapshot
                 if self.engagement_mode == KEY_ENGAGEMENT_ROBOT:
                     self.memory = self.memory_snapshot.save()  # Keep the snapshot saved
                     self.is_imagining = False
+                    self.interaction_step = INTERACTION_STEP_REFRESHING  # TODO use a separate bit
                     # print("Restored", self.memory)
                 # (If continue imagining then keep the previous snapshot)
             else:
                 # If was not previously imagining then take a new memory snapshot
-                self.memory_snapshot = self.memory.save()  # Fail when trying to save an affordance created during imaginary
+                # self.memory_snapshot = self.memory.save()  # Fail when trying to save an affordance created during imaginary
                 if self.engagement_mode == KEY_ENGAGEMENT_IMAGINARY:
                     # Start imagining
+                    self.memory_snapshot = self.memory.save()  # Fail when trying to save an affordance created during imaginary
                     self.is_imagining = True
+            # Next automatic decision
+            if self.decider_mode == KEY_DECIDER_CIRCLE:
+                # The decider chooses the next interaction
+                # self.intended_enaction = self.decider.propose_intended_enaction(self.enacted_interaction)
+                # TODO: Imaginary mode do not alter the last enacted interaction
+                self.enactions[self.clock] = self.decider.propose_intended_enaction(self.enacted_interaction)
+                # self.interaction_step = INTERACTION_STEP_ENGAGING
+            # Case DECIDER_KEY_USER is handled by self.process_user_key()
+
+            # When the next enaction is in the stack
+            if self.clock in self.enactions:
+                # Take the next enaction from the stack
+                self.intended_enaction = self.enactions[self.clock]
+                # self.interaction_step = INTERACTION_STEP_ENGAGING
+                self.intended_enaction.start_simulation()
+                if self.is_imagining:
+                    # If imagining then proceed to simulating the enaction
+                    self.interaction_step = INTERACTION_STEP_ENACTING
+                else:
+                    # Take a snapshot for the simulation
+                    self.memory_snapshot = self.memory.save()  # Fail when trying to save an affordance created during imaginary
+                    self.interaction_step = INTERACTION_STEP_INTENDING
+
+        # ENGAGING: Preparing the simulation and the enaction
+        if self.interaction_step == INTERACTION_STEP_ENGAGING:
+            # Initialize the simulation of the action
+            # self.intended_enaction.start_simulation()
+
+            # # Manage the memory snapshot
+            # if self.is_imagining:
+            #     # If stop imagining then restore memory from the snapshot
+            #     if self.engagement_mode == KEY_ENGAGEMENT_ROBOT:
+            #         self.memory = self.memory_snapshot.save()  # Keep the snapshot saved
+            #         self.is_imagining = False
+            #         # print("Restored", self.memory)
+            #     # (If continue imagining then keep the previous snapshot)
+            # else:
+            #     # If was not previously imagining then take a new memory snapshot
+            #     self.memory_snapshot = self.memory.save()  # Fail when trying to save an affordance created during imaginary
+            #     if self.engagement_mode == KEY_ENGAGEMENT_IMAGINARY:
+            #         # Start imagining
+            #         self.is_imagining = True
 
             # Manage the imaginary mode
             if self.is_imagining:

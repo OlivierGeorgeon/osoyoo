@@ -7,7 +7,7 @@ from pyrr import matrix44
 from .RobotDefine import RETREAT_DISTANCE, RETREAT_DISTANCE_Y, LINE_X, ROBOT_FRONT_X, ROBOT_FRONT_Y, ROBOT_HEAD_X
 from ..Memory.EgocentricMemory.Experience import EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_FLOOR, EXPERIENCE_IMPACT, \
     EXPERIENCE_LOCAL_ECHO, EXPERIENCE_BLOCK
-from ..Decider.Action import ACTION_FORWARD, ACTION_BACKWARD, ACTION_RIGHTWARD, ACTION_LEFTWARD
+from ..Decider.Action import ACTION_FORWARD
 
 # ENACT_STEP_IDLE = 0
 # ENACT_STEP_ENACTING = 1
@@ -18,7 +18,6 @@ KEY_EXPERIENCES = 'points'
 KEY_IMPACT = 'impact'
 
 FOCUS_MAX_DELTA = 100  # (mm) Maximum delta to keep focus
-# ENACTION_DEFAULT_TIMEOUT = 6  # Seconds
 
 
 class CtrlRobot:
@@ -164,39 +163,6 @@ class CtrlRobot:
         translation_matrix = matrix44.create_from_translation(-translation)
         rotation_matrix = matrix44.create_from_z_rotation(math.radians(yaw))
         displacement_matrix = matrix44.multiply(rotation_matrix, translation_matrix)
-
-        # # If focussed then adjust the displacement
-        # if self.workspace.memory.egocentric_memory.focus_point is not None:
-        #     # The new estimated position of the focus point
-        #     # prediction_focus_point = matrix44.apply_to_vector(displacement_matrix, self.workspace.memory.egocentric_memory.focus_point)
-        #     # The error between the expected and the actual position of the echo
-        #     # prediction_error_focus = prediction_focus_point - echo_point
-        #     # The focus displacement was simulated in egocentric memory
-        #     prediction_error_focus = self.workspace.memory.egocentric_memory.focus_point - echo_point
-        #
-        #     # if math.dist(echo_point, prediction_focus_point) < FOCUS_MAX_DELTA:
-        #     if np.linalg.norm(prediction_error_focus) < FOCUS_MAX_DELTA:
-        #         # The focus has been kept
-        #         enacted_interaction['focus'] = True
-        #         # If the action has been completed
-        #         if enacted_interaction['duration1'] >= 1000:
-        #             # If the head is forward then correct longitudinal displacements
-        #             if -20 < enacted_interaction['head_angle'] < 20:
-        #                 if action_code in [ACTION_FORWARD, ACTION_BACKWARD]:
-        #                     translation[0] = translation[0] + prediction_error_focus[0]
-        #                     self.workspace.actions[action_code].adjust_translation_speed(translation)
-        #             # If the head is sideways then correct lateral displacements
-        #             if 60 < enacted_interaction['head_angle'] or enacted_interaction['head_angle'] < -60:
-        #                 if action_code in [ACTION_LEFTWARD, ACTION_RIGHTWARD]:
-        #                     translation[1] = translation[1] + prediction_error_focus[1]
-        #                     self.workspace.actions[action_code].adjust_translation_speed(translation)
-        #             # Update the displacement matrix according to the new translation
-        #             translation_matrix = matrix44.create_from_translation(-translation)
-        #             displacement_matrix = matrix44.multiply(rotation_matrix, translation_matrix)
-        #     else:
-        #         # The focus has been lost
-        #         # enacted_interaction['lost_focus'] = True
-        #         print("Lost focus with prediction error:", prediction_error_focus)
 
         # Return the displacement
         enacted_interaction['translation'] = translation
