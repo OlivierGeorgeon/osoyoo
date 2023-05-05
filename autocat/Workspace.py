@@ -16,11 +16,6 @@ KEY_DECREASE_CONFIDENCE = "D"
 KEY_INCREASE_CONFIDENCE = "P"
 KEY_CLEAR = "C"
 
-# INTERACTION_STEP_IDLE = 0
-# INTERACTION_STEP_ENGAGING = 1
-# INTERACTION_STEP_INTEGRATING = 4
-# INTERACTION_STEP_REFRESHING = 5
-
 
 class Workspace:
     """The Workspace supervises the interaction cycle. It produces the intended_interaction
@@ -107,18 +102,14 @@ class Workspace:
 
         # INTEGRATING: the new enacted interaction (if not imagining)
         if self.interaction_step == INTERACTION_STEP_INTEGRATING:
-            # If not imagining then restore the memory from the snapshot
-            # if not self.is_imagining:
+            # If not imagining then restore the memory from the snapshot and integrate the experiences
             self.memory = self.memory_snapshot
-            # (If imagining then keep the imagined memory until back to robot engagement mode)
-
             # Update body memory and egocentric memory
             self.memory.update_and_add_experiences(self.enacted_interaction)
 
             # Call the integrator to create and update the phenomena
             # Currently we don't create phenomena in imaginary mode because phenomena are not saved in memory
             # TODO save the phenomena in memory so they can be created during imaginary mode
-            # if not self.is_imagining:
             self.integrator.integrate()
 
             # Update allocentric memory: robot, phenomena, focus
@@ -134,28 +125,6 @@ class Workspace:
             self.interaction_step = INTERACTION_STEP_REFRESHING
 
         # REFRESHING: is handled by views and reset by CtrlPhenomenonDisplay
-
-    # def update_enacted_interaction(self, enacted_interaction):
-    #     """Update the enacted interaction (called by CtrlRobot)."""
-    #
-    #     if "status" in enacted_interaction and enacted_interaction["status"] == "T":
-    #         print("The workspace received an empty enacted interaction")
-    #         # restore memory from snapshot
-    #         self.memory = self.memory_snapshot
-    #
-    #         # Reset the interaction step
-    #         if self.decider_mode == KEY_DECIDER_CIRCLE:
-    #             # If automatic mode then resend the same intended interaction unless the user has set another one
-    #             self.interaction_step = INTERACTION_STEP_INTENDING
-    #         else:
-    #             # If user mode then abort the enaction and wait for a new action but don't increment the clock
-    #             self.interaction_step = INTERACTION_STEP_IDLE
-    #             # TODO # Refresh the views to show memory before simulation
-    #         return
-    #
-    #     self.enacted_interaction = enacted_interaction
-    #     self.intended_enaction = None
-    #     self.interaction_step = INTERACTION_STEP_INTEGRATING
 
     def process_user_key(self, user_key):
         """Process the keypress on the view windows (called by the views)"""

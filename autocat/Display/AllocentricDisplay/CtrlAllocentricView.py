@@ -1,6 +1,7 @@
 import time
 from pyglet.window import key
 from .AllocentricView import AllocentricView
+from ...Memory.AllocentricMemory.Hexagonal_geometry import point_to_cell
 from ...Robot.CtrlRobot import INTERACTION_STEP_REFRESHING, INTERACTION_STEP_ENACTING
 
 
@@ -22,7 +23,8 @@ class CtrlAllocentricView:
         def on_mouse_press(x, y, button, modifiers):
             """Open a phenomenon view based on the phenomenon on this cell"""
             self.prompt_point = self.allocentric_view.mouse_coordinates_to_point(x, y)
-            cell_x, cell_y = self.workspace.memory.allocentric_memory.convert_pos_in_cell(self.prompt_point[0], self.prompt_point[1])
+            # cell_x, cell_y = self.workspace.memory.allocentric_memory.convert_pos_in_cell(self.prompt_point[0], self.prompt_point[1])
+            cell_x, cell_y = point_to_cell(self.prompt_point)
             phenomenon = self.workspace.memory.allocentric_memory.grid[cell_x][cell_y].phenomenon
             if phenomenon is not None:
                 print("Displaying Phenomenon", phenomenon)

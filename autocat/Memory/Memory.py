@@ -49,24 +49,8 @@ class Memory:
 
     def update_allocentric(self, phenomena, clock):
         """Allocate the phenomena to the cells of allocentric memory"""
-        # Clear the previous phenomena
-        self.allocentric_memory.clear_phenomena()
-        # Place the phenomena again
-        for p in phenomena:
-            for a in p.affordances:
-                # Attribute the status of the affordance
-                cell_x, cell_y = self.allocentric_memory.convert_pos_in_cell(a.point[0]+p.point[0],
-                                                                             a.point[1]+p.point[1])
-                self.allocentric_memory.apply_status_to_cell(cell_x, cell_y, a.experience.type, a.experience.clock)
-                # Attribute this phenomenon to this cell
-                self.allocentric_memory.grid[cell_x][cell_y].phenomenon = p
-            cell_i, cell_j = self.allocentric_memory.convert_pos_in_cell(p.point[0], p.point[1])
-            self.allocentric_memory.apply_status_to_cell(cell_i, cell_j, CELL_PHENOMENON, clock)  # Mark the origin
-
-        # Place the affordances that are not attached to phenomena
-        for affordance in self.allocentric_memory.affordances:
-            cell_x, cell_y = self.allocentric_memory.convert_pos_in_cell(affordance.point[0], affordance.point[1])
-            self.allocentric_memory.apply_status_to_cell(cell_x, cell_y, affordance.experience.type, clock)
+        # Mark the affordances
+        self.allocentric_memory.update_affordances(phenomena, clock)
 
         # Mark the cells where is the robot
         self.allocentric_memory.place_robot(self.body_memory, clock)
@@ -74,6 +58,7 @@ class Memory:
         # Update the focus in allocentric memory
         allo_focus = self.egocentric_to_allocentric(self.egocentric_memory.focus_point)
         self.allocentric_memory.update_focus(allo_focus)
+
         # Update the prompt in allocentric memory
         allo_prompt = self.egocentric_to_allocentric(self.egocentric_memory.prompt_point)
         self.allocentric_memory.update_prompt(allo_prompt)
@@ -92,8 +77,6 @@ class Memory:
             return None
         # Subtract the body position
         ego_point = point - self.allocentric_memory.robot_point
-        rotation_matrix = matrix44.create_from_z_rotation(self.body_memory.body_direction_rad)
-        # return matrix44.apply_to_vector(rotation_matrix, ego_point)
         # Rotate the point by the opposite body direction using the transposed rotation matrix
         return matrix44.apply_to_vector(self.body_memory.body_direction_matrix().T, ego_point)
 
