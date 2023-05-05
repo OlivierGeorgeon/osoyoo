@@ -1,9 +1,9 @@
 from pyrr import matrix44
 import math
+import numpy as np
 from .BodyView import BodyView
 from autocat.Display.PointOfInterest import PointOfInterest, POINT_COMPASS, POINT_AZIMUTH
-from ...Workspace import INTERACTION_STEP_REFRESHING, INTERACTION_STEP_ENACTING
-import numpy as np
+from ...Robot.CtrlRobot import INTERACTION_STEP_REFRESHING, INTERACTION_STEP_ENACTING
 import circle_fit as cf
 
 KEY_OFFSET = 'O'
@@ -67,10 +67,11 @@ class CtrlBodyView:
 
         # Rotate the previous compass points so they remain at the south of the view
         # TODO rotate the compass points when imagining
-        yaw = self.workspace.enacted_interaction['yaw']
-        displacement_matrix = matrix44.create_from_z_rotation(math.radians(yaw))
-        for poi in [p for p in self.points_of_interest if p.type == POINT_COMPASS]:
-            poi.displace(displacement_matrix)
+        if 'yaw' in self.workspace.enacted_interaction:
+            yaw = self.workspace.enacted_interaction['yaw']
+            displacement_matrix = matrix44.create_from_z_rotation(math.radians(yaw))
+            for poi in [p for p in self.points_of_interest if p.type == POINT_COMPASS]:
+                poi.displace(displacement_matrix)
 
         # Add the new points that indicate the south relative to the robot
         if 'compass_x' in self.workspace.enacted_interaction:
@@ -81,9 +82,6 @@ class CtrlBodyView:
                                        self.view.background)
             self.view.label.text += ", compass: " + str(self.workspace.enacted_interaction['azimuth']) + "°"
         else:
-            # x = 300 * math.cos(math.radians(azimuth + 180))
-            # y = 300 * math.sin(math.radians(azimuth + 180))
-            # self.add_point_of_interest(x, y, POINT_COMPASS)
             x = 330 * math.cos(math.radians(azimuth + 180))
             y = 330 * math.sin(math.radians(azimuth + 180))
             self.add_point_of_interest(x, y, POINT_AZIMUTH, self.view.background)

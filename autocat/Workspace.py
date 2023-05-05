@@ -1,15 +1,12 @@
-import numpy as np
-import math
 from playsound import playsound
-from pyrr import matrix44
-
 from .Decider.AgentCircle import AgentCircle
 from .Decider.Action import create_actions, ACTION_FORWARD, ACTIONS, ACTION_ALIGN_ROBOT
 from .Decider.Interaction import Interaction, OUTCOME_DEFAULT
 from .Memory.Memory import Memory
 from .Integrator.Integrator import Integrator
 from .Robot.Enaction import Enaction, SIMULATION_STEP_OFF
-from .Robot.CtrlRobot import INTERACTION_STEP_INTENDING, INTERACTION_STEP_ENACTING
+from .Robot.CtrlRobot import INTERACTION_STEP_IDLE, INTERACTION_STEP_INTENDING, INTERACTION_STEP_ENACTING, \
+    INTERACTION_STEP_INTEGRATING, INTERACTION_STEP_REFRESHING
 
 KEY_DECIDER_CIRCLE = "A"  # Automatic mode: controlled by AgentCircle
 KEY_DECIDER_USER = "M"  # Manual mode : controlled by the user
@@ -19,12 +16,10 @@ KEY_DECREASE_CONFIDENCE = "D"
 KEY_INCREASE_CONFIDENCE = "P"
 KEY_CLEAR = "C"
 
-INTERACTION_STEP_IDLE = 0
-INTERACTION_STEP_ENGAGING = 1
-# INTERACTION_STEP_INTENDING = 2
-# INTERACTION_STEP_ENACTING = 3
-INTERACTION_STEP_INTEGRATING = 4
-INTERACTION_STEP_REFRESHING = 5
+# INTERACTION_STEP_IDLE = 0
+# INTERACTION_STEP_ENGAGING = 1
+# INTERACTION_STEP_INTEGRATING = 4
+# INTERACTION_STEP_REFRESHING = 5
 
 
 class Workspace:
@@ -63,30 +58,27 @@ class Workspace:
                 if self.engagement_mode == KEY_ENGAGEMENT_ROBOT:
                     self.memory = self.memory_snapshot.save()  # Keep the snapshot saved
                     self.is_imagining = False
-                    self.interaction_step = INTERACTION_STEP_REFRESHING  # TODO use a separate bit
+                    self.interaction_step = INTERACTION_STEP_REFRESHING  # TODO use a separate flag
                     # print("Restored", self.memory)
                 # (If continue imagining then keep the previous snapshot)
             else:
                 # If was not previously imagining then take a new memory snapshot
-                # self.memory_snapshot = self.memory.save()  # Fail when trying to save an affordance created during imaginary
                 if self.engagement_mode == KEY_ENGAGEMENT_IMAGINARY:
                     # Start imagining
                     self.memory_snapshot = self.memory.save()  # Fail when trying to save an affordance created during imaginary
                     self.is_imagining = True
             # Next automatic decision
-            if self.decider_mode == KEY_DECIDER_CIRCLE:
-                # The decider chooses the next interaction
-                # self.intended_enaction = self.decider.propose_intended_enaction(self.enacted_interaction)
-                # TODO: Imaginary mode do not alter the last enacted interaction
-                self.enactions[self.clock] = self.decider.propose_intended_enaction(self.enacted_interaction)
-                # self.interaction_step = INTERACTION_STEP_ENGAGING
-            # Case DECIDER_KEY_USER is handled by self.process_user_key()
+            if self.clock not in self.enactions:
+                if self.decider_mode == KEY_DECIDER_CIRCLE:
+                    # The decider chooses the next interaction
+                    # TODO Manage the enacted_interaction after imagining
+                    self.enactions[self.clock] = self.decider.propose_intended_enaction(self.enacted_interaction)
+                # Case DECIDER_KEY_USER is handled by self.process_user_key()
 
             # When the next enaction is in the stack
             if self.clock in self.enactions:
                 # Take the next enaction from the stack
                 self.intended_enaction = self.enactions[self.clock]
-                # self.interaction_step = INTERACTION_STEP_ENGAGING
                 self.intended_enaction.start_simulation()
                 if self.is_imagining:
                     # If imagining then proceed to simulating the enaction
@@ -95,34 +87,6 @@ class Workspace:
                     # Take a snapshot for the simulation
                     self.memory_snapshot = self.memory.save()  # Fail when trying to save an affordance created during imaginary
                     self.interaction_step = INTERACTION_STEP_INTENDING
-
-        # ENGAGING: Preparing the simulation and the enaction
-        if self.interaction_step == INTERACTION_STEP_ENGAGING:
-            # Initialize the simulation of the action
-            # self.intended_enaction.start_simulation()
-
-            # # Manage the memory snapshot
-            # if self.is_imagining:
-            #     # If stop imagining then restore memory from the snapshot
-            #     if self.engagement_mode == KEY_ENGAGEMENT_ROBOT:
-            #         self.memory = self.memory_snapshot.save()  # Keep the snapshot saved
-            #         self.is_imagining = False
-            #         # print("Restored", self.memory)
-            #     # (If continue imagining then keep the previous snapshot)
-            # else:
-            #     # If was not previously imagining then take a new memory snapshot
-            #     self.memory_snapshot = self.memory.save()  # Fail when trying to save an affordance created during imaginary
-            #     if self.engagement_mode == KEY_ENGAGEMENT_IMAGINARY:
-            #         # Start imagining
-            #         self.is_imagining = True
-
-            # Manage the imaginary mode
-            if self.is_imagining:
-                # If imagining then proceed to simulating the enaction
-                self.interaction_step = INTERACTION_STEP_ENACTING
-            else:
-                # If engagement robot then send the command to the robot
-                self.interaction_step = INTERACTION_STEP_INTENDING
 
         # INTENDING: is handled by CtrlRobot
 
@@ -134,15 +98,18 @@ class Workspace:
                 # End of the simulation
                 if self.is_imagining:
                     # Compute an imaginary enacted_interaction and proceed to integrating
-                    self.update_enacted_interaction(self.intended_enaction.imagine())
-                    self.interaction_step = INTERACTION_STEP_INTEGRATING
-                    # self.interaction_step = INTERACTION_STEP_REFRESHING
+                    # self.update_enacted_interaction(self.intended_enaction.imagine())
+                    # self.interaction_step = INTERACTION_STEP_INTEGRATING
+                    # Skip INTEGRATING for now
+                    del self.enactions[self.clock]
+                    self.clock += 1  # Perhaps not necessary
+                    self.interaction_step = INTERACTION_STEP_REFRESHING
 
-        # INTEGRATING: the new enacted interaction
+        # INTEGRATING: the new enacted interaction (if not imagining)
         if self.interaction_step == INTERACTION_STEP_INTEGRATING:
             # If not imagining then restore the memory from the snapshot
-            if not self.is_imagining:
-                self.memory = self.memory_snapshot
+            # if not self.is_imagining:
+            self.memory = self.memory_snapshot
             # (If imagining then keep the imagined memory until back to robot engagement mode)
 
             # Update body memory and egocentric memory
@@ -151,45 +118,44 @@ class Workspace:
             # Call the integrator to create and update the phenomena
             # Currently we don't create phenomena in imaginary mode because phenomena are not saved in memory
             # TODO save the phenomena in memory so they can be created during imaginary mode
-            if not self.is_imagining:
-                self.integrator.integrate()
+            # if not self.is_imagining:
+            self.integrator.integrate()
 
             # Update allocentric memory: robot, phenomena, focus
             self.memory.update_allocentric(self.integrator.phenomena, self.clock)
 
             # Increment the clock if the enacted interaction was properly received
             if self.enacted_interaction['clock'] >= self.clock:  # don't increment if the robot is behind
+                # Remove the enaction from the stack
+                del self.enactions[self.clock]
+                # Increment the clock
                 self.clock += 1
 
             self.interaction_step = INTERACTION_STEP_REFRESHING
 
         # REFRESHING: is handled by views and reset by CtrlPhenomenonDisplay
 
-    def update_enacted_interaction(self, enacted_interaction):
-        """Update the enacted interaction (called by CtrlRobot)"""
-
-        if "status" in enacted_interaction and enacted_interaction["status"] == "T":
-            print("The workspace received an empty enacted interaction")
-            # restore memory from snapshot
-            self.memory = self.memory_snapshot
-
-            # Reset the interaction step
-            if self.decider_mode == KEY_DECIDER_CIRCLE:
-                # If automatic mode then resend the same intended interaction unless the user has set another one
-                self.interaction_step = INTERACTION_STEP_INTENDING
-            else:
-                # If user mode then abort the enaction and wait for a new action but don't increment the clock
-                self.interaction_step = INTERACTION_STEP_IDLE
-                # TODO # Refresh the views to show memory before simulation
-            return
-
-        # # Increment the clock if the enacted interaction was properly received
-        # if enacted_interaction['clock'] >= self.clock:  # don't increment if the robot is behind
-        #     self.clock += 1
-
-        self.enacted_interaction = enacted_interaction
-        self.intended_enaction = None
-        self.interaction_step = INTERACTION_STEP_INTEGRATING
+    # def update_enacted_interaction(self, enacted_interaction):
+    #     """Update the enacted interaction (called by CtrlRobot)."""
+    #
+    #     if "status" in enacted_interaction and enacted_interaction["status"] == "T":
+    #         print("The workspace received an empty enacted interaction")
+    #         # restore memory from snapshot
+    #         self.memory = self.memory_snapshot
+    #
+    #         # Reset the interaction step
+    #         if self.decider_mode == KEY_DECIDER_CIRCLE:
+    #             # If automatic mode then resend the same intended interaction unless the user has set another one
+    #             self.interaction_step = INTERACTION_STEP_INTENDING
+    #         else:
+    #             # If user mode then abort the enaction and wait for a new action but don't increment the clock
+    #             self.interaction_step = INTERACTION_STEP_IDLE
+    #             # TODO # Refresh the views to show memory before simulation
+    #         return
+    #
+    #     self.enacted_interaction = enacted_interaction
+    #     self.intended_enaction = None
+    #     self.interaction_step = INTERACTION_STEP_INTEGRATING
 
     def process_user_key(self, user_key):
         """Process the keypress on the view windows (called by the views)"""

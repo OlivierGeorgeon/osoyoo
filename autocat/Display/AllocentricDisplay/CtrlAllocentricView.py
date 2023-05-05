@@ -1,7 +1,7 @@
 import time
 from pyglet.window import key
 from .AllocentricView import AllocentricView
-from ...Workspace import INTERACTION_STEP_REFRESHING, INTERACTION_STEP_ENACTING
+from ...Robot.CtrlRobot import INTERACTION_STEP_REFRESHING, INTERACTION_STEP_ENACTING
 
 
 class CtrlAllocentricView:

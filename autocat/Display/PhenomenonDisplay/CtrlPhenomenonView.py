@@ -2,8 +2,8 @@ import math
 from pyrr import matrix44
 from .PhenomenonView import PhenomenonView
 from .AffordanceDisplay import AffordanceDisplay
-from ...Workspace import INTERACTION_STEP_REFRESHING, INTERACTION_STEP_IDLE, KEY_DECREASE_CONFIDENCE, \
-    KEY_INCREASE_CONFIDENCE
+from ...Workspace import KEY_DECREASE_CONFIDENCE, KEY_INCREASE_CONFIDENCE
+from ...Robot.CtrlRobot import INTERACTION_STEP_IDLE, INTERACTION_STEP_REFRESHING
 
 
 class CtrlPhenomenonView:

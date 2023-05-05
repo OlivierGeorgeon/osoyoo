@@ -1,8 +1,8 @@
 from pyglet.window import key
 from .EgocentricView import EgocentricView
-from autocat.Display.PointOfInterest import PointOfInterest, POINT_PROMPT
-from ...Memory.EgocentricMemory.Experience import EXPERIENCE_FOCUS, EXPERIENCE_PLACE
-from ...Workspace import INTERACTION_STEP_REFRESHING, INTERACTION_STEP_ENACTING
+from ..PointOfInterest import PointOfInterest, POINT_PROMPT
+from ...Memory.EgocentricMemory.Experience import EXPERIENCE_FOCUS
+from ...Robot.CtrlRobot import INTERACTION_STEP_ENACTING, INTERACTION_STEP_REFRESHING
 
 
 class CtrlEgocentricView:
