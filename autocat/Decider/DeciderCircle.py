@@ -11,7 +11,7 @@ from . PredefinedInteractions import create_interactions, OUTCOME_LOST_FOCUS, OU
 from ..Robot.Enaction import Enaction
 
 
-class AgentCircle:
+class DeciderCircle:
     def __init__(self, workspace):
         """ Creating our agent """
         self.workspace = workspace
@@ -24,11 +24,11 @@ class AgentCircle:
         self._action = self.workspace.actions[ACTION_FORWARD]
 
     def propose_intended_enaction(self, enacted_interaction):
-        """Propose the next intended interaction from the previous enacted interaction.
+        """Propose the next intended enaction from the previous enacted interaction.
         This is the main method of the agent"""
         # Compute a specific outcome suited for this agent
         outcome = self.outcome(enacted_interaction)
-        # Compute the intended interaction possibly including the focus
+        # Compute the intended enaction
         return self.intended_enaction(outcome)
 
     def intended_enaction(self, outcome):
@@ -116,7 +116,7 @@ class AgentCircle:
 # Testing AgentCircle
 # py -m autocat.Decider.AgentCircle
 if __name__ == "__main__":
-    a = AgentCircle()
+    a = DeciderCircle()
     _outcome = OUTCOME_LOST_FOCUS
 
     for i in range(20):

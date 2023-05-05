@@ -1,13 +1,13 @@
 import math
 import numpy as np
 from pyrr import matrix44
-import time
 from . Hexagonal_geometry import CELL_RADIUS, point_to_cell
 from . GridCell import GridCell, CELL_UNKNOWN
 from ..EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_PLACE
 from ..AllocentricMemory.GridCell import CELL_NO_ECHO, CELL_PHENOMENON
 from ...Utils import rotate_vector_z
 from ..EgocentricMemory.Experience import EXPERIENCE_FOCUS, EXPERIENCE_PROMPT
+from ...Robot.RobotDefine import ROBOT_FRONT_X, ROBOT_SIDE
 
 
 class AllocentricMemory:
@@ -83,7 +83,7 @@ class AllocentricMemory:
         # Place the affordances that are not attached to phenomena
         for affordance in self.affordances:
             cell_x, cell_y = point_to_cell(affordance.point)
-            self.allocentric_memory.apply_status_to_cell(cell_x, cell_y, affordance.experience.type, clock)
+            self.apply_status_to_cell(cell_x, cell_y, affordance.experience.type, clock)
 
     def move(self, body_direction_rad, translation, clock, is_egocentric_translation=True):
         """Move the robot in allocentric memory. Mark the traversed cells Free. Returns the new position"""
@@ -94,7 +94,9 @@ class AllocentricMemory:
         else:
             destination_point = self.robot_point + translation
         # Check that the robot remains within allocentric memory limits
-        self.apply_changes(self.robot_point, destination_point, clock)
+        body_direction_matrix = matrix44.create_from_z_rotation(-body_direction_rad)
+        self.place_robot_translate(body_direction_matrix, self.robot_point, destination_point, clock)
+        # self.place_translation(self.robot_point, destination_point, clock)
         self.robot_point = destination_point
 
         return np.round(destination_point)
@@ -109,6 +111,18 @@ class AllocentricMemory:
             c.clocks[0] = clock
         # print("Place robot time:", time.time() - start_time, "seconds")
 
+    def place_robot_translate(self, body_direction_matrix, start, end, clock):
+        """Mark the cells traversed by the robot translation"""
+        p1 = matrix44.apply_to_vector(body_direction_matrix, [ROBOT_FRONT_X, ROBOT_SIDE, 0]) + end
+        p2 = matrix44.apply_to_vector(body_direction_matrix, [-ROBOT_FRONT_X, ROBOT_SIDE, 0]) + start
+        p3 = matrix44.apply_to_vector(body_direction_matrix, [-ROBOT_FRONT_X, -ROBOT_SIDE, 0]) + start
+        p4 = matrix44.apply_to_vector(body_direction_matrix, [ROBOT_FRONT_X, -ROBOT_SIDE, 0]) + end
+        outline = np.array([p1, p2, p3, p4])
+        polygon = [p[0:2] for p in outline]
+        for c in [c for line in self.grid for c in line if c.is_inside(polygon)]:
+            c.status[0] = EXPERIENCE_PLACE
+            c.clocks[0] = clock
+
     def clear_phenomena(self):
         """Reset the phenomena from cells"""
         for c in [c for line in self.grid for c in line if c.phenomenon is not None]:
@@ -117,24 +131,23 @@ class AllocentricMemory:
             c.clocks[1] = 0
             c.phenomenon = None
 
-    def apply_changes(self, start, end, clock):
-        """Mark the cells traversed by the robot"""
-        distance = math.dist(start, end)
-        if distance == 0:
-            return
-        nb_step = int(distance / self.cell_radius)
-        if nb_step == 0:
-            return
-        step_x = int((end[0] - start[0])/nb_step)
-        step_y = int((end[1] - start[1])/nb_step)
-        current_pos_x = start[0]
-        current_pos_y = start[1]
-        for _ in range(nb_step):
-            # cell_x, cell_y = self.convert_pos_in_cell(current_pos_x, current_pos_y)
-            cell_x, cell_y = point_to_cell(np.array([current_pos_x, current_pos_y, 0]), self.cell_radius)
-            self.apply_status_to_cell(cell_x, cell_y, EXPERIENCE_PLACE, clock)
-            current_pos_x += step_x
-            current_pos_y += step_y
+    # def place_translation(self, start, end, clock):
+    #     """Mark the cells traversed by the robot"""
+    #     distance = math.dist(start, end)
+    #     if distance == 0:
+    #         return
+    #     nb_step = int(distance / self.cell_radius)
+    #     if nb_step == 0:
+    #         return
+    #     step_x = int((end[0] - start[0])/nb_step)
+    #     step_y = int((end[1] - start[1])/nb_step)
+    #     current_pos_x = start[0]
+    #     current_pos_y = start[1]
+    #     for _ in range(nb_step):
+    #         cell_x, cell_y = point_to_cell(np.array([current_pos_x, current_pos_y, 0]), self.cell_radius)
+    #         self.apply_status_to_cell(cell_x, cell_y, EXPERIENCE_PLACE, clock)
+    #         current_pos_x += step_x
+    #         current_pos_y += step_y
 
     def apply_status_to_cell(self, i, j, status, clock):
         """Change the cell status"""
@@ -165,7 +178,6 @@ class AllocentricMemory:
             self.grid[self.focus_i][self.focus_j].status[3] = CELL_UNKNOWN
         # Add the new focus cell
         if allo_focus is not None:
-            # self.focus_i, self.focus_j = self.convert_pos_in_cell(allo_focus[0], allo_focus[1])
             self.focus_i, self.focus_j = point_to_cell(allo_focus, self.cell_radius)
             self.grid[self.focus_i][self.focus_j].status[3] = EXPERIENCE_FOCUS
 
@@ -176,7 +188,6 @@ class AllocentricMemory:
             self.grid[self.prompt_i][self.prompt_j].status[3] = CELL_UNKNOWN
         # Add the new prompt cell
         if allo_prompt is not None:
-            # self.prompt_i, self.prompt_j = self.convert_pos_in_cell(allo_prompt[0], allo_prompt[1])
             self.prompt_i, self.prompt_j = point_to_cell(allo_prompt, self.cell_radius)
             self.grid[self.prompt_i][self.prompt_j].status[3] = EXPERIENCE_PROMPT
             print("Prompt in cell", self.prompt_i, ", ", self.prompt_j)

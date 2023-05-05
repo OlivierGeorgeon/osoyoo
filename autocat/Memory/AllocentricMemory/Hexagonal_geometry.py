@@ -3,6 +3,27 @@ import math
 CELL_RADIUS = 50
 
 
+def get_neighbors(i, j):
+    """Return a dictionary of the coordinates of the six neighboring cells"""
+    neighbors = {}
+    for d in range(6):
+        neighbors[d] = get_neighbor_in_direction(i, j, d)
+    return neighbors
+
+
+def get_neighbor_in_direction(i, j, direction):
+    """Return the cell coordinate of the neighboring cell in the given direction
+    Args : Direction : 0 = N, 1 = NE, 2 = SE, 3 = S, 4 = SW, 5 = NW
+    """
+    if j % 2 == 0:
+        # Even lines
+        di, dj = [(0, 2), (0, 1), (0, -1), (0, -2), (-1, -1), (-1, 1)][direction]
+    else:
+        # Odd lines
+        di, dj = [(0, 2), (1, 1), (1, -1), (0, -2), (0, -1), (0, 1)][direction]
+    return i + di, j + dj
+
+
 def point_to_cell(point, radius=CELL_RADIUS):
     """Convert an allocentric position to cell coordinates."""
     # print(point)

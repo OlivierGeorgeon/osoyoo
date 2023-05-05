@@ -1,5 +1,6 @@
 from playsound import playsound
-from .Decider.AgentCircle import AgentCircle
+from .Decider.DeciderCircle import DeciderCircle
+from .Decider.DeciderExplore import DeciderExplore
 from .Decider.Action import create_actions, ACTION_FORWARD, ACTIONS, ACTION_ALIGN_ROBOT
 from .Decider.Interaction import Interaction, OUTCOME_DEFAULT
 from .Memory.Memory import Memory
@@ -24,7 +25,8 @@ class Workspace:
         self.actions = create_actions()
 
         self.memory = Memory()
-        self.decider = AgentCircle(self)
+        # self.decider = AgentCircle(self)
+        self.decider = DeciderExplore(self)
         self.integrator = Integrator(self)
 
         self.intended_enaction = None
