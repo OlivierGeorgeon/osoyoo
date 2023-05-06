@@ -17,7 +17,7 @@ class DeciderExplore:
         self.workspace = workspace
         self.anticipated_outcome = OUTCOME_DEFAULT
 
-        self.exploration_step = EXPLORATION_STEP_ROTATE
+        self.exploration_step = EXPLORATION_STEP_INIT
         self.prompt_point = np.array([-1000, 0, 0])
 
     def propose_intended_enaction(self, enacted_interaction):

@@ -136,28 +136,3 @@ class Enaction:
         label = "Speed x: " + str(int(self.interaction.action.translation_speed[0])) + "mm/s, y: " \
             + str(int(self.interaction.action.translation_speed[1])) + "mm/s, rotation:" + rotation_speed + "°/s"
         return label
-
-    # def imagine(self):
-    #     """Return the imaginary enacted interaction"""
-    #     # enacted_interaction = self.intended_interaction.copy()
-    #     enacted_interaction = {'action': self.interaction.action.action_code, 'clock': self.clock}
-    #
-    #     translation = np.array([0, 0, 0], dtype=float)
-    #     yaw_rad = 0
-    #
-    #     translation_matrix = matrix44.create_from_translation(-translation)
-    #     rotation_matrix = matrix44.create_from_z_rotation(yaw_rad)
-    #     displacement_matrix = matrix44.multiply(rotation_matrix, translation_matrix)
-    #
-    #     enacted_interaction['translation'] = translation
-    #     enacted_interaction['yaw'] = round(math.degrees(yaw_rad))
-    #     enacted_interaction['azimuth'] = 0  # Is computed by body_memory
-    #     enacted_interaction['displacement_matrix'] = displacement_matrix
-    #     enacted_interaction['rotation_matrix'] = rotation_matrix
-    #     enacted_interaction['head_angle'] = 0
-    #     enacted_interaction['points'] = []
-    #
-    #     # print("intended interaction", self.intended_enaction)
-    #     print("Imaginary enacted interaction", enacted_interaction)
-    #
-    #     return enacted_interaction

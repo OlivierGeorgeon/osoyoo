@@ -32,9 +32,6 @@ class CtrlRobot:
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.socket.connect((self.robot_ip, self.port))  # Not necessary for UDP
         self.socket.settimeout(0)
-
-        # Class variables used in an asynchronous Thread
-        # self.enact_step = ENACT_STEP_IDLE
         self.expected_outcome_time = 0.
 
     def main(self, dt):

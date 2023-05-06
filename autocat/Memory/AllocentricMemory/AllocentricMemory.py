@@ -113,6 +113,7 @@ class AllocentricMemory:
 
     def place_robot_translate(self, body_direction_matrix, start, end, clock):
         """Mark the cells traversed by the robot translation"""
+        # TODO manage different directions
         p1 = matrix44.apply_to_vector(body_direction_matrix, [ROBOT_FRONT_X, ROBOT_SIDE, 0]) + end
         p2 = matrix44.apply_to_vector(body_direction_matrix, [-ROBOT_FRONT_X, ROBOT_SIDE, 0]) + start
         p3 = matrix44.apply_to_vector(body_direction_matrix, [-ROBOT_FRONT_X, -ROBOT_SIDE, 0]) + start

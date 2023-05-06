@@ -52,9 +52,6 @@ class CtrlPhenomenonView:
         for poi in self.affordance_displays:
             poi.delete()
         self.affordance_displays = []
-        # for cone in self.cones:
-        #     cone.delete()
-        # self.cones = []
 
         # Recreate all affordance displays
         for a in phenomenon.affordances:
@@ -93,10 +90,8 @@ class CtrlPhenomenonView:
             #     self.phenomenon = self.workspace.integrator.phenomena[0]
             if self.phenomenon is not None:
                 self.update_affordance_displays(self.phenomenon)
-                self.view.label3.text = "Origin direction: " + \
-                    str(round(math.degrees(self.phenomenon.origin_affordance.experience.absolute_direction_rad))) + \
-                    "°. Nb tours:" + str(self.phenomenon.nb_tour)
+                self.view.label3.text = self.phenomenon.phenomenon_label()
             self.update_body_robot()
 
             # Last view to refresh
-            self.workspace.interaction_step = INTERACTION_STEP_IDLE
+            # self.workspace.interaction_step = INTERACTION_STEP_IDLE

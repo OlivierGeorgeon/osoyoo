@@ -47,6 +47,10 @@ class Workspace:
     def main(self, dt):
         """The main handler of the interaction cycle:
         organize the generation of the intended_interaction and the processing of the enacted_interaction."""
+        # REFRESHING: last only one cycle
+        if self.interaction_step == INTERACTION_STEP_REFRESHING:
+            self.interaction_step = INTERACTION_STEP_IDLE
+
         # IDLE: Ready to choose the next intended interaction
         if self.interaction_step == INTERACTION_STEP_IDLE:
             # Manage the memory snapshot
@@ -55,8 +59,7 @@ class Workspace:
                 if self.engagement_mode == KEY_ENGAGEMENT_ROBOT:
                     self.memory = self.memory_snapshot.save()  # Keep the snapshot saved
                     self.is_imagining = False
-                    self.interaction_step = INTERACTION_STEP_REFRESHING  # TODO use a separate flag
-                    # print("Restored", self.memory)
+                    self.interaction_step = INTERACTION_STEP_REFRESHING
                 # (If continue imagining then keep the previous snapshot)
             else:
                 # If was not previously imagining then take a new memory snapshot
@@ -94,9 +97,6 @@ class Workspace:
             else:
                 # End of the simulation
                 if self.is_imagining:
-                    # Compute an imaginary enacted_interaction and proceed to integrating
-                    # self.update_enacted_interaction(self.intended_enaction.imagine())
-                    # self.interaction_step = INTERACTION_STEP_INTEGRATING
                     # Skip INTEGRATING for now
                     del self.enactions[self.clock]
                     self.clock += 1  # Perhaps not necessary
@@ -126,7 +126,7 @@ class Workspace:
 
             self.interaction_step = INTERACTION_STEP_REFRESHING
 
-        # REFRESHING: is handled by views and reset by CtrlPhenomenonDisplay
+        # REFRESHING: Will be reset to IDLE in the next cycle
 
     def process_user_key(self, user_key):
         """Process the keypress on the view windows (called by the views)"""

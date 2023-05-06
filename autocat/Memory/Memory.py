@@ -49,11 +49,11 @@ class Memory:
 
     def update_allocentric(self, phenomena, clock):
         """Allocate the phenomena to the cells of allocentric memory"""
-        # Mark the affordances
-        self.allocentric_memory.update_affordances(phenomena, clock)
-
         # Mark the cells where is the robot
         self.allocentric_memory.place_robot(self.body_memory, clock)
+
+        # Mark the affordances
+        self.allocentric_memory.update_affordances(phenomena, clock)
 
         # Update the focus in allocentric memory
         allo_focus = self.egocentric_to_allocentric(self.egocentric_memory.focus_point)

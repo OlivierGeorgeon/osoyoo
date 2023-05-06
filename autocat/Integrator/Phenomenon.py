@@ -1,5 +1,5 @@
+import math
 import numpy as np
-from pyrr import matrix44
 from scipy.spatial import ConvexHull, QhullError, Delaunay
 
 PHENOMENON_DELTA = 300  # (mm) Distance between affordances to be considered the same phenomenon
@@ -61,6 +61,12 @@ class Phenomenon:
         except IndexError as e:
             print("Error computing the Delaunay: ", e)
         return is_inside
+
+    def phenomenon_label(self):
+        label = "Origin direction: " + \
+            str(round(math.degrees(self.origin_affordance.experience.absolute_direction_rad))) + \
+            "°. Nb tours:" + str(self.nb_tour)
+        return label
 
     def save(self, saved_phenomenon, experiences):
         """Return a clone of the phenomenon for memory snapshot"""
