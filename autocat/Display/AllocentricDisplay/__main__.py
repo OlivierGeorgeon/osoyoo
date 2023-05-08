@@ -30,7 +30,24 @@ workspace.memory.allocentric_memory.grid[1][2].status[0] = EXPERIENCE_FLOOR
 workspace.memory.allocentric_memory.grid[-1][-2].status[0] = EXPERIENCE_PLACE
 workspace.memory.allocentric_memory.grid[-1][-3].status[0] = EXPERIENCE_PLACE
 
+# Pool cells
+workspace.memory.allocentric_memory.grid[-2][1].status[0] = EXPERIENCE_ALIGNED_ECHO
+workspace.memory.allocentric_memory.grid[-1][-4].status[0] = EXPERIENCE_ALIGNED_ECHO
+workspace.memory.allocentric_memory.grid[0][0].status[0] = EXPERIENCE_ALIGNED_ECHO
+workspace.memory.allocentric_memory.grid[0][5].status[0] = EXPERIENCE_PLACE
+workspace.memory.allocentric_memory.grid[0][-5].status[0] = EXPERIENCE_ALIGNED_ECHO
+workspace.memory.allocentric_memory.grid[1][4].status[0] = EXPERIENCE_ALIGNED_ECHO
+workspace.memory.allocentric_memory.grid[1][-6].status[0] = EXPERIENCE_PLACE
+workspace.memory.allocentric_memory.grid[1][-1].status[0] = EXPERIENCE_ALIGNED_ECHO
+workspace.memory.allocentric_memory.grid[2][-2].status[0] = EXPERIENCE_PLACE
+workspace.memory.allocentric_memory.grid[2][3].status[0] = EXPERIENCE_ALIGNED_ECHO
+workspace.memory.allocentric_memory.grid[3][2].status[0] = EXPERIENCE_PLACE
+workspace.memory.allocentric_memory.grid[3][-2].status[0] = EXPERIENCE_ALIGNED_ECHO
+workspace.memory.allocentric_memory.grid[4][2].status[0] = EXPERIENCE_ALIGNED_ECHO
+workspace.memory.allocentric_memory.grid[2][-6].status[0] = EXPERIENCE_ALIGNED_ECHO
+workspace.memory.allocentric_memory.grid[3][-7].status[0] = EXPERIENCE_ALIGNED_ECHO
+
 view_controller = CtrlAllocentricView(workspace)
-view_controller.update()
+view_controller.update_view()
 
 pyglet.app.run()

@@ -18,17 +18,25 @@ class CellDisplay:
         # self.cell = cell Do not store the cell because it may be cloned
         self.batch = batch
 
+        # Pool
+        self.shape_pool = None
+        if cell.is_pool():
+            point_pool = np.array([cell.radius * 3, 0, 0])
+            rotation_matrix = matrix44.create_from_z_rotation(-math.atan2(math.sqrt(3), -2))
+            point_pool = matrix44.apply_to_vector(rotation_matrix, point_pool)
+            self.shape_pool = self.create_shape(cell.point, point_pool, groups[0])
+
         # The level 0 hexagon
         point0 = np.array([cell.radius * SCALE_LEVEL_0, 0, 0])
-        self.shape0 = self.create_shape(cell.point, point0, groups[0])
+        self.shape0 = self.create_shape(cell.point, point0, groups[1])
 
         # The level 1 hexagon
         point1 = np.array([cell.radius * SCALE_LEVEL_1, 0, 0])
-        self.shape1 = self.create_shape(cell.point, point1, groups[1])
+        self.shape1 = self.create_shape(cell.point, point1, groups[2])
 
         # The level 2 hexagon
         point2 = np.array([cell.radius * SCALE_LEVEL_2, 0, 0])
-        self.shape2 = self.create_shape(cell.point, point2, groups[2])
+        self.shape2 = self.create_shape(cell.point, point2, groups[3])
 
         self.update_color(cell.status)
 
@@ -47,6 +55,9 @@ class CellDisplay:
 
     def update_color(self, status):
         """Update the color and opacity of the shapes based on the cell status"""
+        if self.shape_pool is not None:
+            self.shape_pool.colors[0:24] = 6 * (*name_to_rgb('royalblue'), 255)
+
         # Level 0
         color0 = name_to_rgb('white')
         opacity0 = 255

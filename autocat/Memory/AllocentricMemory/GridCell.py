@@ -1,6 +1,7 @@
 import math
 import numpy as np
 import matplotlib.path as mpath
+from .Hexagonal_geometry import cell_to_point
 
 CELL_PHENOMENON = 'phenomenon'
 CELL_UNKNOWN = 'Unknown'
@@ -13,17 +14,18 @@ class GridCell:
         """Constructor of the class, i and j are the coordinates of the cell in the grid"""
         self.i = i
         self.j = j
-        self.radius = cell_radius
+        self.radius = cell_radius  # The radius of the outer circle
 
         # Compute the position of this cell
-        cell_height = math.sqrt((2 * cell_radius) ** 2 - cell_radius ** 2)
-        if j % 2 == 0:
-            x = i * 3 * cell_radius
-            y = cell_height * (j / 2)
-        else:
-            x = (1.5 * cell_radius) + i * 3 * cell_radius
-            y = (cell_height / 2) + (j - 1) / 2 * cell_height
-        self.point = np.array([x, y, 0], dtype=int)
+        # cell_height = math.sqrt((2 * cell_radius) ** 2 - cell_radius ** 2)  # The radius of the inner circle
+        # if j % 2 == 0:
+        #     x = i * 3 * cell_radius
+        #     y = cell_height * (j / 2)
+        # else:
+        #     x = (1.5 * cell_radius) + i * 3 * cell_radius
+        #     y = (cell_height / 2) + (j - 1) / 2 * cell_height
+        # self.point = np.array([x, y, 0], dtype=int)
+        self.point = cell_to_point(i, j)
 
         self.status = [CELL_UNKNOWN,  # Place
                        CELL_UNKNOWN,  # Interaction
@@ -46,6 +48,22 @@ class GridCell:
         """True if this cell is inside the polygon"""
         path = mpath.Path(polygon)
         return path.contains_point(self.point[0:2])
+
+    def interest_value(self):
+        """Return how much this cell is interesting to visit"""
+        interest_value = 0
+        if self.status[0] == CELL_UNKNOWN:
+            interest_value += 1
+        return interest_value
+
+    def is_pool(self):
+        """True if this cell is used for pooling with aperture 7"""
+        # https://ieeexplore.ieee.org/document/8853238
+        # even: i = 3n + m, j = -2n + 4m
+        # odd: i = 3n + m -2, j = -2n + 4m + 1
+        pool_even = (-4 * self.i + self.j) % 14 == 0
+        pool_odd = (-4 * self.i + self.j - 9) % 14 == 0
+        return pool_even or pool_odd
 
     def save(self, experiences):
         """Return a clone of the cell to save a snapshot of allocentric memory"""

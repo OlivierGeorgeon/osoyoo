@@ -18,24 +18,21 @@ class AllocentricView(InteractiveDisplay):
         super().__init__(width, height, resizable=True, *args, **kwargs)
         self.set_caption("Allocentric Memory")
         self.set_minimum_size(150, 150)
+
         # glClearColor(0.2, 0.2, 0.7, 1.0)  # Make it look like hippocampus imaging
         glClearColor(0.2, 0.2, 1.0, 1.0)  # For demonstration in Fête de la Science
         # glClearColor(1.0, 1.0, 1.0, 1.0)
-        # pyglet.gl.glEnable(pyglet.gl.GL_BLEND)
-        # self.batch = pyglet.graphics.Batch()
-        self.groups = [pyglet.graphics.OrderedGroup(0),
-                       pyglet.graphics.OrderedGroup(1),
-                       pyglet.graphics.OrderedGroup(2)]
-        # self.foreground = pyglet.graphics.OrderedGroup(3)
 
+        self.groups = [pyglet.graphics.OrderedGroup(1),
+                       pyglet.graphics.OrderedGroup(2),
+                       pyglet.graphics.OrderedGroup(3),
+                       pyglet.graphics.OrderedGroup(4)]
         self.robot_batch = pyglet.graphics.Batch()
         self.robot = OsoyooCar(self.robot_batch, self.forefront)  # Rectangles seem not to respect ordered groups
 
-        # self.test_cell = Cell(0, 100, self.robot_batch, self.foreground, 50, 'Free')
-
         self.zoom_level = 4
         self.mouse_press_angle = 0
-        self.window = None
+        # self.window = None
 
         self.workspace = workspace
         self.nb_cell_x = workspace.memory.allocentric_memory.width

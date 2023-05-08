@@ -33,7 +33,7 @@ class InteractiveDisplay(pyglet.window.Window):
         pyglet.gl.glEnable(pyglet.gl.GL_BLEND)
         self.batch = pyglet.graphics.Batch()
         self.background = pyglet.graphics.OrderedGroup(0)
-        self.forefront = pyglet.graphics.OrderedGroup(3)
+        self.forefront = pyglet.graphics.OrderedGroup(5)
         self.screen_scale = screen_scale()
 
     def on_resize(self, width, height):

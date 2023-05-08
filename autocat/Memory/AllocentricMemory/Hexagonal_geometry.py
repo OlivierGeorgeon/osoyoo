@@ -1,6 +1,17 @@
-import math
+########################################################################################
+# The math used to handle the hexagonal grid
+# https://www.redblobgames.com/grids/hexagons/
+# Orientation: flat_top.
+# Coordinate system: Horizontal layout with odd row offset
+#                    (0,0) center. Positive rows upward.
+# Pooling with aperture of 7
+# https://ieeexplore.ieee.org/document/8853238
+########################################################################################
 
-CELL_RADIUS = 50
+import math
+import numpy as np
+
+CELL_RADIUS = 50  # (mm) Diameter of the outer circle
 
 
 def get_neighbors(i, j):
@@ -22,6 +33,18 @@ def get_neighbor_in_direction(i, j, direction):
         # Odd lines
         di, dj = [(0, 2), (1, 1), (1, -1), (0, -2), (0, -1), (0, 1)][direction]
     return i + di, j + dj
+
+
+def cell_to_point(i, j, radius=CELL_RADIUS):
+    """Convert the cell coordinates into allocentric coordinates"""
+    cell_height = math.sqrt((2 * radius) ** 2 - radius ** 2)
+    if j % 2 == 0:
+        x = i * 3 * radius
+        y = cell_height * (j / 2)
+    else:
+        x = (1.5 * radius) + i * 3 * radius
+        y = (cell_height / 2) + (j - 1) / 2 * cell_height
+    return np.array([x, y, 0], dtype=int)
 
 
 def point_to_cell(point, radius=CELL_RADIUS):
