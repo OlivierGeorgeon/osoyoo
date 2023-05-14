@@ -74,16 +74,16 @@ class AllocentricMemory:
             for a in p.affordances:
                 # Attribute the status of the affordance
                 cell_x, cell_y = point_to_cell(a.point+p.point)
-                self.apply_status_to_cell(cell_x, cell_y, a.experience.type, a.experience.clock)
+                self.apply_status_to_cell(cell_x, cell_y, a.experience.type, a.experience.clock, a.experience.color_index)
                 # Attribute this phenomenon to this cell
                 self.grid[cell_x][cell_y].phenomenon = p
             cell_i, cell_j = point_to_cell(p.point)
-            self.apply_status_to_cell(cell_i, cell_j, CELL_PHENOMENON, clock)  # Mark the origin
+            self.apply_status_to_cell(cell_i, cell_j, CELL_PHENOMENON, clock, None)  # Mark the origin
 
         # Place the affordances that are not attached to phenomena
-        for affordance in self.affordances:
-            cell_x, cell_y = point_to_cell(affordance.point)
-            self.apply_status_to_cell(cell_x, cell_y, affordance.experience.type, clock)
+        for a in self.affordances:
+            cell_x, cell_y = point_to_cell(a.point)
+            self.apply_status_to_cell(cell_x, cell_y, a.experience.type, clock, a.experience.color_index)
 
     def move(self, body_direction_rad, translation, clock, is_egocentric_translation=True):
         """Move the robot in allocentric memory. Mark the traversed cells Free. Returns the new position"""
@@ -150,12 +150,13 @@ class AllocentricMemory:
     #         current_pos_x += step_x
     #         current_pos_y += step_y
 
-    def apply_status_to_cell(self, i, j, status, clock):
+    def apply_status_to_cell(self, i, j, status, clock, color_index):
         """Change the cell status"""
         if (self.min_i <= i <= self.max_i) and (self.min_j <= j <= self.max_j):
             if status == EXPERIENCE_FLOOR:
                 self.grid[i][j].status[0] = status
                 self.grid[i][j].clock_place = clock
+                self.grid[i][j].color_index = color_index
             else:
                 self.grid[i][j].status[1] = status
                 self.grid[i][j].clock_interaction = clock

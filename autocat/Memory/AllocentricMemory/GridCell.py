@@ -21,6 +21,7 @@ class GridCell:
                        CELL_UNKNOWN,  # No echo
                        CELL_UNKNOWN]  # Focus
         # self.clocks = [0, 0, 0, 0]  # The latest clocks attached with each layer
+        self.color_index = 0
         self.clock_place = 0
         self.clock_interaction = 0
         self.clock_phenomenon = 0
@@ -73,8 +74,8 @@ class GridCell:
         # Use the experiences cloned when saving egocentric memory
         saved_cell = GridCell(self.i, self.j, self.radius)
         # Clone the content
+        saved_cell.color_index = self.color_index
         saved_cell.status = self.status.copy()
-        # saved_cell.clocks = self.clocks.copy()
         saved_cell.clock_place = self.clock_place
         saved_cell.clock_interaction = self.clock_interaction
         saved_cell.clock_phenomenon = self.clock_phenomenon

@@ -59,7 +59,7 @@ class AllocentricView(InteractiveDisplay):
         else:
             if cell.is_known():
                 # Update the hexagon
-                self.hexagons[cell.i][cell.j].update_color(cell.status)
+                self.hexagons[cell.i][cell.j].update_color(cell)
             else:
                 # Delete the hexagon
                 self.hexagons[cell.i][cell.j].delete()
