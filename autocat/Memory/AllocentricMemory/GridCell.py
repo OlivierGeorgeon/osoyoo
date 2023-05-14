@@ -1,5 +1,3 @@
-import math
-import numpy as np
 import matplotlib.path as mpath
 from .Hexagonal_geometry import cell_to_point
 
@@ -16,28 +14,29 @@ class GridCell:
         self.j = j
         self.radius = cell_radius  # The radius of the outer circle
 
-        # Compute the position of this cell
-        # cell_height = math.sqrt((2 * cell_radius) ** 2 - cell_radius ** 2)  # The radius of the inner circle
-        # if j % 2 == 0:
-        #     x = i * 3 * cell_radius
-        #     y = cell_height * (j / 2)
-        # else:
-        #     x = (1.5 * cell_radius) + i * 3 * cell_radius
-        #     y = (cell_height / 2) + (j - 1) / 2 * cell_height
-        # self.point = np.array([x, y, 0], dtype=int)
-        self.point = cell_to_point(i, j)
+        self._point = cell_to_point(i, j)  # Must not be changed
 
         self.status = [CELL_UNKNOWN,  # Place
                        CELL_UNKNOWN,  # Interaction
                        CELL_UNKNOWN,  # No echo
                        CELL_UNKNOWN]  # Focus
-        self.clocks = [0, 0, 0, 0]  # The latest clocks attached with each layer
+        # self.clocks = [0, 0, 0, 0]  # The latest clocks attached with each layer
+        self.clock_place = 0
+        self.clock_interaction = 0
+        self.clock_phenomenon = 0
+        self.clock_no_echo = 0
+        self.clock_focus = 0
+        self.clock_prompt = 0
         self.experiences = list()  # Used in Synthesizer to store the experiences that happened on the cell
         self.phenomenon = None
 
     def __str__(self):
         """String representation of the cell for console display"""
         return "(%+d,%+d)" % (self.i, self.j)
+
+    def point(self):
+        """Return a clone of the cell's point"""
+        return self._point.copy()
 
     def is_known(self):
         """Return True if something is known in this cell"""
@@ -47,13 +46,17 @@ class GridCell:
     def is_inside(self, polygon):
         """True if this cell is inside the polygon"""
         path = mpath.Path(polygon)
-        return path.contains_point(self.point[0:2])
+        return path.contains_point(self._point[0:2])
 
     def interest_value(self):
         """Return how much this cell is interesting to visit"""
         interest_value = 0
+        # Interesting if not visited
         if self.status[0] == CELL_UNKNOWN:
-            interest_value += 1
+            interest_value = 1
+        # Not interesting if already prompted
+        if self.clock_prompt > 0:
+            interest_value = -10
         return interest_value
 
     def is_pool(self):
@@ -71,7 +74,13 @@ class GridCell:
         saved_cell = GridCell(self.i, self.j, self.radius)
         # Clone the content
         saved_cell.status = self.status.copy()
-        saved_cell.clocks = self.clocks.copy()
+        # saved_cell.clocks = self.clocks.copy()
+        saved_cell.clock_place = self.clock_place
+        saved_cell.clock_interaction = self.clock_interaction
+        saved_cell.clock_phenomenon = self.clock_phenomenon
+        saved_cell.clock_no_echo = self.clock_no_echo
+        saved_cell.clock_focus = self.clock_focus
+        saved_cell.clock_prompt = self.clock_prompt
         saved_cell.experiences = [experiences[e.id] for e in self.experiences]
         if self.phenomenon is not None:
             saved_cell.phenomenon = self.phenomenon.save(experiences)

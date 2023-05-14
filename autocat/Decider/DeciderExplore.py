@@ -1,5 +1,5 @@
 ########################################################################################
-# This decider makes the robot explore the areas of the terrain that are not yet known
+# This decider makes the robot explore the parts of the terrain that are not yet known
 ########################################################################################
 
 import numpy as np
@@ -18,7 +18,7 @@ class DeciderExplore:
         self.anticipated_outcome = OUTCOME_DEFAULT
 
         self.exploration_step = EXPLORATION_STEP_INIT
-        self.prompt_point = np.array([-1000, 0, 0])
+        self.prompt_point = np.array([-900, 600, 0])
 
     def propose_intended_enaction(self, enacted_interaction):
         """Propose the next intended enaction from the previous enacted interaction.
@@ -37,7 +37,9 @@ class DeciderExplore:
         # Compute the next prompt point
         if self.exploration_step == EXPLORATION_STEP_INIT:
             # Go back and forth
-            self.workspace.memory.egocentric_memory.prompt_point = self.prompt_point.copy()
+            # self.workspace.memory.egocentric_memory.prompt_point = self.prompt_point.copy()
+            self.workspace.memory.egocentric_memory.prompt_point = \
+                self.workspace.memory.allocentric_to_egocentric(self.workspace.memory.allocentric_memory.most_interesting_pool())
             self.exploration_step = EXPLORATION_STEP_ROTATE
 
         # Compute the next intended interaction

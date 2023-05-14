@@ -47,6 +47,9 @@ workspace.memory.allocentric_memory.grid[4][2].status[0] = EXPERIENCE_ALIGNED_EC
 workspace.memory.allocentric_memory.grid[2][-6].status[0] = EXPERIENCE_ALIGNED_ECHO
 workspace.memory.allocentric_memory.grid[3][-7].status[0] = EXPERIENCE_ALIGNED_ECHO
 
+# Interesting pool
+workspace.memory.allocentric_memory.most_interesting_pool()
+
 view_controller = CtrlAllocentricView(workspace)
 view_controller.update_view()
 
