@@ -70,15 +70,15 @@ class AllocentricMemory:
         # Clear the previous phenomena
         self.clear_phenomena()
         # Place the phenomena again
-        for p in phenomena:
+        for p_id, p in phenomena.items():
             for a in p.affordances:
                 # Attribute the status of the affordance
                 cell_x, cell_y = point_to_cell(a.point+p.point)
                 self.apply_status_to_cell(cell_x, cell_y, a.experience.type, a.experience.clock, a.experience.color_index)
                 # Attribute this phenomenon to this cell
-                self.grid[cell_x][cell_y].phenomenon = p
-            cell_i, cell_j = point_to_cell(p.point)
-            self.apply_status_to_cell(cell_i, cell_j, CELL_PHENOMENON, clock, None)  # Mark the origin
+                self.grid[cell_x][cell_y].phenomenon_id = p_id
+            # cell_i, cell_j = point_to_cell(p.point)
+            # self.apply_status_to_cell(cell_i, cell_j, CELL_PHENOMENON, clock, None)  # Mark the origin
 
         # Place the affordances that are not attached to phenomena
         for a in self.affordances:
@@ -126,8 +126,7 @@ class AllocentricMemory:
 
     def clear_phenomena(self):
         """Reset the phenomena from cells"""
-        for c in [c for line in self.grid for c in line if c.phenomenon is not None]:
-            # self.apply_status_to_cell(i, j, CELL_UNKNOWN)
+        for c in [c for line in self.grid for c in line if c.phenomenon_id is not None]:
             c.status[1] = CELL_UNKNOWN
             c.clock_phenomenon = 0  # Not sure we should reset this clock
             c.phenomenon = None
@@ -153,7 +152,7 @@ class AllocentricMemory:
     def apply_status_to_cell(self, i, j, status, clock, color_index):
         """Change the cell status"""
         if (self.min_i <= i <= self.max_i) and (self.min_j <= j <= self.max_j):
-            if status == EXPERIENCE_FLOOR:
+            if status in [EXPERIENCE_FLOOR, EXPERIENCE_PLACE]:
                 self.grid[i][j].status[0] = status
                 self.grid[i][j].clock_place = clock
                 self.grid[i][j].color_index = color_index
@@ -173,7 +172,7 @@ class AllocentricMemory:
             c.clock_no_echo = affordance.experience.clock
         # print("Place echo time:", time.time() - start_time, "seconds")
 
-    def update_focus(self, allo_focus):
+    def update_focus(self, allo_focus, clock):
         """Update the focus in allocentric memory"""
         # Clear the previous focus cell
         if self.focus_i is not None:
@@ -182,8 +181,9 @@ class AllocentricMemory:
         if allo_focus is not None:
             self.focus_i, self.focus_j = point_to_cell(allo_focus, self.cell_radius)
             self.grid[self.focus_i][self.focus_j].status[3] = EXPERIENCE_FOCUS
+            self.grid[self.focus_i][self.focus_j].clock_focus = clock
 
-    def update_prompt(self, allo_prompt):
+    def update_prompt(self, allo_prompt, clock):
         """Update the prompt in allocentric memory"""
         # Clear the previous focus cell
         if self.prompt_i is not None:
@@ -192,7 +192,7 @@ class AllocentricMemory:
         if allo_prompt is not None:
             self.prompt_i, self.prompt_j = point_to_cell(allo_prompt, self.cell_radius)
             self.grid[self.prompt_i][self.prompt_j].status[3] = EXPERIENCE_PROMPT
-            self.grid[self.prompt_i][self.prompt_j].clock_prompt = 1  # TODO the actual clock
+            self.grid[self.prompt_i][self.prompt_j].clock_prompt = clock
             print("Prompt in cell", self.prompt_i, ", ", self.prompt_j)
 
     def save(self, experiences):
@@ -209,23 +209,24 @@ class AllocentricMemory:
 
         return saved_allocentric_memory
 
-    def most_interesting_pool(self):
+    def most_interesting_pool(self, clock):
         """Return the coordinates of the cell that has the most interesting pool value"""
         cells = []
         interests = []
 
         # for n in range(-2, 2):
         #     for m in range(-2, 2):
-        for i in [(2, 0), (2, -2), (2, 2), (0, -2), (2, 1), (-2, 1), (1, 2), (-2, -2), (0, 2), (-2, -1), (-1, 2), (-2, 2),
-                  (1, -2), (-2, 0), (2, -1), (-1, -2)]:
+        # 3 tours counterclockwise:
+        for i in [(2, 0), (-1, 2), (-2, -2), (2, -1), (0, 5), (-2, -1), (2, -2), (1, 2), (-2, 0), (1, -2), (2, 2), (-2, 1),
+                  (0, -2), (2, 1), (-2, 2), (-1, -2)]:
             i_even = 3 * i[0] + i[1]
             j_even = -2 * i[0] + 4 * i[1]
             cells.append([i_even, j_even])
-            interests.append(self.pool_interest(i_even, j_even))
+            interests.append(self.pool_interest(i_even, j_even, clock))
             i_odd = i_even - 2
             j_odd = j_even + 1
             cells.append([i_odd, j_odd])
-            interests.append(self.pool_interest(i_odd, j_odd))
+            interests.append(self.pool_interest(i_odd, j_odd, clock))
         max_interest = max(interests)
         coord = cells[interests.index(max_interest)]
         # Update the prompt
@@ -237,12 +238,12 @@ class AllocentricMemory:
         print("Most interesting pool:", coord, "with interest", max_interest)
         return self.grid[self.prompt_i][self.prompt_j].point()
 
-    def pool_interest(self, i, j):
+    def pool_interest(self, i, j, clock):
         """Return the sum of interest of neighbors plus this cell"""
         if (self.min_i + 1 <= i <= self.max_i - 1) and (self.min_j + 1 <= j <= self.max_j - 1):
-            interest = self.grid[i][j].interest_value()
+            interest = self.grid[i][j].interest_value(clock)
             for n in get_neighbors(i, j).values():
-                interest += self.grid[n[0]][n[1]].interest_value()
+                interest += self.grid[n[0]][n[1]].interest_value(clock)
             return interest
         else:
             # If not in the grid

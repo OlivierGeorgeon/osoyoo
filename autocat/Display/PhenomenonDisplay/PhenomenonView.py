@@ -10,7 +10,7 @@ class PhenomenonView(InteractiveDisplay):
     """Display a phenomenon"""
     def __init__(self, width=350, height=350, *args, **kwargs):
         super().__init__(width, height, resizable=True, *args, **kwargs)
-        self.set_caption("Phenomenon View")
+        self.set_caption("Terrain Phenomenon View")
         self.set_minimum_size(150, 150)
 
         # # Initialize OpenGL parameters

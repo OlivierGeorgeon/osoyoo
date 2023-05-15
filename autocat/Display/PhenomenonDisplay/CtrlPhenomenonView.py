@@ -80,10 +80,13 @@ class CtrlPhenomenonView:
         """Called every frame. Update the phenomenon view"""
         # The position of the robot in the view
         self.view.robot_rotate = 90 - self.workspace.memory.body_memory.body_azimuth()
+        # Always display Phenomenon 0 (terrain)
+        if 0 in self.workspace.memory.phenomenon_memory.phenomena:
+            self.phenomenon = self.workspace.memory.phenomenon_memory.phenomena[0]
+
         if self.phenomenon is not None:
             self.view.robot_translate = self.workspace.memory.allocentric_memory.robot_point - self.phenomenon.point
             self.view.label2.text = "Confidence: " + str(round(self.phenomenon.confidence * 100)) + "%"
-        # if self.workspace.flag_for_view_refresh:
         if self.workspace.interaction_step == INTERACTION_STEP_REFRESHING:
             # Display in phenomenon view
             # if len(self.workspace.integrator.phenomena) > 0:
@@ -92,6 +95,3 @@ class CtrlPhenomenonView:
                 self.update_affordance_displays(self.phenomenon)
                 self.view.label3.text = self.phenomenon.phenomenon_label()
             self.update_body_robot()
-
-            # Last view to refresh
-            # self.workspace.interaction_step = INTERACTION_STEP_IDLE

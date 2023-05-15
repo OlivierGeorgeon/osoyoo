@@ -1,10 +1,8 @@
 import math
 import numpy as np
 from pyrr import matrix44
-from webcolors import name_to_rgb
 from ..Memory.EgocentricMemory.Experience import EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_CENTRAL_ECHO, EXPERIENCE_FLOOR
 from ..Utils import assert_almost_equal_angles
-from .PhenomenonTerrain import TERRAIN_EXPERIENCE_TYPES
 
 MAX_SIMILAR_DISTANCE = 300    # (mm) Max distance within which affordances are similar
 MAX_SIMILAR_DIRECTION = 15    # (degrees) Max angle within which affordances are similar

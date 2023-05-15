@@ -38,9 +38,11 @@ class DeciderExplore:
         if self.exploration_step == EXPLORATION_STEP_INIT:
             # Go back and forth
             # self.workspace.memory.egocentric_memory.prompt_point = self.prompt_point.copy()
-            self.workspace.memory.egocentric_memory.prompt_point = \
-                self.workspace.memory.allocentric_to_egocentric(self.workspace.memory.allocentric_memory.most_interesting_pool())
+            # Go to the most interesting pool point
+            mip = self.workspace.memory.allocentric_memory.most_interesting_pool(self.workspace.clock)
+            self.workspace.memory.egocentric_memory.prompt_point = self.workspace.memory.allocentric_to_egocentric(mip)
             self.exploration_step = EXPLORATION_STEP_ROTATE
+            # If close to terrain origin and not recently updated then re-enact the origin interaction
 
         # Compute the next intended interaction
         if self.exploration_step == EXPLORATION_STEP_TRANSLATE:

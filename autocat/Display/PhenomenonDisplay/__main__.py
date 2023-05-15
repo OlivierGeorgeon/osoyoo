@@ -3,7 +3,7 @@ import numpy
 import pyglet
 from .CtrlPhenomenonView import CtrlPhenomenonView
 from ...Workspace import Workspace
-from ...Integrator.PhenomenonObject import PhenomenonObject
+from autocat.Memory.PhenomenonMemory.PhenomenonObject import PhenomenonObject
 from ...Integrator.Affordance import Affordance
 from ...Memory.EgocentricMemory.Experience import Experience, EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO
 

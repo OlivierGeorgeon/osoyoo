@@ -28,8 +28,8 @@ class GridCell:
         self.clock_no_echo = 0
         self.clock_focus = 0
         self.clock_prompt = 0
-        self.experiences = list()  # Used in Synthesizer to store the experiences that happened on the cell
-        self.phenomenon = None
+        # self.experiences = list()  # Used in Synthesizer to store the experiences that happened on the cell
+        self.phenomenon_id = None
 
     def __str__(self):
         """String representation of the cell for console display"""
@@ -49,7 +49,7 @@ class GridCell:
         path = mpath.Path(polygon)
         return path.contains_point(self._point[0:2])
 
-    def interest_value(self):
+    def interest_value(self, clock):
         """Return how much this cell is interesting to visit"""
         interest_value = 0
         # Interesting if not visited
@@ -58,6 +58,10 @@ class GridCell:
         # Not interesting if already prompted
         if self.clock_prompt > 0:
             interest_value = -10
+        # Very interesting if colored
+        # Not working because stop on the cell and don't change the clock_place
+        # if self.color_index is not None and self.color_index > 0 and clock - self.clock_place > 5:
+        #     interest_value = 10
         return interest_value
 
     def is_pool(self):
@@ -82,7 +86,8 @@ class GridCell:
         saved_cell.clock_no_echo = self.clock_no_echo
         saved_cell.clock_focus = self.clock_focus
         saved_cell.clock_prompt = self.clock_prompt
-        saved_cell.experiences = [experiences[e.id] for e in self.experiences]
-        if self.phenomenon is not None:
-            saved_cell.phenomenon = self.phenomenon.save(experiences)
+        # saved_cell.experiences = [experiences[e.id] for e in self.experiences]
+        saved_cell.phenomenon_id = self.phenomenon_id
+        # if self.phenomenon is not None:
+        #     saved_cell.phenomenon = self.phenomenon.save(experiences)
         return saved_cell

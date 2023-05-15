@@ -66,7 +66,7 @@ class CellDisplay:
             color1 = name_to_rgb('grey')
             opacity1 = 0
         if cell.status[0] == EXPERIENCE_PLACE:
-            color1 = name_to_rgb('LightGreen')  # FLOOR_COLORS[0]
+            color1 = name_to_rgb('LightGreen')  # name_to_rgb('LightGreen')  # name_to_rgb(FLOOR_COLORS[0])
         if cell.status[0] == EXPERIENCE_FLOOR:
             if cell.color_index == 0:
                 color1 = name_to_rgb('black')
@@ -82,7 +82,7 @@ class CellDisplay:
             color2 = name_to_rgb('grey')
             opacity2 = 0
         if cell.status[1] == EXPERIENCE_PLACE:  # Not used
-            color2 = name_to_rgb('LightGreen')
+            color2 = name_to_rgb('LightGreen')  # LightGreen
         if cell.status[1] == EXPERIENCE_BLOCK:
             color2 = name_to_rgb('red')
         if cell.status[1] == EXPERIENCE_IMPACT:
@@ -106,7 +106,7 @@ class CellDisplay:
             color3 = name_to_rgb('Orchid')
         else:
             if cell.status[2] == CELL_NO_ECHO:
-                color3 = name_to_rgb('CadetBlue')
+                color3 = name_to_rgb('CadetBlue')  # CadetBlue LightGreen
             else:
                 color3 = name_to_rgb('grey')
                 opacity3 = 0

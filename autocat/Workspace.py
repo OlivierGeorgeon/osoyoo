@@ -115,7 +115,7 @@ class Workspace:
             self.integrator.integrate()
 
             # Update allocentric memory: robot, phenomena, focus
-            self.memory.update_allocentric(self.integrator.phenomena, self.clock)
+            self.memory.update_allocentric(self.clock)
 
             # Increment the clock if the enacted interaction was properly received
             if self.enacted_interaction['clock'] >= self.clock:  # don't increment if the robot is behind

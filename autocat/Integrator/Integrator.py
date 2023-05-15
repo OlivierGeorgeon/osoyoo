@@ -2,19 +2,19 @@ import numpy as np
 from ..Memory.EgocentricMemory.Experience import EXPERIENCE_LOCAL_ECHO, EXPERIENCE_CENTRAL_ECHO, \
     EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_FLOOR
 from .Affordance import Affordance
-from .PhenomenonObject import PhenomenonObject, OBJECT_EXPERIENCE_TYPES
-from .PhenomenonTerrain import PhenomenonTerrain, TERRAIN_EXPERIENCE_TYPES
+# from .PhenomenonObject import PhenomenonObject, OBJECT_EXPERIENCE_TYPES
+# from .PhenomenonTerrain import PhenomenonTerrain, TERRAIN_EXPERIENCE_TYPES
 
 PHENOMENON_DELTA = 300
 
 
-def create_phenomenon(affordance):
-    """Create a new phenomenon depending of the type of the affordance"""
-    # Must always return a phenomenon
-    if affordance.experience.type in TERRAIN_EXPERIENCE_TYPES:
-        return PhenomenonTerrain(affordance)
-    else:
-        return PhenomenonObject(affordance)
+# def create_phenomenon(affordance):
+#     """Create a new phenomenon depending of the type of the affordance"""
+#     # Must always return a phenomenon
+#     if affordance.experience.type in TERRAIN_EXPERIENCE_TYPES:
+#         return PhenomenonTerrain(affordance)
+#     else:
+#         return PhenomenonObject(affordance)
 
 
 class Integrator:
@@ -22,7 +22,7 @@ class Integrator:
     def __init__(self, workspace):
         """Constructor"""
         self.workspace = workspace
-        self.phenomena = []
+        # self.phenomena = []
 
     def integrate(self):
         """Create phenomena and update cells in allocentric memory"""
@@ -46,7 +46,7 @@ class Integrator:
             self.workspace.memory.allocentric_memory.mark_echo_area(a)
 
         # Try to attach the new affordances to existing phenomena and remove these affordances
-        new_affordances, position_correction = self.update_phenomena(new_affordances)
+        new_affordances, position_correction = self.workspace.memory.phenomenon_memory.update_phenomena(new_affordances)
 
         # Adjust the robot's position in allocentric memory
         print("Position correction due to phenomenon update", position_correction)
@@ -54,52 +54,52 @@ class Integrator:
                                                       is_egocentric_translation=False)
 
         # Create new hypothetical phenomena from remaining affordances
-        self.create_phenomena(new_affordances)
+        self.workspace.memory.phenomenon_memory.create_phenomena(new_affordances)
 
         # Stores the remaining new affordances in allocentric memory
         # self.allocentric_memory.affordances.extend(new_affordances) Not sure why
 
         return None
 
-    def update_phenomena(self, affordances):
-        """Try to attach a list of affordances to phenomena in the list.
-        Returns the affordances that have not been attached, and the average translation"""
-        position_correction = np.array([0, 0, 0], dtype=int)
-        sum_translation = np.array([0, 0, 0], dtype=int)
-        number_of_add = 0
-        remaining_affordances = affordances.copy()
-
-        for affordance in affordances:
-            for phenomenon in self.phenomena:
-                delta = phenomenon.update(affordance)
-                if delta is not None:
-                    remaining_affordances.remove(affordance)
-                    # Null correction do not count (to be improved)
-                    if round(np.linalg.norm(delta)) > 0:
-                        sum_translation += delta
-                        number_of_add += 1
-                    # Don't look the other phenomena
-                    break
-        if number_of_add > 0:
-            position_correction = np.divide(sum_translation, number_of_add)
-
-        return remaining_affordances, position_correction
-
-    def create_phenomena(self, affordances):
-        """Create new phenomena from the list of affordances"""
-        new_phenomena = []
-        for affordance in affordances:
-            if len(new_phenomena) == 0:
-                new_phenomena.append(create_phenomenon(affordance))
-            else:
-                clustered = False
-                # Look if the new affordance can be attached to an existing new phenomenon
-                for new_phenomenon in new_phenomena:
-                    print("Update new phenomenon")
-                    if new_phenomenon.update(affordance) is not None:
-                        clustered = True
-                        break
-                if not clustered:
-                    new_phenomena.append(create_phenomenon(affordance))
-
-        self.phenomena.extend(new_phenomena)
+    # def update_phenomena(self, affordances):
+    #     """Try to attach a list of affordances to phenomena in the list.
+    #     Returns the affordances that have not been attached, and the average translation"""
+    #     position_correction = np.array([0, 0, 0], dtype=int)
+    #     sum_translation = np.array([0, 0, 0], dtype=int)
+    #     number_of_add = 0
+    #     remaining_affordances = affordances.copy()
+    #
+    #     for affordance in affordances:
+    #         for phenomenon in self.workspace.memory.phenomenon_memory.phenomena:
+    #             delta = phenomenon.update(affordance)
+    #             if delta is not None:
+    #                 remaining_affordances.remove(affordance)
+    #                 # Null correction do not count (to be improved)
+    #                 if round(np.linalg.norm(delta)) > 0:
+    #                     sum_translation += delta
+    #                     number_of_add += 1
+    #                 # Don't look the other phenomena
+    #                 break
+    #     if number_of_add > 0:
+    #         position_correction = np.divide(sum_translation, number_of_add)
+    #
+    #     return remaining_affordances, position_correction
+    #
+    # def create_phenomena(self, affordances):
+    #     """Create new phenomena from the list of affordances"""
+    #     new_phenomena = []
+    #     for affordance in affordances:
+    #         if len(new_phenomena) == 0:
+    #             new_phenomena.append(create_phenomenon(affordance))
+    #         else:
+    #             clustered = False
+    #             # Look if the new affordance can be attached to an existing new phenomenon
+    #             for new_phenomenon in new_phenomena:
+    #                 print("Update new phenomenon")
+    #                 if new_phenomenon.update(affordance) is not None:
+    #                     clustered = True
+    #                     break
+    #             if not clustered:
+    #                 new_phenomena.append(create_phenomenon(affordance))
+    #
+    #     self.workspace.memory.phenomenon_memory.phenomena.extend(new_phenomena)

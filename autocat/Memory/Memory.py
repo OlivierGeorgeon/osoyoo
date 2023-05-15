@@ -1,8 +1,9 @@
+import numpy as np
 from pyrr import matrix44
 from .EgocentricMemory.EgocentricMemory import EgocentricMemory
 from .AllocentricMemory.AllocentricMemory import AllocentricMemory
 from .BodyMemory import BodyMemory
-from .AllocentricMemory.GridCell import CELL_UNKNOWN, CELL_PHENOMENON
+from .PhenomenonMemory.PhenomenonMemory import PhenomenonMemory
 
 HEXAGRID_WIDTH = 100
 HEXAGRID_HEIGHT = 200
@@ -18,6 +19,7 @@ class Memory:
         self.body_memory = BodyMemory()
         self.egocentric_memory = EgocentricMemory()
         self.allocentric_memory = AllocentricMemory(HEXAGRID_WIDTH, HEXAGRID_HEIGHT, cell_radius=CELL_RADIUS)
+        self.phenomenon_memory = PhenomenonMemory()
 
     def __str__(self):
         return "Memory Robot position (" + str(round(self.allocentric_memory.robot_point[0])) + "," +\
@@ -47,21 +49,21 @@ class Memory:
 
         # The integrator may subsequently update the robot's position
 
-    def update_allocentric(self, phenomena, clock):
+    def update_allocentric(self, clock):
         """Allocate the phenomena to the cells of allocentric memory"""
         # Mark the cells where is the robot
         self.allocentric_memory.place_robot(self.body_memory, clock)
 
         # Mark the affordances
-        self.allocentric_memory.update_affordances(phenomena, clock)
+        self.allocentric_memory.update_affordances(self.phenomenon_memory.phenomena, clock)
 
         # Update the focus in allocentric memory
         allo_focus = self.egocentric_to_allocentric(self.egocentric_memory.focus_point)
-        self.allocentric_memory.update_focus(allo_focus)
+        self.allocentric_memory.update_focus(allo_focus, clock)
 
         # Update the prompt in allocentric memory
         allo_prompt = self.egocentric_to_allocentric(self.egocentric_memory.prompt_point)
-        self.allocentric_memory.update_prompt(allo_prompt)
+        self.allocentric_memory.update_prompt(allo_prompt, clock)
 
     def egocentric_to_allocentric(self, point):
         """Return the point in allocentric coordinates from the point in egocentric coordinates"""
@@ -85,11 +87,19 @@ class Memory:
         saved_memory = Memory()
         # Clone body memory
         saved_memory.body_memory = self.body_memory.save()
-
         # Clone egocentric memory
         saved_memory.egocentric_memory = self.egocentric_memory.save()
-
         # Clone allocentric memory
         saved_memory.allocentric_memory = self.allocentric_memory.save(saved_memory.egocentric_memory.experiences)
+        # Clone phenomenon memory
+        saved_memory.phenomenon_memory = self.phenomenon_memory.save(saved_memory.egocentric_memory.experiences)
 
         return saved_memory
+
+    def is_near_terrain_origin(self):
+        """Return True if the robot is near the origin of the terrain"""
+        if len(self.phenomenon_memory.object_phenomena) > 0:
+            delta = self.phenomenon_memory.object_phenomena[0].point - self.allocentric_memory.robot_point
+            return np.linalg.norm(delta) < 300
+        else:
+            return False
