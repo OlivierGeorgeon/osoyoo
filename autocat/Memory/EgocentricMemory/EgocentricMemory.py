@@ -77,18 +77,18 @@ class EgocentricMemory:
                     print("LOST FOCUS due to delta", prediction_error_focus)
                     enacted_interaction['lost_focus'] = True  # Used by agent_circle
                     self.focus_point = None
-                    playsound('autocat/Assets/R5.wav', False)
+                    # playsound('autocat/Assets/R5.wav', False)
             else:
                 # The focus was lost, override the echo outcome
                 print("LOST FOCUS due to no echo")
                 enacted_interaction['lost_focus'] = True  # Used by agent_circle
                 self.focus_point = None
-                playsound('autocat/Assets/R5.wav', False)
+                # playsound('autocat/Assets/R5.wav', False)
         else:
             if enacted_interaction['action'] in [ACTION_SCAN, ACTION_FORWARD]:
                 # Catch focus
                 if 'echo_xy' in enacted_interaction:
-                    playsound('autocat/Assets/R11.wav', False)
+                    # playsound('autocat/Assets/R11.wav', False)
                     # Create the focus in the memory snapshot that will be retrieved at the INTEGRETING step
                     # self.focus_point = np.array([enacted_interaction['echo_xy'][0],
                     #                              enacted_interaction['echo_xy'][1], 0])
@@ -97,8 +97,8 @@ class EgocentricMemory:
 
         # Move the prompt
         if self.prompt_point is not None:
-            self.prompt_point = matrix44.apply_to_vector(enacted_interaction['displacement_matrix'], self.prompt_point)
-            print("Prompt moved", self.prompt_point)
+            self.prompt_point = matrix44.apply_to_vector(enacted_interaction['displacement_matrix'], self.prompt_point).astype(int)
+            print("Prompt moved to egocentric: ", self.prompt_point)
 
     def update_and_add_experiences(self, enacted_interaction, body_direction_rad):
         """ Process the enacted interaction to update the egocentric memory

@@ -42,7 +42,6 @@ class Experience:
         self.position_matrix = matrix44.create_from_translation(self.point).astype('float64')
         # The position of the robot relative to the experience
         # Used to compute the position of the robot relative to the experience
-        # opposite_position_matrix = matrix44.create_from_translation(-self.point).astype('float64')
         relative_sensor_point = -self.point  # By default the center of the robot
         # The absolute direction of this experience
 
@@ -95,10 +94,8 @@ class Experience:
                                       self.color_index)
         # Clone the position matrix so it can be updated separately
         saved_experience.position_matrix = self.position_matrix.copy()
-
-        # Absolute relative sensor position do not change
+        # Absolute sensor direction do not change
         saved_experience.absolute_direction_rad = self.absolute_direction_rad
-        # saved_experience.sensor_matrix = self.sensor_matrix
         saved_experience.rotation_matrix = self.rotation_matrix
         return saved_experience
 

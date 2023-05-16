@@ -6,8 +6,6 @@ from pyrr import matrix44
 from . OsoyooCar import OsoyooCar
 from ..InteractiveDisplay import InteractiveDisplay
 
-ZOOM_IN_FACTOR = 1.2
-
 
 class EgocentricView(InteractiveDisplay):
     def __init__(self, width=400, height=400, *args, **kwargs):

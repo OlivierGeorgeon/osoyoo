@@ -98,8 +98,8 @@ class Memory:
 
     def is_near_terrain_origin(self):
         """Return True if the robot is near the origin of the terrain"""
-        if len(self.phenomenon_memory.object_phenomena) > 0:
-            delta = self.phenomenon_memory.object_phenomena[0].point - self.allocentric_memory.robot_point
+        if len(self.phenomenon_memory.phenomena) > 0:
+            delta = self.phenomenon_memory.phenomena[0].point - self.allocentric_memory.robot_point
             return np.linalg.norm(delta) < 300
         else:
             return False

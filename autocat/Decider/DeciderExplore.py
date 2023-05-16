@@ -3,6 +3,7 @@
 ########################################################################################
 
 import numpy as np
+from playsound import playsound
 from . Action import ACTION_ALIGN_ROBOT, ACTION_FORWARD
 from . Interaction import Interaction, OUTCOME_DEFAULT
 from ..Robot.Enaction import Enaction
@@ -18,7 +19,7 @@ class DeciderExplore:
         self.anticipated_outcome = OUTCOME_DEFAULT
 
         self.exploration_step = EXPLORATION_STEP_INIT
-        self.prompt_point = np.array([-900, 600, 0])
+        self.prompt_point = np.array([-2000, 1500, 0])
 
     def propose_intended_enaction(self, enacted_interaction):
         """Propose the next intended enaction from the previous enacted interaction.
@@ -38,11 +39,30 @@ class DeciderExplore:
         if self.exploration_step == EXPLORATION_STEP_INIT:
             # Go back and forth
             # self.workspace.memory.egocentric_memory.prompt_point = self.prompt_point.copy()
-            # Go to the most interesting pool point
-            mip = self.workspace.memory.allocentric_memory.most_interesting_pool(self.workspace.clock)
-            self.workspace.memory.egocentric_memory.prompt_point = self.workspace.memory.allocentric_to_egocentric(mip)
+
+            # If long time no see terrain origin
+            if self.workspace.clock - self.workspace.memory.phenomenon_memory.phenomena[0].last_origin_clock > 3:
+                # If near the terrain origin then go to confirmation prompt
+                if self.workspace.memory.is_near_terrain_origin():
+                    allo_confirmation = self.workspace.memory.phenomenon_memory.phenomena[0].confirmation_prompt()
+                    print("Enact confirmation affordance to allocentric", allo_confirmation)
+                    ego_confirmation = self.workspace.memory.allocentric_to_egocentric(allo_confirmation)
+                    self.workspace.memory.egocentric_memory.prompt_point = ego_confirmation
+                    # TODO check how to ensure it does not keep doing that
+                    self.workspace.memory.phenomenon_memory.phenomena[0].last_origin_clock = self.workspace.clock
+                    playsound('autocat/Assets/R3.wav', False)
+                else:
+                    allo_origin = self.workspace.memory.phenomenon_memory.phenomena[0].point
+                    print("Go to origin at allocentric:", allo_origin)
+                    ego_origin = self.workspace.memory.allocentric_to_egocentric(allo_origin)
+                    self.workspace.memory.egocentric_memory.prompt_point = ego_origin
+                    playsound('autocat/Assets/R1.wav', False)
+            else:
+                # Go to the most interesting pool point
+                # mip = self.workspace.memory.allocentric_memory.most_interesting_pool(self.workspace.clock)
+                # self.workspace.memory.egocentric_memory.prompt_point = self.workspace.memory.allocentric_to_egocentric(mip)
+                self.workspace.memory.egocentric_memory.prompt_point = self.prompt_point.copy()
             self.exploration_step = EXPLORATION_STEP_ROTATE
-            # If close to terrain origin and not recently updated then re-enact the origin interaction
 
         # Compute the next intended interaction
         if self.exploration_step == EXPLORATION_STEP_TRANSLATE:

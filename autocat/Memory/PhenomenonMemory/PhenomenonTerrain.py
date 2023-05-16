@@ -40,6 +40,7 @@ class PhenomenonTerrain(Phenomenon):
                     # position_correction = self.origin_affordance.point - affordance.point
                     print("Near origin affordance")
                     position_correction = self.origin_affordance.color_position(affordance.experience.color_index) - affordance.point
+                    self.last_origin_clock = affordance.experience.clock
 
                     # Correct the position of the affordances
                     print("Origin affordance clock:", self.origin_affordance.experience.clock)
@@ -54,6 +55,12 @@ class PhenomenonTerrain(Phenomenon):
             return position_correction
         # No position correction
         return None  # Must return None to check if this affordance can be associated with another phenomenon
+
+    def confirmation_prompt(self):
+        """Return the point to aim at for confirmation of this phenomenon"""
+        rotation_matrix = self.origin_affordance.experience.rotation_matrix
+        point = np.array([400, 0, 0], dtype=int)
+        return matrix44.apply_to_vector(rotation_matrix, point) + self.point
 
     def save(self, experiences):
         """Return a clone of the phenomenon for memory snapshot"""

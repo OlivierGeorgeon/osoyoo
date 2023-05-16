@@ -14,7 +14,7 @@ class Phenomenon:
         Parameters:
             affordance: the first affordance that serves as the origin of the phenomenon
             """
-        self.point = affordance.point.copy()  # The position of the phenomenon = position of the first affordance
+        self.point = affordance.point.copy().astype(int)  # The position of the phenomenon = position of the first affordance
         self.confidence = PHENOMENON_INITIAL_CONFIDENCE
         # print("Phenomenon:", affordance.experience.type, ", point:", self.point)
 
@@ -27,6 +27,8 @@ class Phenomenon:
         self.tour_started = False
         # The hull is used to display the phenomenon's contour
         self.hull_array = None
+        # Last time the origin affordance was enacted. Used to compute the return to origin.
+        self.last_origin_clock = affordance.experience.clock
 
     def compute_center(self):
         """Recompute the center of the phenomenon as the mean of the affordance position"""

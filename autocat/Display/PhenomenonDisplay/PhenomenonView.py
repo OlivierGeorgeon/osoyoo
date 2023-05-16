@@ -20,7 +20,7 @@ class PhenomenonView(InteractiveDisplay):
         # self.batch = pyglet.graphics.Batch()
         # self.background = pyglet.graphics.OrderedGroup(0)
         # self.forefront = pyglet.graphics.OrderedGroup(1)
-        self.zoom_level = 1.3
+        self.zoom_level = 4
 
         # Define the robot
         self.robot_batch = pyglet.graphics.Batch()

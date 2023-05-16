@@ -6,8 +6,6 @@ from pyrr import matrix44
 from ..EgocentricDisplay.OsoyooCar import OsoyooCar
 from ..InteractiveDisplay import InteractiveDisplay
 
-ZOOM_IN_FACTOR = 1.2
-
 
 class BodyView(InteractiveDisplay):
     """Display the information in body memory"""

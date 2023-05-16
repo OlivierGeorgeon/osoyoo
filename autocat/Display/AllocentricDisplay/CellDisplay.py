@@ -66,7 +66,7 @@ class CellDisplay:
             color1 = name_to_rgb('grey')
             opacity1 = 0
         if cell.status[0] == EXPERIENCE_PLACE:
-            color1 = name_to_rgb('LightGreen')  # name_to_rgb('LightGreen')  # name_to_rgb(FLOOR_COLORS[0])
+            color1 = name_to_rgb('Lavender')  # name_to_rgb('LightGreen')  # name_to_rgb(FLOOR_COLORS[0])
         if cell.status[0] == EXPERIENCE_FLOOR:
             if cell.color_index == 0:
                 color1 = name_to_rgb('black')

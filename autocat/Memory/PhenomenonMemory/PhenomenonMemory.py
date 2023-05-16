@@ -6,7 +6,7 @@ from .PhenomenonTerrain import PhenomenonTerrain, TERRAIN_EXPERIENCE_TYPES
 class PhenomenonMemory:
     def __init__(self):
         self.phenomena = {}  # Phenomenon 0 is the terrain
-        self.phenomenon_id = 0
+        self.phenomenon_id = 0  # Used for object phenomena
 
     def create_phenomenon(self, affordance):
         """Create a new phenomenon depending of the type of the affordance"""
@@ -46,13 +46,6 @@ class PhenomenonMemory:
         remaining_affordances = affordances.copy()
 
         for affordance in affordances:
-            # Update the terrain phenomenon if it exists
-            # if affordance.experience.type in TERRAIN_EXPERIENCE_TYPES:
-            #     if self.terrain_phenomenon is not None:
-            #         self.terrain_phenomenon.update(affordance)
-            #         remaining_affordances.remove(affordance)
-            # # Update the object phenomena
-            # else:
             for phenomenon in self.phenomena.values():
                 delta = phenomenon.update(affordance)
                 if delta is not None:
@@ -70,6 +63,7 @@ class PhenomenonMemory:
 
     def save(self, experiences):
         """Return a clone of phenomenon memory for memory snapshot"""
+        # Use the experiences cloned when saving egocentric memory
         saved_phenomenon_memory = PhenomenonMemory()
         saved_phenomenon_memory.phenomena = {key: p.save(experiences) for key, p in self.phenomena.items()}
         saved_phenomenon_memory.phenomenon_id = self.phenomenon_id
