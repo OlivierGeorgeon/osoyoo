@@ -1,4 +1,4 @@
-#define ROBOT_ID 3 // 0: regular Osoyoo robot, 1: robot BSN, 2: robot UCBL, 3: robot SHS, 4: SHS with GY86 chez Olivier
+#define ROBOT_ID 3 // 0: regular Osoyoo robot, 1: robot BSN, 2: robot UCBL, 3: SHS with GY86 chez Olivier
 
 #define AP_SSID "osoyoo_robot"          // The wifi SSID of this robot in Access Point
 #define ROBOT_HEAD_X 80                 // (mm) X position of the head
@@ -47,7 +47,7 @@
 #define COMPASS_X_OFFSET 1431  //  1435
 #define COMPASS_Y_OFFSET -1601 // -1645
 #define ACCELERATION_X_OFFSET 550 //
-#define ACCELERATION_SHOCK_THRESHOLD -200 // -400 // Below the threshold it is a strong deceleration = shock
+#define ACCELERATION_SHOCK_THRESHOLD -250 // -400 // Below the threshold it is a strong deceleration = shock
 #define ACCELERATION_BLOCK_THRESHOLD 60 // Below the threshold, the robot is blocked
 #define GYRO_COEF 1.35 // UMI is upright
 #define ROBOT_SERVO_PIN 4

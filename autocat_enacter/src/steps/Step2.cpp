@@ -19,7 +19,8 @@ extern int interaction_step;
 // Warning: in some situations, the head alignment may take quite long
 void Step2()
 {
-  if (action_end_time < millis() &&  !FCR._is_enacting && !HEA._is_enacting_head_alignment /*&& !HECS._is_enacting_echo_scan*/)
+  // if (action_end_time < millis() &&  !FCR._is_enacting && !HEA._is_enacting_head_alignment /*&& !HECS._is_enacting_echo_scan*/)
+  if (action_end_time < millis() &&  !FCR._is_enacting)
   {
     TCS.read();
     interaction_step = 3;

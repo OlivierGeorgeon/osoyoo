@@ -41,7 +41,7 @@ class DeciderExplore:
             # self.workspace.memory.egocentric_memory.prompt_point = self.prompt_point.copy()
 
             # If long time no see terrain origin
-            if self.workspace.clock - self.workspace.memory.phenomenon_memory.phenomena[0].last_origin_clock > 3:
+            if self.workspace.clock - self.workspace.memory.phenomenon_memory.phenomena[0].last_origin_clock > 5:
                 # If near the terrain origin then go to confirmation prompt
                 if self.workspace.memory.is_near_terrain_origin():
                     allo_confirmation = self.workspace.memory.phenomenon_memory.phenomena[0].confirmation_prompt()
@@ -49,14 +49,16 @@ class DeciderExplore:
                     ego_confirmation = self.workspace.memory.allocentric_to_egocentric(allo_confirmation)
                     self.workspace.memory.egocentric_memory.prompt_point = ego_confirmation
                     # TODO check how to ensure it does not keep doing that
-                    self.workspace.memory.phenomenon_memory.phenomena[0].last_origin_clock = self.workspace.clock
                     playsound('autocat/Assets/R3.wav', False)
                 else:
-                    allo_origin = self.workspace.memory.phenomenon_memory.phenomena[0].point
+                    # If not near terrain origin then go to origin affordance point
+                    allo_origin = self.workspace.memory.phenomenon_memory.phenomena[0].origin_affordance.experience.sensor_point.copy()
+                    allo_origin += self.workspace.memory.phenomenon_memory.phenomena[0].point
                     print("Go to origin at allocentric:", allo_origin)
                     ego_origin = self.workspace.memory.allocentric_to_egocentric(allo_origin)
                     self.workspace.memory.egocentric_memory.prompt_point = ego_origin
                     playsound('autocat/Assets/R1.wav', False)
+                    self.workspace.memory.phenomenon_memory.phenomena[0].last_origin_clock = self.workspace.clock
             else:
                 # Go to the most interesting pool point
                 # mip = self.workspace.memory.allocentric_memory.most_interesting_pool(self.workspace.clock)

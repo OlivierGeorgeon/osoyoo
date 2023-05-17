@@ -98,7 +98,9 @@ class CtrlRobot:
 
         # Translation integrated from the action's speed multiplied by the duration1
         action_code = enacted_interaction['action']
-        translation = self.workspace.actions[action_code].translation_speed * (enacted_interaction['duration1'] / 1000)
+        translation = self.workspace.actions[action_code].translation_speed * \
+                      (float(enacted_interaction['duration1']) / 1000.0)
+        # TODO Take the yaw into account
 
         # Yaw presupposed or returned by the robot
         yaw = self.workspace.actions[action_code].target_duration * self.workspace.actions[action_code].rotation_speed_rad
@@ -124,14 +126,21 @@ class CtrlRobot:
 
         # Interaction Floor line
         if enacted_interaction['floor'] > 0:
-            enacted_interaction[KEY_EXPERIENCES].append((EXPERIENCE_FLOOR, LINE_X, 0))
-            # Update the x translation
-            translation[0] -= RETREAT_DISTANCE
-            # Set the y translation
-            if enacted_interaction['floor'] == 0b01:  # Black line on the right
-                translation[1] = RETREAT_DISTANCE_Y
-            if enacted_interaction['floor'] == 0b10:  # Black line on the left
-                translation[1] = -RETREAT_DISTANCE_Y
+            # Update the translation
+            if enacted_interaction['floor'] == 0b01:
+                # Black line on the right
+                translation += [-RETREAT_DISTANCE / 2, RETREAT_DISTANCE_Y, 0]
+                experience_x, experience_y = 100, 20
+            elif enacted_interaction['floor'] == 0b10:
+                # Black line on the left
+                translation += [-RETREAT_DISTANCE / 2, -RETREAT_DISTANCE_Y, 0]
+                experience_x, experience_y = 100, -20
+            else:
+                # Black line on the front
+                translation += [-RETREAT_DISTANCE, 0, 0]
+                experience_x, experience_y = LINE_X, 0
+            # Place the experience point
+            enacted_interaction[KEY_EXPERIENCES].append((EXPERIENCE_FLOOR, LINE_X, experience_y))
 
         # Interaction ECHO for actions involving scanning
         # if action_code in ['-', '*', '+', '8', '2', '1', '3', '4', '6']:
@@ -164,7 +173,14 @@ class CtrlRobot:
         # The estimated displacement of the environment relative to the robot caused by this interaction
         translation_matrix = matrix44.create_from_translation(-translation)
         rotation_matrix = matrix44.create_from_z_rotation(math.radians(yaw))
-        displacement_matrix = matrix44.multiply(rotation_matrix, translation_matrix)
+        # https://pages.mtu.edu/~shene/COURSES/cs3621/NOTES/geometry/geo-tran.html#:~:text=A%20rotation%20matrix%20and%20a,rotations%20followed%20by%20a%20translation.
+        # Multiply the rotation by the translation results in simply adding the translation values to the matrix.
+        # The point will be rotated around origin and then the translation will be added
+        # displacement_matrix = matrix44.multiply(rotation_matrix, translation_matrix)  # Historic Version
+        # Multiply the translation by the rotation will compute a matrix
+        # that will first translate the point and then rotate it around it new origin
+        # This better processes floor retreat
+        displacement_matrix = matrix44.multiply(translation_matrix, rotation_matrix)  # Try translate and then rotate
 
         # Return the displacement
         enacted_interaction['translation'] = translation

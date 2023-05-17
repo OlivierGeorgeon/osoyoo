@@ -18,7 +18,7 @@ DEFAULT_YAW = 45            # (degree) Default rotation when yaw is not returned
 TURN_DURATION = 1.000       # (s) The duration of turn left and turn right actions
 TRANSLATE_DURATION = 1.     # (s) The duration of longitudinal or lateral translation
 RETREAT_DISTANCE = 90       # (mm) Distance travelled during retreat
-RETREAT_DISTANCE_Y = 20     # (mm) Y displacement when line is detected on the side
+RETREAT_DISTANCE_Y = 20  # 75     # (mm) Y displacement when line is detected on the side
 LINE_X = 160                # (mm) X coordinate of the line after retreat
 
 # You must set the compass offset to the center of the circle drawn by the (compass_x, compass_y) points.

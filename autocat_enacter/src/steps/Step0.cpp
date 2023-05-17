@@ -86,7 +86,7 @@ void Step0()
     {
       previous_clock = clock;
       action_start_time = millis();
-      action_end_time = action_start_time + 1000;
+      action_end_time = action_start_time + target_duration;
       interaction_step = 1;
       IMU.begin();
       shock_event = 0; // reset event from previous interaction
@@ -113,7 +113,6 @@ void Step0()
           HEA._next_saccade_time = action_end_time - SACCADE_DURATION;  // Inhibit HEA during the interaction
           // if (is_focussed) {
           //  HEA.turnHead(HEA.head_direction(focus_x, focus_y));} // Turn head towards the focus point in step 1
-          action_end_time = millis() + target_duration;
           OWM.goBack(SPEED);
           break;
         case ACTION_TURN_IN_SPOT_RIGHT:
@@ -149,7 +148,6 @@ void Step0()
           break;
         case ACTION_GO_ADVANCE:
           HEA._next_saccade_time = action_end_time - SACCADE_DURATION;  // Inhibit HEA during the interaction
-          action_end_time = millis() + target_duration;
           OWM.goForward(SPEED);
           break;
         case ACTION_TURN_RIGHT:
