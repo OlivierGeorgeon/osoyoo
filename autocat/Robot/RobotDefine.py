@@ -19,7 +19,7 @@ TURN_DURATION = 1.000       # (s) The duration of turn left and turn right actio
 TRANSLATE_DURATION = 1.     # (s) The duration of longitudinal or lateral translation
 RETREAT_DISTANCE = 90       # (mm) Distance travelled during retreat
 RETREAT_DISTANCE_Y = 20  # 75     # (mm) Y displacement when line is detected on the side
-LINE_X = 160                # (mm) X coordinate of the line after retreat
+LINE_X = 150  # 160              # (mm) X coordinate of the line after retreat
 
 # You must set the compass offset to the center of the circle drawn by the (compass_x, compass_y) points.
 # Display the compass points of interest in Egocentric view.
@@ -46,7 +46,7 @@ if ROBOT_ID == 3:
     COMPASS_X_OFFSET = 0  # -70    # (Compass unit) X offset of the compass measure
     COMPASS_Y_OFFSET = 0  # 63   # (Compass unit) Y offset of the compass measrue
     FORWARD_SPEED = 190     # (mm/s) Forward translation speed.
-    RETREAT_DISTANCE = 70   # (mm) Distance of the line after retreat
+    RETREAT_DISTANCE = 80  #70   # (mm) Distance of the line after retreat
 
 
 SCAN_DISTANCE = 800

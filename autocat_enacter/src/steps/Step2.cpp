@@ -1,16 +1,12 @@
 #include <Arduino_JSON.h>
-#include "Step0.h"
-#include "../wifi/WifiCat.h"
-#include "../../Robot_define.h"
-#include "../../Action_define.h"
+#include "../../Color.h"
 #include "../../Floor.h"
 #include "../../Head.h"
-#include "../../Imu.h"
-#include "../../Color.h"
+//#include "../../Imu.h"
 
-extern Head HEA;
-extern Floor FCR;
 extern Color TCS;
+extern Floor FCR;
+extern Head HEA;
 extern unsigned long action_end_time;
 extern int interaction_step;
 

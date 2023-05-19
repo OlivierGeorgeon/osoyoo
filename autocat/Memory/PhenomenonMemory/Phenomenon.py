@@ -14,14 +14,14 @@ class Phenomenon:
         Parameters:
             affordance: the first affordance that serves as the origin of the phenomenon
             """
-        self.point = affordance.point.copy().astype(int)  # The position of the phenomenon = position of the first affordance
         self.confidence = PHENOMENON_INITIAL_CONFIDENCE
-        # print("Phenomenon:", affordance.experience.type, ", point:", self.point)
 
         # Record the first affordance of the phenomenon
+        self.point = affordance.point.copy().astype(int)  # The position of the phenomenon = position of the first affordance
         affordance.point = np.array([0, 0, 0], dtype=int)  # Position of the first affordance is reset
-        self.affordances = [affordance]
-        self.origin_affordance = affordance  # In case affordances[0] is pruned
+        self.affordances = {0: affordance}
+        # self.origin_affordance = affordance  # In case affordances[0] is pruned
+        self.affordance_id = 0
 
         self.nb_tour = 0
         self.tour_started = False
@@ -33,7 +33,7 @@ class Phenomenon:
     def compute_center(self):
         """Recompute the center of the phenomenon as the mean of the affordance position"""
         # https://stackoverflow.com/questions/4355894/how-to-get-center-of-set-of-points-using-python
-        points = np.array([a.point for a in self.affordances])
+        points = np.array([a.point for a in self.affordances.values()])
         centroid = points.mean(axis=0)
         return centroid
 
@@ -42,7 +42,7 @@ class Phenomenon:
         hull_points = None
         # ConvexHull triggers errors if points are aligned
         try:
-            points = np.array([a.point[0:2] for a in self.affordances])
+            points = np.array([a.point[0:2] for a in self.affordances.values()])
             hull = ConvexHull(points)
             self.hull_array = np.array([points[vertex] for vertex in hull.vertices])
             hull_points = self.hull_array.flatten().astype("int").tolist()
@@ -65,8 +65,9 @@ class Phenomenon:
         return is_inside
 
     def phenomenon_label(self):
+        """Return the text to display in phenomenon view"""
         label = "Origin direction: " + \
-            str(round(math.degrees(self.origin_affordance.experience.absolute_direction_rad))) + \
+            str(round(math.degrees(self.affordances[0].experience.absolute_direction_rad))) + \
             "°. Nb tours:" + str(self.nb_tour)
         return label
 
@@ -77,5 +78,7 @@ class Phenomenon:
         saved_phenomenon.confidence = self.confidence
         saved_phenomenon.nb_tour = self.nb_tour
         saved_phenomenon.tour_started = self.tour_started
-        saved_phenomenon.affordances = [a.save(experiences) for a in self.affordances]
+        saved_phenomenon.affordances = {key: a.save(experiences) for key, a in self.affordances.items()}
+        saved_phenomenon.affordance_id = self.affordance_id
+        saved_phenomenon.last_origin_clock = self.last_origin_clock
         return

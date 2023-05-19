@@ -4,6 +4,7 @@ from .EgocentricMemory.EgocentricMemory import EgocentricMemory
 from .AllocentricMemory.AllocentricMemory import AllocentricMemory
 from .BodyMemory import BodyMemory
 from .PhenomenonMemory.PhenomenonMemory import PhenomenonMemory
+from .PhenomenonMemory.PhenomenonTerrain import ABS
 
 HEXAGRID_WIDTH = 100
 HEXAGRID_HEIGHT = 200
@@ -99,7 +100,7 @@ class Memory:
     def is_near_terrain_origin(self):
         """Return True if the robot is near the origin of the terrain"""
         if len(self.phenomenon_memory.phenomena) > 0:
-            delta = self.phenomenon_memory.phenomena[0].point - self.allocentric_memory.robot_point
-            return np.linalg.norm(delta) < 300
+            delta = self.phenomenon_memory.phenomena[0].origin_prompt() - self.allocentric_memory.robot_point
+            return np.linalg.norm(delta) < 100
         else:
             return False

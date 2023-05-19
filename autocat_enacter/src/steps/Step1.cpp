@@ -1,6 +1,4 @@
 #include <Arduino_JSON.h>
-#include "Step0.h"
-#include "../wifi/WifiCat.h"
 #include "../../Robot_define.h"
 #include "../../Action_define.h"
 #include "../../Floor.h"
@@ -11,8 +9,6 @@ extern Wheel OWM;
 extern Floor FCR;
 extern Head HEA;
 extern Imu IMU;
-extern WifiCat WifiCat;
-extern char packetBuffer[100];
 
 extern unsigned long action_start_time;
 extern unsigned long duration1;

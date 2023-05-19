@@ -40,7 +40,7 @@ void Head::beginEchoAlignment()
 {
   _is_enacting_head_alignment = true;
   _penultimate_ultrasonic_measure = 1;  // Reinitialize previous measures so it will not ...
-  _previous_ultrasonic_measure = 10000; // ... believe that the next measure is a minimum
+  _previous_ultrasonic_measure = NO_ECHO_DISTANCE; // ... believe that the next measure is a minimum
   _echo_alignment_step = 0;
   _head_angle_span =  -_head_angle_span;  // Inverse the movement to track moving objects more easily
   //turnHead(_head_angle - _head_angle_span);
@@ -50,7 +50,7 @@ void Head::beginEchoScan()
 {
   _is_enacting_head_alignment = false; // Stop current head alignment if any
   _is_enacting_echo_scan = true;
-  _min_ultrasonic_measure = 10000;
+  _min_ultrasonic_measure = NO_ECHO_DISTANCE;
   if (_head_angle > 0) {
     // If head is to the left, start from 90° and scan every 20° clockwise
     _angle_min_ultrasonic_measure = 80;
@@ -108,7 +108,7 @@ void Head::update()
         _head_angle_span = - _head_angle_span;
         _head_angle += _head_angle_span;
         turnHead(_head_angle);
-        if ((_penultimate_ultrasonic_measure >= _previous_ultrasonic_measure) &&  (_echo_alignment_step > 2))
+        if ((_penultimate_ultrasonic_measure >= _previous_ultrasonic_measure) &&  ((_echo_alignment_step > 2) || (_penultimate_ultrasonic_measure == NO_ECHO_DISTANCE)))
         // The head passed the minimum echo distance after two measures in the same direction: the minimum is at the previous angle
         // TODO make sure the two measures are in the same direction
         {
@@ -210,7 +210,6 @@ void Head::outcome_complete(JSONVar & outcome_object)
    }
     // Reset every values
     //nb_echo = 0;
-
 }
 
 void Head::turnHead(int head_angle)

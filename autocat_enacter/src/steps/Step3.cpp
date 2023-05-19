@@ -1,12 +1,9 @@
 #include <Arduino_JSON.h>
-#include "Step0.h"
 #include "../wifi/WifiCat.h"
-#include "../../Robot_define.h"
-#include "../../Action_define.h"
+#include "../../Color.h"
 #include "../../Floor.h"
 #include "../../Head.h"
 #include "../../Imu.h"
-#include "../../Color.h"
 
 extern String status; // The outcome information used for sequential learning
 extern char action;

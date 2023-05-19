@@ -54,7 +54,7 @@ class CtrlPhenomenonView:
         self.affordance_displays = []
 
         # Recreate all affordance displays
-        for a in phenomenon.affordances:
+        for a in phenomenon.affordances.values():
             ad = self.create_affordance_display(a)
             self.affordance_displays.append(ad)
 
@@ -88,9 +88,6 @@ class CtrlPhenomenonView:
             self.view.robot_translate = self.workspace.memory.allocentric_memory.robot_point - self.phenomenon.point
             self.view.label2.text = "Confidence: " + str(round(self.phenomenon.confidence * 100)) + "%"
         if self.workspace.interaction_step == INTERACTION_STEP_REFRESHING:
-            # Display in phenomenon view
-            # if len(self.workspace.integrator.phenomena) > 0:
-            #     self.phenomenon = self.workspace.integrator.phenomena[0]
             if self.phenomenon is not None:
                 self.update_affordance_displays(self.phenomenon)
                 self.view.label3.text = self.phenomenon.phenomenon_label()

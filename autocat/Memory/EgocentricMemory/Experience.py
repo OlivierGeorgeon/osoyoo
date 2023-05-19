@@ -42,7 +42,7 @@ class Experience:
         self.position_matrix = matrix44.create_from_translation(self.point).astype('float64')
         # The position of the robot relative to the experience
         # Used to compute the position of the robot relative to the experience
-        relative_sensor_point = -self.point  # By default the center of the robot
+        relative_sensor_point = -self.point  # By default the center of the robot. It is wrong in the cloned experience
         # The absolute direction of this experience
 
         if self.type in [EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_CENTRAL_ECHO]:
@@ -63,17 +63,10 @@ class Experience:
             # opposite_position_matrix = matrix44.create_from_translation([-x + ROBOT_HEAD_X, -y, 0])
             relative_sensor_point = np.array([-x + ROBOT_HEAD_X, -y, 0])
 
-        # opposite azimuth
-        body_direction_matrix = matrix44.create_from_z_rotation(-body_direction_rad)
-        # Move the head position by the azimuth
-        # sensor_matrix = matrix44.multiply(opposite_position_matrix, body_direction_matrix)
-        # self.sensor_point = matrix44.apply_to_vector(sensor_matrix, [0, 0, 0])
-
         # The allocentric position of the sensor relative to the allocentric position of the experience
-        self.sensor_point = matrix44.apply_to_vector(body_direction_matrix, relative_sensor_point)
-
-        # The rotation matrix to display the affordance in phenomenon view
-        angle_sensor = math.atan2(self.sensor_point[1], self.sensor_point[0])
+        body_direction_matrix = matrix44.create_from_z_rotation(-body_direction_rad)
+        self._sensor_point = matrix44.apply_to_vector(body_direction_matrix, relative_sensor_point).astype(int)
+        angle_sensor = math.atan2(self._sensor_point[1], self._sensor_point[0])
         self.rotation_matrix = matrix44.create_from_z_rotation(math.pi - angle_sensor)
 
     def __str__(self):
@@ -88,14 +81,19 @@ class Experience:
         # Recompute the experience's coordinates in robot-centric coordinates
         self.point = matrix44.apply_to_vector(self.position_matrix, [0, 0, 0])
 
+    def sensor_point(self):
+        """Return a clone of the sensor point relative to the experience"""
+        return self._sensor_point.copy()
+
     def save(self):
         """Create a copy of the experience for memory snapshot"""
-        saved_experience = Experience(self.point[0], self.point[1], self.type, 0, self.clock, self.id, self.durability,
-                                      self.color_index)
+        saved_experience = Experience(self.point[0], self.point[1], self.type, self.absolute_direction_rad, self.clock,
+                                      self.id, self.durability, self.color_index)
         # Clone the position matrix so it can be updated separately
         saved_experience.position_matrix = self.position_matrix.copy()
-        # Absolute sensor direction do not change
+        # Reset the absolute directions  TODO Modify so they don't have to be reset
         saved_experience.absolute_direction_rad = self.absolute_direction_rad
+        saved_experience._sensor_point = self.sensor_point()
         saved_experience.rotation_matrix = self.rotation_matrix
         return saved_experience
 

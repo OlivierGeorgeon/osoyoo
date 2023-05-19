@@ -16,16 +16,11 @@ class PhenomenonView(InteractiveDisplay):
         # # Initialize OpenGL parameters
         # # https://www.w3schools.com/cssref/css_colors.asp
         glClearColor(1.0, 1.0, 1.0, 1.0)
-        # pyglet.gl.glEnable(pyglet.gl.GL_BLEND)
-        # self.batch = pyglet.graphics.Batch()
-        # self.background = pyglet.graphics.OrderedGroup(0)
-        # self.forefront = pyglet.graphics.OrderedGroup(1)
-        self.zoom_level = 4
+        self.zoom_level = 3
 
         # Define the robot
         self.robot_batch = pyglet.graphics.Batch()
         self.robot = OsoyooCar(self.robot_batch, self.background)
-        # self.memory = memory
         self.robot_translate = np.array([0, 0, 0], dtype=float)
         self.robot_rotate = 0
         self.phenomenon_point = np.array([0, 0, 0], dtype=float)

@@ -71,7 +71,7 @@ class AllocentricMemory:
         self.clear_phenomena()
         # Place the phenomena again
         for p_id, p in phenomena.items():
-            for a in p.affordances:
+            for a in p.affordances.values():
                 # Attribute the status of the affordance
                 cell_x, cell_y = point_to_cell(a.point+p.point)
                 self.apply_status_to_cell(cell_x, cell_y, a.experience.type, a.experience.clock, a.experience.color_index)

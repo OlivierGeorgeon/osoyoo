@@ -25,49 +25,45 @@
 
 #include <Arduino_JSON.h>
 #include "Robot_define.h"
-#include "Floor.h"
+#include "Floor.h"  // imports "Wheel.h"
 #include "Head.h"
 #include "Imu.h"
 #include "Color.h"
 #include "Action_define.h"
-#include "src/wifi/WifiCat.h"
 #include "Led.h"
+#include "src/wifi/WifiCat.h"
 #include "src/steps/Step0.h"
 #include "src/steps/Step1.h"
 #include "src/steps/Step2.h"
 #include "src/steps/Step3.h"
 
-// "Wheel.h" is imported by Floor.h
-// #include "Head_echo_complete_scan.h"
-
 Wheel OWM;
 Floor FCR(OWM);
 Head HEA;
 Imu IMU;
-//Head_echo_complete_scan HECS;
-char packetBuffer[100]; // Max number of characters received
 WifiCat WifiCat;
 Led LED;
 Color TCS;
+char packetBuffer[100]; // Max number of characters received
 
 unsigned long action_start_time = 0;
 unsigned long duration1 = 0;
 unsigned long action_end_time = 0;
-int interaction_step = 0;
 char action =' ';
-String status = "0"; // The outcome information used for sequential learning
+int interaction_step = 0;
 int robot_destination_angle = 0;
 int head_destination_angle = 0;
 int target_angle = 0;
 int target_duration = 1000;
 int target_focus_angle = 0;
-bool is_focussed = false;
 int focus_x = 0;
 int focus_y = 0;
 int focus_speed = 180;
 int clock = 0;
 int previous_clock = -1;
 int shock_event = 0;
+bool is_focussed = false;
+String status = "0"; // The outcome information used for sequential learning
 
 void setup()
 {
@@ -80,23 +76,19 @@ void setup()
 
   // Initialize the automatic behaviors
   OWM.setup();
-  Serial.println("Wheels intialized");
+  Serial.println("Wheels initialized");
   HEA.setup();
-  Serial.println("HEAD intialized");
+  Serial.println("Head initialized");
   IMU.setup();
-  Serial.println("IMU1 intialized");
-  //HECS.setup();
   // Setup the imu twice otherwise the calibration is wrong. I don't know why.
   // Probably something to do with the order in which the imu registers are written.
   delay(100);
   IMU.setup();
   delay(100);
   IMU.setup();
-  Serial.println("IMU intialized");
-  TCS.setup(); // TODO Test
-  Serial.println("Color sensor intialized");
-
-
+  Serial.println("IMU initialized");
+  TCS.setup();
+  Serial.println("Color sensor initialized");
   Serial.println("--- Robot initialized ---");
 
   // Initialize PIN 13 LED for debugging

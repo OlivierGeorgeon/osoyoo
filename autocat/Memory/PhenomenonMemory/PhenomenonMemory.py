@@ -52,7 +52,7 @@ class PhenomenonMemory:
                     remaining_affordances.remove(affordance)
                     # Null correction do not count (to be improved)
                     if round(np.linalg.norm(delta)) > 0:
-                        sum_translation += delta
+                        sum_translation += delta.astype(int)
                         number_of_add += 1
                     # Don't look the other phenomena
                     break

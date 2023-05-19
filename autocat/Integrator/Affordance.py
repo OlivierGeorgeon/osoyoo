@@ -71,7 +71,7 @@ class Affordance:
         points = None
         if self.experience.type in [EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_CENTRAL_ECHO]:
             # The position of the head from the position of the affordance
-            p1 = self.experience.sensor_point.copy()
+            p1 = self.experience.sensor_point()
             # The direction of p2 is orthogonal to the direction of the sensor
             orthogonal_rotation = matrix44.create_from_z_rotation(math.pi/2)
             p2 = matrix44.apply_to_vector(orthogonal_rotation, p1) * 0.4
@@ -82,14 +82,14 @@ class Affordance:
         return points
 
     def color_position(self, color_index):
-        """Return the position in allocentric memory of the color patch"""
+        """Return the position relative to the phenomenon origin of the color patch"""
         # Orthogonal vector
         om = matrix44.create_from_z_rotation(-math.pi / 2)
-        vo = matrix44.apply_to_vector(om, self.experience.sensor_point) / np.linalg.norm(self.experience.sensor_point)
+        vo = matrix44.apply_to_vector(om, self.experience.sensor_point()) / np.linalg.norm(self.experience.sensor_point())
         # Distance along the orthogonal vector
         color_distance = np.array((color_index - self.experience.color_index) * vo * COLOR_DISTANCE, dtype=int)
-        # print("Origin position:", self.point, "color index:", self.experience.color_index)
-        # print("Color position:", color_distance + self.point, "color index:", color_index)
+        print("Affordance position:", self.point, "sensor point", self.experience.sensor_point(), "color index", self.experience.color_index)
+        print("New index", color_index, "at", color_distance)
         return color_distance + self.point
 
     def save(self, experiences):

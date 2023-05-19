@@ -7,6 +7,7 @@ from playsound import playsound
 from . Action import ACTION_ALIGN_ROBOT, ACTION_FORWARD
 from . Interaction import Interaction, OUTCOME_DEFAULT
 from ..Robot.Enaction import Enaction
+from ..Memory.PhenomenonMemory.PhenomenonTerrain import ABS
 
 EXPLORATION_STEP_INIT = 0
 EXPLORATION_STEP_ROTATE = 1
@@ -41,24 +42,25 @@ class DeciderExplore:
             # self.workspace.memory.egocentric_memory.prompt_point = self.prompt_point.copy()
 
             # If long time no see terrain origin
-            if self.workspace.clock - self.workspace.memory.phenomenon_memory.phenomena[0].last_origin_clock > 5:
+            if 0 in self.workspace.memory.phenomenon_memory.phenomena and \
+                    ABS in self.workspace.memory.phenomenon_memory.phenomena[0].affordances \
+                    and self.workspace.clock - self.workspace.memory.phenomenon_memory.phenomena[0].last_origin_clock > 3:
                 # If near the terrain origin then go to confirmation prompt
                 if self.workspace.memory.is_near_terrain_origin():
                     allo_confirmation = self.workspace.memory.phenomenon_memory.phenomena[0].confirmation_prompt()
-                    print("Enact confirmation affordance to allocentric", allo_confirmation)
+                    print("Enacting confirmation affordance to", allo_confirmation)
                     ego_confirmation = self.workspace.memory.allocentric_to_egocentric(allo_confirmation)
                     self.workspace.memory.egocentric_memory.prompt_point = ego_confirmation
                     # TODO check how to ensure it does not keep doing that
                     playsound('autocat/Assets/R3.wav', False)
                 else:
                     # If not near terrain origin then go to origin affordance point
-                    allo_origin = self.workspace.memory.phenomenon_memory.phenomena[0].origin_affordance.experience.sensor_point.copy()
-                    allo_origin += self.workspace.memory.phenomenon_memory.phenomena[0].point
-                    print("Go to origin at allocentric:", allo_origin)
+                    allo_origin = self.workspace.memory.phenomenon_memory.phenomena[0].origin_prompt()
+                    print("Going from", self.workspace.memory.allocentric_memory.robot_point, "to origin sensor point", allo_origin)
                     ego_origin = self.workspace.memory.allocentric_to_egocentric(allo_origin)
                     self.workspace.memory.egocentric_memory.prompt_point = ego_origin
                     playsound('autocat/Assets/R1.wav', False)
-                    self.workspace.memory.phenomenon_memory.phenomena[0].last_origin_clock = self.workspace.clock
+                    # self.workspace.memory.phenomenon_memory.phenomena[0].last_origin_clock = self.workspace.clock
             else:
                 # Go to the most interesting pool point
                 # mip = self.workspace.memory.allocentric_memory.most_interesting_pool(self.workspace.clock)

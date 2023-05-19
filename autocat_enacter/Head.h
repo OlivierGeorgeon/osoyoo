@@ -19,6 +19,7 @@
 // #define SCAN_SACCADE_SPAN 10   // (degrees) For complete-scan
 #define ECHO_MONITOR_PERIOD 500   // (ms) The period for checking whether to trigger head alignment
 #define ECHO_MONITOR_VARIATION 50 // (mm) The measure threshold to trigger head alignment
+#define NO_ECHO_DISTANCE 10000    // (mm) Default distance when no echo
 
 struct significant_array {
     // Struct to store the angles and the corresponding measures,
