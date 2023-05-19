@@ -39,11 +39,12 @@ void Step0()
   // Watch the wifi for new action
   // If the received packet exceeds the size of packetBuffer defined above, Arduino will crash
   int len = WifiCat.read(packetBuffer);
-  if (len) {
+  if (len > 1) {  // > 0  do not accept single character in the buffer
     //Serial.print("Received action ");
+    action = 0;  // Reset the action to rise an error if no action is in the buffer string
     target_angle = 0;
     target_duration = 1000;
-    if (len == 1) {
+    if (len == 1) {  // Not used
       // Single character is the action
       action = packetBuffer[0];
       //Serial.print(action);
@@ -77,7 +78,7 @@ void Step0()
       }
     }
 
-    // If received the same action (same clock) then resend the outcome
+    // If received a string with the same clock then resend the outcome
     // (The previous outcome was sent but the PC did not receive it)
     if (clock == previous_clock) {
       interaction_step = 3;
@@ -193,6 +194,11 @@ void Step0()
           }
           break;
         default:
+          // Unrecognized action: remain in step 0
+          interaction_step = 0;
+          WifiCat.send("{\"status\":\"T\", \"char\":\"" + String(len) + "\"}");
+
+          // TODO: send a "resend" request
           break;
       }
     }

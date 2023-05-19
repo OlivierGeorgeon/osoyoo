@@ -20,7 +20,7 @@ class DeciderExplore:
         self.anticipated_outcome = OUTCOME_DEFAULT
 
         self.exploration_step = EXPLORATION_STEP_INIT
-        self.prompt_point = np.array([-2000, 1500, 0])
+        self.prompt_point = np.array([-2000, 2000, 0])
 
     def propose_intended_enaction(self, enacted_interaction):
         """Propose the next intended enaction from the previous enacted interaction.

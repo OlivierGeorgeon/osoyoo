@@ -85,8 +85,8 @@ class PhenomenonTerrain(Phenomenon):
         """Return the point to aim at for confirmation of this phenomenon"""
         if ABS in self.affordances:
             rotation_matrix = self.affordances[ABS].experience.rotation_matrix
-            point = np.array([200, 0, 0])
-            print("Compiting confirmation point from origin", self.point)
+            point = np.array([500, 0, 0])
+            print("Computing confirmation point from origin", self.point)
             confirmation_point = matrix44.apply_to_vector(rotation_matrix, point).astype(int) + self.point
             return confirmation_point
         return None
@@ -94,7 +94,7 @@ class PhenomenonTerrain(Phenomenon):
     def phenomenon_label(self):
         """Return the text to display in phenomenon view"""
         if ABS in self.affordances:
-            label = "Absolute origin: " + str(self.point) + " Relative origin prompt: " + \
+            label = "Origin: " + str(self.point[0]) + "," + str(self.point[1]) + " Relative origin prompt: " + \
                     str(self.affordances[ABS].experience.sensor_point())
         else:
             label = "Origin: " + str(self.point) + \

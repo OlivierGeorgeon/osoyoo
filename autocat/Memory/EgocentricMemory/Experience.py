@@ -42,7 +42,7 @@ class Experience:
         self.position_matrix = matrix44.create_from_translation(self.point).astype('float64')
         # The position of the robot relative to the experience
         # Used to compute the position of the robot relative to the experience
-        relative_sensor_point = -self.point  # By default the center of the robot. It is wrong in the cloned experience
+        relative_sensor_point = -self.point.copy()  # By default the center of the robot.
         # The absolute direction of this experience
 
         if self.type in [EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_CENTRAL_ECHO]:
@@ -93,7 +93,7 @@ class Experience:
         saved_experience.position_matrix = self.position_matrix.copy()
         # Reset the absolute directions  TODO Modify so they don't have to be reset
         saved_experience.absolute_direction_rad = self.absolute_direction_rad
-        saved_experience._sensor_point = self.sensor_point()
+        saved_experience._sensor_point = self.sensor_point()  # The cloned experience would compute from the new x y
         saved_experience.rotation_matrix = self.rotation_matrix
         return saved_experience
 
