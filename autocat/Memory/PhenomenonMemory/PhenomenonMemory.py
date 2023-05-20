@@ -2,6 +2,8 @@ import numpy as np
 from .PhenomenonObject import PhenomenonObject, OBJECT_EXPERIENCE_TYPES
 from .PhenomenonTerrain import PhenomenonTerrain, TERRAIN_EXPERIENCE_TYPES
 
+TER = 0
+
 
 class PhenomenonMemory:
     def __init__(self):
@@ -12,7 +14,7 @@ class PhenomenonMemory:
         """Create a new phenomenon depending of the type of the affordance"""
         # Must always create a phenomenon
         if affordance.experience.type in TERRAIN_EXPERIENCE_TYPES:
-            self.phenomena[0] = PhenomenonTerrain(affordance)
+            self.phenomena[TER] = PhenomenonTerrain(affordance)
             return 0
         else:
             self.phenomenon_id += 1

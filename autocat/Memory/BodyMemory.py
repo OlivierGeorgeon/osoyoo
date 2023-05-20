@@ -1,6 +1,6 @@
 import math
 import numpy as np
-from pyrr import matrix44
+from pyrr import matrix44, quaternion
 from ..Robot.RobotDefine import ROBOT_FRONT_X, ROBOT_SIDE, COMPASS_X_OFFSET, COMPASS_Y_OFFSET
 from ..Utils import assert_almost_equal_angles
 
@@ -32,6 +32,10 @@ class BodyMemory:
     def body_azimuth(self):
         """Return the azimuth in degree relative to north [0,360["""
         return round((90 - math.degrees(self.body_direction_rad)) % 360)
+
+    def body_quaternion(self):
+        """Return the quaternion representing the body direction"""
+        return quaternion.create_from_z_rotation(self.body_direction_rad)
 
     def body_direction_degree(self):
         """Return the body direction in degree relative to the x axis [-180,180["""

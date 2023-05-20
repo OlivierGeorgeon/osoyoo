@@ -133,14 +133,12 @@ void Step0()
         case ACTION_SHIFT_LEFT:
           HEA._next_saccade_time = action_end_time - SACCADE_DURATION;  // Inhibit HEA during the interaction
           OWM.shiftLeft(SHIFT_SPEED);
-          //action_end_time = millis() + 5000;
           break;
         case ACTION_STOP:
           OWM.stopMotion();
           break;
         case ACTION_SHIFT_RIGHT:
           HEA._next_saccade_time = action_end_time - SACCADE_DURATION;  // Inhibit HEA during the interaction
-          //action_end_time = millis() + 5000;
           OWM.shiftRight(SHIFT_SPEED);
           break;
         case ACTION_TURN_LEFT:
@@ -197,7 +195,6 @@ void Step0()
           // Unrecognized action: remain in step 0
           interaction_step = 0;
           WifiCat.send("{\"status\":\"T\", \"char\":\"" + String(len) + "\"}");
-
           // TODO: send a "resend" request
           break;
       }

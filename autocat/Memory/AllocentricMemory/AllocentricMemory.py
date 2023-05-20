@@ -127,9 +127,10 @@ class AllocentricMemory:
     def clear_phenomena(self):
         """Reset the phenomena from cells"""
         for c in [c for line in self.grid for c in line if c.phenomenon_id is not None]:
+            c.status[0] = CELL_UNKNOWN
             c.status[1] = CELL_UNKNOWN
-            c.clock_phenomenon = 0  # Not sure we should reset this clock
-            c.phenomenon = None
+            c.clock_phenomenon = 0
+            c.phenomenon_id = None
 
     # def place_translation(self, start, end, clock):
     #     """Mark the cells traversed by the robot"""

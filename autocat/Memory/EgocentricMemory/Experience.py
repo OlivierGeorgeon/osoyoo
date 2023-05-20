@@ -1,7 +1,7 @@
 import colorsys
 import math
 import numpy as np
-from pyrr import matrix44
+from pyrr import matrix44, quaternion
 from ...Robot.RobotDefine import ROBOT_HEAD_X
 
 EXPERIENCE_ALIGNED_ECHO = 'Echo'
@@ -71,6 +71,10 @@ class Experience:
 
     def __str__(self):
         return "(id:" + str(self.id) + ",clock:" + str(self.clock) + ", type:" + self.type + ")"
+
+    def body_direction_quaternion(self):
+        """Return the quaternion representing the body direction"""
+        return quaternion.create_from_z_rotation(self.absolute_direction_rad)
 
     def displace(self, displacement_matrix):
         """Displace the experience by the displacement_matrix"""

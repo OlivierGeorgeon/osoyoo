@@ -51,7 +51,7 @@ class Memory:
         # The integrator may subsequently update the robot's position
 
     def update_allocentric(self, clock):
-        """Allocate the phenomena to the cells of allocentric memory"""
+        """Update allocentric memory on the basis of body, phenomenon, and egocentric memory"""
         # Mark the cells where is the robot
         self.allocentric_memory.place_robot(self.body_memory, clock)
 

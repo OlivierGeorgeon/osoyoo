@@ -27,6 +27,9 @@ class Enaction:
             if self.interaction.action.action_code in [ACTION_FORWARD, ACTION_BACKWARD]:
                 self.duration = int(np.linalg.norm(prompt_point) /
                                     math.fabs(self.interaction.action.translation_speed[0]) * 1000)
+            if self.interaction.action.action_code in [ACTION_LEFTWARD, ACTION_RIGHTWARD]:
+                self.duration = int(np.linalg.norm(prompt_point) /
+                                    math.fabs(self.interaction.action.translation_speed[1]) * 1000)
             if self.interaction.action.action_code == ACTION_ALIGN_ROBOT:
                 self.angle = int(math.degrees(math.atan2(prompt_point[1], prompt_point[0])))
             if (self.interaction.action.action_code == ACTION_TURN_RIGHT) and prompt_point[1] < 0:
