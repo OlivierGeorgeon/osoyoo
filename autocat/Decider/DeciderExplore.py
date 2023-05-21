@@ -64,9 +64,9 @@ class DeciderExplore:
                         elif rot < math.pi:
                             print("OUTCOME Far Left of origin")
                             outcome = OUTCOME_FAR_LEFT
-                        else:  # Not used
-                            print("OUTCOME Far Right of origin")
-                            outcome = OUTCOME_FAR_RIGHT
+                        # else:  # Not used
+                        #     print("OUTCOME Far Right of origin")
+                        #     outcome = OUTCOME_FAR_RIGHT
                     else:
                         if rot < math.pi/4:
                             print("OUTCOME Right of origin")
@@ -74,9 +74,9 @@ class DeciderExplore:
                         elif rot < math.pi:
                             print("OUTCOME Far Right of origin")
                             outcome = OUTCOME_FAR_RIGHT
-                        else:  # Not used
-                            print("OUTCOME Far left of origin")
-                            outcome = OUTCOME_FAR_LEFT
+                        # else:  # Not used
+                        #     print("OUTCOME Far left of origin")
+                        #     outcome = OUTCOME_FAR_LEFT
         return outcome
 
     def intended_enaction(self, outcome):
@@ -90,10 +90,10 @@ class DeciderExplore:
                 # If right or left then swipe to home
                 if outcome in [OUTCOME_LEFT, OUTCOME_RIGHT]:
                     if outcome == OUTCOME_RIGHT:
-                        ego_confirmation = np.array([0, 500, 0], dtype=int)
+                        ego_confirmation = np.array([0, 400, 0], dtype=int)
                         self.exploration_step = EXPLORATION_STEP_SWIPE_LEFT
                     else:
-                        ego_confirmation = np.array([0, -500, 0], dtype=int)
+                        ego_confirmation = np.array([0, -400, 0], dtype=int)
                         self.exploration_step = EXPLORATION_STEP_SWIPE_RIGHT
                     print("Swiping to confirmation by:", ego_confirmation)
                     self.workspace.memory.egocentric_memory.prompt_point = ego_confirmation
@@ -117,10 +117,10 @@ class DeciderExplore:
                     self.exploration_step = EXPLORATION_STEP_ROTATE
             else:
                 # Go to the most interesting pool point
-                # mip = self.workspace.memory.allocentric_memory.most_interesting_pool(self.workspace.clock)
-                # self.workspace.memory.egocentric_memory.prompt_point = self.workspace.memory.allocentric_to_egocentric(mip)
+                mip = self.workspace.memory.allocentric_memory.most_interesting_pool(self.workspace.clock)
+                self.workspace.memory.egocentric_memory.prompt_point = self.workspace.memory.allocentric_to_egocentric(mip)
                 # Go back and forth
-                self.workspace.memory.egocentric_memory.prompt_point = self.prompt_point.copy()
+                # self.workspace.memory.egocentric_memory.prompt_point = self.prompt_point.copy()
                 self.exploration_step = EXPLORATION_STEP_ROTATE
 
         # Compute the next intended interaction

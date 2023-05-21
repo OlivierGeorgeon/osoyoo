@@ -10,8 +10,8 @@
 #include "arduino_secrets.h"
 #include "../../Robot_define.h"
 
-#define WIFI_CHANNEL 10 // 10 was the original value in the Osoyoo demo
-#define PORT 8888
+// #define WIFI_CHANNEL 10 // 10 was the original value in the Osoyoo demo
+// #define PORT 8888
 
 WifiCat::WifiCat()
 {
@@ -67,10 +67,12 @@ int WifiCat::read(char* packetBuffer)
   int len = 0;
   if (Udp.parsePacket())
   {
-    len = Udp.read(packetBuffer, 512);
+    len = Udp.read(packetBuffer, UDP_BUFFER_SIZE - 1);
     packetBuffer[len] = 0;
     Serial.print("Income string: ");
     Serial.println(packetBuffer);
+
+    Udp.flush(); // Discard any remaining input data. Test for debug
 
     //Serial.print("From ");
     //Serial.print(Udp.remoteIP());
@@ -81,10 +83,10 @@ int WifiCat::read(char* packetBuffer)
 }
 
 // Send the outcome to the IP address and port that sent the action
-void WifiCat::send(String outcome_json_string)
+void WifiCat::send(String message)
 {
-  Serial.println("Outcome string: " + outcome_json_string);
+  Serial.println("Outcome string: " + message);
   Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
-  Udp.print(outcome_json_string);
-  Udp.endPacket();
+  Udp.print(message);
+  // Udp.endPacket(); // does nothing: just returns 1
 }

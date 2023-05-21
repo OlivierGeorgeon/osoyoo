@@ -1,8 +1,6 @@
 import math
 import numpy as np
-from pyrr import matrix44
 from ..Robot.RobotDefine import FORWARD_SPEED, LATERAL_SPEED, DEFAULT_YAW, TURN_DURATION, TRANSLATE_DURATION
-from ..Utils import rotate_vector_z
 
 ACTION_FORWARD = '8'
 ACTION_BACKWARD = '2'
@@ -15,10 +13,6 @@ ACTION_ALIGN_ROBOT = '/'
 ACTION_ALIGN_HEAD = '*'
 ACTIONS = [ACTION_FORWARD, ACTION_BACKWARD, ACTION_LEFTWARD, ACTION_RIGHTWARD, ACTION_TURN_LEFT,
            ACTION_TURN_RIGHT, ACTION_SCAN, ACTION_ALIGN_ROBOT, ACTION_ALIGN_HEAD]
-
-# SIMULATION_TIME_RATIO = 1  # 0.5   # The simulation speed is slower than the real speed because ...
-# SIMULATION_STEP_OFF = 0
-# SIMULATION_STEP_ON = 1  # More step will be used to take wifi transmission time into account
 
 
 class Action:
@@ -64,45 +58,6 @@ class Action:
             self.translation_speed[1] = (self.translation_speed[1] + translation[1]) / 2
             print("adjusting y speed: correction:", round(translation[1]),
                   "new y speed:", round(self.translation_speed[1]))
-
-    # def simulate(self, memory, dt):
-    #     """Simulate the action in memory. Return True during the simulation, and False when it ends"""
-    #     # Check the target time
-    #     self.simulation_time += dt
-    #     if self.simulation_time > self.simulation_duration:
-    #         self.simulation_time = 0.
-    #         self.simulation_step = SIMULATION_STEP_OFF
-    #         return False
-    #
-    #     # Simulate the displacement in egocentric memory
-    #     translation_matrix = matrix44.create_from_translation(-self.translation_speed * dt * SIMULATION_TIME_RATIO)
-    #     rotation_matrix = matrix44.create_from_z_rotation(self.simulation_rotation_speed * dt)
-    #     displacement_matrix = matrix44.multiply(rotation_matrix, translation_matrix)
-    #     for experience in memory.egocentric_memory.experiences.values():
-    #         experience.displace(displacement_matrix)
-    #     # Displacement in body memory
-    #     memory.body_memory.body_direction_rad += self.simulation_rotation_speed * dt
-    #     # Update allocentric memory
-    #     memory.allocentric_memory.robot_point += rotate_vector_z(self.translation_speed * dt * SIMULATION_TIME_RATIO,
-    #                                                              memory.body_memory.body_direction_rad)
-    #     memory.allocentric_memory.place_robot(memory.body_memory, 0)  # TODO add the clock
-    #
-    #     return True
-
-    # def start_simulation(self, enaction):
-    #     """Initialize the simulation of the intended interaction"""
-    #     self.simulation_step = SIMULATION_STEP_ON
-    #     # Compute the duration and the speed depending and the intended interaction
-    #     self.simulation_duration = self.target_duration
-    #     self.simulation_rotation_speed = self. rotation_speed_rad
-    #     if enaction.duration is not None:
-    #         self.simulation_duration = enaction.duration / 1000
-    #     if enaction.angle is not None:
-    #         self.simulation_duration = math.fabs(enaction.angle) * TURN_DURATION / DEFAULT_YAW
-    #         if enaction.angle < 0:
-    #             self.simulation_rotation_speed = -self.rotation_speed_rad
-    #     self.simulation_duration *= SIMULATION_TIME_RATIO
-    #     self.simulation_rotation_speed *= SIMULATION_TIME_RATIO
 
 
 def create_actions():

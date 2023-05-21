@@ -108,7 +108,8 @@ void Head::update()
         _head_angle_span = - _head_angle_span;
         _head_angle += _head_angle_span;
         turnHead(_head_angle);
-        if ((_penultimate_ultrasonic_measure >= _previous_ultrasonic_measure) &&  ((_echo_alignment_step > 2) || (_penultimate_ultrasonic_measure == NO_ECHO_DISTANCE)))
+        // if ((_penultimate_ultrasonic_measure >= _previous_ultrasonic_measure) &&  ((_echo_alignment_step > 2) || (_penultimate_ultrasonic_measure == NO_ECHO_DISTANCE)))
+        if ((_penultimate_ultrasonic_measure >= _previous_ultrasonic_measure) &&  (_echo_alignment_step > 2))
         // The head passed the minimum echo distance after two measures in the same direction: the minimum is at the previous angle
         // TODO make sure the two measures are in the same direction
         {

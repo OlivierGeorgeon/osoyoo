@@ -51,11 +51,11 @@ class CtrlRobot:
             if time.time() < self.expected_outcome_time:
                 try:
                     outcome, address = self.socket.recvfrom(512)
-                    if outcome is not None:  # Sometimes it receives a None outcome. I don't know why
-                        print()
-                        print("Receive:", outcome)
+                    print()
+                    print("Receive:", outcome)
+                    # Short outcome are for debug
+                    if outcome is not None and len(outcome) > 100:  # Sometimes it receives a None outcome. I don't know why
                         self.send_enacted_interaction_to_workspace(outcome)
-                        # self.enact_step = ENACT_STEP_IDLE  # Now we have received the outcome from the robot
                 except socket.timeout:   # Time out error if outcome not yet received
                     print(".", end='')
                 except OSError as e:
@@ -63,12 +63,12 @@ class CtrlRobot:
                         print(".", end='')
                     else:
                         print(e)
-                # except socket.error as error:
-                #     print(error)
             else:
-                self.send_enacted_interaction_to_workspace(b'{"status":"T"}')
-                print("Receive: No outcome")
-                # self.enact_step = ENACT_STEP_IDLE
+                # Timeout: resend the enaction
+                self.workspace.memory = self.workspace.memory_snapshot
+                self.workspace.interaction_step = INTERACTION_STEP_IDLE
+                # self.send_enacted_interaction_to_workspace(b'{"status":"T"}')
+                print("Timeout")
 
     def send_enaction_to_robot(self, enaction):
         """Send the enaction string to the robot and set the timeout"""
@@ -87,14 +87,14 @@ class CtrlRobot:
 
         enacted_interaction[KEY_EXPERIENCES] = []
 
-        # If timeout then there is no enacted interaction
-        if enacted_interaction['status'] == "T":
-            # self.workspace.update_enacted_interaction(enacted_interaction)
-            print("Resend the enaction")
-            # Restore the memory
-            self.workspace.memory = self.workspace.memory_snapshot
-            self.workspace.interaction_step = INTERACTION_STEP_IDLE
-            return
+        # # If timeout then there is no enacted interaction
+        # if enacted_interaction['status'] == "T":
+        #     # self.workspace.update_enacted_interaction(enacted_interaction)
+        #     print("Resend the enaction")
+        #     # Restore the memory
+        #     self.workspace.memory = self.workspace.memory_snapshot
+        #     self.workspace.interaction_step = INTERACTION_STEP_IDLE
+        #     return
 
         # Translation integrated from the action's speed multiplied by the duration1
         action_code = enacted_interaction['action']

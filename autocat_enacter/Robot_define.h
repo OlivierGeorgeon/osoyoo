@@ -7,8 +7,8 @@
 #define SHIFT_SPEED 130
 #define TURN_TIME 500                   // (ms)
 #define MOVE_TIME 500
-#define TURN_FRONT_ENDING_DELAY 100     // (ms)
-#define TURN_FRONT_ENDING_ANGLE 3       // (degree)
+// #define TURN_FRONT_ENDING_DELAY 100     // (ms)
+// #define TURN_FRONT_ENDING_ANGLE 3       // (degree)
 #define TURN_SPOT_ANGLE 45              // (degree)
 #define GYRO_SHOCK_THRESHOLD 1          // (degree) above this threshold: strong z rotation = lateral impact
 
@@ -57,10 +57,10 @@
 #warning "Compiling for SHS's robot with GY-86"
 #define ROBOT_HAS_MPU6050  true
 #define ROBOT_COMPASS_TYPE 1 //  "HMC5883L"
-#define ROBOT_REAR_LEFT_WHEEL_COEF  1.1 // 1.3  04/04/2023 // 1.1 26/02/2023 // 1
-#define ROBOT_FRONT_LEFT_WHEEL_COEF 1.1 //1.3 04/04/2023
-#define ROBOT_REAR_RIGHT_WHEEL_COEF 1.0  // 0.9 26/02/2023
-#define ROBOT_FRONT_RIGHT_WHEEL_COEF 1.1  // 1.0 04/04/2023 // 1.1 26/02/2023 // 1.2 29/05/2022
+#define ROBOT_REAR_LEFT_WHEEL_COEF  1.2  // 1.1 20/05/2023 // 1.3 04/04/2023 // 1.1 26/02/2023 // 1
+#define ROBOT_FRONT_LEFT_WHEEL_COEF 1.2  // 1.1 20/05/2023 // 1.3 04/04/2023
+#define ROBOT_REAR_RIGHT_WHEEL_COEF 1.0  //                                     0.9 26/02/2023
+#define ROBOT_FRONT_RIGHT_WHEEL_COEF 1.0 // 1.1 20/05/2023 // 1.0 04/04/2023 // 1.1 26/02/2023 // 1.2 29/05/2022
 #define TURN_SPOT_MAX_DURATION 2400
 #define TURN_SPOT_ENDING_DELAY 200
 #define TURN_SPOT_ENDING_ANGLE 5

@@ -44,7 +44,6 @@ Imu IMU;
 WifiCat WifiCat;
 Led LED;
 Color TCS;
-char packetBuffer[100]; // Max number of characters received
 
 unsigned long action_start_time = 0;
 unsigned long duration1 = 0;
@@ -116,28 +115,20 @@ void loop()
   // STEP 0: no interaction being enacted
   // Watching for message received from PC. If yes, starts the interaction
   if (interaction_step == 0)
-  {
     Step0();
-  }
 
   // STEP 1: Performing the action until the termination conditions are triggered
   // When termination conditions are triggered, stop the action and proceed to step 2
   if (interaction_step == 1)
-  {
     Step1();
-  }
 
   // STEP 2: Enacting the termination of the interaction: Floor change retreat, Stabilisation time
   // When the terminations are finished, proceed to Step 3
   if (interaction_step == 2)
-  {
     Step2();
-  }
 
   // STEP 3: Ending the interaction:
   // Send the outcome and go back to Step 0
   if (interaction_step == 3)
-  {
     Step3();
-  }
 }

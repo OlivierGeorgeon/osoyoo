@@ -7,12 +7,13 @@
 #include "../../Head.h"
 #include "../../Imu.h"
 
+char packetBuffer[UDP_BUFFER_SIZE];
+
 extern Wheel OWM;
 extern Floor FCR;
 extern Head HEA;
 extern Imu IMU;
 extern WifiCat WifiCat;
-extern char packetBuffer[100];
 
 extern unsigned long action_start_time;
 extern unsigned long duration1;
@@ -37,9 +38,10 @@ extern int shock_event;
 void Step0()
 {
   // Watch the wifi for new action
-  // If the received packet exceeds the size of packetBuffer defined above, Arduino will crash
+  digitalWrite(LED_BUILTIN, HIGH); // light the led during transfer
   int len = WifiCat.read(packetBuffer);
-  if (len > 1) {  // > 0  do not accept single character in the buffer
+  digitalWrite(LED_BUILTIN, LOW);
+  if ((len > 1) && (len < 100)) {  // > 0  do not accept single character in the buffer
     //Serial.print("Received action ");
     action = 0;  // Reset the action to rise an error if no action is in the buffer string
     target_angle = 0;
@@ -182,22 +184,26 @@ void Step0()
           //  HEA.turnHead(HEA.head_direction(focus_x, focus_y));  // Look to the focussed phenomenon
           //} else {
           //  HEA.turnHead(robot_destination_angle);}  // look parallel to the direction
-          if ( robot_destination_angle < - TURN_FRONT_ENDING_ANGLE){
+          if ( robot_destination_angle < - TURN_SPOT_ENDING_ANGLE){
             OWM.turnInSpotRight(TURN_SPEED);
             //OWM.turnFrontRight(SPEED);
           }
-          if ( robot_destination_angle > TURN_FRONT_ENDING_ANGLE){
+          if ( robot_destination_angle > TURN_SPOT_ENDING_ANGLE){
             OWM.turnInSpotLeft(TURN_SPEED);
             //OWM.turnFrontLeft(SPEED);
           }
           break;
         default:
-          // Unrecognized action: remain in step 0
-          interaction_step = 0;
-          WifiCat.send("{\"status\":\"T\", \"char\":\"" + String(len) + "\"}");
-          // TODO: send a "resend" request
+          // Unrecognized action (for debug)
+          interaction_step = 0;  // remain in step 0
+          WifiCat.send("{\"status\":\"T\", \"action\":\"" + String(action) + "\"}");
           break;
       }
+    }
+  } else {
+    if (len > 0) {
+      // Unexpected length (for debug)
+      WifiCat.send("{\"status\":\"T\", \"char\":\"" + String(len) + "\"}");
     }
   }
 }
