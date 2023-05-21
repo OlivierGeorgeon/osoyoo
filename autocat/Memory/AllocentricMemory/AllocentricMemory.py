@@ -1,7 +1,7 @@
 import math
 import numpy as np
 from pyrr import matrix44
-from . Hexagonal_geometry import CELL_RADIUS, point_to_cell, get_neighbors
+from . Hexagonal_geometry import point_to_cell, get_neighbors
 from . GridCell import GridCell, CELL_UNKNOWN
 from ..EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_PLACE
 from ..AllocentricMemory.GridCell import CELL_NO_ECHO, CELL_PHENOMENON
@@ -13,7 +13,7 @@ from ...Robot.RobotDefine import ROBOT_FRONT_X, ROBOT_SIDE
 class AllocentricMemory:
     """The agent's allocentric memory made with an hexagonal grid."""
 
-    def __init__(self, width, height, cell_radius=CELL_RADIUS):
+    def __init__(self, width, height, cell_radius):
         """Construct the allocentric memory of the robot, child class of HexaGrid
         with the addition of the robot at the center of the grid and a link between the
         software and the real word, cell_radius representing the radius of a cell in the real world (in millimeters)
@@ -212,30 +212,33 @@ class AllocentricMemory:
 
     def most_interesting_pool(self, clock):
         """Return the coordinates of the cell that has the most interesting pool value"""
-        cells = []
         interests = []
+        coords = []
 
         # for n in range(-2, 2):
         #     for m in range(-2, 2):
         # 3 tours counterclockwise:
-        for i in [(2, 0), (-1, 2), (-2, -2), (2, -1), (0, 5), (-2, -1), (2, -2), (1, 2), (-2, 0), (1, -2), (2, 2), (-2, 1),
-                  (0, -2), (2, 1), (-2, 2), (-1, -2)]:
+        visit = [(2, 0), (-1, 4), (-2, -4), (2, -2), (0, 4), (-2, -2), (2, -4), (1, 4), (-2, 0), (1, -4), (2, 4), (-2, 2),
+                 (0, -4), (2, 2), (-2, 4), (-1, -4)]
+        visit = [(2, 0), (-1, 4), (-2, -4), (2, -2), (0, 4), (-2, -2), (2, -4), (1, 4), (-2, 0), (1, -4), (2, 4), (-2, 2),
+                 (0, -4), (2, 2), (-2, 4), (-1, -4)]
+        for i in visit:
             i_even = 3 * i[0] + i[1]
             j_even = -2 * i[0] + 4 * i[1]
-            cells.append([i_even, j_even])
+            coords.append([i_even, j_even])
             interests.append(self.pool_interest(i_even, j_even, clock))
-            i_odd = i_even - 2
-            j_odd = j_even + 1
-            cells.append([i_odd, j_odd])
-            interests.append(self.pool_interest(i_odd, j_odd, clock))
+            # i_odd = i_even - 2
+            # j_odd = j_even + 1
+            # cells.append([i_odd, j_odd])
+            # interests.append(self.pool_interest(i_odd, j_odd, clock))
         max_interest = max(interests)
-        coord = cells[interests.index(max_interest)]
+        coord = coords[interests.index(max_interest)]
         # Update the prompt
         if self.prompt_i is not None:
             self.grid[self.prompt_i][self.prompt_j].status[3] = CELL_UNKNOWN
         self.prompt_i, self.prompt_j = coord[0], coord[1]
         self.grid[self.prompt_i][self.prompt_j].status[3] = EXPERIENCE_PROMPT
-        self.grid[self.prompt_i][self.prompt_j].clock_prompt = 1  # TODO save the actual clock
+        self.grid[self.prompt_i][self.prompt_j].clock_prompt = clock
         print("Most interesting pool:", coord, "with interest", max_interest)
         return self.grid[self.prompt_i][self.prompt_j].point()
 

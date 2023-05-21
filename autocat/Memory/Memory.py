@@ -4,11 +4,10 @@ from .EgocentricMemory.EgocentricMemory import EgocentricMemory
 from .AllocentricMemory.AllocentricMemory import AllocentricMemory
 from .BodyMemory import BodyMemory
 from .PhenomenonMemory.PhenomenonMemory import PhenomenonMemory
-# from .PhenomenonMemory.PhenomenonTerrain import ABS
+from .AllocentricMemory.Hexagonal_geometry import CELL_RADIUS
 
 HEXAGRID_WIDTH = 100
 HEXAGRID_HEIGHT = 200
-CELL_RADIUS = 40
 
 
 class Memory:

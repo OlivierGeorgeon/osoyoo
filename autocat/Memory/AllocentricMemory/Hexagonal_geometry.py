@@ -11,7 +11,7 @@
 import math
 import numpy as np
 
-CELL_RADIUS = 50  # (mm) Diameter of the outer circle
+CELL_RADIUS = 40  # (mm) Diameter of the outer circle
 
 
 def get_neighbors(i, j):

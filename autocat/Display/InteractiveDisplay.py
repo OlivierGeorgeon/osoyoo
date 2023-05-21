@@ -45,7 +45,7 @@ class InteractiveDisplay(pyglet.window.Window):
     def on_mouse_scroll(self, x, y, dx, dy):
         """ Zooming the window """
         # Inspired by https://www.py4u.net/discuss/148957
-        f = ZOOM_IN_FACTOR if dy > 0 else 1/ZOOM_IN_FACTOR if dy < 0 else 1
+        f = ZOOM_IN_FACTOR if dy < 0 else 1/ZOOM_IN_FACTOR if dy > 0 else 1
         if .4 < self.zoom_level * f < 5:
             self.zoom_level *= f
 

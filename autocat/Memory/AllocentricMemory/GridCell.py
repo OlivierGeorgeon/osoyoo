@@ -20,7 +20,6 @@ class GridCell:
                        CELL_UNKNOWN,  # Interaction
                        CELL_UNKNOWN,  # No echo
                        CELL_UNKNOWN]  # Focus
-        # self.clocks = [0, 0, 0, 0]  # The latest clocks attached with each layer
         self.color_index = 0
         self.clock_place = 0
         self.clock_interaction = 0
@@ -28,7 +27,6 @@ class GridCell:
         self.clock_no_echo = 0
         self.clock_focus = 0
         self.clock_prompt = 0
-        # self.experiences = list()  # Used in Synthesizer to store the experiences that happened on the cell
         self.phenomenon_id = None
 
     def __str__(self):
@@ -42,7 +40,7 @@ class GridCell:
     def is_known(self):
         """Return True if something is known in this cell"""
         return self.status[0] != CELL_UNKNOWN or self.status[1] != CELL_UNKNOWN or self.status[2] != CELL_UNKNOWN \
-            or self.status[3] != CELL_UNKNOWN
+            or self.status[3] != CELL_UNKNOWN or self.clock_prompt > 0
 
     def is_inside(self, polygon):
         """True if this cell is inside the polygon"""
@@ -86,8 +84,5 @@ class GridCell:
         saved_cell.clock_no_echo = self.clock_no_echo
         saved_cell.clock_focus = self.clock_focus
         saved_cell.clock_prompt = self.clock_prompt
-        # saved_cell.experiences = [experiences[e.id] for e in self.experiences]
         saved_cell.phenomenon_id = self.phenomenon_id
-        # if self.phenomenon is not None:
-        #     saved_cell.phenomenon = self.phenomenon.save(experiences)
         return saved_cell

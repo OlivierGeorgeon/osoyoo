@@ -7,9 +7,10 @@ from ...Memory.EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_A
     EXPERIENCE_FOCUS, EXPERIENCE_IMPACT, EXPERIENCE_PLACE, EXPERIENCE_CENTRAL_ECHO, EXPERIENCE_PROMPT, FLOOR_COLORS
 from ...Memory.AllocentricMemory.GridCell import CELL_PHENOMENON, CELL_UNKNOWN, CELL_NO_ECHO
 
-SCALE_LEVEL_0 = 0.9
-SCALE_LEVEL_1 = 0.65
-SCALE_LEVEL_2 = 0.4
+SCALE_LEVEL_0 = 2.5  # 3
+SCALE_LEVEL_1 = 0.8  # 0.9
+SCALE_LEVEL_2 = 0.6  # 0.65
+SCALE_LEVEL_3 = 0.35  # 0.4
 
 
 class CellDisplay:
@@ -21,21 +22,21 @@ class CellDisplay:
         # The level 0 hexagon: Pool cell
         self.shape0 = None
         if cell.is_pool():
-            point_pool = np.array([cell.radius * 3, 0, 0])
+            point_pool = np.array([cell.radius * SCALE_LEVEL_0, 0, 0])
             rotation_matrix = matrix44.create_from_z_rotation(-math.atan2(math.sqrt(3), -2))
             point_pool = matrix44.apply_to_vector(rotation_matrix, point_pool)
             self.shape0 = self.create_shape(cell.point(), point_pool, groups[0])
 
         # The level 1 hexagon
-        point0 = np.array([cell.radius * SCALE_LEVEL_0, 0, 0])
+        point0 = np.array([cell.radius * SCALE_LEVEL_1, 0, 0])
         self.shape1 = self.create_shape(cell.point(), point0, groups[1])
 
         # The level 2 hexagon
-        point1 = np.array([cell.radius * SCALE_LEVEL_1, 0, 0])
+        point1 = np.array([cell.radius * SCALE_LEVEL_2, 0, 0])
         self.shape2 = self.create_shape(cell.point(), point1, groups[2])
 
         # The level 3 hexagon
-        point2 = np.array([cell.radius * SCALE_LEVEL_2, 0, 0])
+        point2 = np.array([cell.radius * SCALE_LEVEL_3, 0, 0])
         self.shape3 = self.create_shape(cell.point(), point2, groups[3])
 
         self.update_color(cell)
@@ -57,7 +58,10 @@ class CellDisplay:
         """Update the color and opacity of the shapes based on the cell status"""
         # Level 0 Pool
         if self.shape0 is not None:
-            self.shape0.colors[0:24] = 6 * (*name_to_rgb('royalblue'), 255)
+            color0 = name_to_rgb('royalBlue')
+            if cell.clock_prompt > 0:
+                color0 = name_to_rgb('MediumOrchid')
+            self.shape0.colors[0:24] = 6 * (*color0, 255)
 
         # Level 1
         color1 = name_to_rgb('white')
