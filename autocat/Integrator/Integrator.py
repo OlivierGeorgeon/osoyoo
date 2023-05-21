@@ -1,6 +1,6 @@
 from ..Memory.EgocentricMemory.Experience import EXPERIENCE_LOCAL_ECHO, EXPERIENCE_CENTRAL_ECHO, \
-    EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_FLOOR
-from .Affordance import Affordance
+    EXPERIENCE_ALIGNED_ECHO
+from autocat.Memory.PhenomenonMemory.Affordance import Affordance
 
 PHENOMENON_DELTA = 300
 

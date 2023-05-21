@@ -1,8 +1,8 @@
 import math
 import numpy as np
 from pyrr import matrix44
-from ..Memory.EgocentricMemory.Experience import EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_CENTRAL_ECHO, EXPERIENCE_FLOOR
-from ..Utils import assert_almost_equal_angles
+from autocat.Memory.EgocentricMemory.Experience import EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_CENTRAL_ECHO, EXPERIENCE_FLOOR
+from autocat.Utils import assert_almost_equal_angles
 
 MAX_SIMILAR_DISTANCE = 300    # (mm) Max distance within which affordances are similar
 MAX_SIMILAR_DIRECTION = 15    # (degrees) Max angle within which affordances are similar
@@ -16,6 +16,10 @@ class Affordance:
         """Position should be integer to facilitate search"""
         self.point = point
         self.experience = experience
+
+    def absolute_point_interest(self):
+        """Return True if this affordance can be used as absolute origin of this phenomenon"""
+        return self.experience.type == EXPERIENCE_FLOOR and self.experience.color_index > 0
 
     def is_similar_to(self, other_affordance):
         """Return True if the the two interactions are similar"""

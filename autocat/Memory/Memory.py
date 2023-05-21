@@ -4,7 +4,7 @@ from .EgocentricMemory.EgocentricMemory import EgocentricMemory
 from .AllocentricMemory.AllocentricMemory import AllocentricMemory
 from .BodyMemory import BodyMemory
 from .PhenomenonMemory.PhenomenonMemory import PhenomenonMemory
-from .PhenomenonMemory.PhenomenonTerrain import ABS
+# from .PhenomenonMemory.PhenomenonTerrain import ABS
 
 HEXAGRID_WIDTH = 100
 HEXAGRID_HEIGHT = 200

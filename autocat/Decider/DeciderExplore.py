@@ -10,7 +10,7 @@ from . Action import ACTION_ALIGN_ROBOT, ACTION_FORWARD, ACTION_LEFTWARD, ACTION
 from . Interaction import Interaction, OUTCOME_DEFAULT
 from ..Robot.Enaction import Enaction
 from ..Memory.PhenomenonMemory.PhenomenonMemory import TER
-from ..Memory.PhenomenonMemory.PhenomenonTerrain import ABS
+# from ..Memory.PhenomenonMemory.PhenomenonTerrain import ABS
 from ..Memory.EgocentricMemory.Experience import EXPERIENCE_FLOOR
 
 EXPLORATION_STEP_INIT = 0
@@ -51,8 +51,9 @@ class DeciderExplore:
                 outcome = OUTCOME_ORIGIN
                 self.workspace.memory.phenomenon_memory.phenomena[TER].last_origin_clock = enacted_interaction["clock"]
             else:
-                if ABS in self.workspace.memory.phenomenon_memory.phenomena[TER].affordances:
-                    relative_quaternion = quaternion.cross(self.workspace.memory.body_memory.body_quaternion(), quaternion.inverse(self.workspace.memory.phenomenon_memory.phenomena[TER].affordances[ABS].experience.body_direction_quaternion()))
+                # if ABS in self.workspace.memory.phenomenon_memory.phenomena[TER].affordances:
+                if self.workspace.memory.phenomenon_memory.phenomena[TER].absolute_affordance() is not None:
+                    relative_quaternion = quaternion.cross(self.workspace.memory.body_memory.body_quaternion(), quaternion.inverse(self.workspace.memory.phenomenon_memory.phenomena[TER].absolute_affordance().experience.body_direction_quaternion()))
                     if quaternion.rotation_angle(relative_quaternion) > math.pi:
                         relative_quaternion = -1 * relative_quaternion  # The quaternion representing the short angle
                     rot = quaternion.rotation_angle(relative_quaternion)
@@ -85,7 +86,7 @@ class DeciderExplore:
         if self.exploration_step == EXPLORATION_STEP_INIT:
             # If time to go home
             if 0 in self.workspace.memory.phenomenon_memory.phenomena and \
-                    ABS in self.workspace.memory.phenomenon_memory.phenomena[0].affordances \
+                    self.workspace.memory.phenomenon_memory.phenomena[TER].absolute_affordance() is not None \
                     and self.workspace.clock - self.workspace.memory.phenomenon_memory.phenomena[0].last_origin_clock > 3:
                 # If right or left then swipe to home
                 if outcome in [OUTCOME_LEFT, OUTCOME_RIGHT]:

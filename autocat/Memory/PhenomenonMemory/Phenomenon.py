@@ -20,8 +20,8 @@ class Phenomenon:
         self.point = affordance.point.copy().astype(int)  # The position of the phenomenon = position of the first affordance
         affordance.point = np.array([0, 0, 0], dtype=int)  # Position of the first affordance is reset
         self.affordances = {0: affordance}
-        # self.origin_affordance = affordance  # In case affordances[0] is pruned
         self.affordance_id = 0
+        self.absolute_affordance_key = None
 
         self.nb_tour = 0
         self.tour_started = False
@@ -29,6 +29,12 @@ class Phenomenon:
         self.hull_array = None
         # Last time the origin affordance was enacted. Used to compute the return to origin.
         self.last_origin_clock = affordance.experience.clock
+
+    def absolute_affordance(self):
+        """Return a reference to the absolute origin affordance or None"""
+        if self.absolute_affordance_key is None:
+            return None
+        return self.affordances[self.absolute_affordance_key]
 
     def compute_center(self):
         """Recompute the center of the phenomenon as the mean of the affordance position"""
@@ -80,5 +86,6 @@ class Phenomenon:
         saved_phenomenon.tour_started = self.tour_started
         saved_phenomenon.affordances = {key: a.save(experiences) for key, a in self.affordances.items()}
         saved_phenomenon.affordance_id = self.affordance_id
+        saved_phenomenon.absolute_affordance_key = self.absolute_affordance_key
         saved_phenomenon.last_origin_clock = self.last_origin_clock
         return

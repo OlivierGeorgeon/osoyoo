@@ -4,7 +4,7 @@ import pyglet
 from .CtrlPhenomenonView import CtrlPhenomenonView
 from ...Workspace import Workspace
 from autocat.Memory.PhenomenonMemory.PhenomenonObject import PhenomenonObject
-from ...Integrator.Affordance import Affordance
+from autocat.Memory.PhenomenonMemory.Affordance import Affordance
 from ...Memory.EgocentricMemory.Experience import Experience, EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO
 
 # Testing the Phenomenon View

@@ -11,6 +11,7 @@ class PhenomenonObject(Phenomenon):
     """A hypothetical phenomenon related to echo localization"""
     def __init__(self, affordance):
         super().__init__(affordance)
+        self.absolute_affordance_key = 0  # The initial affordance is the origin
         # print("New phenomenon Object")
 
     def update(self, affordance):
