@@ -25,8 +25,8 @@ class Workspace:
         self.actions = create_actions()
 
         self.memory = Memory()
-        # self.decider = AgentCircle(self)
-        self.decider = DeciderExplore(self)
+        self.deciders = {0: DeciderExplore(self), 1: DeciderCircle(self)}
+        # self.decider = DeciderExplore(self)
         self.integrator = Integrator(self)
 
         self.intended_enaction = None
@@ -72,7 +72,13 @@ class Workspace:
                 if self.decider_mode == KEY_DECIDER_CIRCLE:
                     # The decider chooses the next interaction
                     # TODO Manage the enacted_interaction after imagining
-                    self.enactions[self.clock] = self.decider.propose_intended_enaction(self.enacted_interaction)
+                    if self.deciders[0].is_active():
+                        # Explore the terrain
+                        self.enactions[self.clock] = self.deciders[0].propose_intended_enaction(self.enacted_interaction)
+                    else:
+                        # Search for terrain origin
+                        self.enactions[self.clock] = self.deciders[1].propose_intended_enaction(self.enacted_interaction)
+
                 # Case DECIDER_KEY_USER is handled by self.process_user_key()
 
             # When the next enaction is in the stack

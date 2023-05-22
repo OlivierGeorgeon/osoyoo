@@ -3,11 +3,12 @@ from pyrr import matrix44
 from .EgocentricMemory.EgocentricMemory import EgocentricMemory
 from .AllocentricMemory.AllocentricMemory import AllocentricMemory
 from .BodyMemory import BodyMemory
-from .PhenomenonMemory.PhenomenonMemory import PhenomenonMemory
+from .PhenomenonMemory.PhenomenonMemory import PhenomenonMemory, TER
 from .AllocentricMemory.Hexagonal_geometry import CELL_RADIUS
 
-HEXAGRID_WIDTH = 100
-HEXAGRID_HEIGHT = 200
+GRID_WIDTH = 100   # Number of cells wide
+GRID_HEIGHT = 200  # Number of cells high
+NEAR_HOME = 300    # (mm) Max distance to consider near home
 
 
 class Memory:
@@ -18,7 +19,7 @@ class Memory:
     def __init__(self):
         self.body_memory = BodyMemory()
         self.egocentric_memory = EgocentricMemory()
-        self.allocentric_memory = AllocentricMemory(HEXAGRID_WIDTH, HEXAGRID_HEIGHT, cell_radius=CELL_RADIUS)
+        self.allocentric_memory = AllocentricMemory(GRID_WIDTH, GRID_HEIGHT, cell_radius=CELL_RADIUS)
         self.phenomenon_memory = PhenomenonMemory()
 
     def __str__(self):
@@ -98,8 +99,8 @@ class Memory:
 
     def is_near_terrain_origin(self):
         """Return True if the robot is near the origin of the terrain"""
-        if len(self.phenomenon_memory.phenomena) > 0:
-            delta = self.phenomenon_memory.phenomena[0].origin_prompt() - self.allocentric_memory.robot_point
-            return np.linalg.norm(delta) < 100
+        if TER in self.phenomenon_memory.phenomena:
+            delta = self.phenomenon_memory.phenomena[TER].origin_point() - self.allocentric_memory.robot_point
+            return np.linalg.norm(delta) < NEAR_HOME
         else:
             return False

@@ -32,7 +32,7 @@ class DeciderExplore:
 
         self.exploration_step = EXPLORATION_STEP_INIT
         # self.prompt_point = np.array([-2000, 2000, 0])
-        point = np.array([2000, 0, 0])
+        point = np.array([0, 2000, 0])  # Begin with north
         self.prompt_points = [point]
         self.nb_points = 12
         rotation_matrix = matrix44.create_from_z_rotation(-2. * math.pi/self.nb_points)
@@ -40,6 +40,13 @@ class DeciderExplore:
             point = matrix44.apply_to_vector(rotation_matrix, point)
             self.prompt_points.append(point)
         self.prompt_index = 0
+
+    def is_active(self):
+        """Return True if this decider is active: the terrain phenomenon has an absolute point"""
+        if TER in self.workspace.memory.phenomenon_memory.phenomena:
+            if self.workspace.memory.phenomenon_memory.phenomena[TER].origin_point() is not None:
+                return True
+        return False
 
     def propose_intended_enaction(self, enacted_interaction):
         """Propose the next intended enaction from the previous enacted interaction.
@@ -119,7 +126,7 @@ class DeciderExplore:
                         playsound('autocat/Assets/R5.wav', False)
                     else:
                         # If not near home then go home
-                        allo_origin = self.workspace.memory.phenomenon_memory.phenomena[TER].origin_prompt()
+                        allo_origin = self.workspace.memory.phenomenon_memory.phenomena[TER].origin_point()
                         print("Going from", self.workspace.memory.allocentric_memory.robot_point, "to origin sensor point", allo_origin)
                         ego_origin = self.workspace.memory.allocentric_to_egocentric(allo_origin)
                         self.workspace.memory.egocentric_memory.prompt_point = ego_origin

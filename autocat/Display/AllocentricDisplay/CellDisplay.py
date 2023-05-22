@@ -59,8 +59,8 @@ class CellDisplay:
         # Level 0 Pool
         if self.shape0 is not None:
             color0 = name_to_rgb('royalBlue')
-            if cell.clock_prompt > 0:
-                color0 = name_to_rgb('MediumOrchid')
+            # if cell.clock_prompt > 0:
+            #     color0 = name_to_rgb('MediumOrchid')
             self.shape0.colors[0:24] = 6 * (*color0, 255)
 
         # Level 1

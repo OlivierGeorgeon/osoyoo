@@ -67,9 +67,12 @@ class PhenomenonTerrain(Phenomenon):
         # Does not belong to this phenomenon: must return None
         return None
 
-    def origin_prompt(self):
+    def origin_point(self):
         """Return the position where to go to check the origin"""
-        return self.absolute_affordance().experience.sensor_point() + self.point
+        if self.absolute_affordance() is not None:
+            return self.absolute_affordance().experience.sensor_point() + self.point
+        else:
+            return None
 
     def confirmation_prompt(self):
         """Return the point to aim at for confirmation of this phenomenon"""
