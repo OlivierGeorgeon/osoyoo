@@ -1,13 +1,15 @@
 import math
 import numpy as np
 from pyrr import matrix44
-from autocat.Memory.EgocentricMemory.Experience import EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_CENTRAL_ECHO, EXPERIENCE_FLOOR
+from autocat.Memory.EgocentricMemory.Experience import EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_CENTRAL_ECHO, \
+    EXPERIENCE_FLOOR
 from autocat.Utils import assert_almost_equal_angles
 
 MAX_SIMILAR_DISTANCE = 300    # (mm) Max distance within which affordances are similar
 MAX_SIMILAR_DIRECTION = 15    # (degrees) Max angle within which affordances are similar
 MIN_OPPOSITE_DIRECTION = 135  # (degrees) Min angle to tell affordances are in opposite directions
-COLOR_DISTANCE = 40           # (mm) The distance between patches of colors
+COLOR_DISTANCE = 50           # (mm) The distance between patches of colors. On A4 paper: 40mm. On A3 paper: 50mm
+MIDDLE_COLOR_INDEX = 4        # (color index) The index of the middle color (green)
 
 
 class Affordance:
@@ -85,15 +87,17 @@ class Affordance:
             points = [p1, p2, p3] + self.point
         return points
 
-    def color_position(self, color_index):
-        """Return the position relative to the phenomenon origin of the color patch"""
+    def color_position(self):
+        """Return the position of the color_index patch knowing the position and color of this affordance"""
         # Orthogonal vector
         om = matrix44.create_from_z_rotation(-math.pi / 2)
-        vo = matrix44.apply_to_vector(om, self.experience.sensor_point()) / np.linalg.norm(self.experience.sensor_point())
+        vo = matrix44.apply_to_vector(om, self.experience.sensor_point()) / \
+             np.linalg.norm(self.experience.sensor_point())
         # Distance along the orthogonal vector
-        color_distance = np.array((color_index - self.experience.color_index) * vo * COLOR_DISTANCE, dtype=int)
-        print("Affordance position:", self.point, "sensor point", self.experience.sensor_point(), "color index", self.experience.color_index)
-        print("New index", color_index, "at", color_distance)
+        color_distance = np.array((MIDDLE_COLOR_INDEX - self.experience.color_index) * vo * COLOR_DISTANCE, dtype=int)
+        print("Affordance position:", self.point, "sensor point", self.experience.sensor_point(), "color index",
+              self.experience.color_index)
+        print("New index", MIDDLE_COLOR_INDEX, "at", color_distance)
         return color_distance + self.point
 
     def save(self, experiences):

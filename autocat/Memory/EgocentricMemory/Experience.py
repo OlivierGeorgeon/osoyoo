@@ -111,7 +111,7 @@ def category_color(color_sensor):
                               float(color_sensor['blue']) / 256.0)
 
     if hsv[1] < 0.45:
-        if hsv[0] < 0.6:
+        if hsv[0] < 0.7:  # 0.6
             # Not saturate, not violet
             # Floor. Saturation: Table bureau 0.16. Sol bureau 0.17, table olivier 0.21, sol olivier: 0.4, 0.33
             color_index = 0
@@ -126,8 +126,8 @@ def category_color(color_sensor):
             if hsv[0] > 0.9:
                 # 'deepPink'  # Hue = 0.94, 0.94, 0.94, 0.96, 0.95, sat 0.54
                 color_index = 7
-            elif hsv[0] > 0.6:
-                # 'orchid'  # Hue = 0.66
+            elif hsv[0] > 0.7:  # 0.6
+                # 'orchid'  # Hue = 0.83 -- 0.66, sat 0.25
                 color_index = 6
             elif hsv[0] > 0.5:
                 # 'deepSkyBlue'  # Hue = 0.59 -- 0.57, 0.58 -- 0.58, sat 0.86
@@ -142,5 +142,5 @@ def category_color(color_sensor):
                 # 'darkOrange'  # Hue = 0.13, 0.16, 0.15 -- 0.06, 0.08, 0.09, 0.08 -- 0.11, sat 0.56
                 color_index = 2
 
-    # print("Color: ", hsv, FLOOR_COLORS[color_index])
+    print("Color: ", hsv, FLOOR_COLORS[color_index])
     return color_index

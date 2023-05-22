@@ -4,15 +4,15 @@
 
 import math
 import numpy as np
-from pyrr import quaternion
+from pyrr import quaternion, matrix44
 from playsound import playsound
 from . Action import ACTION_ALIGN_ROBOT, ACTION_FORWARD, ACTION_LEFTWARD, ACTION_RIGHTWARD
 from . Interaction import Interaction, OUTCOME_DEFAULT
 from ..Robot.Enaction import Enaction
 from ..Memory.PhenomenonMemory.PhenomenonMemory import TER
-# from ..Memory.PhenomenonMemory.PhenomenonTerrain import ABS
 from ..Memory.EgocentricMemory.Experience import EXPERIENCE_FLOOR
 
+CLOCK_TO_GO_HOME = 5
 EXPLORATION_STEP_INIT = 0
 EXPLORATION_STEP_ROTATE = 1
 EXPLORATION_STEP_FORWARD = 2
@@ -31,7 +31,15 @@ class DeciderExplore:
         self.anticipated_outcome = OUTCOME_DEFAULT
 
         self.exploration_step = EXPLORATION_STEP_INIT
-        self.prompt_point = np.array([-2000, 2000, 0])
+        # self.prompt_point = np.array([-2000, 2000, 0])
+        point = np.array([2000, 0, 0])
+        self.prompt_points = [point]
+        self.nb_points = 12
+        rotation_matrix = matrix44.create_from_z_rotation(-2. * math.pi/self.nb_points)
+        for i in range(1, self.nb_points):
+            point = matrix44.apply_to_vector(rotation_matrix, point)
+            self.prompt_points.append(point)
+        self.prompt_index = 0
 
     def propose_intended_enaction(self, enacted_interaction):
         """Propose the next intended enaction from the previous enacted interaction.
@@ -59,7 +67,7 @@ class DeciderExplore:
                     rot = quaternion.rotation_angle(relative_quaternion)
                     print("Rotation from origin", round(math.degrees(rot)))
                     if quaternion.rotation_axis(relative_quaternion)[2] > 0:  # Positive z axis rotation
-                        if rot < math.pi/4:
+                        if rot < math.pi/2:
                             print("OUTCOME Left of origin")
                             outcome = OUTCOME_LEFT
                         elif rot < math.pi:
@@ -69,7 +77,7 @@ class DeciderExplore:
                         #     print("OUTCOME Far Right of origin")
                         #     outcome = OUTCOME_FAR_RIGHT
                     else:
-                        if rot < math.pi/4:
+                        if rot < math.pi/2:
                             print("OUTCOME Right of origin")
                             outcome = OUTCOME_RIGHT
                         elif rot < math.pi:
@@ -86,8 +94,9 @@ class DeciderExplore:
         if self.exploration_step == EXPLORATION_STEP_INIT:
             # If time to go home
             if 0 in self.workspace.memory.phenomenon_memory.phenomena and \
-                    self.workspace.memory.phenomenon_memory.phenomena[TER].absolute_affordance() is not None \
-                    and self.workspace.clock - self.workspace.memory.phenomenon_memory.phenomena[0].last_origin_clock > 3:
+                    self.workspace.memory.phenomenon_memory.phenomena[TER].absolute_affordance() is not None and \
+                    self.workspace.clock - self.workspace.memory.phenomenon_memory.phenomena[0].last_origin_clock > \
+                    CLOCK_TO_GO_HOME:
                 # If right or left then swipe to home
                 if outcome in [OUTCOME_LEFT, OUTCOME_RIGHT]:
                     if outcome == OUTCOME_RIGHT:
@@ -118,10 +127,15 @@ class DeciderExplore:
                     self.exploration_step = EXPLORATION_STEP_ROTATE
             else:
                 # Go to the most interesting pool point
-                mip = self.workspace.memory.allocentric_memory.most_interesting_pool(self.workspace.clock)
-                self.workspace.memory.egocentric_memory.prompt_point = self.workspace.memory.allocentric_to_egocentric(mip)
+                # mip = self.workspace.memory.allocentric_memory.most_interesting_pool(self.workspace.clock)
+                # self.workspace.memory.egocentric_memory.prompt_point = self.workspace.memory.allocentric_to_egocentric(mip)
                 # Go back and forth
-                # self.workspace.memory.egocentric_memory.prompt_point = self.prompt_point.copy()
+                allo_prompt = self.prompt_points[self.prompt_index]
+                ego_prompt = self.workspace.memory.allocentric_to_egocentric(allo_prompt)
+                self.workspace.memory.egocentric_memory.prompt_point = ego_prompt
+                self.prompt_index += 1
+                if self.prompt_index >= self.nb_points:
+                    self.prompt_index = 0
                 self.exploration_step = EXPLORATION_STEP_ROTATE
 
         # Compute the next intended interaction

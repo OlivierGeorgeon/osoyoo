@@ -32,22 +32,27 @@ class PhenomenonTerrain(Phenomenon):
 
             # Check if this affordance is absolute
             if affordance.absolute_point_interest():
-                # If the phenomenon does not have an absolute yet then this affordance becomes the absolute
+                # If the phenomenon does not have an absolute origin yet then this affordance becomes the absolute
                 if self.absolute_affordance_key is None:
                     # This experience becomes the phenomenon's absolute origin
                     self.absolute_affordance_key = self.affordance_id
                     self.last_origin_clock = affordance.experience.clock
                     # The position of the phenomenon is adjusted
-                    self.point += affordance.point
+                    # self.point += affordance.point  # The phenomenon's origin moves to this affordance's point
+                    # The phenomenon's origin moves to the green patch relative to this affordance
+                    self.point += affordance.color_position()
                     # All the position of affordance including this one are adjusted
                     for a in self.affordances.values():
-                        a.point -= affordance.point
+                        # a.point -= affordance.point
+                        a.point -= affordance.color_position()
                     # return position_correction
                 else:
                     # Correct the robot's position
                     print("Near absolute origin affordance")
-                    position_correction = self.absolute_affordance().color_position(affordance.experience.color_index) \
-                        - affordance.point
+                    # position_correction = self.absolute_affordance().color_position(affordance.experience.color_index) \
+                    #      - affordance.point
+                    # Corrected to move the affordance's green patch to the phenomenon's origin
+                    position_correction = - affordance.color_position()
                     # Correct the position of the affordances since last time the robot visited the absolute origin
                     print("Last origin clock:", self.last_origin_clock)
                     print("Current Affordance clock", affordance.experience.clock)
