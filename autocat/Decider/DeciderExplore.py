@@ -12,7 +12,7 @@ from ..Robot.Enaction import Enaction
 from ..Memory.PhenomenonMemory.PhenomenonMemory import TER
 from ..Memory.EgocentricMemory.Experience import EXPERIENCE_FLOOR
 
-CLOCK_TO_GO_HOME = 5
+CLOCK_TO_GO_HOME = 4  # Number of interactions before going home
 EXPLORATION_STEP_INIT = 0
 EXPLORATION_STEP_ROTATE = 1
 EXPLORATION_STEP_FORWARD = 2
@@ -32,10 +32,11 @@ class DeciderExplore:
 
         self.exploration_step = EXPLORATION_STEP_INIT
         # self.prompt_point = np.array([-2000, 2000, 0])
-        point = np.array([0, 2000, 0])  # Begin with north
+        point = np.array([-2000, 2000, 0])  # Begin with North West
         self.prompt_points = [point]
-        self.nb_points = 12
-        rotation_matrix = matrix44.create_from_z_rotation(-2. * math.pi/self.nb_points)
+        # Visit 6 points from North West to south East every pi/6
+        self.nb_points = 6
+        rotation_matrix = matrix44.create_from_z_rotation(-math.pi/6)
         for i in range(1, self.nb_points):
             point = matrix44.apply_to_vector(rotation_matrix, point)
             self.prompt_points.append(point)
@@ -74,25 +75,19 @@ class DeciderExplore:
                     rot = quaternion.rotation_angle(relative_quaternion)
                     print("Rotation from origin", round(math.degrees(rot)))
                     if quaternion.rotation_axis(relative_quaternion)[2] > 0:  # Positive z axis rotation
-                        if rot < math.pi/2:
+                        if rot < math.pi/3:
                             print("OUTCOME Left of origin")
                             outcome = OUTCOME_LEFT
                         elif rot < math.pi:
                             print("OUTCOME Far Left of origin")
                             outcome = OUTCOME_FAR_LEFT
-                        # else:  # Not used
-                        #     print("OUTCOME Far Right of origin")
-                        #     outcome = OUTCOME_FAR_RIGHT
                     else:
-                        if rot < math.pi/2:
+                        if rot < math.pi/3:
                             print("OUTCOME Right of origin")
                             outcome = OUTCOME_RIGHT
                         elif rot < math.pi:
                             print("OUTCOME Far Right of origin")
                             outcome = OUTCOME_FAR_RIGHT
-                        # else:  # Not used
-                        #     print("OUTCOME Far left of origin")
-                        #     outcome = OUTCOME_FAR_LEFT
         return outcome
 
     def intended_enaction(self, outcome):
@@ -136,7 +131,7 @@ class DeciderExplore:
                 # Go to the most interesting pool point
                 # mip = self.workspace.memory.allocentric_memory.most_interesting_pool(self.workspace.clock)
                 # self.workspace.memory.egocentric_memory.prompt_point = self.workspace.memory.allocentric_to_egocentric(mip)
-                # Go back and forth
+                # Go successively to the predefined prompt points
                 allo_prompt = self.prompt_points[self.prompt_index]
                 ego_prompt = self.workspace.memory.allocentric_to_egocentric(allo_prompt)
                 self.workspace.memory.egocentric_memory.prompt_point = ego_prompt
