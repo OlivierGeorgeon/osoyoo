@@ -37,21 +37,14 @@ class PhenomenonTerrain(Phenomenon):
                     # This experience becomes the phenomenon's absolute origin
                     self.absolute_affordance_key = self.affordance_id
                     self.last_origin_clock = affordance.experience.clock
-                    # The position of the phenomenon is adjusted
-                    # self.point += affordance.point  # The phenomenon's origin moves to this affordance's point
                     # The phenomenon's origin moves to the green patch relative to this affordance
                     self.point += affordance.color_position()
                     # All the position of affordance including this one are adjusted
                     for a in self.affordances.values():
                         # a.point -= affordance.point
                         a.point -= affordance.color_position()
-                    # return position_correction
                 else:
-                    # Correct the robot's position
-                    print("Near absolute origin affordance")
-                    # position_correction = self.absolute_affordance().color_position(affordance.experience.color_index) \
-                    #      - affordance.point
-                    # Corrected to move the affordance's green patch to the phenomenon's origin
+                    # The position correction is the distance of the affordance's green patch to the phenomenon origin
                     position_correction = - affordance.color_position()
                     # Correct the position of the affordances since last time the robot visited the absolute origin
                     print("Last origin clock:", self.last_origin_clock)
@@ -64,7 +57,7 @@ class PhenomenonTerrain(Phenomenon):
                         print("Affordance clock:", a.experience.clock, "corrected by:", ac, "coef:", coef)
                     self.last_origin_clock = affordance.experience.clock
             return position_correction
-        # Does not belong to this phenomenon: must return None
+        # Affordances that do not belong to this phenomenon must return None
         return None
 
     def origin_point(self):

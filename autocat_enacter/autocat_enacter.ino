@@ -31,6 +31,7 @@
 #include "Color.h"
 #include "Action_define.h"
 #include "Led.h"
+#include "Interaction.h"
 #include "src/wifi/WifiCat.h"
 #include "src/steps/Step0.h"
 #include "src/steps/Step1.h"
@@ -44,6 +45,8 @@ Imu IMU;
 WifiCat WifiCat;
 Led LED;
 Color TCS;
+Interaction INT(TCS, FCR, HEA);
+//Interaction INT(TCS, HEA);
 
 unsigned long action_start_time = 0;
 unsigned long duration1 = 0;
@@ -125,7 +128,8 @@ void loop()
   // STEP 2: Enacting the termination of the interaction: Floor change retreat, Stabilisation time
   // When the terminations are finished, proceed to Step 3
   if (interaction_step == 2)
-    Step2();
+    INT.Step2(action_end_time, interaction_step);
+    //Step2();
 
   // STEP 3: Ending the interaction:
   // Send the outcome and go back to Step 0

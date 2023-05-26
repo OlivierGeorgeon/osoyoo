@@ -13,9 +13,9 @@
 #define sensor4   A1 // 2nd right sensor
 #define sensor5   A0 // Right most sensor
 
-Floor::Floor(Wheel OWM)
+Floor::Floor(Wheel& OWM) : _OWM(OWM)
 {
-  _OWM = OWM;
+  //_OWM = OWM;
   _is_enacting = false;
   _previous_measure_floor = 0;
   _floor_change_retreat_end_time = 0;
