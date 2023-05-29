@@ -24,19 +24,20 @@
 */
 
 #include <Arduino_JSON.h>
-#include "Robot_define.h"
-#include "Floor.h"  // imports "Wheel.h"
-#include "Head.h"
-#include "Imu.h"
-#include "Color.h"
-#include "Action_define.h"
-#include "Led.h"
-#include "Interaction.h"
 #include "src/wifi/WifiCat.h"
 #include "src/steps/Step0.h"
 #include "src/steps/Step1.h"
 #include "src/steps/Step2.h"
 #include "src/steps/Step3.h"
+#include "Action_define.h"
+#include "Color.h"
+#include "Color.h"
+#include "Floor.h"  // imports "Wheel.h"
+#include "Head.h"
+#include "Imu.h"
+#include "Interaction.h"
+#include "Led.h"
+#include "Robot_define.h"
 
 Wheel OWM;
 Floor FCR(OWM);
@@ -45,8 +46,6 @@ Imu IMU;
 WifiCat WifiCat;
 Led LED;
 Color TCS;
-Interaction INT(TCS, FCR, HEA);
-//Interaction INT(TCS, HEA);
 
 unsigned long action_start_time = 0;
 unsigned long duration1 = 0;
@@ -66,6 +65,9 @@ int previous_clock = -1;
 int shock_event = 0;
 bool is_focussed = false;
 String status = "0"; // The outcome information used for sequential learning
+
+Interaction INT(TCS, FCR, HEA, IMU, WifiCat, action_end_time, interaction_step, status, action, clock, duration1, action_start_time);
+
 
 void setup()
 {
@@ -125,14 +127,16 @@ void loop()
   if (interaction_step == 1)
     Step1();
 
+  // Update the current interaction
+  INT.Update();
+
   // STEP 2: Enacting the termination of the interaction: Floor change retreat, Stabilisation time
   // When the terminations are finished, proceed to Step 3
-  if (interaction_step == 2)
-    INT.Step2(action_end_time, interaction_step);
+  //if (interaction_step == 2)
     //Step2();
 
   // STEP 3: Ending the interaction:
   // Send the outcome and go back to Step 0
-  if (interaction_step == 3)
-    Step3();
+  // if (interaction_step == 3)
+    // Step3();
 }

@@ -5,22 +5,20 @@
 #include "../../Head.h"
 #include "../../Imu.h"
 
-extern String status; // The outcome information used for sequential learning
-extern char action;
-extern int clock;
+extern Color TCS;
 extern Floor FCR;
 extern Head HEA;
 extern Imu IMU;
-extern Color TCS;
+extern WifiCat WifiCat;
+
+extern String status; // The outcome information used for sequential learning
+extern char action;
+extern int clock;
 extern unsigned long duration1;
 extern unsigned long action_start_time;
 extern int interaction_step;
-extern WifiCat WifiCat;
 
 
-
-// Wait for the interaction to terminate and proceed to Step 3
-// Warning: in some situations, the head alignment may take quite long
 void Step3()
 {
   // Compute the outcome message
