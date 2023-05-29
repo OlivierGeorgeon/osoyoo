@@ -27,8 +27,8 @@
 #include "src/wifi/WifiCat.h"
 #include "src/steps/Step0.h"
 #include "src/steps/Step1.h"
-#include "src/steps/Step2.h"
-#include "src/steps/Step3.h"
+// #include "src/steps/Step2.h"
+// #include "src/steps/Step3.h"
 #include "Action_define.h"
 #include "Color.h"
 #include "Color.h"
@@ -36,6 +36,7 @@
 #include "Head.h"
 #include "Imu.h"
 #include "Interaction.h"
+#include "src/interactions/Forward.h"  // Must be included after Interaction.h for some reason
 #include "Led.h"
 #include "Robot_define.h"
 
@@ -67,6 +68,8 @@ bool is_focussed = false;
 String status = "0"; // The outcome information used for sequential learning
 
 Interaction INT(TCS, FCR, HEA, IMU, WifiCat, action_end_time, interaction_step, status, action, clock, duration1, action_start_time);
+Forward FWD(TCS, FCR, HEA, IMU, WifiCat, action_end_time, interaction_step, status, action, clock, duration1, action_start_time,
+  is_focussed, focus_x, focus_y, focus_speed, shock_event);
 
 
 void setup()
@@ -128,7 +131,7 @@ void loop()
     Step1();
 
   // Update the current interaction
-  INT.Update();
+  INT.update();
 
   // STEP 2: Enacting the termination of the interaction: Floor change retreat, Stabilisation time
   // When the terminations are finished, proceed to Step 3

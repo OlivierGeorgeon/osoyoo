@@ -8,11 +8,11 @@
 
 class Interaction
 {
-  public:
+public:
   Interaction(Color& CLR, Floor& FCR, Head& HEA, Imu& IMU, WifiCat& WifiCat, unsigned long& action_end_time, int& interaction_step, String& status, char& action, int& clock, unsigned long& duration1, unsigned long& action_start_time);
-  void Step2();
-  void Update();
-  private:
+  void step2();
+  void update();
+protected:
   Color& _CLR;
   Floor& _FCR;
   Head& _HEA;
@@ -20,7 +20,6 @@ class Interaction
   WifiCat& _WifiCat;
   unsigned long& _action_end_time;
   int& _interaction_step;
-
   String& _status;
   char& _action;
   int& _clock;

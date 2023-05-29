@@ -24,8 +24,9 @@ class Floor
     void outcome(JSONVar & outcome_object);
     int _floor_outcome;
     // String _debug_message;
-  private:
     Wheel& _OWM;
+  private:
+    // Wheel& _OWM;
     int _previous_measure_floor;
     unsigned long _floor_change_retreat_end_time;
 };
