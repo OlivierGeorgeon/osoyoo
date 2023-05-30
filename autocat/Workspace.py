@@ -125,8 +125,8 @@ class Workspace:
 
             # Increment the clock if the enacted interaction was properly received
             if self.enacted_interaction['clock'] >= self.clock:  # don't increment if the robot is behind
-                # Remove the enaction from the stack
-                del self.enactions[self.clock]
+                # Remove the enaction from the stack (ok if it has already been removed)
+                self.enactions.pop(self.clock, None)
                 # Increment the clock
                 self.clock += 1
 

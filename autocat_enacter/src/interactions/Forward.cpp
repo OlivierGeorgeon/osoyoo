@@ -36,7 +36,16 @@ Forward::Forward(
 {
 }
 
-void Forward::step1()
+// STEP 0: Start the interaction
+void Forward::begin()
+{
+  _HEA._next_saccade_time = _action_end_time - SACCADE_DURATION;  // Inhibit HEA during the interaction
+  _FCR._OWM.goForward(SPEED);
+  _step = INTERACTION_ONGOING;
+}
+
+// STEP 1: Control the enaction
+void Forward::ongoing()
 {
   if (_is_focussed)  // Keep the head towards the focus (HEA is inhibited during the action)
     _HEA.turnHead(_HEA.head_direction(_focus_x - _focus_speed * (millis()- _action_start_time)/1000, _focus_y));
@@ -46,7 +55,7 @@ void Forward::step1()
     _duration1 = millis()- _action_start_time;
     _action_end_time = 0;
     _FCR._OWM.stopMotion();
-    _interaction_step = 2;
+    _step = INTERACTION_TERMINATE;
     // break;
   }
   // Check if Floor Change Retreat
@@ -57,7 +66,7 @@ void Forward::step1()
     // Proceed to step 2 for enacting Floor Change Retreat
     _duration1 = millis() - _action_start_time;
     _action_end_time = 0;
-    _interaction_step = 2;
+    _step = INTERACTION_TERMINATE;
   }
   // If no floor change, check whether duration has elapsed
   else if (_action_end_time < millis())
@@ -66,6 +75,6 @@ void Forward::step1()
       _HEA.beginEchoAlignment();  // Force HEA
     _duration1 = millis()- _action_start_time;
     _FCR._OWM.stopMotion();
-    _interaction_step = 2;
+    _step = INTERACTION_TERMINATE;
   }
 }

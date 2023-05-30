@@ -3,12 +3,16 @@
 #include "../wifi/WifiCat.h"
 #include "../../Robot_define.h"
 #include "../../Action_define.h"
+#include "../../Color.h"
 #include "../../Floor.h"
 #include "../../Head.h"
 #include "../../Imu.h"
+#include "../../Interaction.h"
+#include "../interactions/Forward.h"
 
 char packetBuffer[UDP_BUFFER_SIZE];
 
+extern Color TCS;
 extern Wheel OWM;
 extern Floor FCR;
 extern Head HEA;
@@ -34,6 +38,7 @@ extern int clock;
 extern int previous_clock;
 extern int shock_event;
 
+extern Interaction* INT;
 
 void Step0()
 {
@@ -148,8 +153,11 @@ void Step0()
           OWM.turnLeft(SPEED);
           break;
         case ACTION_GO_ADVANCE:
-          HEA._next_saccade_time = action_end_time - SACCADE_DURATION;  // Inhibit HEA during the interaction
-          OWM.goForward(SPEED);
+          // HEA._next_saccade_time = action_end_time - SACCADE_DURATION;  // Inhibit HEA during the interaction
+          // OWM.goForward(SPEED);
+          INT = new Forward(TCS, FCR, HEA, IMU, WifiCat, action_end_time, interaction_step, status, action, clock, duration1, action_start_time,
+            is_focussed, focus_x, focus_y, focus_speed, shock_event);
+          INT->begin();
           break;
         case ACTION_TURN_RIGHT:
           action_end_time = millis() + 250;
