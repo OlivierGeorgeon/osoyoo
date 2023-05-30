@@ -15,7 +15,9 @@
 class Interaction
 {
 public:
-  Interaction(Color& CLR, Floor& FCR, Head& HEA, Imu& IMU, WifiCat& WifiCat, unsigned long& action_end_time, int& interaction_step, String& status, char& action, int& clock, unsigned long& duration1, unsigned long& action_start_time);
+  // Interaction(Color& CLR, Floor& FCR, Head& HEA, Imu& IMU, WifiCat& WifiCat, unsigned long& action_end_time, int& interaction_step, String& status, char& action, int& clock, unsigned long& duration1, unsigned long& action_start_time);
+  Interaction(Color& CLR, Floor& FCR, Head& HEA, Imu& IMU, WifiCat& WifiCat, unsigned long action_end_time, char action,
+  int clock, bool is_focussed, int focus_x, int focus_y, int focus_speed, int& shock_event);
   virtual void begin();
   virtual void ongoing();
   void terminate();
@@ -28,14 +30,18 @@ protected:
   Head& _HEA;
   Imu& _IMU;
   WifiCat& _WifiCat;
-  unsigned long& _action_end_time;
-  int& _interaction_step;
-  String& _status;
-  char& _action;
-  int& _clock;
-  unsigned long& _duration1;
-  unsigned long& _action_start_time;
+  unsigned long _action_end_time;
+  String _status;
+  char _action;
+  int _clock;
+  unsigned long _duration1;
+  unsigned long _action_start_time;
   int _step;
+  bool _is_focussed;
+  int _focus_x;
+  int _focus_y;
+  int _focus_speed;
+  int& _shock_event;
 };
 
 #endif

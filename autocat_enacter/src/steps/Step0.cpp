@@ -94,7 +94,7 @@ void Step0()
     {
       previous_clock = clock;
       action_start_time = millis();
-      action_end_time = action_start_time + target_duration;
+      action_end_time = millis() + target_duration;
       interaction_step = 1;
       IMU.begin();
       shock_event = 0; // reset event from previous interaction
@@ -155,7 +155,7 @@ void Step0()
         case ACTION_GO_ADVANCE:
           // HEA._next_saccade_time = action_end_time - SACCADE_DURATION;  // Inhibit HEA during the interaction
           // OWM.goForward(SPEED);
-          INT = new Forward(TCS, FCR, HEA, IMU, WifiCat, action_end_time, interaction_step, status, action, clock, duration1, action_start_time,
+          INT = new Forward(TCS, FCR, HEA, IMU, WifiCat, action_end_time, action, clock,
             is_focussed, focus_x, focus_y, focus_speed, shock_event);
           INT->begin();
           break;

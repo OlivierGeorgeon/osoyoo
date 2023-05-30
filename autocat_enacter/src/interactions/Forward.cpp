@@ -18,21 +18,16 @@ Forward::Forward(
   Head& HEA,
   Imu& IMU,
   WifiCat& WifiCat,
-  unsigned long& action_end_time,
-  int& interaction_step,
-  String& status,
-  char& action,
-  int& clock,
-  unsigned long& duration1,
-  unsigned long& action_start_time,
-  bool& is_focussed,
-  int& focus_x,
-  int& focus_y,
-  int& focus_speed,
+  unsigned long action_end_time,
+  char action,
+  int clock,
+  bool is_focussed,
+  int focus_x,
+  int focus_y,
+  int focus_speed,
   int& shock_event
   ) :
-  Interaction(CLR, FCR, HEA, IMU, WifiCat, action_end_time, interaction_step, status, action, clock, duration1, action_start_time),
-  _is_focussed(is_focussed), _focus_x(focus_x), _focus_y(focus_y), _focus_speed(focus_speed), _shock_event(shock_event)
+  Interaction(CLR, FCR, HEA, IMU, WifiCat, action_end_time, action, clock, is_focussed, focus_x, focus_y, focus_speed, shock_event)
 {
 }
 

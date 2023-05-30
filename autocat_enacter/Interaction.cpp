@@ -17,19 +17,27 @@ Interaction::Interaction(
   Head& HEA,
   Imu& IMU,
   WifiCat& WifiCat,
-  unsigned long& action_end_time,
-  int& interaction_step,
-  String& status,
-  char& action,
-  int& clock,
-  unsigned long& duration1,
-  unsigned long& action_start_time
+  unsigned long action_end_time,
+  char action,
+  int clock,
+  bool is_focussed,
+  int focus_x,
+  int focus_y,
+  int focus_speed,
+  int& shock_event
   ) :
-  _CLR(CLR), _FCR(FCR), _HEA(HEA), _IMU(IMU), _WifiCat(WifiCat),_action_end_time(action_end_time),
-  _interaction_step(interaction_step), _status(status), _action(action), _clock(clock), _duration1(duration1),
-  _action_start_time(action_start_time)
+  _CLR(CLR), _FCR(FCR), _HEA(HEA), _IMU(IMU), _WifiCat(WifiCat), _shock_event(shock_event)
 {
   _step = INTERACTION_BEGIN;
+  _status = "0";
+  _action_start_time = millis();
+  _action_end_time = action_end_time;
+  _action = action;
+  _clock = clock;
+  _is_focussed = is_focussed;
+  _focus_x = focus_x;
+  _focus_y = focus_y;
+  _focus_speed = focus_speed;
 }
 
 void Interaction::begin()
