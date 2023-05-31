@@ -1,6 +1,6 @@
 /*
-  Forward.h - library for controlling the move forward interaction
-  Created by Olivier Georgeon, mai 29 2023
+  Swipe_right.cpp - library for controlling the move swipe right interaction
+  Created by Olivier Georgeon, mai 31 2023
   released into the public domain
 */
 #include "../wifi/WifiCat.h"
@@ -10,9 +10,9 @@
 #include "../../Head.h"
 #include "../../Imu.h"
 #include "../../Interaction.h"
-#include "Forward.h"
+#include "Swipe_right.h"
 
-Forward::Forward(
+Swipe_right::Swipe_right(
   Color& CLR,
   Floor& FCR,
   Head& HEA,
@@ -31,41 +31,30 @@ Forward::Forward(
 }
 
 // STEP 0: Start the interaction
-void Forward::begin()
+void Swipe_right::begin()
 {
   _HEA._next_saccade_time = _action_end_time - SACCADE_DURATION;  // Inhibit HEA during the interaction
-  _FCR._OWM.goForward(SPEED);
+  _FCR._OWM.shiftRight(SHIFT_SPEED);
   _step = INTERACTION_ONGOING;
 }
 
 // STEP 1: Control the enaction
-void Forward::ongoing()
+void Swipe_right::ongoing()
 {
   if (_is_focussed)  // Keep the head towards the focus (HEA is inhibited during the action)
-    _HEA.turnHead(_HEA.head_direction(_focus_x - _focus_speed * (millis()- _action_start_time)/1000, _focus_y));
-  //if (_shock_event > 0 && !_FCR._is_enacting)
-  if (_IMU.get_impact_measure() > 0 && !_FCR._is_enacting)
-  {
-    // If shock then stop the go advance action
-    _duration1 = millis()- _action_start_time;
-    _action_end_time = 0;
-    _FCR._OWM.stopMotion();
-    _step = INTERACTION_TERMINATE;
-    // break;
-  }
+    _HEA.turnHead(_HEA.head_direction(_focus_x, _focus_y + _focus_speed * (millis()- _action_start_time)/1000));
   // Check if Floor Change Retreat
-  else if (_FCR._is_enacting)
+  if (_FCR._is_enacting)
   {
     _FCR.extraDuration(RETREAT_EXTRA_DURATION); // Increase retreat duration because need to reverse speed
     _status ="1";
     // Proceed to step 2 for enacting Floor Change Retreat
-    _duration1 = millis() - _action_start_time;
+    _duration1 = millis()- _action_start_time;
     _action_end_time = 0;
     _step = INTERACTION_TERMINATE;
   }
   // If no floor change, check whether duration has elapsed
-  else if (_action_end_time < millis())
-  {
+  else if (_action_end_time < millis()) {
     if (!_HEA._is_enacting_head_alignment)
       _HEA.beginEchoAlignment();  // Force HEA
     _duration1 = millis()- _action_start_time;

@@ -98,7 +98,7 @@ void Imu::setup()
 void Imu::begin()
 {
   _yaw = 0;
-  _shock_measure = 0;
+  _impact_measure = 0;
   _cycle_count = 0;
   _blocked = false;
   _max_acceleration = 0;
@@ -144,22 +144,22 @@ int Imu::update(int interaction_step)
       // Check for turned to the right by more than 1°/s after the first 250ms
       if ((_ZAngle < -GYRO_SHOCK_THRESHOLD) && (_cycle_count > IMU_ACCELERATION_CYCLES)) {
         // If moving forward, this will mean collision on the right
-        _shock_measure = B01;
+        _impact_measure = B01;
       }
       // Check a peek deceleration = frontal shock
       if (normalized_acceleration < ACCELERATION_SHOCK_THRESHOLD) {
-        _shock_measure = B11;
+        _impact_measure = B11;
       }
       // Check for turned to the left by more than 1°/s after the first 250ms
       if ((_ZAngle > GYRO_SHOCK_THRESHOLD) && (_cycle_count > IMU_ACCELERATION_CYCLES)) {
         // If moving forward, this will mean collision on the left
-        _shock_measure = B10;
+        _impact_measure = B10;
       }
       // Check for blocked on the front
       // (the acceleration did not pass the threshold during the first 250ms)
       if (_cycle_count >= IMU_ACCELERATION_CYCLES) {
         if (_max_acceleration < ACCELERATION_BLOCK_THRESHOLD) {
-          // _shock_measure = B11;
+          // _impact_measure = B11;
           _blocked = true;
         }
       }
@@ -173,15 +173,21 @@ int Imu::update(int interaction_step)
     }
     #endif
   }
-  return _shock_measure;
+  return _impact_measure;
 }
+
+int Imu::get_impact_measure()
+{
+  return _impact_measure;
+}
+
 void Imu::outcome(JSONVar & outcome_object, char action)
 {
   #if ROBOT_HAS_MPU6050 == true
   outcome_object["yaw"] = (int) _yaw;
   if (action == ACTION_GO_ADVANCE)
   {
-    outcome_object["impact"] = _shock_measure;
+    outcome_object["impact"] = _impact_measure;
     outcome_object["blocked"] = _blocked;
     outcome_object["max_acc"] = _max_acceleration;
     outcome_object["min_acc"] = _min_acceleration;

@@ -23,10 +23,9 @@ Interaction::Interaction(
   bool is_focussed,
   int focus_x,
   int focus_y,
-  int focus_speed,
-  int& shock_event
+  int focus_speed
   ) :
-  _CLR(CLR), _FCR(FCR), _HEA(HEA), _IMU(IMU), _WifiCat(WifiCat), _shock_event(shock_event)
+  _CLR(CLR), _FCR(FCR), _HEA(HEA), _IMU(IMU), _WifiCat(WifiCat)
 {
   _step = INTERACTION_BEGIN;
   _status = "0";
@@ -38,6 +37,7 @@ Interaction::Interaction(
   _focus_x = focus_x;
   _focus_y = focus_y;
   _focus_speed = focus_speed;
+  _step = INTERACTION_BEGIN;
 }
 
 void Interaction::begin()

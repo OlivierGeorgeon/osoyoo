@@ -9,6 +9,9 @@
 #include "../../Imu.h"
 #include "../../Interaction.h"
 #include "../interactions/Forward.h"
+#include "../interactions/Swipe_left.h"
+#include "../interactions/Swipe_right.h"
+#include "../interactions/Turn_angle.h"
 
 char packetBuffer[UDP_BUFFER_SIZE];
 
@@ -138,15 +141,19 @@ void Step0()
           OWM.turnInSpotRight(TURN_SPEED);
           break;
         case ACTION_SHIFT_LEFT:
-          HEA._next_saccade_time = action_end_time - SACCADE_DURATION;  // Inhibit HEA during the interaction
-          OWM.shiftLeft(SHIFT_SPEED);
+          // HEA._next_saccade_time = action_end_time - SACCADE_DURATION;  // Inhibit HEA during the interaction
+          // OWM.shiftLeft(SHIFT_SPEED);
+          INT = new Swipe_left(TCS, FCR, HEA, IMU, WifiCat, action_end_time, action, clock, is_focussed, focus_x, focus_y,
+            focus_speed);
           break;
         case ACTION_STOP:
           OWM.stopMotion();
           break;
         case ACTION_SHIFT_RIGHT:
-          HEA._next_saccade_time = action_end_time - SACCADE_DURATION;  // Inhibit HEA during the interaction
-          OWM.shiftRight(SHIFT_SPEED);
+          //HEA._next_saccade_time = action_end_time - SACCADE_DURATION;  // Inhibit HEA during the interaction
+          //OWM.shiftRight(SHIFT_SPEED);
+          INT = new Swipe_right(TCS, FCR, HEA, IMU, WifiCat, action_end_time, action, clock, is_focussed, focus_x, focus_y,
+            focus_speed);
           break;
         case ACTION_TURN_LEFT:
           action_end_time = millis() + 250;
@@ -155,9 +162,8 @@ void Step0()
         case ACTION_GO_ADVANCE:
           // HEA._next_saccade_time = action_end_time - SACCADE_DURATION;  // Inhibit HEA during the interaction
           // OWM.goForward(SPEED);
-          INT = new Forward(TCS, FCR, HEA, IMU, WifiCat, action_end_time, action, clock,
-            is_focussed, focus_x, focus_y, focus_speed, shock_event);
-          INT->begin();
+          INT = new Forward(TCS, FCR, HEA, IMU, WifiCat, action_end_time, action, clock, is_focussed, focus_x, focus_y,
+            focus_speed);
           break;
         case ACTION_TURN_RIGHT:
           action_end_time = millis() + 250;
@@ -184,22 +190,22 @@ void Step0()
           action_end_time = millis() + 5000;
           break;*/
         case ACTION_ALIGN_ROBOT:
-          action_end_time = millis() + 5000;
-          robot_destination_angle = target_angle;
-          Serial.println("Begin align robot angle : " + String(robot_destination_angle));
-          HEA._next_saccade_time = action_end_time - SACCADE_DURATION;  // Inhibit HEA during the interaction
-          //if (is_focussed) {
-          //  HEA.turnHead(HEA.head_direction(focus_x, focus_y));  // Look to the focussed phenomenon
-          //} else {
-          //  HEA.turnHead(robot_destination_angle);}  // look parallel to the direction
-          if ( robot_destination_angle < - TURN_SPOT_ENDING_ANGLE){
-            OWM.turnInSpotRight(TURN_SPEED);
-            //OWM.turnFrontRight(SPEED);
-          }
-          if ( robot_destination_angle > TURN_SPOT_ENDING_ANGLE){
-            OWM.turnInSpotLeft(TURN_SPEED);
-            //OWM.turnFrontLeft(SPEED);
-          }
+          // action_end_time = millis() + 5000;
+          // robot_destination_angle = target_angle;
+          // Serial.println("Begin align robot angle : " + String(robot_destination_angle));
+          // HEA._next_saccade_time = action_end_time - SACCADE_DURATION;  // Inhibit HEA during the interaction
+          // //if (is_focussed) {
+          // //  HEA.turnHead(HEA.head_direction(focus_x, focus_y));  // Look to the focussed phenomenon
+          // //} else {
+          // //  HEA.turnHead(robot_destination_angle);}  // look parallel to the direction
+          // if ( robot_destination_angle < - TURN_SPOT_ENDING_ANGLE){
+          //   OWM.turnInSpotRight(TURN_SPEED);
+          // }
+          // if ( robot_destination_angle > TURN_SPOT_ENDING_ANGLE){
+          //   OWM.turnInSpotLeft(TURN_SPEED);
+          // }
+          INT = new Turn_angle(TCS, FCR, HEA, IMU, WifiCat, action_end_time, action, clock, is_focussed, focus_x, focus_y,
+            focus_speed, target_angle);
           break;
         default:
           // Unrecognized action (for debug)

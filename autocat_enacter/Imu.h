@@ -29,6 +29,7 @@ class Imu
     void begin();
     int update(int interaction_step);
     void outcome(JSONVar & outcome_object, char action);
+    int get_impact_measure();
     float _yaw;
     float _xSpeed;
     float _xDistance;
@@ -51,7 +52,7 @@ class Imu
     int _min_acceleration;
     float _max_speed;
     float _min_speed;
-    int _shock_measure;
+    int _impact_measure;
     bool _blocked;
     int _cycle_count;
 };
