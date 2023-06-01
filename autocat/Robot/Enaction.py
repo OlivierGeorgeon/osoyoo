@@ -3,7 +3,7 @@ import math
 import numpy as np
 from pyrr import matrix44
 from ..Decider.Action import ACTION_FORWARD, ACTION_BACKWARD, ACTION_ALIGN_ROBOT, ACTION_LEFTWARD, ACTION_RIGHTWARD, \
-    ACTION_TURN_LEFT, ACTION_TURN_RIGHT
+    ACTION_TURN_LEFT, ACTION_TURN_RIGHT, ACTION_TURN_HEAD
 from .RobotDefine import DEFAULT_YAW, TURN_DURATION
 from ..Utils import rotate_vector_z
 
@@ -30,7 +30,7 @@ class Enaction:
             if self.interaction.action.action_code in [ACTION_LEFTWARD, ACTION_RIGHTWARD]:
                 self.duration = int(np.linalg.norm(prompt_point) /
                                     math.fabs(self.interaction.action.translation_speed[1]) * 1000)
-            if self.interaction.action.action_code == ACTION_ALIGN_ROBOT:
+            if self.interaction.action.action_code in [ACTION_ALIGN_ROBOT,ACTION_TURN_HEAD]:
                 self.angle = int(math.degrees(math.atan2(prompt_point[1], prompt_point[0])))
             if (self.interaction.action.action_code == ACTION_TURN_RIGHT) and prompt_point[1] < 0:
                 self.angle = int(math.degrees(math.atan2(prompt_point[1], prompt_point[0])))

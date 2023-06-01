@@ -11,8 +11,9 @@ ACTION_TURN_RIGHT = '3'
 ACTION_SCAN = '-'
 ACTION_ALIGN_ROBOT = '/'
 ACTION_ALIGN_HEAD = '*'
+ACTION_TURN_HEAD = '+'
 ACTIONS = [ACTION_FORWARD, ACTION_BACKWARD, ACTION_LEFTWARD, ACTION_RIGHTWARD, ACTION_TURN_LEFT,
-           ACTION_TURN_RIGHT, ACTION_SCAN, ACTION_ALIGN_ROBOT, ACTION_ALIGN_HEAD]
+           ACTION_TURN_RIGHT, ACTION_SCAN, ACTION_ALIGN_ROBOT, ACTION_ALIGN_HEAD, ACTION_TURN_HEAD]
 
 
 class Action:
@@ -86,6 +87,7 @@ def create_actions():
 
     action_dictionary[ACTION_SCAN] = Action(ACTION_SCAN, null_speed, 0, 2)
     action_dictionary[ACTION_ALIGN_HEAD] = Action(ACTION_ALIGN_HEAD, null_speed, 0, 1)
+    action_dictionary[ACTION_TURN_HEAD] = Action(ACTION_TURN_HEAD, null_speed, 0, 1)
 
     return action_dictionary
 
