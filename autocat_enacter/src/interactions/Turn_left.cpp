@@ -45,11 +45,6 @@ void Turn_left::begin()
   if (_target_angle > 0)  // Received positive angle overrides the default rotation angle
     _robot_destination_angle = _target_angle;
 
-  // if (_is_focussed)
-  //   _head_destination_angle = _HEA.head_direction(_focus_x, _focus_y); // Look at the focus phenomenon
-  // else
-  //   _head_destination_angle = _robot_destination_angle;
-
   _FCR._OWM.turnInSpotLeft(TURN_SPEED);
 
   _step = INTERACTION_ONGOING;
