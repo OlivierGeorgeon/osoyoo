@@ -95,7 +95,7 @@ void Interaction::send()
 }
 
 // Proceed with the enaction of the interaction
-void Interaction::update()
+int Interaction::update()
 {
   // STEP 0: Begin the interaction
   if (_step == INTERACTION_BEGIN)
@@ -112,6 +112,8 @@ void Interaction::update()
   // STEP 3: Ending the interaction:
   if (_step == INTERACTION_SEND)
     send();
+
+  return _step;
 }
 
 int Interaction::getStep()

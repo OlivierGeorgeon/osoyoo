@@ -110,14 +110,14 @@ def category_color(color_sensor):
     hsv = colorsys.rgb_to_hsv(float(color_sensor['red']) / 256.0, float(color_sensor['green']) / 256.0,
                               float(color_sensor['blue']) / 256.0)
 
-    if hsv[1] < 0.45:
+    if hsv[1] < 0.3:  # 0.45:
         if hsv[0] < 0.7:  # 0.6
             # Not saturate, not violet
             # Floor. Saturation: Table bureau 0.16. Sol bureau 0.17, table olivier 0.21, sol olivier: 0.4, 0.33
             color_index = 0
         else:
             # Not saturate but violet
-            color = 'orchid'  # Hue = 0.66 -- 0.66, Saturation = 0.34, 0.2 -- 0.2
+            color = 'orchid'  # Hue = 0.75, 0.66 -- 0.66, Saturation = 0.24, 0.34, 0.2 -- 0.2
             color_index = 6
     else:
         # 'red'  # Hue = 0 -- 0.0, 0.0, sat 0.59

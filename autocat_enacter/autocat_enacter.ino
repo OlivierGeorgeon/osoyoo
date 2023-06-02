@@ -123,7 +123,7 @@ void loop()
 
   // STEP 0: no interaction being enacted
   // Watching for message received from PC. If yes, starts the interaction
-  if (interaction_step == 0)
+  if (interaction_step == INTERACTION_DONE)
     Step0();
 
   if (INT == nullptr)
@@ -146,12 +146,13 @@ void loop()
   else
   {
     // Update the current interaction
-    INT->update();
-    if (INT->getStep() == 5)
-    {
-      delete INT; // TODO do not delete until the next interaction has been received
-      INT = nullptr;
-      interaction_step = 0;
-    }
+    // Return 0 when done
+    interaction_step = INT->update();
+    //if (INT->getStep() == 5)
+    //{
+    //  delete INT; // TODO do not delete until the next interaction has been received
+    //  INT = nullptr;
+    //  interaction_step = 0;
+    //}
   }
 }

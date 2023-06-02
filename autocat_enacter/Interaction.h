@@ -10,7 +10,7 @@
 #define INTERACTION_ONGOING 2
 #define INTERACTION_TERMINATE 3
 #define INTERACTION_SEND 4
-#define INTERACTION_DONE 5
+#define INTERACTION_DONE 0
 
 class Interaction
 {
@@ -22,7 +22,7 @@ public:
   virtual void ongoing();
   void terminate();
   void send();
-  void update();
+  int update();
   int getStep();
 protected:
   Color& _CLR;

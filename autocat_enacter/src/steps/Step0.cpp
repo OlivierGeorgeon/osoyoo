@@ -96,10 +96,18 @@ void Step0()
     // If received a string with the same clock then resend the outcome
     // (The previous outcome was sent but the PC did not receive it)
     if (clock == previous_clock) {
-      interaction_step = 3;
+      //interaction_step = 3;
+      if (INT != nullptr)
+        INT->send();
     }
     else
     {
+      // Delete the previous interaction (Not sure if it is needed)
+      if (INT != nullptr)
+      {
+        delete INT;
+        INT = nullptr;
+      }
       previous_clock = clock;
       action_start_time = millis();
       action_end_time = millis() + target_duration;
