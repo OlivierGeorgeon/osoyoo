@@ -1,4 +1,4 @@
-#define ROBOT_ID 12 // 0: regular Osoyoo robot, 1: robot BSN, 2: robot UCBL, 3: SHS with GY86 chez Olivier
+#define ROBOT_ID 13 // 0: regular Osoyoo robot, 1: robot BSN, 2: robot UCBL, 3: SHS with GY86 chez Olivier
 
 #define AP_SSID "osoyoo_robot"          // The wifi SSID of this robot in Access Point
 #define ROBOT_HEAD_X 80                 // (mm) X position of the head
@@ -116,7 +116,7 @@
 
 #warning "Compiling for DOLL robot D3"
 #define ROBOT_HAS_MPU6050  true
-#define ROBOT_COMPASS_TYPE 1 // "HMC5883L"
+#define ROBOT_COMPASS_TYPE 2
 #define ROBOT_REAR_RIGHT_WHEEL_COEF 1
 #define ROBOT_REAR_LEFT_WHEEL_COEF 1
 #define ROBOT_FRONT_RIGHT_WHEEL_COEF 1
@@ -125,28 +125,28 @@
 #define TURN_SPOT_ENDING_DELAY 200
 #define TURN_SPOT_ENDING_ANGLE 15
 #define ACCELERATION_X_OFFSET -40
-#define COMPASS_X_OFFSET -1090 // 1431
-#define COMPASS_Y_OFFSET -1215 // -1601
+#define COMPASS_X_OFFSET 6021 // 1431
+#define COMPASS_Y_OFFSET 5653 // -1601
 #define ACCELERATION_SHOCK_THRESHOLD -200
 #define ACCELERATION_BLOCK_THRESHOLD 60  // TODO depends whether the interaction starts when the robot is immobile
-#define GYRO_COEF 1.5  //  1 // IMU is upright. If turns too much, increase this value
+#define GYRO_COEF 1.4  //  1 // IMU is upright. If turns too much, increase this value
 #define ROBOT_SERVO_PIN 4  // 13 Changed because 13 is used for internal led
 
 #elif ROBOT_ID == 14
 
 #warning "Compiling for DOLL robot D4"
 #define ROBOT_HAS_MPU6050  true
-#define ROBOT_COMPASS_TYPE 1 // "HMC5883L"
+#define ROBOT_COMPASS_TYPE 2
 #define ROBOT_REAR_RIGHT_WHEEL_COEF 1
 #define ROBOT_REAR_LEFT_WHEEL_COEF 1
 #define ROBOT_FRONT_RIGHT_WHEEL_COEF 1
-#define ROBOT_FRONT_LEFT_WHEEL_COEF 1
+#define ROBOT_FRONT_LEFT_WHEEL_COEF 1.2
 #define TURN_SPOT_MAX_DURATION 2400
 #define TURN_SPOT_ENDING_DELAY 200
-#define TURN_SPOT_ENDING_ANGLE 15
+#define TURN_SPOT_ENDING_ANGLE 10
 #define ACCELERATION_X_OFFSET -40
-#define COMPASS_X_OFFSET -1090 // 1431
-#define COMPASS_Y_OFFSET -1215 // -1601
+#define COMPASS_X_OFFSET 5951 // 1431
+#define COMPASS_Y_OFFSET 5660 // -1601
 #define ACCELERATION_SHOCK_THRESHOLD -200
 #define ACCELERATION_BLOCK_THRESHOLD 60  // TODO depends whether the interaction starts when the robot is immobile
 #define GYRO_COEF 1.5  //  1 // IMU is upright. If turns too much, increase this value
