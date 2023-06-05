@@ -1,4 +1,4 @@
-#define ROBOT_ID 3 // 0: regular Osoyoo robot, 1: robot BSN, 2: robot UCBL, 3: SHS with GY86 chez Olivier
+#define ROBOT_ID 0 // 0: regular Osoyoo robot, 1: robot BSN, 2: robot UCBL, 3: SHS with GY86 chez Olivier
 
 #define AP_SSID "osoyoo_robot"          // The wifi SSID of this robot in Access Point
 #define ROBOT_HEAD_X 80                 // (mm) X position of the head
@@ -83,6 +83,6 @@
 #define TURN_SPOT_MAX_DURATION 1300
 #define TURN_SPOT_ENDING_DELAY 200
 #define TURN_SPOT_ENDING_ANGLE 3
-#define ROBOT_SERVO_PIN 13
+#define ROBOT_SERVO_PIN 4
 
 #endif
