@@ -33,7 +33,7 @@ class Imu
     float _yaw;
     float _xSpeed;
     float _xDistance;
-    #ifdef ROBOT_COMPASS_TYPE > 0
+    #if ROBOT_COMPASS_TYPE > 0
     void read_azimuth(JSONVar & outcome_object);
     #endif
     //String _debug_message;
