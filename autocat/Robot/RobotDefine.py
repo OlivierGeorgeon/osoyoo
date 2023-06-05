@@ -4,7 +4,7 @@
 #
 
 # 0: No robot
-ROBOT_ID = 3  # 1: robot BSN. 2: robot UCBL, 3: robot SHS chez Olivier
+ROBOT_ID = 21  # 1: robot BSN. 2: robot UCBL, 3: robot SHS chez Olivier
 
 ROBOT_HEAD_X = 80           # (mm) The X position of the head pivot
 ROBOT_FRONT_X = 110         # (mm) The X position of the robot front
@@ -45,6 +45,13 @@ if ROBOT_ID == 2:
 if ROBOT_ID == 3:
     COMPASS_X_OFFSET = 0  # -70    # (Compass unit) X offset of the compass measure
     COMPASS_Y_OFFSET = 0  # 63   # (Compass unit) Y offset of the compass measrue
+    FORWARD_SPEED = 190     # (mm/s) Forward translation speed.
+    RETREAT_DISTANCE = 80  #70   # (mm) Distance of the line after retreat
+
+# Robot 1 at DOLL
+if ROBOT_ID == 21:
+    COMPASS_X_OFFSET = 0  # -2324  # -70    # (Compass unit) X offset of the compass measure
+    COMPASS_Y_OFFSET = 0  # 375  # 63   # (Compass unit) Y offset of the compass measrue
     FORWARD_SPEED = 190     # (mm/s) Forward translation speed.
     RETREAT_DISTANCE = 80  #70   # (mm) Distance of the line after retreat
 
