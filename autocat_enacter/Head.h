@@ -42,6 +42,7 @@ class Head
     void outcome_complete(JSONVar & outcome_object);
     void turnHead(int head_angle);
     int head_direction(int x, int y);
+    int get_ultrasonic_measure();
     int _head_angle;
     bool _is_enacting_head_alignment;
     bool _is_enacting_echo_scan;
@@ -50,6 +51,7 @@ class Head
     Servo _head;
     int _penultimate_ultrasonic_measure;
     int _previous_ultrasonic_measure;
+    int _current_ultrasonic_measure;
     int _min_ultrasonic_measure;
     int _angle_min_ultrasonic_measure;
     int _head_angle_span;

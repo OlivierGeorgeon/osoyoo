@@ -55,7 +55,7 @@ void Interaction::ongoing()
 // Warning: in some situations, the head alignment may take quite long
 void Interaction::terminate()
 {
-  Serial.println("Interaction.step2()");
+  // Serial.println("Interaction.step2()");
   if (_action_end_time < millis() &&  !_FCR._is_enacting && !_HEA._is_enacting_head_alignment /*&& !HECS._is_enacting_echo_scan*/)
   {
     // Read the floor color
@@ -68,7 +68,7 @@ void Interaction::terminate()
 // Send the outcome and go back to Step 0
 void Interaction::send()
 {
-  Serial.println("Interaction.step3()");
+  // Serial.println("Interaction.step3()");
   // Compute the outcome message
   JSONVar outcome_object;
   outcome_object["status"] = _status;
