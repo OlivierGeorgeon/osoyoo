@@ -36,6 +36,13 @@ class Enaction:
                 self.angle = int(math.degrees(math.atan2(prompt_point[1], prompt_point[0])))
             if (self.interaction.action.action_code == ACTION_TURN_LEFT) and prompt_point[1] > 0:
                 self.angle = int(math.degrees(math.atan2(prompt_point[1], prompt_point[0])))
+        else:
+            # Default backward 0.5s
+            if self.interaction.action.action_code in [ACTION_BACKWARD]:
+                self.duration = 500
+            # Default forward 1.5s
+            if self.interaction.action.action_code in [ACTION_LEFTWARD, ACTION_RIGHTWARD]:
+                self.duration = 1500
 
         # The simulation of the enaction in memory
         self.simulation_duration = 0

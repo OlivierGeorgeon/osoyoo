@@ -8,6 +8,7 @@
 #include <Wire.h>
 #include "Arduino.h"
 #include "Imu.h"
+// #include "Interaction.h"  TODO Check why we can't import it from herer
 #include "Robot_define.h"
 #include "src/lib/MPU6050.h"
 #include "Action_define.h"
@@ -131,7 +132,7 @@ int Imu::update(int interaction_step)
     _yaw += _ZAngle;
 
     // During the first step of the interaction, check acceleration
-    if (interaction_step == 1)
+    if (interaction_step == 2) // INTERACTION_ONGOING)
     {
       // Record the min acceleration (deceleration) during the interaction to detect collision
       if (normalized_acceleration < _min_acceleration) {

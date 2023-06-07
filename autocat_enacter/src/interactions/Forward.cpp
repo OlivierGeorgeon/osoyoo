@@ -48,15 +48,17 @@ void Forward::ongoing()
   // If impact then proceed to phase 2
   if (_IMU.get_impact_measure() > 0 && !_FCR._is_enacting)
   {
-    _duration1 = millis()- _action_start_time;
+    _duration1 = millis() - _action_start_time;
     _action_end_time = 0;
     _FCR._OWM.stopMotion();
     _step = INTERACTION_TERMINATE;
   }
 
   // If obstacle the proceed to step 2
-  if (_HEA.get_ultrasonic_measure() < 200)
+  if (_HEA.get_ultrasonic_measure() < 200) // 200
   {
+    if (!_HEA._is_enacting_head_alignment)
+      _HEA.beginEchoAlignment();  // Force to look at the obstacle
     _status ="2";
     _duration1 = millis()- _action_start_time;
     _action_end_time = 0;

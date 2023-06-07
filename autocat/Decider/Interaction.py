@@ -10,7 +10,6 @@ class Interaction:
         self.action = action
         self.outcome = outcome
         self.valence = valence
-        # self.modifier = {}
 
     def __str__(self):
         """ Print interaction in the form <action><outcome>(<valence>) """

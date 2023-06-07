@@ -8,6 +8,7 @@
 #define Imu_h
 #include "Arduino.h"
 #include "Robot_define.h"
+//#include "Interaction.h"  TODO Check why we can't import it from herer
 #include "src/lib/MPU6050.h"
 #include <Arduino_JSON.h>
 #include <Wire.h>

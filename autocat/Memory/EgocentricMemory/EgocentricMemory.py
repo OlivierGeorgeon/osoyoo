@@ -4,7 +4,7 @@ from pyrr import matrix44
 from ...Memory.EgocentricMemory.Experience import Experience, EXPERIENCE_LOCAL_ECHO, EXPERIENCE_CENTRAL_ECHO, \
     EXPERIENCE_PLACE, category_color
 from ...Robot.CtrlRobot import KEY_EXPERIENCES
-from ...Robot.RobotDefine import ROBOT_COLOR_X
+from ...Robot.RobotDefine import ROBOT_COLOR_X, ROBOT_FRONT_X
 from ...Decider.Action import ACTION_SCAN, ACTION_FORWARD, ACTION_BACKWARD, ACTION_LEFTWARD, ACTION_RIGHTWARD
 import math
 import colorsys
@@ -85,15 +85,20 @@ class EgocentricMemory:
                 self.focus_point = None
                 # playsound('autocat/Assets/R5.wav', False)
         else:
-            if enacted_interaction['action'] in [ACTION_SCAN, ACTION_FORWARD]:
+            if enacted_interaction['action'] in [ACTION_SCAN, ACTION_FORWARD] and 'echo_xy' in enacted_interaction:
                 # Catch focus
+                # playsound('autocat/Assets/R11.wav', False)
+                self.focus_point = enacted_interaction['echo_xy']
+                print("CATCH FOCUS", self.focus_point)
+
+        # Impact or block catch focus. No need to set lost_focus because the outcome is OUTCOME_IMPACT
+        if 'impact' in enacted_interaction:
+            if enacted_interaction['impact'] > 0 or enacted_interaction['blocked']:
                 if 'echo_xy' in enacted_interaction:
-                    # playsound('autocat/Assets/R11.wav', False)
-                    # Create the focus in the memory snapshot that will be retrieved at the INTEGRETING step
-                    # self.focus_point = np.array([enacted_interaction['echo_xy'][0],
-                    #                              enacted_interaction['echo_xy'][1], 0])
                     self.focus_point = enacted_interaction['echo_xy']
-                    print("CATCH FOCUS", self.focus_point)
+                else:
+                    self.focus_point = np.array([ROBOT_FRONT_X, 0, 0])
+                print("CATCH FOCUS IMPACT", self.focus_point)
 
         # Move the prompt
         if self.prompt_point is not None:

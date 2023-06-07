@@ -1,5 +1,6 @@
 /*
   Turn_head.cpp - library for controlling the turn head interaction
+  Turn the head towards the focus point or the target angle and then align head to nearest echo
   Created by Olivier Georgeon, mai 31 2023
   released into the public domain
 */

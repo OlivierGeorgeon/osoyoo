@@ -8,6 +8,7 @@ from pyrr import quaternion, matrix44
 from playsound import playsound
 from . Action import ACTION_ALIGN_ROBOT, ACTION_FORWARD, ACTION_LEFTWARD, ACTION_RIGHTWARD
 from . Interaction import Interaction, OUTCOME_DEFAULT
+from . PredefinedInteractions import OUTCOME_IMPACT
 from ..Robot.Enaction import Enaction
 from ..Memory.PhenomenonMemory.PhenomenonMemory import TER
 from ..Memory.EgocentricMemory.Experience import EXPERIENCE_FLOOR
@@ -42,12 +43,14 @@ class DeciderExplore:
             self.prompt_points.append(point)
         self.prompt_index = 0
 
-    def is_active(self):
-        """Return True if this decider is active: the terrain phenomenon has an absolute point"""
+    def activation_level(self):
+        """The level of activation of this decider: 0: default, 2 if the terrain has an origin """
+        activation_level = 0
+        # Activate when the terrain phenomenon has an absolute point
         if TER in self.workspace.memory.phenomenon_memory.phenomena:
             if self.workspace.memory.phenomenon_memory.phenomena[TER].origin_point() is not None:
-                return True
-        return False
+                activation_level = 2
+        return activation_level
 
     def propose_intended_enaction(self, enacted_interaction):
         """Propose the next intended enaction from the previous enacted interaction.
@@ -60,6 +63,15 @@ class DeciderExplore:
     def outcome(self, enacted_interaction):
         """ Convert the enacted interaction into an outcome adapted to the explore behavior """
         outcome = OUTCOME_DEFAULT
+
+        # # If impact then override the default outcome
+        # if 'impact' in enacted_interaction:
+        #     if enacted_interaction['impact'] > 0:
+        #         outcome = OUTCOME_IMPACT
+        # if 'blocked' in enacted_interaction:
+        #     if enacted_interaction['blocked']:
+        #         outcome = OUTCOME_IMPACT
+
         # If the enacted experiences include a floor experience
         for e in [e for e in self.workspace.memory.egocentric_memory.experiences.values() if e.type == EXPERIENCE_FLOOR and e.clock == enacted_interaction["clock"]]:
             if e.color_index > 0:
@@ -67,7 +79,6 @@ class DeciderExplore:
                 outcome = OUTCOME_ORIGIN
                 self.workspace.memory.phenomenon_memory.phenomena[TER].last_origin_clock = enacted_interaction["clock"]
             else:
-                # if ABS in self.workspace.memory.phenomenon_memory.phenomena[TER].affordances:
                 if self.workspace.memory.phenomenon_memory.phenomena[TER].absolute_affordance() is not None:
                     relative_quaternion = quaternion.cross(self.workspace.memory.body_memory.body_quaternion(), quaternion.inverse(self.workspace.memory.phenomenon_memory.phenomena[TER].absolute_affordance().experience.body_direction_quaternion()))
                     if quaternion.rotation_angle(relative_quaternion) > math.pi:
@@ -88,6 +99,7 @@ class DeciderExplore:
                         elif rot < math.pi:
                             print("OUTCOME Far Right of origin")
                             outcome = OUTCOME_FAR_RIGHT
+
         return outcome
 
     def intended_enaction(self, outcome):

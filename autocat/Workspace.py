@@ -25,7 +25,7 @@ class Workspace:
         self.actions = create_actions()
 
         self.memory = Memory()
-        self.deciders = {0: DeciderExplore(self), 1: DeciderCircle(self)}
+        self.deciders = {'Explore': DeciderExplore(self), 'Circle': DeciderCircle(self)}
         # self.decider = DeciderExplore(self)
         self.integrator = Integrator(self)
 
@@ -70,14 +70,17 @@ class Workspace:
             # Next automatic decision
             if self.clock not in self.enactions:
                 if self.decider_mode == KEY_DECIDER_CIRCLE:
-                    # The decider chooses the next interaction
+                    # The most activated decider processes the previous enaction and chooses the next enaction
                     # TODO Manage the enacted_interaction after imagining
-                    if self.deciders[0].is_active():
-                        # Explore the terrain
-                        self.enactions[self.clock] = self.deciders[0].propose_intended_enaction(self.enacted_interaction)
-                    else:
-                        # Search for terrain origin
-                        self.enactions[self.clock] = self.deciders[1].propose_intended_enaction(self.enacted_interaction)
+                    ad = max(self.deciders, key=lambda k: self.deciders[k].activation_level())
+                    print("Activated decider:", ad)
+                    self.enactions[self.clock] = self.deciders[ad].propose_intended_enaction(self.enacted_interaction)
+                    # if self.deciders[0].activation_level() > 0:
+                    #     # Explore the terrain
+                    #     self.enactions[self.clock] = self.deciders[0].propose_intended_enaction(self.enacted_interaction)
+                    # else:
+                    #     # Search for terrain origin
+                    #     self.enactions[self.clock] = self.deciders[1].propose_intended_enaction(self.enacted_interaction)
 
                 # Case DECIDER_KEY_USER is handled by self.process_user_key()
 

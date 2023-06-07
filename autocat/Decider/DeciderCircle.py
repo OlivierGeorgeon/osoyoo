@@ -2,12 +2,13 @@
 # This agent makes the robot circle around an echo object or a territory delimited by a line
 ########################################################################################
 
+import numpy as np
 from . Action import ACTION_FORWARD, ACTION_SCAN
 from . Interaction import Interaction, OUTCOME_DEFAULT
 from . CompositeInteraction import CompositeInteraction
 from . PredefinedInteractions import create_interactions, OUTCOME_LOST_FOCUS, OUTCOME_CLOSE_FRONT, \
     OUTCOME_FAR_FRONT, OUTCOME_FAR_LEFT, OUTCOME_LEFT, OUTCOME_RIGHT, OUTCOME_FAR_RIGHT, OUTCOME_FLOOR_LEFT, \
-    OUTCOME_FLOOR_FRONT, OUTCOME_FLOOR_RIGHT
+    OUTCOME_FLOOR_FRONT, OUTCOME_FLOOR_RIGHT, OUTCOME_IMPACT
 from ..Robot.Enaction import Enaction
 
 
@@ -22,6 +23,15 @@ class DeciderCircle:
         # Load the predefined behavior
         self.procedural_memory = create_interactions(self.workspace.actions)
         self._action = self.workspace.actions[ACTION_FORWARD]
+
+    def activation_level(self):
+        """Return the activation level of this decider/ 1: default; 3 if focus object """
+        activation_level = 1
+
+        if self.workspace.memory.egocentric_memory.focus_point is not None:
+            if np.linalg.norm(self.workspace.memory.egocentric_memory.focus_point) < 500:
+                activation_level = 3
+        return activation_level
 
     def propose_intended_enaction(self, enacted_interaction):
         """Propose the next intended enaction from the previous enacted interaction.
@@ -85,9 +95,9 @@ class DeciderCircle:
 
         # If there is an echo, compute the echo outcome
         if 'echo_xy' in enacted_interaction:
-            if enacted_interaction['echo_xy'][0] < 50:
+            if enacted_interaction['echo_xy'][0] < 200:  # From the center of the robot
                 outcome = OUTCOME_CLOSE_FRONT
-            elif enacted_interaction['echo_xy'][0] > 400:  # Must be farther than the forward speed
+            elif enacted_interaction['echo_xy'][0] > 500:  # Must be farther than the forward speed
                 outcome = OUTCOME_FAR_FRONT
             elif enacted_interaction['echo_xy'][1] > 150:
                 outcome = OUTCOME_FAR_LEFT  # More that 150 to the left
@@ -101,7 +111,15 @@ class DeciderCircle:
         if 'lost_focus' in enacted_interaction:
             outcome = OUTCOME_LOST_FOCUS
 
-        # If floor then override the echo and focus outcome
+        # If impact then override the echo and focus outcome
+        if 'impact' in enacted_interaction:
+            if enacted_interaction['impact'] > 0:
+                outcome = OUTCOME_IMPACT
+        if 'blocked' in enacted_interaction:
+            if enacted_interaction['blocked']:
+                outcome = OUTCOME_IMPACT
+
+        # If floor then override the echo and focus and impact outcome
         if 'floor' in enacted_interaction:
             if enacted_interaction['floor'] == 0b10:
                 outcome = OUTCOME_FLOOR_LEFT

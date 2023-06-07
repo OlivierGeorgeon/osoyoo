@@ -41,8 +41,10 @@ void Swipe_right::begin()
 // STEP 1: Control the enaction
 void Swipe_right::ongoing()
 {
-  if (_is_focussed)  // Keep the head towards the focus (HEA is inhibited during the action)
+  // Keep the head towards the focus (HEA is inhibited during the action)
+  if (_is_focussed)
     _HEA.turnHead(_HEA.head_direction(_focus_x, _focus_y + _focus_speed * (millis()- _action_start_time)/1000));
+
   // Check if Floor Change Retreat
   if (_FCR._is_enacting)
   {

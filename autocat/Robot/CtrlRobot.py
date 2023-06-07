@@ -36,14 +36,10 @@ class CtrlRobot:
 
     def main(self, dt):
         """The main handler of the communication to and from the robot."""
-        # If the robot is idle, check for an intended interaction in the workspace and send it to the robot
-        # if self.enact_step == ENACT_STEP_IDLE:
+        # if INTENDING then send the interaction to the robot
         if self.workspace.interaction_step == INTERACTION_STEP_INTENDING:
             self.workspace.interaction_step = INTERACTION_STEP_ENACTING
-            # enaction = self.workspace.intended_enaction
-            # if enaction is not None:
             self.send_enaction_to_robot(self.workspace.intended_enaction)
-            # self.enact_step = ENACT_STEP_ENACTING
 
         # While the robot is enacting the interaction, check for the outcome
         if self.workspace.interaction_step == INTERACTION_STEP_ENACTING and not self.workspace.is_imagining:
@@ -67,7 +63,6 @@ class CtrlRobot:
                 # Timeout: resend the enaction
                 self.workspace.memory = self.workspace.memory_snapshot
                 self.workspace.interaction_step = INTERACTION_STEP_IDLE
-                # self.send_enacted_interaction_to_workspace(b'{"status":"T"}')
                 print("Timeout")
 
     def send_enaction_to_robot(self, enaction):
@@ -86,15 +81,6 @@ class CtrlRobot:
         enacted_interaction = json.loads(outcome)
 
         enacted_interaction[KEY_EXPERIENCES] = []
-
-        # # If timeout then there is no enacted interaction
-        # if enacted_interaction['status'] == "T":
-        #     # self.workspace.update_enacted_interaction(enacted_interaction)
-        #     print("Resend the enaction")
-        #     # Restore the memory
-        #     self.workspace.memory = self.workspace.memory_snapshot
-        #     self.workspace.interaction_step = INTERACTION_STEP_IDLE
-        #     return
 
         # Translation integrated from the action's speed multiplied by the duration1
         action_code = enacted_interaction['action']
@@ -142,8 +128,7 @@ class CtrlRobot:
             # Place the experience point
             enacted_interaction[KEY_EXPERIENCES].append((EXPERIENCE_FLOOR, LINE_X, experience_y))
 
-        # Interaction ECHO for actions involving scanning
-        # if action_code in ['-', '*', '+', '8', '2', '1', '3', '4', '6']:
+        # Interaction ECHO
         if enacted_interaction['echo_distance'] < 10000:
             echo_point = np.array([0, 0, 0], dtype=int)
             echo_point[0] = round(ROBOT_HEAD_X + math.cos(math.radians(enacted_interaction['head_angle']))
@@ -205,101 +190,3 @@ class CtrlRobot:
         self.workspace.enacted_interaction = enacted_interaction
         self.workspace.intended_enaction = None
         self.workspace.interaction_step = INTERACTION_STEP_INTEGRATING
-
-    # def outcome_to_enaction(self, outcome, enaction):
-    #     """ Update the enaction from the outcome received from the robot. NOT USED YET"""
-    #     enacted_interaction = json.loads(outcome)
-    #
-    #     # If timeout then we consider that there was no enacted interaction
-    #     if enacted_interaction['status'] == "T":
-    #         enaction.status = "T"
-    #         return
-    #
-    #     # Translation integrated from the action's speed multiplied by the duration1
-    #     action_code = enaction.interaction.action.action_code
-    #     translation = self.workspace.actions[action_code].translation_speed * (enacted_interaction['duration1'] / 1000)
-    #
-    #     # Yaw presupposed or returned by the robot
-    #     enaction.yaw = self.workspace.actions[action_code].target_duration * self.workspace.actions[action_code].rotation_speed_rad
-    #     if 'yaw' in enacted_interaction:
-    #         enaction.yaw = enacted_interaction['yaw']
-    #
-    #     # If the robot does not return the azimuth then return 0. The azimuth will be computed by BodyMemory
-    #     if 'azimuth' not in enacted_interaction:
-    #         enacted_interaction['azimuth'] = 0
-    #
-    #     # If the robot returns compass_x and compass_y then recompute the azimuth
-    #     # (They differ if the compass offset has been adjusted)
-    #     if 'compass_x' in enacted_interaction:
-    #         # Subtract the offset from robot_define.py
-    #         enacted_interaction['compass_x'] -= self.workspace.memory.body_memory.compass_offset[0]
-    #         enacted_interaction['compass_y'] -= self.workspace.memory.body_memory.compass_offset[1]
-    #         azimuth = math.degrees(math.atan2(enacted_interaction['compass_y'], enacted_interaction['compass_x']))
-    #         # The compass point indicates the south so we must rotate it of 180° to obtain the azimuth
-    #         azimuth = round(azimuth + 180) % 360
-    #         enacted_interaction['azimuth'] = azimuth
-    #
-    #     # Interaction Floor line
-    #     if enacted_interaction['floor'] > 0:
-    #         enacted_interaction[KEY_EXPERIENCES].append((EXPERIENCE_FLOOR, LINE_X, 0))
-    #         # Update the x translation
-    #         translation[0] -= RETREAT_DISTANCE
-    #         # Set the y translation
-    #         if enacted_interaction['floor'] == 0b01:  # Black line on the right
-    #             translation[1] = RETREAT_DISTANCE_Y
-    #         if enacted_interaction['floor'] == 0b10:  # Black line on the left
-    #             translation[1] = -RETREAT_DISTANCE_Y
-    #
-    #     # Interaction ECHO for actions involving scanning
-    #     # if action_code in ['-', '*', '+', '8', '2', '1', '3', '4', '6']:
-    #     if enacted_interaction['echo_distance'] < 10000:
-    #         echo_point = np.array([0, 0, 0], dtype=int)
-    #         echo_point[0] = round(ROBOT_HEAD_X + math.cos(math.radians(enacted_interaction['head_angle']))
-    #                               * enacted_interaction['echo_distance'])
-    #         echo_point[1] = round(math.sin(math.radians(enacted_interaction['head_angle']))
-    #                               * enacted_interaction['echo_distance'])
-    #         enacted_interaction[KEY_EXPERIENCES].append((EXPERIENCE_ALIGNED_ECHO, *echo_point))
-    #         # Return the echo_xy to possibly use as focus
-    #         enacted_interaction['echo_xy'] = echo_point
-    #
-    #     # Interaction impact
-    #     # (The forward translation is already correct since it is integrated during duration1)
-    #     if KEY_IMPACT in enacted_interaction and action_code == ACTION_FORWARD:
-    #         if enacted_interaction[KEY_IMPACT] == 0b01:  # Impact on the right
-    #             enacted_interaction[KEY_EXPERIENCES].append((EXPERIENCE_IMPACT, ROBOT_FRONT_X, -ROBOT_FRONT_Y))
-    #         if enacted_interaction[KEY_IMPACT] == 0b11:  # Impact on the front
-    #             enacted_interaction[KEY_EXPERIENCES].append((EXPERIENCE_IMPACT, ROBOT_FRONT_X, 0))
-    #         if enacted_interaction[KEY_IMPACT] == 0b10:  # Impact on the left
-    #             enacted_interaction[KEY_EXPERIENCES].append((EXPERIENCE_IMPACT, ROBOT_FRONT_X, ROBOT_FRONT_Y))
-    #
-    #     # Interaction blocked
-    #     if 'blocked' in enacted_interaction and action_code == ACTION_FORWARD:
-    #         if enacted_interaction['blocked']:
-    #             enacted_interaction[KEY_EXPERIENCES].append((EXPERIENCE_BLOCK, ROBOT_FRONT_X, 0))
-    #             translation = np.array([0, 0, 0], dtype=float)  # Reset the translation
-    #
-    #     # The estimated displacement of the environment relative to the robot caused by this interaction
-    #     translation_matrix = matrix44.create_from_translation(-translation)
-    #     rotation_matrix = matrix44.create_from_z_rotation(math.radians(enaction.yaw))
-    #     displacement_matrix = matrix44.multiply(rotation_matrix, translation_matrix)
-    #
-    #     # Return the displacement
-    #     enacted_interaction['translation'] = translation
-    #     enacted_interaction['rotation_matrix'] = rotation_matrix
-    #     enacted_interaction['displacement_matrix'] = displacement_matrix
-    #
-    #     # The echo array
-    #     if "echo_array" not in enacted_interaction:
-    #         enacted_interaction["echo_array"] = []
-    #     # Compute the position of each echo point in the echo array
-    #     for i in range(100, -99, -5):
-    #         ed_str = "ed"+str(i)
-    #         if ed_str in enacted_interaction:
-    #             ha = i
-    #             ed = enacted_interaction[ed_str]
-    #             tmp_x = ROBOT_HEAD_X + math.cos(math.radians(ha)) * ed
-    #             tmp_y = math.sin(math.radians(ha)) * ed
-    #             enacted_interaction[KEY_EXPERIENCES].append((EXPERIENCE_LOCAL_ECHO, tmp_x, tmp_y))
-    #     # print(enacted_interaction)
-    #
-    #     self.workspace.update_enacted_interaction(enacted_interaction)
