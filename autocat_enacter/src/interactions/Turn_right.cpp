@@ -4,6 +4,7 @@
   released into the public domain
 */
 #include "../wifi/WifiCat.h"
+#include "../../Action_define.h"
 #include "../../Robot_define.h"
 #include "../../Color.h"
 #include "../../Floor.h"

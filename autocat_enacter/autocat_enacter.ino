@@ -26,9 +26,9 @@
 #include <Arduino_JSON.h>
 #include "src/wifi/WifiCat.h"
 #include "src/steps/Step0.h"
-#include "src/steps/Step1.h"
-#include "src/steps/Step2.h"
-#include "src/steps/Step3.h"
+//#include "src/steps/Step1.h"
+//#include "src/steps/Step2.h"
+//#include "src/steps/Step3.h"
 #include "Action_define.h"
 #include "Color.h"
 #include "Color.h"
@@ -63,14 +63,11 @@ int focus_y = 0;
 int focus_speed = 180;
 int clock = 0;
 int previous_clock = -1;
-int shock_event = 0;
+// int shock_event = 0;
 bool is_focussed = false;
 String status = "0"; // The outcome information used for sequential learning
 
 Interaction* INT  = nullptr;  // The interaction type will depend on the action received from the PC
-// Interaction INT(TCS, FCR, HEA, IMU, WifiCat, action_end_time, interaction_step, status, action, clock, duration1, action_start_time);
-// Forward FWD(TCS, FCR, HEA, IMU, WifiCat, action_end_time, interaction_step, status, action, clock, duration1, action_start_time,
-//   is_focussed, focus_x, focus_y, focus_speed, shock_event);
 
 
 void setup()
@@ -119,40 +116,33 @@ void loop()
   //HECS.update();
 
   // Behavior IMU
-  shock_event = IMU.update(interaction_step);
+  IMU.update(interaction_step);
 
   // STEP 0: no interaction being enacted
   // Watching for message received from PC. If yes, starts the interaction
   if (interaction_step == INTERACTION_DONE)
     Step0();
 
-  if (INT == nullptr)
-  {
+  //if (INT == nullptr)
+  //{
     // STEP 1: Performing the action until the termination conditions are triggered
     // When termination conditions are triggered, stop the action and proceed to step 2
-    if (interaction_step == 1)
-      Step1();
+    //if (interaction_step == 1)
+    //  Step1();
 
     // STEP 2: Enacting the termination of the interaction: Floor change retreat, Stabilisation time
     // When the terminations are finished, proceed to Step 3
-    if (interaction_step == 2)
-      Step2();
+    //if (interaction_step == 2)
+    //  Step2();
 
     // STEP 3: Ending the interaction:
     // Send the outcome and go back to Step 0
-    if (interaction_step == 3)
-      Step3();
-  }
-  else
-  {
-    // Update the current interaction
-    // Return 0 when done
+    //if (interaction_step == 3)
+    //  Step3();
+  //}
+  //else
+
+  // Update the current interaction and return INTERACTION_DONE when done
+  if (INT != nullptr)
     interaction_step = INT->update();
-    //if (INT->getStep() == 5)
-    //{
-    //  delete INT; // TODO do not delete until the next interaction has been received
-    //  INT = nullptr;
-    //  interaction_step = 0;
-    //}
-  }
 }

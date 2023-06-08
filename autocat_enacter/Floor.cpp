@@ -23,14 +23,12 @@ Floor::Floor(Wheel& OWM) : _OWM(OWM)
   // _debug_message = "";
 }
 
-void Floor::update()
+int Floor::update()
 {
   // Detect change in the floor measure
   int current_measure_floor = measureFloor();
   int floor_change = current_measure_floor ^ _previous_measure_floor; // Bitwise XOR
   _previous_measure_floor = current_measure_floor;
-
-  // floor_change = current_measure_floor; // Test
 
   // If is not already retreating
   if (!_is_enacting)
@@ -45,14 +43,20 @@ void Floor::update()
       switch (floor_change) {
         case 0b10000:
         case 0b11000:
+        case 0b01000:
         case 0b11100:
+        case 0b01100:
+        case 0b10100:
           // back right
           _OWM.setMotion(-150,-150,-50,-50);
           _floor_outcome=2;
           _floor_change_retreat_end_time = millis() + RETREAT_DURATION + 2* RETREAT_EXTRA_DURATION;
           break;
         case 0b00111:
+        case 0b00101:
+        case 0b00110:
         case 0b00011:
+        case 0b00010:
         case 0b00001:
           // back left
           _OWM.setMotion(-50,-50,-150,-150);
@@ -80,6 +84,7 @@ void Floor::update()
       _is_enacting = false;
     }
   }
+  return _floor_outcome;
 }
 
 void Floor::extraDuration(int duration)

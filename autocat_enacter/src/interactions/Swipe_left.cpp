@@ -10,6 +10,7 @@
 #include "../../Head.h"
 #include "../../Imu.h"
 #include "../../Interaction.h"
+#include "../../Action_define.h"
 #include "Swipe_left.h"
 
 Swipe_left::Swipe_left(

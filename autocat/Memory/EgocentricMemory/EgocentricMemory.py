@@ -117,7 +117,6 @@ class EgocentricMemory:
             experience.displace(enacted_interaction['displacement_matrix'])
 
         # Add the PLACE experience with the sensed color
-        # color = None
         if 'color' in enacted_interaction:
             color_index = category_color(enacted_interaction['color'])
         else:

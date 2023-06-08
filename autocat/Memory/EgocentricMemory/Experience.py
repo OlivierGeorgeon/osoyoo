@@ -129,6 +129,7 @@ def category_color(color_sensor):
             # 'gold'  # Hue = 0.25, 0.26 -- 0.20 -- 0.20, 0.20, 0.184, 0.2 -- 0.24, sat 0.68
             color_index = 3
         elif hsv[0] > 0.05:
+            # 'orange'
             color_index = 2
 
     # Floor in lyon

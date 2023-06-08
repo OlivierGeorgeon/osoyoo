@@ -1,4 +1,4 @@
-#define ROBOT_ID 12 // 0: regular Osoyoo robot, 1: robot BSN, 2: robot UCBL, 3: SHS with GY86 chez Olivier
+#define ROBOT_ID 14 // 0: regular Osoyoo robot, 1: robot BSN, 2: robot UCBL, 3: SHS with GY86 chez Olivier
 
 #define AP_SSID "osoyoo_robot"          // The wifi SSID of this robot in Access Point
 #define ROBOT_HEAD_X 80                 // (mm) X position of the head
@@ -112,6 +112,7 @@
 #define ACCELERATION_BLOCK_THRESHOLD 50  // TODO depends whether the interaction starts when the robot is immobile
 #define GYRO_COEF 1.5  //  1 // IMU is upright. If turns too much, increase this value
 #define ROBOT_SERVO_PIN 4  // 13 Changed because 13 is used for internal led
+#define GYRO_SHOCK_THRESHOLD 2 // 1 07/06/2023
 
 #elif ROBOT_ID == 13
 
@@ -132,6 +133,7 @@
 #define ACCELERATION_BLOCK_THRESHOLD 50  // TODO depends whether the interaction starts when the robot is immobile
 #define GYRO_COEF 1.4  //  1 // IMU is upright. If turns too much, increase this value
 #define ROBOT_SERVO_PIN 4  // 13 Changed because 13 is used for internal led
+#define GYRO_SHOCK_THRESHOLD 2 // 1 07/06/2023
 
 #elif ROBOT_ID == 14
 
@@ -152,6 +154,7 @@
 #define ACCELERATION_BLOCK_THRESHOLD 50  // TODO depends whether the interaction starts when the robot is immobile
 #define GYRO_COEF 1.5  //  1 // IMU is upright. If turns too much, increase this value
 #define ROBOT_SERVO_PIN 4  // 13 Changed because 13 is used for internal led
+#define GYRO_SHOCK_THRESHOLD 2 // 1 07/06/2023
 
 
 #else

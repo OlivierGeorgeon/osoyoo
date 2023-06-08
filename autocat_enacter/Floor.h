@@ -17,7 +17,7 @@ class Floor
 {
   public:
     Floor(Wheel& _OWM);  // The Wheel object is passed by reference to avoid creating another instance
-    void update();
+    int update();
     int measureFloor();
     void extraDuration(int duration);
     bool _is_enacting;

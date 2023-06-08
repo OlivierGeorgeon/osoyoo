@@ -6,11 +6,11 @@
 #ifndef Interaction_h
 #define Interaction_h
 
-#define INTERACTION_BEGIN 1
-#define INTERACTION_ONGOING 2
-#define INTERACTION_TERMINATE 3
-#define INTERACTION_SEND 4
-#define INTERACTION_DONE 0
+//#define INTERACTION_BEGIN 1
+//#define INTERACTION_ONGOING 2
+//#define INTERACTION_TERMINATE 3
+//#define INTERACTION_SEND 4
+//#define INTERACTION_DONE 0
 
 class Interaction
 {

@@ -11,9 +11,9 @@ from . Interaction import Interaction, OUTCOME_DEFAULT
 from . PredefinedInteractions import OUTCOME_IMPACT
 from ..Robot.Enaction import Enaction
 from ..Memory.PhenomenonMemory.PhenomenonMemory import TER
-from ..Memory.EgocentricMemory.Experience import EXPERIENCE_FLOOR
+from ..Memory.EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_PLACE
 
-CLOCK_TO_GO_HOME = 4  # Number of interactions before going home
+CLOCK_TO_GO_HOME = 8  # Number of interactions before going home
 EXPLORATION_STEP_INIT = 0
 EXPLORATION_STEP_ROTATE = 1
 EXPLORATION_STEP_FORWARD = 2
@@ -24,6 +24,7 @@ OUTCOME_LEFT = "LO"
 OUTCOME_RIGHT = "RO"
 OUTCOME_FAR_LEFT = "FL"
 OUTCOME_FAR_RIGHT = "FR"
+OUTCOME_COLOR = "CL"
 
 
 class DeciderExplore:
@@ -64,22 +65,18 @@ class DeciderExplore:
         """ Convert the enacted interaction into an outcome adapted to the explore behavior """
         outcome = OUTCOME_DEFAULT
 
-        # # If impact then override the default outcome
-        # if 'impact' in enacted_interaction:
-        #     if enacted_interaction['impact'] > 0:
-        #         outcome = OUTCOME_IMPACT
-        # if 'blocked' in enacted_interaction:
-        #     if enacted_interaction['blocked']:
-        #         outcome = OUTCOME_IMPACT
-
-        # If the enacted experiences include a floor experience
-        for e in [e for e in self.workspace.memory.egocentric_memory.experiences.values() if e.type == EXPERIENCE_FLOOR and e.clock == enacted_interaction["clock"]]:
+        # Look for color place experience
+        for e in [e for e in self.workspace.memory.egocentric_memory.experiences.values() if e.type == EXPERIENCE_PLACE and e.clock == enacted_interaction["clock"] and e.color_index > 0]:
+            outcome = OUTCOME_COLOR
+            print("Outcome color")
+        # Look for the floor experience
+        for e in [e for e in self.workspace.memory.egocentric_memory.experiences.values() if e.type in [EXPERIENCE_FLOOR] and e.clock == enacted_interaction["clock"]]:
             if e.color_index > 0:
                 # If the floor is color then origin confirmation was enacted
                 outcome = OUTCOME_ORIGIN
                 self.workspace.memory.phenomenon_memory.phenomena[TER].last_origin_clock = enacted_interaction["clock"]
             else:
-                if self.workspace.memory.phenomenon_memory.phenomena[TER].absolute_affordance() is not None:
+                if e.type == EXPERIENCE_FLOOR and self.workspace.memory.phenomenon_memory.phenomena[TER].absolute_affordance() is not None:
                     relative_quaternion = quaternion.cross(self.workspace.memory.body_memory.body_quaternion(), quaternion.inverse(self.workspace.memory.phenomenon_memory.phenomena[TER].absolute_affordance().experience.body_direction_quaternion()))
                     if quaternion.rotation_angle(relative_quaternion) > math.pi:
                         relative_quaternion = -1 * relative_quaternion  # The quaternion representing the short angle
@@ -104,33 +101,39 @@ class DeciderExplore:
 
     def intended_enaction(self, outcome):
         """Return the next intended interaction"""
+        # # If robot on a color then re-init
+        # if TER in self.workspace.memory.phenomenon_memory.phenomena and \
+        #    self.workspace.memory.phenomenon_memory.phenomena[TER].absolute_affordance() is not None and \
+        #    self.workspace.clock - self.workspace.memory.phenomenon_memory.phenomena[TER].last_origin_clock > CLOCK_TO_GO_HOME and \
+        #    outcome == OUTCOME_COLOR:
+        #     self.exploration_step = EXPLORATION_STEP_INIT
+
         # Compute the next prompt point
         if self.exploration_step == EXPLORATION_STEP_INIT:
             # If time to go home
-            if 0 in self.workspace.memory.phenomenon_memory.phenomena and \
-                    self.workspace.memory.phenomenon_memory.phenomena[TER].absolute_affordance() is not None and \
-                    self.workspace.clock - self.workspace.memory.phenomenon_memory.phenomena[0].last_origin_clock > \
-                    CLOCK_TO_GO_HOME:
+            if TER in self.workspace.memory.phenomenon_memory.phenomena and \
+               self.workspace.memory.phenomenon_memory.phenomena[TER].absolute_affordance() is not None and \
+               self.workspace.clock - self.workspace.memory.phenomenon_memory.phenomena[TER].last_origin_clock > CLOCK_TO_GO_HOME:
                 # If right or left then swipe to home
                 if outcome in [OUTCOME_LEFT, OUTCOME_RIGHT]:
                     if outcome == OUTCOME_RIGHT:
-                        ego_confirmation = np.array([0, 400, 0], dtype=int)
+                        ego_confirmation = np.array([0, 300, 0], dtype=int)
                         self.exploration_step = EXPLORATION_STEP_SWIPE_LEFT
                     else:
-                        ego_confirmation = np.array([0, -400, 0], dtype=int)
+                        ego_confirmation = np.array([0, -300, 0], dtype=int)
                         self.exploration_step = EXPLORATION_STEP_SWIPE_RIGHT
                     print("Swiping to confirmation by:", ego_confirmation)
                     self.workspace.memory.egocentric_memory.prompt_point = ego_confirmation
                     playsound('autocat/Assets/R5.wav', False)
-                # If not left or write we need to manoeuvre
+                # If not left or right we need to manoeuvre
                 else:
                     # If near home then go to confirmation prompt
-                    if self.workspace.memory.is_near_terrain_origin():
+                    if self.workspace.memory.is_near_terrain_origin() or outcome == OUTCOME_COLOR:
                         allo_confirmation = self.workspace.memory.phenomenon_memory.phenomena[TER].confirmation_prompt()
                         print("Enacting confirmation affordance to", allo_confirmation)
                         ego_confirmation = self.workspace.memory.allocentric_to_egocentric(allo_confirmation)
                         self.workspace.memory.egocentric_memory.prompt_point = ego_confirmation
-                        playsound('autocat/Assets/R5.wav', False)
+                        playsound('autocat/Assets/R4.wav', False)
                     else:
                         # If not near home then go home
                         allo_origin = self.workspace.memory.phenomenon_memory.phenomena[TER].origin_point()
