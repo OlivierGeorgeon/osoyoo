@@ -13,7 +13,6 @@ EXPERIENCE_FLOOR = 'Floor'
 EXPERIENCE_FOCUS = 'Focus'
 EXPERIENCE_PLACE = 'Place'
 EXPERIENCE_PROMPT = 'Prompt'
-# COLOR_FLOOR = "LightSlateGrey"
 FLOOR_COLORS = {0: 'LightSlateGrey', 1: 'red', 2: 'darkOrange', 3: 'gold', 4: 'limeGreen', 5: 'deepSkyBlue',
                 6: 'orchid', 7: 'deepPink'}
 
@@ -145,10 +144,9 @@ def category_color(color_sensor):
 
     # Yoga mat at DOLL (0.16,0.34,0.42)
     # if hsv[2] < 0.43:
-    #     color_index = 0*
+    #     color_index = 0
 
-    # Rug at DOLL  Works with Robot D3
-    # if (0.2 < hsv[0] < 0.35) and (hsv[1] < 0.45):
+    # Rug at DOLL
     if (0.2 < hsv[0] < 0.45) and (hsv[1] < 0.45):
         color_index = 0
 

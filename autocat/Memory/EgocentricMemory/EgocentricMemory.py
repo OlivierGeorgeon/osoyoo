@@ -10,7 +10,7 @@ import math
 import colorsys
 
 EXPERIENCE_PERSISTENCE = 10
-FOCUS_MAX_DELTA = 100  # (mm) Maximum delta to keep focus
+FOCUS_MAX_DELTA = 200  # 100 (mm) Maximum delta to keep focus
 
 
 class EgocentricMemory:
@@ -91,13 +91,15 @@ class EgocentricMemory:
                 self.focus_point = enacted_interaction['echo_xy']
                 print("CATCH FOCUS", self.focus_point)
 
-        # Impact or block catch focus. No need to set lost_focus because the outcome is OUTCOME_IMPACT
+        # Impact or block catch focus.
         if 'impact' in enacted_interaction:
             if enacted_interaction['impact'] > 0 or enacted_interaction['blocked']:
                 if 'echo_xy' in enacted_interaction:
                     self.focus_point = enacted_interaction['echo_xy']
                 else:
                     self.focus_point = np.array([ROBOT_FRONT_X, 0, 0])
+                # Reset lost focus because because DecideCircle must trigger a scan
+                enacted_interaction['lost_focus'] = False
                 print("CATCH FOCUS IMPACT", self.focus_point)
 
         # Move the prompt

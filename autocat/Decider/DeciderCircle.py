@@ -95,9 +95,11 @@ class DeciderCircle:
 
         # If there is an echo, compute the echo outcome
         if 'echo_xy' in enacted_interaction:
-            if enacted_interaction['echo_xy'][0] < 200:  # From the center of the robot
+            # if enacted_interaction['echo_xy'][0] < 200:  # From the center of the robot
+            if np.linalg.norm(enacted_interaction['echo_xy']) < 200:  # From the center of the robot
                 outcome = OUTCOME_CLOSE_FRONT
-            elif enacted_interaction['echo_xy'][0] > 500:  # Must be farther than the forward speed
+            # elif enacted_interaction['echo_xy'][0] > 500:  # Must be farther than the forward speed
+            elif np.linalg.norm(enacted_interaction['echo_xy']) > 500:  # Must be farther than the forward speed
                 outcome = OUTCOME_FAR_FRONT
             elif enacted_interaction['echo_xy'][1] > 150:
                 outcome = OUTCOME_FAR_LEFT  # More that 150 to the left
@@ -108,7 +110,7 @@ class DeciderCircle:
             else:
                 outcome = OUTCOME_FAR_RIGHT  # More that -150 to the right
 
-        if 'lost_focus' in enacted_interaction:
+        if 'lost_focus' in enacted_interaction and enacted_interaction['lost_focus']:
             outcome = OUTCOME_LOST_FOCUS
 
         # If impact then override the echo and focus outcome

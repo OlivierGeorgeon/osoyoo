@@ -43,6 +43,7 @@ class DeciderExplore:
             point = matrix44.apply_to_vector(rotation_matrix, point)
             self.prompt_points.append(point)
         self.prompt_index = 0
+        self._action = "-"
 
     def activation_level(self):
         """The level of activation of this decider: 0: default, 2 if the terrain has an origin """
@@ -81,6 +82,7 @@ class DeciderExplore:
                     if quaternion.rotation_angle(relative_quaternion) > math.pi:
                         relative_quaternion = -1 * relative_quaternion  # The quaternion representing the short angle
                     rot = quaternion.rotation_angle(relative_quaternion)
+                    print("Rot", rot)
                     print("Rotation from origin", round(math.degrees(rot)))
                     if quaternion.rotation_axis(relative_quaternion)[2] > 0:  # Positive z axis rotation
                         if rot < math.pi/3:
@@ -101,12 +103,14 @@ class DeciderExplore:
 
     def intended_enaction(self, outcome):
         """Return the next intended interaction"""
-        # # If robot on a color then re-init
-        # if TER in self.workspace.memory.phenomenon_memory.phenomena and \
-        #    self.workspace.memory.phenomenon_memory.phenomena[TER].absolute_affordance() is not None and \
-        #    self.workspace.clock - self.workspace.memory.phenomenon_memory.phenomena[TER].last_origin_clock > CLOCK_TO_GO_HOME and \
-        #    outcome == OUTCOME_COLOR:
-        #     self.exploration_step = EXPLORATION_STEP_INIT
+        # Tracing the last interaction
+        if self._action is not None:
+            print("Action: " + str(self._action) +
+                  ", Anticipation: " + str(self.anticipated_outcome) +
+                  ", Outcome: " + str(outcome) +
+                  ", Satisfaction: (anticipation: " + str(self.anticipated_outcome == outcome)) # +
+                  # ", valence: " + str(self.last_interaction.valence) + ")")
+
 
         # Compute the next prompt point
         if self.exploration_step == EXPLORATION_STEP_INIT:
@@ -117,10 +121,10 @@ class DeciderExplore:
                 # If right or left then swipe to home
                 if outcome in [OUTCOME_LEFT, OUTCOME_RIGHT]:
                     if outcome == OUTCOME_RIGHT:
-                        ego_confirmation = np.array([0, 300, 0], dtype=int)
+                        ego_confirmation = np.array([0, 280, 0], dtype=int)
                         self.exploration_step = EXPLORATION_STEP_SWIPE_LEFT
                     else:
-                        ego_confirmation = np.array([0, -300, 0], dtype=int)
+                        ego_confirmation = np.array([0, -280, 0], dtype=int)
                         self.exploration_step = EXPLORATION_STEP_SWIPE_RIGHT
                     print("Swiping to confirmation by:", ego_confirmation)
                     self.workspace.memory.egocentric_memory.prompt_point = ego_confirmation
@@ -155,6 +159,17 @@ class DeciderExplore:
                     self.prompt_index = 0
                 self.exploration_step = EXPLORATION_STEP_ROTATE
 
+        # Anyway if it is an a color and must enact confirmation affordance
+        if TER in self.workspace.memory.phenomenon_memory.phenomena and \
+                self.workspace.memory.phenomenon_memory.phenomena[TER].absolute_affordance() is not None and \
+                self.workspace.clock - self.workspace.memory.phenomenon_memory.phenomena[TER].last_origin_clock > CLOCK_TO_GO_HOME:
+            if outcome == OUTCOME_COLOR:
+                allo_confirmation = self.workspace.memory.phenomenon_memory.phenomena[TER].confirmation_prompt()
+                print("Enacting confirmation affordance to", allo_confirmation)
+                ego_confirmation = self.workspace.memory.allocentric_to_egocentric(allo_confirmation)
+                self.workspace.memory.egocentric_memory.prompt_point = ego_confirmation
+                playsound('autocat/Assets/R4.wav', False)
+
         # Compute the next intended interaction
         if self.exploration_step == EXPLORATION_STEP_SWIPE_RIGHT:
             action = self.workspace.actions[ACTION_RIGHTWARD]
@@ -169,6 +184,7 @@ class DeciderExplore:
             action = self.workspace.actions[ACTION_ALIGN_ROBOT]
             self.exploration_step = EXPLORATION_STEP_FORWARD
         ii = Interaction.create_or_retrieve(action, self.anticipated_outcome)
+        self._action = action  # For debug
 
         return Enaction(ii, self.workspace.clock, self.workspace.memory.egocentric_memory.focus_point,
                         self.workspace.memory.egocentric_memory.prompt_point)
