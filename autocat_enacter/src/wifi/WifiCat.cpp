@@ -3,6 +3,7 @@
   Created Olivier Georgeon February 15 2023
   Released into the public domain
 */
+
 #include <WiFiEsp.h>
 #include <WiFiEspUDP.h>
 
@@ -10,17 +11,16 @@
 #include "arduino_secrets.h"
 #include "../../Robot_define.h"
 
-// #define WIFI_CHANNEL 10 // 10 was the original value in the Osoyoo demo
-// #define PORT 8888
-
 WifiCat::WifiCat()
 {
 }
 
 // Initialize the wifi
+
 void WifiCat::begin()
 {
   // Connect to the wifi board
+
   Serial1.begin(115200);
   Serial1.write("AT+UART_DEF=9600,8,1,0,0\r\n");
   delay(200);
@@ -34,15 +34,21 @@ void WifiCat::begin()
     // don't continue
     while (true);
   }
+
   // Connect to the wifi network
+
   int status = WL_IDLE_STATUS;
-  if (SECRET_WIFI_TYPE == "AP") { // Wifi parameters in arduino_secret.h
+  // Connection depends on the Wifi parameters in arduino_secret.h
+  if (SECRET_WIFI_TYPE == "AP")
+  {
     // Connecting to wifi as an Access Point (AP)
     char ssid[] = AP_SSID;
     Serial.print("Attempting to start AP SSID: ");
     Serial.println(ssid);
     status = WiFi.beginAP(ssid, WIFI_CHANNEL, "", 0);
-  } else {
+  }
+  else
+  {
     // Connecting to wifi as a Station (STA)
     char ssid[] = SECRET_SSID;
     char pass[] = SECRET_PASS;
@@ -52,6 +58,7 @@ void WifiCat::begin()
       status = WiFi.begin(ssid, pass);
     }
   }
+
   Udp.begin(PORT);
 
   Serial.print("IP Address: ");
@@ -62,6 +69,7 @@ void WifiCat::begin()
 
 // Read up tp 512 characters from the current packet and place them to the buffer
 // Returns the number of bytes read, or 0 if none are available
+
 int WifiCat::read(char* packetBuffer)
 {
   int len = 0;
@@ -71,7 +79,6 @@ int WifiCat::read(char* packetBuffer)
     packetBuffer[len] = 0;
     Serial.print("Income string: ");
     Serial.println(packetBuffer);
-
     Udp.flush(); // Discard any remaining input data. Test for debug
 
     //Serial.print("From ");
@@ -83,6 +90,7 @@ int WifiCat::read(char* packetBuffer)
 }
 
 // Send the outcome to the IP address and port that sent the action
+
 void WifiCat::send(String message)
 {
   Serial.println("Outcome string: " + message);

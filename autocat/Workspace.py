@@ -9,13 +9,13 @@ from .Robot.Enaction import Enaction, SIMULATION_STEP_OFF
 from .Robot.CtrlRobot import INTERACTION_STEP_IDLE, INTERACTION_STEP_INTENDING, INTERACTION_STEP_ENACTING, \
     INTERACTION_STEP_INTEGRATING, INTERACTION_STEP_REFRESHING
 
-KEY_DECIDER_CIRCLE = "A"  # Automatic mode: controlled by AgentCircle
+KEY_DECIDER_CIRCLE = "A"  # Automatic mode: controlled by the deciders
 KEY_DECIDER_USER = "M"  # Manual mode : controlled by the user
-KEY_ENGAGEMENT_ROBOT = "R"  # The application controls the robot
-KEY_ENGAGEMENT_IMAGINARY = "I"  # The application imagines the interaction
+KEY_ENGAGEMENT_ROBOT = "R"  # The robot actually enacts the interaction
+KEY_ENGAGEMENT_IMAGINARY = "I"  # The application imagines the interaction but the robot does not enact them
 KEY_DECREASE_CONFIDENCE = "D"
 KEY_INCREASE_CONFIDENCE = "P"
-KEY_CLEAR = "C"
+KEY_CLEAR = "C"  # Clear the stack of interactions to enact next
 
 
 class Workspace:
@@ -26,7 +26,6 @@ class Workspace:
 
         self.memory = Memory()
         self.deciders = {'Explore': DeciderExplore(self), 'Circle': DeciderCircle(self)}
-        # self.decider = DeciderExplore(self)
         self.integrator = Integrator(self)
 
         self.intended_enaction = None
@@ -71,16 +70,10 @@ class Workspace:
             if self.clock not in self.enactions:
                 if self.decider_mode == KEY_DECIDER_CIRCLE:
                     # The most activated decider processes the previous enaction and chooses the next enaction
-                    # TODO Manage the enacted_interaction after imagining
                     ad = max(self.deciders, key=lambda k: self.deciders[k].activation_level())
                     print("Activated decider:", ad)
                     self.enactions[self.clock] = self.deciders[ad].propose_intended_enaction(self.enacted_interaction)
-                    # if self.deciders[0].activation_level() > 0:
-                    #     # Explore the terrain
-                    #     self.enactions[self.clock] = self.deciders[0].propose_intended_enaction(self.enacted_interaction)
-                    # else:
-                    #     # Search for terrain origin
-                    #     self.enactions[self.clock] = self.deciders[1].propose_intended_enaction(self.enacted_interaction)
+                    # TODO Manage the enacted_interaction after imagining
 
                 # Case DECIDER_KEY_USER is handled by self.process_user_key()
 
@@ -93,7 +86,7 @@ class Workspace:
                     # If imagining then proceed to simulating the enaction
                     self.interaction_step = INTERACTION_STEP_ENACTING
                 else:
-                    # Take a snapshot for the simulation
+                    # Take a snapshot for the simulation and proceed to INTENDING
                     self.memory_snapshot = self.memory.save()  # Fail when trying to save an affordance created during imaginary
                     self.interaction_step = INTERACTION_STEP_INTENDING
 
@@ -113,14 +106,13 @@ class Workspace:
 
         # INTEGRATING: the new enacted interaction (if not imagining)
         if self.interaction_step == INTERACTION_STEP_INTEGRATING:
-            # If not imagining then restore the memory from the snapshot and integrate the experiences
+            # Restore the memory from the snapshot and integrate the experiences
             self.memory = self.memory_snapshot
             # Update body memory and egocentric memory
             self.memory.update_and_add_experiences(self.enacted_interaction)
 
             # Call the integrator to create and update the phenomena
-            # Currently we don't create phenomena in imaginary mode because phenomena are not saved in memory
-            # TODO save the phenomena in memory so they can be created during imaginary mode
+            # Currently we don't create phenomena in imaginary mode
             self.integrator.integrate()
 
             # Update allocentric memory: robot, phenomena, focus
@@ -144,7 +136,7 @@ class Workspace:
         elif user_key.upper() in [KEY_ENGAGEMENT_ROBOT, KEY_ENGAGEMENT_IMAGINARY]:
             self.engagement_mode = user_key.upper()
         elif user_key.upper() in ACTIONS:
-            # Keys that correspond to actions
+            # Only process actions when the robot is IDLE
             if self.interaction_step == INTERACTION_STEP_IDLE:
                 ii = Interaction.create_or_retrieve(self.actions[user_key.upper()], OUTCOME_DEFAULT)
                 self.enactions[self.clock] = Enaction(ii, self.clock, self.memory.egocentric_memory.focus_point, self.memory.egocentric_memory.prompt_point)

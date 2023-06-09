@@ -10,7 +10,7 @@ import math
 import colorsys
 
 EXPERIENCE_PERSISTENCE = 10
-FOCUS_MAX_DELTA = 200  # 100 (mm) Maximum delta to keep focus
+FOCUS_MAX_DELTA = 200  # 100 (mm) Maximum delta to keep focus  TODO improve the focus position when impact
 
 
 class EgocentricMemory:
@@ -31,16 +31,11 @@ class EgocentricMemory:
             translation = enacted_interaction['translation']
             rotation_matrix = enacted_interaction['rotation_matrix']
             if 'echo_xy' in enacted_interaction:
-                # echo_point = enacted_interaction['echo_xy']  # May be 10000 if no echo received
                 action_code = enacted_interaction['action']
                 prediction_focus_point = matrix44.apply_to_vector(displacement_matrix, self.focus_point)
                 # The error between the expected and the actual position of the echo
-                # prediction_error_focus = prediction_focus_point - echo_point
                 prediction_error_focus = prediction_focus_point - enacted_interaction['echo_xy']
-                # The focus displacement was simulated in egocentric memory
-                # prediction_error_focus = self.workspace.memory.egocentric_memory.focus_point - echo_point
 
-                # if math.dist(echo_point, prediction_focus_point) < FOCUS_MAX_DELTA:
                 if np.linalg.norm(prediction_error_focus) < FOCUS_MAX_DELTA:
                     # The focus has been kept
                     enacted_interaction['focus'] = True
@@ -91,7 +86,7 @@ class EgocentricMemory:
                 self.focus_point = enacted_interaction['echo_xy']
                 print("CATCH FOCUS", self.focus_point)
 
-        # Impact or block catch focus.
+        # Impact or block catch focus
         if 'impact' in enacted_interaction:
             if enacted_interaction['impact'] > 0 or enacted_interaction['blocked']:
                 if 'echo_xy' in enacted_interaction:

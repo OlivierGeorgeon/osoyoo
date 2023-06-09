@@ -31,7 +31,7 @@ class CtrlBodyView:
                     # Find the center of the circle made by the compass points
                     xc, yc, r, sigma = cf.taubinSVD(points)
                     # print("Fit circle", xc, yc, r, sigma)
-                    if 150 < r < 300:
+                    if 130 < r < 300:
                         # If the radius is in bound then we can update de compass offset
                         delta_offset = np.array([xc, yc, 0], dtype=int)
                         self.workspace.memory.body_memory.compass_offset += delta_offset

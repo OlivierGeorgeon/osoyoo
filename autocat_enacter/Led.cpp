@@ -16,11 +16,15 @@ Led::Led()
 // Blink the LED with period 100ms
 void Led::blink()
 {
-  if (millis() > blink_end_time){
-    if (blink_on) {
+  if (millis() > blink_end_time)
+  {
+    if (blink_on)
+    {
       digitalWrite(LED_BUILTIN, HIGH);
       blink_on = false;
-    }else {
+    }
+    else
+    {
       digitalWrite(LED_BUILTIN, LOW);
       blink_on = true;
     }

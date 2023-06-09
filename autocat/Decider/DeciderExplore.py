@@ -79,10 +79,10 @@ class DeciderExplore:
             else:
                 if e.type == EXPERIENCE_FLOOR and self.workspace.memory.phenomenon_memory.phenomena[TER].absolute_affordance() is not None:
                     relative_quaternion = quaternion.cross(self.workspace.memory.body_memory.body_quaternion(), quaternion.inverse(self.workspace.memory.phenomenon_memory.phenomena[TER].absolute_affordance().experience.body_direction_quaternion()))
+                    print("Relative quaternion", repr(relative_quaternion))
                     if quaternion.rotation_angle(relative_quaternion) > math.pi:
                         relative_quaternion = -1 * relative_quaternion  # The quaternion representing the short angle
                     rot = quaternion.rotation_angle(relative_quaternion)
-                    print("Rot", rot)
                     print("Rotation from origin", round(math.degrees(rot)))
                     if quaternion.rotation_axis(relative_quaternion)[2] > 0:  # Positive z axis rotation
                         if rot < math.pi/3:
@@ -110,7 +110,6 @@ class DeciderExplore:
                   ", Outcome: " + str(outcome) +
                   ", Satisfaction: (anticipation: " + str(self.anticipated_outcome == outcome)) # +
                   # ", valence: " + str(self.last_interaction.valence) + ")")
-
 
         # Compute the next prompt point
         if self.exploration_step == EXPLORATION_STEP_INIT:

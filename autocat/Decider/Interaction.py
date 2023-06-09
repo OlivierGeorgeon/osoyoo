@@ -26,12 +26,6 @@ class Interaction:
         else:
             return False
 
-    # def serialize(self):
-    #     """Return the serial representation to send to the robot"""
-    #     serial = dict(self.modifier)
-    #     serial['action'] = self.action.action_code
-    #     return json.dumps(serial)
-
     @classmethod
     def create_or_retrieve(cls, action, outcome, valence=None):
         """ Use this methode to create a new interaction or to retrieve it if it already exists """

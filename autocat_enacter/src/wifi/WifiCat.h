@@ -3,6 +3,7 @@
   Created Olivier Georgeon February 15 2023
   Released into the public domain
 */
+
 #ifndef WifiCat_h
 #define WifiCat_h
 #include <WiFiEsp.h>

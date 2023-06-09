@@ -54,6 +54,7 @@ void Interaction::ongoing()
 // Wait for Floor change retreat completed otherwise the wifi send interfers with the retreat
 // Wait for Head alignment completed otherwise the head signal sent comes from before the interaction
 // Warning: in some situations, the head alignment may take quite long
+
 void Interaction::terminate()
 {
   // Serial.println("Interaction.step2()");
@@ -67,6 +68,7 @@ void Interaction::terminate()
 }
 
 // Send the outcome and go back to Step 0
+
 void Interaction::send()
 {
   // Serial.println("Interaction.step3()");
@@ -96,6 +98,7 @@ void Interaction::send()
 }
 
 // Proceed with the enaction of the interaction
+
 int Interaction::update()
 {
   // STEP 0: Begin the interaction
@@ -117,7 +120,7 @@ int Interaction::update()
   return _step;
 }
 
-int Interaction::getStep()
-{
-  return _step;
-}
+//int Interaction::getStep()
+//{
+//  return _step;
+//}

@@ -1,29 +1,23 @@
 /*
-  Interaction.h - library for controlling an interaction
-  Created by Olivier Georgeon, mai 26 2023
-  released into the public domain
+Interaction.h - library for controlling an interaction
+Created by Olivier Georgeon, mai 26 2023
+released into the public domain
 */
+
 #ifndef Interaction_h
 #define Interaction_h
-
-//#define INTERACTION_BEGIN 1
-//#define INTERACTION_ONGOING 2
-//#define INTERACTION_TERMINATE 3
-//#define INTERACTION_SEND 4
-//#define INTERACTION_DONE 0
 
 class Interaction
 {
 public:
-  // Interaction(Color& CLR, Floor& FCR, Head& HEA, Imu& IMU, WifiCat& WifiCat, unsigned long& action_end_time, int& interaction_step, String& status, char& action, int& clock, unsigned long& duration1, unsigned long& action_start_time);
   Interaction(Color& CLR, Floor& FCR, Head& HEA, Imu& IMU, WifiCat& WifiCat, unsigned long action_end_time, char action,
-  int clock, bool is_focussed, int focus_x, int focus_y, int focus_speed);
+    int clock, bool is_focussed, int focus_x, int focus_y, int focus_speed);
   virtual void begin();
   virtual void ongoing();
   void terminate();
   void send();
   int update();
-  int getStep();
+  // int getStep();
 protected:
   Color& _CLR;
   Floor& _FCR;

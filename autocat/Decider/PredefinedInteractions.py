@@ -111,17 +111,4 @@ def create_interactions(actions):
         if interaction.outcome in [OUTCOME_FLOOR_LEFT, OUTCOME_FLOOR_FRONT, OUTCOME_FLOOR_RIGHT]:
             CompositeInteraction.create_or_retrieve(interaction, i40)
 
-    ##################################
-    # Impact outcome
-
-    # i8I = Interaction.create_or_retrieve(actions[ACTION_FORWARD], OUTCOME_IMPACT, -1)
-    #
-    # # When impact then scan
-    # CompositeInteraction.create_or_retrieve(i8I, i_4)
-    #
-    # for interaction in Interaction.interaction_list:
-    #     if interaction.outcome in [OUTCOME_FLOOR_LEFT, OUTCOME_FLOOR_FRONT, OUTCOME_FLOOR_RIGHT]:
-    #         CompositeInteraction.create_or_retrieve(interaction, i8I)
-    #
-
     return CompositeInteraction.composite_interaction_list
