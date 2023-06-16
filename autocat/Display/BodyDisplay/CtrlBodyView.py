@@ -48,11 +48,11 @@ class CtrlBodyView:
 
         self.view.push_handlers(on_text)
 
-    def add_point_of_interest(self, x, y, point_type, group=None):
+    def add_point_of_interest(self, point, point_type, group=None):
         """ Adding a point of interest to the view """
         if group is None:
             group = self.view.forefront
-        point_of_interest = PointOfInterest(x, y, self.view.batch, group, point_type, self.workspace.clock)
+        point_of_interest = PointOfInterest(point[0], point[1], self.view.batch, group, point_type, self.workspace.clock)
         self.points_of_interest.append(point_of_interest)
 
     def update_body_view(self):
@@ -67,24 +67,22 @@ class CtrlBodyView:
 
         # Rotate the previous compass points so they remain at the south of the view
         # TODO rotate the compass points when imagining
-        if 'yaw' in self.workspace.enacted_interaction:
-            yaw = self.workspace.enacted_interaction['yaw']
-            displacement_matrix = matrix44.create_from_z_rotation(math.radians(yaw))
-            for poi in [p for p in self.points_of_interest if p.type == POINT_COMPASS]:
-                poi.displace(displacement_matrix)
+        # if 'yaw' in self.workspace.enacted_interaction:
+        yaw = self.workspace.enacted_enaction.yaw
+        displacement_matrix = matrix44.create_from_z_rotation(math.radians(yaw))
+        for poi in [p for p in self.points_of_interest if p.type == POINT_COMPASS]:
+            poi.displace(displacement_matrix)
 
         # Add the new points that indicate the south relative to the robot
-        if 'compass_x' in self.workspace.enacted_interaction:
-            self.add_point_of_interest(self.workspace.enacted_interaction['compass_x'],
-                                       self.workspace.enacted_interaction['compass_y'], POINT_COMPASS)
-            self.add_point_of_interest(self.workspace.enacted_interaction['compass_x'],
-                                       self.workspace.enacted_interaction['compass_y'], POINT_AZIMUTH,
+        if self.workspace.enacted_enaction.compass_point is not None:
+            self.add_point_of_interest(self.workspace.enacted_enaction.compass_point, POINT_COMPASS)
+            self.add_point_of_interest(self.workspace.enacted_enaction.compass_point, POINT_AZIMUTH,
                                        self.view.background)
-            self.view.label.text += ", compass: " + str(self.workspace.enacted_interaction['azimuth']) + "°"
+            self.view.label.text += ", compass: " + str(self.workspace.enacted_enaction.azimuth) + "°"
         else:
             x = 330 * math.cos(math.radians(azimuth + 180))
             y = 330 * math.sin(math.radians(azimuth + 180))
-            self.add_point_of_interest(x, y, POINT_AZIMUTH, self.view.background)
+            self.add_point_of_interest([x, y, 0], POINT_AZIMUTH, self.view.background)
 
         # Fade the points of interest
         for poi in self.points_of_interest:

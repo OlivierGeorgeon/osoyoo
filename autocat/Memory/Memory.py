@@ -26,23 +26,23 @@ class Memory:
         return "Memory Robot position (" + str(round(self.allocentric_memory.robot_point[0])) + "," +\
                                            str(round(self.allocentric_memory.robot_point[1])) + ")"
 
-    def update_and_add_experiences(self, enacted_interaction):
+    def update_and_add_experiences(self, enacted_enaction):
         """ Process the enacted interaction to update the memory
         - Move the robot in body memory
         - Move the previous experiences in egocentric_memory
         - Add new experiences in egocentric_memory
         - Move the robot in allocentric_memory
         """
-        self.egocentric_memory.manage_focus(enacted_interaction)
+        self.egocentric_memory.manage_focus(enacted_enaction)
 
-        self.body_memory.set_head_direction_degree(enacted_interaction['head_angle'])
+        self.body_memory.set_head_direction_degree(enacted_enaction.head_angle)
         # TODO Keep the simulation and adjust the robot position
         # Translate the robot before applying the yaw
-        self.allocentric_memory.move(self.body_memory.body_direction_rad, enacted_interaction['translation'],
-                                     enacted_interaction['clock'])
-        self.body_memory.rotate_degree(enacted_interaction['yaw'], enacted_interaction['azimuth'])
+        self.allocentric_memory.move(self.body_memory.body_direction_rad, enacted_enaction.translation,
+                                     enacted_enaction.clock)
+        self.body_memory.rotate_degree(enacted_enaction.yaw, enacted_enaction.azimuth)
 
-        self.egocentric_memory.update_and_add_experiences(enacted_interaction, self.body_memory.body_direction_rad)
+        self.egocentric_memory.update_and_add_experiences(enacted_enaction, self.body_memory.body_direction_rad)
 
         # # TODO Keep the simulation and adjust the robot position
         # self.allocentric_memory.move(self.body_memory.body_direction_rad, enacted_interaction['translation'],

@@ -22,33 +22,33 @@ class EgocentricMemory:
         self.experiences = {}
         self.experience_id = 0  # A unique ID for each experience in memory
 
-    def manage_focus(self, enacted_interaction):
+    def manage_focus(self, enacted_enaction):
         """Manage focus catch, lost, or update. Also move the prompt"""
         if self.focus_point is not None:
             # If focussed then adjust the displacement
             # The new estimated position of the focus point
-            displacement_matrix = enacted_interaction['displacement_matrix']
-            translation = enacted_interaction['translation']
-            rotation_matrix = enacted_interaction['rotation_matrix']
-            if 'echo_xy' in enacted_interaction:
-                action_code = enacted_interaction['action']
+            displacement_matrix = enacted_enaction.displacement_matrix
+            translation = enacted_enaction.translation
+            rotation_matrix = enacted_enaction.rotation_matrix
+            if enacted_enaction.echo_point is not None:
+                action_code = enacted_enaction.action.action_code
                 prediction_focus_point = matrix44.apply_to_vector(displacement_matrix, self.focus_point)
                 # The error between the expected and the actual position of the echo
-                prediction_error_focus = prediction_focus_point - enacted_interaction['echo_xy']
+                prediction_error_focus = prediction_focus_point - enacted_enaction.echo_point
 
                 if np.linalg.norm(prediction_error_focus) < FOCUS_MAX_DELTA:
                     # The focus has been kept
-                    enacted_interaction['focus'] = True
+                    enacted_enaction.is_focussed = True
                     # If the action has been completed
-                    if enacted_interaction['duration1'] >= 1000:
+                    if enacted_enaction.duration1 >= 1000:
                         # If the head is forward then correct longitudinal displacements
-                        if -20 < enacted_interaction['head_angle'] < 20:
+                        if -20 < enacted_enaction.head_angle < 20:
                             if action_code in [ACTION_FORWARD, ACTION_BACKWARD]:
                                 translation[0] = translation[0] + prediction_error_focus[0]
                                 # TODO pass the action to correct the estimated speed:
                                 # self.workspace.actions[action_code].adjust_translation_speed(translation)
                         # If the head is sideways then correct lateral displacements
-                        if 60 < enacted_interaction['head_angle'] or enacted_interaction['head_angle'] < -60:
+                        if 60 < enacted_enaction.head_angle or enacted_enaction.head_angle < -60:
                             if action_code in [ACTION_LEFTWARD, ACTION_RIGHTWARD]:
                                 translation[1] = translation[1] + prediction_error_focus[1]
                                 # TODO pass the action to correct the estimated speed:
@@ -56,53 +56,52 @@ class EgocentricMemory:
                         # Update the displacement matrix according to the new translation
                         translation_matrix = matrix44.create_from_translation(-translation)
                         displacement_matrix = matrix44.multiply(rotation_matrix, translation_matrix)
-                        enacted_interaction['translation'] = translation
-                        enacted_interaction['displacement_matrix'] = displacement_matrix
+                        enacted_enaction.translation = translation
+                        enacted_enaction.displacement_matrix = displacement_matrix
 
                         # If the focus was kept then update it
                         # if 'focus' in enacted_interaction:
                         # if 'echo_xy' in enacted_interaction:  # Not sure why this is necessary
                         # self.focus_point = np.array([enacted_interaction['echo_xy'][0],
                         #                              enacted_interaction['echo_xy'][1], 0])
-                    self.focus_point = enacted_interaction['echo_xy']
+                    self.focus_point = enacted_enaction.echo_point
                     print("UPDATE FOCUS by delta", prediction_error_focus)
                     # If the focus was lost then reset it
                 else:
                     # The focus was lost, override the echo outcome
                     print("LOST FOCUS due to delta", prediction_error_focus)
-                    enacted_interaction['lost_focus'] = True  # Used by agent_circle
+                    enacted_enaction.lost_focus = True  # Used by agent_circle
                     self.focus_point = None
                     # playsound('autocat/Assets/R5.wav', False)
             else:
                 # The focus was lost, override the echo outcome
                 print("LOST FOCUS due to no echo")
-                enacted_interaction['lost_focus'] = True  # Used by agent_circle
+                enacted_enaction.lost_focus = True  # Used by agent_circle
                 self.focus_point = None
                 # playsound('autocat/Assets/R5.wav', False)
         else:
-            if enacted_interaction['action'] in [ACTION_SCAN, ACTION_FORWARD] and 'echo_xy' in enacted_interaction:
+            if enacted_enaction.action.action_code in [ACTION_SCAN, ACTION_FORWARD] and enacted_enaction.echo_point is not None:
                 # Catch focus
                 # playsound('autocat/Assets/R11.wav', False)
-                self.focus_point = enacted_interaction['echo_xy']
+                self.focus_point = enacted_enaction.echo_point
                 print("CATCH FOCUS", self.focus_point)
 
         # Impact or block catch focus
-        if 'impact' in enacted_interaction:
-            if enacted_interaction['impact'] > 0 or enacted_interaction['blocked']:
-                if 'echo_xy' in enacted_interaction:
-                    self.focus_point = enacted_interaction['echo_xy']
-                else:
-                    self.focus_point = np.array([ROBOT_FRONT_X, 0, 0])
-                # Reset lost focus because because DecideCircle must trigger a scan
-                enacted_interaction['lost_focus'] = False
-                print("CATCH FOCUS IMPACT", self.focus_point)
+        if enacted_enaction.impact > 0 or enacted_enaction.blocked:
+            if enacted_enaction.echo_point is not None:
+                self.focus_point = enacted_enaction.echo_point
+            else:
+                self.focus_point = np.array([ROBOT_FRONT_X, 0, 0])
+            # Reset lost focus because because DecideCircle must trigger a scan
+            enacted_enaction.lost_focus = False
+            print("CATCH FOCUS IMPACT", self.focus_point)
 
         # Move the prompt
         if self.prompt_point is not None:
-            self.prompt_point = matrix44.apply_to_vector(enacted_interaction['displacement_matrix'], self.prompt_point).astype(int)
+            self.prompt_point = matrix44.apply_to_vector(enacted_enaction.displacement_matrix, self.prompt_point).astype(int)
             print("Prompt moved to egocentric: ", self.prompt_point)
 
-    def update_and_add_experiences(self, enacted_interaction, body_direction_rad):
+    def update_and_add_experiences(self, enacted_enaction, body_direction_rad):
         """ Process the enacted interaction to update the egocentric memory
         - Move the previous experiences
         - Add new experiences
@@ -111,21 +110,21 @@ class EgocentricMemory:
         last_experience_id = self.experience_id
         # Move the existing experiences
         for experience in self.experiences.values():
-            experience.displace(enacted_interaction['displacement_matrix'])
+            experience.displace(enacted_enaction.displacement_matrix)
 
         # Add the PLACE experience with the sensed color
-        if 'color' in enacted_interaction:
-            color_index = category_color(enacted_interaction['color'])
+        if enacted_enaction.color is not None:
+            color_index = category_color(enacted_enaction.color)
         else:
             color_index = 0
-        color_exp = Experience(ROBOT_COLOR_X, 0, EXPERIENCE_PLACE, body_direction_rad, enacted_interaction["clock"],
+        color_exp = Experience(ROBOT_COLOR_X, 0, EXPERIENCE_PLACE, body_direction_rad, enacted_enaction.clock,
                                self.experience_id, durability=EXPERIENCE_PERSISTENCE, color_index=color_index)
         self.experiences[color_exp.id] = color_exp
         self.experience_id += 1
 
         # Create new experiences from points in the enacted_interaction
-        for p in enacted_interaction[KEY_EXPERIENCES]:
-            experience = Experience(p[1], p[2], p[0], body_direction_rad, enacted_interaction["clock"],
+        for p in enacted_enaction.enacted_points:
+            experience = Experience(p[1], p[2], p[0], body_direction_rad, enacted_enaction.clock,
                                     experience_id=self.experience_id, durability=EXPERIENCE_PERSISTENCE,
                                     color_index=color_index)
             # new_experiences.append(experience)

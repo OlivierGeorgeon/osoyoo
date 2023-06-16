@@ -5,6 +5,7 @@ import math
 import numpy as np
 from pyrr import matrix44
 from .RobotDefine import RETREAT_DISTANCE, RETREAT_DISTANCE_Y, LINE_X, ROBOT_FRONT_X, ROBOT_FRONT_Y, ROBOT_HEAD_X
+from .Enaction import Enaction
 from ..Memory.EgocentricMemory.Experience import EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_FLOOR, EXPERIENCE_IMPACT, \
     EXPERIENCE_LOCAL_ECHO, EXPERIENCE_BLOCK
 from ..Decider.Action import ACTION_FORWARD
@@ -80,13 +81,13 @@ class CtrlRobot:
     def send_enacted_interaction_to_workspace(self, outcome):
         """ Computes the enacted interaction from the robot's outcome data."""
         enacted_interaction = json.loads(outcome)
+        action_code = enacted_interaction['action']
 
-        # enacted_enaction = Enaction()
+        enacted_enaction = Enaction(self.workspace.actions[action_code], enacted_interaction['clock'], None, None)
 
         enacted_interaction[KEY_EXPERIENCES] = []
 
         # Translation integrated from the action's speed multiplied by the duration1
-        action_code = enacted_interaction['action']
         translation = self.workspace.actions[action_code].translation_speed * \
                       (float(enacted_interaction['duration1']) / 1000.0)
         # TODO Take the yaw into account
@@ -97,11 +98,11 @@ class CtrlRobot:
             yaw = enacted_interaction['yaw']
         else:
             enacted_interaction['yaw'] = yaw
-        self.workspace.intended_enaction.yaw = yaw
+        enacted_enaction.yaw = yaw
 
         # If the robot does not return the azimuth then return 0. The azimuth will be computed by BodyMemory
         if 'azimuth' in enacted_interaction:
-            self.workspace.intended_enaction.azimuth = enacted_interaction['azimuth']
+            enacted_enaction.azimuth = enacted_interaction['azimuth']
         else:
             enacted_interaction['azimuth'] = 0
 
@@ -115,7 +116,8 @@ class CtrlRobot:
             # The compass point indicates the south so we must rotate it of 180° to obtain the azimuth
             azimuth = round(azimuth + 180) % 360
             enacted_interaction['azimuth'] = azimuth
-            self.workspace.intended_enaction.azimuth = azimuth
+            enacted_enaction.azimuth = azimuth
+            enacted_enaction.compass_point = np.array([enacted_interaction['compass_x'], enacted_interaction['compass_y'], 0])
 
         # Interaction Floor line
         if enacted_interaction['floor'] > 0:
@@ -141,7 +143,7 @@ class CtrlRobot:
             #                               experience_id=self.experience_id,
             #                               durability=EXPERIENCE_PERSISTENCE,
             #                               color_index=color_index)
-            # self.workspace.intended_enaction.enacted_experiences.append(floor_experience)
+            enacted_enaction.enacted_points.append(point)
 
         # Interaction ECHO
         if enacted_interaction['echo_distance'] < 10000:
@@ -150,25 +152,33 @@ class CtrlRobot:
                                   * enacted_interaction['echo_distance'])
             echo_point[1] = round(math.sin(math.radians(enacted_interaction['head_angle']))
                                   * enacted_interaction['echo_distance'])
-            enacted_interaction[KEY_EXPERIENCES].append((EXPERIENCE_ALIGNED_ECHO, *echo_point))
+            echo_p = (EXPERIENCE_ALIGNED_ECHO, *echo_point)
+            enacted_interaction[KEY_EXPERIENCES].append(echo_p)
             # Return the echo_xy to possibly use as focus
             enacted_interaction['echo_xy'] = echo_point
-            self.workspace.intended_enaction.echo_point = echo_point
+            enacted_enaction.echo_point = echo_point
+            enacted_enaction.enacted_points.append(echo_p)
 
         # Interaction impact
         # (The forward translation is already correct since it is integrated during duration1)
+        impact_point = None
         if KEY_IMPACT in enacted_interaction and action_code == ACTION_FORWARD:
             if enacted_interaction[KEY_IMPACT] == 0b01:  # Impact on the right
-                enacted_interaction[KEY_EXPERIENCES].append((EXPERIENCE_IMPACT, ROBOT_FRONT_X, -ROBOT_FRONT_Y))
+                impact_point = (EXPERIENCE_IMPACT, ROBOT_FRONT_X, -ROBOT_FRONT_Y)
             if enacted_interaction[KEY_IMPACT] == 0b11:  # Impact on the front
-                enacted_interaction[KEY_EXPERIENCES].append((EXPERIENCE_IMPACT, ROBOT_FRONT_X, 0))
+                impact_point = (EXPERIENCE_IMPACT, ROBOT_FRONT_X, 0)
             if enacted_interaction[KEY_IMPACT] == 0b10:  # Impact on the left
-                enacted_interaction[KEY_EXPERIENCES].append((EXPERIENCE_IMPACT, ROBOT_FRONT_X, ROBOT_FRONT_Y))
+                impact_point = (EXPERIENCE_IMPACT, ROBOT_FRONT_X, ROBOT_FRONT_Y)
+        if impact_point is not None:
+            enacted_interaction[KEY_EXPERIENCES].append(impact_point)
+            enacted_enaction.enacted_points.append(impact_point)
 
         # Interaction blocked
         if 'blocked' in enacted_interaction and action_code == ACTION_FORWARD:
             if enacted_interaction['blocked']:
-                enacted_interaction[KEY_EXPERIENCES].append((EXPERIENCE_BLOCK, ROBOT_FRONT_X, 0))
+                blocked_p = (EXPERIENCE_BLOCK, ROBOT_FRONT_X, 0)
+                enacted_interaction[KEY_EXPERIENCES].append(blocked_p)
+                enacted_enaction.enacted_points.append(blocked_p)
                 translation = np.array([0, 0, 0], dtype=float)  # Reset the translation
 
         # The estimated displacement of the environment relative to the robot caused by this interaction
@@ -185,8 +195,20 @@ class CtrlRobot:
 
         # Return the displacement
         enacted_interaction['translation'] = translation
+        enacted_enaction.translation = translation
         enacted_interaction['rotation_matrix'] = rotation_matrix
+        enacted_enaction.rotation_matrix = rotation_matrix
         enacted_interaction['displacement_matrix'] = displacement_matrix
+        enacted_enaction.displacement_matrix = displacement_matrix
+        enacted_enaction.duration1 = enacted_interaction['duration1']
+        enacted_enaction.head_angle = enacted_interaction['head_angle']
+        if 'floor' in enacted_interaction:
+            enacted_enaction.impact = enacted_interaction['floor']
+        if 'impact' in enacted_interaction:
+            enacted_enaction.impact = enacted_interaction['impact']
+        if 'blocked' in enacted_interaction:
+            enacted_enaction.blocked = enacted_interaction['blocked']
+        enacted_enaction.color = enacted_interaction['color']
 
         # The echo array
         if "echo_array" not in enacted_interaction:
@@ -199,9 +221,12 @@ class CtrlRobot:
                 ed = enacted_interaction[ed_str]
                 tmp_x = ROBOT_HEAD_X + math.cos(math.radians(ha)) * ed
                 tmp_y = math.sin(math.radians(ha)) * ed
-                enacted_interaction[KEY_EXPERIENCES].append((EXPERIENCE_LOCAL_ECHO, tmp_x, tmp_y))
+                local_echo_p = (EXPERIENCE_LOCAL_ECHO, tmp_x, tmp_y)
+                enacted_interaction[KEY_EXPERIENCES].append(local_echo_p)
+                enacted_enaction.enacted_points.append(local_echo_p)
         # print(enacted_interaction)
 
-        self.workspace.enacted_interaction = enacted_interaction
+        # self.workspace.enacted_interaction = enacted_interaction
         self.workspace.intended_enaction = None
+        self.workspace.enacted_enaction = enacted_enaction
         self.workspace.interaction_step = INTERACTION_STEP_INTEGRATING

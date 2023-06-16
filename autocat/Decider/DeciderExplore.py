@@ -54,28 +54,28 @@ class DeciderExplore:
                 activation_level = 2
         return activation_level
 
-    def propose_intended_enaction(self, enacted_interaction):
+    def propose_intended_enaction(self, enacted_enaction):
         """Propose the next intended enaction from the previous enacted interaction.
         This is the main method of the agent"""
         # Compute a specific outcome suited for this agent
-        outcome = self.outcome(enacted_interaction)
+        outcome = self.outcome(enacted_enaction)
         # Compute the intended enaction
         return self.intended_enaction(outcome)
 
-    def outcome(self, enacted_interaction):
+    def outcome(self, enacted_enaction):
         """ Convert the enacted interaction into an outcome adapted to the explore behavior """
         outcome = OUTCOME_DEFAULT
 
         # Look for color place experience
-        for e in [e for e in self.workspace.memory.egocentric_memory.experiences.values() if e.type == EXPERIENCE_PLACE and e.clock == enacted_interaction["clock"] and e.color_index > 0]:
+        for e in [e for e in self.workspace.memory.egocentric_memory.experiences.values() if e.type == EXPERIENCE_PLACE and e.clock == enacted_enaction.clock and e.color_index > 0]:
             outcome = OUTCOME_COLOR
             print("Outcome color")
         # Look for the floor experience
-        for e in [e for e in self.workspace.memory.egocentric_memory.experiences.values() if e.type in [EXPERIENCE_FLOOR] and e.clock == enacted_interaction["clock"]]:
+        for e in [e for e in self.workspace.memory.egocentric_memory.experiences.values() if e.type in [EXPERIENCE_FLOOR] and e.clock == enacted_enaction.clock]:
             if e.color_index > 0:
                 # If the floor is color then origin confirmation was enacted
                 outcome = OUTCOME_ORIGIN
-                self.workspace.memory.phenomenon_memory.phenomena[TER].last_origin_clock = enacted_interaction["clock"]
+                self.workspace.memory.phenomenon_memory.phenomena[TER].last_origin_clock = enacted_enaction.clock
             else:
                 if e.type == EXPERIENCE_FLOOR and self.workspace.memory.phenomenon_memory.phenomena[TER].absolute_affordance() is not None:
                     relative_quaternion = quaternion.cross(self.workspace.memory.body_memory.body_quaternion(), quaternion.inverse(self.workspace.memory.phenomenon_memory.phenomena[TER].absolute_affordance().experience.body_direction_quaternion()))

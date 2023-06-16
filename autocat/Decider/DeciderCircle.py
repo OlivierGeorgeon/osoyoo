@@ -33,11 +33,11 @@ class DeciderCircle:
                 activation_level = 3
         return activation_level
 
-    def propose_intended_enaction(self, enacted_interaction):
+    def propose_intended_enaction(self, enacted_enaction):
         """Propose the next intended enaction from the previous enacted interaction.
         This is the main method of the agent"""
         # Compute a specific outcome suited for this agent
-        outcome = self.outcome(enacted_interaction)
+        outcome = self.outcome(enacted_enaction)
         # Compute the intended enaction
         return self.intended_enaction(outcome)
 
@@ -88,58 +88,46 @@ class DeciderCircle:
         # The intended enaction
         return Enaction(self._action, self.workspace.clock, self.workspace.memory.egocentric_memory.focus_point, None)
 
-    def outcome(self, enacted_interaction):
+    def outcome(self, enacted_enaction):
         """ Convert the enacted interaction into an outcome adapted to the circle behavior """
         outcome = OUTCOME_DEFAULT
 
         # If there is an echo, compute the echo outcome
-        if 'echo_xy' in enacted_interaction:
+        if enacted_enaction.echo_point is not None:
             # if enacted_interaction['echo_xy'][0] < 200:  # From the center of the robot
-            if np.linalg.norm(enacted_interaction['echo_xy']) < 200:  # From the center of the robot
+            if np.linalg.norm(enacted_enaction.echo_point) < 200:  # From the center of the robot
                 outcome = OUTCOME_CLOSE_FRONT
             # elif enacted_interaction['echo_xy'][0] > 500:  # Must be farther than the forward speed
-            elif np.linalg.norm(enacted_interaction['echo_xy']) > 500:  # Must be farther than the forward speed
+            elif np.linalg.norm(enacted_enaction.echo_point) > 500:  # Must be farther than the forward speed
                 outcome = OUTCOME_FAR_FRONT
-            elif enacted_interaction['echo_xy'][1] > 150:
+            elif enacted_enaction.echo_point[1] > 150:
                 outcome = OUTCOME_FAR_LEFT  # More that 150 to the left
-            elif enacted_interaction['echo_xy'][1] > 0:
+            elif enacted_enaction.echo_point[1] > 0:
                 outcome = OUTCOME_LEFT      # between 0 and 150 to the left
-            elif enacted_interaction['echo_xy'][1] > -150:
+            elif enacted_enaction.echo_point[1] > -150:
                 outcome = OUTCOME_RIGHT     # Between 0 and -150 to the right
             else:
                 outcome = OUTCOME_FAR_RIGHT  # More that -150 to the right
 
-        if 'lost_focus' in enacted_interaction and enacted_interaction['lost_focus']:
+        if enacted_enaction.lost_focus:
             outcome = OUTCOME_LOST_FOCUS
 
         # If impact then override the echo and focus outcome
-        if 'impact' in enacted_interaction:
-            if enacted_interaction['impact'] > 0:
-                outcome = OUTCOME_IMPACT
-        if 'blocked' in enacted_interaction:
-            if enacted_interaction['blocked']:
-                outcome = OUTCOME_IMPACT
+        # if 'impact' in enacted_interaction:
+        if enacted_enaction.impact > 0:
+            outcome = OUTCOME_IMPACT
+        # if 'blocked' in enacted_interaction:
+        if enacted_enaction.blocked:
+            outcome = OUTCOME_IMPACT
 
         # If floor then override the echo and focus and impact outcome
-        if 'floor' in enacted_interaction:
-            if enacted_interaction['floor'] == 0b10:
+        if enacted_enaction.floor > 0:
+            if enacted_enaction.floor == 0b10:
                 outcome = OUTCOME_FLOOR_LEFT
-            if enacted_interaction['floor'] == 0b11:
+            if enacted_enaction.floor == 0b11:
                 outcome = OUTCOME_FLOOR_FRONT
-            if enacted_interaction['floor'] == 0b01:
+            if enacted_enaction.floor == 0b01:
                 outcome = OUTCOME_FLOOR_RIGHT
 
         return outcome
 
-
-# Testing AgentCircle
-# py -m autocat.Decider.AgentCircle
-if __name__ == "__main__":
-    a = DeciderCircle()
-    _outcome = OUTCOME_LOST_FOCUS
-
-    for i in range(20):
-        _intended_interaction = a.intended_interaction(_outcome)
-        print("Action: ", _intended_interaction)
-        _outcome = input("Enter outcome: ").upper()
-        print(" Outcome: ", _outcome)

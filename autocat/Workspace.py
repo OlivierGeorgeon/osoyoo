@@ -30,7 +30,8 @@ class Workspace:
 
         self.intended_enaction = None
         self.enactions = {}  # The stack of enactions to enact next
-        self.enacted_interaction = {}
+        # self.enacted_interaction = {}
+        self.enacted_enaction = None
 
         self.decider_mode = KEY_DECIDER_USER
         self.engagement_mode = KEY_ENGAGEMENT_ROBOT
@@ -72,7 +73,7 @@ class Workspace:
                     # The most activated decider processes the previous enaction and chooses the next enaction
                     ad = max(self.deciders, key=lambda k: self.deciders[k].activation_level())
                     print("Activated decider:", ad)
-                    self.enactions[self.clock] = self.deciders[ad].propose_intended_enaction(self.enacted_interaction)
+                    self.enactions[self.clock] = self.deciders[ad].propose_intended_enaction(self.enacted_enaction)
                     # TODO Manage the enacted_interaction after imagining
 
                 # Case DECIDER_KEY_USER is handled by self.process_user_key()
@@ -109,7 +110,8 @@ class Workspace:
             # Restore the memory from the snapshot and integrate the experiences
             self.memory = self.memory_snapshot
             # Update body memory and egocentric memory
-            self.memory.update_and_add_experiences(self.enacted_interaction)
+            # self.memory.update_and_add_experiences(self.enacted_interaction)
+            self.memory.update_and_add_experiences(self.enacted_enaction)
 
             # Call the integrator to create and update the phenomena
             # Currently we don't create phenomena in imaginary mode
@@ -119,7 +121,7 @@ class Workspace:
             self.memory.update_allocentric(self.clock)
 
             # Increment the clock if the enacted interaction was properly received
-            if self.enacted_interaction['clock'] >= self.clock:  # don't increment if the robot is behind
+            if self.enacted_enaction.clock >= self.clock:  # don't increment if the robot is behind
                 # Remove the enaction from the stack (ok if it has already been removed)
                 self.enactions.pop(self.clock, None)
                 # Increment the clock
