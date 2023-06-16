@@ -36,22 +36,17 @@ class CtrlRobot:
 
     def main(self, dt):
         """The main handler of the communication to and from the robot."""
-        # if INTENDING then send the interaction to the robot
+        # If INTENDING then send the interaction to the robot
         if self.workspace.interaction_step == INTERACTION_STEP_INTENDING:
             self.workspace.interaction_step = INTERACTION_STEP_ENACTING
-            self.send_enaction_to_robot(self.workspace.intended_enaction)
+            self.send_enaction_to_robot()
 
         # While the robot is enacting the interaction, check for the outcome
         if self.workspace.interaction_step == INTERACTION_STEP_ENACTING and not self.workspace.is_imagining:
-            # if self.enact_step == ENACT_STEP_ENACTING:
             if time.time() < self.expected_outcome_time:
+                outcome = None
                 try:
-                    outcome, address = self.socket.recvfrom(512)
-                    print()
-                    print("Receive:", outcome)
-                    # Short outcome are for debug
-                    if outcome is not None and len(outcome) > 100:  # Sometimes it receives a None outcome. I don't know why
-                        self.send_enacted_interaction_to_workspace(outcome)
+                    outcome, _ = self.socket.recvfrom(512)
                 except socket.timeout:   # Time out error if outcome not yet received
                     print(".", end='')
                 except OSError as e:
@@ -59,26 +54,34 @@ class CtrlRobot:
                         print(".", end='')
                     else:
                         print(e)
+                if outcome is not None:  # Sometimes it receives a None outcome. I don't know why
+                    print()
+                    print("Receive:", outcome)
+                    # Short outcome are for debug
+                    if len(outcome) > 100:
+                        self.send_enacted_interaction_to_workspace(outcome)
             else:
                 # Timeout: resend the enaction
                 self.workspace.memory = self.workspace.memory_snapshot
                 self.workspace.interaction_step = INTERACTION_STEP_IDLE
                 print("Timeout")
 
-    def send_enaction_to_robot(self, enaction):
+    def send_enaction_to_robot(self):
         """Send the enaction string to the robot and set the timeout"""
-        enaction_string = enaction.serialize()
-        print("Sending: " + enaction_string)
+        enaction_string = self.workspace.intended_enaction.serialize()
+        print("Sending:", enaction_string)
 
         # Send the intended interaction string to the robot
         self.socket.sendto(bytes(enaction_string, 'utf-8'), (self.robot_ip, self.port))
 
         # Initialize the timeout
-        self.expected_outcome_time = time.time() + enaction.timeout()
+        self.expected_outcome_time = time.time() + self.workspace.intended_enaction.timeout()
 
     def send_enacted_interaction_to_workspace(self, outcome):
         """ Computes the enacted interaction from the robot's outcome data."""
         enacted_interaction = json.loads(outcome)
+
+        # enacted_enaction = Enaction()
 
         enacted_interaction[KEY_EXPERIENCES] = []
 
@@ -94,9 +97,12 @@ class CtrlRobot:
             yaw = enacted_interaction['yaw']
         else:
             enacted_interaction['yaw'] = yaw
+        self.workspace.intended_enaction.yaw = yaw
 
         # If the robot does not return the azimuth then return 0. The azimuth will be computed by BodyMemory
-        if 'azimuth' not in enacted_interaction:
+        if 'azimuth' in enacted_interaction:
+            self.workspace.intended_enaction.azimuth = enacted_interaction['azimuth']
+        else:
             enacted_interaction['azimuth'] = 0
 
         # If the robot returns compass_x and compass_y then recompute the azimuth
@@ -109,6 +115,7 @@ class CtrlRobot:
             # The compass point indicates the south so we must rotate it of 180° to obtain the azimuth
             azimuth = round(azimuth + 180) % 360
             enacted_interaction['azimuth'] = azimuth
+            self.workspace.intended_enaction.azimuth = azimuth
 
         # Interaction Floor line
         if enacted_interaction['floor'] > 0:
@@ -126,7 +133,15 @@ class CtrlRobot:
                 translation += [-RETREAT_DISTANCE, 0, 0]
                 experience_x, experience_y = LINE_X, 0
             # Place the experience point
-            enacted_interaction[KEY_EXPERIENCES].append((EXPERIENCE_FLOOR, LINE_X, experience_y))
+            point = (EXPERIENCE_FLOOR, LINE_X, experience_y)
+            enacted_interaction[KEY_EXPERIENCES].append(point)
+            self.workspace.intended_enaction.enacted_points.append(point)
+            # floor_experience = Experience(experience_x, experience_y, EXPERIENCE_FLOOR, body_direction_rad,
+            #                               enacted_interaction["clock"],
+            #                               experience_id=self.experience_id,
+            #                               durability=EXPERIENCE_PERSISTENCE,
+            #                               color_index=color_index)
+            # self.workspace.intended_enaction.enacted_experiences.append(floor_experience)
 
         # Interaction ECHO
         if enacted_interaction['echo_distance'] < 10000:
@@ -138,6 +153,7 @@ class CtrlRobot:
             enacted_interaction[KEY_EXPERIENCES].append((EXPERIENCE_ALIGNED_ECHO, *echo_point))
             # Return the echo_xy to possibly use as focus
             enacted_interaction['echo_xy'] = echo_point
+            self.workspace.intended_enaction.echo_point = echo_point
 
         # Interaction impact
         # (The forward translation is already correct since it is integrated during duration1)
@@ -186,7 +202,6 @@ class CtrlRobot:
                 enacted_interaction[KEY_EXPERIENCES].append((EXPERIENCE_LOCAL_ECHO, tmp_x, tmp_y))
         # print(enacted_interaction)
 
-        # self.workspace.update_enacted_interaction(enacted_interaction)
         self.workspace.enacted_interaction = enacted_interaction
         self.workspace.intended_enaction = None
         self.workspace.interaction_step = INTERACTION_STEP_INTEGRATING

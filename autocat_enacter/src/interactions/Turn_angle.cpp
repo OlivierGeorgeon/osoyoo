@@ -21,6 +21,7 @@ Turn_angle::Turn_angle(
   JSONVar json_action) :
   Interaction(FCR, HEA, IMU, WifiCat, json_action)
 {
+  // _robot_destination_angle = target_angle;
 }
 
 // STEP 0: Start the interaction
@@ -28,7 +29,7 @@ Turn_angle::Turn_angle(
 void Turn_angle::begin()
 {
   _action_end_time = millis() + 5000;
-  // _robot_destination_angle = _target_angle;
+  _robot_destination_angle = _target_angle;
   Serial.println("Begin align robot angle : " + String(_robot_destination_angle));
   _HEA._next_saccade_time = _action_end_time - SACCADE_DURATION;  // Inhibit HEA during the interaction
   if (_robot_destination_angle < - TURN_SPOT_ENDING_ANGLE)

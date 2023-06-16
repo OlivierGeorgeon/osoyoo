@@ -81,13 +81,12 @@ class DeciderCircle:
             # See https://pythonguides.com/python-find-max-value-in-a-dictionary/
             self._action = max(proclivity_dict, key=proclivity_dict.get)
 
-        """ Computing the anticipation """
         # TODO compute the anticipated outcome
         self.anticipated_outcome = OUTCOME_DEFAULT
+        ii = Interaction.create_or_retrieve(self._action, self.anticipated_outcome)
 
         # The intended enaction
-        ii = Interaction.create_or_retrieve(self._action, self.anticipated_outcome)
-        return Enaction(ii, self.workspace.clock, self.workspace.memory.egocentric_memory.focus_point, None)
+        return Enaction(self._action, self.workspace.clock, self.workspace.memory.egocentric_memory.focus_point, None)
 
     def outcome(self, enacted_interaction):
         """ Convert the enacted interaction into an outcome adapted to the circle behavior """

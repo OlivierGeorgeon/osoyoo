@@ -138,11 +138,11 @@ class Workspace:
         elif user_key.upper() in ACTIONS:
             # Only process actions when the robot is IDLE
             if self.interaction_step == INTERACTION_STEP_IDLE:
-                ii = Interaction.create_or_retrieve(self.actions[user_key.upper()], OUTCOME_DEFAULT)
-                self.enactions[self.clock] = Enaction(ii, self.clock, self.memory.egocentric_memory.focus_point, self.memory.egocentric_memory.prompt_point)
+                # ii = Interaction.create_or_retrieve(self.actions[user_key.upper()], OUTCOME_DEFAULT)
+                self.enactions[self.clock] = Enaction(self.actions[user_key.upper()], self.clock, self.memory.egocentric_memory.focus_point, self.memory.egocentric_memory.prompt_point)
                 if user_key.upper() == ACTION_ALIGN_ROBOT and self.memory.egocentric_memory.prompt_point is not None:
-                    ii2 = Interaction.create_or_retrieve(self.actions[ACTION_FORWARD], OUTCOME_DEFAULT)
-                    self.enactions[self.clock + 1] = Enaction(ii2, self.clock + 1, self.memory.egocentric_memory.focus_point, self.memory.egocentric_memory.prompt_point)
+                    # ii2 = Interaction.create_or_retrieve(self.actions[ACTION_FORWARD], OUTCOME_DEFAULT)
+                    self.enactions[self.clock + 1] = Enaction(self.actions[ACTION_FORWARD], self.clock + 1, self.memory.egocentric_memory.focus_point, self.memory.egocentric_memory.prompt_point)
         elif user_key.upper() == KEY_CLEAR:
             # Clear the stack of enactions
             playsound('autocat/Assets/R3.wav', False)

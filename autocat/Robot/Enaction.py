@@ -14,9 +14,9 @@ SIMULATION_STEP_ON = 1  # More step will be used to take wifi transmission time 
 
 
 class Enaction:
-    def __init__(self, interaction, clock, focus_point, prompt_point):
+    def __init__(self, action, clock, focus_point, prompt_point):
         # The intended enaction
-        self.interaction = interaction
+        self.action = action
         self.clock = clock
         self.focus_point = None
         if focus_point is not None:
@@ -24,24 +24,24 @@ class Enaction:
         self.duration = None
         self.angle = None
         if prompt_point is not None:
-            if self.interaction.action.action_code in [ACTION_FORWARD, ACTION_BACKWARD]:
+            if self.action.action_code in [ACTION_FORWARD, ACTION_BACKWARD]:
                 self.duration = int(np.linalg.norm(prompt_point) /
-                                    math.fabs(self.interaction.action.translation_speed[0]) * 1000)
-            if self.interaction.action.action_code in [ACTION_LEFTWARD, ACTION_RIGHTWARD]:
+                                    math.fabs(self.action.translation_speed[0]) * 1000)
+            if self.action.action_code in [ACTION_LEFTWARD, ACTION_RIGHTWARD]:
                 self.duration = int(np.linalg.norm(prompt_point) /
-                                    math.fabs(self.interaction.action.translation_speed[1]) * 1000)
-            if self.interaction.action.action_code in [ACTION_ALIGN_ROBOT,ACTION_TURN_HEAD]:
+                                    math.fabs(self.action.translation_speed[1]) * 1000)
+            if self.action.action_code in [ACTION_ALIGN_ROBOT, ACTION_TURN_HEAD]:
                 self.angle = int(math.degrees(math.atan2(prompt_point[1], prompt_point[0])))
-            if (self.interaction.action.action_code == ACTION_TURN_RIGHT) and prompt_point[1] < 0:
+            if (self.action.action_code == ACTION_TURN_RIGHT) and prompt_point[1] < 0:
                 self.angle = int(math.degrees(math.atan2(prompt_point[1], prompt_point[0])))
-            if (self.interaction.action.action_code == ACTION_TURN_LEFT) and prompt_point[1] > 0:
+            if (self.action.action_code == ACTION_TURN_LEFT) and prompt_point[1] > 0:
                 self.angle = int(math.degrees(math.atan2(prompt_point[1], prompt_point[0])))
         else:
             # Default backward 0.5s
-            if self.interaction.action.action_code in [ACTION_BACKWARD]:
+            if self.action.action_code in [ACTION_BACKWARD]:
                 self.duration = 500
-            # Default forward 1.5s
-            if self.interaction.action.action_code in [ACTION_LEFTWARD, ACTION_RIGHTWARD]:
+            # Default sidewards 1.5s
+            if self.action.action_code in [ACTION_LEFTWARD, ACTION_RIGHTWARD]:
                 self.duration = 1500
 
         # The simulation of the enaction in memory
@@ -52,10 +52,10 @@ class Enaction:
 
         # The enacted enaction (not used yet)
         self.status = None
-        self.enacted_experiences = []
+        self.enacted_points = []
         self.yaw = 0
         self.azimuth = None
-        self.compass_point = None
+        # self.compass_point = None
         self.echo_point = None
         self.head_angle = 0
         self.translation = np.array([0, 0, 0], dtype=float)
@@ -65,7 +65,7 @@ class Enaction:
 
     def serialize(self):
         """Return the serial representation to send to the robot"""
-        serial = {'clock': self.clock, 'action': self.interaction.action.action_code}
+        serial = {'clock': self.clock, 'action': self.action.action_code}
         if self.duration is not None:
             serial['duration'] = self.duration
         if self.angle is not None:
@@ -73,14 +73,14 @@ class Enaction:
         if self.focus_point is not None:
             serial['focus_x'] = int(self.focus_point[0])  # Convert to python int
             serial['focus_y'] = int(self.focus_point[1])
-        if self.interaction.action.action_code == ACTION_FORWARD:
-            serial['speed'] = int(self.interaction.action.translation_speed[0])
-        if self.interaction.action.action_code == ACTION_BACKWARD:
-            serial['speed'] = -int(self.interaction.action.translation_speed[0])
-        if self.interaction.action.action_code == ACTION_LEFTWARD:
-            serial['speed'] = int(self.interaction.action.translation_speed[1])
-        if self.interaction.action.action_code == ACTION_RIGHTWARD:
-            serial['speed'] = -int(self.interaction.action.translation_speed[1])
+        if self.action.action_code == ACTION_FORWARD:
+            serial['speed'] = int(self.action.translation_speed[0])
+        if self.action.action_code == ACTION_BACKWARD:
+            serial['speed'] = -int(self.action.translation_speed[0])
+        if self.action.action_code == ACTION_LEFTWARD:
+            serial['speed'] = int(self.action.translation_speed[1])
+        if self.action.action_code == ACTION_RIGHTWARD:
+            serial['speed'] = -int(self.action.translation_speed[1])
         return json.dumps(serial)
 
     def timeout(self):
@@ -96,14 +96,14 @@ class Enaction:
         """Initialize the simulation of the intended interaction"""
         self.simulation_step = SIMULATION_STEP_ON
         # Compute the duration and the speed depending and the enaction
-        self.simulation_duration = self.interaction.action.target_duration
-        self.simulation_rotation_speed = self.interaction.action.rotation_speed_rad
+        self.simulation_duration = self.action.target_duration
+        self.simulation_rotation_speed = self.action.rotation_speed_rad
         if self.duration is not None:
             self.simulation_duration = self.duration / 1000
         if self.angle is not None:
             self.simulation_duration = math.fabs(self.angle) * TURN_DURATION / DEFAULT_YAW
-            if self.angle < 0 and self.interaction.action.action_code != ACTION_TURN_RIGHT:  # TODO fix turn right with prompt
-                self.simulation_rotation_speed = -self.interaction.action.rotation_speed_rad
+            if self.angle < 0 and self.action.action_code != ACTION_TURN_RIGHT:  # TODO fix turn right with prompt
+                self.simulation_rotation_speed = -self.action.rotation_speed_rad
         self.simulation_duration *= SIMULATION_TIME_RATIO
         self.simulation_rotation_speed *= SIMULATION_TIME_RATIO
 
@@ -117,7 +117,7 @@ class Enaction:
             return False
 
         # Simulate the displacement in egocentric memory
-        translation_matrix = matrix44.create_from_translation(-self.interaction.action.translation_speed * dt *
+        translation_matrix = matrix44.create_from_translation(-self.action.translation_speed * dt *
                                                               SIMULATION_TIME_RATIO)
         rotation_matrix = matrix44.create_from_z_rotation(self.simulation_rotation_speed * dt)
         displacement_matrix = matrix44.multiply(rotation_matrix, translation_matrix)
@@ -133,7 +133,7 @@ class Enaction:
         # Displacement in body memory
         memory.body_memory.body_direction_rad += self.simulation_rotation_speed * dt
         # Update allocentric memory
-        memory.allocentric_memory.robot_point += rotate_vector_z(self.interaction.action.translation_speed * dt *
+        memory.allocentric_memory.robot_point += rotate_vector_z(self.action.translation_speed * dt *
                                                                  SIMULATION_TIME_RATIO,
                                                                  memory.body_memory.body_direction_rad)
         memory.allocentric_memory.place_robot(memory.body_memory, self.clock)
@@ -142,7 +142,7 @@ class Enaction:
 
     def body_label(self):
         """Return the label to display in the body view"""
-        rotation_speed = "{:.2f}".format(math.degrees(self.interaction.action.rotation_speed_rad))
-        label = "Speed x: " + str(int(self.interaction.action.translation_speed[0])) + "mm/s, y: " \
-            + str(int(self.interaction.action.translation_speed[1])) + "mm/s, rotation:" + rotation_speed + "°/s"
+        rotation_speed = "{:.2f}".format(math.degrees(self.action.rotation_speed_rad))
+        label = "Speed x: " + str(int(self.action.translation_speed[0])) + "mm/s, y: " \
+            + str(int(self.action.translation_speed[1])) + "mm/s, rotation:" + rotation_speed + "°/s"
         return label

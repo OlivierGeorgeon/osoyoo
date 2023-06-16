@@ -16,7 +16,7 @@ public:
   void begin() override;
   void ongoing() override;
 private:
-  int _robot_destination_angle;
+//  int _robot_destination_angle;
 };
 
 #endif

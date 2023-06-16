@@ -182,8 +182,10 @@ class DeciderExplore:
         if self.exploration_step == EXPLORATION_STEP_ROTATE:
             action = self.workspace.actions[ACTION_ALIGN_ROBOT]
             self.exploration_step = EXPLORATION_STEP_FORWARD
+
+        # TODO compute the anticipated outcome
         ii = Interaction.create_or_retrieve(action, self.anticipated_outcome)
         self._action = action  # For debug
 
-        return Enaction(ii, self.workspace.clock, self.workspace.memory.egocentric_memory.focus_point,
+        return Enaction(action, self.workspace.clock, self.workspace.memory.egocentric_memory.focus_point,
                         self.workspace.memory.egocentric_memory.prompt_point)

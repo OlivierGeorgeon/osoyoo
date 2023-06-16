@@ -24,9 +24,7 @@
 
 #include <Arduino_JSON.h>
 #include "src/wifi/WifiCat.h"
-//#include "src/steps/Step0.h"
 #include "Action_define.h"
-//#include "Color.h"
 #include "Floor.h"
 #include "Head.h"
 #include "Imu.h"
@@ -35,18 +33,14 @@
 #include "Robot_define.h"
 #include "Sequencer.h"
 
-// Wheel OWM;
-// Floor FCR(OWM);
 Floor FLO;
 Head HEA;
 Imu IMU;
 WifiCat WifiCat;
 Led LED;
-//Color CLR;
 Sequencer SEQ(FLO, HEA, IMU, WifiCat);
 
 int interaction_step = 0;
-// int previous_clock = -1;
 Interaction* INT  = nullptr;  // The interaction type will depend on the action received from the PC
 
 void setup()

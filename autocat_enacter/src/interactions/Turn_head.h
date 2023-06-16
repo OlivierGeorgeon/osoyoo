@@ -17,7 +17,7 @@ public:
   void begin() override;
   void ongoing() override;
 private:
-  int _target_angle;
+//  int _target_angle;
 };
 
 #endif
