@@ -11,8 +11,8 @@
 class Turn_right : public Interaction
 {
 public:
-  Turn_right(Color& CLR, Floor& FCR, Head& HEA, Imu& IMU, WifiCat& WifiCat, unsigned long action_end_time, char action,
-  int clock, bool is_focussed, int focus_x, int focus_y, int focus_speed, int _target_angle, int _target_focus_angle);
+  Turn_right(Floor& FCR, Head& HEA, Imu& IMU, WifiCat& WifiCat, JSONVar json_action);
+  // unsigned long action_end_time, char action, int clock, bool is_focussed, int focus_x, int focus_y, int focus_speed, int _target_angle, int _target_focus_angle);
   void begin() override;
   void ongoing() override;
 private:

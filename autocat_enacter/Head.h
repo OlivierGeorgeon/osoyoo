@@ -3,13 +3,13 @@
   Created by Olivier Georgeon, june 20 2021
   released into the public domain
 */
+
 #ifndef Head_h
 #define Head_h
 #include "Arduino.h"
 #include <Servo.h>
 #include <Arduino_JSON.h>
 
-//#define SERVO_PIN   13  //servo connect to D5. Now defined in Robot_define.h
 #define Echo_PIN    31  // Ultrasonic Echo pin connect to A5
 #define Trig_PIN    30  // Ultrasonic Trig pin connect to A4
 
@@ -21,7 +21,8 @@
 #define ECHO_MONITOR_VARIATION 50 // (mm) The measure threshold to trigger head alignment
 #define NO_ECHO_DISTANCE 10000    // (mm) Default distance when no echo
 
-struct significant_array {
+struct significant_array
+{
     // Struct to store the angles and the corresponding measures,
     // and booleans to indicate if the measure are significant
     int distances[180/SCAN_SACCADE_SPAN]{0};
@@ -29,6 +30,7 @@ struct significant_array {
     bool sign[180/SCAN_SACCADE_SPAN]{false};
     int size = 180/SCAN_SACCADE_SPAN;
 };
+
 class Head
 {
   public:

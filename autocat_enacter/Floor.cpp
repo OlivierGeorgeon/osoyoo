@@ -13,7 +13,8 @@
 #define sensor4   A1 // 2nd right sensor
 #define sensor5   A0 // Right most sensor
 
-Floor::Floor(Wheel& OWM) : _OWM(OWM)
+// Floor::Floor(Wheel& OWM) : _OWM(OWM)
+Floor::Floor()
 {
   //_OWM = OWM;
   _is_enacting = false;
@@ -21,6 +22,12 @@ Floor::Floor(Wheel& OWM) : _OWM(OWM)
   _floor_change_retreat_end_time = 0;
   _floor_outcome = 0;
   // _debug_message = "";
+}
+
+void Floor::setup()
+{
+  _OWM.setup();
+  _CLR.setup();
 }
 
 int Floor::update()
@@ -109,6 +116,7 @@ int Floor::measureFloor()
 void Floor::outcome(JSONVar & outcome_object)
 {
   outcome_object["floor"] = _floor_outcome;
+  _CLR.outcome(outcome_object);
   // outcome_object["debug"] = _debug_message;
   // _debug_message = "";
   _floor_outcome = 0;

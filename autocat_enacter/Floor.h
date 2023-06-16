@@ -8,6 +8,7 @@
 
 #include "Arduino.h"
 #include "Wheel.h"
+#include "Color.h"
 #include <Arduino_JSON.h>
 
 #define RETREAT_DURATION 200
@@ -16,7 +17,9 @@
 class Floor
 {
   public:
-    Floor(Wheel& _OWM);  // The Wheel object is passed by reference to avoid creating another instance
+    //Floor(Wheel& _OWM);  // The Wheel object is passed by reference to avoid creating another instance
+    Floor();  // The Wheel object is passed by reference to avoid creating another instance
+    void setup();
     int update();
     int measureFloor();
     void extraDuration(int duration);
@@ -24,9 +27,9 @@ class Floor
     void outcome(JSONVar & outcome_object);
     int _floor_outcome;
     // String _debug_message;
-    Wheel& _OWM;
+    Wheel _OWM;
+    Color _CLR;
   private:
-    // Wheel& _OWM;
     int _previous_measure_floor;
     unsigned long _floor_change_retreat_end_time;
 };

@@ -11,8 +11,8 @@
 class Scan : public Interaction
 {
 public:
-  Scan(Color& CLR, Floor& FCR, Head& HEA, Imu& IMU, WifiCat& WifiCat, unsigned long action_end_time, char action, int clock,
-  bool is_focussed, int focus_x, int focus_y, int focus_speed);
+  Scan(Floor& FCR, Head& HEA, Imu& IMU, WifiCat& WifiCat, JSONVar json_action);
+  // unsigned long action_end_time, char action, int clock, bool is_focussed, int focus_x, int focus_y, int focus_speed);
   void begin() override;
   void ongoing() override;
 private:

@@ -24,26 +24,29 @@
 
 #include <Arduino_JSON.h>
 #include "src/wifi/WifiCat.h"
-#include "src/steps/Step0.h"
+//#include "src/steps/Step0.h"
 #include "Action_define.h"
-#include "Color.h"
-#include "Floor.h"  // imports "Wheel.h"
+//#include "Color.h"
+#include "Floor.h"
 #include "Head.h"
 #include "Imu.h"
 #include "Interaction.h"
 #include "Led.h"
 #include "Robot_define.h"
+#include "Sequencer.h"
 
-Wheel OWM;
-Floor FCR(OWM);
+// Wheel OWM;
+// Floor FCR(OWM);
+Floor FLO;
 Head HEA;
 Imu IMU;
 WifiCat WifiCat;
 Led LED;
-Color CLR;
+//Color CLR;
+Sequencer SEQ(FLO, HEA, IMU, WifiCat);
 
 int interaction_step = 0;
-int previous_clock = -1;
+// int previous_clock = -1;
 Interaction* INT  = nullptr;  // The interaction type will depend on the action received from the PC
 
 void setup()
@@ -59,10 +62,12 @@ void setup()
 
   // Initialize the automatic behaviors
 
-  OWM.setup();
+  FLO.setup();
   Serial.println("Wheels initialized");
+
   HEA.setup();
   Serial.println("Head initialized");
+
   IMU.setup();
   // Setup the imu twice otherwise the calibration is wrong. I don't know why.
   // Probably something to do with the order in which the imu registers are written.
@@ -71,11 +76,11 @@ void setup()
   delay(100);
   IMU.setup();
   Serial.println("IMU initialized");
-  CLR.setup();
-  Serial.println("Color sensor initialized");
+  //CLR.setup();
+  // Serial.println("Color sensor initialized");
   Serial.println("--- Robot initialized ---");
 
-  // Initialize PIN 13 LED for debugging
+  // Initialize built-in LED for debugging
 
   pinMode(LED_BUILTIN, OUTPUT);
 }
@@ -88,7 +93,7 @@ void loop()
 
   // Behavior Floor Change Retreat
 
-  FCR.update();
+  FLO.update();
 
   // Behavior Head Echo Alignment
 
@@ -101,7 +106,8 @@ void loop()
   // Watch for message received from PC. If yes, starts the interaction
 
   if (interaction_step == INTERACTION_DONE)
-    Step0();
+    //Step0();
+    INT = SEQ.update(interaction_step, INT);
 
   // Update the current interaction and return INTERACTION_DONE when done
 

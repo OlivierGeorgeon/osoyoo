@@ -26,10 +26,13 @@ void Color::setup()
   digitalWrite(Led_PIN, LOW);
 
   // Initialize the sensor
-  if (tcs.begin()) {
+  if (tcs.begin())
+  {
     Serial.println("Color sensor initialized");
     is_initialized = true;
-  } else {
+  }
+  else
+  {
     Serial.println("No TCS34725 found ... check your connections");
     is_initialized = false;
     //while (1); // halt!
@@ -39,7 +42,8 @@ void Color::setup()
 // Read the sensor
 void Color::read()
 {
-  if (is_initialized){
+  if (is_initialized)
+  {
     // Switch the LED on
     digitalWrite(Led_PIN, HIGH);
 
@@ -55,7 +59,8 @@ void Color::read()
 void Color::outcome(JSONVar & outcome_object)
 {
 
-  if (is_initialized){
+  if (is_initialized)
+  {
     // Scale the measure
     //red = constrain(red, 90, 190);
     //red = map(red, 90, 190, 0, 255);
@@ -69,9 +74,10 @@ void Color::outcome(JSONVar & outcome_object)
     int green;
     int blue;
 
-    if (c == 0) {
+    if (c == 0)
       red = green = blue = 0;
-    } else {
+    else
+    {
       red = (int)((float)r / (float)c * 255.0);
       green = (int)((float)g / (float)c * 255.0);
       blue = (int)((float)b / (float)c * 255.0);

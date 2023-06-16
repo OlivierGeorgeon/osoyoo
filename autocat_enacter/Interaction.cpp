@@ -13,31 +13,53 @@
 #include "Action_define.h"
 
 Interaction::Interaction(
-  Color& CLR,
   Floor& FCR,
   Head& HEA,
   Imu& IMU,
   WifiCat& WifiCat,
-  unsigned long action_end_time,
-  char action,
-  int clock,
-  bool is_focussed,
-  int focus_x,
-  int focus_y,
-  int focus_speed
-  ) :
-  _CLR(CLR), _FCR(FCR), _HEA(HEA), _IMU(IMU), _WifiCat(WifiCat)
+  JSONVar json_action) :
+  // unsigned long action_end_time, char action, int clock, bool is_focussed, int focus_x, int focus_y, int focus_speed ) :
+  _FCR(FCR), _HEA(HEA), _IMU(IMU), _WifiCat(WifiCat)
 {
-  _step = INTERACTION_BEGIN;
-  _status = "0";
+  // The received string must contain the action
+  _action = ((const char*) json_action["action"])[0];
+
+  // The received string must contain the clock
+  _clock = (int)json_action["clock"];
+
+  // The target angle used if there is no focus
+  if (json_action.hasOwnProperty("angle"))
+    _target_angle = (int)json_action["angle"];
+
+  // The focus point
+  if (json_action.hasOwnProperty("focus_x"))
+  {
+    _focus_x = (int)json_action["focus_x"];
+    _focus_y = (int)json_action["focus_y"];
+    _target_focus_angle = atan2(_focus_y, _focus_x) * 180.0 / M_PI; // Direction of the focus relative to the robot
+    _is_focussed = true;
+  }
+  else
+    _is_focussed = false;
+
+  if (json_action.hasOwnProperty("speed"))
+    _focus_speed = (int)json_action["speed"]; // Must be positive otherwise multiplication with unsigned long fails
+
+  // The target duration used if there is no focus
+  if (json_action.hasOwnProperty("duration"))
+    _target_duration = (int)json_action["duration"];
+
   _action_start_time = millis();
-  _action_end_time = action_end_time;
-  _action = action;
-  _clock = clock;
-  _is_focussed = is_focussed;
-  _focus_x = focus_x;
-  _focus_y = focus_y;
-  _focus_speed = focus_speed;
+  // _action_end_time = action_end_time;
+  _action_end_time = _action_start_time + _target_duration;
+  // _action = action;
+  // _clock = clock;
+  // _is_focussed = is_focussed;
+  // _focus_x = focus_x;
+  // _focus_y = focus_y;
+  // _focus_speed = focus_speed;
+
+  _status = "0";
   _step = INTERACTION_BEGIN;
 }
 
@@ -58,10 +80,10 @@ void Interaction::ongoing()
 void Interaction::terminate()
 {
   // Serial.println("Interaction.step2()");
-  if (_action_end_time < millis() &&  !_FCR._is_enacting && !_HEA._is_enacting_head_alignment /*&& !HECS._is_enacting_echo_scan*/)
+  if (_action_end_time < millis() &&  !_FCR._is_enacting && !_HEA._is_enacting_head_alignment)
   {
     // Read the floor color
-    _CLR.read();
+    _FCR._CLR.read();
     // Proceed to step 3
     _step = INTERACTION_SEND;
   }
@@ -77,7 +99,7 @@ void Interaction::send()
   outcome_object["status"] = _status;
   outcome_object["action"] = String(_action);
   outcome_object["clock"] = _clock;
-  _CLR.outcome(outcome_object);
+  // _CLR.outcome(outcome_object);
   _FCR.outcome(outcome_object);
   _HEA.outcome(outcome_object);
   _HEA.outcome_complete(outcome_object);
@@ -119,8 +141,3 @@ int Interaction::update()
 
   return _step;
 }
-
-//int Interaction::getStep()
-//{
-//  return _step;
-//}

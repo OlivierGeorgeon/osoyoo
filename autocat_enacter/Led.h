@@ -9,12 +9,12 @@
 
 class Led
 {
-  public:
-    Led();
-    void blink();
-  private:
-    unsigned long blink_end_time = 0;
-    bool blink_on = true;
+public:
+  Led();
+  void blink();
+private:
+  unsigned long blink_end_time = 0;
+  bool blink_on = true;
 };
 
 #endif

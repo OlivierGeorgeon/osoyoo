@@ -15,23 +15,13 @@
 #include "Turn_head.h"
 
 Turn_head::Turn_head(
-  Color& CLR,
   Floor& FCR,
   Head& HEA,
   Imu& IMU,
   WifiCat& WifiCat,
-  unsigned long action_end_time,
-  char action,
-  int clock,
-  bool is_focussed,
-  int focus_x,
-  int focus_y,
-  int focus_speed,
-  int target_angle
-  ) :
-  Interaction(CLR, FCR, HEA, IMU, WifiCat, action_end_time, action, clock, is_focussed, focus_x, focus_y, focus_speed)
+  JSONVar json_action) :
+  Interaction(FCR, HEA, IMU, WifiCat, json_action)
 {
-  _target_angle = target_angle;
 }
 
 // STEP 0: Start the interaction
