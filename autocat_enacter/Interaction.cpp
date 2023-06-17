@@ -12,13 +12,7 @@
 #include "Interaction.h"
 #include "Action_define.h"
 
-Interaction::Interaction(
-  Floor& FCR,
-  Head& HEA,
-  Imu& IMU,
-  WifiCat& WifiCat,
-  JSONVar json_action) :
-  // unsigned long action_end_time, char action, int clock, bool is_focussed, int focus_x, int focus_y, int focus_speed ) :
+Interaction::Interaction(Floor& FCR, Head& HEA, Imu& IMU, WifiCat& WifiCat, JSONVar json_action) :
   _FCR(FCR), _HEA(HEA), _IMU(IMU), _WifiCat(WifiCat)
 {
   // The received string must contain the action
@@ -50,15 +44,7 @@ Interaction::Interaction(
     _target_duration = (int)json_action["duration"];
 
   _action_start_time = millis();
-  // _action_end_time = action_end_time;
   _action_end_time = _action_start_time + _target_duration;
-  // _action = action;
-  // _clock = clock;
-  // _is_focussed = is_focussed;
-  // _focus_x = focus_x;
-  // _focus_y = focus_y;
-  // _focus_speed = focus_speed;
-
   _status = "0";
   _step = INTERACTION_BEGIN;
 }
@@ -69,6 +55,10 @@ void Interaction::begin()
 }
 
 void Interaction::ongoing()
+{
+}
+
+void Interaction::outcome(JSONVar & outcome_object)
 {
 }
 
@@ -99,15 +89,15 @@ void Interaction::send()
   outcome_object["status"] = _status;
   outcome_object["action"] = String(_action);
   outcome_object["clock"] = _clock;
-  // _CLR.outcome(outcome_object);
   _FCR.outcome(outcome_object);
   _HEA.outcome(outcome_object);
-  _HEA.outcome_complete(outcome_object);
   _IMU.outcome(outcome_object, _action);
 
-  // HECS.outcome(outcome_object);
   outcome_object["duration1"] = _duration1;
   outcome_object["duration"] = millis() - _action_start_time;
+
+  // The outcome for the specific interaction subclass
+  outcome(outcome_object);
 
   // Send the outcome to the PC
   String outcome_json_string = JSON.stringify(outcome_object);

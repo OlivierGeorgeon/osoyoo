@@ -66,6 +66,10 @@ class DeciderExplore:
         """ Convert the enacted interaction into an outcome adapted to the explore behavior """
         outcome = OUTCOME_DEFAULT
 
+        # On startup return DEFAULT
+        if enacted_enaction is None:
+            return outcome
+
         # Look for color place experience
         for e in [e for e in self.workspace.memory.egocentric_memory.experiences.values() if e.type == EXPERIENCE_PLACE and e.clock == enacted_enaction.clock and e.color_index > 0]:
             outcome = OUTCOME_COLOR

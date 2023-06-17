@@ -198,8 +198,6 @@ void Imu::outcome(JSONVar & outcome_object, char action)
   // outcome_object["distance"] = (int) _xDistance;
 
   #endif
-  //outcome_object["debug"] = _debug_message;
-  //_debug_message = "";
 
   #if ROBOT_COMPASS_TYPE > 0
   read_azimuth(outcome_object);

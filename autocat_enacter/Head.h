@@ -17,6 +17,8 @@
 #define ALIGN_SACCADE_SPAN 10     // (degrees)
 #define SCAN_SACCADE_SPAN 40      // (degrees) For full scan followed by head alignment
 // #define SCAN_SACCADE_SPAN 10   // (degrees) For complete-scan
+#define SCAN_SIZE 5               // Size of the array of scans
+// #define SCAN_SIZE 18           // Size of the array of scans for complete scan
 #define ECHO_MONITOR_PERIOD 500   // (ms) The period for checking whether to trigger head alignment
 #define ECHO_MONITOR_VARIATION 50 // (mm) The measure threshold to trigger head alignment
 #define NO_ECHO_DISTANCE 10000    // (mm) Default distance when no echo
@@ -25,10 +27,10 @@ struct significant_array
 {
     // Struct to store the angles and the corresponding measures,
     // and booleans to indicate if the measure are significant
-    int distances[180/SCAN_SACCADE_SPAN]{0};
-    int angles[180/SCAN_SACCADE_SPAN]{0};
-    bool sign[180/SCAN_SACCADE_SPAN]{false};
-    int size = 180/SCAN_SACCADE_SPAN;
+    int distances[SCAN_SIZE]{0}; // 180/SCAN_SACCADE_SPAN
+    int angles[SCAN_SIZE]{0};
+    bool sign[SCAN_SIZE]{false};
+    int size = SCAN_SIZE;
 };
 
 class Head
@@ -41,7 +43,7 @@ class Head
     void update();
     int measureUltrasonicEcho();
     void outcome(JSONVar & outcome_object);
-    void outcome_complete(JSONVar & outcome_object);
+    void outcome_scan(JSONVar & outcome_object);
     void turnHead(int head_angle);
     int head_direction(int x, int y);
     int get_ultrasonic_measure();

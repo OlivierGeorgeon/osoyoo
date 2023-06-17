@@ -50,6 +50,10 @@ void setup()
   Serial.begin(9600);
   Serial.println("Serial initialized");
 
+  // Initialize built-in LED for debugging
+
+  pinMode(LED_BUILTIN, OUTPUT);
+
   // Connect to the wifi board
 
   WifiCat.begin();
@@ -62,21 +66,12 @@ void setup()
   HEA.setup();
   Serial.println("Head initialized");
 
-  IMU.setup();
+  IMU.setup(); delay(100); IMU.setup(); //delay(100); IMU.setup();
   // Setup the imu twice otherwise the calibration is wrong. I don't know why.
   // Probably something to do with the order in which the imu registers are written.
-  delay(100);
-  IMU.setup();
-  delay(100);
-  IMU.setup();
   Serial.println("IMU initialized");
-  //CLR.setup();
-  // Serial.println("Color sensor initialized");
+
   Serial.println("--- Robot initialized ---");
-
-  // Initialize built-in LED for debugging
-
-  pinMode(LED_BUILTIN, OUTPUT);
 }
 
 void loop()

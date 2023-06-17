@@ -2,9 +2,8 @@ import numpy as np
 from playsound import playsound
 from pyrr import matrix44
 from ...Memory.EgocentricMemory.Experience import Experience, EXPERIENCE_LOCAL_ECHO, EXPERIENCE_CENTRAL_ECHO, \
-    EXPERIENCE_PLACE, category_color
-from ...Robot.CtrlRobot import KEY_EXPERIENCES
-from ...Robot.RobotDefine import ROBOT_COLOR_X, ROBOT_FRONT_X
+    EXPERIENCE_PLACE, EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_IMPACT
+from ...Robot.RobotDefine import ROBOT_COLOR_X, ROBOT_FRONT_X, LINE_X, ROBOT_FRONT_Y, ROBOT_HEAD_X
 from ...Decider.Action import ACTION_SCAN, ACTION_FORWARD, ACTION_BACKWARD, ACTION_LEFTWARD, ACTION_RIGHTWARD
 import math
 import colorsys
@@ -113,58 +112,118 @@ class EgocentricMemory:
             experience.displace(enacted_enaction.displacement_matrix)
 
         # Add the PLACE experience with the sensed color
-        if enacted_enaction.color is not None:
-            color_index = category_color(enacted_enaction.color)
-        else:
-            color_index = 0
-        color_exp = Experience(ROBOT_COLOR_X, 0, EXPERIENCE_PLACE, body_direction_rad, enacted_enaction.clock,
-                               self.experience_id, durability=EXPERIENCE_PERSISTENCE, color_index=color_index)
-        self.experiences[color_exp.id] = color_exp
+        place_exp = Experience(ROBOT_COLOR_X, 0, EXPERIENCE_PLACE, body_direction_rad, enacted_enaction.clock,
+                               self.experience_id, durability=EXPERIENCE_PERSISTENCE,
+                               color_index=enacted_enaction.color_index)
+        self.experiences[place_exp.id] = place_exp
         self.experience_id += 1
 
-        # Create new experiences from points in the enacted_interaction
-        for p in enacted_enaction.enacted_points:
-            experience = Experience(p[1], p[2], p[0], body_direction_rad, enacted_enaction.clock,
-                                    experience_id=self.experience_id, durability=EXPERIENCE_PERSISTENCE,
-                                    color_index=color_index)
-            # new_experiences.append(experience)
-            self.experiences[experience.id] = experience
+        # The FLOOR experience
+        if enacted_enaction.floor > 0:
+            if enacted_enaction.floor == 0b01:
+                # Black line on the right
+                experience_x, experience_y = LINE_X, 0  # 100, 0  # 20
+            elif enacted_enaction.floor == 0b10:
+                # Black line on the left
+                experience_x, experience_y = LINE_X, 0  # 100, 0  # -20
+            else:
+                # Black line on the front
+                experience_x, experience_y = LINE_X, 0
+            # Place the experience point
+            floor_exp = Experience(experience_x, experience_y, EXPERIENCE_FLOOR, body_direction_rad,
+                                   enacted_enaction.clock, experience_id=self.experience_id,
+                                   durability=EXPERIENCE_PERSISTENCE, color_index=enacted_enaction.color_index)
+            self.experiences[floor_exp.id] = floor_exp
             self.experience_id += 1
 
+        # The ALIGNED_ECHO experience
+        if enacted_enaction.echo_point is not None:
+            aligned_exp = Experience(enacted_enaction.echo_point[0], enacted_enaction.echo_point[1],
+                                     EXPERIENCE_ALIGNED_ECHO, body_direction_rad,
+                                     enacted_enaction.clock, experience_id=self.experience_id,
+                                     durability=EXPERIENCE_PERSISTENCE, color_index=enacted_enaction.color_index)
+            self.experiences[aligned_exp.id] = aligned_exp
+            self.experience_id += 1
+
+        # The IMPACT experience
+        if enacted_enaction.impact > 0:
+            if enacted_enaction.impact == 0b01:  # Impact on the right
+                experience_x, experience_y = ROBOT_FRONT_X, -ROBOT_FRONT_Y
+            elif enacted_enaction.impact == 0b11:  # Impact on the front
+                experience_x, experience_y = ROBOT_FRONT_X, 0
+            else:  # Impact on the left
+                experience_x, experience_y = ROBOT_FRONT_X, ROBOT_FRONT_Y
+            impact_exp = Experience(experience_x, experience_y, EXPERIENCE_IMPACT, body_direction_rad,
+                                    enacted_enaction.clock, experience_id=self.experience_id,
+                                    durability=EXPERIENCE_PERSISTENCE, color_index=enacted_enaction.color_index)
+            self.experiences[impact_exp.id] = impact_exp
+            self.experience_id += 1
+
+        # The BLOCKED experience, only if move forward
+        if enacted_enaction.blocked and enacted_enaction.action.action_code == ACTION_FORWARD:
+            blocked_exp = Experience(ROBOT_FRONT_X, 0, EXPERIENCE_IMPACT, body_direction_rad,
+                                     enacted_enaction.clock, experience_id=self.experience_id,
+                                     durability=EXPERIENCE_PERSISTENCE, color_index=enacted_enaction.color_index)
+            self.experiences[blocked_exp.id] = blocked_exp
+            self.experience_id += 1
+
+        # The LOCAL ECHO experiences
+        local_echos = []
+        for e in enacted_enaction.echos.items():
+            angle = math.radians(int(e[0]))
+            x = ROBOT_HEAD_X + math.cos(angle) * e[1]
+            y = math.sin(angle) * e[1]
+            local_exp = Experience(x, y, EXPERIENCE_LOCAL_ECHO, body_direction_rad,
+                                   enacted_enaction.clock, experience_id=self.experience_id,
+                                   durability=EXPERIENCE_PERSISTENCE, color_index=enacted_enaction.color_index)
+            self.experiences[local_exp.id] = local_exp
+            self.experience_id += 1
+            local_echos.append((angle, e[1], local_exp))
+
+
+        # Create new experiences from points in the enacted_interaction
+        # for p in enacted_enaction.enacted_points:
+        #     experience = Experience(p[1], p[2], p[0], body_direction_rad, enacted_enaction.clock,
+        #                             experience_id=self.experience_id, durability=EXPERIENCE_PERSISTENCE,
+        #                             color_index=color_index)
+        #     # new_experiences.append(experience)
+        #     self.experiences[experience.id] = experience
+        #     self.experience_id += 1
+
         # Add the central echos from the local echos
-        echos = [e for e in self.experiences.values() if e.type == EXPERIENCE_LOCAL_ECHO and e.id > last_experience_id]
-        new_central_echos = self.Compute_central_echo(echos)
-        for e in new_central_echos:
-            self.experiences[e.id] = e
+        # echos = [e for e in self.experiences.values() if e.type == EXPERIENCE_LOCAL_ECHO and e.id > last_experience_id]
+        self.add_central_echos(local_echos)
+        # for e in central_echos:
+        #     self.experiences[e.id] = e
 
         # Remove the experiences from egocentric memory when they are two old
         # self.experiences = [e for e in self.experiences if e.clock >= enacted_interaction["clock"] - e.durability]
 
-    def revert_echoes_to_angle_distance(self, echo_list):
-        """Convert echo interaction to triples (angle,distance,interaction)"""
-        # TODO use the angle and the distance from the head
-        output = []
-        for elem in echo_list:
-            # compute the angle using elem x and y
-            angle = math.atan2(elem.point[1], elem.point[0])
-            # compute the distance using elem x and y
-            distance = math.sqrt(elem.point[0] ** 2 + elem.point[1] ** 2)
-            output.append((angle, distance, elem))
-        return output
+    # def revert_echoes_to_angle_distance(self, echo_list):
+    #     """Convert echo interaction to triples (angle,distance,interaction)"""
+    #     # TODO use the angle and the distance from the head
+    #     output = []
+    #     for elem in echo_list:
+    #         # compute the angle using elem x and y
+    #         angle = math.atan2(elem.point[1], elem.point[0])
+    #         # compute the distance using elem x and y
+    #         distance = math.sqrt(elem.point[0] ** 2 + elem.point[1] ** 2)
+    #         output.append((angle, distance, elem))
+    #     return output
 
-    def Compute_central_echo(self, echos):
+    def add_central_echos(self, echos):
         """In case of a sweep we obtain an array of echo, this function discretizes
         it to try to find the real position of the objects that sent back the echo
 
         To do so use 'strikes' which are series of consecutive echoes that are
         close enough to be considered as the same object, and consider that the
         real position of the object is at the middle of the strike"""
-        experiences_central_echo = []
+        # experiences_central_echo = []
         if len(echos) == 0:
-            return experiences_central_echo
-        body_direction_rad = echos[0].absolute_direction_rad
-        clock = echos[0].clock
-        echos = self.revert_echoes_to_angle_distance(echos)
+            return
+        body_direction_rad = echos[0][2].absolute_direction_rad
+        clock = echos[0][2].clock
+        # echos = self.revert_echoes_to_angle_distance(echos)
         max_delta_dist = 160
         max_delta_angle = math.radians(20)
         streaks = [[], [], [], [], [], [], [], [], [], [], [], []]
@@ -205,10 +264,10 @@ class EgocentricMemory:
                 experience_central_echo = Experience(int(x_mean), int(y_mean), EXPERIENCE_CENTRAL_ECHO,
                                                      body_direction_rad, clock, experience_id=self.experience_id,
                                                      durability=5)
+                self.experiences[experience_central_echo.id] = experience_central_echo
                 self.experience_id += 1
-                experiences_central_echo.append(experience_central_echo)
-
-        return experiences_central_echo
+                # experiences_central_echo.append(experience_central_echo)
+        # return experiences_central_echo
 
     def save(self):
         """Return a deep clone of egocentric memory for simulation"""

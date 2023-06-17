@@ -13,17 +13,12 @@
 #include "../../Action_define.h"
 #include "Scan.h"
 
-Scan::Scan(
-  Floor& FCR,
-  Head& HEA,
-  Imu& IMU,
-  WifiCat& WifiCat,
-  JSONVar json_action) :
+Scan::Scan(Floor& FCR, Head& HEA, Imu& IMU, WifiCat& WifiCat, JSONVar json_action) :
   Interaction(FCR, HEA, IMU, WifiCat, json_action)
 {
 }
 
-// STEP 0: Start the interaction
+// STEP 1: Start the interaction
 void Scan::begin()
 {
   _HEA.beginEchoScan();
@@ -31,7 +26,7 @@ void Scan::begin()
   _step = INTERACTION_ONGOING;
 }
 
-// STEP 1: Control the enaction
+// STEP 2: Control the enaction
 void Scan::ongoing()
 {
   if (!_HEA._is_enacting_echo_scan)
@@ -42,4 +37,11 @@ void Scan::ongoing()
     _action_end_time = 0;
     _step = INTERACTION_TERMINATE;
   }
+}
+
+// Send the scan outcome
+
+void Scan::outcome(JSONVar & outcome_object)
+{
+  _HEA.outcome_scan(outcome_object);
 }

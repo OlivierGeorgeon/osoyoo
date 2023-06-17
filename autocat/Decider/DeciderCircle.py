@@ -92,6 +92,10 @@ class DeciderCircle:
         """ Convert the enacted interaction into an outcome adapted to the circle behavior """
         outcome = OUTCOME_DEFAULT
 
+        # On startup return DEFAULT
+        if enacted_enaction is None:
+            return outcome
+
         # If there is an echo, compute the echo outcome
         if enacted_enaction.echo_point is not None:
             # if enacted_interaction['echo_xy'][0] < 200:  # From the center of the robot

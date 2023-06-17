@@ -56,16 +56,16 @@ class Enaction:
         self.enacted_points = []
         self.yaw = 0
         self.compass_point = None
-        self.azimuth = None
-        # self.compass_point = None
+        self.azimuth = 0
         self.echo_point = None
         self.is_focussed = False
         self.lost_focus = False
         self.floor = 0
         self.impact = 0
         self.blocked = False
-        self.color = None
+        self.color_index = 0
         self.head_angle = 0
+        self.echos = {}
         self.translation = np.array([0, 0, 0], dtype=float)
         self.rotation_matrix = matrix44.create_from_z_rotation(self.yaw)
         self.displacement_matrix = matrix44.multiply(self.rotation_matrix,

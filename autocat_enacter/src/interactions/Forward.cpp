@@ -13,12 +13,7 @@
 #include "../../Action_define.h"
 #include "Forward.h"
 
-Forward::Forward(
-  Floor& FCR,
-  Head& HEA,
-  Imu& IMU,
-  WifiCat& WifiCat,
-  JSONVar json_action) :
+Forward::Forward(Floor& FCR, Head& HEA, Imu& IMU, WifiCat& WifiCat, JSONVar json_action) :
   Interaction(FCR, HEA, IMU, WifiCat, json_action)
 {
 }

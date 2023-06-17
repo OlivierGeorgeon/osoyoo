@@ -52,14 +52,17 @@ void Head::beginEchoScan()
   _is_enacting_head_alignment = false; // Stop current head alignment if any
   _is_enacting_echo_scan = true;
   _min_ultrasonic_measure = NO_ECHO_DISTANCE;
-  if (_head_angle > 0) {
-    // If head is to the left, start from 90° and scan every 20° clockwise
+  if (_head_angle > 0)
+  {
+    // If head is to the left, start from 80° and scan clockwise
     _angle_min_ultrasonic_measure = 80;
-    _head_angle_span = -SCAN_SACCADE_SPAN ;//-SACCADE_SPAN * 2;
-  } else {
-    // If head is to the right, start from -90° and scan every 20° counterclockwise
+    _head_angle_span = -SCAN_SACCADE_SPAN;
+  }
+  else
+  {
+    // If head is to the right, start from -80° and scan counterclockwise
     _angle_min_ultrasonic_measure = -80;
-    _head_angle_span = SCAN_SACCADE_SPAN; //SACCADE_SPAN * 2;
+    _head_angle_span = SCAN_SACCADE_SPAN;
   }
   turnHead(_angle_min_ultrasonic_measure); // Start the scan right away
   _next_saccade_time = millis() + SACCADE_DURATION;
@@ -128,16 +131,18 @@ void Head::update()
       _echo_alignment_step++;
       _current_ultrasonic_measure = measureUltrasonicEcho();
       _next_saccade_time = millis() + SACCADE_DURATION;
-      if (_current_ultrasonic_measure < _min_ultrasonic_measure){
+      if (_current_ultrasonic_measure < _min_ultrasonic_measure)
+      {
         _min_ultrasonic_measure = _current_ultrasonic_measure;
         _angle_min_ultrasonic_measure = _head_angle;
       }
       _sign_array.distances[_current_index] = _current_ultrasonic_measure;
       _sign_array.angles[_current_index] = _head_angle;
-      Serial.println("Index: " + (String)_current_index + ", angle: " + (String)_head_angle + ", distance; "+ (String)_current_ultrasonic_measure);
+      Serial.println("Index: " + (String)_current_index + ", angle: " + (String)_head_angle + ", distance: "+ (String)_current_ultrasonic_measure);
       _current_index++;
       _head_angle += _head_angle_span;
-      if (abs(_head_angle) > 90){ // The scan is over, move to the angle of the min measure
+      if (abs(_head_angle) > 90)
+      { // The scan is over, move to the angle of the min measure
         _is_enacting_echo_scan = false;
         _head_angle  = _angle_min_ultrasonic_measure;
         // turnHead(_angle_min_ultrasonic_measure);
@@ -177,47 +182,23 @@ void Head::outcome(JSONVar & outcome_object)
   outcome_object["echo_distance"] = _min_ultrasonic_measure;
 }
 
-void Head::outcome_complete(JSONVar & outcome_object)
+void Head::outcome_scan(JSONVar & outcome_object)
 {
+  JSONVar echos;
+
     for (int i = 0; i < _sign_array.size; i++)
     {
-      if( _sign_array.distances[i] > 0 and _sign_array.distances[i]< 10000){
-        String str = String(_sign_array.angles[i]);
-        //outcome_object["ha"+str] = _sign_array.angles[i];
-        outcome_object["ed"+ str] = _sign_array.distances[i];
-        // reset values
-        _sign_array.sign[i] = false;
-        _sign_array.distances[i] = 0;
-        _sign_array.angles[i] = 0;
-      }
-      /*if (_sign_array.distances[i] < _sign_array.distances[i+1] && _sign_array.distances[i] > 0)
+      if (_sign_array.distances[i] > 0 and _sign_array.distances[i]< 10000)
       {
-        if(i != 0 and _sign_array.distances[i] > _sign_array.distances[i-1]){
-            continue;
-        }
-        _sign_array.sign[i] = true;
-      }
-      else
-      {
-        _sign_array.sign[i] = false;
-      }
-    }
-    int nb_echo = 0;
-    for (int i = 0; i < _sign_array.size; i++){
-        if (_sign_array.sign[i]){
-            String str = String(nb_echo);
-            outcome_object["ha_"+str] = _sign_array.angles[i];
-            outcome_object["ed_"+ str] = _sign_array.distances[i];
-            nb_echo++;
-        }
+        // String str = String(_sign_array.angles[i]);
+        echos[String(_sign_array.angles[i])] = _sign_array.distances[i];
         // reset values
-        _sign_array.sign[i] = false;
-        _sign_array.distances[i] = 0;
-        _sign_array.angles[i] = 0;
-    }*/
+//        _sign_array.sign[i] = false;
+//        _sign_array.distances[i] = 0;
+//        _sign_array.angles[i] = 0;
+      }
    }
-    // Reset every values
-    //nb_echo = 0;
+  outcome_object["echos"] = echos;
 }
 
 void Head::turnHead(int head_angle)
