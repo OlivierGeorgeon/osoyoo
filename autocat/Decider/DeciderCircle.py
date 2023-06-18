@@ -8,7 +8,7 @@ from . Interaction import Interaction, OUTCOME_DEFAULT
 from . CompositeInteraction import CompositeInteraction
 from . PredefinedInteractions import create_interactions, OUTCOME_LOST_FOCUS, OUTCOME_CLOSE_FRONT, \
     OUTCOME_FAR_FRONT, OUTCOME_FAR_LEFT, OUTCOME_LEFT, OUTCOME_RIGHT, OUTCOME_FAR_RIGHT, OUTCOME_FLOOR_LEFT, \
-    OUTCOME_FLOOR_FRONT, OUTCOME_FLOOR_RIGHT, OUTCOME_IMPACT
+    OUTCOME_FLOOR_FRONT, OUTCOME_FLOOR_RIGHT  # , OUTCOME_IMPACT
 from ..Robot.Enaction import Enaction
 
 
@@ -117,12 +117,13 @@ class DeciderCircle:
             outcome = OUTCOME_LOST_FOCUS
 
         # If impact then override the echo and focus outcome
+        # Not needed because the impact causes the focus
         # if 'impact' in enacted_interaction:
-        if enacted_enaction.impact > 0:
-            outcome = OUTCOME_IMPACT
+        # if enacted_enaction.impact > 0:
+        #     outcome = OUTCOME_IMPACT
         # if 'blocked' in enacted_interaction:
-        if enacted_enaction.blocked:
-            outcome = OUTCOME_IMPACT
+        # if enacted_enaction.blocked:
+        #     outcome = OUTCOME_IMPACT
 
         # If floor then override the echo and focus and impact outcome
         if enacted_enaction.floor > 0:

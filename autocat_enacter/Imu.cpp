@@ -99,15 +99,21 @@ void Imu::setup()
 void Imu::begin()
 {
   _yaw = 0;
-  _impact_measure = 0;
+  _impact_forward = 0;
+  _impact_leftwards = 0;
+  _impact_rightwards = 0;
   _cycle_count = 0;
   _blocked = false;
-  _max_acceleration = 0;
-  _min_acceleration = 0;
+  _max_positive_x_acc = 0;
+  _min_negative_x_acc = 0;
+  _max_positive_y_acc = 0;
+  _min_negative_y_acc = 0;
   _max_speed = 0;
   _min_speed = 0;
   _xSpeed = 0;
   _xDistance = 0;
+  _max_positive_yaw_left = 0.0;
+  _min_negative_yaw_right = 0.0;
 }
 int Imu::update(int interaction_step)
 {
@@ -125,7 +131,8 @@ int Imu::update(int interaction_step)
     Vector normGyro = _mpu.readNormalizeGyro();
     // Serial.println("end read mpu"); // for debug
 
-    int normalized_acceleration = -normAccel.XAxis * 100 + ACCELERATION_X_OFFSET;
+    int x_acceleration = -normAccel.XAxis * 100 + ACCELERATION_X_OFFSET;
+    int y_acceleration = -normAccel.YAxis * 100 + ACCELERATION_Y_OFFSET;
 
     // Integrate yaw during the interaction
     float _ZAngle = normGyro.ZAxis * IMU_READ_PERIOD / 1000 * GYRO_COEF;
@@ -134,39 +141,72 @@ int Imu::update(int interaction_step)
     // During the first step of the interaction, check acceleration
     if (interaction_step == INTERACTION_ONGOING)
     {
-      // Record the min acceleration (deceleration) during the interaction to detect collision
-      if (normalized_acceleration < _min_acceleration) {
-        _min_acceleration =  normalized_acceleration;
-      }
+      // Record the min acceleration (deceleration) during the interaction to detect impact
+      if (x_acceleration < _min_negative_x_acc)
+        _min_negative_x_acc =  x_acceleration;
+
       // Record the max acceleration during the interaction to detect block
-      if (normalized_acceleration > _max_acceleration) {
-        _max_acceleration =  normalized_acceleration;
-      }
+      if (x_acceleration > _max_positive_x_acc)
+        _max_positive_x_acc =  x_acceleration;
+
+      // Record the min acceleration (deceleration) during the interaction to detect impact
+      if (y_acceleration < _min_negative_y_acc)
+        _min_negative_y_acc = y_acceleration;
+
+      // Record the max acceleration during the interaction to detect block
+      if (y_acceleration > _max_positive_y_acc)
+        _max_positive_y_acc =  y_acceleration;
+
+      // Record the max positive yaw during the interaction to detect impact on the left
+      if (_ZAngle > _max_positive_yaw_left)
+        _max_positive_yaw_left = _ZAngle;
+
+      // Record the min negative yaw during the interaction to detect impact on the right
+      if (_ZAngle < _min_negative_yaw_right)
+        _min_negative_yaw_right = _ZAngle;
+
       // Check for turned to the right by more than 1°/s after the first 250ms
-      if ((_ZAngle < -GYRO_SHOCK_THRESHOLD) && (_cycle_count > IMU_ACCELERATION_CYCLES)) {
+      // if ((_ZAngle < -GYRO_SHOCK_THRESHOLD) && (_cycle_count > IMU_ACCELERATION_CYCLES))
         // If moving forward, this will mean collision on the right
-        _impact_measure = B01;
-      }
-      // Check a peek deceleration = frontal shock
-      if (normalized_acceleration < ACCELERATION_SHOCK_THRESHOLD) {
-        _impact_measure = B11;
-      }
-      // Check for turned to the left by more than 1°/s after the first 250ms
-      if ((_ZAngle > GYRO_SHOCK_THRESHOLD) && (_cycle_count > IMU_ACCELERATION_CYCLES)) {
-        // If moving forward, this will mean collision on the left
-        _impact_measure = B10;
-      }
-      // Check for blocked on the front
-      // (the acceleration did not pass the threshold during the first 250ms)
-      if (_cycle_count >= IMU_ACCELERATION_CYCLES) {
-        if (_max_acceleration < ACCELERATION_BLOCK_THRESHOLD) {
-          _impact_measure = B111;  // B11
-          _blocked = true;
-        }
+        // _impact_forward = B01;
+
+      // Check for x impact or blocked
+      if ((x_acceleration < ACCELERATION_IMPACT_THRESHOLD) ||
+         (_cycle_count >= IMU_ACCELERATION_CYCLES) && (_max_positive_x_acc < ACCELERATION_BLOCK_THRESHOLD))
+      {
+        if (_min_negative_yaw_right < -GYRO_IMPACT_THRESHOLD)
+          _impact_forward = B01;
+        else if (_max_positive_yaw_left > GYRO_IMPACT_THRESHOLD)
+          _impact_forward = B10;
+        else
+          _impact_forward = B11;
       }
 
+      // Check for leftwards impact or blocked (y positive)
+      if ((y_acceleration < -100) ||
+         (_cycle_count >= IMU_ACCELERATION_CYCLES) && (_max_positive_y_acc < 80))  // 100
+        _impact_leftwards = 1;
+
+      // Check for rightwards impact or blocked
+      if ((y_acceleration > 100) ||
+         (_cycle_count >= IMU_ACCELERATION_CYCLES) && (_min_negative_y_acc > -80))
+        _impact_rightwards = 1;
+
+      // Check for turned to the left by more than 1°/s after the first 250ms
+      // if ((_ZAngle > GYRO_SHOCK_THRESHOLD) && (_cycle_count > IMU_ACCELERATION_CYCLES))
+        // If moving forward, this will mean collision on the left
+        // _impact_forward = B10;
+
+      // Check for blocked on the front
+      // (the initial acceleration did not pass the threshold)
+//      if (_cycle_count >= IMU_ACCELERATION_CYCLES) && (_max_positive_x_acc < ACCELERATION_BLOCK_THRESHOLD)
+//      {
+//        _impact_forward = B111;  // Stop the motors
+//        _blocked = true;
+//      }
+
       // Trying to compute the speed by integrating acceleration (not working)
-      _xSpeed += (normalized_acceleration) * IMU_READ_PERIOD / 100;
+      _xSpeed += (x_acceleration) * IMU_READ_PERIOD / 100;
       if (_xSpeed > _max_speed) _max_speed = _xSpeed;
       if (_xSpeed < _min_speed) _min_speed = _xSpeed;
       // Trying to compute the distance by integrating the speed (not working)
@@ -174,33 +214,69 @@ int Imu::update(int interaction_step)
     }
     #endif
   }
-  return _impact_measure;
+  return _impact_forward;
 }
 
-int Imu::get_impact_measure()
+int Imu::get_impact_forward()
 {
-  return _impact_measure;
+  return _impact_forward;
 }
 
-void Imu::outcome(JSONVar & outcome_object, char action)
+int Imu::get_impact_leftwards()
+{
+  return _impact_leftwards;
+}
+
+int Imu::get_impact_rightwards()
+{
+  return _impact_rightwards;
+}
+
+void Imu::outcome(JSONVar & outcome_object)
+{
+  // Always return the yaw
+  #if ROBOT_HAS_MPU6050 == true
+  outcome_object["yaw"] = round(_yaw);
+  #endif
+
+  // Always return the compass
+  #if ROBOT_COMPASS_TYPE > 0
+  read_azimuth(outcome_object);
+  #endif
+}
+
+void Imu::outcome_forward(JSONVar & outcome_object)
 {
   #if ROBOT_HAS_MPU6050 == true
-  outcome_object["yaw"] = (int) _yaw;
-  if (action == ACTION_GO_ADVANCE)
-  {
-    outcome_object["impact"] = _impact_measure;
-    outcome_object["blocked"] = _blocked;
-    outcome_object["max_acc"] = _max_acceleration;
-    outcome_object["min_acc"] = _min_acceleration;
-  }
+  outcome_object["impact"] = _impact_forward;
+  // outcome_object["blocked"] = _blocked;
+  outcome_object["max_acc"] = _max_positive_x_acc;
+  outcome_object["min_acc"] = _min_negative_x_acc;
+
+  outcome_object["max_yaw"] = round(_max_positive_yaw_left * 100.0);
+  outcome_object["min_yaw"] = round(_min_negative_yaw_right * 100.0); // Does not show negative sign of floats!
+
   // outcome_object["max_speed"] = (int) _max_speed;
   // outcome_object["min_speed"] = (int) _min_speed;
   // outcome_object["distance"] = (int) _xDistance;
-
   #endif
+}
 
-  #if ROBOT_COMPASS_TYPE > 0
-  read_azimuth(outcome_object);
+void Imu::outcome_leftwards(JSONVar & outcome_object)
+{
+  #if ROBOT_HAS_MPU6050 == true
+  outcome_object["impact"] = _impact_leftwards;
+  outcome_object["max_acc"] = _max_positive_y_acc;
+  outcome_object["min_acc"] = _min_negative_y_acc;
+  #endif
+}
+
+void Imu::outcome_rightwards(JSONVar & outcome_object)
+{
+  #if ROBOT_HAS_MPU6050 == true
+  outcome_object["impact"] = _impact_rightwards;
+  outcome_object["max_acc"] = _max_positive_y_acc;
+  outcome_object["min_acc"] = _min_negative_y_acc;
   #endif
 }
 
@@ -226,14 +302,10 @@ void Imu::read_azimuth(JSONVar & outcome_object)
 
   headingDegrees += 180;
   if (heading >= 360)
-  {
     headingDegrees -= 360;
-  }
 
   outcome_object["compass_x"] = round(norm.XAxis);
   outcome_object["compass_y"] = round(norm.YAxis);
   outcome_object["azimuth"] = headingDegrees;
-
-  // return headingDegrees;
 }
 #endif

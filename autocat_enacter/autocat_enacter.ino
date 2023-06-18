@@ -54,24 +54,32 @@ void setup()
 
   pinMode(LED_BUILTIN, OUTPUT);
 
+  // First attempt to initialize IMU
+
+  IMU.setup();
+
   // Connect to the wifi board
 
   WifiCat.begin();
 
+  // Second attempt to initialize IMU (try a second time after some time because sometimes it fails the first time)
+
+  IMU.setup();
+  Serial.println("-- IMU initialized");
+
   // Initialize the automatic behaviors
 
   FLO.setup();
-  Serial.println("Wheels initialized");
+  Serial.println("-- Wheels initialized");
 
   HEA.setup();
-  Serial.println("Head initialized");
+  Serial.println("-- Head initialized");
 
-  IMU.setup(); delay(100); IMU.setup(); //delay(100); IMU.setup();
+  // IMU.setup(); delay(100); IMU.setup(); //delay(100); IMU.setup();
   // Setup the imu twice otherwise the calibration is wrong. I don't know why.
   // Probably something to do with the order in which the imu registers are written.
-  Serial.println("IMU initialized");
 
-  Serial.println("--- Robot initialized ---");
+  Serial.println("--- Robot is ready ---");
 }
 
 void loop()

@@ -50,15 +50,15 @@ class Enaction:
         self.simulation_step = 0
         self.simulation_time = 0.
 
-        # The enacted enaction (not used yet)
+        # The enacted enaction
         self.status = None
         self.duration1 = 0
-        self.enacted_points = []
+        # self.enacted_points = []
         self.yaw = 0
         self.compass_point = None
         self.azimuth = 0
         self.echo_point = None
-        self.is_focussed = False
+        # self.is_focussed = False
         self.lost_focus = False
         self.floor = 0
         self.impact = 0

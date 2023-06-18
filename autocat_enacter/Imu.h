@@ -19,8 +19,8 @@
 #include "src/lib/MMC5883.h"
 #endif
 
-#define IMU_READ_PERIOD 50  // (ms)
-#define IMU_ACCELERATION_CYCLES 5  // number of cycles of imu read during acceration phase
+#define IMU_READ_PERIOD 10  // 50 (ms)
+#define IMU_ACCELERATION_CYCLES 10  // 5  // number of cycles of imu read during acceration phase
 
 class Imu
 {
@@ -29,8 +29,13 @@ class Imu
     void setup();
     void begin();
     int update(int interaction_step);
-    void outcome(JSONVar & outcome_object, char action);
-    int get_impact_measure();
+    void outcome(JSONVar & outcome_object);
+    void outcome_forward(JSONVar & outcome_object);
+    void outcome_leftwards(JSONVar & outcome_object);
+    void outcome_rightwards(JSONVar & outcome_object);
+    int get_impact_forward();
+    int get_impact_leftwards();
+    int get_impact_rightwards();
     float _yaw;
     float _xSpeed;
     float _xDistance;
@@ -49,12 +54,18 @@ class Imu
     MMC5883MA compass;
     #endif
     unsigned long _next_imu_read_time;
-    int _max_acceleration;
-    int _min_acceleration;
+    int _max_positive_x_acc;
+    int _min_negative_x_acc;
+    int _max_positive_y_acc;
+    int _min_negative_y_acc;
     float _max_speed;
     float _min_speed;
-    int _impact_measure;
+    int _impact_forward;
+    int _impact_leftwards;
+    int _impact_rightwards;
     bool _blocked;
     int _cycle_count;
+    float _max_positive_yaw_left;
+    float _min_negative_yaw_right;
 };
 #endif

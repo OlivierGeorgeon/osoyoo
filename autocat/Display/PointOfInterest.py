@@ -51,10 +51,11 @@ class PointOfInterest:
             self.shape = self.batch.add_indexed(4, gl.GL_TRIANGLES, self.group, [0, 1, 2, 0, 2, 3],
                                                 ('v2i', self.points), ('c4B', 4 * (*self.color, self.opacity)))
         if self.type == EXPERIENCE_IMPACT:
-            self.color = name_to_rgb("red")
-            self.points = [0, 0, 30, -30, 30, 30]
-            self.shape = self.batch.add_indexed(3, gl.GL_TRIANGLES, self.group, [0, 1, 2], ('v2i', self.points),
-                                                ('c4B', 3 * (*self.color, self.opacity)))
+            self.color = name_to_rgb("salmon")
+            # self.points = [0, 0, 30, -30, 30, 30]
+            self.points = [-20, 0, 0, 20, 20, 0, 0, -20]
+            self.shape = self.batch.add_indexed(4, gl.GL_TRIANGLES, self.group, [0, 1, 2, 0, 2, 3], ('v2i', self.points),
+                                                ('c4B', 4 * (*self.color, self.opacity)))
         if self.type == EXPERIENCE_BLOCK:
             self.color = name_to_rgb("salmon")
             self.points = [0, 0, 30, -30, 30, 30]

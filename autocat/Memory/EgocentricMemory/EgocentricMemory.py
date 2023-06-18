@@ -3,13 +3,12 @@ from playsound import playsound
 from pyrr import matrix44
 from ...Memory.EgocentricMemory.Experience import Experience, EXPERIENCE_LOCAL_ECHO, EXPERIENCE_CENTRAL_ECHO, \
     EXPERIENCE_PLACE, EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_IMPACT
-from ...Robot.RobotDefine import ROBOT_COLOR_X, ROBOT_FRONT_X, LINE_X, ROBOT_FRONT_Y, ROBOT_HEAD_X
+from ...Robot.RobotDefine import ROBOT_COLOR_X, ROBOT_FRONT_X, LINE_X, ROBOT_FRONT_Y, ROBOT_HEAD_X, ROBOT_SIDE
 from ...Decider.Action import ACTION_SCAN, ACTION_FORWARD, ACTION_BACKWARD, ACTION_LEFTWARD, ACTION_RIGHTWARD
 import math
-import colorsys
 
 EXPERIENCE_PERSISTENCE = 10
-FOCUS_MAX_DELTA = 200  # 100 (mm) Maximum delta to keep focus  TODO improve the focus position when impact
+FOCUS_MAX_DELTA = 100  # 200 (mm) Maximum delta to keep focus
 
 
 class EgocentricMemory:
@@ -23,75 +22,78 @@ class EgocentricMemory:
 
     def manage_focus(self, enacted_enaction):
         """Manage focus catch, lost, or update. Also move the prompt"""
+
+        # If the robot is already focussed then adjust the focus and the displacement
         if self.focus_point is not None:
-            # If focussed then adjust the displacement
             # The new estimated position of the focus point
             displacement_matrix = enacted_enaction.displacement_matrix
             translation = enacted_enaction.translation
             rotation_matrix = enacted_enaction.rotation_matrix
             if enacted_enaction.echo_point is not None:
-                action_code = enacted_enaction.action.action_code
-                prediction_focus_point = matrix44.apply_to_vector(displacement_matrix, self.focus_point)
+                # action_code = enacted_enaction.action.action_code
                 # The error between the expected and the actual position of the echo
+                prediction_focus_point = matrix44.apply_to_vector(displacement_matrix, self.focus_point)
                 prediction_error_focus = prediction_focus_point - enacted_enaction.echo_point
-
+                # If the new focus is near the previous focus
                 if np.linalg.norm(prediction_error_focus) < FOCUS_MAX_DELTA:
                     # The focus has been kept
-                    enacted_enaction.is_focussed = True
+                    self.focus_point = enacted_enaction.echo_point
+                    print("UPDATE FOCUS by delta", prediction_error_focus)
+                    # enacted_enaction.is_focussed = True
                     # If the action has been completed
                     if enacted_enaction.duration1 >= 1000:
                         # If the head is forward then correct longitudinal displacements
                         if -20 < enacted_enaction.head_angle < 20:
-                            if action_code in [ACTION_FORWARD, ACTION_BACKWARD]:
+                            if enacted_enaction.action.action_code in [ACTION_FORWARD, ACTION_BACKWARD]:
                                 translation[0] = translation[0] + prediction_error_focus[0]
-                                # TODO pass the action to correct the estimated speed:
-                                # self.workspace.actions[action_code].adjust_translation_speed(translation)
+                                # Correct the estimated speed of the action
+                                enacted_enaction.action.adjust_translation_speed(translation)
                         # If the head is sideways then correct lateral displacements
-                        if 60 < enacted_enaction.head_angle or enacted_enaction.head_angle < -60:
-                            if action_code in [ACTION_LEFTWARD, ACTION_RIGHTWARD]:
+                        if enacted_enaction.head_angle < -60 or 60 < enacted_enaction.head_angle:
+                            if enacted_enaction.action.action_code in [ACTION_LEFTWARD, ACTION_RIGHTWARD]:
                                 translation[1] = translation[1] + prediction_error_focus[1]
-                                # TODO pass the action to correct the estimated speed:
-                                # self.workspace.actions[action_code].adjust_translation_speed(translation)
+                                # Correct the estimated speed of the action
+                                enacted_enaction.action.adjust_translation_speed(translation)
                         # Update the displacement matrix according to the new translation
                         translation_matrix = matrix44.create_from_translation(-translation)
-                        displacement_matrix = matrix44.multiply(rotation_matrix, translation_matrix)
+                        # displacement_matrix = matrix44.multiply(rotation_matrix, translation_matrix)
+                        displacement_matrix = matrix44.multiply(translation_matrix, rotation_matrix)
                         enacted_enaction.translation = translation
                         enacted_enaction.displacement_matrix = displacement_matrix
-
-                        # If the focus was kept then update it
-                        # if 'focus' in enacted_interaction:
-                        # if 'echo_xy' in enacted_interaction:  # Not sure why this is necessary
-                        # self.focus_point = np.array([enacted_interaction['echo_xy'][0],
-                        #                              enacted_interaction['echo_xy'][1], 0])
-                    self.focus_point = enacted_enaction.echo_point
-                    print("UPDATE FOCUS by delta", prediction_error_focus)
-                    # If the focus was lost then reset it
                 else:
-                    # The focus was lost, override the echo outcome
+                    # The focus was lost
                     print("LOST FOCUS due to delta", prediction_error_focus)
                     enacted_enaction.lost_focus = True  # Used by agent_circle
                     self.focus_point = None
                     # playsound('autocat/Assets/R5.wav', False)
             else:
-                # The focus was lost, override the echo outcome
+                # The focus was lost
                 print("LOST FOCUS due to no echo")
                 enacted_enaction.lost_focus = True  # Used by agent_circle
                 self.focus_point = None
                 # playsound('autocat/Assets/R5.wav', False)
         else:
-            if enacted_enaction.action.action_code in [ACTION_SCAN, ACTION_FORWARD] and enacted_enaction.echo_point is not None:
+            # If the robot was not focussed
+            if enacted_enaction.action.action_code in [ACTION_SCAN, ACTION_FORWARD] \
+                    and enacted_enaction.echo_point is not None:
                 # Catch focus
                 # playsound('autocat/Assets/R11.wav', False)
                 self.focus_point = enacted_enaction.echo_point
                 print("CATCH FOCUS", self.focus_point)
 
         # Impact or block catch focus
-        if enacted_enaction.impact > 0 or enacted_enaction.blocked:
-            if enacted_enaction.echo_point is not None:
-                self.focus_point = enacted_enaction.echo_point
-            else:
-                self.focus_point = np.array([ROBOT_FRONT_X, 0, 0])
-            # Reset lost focus because because DecideCircle must trigger a scan
+        if enacted_enaction.impact > 0 and enacted_enaction.action.action_code == ACTION_FORWARD:  # or enacted_enaction.blocked:
+            if enacted_enaction.echo_point is None or np.linalg.norm(enacted_enaction.echo_point) > 200:
+                # Count as an echo to to activate DeciderCircle
+                if enacted_enaction.impact == 0b01:
+                    enacted_enaction.echo_point = np.array([ROBOT_FRONT_X + 10, -ROBOT_FRONT_Y, 0])
+                elif enacted_enaction.impact == 0b10:
+                    enacted_enaction.echo_point = np.array([ROBOT_FRONT_X + 10, ROBOT_FRONT_Y, 0])
+                else:
+                    enacted_enaction.echo_point = np.array([ROBOT_FRONT_X + 10, 0, 0])
+            # TODO Do not create echo experience
+            self.focus_point = enacted_enaction.echo_point
+            # Reset lost focus to activate DecideCircle
             enacted_enaction.lost_focus = False
             print("CATCH FOCUS IMPACT", self.focus_point)
 
@@ -106,7 +108,6 @@ class EgocentricMemory:
         - Add new experiences
         """
 
-        last_experience_id = self.experience_id
         # Move the existing experiences
         for experience in self.experiences.values():
             experience.displace(enacted_enaction.displacement_matrix)
@@ -136,35 +137,40 @@ class EgocentricMemory:
             self.experiences[floor_exp.id] = floor_exp
             self.experience_id += 1
 
-        # The ALIGNED_ECHO experience
+        # The ECHO experience
         if enacted_enaction.echo_point is not None:
-            aligned_exp = Experience(enacted_enaction.echo_point[0], enacted_enaction.echo_point[1],
-                                     EXPERIENCE_ALIGNED_ECHO, body_direction_rad,
-                                     enacted_enaction.clock, experience_id=self.experience_id,
-                                     durability=EXPERIENCE_PERSISTENCE, color_index=enacted_enaction.color_index)
-            self.experiences[aligned_exp.id] = aligned_exp
+            echo_exp = Experience(enacted_enaction.echo_point[0], enacted_enaction.echo_point[1],
+                                  EXPERIENCE_ALIGNED_ECHO, body_direction_rad,
+                                  enacted_enaction.clock, experience_id=self.experience_id,
+                                  durability=EXPERIENCE_PERSISTENCE, color_index=enacted_enaction.color_index)
+            self.experiences[echo_exp.id] = echo_exp
             self.experience_id += 1
 
+        # The BLOCKED experience
+        # if enacted_enaction.blocked:
+        #     blocked_exp = Experience(ROBOT_FRONT_X, 0, EXPERIENCE_IMPACT, body_direction_rad,
+        #                              enacted_enaction.clock, experience_id=self.experience_id,
+        #                              durability=EXPERIENCE_PERSISTENCE, color_index=enacted_enaction.color_index)
+        #     self.experiences[blocked_exp.id] = blocked_exp
+        #     self.experience_id += 1
+        # else:
         # The IMPACT experience
         if enacted_enaction.impact > 0:
-            if enacted_enaction.impact == 0b01:  # Impact on the right
-                experience_x, experience_y = ROBOT_FRONT_X, -ROBOT_FRONT_Y
-            elif enacted_enaction.impact == 0b11:  # Impact on the front
-                experience_x, experience_y = ROBOT_FRONT_X, 0
-            else:  # Impact on the left
-                experience_x, experience_y = ROBOT_FRONT_X, ROBOT_FRONT_Y
+            if enacted_enaction.action.action_code == ACTION_FORWARD:
+                if enacted_enaction.impact == 0b01:  # Impact on the right
+                    experience_x, experience_y = ROBOT_FRONT_X, -ROBOT_FRONT_Y
+                elif enacted_enaction.impact == 0b11:  # Impact on the front
+                    experience_x, experience_y = ROBOT_FRONT_X, 0
+                else:  # Impact on the left
+                    experience_x, experience_y = ROBOT_FRONT_X, ROBOT_FRONT_Y
+            elif enacted_enaction.action.action_code == ACTION_LEFTWARD:
+                experience_x, experience_y = 0, ROBOT_SIDE
+            elif enacted_enaction.action.action_code == ACTION_RIGHTWARD:
+                experience_x, experience_y = 0, -ROBOT_SIDE
             impact_exp = Experience(experience_x, experience_y, EXPERIENCE_IMPACT, body_direction_rad,
                                     enacted_enaction.clock, experience_id=self.experience_id,
                                     durability=EXPERIENCE_PERSISTENCE, color_index=enacted_enaction.color_index)
             self.experiences[impact_exp.id] = impact_exp
-            self.experience_id += 1
-
-        # The BLOCKED experience, only if move forward
-        if enacted_enaction.blocked and enacted_enaction.action.action_code == ACTION_FORWARD:
-            blocked_exp = Experience(ROBOT_FRONT_X, 0, EXPERIENCE_IMPACT, body_direction_rad,
-                                     enacted_enaction.clock, experience_id=self.experience_id,
-                                     durability=EXPERIENCE_PERSISTENCE, color_index=enacted_enaction.color_index)
-            self.experiences[blocked_exp.id] = blocked_exp
             self.experience_id += 1
 
         # The LOCAL ECHO experiences
@@ -180,36 +186,11 @@ class EgocentricMemory:
             self.experience_id += 1
             local_echos.append((angle, e[1], local_exp))
 
-
-        # Create new experiences from points in the enacted_interaction
-        # for p in enacted_enaction.enacted_points:
-        #     experience = Experience(p[1], p[2], p[0], body_direction_rad, enacted_enaction.clock,
-        #                             experience_id=self.experience_id, durability=EXPERIENCE_PERSISTENCE,
-        #                             color_index=color_index)
-        #     # new_experiences.append(experience)
-        #     self.experiences[experience.id] = experience
-        #     self.experience_id += 1
-
-        # Add the central echos from the local echos
-        # echos = [e for e in self.experiences.values() if e.type == EXPERIENCE_LOCAL_ECHO and e.id > last_experience_id]
+        # Add the CENTRAL ECHOs from the LOCAL ECHOs
         self.add_central_echos(local_echos)
-        # for e in central_echos:
-        #     self.experiences[e.id] = e
 
         # Remove the experiences from egocentric memory when they are two old
         # self.experiences = [e for e in self.experiences if e.clock >= enacted_interaction["clock"] - e.durability]
-
-    # def revert_echoes_to_angle_distance(self, echo_list):
-    #     """Convert echo interaction to triples (angle,distance,interaction)"""
-    #     # TODO use the angle and the distance from the head
-    #     output = []
-    #     for elem in echo_list:
-    #         # compute the angle using elem x and y
-    #         angle = math.atan2(elem.point[1], elem.point[0])
-    #         # compute the distance using elem x and y
-    #         distance = math.sqrt(elem.point[0] ** 2 + elem.point[1] ** 2)
-    #         output.append((angle, distance, elem))
-    #     return output
 
     def add_central_echos(self, echos):
         """In case of a sweep we obtain an array of echo, this function discretizes
@@ -218,12 +199,11 @@ class EgocentricMemory:
         To do so use 'strikes' which are series of consecutive echoes that are
         close enough to be considered as the same object, and consider that the
         real position of the object is at the middle of the strike"""
-        # experiences_central_echo = []
+
         if len(echos) == 0:
             return
         body_direction_rad = echos[0][2].absolute_direction_rad
         clock = echos[0][2].clock
-        # echos = self.revert_echoes_to_angle_distance(echos)
         max_delta_dist = 160
         max_delta_angle = math.radians(20)
         streaks = [[], [], [], [], [], [], [], [], [], [], [], []]
@@ -266,8 +246,6 @@ class EgocentricMemory:
                                                      durability=5)
                 self.experiences[experience_central_echo.id] = experience_central_echo
                 self.experience_id += 1
-                # experiences_central_echo.append(experience_central_echo)
-        # return experiences_central_echo
 
     def save(self):
         """Return a deep clone of egocentric memory for simulation"""

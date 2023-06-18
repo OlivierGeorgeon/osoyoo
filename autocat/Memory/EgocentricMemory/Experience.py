@@ -58,7 +58,6 @@ class Experience:
                                                      matrix44.create_from_translation([ROBOT_HEAD_X, 0, 0])
                                                      .astype('float64'))
             # The position of the head relative to the echo in allocentric coordinates
-            # opposite_position_matrix = matrix44.create_from_translation([-x + ROBOT_HEAD_X, -y, 0])
             relative_sensor_point = np.array([-x + ROBOT_HEAD_X, -y, 0])
 
         # The allocentric position of the sensor relative to the allocentric position of the experience

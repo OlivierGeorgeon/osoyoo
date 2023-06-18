@@ -12,10 +12,12 @@ OUTCOME_LEFT = '4'
 OUTCOME_RIGHT = '6'
 OUTCOME_FAR_LEFT = '1'
 OUTCOME_FAR_RIGHT = '3'
-OUTCOME_IMPACT = 'I'
+# OUTCOME_IMPACT = 'I'
 
+# OUTCOME_LIST = [OUTCOME_LOST_FOCUS, OUTCOME_FAR_FRONT, OUTCOME_CLOSE_FRONT, OUTCOME_LEFT, OUTCOME_RIGHT,
+#                OUTCOME_FAR_LEFT, OUTCOME_FAR_RIGHT, OUTCOME_IMPACT]
 OUTCOME_LIST = [OUTCOME_LOST_FOCUS, OUTCOME_FAR_FRONT, OUTCOME_CLOSE_FRONT, OUTCOME_LEFT, OUTCOME_RIGHT,
-                OUTCOME_FAR_LEFT, OUTCOME_FAR_RIGHT, OUTCOME_IMPACT]
+                OUTCOME_FAR_LEFT, OUTCOME_FAR_RIGHT]
 
 OUTCOME_FLOOR_LEFT = '10'
 OUTCOME_FLOOR_FRONT = '11'
@@ -32,11 +34,12 @@ def create_interactions(actions):
 
     # Predefine behaviors for circling around an object
 
-    # When lost focus or impact then scan
+    # When lost focus then scan
     i_4 = Interaction.create_or_retrieve(actions[ACTION_SCAN], OUTCOME_LEFT, 1)
     i_l = Interaction.create_or_retrieve(actions[ACTION_SCAN], OUTCOME_LOST_FOCUS, 1)
     for interaction in Interaction.interaction_list:
-        if interaction != i_l and interaction.outcome in [OUTCOME_LOST_FOCUS, OUTCOME_IMPACT]:
+        # if interaction != i_l and interaction.outcome in [OUTCOME_LOST_FOCUS, OUTCOME_IMPACT]:
+        if interaction != i_l and interaction.outcome in [OUTCOME_LOST_FOCUS]:
             CompositeInteraction.create_or_retrieve(interaction, i_4)
 
     # When scan and lost focus then turn left

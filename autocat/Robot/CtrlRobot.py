@@ -86,6 +86,10 @@ class CtrlRobot:
 
         enacted_enaction = Enaction(self.workspace.actions[action_code], outcome['clock'], None, None)
 
+        enacted_enaction.duration1 = outcome['duration1']
+        enacted_enaction.head_angle = outcome['head_angle']
+        enacted_enaction.color_index = category_color(outcome['color'])
+
         # Translation integrated from the action's speed multiplied by the duration1
         translation = self.workspace.actions[action_code].translation_speed * (float(outcome['duration1']) / 1000.0)
         # TODO Take the yaw into account
@@ -111,18 +115,20 @@ class CtrlRobot:
             enacted_enaction.azimuth = round(math.degrees(math.atan2(compass_y, compass_x)) + 180) % 360
             enacted_enaction.compass_point = np.array([compass_x, compass_y, 0], dtype=int)
 
-        # Interaction Floor line
-        if outcome['floor'] > 0:
-            # Update the translation
-            if outcome['floor'] == 0b01:
-                # Black line on the right
-                translation += [-RETREAT_DISTANCE, RETREAT_DISTANCE_Y, 0]
-            elif outcome['floor'] == 0b10:
-                # Black line on the left
-                translation += [-RETREAT_DISTANCE, -RETREAT_DISTANCE_Y, 0]
-            else:
-                # Black line on the front
-                translation += [-RETREAT_DISTANCE, 0, 0]
+        # Interaction FLOOR
+        if 'floor' in outcome:
+            enacted_enaction.floor = outcome['floor']
+            if outcome['floor'] > 0:
+                # Update the translation
+                if outcome['floor'] == 0b01:
+                    # Black line on the right
+                    translation += [-RETREAT_DISTANCE, RETREAT_DISTANCE_Y, 0]
+                elif outcome['floor'] == 0b10:
+                    # Black line on the left
+                    translation += [-RETREAT_DISTANCE, -RETREAT_DISTANCE_Y, 0]
+                else:
+                    # Black line on the front
+                    translation += [-RETREAT_DISTANCE, 0, 0]
 
         # Interaction ECHO
         if outcome['echo_distance'] < 10000:
@@ -132,13 +138,24 @@ class CtrlRobot:
 
         # Interaction impact
         # (The forward translation is already correct since it is integrated during duration1)
+        if 'impact' in outcome:
+            enacted_enaction.impact = outcome['impact']
 
         # Interaction blocked
-        # (The forward translation is already correct since it is integrated during duration1)
+        if 'blocked' in outcome and outcome['blocked']:
+            enacted_enaction.blocked = True
+            translation = np.array([0, 0, 0], dtype=int)
+
+        # The echo array for SCAN interactions
+        if "echos" in outcome:
+            enacted_enaction.echos = outcome['echos']
 
         # The estimated displacement of the environment relative to the robot caused by this interaction
-        translation_matrix = matrix44.create_from_translation(-translation)
+
+        enacted_enaction.translation = translation
         rotation_matrix = matrix44.create_from_z_rotation(math.radians(yaw))
+        enacted_enaction.rotation_matrix = rotation_matrix
+
         # https://pages.mtu.edu/~shene/COURSES/cs3621/NOTES/geometry/geo-tran.html#:~:text=A%20rotation%20matrix%20and%20a,rotations%20followed%20by%20a%20translation.
         # Multiply the rotation by the translation results in simply adding the translation values to the matrix.
         # The point will be rotated around origin and then the translation will be added
@@ -146,43 +163,9 @@ class CtrlRobot:
         # Multiply the translation by the rotation will compute a matrix
         # that will first translate the point and then rotate it around it new origin
         # This better processes floor retreat
-        displacement_matrix = matrix44.multiply(translation_matrix, rotation_matrix)  # Try translate and then rotate
-
-        # Return the displacement
-        outcome['translation'] = translation
-        enacted_enaction.translation = translation
-        outcome['rotation_matrix'] = rotation_matrix
-        enacted_enaction.rotation_matrix = rotation_matrix
-        outcome['displacement_matrix'] = displacement_matrix
+        translation_matrix = matrix44.create_from_translation(-translation)
+        displacement_matrix = matrix44.multiply(translation_matrix, rotation_matrix)
         enacted_enaction.displacement_matrix = displacement_matrix
-        enacted_enaction.duration1 = outcome['duration1']
-        enacted_enaction.head_angle = outcome['head_angle']
-        if 'floor' in outcome:
-            enacted_enaction.floor = outcome['floor']
-        if 'impact' in outcome:
-            enacted_enaction.impact = outcome['impact']
-        if 'blocked' in outcome:
-            enacted_enaction.blocked = outcome['blocked']
-        enacted_enaction.color_index = category_color(outcome['color'])
-
-        # The echo array
-        if "echos" in outcome:
-            enacted_enaction.echos = outcome['echos']
-
-        # if "echo_array" not in outcome:
-        #     outcome["echo_array"] = []
-        # # Compute the position of each echo point in the echo array
-        # for i in range(100, -99, -5):
-        #     ed_str = "ed"+str(i)
-        #     if ed_str in outcome:
-        #         ha = i
-        #         ed = outcome[ed_str]
-        #         tmp_x = ROBOT_HEAD_X + math.cos(math.radians(ha)) * ed
-        #         tmp_y = math.sin(math.radians(ha)) * ed
-        #         local_echo_p = (EXPERIENCE_LOCAL_ECHO, tmp_x, tmp_y)
-        #         outcome[KEY_EXPERIENCES].append(local_echo_p)
-        #         enacted_enaction.enacted_points.append(local_echo_p)
-        # print(enacted_interaction)
 
         self.workspace.intended_enaction = None
         self.workspace.enacted_enaction = enacted_enaction

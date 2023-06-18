@@ -14,6 +14,7 @@ public:
   Forward(Floor& FCR, Head& HEA, Imu& IMU, WifiCat& WifiCat, JSONVar json_action);
   void begin() override;
   void ongoing() override;
+  void outcome(JSONVar & outcome_object) override;
 private:
 };
 

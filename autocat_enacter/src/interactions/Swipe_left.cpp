@@ -47,11 +47,18 @@ void Swipe_left::ongoing()
     _step = INTERACTION_TERMINATE;
   }
   // If no floor change, check whether duration has elapsed
-  else if (_action_end_time < millis()) {
+  else if ((_action_end_time < millis()) || _IMU.get_impact_leftwards() > 0)
+  {
     if (!_HEA._is_enacting_head_alignment)
       _HEA.beginEchoAlignment();  // Force HEA
     _duration1 = millis()- _action_start_time;
     _FCR._OWM.stopMotion();
     _step = INTERACTION_TERMINATE;
+    _action_end_time = 0;
   }
+}
+
+void Swipe_left::outcome(JSONVar & outcome_object)
+{
+  _IMU.outcome_leftwards(outcome_object);
 }

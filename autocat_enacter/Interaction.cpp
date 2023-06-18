@@ -86,14 +86,14 @@ void Interaction::send()
   // Serial.println("Interaction.step3()");
   // Compute the outcome message
   JSONVar outcome_object;
-  outcome_object["status"] = _status;
-  outcome_object["action"] = String(_action);
   outcome_object["clock"] = _clock;
-  _FCR.outcome(outcome_object);
-  _HEA.outcome(outcome_object);
-  _IMU.outcome(outcome_object, _action);
-
+  outcome_object["action"] = String(_action);
+  outcome_object["status"] = _status;
   outcome_object["duration1"] = _duration1;
+  _HEA.outcome(outcome_object);
+  _FCR.outcome(outcome_object);
+  _IMU.outcome(outcome_object);
+
   outcome_object["duration"] = millis() - _action_start_time;
 
   // The outcome for the specific interaction subclass

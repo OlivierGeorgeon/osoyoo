@@ -8,7 +8,7 @@ from pyrr import quaternion, matrix44
 from playsound import playsound
 from . Action import ACTION_ALIGN_ROBOT, ACTION_FORWARD, ACTION_LEFTWARD, ACTION_RIGHTWARD
 from . Interaction import Interaction, OUTCOME_DEFAULT
-from . PredefinedInteractions import OUTCOME_IMPACT
+# from . PredefinedInteractions import OUTCOME_IMPACT
 from ..Robot.Enaction import Enaction
 from ..Memory.PhenomenonMemory.PhenomenonMemory import TER
 from ..Memory.EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_PLACE
@@ -71,49 +71,49 @@ class DeciderExplore:
             return outcome
 
         # Look for color place experience
-        for e in [e for e in self.workspace.memory.egocentric_memory.experiences.values() if e.type == EXPERIENCE_PLACE and e.clock == enacted_enaction.clock and e.color_index > 0]:
+        # for e in [e for e in self.workspace.memory.egocentric_memory.experiences.values() if e.type == EXPERIENCE_PLACE and e.clock == enacted_enaction.clock and e.color_index > 0]:
+        if enacted_enaction.color_index > 0:
             outcome = OUTCOME_COLOR
             print("Outcome color")
         # Look for the floor experience
-        for e in [e for e in self.workspace.memory.egocentric_memory.experiences.values() if e.type in [EXPERIENCE_FLOOR] and e.clock == enacted_enaction.clock]:
-            if e.color_index > 0:
-                # If the floor is color then origin confirmation was enacted
-                outcome = OUTCOME_ORIGIN
-                self.workspace.memory.phenomenon_memory.phenomena[TER].last_origin_clock = enacted_enaction.clock
-            else:
-                if e.type == EXPERIENCE_FLOOR and self.workspace.memory.phenomenon_memory.phenomena[TER].absolute_affordance() is not None:
-                    relative_quaternion = quaternion.cross(self.workspace.memory.body_memory.body_quaternion(), quaternion.inverse(self.workspace.memory.phenomenon_memory.phenomena[TER].absolute_affordance().experience.body_direction_quaternion()))
-                    print("Relative quaternion", repr(relative_quaternion))
-                    if quaternion.rotation_angle(relative_quaternion) > math.pi:
-                        relative_quaternion = -1 * relative_quaternion  # The quaternion representing the short angle
-                    rot = quaternion.rotation_angle(relative_quaternion)
-                    print("Rotation from origin", round(math.degrees(rot)))
-                    if quaternion.rotation_axis(relative_quaternion)[2] > 0:  # Positive z axis rotation
-                        if rot < math.pi/3:
-                            print("OUTCOME Left of origin")
-                            outcome = OUTCOME_LEFT
-                        elif rot < math.pi:
-                            print("OUTCOME Far Left of origin")
-                            outcome = OUTCOME_FAR_LEFT
-                    else:
-                        if rot < math.pi/3:
-                            print("OUTCOME Right of origin")
-                            outcome = OUTCOME_RIGHT
-                        elif rot < math.pi:
-                            print("OUTCOME Far Right of origin")
-                            outcome = OUTCOME_FAR_RIGHT
-
+        # for e in [e for e in self.workspace.memory.egocentric_memory.experiences.values() if e.type in [EXPERIENCE_FLOOR] and e.clock == enacted_enaction.clock]:
+        if enacted_enaction.floor > 0 and enacted_enaction.color_index == 0:
+            # if enacted_enaction.color_index > 0:
+            #     # If the floor is color then origin confirmation was enacted
+            #     outcome = OUTCOME_ORIGIN
+            #     self.workspace.memory.phenomenon_memory.phenomena[TER].last_origin_clock = enacted_enaction.clock
+            # else:
+            # If the floor is not colored then figure out if the robot is on the right or on the left
+            if self.workspace.memory.phenomenon_memory.phenomena[TER].absolute_affordance() is not None:
+                relative_quaternion = quaternion.cross(self.workspace.memory.body_memory.body_quaternion(),
+                                      quaternion.inverse(self.workspace.memory.phenomenon_memory.phenomena[TER].absolute_affordance().experience.body_direction_quaternion()))
+                print("Relative quaternion", repr(relative_quaternion))
+                if quaternion.rotation_angle(relative_quaternion) > math.pi:
+                    relative_quaternion = -1 * relative_quaternion  # The quaternion representing the short angle
+                rot = quaternion.rotation_angle(relative_quaternion)
+                print("Rotation from origin", round(math.degrees(rot)))
+                if quaternion.rotation_axis(relative_quaternion)[2] > 0:  # Positive z axis rotation
+                    if rot < math.pi/3:
+                        print("OUTCOME Left of origin")
+                        outcome = OUTCOME_LEFT
+                    elif rot < math.pi:
+                        print("OUTCOME Far Left of origin")
+                        outcome = OUTCOME_FAR_LEFT
+                else:
+                    if rot < math.pi/3:
+                        print("OUTCOME Right of origin")
+                        outcome = OUTCOME_RIGHT
+                    elif rot < math.pi:
+                        print("OUTCOME Far Right of origin")
+                        outcome = OUTCOME_FAR_RIGHT
         return outcome
 
     def intended_enaction(self, outcome):
         """Return the next intended interaction"""
         # Tracing the last interaction
         if self._action is not None:
-            print("Action: " + str(self._action) +
-                  ", Anticipation: " + str(self.anticipated_outcome) +
-                  ", Outcome: " + str(outcome) +
-                  ", Satisfaction: (anticipation: " + str(self.anticipated_outcome == outcome)) # +
-                  # ", valence: " + str(self.last_interaction.valence) + ")")
+            print("Action: " + str(self._action) + ", Anticipation: " + str(self.anticipated_outcome) +
+                  ", Outcome: " + str(outcome))
 
         # Compute the next prompt point
         if self.exploration_step == EXPLORATION_STEP_INIT:
@@ -162,16 +162,16 @@ class DeciderExplore:
                     self.prompt_index = 0
                 self.exploration_step = EXPLORATION_STEP_ROTATE
 
-        # Anyway if it is an a color and must enact confirmation affordance
+        # If the robot is on a color patch and must enact confirmation affordance
         if TER in self.workspace.memory.phenomenon_memory.phenomena and \
-                self.workspace.memory.phenomenon_memory.phenomena[TER].absolute_affordance() is not None and \
-                self.workspace.clock - self.workspace.memory.phenomenon_memory.phenomena[TER].last_origin_clock > CLOCK_TO_GO_HOME:
-            if outcome == OUTCOME_COLOR:
-                allo_confirmation = self.workspace.memory.phenomenon_memory.phenomena[TER].confirmation_prompt()
-                print("Enacting confirmation affordance to", allo_confirmation)
-                ego_confirmation = self.workspace.memory.allocentric_to_egocentric(allo_confirmation)
-                self.workspace.memory.egocentric_memory.prompt_point = ego_confirmation
-                playsound('autocat/Assets/R4.wav', False)
+            self.workspace.memory.phenomenon_memory.phenomena[TER].absolute_affordance() is not None and \
+            self.workspace.clock - self.workspace.memory.phenomenon_memory.phenomena[TER].last_origin_clock \
+                > CLOCK_TO_GO_HOME and outcome == OUTCOME_COLOR:
+            allo_confirmation = self.workspace.memory.phenomenon_memory.phenomena[TER].confirmation_prompt()
+            print("Enacting confirmation affordance to", allo_confirmation)
+            ego_confirmation = self.workspace.memory.allocentric_to_egocentric(allo_confirmation)
+            self.workspace.memory.egocentric_memory.prompt_point = ego_confirmation
+            playsound('autocat/Assets/R4.wav', False)
 
         # Compute the next intended interaction
         if self.exploration_step == EXPLORATION_STEP_SWIPE_RIGHT:

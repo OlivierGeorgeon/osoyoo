@@ -34,20 +34,28 @@ void Forward::ongoing()
 
 
   // If impact then proceed to phase 2
-  if (_IMU.get_impact_measure() > 0 && !_FCR._is_enacting)
+  int impact = _IMU.get_impact_forward();
+  if (impact > 0) // && !_FCR._is_enacting)
   {
+    // If lateral impact, look at the direction of the impact
+    if (impact == B01)
+      _HEA.turnHead(-70);
+    else if (impact == B10)
+      _HEA.turnHead(70);
+    // Trigger head alignment
+    _HEA.beginEchoAlignment();
     _duration1 = millis() - _action_start_time;
     _action_end_time = 0;
     _FCR._OWM.stopMotion();
     _step = INTERACTION_TERMINATE;
   }
 
-  // If obstacle the proceed to step 2
+  // If obstacle then proceed to step 2
   if (_HEA.get_ultrasonic_measure() < 200) // 200
   {
     if (!_HEA._is_enacting_head_alignment)
       _HEA.beginEchoAlignment();  // Force to look at the obstacle
-    _status ="2";
+    _status ="echo";
     _duration1 = millis()- _action_start_time;
     _action_end_time = 0;
     _FCR._OWM.stopMotion();
@@ -73,4 +81,9 @@ void Forward::ongoing()
     _FCR._OWM.stopMotion();
     _step = INTERACTION_TERMINATE;
   }
+}
+
+void Forward::outcome(JSONVar & outcome_object)
+{
+  _IMU.outcome_forward(outcome_object);
 }
