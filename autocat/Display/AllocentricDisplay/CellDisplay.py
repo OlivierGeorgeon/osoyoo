@@ -88,9 +88,9 @@ class CellDisplay:
         if cell.status[1] == EXPERIENCE_PLACE:  # Not used
             color2 = name_to_rgb('LightGreen')  # LightGreen
         if cell.status[1] == EXPERIENCE_BLOCK:
-            color2 = name_to_rgb('red')
+            color2 = name_to_rgb('salmon')
         if cell.status[1] == EXPERIENCE_IMPACT:
-            color2 = name_to_rgb('red')
+            color2 = name_to_rgb('salmon')
         if cell.status[1] == EXPERIENCE_FLOOR:  # Not used
             color2 = name_to_rgb('black')
         if cell.status[1] == EXPERIENCE_ALIGNED_ECHO:

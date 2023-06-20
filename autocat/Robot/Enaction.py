@@ -53,12 +53,10 @@ class Enaction:
         # The enacted enaction
         self.status = None
         self.duration1 = 0
-        # self.enacted_points = []
         self.yaw = 0
         self.compass_point = None
         self.azimuth = 0
         self.echo_point = None
-        # self.is_focussed = False
         self.lost_focus = False
         self.floor = 0
         self.impact = 0

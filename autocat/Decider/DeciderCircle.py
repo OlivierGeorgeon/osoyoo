@@ -97,18 +97,18 @@ class DeciderCircle:
             return outcome
 
         # If there is an echo, compute the echo outcome
-        if enacted_enaction.echo_point is not None:
+        if enacted_enaction.focus_point is not None:
             # if enacted_interaction['echo_xy'][0] < 200:  # From the center of the robot
-            if np.linalg.norm(enacted_enaction.echo_point) < 200:  # From the center of the robot
+            if np.linalg.norm(enacted_enaction.focus_point) < 200:  # From the center of the robot
                 outcome = OUTCOME_CLOSE_FRONT
             # elif enacted_interaction['echo_xy'][0] > 500:  # Must be farther than the forward speed
-            elif np.linalg.norm(enacted_enaction.echo_point) > 500:  # Must be farther than the forward speed
+            elif np.linalg.norm(enacted_enaction.focus_point) > 500:  # Must be farther than the forward speed
                 outcome = OUTCOME_FAR_FRONT
-            elif enacted_enaction.echo_point[1] > 150:
+            elif enacted_enaction.focus_point[1] > 150:
                 outcome = OUTCOME_FAR_LEFT  # More that 150 to the left
-            elif enacted_enaction.echo_point[1] > 0:
+            elif enacted_enaction.focus_point[1] > 0:
                 outcome = OUTCOME_LEFT      # between 0 and 150 to the left
-            elif enacted_enaction.echo_point[1] > -150:
+            elif enacted_enaction.focus_point[1] > -150:
                 outcome = OUTCOME_RIGHT     # Between 0 and -150 to the right
             else:
                 outcome = OUTCOME_FAR_RIGHT  # More that -150 to the right

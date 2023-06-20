@@ -69,13 +69,16 @@ void Interaction::outcome(JSONVar & outcome_object)
 
 void Interaction::terminate()
 {
+  // Turn on the color sensor led
+  _FCR._CLR.begin_read();
+
   // Serial.println("Interaction.step2()");
   if (_action_end_time < millis() &&  !_FCR._is_enacting && !_HEA._is_enacting_head_alignment)
   {
-    // Read the floor color
-    _FCR._CLR.read();
-    // Proceed to step 3
-    _step = INTERACTION_SEND;
+    // Read the floor color and return true when done
+    if (_FCR._CLR.end_read())
+      // When color has been read, proceed to step 3
+      _step = INTERACTION_SEND;
   }
 }
 

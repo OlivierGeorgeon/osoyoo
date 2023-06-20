@@ -39,21 +39,40 @@ void Color::setup()
   }
 }
 
+// Turn on the led and starts the 50ms timer
+
+void Color::begin_read()
+{
+  if (!_is_led_on)
+  {
+    digitalWrite(Led_PIN, HIGH);
+    _read_start_time = millis();
+    _is_led_on = true;
+  }
+}
+
 // Read the sensor
-void Color::read()
+bool Color::end_read()
 {
   if (is_initialized)
   {
     // Switch the LED on
-    digitalWrite(Led_PIN, HIGH);
+    // digitalWrite(Led_PIN, HIGH);
 
-    // TODO : don't block the loop
-    delay(50);  // takes 50ms to read
-
-    tcs.getRawData(&r, &g, &b, &c);
-
-    digitalWrite(Led_PIN, LOW);
+    // delay(50);  // takes 50ms to read
+    if (millis() > _read_start_time + LED_ON_DURATION)
+    {
+      tcs.getRawData(&r, &g, &b, &c);
+      digitalWrite(Led_PIN, LOW);
+      _is_led_on = false;
+      return true;
+    }
+    else
+      return false;
   }
+  // No color sensor then always return true
+  else
+    return true;
 }
 
 void Color::outcome(JSONVar & outcome_object)

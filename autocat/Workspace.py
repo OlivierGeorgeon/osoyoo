@@ -28,9 +28,8 @@ class Workspace:
         self.deciders = {'Explore': DeciderExplore(self), 'Circle': DeciderCircle(self)}
         self.integrator = Integrator(self)
 
-        self.intended_enaction = None
         self.enactions = {}  # The stack of enactions to enact next
-        # self.enacted_interaction = {}
+        self.intended_enaction = None
         self.enacted_enaction = None
 
         self.decider_mode = KEY_DECIDER_USER
@@ -110,7 +109,6 @@ class Workspace:
             # Restore the memory from the snapshot and integrate the experiences
             self.memory = self.memory_snapshot
             # Update body memory and egocentric memory
-            # self.memory.update_and_add_experiences(self.enacted_interaction)
             self.memory.update_and_add_experiences(self.enacted_enaction)
 
             # Call the integrator to create and update the phenomena

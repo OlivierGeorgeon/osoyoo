@@ -25,7 +25,9 @@
 #define ACCELERATION_Y_OFFSET -3        //
 #define COMPASS_X_OFFSET 7051 // 7022
 #define COMPASS_Y_OFFSET 7306 // 7336
-#define ACCELERATION_IMPACT_THRESHOLD -200
+// #define ACCELERATION_IMPACT_THRESHOLD -200
+#define ACCELERATION_X_IMPACT_THRESHOLD 200 // -400 // Below the threshold it is a strong deceleration = shock
+#define ACCELERATION_Y_IMPACT_THRESHOLD 110
 #define ACCELERATION_BLOCK_THRESHOLD 60  // TODO depends whether the interaction starts when the robot is immobile
 #define GYRO_COEF 1.2  //  1 // IMU is upright. If turns too much, increase this value
 #define ROBOT_SERVO_PIN 4  // 13 Changed because 13 is used for internal led
@@ -47,7 +49,8 @@
 #define COMPASS_Y_OFFSET -1601 // -1645
 #define ACCELERATION_X_OFFSET 550 //
 #define ACCELERATION_Y_OFFSET -3        //
-#define ACCELERATION_IMPACT_THRESHOLD -250 // -400 // Below the threshold it is a strong deceleration = shock
+#define ACCELERATION_X_IMPACT_THRESHOLD 250 // -400 // Below the threshold it is a strong deceleration = shock
+#define ACCELERATION_Y_IMPACT_THRESHOLD 110
 #define ACCELERATION_BLOCK_THRESHOLD 60 // Below the threshold, the robot is blocked
 #define GYRO_COEF 1.35 // UMI is upright
 #define ROBOT_SERVO_PIN 4
@@ -64,14 +67,15 @@
 #define ROBOT_FRONT_RIGHT_WHEEL_COEF 1.0 // 1.1 20/05/2023 // 1.0 04/04/2023 // 1.1 26/02/2023 // 1.2 29/05/2022
 #define TURN_SPOT_MAX_DURATION 2400
 #define TURN_SPOT_ENDING_DELAY 200
-#define TURN_SPOT_ENDING_ANGLE 11 // 5
+#define TURN_SPOT_ENDING_ANGLE 9 // 5
 #define COMPASS_X_OFFSET  1071  // 1100  // 1005  //  1020,  1060
 #define COMPASS_Y_OFFSET  -1225  // -1300  // -1247 // -1300, -1290
 #define ACCELERATION_X_OFFSET 55  // 35
 #define ACCELERATION_Y_OFFSET -3        //
-#define ACCELERATION_IMPACT_THRESHOLD -200
+#define ACCELERATION_X_IMPACT_THRESHOLD 200
+#define ACCELERATION_Y_IMPACT_THRESHOLD 110
 #define ACCELERATION_BLOCK_THRESHOLD 140 // 30 // Below the threshold, the robot is blocked
-#define GYRO_COEF 2.0 // 1.33  // 1.5 si tourne trop, augmenter cette valeur
+#define GYRO_COEF 1.  // 2.0 // 1.33  // 1.5 si tourne trop, augmenter cette valeur
 #define ROBOT_SERVO_PIN 4
 #define GYRO_IMPACT_THRESHOLD 0.25      // (degree/s) above this threshold: strong z rotation = lateral impact
 
@@ -91,7 +95,9 @@
 #define ACCELERATION_Y_OFFSET -3        //
 #define COMPASS_X_OFFSET -1155
 #define COMPASS_Y_OFFSET -1150
-#define ACCELERATION_IMPACT_THRESHOLD -300
+// #define ACCELERATION_IMPACT_THRESHOLD -300
+#define ACCELERATION_X_IMPACT_THRESHOLD 300 // -400 // Below the threshold it is a strong deceleration = shock
+#define ACCELERATION_Y_IMPACT_THRESHOLD 110
 #define ACCELERATION_BLOCK_THRESHOLD 50
 #define GYRO_COEF 1.5
 #define ROBOT_SERVO_PIN 4
@@ -113,7 +119,8 @@
 #define ACCELERATION_Y_OFFSET -3        //
 #define COMPASS_X_OFFSET 6435
 #define COMPASS_Y_OFFSET 5581
-#define ACCELERATION_IMPACT_THRESHOLD -300
+#define ACCELERATION_X_IMPACT_THRESHOLD 300
+#define ACCELERATION_Y_IMPACT_THRESHOLD 110
 #define ACCELERATION_BLOCK_THRESHOLD 50
 #define GYRO_COEF 1.5
 #define ROBOT_SERVO_PIN 4
@@ -135,7 +142,8 @@
 #define ACCELERATION_Y_OFFSET -3        //
 #define COMPASS_X_OFFSET 6021
 #define COMPASS_Y_OFFSET 5653
-#define ACCELERATION_IMPACT_THRESHOLD -300
+#define ACCELERATION_X_IMPACT_THRESHOLD 300
+#define ACCELERATION_Y_IMPACT_THRESHOLD 110
 #define ACCELERATION_BLOCK_THRESHOLD 50
 #define GYRO_COEF 1.4
 #define ROBOT_SERVO_PIN 4
@@ -157,7 +165,8 @@
 #define ACCELERATION_Y_OFFSET -3        //
 #define COMPASS_X_OFFSET 5921
 #define COMPASS_Y_OFFSET 5669
-#define ACCELERATION_IMPACT_THRESHOLD -300
+#define ACCELERATION_X_IMPACT_THRESHOLD 300
+#define ACCELERATION_Y_IMPACT_THRESHOLD 110
 #define ACCELERATION_BLOCK_THRESHOLD 50
 #define GYRO_COEF 1.5
 #define ROBOT_SERVO_PIN 4

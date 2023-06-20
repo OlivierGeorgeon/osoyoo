@@ -21,7 +21,7 @@
 
 Imu::Imu()
 {
-  _next_imu_read_time = 0;
+  // _imu_read_time = 0; initialized in imu.h
   _yaw = 0;
   //_debug_message = "";
 }
@@ -117,10 +117,10 @@ void Imu::begin()
 }
 int Imu::update(int interaction_step)
 {
-  unsigned long timer = millis();
-  if (_next_imu_read_time < timer)
+  if (millis() > _imu_read_time + IMU_READ_PERIOD)
   {
-    _next_imu_read_time = timer + IMU_READ_PERIOD;
+    unsigned long _time_interval = millis() - _imu_read_time;
+    _imu_read_time = millis();
     _cycle_count++;
 
     #if ROBOT_HAS_MPU6050 == true
@@ -134,8 +134,10 @@ int Imu::update(int interaction_step)
     int x_acceleration = -normAccel.XAxis * 100 + ACCELERATION_X_OFFSET;
     int y_acceleration = -normAccel.YAxis * 100 + ACCELERATION_Y_OFFSET;
 
-    // Integrate yaw during the interaction
-    float _ZAngle = normGyro.ZAxis * IMU_READ_PERIOD / 1000 * GYRO_COEF;
+    // Integrate yaw during the interaction (Jarzebski multiply by the time step):
+    // https://github.com/jarzebski/Arduino-MPU6050/blob/dev/MPU6050_gyro_pitch_roll_yaw/MPU6050_gyro_pitch_roll_yaw.ino
+    // float _ZAngle = normGyro.ZAxis * IMU_READ_PERIOD / 1000 * GYRO_COEF;
+    float _ZAngle = normGyro.ZAxis * _time_interval / 1000 * GYRO_COEF;  // TODO test this
     _yaw += _ZAngle;
 
     // During the first step of the interaction, check acceleration
@@ -165,13 +167,8 @@ int Imu::update(int interaction_step)
       if (_ZAngle < _min_negative_yaw_right)
         _min_negative_yaw_right = _ZAngle;
 
-      // Check for turned to the right by more than 1°/s after the first 250ms
-      // if ((_ZAngle < -GYRO_SHOCK_THRESHOLD) && (_cycle_count > IMU_ACCELERATION_CYCLES))
-        // If moving forward, this will mean collision on the right
-        // _impact_forward = B01;
-
       // Check for x impact or blocked
-      if ((x_acceleration < ACCELERATION_IMPACT_THRESHOLD) ||
+      if ((x_acceleration < -ACCELERATION_X_IMPACT_THRESHOLD) ||
          (_cycle_count >= IMU_ACCELERATION_CYCLES) && (_max_positive_x_acc < ACCELERATION_BLOCK_THRESHOLD))
       {
         if (_min_negative_yaw_right < -GYRO_IMPACT_THRESHOLD)
@@ -183,34 +180,21 @@ int Imu::update(int interaction_step)
       }
 
       // Check for leftwards impact or blocked (y positive)
-      if ((y_acceleration < -100) ||
+      if ((y_acceleration < -ACCELERATION_Y_IMPACT_THRESHOLD) ||
          (_cycle_count >= IMU_ACCELERATION_CYCLES) && (_max_positive_y_acc < 80))  // 100
         _impact_leftwards = 1;
 
       // Check for rightwards impact or blocked
-      if ((y_acceleration > 100) ||
+      if ((y_acceleration > ACCELERATION_Y_IMPACT_THRESHOLD) ||
          (_cycle_count >= IMU_ACCELERATION_CYCLES) && (_min_negative_y_acc > -80))
         _impact_rightwards = 1;
 
-      // Check for turned to the left by more than 1°/s after the first 250ms
-      // if ((_ZAngle > GYRO_SHOCK_THRESHOLD) && (_cycle_count > IMU_ACCELERATION_CYCLES))
-        // If moving forward, this will mean collision on the left
-        // _impact_forward = B10;
-
-      // Check for blocked on the front
-      // (the initial acceleration did not pass the threshold)
-//      if (_cycle_count >= IMU_ACCELERATION_CYCLES) && (_max_positive_x_acc < ACCELERATION_BLOCK_THRESHOLD)
-//      {
-//        _impact_forward = B111;  // Stop the motors
-//        _blocked = true;
-//      }
-
       // Trying to compute the speed by integrating acceleration (not working)
-      _xSpeed += (x_acceleration) * IMU_READ_PERIOD / 100;
+      _xSpeed += (x_acceleration) * _time_interval / 100;
       if (_xSpeed > _max_speed) _max_speed = _xSpeed;
       if (_xSpeed < _min_speed) _min_speed = _xSpeed;
       // Trying to compute the distance by integrating the speed (not working)
-      _xDistance += _xSpeed * IMU_READ_PERIOD / 1000;
+      _xDistance += _xSpeed * _time_interval / 1000;
     }
     #endif
   }

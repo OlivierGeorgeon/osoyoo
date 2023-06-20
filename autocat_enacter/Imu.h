@@ -53,7 +53,7 @@ class Imu
     #warning "Compiling for MMC5883"
     MMC5883MA compass;
     #endif
-    unsigned long _next_imu_read_time;
+    unsigned long _imu_read_time = 0;
     int _max_positive_x_acc;
     int _min_negative_x_acc;
     int _max_positive_y_acc;

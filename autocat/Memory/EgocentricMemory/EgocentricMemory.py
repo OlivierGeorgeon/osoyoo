@@ -86,16 +86,19 @@ class EgocentricMemory:
             if enacted_enaction.echo_point is None or np.linalg.norm(enacted_enaction.echo_point) > 200:
                 # Count as an echo to to activate DeciderCircle
                 if enacted_enaction.impact == 0b01:
-                    enacted_enaction.echo_point = np.array([ROBOT_FRONT_X + 10, -ROBOT_FRONT_Y, 0])
+                    self.focus_point = np.array([ROBOT_FRONT_X + 10, -ROBOT_FRONT_Y, 0])
                 elif enacted_enaction.impact == 0b10:
-                    enacted_enaction.echo_point = np.array([ROBOT_FRONT_X + 10, ROBOT_FRONT_Y, 0])
+                    self.focus_point = np.array([ROBOT_FRONT_X + 10, ROBOT_FRONT_Y, 0])
                 else:
-                    enacted_enaction.echo_point = np.array([ROBOT_FRONT_X + 10, 0, 0])
-            # TODO Do not create echo experience
-            self.focus_point = enacted_enaction.echo_point
+                    self.focus_point = np.array([ROBOT_FRONT_X + 10, 0, 0])
+            else:
+                self.focus_point = enacted_enaction.echo_point
             # Reset lost focus to activate DecideCircle
             enacted_enaction.lost_focus = False
             print("CATCH FOCUS IMPACT", self.focus_point)
+
+        # The focus is passed to the enacted enaction to be used by the decider
+        enacted_enaction.focus_point = self.focus_point
 
         # Move the prompt
         if self.prompt_point is not None:
