@@ -97,6 +97,7 @@ void Imu::setup()
   compass.setOffset(COMPASS_X_OFFSET, COMPASS_Y_OFFSET);
   #endif
 }
+
 void Imu::begin()
 {
   _yaw = 0;
@@ -117,6 +118,7 @@ void Imu::begin()
   _max_positive_yaw_left = 0.0;
   _min_negative_yaw_right = 0.0;
 }
+
 void Imu::update(int interaction_step)
 {
   #if ROBOT_HAS_MPU6050 == true
@@ -212,7 +214,6 @@ void Imu::update(int interaction_step)
     }
   }
   #endif
-  // return _impact_forward;
 }
 
 int Imu::get_impact_forward()

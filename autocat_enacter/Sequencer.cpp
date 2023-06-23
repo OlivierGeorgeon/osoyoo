@@ -120,8 +120,3 @@ Interaction* Sequencer::update(int& interaction_step, Interaction* INT)
   }
   return INT;
 }
-
-//int Sequencer::get_interaction_step()
-//{
-//  return interaction_step;
-//}

@@ -5,10 +5,15 @@ from .AllocentricMemory.AllocentricMemory import AllocentricMemory
 from .BodyMemory import BodyMemory
 from .PhenomenonMemory.PhenomenonMemory import PhenomenonMemory, TER
 from .AllocentricMemory.Hexagonal_geometry import CELL_RADIUS
+from ..Utils import rotate_vector_z
+
 
 GRID_WIDTH = 100   # Number of cells wide
 GRID_HEIGHT = 200  # Number of cells high
 NEAR_HOME = 300    # (mm) Max distance to consider near home
+SIMULATION_TIME_RATIO = 1  # 0.5   # The simulation speed is slower than the real speed because ...
+SIMULATION_STEP_OFF = 0
+SIMULATION_STEP_ON = 1  # More step will be used to take wifi transmission time into account
 
 
 class Memory:
@@ -33,10 +38,10 @@ class Memory:
         - Add new experiences in egocentric_memory
         - Move the robot in allocentric_memory
         """
-        self.egocentric_memory.maintain_focus(self.egocentric_memory.focus_point, enacted_enaction)
+        # self.egocentric_memory.maintain_focus(self.egocentric_memory.focus_point, enacted_enaction)
         self.egocentric_memory.focus_point = enacted_enaction.focus_point
-
-        self.egocentric_memory.maintain_prompt(enacted_enaction)
+        self.egocentric_memory.prompt_point = enacted_enaction.prompt_point
+        # self.egocentric_memory.maintain_prompt(enacted_enaction)
 
         self.body_memory.set_head_direction_degree(enacted_enaction.head_angle)
         # TODO Keep the simulation and adjust the robot position
@@ -107,3 +112,36 @@ class Memory:
             return np.linalg.norm(delta) < NEAR_HOME
         else:
             return False
+
+    def simulate(self, intended_enaction, dt):
+        """Simulate the enaction in memory. Return True during the simulation, and False when it ends"""
+        # Check the target time
+        intended_enaction.simulation_time += dt
+        if intended_enaction.simulation_time > intended_enaction.simulation_duration:
+            intended_enaction.simulation_time = 0.
+            intended_enaction.simulation_step = SIMULATION_STEP_OFF
+            return False
+
+        # Simulate the displacement in egocentric memory
+        translation_matrix = matrix44.create_from_translation(-intended_enaction.action.translation_speed * dt *
+                                                              SIMULATION_TIME_RATIO)
+        rotation_matrix = matrix44.create_from_z_rotation(intended_enaction.simulation_rotation_speed * dt)
+        displacement_matrix = matrix44.multiply(rotation_matrix, translation_matrix)
+        for experience in self.egocentric_memory.experiences.values():
+            experience.displace(displacement_matrix)
+        # Simulate the displacement of the focus and prompt
+        if self.egocentric_memory.focus_point is not None:
+            self.egocentric_memory.focus_point = matrix44.apply_to_vector(displacement_matrix,
+                                                                            self.egocentric_memory.focus_point)
+        if self.egocentric_memory.prompt_point is not None:
+            self.egocentric_memory.prompt_point = matrix44.apply_to_vector(displacement_matrix,
+                                                                             self.egocentric_memory.prompt_point)
+        # Displacement in body memory
+        self.body_memory.body_direction_rad += intended_enaction.simulation_rotation_speed * dt
+        # Update allocentric memory
+        self.allocentric_memory.robot_point += rotate_vector_z(intended_enaction.action.translation_speed * dt *
+                                                                 SIMULATION_TIME_RATIO,
+                                                                 self.body_memory.body_direction_rad)
+        self.allocentric_memory.place_robot(self.body_memory, intended_enaction.clock)
+
+        return True

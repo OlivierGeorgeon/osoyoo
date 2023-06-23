@@ -172,6 +172,7 @@ class CtrlRobot:
         displacement_matrix = matrix44.multiply(translation_matrix, rotation_matrix)
         enacted_enaction.displacement_matrix = displacement_matrix
 
+        enacted_enaction.follow_up(self.workspace.intended_enaction)
         self.workspace.intended_enaction = None
         self.workspace.enacted_enaction = enacted_enaction
         self.workspace.interaction_step = INTERACTION_STEP_INTEGRATING

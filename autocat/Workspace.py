@@ -3,9 +3,9 @@ from .Decider.DeciderCircle import DeciderCircle
 from .Decider.DeciderExplore import DeciderExplore
 from .Decider.Action import create_actions, ACTION_FORWARD, ACTIONS, ACTION_ALIGN_ROBOT
 from .Decider.Interaction import Interaction, OUTCOME_DEFAULT
-from .Memory.Memory import Memory
+from .Memory.Memory import Memory, SIMULATION_STEP_OFF
 from .Integrator.Integrator import Integrator
-from .Robot.Enaction import Enaction, SIMULATION_STEP_OFF
+from .Robot.Enaction import Enaction
 from .Robot.CtrlRobot import INTERACTION_STEP_IDLE, INTERACTION_STEP_INTENDING, INTERACTION_STEP_ENACTING, \
     INTERACTION_STEP_INTEGRATING, INTERACTION_STEP_REFRESHING
 
@@ -95,7 +95,8 @@ class Workspace:
         # ENACTING: update body memory during the robot enaction or the imaginary simulation
         if self.interaction_step == INTERACTION_STEP_ENACTING:
             if self.intended_enaction.simulation_step != SIMULATION_STEP_OFF:
-                self.intended_enaction.simulate(self.memory, dt)
+                # self.intended_enaction.simulate(self.memory, dt)
+                self.memory.simulate(self.intended_enaction, dt)
             else:
                 # End of the simulation
                 if self.is_imagining:

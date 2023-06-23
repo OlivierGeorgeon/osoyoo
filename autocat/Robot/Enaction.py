@@ -2,15 +2,14 @@ import json
 import math
 import numpy as np
 from pyrr import matrix44
+from playsound import playsound
 from ..Decider.Action import ACTION_FORWARD, ACTION_BACKWARD, ACTION_ALIGN_ROBOT, ACTION_LEFTWARD, ACTION_RIGHTWARD, \
-    ACTION_TURN_LEFT, ACTION_TURN_RIGHT, ACTION_TURN_HEAD
-from .RobotDefine import DEFAULT_YAW, TURN_DURATION
-from ..Utils import rotate_vector_z
+    ACTION_TURN_LEFT, ACTION_TURN_RIGHT, ACTION_TURN_HEAD, ACTION_SCAN
+from ..Memory.Memory import SIMULATION_STEP_ON, SIMULATION_TIME_RATIO
+from .RobotDefine import DEFAULT_YAW, TURN_DURATION, ROBOT_FRONT_X, ROBOT_FRONT_Y
 
 ENACTION_DEFAULT_TIMEOUT = 6  # Seconds
-SIMULATION_TIME_RATIO = 1  # 0.5   # The simulation speed is slower than the real speed because ...
-SIMULATION_STEP_OFF = 0
-SIMULATION_STEP_ON = 1  # More step will be used to take wifi transmission time into account
+FOCUS_MAX_DELTA = 100  # 200 (mm) Maximum delta to keep focus
 
 
 class Enaction:
@@ -23,6 +22,7 @@ class Enaction:
             self.focus_point = focus_point.copy()
         self.duration = None
         self.angle = None
+        self.prompt_point = prompt_point
         if prompt_point is not None:
             if self.action.action_code in [ACTION_FORWARD, ACTION_BACKWARD]:
                 self.duration = int(np.linalg.norm(prompt_point) /
@@ -113,42 +113,91 @@ class Enaction:
         self.simulation_duration *= SIMULATION_TIME_RATIO
         self.simulation_rotation_speed *= SIMULATION_TIME_RATIO
 
-    def simulate(self, memory, dt):
-        """Simulate the enaction in memory. Return True during the simulation, and False when it ends"""
-        # Check the target time
-        self.simulation_time += dt
-        if self.simulation_time > self.simulation_duration:
-            self.simulation_time = 0.
-            self.simulation_step = SIMULATION_STEP_OFF
-            return False
-
-        # Simulate the displacement in egocentric memory
-        translation_matrix = matrix44.create_from_translation(-self.action.translation_speed * dt *
-                                                              SIMULATION_TIME_RATIO)
-        rotation_matrix = matrix44.create_from_z_rotation(self.simulation_rotation_speed * dt)
-        displacement_matrix = matrix44.multiply(rotation_matrix, translation_matrix)
-        for experience in memory.egocentric_memory.experiences.values():
-            experience.displace(displacement_matrix)
-        # Simulate the displacement of the focus and prompt
-        if memory.egocentric_memory.focus_point is not None:
-            memory.egocentric_memory.focus_point = matrix44.apply_to_vector(displacement_matrix,
-                                                                            memory.egocentric_memory.focus_point)
-        if memory.egocentric_memory.prompt_point is not None:
-            memory.egocentric_memory.prompt_point = matrix44.apply_to_vector(displacement_matrix,
-                                                                             memory.egocentric_memory.prompt_point)
-        # Displacement in body memory
-        memory.body_memory.body_direction_rad += self.simulation_rotation_speed * dt
-        # Update allocentric memory
-        memory.allocentric_memory.robot_point += rotate_vector_z(self.action.translation_speed * dt *
-                                                                 SIMULATION_TIME_RATIO,
-                                                                 memory.body_memory.body_direction_rad)
-        memory.allocentric_memory.place_robot(memory.body_memory, self.clock)
-
-        return True
-
     def body_label(self):
         """Return the label to display in the body view"""
         rotation_speed = "{:.2f}".format(math.degrees(self.action.rotation_speed_rad))
         label = "Speed x: " + str(int(self.action.translation_speed[0])) + "mm/s, y: " \
             + str(int(self.action.translation_speed[1])) + "mm/s, rotation:" + rotation_speed + "°/s"
         return label
+
+    def follow_up(self, intended_enaction):
+        """Manage focus catch, lost, or update. Also move the prompt"""
+
+        # If the robot is already focussed then adjust the focus and the displacement
+        if intended_enaction.focus_point is not None:
+            # The new estimated position of the focus point
+            displacement_matrix = self.displacement_matrix
+            translation = self.translation
+            rotation_matrix = self.rotation_matrix
+            if self.echo_point is not None:
+                # action_code = enacted_enaction.action.action_code
+                # The error between the expected and the actual position of the echo
+                prediction_focus_point = matrix44.apply_to_vector(displacement_matrix, intended_enaction.focus_point)
+                prediction_error_focus = prediction_focus_point - self.echo_point
+                # If the new focus is near the previous focus
+                if np.linalg.norm(prediction_error_focus) < FOCUS_MAX_DELTA:
+                    # The focus has been kept
+                    self.focus_point = self.echo_point
+                    print("UPDATE FOCUS by delta", prediction_error_focus)
+                    # enacted_enaction.is_focussed = True
+                    # If the action has been completed
+                    if self.duration1 >= 1000:
+                        # If the head is forward then correct longitudinal displacements
+                        if -20 < self.head_angle < 20:
+                            if self.action.action_code in [ACTION_FORWARD, ACTION_BACKWARD]:
+                                translation[0] = translation[0] + prediction_error_focus[0]
+                                # Correct the estimated speed of the action
+                                self.action.adjust_translation_speed(translation)
+                        # If the head is sideways then correct lateral displacements
+                        if self.head_angle < -60 or 60 < self.head_angle:
+                            if self.action.action_code in [ACTION_LEFTWARD, ACTION_RIGHTWARD]:
+                                translation[1] = translation[1] + prediction_error_focus[1]
+                                # Correct the estimated speed of the action
+                                self.action.adjust_translation_speed(translation)
+                        # Update the displacement matrix according to the new translation
+                        translation_matrix = matrix44.create_from_translation(-translation)
+                        # displacement_matrix = matrix44.multiply(rotation_matrix, translation_matrix)
+                        displacement_matrix = matrix44.multiply(translation_matrix, rotation_matrix)
+                        self.translation = translation
+                        self.displacement_matrix = displacement_matrix
+                else:
+                    # The focus was lost
+                    print("LOST FOCUS due to delta", prediction_error_focus)
+                    self.lost_focus = True  # Used by agent_circle
+                    self.focus_point = None
+                    # playsound('autocat/Assets/R5.wav', False)
+            else:
+                # The focus was lost
+                print("LOST FOCUS due to no echo")
+                self.lost_focus = True  # Used by agent_circle
+                self.focus_point = None
+                # playsound('autocat/Assets/R5.wav', False)
+        else:
+            # If the robot was not focussed
+            if self.action.action_code in [ACTION_SCAN, ACTION_FORWARD] \
+                    and self.echo_point is not None:
+                # Catch focus
+                playsound('autocat/Assets/cute_beep2.wav', False)
+                self.focus_point = self.echo_point
+                print("CATCH FOCUS", self.focus_point)
+
+        # Impact or block catch focus
+        if self.impact > 0 and self.action.action_code == ACTION_FORWARD:  # or enacted_enaction.blocked:
+            if self.echo_point is None or np.linalg.norm(self.echo_point) > 200:
+                # Count as an echo to to activate DeciderCircle
+                if self.impact == 0b01:
+                    self.focus_point = np.array([ROBOT_FRONT_X + 10, -ROBOT_FRONT_Y, 0])
+                elif self.impact == 0b10:
+                    self.focus_point = np.array([ROBOT_FRONT_X + 10, ROBOT_FRONT_Y, 0])
+                else:
+                    self.focus_point = np.array([ROBOT_FRONT_X + 10, 0, 0])
+            else:
+                self.focus_point = self.echo_point
+            # Reset lost focus to activate DecideCircle
+            self.lost_focus = False
+            print("CATCH FOCUS IMPACT", self.focus_point)
+
+        # Move the prompt
+        if intended_enaction.prompt_point is not None:
+            self.prompt_point = matrix44.apply_to_vector(self.displacement_matrix, intended_enaction.prompt_point).astype(int)
+            print("Prompt moved to egocentric: ", self.prompt_point)

@@ -8,7 +8,6 @@ from ...Decider.Action import ACTION_SCAN, ACTION_FORWARD, ACTION_BACKWARD, ACTI
 import math
 
 EXPERIENCE_PERSISTENCE = 10
-FOCUS_MAX_DELTA = 100  # 200 (mm) Maximum delta to keep focus
 
 
 class EgocentricMemory:
@@ -19,92 +18,6 @@ class EgocentricMemory:
         self.prompt_point = None  # The point where the agent is prompted do go
         self.experiences = {}
         self.experience_id = 0  # A unique ID for each experience in memory
-
-    def maintain_focus(self, focus_point, enacted_enaction):
-        """Manage focus catch, lost, or update. Also move the prompt"""
-
-        # If the robot is already focussed then adjust the focus and the displacement
-        if focus_point is not None:
-            # The new estimated position of the focus point
-            displacement_matrix = enacted_enaction.displacement_matrix
-            translation = enacted_enaction.translation
-            rotation_matrix = enacted_enaction.rotation_matrix
-            if enacted_enaction.echo_point is not None:
-                # action_code = enacted_enaction.action.action_code
-                # The error between the expected and the actual position of the echo
-                prediction_focus_point = matrix44.apply_to_vector(displacement_matrix, focus_point)
-                prediction_error_focus = prediction_focus_point - enacted_enaction.echo_point
-                # If the new focus is near the previous focus
-                if np.linalg.norm(prediction_error_focus) < FOCUS_MAX_DELTA:
-                    # The focus has been kept
-                    focus_point = enacted_enaction.echo_point
-                    print("UPDATE FOCUS by delta", prediction_error_focus)
-                    # enacted_enaction.is_focussed = True
-                    # If the action has been completed
-                    if enacted_enaction.duration1 >= 1000:
-                        # If the head is forward then correct longitudinal displacements
-                        if -20 < enacted_enaction.head_angle < 20:
-                            if enacted_enaction.action.action_code in [ACTION_FORWARD, ACTION_BACKWARD]:
-                                translation[0] = translation[0] + prediction_error_focus[0]
-                                # Correct the estimated speed of the action
-                                enacted_enaction.action.adjust_translation_speed(translation)
-                        # If the head is sideways then correct lateral displacements
-                        if enacted_enaction.head_angle < -60 or 60 < enacted_enaction.head_angle:
-                            if enacted_enaction.action.action_code in [ACTION_LEFTWARD, ACTION_RIGHTWARD]:
-                                translation[1] = translation[1] + prediction_error_focus[1]
-                                # Correct the estimated speed of the action
-                                enacted_enaction.action.adjust_translation_speed(translation)
-                        # Update the displacement matrix according to the new translation
-                        translation_matrix = matrix44.create_from_translation(-translation)
-                        # displacement_matrix = matrix44.multiply(rotation_matrix, translation_matrix)
-                        displacement_matrix = matrix44.multiply(translation_matrix, rotation_matrix)
-                        enacted_enaction.translation = translation
-                        enacted_enaction.displacement_matrix = displacement_matrix
-                else:
-                    # The focus was lost
-                    print("LOST FOCUS due to delta", prediction_error_focus)
-                    enacted_enaction.lost_focus = True  # Used by agent_circle
-                    focus_point = None
-                    # playsound('autocat/Assets/R5.wav', False)
-            else:
-                # The focus was lost
-                print("LOST FOCUS due to no echo")
-                enacted_enaction.lost_focus = True  # Used by agent_circle
-                focus_point = None
-                # playsound('autocat/Assets/R5.wav', False)
-        else:
-            # If the robot was not focussed
-            if enacted_enaction.action.action_code in [ACTION_SCAN, ACTION_FORWARD] \
-                    and enacted_enaction.echo_point is not None:
-                # Catch focus
-                playsound('autocat/Assets/cute_beep2.wav', False)
-                focus_point = enacted_enaction.echo_point
-                print("CATCH FOCUS", focus_point)
-
-        # Impact or block catch focus
-        if enacted_enaction.impact > 0 and enacted_enaction.action.action_code == ACTION_FORWARD:  # or enacted_enaction.blocked:
-            if enacted_enaction.echo_point is None or np.linalg.norm(enacted_enaction.echo_point) > 200:
-                # Count as an echo to to activate DeciderCircle
-                if enacted_enaction.impact == 0b01:
-                    focus_point = np.array([ROBOT_FRONT_X + 10, -ROBOT_FRONT_Y, 0])
-                elif enacted_enaction.impact == 0b10:
-                    focus_point = np.array([ROBOT_FRONT_X + 10, ROBOT_FRONT_Y, 0])
-                else:
-                    focus_point = np.array([ROBOT_FRONT_X + 10, 0, 0])
-            else:
-                focus_point = enacted_enaction.echo_point
-            # Reset lost focus to activate DecideCircle
-            enacted_enaction.lost_focus = False
-            print("CATCH FOCUS IMPACT", focus_point)
-
-        # The focus is passed to the enacted enaction to be used by the decider
-        enacted_enaction.focus_point = focus_point
-
-    def maintain_prompt(self, enacted_enaction):
-        """Move the prompt in egocentric memory"""
-        if self.prompt_point is not None:
-            self.prompt_point = matrix44.apply_to_vector(enacted_enaction.displacement_matrix, self.prompt_point).astype(int)
-            print("Prompt moved to egocentric: ", self.prompt_point)
 
     def update_and_add_experiences(self, enacted_enaction, body_direction_rad):
         """ Process the enacted interaction to update the egocentric memory

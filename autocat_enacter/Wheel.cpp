@@ -10,6 +10,7 @@
 Wheel::Wheel()
 {
 }
+
 void Wheel::setup()
 {
   //Pin initialize
