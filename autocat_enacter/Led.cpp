@@ -9,15 +9,18 @@
 
 Led::Led()
 {
-  blink_end_time = 0;
-  blink_on = true;
+  //blink_end_time = 0;
+  //blink_on = true;
 }
 
 // Blink the LED with period 100ms
 void Led::blink()
 {
-  if (millis() > blink_end_time)
+  // cycle_count++;
+  if (millis() > blink_time + BLINK_PERIOD / 2)
   {
+    blink_time = millis();
+    // Serial.print("Cycle count:"); Serial.println(cycle_count);cycle_count = 0;  // For debug
     if (blink_on)
     {
       digitalWrite(LED_BUILTIN, HIGH);
@@ -28,6 +31,5 @@ void Led::blink()
       digitalWrite(LED_BUILTIN, LOW);
       blink_on = true;
     }
-    blink_end_time = millis() + 50;
   }
 }

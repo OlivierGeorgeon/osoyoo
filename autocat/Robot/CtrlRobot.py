@@ -7,6 +7,7 @@ from pyrr import matrix44
 from .RobotDefine import RETREAT_DISTANCE, RETREAT_DISTANCE_Y, LINE_X, ROBOT_FRONT_X, ROBOT_FRONT_Y, ROBOT_HEAD_X
 from .Enaction import Enaction
 from .Color import category_color
+from playsound import playsound
 from ..Memory.EgocentricMemory.Experience import EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_FLOOR, EXPERIENCE_IMPACT, \
     EXPERIENCE_LOCAL_ECHO, EXPERIENCE_BLOCK
 from ..Decider.Action import ACTION_FORWARD
@@ -129,6 +130,8 @@ class CtrlRobot:
                 else:
                     # Black line on the front
                     translation += [-RETREAT_DISTANCE, 0, 0]
+                playsound('autocat/Assets/tiny_beep.wav', False)
+
 
         # Interaction ECHO
         if outcome['echo_distance'] < 10000:
@@ -140,6 +143,8 @@ class CtrlRobot:
         # (The forward translation is already correct since it is integrated during duration1)
         if 'impact' in outcome:
             enacted_enaction.impact = outcome['impact']
+            if enacted_enaction.impact > 0:
+                playsound('autocat/Assets/cute_beep1.wav', False)
 
         # Interaction blocked
         if 'blocked' in outcome and outcome['blocked']:

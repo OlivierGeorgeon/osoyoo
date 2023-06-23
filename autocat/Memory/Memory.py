@@ -33,7 +33,10 @@ class Memory:
         - Add new experiences in egocentric_memory
         - Move the robot in allocentric_memory
         """
-        self.egocentric_memory.manage_focus(enacted_enaction)
+        self.egocentric_memory.maintain_focus(self.egocentric_memory.focus_point, enacted_enaction)
+        self.egocentric_memory.focus_point = enacted_enaction.focus_point
+
+        self.egocentric_memory.maintain_prompt(enacted_enaction)
 
         self.body_memory.set_head_direction_degree(enacted_enaction.head_angle)
         # TODO Keep the simulation and adjust the robot position

@@ -20,11 +20,11 @@ class EgocentricMemory:
         self.experiences = {}
         self.experience_id = 0  # A unique ID for each experience in memory
 
-    def manage_focus(self, enacted_enaction):
+    def maintain_focus(self, focus_point, enacted_enaction):
         """Manage focus catch, lost, or update. Also move the prompt"""
 
         # If the robot is already focussed then adjust the focus and the displacement
-        if self.focus_point is not None:
+        if focus_point is not None:
             # The new estimated position of the focus point
             displacement_matrix = enacted_enaction.displacement_matrix
             translation = enacted_enaction.translation
@@ -32,12 +32,12 @@ class EgocentricMemory:
             if enacted_enaction.echo_point is not None:
                 # action_code = enacted_enaction.action.action_code
                 # The error between the expected and the actual position of the echo
-                prediction_focus_point = matrix44.apply_to_vector(displacement_matrix, self.focus_point)
+                prediction_focus_point = matrix44.apply_to_vector(displacement_matrix, focus_point)
                 prediction_error_focus = prediction_focus_point - enacted_enaction.echo_point
                 # If the new focus is near the previous focus
                 if np.linalg.norm(prediction_error_focus) < FOCUS_MAX_DELTA:
                     # The focus has been kept
-                    self.focus_point = enacted_enaction.echo_point
+                    focus_point = enacted_enaction.echo_point
                     print("UPDATE FOCUS by delta", prediction_error_focus)
                     # enacted_enaction.is_focussed = True
                     # If the action has been completed
@@ -64,43 +64,44 @@ class EgocentricMemory:
                     # The focus was lost
                     print("LOST FOCUS due to delta", prediction_error_focus)
                     enacted_enaction.lost_focus = True  # Used by agent_circle
-                    self.focus_point = None
+                    focus_point = None
                     # playsound('autocat/Assets/R5.wav', False)
             else:
                 # The focus was lost
                 print("LOST FOCUS due to no echo")
                 enacted_enaction.lost_focus = True  # Used by agent_circle
-                self.focus_point = None
+                focus_point = None
                 # playsound('autocat/Assets/R5.wav', False)
         else:
             # If the robot was not focussed
             if enacted_enaction.action.action_code in [ACTION_SCAN, ACTION_FORWARD] \
                     and enacted_enaction.echo_point is not None:
                 # Catch focus
-                # playsound('autocat/Assets/R11.wav', False)
-                self.focus_point = enacted_enaction.echo_point
-                print("CATCH FOCUS", self.focus_point)
+                playsound('autocat/Assets/cute_beep2.wav', False)
+                focus_point = enacted_enaction.echo_point
+                print("CATCH FOCUS", focus_point)
 
         # Impact or block catch focus
         if enacted_enaction.impact > 0 and enacted_enaction.action.action_code == ACTION_FORWARD:  # or enacted_enaction.blocked:
             if enacted_enaction.echo_point is None or np.linalg.norm(enacted_enaction.echo_point) > 200:
                 # Count as an echo to to activate DeciderCircle
                 if enacted_enaction.impact == 0b01:
-                    self.focus_point = np.array([ROBOT_FRONT_X + 10, -ROBOT_FRONT_Y, 0])
+                    focus_point = np.array([ROBOT_FRONT_X + 10, -ROBOT_FRONT_Y, 0])
                 elif enacted_enaction.impact == 0b10:
-                    self.focus_point = np.array([ROBOT_FRONT_X + 10, ROBOT_FRONT_Y, 0])
+                    focus_point = np.array([ROBOT_FRONT_X + 10, ROBOT_FRONT_Y, 0])
                 else:
-                    self.focus_point = np.array([ROBOT_FRONT_X + 10, 0, 0])
+                    focus_point = np.array([ROBOT_FRONT_X + 10, 0, 0])
             else:
-                self.focus_point = enacted_enaction.echo_point
+                focus_point = enacted_enaction.echo_point
             # Reset lost focus to activate DecideCircle
             enacted_enaction.lost_focus = False
-            print("CATCH FOCUS IMPACT", self.focus_point)
+            print("CATCH FOCUS IMPACT", focus_point)
 
         # The focus is passed to the enacted enaction to be used by the decider
-        enacted_enaction.focus_point = self.focus_point
+        enacted_enaction.focus_point = focus_point
 
-        # Move the prompt
+    def maintain_prompt(self, enacted_enaction):
+        """Move the prompt in egocentric memory"""
         if self.prompt_point is not None:
             self.prompt_point = matrix44.apply_to_vector(enacted_enaction.displacement_matrix, self.prompt_point).astype(int)
             print("Prompt moved to egocentric: ", self.prompt_point)
@@ -170,6 +171,13 @@ class EgocentricMemory:
                 experience_x, experience_y = 0, ROBOT_SIDE
             elif enacted_enaction.action.action_code == ACTION_RIGHTWARD:
                 experience_x, experience_y = 0, -ROBOT_SIDE
+            elif enacted_enaction.action.action_code == ACTION_BACKWARD:
+                if enacted_enaction.impact == 0b01:  # Impact on the right
+                    experience_x, experience_y = -ROBOT_FRONT_X, -ROBOT_FRONT_Y
+                elif enacted_enaction.impact == 0b11:  # Impact on the front
+                    experience_x, experience_y = -ROBOT_FRONT_X, 0
+                else:  # Impact on the left
+                    experience_x, experience_y = -ROBOT_FRONT_X, ROBOT_FRONT_Y
             impact_exp = Experience(experience_x, experience_y, EXPERIENCE_IMPACT, body_direction_rad,
                                     enacted_enaction.clock, experience_id=self.experience_id,
                                     durability=EXPERIENCE_PERSISTENCE, color_index=enacted_enaction.color_index)

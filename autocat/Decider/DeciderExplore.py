@@ -8,10 +8,8 @@ from pyrr import quaternion, matrix44
 from playsound import playsound
 from . Action import ACTION_ALIGN_ROBOT, ACTION_FORWARD, ACTION_LEFTWARD, ACTION_RIGHTWARD
 from . Interaction import Interaction, OUTCOME_DEFAULT
-# from . PredefinedInteractions import OUTCOME_IMPACT
 from ..Robot.Enaction import Enaction
 from ..Memory.PhenomenonMemory.PhenomenonMemory import TER
-from ..Memory.EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_PLACE
 
 CLOCK_TO_GO_HOME = 8  # Number of interactions before going home
 EXPLORATION_STEP_INIT = 0

@@ -31,7 +31,6 @@ void Imu::setup()
   // Initialize MPU6050
 
   _mpu.begin(MPU6050_SCALE_2000DPS, MPU6050_RANGE_2G);
-  // _mpu.begin(MPU6050_SCALE_2000DPS, MPU6050_RANGE_2G);
 
   //while(!_mpu.begin(MPU6050_SCALE_2000DPS, MPU6050_RANGE_2G))
   //{
@@ -40,9 +39,11 @@ void Imu::setup()
   //  delay(500);
   //}
 
-  // Set DLP Filter
+  // Set DLP Filter. It should filter out the vibrations but it should keep the impacts
   // See https://ulrichbuschbaum.wordpress.com/2015/01/18/using-the-mpu6050s-dlpf/
-  _mpu.setDLPFMode(MPU6050_DLPF_4);  // Filter out frequencies over 21 Hz
+  // _mpu.setDLPFMode(MPU6050_DLPF_4);  // Filter out frequencies over 21 Hz (48ms) read every 25ms
+  _mpu.setDLPFMode(MPU6050_DLPF_3);  // Filter out frequencies over 44 Hz (23ms) read every 10ms
+  //_mpu.setDLPFMode(MPU6050_DLPF_2);  // Filter out frequencies over 94 Hz (10ms)
 
   // Calibrate gyroscope. The robot must be at rest during calibration.
   // If you don't want calibrate, comment this line.
@@ -100,6 +101,7 @@ void Imu::begin()
 {
   _yaw = 0;
   _impact_forward = 0;
+  _impact_backward = 0;
   _impact_leftwards = 0;
   _impact_rightwards = 0;
   _cycle_count = 0;
@@ -115,15 +117,15 @@ void Imu::begin()
   _max_positive_yaw_left = 0.0;
   _min_negative_yaw_right = 0.0;
 }
-int Imu::update(int interaction_step)
+void Imu::update(int interaction_step)
 {
+  #if ROBOT_HAS_MPU6050 == true
   if (millis() > _imu_read_time + IMU_READ_PERIOD)
   {
     unsigned long _time_interval = millis() - _imu_read_time;
     _imu_read_time = millis();
     _cycle_count++;
 
-    #if ROBOT_HAS_MPU6050 == true
     // Read normalized values
     // Serial.println("Read Acceleration"); // for debug
     Vector normAccel = _mpu.readNormalizeAccel();
@@ -137,7 +139,7 @@ int Imu::update(int interaction_step)
     // Integrate yaw during the interaction (Jarzebski multiply by the time step):
     // https://github.com/jarzebski/Arduino-MPU6050/blob/dev/MPU6050_gyro_pitch_roll_yaw/MPU6050_gyro_pitch_roll_yaw.ino
     // float _ZAngle = normGyro.ZAxis * IMU_READ_PERIOD / 1000 * GYRO_COEF;
-    float _ZAngle = normGyro.ZAxis * _time_interval / 1000 * GYRO_COEF;  // TODO test this
+    float _ZAngle = normGyro.ZAxis * _time_interval / 1000 * GYRO_COEF;
     _yaw += _ZAngle;
 
     // During the first step of the interaction, check acceleration
@@ -167,9 +169,9 @@ int Imu::update(int interaction_step)
       if (_ZAngle < _min_negative_yaw_right)
         _min_negative_yaw_right = _ZAngle;
 
-      // Check for x impact or blocked
+      // Check for forward impact or blocked (x positive)
       if ((x_acceleration < -ACCELERATION_X_IMPACT_THRESHOLD) ||
-         (_cycle_count >= IMU_ACCELERATION_CYCLES) && (_max_positive_x_acc < ACCELERATION_BLOCK_THRESHOLD))
+         (_cycle_count >= IMU_ACCELERATION_CYCLES) && (_max_positive_x_acc < ACCELERATION_X_BLOCK_THRESHOLD))
       {
         if (_min_negative_yaw_right < -GYRO_IMPACT_THRESHOLD)
           _impact_forward = B01;
@@ -179,15 +181,27 @@ int Imu::update(int interaction_step)
           _impact_forward = B11;
       }
 
+      // Check for backward impact or blocked (x negative)
+      if ((x_acceleration > ACCELERATION_X_IMPACT_THRESHOLD) ||
+         (_cycle_count >= IMU_ACCELERATION_CYCLES) && (_min_negative_x_acc > -ACCELERATION_X_BLOCK_THRESHOLD))
+      {
+        if (_min_negative_yaw_right < -GYRO_IMPACT_THRESHOLD)
+          _impact_backward = B10;
+        else if (_max_positive_yaw_left > GYRO_IMPACT_THRESHOLD)
+          _impact_backward = B01;
+        else
+          _impact_backward = B11;
+      }
+
       // Check for leftwards impact or blocked (y positive)
       if ((y_acceleration < -ACCELERATION_Y_IMPACT_THRESHOLD) ||
-         (_cycle_count >= IMU_ACCELERATION_CYCLES) && (_max_positive_y_acc < 80))  // 100
-        _impact_leftwards = 1;
+         (_cycle_count >= IMU_ACCELERATION_CYCLES) && (_max_positive_y_acc < ACCELERATION_Y_BLOCK_THRESHOLD))
+        _impact_leftwards = B11;
 
-      // Check for rightwards impact or blocked
+      // Check for rightwards impact or blocked (y negative)
       if ((y_acceleration > ACCELERATION_Y_IMPACT_THRESHOLD) ||
-         (_cycle_count >= IMU_ACCELERATION_CYCLES) && (_min_negative_y_acc > -80))
-        _impact_rightwards = 1;
+         (_cycle_count >= IMU_ACCELERATION_CYCLES) && (_min_negative_y_acc > -ACCELERATION_Y_BLOCK_THRESHOLD))
+        _impact_rightwards = B11;
 
       // Trying to compute the speed by integrating acceleration (not working)
       _xSpeed += (x_acceleration) * _time_interval / 100;
@@ -196,14 +210,19 @@ int Imu::update(int interaction_step)
       // Trying to compute the distance by integrating the speed (not working)
       _xDistance += _xSpeed * _time_interval / 1000;
     }
-    #endif
   }
-  return _impact_forward;
+  #endif
+  // return _impact_forward;
 }
 
 int Imu::get_impact_forward()
 {
   return _impact_forward;
+}
+
+int Imu::get_impact_backward()
+{
+  return _impact_backward;
 }
 
 int Imu::get_impact_leftwards()
@@ -243,6 +262,17 @@ void Imu::outcome_forward(JSONVar & outcome_object)
   // outcome_object["max_speed"] = (int) _max_speed;
   // outcome_object["min_speed"] = (int) _min_speed;
   // outcome_object["distance"] = (int) _xDistance;
+  #endif
+}
+
+void Imu::outcome_backward(JSONVar & outcome_object)
+{
+  #if ROBOT_HAS_MPU6050 == true
+  outcome_object["impact"] = _impact_backward;
+  outcome_object["max_acc"] = _max_positive_x_acc;
+  outcome_object["min_acc"] = _min_negative_x_acc;
+  outcome_object["max_yaw"] = round(_max_positive_yaw_left * 100.0);
+  outcome_object["min_yaw"] = round(_min_negative_yaw_right * 100.0); // Does not show negative sign of floats!
   #endif
 }
 

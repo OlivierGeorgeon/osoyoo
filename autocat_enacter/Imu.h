@@ -19,8 +19,8 @@
 #include "src/lib/MMC5883.h"
 #endif
 
-#define IMU_READ_PERIOD 10  // 50 (ms)
-#define IMU_ACCELERATION_CYCLES 10  // 5  // number of cycles of imu read during acceration phase
+#define IMU_READ_PERIOD 10 // 25  // 50 (ms)
+#define IMU_ACCELERATION_CYCLES 10  // 5  // number of cycles of imu read during acceleration phase
 
 class Imu
 {
@@ -28,12 +28,14 @@ class Imu
     Imu();
     void setup();
     void begin();
-    int update(int interaction_step);
+    void update(int interaction_step);
     void outcome(JSONVar & outcome_object);
     void outcome_forward(JSONVar & outcome_object);
+    void outcome_backward(JSONVar & outcome_object);
     void outcome_leftwards(JSONVar & outcome_object);
     void outcome_rightwards(JSONVar & outcome_object);
     int get_impact_forward();
+    int get_impact_backward();
     int get_impact_leftwards();
     int get_impact_rightwards();
     float _yaw;
@@ -61,6 +63,7 @@ class Imu
     float _max_speed;
     float _min_speed;
     int _impact_forward;
+    int _impact_backward;
     int _impact_leftwards;
     int _impact_rightwards;
     bool _blocked;

@@ -42,7 +42,7 @@ class Enaction:
                 self.duration = 500
             # Default sidewards 1.5s
             if self.action.action_code in [ACTION_LEFTWARD, ACTION_RIGHTWARD]:
-                self.duration = 1500
+                self.duration = 1000  # 1500
 
         # The simulation of the enaction in memory
         self.simulation_duration = 0

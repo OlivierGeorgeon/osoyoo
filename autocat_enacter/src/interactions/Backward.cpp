@@ -36,6 +36,20 @@ void Backward::ongoing()
 {
   if (_is_focussed)  // Keep the head towards the focus (HEA is inhibited during the action)
     _HEA.turnHead(_HEA.head_direction(_focus_x + _focus_speed * (millis()- _action_start_time)/1000, _focus_y));
+
+  // If impact then proceed to phase 2
+  int impact = _IMU.get_impact_backward();
+  if (impact > 0) // && !_FCR._is_enacting)
+  {
+    // Trigger head alignment
+    if (!_HEA._is_enacting_head_alignment)
+      _HEA.beginEchoAlignment();
+    _duration1 = millis() - _action_start_time;
+    _action_end_time = 0;
+    _FCR._OWM.stopMotion();
+    _step = INTERACTION_TERMINATE;
+  }
+
   // Check if Floor Change Retreat
   if (_FCR._is_enacting)
   {
@@ -54,4 +68,9 @@ void Backward::ongoing()
     _FCR._OWM.stopMotion();
     _step = INTERACTION_TERMINATE;
   }
+}
+
+void Backward::outcome(JSONVar & outcome_object)
+{
+  _IMU.outcome_backward(outcome_object);
 }
