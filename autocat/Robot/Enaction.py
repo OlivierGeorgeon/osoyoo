@@ -1,7 +1,7 @@
 import json
 import math
 import numpy as np
-from pyrr import matrix44
+from pyrr import matrix44, quaternion
 from playsound import playsound
 from ..Decider.Action import ACTION_FORWARD, ACTION_BACKWARD, ACTION_ALIGN_ROBOT, ACTION_LEFTWARD, ACTION_RIGHTWARD, \
     ACTION_TURN_LEFT, ACTION_TURN_RIGHT, ACTION_TURN_HEAD, ACTION_SCAN
@@ -13,36 +13,42 @@ FOCUS_MAX_DELTA = 100  # 200 (mm) Maximum delta to keep focus
 
 
 class Enaction:
-    def __init__(self, action, clock, focus_point, prompt_point):
+    def __init__(self, action, clock, memory):
         # The intended enaction
         self.action = action
         self.clock = clock
-        self.focus_point = None
-        if focus_point is not None:
-            self.focus_point = focus_point.copy()
         self.duration = None
         self.angle = None
-        self.prompt_point = prompt_point
-        if prompt_point is not None:
-            if self.action.action_code in [ACTION_FORWARD, ACTION_BACKWARD]:
-                self.duration = int(np.linalg.norm(prompt_point) /
-                                    math.fabs(self.action.translation_speed[0]) * 1000)
-            if self.action.action_code in [ACTION_LEFTWARD, ACTION_RIGHTWARD]:
-                self.duration = int(np.linalg.norm(prompt_point) /
-                                    math.fabs(self.action.translation_speed[1]) * 1000)
-            if self.action.action_code in [ACTION_ALIGN_ROBOT, ACTION_TURN_HEAD]:
-                self.angle = int(math.degrees(math.atan2(prompt_point[1], prompt_point[0])))
-            if (self.action.action_code == ACTION_TURN_RIGHT) and prompt_point[1] < 0:
-                self.angle = int(math.degrees(math.atan2(prompt_point[1], prompt_point[0])))
-            if (self.action.action_code == ACTION_TURN_LEFT) and prompt_point[1] > 0:
-                self.angle = int(math.degrees(math.atan2(prompt_point[1], prompt_point[0])))
-        else:
-            # Default backward 0.5s
-            if self.action.action_code in [ACTION_BACKWARD]:
-                self.duration = 500
-            # Default sidewards 1.5s
-            if self.action.action_code in [ACTION_LEFTWARD, ACTION_RIGHTWARD]:
-                self.duration = 1000  # 1500
+        self.focus_point = None
+        self.prompt_point = None
+        self.body_direction_rad = 0
+        self.body_quaternion = None  # Inferred from compass and yaw
+        if memory is not None:
+            if memory.egocentric_memory.focus_point is not None:
+                self.focus_point = memory.egocentric_memory.focus_point.copy()
+            if memory.egocentric_memory.prompt_point is not None:
+                self.prompt_point = memory.egocentric_memory.prompt_point.copy()
+                if self.action.action_code in [ACTION_FORWARD, ACTION_BACKWARD]:
+                    self.duration = int(np.linalg.norm(self.prompt_point) /
+                                        math.fabs(self.action.translation_speed[0]) * 1000)
+                if self.action.action_code in [ACTION_LEFTWARD, ACTION_RIGHTWARD]:
+                    self.duration = int(np.linalg.norm(self.prompt_point) /
+                                        math.fabs(self.action.translation_speed[1]) * 1000)
+                if self.action.action_code in [ACTION_ALIGN_ROBOT, ACTION_TURN_HEAD]:
+                    self.angle = int(math.degrees(math.atan2(self.prompt_point[1], self.prompt_point[0])))
+                if (self.action.action_code == ACTION_TURN_RIGHT) and self.prompt_point[1] < 0:
+                    self.angle = int(math.degrees(math.atan2(self.prompt_point[1], self.prompt_point[0])))
+                if (self.action.action_code == ACTION_TURN_LEFT) and self.prompt_point[1] > 0:
+                    self.angle = int(math.degrees(math.atan2(self.prompt_point[1], self.prompt_point[0])))
+            else:
+                # Default backward 0.5s
+                if self.action.action_code in [ACTION_BACKWARD]:
+                    self.duration = 500
+                # Default sidewards 1.5s
+                if self.action.action_code in [ACTION_LEFTWARD, ACTION_RIGHTWARD]:
+                    self.duration = 1000  # 1500
+            self.body_direction_rad = memory.body_memory.get_body_direction_rad()
+            self.body_quaternion = memory.body_memory.body_quaternion  # Inferred from compass and yaw
 
         # The simulation of the enaction in memory
         self.simulation_duration = 0
@@ -55,7 +61,7 @@ class Enaction:
         self.duration1 = 0
         self.yaw = 0
         self.compass_point = None
-        self.azimuth = 0
+        self.azimuth = None  # Remains None if the robot does not return azimuth or compass
         self.echo_point = None
         self.lost_focus = False
         self.floor = 0
@@ -201,3 +207,35 @@ class Enaction:
         if intended_enaction.prompt_point is not None:
             self.prompt_point = matrix44.apply_to_vector(self.displacement_matrix, intended_enaction.prompt_point).astype(int)
             print("Prompt moved to egocentric: ", self.prompt_point)
+
+        # Estimate the new azimuth from the yaw
+        yaw_quaternion = quaternion.create_from_z_rotation(math.radians(self.yaw))
+        estimate_body_quaternion = quaternion.cross(intended_enaction.body_quaternion, yaw_quaternion)
+
+        # If the robot returns no azimuth then the body_quaternion is estimated from yaw
+        if self.azimuth is None:
+            self.body_quaternion = estimate_body_quaternion
+        else:
+            # If the robot returns the azimuth then the body_quaternion is initialized from the azimuth
+            self.body_quaternion = quaternion.create_from_z_rotation(self.body_direction_rad)
+            # After the first interaction, the body_quaternion is averaged between the compass and the estimate
+            if self.clock > 0:
+                dot = quaternion.dot(self.body_quaternion, estimate_body_quaternion)
+                if dot < 0.0:
+                    estimate_body_quaternion = - estimate_body_quaternion
+
+                # Print the difference
+                dif_q = quaternion.cross(self.body_quaternion, quaternion.inverse(estimate_body_quaternion))
+                if quaternion.rotation_angle(dif_q) > math.pi:
+                    dif_q = -dif_q
+                if quaternion.rotation_axis(dif_q)[2] > 0:
+                    print("difference angle", math.degrees(quaternion.rotation_angle(dif_q)))
+                else:
+                    print("difference angle", -math.degrees(quaternion.rotation_angle(dif_q)))
+
+                # Take the median angle between the compass and the estimate
+                # 0 is compass only, 1 is yaw estimate only
+                self.body_quaternion = quaternion.slerp(self.body_quaternion, estimate_body_quaternion, 0.5)
+        self.body_direction_rad = quaternion.rotation_axis(self.body_quaternion)[2] * \
+                                  quaternion.rotation_angle(self.body_quaternion)
+        print("Computed body direction:", round(math.degrees(self.body_direction_rad)))

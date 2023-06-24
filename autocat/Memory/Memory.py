@@ -1,5 +1,5 @@
 import numpy as np
-from pyrr import matrix44
+from pyrr import matrix44, quaternion
 from .EgocentricMemory.EgocentricMemory import EgocentricMemory
 from .AllocentricMemory.AllocentricMemory import AllocentricMemory
 from .BodyMemory import BodyMemory
@@ -46,11 +46,12 @@ class Memory:
         self.body_memory.set_head_direction_degree(enacted_enaction.head_angle)
         # TODO Keep the simulation and adjust the robot position
         # Translate the robot before applying the yaw
-        self.allocentric_memory.move(self.body_memory.body_direction_rad, enacted_enaction.translation,
+        self.allocentric_memory.move(self.body_memory.get_body_direction_rad(), enacted_enaction.translation,
                                      enacted_enaction.clock)
-        self.body_memory.rotate_degree(enacted_enaction.yaw, enacted_enaction.azimuth)
+        # self.body_memory.rotate_degree(enacted_enaction.yaw, enacted_enaction.azimuth)
+        self.body_memory.body_quaternion = enacted_enaction.body_quaternion
 
-        self.egocentric_memory.update_and_add_experiences(enacted_enaction, self.body_memory.body_direction_rad)
+        self.egocentric_memory.update_and_add_experiences(enacted_enaction)
 
         # # TODO Keep the simulation and adjust the robot position
         # self.allocentric_memory.move(self.body_memory.body_direction_rad, enacted_interaction['translation'],
@@ -137,11 +138,13 @@ class Memory:
             self.egocentric_memory.prompt_point = matrix44.apply_to_vector(displacement_matrix,
                                                                              self.egocentric_memory.prompt_point)
         # Displacement in body memory
-        self.body_memory.body_direction_rad += intended_enaction.simulation_rotation_speed * dt
+        # self.body_memory.body_direction_rad += intended_enaction.simulation_rotation_speed * dt
+        self.body_memory.body_quaternion = quaternion.cross(self.body_memory.body_quaternion,
+             quaternion.create_from_z_rotation((intended_enaction.simulation_rotation_speed * dt)))
         # Update allocentric memory
         self.allocentric_memory.robot_point += rotate_vector_z(intended_enaction.action.translation_speed * dt *
                                                                  SIMULATION_TIME_RATIO,
-                                                                 self.body_memory.body_direction_rad)
+                                                                 self.body_memory.get_body_direction_rad())
         self.allocentric_memory.place_robot(self.body_memory, intended_enaction.clock)
 
         return True

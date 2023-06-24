@@ -99,14 +99,15 @@ class PhenomenonObject(Phenomenon):
                 #     self.affordances.remove(a)
                 #     break  # Remove only the first similar affordance found
                 if a.is_similar_to(affordance):
-                    # self.affordances.remove(a)
-                    self.affordances = {key: val for key, val in self.affordances.items() if val != a}
+                    # Remove affordance similar to this affordance that are not the affordance 0
+                    self.affordances = {key: val for key, val in self.affordances.items() if val != a and key != 0}
                     break  # Remove only the first similar affordance found
             print("Prune:", nb_affordance - len(self.affordances), "affordances removed.")
 
     def save(self, experiences):
         """Return a clone of the phenomenon for memory snapshot"""
         # Use the experiences cloned when saving egocentric memory
+        # The affordance 0 is not removed
         saved_phenomenon = PhenomenonObject(self.affordances[0].save(experiences))
         super().save(saved_phenomenon, experiences)
         return saved_phenomenon

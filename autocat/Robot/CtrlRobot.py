@@ -85,7 +85,7 @@ class CtrlRobot:
         outcome = json.loads(outcome_string)
         action_code = outcome['action']
 
-        enacted_enaction = Enaction(self.workspace.actions[action_code], outcome['clock'], None, None)
+        enacted_enaction = Enaction(self.workspace.actions[action_code], outcome['clock'], None)
 
         enacted_enaction.duration1 = outcome['duration1']
         enacted_enaction.head_angle = outcome['head_angle']
@@ -102,7 +102,7 @@ class CtrlRobot:
             yaw = outcome['yaw']
         enacted_enaction.yaw = yaw
 
-        # If the robot does not return the azimuth then return 0. The azimuth will be computed by BodyMemory
+        # If the robot does not return the azimuth then the body_direction_rad will be computed by integrating yaw
         if 'azimuth' in outcome:
             enacted_enaction.azimuth = outcome['azimuth']
 
@@ -112,9 +112,11 @@ class CtrlRobot:
             # Subtract the offset from robot_define.py
             compass_x = outcome['compass_x'] - self.workspace.memory.body_memory.compass_offset[0]
             compass_y = outcome['compass_y'] - self.workspace.memory.body_memory.compass_offset[1]
+            enacted_enaction.compass_point = np.array([compass_x, compass_y, 0], dtype=int)
+            # The compass point indicates the south so we must take the opposite and rotate by pi/2
+            enacted_enaction.body_direction_rad = math.atan2(-compass_x, -compass_y)
             # The compass point indicates the south so we must rotate it of 180° to obtain the azimuth
             enacted_enaction.azimuth = round(math.degrees(math.atan2(compass_y, compass_x)) + 180) % 360
-            enacted_enaction.compass_point = np.array([compass_x, compass_y, 0], dtype=int)
 
         # Interaction FLOOR
         if 'floor' in outcome:
@@ -131,7 +133,6 @@ class CtrlRobot:
                     # Black line on the front
                     translation += [-RETREAT_DISTANCE, 0, 0]
                 playsound('autocat/Assets/tiny_beep.wav', False)
-
 
         # Interaction ECHO
         if outcome['echo_distance'] < 10000:

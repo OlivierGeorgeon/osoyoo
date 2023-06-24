@@ -17,3 +17,12 @@ def rotate_vector_z(vector, angle):
     # https://www.evl.uic.edu/ralph/508S98/coordinates.html
     rotation_matrix = pyrr.Matrix44.from_z_rotation(-angle)
     return pyrr.matrix44.apply_to_vector(rotation_matrix, vector)
+
+
+def body_direction_from_azimuth(azimuth_degree):
+    """Return the body direction from azimuth measure relative to north [0,360[ degree"""
+    body_direction_degree = 90 - azimuth_degree  # Degree relative to x axis in trigonometric direction
+    while body_direction_degree < -180:  # Keep within [-180, 180]
+        body_direction_degree += 360
+    return math.radians(body_direction_degree)
+

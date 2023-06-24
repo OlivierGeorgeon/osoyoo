@@ -86,7 +86,8 @@ class DeciderCircle:
         ii = Interaction.create_or_retrieve(self._action, self.anticipated_outcome)
 
         # The intended enaction
-        return Enaction(self._action, self.workspace.clock, self.workspace.memory.egocentric_memory.focus_point, None)
+        self.workspace.memory.egocentric_memory.prompt_point = None  # Remove possible prompt set by another decider
+        return Enaction(self._action, self.workspace.clock, self.workspace.memory)
 
     def outcome(self, enacted_enaction):
         """ Convert the enacted interaction into an outcome adapted to the circle behavior """

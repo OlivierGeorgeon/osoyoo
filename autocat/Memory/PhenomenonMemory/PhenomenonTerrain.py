@@ -79,10 +79,6 @@ class PhenomenonTerrain(Phenomenon):
 
     def phenomenon_label(self):
         """Return the text to display in phenomenon view"""
-        # # if self.absolute_affordance() is not None:
-        #     label = "Origin: " + str(self.point[0]) + "," + str(self.point[1]) + " Relative origin prompt: " + \
-        #             str(self.absolute_affordance().experience.sensor_point())
-        # else:
         label = "Origin: " + str(self.point[0]) + "," + str(self.point[1])
         return label
 

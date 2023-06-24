@@ -83,11 +83,12 @@ class DeciderExplore:
             # else:
             # If the floor is not colored then figure out if the robot is on the right or on the left
             if self.workspace.memory.phenomenon_memory.phenomena[TER].absolute_affordance() is not None:
-                relative_quaternion = quaternion.cross(self.workspace.memory.body_memory.body_quaternion(),
+                relative_quaternion = quaternion.cross(self.workspace.memory.body_memory.body_quaternion,
                                       quaternion.inverse(self.workspace.memory.phenomenon_memory.phenomena[TER].absolute_affordance().experience.body_direction_quaternion()))
                 print("Relative quaternion", repr(relative_quaternion))
                 if quaternion.rotation_angle(relative_quaternion) > math.pi:
-                    relative_quaternion = -1 * relative_quaternion  # The quaternion representing the short angle
+                    # relative_quaternion = -1 * relative_quaternion  # The quaternion representing the short angle
+                    relative_quaternion = - relative_quaternion  # The quaternion representing the short angle
                 rot = quaternion.rotation_angle(relative_quaternion)
                 print("Rotation from origin", round(math.degrees(rot)))
                 if quaternion.rotation_axis(relative_quaternion)[2] > 0:  # Positive z axis rotation
@@ -189,5 +190,4 @@ class DeciderExplore:
         ii = Interaction.create_or_retrieve(action, self.anticipated_outcome)
         self._action = action  # For debug
 
-        return Enaction(action, self.workspace.clock, self.workspace.memory.egocentric_memory.focus_point,
-                        self.workspace.memory.egocentric_memory.prompt_point)
+        return Enaction(action, self.workspace.clock, self.workspace.memory)

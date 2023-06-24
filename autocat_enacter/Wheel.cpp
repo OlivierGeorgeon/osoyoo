@@ -1,5 +1,5 @@
 /*
-  Omny_wheel_motion.h - library for Osoyoo car motion command.
+  Wheel.h - library for Osoyoo car motion command.
   Created by Olivier Georgeon, june 20 2021
   released into the public domain
 */
@@ -76,7 +76,8 @@ void Wheel::turnRight(int speed)
   //setMotion(speed, speed, 0, 0);
 }
 
-void Wheel::setMotion(int speed_fl, int speed_rl, int speed_rr, int speed_fr){
+void Wheel::setMotion(int speed_fl, int speed_rl, int speed_rr, int speed_fr)
+{
   frontLeftWheel(speed_fl);
   rearLeftWheel(speed_rl);
   frontRightWheel(speed_fr);
@@ -94,12 +95,15 @@ void Wheel::stopMotion()    //Stop
 /*motor control*/
 void Wheel::frontRightWheel(int speed)
 {
-  if (speed > 0) {
+  if (speed > 0)
+  {
     // Forward
     digitalWrite(RightMotorDirPin1,LOW);
     digitalWrite(RightMotorDirPin2,HIGH);
     analogWrite(speedPinR,speed * ROBOT_FRONT_RIGHT_WHEEL_COEF);
-  } else {
+  }
+  else
+  {
     // Backward
     digitalWrite(RightMotorDirPin1,HIGH);
     digitalWrite(RightMotorDirPin2,LOW);
@@ -108,12 +112,15 @@ void Wheel::frontRightWheel(int speed)
 }
 void Wheel::frontLeftWheel(int speed)
 {
-  if (speed > 0) {
+  if (speed > 0)
+  {
     // Forward
     digitalWrite(LeftMotorDirPin1,LOW);
     digitalWrite(LeftMotorDirPin2,HIGH);
     analogWrite(speedPinL,speed * ROBOT_FRONT_LEFT_WHEEL_COEF);
-  } else {
+  }
+  else
+  {
     // Backward
     digitalWrite(LeftMotorDirPin1,HIGH);
     digitalWrite(LeftMotorDirPin2,LOW);
@@ -122,12 +129,15 @@ void Wheel::frontLeftWheel(int speed)
 }
 void Wheel::rearRightWheel(int speed)
 {
-  if (speed > 0) {
+  if (speed > 0)
+  {
     // Forward
     digitalWrite(RightMotorDirPin1B, LOW);
     digitalWrite(RightMotorDirPin2B,HIGH);
     analogWrite(speedPinRB,speed * ROBOT_REAR_RIGHT_WHEEL_COEF); // corrective coefficient depends on robot
-  } else {
+  }
+  else
+  {
     // Backward
     digitalWrite(RightMotorDirPin1B, HIGH);
     digitalWrite(RightMotorDirPin2B,LOW);
@@ -136,12 +146,15 @@ void Wheel::rearRightWheel(int speed)
 }
 void Wheel::rearLeftWheel(int speed)
 {
-  if (speed > 0) {
+  if (speed > 0)
+  {
     // Forward
     digitalWrite(LeftMotorDirPin1B,LOW);
     digitalWrite(LeftMotorDirPin2B,HIGH);
     analogWrite(speedPinLB,speed * ROBOT_REAR_LEFT_WHEEL_COEF); // corrective coefficient depends on robot
-  } else {
+  }
+  else
+  {
     // Backward
     digitalWrite(LeftMotorDirPin1B,HIGH);
     digitalWrite(LeftMotorDirPin2B,LOW);
