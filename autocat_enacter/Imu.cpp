@@ -107,16 +107,16 @@ void Imu::begin()
   _impact_rightwards = 0;
   _cycle_count = 0;
   _blocked = false;
-  _max_positive_x_acc = 0;
-  _min_negative_x_acc = 0;
-  _max_positive_y_acc = 0;
-  _min_negative_y_acc = 0;
+  _max_positive_x_acc = -1000;  // Initialize with a high negative value because the max may be negative
+  _min_negative_x_acc = 1000;
+  _max_positive_y_acc = -1000;
+  _min_negative_y_acc = 1000;
   _max_speed = 0;
   _min_speed = 0;
   _xSpeed = 0;
   _xDistance = 0;
-  _max_positive_yaw_left = 0.0;
-  _min_negative_yaw_right = 0.0;
+  _max_positive_yaw_left = -10.0;
+  _min_negative_yaw_right = 10.0;
 }
 
 void Imu::update(int interaction_step)
@@ -135,8 +135,8 @@ void Imu::update(int interaction_step)
     Vector normGyro = _mpu.readNormalizeGyro();
     // Serial.println("end read mpu"); // for debug
 
-    int x_acceleration = -normAccel.XAxis * 100 + ACCELERATION_X_OFFSET;
-    int y_acceleration = -normAccel.YAxis * 100 + ACCELERATION_Y_OFFSET;
+    int x_acceleration = -normAccel.XAxis * 100 - ACCELERATION_X_OFFSET;
+    int y_acceleration = -normAccel.YAxis * 100 - ACCELERATION_Y_OFFSET;
 
     // Integrate yaw during the interaction (Jarzebski multiply by the time step):
     // https://github.com/jarzebski/Arduino-MPU6050/blob/dev/MPU6050_gyro_pitch_roll_yaw/MPU6050_gyro_pitch_roll_yaw.ino
@@ -254,8 +254,8 @@ void Imu::outcome_forward(JSONVar & outcome_object)
   #if ROBOT_HAS_MPU6050 == true
   outcome_object["impact"] = _impact_forward;
   // outcome_object["blocked"] = _blocked;
-  outcome_object["max_acc"] = _max_positive_x_acc;
-  outcome_object["min_acc"] = _min_negative_x_acc;
+  outcome_object["max_x_acc"] = _max_positive_x_acc;
+  outcome_object["min_x_acc"] = _min_negative_x_acc;
 
   outcome_object["max_yaw"] = round(_max_positive_yaw_left * 100.0);
   outcome_object["min_yaw"] = round(_min_negative_yaw_right * 100.0); // Does not show negative sign of floats!
@@ -270,8 +270,8 @@ void Imu::outcome_backward(JSONVar & outcome_object)
 {
   #if ROBOT_HAS_MPU6050 == true
   outcome_object["impact"] = _impact_backward;
-  outcome_object["max_acc"] = _max_positive_x_acc;
-  outcome_object["min_acc"] = _min_negative_x_acc;
+  outcome_object["max_x_acc"] = _max_positive_x_acc;
+  outcome_object["min_x_acc"] = _min_negative_x_acc;
   outcome_object["max_yaw"] = round(_max_positive_yaw_left * 100.0);
   outcome_object["min_yaw"] = round(_min_negative_yaw_right * 100.0); // Does not show negative sign of floats!
   #endif
@@ -281,8 +281,8 @@ void Imu::outcome_leftwards(JSONVar & outcome_object)
 {
   #if ROBOT_HAS_MPU6050 == true
   outcome_object["impact"] = _impact_leftwards;
-  outcome_object["max_acc"] = _max_positive_y_acc;
-  outcome_object["min_acc"] = _min_negative_y_acc;
+  outcome_object["max_y_acc"] = _max_positive_y_acc;
+  outcome_object["min_y_acc"] = _min_negative_y_acc;
   #endif
 }
 
@@ -290,8 +290,8 @@ void Imu::outcome_rightwards(JSONVar & outcome_object)
 {
   #if ROBOT_HAS_MPU6050 == true
   outcome_object["impact"] = _impact_rightwards;
-  outcome_object["max_acc"] = _max_positive_y_acc;
-  outcome_object["min_acc"] = _min_negative_y_acc;
+  outcome_object["max_y_acc"] = _max_positive_y_acc;
+  outcome_object["min_y_acc"] = _min_negative_y_acc;
   #endif
 }
 

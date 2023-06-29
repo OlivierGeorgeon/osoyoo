@@ -47,16 +47,18 @@ int Floor::update()
       // Start the retreat
       // Serial.println("Floor change " + String(floor_change, BIN) + " Begin retreat at " + String(millis()));
       _is_enacting = true;
-      switch (floor_change) {
+      switch (floor_change)
+      {
         case 0b10000:
         case 0b11000:
         case 0b01000:
         case 0b11100:
         case 0b01100:
         case 0b10100:
-          // back right
-          _OWM.setMotion(-150,-150,-50,-50);
-          _floor_outcome=2;
+          // Retreat right
+          _OWM.retreatRight();
+          //_OWM.setMotion(-150,-150,-50,-50);
+          _floor_outcome = B10;
           _floor_change_retreat_end_time = millis() + RETREAT_DURATION + 2* RETREAT_EXTRA_DURATION;
           break;
         case 0b00111:
@@ -65,15 +67,17 @@ int Floor::update()
         case 0b00011:
         case 0b00010:
         case 0b00001:
-          // back left
-          _OWM.setMotion(-50,-50,-150,-150);
-          _floor_outcome=1;
+          // Retreat left
+          _OWM.retreatLeft();
+          // _OWM.setMotion(-50,-50,-150,-150);
+          _floor_outcome = B01;
           _floor_change_retreat_end_time = millis() + RETREAT_DURATION + 2 * RETREAT_EXTRA_DURATION;
           break;
         default:
-          // back straight
-          _OWM.setMotion(-150,-150,-150,-150);
-          _floor_outcome=3;
+          // Retreat straight
+          _OWM.retreatStrait();
+          // _OWM.setMotion(-150,-150,-150,-150);
+          _floor_outcome = B11;
           _floor_change_retreat_end_time = millis() + RETREAT_DURATION;
           break;
       }

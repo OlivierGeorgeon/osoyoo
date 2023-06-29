@@ -4,7 +4,7 @@ from pyrr import matrix44
 from ...Memory.EgocentricMemory.Experience import Experience, EXPERIENCE_LOCAL_ECHO, EXPERIENCE_CENTRAL_ECHO, \
     EXPERIENCE_PLACE, EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_IMPACT
 from ...Robot.RobotDefine import ROBOT_COLOR_X, ROBOT_FRONT_X, LINE_X, ROBOT_FRONT_Y, ROBOT_HEAD_X, ROBOT_SIDE
-from ...Decider.Action import ACTION_SCAN, ACTION_FORWARD, ACTION_BACKWARD, ACTION_LEFTWARD, ACTION_RIGHTWARD
+from ...Decider.Action import ACTION_SCAN, ACTION_FORWARD, ACTION_BACKWARD, ACTION_LEFTWARD, ACTION_RIGHTWARD, ACTION_CIRCUMVENT
 import math
 
 EXPERIENCE_PERSISTENCE = 10
@@ -80,9 +80,9 @@ class EgocentricMemory:
                     point = np.array([ROBOT_FRONT_X, 0, 0])
                 else:  # Impact on the left
                     point = np.array([ROBOT_FRONT_X, ROBOT_FRONT_Y, 0])
-            elif enacted_enaction.action.action_code == ACTION_LEFTWARD:
+            elif enacted_enaction.action.action_code in [ACTION_LEFTWARD]:
                 point = np.array([0, ROBOT_SIDE, 0])
-            elif enacted_enaction.action.action_code == ACTION_RIGHTWARD:
+            elif enacted_enaction.action.action_code in [ACTION_RIGHTWARD, ACTION_CIRCUMVENT]:
                 point = np.array([0, -ROBOT_SIDE, 0])
             elif enacted_enaction.action.action_code == ACTION_BACKWARD:
                 if enacted_enaction.impact == 0b01:  # Impact on the right

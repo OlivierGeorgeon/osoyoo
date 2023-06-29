@@ -1,3 +1,4 @@
+import math
 import numpy as np
 from pyrr import matrix44, quaternion
 from .EgocentricMemory.EgocentricMemory import EgocentricMemory
@@ -26,6 +27,7 @@ class Memory:
         self.egocentric_memory = EgocentricMemory()
         self.allocentric_memory = AllocentricMemory(GRID_WIDTH, GRID_HEIGHT, cell_radius=CELL_RADIUS)
         self.phenomenon_memory = PhenomenonMemory()
+        self.body_direction_deltas = {}  # Used to calibrate GYRO_COEF
 
     def __str__(self):
         return "Memory Robot position (" + str(round(self.allocentric_memory.robot_point[0])) + "," +\
@@ -50,6 +52,11 @@ class Memory:
                                      enacted_enaction.clock)
         # self.body_memory.rotate_degree(enacted_enaction.yaw, enacted_enaction.azimuth)
         self.body_memory.body_quaternion = enacted_enaction.body_quaternion
+
+        # Keep a dictionary of the direction deltas to check gyro_coef is correct
+        self.body_direction_deltas[enacted_enaction.clock] = enacted_enaction.body_direction_delta
+        self.body_direction_deltas = {key: d for key, d in self.body_direction_deltas.items() if key > enacted_enaction.clock-10 }
+        print("Average delta compass-yaw:", round(math.degrees(np.mean(list(self.body_direction_deltas.values()))), 2))
 
         self.egocentric_memory.update_and_add_experiences(enacted_enaction)
 
@@ -103,6 +110,7 @@ class Memory:
         saved_memory.allocentric_memory = self.allocentric_memory.save(saved_memory.egocentric_memory.experiences)
         # Clone phenomenon memory
         saved_memory.phenomenon_memory = self.phenomenon_memory.save(saved_memory.egocentric_memory.experiences)
+        saved_memory.body_direction_deltas = {key: d for key, d in self.body_direction_deltas.items()}
 
         return saved_memory
 
@@ -146,5 +154,4 @@ class Memory:
                                                                  SIMULATION_TIME_RATIO,
                                                                  self.body_memory.get_body_direction_rad())
         self.allocentric_memory.place_robot(self.body_memory, intended_enaction.clock)
-
         return True

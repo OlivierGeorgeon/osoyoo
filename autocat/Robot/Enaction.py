@@ -62,6 +62,7 @@ class Enaction:
         self.yaw = 0
         self.compass_point = None
         self.azimuth = None  # Remains None if the robot does not return azimuth or compass
+        self.body_direction_delta = 0
         self.echo_point = None
         self.lost_focus = False
         self.floor = 0
@@ -125,6 +126,15 @@ class Enaction:
         label = "Speed x: " + str(int(self.action.translation_speed[0])) + "mm/s, y: " \
             + str(int(self.action.translation_speed[1])) + "mm/s, rotation:" + rotation_speed + "°/s"
         return label
+
+    def body_label_azimuth(self):
+        """Return the label to display in the body view"""
+        azimuth = round((90 - math.degrees(self.body_direction_rad)) % 360)
+        if self.azimuth is None:
+            return "Azimuth: " + str(azimuth)
+        else:
+            return "Azimuth: " + str(azimuth) + ", compass: " + str(self.azimuth) + ", delta: " + \
+                   " {:.2f}".format(math.degrees(self.body_direction_delta))
 
     def follow_up(self, intended_enaction):
         """Manage focus catch, lost, or update. Also move the prompt"""
@@ -228,14 +238,16 @@ class Enaction:
                 dif_q = quaternion.cross(self.body_quaternion, quaternion.inverse(estimate_body_quaternion))
                 if quaternion.rotation_angle(dif_q) > math.pi:
                     dif_q = -dif_q
-                if quaternion.rotation_axis(dif_q)[2] > 0:
-                    print("difference angle", math.degrees(quaternion.rotation_angle(dif_q)))
-                else:
-                    print("difference angle", -math.degrees(quaternion.rotation_angle(dif_q)))
+                # if quaternion.rotation_axis(dif_q)[2] > 0:
+                #     print("difference angle", math.degrees(quaternion.rotation_angle(dif_q)))
+                # else:
+                #     print("difference angle", -math.degrees(quaternion.rotation_angle(dif_q)))
+                # Used to calibrate GYRO_COEF
+                self.body_direction_delta = quaternion.rotation_axis(dif_q)[2] * quaternion.rotation_angle(dif_q)
 
-                # Take the median angle between the compass and the estimate
+                # Take the median angle between the compass and the yaw estimate
                 # 0 is compass only, 1 is yaw estimate only
                 self.body_quaternion = quaternion.slerp(self.body_quaternion, estimate_body_quaternion, 0.5)
         self.body_direction_rad = quaternion.rotation_axis(self.body_quaternion)[2] * \
                                   quaternion.rotation_angle(self.body_quaternion)
-        print("Computed body direction:", round(math.degrees(self.body_direction_rad)))
+        # print("Computed body direction:", round(math.degrees(self.body_direction_rad)))

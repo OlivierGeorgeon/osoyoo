@@ -16,6 +16,7 @@
 #include "Imu.h"
 #include "Interaction.h"
 #include "Action_define.h"
+#include "src/interactions/Circumvent.h"
 #include "src/interactions/Backward.h"
 #include "src/interactions/Forward.h"
 #include "src/interactions/Scan.h"
@@ -100,6 +101,9 @@ Interaction* Sequencer::update(int& interaction_step, Interaction* INT)
 
       else if (action == ACTION_GO_ADVANCE)
         INT = new Forward(_FLO, _HEA, _IMU, _WifiCat, json_action);
+
+      else if (action == ACTION_TURN_RIGHT)
+        INT = new Circumvent(_FLO, _HEA, _IMU, _WifiCat, json_action);
 
       else if (action == ACTION_SCAN_DIRECTION)
         INT = new Turn_head(_FLO, _HEA, _IMU, _WifiCat, json_action);

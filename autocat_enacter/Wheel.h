@@ -36,13 +36,19 @@ class Wheel
     void turnLeft(int speed);
     void goForward(int speed);
     void turnRight(int speed);
-    void setMotion(int speed_fl, int speed_rl, int speed_rr, int speed_fr);
+    void retreatRight();
+    void retreatStrait();
+    void retreatLeft();
     void stopMotion();
+    void circumvent(int speed);
   private:
+    void setMotion(int speed_fl, int speed_rl, int speed_rr, int speed_fr);
     void frontLeftWheel(int speed_fl);
     void rearLeftWheel(int speed_rl);
     void frontRightWheel(int speed_fr);
     void rearRightWheel(int speed_rr);
+    int _direction = 0;
+    bool _is_retreating = false;
 };
 
 #endif

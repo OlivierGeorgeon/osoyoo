@@ -59,7 +59,7 @@ class CtrlRobot:
                         print(e)
                 if outcome_string is not None:  # Sometimes it receives a None outcome. I don't know why
                     print()
-                    print("Receive:", outcome_string)
+                    print("Outcome:", outcome_string)
                     # Short outcome are for debug
                     if len(outcome_string) > 100:
                         self.send_enacted_interaction_to_workspace(outcome_string)
@@ -89,7 +89,8 @@ class CtrlRobot:
 
         enacted_enaction.duration1 = outcome['duration1']
         enacted_enaction.head_angle = outcome['head_angle']
-        enacted_enaction.color_index = category_color(outcome['color'])
+        if 'color' in outcome:
+            enacted_enaction.color_index = category_color(outcome['color'])
 
         # Translation integrated from the action's speed multiplied by the duration1
         translation = self.workspace.actions[action_code].translation_speed * (float(outcome['duration1']) / 1000.0)

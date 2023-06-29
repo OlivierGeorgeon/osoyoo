@@ -63,7 +63,7 @@ class CtrlBodyView:
         azimuth = self.workspace.memory.body_memory.body_azimuth()
         self.view.body_rotation_matrix = self.workspace.memory.body_memory.body_direction_matrix()
 
-        self.view.label.text = "Azimuth: " + str(azimuth) + "°"
+        # self.view.label.text = "Azimuth: " + str(azimuth) + "°"
 
         # Rotate the previous compass points so they remain at the south of the view
         # TODO rotate the compass points when imagining
@@ -78,7 +78,7 @@ class CtrlBodyView:
             self.add_point_of_interest(self.workspace.enacted_enaction.compass_point, POINT_COMPASS)
             self.add_point_of_interest(self.workspace.enacted_enaction.compass_point, POINT_AZIMUTH,
                                        self.view.background)
-            self.view.label.text += ", compass: " + str(self.workspace.enacted_enaction.azimuth) + "°"
+            # self.view.label.text += ", compass: " + str(self.workspace.enacted_enaction.azimuth) + "°"
         else:
             x = 330 * math.cos(math.radians(azimuth + 180))
             y = 330 * math.sin(math.radians(azimuth + 180))
@@ -98,7 +98,9 @@ class CtrlBodyView:
         self.view.label_clock.text = "Clock: " + str(self.workspace.clock) \
                                      + ", Decider: " + self.workspace.decider_mode \
                                      + ", Engagement: " + self.workspace.engagement_mode
-        if self.workspace.interaction_step == INTERACTION_STEP_ENACTING:
-            self.view.label_enaction.text = self.workspace.intended_enaction.body_label()
+        # if self.workspace.interaction_step == INTERACTION_STEP_ENACTING:
+            # self.view.label_enaction.text = self.workspace.intended_enaction.body_label()
         if self.workspace.interaction_step == INTERACTION_STEP_REFRESHING:
+            self.view.label.text = self.workspace.enacted_enaction.body_label_azimuth()
+            self.view.label_enaction.text = self.workspace.enacted_enaction.body_label()
             self.update_body_view()
