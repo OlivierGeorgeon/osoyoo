@@ -27,7 +27,7 @@ Backward::Backward(
 void Backward::begin()
 {
   _HEA._next_saccade_time = _action_end_time - SACCADE_DURATION;  // Inhibit HEA during the interaction
-  _FCR._OWM.goBack(SPEED);
+  _FLO._OWM.goBack(SPEED);
   _step = INTERACTION_ONGOING;
 }
 
@@ -39,21 +39,21 @@ void Backward::ongoing()
 
   // If impact then proceed to phase 2
   int impact = _IMU.get_impact_backward();
-  if (impact > 0) // && !_FCR._is_enacting)
+  if (impact > 0) // && !_FLO._is_enacting)
   {
     // Trigger head alignment
     if (!_HEA._is_enacting_head_alignment)
       _HEA.beginEchoAlignment();
     _duration1 = millis() - _action_start_time;
     _action_end_time = 0;
-    _FCR._OWM.stopMotion();
+    _FLO._OWM.stopMotion();
     _step = INTERACTION_TERMINATE;
   }
 
   // Check if Floor Change Retreat
-  if (_FCR._is_enacting)
+  if (_FLO._is_enacting)
   {
-    _FCR.extraDuration(RETREAT_EXTRA_DURATION); // Increase retreat duration because need to reverse speed
+    _FLO.extraDuration(RETREAT_EXTRA_DURATION); // Increase retreat duration because need to reverse speed
     _status ="1";
     // Proceed to step 2 for enacting Floor Change Retreat
     _duration1 = millis()- _action_start_time;
@@ -65,7 +65,7 @@ void Backward::ongoing()
     if (!_HEA._is_enacting_head_alignment)
       _HEA.beginEchoAlignment();  // Force HEA
     _duration1 = millis()- _action_start_time;
-    _FCR._OWM.stopMotion();
+    _FLO._OWM.stopMotion();
     _step = INTERACTION_TERMINATE;
   }
 }

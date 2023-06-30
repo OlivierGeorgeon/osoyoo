@@ -12,7 +12,7 @@
 class Turn_head : public Interaction
 {
 public:
-  Turn_head(Floor& FCR, Head& HEA, Imu& IMU, WifiCat& WifiCat, JSONVar json_action);
+  Turn_head(Floor& FLO, Head& HEA, Imu& IMU, WifiCat& WifiCat, JSONVar json_action);
   void begin() override;
   void ongoing() override;
 private:

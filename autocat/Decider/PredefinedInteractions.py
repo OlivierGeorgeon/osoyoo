@@ -1,6 +1,6 @@
 from . Interaction import Interaction, OUTCOME_DEFAULT
 from . CompositeInteraction import CompositeInteraction
-from . Action import ACTION_FORWARD, ACTION_BACKWARD, ACTION_LEFTWARD, ACTION_RIGHTWARD, ACTION_TURN_LEFT, \
+from . Action import ACTION_FORWARD, ACTION_BACKWARD, ACTION_LEFTWARD, ACTION_RIGHTWARD, ACTION_TURN, \
     ACTION_TURN_RIGHT, ACTION_SCAN
 
 # Circle object outcome
@@ -43,7 +43,7 @@ def create_interactions(actions):
             CompositeInteraction.create_or_retrieve(interaction, i_4)
 
     # When scan and lost focus then turn left
-    i14 = Interaction.create_or_retrieve(actions[ACTION_TURN_LEFT], OUTCOME_LEFT, 1)
+    i14 = Interaction.create_or_retrieve(actions[ACTION_TURN], OUTCOME_LEFT, 1)
     CompositeInteraction.create_or_retrieve(i_l, i14)
 
     # Keep turning right
@@ -99,10 +99,10 @@ def create_interactions(actions):
     i611 = Interaction.create_or_retrieve(actions[ACTION_RIGHTWARD], OUTCOME_FLOOR_FRONT, -1)
     i601 = Interaction.create_or_retrieve(actions[ACTION_RIGHTWARD], OUTCOME_FLOOR_RIGHT, -1)
 
-    i10 = Interaction.create_or_retrieve(actions[ACTION_TURN_LEFT], OUTCOME_DEFAULT, -1)
-    i110 = Interaction.create_or_retrieve(actions[ACTION_TURN_LEFT], OUTCOME_FLOOR_LEFT, -1)
-    i111 = Interaction.create_or_retrieve(actions[ACTION_TURN_LEFT], OUTCOME_FLOOR_FRONT, -1)
-    i101 = Interaction.create_or_retrieve(actions[ACTION_TURN_LEFT], OUTCOME_FLOOR_RIGHT, -1)
+    i10 = Interaction.create_or_retrieve(actions[ACTION_TURN], OUTCOME_DEFAULT, -1)
+    i110 = Interaction.create_or_retrieve(actions[ACTION_TURN], OUTCOME_FLOOR_LEFT, -1)
+    i111 = Interaction.create_or_retrieve(actions[ACTION_TURN], OUTCOME_FLOOR_FRONT, -1)
+    i101 = Interaction.create_or_retrieve(actions[ACTION_TURN], OUTCOME_FLOOR_RIGHT, -1)
 
     i30 = Interaction.create_or_retrieve(actions[ACTION_TURN_RIGHT], OUTCOME_DEFAULT, -2)
     i310 = Interaction.create_or_retrieve(actions[ACTION_TURN_RIGHT], OUTCOME_FLOOR_LEFT, -2)

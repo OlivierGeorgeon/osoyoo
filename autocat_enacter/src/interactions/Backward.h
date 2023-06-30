@@ -11,7 +11,7 @@
 class Backward : public Interaction
 {
 public:
-  Backward(Floor& FCR, Head& HEA, Imu& IMU, WifiCat& WifiCat, JSONVar json_action);
+  Backward(Floor& FLO, Head& HEA, Imu& IMU, WifiCat& WifiCat, JSONVar json_action);
   // unsigned long action_end_time, char action, int clock, bool is_focussed, int focus_x, int focus_y, int focus_speed);
   void begin() override;
   void ongoing() override;

@@ -39,13 +39,31 @@ void Watch::ongoing()
     _step = INTERACTION_TERMINATE;
   }
   // If no Head alignment, check whether duration has elapsed
-  else if ((_action_end_time < millis() )) // || _IMU.get_impact_rightwards() > 0)
+  else if (_scan == nullptr)
   {
-    // Trigger echo scan
-    _HEA.beginEchoScan();
-    _duration1 = millis()- _action_start_time;
-    _step = INTERACTION_TERMINATE;
-    _action_end_time = 0;
+    if (millis() > _action_end_time) // || _IMU.get_impact_rightwards() > 0)
+    {
+      // Trigger the scan interaction
+      //_HEA.beginEchoScan();
+      JSONVar json_action;
+      json_action["action"] = String(_action);
+      json_action["clock"] = _clock;
+      _scan = new Scan(_FLO, _HEA, _IMU, _WifiCat, json_action);
+      _scan -> begin();
+    }
+  }
+  // Execute the Scan interaction and then terminate
+  else
+  {
+    if (_scan -> update() == INTERACTION_TERMINATE)
+    {
+      delete _scan;
+      _scan = nullptr;
+      _duration1 = millis() - _action_start_time;
+      _HEA.beginEchoAlignment();
+      _step = INTERACTION_TERMINATE;
+      _action_end_time = 0;
+    }
   }
 }
 
@@ -53,12 +71,12 @@ void Watch::ongoing()
 void Watch::terminate()
 {
   // Turn on the color sensor led
-  _FCR._CLR.begin_read();
+  _FLO._CLR.begin_read();
 
-  if (_action_end_time < millis() &&  !_FCR._is_enacting && !_HEA._is_enacting_echo_scan && !_HEA._is_enacting_head_alignment)
+  if (_action_end_time < millis() &&  !_FLO._is_enacting && !_HEA._is_enacting_head_alignment)
   {
     // Read the floor color and return true when done
-    if (_FCR._CLR.end_read())
+    if (_FLO._CLR.end_read())
       // When color has been read, proceed to step 3
       _step = INTERACTION_SEND;
   }

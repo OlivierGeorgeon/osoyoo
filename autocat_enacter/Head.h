@@ -23,15 +23,15 @@
 #define ECHO_MONITOR_VARIATION 50 // (mm) The measure threshold to trigger head alignment
 #define NO_ECHO_DISTANCE 10000    // (mm) Default distance when no echo
 
-struct significant_array
-{
-    // Struct to store the angles and the corresponding measures,
-    // and booleans to indicate if the measure are significant
-    int distances[SCAN_SIZE]{0}; // 180/SCAN_SACCADE_SPAN
-    int angles[SCAN_SIZE]{0};
-    bool sign[SCAN_SIZE]{false};
-    int size = SCAN_SIZE;
-};
+//struct significant_array2
+//{
+//    // Struct to store the angles and the corresponding measures,
+//    // and booleans to indicate if the measure are significant
+//    int distances[SCAN_SIZE]{0}; // 180/SCAN_SACCADE_SPAN
+//    int angles[SCAN_SIZE]{0};
+//    bool sign[SCAN_SIZE]{false};
+//    int size = SCAN_SIZE;
+//};
 
 class Head
 {
@@ -39,11 +39,11 @@ class Head
     Head();
     void setup();
     void beginEchoAlignment();
-    void beginEchoScan();
+//    void beginEchoScan();
     void update();
     int measureUltrasonicEcho();
     void outcome(JSONVar & outcome_object);
-    void outcome_scan(JSONVar & outcome_object);
+//    void outcome_scan(JSONVar & outcome_object);
     void turnHead(int head_angle);
     int head_direction(int x, int y);
     int get_ultrasonic_measure();
@@ -60,8 +60,8 @@ class Head
     int _angle_min_ultrasonic_measure;
     int _head_angle_span;
     int _echo_alignment_step;
-    significant_array _sign_array;
-    int _current_index;
+//    significant_array2 _sign_array;
+//    int _current_index;
 };
 
 #endif

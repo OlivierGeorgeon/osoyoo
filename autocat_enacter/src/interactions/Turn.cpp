@@ -1,5 +1,6 @@
 /*
   Turn_angle.cpp - library for controlling the move turn in spot to angle interaction
+  Turn the robot to the _target_angle while keeping the head to the focus or to the_target_angle
   Created by Olivier Georgeon, mai 31 2023
   released into the public domain
 */
@@ -13,8 +14,8 @@
 #include "../../Interaction.h"
 #include "Turn.h"
 
-Turn::Turn(Floor& FCR, Head& HEA, Imu& IMU, WifiCat& WifiCat, JSONVar json_action) :
-  Interaction(FCR, HEA, IMU, WifiCat, json_action)
+Turn::Turn(Floor& FLO, Head& HEA, Imu& IMU, WifiCat& WifiCat, JSONVar json_action) :
+  Interaction(FLO, HEA, IMU, WifiCat, json_action)
 {
 }
 
@@ -23,14 +24,12 @@ Turn::Turn(Floor& FCR, Head& HEA, Imu& IMU, WifiCat& WifiCat, JSONVar json_actio
 void Turn::begin()
 {
   _action_end_time = millis() + 5000;
-  // _robot_destination_angle = _target_angle;
-  // Serial.println("Begin align robot angle : " + String(_robot_destination_angle));
   _HEA._next_saccade_time = _action_end_time - SACCADE_DURATION;  // Inhibit HEA during the interaction
   if (_target_angle < - TURN_SPOT_ENDING_ANGLE)
-    _FCR._OWM.turnInSpotRight(TURN_SPEED);
+    _FLO._OWM.turnInSpotRight(TURN_SPEED);
 
   if (_target_angle > TURN_SPOT_ENDING_ANGLE)
-    _FCR._OWM.turnInSpotLeft(TURN_SPEED);
+    _FLO._OWM.turnInSpotLeft(TURN_SPEED);
 
   _step = INTERACTION_ONGOING;
 }
@@ -44,15 +43,12 @@ void Turn::ongoing()
     float r = sqrt(sq((float)_focus_x) + sq((float)_focus_y));  // conversion to float is necessary for some reason
     float current_head_direction = _HEA.head_direction(cos(current_robot_direction) * r, sin(current_robot_direction) * r);
     // Serial.println("Directions robot: " + String(current_robot_direction) + ", head: " + String((int)current_head_direction) + ", dist: " + String((int)r));
-    _HEA.turnHead(current_head_direction); // Keep looking at destination
+    _HEA.turnHead(current_head_direction);
   }
   else
     _HEA.turnHead(_target_angle - _IMU._yaw); // Keep looking at destination
-  // If nearly turned to destination or duration elapsed
-  // if (((_robot_destination_angle > TURN_SPOT_ENDING_ANGLE) && (_IMU._yaw > _robot_destination_angle - TURN_SPOT_ENDING_ANGLE)) ||
-  // ((_robot_destination_angle < -TURN_SPOT_ENDING_ANGLE) && (_IMU._yaw < _robot_destination_angle + TURN_SPOT_ENDING_ANGLE)) ||
-  // (abs(_robot_destination_angle) <= TURN_SPOT_ENDING_ANGLE) ||
-  // (_action_end_time < millis()))
+
+  // When reached the target angle or the max duration
   if (((_target_angle > TURN_SPOT_ENDING_ANGLE) && (_IMU._yaw > _target_angle - TURN_SPOT_ENDING_ANGLE)) ||
   ((_target_angle < -TURN_SPOT_ENDING_ANGLE) && (_IMU._yaw < _target_angle + TURN_SPOT_ENDING_ANGLE)) ||
   (abs(_target_angle) <= TURN_SPOT_ENDING_ANGLE) ||
@@ -61,7 +57,7 @@ void Turn::ongoing()
     if (!_HEA._is_enacting_head_alignment)
         _HEA.beginEchoAlignment();  // Force HEA
     _duration1 = millis()- _action_start_time;
-    _FCR._OWM.stopMotion();
+    _FLO._OWM.stopMotion();
     _action_end_time = millis() + TURN_SPOT_ENDING_DELAY;// give it time to immobilize before terminating interaction
     _step = INTERACTION_TERMINATE;
   }

@@ -7,15 +7,17 @@
 #define Watch_h
 
 #include "../../Interaction.h"
+#include "Scan.h"
 
 class Watch : public Interaction
 {
 public:
-  Watch(Floor& FCR, Head& HEA, Imu& IMU, WifiCat& WifiCat, JSONVar json_action);
+  Watch(Floor& FLO, Head& HEA, Imu& IMU, WifiCat& WifiCat, JSONVar json_action);
   void begin() override;
   void ongoing() override;
   void terminate() override;
 private:
+  Scan* _scan  = nullptr;
 };
 
 #endif

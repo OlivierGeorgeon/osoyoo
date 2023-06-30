@@ -4,7 +4,7 @@ import numpy as np
 from pyrr import matrix44, quaternion
 from playsound import playsound
 from ..Decider.Action import ACTION_FORWARD, ACTION_BACKWARD, ACTION_LEFTWARD, ACTION_RIGHTWARD, \
-    ACTION_TURN_LEFT, ACTION_TURN_RIGHT, ACTION_TURN_HEAD, ACTION_SCAN, ACTION_WATCH
+    ACTION_TURN, ACTION_TURN_RIGHT, ACTION_TURN_HEAD, ACTION_SCAN, ACTION_WATCH
 from ..Memory.Memory import SIMULATION_STEP_ON, SIMULATION_TIME_RATIO
 from .RobotDefine import DEFAULT_YAW, TURN_DURATION, ROBOT_FRONT_X, ROBOT_FRONT_Y
 
@@ -34,12 +34,8 @@ class Enaction:
                 if self.action.action_code in [ACTION_LEFTWARD, ACTION_RIGHTWARD]:
                     self.duration = int(np.linalg.norm(self.prompt_point) /
                                         math.fabs(self.action.translation_speed[1]) * 1000)
-                if self.action.action_code in [ACTION_TURN_HEAD, ACTION_TURN_RIGHT, ACTION_TURN_LEFT]:
+                if self.action.action_code in [ACTION_TURN_HEAD, ACTION_TURN_RIGHT, ACTION_TURN]:
                     self.angle = int(math.degrees(math.atan2(self.prompt_point[1], self.prompt_point[0])))
-                # if (self.action.action_code == ACTION_TURN_RIGHT) and self.prompt_point[1] < 0:
-                #     self.angle = int(math.degrees(math.atan2(self.prompt_point[1], self.prompt_point[0])))
-                # if (self.action.action_code == ACTION_TURN_LEFT) and self.prompt_point[1] > 0:
-                #     self.angle = int(math.degrees(math.atan2(self.prompt_point[1], self.prompt_point[0])))
             else:
                 # Default backward 0.5s
                 if self.action.action_code in [ACTION_BACKWARD]:
@@ -48,7 +44,7 @@ class Enaction:
                 if self.action.action_code in [ACTION_LEFTWARD, ACTION_RIGHTWARD]:
                     self.duration = 1000  # 1500
                 if self.action.action_code in [ACTION_WATCH]:
-                    self.duration = 10000
+                    self.duration = 5000
             self.body_direction_rad = memory.body_memory.get_body_direction_rad()
             self.body_quaternion = memory.body_memory.body_quaternion  # Inferred from compass and yaw
 
@@ -192,7 +188,7 @@ class Enaction:
                 # playsound('autocat/Assets/R5.wav', False)
         else:
             # If the robot was not focussed
-            if self.action.action_code in [ACTION_SCAN, ACTION_FORWARD] \
+            if self.action.action_code in [ACTION_SCAN, ACTION_FORWARD, ACTION_WATCH] \
                     and self.echo_point is not None:
                 # Catch focus
                 playsound('autocat/Assets/cute_beep2.wav', False)
@@ -236,15 +232,10 @@ class Enaction:
                 if dot < 0.0:
                     estimate_body_quaternion = - estimate_body_quaternion
 
-                # Print the difference
+                # Save the difference
                 dif_q = quaternion.cross(self.body_quaternion, quaternion.inverse(estimate_body_quaternion))
                 if quaternion.rotation_angle(dif_q) > math.pi:
                     dif_q = -dif_q
-                # if quaternion.rotation_axis(dif_q)[2] > 0:
-                #     print("difference angle", math.degrees(quaternion.rotation_angle(dif_q)))
-                # else:
-                #     print("difference angle", -math.degrees(quaternion.rotation_angle(dif_q)))
-                # Used to calibrate GYRO_COEF
                 self.body_direction_delta = quaternion.rotation_axis(dif_q)[2] * quaternion.rotation_angle(dif_q)
 
                 # Take the median angle between the compass and the yaw estimate

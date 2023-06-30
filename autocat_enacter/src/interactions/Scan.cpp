@@ -21,21 +21,65 @@ Scan::Scan(Floor& FCR, Head& HEA, Imu& IMU, WifiCat& WifiCat, JSONVar json_actio
 // STEP 1: Start the interaction
 void Scan::begin()
 {
-  _HEA.beginEchoScan();
-  _action_end_time = millis() + 2000;
+  _HEA._next_saccade_time = millis() + 2000;  // Inhibit HEA during the interaction
+  // _HEA.beginEchoScan();
+  // _action_end_time = millis() + 2000;
+  _HEA._is_enacting_head_alignment = false; // Stop current head alignment if any
+  _min_ultrasonic_measure = NO_ECHO_DISTANCE;
+  _head_angle = _HEA._head_angle;
+  if (_head_angle > 0)
+  {
+    // If head is to the left, start from 80° and scan clockwise
+    _head_angle = 80;
+    _head_angle_span = -SCAN_SACCADE_SPAN;
+  }
+  else
+  {
+    // If head is to the right, start from -80° and scan counterclockwise
+    _head_angle = -80;
+    _head_angle_span = SCAN_SACCADE_SPAN;
+  }
+  _angle_min_ultrasonic_measure = _head_angle;
+  _HEA.turnHead(_head_angle); // Start the scan right away
+  _next_saccade_time = millis() + SACCADE_DURATION;
+  // _echo_alignment_step = 0;
+  _current_index = 0;
+
   _step = INTERACTION_ONGOING;
 }
 
 // STEP 2: Control the enaction
 void Scan::ongoing()
 {
-  if (!_HEA._is_enacting_echo_scan)
+  if (millis() > _next_saccade_time)
   {
-    if (!_HEA._is_enacting_head_alignment)
-      _HEA.beginEchoAlignment();  // Force HEA
-    _duration1 = millis()- _action_start_time;
-    _action_end_time = 0;
-    _step = INTERACTION_TERMINATE;
+    // _echo_alignment_step++;
+    _current_ultrasonic_measure = _HEA.measureUltrasonicEcho();
+    _next_saccade_time = millis() + SACCADE_DURATION;
+    if (_current_ultrasonic_measure < _min_ultrasonic_measure)
+    {
+      _min_ultrasonic_measure = _current_ultrasonic_measure;
+      _angle_min_ultrasonic_measure = _head_angle;
+    }
+    _sign_array.distances[_current_index] = _current_ultrasonic_measure;
+    _sign_array.angles[_current_index] = _head_angle;
+    Serial.println("Index: " + (String)_current_index + ", angle: " + (String)_head_angle + ", distance: "+ (String)_current_ultrasonic_measure);
+    _current_index++;
+    _head_angle += _head_angle_span;
+    if (abs(_head_angle) > 90)
+    { // The scan is over, move to the angle of the min measure
+      _head_angle  = _angle_min_ultrasonic_measure;
+      _head_angle_span = ALIGN_SACCADE_SPAN;  // reset saccade span for alignment
+      Serial.println("Scan aligned at angle: " + String(_head_angle) + ", measure: " + String(_min_ultrasonic_measure));
+      _HEA._next_saccade_time = millis() + ECHO_MONITOR_PERIOD; // Wait before monitoring again
+
+      // Terminate the ongoing step
+      _HEA.beginEchoAlignment();  // Trigger echo alignment
+      _duration1 = millis() - _action_start_time;
+      _action_end_time = 0;
+      _step = INTERACTION_TERMINATE;
+    }
+    _HEA.turnHead(_head_angle);
   }
 }
 
@@ -43,5 +87,13 @@ void Scan::ongoing()
 
 void Scan::outcome(JSONVar & outcome_object)
 {
-  _HEA.outcome_scan(outcome_object);
+  // _HEA.outcome_scan(outcome_object);
+
+  JSONVar echos;
+  for (int i = 0; i < _sign_array.size; i++)
+  {
+    if (_sign_array.distances[i] > 0 and _sign_array.distances[i]< 10000)
+      echos[String(_sign_array.angles[i])] = _sign_array.distances[i];
+  }
+  outcome_object["echos"] = echos;
 }

@@ -1,7 +1,8 @@
 from playsound import playsound
 from .Decider.DeciderCircle import DeciderCircle
 from .Decider.DeciderExplore import DeciderExplore
-from .Decider.Action import create_actions, ACTION_FORWARD, ACTIONS, ACTION_TURN_LEFT
+from .Decider.DeciderWatch import DeciderWatch
+from .Decider.Action import create_actions, ACTION_FORWARD, ACTIONS, ACTION_TURN
 from .Decider.Interaction import Interaction, OUTCOME_DEFAULT
 from .Memory.Memory import Memory, SIMULATION_STEP_OFF
 from .Integrator.Integrator import Integrator
@@ -25,7 +26,7 @@ class Workspace:
         self.actions = create_actions()
 
         self.memory = Memory()
-        self.deciders = {'Explore': DeciderExplore(self), 'Circle': DeciderCircle(self)}
+        self.deciders = {'Explore': DeciderExplore(self), 'Circle': DeciderCircle(self), 'Watch': DeciderWatch(self)}
         self.integrator = Integrator(self)
 
         self.enactions = {}  # The stack of enactions to enact next
@@ -140,7 +141,7 @@ class Workspace:
             # Only process actions when the robot is IDLE
             if self.interaction_step == INTERACTION_STEP_IDLE:
                 self.enactions[self.clock] = Enaction(self.actions[user_key.upper()], self.clock, self.memory)
-                if user_key.upper() == ACTION_TURN_LEFT and self.memory.egocentric_memory.prompt_point is not None:
+                if user_key.upper() == ACTION_TURN and self.memory.egocentric_memory.prompt_point is not None:
                     # If action ALIGN then the next enaction is to move forward to the prompt
                     self.enactions[self.clock + 1] = Enaction(self.actions[ACTION_FORWARD], self.clock + 1, self.memory)
         elif user_key.upper() == KEY_CLEAR:

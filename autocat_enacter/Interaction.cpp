@@ -12,8 +12,8 @@
 #include "Interaction.h"
 #include "Action_define.h"
 
-Interaction::Interaction(Floor& FCR, Head& HEA, Imu& IMU, WifiCat& WifiCat, JSONVar json_action) :
-  _FCR(FCR), _HEA(HEA), _IMU(IMU), _WifiCat(WifiCat)
+Interaction::Interaction(Floor& FLO, Head& HEA, Imu& IMU, WifiCat& WifiCat, JSONVar json_action) :
+  _FLO(FLO), _HEA(HEA), _IMU(IMU), _WifiCat(WifiCat)
 {
   // The received string must contain the action
   _action = ((const char*) json_action["action"])[0];
@@ -74,13 +74,13 @@ void Interaction::outcome(JSONVar & outcome_object)
 void Interaction::terminate()
 {
   // Turn on the color sensor led
-  _FCR._CLR.begin_read();
+  _FLO._CLR.begin_read();
 
   // Serial.println("Interaction.step2()");
-  if (_action_end_time < millis() &&  !_FCR._is_enacting && !_HEA._is_enacting_head_alignment)
+  if (_action_end_time < millis() &&  !_FLO._is_enacting && !_HEA._is_enacting_head_alignment)
   {
     // Read the floor color and return true when done
-    if (_FCR._CLR.end_read())
+    if (_FLO._CLR.end_read())
       // When color has been read, proceed to step 3
       _step = INTERACTION_SEND;
   }
@@ -98,7 +98,7 @@ void Interaction::send()
   outcome_object["status"] = _status;
   outcome_object["duration1"] = _duration1;
   _HEA.outcome(outcome_object);
-  _FCR.outcome(outcome_object);
+  _FLO.outcome(outcome_object);
   _IMU.outcome(outcome_object);
 
   outcome_object["duration"] = millis() - _action_start_time;

@@ -11,7 +11,7 @@
 class Swipe_left : public Interaction
 {
 public:
-  Swipe_left(Floor& FCR, Head& HEA, Imu& IMU, WifiCat& WifiCat, JSONVar json_action);
+  Swipe_left(Floor& FLO, Head& HEA, Imu& IMU, WifiCat& WifiCat, JSONVar json_action);
   void begin() override;
   void ongoing() override;
   void outcome(JSONVar & outcome_object) override;

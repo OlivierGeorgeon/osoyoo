@@ -13,13 +13,8 @@
 #include "../../Action_define.h"
 #include "Swipe_left.h"
 
-Swipe_left::Swipe_left(
-  Floor& FCR,
-  Head& HEA,
-  Imu& IMU,
-  WifiCat& WifiCat,
-  JSONVar json_action) :
-  Interaction(FCR, HEA, IMU, WifiCat, json_action)
+Swipe_left::Swipe_left(Floor& FLO, Head& HEA, Imu& IMU, WifiCat& WifiCat, JSONVar json_action) :
+  Interaction(FLO, HEA, IMU, WifiCat, json_action)
 {
 }
 
@@ -27,7 +22,7 @@ Swipe_left::Swipe_left(
 void Swipe_left::begin()
 {
   _HEA._next_saccade_time = _action_end_time - SACCADE_DURATION;  // Inhibit HEA during the interaction
-  _FCR._OWM.shiftLeft(SHIFT_SPEED);
+  _FLO._OWM.shiftLeft(SHIFT_SPEED);
   _step = INTERACTION_ONGOING;
 }
 
@@ -37,9 +32,9 @@ void Swipe_left::ongoing()
   if (_is_focussed)  // Keep the head towards the focus (HEA is inhibited during the action)
     _HEA.turnHead(_HEA.head_direction(_focus_x, _focus_y - _focus_speed * (millis()- _action_start_time)/1000));
   // Check if Floor Change Retreat
-  if (_FCR._is_enacting)
+  if (_FLO._is_enacting)
   {
-    _FCR.extraDuration(RETREAT_EXTRA_DURATION); // Increase retreat duration because need to reverse speed
+    _FLO.extraDuration(RETREAT_EXTRA_DURATION); // Increase retreat duration because need to reverse speed
     _status ="1";
     // Proceed to step 2 for enacting Floor Change Retreat
     _duration1 = millis()- _action_start_time;
@@ -52,7 +47,7 @@ void Swipe_left::ongoing()
     if (!_HEA._is_enacting_head_alignment)
       _HEA.beginEchoAlignment();  // Force HEA
     _duration1 = millis()- _action_start_time;
-    _FCR._OWM.stopMotion();
+    _FLO._OWM.stopMotion();
     _step = INTERACTION_TERMINATE;
     _action_end_time = 0;
   }

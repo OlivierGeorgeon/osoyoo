@@ -1,12 +1,13 @@
 ########################################################################################
 # This decider makes the robot explore the parts of the terrain that are not yet known
+# Activation 0: default. 2: the terrain has an absolute reference
 ########################################################################################
 
 import math
 import numpy as np
 from pyrr import quaternion, matrix44
 from playsound import playsound
-from . Action import ACTION_TURN_LEFT, ACTION_FORWARD, ACTION_LEFTWARD, ACTION_RIGHTWARD
+from . Action import ACTION_TURN, ACTION_FORWARD, ACTION_LEFTWARD, ACTION_RIGHTWARD
 from . Interaction import Interaction, OUTCOME_DEFAULT
 from ..Robot.Enaction import Enaction
 from ..Memory.PhenomenonMemory.PhenomenonMemory import TER
@@ -68,19 +69,13 @@ class DeciderExplore:
         if enacted_enaction is None:
             return outcome
 
-        # Look for color place experience
-        # for e in [e for e in self.workspace.memory.egocentric_memory.experiences.values() if e.type == EXPERIENCE_PLACE and e.clock == enacted_enaction.clock and e.color_index > 0]:
+        # If color outcome
         if enacted_enaction.color_index > 0:
             outcome = OUTCOME_COLOR
             print("Outcome color")
+
         # Look for the floor experience
-        # for e in [e for e in self.workspace.memory.egocentric_memory.experiences.values() if e.type in [EXPERIENCE_FLOOR] and e.clock == enacted_enaction.clock]:
         if enacted_enaction.floor > 0 and enacted_enaction.color_index == 0:
-            # if enacted_enaction.color_index > 0:
-            #     # If the floor is color then origin confirmation was enacted
-            #     outcome = OUTCOME_ORIGIN
-            #     self.workspace.memory.phenomenon_memory.phenomena[TER].last_origin_clock = enacted_enaction.clock
-            # else:
             # If the floor is not colored then figure out if the robot is on the right or on the left
             if self.workspace.memory.phenomenon_memory.phenomena[TER].absolute_affordance() is not None:
                 relative_quaternion = quaternion.cross(self.workspace.memory.body_memory.body_quaternion,
@@ -183,7 +178,7 @@ class DeciderExplore:
             action = self.workspace.actions[ACTION_FORWARD]
             self.exploration_step = EXPLORATION_STEP_INIT
         if self.exploration_step == EXPLORATION_STEP_ROTATE:
-            action = self.workspace.actions[ACTION_TURN_LEFT]
+            action = self.workspace.actions[ACTION_TURN]
             self.exploration_step = EXPLORATION_STEP_FORWARD
 
         # TODO compute the anticipated outcome

@@ -6,15 +6,14 @@ ACTION_FORWARD = '8'
 ACTION_BACKWARD = '2'
 ACTION_LEFTWARD = '4'
 ACTION_RIGHTWARD = '6'
-ACTION_TURN_LEFT = '1'
+ACTION_TURN = '1'
 ACTION_TURN_RIGHT = '3'
 ACTION_CIRCUMVENT = '9'
 ACTION_SCAN = '-'
-# ACTION_ALIGN_ROBOT = '/'
 ACTION_ALIGN_HEAD = '*'
 ACTION_TURN_HEAD = '+'
 ACTION_WATCH = 'W'
-ACTIONS = [ACTION_FORWARD, ACTION_BACKWARD, ACTION_LEFTWARD, ACTION_RIGHTWARD, ACTION_TURN_LEFT, ACTION_TURN_RIGHT,
+ACTIONS = [ACTION_FORWARD, ACTION_BACKWARD, ACTION_LEFTWARD, ACTION_RIGHTWARD, ACTION_TURN, ACTION_TURN_RIGHT,
            ACTION_SCAN, ACTION_ALIGN_HEAD, ACTION_TURN_HEAD, ACTION_CIRCUMVENT, ACTION_WATCH]
 
 
@@ -83,11 +82,9 @@ def create_actions():
 
     null_speed = np.array([0, 0, 0], dtype=float)
     rotation_speed = math.radians(DEFAULT_YAW) / TURN_DURATION
-    action_dictionary[ACTION_TURN_LEFT] = Action(ACTION_TURN_LEFT, null_speed, rotation_speed, TURN_DURATION)
+    action_dictionary[ACTION_TURN] = Action(ACTION_TURN, null_speed, rotation_speed, TURN_DURATION)
 
     action_dictionary[ACTION_TURN_RIGHT] = Action(ACTION_TURN_RIGHT, null_speed, -rotation_speed, TURN_DURATION)
-
-    # action_dictionary[ACTION_ALIGN_ROBOT] = Action(ACTION_ALIGN_ROBOT, null_speed, rotation_speed, 1)
 
     action_dictionary[ACTION_SCAN] = Action(ACTION_SCAN, null_speed, 0, 2)
     action_dictionary[ACTION_ALIGN_HEAD] = Action(ACTION_ALIGN_HEAD, null_speed, 0, 1)

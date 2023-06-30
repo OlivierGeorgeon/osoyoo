@@ -16,7 +16,7 @@ released into the public domain
 class Interaction
 {
 public:
-  Interaction(Floor& FCR, Head& HEA, Imu& IMU, WifiCat& WifiCat, JSONVar json_action);
+  Interaction(Floor& FLO, Head& HEA, Imu& IMU, WifiCat& WifiCat, JSONVar json_action);
   virtual void begin();
   virtual void ongoing();
   virtual void outcome(JSONVar & outcome_object);
@@ -24,7 +24,7 @@ public:
   void send();
   int update();
 protected:
-  Floor& _FCR;
+  Floor& _FLO;
   Head& _HEA;
   Imu& _IMU;
   WifiCat& _WifiCat;
@@ -39,7 +39,6 @@ protected:
   int _focus_y = 0;
   int _focus_speed = 0;
   int _clock = 0;
-  // int _robot_destination_angle = 0;
   int head_destination_angle = 0;
   unsigned long _duration1;
   unsigned long _action_start_time;

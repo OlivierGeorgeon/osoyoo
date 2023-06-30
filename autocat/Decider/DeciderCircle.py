@@ -1,5 +1,6 @@
 ########################################################################################
-# This agent makes the robot circle around an echo object or a territory delimited by a line
+# This decider makes the robot circle around an echo object or a territory delimited by a line
+# Activation 1: default. 3: focus
 ########################################################################################
 
 import numpy as np

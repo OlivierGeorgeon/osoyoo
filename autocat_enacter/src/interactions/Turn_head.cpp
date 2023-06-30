@@ -14,8 +14,8 @@
 #include "../../Interaction.h"
 #include "Turn_head.h"
 
-Turn_head::Turn_head( Floor& FCR, Head& HEA, Imu& IMU, WifiCat& WifiCat, JSONVar json_action) :
-  Interaction(FCR, HEA, IMU, WifiCat, json_action)
+Turn_head::Turn_head( Floor& FLO, Head& HEA, Imu& IMU, WifiCat& WifiCat, JSONVar json_action) :
+  Interaction(FLO, HEA, IMU, WifiCat, json_action)
 {
 }
 
