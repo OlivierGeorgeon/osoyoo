@@ -22,10 +22,11 @@
 #include "src/interactions/Scan.h"
 #include "src/interactions/Swipe_left.h"
 #include "src/interactions/Swipe_right.h"
-#include "src/interactions/Turn_angle.h"
+#include "src/interactions/Turn.h"
 #include "src/interactions/Turn_head.h"
-#include "src/interactions/Turn_left.h"
-#include "src/interactions/Turn_right.h"
+// #include "src/interactions/Turn_left.h"
+// #include "src/interactions/Turn_right.h"
+#include "src/interactions/Watch.h"
 
 Sequencer::Sequencer(Floor& FLO, Head& HEA, Imu& IMU, WifiCat& WifiCat) :
   _FLO(FLO), _HEA(HEA), _IMU(IMU), _WifiCat(WifiCat)
@@ -82,13 +83,13 @@ Interaction* Sequencer::update(int& interaction_step, Interaction* INT)
       // Instantiate the interaction
 
       if (action == ACTION_TURN_IN_SPOT_LEFT)
-        INT = new Turn_left(_FLO, _HEA, _IMU, _WifiCat, json_action);
+        INT = new Turn(_FLO, _HEA, _IMU, _WifiCat, json_action);
 
       else if (action == ACTION_GO_BACK)
         INT = new Backward(_FLO, _HEA, _IMU, _WifiCat, json_action);
 
       else if (action == ACTION_TURN_IN_SPOT_RIGHT)
-        INT = new Turn_right(_FLO, _HEA, _IMU, _WifiCat, json_action);
+        INT = new Turn(_FLO, _HEA, _IMU, _WifiCat, json_action);
 
       else if (action == ACTION_SHIFT_LEFT)
         INT = new Swipe_left(_FLO, _HEA, _IMU, _WifiCat, json_action);
@@ -111,8 +112,11 @@ Interaction* Sequencer::update(int& interaction_step, Interaction* INT)
       else if (action == ACTION_ECHO_SCAN)
         INT = new Scan(_FLO, _HEA, _IMU, _WifiCat, json_action);
 
-      else if (action == ACTION_ALIGN_ROBOT)
-        INT = new Turn_angle(_FLO, _HEA, _IMU, _WifiCat, json_action);
+//      else if (action == ACTION_ALIGN_ROBOT)
+//        INT = new Turn_angle(_FLO, _HEA, _IMU, _WifiCat, json_action);
+//
+      else if (action == ACTION_WATCH)
+        INT = new Watch(_FLO, _HEA, _IMU, _WifiCat, json_action);
 
       else
       {

@@ -3,8 +3,8 @@ import math
 import numpy as np
 from pyrr import matrix44, quaternion
 from playsound import playsound
-from ..Decider.Action import ACTION_FORWARD, ACTION_BACKWARD, ACTION_ALIGN_ROBOT, ACTION_LEFTWARD, ACTION_RIGHTWARD, \
-    ACTION_TURN_LEFT, ACTION_TURN_RIGHT, ACTION_TURN_HEAD, ACTION_SCAN
+from ..Decider.Action import ACTION_FORWARD, ACTION_BACKWARD, ACTION_LEFTWARD, ACTION_RIGHTWARD, \
+    ACTION_TURN_LEFT, ACTION_TURN_RIGHT, ACTION_TURN_HEAD, ACTION_SCAN, ACTION_WATCH
 from ..Memory.Memory import SIMULATION_STEP_ON, SIMULATION_TIME_RATIO
 from .RobotDefine import DEFAULT_YAW, TURN_DURATION, ROBOT_FRONT_X, ROBOT_FRONT_Y
 
@@ -34,12 +34,12 @@ class Enaction:
                 if self.action.action_code in [ACTION_LEFTWARD, ACTION_RIGHTWARD]:
                     self.duration = int(np.linalg.norm(self.prompt_point) /
                                         math.fabs(self.action.translation_speed[1]) * 1000)
-                if self.action.action_code in [ACTION_ALIGN_ROBOT, ACTION_TURN_HEAD]:
+                if self.action.action_code in [ACTION_TURN_HEAD, ACTION_TURN_RIGHT, ACTION_TURN_LEFT]:
                     self.angle = int(math.degrees(math.atan2(self.prompt_point[1], self.prompt_point[0])))
-                if (self.action.action_code == ACTION_TURN_RIGHT) and self.prompt_point[1] < 0:
-                    self.angle = int(math.degrees(math.atan2(self.prompt_point[1], self.prompt_point[0])))
-                if (self.action.action_code == ACTION_TURN_LEFT) and self.prompt_point[1] > 0:
-                    self.angle = int(math.degrees(math.atan2(self.prompt_point[1], self.prompt_point[0])))
+                # if (self.action.action_code == ACTION_TURN_RIGHT) and self.prompt_point[1] < 0:
+                #     self.angle = int(math.degrees(math.atan2(self.prompt_point[1], self.prompt_point[0])))
+                # if (self.action.action_code == ACTION_TURN_LEFT) and self.prompt_point[1] > 0:
+                #     self.angle = int(math.degrees(math.atan2(self.prompt_point[1], self.prompt_point[0])))
             else:
                 # Default backward 0.5s
                 if self.action.action_code in [ACTION_BACKWARD]:
@@ -47,6 +47,8 @@ class Enaction:
                 # Default sidewards 1.5s
                 if self.action.action_code in [ACTION_LEFTWARD, ACTION_RIGHTWARD]:
                     self.duration = 1000  # 1500
+                if self.action.action_code in [ACTION_WATCH]:
+                    self.duration = 10000
             self.body_direction_rad = memory.body_memory.get_body_direction_rad()
             self.body_quaternion = memory.body_memory.body_quaternion  # Inferred from compass and yaw
 
@@ -134,7 +136,7 @@ class Enaction:
             return "Azimuth: " + str(azimuth)
         else:
             return "Azimuth: " + str(azimuth) + ", compass: " + str(self.azimuth) + ", delta: " + \
-                   " {:.2f}".format(math.degrees(self.body_direction_delta))
+                   "{:.2f}".format(math.degrees(self.body_direction_delta))
 
     def follow_up(self, intended_enaction):
         """Manage focus catch, lost, or update. Also move the prompt"""

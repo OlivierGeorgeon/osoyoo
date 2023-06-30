@@ -51,5 +51,6 @@ def category_color(color_sensor):
     if (0.2 < hsv[0] < 0.45) and (hsv[1] < 0.45):
         color_index = 0
 
-    print("Color: ", hsv, FLOOR_COLORS[color_index])
+    # print("Color: ", hsv, FLOOR_COLORS[color_index])
+    print("Color:", tuple("{:.3f}".format(x) for x in hsv), FLOOR_COLORS[color_index])
     return color_index

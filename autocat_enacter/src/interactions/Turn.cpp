@@ -11,53 +11,51 @@
 #include "../../Head.h"
 #include "../../Imu.h"
 #include "../../Interaction.h"
-#include "Turn_angle.h"
+#include "Turn.h"
 
-Turn_angle::Turn_angle(
-  Floor& FCR,
-  Head& HEA,
-  Imu& IMU,
-  WifiCat& WifiCat,
-  JSONVar json_action) :
+Turn::Turn(Floor& FCR, Head& HEA, Imu& IMU, WifiCat& WifiCat, JSONVar json_action) :
   Interaction(FCR, HEA, IMU, WifiCat, json_action)
 {
-  // _robot_destination_angle = target_angle;
 }
 
 // STEP 0: Start the interaction
 // Does not handle focus
-void Turn_angle::begin()
+void Turn::begin()
 {
   _action_end_time = millis() + 5000;
-  _robot_destination_angle = _target_angle;
-  Serial.println("Begin align robot angle : " + String(_robot_destination_angle));
+  // _robot_destination_angle = _target_angle;
+  // Serial.println("Begin align robot angle : " + String(_robot_destination_angle));
   _HEA._next_saccade_time = _action_end_time - SACCADE_DURATION;  // Inhibit HEA during the interaction
-  if (_robot_destination_angle < - TURN_SPOT_ENDING_ANGLE)
+  if (_target_angle < - TURN_SPOT_ENDING_ANGLE)
     _FCR._OWM.turnInSpotRight(TURN_SPEED);
 
-  if (_robot_destination_angle > TURN_SPOT_ENDING_ANGLE)
+  if (_target_angle > TURN_SPOT_ENDING_ANGLE)
     _FCR._OWM.turnInSpotLeft(TURN_SPEED);
 
   _step = INTERACTION_ONGOING;
 }
 
 // STEP 1: Control the enaction
-void Turn_angle::ongoing()
+void Turn::ongoing()
 {
   if (_is_focussed)
   {
-    float current_robot_direction = (_robot_destination_angle - _IMU._yaw) * M_PI / 180.0;
+    float current_robot_direction = (_target_angle - _IMU._yaw) * M_PI / 180.0;
     float r = sqrt(sq((float)_focus_x) + sq((float)_focus_y));  // conversion to float is necessary for some reason
     float current_head_direction = _HEA.head_direction(cos(current_robot_direction) * r, sin(current_robot_direction) * r);
     // Serial.println("Directions robot: " + String(current_robot_direction) + ", head: " + String((int)current_head_direction) + ", dist: " + String((int)r));
     _HEA.turnHead(current_head_direction); // Keep looking at destination
   }
   else
-    _HEA.turnHead(_robot_destination_angle - _IMU._yaw); // Keep looking at destination
+    _HEA.turnHead(_target_angle - _IMU._yaw); // Keep looking at destination
   // If nearly turned to destination or duration elapsed
-  if (((_robot_destination_angle > TURN_SPOT_ENDING_ANGLE) && (_IMU._yaw > _robot_destination_angle - TURN_SPOT_ENDING_ANGLE)) ||
-  ((_robot_destination_angle < -TURN_SPOT_ENDING_ANGLE) && (_IMU._yaw < _robot_destination_angle + TURN_SPOT_ENDING_ANGLE)) ||
-  (abs(_robot_destination_angle) <= TURN_SPOT_ENDING_ANGLE) ||
+  // if (((_robot_destination_angle > TURN_SPOT_ENDING_ANGLE) && (_IMU._yaw > _robot_destination_angle - TURN_SPOT_ENDING_ANGLE)) ||
+  // ((_robot_destination_angle < -TURN_SPOT_ENDING_ANGLE) && (_IMU._yaw < _robot_destination_angle + TURN_SPOT_ENDING_ANGLE)) ||
+  // (abs(_robot_destination_angle) <= TURN_SPOT_ENDING_ANGLE) ||
+  // (_action_end_time < millis()))
+  if (((_target_angle > TURN_SPOT_ENDING_ANGLE) && (_IMU._yaw > _target_angle - TURN_SPOT_ENDING_ANGLE)) ||
+  ((_target_angle < -TURN_SPOT_ENDING_ANGLE) && (_IMU._yaw < _target_angle + TURN_SPOT_ENDING_ANGLE)) ||
+  (abs(_target_angle) <= TURN_SPOT_ENDING_ANGLE) ||
   (_action_end_time < millis()))
   {
     if (!_HEA._is_enacting_head_alignment)

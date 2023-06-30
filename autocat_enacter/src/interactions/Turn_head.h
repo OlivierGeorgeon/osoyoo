@@ -13,11 +13,9 @@ class Turn_head : public Interaction
 {
 public:
   Turn_head(Floor& FCR, Head& HEA, Imu& IMU, WifiCat& WifiCat, JSONVar json_action);
-  // unsigned long action_end_time, char action, int clock, bool is_focussed, int focus_x, int focus_y, int focus_speed, int target_angle);
   void begin() override;
   void ongoing() override;
 private:
-//  int _target_angle;
 };
 
 #endif

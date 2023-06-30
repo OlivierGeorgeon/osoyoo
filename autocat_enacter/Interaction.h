@@ -20,10 +20,9 @@ public:
   virtual void begin();
   virtual void ongoing();
   virtual void outcome(JSONVar & outcome_object);
-  void terminate();
+  virtual void terminate();
   void send();
   int update();
-  // int getStep();
 protected:
   Floor& _FCR;
   Head& _HEA;
@@ -40,7 +39,7 @@ protected:
   int _focus_y = 0;
   int _focus_speed = 0;
   int _clock = 0;
-  int _robot_destination_angle = 0;
+  // int _robot_destination_angle = 0;
   int head_destination_angle = 0;
   unsigned long _duration1;
   unsigned long _action_start_time;

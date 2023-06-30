@@ -6,7 +6,7 @@ import math
 import numpy as np
 from pyrr import quaternion, matrix44
 from playsound import playsound
-from . Action import ACTION_ALIGN_ROBOT, ACTION_FORWARD, ACTION_LEFTWARD, ACTION_RIGHTWARD
+from . Action import ACTION_TURN_LEFT, ACTION_FORWARD, ACTION_LEFTWARD, ACTION_RIGHTWARD
 from . Interaction import Interaction, OUTCOME_DEFAULT
 from ..Robot.Enaction import Enaction
 from ..Memory.PhenomenonMemory.PhenomenonMemory import TER
@@ -183,7 +183,7 @@ class DeciderExplore:
             action = self.workspace.actions[ACTION_FORWARD]
             self.exploration_step = EXPLORATION_STEP_INIT
         if self.exploration_step == EXPLORATION_STEP_ROTATE:
-            action = self.workspace.actions[ACTION_ALIGN_ROBOT]
+            action = self.workspace.actions[ACTION_TURN_LEFT]
             self.exploration_step = EXPLORATION_STEP_FORWARD
 
         # TODO compute the anticipated outcome

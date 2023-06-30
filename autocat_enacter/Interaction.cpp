@@ -17,6 +17,10 @@ Interaction::Interaction(Floor& FCR, Head& HEA, Imu& IMU, WifiCat& WifiCat, JSON
 {
   // The received string must contain the action
   _action = ((const char*) json_action["action"])[0];
+  if (_action == ACTION_TURN_IN_SPOT_LEFT)
+    _target_angle = TURN_SPOT_ANGLE;  // Default left rotation
+  if (_action == ACTION_TURN_IN_SPOT_RIGHT)
+    _target_angle = -TURN_SPOT_ANGLE;  // Default right rotation
 
   // The received string must contain the clock
   _clock = (int)json_action["clock"];

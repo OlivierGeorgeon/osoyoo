@@ -7,10 +7,11 @@
 #define ACTION_TURN_LEFT '7'
 #define ACTION_GO_ADVANCE '8'
 #define ACTION_TURN_RIGHT '9'
-#define ACTION_ALIGN_ROBOT '/'
+// #define ACTION_ALIGN_ROBOT '/'
 #define ACTION_ALIGN_HEAD '*'
 #define ACTION_ECHO_SCAN '-'
 #define ACTION_SCAN_DIRECTION '+'
+#define ACTION_WATCH 'W'
 //#define ACTION_ECHO_COMPLETE 's'
 
 #define INTERACTION_BEGIN 1

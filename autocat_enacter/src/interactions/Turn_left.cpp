@@ -21,7 +21,7 @@ Turn_left::Turn_left(
   JSONVar json_action) :
   Interaction(FCR, HEA, IMU, WifiCat, json_action)
 {
-  _robot_destination_angle = TURN_SPOT_ANGLE;
+  // _robot_destination_angle = TURN_SPOT_ANGLE;
 }
 
 // STEP 0: Start the interaction
@@ -29,10 +29,10 @@ void Turn_left::begin()
 {
   _HEA._next_saccade_time = _action_end_time - SACCADE_DURATION;  // Inhibit HEA during the interaction
   _action_end_time = millis() + TURN_SPOT_MAX_DURATION;
-  _robot_destination_angle = TURN_SPOT_ANGLE;
+  _target_angle = TURN_SPOT_ANGLE;
 
   if (_target_angle > 0)  // Received positive angle overrides the default rotation angle
-    _robot_destination_angle = _target_angle;
+    _target_angle = _target_angle;
 
   _FCR._OWM.turnInSpotLeft(TURN_SPEED);
 
@@ -53,9 +53,9 @@ void Turn_left::ongoing()
     _HEA.turnHead(current_head_direction); // Keep looking at destination
   }
   else
-    _HEA.turnHead(_robot_destination_angle - _IMU._yaw); // Keep looking at destination
+    _HEA.turnHead(_target_angle - _IMU._yaw); // Keep looking at destination
   // Stop before reaching destination angle or when duration has elapsed
-  if ((_IMU._yaw > _robot_destination_angle - TURN_SPOT_ENDING_ANGLE) || (_action_end_time < millis()))
+  if ((_IMU._yaw > _target_angle - TURN_SPOT_ENDING_ANGLE) || (_action_end_time < millis()))
   {
     if (!_HEA._is_enacting_head_alignment)
       _HEA.beginEchoAlignment();  // Force HEA
