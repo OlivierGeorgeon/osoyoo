@@ -3,8 +3,10 @@
 # Activation 4: default.
 ########################################################################################
 
+import math
 from . Interaction import Interaction, OUTCOME_DEFAULT
-from . Action import ACTION_WATCH, ACTION_TURN
+from . PredefinedInteractions import OUTCOME_LOST_FOCUS, OUTCOME_LEFT
+from . Action import ACTION_WATCH, ACTION_SCAN, ACTION_TURN
 from ..Robot.Enaction import Enaction
 
 
@@ -29,7 +31,23 @@ class DeciderWatch:
     def outcome(self, enacted_enaction):
         """ Convert the enacted interaction into an outcome adapted to the watch behavior """
 
+        # On startup
+        if enacted_enaction is None:
+            return OUTCOME_DEFAULT
+
         outcome = OUTCOME_DEFAULT
+
+        if enacted_enaction.focus_point is None:
+            if enacted_enaction.status == 'lost':
+                outcome = OUTCOME_LOST_FOCUS
+            else:
+                enacted_enaction.focus_point = enacted_enaction.echo_point
+                self.workspace.memory.egocentric_memory.focus_point = enacted_enaction.focus_point
+
+        if enacted_enaction.focus_point is not None:
+            angle = math.atan2(enacted_enaction.focus_point[1], enacted_enaction.focus_point[0])
+            if math.fabs(angle) > math.pi / 6:
+                outcome = OUTCOME_LEFT
 
         return outcome
 
@@ -40,7 +58,15 @@ class DeciderWatch:
             print("Action: " + str(self._action) + ", Anticipation: " + str(self.anticipated_outcome) +
                   ", Outcome: " + str(outcome))
 
-        self._action = self.workspace.actions[ACTION_WATCH]
+        if outcome == OUTCOME_DEFAULT:
+            self._action = self.workspace.actions[ACTION_WATCH]
+            self.workspace.memory.egocentric_memory.prompt_point = None
+        elif outcome == OUTCOME_LOST_FOCUS:
+            self._action = self.workspace.actions[ACTION_SCAN]
+            self.workspace.memory.egocentric_memory.prompt_point = None
+        else:
+            self.workspace.memory.egocentric_memory.prompt_point = self.workspace.memory.egocentric_memory.focus_point.copy()
+            self._action = self.workspace.actions[ACTION_TURN]
 
         # Compute the next prompt point
         return Enaction(self._action, self.workspace.clock, self.workspace.memory)

@@ -19,19 +19,9 @@
 // #define SCAN_SACCADE_SPAN 10   // (degrees) For complete-scan
 #define SCAN_SIZE 5               // Size of the array of scans
 // #define SCAN_SIZE 18           // Size of the array of scans for complete scan
-#define ECHO_MONITOR_PERIOD 500   // (ms) The period for checking whether to trigger head alignment
+#define ECHO_MONITOR_PERIOD 50    // 500 (ms) The period for checking whether to trigger head alignment
 #define ECHO_MONITOR_VARIATION 50 // (mm) The measure threshold to trigger head alignment
 #define NO_ECHO_DISTANCE 10000    // (mm) Default distance when no echo
-
-//struct significant_array2
-//{
-//    // Struct to store the angles and the corresponding measures,
-//    // and booleans to indicate if the measure are significant
-//    int distances[SCAN_SIZE]{0}; // 180/SCAN_SACCADE_SPAN
-//    int angles[SCAN_SIZE]{0};
-//    bool sign[SCAN_SIZE]{false};
-//    int size = SCAN_SIZE;
-//};
 
 class Head
 {
@@ -39,11 +29,9 @@ class Head
     Head();
     void setup();
     void beginEchoAlignment();
-//    void beginEchoScan();
     void update();
     int measureUltrasonicEcho();
     void outcome(JSONVar & outcome_object);
-//    void outcome_scan(JSONVar & outcome_object);
     void turnHead(int head_angle);
     int head_direction(int x, int y);
     int get_ultrasonic_measure();
@@ -51,17 +39,16 @@ class Head
     bool _is_enacting_head_alignment;
     bool _is_enacting_echo_scan;
     unsigned long _next_saccade_time;
+    bool _lost_focus = false;
   private:
     Servo _head;
-    int _penultimate_ultrasonic_measure;
-    int _previous_ultrasonic_measure;
-    int _current_ultrasonic_measure;
-    int _min_ultrasonic_measure;
+    int _penultimate_ultrasonic_measure = 1;
+    int _previous_ultrasonic_measure = NO_ECHO_DISTANCE;
+    int _current_ultrasonic_measure = NO_ECHO_DISTANCE;
+    int _min_ultrasonic_measure = NO_ECHO_DISTANCE;
     int _angle_min_ultrasonic_measure;
     int _head_angle_span;
     int _echo_alignment_step;
-//    significant_array2 _sign_array;
-//    int _current_index;
 };
 
 #endif

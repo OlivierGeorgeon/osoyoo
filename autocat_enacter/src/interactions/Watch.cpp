@@ -23,6 +23,7 @@ Watch::Watch(Floor& FCR, Head& HEA, Imu& IMU, WifiCat& WifiCat, JSONVar json_act
 // STEP 0: Start the interaction
 void Watch::begin()
 {
+  _HEA._lost_focus = false;
   _step = INTERACTION_ONGOING;
 }
 
@@ -34,36 +35,48 @@ void Watch::ongoing()
   if (_HEA._is_enacting_head_alignment)
   {
     _status ="move";
-    _duration1 = millis()- _action_start_time;
+    _duration1 = millis() - _action_start_time;
     _action_end_time = 0;
     _step = INTERACTION_TERMINATE;
   }
-  // If no Head alignment, check whether duration has elapsed
+  // If no Head alignment, manage the scan
   else if (_scan == nullptr)
   {
-    if (millis() > _action_end_time) // || _IMU.get_impact_rightwards() > 0)
+    if (millis() > _action_end_time)
     {
-      // Trigger the scan interaction
-      //_HEA.beginEchoScan();
-      JSONVar json_action;
-      json_action["action"] = String(_action);
-      json_action["clock"] = _clock;
-      _scan = new Scan(_FLO, _HEA, _IMU, _WifiCat, json_action);
-      _scan -> begin();
-    }
-  }
-  // Execute the Scan interaction and then terminate
-  else
-  {
-    if (_scan -> update() == INTERACTION_TERMINATE)
-    {
-      delete _scan;
-      _scan = nullptr;
+//      // Trigger the scan interaction
+//      JSONVar json_action;
+//      json_action["action"] = String(_action);
+//      json_action["clock"] = _clock;
+//      _scan = new Scan(_FLO, _HEA, _IMU, _WifiCat, json_action);
+//      _scan -> begin();
+//    }
+//  }
+//  // Execute the Scan interaction and then terminate
+//  else
+//  {
+//    if (_scan -> update() == INTERACTION_TERMINATE)
+//    {
+////      delete _scan; _scan will be deleted by outcome()
+////      _scan = nullptr;
       _duration1 = millis() - _action_start_time;
       _HEA.beginEchoAlignment();
       _step = INTERACTION_TERMINATE;
       _action_end_time = 0;
     }
+  }
+}
+
+// Send the scan outcome
+
+void Watch::outcome(JSONVar & outcome_object)
+{
+
+  if (_scan != nullptr)
+  {
+    _scan->outcome(outcome_object);
+    delete _scan;
+    _scan = nullptr;
   }
 }
 
@@ -77,7 +90,11 @@ void Watch::terminate()
   {
     // Read the floor color and return true when done
     if (_FLO._CLR.end_read())
+    {
       // When color has been read, proceed to step 3
       _step = INTERACTION_SEND;
+      if (_HEA._lost_focus)
+        _status ="lost";
+    }
   }
 }

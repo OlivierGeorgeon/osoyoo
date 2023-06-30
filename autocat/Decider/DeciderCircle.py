@@ -9,7 +9,7 @@ from . Interaction import Interaction, OUTCOME_DEFAULT
 from . CompositeInteraction import CompositeInteraction
 from . PredefinedInteractions import create_interactions, OUTCOME_LOST_FOCUS, OUTCOME_CLOSE_FRONT, \
     OUTCOME_FAR_FRONT, OUTCOME_FAR_LEFT, OUTCOME_LEFT, OUTCOME_RIGHT, OUTCOME_FAR_RIGHT, OUTCOME_FLOOR_LEFT, \
-    OUTCOME_FLOOR_FRONT, OUTCOME_FLOOR_RIGHT  # , OUTCOME_IMPACT
+    OUTCOME_FLOOR_FRONT, OUTCOME_FLOOR_RIGHT
 from ..Robot.Enaction import Enaction
 
 
@@ -100,10 +100,8 @@ class DeciderCircle:
 
         # If there is an echo, compute the echo outcome
         if enacted_enaction.focus_point is not None:
-            # if enacted_interaction['echo_xy'][0] < 200:  # From the center of the robot
             if np.linalg.norm(enacted_enaction.focus_point) < 200:  # From the center of the robot
                 outcome = OUTCOME_CLOSE_FRONT
-            # elif enacted_interaction['echo_xy'][0] > 500:  # Must be farther than the forward speed
             elif np.linalg.norm(enacted_enaction.focus_point) > 500:  # Must be farther than the forward speed
                 outcome = OUTCOME_FAR_FRONT
             elif enacted_enaction.focus_point[1] > 150:
@@ -137,4 +135,3 @@ class DeciderCircle:
                 outcome = OUTCOME_FLOOR_RIGHT
 
         return outcome
-

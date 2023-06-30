@@ -88,6 +88,7 @@ class CtrlRobot:
         enacted_enaction = Enaction(self.workspace.actions[action_code], outcome['clock'], None)
 
         enacted_enaction.duration1 = outcome['duration1']
+        enacted_enaction.status = outcome['status']
         enacted_enaction.head_angle = outcome['head_angle']
         if 'color' in outcome:
             enacted_enaction.color_index = category_color(outcome['color'])

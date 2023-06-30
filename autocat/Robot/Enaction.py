@@ -43,8 +43,8 @@ class Enaction:
                 # Default sidewards 1.5s
                 if self.action.action_code in [ACTION_LEFTWARD, ACTION_RIGHTWARD]:
                     self.duration = 1000  # 1500
-                if self.action.action_code in [ACTION_WATCH]:
-                    self.duration = 5000
+            if self.action.action_code in [ACTION_WATCH]:
+                self.duration = 5000
             self.body_direction_rad = memory.body_memory.get_body_direction_rad()
             self.body_quaternion = memory.body_memory.body_quaternion  # Inferred from compass and yaw
 
@@ -55,7 +55,7 @@ class Enaction:
         self.simulation_time = 0.
 
         # The enacted enaction
-        self.status = None
+        self.status = "0"
         self.duration1 = 0
         self.yaw = 0
         self.compass_point = None
