@@ -148,8 +148,8 @@ class Enaction:
                 # The error between the expected and the actual position of the echo
                 prediction_focus_point = matrix44.apply_to_vector(displacement_matrix, intended_enaction.focus_point)
                 prediction_error_focus = prediction_focus_point - self.echo_point
-                # If the new focus is near the previous focus
-                if np.linalg.norm(prediction_error_focus) < FOCUS_MAX_DELTA:
+                # If the new focus is near the previous focus or the displacement has been continuous.
+                if np.linalg.norm(prediction_error_focus) < FOCUS_MAX_DELTA or self.status == "continuous":
                     # The focus has been kept
                     self.focus_point = self.echo_point
                     print("UPDATE FOCUS by delta", prediction_error_focus)
@@ -179,16 +179,16 @@ class Enaction:
                     print("LOST FOCUS due to delta", prediction_error_focus)
                     self.lost_focus = True  # Used by agent_circle
                     self.focus_point = None
-                    # playsound('autocat/Assets/R5.wav', False)
+                    playsound('autocat/Assets/R5.wav', False)
             else:
                 # The focus was lost
                 print("LOST FOCUS due to no echo")
                 self.lost_focus = True  # Used by agent_circle
                 self.focus_point = None
-                # playsound('autocat/Assets/R5.wav', False)
+                playsound('autocat/Assets/R5.wav', False)
         else:
             # If the robot was not focussed
-            if self.action.action_code in [ACTION_SCAN, ACTION_FORWARD, ACTION_WATCH] \
+            if self.action.action_code in [ACTION_SCAN, ACTION_FORWARD, ACTION_TURN, ACTION_WATCH] \
                     and self.echo_point is not None:
                 # Catch focus
                 playsound('autocat/Assets/cute_beep2.wav', False)

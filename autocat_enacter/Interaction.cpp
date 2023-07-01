@@ -95,7 +95,6 @@ void Interaction::send()
   JSONVar outcome_object;
   outcome_object["clock"] = _clock;
   outcome_object["action"] = String(_action);
-  outcome_object["status"] = _status;
   outcome_object["duration1"] = _duration1;
   _HEA.outcome(outcome_object);
   _FLO.outcome(outcome_object);
@@ -105,6 +104,7 @@ void Interaction::send()
 
   // The outcome for the specific interaction subclass
   outcome(outcome_object);
+  outcome_object["status"] = _status;
 
   // Send the outcome to the PC
   String outcome_json_string = JSON.stringify(outcome_object);

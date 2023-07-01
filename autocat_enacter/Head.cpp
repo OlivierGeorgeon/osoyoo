@@ -53,6 +53,14 @@ void Head::update()
       _echo_alignment_step++;
       _next_saccade_time = millis() + SACCADE_DURATION;
       _current_ultrasonic_measure = measureUltrasonicEcho();
+      // Check the variation from the last saccade below  660mm/s. Filter out the echo loss.
+      if (abs(_current_ultrasonic_measure - _previous_ultrasonic_measure) > ECHO_MONITOR_VARIATION * 2 &&
+          abs(_current_ultrasonic_measure - _penultimate_ultrasonic_measure) > ECHO_MONITOR_VARIATION * 2) // &&
+          // abs(_current_ultrasonic_measure - _previous_ultrasonic_measure) < 9000 )
+        {
+          _discontinuous = true;
+          Serial.println("Discontinuous: " + String(_current_ultrasonic_measure) + " " + String(_previous_ultrasonic_measure));
+        }
       Serial.println("Step: " + String(_echo_alignment_step) + ", Angle: " +String(_head_angle) + ", measure: " + String(_current_ultrasonic_measure));
       if (_previous_ultrasonic_measure > _current_ultrasonic_measure )
       // The echo is closer
@@ -105,18 +113,15 @@ void Head::update()
     {
       _next_saccade_time = millis() + ECHO_MONITOR_PERIOD;
       _current_ultrasonic_measure = measureUltrasonicEcho();
-      // Check the variation from the least aligned measure
-      if (abs(_current_ultrasonic_measure - _min_ultrasonic_measure) > ECHO_MONITOR_VARIATION)
+      // Check the variation from the least aligned measure over two cycles
+      if (abs(_current_ultrasonic_measure  - _min_ultrasonic_measure) > ECHO_MONITOR_VARIATION &&
+          abs(_previous_ultrasonic_measure - _min_ultrasonic_measure) > ECHO_MONITOR_VARIATION)
       {
         Serial.print("Trigger alignment from Angle: " +String(_head_angle) + ", measure: " + String(_current_ultrasonic_measure));
         Serial.println(", variation: " + String(_current_ultrasonic_measure - _min_ultrasonic_measure));
         beginEchoAlignment();
       }
     }
-    // Check the variation from the last 50ms
-    if (abs(_current_ultrasonic_measure - _previous_ultrasonic_measure) > ECHO_MONITOR_VARIATION &&
-        abs(_current_ultrasonic_measure - _previous_ultrasonic_measure) < 9000 )
-      _lost_focus = true;
     _penultimate_ultrasonic_measure = _previous_ultrasonic_measure;
     _previous_ultrasonic_measure = _current_ultrasonic_measure;
   }

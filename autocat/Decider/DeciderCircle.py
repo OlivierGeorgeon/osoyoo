@@ -45,7 +45,7 @@ class DeciderCircle:
     def intended_enaction(self, outcome):
         """Learning from the previous outcome and selecting the next enaction"""
 
-        # Recording previous experience
+        # Recording previous interaction
         self.previous_interaction = self.last_interaction
         self.last_interaction = Interaction.create_or_retrieve(self._action, outcome)
 

@@ -39,7 +39,7 @@ class Head
     bool _is_enacting_head_alignment;
     bool _is_enacting_echo_scan;
     unsigned long _next_saccade_time;
-    bool _lost_focus = false;
+    bool _discontinuous = false;
   private:
     Servo _head;
     int _penultimate_ultrasonic_measure = 1;

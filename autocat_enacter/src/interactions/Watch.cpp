@@ -23,7 +23,7 @@ Watch::Watch(Floor& FCR, Head& HEA, Imu& IMU, WifiCat& WifiCat, JSONVar json_act
 // STEP 0: Start the interaction
 void Watch::begin()
 {
-  _HEA._lost_focus = false;
+  _HEA._discontinuous = false; // Reset in outcome() to keep track of continuity across interactions
   _step = INTERACTION_ONGOING;
 }
 
@@ -71,30 +71,26 @@ void Watch::ongoing()
 
 void Watch::outcome(JSONVar & outcome_object)
 {
-
-  if (_scan != nullptr)
-  {
-    _scan->outcome(outcome_object);
-    delete _scan;
-    _scan = nullptr;
-  }
+  if (!_HEA._discontinuous)
+    _status ="continuous";
+    _HEA._discontinuous = false;
 }
 
 // Overrides the terminate() method to wait for end of echo scan
-void Watch::terminate()
-{
-  // Turn on the color sensor led
-  _FLO._CLR.begin_read();
-
-  if (_action_end_time < millis() &&  !_FLO._is_enacting && !_HEA._is_enacting_head_alignment)
-  {
-    // Read the floor color and return true when done
-    if (_FLO._CLR.end_read())
-    {
-      // When color has been read, proceed to step 3
-      _step = INTERACTION_SEND;
-      if (_HEA._lost_focus)
-        _status ="lost";
-    }
-  }
-}
+//void Watch::terminate()
+//{
+//  // Turn on the color sensor led
+//  _FLO._CLR.begin_read();
+//
+//  if (_action_end_time < millis() &&  !_FLO._is_enacting && !_HEA._is_enacting_head_alignment)
+//  {
+//    // Read the floor color and return true when done
+//    if (_FLO._CLR.end_read())
+//    {
+//      // When color has been read, proceed to step 3
+//      _step = INTERACTION_SEND;
+//      if (_HEA._discontinuous)
+//        _status ="lost";
+//    }
+//  }
+//}
