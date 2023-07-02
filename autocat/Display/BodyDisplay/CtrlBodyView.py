@@ -100,7 +100,7 @@ class CtrlBodyView:
                                      + ", Engagement: " + self.workspace.engagement_mode
         # if self.workspace.interaction_step == INTERACTION_STEP_ENACTING:
             # self.view.label_enaction.text = self.workspace.intended_enaction.body_label()
-        if self.workspace.interaction_step == INTERACTION_STEP_REFRESHING:
+        if self.workspace.interaction_step == INTERACTION_STEP_REFRESHING and self.workspace.enacted_enaction is not None:
             self.view.label.text = self.workspace.enacted_enaction.body_label_azimuth()
             self.view.label_enaction.text = self.workspace.enacted_enaction.body_label()
             self.update_body_view()

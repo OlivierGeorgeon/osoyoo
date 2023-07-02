@@ -1,7 +1,7 @@
 import json
 import math
 import numpy as np
-from pyrr import matrix44, quaternion
+from pyrr import matrix44, Quaternion
 from playsound import playsound
 from ..Decider.Action import ACTION_FORWARD, ACTION_BACKWARD, ACTION_LEFTWARD, ACTION_RIGHTWARD, \
     ACTION_TURN, ACTION_TURN_RIGHT, ACTION_TURN_HEAD, ACTION_SCAN, ACTION_WATCH
@@ -217,30 +217,29 @@ class Enaction:
             print("Prompt moved to egocentric: ", self.prompt_point)
 
         # Estimate the new azimuth from the yaw
-        yaw_quaternion = quaternion.create_from_z_rotation(math.radians(self.yaw))
-        estimate_body_quaternion = quaternion.cross(intended_enaction.body_quaternion, yaw_quaternion)
+        yaw_quaternion = Quaternion.from_z_rotation(math.radians(self.yaw))
+        estimate_body_quaternion = intended_enaction.body_quaternion.cross(yaw_quaternion)
 
         # If the robot returns no azimuth then the body_quaternion is estimated from yaw
         if self.azimuth is None:
             self.body_quaternion = estimate_body_quaternion
         else:
             # If the robot returns the azimuth then the body_quaternion is initialized from the azimuth
-            self.body_quaternion = quaternion.create_from_z_rotation(self.body_direction_rad)
+            self.body_quaternion = Quaternion.from_z_rotation(self.body_direction_rad)
             # After the first interaction, the body_quaternion is averaged between the compass and the estimate
             if self.clock > 0:
-                dot = quaternion.dot(self.body_quaternion, estimate_body_quaternion)
+                dot = self.body_quaternion.dot(estimate_body_quaternion)
                 if dot < 0.0:
                     estimate_body_quaternion = - estimate_body_quaternion
 
                 # Save the difference
-                dif_q = quaternion.cross(self.body_quaternion, quaternion.inverse(estimate_body_quaternion))
-                if quaternion.rotation_angle(dif_q) > math.pi:
+                dif_q = self.body_quaternion.cross(estimate_body_quaternion.inverse)
+                if dif_q.angle > math.pi:
                     dif_q = -dif_q
-                self.body_direction_delta = quaternion.rotation_axis(dif_q)[2] * quaternion.rotation_angle(dif_q)
+                self.body_direction_delta = dif_q.axis[2] * dif_q.angle
 
                 # Take the median angle between the compass and the yaw estimate
                 # 0 is compass only, 1 is yaw estimate only
-                self.body_quaternion = quaternion.slerp(self.body_quaternion, estimate_body_quaternion, 0.5)
-        self.body_direction_rad = quaternion.rotation_axis(self.body_quaternion)[2] * \
-                                  quaternion.rotation_angle(self.body_quaternion)
+                self.body_quaternion = self.body_quaternion.slerp(estimate_body_quaternion, 0.5)
+        self.body_direction_rad = self.body_quaternion.axis[2] * self.body_quaternion.angle
         # print("Computed body direction:", round(math.degrees(self.body_direction_rad)))

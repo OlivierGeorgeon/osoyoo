@@ -1,6 +1,6 @@
 import math
 import numpy as np
-from pyrr import matrix44, quaternion
+from pyrr import matrix44, quaternion, Quaternion
 from ..Robot.RobotDefine import ROBOT_SETTINGS, ROBOT_FRONT_X, ROBOT_SIDE
 
 
@@ -10,7 +10,8 @@ class BodyMemory:
         """Initialize the body position and speed variables"""
         self.robot_id = robot_id
         self.head_direction_rad = .0  # [-pi/2, pi/2] Radian relative to the robot's x axis
-        self.body_quaternion = quaternion.create_from_z_rotation(0)  # The quaternion defining the direction of the body
+        # self.body_quaternion = quaternion.create_from_z_rotation(0)  # The quaternion defining the direction of the body
+        self.body_quaternion = Quaternion.from_z_rotation(0)  # The quaternion defining the direction of the body
         self.compass_offset = np.array(ROBOT_SETTINGS[robot_id]["compass_offset"], dtype=int)
 
     def set_head_direction_degree(self, head_direction_degree: int):
@@ -44,8 +45,10 @@ class BodyMemory:
 
     def body_direction_matrix(self):
         """Return the body direction matrix to apply to experiences"""
+        # For some reason the matrix must be the inverse of the angle and also of the quaternion
+        return matrix44.create_from_inverse_of_quaternion(self.body_quaternion)
         # opposite direction because pyrr is left-handed
-        return matrix44.create_from_z_rotation(-self.get_body_direction_rad())
+        # return matrix44.create_from_z_rotation(-self.get_body_direction_rad())
 
     def head_absolute_direction(self):
         return self.get_body_direction_rad() + self.head_direction_rad
@@ -54,13 +57,17 @@ class BodyMemory:
         """The rectangle occupied by the robot's body - North up"""
         # outline = [[ROBOT_FRONT_X, ROBOT_SIDE, 0], [-ROBOT_FRONT_X, ROBOT_SIDE, 0],
         #            [-ROBOT_FRONT_X, -ROBOT_SIDE, 0], [ROBOT_FRONT_X, -ROBOT_SIDE, 0]]
-        # return matrix44.apply_to_vector(self.body_direction_matrix(), outline)
+        # matrix44.apply_to_vector(self.body_direction_matrix(), outline)
         # Apply to array of vectors is not working:
         # Pyrr 0.10.3 installed different from https://github.com/adamlwgriffiths/Pyrr/blob/master/pyrr/matrix44.py
-        p1 = matrix44.apply_to_vector(self.body_direction_matrix(), [ROBOT_FRONT_X, ROBOT_SIDE, 0])
-        p2 = matrix44.apply_to_vector(self.body_direction_matrix(), [-ROBOT_FRONT_X, ROBOT_SIDE, 0])
-        p3 = matrix44.apply_to_vector(self.body_direction_matrix(), [-ROBOT_FRONT_X, -ROBOT_SIDE, 0])
-        p4 = matrix44.apply_to_vector(self.body_direction_matrix(), [ROBOT_FRONT_X, -ROBOT_SIDE, 0])
+        # p1 = matrix44.apply_to_vector(self.body_direction_matrix(), [ROBOT_FRONT_X, ROBOT_SIDE, 0])
+        # p2 = matrix44.apply_to_vector(self.body_direction_matrix(), [-ROBOT_FRONT_X, ROBOT_SIDE, 0])
+        # p3 = matrix44.apply_to_vector(self.body_direction_matrix(), [-ROBOT_FRONT_X, -ROBOT_SIDE, 0])
+        # p4 = matrix44.apply_to_vector(self.body_direction_matrix(), [ROBOT_FRONT_X, -ROBOT_SIDE, 0])
+        p1 = quaternion.apply_to_vector(self.body_quaternion, [ROBOT_FRONT_X, ROBOT_SIDE, 0])
+        p2 = quaternion.apply_to_vector(self.body_quaternion, [-ROBOT_FRONT_X, ROBOT_SIDE, 0])
+        p3 = quaternion.apply_to_vector(self.body_quaternion, [-ROBOT_FRONT_X, -ROBOT_SIDE, 0])
+        p4 = quaternion.apply_to_vector(self.body_quaternion, [ROBOT_FRONT_X, -ROBOT_SIDE, 0])
 
         return np.array([p1, p2, p3, p4])
 

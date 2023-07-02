@@ -83,6 +83,13 @@ class Memory:
         allo_prompt = self.egocentric_to_allocentric(self.egocentric_memory.prompt_point)
         self.allocentric_memory.update_prompt(allo_prompt, clock)
 
+    def egocentric_to_polar_egocentric(self, point):
+        """Return the position of the point relative to the robot in absolute polar direction"""
+        if point is None:
+            return None
+        return quaternion.apply_to_vector(self.body_memory.body_quaternion, point)
+        # return matrix44.apply_to_vector(self.body_memory.body_direction_matrix(), point)
+
     def egocentric_to_allocentric(self, point):
         """Return the point in allocentric coordinates from the point in egocentric coordinates"""
         # Rotate the point by the body direction and add the body position

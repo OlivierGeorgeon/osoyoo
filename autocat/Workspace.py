@@ -1,3 +1,5 @@
+import json
+import numpy as np
 from playsound import playsound
 from .Decider.DeciderCircle import DeciderCircle
 from .Decider.DeciderExplore import DeciderExplore
@@ -9,7 +11,7 @@ from .Integrator.Integrator import Integrator
 from .Robot.Enaction import Enaction
 from .Robot.CtrlRobot import INTERACTION_STEP_IDLE, INTERACTION_STEP_INTENDING, INTERACTION_STEP_ENACTING, \
     INTERACTION_STEP_INTEGRATING, INTERACTION_STEP_REFRESHING
-from .Robot.RobotDefine import ROBOT_SETTINGS
+from .Robot.RobotDefine import ROBOT_FRONT_X
 
 KEY_DECIDER_CIRCLE = "A"  # Automatic mode: controlled by the deciders
 KEY_DECIDER_USER = "M"  # Manual mode : controlled by the user
@@ -28,7 +30,8 @@ class Workspace:
         self.robot_id = robot_id
         self.actions = create_actions(robot_id)
         self.memory = Memory(robot_id)
-        self.deciders = {'Explore': DeciderExplore(self), 'Circle': DeciderCircle(self), 'Watch': DeciderWatch(self)}
+        # self.deciders = {'Explore': DeciderExplore(self), 'Circle': DeciderCircle(self), 'Watch': DeciderWatch(self)}
+        self.deciders = {'Explore': DeciderExplore(self), 'Circle': DeciderCircle(self)}
         self.integrator = Integrator(self)
 
         self.enactions = {}  # The stack of enactions to enact next
@@ -52,6 +55,7 @@ class Workspace:
         # REFRESHING: last only one cycle
         if self.interaction_step == INTERACTION_STEP_REFRESHING:
             self.interaction_step = INTERACTION_STEP_IDLE
+            print("Answer", self.answer_message())
 
         # IDLE: Ready to choose the next intended interaction
         if self.interaction_step == INTERACTION_STEP_IDLE:
@@ -150,3 +154,14 @@ class Workspace:
             # Clear the stack of enactions
             playsound('autocat/Assets/R3.wav', False)
             self.enactions = {}
+
+    def answer_message(self):
+        """Return the message to answer to another robot"""
+        # Return the position of the focus + robot radius in absolute direction
+        message = {"azimuth": self.memory.body_memory.body_azimuth()}
+        p = self.memory.egocentric_to_polar_egocentric(self.memory.egocentric_memory.focus_point)
+        if p is not None:
+            p = p * (np.linalg.norm(p) + ROBOT_FRONT_X / 2) / np.linalg.norm(p)
+            message['x_pos'] = round(p[0])
+            message['y_pos'] = round(p[1])
+        return json.dumps(message)
