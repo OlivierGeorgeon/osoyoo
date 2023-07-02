@@ -9,6 +9,7 @@ from .Integrator.Integrator import Integrator
 from .Robot.Enaction import Enaction
 from .Robot.CtrlRobot import INTERACTION_STEP_IDLE, INTERACTION_STEP_INTENDING, INTERACTION_STEP_ENACTING, \
     INTERACTION_STEP_INTEGRATING, INTERACTION_STEP_REFRESHING
+from .Robot.RobotDefine import ROBOT_SETTINGS
 
 KEY_DECIDER_CIRCLE = "A"  # Automatic mode: controlled by the deciders
 KEY_DECIDER_USER = "M"  # Manual mode : controlled by the user
@@ -22,10 +23,11 @@ KEY_CLEAR = "C"  # Clear the stack of interactions to enact next
 class Workspace:
     """The Workspace supervises the interaction cycle. It produces the intended_interaction
     and processes the enacted interaction """
-    def __init__(self):
-        self.actions = create_actions()
-
-        self.memory = Memory()
+    def __init__(self, arena_id, robot_id):
+        self.arena_id = arena_id
+        self.robot_id = robot_id
+        self.actions = create_actions(robot_id)
+        self.memory = Memory(robot_id)
         self.deciders = {'Explore': DeciderExplore(self), 'Circle': DeciderCircle(self), 'Watch': DeciderWatch(self)}
         self.integrator = Integrator(self)
 

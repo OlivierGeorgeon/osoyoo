@@ -45,13 +45,7 @@ class DeciderWatch:
 
         if enacted_enaction.focus_point is None:
             outcome = OUTCOME_NO_FOCUS
-            # if enacted_enaction.status == 'lost':
-            #     outcome = OUTCOME_NO_FOCUS
-            # elif enacted_enaction.echo_point is not None:
-            #     enacted_enaction.focus_point = enacted_enaction.echo_point
-            #     self.workspace.memory.egocentric_memory.focus_point = enacted_enaction.focus_point
         else:
-            # if enacted_enaction.focus_point is not None:
             if np.linalg.norm(enacted_enaction.focus_point) > 600:
                 outcome = OUTCOME_FAR_FRONT
             else:
@@ -99,5 +93,4 @@ class DeciderWatch:
             self._action = self.workspace.actions[ACTION_WATCH]
             self.workspace.memory.egocentric_memory.prompt_point = None
 
-        # Compute the next prompt point
         return Enaction(self._action, self.workspace.clock, self.workspace.memory)

@@ -1,18 +1,17 @@
 import math
 import numpy as np
 from pyrr import matrix44, quaternion
-from ..Robot.RobotDefine import ROBOT_FRONT_X, ROBOT_SIDE, COMPASS_X_OFFSET, COMPASS_Y_OFFSET
-from ..Utils import assert_almost_equal_angles
+from ..Robot.RobotDefine import ROBOT_SETTINGS, ROBOT_FRONT_X, ROBOT_SIDE
 
 
 class BodyMemory:
     """Memory of body position"""
-    def __init__(self, ):
+    def __init__(self, robot_id):
         """Initialize the body position and speed variables"""
+        self.robot_id = robot_id
         self.head_direction_rad = .0  # [-pi/2, pi/2] Radian relative to the robot's x axis
-        # self.body_direction_rad = .0  # [-pi, pi] Radian relative to horizontal x axis (west-east)
         self.body_quaternion = quaternion.create_from_z_rotation(0)  # The quaternion defining the direction of the body
-        self.compass_offset = np.array([COMPASS_X_OFFSET, COMPASS_Y_OFFSET, 0], dtype=int)
+        self.compass_offset = np.array(ROBOT_SETTINGS[robot_id]["compass_offset"], dtype=int)
 
     def set_head_direction_degree(self, head_direction_degree: int):
         """Set the head direction from degree measured relative to x axis [-90,90]"""
@@ -34,10 +33,6 @@ class BodyMemory:
         """Return the azimuth in degree relative to north [0,360["""
         return round((90 - math.degrees(self.get_body_direction_rad())) % 360)
 
-    # def body_quaternion(self):
-    #     """Return the quaternion representing the body direction"""
-    #     return quaternion.create_from_z_rotation(self.body_direction_rad)
-
     def get_body_direction_rad(self):
         """Return the body direction ind rad ]-pi,pi]"""
         # The Z component of the rotation axis gives the sign of the direction
@@ -51,20 +46,6 @@ class BodyMemory:
         """Return the body direction matrix to apply to experiences"""
         # opposite direction because pyrr is left-handed
         return matrix44.create_from_z_rotation(-self.get_body_direction_rad())
-
-    # def rotate_degree(self, yaw_degree: int, compass_azimuth: int):
-    #     """Rotate the robot's body by the yaw and correct drift using azimuth if out of bound."""
-    #     # Integrate the azimuth from the yaw
-    #     azimuth = self.body_azimuth() - yaw_degree  # Yaw is counterclockwise
-    #     azimuth %= 360
-    #
-    #     # If integrated azimuth is too far from the compass azimuth then use the compass azimuth
-    #     print("Compass azimuth", compass_azimuth, "Estimated azimuth", azimuth)
-    #     if compass_azimuth > 0:  # Don't apply if imu has no compass information
-    #         if not assert_almost_equal_angles(math.radians(azimuth), math.radians(compass_azimuth), 10):
-    #             azimuth = compass_azimuth
-    #
-    #     self.set_body_direction_from_azimuth(azimuth)
 
     def head_absolute_direction(self):
         return self.get_body_direction_rad() + self.head_direction_rad
@@ -85,7 +66,7 @@ class BodyMemory:
 
     def save(self):
         """Return a clone of bodymemory to save a snapshot of memory"""
-        saved_body_memory = BodyMemory()
+        saved_body_memory = BodyMemory(self.robot_id)
         saved_body_memory.head_direction_rad = self.head_direction_rad
         # saved_body_memory.body_direction_rad = self.body_direction_rad
         saved_body_memory.body_quaternion = self.body_quaternion.copy()

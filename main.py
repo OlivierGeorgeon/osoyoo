@@ -7,7 +7,7 @@
 # |__|__| \__,_|  |__|   \___/ \____||__|__|  |__|  
 #
 # Run main.py with the robot's IP address:
-# py main.py "192.168.1.20"
+# py -m main.py <Arena_ID> <Robot ID>
 #
 #  Spring 2022
 #   Titoua Knockart, Université Claude Bernard (UCBL), France
@@ -22,25 +22,21 @@ import pyglet
 from autocat import Workspace, CtrlRobot, CtrlEgocentricView, CtrlAllocentricView, CtrlBodyView, CtrlPhenomenonView
 from playsound import playsound
 
-robot_ip1 = "192.168.8.189"
-if len(sys.argv) > 1:
-    robot_ip1 = sys.argv[1]
-print("Robot IP:", robot_ip1)
+if len(sys.argv) < 3:  # Argument 0 is "main.py" when launched in -m mode
+    print("Please provide the arena ID and the robot ID as arguments")
+    exit()
 
-workspace = Workspace()
-ctrl_robot = CtrlRobot(robot_ip1, workspace)
+workspace = Workspace(sys.argv[1], sys.argv[2])
+ctrl_robot = CtrlRobot(workspace)
 ctrl_egocentric_view = CtrlEgocentricView(workspace)
 ctrl_allocentric_view = CtrlAllocentricView(workspace)
 ctrl_body_view = CtrlBodyView(workspace)
 ctrl_phenomenon_view = CtrlPhenomenonView(workspace)
 workspace.ctrl_phenomenon_view = ctrl_phenomenon_view
 
-robot_ip2 = None
-if len(sys.argv) > 2:
-    robot_ip2 = sys.argv[2]
-    print("Robot IP2:", robot_ip2)
-    workspace2 = Workspace()
-    ctrl_robot2 = CtrlRobot(robot_ip2, workspace2)
+if len(sys.argv) > 3:
+    workspace2 = Workspace(sys.argv[1], sys.argv[3])
+    ctrl_robot2 = CtrlRobot(workspace2)
     ctrl_egocentric_view2 = CtrlEgocentricView(workspace2)
 
 
@@ -53,12 +49,12 @@ def update(dt):
     ctrl_allocentric_view.main(dt)
     ctrl_body_view.main(dt)
     ctrl_phenomenon_view.main(dt)
-    if robot_ip2 is not None:
+    if len(sys.argv) > 3:
         ctrl_robot2.main(dt)
         workspace2.main(dt)
         ctrl_robot2.main(dt)
         ctrl_egocentric_view2.main(dt)
-        ctrl_egocentric_view2.view.set_caption("Robot 2")
+        ctrl_egocentric_view2.view.set_caption("Robot " + str(sys.argv[2]))
 
 
 playsound('autocat/Assets/R5.wav', False)

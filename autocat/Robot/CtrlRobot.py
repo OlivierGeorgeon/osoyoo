@@ -4,7 +4,7 @@ import socket
 import math
 import numpy as np
 from pyrr import matrix44
-from .RobotDefine import RETREAT_DISTANCE, RETREAT_DISTANCE_Y, LINE_X, ROBOT_FRONT_X, ROBOT_FRONT_Y, ROBOT_HEAD_X
+from .RobotDefine import ROBOT_SETTINGS, RETREAT_DISTANCE, RETREAT_DISTANCE_Y, ROBOT_HEAD_X
 from .Enaction import Enaction
 from .Color import category_color
 from playsound import playsound
@@ -27,9 +27,9 @@ FOCUS_MAX_DELTA = 100  # (mm) Maximum delta to keep focus
 class CtrlRobot:
     """The interface between the Workspace and the robot"""
 
-    def __init__(self, robot_ip, workspace):
+    def __init__(self, workspace):
 
-        self.robot_ip = robot_ip
+        self.robot_ip = ROBOT_SETTINGS[workspace.robot_id]["IP"][workspace.arena_id]
         self.workspace = workspace
         self.port = 8888
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)

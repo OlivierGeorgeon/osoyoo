@@ -1,6 +1,6 @@
 import math
 import numpy as np
-from ..Robot.RobotDefine import FORWARD_SPEED, LATERAL_SPEED, DEFAULT_YAW, TURN_DURATION, TRANSLATE_DURATION
+from ..Robot.RobotDefine import ROBOT_SETTINGS, DEFAULT_YAW, TURN_DURATION, TRANSLATE_DURATION
 
 ACTION_FORWARD = '8'
 ACTION_BACKWARD = '2'
@@ -31,7 +31,7 @@ class Action:
 
         self.simulation_step = 0
         self.simulation_time = 0.
-        print("Create action", self, "of speed", self.translation_speed, "rotation speed", self.rotation_speed_rad)
+        # print("Create action", self, "of speed", self.translation_speed, "rotation speed", self.rotation_speed_rad)
 
     def __str__(self):
         """ Print the action as its action_code"""
@@ -62,20 +62,22 @@ class Action:
                   "new y speed:", round(self.translation_speed[1]))
 
 
-def create_actions():
+def create_actions(robot_id):
     """Create all actions"""
+    x_speed = ROBOT_SETTINGS[robot_id]["forward_speed"]
+    y_speed = ROBOT_SETTINGS[robot_id]["lateral_speed"]
     action_dictionary = {}
 
-    forward_speed = np.array([FORWARD_SPEED, 0, 0], dtype=float)
+    forward_speed = np.array([x_speed, 0, 0], dtype=float)
     action_dictionary[ACTION_FORWARD] = Action(ACTION_FORWARD, forward_speed, 0, TRANSLATE_DURATION)
 
-    backward_speed = np.array([-FORWARD_SPEED, 0, 0], dtype=float)
+    backward_speed = np.array([-x_speed, 0, 0], dtype=float)
     action_dictionary[ACTION_BACKWARD] = Action(ACTION_BACKWARD, backward_speed, 0, TRANSLATE_DURATION)
 
-    leftward_speed = np.array([0, LATERAL_SPEED, 0], dtype=float)
+    leftward_speed = np.array([0, y_speed, 0], dtype=float)
     action_dictionary[ACTION_LEFTWARD] = Action(ACTION_LEFTWARD, leftward_speed, 0, TRANSLATE_DURATION)
 
-    rightward_speed = np.array([0, -LATERAL_SPEED, 0], dtype=float)
+    rightward_speed = np.array([0, -y_speed, 0], dtype=float)
     action_dictionary[ACTION_RIGHTWARD] = Action(ACTION_RIGHTWARD, rightward_speed, 0, TRANSLATE_DURATION)
 
     action_dictionary[ACTION_CIRCUMVENT] = Action(ACTION_CIRCUMVENT, rightward_speed, 0, TRANSLATE_DURATION)
