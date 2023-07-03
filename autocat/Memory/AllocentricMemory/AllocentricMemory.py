@@ -1,11 +1,10 @@
 import math
 import numpy as np
-from pyrr import matrix44
+from pyrr import matrix44, quaternion
 from . Hexagonal_geometry import point_to_cell, get_neighbors
 from . GridCell import GridCell, CELL_UNKNOWN
 from ..EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_PLACE
 from ..AllocentricMemory.GridCell import CELL_NO_ECHO, CELL_PHENOMENON
-from ...Utils import rotate_vector_z
 from ..EgocentricMemory.Experience import EXPERIENCE_FOCUS, EXPERIENCE_PROMPT
 from ...Robot.RobotDefine import ROBOT_FRONT_X, ROBOT_SIDE
 
@@ -85,20 +84,42 @@ class AllocentricMemory:
             cell_x, cell_y = point_to_cell(a.point)
             self.apply_status_to_cell(cell_x, cell_y, a.experience.type, clock, a.experience.color_index)
 
-    def move(self, body_direction_rad, translation, clock, is_egocentric_translation=True):
+    # def move(self, body_direction_rad, translation, clock, is_egocentric_translation=True):
+    #     """Move the robot in allocentric memory. Mark the traversed cells Free. Returns the new position"""
+    #     # Compute the robot destination point
+    #     if is_egocentric_translation:
+    #         # TODO Translate between the initial direction and the final direction
+    #         destination_point = self.robot_point + rotate_vector_z(translation, body_direction_rad)
+    #     else:
+    #         destination_point = self.robot_point + translation
+    #     # Check that the robot remains within allocentric memory limits
+    #     body_direction_matrix = matrix44.create_from_z_rotation(-body_direction_rad)
+    #     self.place_robot_translate(body_direction_matrix, self.robot_point, destination_point, clock)
+    #     self.robot_point = destination_point
+    #
+    #     return np.round(destination_point)
+
+    def move(self, body_quaternion, translation, clock, is_egocentric_translation=True):
         """Move the robot in allocentric memory. Mark the traversed cells Free. Returns the new position"""
         # Compute the robot destination point
         if is_egocentric_translation:
             # TODO Translate between the initial direction and the final direction
-            destination_point = self.robot_point + rotate_vector_z(translation, body_direction_rad)
+            destination_point = self.robot_point + quaternion.apply_to_vector(body_quaternion, translation)
         else:
             destination_point = self.robot_point + translation
-        # Check that the robot remains within allocentric memory limits
-        body_direction_matrix = matrix44.create_from_z_rotation(-body_direction_rad)
-        self.place_robot_translate(body_direction_matrix, self.robot_point, destination_point, clock)
-        # self.place_translation(self.robot_point, destination_point, clock)
-        self.robot_point = destination_point
 
+        # Mark the cells traversed by the robot
+        p1 = quaternion.apply_to_vector(body_quaternion, [ROBOT_FRONT_X, ROBOT_SIDE, 0]) + destination_point
+        p2 = quaternion.apply_to_vector(body_quaternion, [-ROBOT_FRONT_X, ROBOT_SIDE, 0]) + self.robot_point
+        p3 = quaternion.apply_to_vector(body_quaternion, [-ROBOT_FRONT_X, -ROBOT_SIDE, 0]) + self.robot_point
+        p4 = quaternion.apply_to_vector(body_quaternion, [ROBOT_FRONT_X, -ROBOT_SIDE, 0]) + destination_point
+        polygon = [p[0:2] for p in [p1, p2, p3, p4]]
+        for c in [c for line in self.grid for c in line if c.is_inside(polygon)]:
+            c.status[0] = EXPERIENCE_PLACE
+            c.clock_place = clock
+
+        # The new position of the robot
+        self.robot_point = destination_point
         return np.round(destination_point)
 
     def place_robot(self, body_memory, clock):
@@ -111,18 +132,18 @@ class AllocentricMemory:
             c.clock_place = clock
         # print("Place robot time:", time.time() - start_time, "seconds")
 
-    def place_robot_translate(self, body_direction_matrix, start, end, clock):
-        """Mark the cells traversed by the robot translation"""
-        # TODO manage different directions
-        p1 = matrix44.apply_to_vector(body_direction_matrix, [ROBOT_FRONT_X, ROBOT_SIDE, 0]) + end
-        p2 = matrix44.apply_to_vector(body_direction_matrix, [-ROBOT_FRONT_X, ROBOT_SIDE, 0]) + start
-        p3 = matrix44.apply_to_vector(body_direction_matrix, [-ROBOT_FRONT_X, -ROBOT_SIDE, 0]) + start
-        p4 = matrix44.apply_to_vector(body_direction_matrix, [ROBOT_FRONT_X, -ROBOT_SIDE, 0]) + end
-        outline = np.array([p1, p2, p3, p4])
-        polygon = [p[0:2] for p in outline]
-        for c in [c for line in self.grid for c in line if c.is_inside(polygon)]:
-            c.status[0] = EXPERIENCE_PLACE
-            c.clock_place = clock
+    # def place_robot_translate(self, body_direction_matrix, start, end, clock):
+    #     """Mark the cells traversed by the robot translation"""
+    #     # TODO manage different directions
+    #     p1 = matrix44.apply_to_vector(body_direction_matrix, [ROBOT_FRONT_X, ROBOT_SIDE, 0]) + end
+    #     p2 = matrix44.apply_to_vector(body_direction_matrix, [-ROBOT_FRONT_X, ROBOT_SIDE, 0]) + start
+    #     p3 = matrix44.apply_to_vector(body_direction_matrix, [-ROBOT_FRONT_X, -ROBOT_SIDE, 0]) + start
+    #     p4 = matrix44.apply_to_vector(body_direction_matrix, [ROBOT_FRONT_X, -ROBOT_SIDE, 0]) + end
+    #     outline = np.array([p1, p2, p3, p4])
+    #     polygon = [p[0:2] for p in outline]
+    #     for c in [c for line in self.grid for c in line if c.is_inside(polygon)]:
+    #         c.status[0] = EXPERIENCE_PLACE
+    #         c.clock_place = clock
 
     def clear_phenomena(self):
         """Reset the phenomena from cells"""
@@ -131,24 +152,6 @@ class AllocentricMemory:
             c.status[1] = CELL_UNKNOWN
             c.clock_phenomenon = 0
             c.phenomenon_id = None
-
-    # def place_translation(self, start, end, clock):
-    #     """Mark the cells traversed by the robot"""
-    #     distance = math.dist(start, end)
-    #     if distance == 0:
-    #         return
-    #     nb_step = int(distance / self.cell_radius)
-    #     if nb_step == 0:
-    #         return
-    #     step_x = int((end[0] - start[0])/nb_step)
-    #     step_y = int((end[1] - start[1])/nb_step)
-    #     current_pos_x = start[0]
-    #     current_pos_y = start[1]
-    #     for _ in range(nb_step):
-    #         cell_x, cell_y = point_to_cell(np.array([current_pos_x, current_pos_y, 0]), self.cell_radius)
-    #         self.apply_status_to_cell(cell_x, cell_y, EXPERIENCE_PLACE, clock)
-    #         current_pos_x += step_x
-    #         current_pos_y += step_y
 
     def apply_status_to_cell(self, i, j, status, clock, color_index):
         """Change the cell status"""

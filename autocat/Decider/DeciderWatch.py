@@ -6,12 +6,12 @@
 import math
 import numpy as np
 from . Interaction import Interaction, OUTCOME_DEFAULT
-from . PredefinedInteractions import OUTCOME_FAR_FRONT
+from . PredefinedInteractions import OUTCOME_FAR_FRONT, OUTCOME_LOST_FOCUS, OUTCOME_FAR_LEFT
 from . Action import ACTION_WATCH, ACTION_SCAN, ACTION_TURN
 from ..Robot.Enaction import Enaction
 
-OUTCOME_SIDE = 'S'
-OUTCOME_NO_FOCUS = 'N'
+# OUTCOME_SIDE = 'S'
+# OUTCOME_NO_FOCUS = 'N'
 
 
 class DeciderWatch:
@@ -44,14 +44,15 @@ class DeciderWatch:
         outcome = OUTCOME_DEFAULT
 
         if enacted_enaction.focus_point is None:
-            outcome = OUTCOME_NO_FOCUS
+            # If there is no focus then consider it was lost and trigger scan
+            outcome = OUTCOME_LOST_FOCUS
         else:
             if np.linalg.norm(enacted_enaction.focus_point) > 600:
                 outcome = OUTCOME_FAR_FRONT
             else:
                 angle = math.atan2(enacted_enaction.focus_point[1], enacted_enaction.focus_point[0])
                 if math.fabs(angle) > math.pi / 6:
-                    outcome = OUTCOME_SIDE
+                    outcome = OUTCOME_FAR_LEFT
 
         return outcome
 
@@ -81,11 +82,11 @@ class DeciderWatch:
                 self.workspace.memory.egocentric_memory.prompt_point = np.array([-100, 0, 0], dtype=int)
                 self._action = self.workspace.actions[ACTION_TURN]
         # No Focus: Scan
-        elif outcome == OUTCOME_NO_FOCUS:
+        elif outcome == OUTCOME_LOST_FOCUS:
             self._action = self.workspace.actions[ACTION_SCAN]
             self.workspace.memory.egocentric_memory.prompt_point = None
         # Focussed on an object on the side: Align towards it
-        elif outcome == OUTCOME_SIDE:
+        elif outcome == OUTCOME_FAR_LEFT:
             self.workspace.memory.egocentric_memory.prompt_point = self.workspace.memory.egocentric_memory.focus_point.copy()
             self._action = self.workspace.actions[ACTION_TURN]
         # DEFAULT: Keep watching

@@ -6,7 +6,7 @@ from .AllocentricMemory.AllocentricMemory import AllocentricMemory
 from .BodyMemory import BodyMemory
 from .PhenomenonMemory.PhenomenonMemory import PhenomenonMemory, TER
 from .AllocentricMemory.Hexagonal_geometry import CELL_RADIUS
-from ..Utils import rotate_vector_z
+# from ..Utils import rotate_vector_z
 
 
 GRID_WIDTH = 100   # Number of cells wide
@@ -41,17 +41,16 @@ class Memory:
         - Add new experiences in egocentric_memory
         - Move the robot in allocentric_memory
         """
-        # self.egocentric_memory.maintain_focus(self.egocentric_memory.focus_point, enacted_enaction)
         self.egocentric_memory.focus_point = enacted_enaction.focus_point
         self.egocentric_memory.prompt_point = enacted_enaction.prompt_point
-        # self.egocentric_memory.maintain_prompt(enacted_enaction)
 
         self.body_memory.set_head_direction_degree(enacted_enaction.head_angle)
         # TODO Keep the simulation and adjust the robot position
         # Translate the robot before applying the yaw
-        self.allocentric_memory.move(self.body_memory.get_body_direction_rad(), enacted_enaction.translation,
+        # self.allocentric_memory.move(self.body_memory.get_body_direction_rad(), enacted_enaction.translation,
+        #                              enacted_enaction.clock)
+        self.allocentric_memory.move(self.body_memory.body_quaternion, enacted_enaction.translation,
                                      enacted_enaction.clock)
-        # self.body_memory.rotate_degree(enacted_enaction.yaw, enacted_enaction.azimuth)
         self.body_memory.body_quaternion = enacted_enaction.body_quaternion
 
         # Keep a dictionary of the direction deltas to check gyro_coef is correct
@@ -158,8 +157,10 @@ class Memory:
         self.body_memory.body_quaternion = quaternion.cross(self.body_memory.body_quaternion,
              quaternion.create_from_z_rotation((intended_enaction.simulation_rotation_speed * dt)))
         # Update allocentric memory
-        self.allocentric_memory.robot_point += rotate_vector_z(intended_enaction.action.translation_speed * dt *
-                                                                 SIMULATION_TIME_RATIO,
-                                                                 self.body_memory.get_body_direction_rad())
+        # self.allocentric_memory.robot_point += rotate_vector_z(intended_enaction.action.translation_speed * dt *
+        #                                                          SIMULATION_TIME_RATIO,
+        #                                                          self.body_memory.get_body_direction_rad())
+        self.allocentric_memory.robot_point += quaternion.apply_to_vector(self.body_memory.body_quaternion,
+                                            intended_enaction.action.translation_speed * dt * SIMULATION_TIME_RATIO)
         self.allocentric_memory.place_robot(self.body_memory, intended_enaction.clock)
         return True

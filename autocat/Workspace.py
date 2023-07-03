@@ -159,8 +159,8 @@ class Workspace:
 
     def answer_message(self):
         """Return the message to answer to another robot"""
-        # Return the position of the focus + robot radius in absolute direction
         message = {"azimuth": self.memory.body_memory.body_azimuth()}
+        # Return the position of the focus + robot radius in absolute direction
         p = self.memory.egocentric_to_polar_egocentric(self.memory.egocentric_memory.focus_point)
         if p is not None:
             p = p * (np.linalg.norm(p) + ROBOT_FRONT_X / 2) / np.linalg.norm(p)

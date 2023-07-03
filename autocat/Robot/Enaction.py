@@ -13,6 +13,13 @@ FOCUS_MAX_DELTA = 100  # 200 (mm) Maximum delta to keep focus
 
 
 class Enaction:
+    """An Enaction object handles the enaction of an interaction by the robot
+    1. Workspace instantiates an intended_interaction
+    2. CtrlRobot send a serialization of the intended_interaction to the robot
+    3. CtrlRobot instantiates an enacted_interaction using the outcome recieved from the robot
+    4. CtrlRobot call enacted_interaction.follow_up(intended_interaction) to update the focus and the azimuth
+
+    """
     def __init__(self, action, clock, memory):
         # The intended enaction
         self.action = action
@@ -135,7 +142,9 @@ class Enaction:
                    "{:.2f}".format(math.degrees(self.body_direction_delta))
 
     def follow_up(self, intended_enaction):
-        """Manage focus catch, lost, or update. Also move the prompt"""
+        """Manage focus catch, lost, or update.
+        Move the prompt
+        Update the azimuth"""
 
         # If the robot is already focussed then adjust the focus and the displacement
         if intended_enaction.focus_point is not None:
