@@ -102,7 +102,7 @@ class DeciderCircle:
         if enacted_enaction.focus_point is not None:
             if np.linalg.norm(enacted_enaction.focus_point) < 200:  # From the center of the robot
                 outcome = OUTCOME_CLOSE_FRONT
-            elif np.linalg.norm(enacted_enaction.focus_point) > 500:  # Must be farther than the forward speed
+            elif np.linalg.norm(enacted_enaction.focus_point) > 400:  # Must be farther than the forward speed
                 outcome = OUTCOME_FAR_FRONT
             elif enacted_enaction.focus_point[1] > 150:
                 outcome = OUTCOME_FAR_LEFT  # More that 150 to the left

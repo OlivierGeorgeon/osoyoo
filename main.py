@@ -54,7 +54,7 @@ def update(dt):
         workspace2.main(dt)
         ctrl_robot2.main(dt)
         ctrl_egocentric_view2.main(dt)
-        ctrl_egocentric_view2.view.set_caption("Robot " + str(sys.argv[2]))
+        ctrl_egocentric_view2.view.set_caption("Robot " + str(sys.argv[3]))
 
 
 playsound('autocat/Assets/R5.wav', False)

@@ -179,13 +179,13 @@ class Enaction:
                     print("LOST FOCUS due to delta", prediction_error_focus)
                     self.lost_focus = True  # Used by agent_circle
                     self.focus_point = None
-                    playsound('autocat/Assets/R5.wav', False)
+                    # playsound('autocat/Assets/R5.wav', False)
             else:
                 # The focus was lost
                 print("LOST FOCUS due to no echo")
                 self.lost_focus = True  # Used by agent_circle
                 self.focus_point = None
-                playsound('autocat/Assets/R5.wav', False)
+                # playsound('autocat/Assets/R5.wav', False)
         else:
             # If the robot was not focussed
             if self.action.action_code in [ACTION_SCAN, ACTION_FORWARD, ACTION_TURN, ACTION_WATCH] \

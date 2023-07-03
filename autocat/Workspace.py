@@ -30,8 +30,10 @@ class Workspace:
         self.robot_id = robot_id
         self.actions = create_actions(robot_id)
         self.memory = Memory(robot_id)
-        # self.deciders = {'Explore': DeciderExplore(self), 'Circle': DeciderCircle(self), 'Watch': DeciderWatch(self)}
-        self.deciders = {'Explore': DeciderExplore(self), 'Circle': DeciderCircle(self)}
+        if self.robot_id == '1':
+            self.deciders = {'Explore': DeciderExplore(self), 'Circle': DeciderCircle(self), 'Watch': DeciderWatch(self)}
+        else:
+            self.deciders = {'Explore': DeciderExplore(self), 'Circle': DeciderCircle(self)}
         self.integrator = Integrator(self)
 
         self.enactions = {}  # The stack of enactions to enact next
