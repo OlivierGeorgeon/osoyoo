@@ -10,8 +10,8 @@ class BodyMemory:
         """Initialize the body position and speed variables"""
         self.robot_id = robot_id
         self.head_direction_rad = .0  # [-pi/2, pi/2] Radian relative to the robot's x axis
-        # self.body_quaternion = quaternion.create_from_z_rotation(0)  # The quaternion defining the direction of the body
-        self.body_quaternion = Quaternion.from_z_rotation(0)  # The quaternion defining the direction of the body
+        # self.body_quaternion = Quaternion.from_z_rotation(0)  # The quaternion defining the direction of the body
+        self.body_quaternion = Quaternion([0., 0., 0., 1.])  # The direction of the body initialized to x axis
         self.compass_offset = np.array(ROBOT_SETTINGS[robot_id]["compass_offset"], dtype=int)
 
     def set_head_direction_degree(self, head_direction_degree: int):
@@ -75,7 +75,6 @@ class BodyMemory:
         """Return a clone of bodymemory to save a snapshot of memory"""
         saved_body_memory = BodyMemory(self.robot_id)
         saved_body_memory.head_direction_rad = self.head_direction_rad
-        # saved_body_memory.body_direction_rad = self.body_direction_rad
         saved_body_memory.body_quaternion = self.body_quaternion.copy()
         saved_body_memory.compass_offset = self.compass_offset.copy()
         return saved_body_memory

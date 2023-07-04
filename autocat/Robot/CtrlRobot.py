@@ -71,14 +71,14 @@ class CtrlRobot:
 
     def send_enaction_to_robot(self):
         """Send the enaction string to the robot and set the timeout"""
-        enaction_string = self.workspace.intended_enaction.serialize()
+        enaction_string = self.workspace.intended_enaction.command.serialize()
         print("Sending:", enaction_string)
 
         # Send the intended interaction string to the robot
         self.socket.sendto(bytes(enaction_string, 'utf-8'), (self.robot_ip, self.port))
 
         # Initialize the timeout
-        self.expected_outcome_time = time.time() + self.workspace.intended_enaction.timeout()
+        self.expected_outcome_time = time.time() + self.workspace.intended_enaction.command.timeout()
 
     def send_enacted_interaction_to_workspace(self, outcome_string):
         """ Computes the enacted interaction from the robot's outcome data."""

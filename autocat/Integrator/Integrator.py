@@ -1,3 +1,4 @@
+from pyrr import Quaternion
 from ..Memory.EgocentricMemory.Experience import EXPERIENCE_LOCAL_ECHO, EXPERIENCE_CENTRAL_ECHO, \
     EXPERIENCE_ALIGNED_ECHO
 from autocat.Memory.PhenomenonMemory.Affordance import Affordance
@@ -38,8 +39,7 @@ class Integrator:
 
         # Adjust the robot's position in allocentric memory
         print("Position correction due to phenomenon update", position_correction)
-        self.workspace.memory.allocentric_memory.move(0, position_correction, self.workspace.clock,
-                                                      is_egocentric_translation=False)
+        self.workspace.memory.allocentric_memory.move(Quaternion([0, 0, 0, 1]), position_correction, self.workspace.clock)
 
         # Create new hypothetical phenomena from remaining affordances
         self.workspace.memory.phenomenon_memory.create_phenomena(new_affordances)

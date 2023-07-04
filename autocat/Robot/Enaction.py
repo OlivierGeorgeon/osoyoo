@@ -7,8 +7,8 @@ from ..Decider.Action import ACTION_FORWARD, ACTION_BACKWARD, ACTION_LEFTWARD, A
     ACTION_TURN, ACTION_TURN_RIGHT, ACTION_TURN_HEAD, ACTION_SCAN, ACTION_WATCH
 from ..Memory.Memory import SIMULATION_STEP_ON, SIMULATION_TIME_RATIO
 from .RobotDefine import DEFAULT_YAW, TURN_DURATION, ROBOT_FRONT_X, ROBOT_FRONT_Y
+from .Command import Command
 
-ENACTION_DEFAULT_TIMEOUT = 6  # Seconds
 FOCUS_MAX_DELTA = 100  # 200 (mm) Maximum delta to keep focus
 
 
@@ -24,34 +24,37 @@ class Enaction:
         # The intended enaction
         self.action = action
         self.clock = clock
-        self.duration = None
-        self.angle = None
-        self.focus_point = None
+        # self.duration = None
+        # self.angle = None
         self.prompt_point = None
+        self.focus_point = None
         self.body_direction_rad = 0
         self.body_quaternion = None  # Inferred from compass and yaw
+        self.command = None
         if memory is not None:
-            if memory.egocentric_memory.focus_point is not None:
-                self.focus_point = memory.egocentric_memory.focus_point.copy()
             if memory.egocentric_memory.prompt_point is not None:
                 self.prompt_point = memory.egocentric_memory.prompt_point.copy()
-                if self.action.action_code in [ACTION_FORWARD, ACTION_BACKWARD]:
-                    self.duration = int(np.linalg.norm(self.prompt_point) /
-                                        math.fabs(self.action.translation_speed[0]) * 1000)
-                if self.action.action_code in [ACTION_LEFTWARD, ACTION_RIGHTWARD]:
-                    self.duration = int(np.linalg.norm(self.prompt_point) /
-                                        math.fabs(self.action.translation_speed[1]) * 1000)
-                if self.action.action_code in [ACTION_TURN_HEAD, ACTION_TURN_RIGHT, ACTION_TURN]:
-                    self.angle = int(math.degrees(math.atan2(self.prompt_point[1], self.prompt_point[0])))
-            else:
-                # Default backward 0.5s
-                if self.action.action_code in [ACTION_BACKWARD]:
-                    self.duration = 500
-                # Default sidewards 1.5s
-                if self.action.action_code in [ACTION_LEFTWARD, ACTION_RIGHTWARD]:
-                    self.duration = 1000  # 1500
-            if self.action.action_code in [ACTION_WATCH]:
-                self.duration = 5000
+            if memory.egocentric_memory.focus_point is not None:
+                self.focus_point = memory.egocentric_memory.focus_point.copy()
+            self.command = Command(self.action, self.clock, self.prompt_point, self.focus_point)
+
+            #     if self.action.action_code in [ACTION_FORWARD, ACTION_BACKWARD]:
+            #         self.duration = int(np.linalg.norm(self.prompt_point) /
+            #                             math.fabs(self.action.translation_speed[0]) * 1000)
+            #     if self.action.action_code in [ACTION_LEFTWARD, ACTION_RIGHTWARD]:
+            #         self.duration = int(np.linalg.norm(self.prompt_point) /
+            #                             math.fabs(self.action.translation_speed[1]) * 1000)
+            #     if self.action.action_code in [ACTION_TURN_HEAD, ACTION_TURN_RIGHT, ACTION_TURN]:
+            #         self.angle = int(math.degrees(math.atan2(self.prompt_point[1], self.prompt_point[0])))
+            # else:
+            #     # Default backward 0.5s
+            #     if self.action.action_code in [ACTION_BACKWARD]:
+            #         self.duration = 500
+            #     # Default sidewards 1.5s
+            #     if self.action.action_code in [ACTION_LEFTWARD, ACTION_RIGHTWARD]:
+            #         self.duration = 1000  # 1500
+            # if self.action.action_code in [ACTION_WATCH]:
+            #     self.duration = 5000
             self.body_direction_rad = memory.body_memory.get_body_direction_rad()
             self.body_quaternion = memory.body_memory.body_quaternion  # Inferred from compass and yaw
 
@@ -81,34 +84,34 @@ class Enaction:
         self.displacement_matrix = matrix44.multiply(self.rotation_matrix,
                                                      matrix44.create_from_translation(-self.translation))
 
-    def serialize(self):
-        """Return the serial representation to send to the robot"""
-        serial = {'clock': self.clock, 'action': self.action.action_code}
-        if self.duration is not None:
-            serial['duration'] = self.duration
-        if self.angle is not None:
-            serial['angle'] = self.angle
-        if self.focus_point is not None:
-            serial['focus_x'] = int(self.focus_point[0])  # Convert to python int
-            serial['focus_y'] = int(self.focus_point[1])
-        if self.action.action_code == ACTION_FORWARD:
-            serial['speed'] = int(self.action.translation_speed[0])
-        if self.action.action_code == ACTION_BACKWARD:
-            serial['speed'] = -int(self.action.translation_speed[0])
-        if self.action.action_code == ACTION_LEFTWARD:
-            serial['speed'] = int(self.action.translation_speed[1])
-        if self.action.action_code == ACTION_RIGHTWARD:
-            serial['speed'] = -int(self.action.translation_speed[1])
-        return json.dumps(serial)
+    # def serialize(self):
+    #     """Return the serial representation to send to the robot"""
+    #     serial = {'clock': self.clock, 'action': self.action.action_code}
+    #     if self.duration is not None:
+    #         serial['duration'] = self.duration
+    #     if self.angle is not None:
+    #         serial['angle'] = self.angle
+    #     if self.focus_point is not None:
+    #         serial['focus_x'] = int(self.focus_point[0])  # Convert to python int
+    #         serial['focus_y'] = int(self.focus_point[1])
+    #     if self.action.action_code == ACTION_FORWARD:
+    #         serial['speed'] = int(self.action.translation_speed[0])
+    #     if self.action.action_code == ACTION_BACKWARD:
+    #         serial['speed'] = -int(self.action.translation_speed[0])
+    #     if self.action.action_code == ACTION_LEFTWARD:
+    #         serial['speed'] = int(self.action.translation_speed[1])
+    #     if self.action.action_code == ACTION_RIGHTWARD:
+    #         serial['speed'] = -int(self.action.translation_speed[1])
+    #     return json.dumps(serial)
 
-    def timeout(self):
-        """Return the timeout of this enaction"""
-        timeout = ENACTION_DEFAULT_TIMEOUT
-        if self.duration is not None:
-            timeout = self.duration / 1000.0 + 4.0
-        if self.angle is not None:
-            timeout = math.fabs(self.angle) / DEFAULT_YAW + 4.0  # Turn speed = 45°/s
-        return timeout
+    # def timeout(self):
+    #     """Return the timeout of this enaction"""
+    #     timeout = ENACTION_DEFAULT_TIMEOUT
+    #     if self.duration is not None:
+    #         timeout = self.duration / 1000.0 + 4.0
+    #     if self.angle is not None:
+    #         timeout = math.fabs(self.angle) / DEFAULT_YAW + 4.0  # Turn speed = 45°/s
+    #     return timeout
 
     def start_simulation(self):
         """Initialize the simulation of the intended interaction"""
@@ -116,11 +119,12 @@ class Enaction:
         # Compute the duration and the speed depending and the enaction
         self.simulation_duration = self.action.target_duration
         self.simulation_rotation_speed = self.action.rotation_speed_rad
-        if self.duration is not None:
-            self.simulation_duration = self.duration / 1000
-        if self.angle is not None:
-            self.simulation_duration = math.fabs(self.angle) * TURN_DURATION / DEFAULT_YAW
-            if self.angle < 0 and self.action.action_code != ACTION_TURN_RIGHT:  # TODO fix turn right with prompt
+        if self.command.duration is not None:
+            # self.simulation_duration = self.duration / 1000
+            self.simulation_duration = self.command.duration / 1000
+        if self.command.angle is not None:
+            self.simulation_duration = math.fabs(self.command.angle) * TURN_DURATION / DEFAULT_YAW
+            if self.command.angle < 0 and self.action.action_code != ACTION_TURN_RIGHT:  # TODO fix turn right with prompt
                 self.simulation_rotation_speed = -self.action.rotation_speed_rad
         self.simulation_duration *= SIMULATION_TIME_RATIO
         self.simulation_rotation_speed *= SIMULATION_TIME_RATIO

@@ -1,6 +1,6 @@
 import math
 import numpy as np
-from pyrr import matrix44, quaternion
+from pyrr import quaternion
 from . Hexagonal_geometry import point_to_cell, get_neighbors
 from . GridCell import GridCell, CELL_UNKNOWN
 from ..EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_PLACE
@@ -99,14 +99,17 @@ class AllocentricMemory:
     #
     #     return np.round(destination_point)
 
-    def move(self, body_quaternion, translation, clock, is_egocentric_translation=True):
-        """Move the robot in allocentric memory. Mark the traversed cells Free. Returns the new position"""
+    def move(self, body_quaternion, translation, clock):
+        """Move the robot in allocentric memory. Mark the traversed cells Free. Returns the new position
+        If body_quaternion is identity then the translation is allocentric"""
         # Compute the robot destination point
-        if is_egocentric_translation:
-            # TODO Translate between the initial direction and the final direction
-            destination_point = self.robot_point + quaternion.apply_to_vector(body_quaternion, translation)
-        else:
-            destination_point = self.robot_point + translation
+        # if is_egocentric_translation:
+        #     # TODO Translate between the initial direction and the final direction
+        #     destination_point = self.robot_point + quaternion.apply_to_vector(body_quaternion, translation)
+        # else:
+        #     destination_point = self.robot_point + translation
+
+        destination_point = self.robot_point + quaternion.apply_to_vector(body_quaternion, translation)
 
         # Mark the cells traversed by the robot
         p1 = quaternion.apply_to_vector(body_quaternion, [ROBOT_FRONT_X, ROBOT_SIDE, 0]) + destination_point
