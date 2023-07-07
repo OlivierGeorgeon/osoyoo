@@ -1,6 +1,6 @@
 import math
 import numpy as np
-from pyrr import matrix44, quaternion
+from pyrr import matrix44, quaternion, Quaternion
 from .EgocentricMemory.EgocentricMemory import EgocentricMemory
 from .AllocentricMemory.AllocentricMemory import AllocentricMemory
 from .BodyMemory import BodyMemory
@@ -44,7 +44,7 @@ class Memory:
         self.egocentric_memory.focus_point = enacted_enaction.focus_point
         self.egocentric_memory.prompt_point = enacted_enaction.prompt_point
 
-        self.body_memory.set_head_direction_degree(enacted_enaction.head_angle)
+        self.body_memory.set_head_direction_degree(enacted_enaction.outcome.head_angle)
         # TODO Keep the simulation and adjust the robot position
         # Translate the robot before applying the yaw
         # self.allocentric_memory.move(self.body_memory.get_body_direction_rad(), enacted_enaction.translation,
@@ -154,8 +154,9 @@ class Memory:
                                                                              self.egocentric_memory.prompt_point)
         # Displacement in body memory
         # self.body_memory.body_direction_rad += intended_enaction.simulation_rotation_speed * dt
-        self.body_memory.body_quaternion = quaternion.cross(self.body_memory.body_quaternion,
-             quaternion.create_from_z_rotation((intended_enaction.simulation_rotation_speed * dt)))
+        self.body_memory.body_quaternion = self.body_memory.body_quaternion.cross(
+             Quaternion.from_z_rotation((intended_enaction.simulation_rotation_speed * dt)))
+        assert(type(self.body_memory.body_quaternion) == Quaternion)
         # Update allocentric memory
         # self.allocentric_memory.robot_point += rotate_vector_z(intended_enaction.action.translation_speed * dt *
         #                                                          SIMULATION_TIME_RATIO,

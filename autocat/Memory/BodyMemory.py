@@ -1,6 +1,6 @@
 import math
 import numpy as np
-from pyrr import matrix44, quaternion, Quaternion
+from pyrr import matrix44, Quaternion, Vector3
 from ..Robot.RobotDefine import ROBOT_SETTINGS, ROBOT_FRONT_X, ROBOT_SIDE
 
 
@@ -10,7 +10,6 @@ class BodyMemory:
         """Initialize the body position and speed variables"""
         self.robot_id = robot_id
         self.head_direction_rad = .0  # [-pi/2, pi/2] Radian relative to the robot's x axis
-        # self.body_quaternion = Quaternion.from_z_rotation(0)  # The quaternion defining the direction of the body
         self.body_quaternion = Quaternion([0., 0., 0., 1.])  # The direction of the body initialized to x axis
         self.compass_offset = np.array(ROBOT_SETTINGS[robot_id]["compass_offset"], dtype=int)
 
@@ -23,12 +22,12 @@ class BodyMemory:
         """Return the robot's head direction in degrees [-90,90]"""
         return int(math.degrees(self.head_direction_rad))
 
-    def set_body_direction_from_azimuth(self, azimuth_degree: int):
-        """Set the body direction from azimuth measure relative to north [0,360[ degree"""
-        body_direction_degree = 90 - azimuth_degree  # Degree relative to x axis in trigonometric direction
-        while body_direction_degree < -180:  # Keep within [-180, 180]
-            body_direction_degree += 360
-        self.body_quaternion = quaternion.create_from_z_rotation(math.radians(body_direction_degree))
+    # def set_body_direction_from_azimuth(self, azimuth_degree: int):
+    #     """Set the body direction from azimuth measure relative to north [0,360[ degree"""
+    #     body_direction_degree = 90 - azimuth_degree  # Degree relative to x axis in trigonometric direction
+    #     while body_direction_degree < -180:  # Keep within [-180, 180]
+    #         body_direction_degree += 360
+    #     self.body_quaternion = quaternion.create_from_z_rotation(math.radians(body_direction_degree))
 
     def body_azimuth(self):
         """Return the azimuth in degree relative to north [0,360["""
@@ -36,12 +35,13 @@ class BodyMemory:
 
     def get_body_direction_rad(self):
         """Return the body direction ind rad ]-pi,pi]"""
-        # The Z component of the rotation axis gives the sign of the direction
-        return quaternion.rotation_axis(self.body_quaternion)[2] * quaternion.rotation_angle(self.body_quaternion)
+        # The Z component of the rotation axis gives the sign of the angle
+        # return quaternion.rotation_axis(self.body_quaternion)[2] * quaternion.rotation_angle(self.body_quaternion)
+        return self.body_quaternion.axis[2] * self.body_quaternion.angle
 
-    def body_direction_degree(self):
-        """Return the body direction in degree relative to the x axis [-180,180["""
-        return round(math.degrees(self.get_body_direction_rad()))
+    # def body_direction_degree(self):
+    #     """Return the body direction in degree relative to the x axis [-180,180["""
+    #     return round(math.degrees(self.get_body_direction_rad()))
 
     def body_direction_matrix(self):
         """Return the body direction matrix to apply to experiences"""
@@ -64,10 +64,11 @@ class BodyMemory:
         # p2 = matrix44.apply_to_vector(self.body_direction_matrix(), [-ROBOT_FRONT_X, ROBOT_SIDE, 0])
         # p3 = matrix44.apply_to_vector(self.body_direction_matrix(), [-ROBOT_FRONT_X, -ROBOT_SIDE, 0])
         # p4 = matrix44.apply_to_vector(self.body_direction_matrix(), [ROBOT_FRONT_X, -ROBOT_SIDE, 0])
-        p1 = quaternion.apply_to_vector(self.body_quaternion, [ROBOT_FRONT_X, ROBOT_SIDE, 0])
-        p2 = quaternion.apply_to_vector(self.body_quaternion, [-ROBOT_FRONT_X, ROBOT_SIDE, 0])
-        p3 = quaternion.apply_to_vector(self.body_quaternion, [-ROBOT_FRONT_X, -ROBOT_SIDE, 0])
-        p4 = quaternion.apply_to_vector(self.body_quaternion, [ROBOT_FRONT_X, -ROBOT_SIDE, 0])
+        # p1 = quaternion.apply_to_vector(self.body_quaternion, [ROBOT_FRONT_X, ROBOT_SIDE, 0])
+        p1 = self.body_quaternion * Vector3([ROBOT_FRONT_X, ROBOT_SIDE, 0])
+        p2 = self.body_quaternion * Vector3([-ROBOT_FRONT_X, ROBOT_SIDE, 0])
+        p3 = self.body_quaternion * Vector3([-ROBOT_FRONT_X, -ROBOT_SIDE, 0])
+        p4 = self.body_quaternion * Vector3([ROBOT_FRONT_X, -ROBOT_SIDE, 0])
 
         return np.array([p1, p2, p3, p4])
 

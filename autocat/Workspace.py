@@ -119,7 +119,8 @@ class Workspace:
             # Restore the memory from the snapshot and integrate the experiences
             self.memory = self.memory_snapshot
             # Update body memory and egocentric memory
-            self.memory.update_and_add_experiences(self.enacted_enaction)
+            # self.memory.update_and_add_experiences(self.enacted_enaction)
+            self.memory.update_and_add_experiences(self.intended_enaction)
 
             # Call the integrator to create and update the phenomena
             # Currently we don't create phenomena in imaginary mode
@@ -129,7 +130,8 @@ class Workspace:
             self.memory.update_allocentric(self.clock)
 
             # Increment the clock if the enacted interaction was properly received
-            if self.enacted_enaction.clock >= self.clock:  # don't increment if the robot is behind
+            # if self.enacted_enaction.clock >= self.clock:  # don't increment if the robot is behind
+            if self.intended_enaction.clock >= self.clock:  # don't increment if the robot is behind
                 # Remove the enaction from the stack (ok if it has already been removed)
                 self.enactions.pop(self.clock, None)
                 # Increment the clock
@@ -149,9 +151,11 @@ class Workspace:
             # Only process actions when the robot is IDLE
             if self.interaction_step == INTERACTION_STEP_IDLE:
                 self.enactions[self.clock] = Enaction(self.actions[user_key.upper()], self.clock, self.memory)
-                if user_key.upper() == ACTION_TURN and self.memory.egocentric_memory.prompt_point is not None:
-                    # If action ALIGN then the next enaction is to move forward to the prompt
-                    self.enactions[self.clock + 1] = Enaction(self.actions[ACTION_FORWARD], self.clock + 1, self.memory)
+        elif user_key.upper() == "/":
+            # If key ALIGN then turn and move forward to the prompt
+            if self.interaction_step == INTERACTION_STEP_IDLE:
+                self.enactions[self.clock] = Enaction(self.actions[ACTION_TURN], self.clock, self.memory)
+                self.enactions[self.clock + 1] = Enaction(self.actions[ACTION_FORWARD], self.clock + 1, self.memory)
         elif user_key.upper() == KEY_CLEAR:
             # Clear the stack of enactions
             playsound('autocat/Assets/R3.wav', False)

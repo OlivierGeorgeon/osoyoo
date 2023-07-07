@@ -1,6 +1,7 @@
 import math
 import numpy
 import pyglet
+from pyrr import Quaternion
 from .CtrlPhenomenonView import CtrlPhenomenonView
 from ...Workspace import Workspace
 from autocat.Memory.PhenomenonMemory.PhenomenonObject import PhenomenonObject
@@ -9,7 +10,7 @@ from ...Memory.EgocentricMemory.Experience import Experience, EXPERIENCE_FLOOR, 
 
 # Testing the Phenomenon View
 # py -m autocat.Display.PhenomenonDisplay
-workspace = Workspace()
+workspace = Workspace("PetiteIA", "1")
 controller = CtrlPhenomenonView(workspace)
 
 experience0 = Experience([50, 0, 0], EXPERIENCE_FLOOR, math.pi / 4, 0, experience_id=0)
@@ -50,7 +51,8 @@ print("Point [1, 1] is inside: ", phenomenon.is_inside(numpy.array([1, 1])))
 controller.update_affordance_displays(phenomenon)
 
 # The robot position relative the phenomenon
-workspace.memory.body_memory.set_body_direction_from_azimuth(45)
+# workspace.memory.body_memory.set_body_direction_from_azimuth(45)
+workspace.memory.body_memory.body_quaternion = Quaternion.from_z_rotation(math.pi/4)
 controller.update_body_robot()
 controller.view.robot_translate = [-150, -150, 0]
 controller.view.robot_rotate = 90 - workspace.memory.body_memory.body_azimuth()

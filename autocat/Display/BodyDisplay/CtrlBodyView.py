@@ -9,6 +9,12 @@ import circle_fit as cf
 KEY_OFFSET = 'O'
 
 
+def quaternion_to_azimuth(body_quaternion):
+    """Return the azimuth in degree relative to north [0,360["""
+    body_direction_rad = body_quaternion.axis[2] * body_quaternion.angle
+    return round((90 - math.degrees(body_direction_rad)) % 360)
+
+
 class CtrlBodyView:
     """Controls the body view"""
     def __init__(self, workspace):
@@ -68,15 +74,15 @@ class CtrlBodyView:
         # Rotate the previous compass points so they remain at the south of the view
         # TODO rotate the compass points when imagining
         # if 'yaw' in self.workspace.enacted_interaction:
-        yaw = self.workspace.enacted_enaction.yaw
-        displacement_matrix = matrix44.create_from_z_rotation(math.radians(yaw))
+        # yaw = self.workspace.intended_enaction.yaw
+        # displacement_matrix = matrix44.create_from_z_rotation(math.radians(yaw))
         for poi in [p for p in self.points_of_interest if p.type == POINT_COMPASS]:
-            poi.displace(displacement_matrix)
+            poi.displace(self.workspace.intended_enaction.displacement_matrix)
 
         # Add the new points that indicate the south relative to the robot
-        if self.workspace.enacted_enaction.compass_point is not None:
-            self.add_point_of_interest(self.workspace.enacted_enaction.compass_point, POINT_COMPASS)
-            self.add_point_of_interest(self.workspace.enacted_enaction.compass_point, POINT_AZIMUTH,
+        if self.workspace.intended_enaction.outcome.compass_point is not None:
+            self.add_point_of_interest(self.workspace.intended_enaction.outcome.compass_point, POINT_COMPASS)
+            self.add_point_of_interest(self.workspace.intended_enaction.outcome.compass_point, POINT_AZIMUTH,
                                        self.view.background)
             # self.view.label.text += ", compass: " + str(self.workspace.enacted_enaction.azimuth) + "°"
         else:
@@ -100,7 +106,26 @@ class CtrlBodyView:
                                      + ", Engagement: " + self.workspace.engagement_mode
         # if self.workspace.interaction_step == INTERACTION_STEP_ENACTING:
             # self.view.label_enaction.text = self.workspace.intended_enaction.body_label()
-        if self.workspace.interaction_step == INTERACTION_STEP_REFRESHING and self.workspace.enacted_enaction is not None:
-            self.view.label.text = self.workspace.enacted_enaction.body_label_azimuth()
-            self.view.label_enaction.text = self.workspace.enacted_enaction.body_label()
+        # if self.workspace.interaction_step == INTERACTION_STEP_REFRESHING and self.workspace.enacted_enaction is not None:
+        if self.workspace.interaction_step == INTERACTION_STEP_REFRESHING:
+            self.view.label.text = self.body_label_azimuth(self.workspace.intended_enaction)
+            # self.view.label_enaction.text = self.workspace.enacted_enaction.body_label()
+            self.view.label_enaction.text = self.body_label(self.workspace.intended_enaction.action)
             self.update_body_view()
+
+    def body_label(self, action):
+        """Return the label to display in the body view"""
+        rotation_speed = "{:.2f}".format(math.degrees(action.rotation_speed_rad))
+        label = "Speed x: " + str(int(action.translation_speed[0])) + "mm/s, y: " \
+            + str(int(action.translation_speed[1])) + "mm/s, rotation:" + rotation_speed + "°/s"
+        return label
+
+    def body_label_azimuth(self, enaction):
+        """Return the label to display in the body view"""
+        azimuth = quaternion_to_azimuth(enaction.body_quaternion)
+        if enaction.outcome.compass_quaternion is None:
+            return "Azimuth: " + str(azimuth)
+        else:
+            compass = quaternion_to_azimuth(enaction.outcome.compass_quaternion)
+            return "Azimuth: " + str(azimuth) + ", compass: " + str(compass) + ", delta: " + \
+                   "{:.2f}".format(math.degrees(enaction.body_direction_delta))
