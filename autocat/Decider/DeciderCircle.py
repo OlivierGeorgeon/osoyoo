@@ -11,15 +11,13 @@ from . PredefinedInteractions import create_interactions, OUTCOME_LOST_FOCUS, OU
     OUTCOME_FAR_FRONT, OUTCOME_FAR_LEFT, OUTCOME_LEFT, OUTCOME_RIGHT, OUTCOME_FAR_RIGHT, OUTCOME_FLOOR_LEFT, \
     OUTCOME_FLOOR_FRONT, OUTCOME_FLOOR_RIGHT
 from ..Robot.Enaction import Enaction
+from . Decider import Decider
 
 
-class DeciderCircle:
+class DeciderCircle(Decider):
     def __init__(self, workspace):
         """ Creating our agent """
-        self.workspace = workspace
-        self.anticipated_outcome = None
-        self.previous_interaction = None
-        self.last_interaction = None
+        super().__init__(workspace)
 
         # Load the predefined behavior
         self.procedural_memory = create_interactions(self.workspace.actions)
@@ -34,13 +32,13 @@ class DeciderCircle:
                 activation_level = 3
         return activation_level
 
-    def propose_intended_enaction(self, enacted_enaction):
-        """Propose the next intended enaction from the previous enacted interaction.
-        This is the main method of the agent"""
-        # Compute a specific outcome suited for this agent
-        outcome = self.outcome(enacted_enaction)
-        # Compute the intended enaction
-        return self.intended_enaction(outcome)
+    # def propose_intended_enaction(self, enacted_enaction):
+    #     """Propose the next intended enaction from the previous enacted interaction.
+    #     This is the main method of the agent"""
+    #     # Compute a specific outcome suited for this agent
+    #     outcome = self.outcome(enacted_enaction)
+    #     # Compute the intended enaction
+    #     return self.intended_enaction(outcome)
 
     def intended_enaction(self, outcome):
         """Learning from the previous outcome and selecting the next enaction"""
@@ -88,7 +86,9 @@ class DeciderCircle:
 
         # The intended enaction
         self.workspace.memory.egocentric_memory.prompt_point = None  # Remove possible prompt set by another decider
-        return Enaction(self._action, self.workspace.clock, self.workspace.memory)
+
+        self.workspace.enactions[self.workspace.clock] = Enaction(self._action, self.workspace.clock, self.workspace.memory)
+        # return Enaction(self._action, self.workspace.clock, self.workspace.memory)
 
     def outcome(self, enacted_enaction):
         """ Convert the enacted interaction into an outcome adapted to the circle behavior """
@@ -126,12 +126,12 @@ class DeciderCircle:
         #     outcome = OUTCOME_IMPACT
 
         # If floor then override the echo and focus and impact outcome
-        if enacted_enaction.floor > 0:
-            if enacted_enaction.floor == 0b10:
+        if enacted_enaction.outcome.floor > 0:
+            if enacted_enaction.outcome.floor == 0b10:
                 outcome = OUTCOME_FLOOR_LEFT
-            if enacted_enaction.floor == 0b11:
+            if enacted_enaction.outcome.floor == 0b11:
                 outcome = OUTCOME_FLOOR_FRONT
-            if enacted_enaction.floor == 0b01:
+            if enacted_enaction.outcome.floor == 0b01:
                 outcome = OUTCOME_FLOOR_RIGHT
 
         return outcome

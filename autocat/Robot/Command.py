@@ -43,10 +43,10 @@ class Command:
                 self.speed = int(self.action.translation_speed[0])
             if self.action.action_code == ACTION_BACKWARD:
                 self.speed = -int(self.action.translation_speed[0])
-            if self.action.action_code == ACTION_LEFTWARD:
+            if self.action.action_code in [ACTION_LEFTWARD, ACTION_RIGHTWARD]:
                 self.speed = int(self.action.translation_speed[1])
-            if self.action.action_code == ACTION_RIGHTWARD:
-                self.speed = -int(self.action.translation_speed[1])
+            # if self.action.action_code == ACTION_RIGHTWARD:
+            #     self.speed = -int(self.action.translation_speed[1])
 
     def serialize(self):
         """Return the command string to send to the robot"""

@@ -77,12 +77,12 @@ class CtrlBodyView:
         # yaw = self.workspace.intended_enaction.yaw
         # displacement_matrix = matrix44.create_from_z_rotation(math.radians(yaw))
         for poi in [p for p in self.points_of_interest if p.type == POINT_COMPASS]:
-            poi.displace(self.workspace.intended_enaction.displacement_matrix)
+            poi.displace(self.workspace.enaction.displacement_matrix)
 
         # Add the new points that indicate the south relative to the robot
-        if self.workspace.intended_enaction.outcome.compass_point is not None:
-            self.add_point_of_interest(self.workspace.intended_enaction.outcome.compass_point, POINT_COMPASS)
-            self.add_point_of_interest(self.workspace.intended_enaction.outcome.compass_point, POINT_AZIMUTH,
+        if self.workspace.enaction.outcome.compass_point is not None:
+            self.add_point_of_interest(self.workspace.enaction.outcome.compass_point, POINT_COMPASS)
+            self.add_point_of_interest(self.workspace.enaction.outcome.compass_point, POINT_AZIMUTH,
                                        self.view.background)
             # self.view.label.text += ", compass: " + str(self.workspace.enacted_enaction.azimuth) + "°"
         else:
@@ -108,9 +108,9 @@ class CtrlBodyView:
             # self.view.label_enaction.text = self.workspace.intended_enaction.body_label()
         # if self.workspace.interaction_step == INTERACTION_STEP_REFRESHING and self.workspace.enacted_enaction is not None:
         if self.workspace.interaction_step == INTERACTION_STEP_REFRESHING:
-            self.view.label.text = self.body_label_azimuth(self.workspace.intended_enaction)
+            self.view.label.text = self.body_label_azimuth(self.workspace.enaction)
             # self.view.label_enaction.text = self.workspace.enacted_enaction.body_label()
-            self.view.label_enaction.text = self.body_label(self.workspace.intended_enaction.action)
+            self.view.label_enaction.text = self.body_label(self.workspace.enaction.action)
             self.update_body_view()
 
     def body_label(self, action):

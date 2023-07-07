@@ -40,8 +40,9 @@ Interaction::Interaction(Floor& FLO, Head& HEA, Imu& IMU, WifiCat& WifiCat, JSON
   else
     _is_focussed = false;
 
+  // The speed used to keep focus and to specify swipe direction
   if (json_action.hasOwnProperty("speed"))
-    _focus_speed = (int)json_action["speed"]; // Must be positive otherwise multiplication with unsigned long fails
+    _focus_speed = (int)json_action["speed"];  // Is automatically converted to float
 
   // The target duration used if there is no focus
   if (json_action.hasOwnProperty("duration"))

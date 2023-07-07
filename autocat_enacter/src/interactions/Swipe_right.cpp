@@ -31,7 +31,7 @@ void Swipe_right::ongoing()
 {
   // Keep the head towards the focus (HEA is inhibited during the action)
   if (_is_focussed)
-    _HEA.turnHead(_HEA.head_direction(_focus_x, _focus_y + _focus_speed * (millis()- _action_start_time)/1000));
+    _HEA.turnHead(_HEA.head_direction(_focus_x, _focus_y + _focus_speed * (float)(millis() - _action_start_time)/1000.));
 
   // Check if Floor Change Retreat
   if (_FLO._is_enacting)

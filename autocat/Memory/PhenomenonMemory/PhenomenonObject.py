@@ -100,7 +100,7 @@ class PhenomenonObject(Phenomenon):
                 #     break  # Remove only the first similar affordance found
                 if a.is_similar_to(affordance):
                     # Remove affordance similar to this affordance that are not the affordance 0
-                    self.affordances = {key: val for key, val in self.affordances.items() if val != a and key != 0}
+                    self.affordances = {key: val for key, val in self.affordances.items() if val != a or key == 0}
                     break  # Remove only the first similar affordance found
             print("Prune:", nb_affordance - len(self.affordances), "affordances removed.")
 

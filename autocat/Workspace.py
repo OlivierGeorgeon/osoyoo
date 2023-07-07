@@ -37,8 +37,8 @@ class Workspace:
         self.integrator = Integrator(self)
 
         self.enactions = {}  # The stack of enactions to enact next
-        self.intended_enaction = None
-        self.enacted_enaction = None
+        self.enaction = None
+        # self.enacted_enaction = None
 
         self.decider_mode = KEY_DECIDER_USER
         self.engagement_mode = KEY_ENGAGEMENT_ROBOT
@@ -81,7 +81,8 @@ class Workspace:
                     # The most activated decider processes the previous enaction and chooses the next enaction
                     ad = max(self.deciders, key=lambda k: self.deciders[k].activation_level())
                     print("Activated decider:", ad)
-                    self.enactions[self.clock] = self.deciders[ad].propose_intended_enaction(self.enacted_enaction)
+                    # self.enactions[self.clock] = self.deciders[ad].propose_intended_enaction(self.enaction)
+                    self.deciders[ad].propose_intended_enaction()
                     # TODO Manage the enacted_interaction after imagining
 
                 # Case DECIDER_KEY_USER is handled by self.process_user_key()
@@ -89,8 +90,8 @@ class Workspace:
             # When the next enaction is in the stack
             if self.clock in self.enactions:
                 # Take the next enaction from the stack
-                self.intended_enaction = self.enactions[self.clock]
-                self.intended_enaction.start_simulation()
+                self.enaction = self.enactions[self.clock]
+                self.enaction.start_simulation()
                 if self.is_imagining:
                     # If imagining then proceed to simulating the enaction
                     self.interaction_step = INTERACTION_STEP_ENACTING
@@ -103,9 +104,9 @@ class Workspace:
 
         # ENACTING: update body memory during the robot enaction or the imaginary simulation
         if self.interaction_step == INTERACTION_STEP_ENACTING:
-            if self.intended_enaction.simulation_step != SIMULATION_STEP_OFF:
+            if self.enaction.simulation_step != SIMULATION_STEP_OFF:
                 # self.intended_enaction.simulate(self.memory, dt)
-                self.memory.simulate(self.intended_enaction, dt)
+                self.memory.simulate(self.enaction, dt)
             else:
                 # End of the simulation
                 if self.is_imagining:
@@ -120,7 +121,7 @@ class Workspace:
             self.memory = self.memory_snapshot
             # Update body memory and egocentric memory
             # self.memory.update_and_add_experiences(self.enacted_enaction)
-            self.memory.update_and_add_experiences(self.intended_enaction)
+            self.memory.update_and_add_experiences(self.enaction)
 
             # Call the integrator to create and update the phenomena
             # Currently we don't create phenomena in imaginary mode
@@ -131,7 +132,7 @@ class Workspace:
 
             # Increment the clock if the enacted interaction was properly received
             # if self.enacted_enaction.clock >= self.clock:  # don't increment if the robot is behind
-            if self.intended_enaction.clock >= self.clock:  # don't increment if the robot is behind
+            if self.enaction.clock >= self.clock:  # don't increment if the robot is behind
                 # Remove the enaction from the stack (ok if it has already been removed)
                 self.enactions.pop(self.clock, None)
                 # Increment the clock

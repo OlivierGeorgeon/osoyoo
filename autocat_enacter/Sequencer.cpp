@@ -20,8 +20,8 @@
 #include "src/interactions/Backward.h"
 #include "src/interactions/Forward.h"
 #include "src/interactions/Scan.h"
-#include "src/interactions/Swipe_left.h"
-#include "src/interactions/Swipe_right.h"
+#include "src/interactions/Swipe.h"
+// #include "src/interactions/Swipe_right.h"
 #include "src/interactions/Turn.h"
 #include "src/interactions/Turn_head.h"
 // #include "src/interactions/Turn_left.h"
@@ -92,13 +92,13 @@ Interaction* Sequencer::update(int& interaction_step, Interaction* INT)
         INT = new Turn(_FLO, _HEA, _IMU, _WifiCat, json_action);
 
       else if (action == ACTION_SHIFT_LEFT)
-        INT = new Swipe_left(_FLO, _HEA, _IMU, _WifiCat, json_action);
+        INT = new Swipe(_FLO, _HEA, _IMU, _WifiCat, json_action);
 
       else if (action == ACTION_STOP)
         _FLO._OWM.stopMotion();
 
-      else if (action == ACTION_SHIFT_RIGHT)
-        INT = new Swipe_right(_FLO, _HEA, _IMU, _WifiCat, json_action);
+      else if (action == ACTION_SHIFT_RIGHT)  // Negative speed makes swipe to the right
+        INT = new Swipe(_FLO, _HEA, _IMU, _WifiCat, json_action);
 
       else if (action == ACTION_GO_ADVANCE)
         INT = new Forward(_FLO, _HEA, _IMU, _WifiCat, json_action);
