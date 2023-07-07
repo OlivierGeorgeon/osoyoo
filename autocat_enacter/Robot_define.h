@@ -2,9 +2,9 @@
 
 #define AP_SSID "osoyoo_robot"          // The wifi SSID of this robot in Access Point
 #define ROBOT_HEAD_X 80                 // (mm) X position of the head
-#define SPEED 120                       // (mm/s)
+#define SPEED 120                       // motor control
 #define TURN_SPEED 110                  // (degree/s)
-#define SHIFT_SPEED 150                 // (mm/s) 130
+#define SHIFT_SPEED 150                 // motor control 130
 #define TURN_TIME 500                   // (ms)
 #define MOVE_TIME 500                   // (ms)
 #define TURN_SPOT_ANGLE 45              // (degree)

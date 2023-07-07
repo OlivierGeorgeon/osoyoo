@@ -1,7 +1,7 @@
 import json
 import math
 import numpy as np
-from ..Decider.Action import ACTION_FORWARD, ACTION_BACKWARD, ACTION_LEFTWARD, ACTION_RIGHTWARD, \
+from ..Decider.Action import ACTION_FORWARD, ACTION_BACKWARD, ACTION_SWIPE, ACTION_RIGHTWARD, \
     ACTION_TURN, ACTION_TURN_RIGHT, ACTION_TURN_HEAD, ACTION_WATCH
 from .RobotDefine import DEFAULT_YAW
 
@@ -22,16 +22,18 @@ class Command:
         if prompt_point is not None:
             if self.action.action_code in [ACTION_FORWARD, ACTION_BACKWARD]:
                 self.duration = int(np.linalg.norm(prompt_point) / math.fabs(self.action.translation_speed[0]) * 1000)
-            if self.action.action_code in [ACTION_LEFTWARD, ACTION_RIGHTWARD]:
+            if self.action.action_code in [ACTION_SWIPE]:  # ACTION_RIGHTWARD
                 self.duration = int(np.linalg.norm(prompt_point) / math.fabs(self.action.translation_speed[1]) * 1000)
-            if self.action.action_code in [ACTION_TURN_HEAD, ACTION_TURN_RIGHT, ACTION_TURN]:
+                if prompt_point[1] < 0:
+                    self.speed = -int(self.action.translation_speed[1])  # Negative speed makes swipe right
+            if self.action.action_code in [ACTION_TURN_HEAD, ACTION_TURN]:  # ACTION_TURN_RIGHT
                 self.angle = int(math.degrees(math.atan2(prompt_point[1], prompt_point[0])))
         else:
             # Default backward 0.5s
             if self.action.action_code in [ACTION_BACKWARD]:
                 self.duration = 500
             # Default sidewards 1.5s
-            if self.action.action_code in [ACTION_LEFTWARD, ACTION_RIGHTWARD]:
+            if self.action.action_code in [ACTION_SWIPE, ACTION_RIGHTWARD]:
                 self.duration = 1000  # 1500
         if self.action.action_code in [ACTION_WATCH]:
             self.duration = 5000
@@ -43,10 +45,14 @@ class Command:
                 self.speed = int(self.action.translation_speed[0])
             if self.action.action_code == ACTION_BACKWARD:
                 self.speed = -int(self.action.translation_speed[0])
-            if self.action.action_code in [ACTION_LEFTWARD, ACTION_RIGHTWARD]:
+            if self.action.action_code in [ACTION_SWIPE, ACTION_RIGHTWARD]:
                 self.speed = int(self.action.translation_speed[1])
+                if prompt_point is not None:  #  and prompt_point[1] > 0:
+                    self.speed = math.copysign(int(self.action.translation_speed[1]), prompt_point[1])
+            #     else:
+            #         self.speed = -int(self.action.translation_speed[1])  # Negative speed makes swipe right
             # if self.action.action_code == ACTION_RIGHTWARD:
-            #     self.speed = -int(self.action.translation_speed[1])
+            #     self.speed = int(self.action.translation_speed[1])
 
     def serialize(self):
         """Return the command string to send to the robot"""

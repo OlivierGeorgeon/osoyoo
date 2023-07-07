@@ -2,7 +2,7 @@ import math
 import numpy as np
 from pyrr import matrix44, Quaternion
 from playsound import playsound
-from ..Decider.Action import ACTION_FORWARD, ACTION_BACKWARD, ACTION_LEFTWARD, ACTION_RIGHTWARD, \
+from ..Decider.Action import ACTION_FORWARD, ACTION_BACKWARD, ACTION_SWIPE, ACTION_RIGHTWARD, \
     ACTION_TURN, ACTION_TURN_RIGHT, ACTION_SCAN, ACTION_WATCH
 from ..Memory.Memory import SIMULATION_STEP_ON, SIMULATION_TIME_RATIO
 from .RobotDefine import DEFAULT_YAW, TURN_DURATION, ROBOT_FRONT_X, ROBOT_FRONT_Y
@@ -44,6 +44,7 @@ class Enaction:
         self.body_direction_delta = 0
         self.lost_focus = False
         self.translation = None
+        self.yaw_matrix = None  # Used by bodyView
         self.displacement_matrix = None
 
     def start_simulation(self):
@@ -56,7 +57,7 @@ class Enaction:
             self.simulation_duration = self.command.duration / 1000
         if self.command.angle is not None:
             self.simulation_duration = math.fabs(self.command.angle) * TURN_DURATION / DEFAULT_YAW
-            if self.command.angle < 0 and self.action.action_code != ACTION_TURN_RIGHT:  # TODO fix turn right with prompt
+            if self.command.angle < 0:  # and self.action.action_code != ACTION_TURN_RIGHT:
                 self.simulation_rotation_speed = -self.action.rotation_speed_rad
         self.simulation_duration *= SIMULATION_TIME_RATIO
         self.simulation_rotation_speed *= SIMULATION_TIME_RATIO
@@ -70,6 +71,8 @@ class Enaction:
         # Translation integrated from the action's speed multiplied by the duration1
         # TODO Take the yaw into account
         self.translation = self.action.translation_speed * (float(outcome.duration1) / 1000.0)
+        if self.action.action_code == ACTION_SWIPE and self.command.speed is not None and self.command.speed < 0:
+            self.translation = - self.translation
         self.translation += outcome.retreat_translation
         if outcome.blocked:
             self.translation = np.array([0, 0, 0], dtype=int)
@@ -111,8 +114,8 @@ class Enaction:
 
         # Compute the displacement matrix which represents the displacement of the environment
         # relative to the robot (Translates and turns in the opposite direction)
-        yaw_matrix = matrix44.create_from_quaternion(yaw_quaternion)
-        self.displacement_matrix = matrix44.multiply(matrix44.create_from_translation(-self.translation), yaw_matrix)
+        self.yaw_matrix = matrix44.create_from_quaternion(yaw_quaternion)
+        self.displacement_matrix = matrix44.multiply(matrix44.create_from_translation(-self.translation), self.yaw_matrix)
 
         # The focus --------
 
@@ -137,13 +140,13 @@ class Enaction:
                                 self.action.adjust_translation_speed(self.translation)
                         # If the head is sideways then correct lateral displacements
                         if self.outcome.head_angle < -60 or 60 < self.outcome.head_angle:
-                            if self.action.action_code in [ACTION_LEFTWARD, ACTION_RIGHTWARD]:
+                            if self.action.action_code in [ACTION_SWIPE, ACTION_RIGHTWARD]:
                                 self.translation[1] = self.translation[1] + prediction_error_focus[1]
                                 # Correct the estimated speed of the action
                                 self.action.adjust_translation_speed(self.translation)
                         # Update the displacement matrix according to the new translation
                         translation_matrix = matrix44.create_from_translation(-self.translation)
-                        self.displacement_matrix = matrix44.multiply(translation_matrix, yaw_matrix)
+                        self.displacement_matrix = matrix44.multiply(translation_matrix, self.yaw_matrix)
                 else:
                     # The focus was lost
                     print("LOST FOCUS due to delta", prediction_error_focus)

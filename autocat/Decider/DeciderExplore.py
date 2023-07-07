@@ -7,18 +7,18 @@ import math
 import numpy as np
 from pyrr import quaternion, matrix44
 from playsound import playsound
-from . Action import ACTION_TURN, ACTION_FORWARD, ACTION_LEFTWARD, ACTION_RIGHTWARD
+from . Action import ACTION_TURN, ACTION_FORWARD, ACTION_SWIPE, ACTION_RIGHTWARD
 from . Interaction import Interaction, OUTCOME_DEFAULT
 from ..Robot.Enaction import Enaction
 from ..Memory.PhenomenonMemory.PhenomenonMemory import TER
 from . Decider import Decider
 
 CLOCK_TO_GO_HOME = 8  # Number of interactions before going home
-EXPLORATION_STEP_INIT = 0
-EXPLORATION_STEP_ROTATE = 1
-EXPLORATION_STEP_FORWARD = 2
-EXPLORATION_STEP_SWIPE_LEFT = 3
-EXPLORATION_STEP_SWIPE_RIGHT = 4
+# EXPLORATION_STEP_INIT = 0
+# EXPLORATION_STEP_ROTATE = 1
+# EXPLORATION_STEP_FORWARD = 2
+# EXPLORATION_STEP_SWIPE_LEFT = 3
+# EXPLORATION_STEP_SWIPE_RIGHT = 4
 OUTCOME_ORIGIN = "O"
 OUTCOME_LEFT = "LO"
 OUTCOME_RIGHT = "RO"
@@ -33,8 +33,7 @@ class DeciderExplore(Decider):
         # self.workspace = workspace
         # self.anticipated_outcome = OUTCOME_DEFAULT
 
-        self.exploration_step = EXPLORATION_STEP_INIT
-        # self.prompt_point = np.array([-2000, 2000, 0])
+        # self.exploration_step = EXPLORATION_STEP_INIT
         point = np.array([-2000, 2000, 0])  # Begin with North West
         self.prompt_points = [point]
         # Visit 6 points from North West to south East every pi/6
@@ -112,65 +111,64 @@ class DeciderExplore(Decider):
                   ", Outcome: " + str(outcome))
 
         # Compute the next prompt point
-        if True:  #self.exploration_step == EXPLORATION_STEP_INIT:
-            # If time to go home
-            if TER in self.workspace.memory.phenomenon_memory.phenomena and \
-               self.workspace.memory.phenomenon_memory.phenomena[TER].absolute_affordance() is not None and \
-               self.workspace.clock - self.workspace.memory.phenomenon_memory.phenomena[TER].last_origin_clock > CLOCK_TO_GO_HOME:
-                # If right or left then swipe to home
-                if outcome in [OUTCOME_LEFT, OUTCOME_RIGHT]:
-                    if outcome == OUTCOME_RIGHT:
-                        ego_confirmation = np.array([0, 280, 0], dtype=int)
-                        self.action = self.workspace.actions[ACTION_LEFTWARD]
-                        # self.exploration_step = EXPLORATION_STEP_SWIPE_LEFT
-                    else:
-                        ego_confirmation = np.array([0, -280, 0], dtype=int)
-                        self.action = self.workspace.actions[ACTION_RIGHTWARD]
-                        # self.exploration_step = EXPLORATION_STEP_SWIPE_RIGHT
-                    print("Swiping to confirmation by:", ego_confirmation)
-                    self.workspace.memory.egocentric_memory.prompt_point = ego_confirmation
-                    self.workspace.enactions[self.workspace.clock] = Enaction(self.action, self.workspace.clock,
-                                                                              self.workspace.memory)
-                    playsound('autocat/Assets/R5.wav', False)
-                # If not left or right we need to manoeuvre
+
+        # If time to go home
+        if TER in self.workspace.memory.phenomenon_memory.phenomena and \
+           self.workspace.memory.phenomenon_memory.phenomena[TER].absolute_affordance() is not None and \
+           self.workspace.clock - self.workspace.memory.phenomenon_memory.phenomena[TER].last_origin_clock > CLOCK_TO_GO_HOME:
+            # If right or left then swipe to home
+            if outcome in [OUTCOME_LEFT, OUTCOME_RIGHT]:
+                if outcome == OUTCOME_RIGHT:
+                    ego_confirmation = np.array([0, 280, 0], dtype=int)
+                    # self.exploration_step = EXPLORATION_STEP_SWIPE_LEFT
                 else:
-                    # If near home then go to confirmation prompt
-                    if self.workspace.memory.is_near_terrain_origin() or outcome == OUTCOME_COLOR:
-                        allo_confirmation = self.workspace.memory.phenomenon_memory.phenomena[TER].confirmation_prompt()
-                        print("Enacting confirmation affordance to", allo_confirmation)
-                        ego_confirmation = self.workspace.memory.allocentric_to_egocentric(allo_confirmation)
-                        self.workspace.memory.egocentric_memory.prompt_point = ego_confirmation
-                        playsound('autocat/Assets/R4.wav', False)
-                    else:
-                        # If not near home then go to origin prompt
-                        allo_origin = self.workspace.memory.phenomenon_memory.phenomena[TER].origin_point()
-                        print("Going from", self.workspace.memory.allocentric_memory.robot_point, "to origin sensor point", allo_origin)
-                        ego_origin = self.workspace.memory.allocentric_to_egocentric(allo_origin)
-                        self.workspace.memory.egocentric_memory.prompt_point = ego_origin
-                        playsound('autocat/Assets/R3.wav', False)
-                    self.action = self.workspace.actions[ACTION_TURN]
-                    self.workspace.enactions[self.workspace.clock] = Enaction(self.action, self.workspace.clock,
-                                                                              self.workspace.memory)
-                    self.workspace.enactions[self.workspace.clock + 1] = Enaction(
-                        self.workspace.actions[ACTION_FORWARD], self.workspace.clock + 1, self.workspace.memory)
-                    # self.exploration_step = EXPLORATION_STEP_ROTATE
+                    ego_confirmation = np.array([0, -280, 0], dtype=int)
+                    # self.exploration_step = EXPLORATION_STEP_SWIPE_RIGHT
+                print("Swiping to confirmation by:", ego_confirmation)
+                self.action = self.workspace.actions[ACTION_SWIPE]
+                self.workspace.memory.egocentric_memory.prompt_point = ego_confirmation
+                self.workspace.enactions[self.workspace.clock] = Enaction(self.action, self.workspace.clock,
+                                                                          self.workspace.memory)
+                playsound('autocat/Assets/R5.wav', False)
+            # If not left or right we need to manoeuvre
             else:
-                # Go to the most interesting pool point
-                # mip = self.workspace.memory.allocentric_memory.most_interesting_pool(self.workspace.clock)
-                # self.workspace.memory.egocentric_memory.prompt_point = self.workspace.memory.allocentric_to_egocentric(mip)
-                # Go successively to the predefined prompt points
-                allo_prompt = self.prompt_points[self.prompt_index]
-                ego_prompt = self.workspace.memory.allocentric_to_egocentric(allo_prompt)
-                self.workspace.memory.egocentric_memory.prompt_point = ego_prompt
-                self.prompt_index += 1
-                if self.prompt_index >= self.nb_points:
-                    self.prompt_index = 0
+                # If near home then go to confirmation prompt
+                if self.workspace.memory.is_near_terrain_origin() or outcome == OUTCOME_COLOR:
+                    allo_confirmation = self.workspace.memory.phenomenon_memory.phenomena[TER].confirmation_prompt()
+                    print("Enacting confirmation affordance to", allo_confirmation)
+                    ego_confirmation = self.workspace.memory.allocentric_to_egocentric(allo_confirmation)
+                    self.workspace.memory.egocentric_memory.prompt_point = ego_confirmation
+                    playsound('autocat/Assets/R4.wav', False)
+                else:
+                    # If not near home then go to origin prompt
+                    allo_origin = self.workspace.memory.phenomenon_memory.phenomena[TER].origin_point()
+                    print("Going from", self.workspace.memory.allocentric_memory.robot_point, "to origin sensor point", allo_origin)
+                    ego_origin = self.workspace.memory.allocentric_to_egocentric(allo_origin)
+                    self.workspace.memory.egocentric_memory.prompt_point = ego_origin
+                    playsound('autocat/Assets/R3.wav', False)
                 self.action = self.workspace.actions[ACTION_TURN]
                 self.workspace.enactions[self.workspace.clock] = Enaction(self.action, self.workspace.clock,
                                                                           self.workspace.memory)
-                self.workspace.enactions[self.workspace.clock + 1] = Enaction(self.workspace.actions[ACTION_FORWARD],
-                                                                     self.workspace.clock + 1, self.workspace.memory)
+                self.workspace.enactions[self.workspace.clock + 1] = Enaction(
+                    self.workspace.actions[ACTION_FORWARD], self.workspace.clock + 1, self.workspace.memory)
                 # self.exploration_step = EXPLORATION_STEP_ROTATE
+        else:
+            # Go to the most interesting pool point
+            # mip = self.workspace.memory.allocentric_memory.most_interesting_pool(self.workspace.clock)
+            # self.workspace.memory.egocentric_memory.prompt_point = self.workspace.memory.allocentric_to_egocentric(mip)
+            # Go successively to the predefined prompt points
+            allo_prompt = self.prompt_points[self.prompt_index]
+            ego_prompt = self.workspace.memory.allocentric_to_egocentric(allo_prompt)
+            self.workspace.memory.egocentric_memory.prompt_point = ego_prompt
+            self.prompt_index += 1
+            if self.prompt_index >= self.nb_points:
+                self.prompt_index = 0
+            self.action = self.workspace.actions[ACTION_TURN]
+            self.workspace.enactions[self.workspace.clock] = Enaction(self.action, self.workspace.clock,
+                                                                      self.workspace.memory)
+            self.workspace.enactions[self.workspace.clock + 1] = Enaction(self.workspace.actions[ACTION_FORWARD],
+                                                                 self.workspace.clock + 1, self.workspace.memory)
+            # self.exploration_step = EXPLORATION_STEP_ROTATE
 
         # If the robot is on a color patch and must enact confirmation affordance
         # (If already on a color then go to confirmation prompt rather than origin prompt)
@@ -184,19 +182,3 @@ class DeciderExplore(Decider):
             ego_confirmation = self.workspace.memory.allocentric_to_egocentric(allo_confirmation)
             self.workspace.memory.egocentric_memory.prompt_point = ego_confirmation
             playsound('autocat/Assets/R4.wav', False)
-
-        # # Compute the next intended interaction
-        # if self.exploration_step == EXPLORATION_STEP_SWIPE_RIGHT:
-        #     action = self.workspace.actions[ACTION_RIGHTWARD]
-        #     self.exploration_step = EXPLORATION_STEP_INIT
-        # if self.exploration_step == EXPLORATION_STEP_SWIPE_LEFT:
-        #     action = self.workspace.actions[ACTION_LEFTWARD]
-        #     self.exploration_step = EXPLORATION_STEP_INIT
-        # if self.exploration_step == EXPLORATION_STEP_FORWARD:
-        #     action = self.workspace.actions[ACTION_FORWARD]
-        #     self.exploration_step = EXPLORATION_STEP_INIT
-        # if self.exploration_step == EXPLORATION_STEP_ROTATE:
-        #     action = self.workspace.actions[ACTION_TURN]
-        #     self.exploration_step = EXPLORATION_STEP_FORWARD
-
-        # return Enaction(action, self.workspace.clock, self.workspace.memory)

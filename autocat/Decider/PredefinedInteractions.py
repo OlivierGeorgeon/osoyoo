@@ -1,6 +1,6 @@
 from . Interaction import Interaction, OUTCOME_DEFAULT
 from . CompositeInteraction import CompositeInteraction
-from . Action import ACTION_FORWARD, ACTION_BACKWARD, ACTION_LEFTWARD, ACTION_RIGHTWARD, ACTION_TURN, \
+from . Action import ACTION_FORWARD, ACTION_BACKWARD, ACTION_SWIPE, ACTION_RIGHTWARD, ACTION_TURN, \
     ACTION_TURN_RIGHT, ACTION_SCAN
 
 # Circle object outcome
@@ -47,7 +47,7 @@ def create_interactions(actions):
     CompositeInteraction.create_or_retrieve(i_l, i14)
 
     # Keep turning right
-    i44 = Interaction.create_or_retrieve(actions[ACTION_LEFTWARD], OUTCOME_LEFT, 1)
+    i44 = Interaction.create_or_retrieve(actions[ACTION_SWIPE], OUTCOME_LEFT, 1)
     for interaction in Interaction.interaction_list:
         if interaction.outcome in [OUTCOME_LEFT, OUTCOME_RIGHT]:
             CompositeInteraction.create_or_retrieve(interaction, i44)
@@ -89,10 +89,10 @@ def create_interactions(actions):
     i811 = Interaction.create_or_retrieve(actions[ACTION_FORWARD], OUTCOME_FLOOR_FRONT, -2)
     i801 = Interaction.create_or_retrieve(actions[ACTION_FORWARD], OUTCOME_FLOOR_RIGHT, -2)
 
-    i40 = Interaction.create_or_retrieve(actions[ACTION_LEFTWARD], OUTCOME_DEFAULT, 1)
-    i410 = Interaction.create_or_retrieve(actions[ACTION_LEFTWARD], OUTCOME_FLOOR_LEFT, -1)
-    i411 = Interaction.create_or_retrieve(actions[ACTION_LEFTWARD], OUTCOME_FLOOR_FRONT, -1)
-    i401 = Interaction.create_or_retrieve(actions[ACTION_LEFTWARD], OUTCOME_FLOOR_RIGHT, -1)
+    i40 = Interaction.create_or_retrieve(actions[ACTION_SWIPE], OUTCOME_DEFAULT, 1)
+    i410 = Interaction.create_or_retrieve(actions[ACTION_SWIPE], OUTCOME_FLOOR_LEFT, -1)
+    i411 = Interaction.create_or_retrieve(actions[ACTION_SWIPE], OUTCOME_FLOOR_FRONT, -1)
+    i401 = Interaction.create_or_retrieve(actions[ACTION_SWIPE], OUTCOME_FLOOR_RIGHT, -1)
 
     i60 = Interaction.create_or_retrieve(actions[ACTION_RIGHTWARD], OUTCOME_DEFAULT, 1)
     i610 = Interaction.create_or_retrieve(actions[ACTION_RIGHTWARD], OUTCOME_FLOOR_LEFT, -1)

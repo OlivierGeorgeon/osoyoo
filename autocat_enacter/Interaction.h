@@ -37,12 +37,13 @@ protected:
   bool _is_focussed = false;
   int _focus_x = 0;
   int _focus_y = 0;
-  float _focus_speed = 0.;  // Must be a float to multiply by the elapsed time
+  float _focus_speed = 160.;  // Must be a float to multiply by the elapsed time
   int _clock = 0;
   int head_destination_angle = 0;
   unsigned long _duration1;
   unsigned long _action_start_time;
   int _step;
+  int _caution = 0;
 };
 
 #endif

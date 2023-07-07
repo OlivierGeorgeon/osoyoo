@@ -77,7 +77,7 @@ class CtrlBodyView:
         # yaw = self.workspace.intended_enaction.yaw
         # displacement_matrix = matrix44.create_from_z_rotation(math.radians(yaw))
         for poi in [p for p in self.points_of_interest if p.type == POINT_COMPASS]:
-            poi.displace(self.workspace.enaction.displacement_matrix)
+            poi.displace(self.workspace.enaction.yaw_matrix)
 
         # Add the new points that indicate the south relative to the robot
         if self.workspace.enaction.outcome.compass_point is not None:

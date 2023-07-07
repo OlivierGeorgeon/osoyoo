@@ -4,7 +4,7 @@ from ..Robot.RobotDefine import ROBOT_SETTINGS, DEFAULT_YAW, TURN_DURATION, TRAN
 
 ACTION_FORWARD = '8'
 ACTION_BACKWARD = '2'
-ACTION_LEFTWARD = '4'
+ACTION_SWIPE = '4'
 ACTION_RIGHTWARD = '6'
 ACTION_TURN = '1'
 ACTION_TURN_RIGHT = '3'
@@ -13,7 +13,7 @@ ACTION_SCAN = '-'
 ACTION_ALIGN_HEAD = '*'
 ACTION_TURN_HEAD = '+'
 ACTION_WATCH = 'W'
-ACTIONS = [ACTION_FORWARD, ACTION_BACKWARD, ACTION_LEFTWARD, ACTION_RIGHTWARD, ACTION_TURN, ACTION_TURN_RIGHT,
+ACTIONS = [ACTION_FORWARD, ACTION_BACKWARD, ACTION_SWIPE, ACTION_RIGHTWARD, ACTION_TURN, ACTION_TURN_RIGHT,
            ACTION_SCAN, ACTION_ALIGN_HEAD, ACTION_TURN_HEAD, ACTION_CIRCUMVENT, ACTION_WATCH]
 
 
@@ -56,7 +56,7 @@ class Action:
             print("adjusting x speed: correction:", round(translation[0]),
                   "new x speed:", round(self.translation_speed[0]))
         # Adjust lateral speed only
-        if self.action_code in [ACTION_LEFTWARD, ACTION_RIGHTWARD]:
+        if self.action_code in [ACTION_SWIPE, ACTION_RIGHTWARD]:
             self.translation_speed[1] = (self.translation_speed[1] + translation[1]) / 2
             print("adjusting y speed: correction:", round(translation[1]),
                   "new y speed:", round(self.translation_speed[1]))
@@ -75,7 +75,7 @@ def create_actions(robot_id):
     action_dictionary[ACTION_BACKWARD] = Action(ACTION_BACKWARD, backward_speed, 0, TRANSLATE_DURATION)
 
     leftward_speed = np.array([0, y_speed, 0], dtype=float)
-    action_dictionary[ACTION_LEFTWARD] = Action(ACTION_LEFTWARD, leftward_speed, 0, TRANSLATE_DURATION)
+    action_dictionary[ACTION_SWIPE] = Action(ACTION_SWIPE, leftward_speed, 0, TRANSLATE_DURATION)
 
     rightward_speed = np.array([0, -y_speed, 0], dtype=float)
     action_dictionary[ACTION_RIGHTWARD] = Action(ACTION_RIGHTWARD, rightward_speed, 0, TRANSLATE_DURATION)

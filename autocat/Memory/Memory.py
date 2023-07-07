@@ -6,6 +6,7 @@ from .AllocentricMemory.AllocentricMemory import AllocentricMemory
 from .BodyMemory import BodyMemory
 from .PhenomenonMemory.PhenomenonMemory import PhenomenonMemory, TER
 from .AllocentricMemory.Hexagonal_geometry import CELL_RADIUS
+from ..Decider.Action import ACTION_SWIPE
 # from ..Utils import rotate_vector_z
 
 
@@ -139,8 +140,11 @@ class Memory:
             return False
 
         # Simulate the displacement in egocentric memory
+        way = 1
+        if intended_enaction.action.action_code == ACTION_SWIPE and intended_enaction.command.speed is not None and intended_enaction.command.speed < 0:
+            way = -1
         translation_matrix = matrix44.create_from_translation(-intended_enaction.action.translation_speed * dt *
-                                                              SIMULATION_TIME_RATIO)
+                                                              SIMULATION_TIME_RATIO * way)
         rotation_matrix = matrix44.create_from_z_rotation(intended_enaction.simulation_rotation_speed * dt)
         displacement_matrix = matrix44.multiply(rotation_matrix, translation_matrix)
         for experience in self.egocentric_memory.experiences.values():
@@ -153,14 +157,10 @@ class Memory:
             self.egocentric_memory.prompt_point = matrix44.apply_to_vector(displacement_matrix,
                                                                              self.egocentric_memory.prompt_point)
         # Displacement in body memory
-        # self.body_memory.body_direction_rad += intended_enaction.simulation_rotation_speed * dt
         self.body_memory.body_quaternion = self.body_memory.body_quaternion.cross(
              Quaternion.from_z_rotation((intended_enaction.simulation_rotation_speed * dt)))
-        assert(type(self.body_memory.body_quaternion) == Quaternion)
+
         # Update allocentric memory
-        # self.allocentric_memory.robot_point += rotate_vector_z(intended_enaction.action.translation_speed * dt *
-        #                                                          SIMULATION_TIME_RATIO,
-        #                                                          self.body_memory.get_body_direction_rad())
         self.allocentric_memory.robot_point += quaternion.apply_to_vector(self.body_memory.body_quaternion,
                                             intended_enaction.action.translation_speed * dt * SIMULATION_TIME_RATIO)
         self.allocentric_memory.place_robot(self.body_memory, intended_enaction.clock)
