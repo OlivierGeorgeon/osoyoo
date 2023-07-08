@@ -15,16 +15,16 @@ class Decider:
         # Load the predefined behavior
         self.procedural_memory = create_interactions(self.workspace.actions)
 
-    def propose_intended_enaction(self):
+    def stack_enaction(self):
         """Propose the next intended enaction from the previous enacted interaction.
         This is the main method of the agent"""
         # Compute a specific outcome suited for this agent
         outcome = self.outcome(self.workspace.enaction)
         # Compute the intended enaction
-        self.intended_enaction(outcome)
+        self.select_enaction(outcome)
 
-    def propose_action(self, outcome):
-        """Propose the next action based on sequence learning"""
+    def select_action(self, outcome):
+        """The sequence learning mechanism that proposes the next action"""
         # Recording previous interaction
         self.previous_interaction = self.last_interaction
         self.last_interaction = Interaction.create_or_retrieve(self.action, outcome)
@@ -61,5 +61,3 @@ class Decider:
         if proclivity_dict:
             # See https://pythonguides.com/python-find-max-value-in-a-dictionary/
             self.action = max(proclivity_dict, key=proclivity_dict.get)
-
-        print("Propose action", self.action.action_code)

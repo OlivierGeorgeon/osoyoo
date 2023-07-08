@@ -5,7 +5,6 @@ from .Decider.DeciderCircle import DeciderCircle
 from .Decider.DeciderExplore import DeciderExplore
 from .Decider.DeciderWatch import DeciderWatch
 from .Decider.Action import create_actions, ACTION_FORWARD, ACTIONS, ACTION_TURN
-from .Decider.Interaction import Interaction, OUTCOME_DEFAULT
 from .Memory.Memory import Memory, SIMULATION_STEP_OFF
 from .Integrator.Integrator import Integrator
 from .Robot.Enaction import Enaction
@@ -81,7 +80,7 @@ class Workspace:
                     # The most activated decider processes the previous enaction and chooses the next enaction
                     decider = max(self.deciders, key=lambda k: self.deciders[k].activation_level())
                     print("Decider:", decider)
-                    self.deciders[decider].propose_intended_enaction()
+                    self.deciders[decider].stack_enaction()
                     # TODO Manage the enacted_interaction after imagining
 
                 # Case DECIDER_KEY_USER is handled by self.process_user_key()

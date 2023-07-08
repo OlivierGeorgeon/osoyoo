@@ -86,7 +86,7 @@ class DeciderExplore(Decider):
                         outcome = OUTCOME_FAR_RIGHT
         return outcome
 
-    def intended_enaction(self, outcome):
+    def select_enaction(self, outcome):
         """Return the next intended interaction"""
         # Tracing the last interaction
         if self.action is not None:

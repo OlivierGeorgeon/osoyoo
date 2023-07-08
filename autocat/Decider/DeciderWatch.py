@@ -6,7 +6,7 @@
 import math
 import numpy as np
 from . Interaction import Interaction
-from . PredefinedInteractions import OUTCOME_FAR_FRONT, OUTCOME_LOST_FOCUS, OUTCOME_FAR_LEFT, OUTCOME_NEARBY
+from . PredefinedInteractions import OUTCOME_FOCUS_TOO_FAR, OUTCOME_LOST_FOCUS, OUTCOME_FOCUS_SIDE, OUTCOME_FOCUS_FRONT
 from . Action import ACTION_WATCH, ACTION_SCAN, ACTION_TURN
 from ..Robot.Enaction import Enaction
 from . Decider import Decider
@@ -27,25 +27,25 @@ class DeciderWatch(Decider):
 
         # On startup
         if enacted_enaction is None:
-            return OUTCOME_NEARBY
+            return OUTCOME_FOCUS_FRONT
 
-        outcome = OUTCOME_NEARBY
+        outcome = OUTCOME_FOCUS_FRONT
 
         if enacted_enaction.focus_point is None:
             # If there is no focus then consider it was lost and trigger scan
             outcome = OUTCOME_LOST_FOCUS
         else:
             if np.linalg.norm(enacted_enaction.focus_point) > 600:
-                outcome = OUTCOME_FAR_FRONT
+                outcome = OUTCOME_FOCUS_TOO_FAR
             else:
                 angle = math.atan2(enacted_enaction.focus_point[1], enacted_enaction.focus_point[0])
                 if math.fabs(angle) > math.pi / 6:
-                    outcome = OUTCOME_FAR_LEFT
+                    outcome = OUTCOME_FOCUS_SIDE
 
         # DEFAULT when focused on object in near front
         return outcome
 
-    def intended_enaction(self, outcome):
+    def select_enaction(self, outcome):
         """Return the next intended interaction"""
 
         # Recording previous interaction
@@ -62,7 +62,7 @@ class DeciderWatch(Decider):
 
         self.workspace.memory.egocentric_memory.prompt_point = None
         # If focus FAR: Turn around or Scan - (idem circle)
-        if outcome == OUTCOME_FAR_FRONT:
+        if outcome == OUTCOME_FOCUS_TOO_FAR:
             if self.action.action_code == ACTION_TURN:
                 self.action = self.workspace.actions[ACTION_SCAN]
             else:
@@ -74,7 +74,7 @@ class DeciderWatch(Decider):
             self.action = self.workspace.actions[ACTION_SCAN]
             self.workspace.memory.egocentric_memory.prompt_point = None
         # Focussed on an object on the side: Align towards it - (idem circle)
-        elif outcome == OUTCOME_FAR_LEFT:
+        elif outcome == OUTCOME_FOCUS_SIDE:
             self.workspace.memory.egocentric_memory.prompt_point = self.workspace.memory.egocentric_memory.focus_point.copy()
             self.action = self.workspace.actions[ACTION_TURN]
         # Focus is NEARBY: Keep watching
