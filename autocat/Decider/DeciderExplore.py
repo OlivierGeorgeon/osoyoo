@@ -8,17 +8,12 @@ import numpy as np
 from pyrr import quaternion, matrix44
 from playsound import playsound
 from . Action import ACTION_TURN, ACTION_FORWARD, ACTION_SWIPE, ACTION_RIGHTWARD
-from . Interaction import Interaction, OUTCOME_DEFAULT
+from . Interaction import OUTCOME_DEFAULT
 from ..Robot.Enaction import Enaction
 from ..Memory.PhenomenonMemory.PhenomenonMemory import TER
 from . Decider import Decider
 
 CLOCK_TO_GO_HOME = 8  # Number of interactions before going home
-# EXPLORATION_STEP_INIT = 0
-# EXPLORATION_STEP_ROTATE = 1
-# EXPLORATION_STEP_FORWARD = 2
-# EXPLORATION_STEP_SWIPE_LEFT = 3
-# EXPLORATION_STEP_SWIPE_RIGHT = 4
 OUTCOME_ORIGIN = "O"
 OUTCOME_LEFT = "LO"
 OUTCOME_RIGHT = "RO"
@@ -30,10 +25,7 @@ OUTCOME_COLOR = "CL"
 class DeciderExplore(Decider):
     def __init__(self, workspace):
         super().__init__(workspace)
-        # self.workspace = workspace
-        # self.anticipated_outcome = OUTCOME_DEFAULT
 
-        # self.exploration_step = EXPLORATION_STEP_INIT
         point = np.array([-2000, 2000, 0])  # Begin with North West
         self.prompt_points = [point]
         # Visit 6 points from North West to south East every pi/6
@@ -75,7 +67,6 @@ class DeciderExplore(Decider):
                                       quaternion.inverse(self.workspace.memory.phenomenon_memory.phenomena[TER].absolute_affordance().experience.body_direction_quaternion()))
                 print("Relative quaternion", repr(relative_quaternion))
                 if quaternion.rotation_angle(relative_quaternion) > math.pi:
-                    # relative_quaternion = -1 * relative_quaternion  # The quaternion representing the short angle
                     relative_quaternion = - relative_quaternion  # The quaternion representing the short angle
                 rot = quaternion.rotation_angle(relative_quaternion)
                 print("Rotation from origin", round(math.degrees(rot)))
@@ -112,10 +103,8 @@ class DeciderExplore(Decider):
             if outcome in [OUTCOME_LEFT, OUTCOME_RIGHT]:
                 if outcome == OUTCOME_RIGHT:
                     ego_confirmation = np.array([0, 280, 0], dtype=int)
-                    # self.exploration_step = EXPLORATION_STEP_SWIPE_LEFT
                 else:
                     ego_confirmation = np.array([0, -280, 0], dtype=int)
-                    # self.exploration_step = EXPLORATION_STEP_SWIPE_RIGHT
                 print("Swiping to confirmation by:", ego_confirmation)
                 self.action = self.workspace.actions[ACTION_SWIPE]
                 self.workspace.memory.egocentric_memory.prompt_point = ego_confirmation
@@ -141,7 +130,6 @@ class DeciderExplore(Decider):
                 self.workspace.enactions[self.workspace.clock] = Enaction(self.action, self.workspace.clock)
                 self.workspace.enactions[self.workspace.clock + 1] = Enaction(self.workspace.actions[ACTION_FORWARD],
                                                                               self.workspace.clock + 1)
-                # self.exploration_step = EXPLORATION_STEP_ROTATE
         else:
             # Go to the most interesting pool point
             # mip = self.workspace.memory.allocentric_memory.most_interesting_pool(self.workspace.clock)
@@ -157,7 +145,6 @@ class DeciderExplore(Decider):
             self.workspace.enactions[self.workspace.clock] = Enaction(self.action, self.workspace.clock)
             self.workspace.enactions[self.workspace.clock + 1] = Enaction(self.workspace.actions[ACTION_FORWARD],
                                                                           self.workspace.clock + 1)
-            # self.exploration_step = EXPLORATION_STEP_ROTATE
 
         # If the robot is on a color patch and must enact confirmation affordance
         # (If already on a color then go to confirmation prompt rather than origin prompt)

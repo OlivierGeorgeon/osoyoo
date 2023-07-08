@@ -79,10 +79,9 @@ class Workspace:
             if self.clock not in self.enactions:
                 if self.decider_mode == KEY_DECIDER_CIRCLE:
                     # The most activated decider processes the previous enaction and chooses the next enaction
-                    ad = max(self.deciders, key=lambda k: self.deciders[k].activation_level())
-                    print("Activated decider:", ad)
-                    # self.enactions[self.clock] = self.deciders[ad].propose_intended_enaction(self.enaction)
-                    self.deciders[ad].propose_intended_enaction()
+                    decider = max(self.deciders, key=lambda k: self.deciders[k].activation_level())
+                    print("Decider:", decider)
+                    self.deciders[decider].propose_intended_enaction()
                     # TODO Manage the enacted_interaction after imagining
 
                 # Case DECIDER_KEY_USER is handled by self.process_user_key()
@@ -91,6 +90,7 @@ class Workspace:
             if self.clock in self.enactions:
                 # Take the next enaction from the stack
                 self.enaction = self.enactions[self.clock]
+                print("Prompt", self.memory.egocentric_memory.prompt_point)
                 self.enaction.adjust_and_begin(self.memory)
                 if self.is_imagining:
                     # If imagining then proceed to simulating the enaction

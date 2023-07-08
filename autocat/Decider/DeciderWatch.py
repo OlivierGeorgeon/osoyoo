@@ -5,45 +5,31 @@
 
 import math
 import numpy as np
-from . Interaction import Interaction, OUTCOME_DEFAULT
-from . PredefinedInteractions import OUTCOME_FAR_FRONT, OUTCOME_LOST_FOCUS, OUTCOME_FAR_LEFT
+from . Interaction import Interaction
+from . PredefinedInteractions import OUTCOME_FAR_FRONT, OUTCOME_LOST_FOCUS, OUTCOME_FAR_LEFT, OUTCOME_NEARBY
 from . Action import ACTION_WATCH, ACTION_SCAN, ACTION_TURN
 from ..Robot.Enaction import Enaction
 from . Decider import Decider
-
-# OUTCOME_SIDE = 'S'
-# OUTCOME_NO_FOCUS = 'N'
 
 
 class DeciderWatch(Decider):
     def __init__(self, workspace):
         super().__init__(workspace)
-        # self.workspace = workspace
-        # self.anticipated_outcome = OUTCOME_DEFAULT
-        # self.previous_interaction = None
-        # self.last_interaction = None
+
         self.action = self.workspace.actions[ACTION_WATCH]
 
     def activation_level(self):
         """The level of activation of this decider: 0: default, 2 if the terrain has an origin """
         return 4
 
-    # def propose_intended_enaction(self, enacted_enaction):
-    #     """Propose the next intended enaction from the previous enacted interaction.
-    #     This is the main method of the agent"""
-    #     # Compute a specific outcome suited for this agent
-    #     outcome = self.outcome(enacted_enaction)
-    #     # Compute the intended enaction
-    #     return self.intended_enaction(outcome)
-
     def outcome(self, enacted_enaction):
         """ Convert the enacted interaction into an outcome adapted to the watch behavior """
 
         # On startup
         if enacted_enaction is None:
-            return OUTCOME_DEFAULT
+            return OUTCOME_NEARBY
 
-        outcome = OUTCOME_DEFAULT
+        outcome = OUTCOME_NEARBY
 
         if enacted_enaction.focus_point is None:
             # If there is no focus then consider it was lost and trigger scan
@@ -56,11 +42,11 @@ class DeciderWatch(Decider):
                 if math.fabs(angle) > math.pi / 6:
                     outcome = OUTCOME_FAR_LEFT
 
+        # DEFAULT when focused on object in near front
         return outcome
 
     def intended_enaction(self, outcome):
         """Return the next intended interaction"""
-        # Tracing the last interaction
 
         # Recording previous interaction
         self.previous_interaction = self.last_interaction
@@ -75,7 +61,7 @@ class DeciderWatch(Decider):
                   ", valence: " + str(self.last_interaction.valence) + ")")
 
         self.workspace.memory.egocentric_memory.prompt_point = None
-        # If focus FAR: Turn around or Scan
+        # If focus FAR: Turn around or Scan - (idem circle)
         if outcome == OUTCOME_FAR_FRONT:
             if self.action.action_code == ACTION_TURN:
                 self.action = self.workspace.actions[ACTION_SCAN]
@@ -83,18 +69,17 @@ class DeciderWatch(Decider):
                 self.workspace.memory.egocentric_memory.focus_point = None  # Prepare to catch focus again
                 self.workspace.memory.egocentric_memory.prompt_point = np.array([-100, 0, 0], dtype=int)
                 self.action = self.workspace.actions[ACTION_TURN]
-        # No Focus: Scan
+        # No Focus: Scan - (idem circle)
         elif outcome == OUTCOME_LOST_FOCUS:
             self.action = self.workspace.actions[ACTION_SCAN]
             self.workspace.memory.egocentric_memory.prompt_point = None
-        # Focussed on an object on the side: Align towards it
+        # Focussed on an object on the side: Align towards it - (idem circle)
         elif outcome == OUTCOME_FAR_LEFT:
             self.workspace.memory.egocentric_memory.prompt_point = self.workspace.memory.egocentric_memory.focus_point.copy()
             self.action = self.workspace.actions[ACTION_TURN]
-        # DEFAULT: Keep watching
+        # Focus is NEARBY: Keep watching
         else:
             self.action = self.workspace.actions[ACTION_WATCH]
             self.workspace.memory.egocentric_memory.prompt_point = None
 
         self.workspace.enactions[self.workspace.clock] = Enaction(self.action, self.workspace.clock)
-        # return Enaction(self.action, self.workspace.clock, self.workspace.memory)

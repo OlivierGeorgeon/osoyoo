@@ -94,8 +94,6 @@ class Enaction:
         else:
             yaw_quaternion = outcome.yaw_quaternion
         yaw_integration_quaternion = self.body_quaternion.cross(yaw_quaternion)
-        print("previous body_quaternion", repr(self.body_quaternion))
-        print("yaw_integration_quaternion", repr(yaw_integration_quaternion))
 
         # If the robot returns no compass then the body_quaternion is estimated from yaw
         if outcome.compass_point is None:
@@ -109,29 +107,29 @@ class Enaction:
                 if self.outcome.compass_quaternion.dot(yaw_integration_quaternion) < 0.0:
                     yaw_integration_quaternion = - yaw_integration_quaternion
 
-                # Save the difference
+                # Save the difference to display in BodyView
                 dif_q = self.outcome.compass_quaternion.cross(yaw_integration_quaternion.inverse)
                 if dif_q.angle > math.pi:
                     dif_q = -dif_q
-                print("dif_quaternion", repr(yaw_integration_quaternion))
                 self.body_direction_delta = dif_q.axis[2] * dif_q.angle
 
                 # Take the median angle between the compass and the yaw estimate
                 # 0 is compass only, 1 is yaw estimate only
                 new_body_quaternion = self.outcome.compass_quaternion.slerp(yaw_integration_quaternion, 0.5)
-                print("new_body_quaternion", repr(new_body_quaternion))
 
-                # The yaw quaternion is recomputed
+                # Recompute the yaw quaternion
                 yaw_quaternion = new_body_quaternion.cross(self.body_quaternion.inverse)
                 if yaw_quaternion.angle > math.pi:
                     yaw_quaternion = -yaw_quaternion
+
+                # Update the body_quaternion
                 self.body_quaternion = new_body_quaternion
-                print("new_body_quaternion", repr(self.body_quaternion))
 
         # Compute the displacement matrix which represents the displacement of the environment
         # relative to the robot (Translates and turns in the opposite direction)
         self.yaw_matrix = matrix44.create_from_quaternion(yaw_quaternion)
-        self.displacement_matrix = matrix44.multiply(matrix44.create_from_translation(-self.translation), self.yaw_matrix)
+        self.displacement_matrix = matrix44.multiply(matrix44.create_from_translation(-self.translation),
+                                                     self.yaw_matrix)
 
         # The focus --------
 
@@ -185,9 +183,8 @@ class Enaction:
                 print("CATCH FOCUS", self.focus_point)
 
         # Impact or block catch focus
-        if self.outcome.impact > 0 and self.action.action_code == ACTION_FORWARD:  # or enacted_enaction.blocked:
+        if self.outcome.impact > 0 and self.action.action_code == ACTION_FORWARD:
             if self.outcome.echo_point is None or np.linalg.norm(self.outcome.echo_point) > 200:
-                # Count as an echo to to activate DeciderCircle
                 if self.outcome.impact == 0b01:
                     self.focus_point = np.array([ROBOT_FRONT_X + 10, -ROBOT_FRONT_Y, 0])
                 elif self.outcome.impact == 0b10:

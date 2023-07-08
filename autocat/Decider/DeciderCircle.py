@@ -4,7 +4,7 @@
 ########################################################################################
 
 import numpy as np
-from . Action import ACTION_FORWARD, ACTION_SCAN
+from . Action import ACTION_FORWARD, ACTION_TURN_RIGHT, ACTION_TURN
 from . Interaction import Interaction, OUTCOME_DEFAULT
 from . CompositeInteraction import CompositeInteraction
 from . PredefinedInteractions import create_interactions, OUTCOME_LOST_FOCUS, OUTCOME_CLOSE_FRONT, \
@@ -21,7 +21,7 @@ class DeciderCircle(Decider):
 
         # Load the predefined behavior
         self.procedural_memory = create_interactions(self.workspace.actions)
-        self._action = self.workspace.actions[ACTION_FORWARD]
+        self.action = self.workspace.actions[ACTION_FORWARD]
 
     def activation_level(self):
         """Return the activation level of this decider/ 1: default; 3 if focus object """
@@ -32,63 +32,60 @@ class DeciderCircle(Decider):
                 activation_level = 3
         return activation_level
 
-    # def propose_intended_enaction(self, enacted_enaction):
-    #     """Propose the next intended enaction from the previous enacted interaction.
-    #     This is the main method of the agent"""
-    #     # Compute a specific outcome suited for this agent
-    #     outcome = self.outcome(enacted_enaction)
-    #     # Compute the intended enaction
-    #     return self.intended_enaction(outcome)
-
     def intended_enaction(self, outcome):
         """Learning from the previous outcome and selecting the next enaction"""
 
-        # Recording previous interaction
-        self.previous_interaction = self.last_interaction
-        self.last_interaction = Interaction.create_or_retrieve(self._action, outcome)
+        self.propose_action(outcome)
 
-        # Tracing the last interaction
-        if self._action is not None:
-            print("Action: " + str(self._action) +
-                  ", Anticipation: " + str(self.anticipated_outcome) +
-                  ", Outcome: " + str(outcome) +
-                  ", Satisfaction: (anticipation: " + str(self.anticipated_outcome == outcome) +
-                  ", valence: " + str(self.last_interaction.valence) + ")")
+        # # Recording previous interaction
+        # self.previous_interaction = self.last_interaction
+        # self.last_interaction = Interaction.create_or_retrieve(self.action, outcome)
+        #
+        # # Tracing the last interaction
+        # if self.action is not None:
+        #     print("Action: " + str(self.action) +
+        #           ", Anticipation: " + str(self.anticipated_outcome) +
+        #           ", Outcome: " + str(outcome) +
+        #           ", Satisfaction: (anticipation: " + str(self.anticipated_outcome == outcome) +
+        #           ", valence: " + str(self.last_interaction.valence) + ")")
+        #
+        # # Learning or reinforcing the last composite interaction
+        # if self.previous_interaction is not None:
+        #     composite_interaction = CompositeInteraction.create_or_reinforce(self.previous_interaction,
+        #                                                                      self.last_interaction)
+        #     self.procedural_memory.append(composite_interaction)
+        #
+        # # Selecting the next action to enact
+        # self.action = self.workspace.actions[ACTION_SCAN]  # Good for circling around object behavior
+        # # proclivity_dict = {}  # dict.fromkeys(ACTION_LIST, 0)
+        # # proclivity_dict = {ACTION_FORWARD: 0, ACTION_TURN_LEFT: 0, ACTION_TURN_RIGHT: 0} good for exploring terrain
+        # proclivity_dict = {self.workspace.actions[ACTION_FORWARD]: 0}  # Good for touring terrain
+        # if self.procedural_memory:
+        #     activated_interactions = [ci for ci in self.procedural_memory if ci.pre_interaction == self.last_interaction]
+        #     for ai in activated_interactions:
+        #         if ai.post_interaction.action in proclivity_dict:
+        #             proclivity_dict[ai.post_interaction.action] += ai.weight * ai.post_interaction.valence
+        #         else:
+        #             proclivity_dict[ai.post_interaction.action] = ai.weight * ai.post_interaction.valence
+        #
+        # # print("Proclivity dictionary:", proclivity_dict)
+        # # Select the action that has the highest proclivity value
+        # if proclivity_dict:
+        #     # See https://pythonguides.com/python-find-max-value-in-a-dictionary/
+        #     self.action = max(proclivity_dict, key=proclivity_dict.get)
+        #
+        # # TODO compute the anticipated outcome
+        # self.anticipated_outcome = OUTCOME_DEFAULT
+        # ii = Interaction.create_or_retrieve(self.action, self.anticipated_outcome)
 
-        # Learning or reinforcing the last composite interaction
-        if self.previous_interaction is not None:
-            composite_interaction = CompositeInteraction.create_or_reinforce(self.previous_interaction,
-                                                                             self.last_interaction)
-            self.procedural_memory.append(composite_interaction)
-
-        # Selecting the next action to enact
-        self._action = self.workspace.actions[ACTION_SCAN]  # Good for circling around object behavior
-        # proclivity_dict = {}  # dict.fromkeys(ACTION_LIST, 0)
-        # proclivity_dict = {ACTION_FORWARD: 0, ACTION_TURN_LEFT: 0, ACTION_TURN_RIGHT: 0} good for exploring terrain
-        proclivity_dict = {self.workspace.actions[ACTION_FORWARD]: 0}  # Good for touring terrain
-        if self.procedural_memory:
-            activated_interactions = [ci for ci in self.procedural_memory if ci.pre_interaction == self.last_interaction]
-            for ai in activated_interactions:
-                if ai.post_interaction.action in proclivity_dict:
-                    proclivity_dict[ai.post_interaction.action] += ai.weight * ai.post_interaction.valence
-                else:
-                    proclivity_dict[ai.post_interaction.action] = ai.weight * ai.post_interaction.valence
-
-        # print("Proclivity dictionary:", proclivity_dict)
-        # Select the action that has the highest proclivity value
-        if proclivity_dict:
-            # See https://pythonguides.com/python-find-max-value-in-a-dictionary/
-            self._action = max(proclivity_dict, key=proclivity_dict.get)
-
-        # TODO compute the anticipated outcome
-        self.anticipated_outcome = OUTCOME_DEFAULT
-        ii = Interaction.create_or_retrieve(self._action, self.anticipated_outcome)
-
-        # The intended enaction
-        self.workspace.memory.egocentric_memory.prompt_point = None  # Remove possible prompt set by another decider
-
-        self.workspace.enactions[self.workspace.clock] = Enaction(self._action, self.workspace.clock)
-        # return Enaction(self._action, self.workspace.clock, self.workspace.memory)
+        # Adjust the spatial attributes
+        if self.action.action_code in [ACTION_TURN]:  #, ACTION_TURN_RIGHT]:
+            # self.action = self.workspace.actions[ACTION_TURN]
+            self.workspace.memory.egocentric_memory.prompt_point = self.workspace.memory.egocentric_memory.focus_point.copy()
+        else:
+            self.workspace.memory.egocentric_memory.prompt_point = None  # Remove possible prompt set by another decider
+        # Add the enaction to the stack
+        self.workspace.enactions[self.workspace.clock] = Enaction(self.action, self.workspace.clock)
 
     def outcome(self, enacted_enaction):
         """ Convert the enacted interaction into an outcome adapted to the circle behavior """
@@ -98,7 +95,7 @@ class DeciderCircle(Decider):
         if enacted_enaction is None:
             return outcome
 
-        # If there is an echo, compute the echo outcome
+        # If there is a focus point, compute the echo outcome (focus may come from echo or from impact)
         if enacted_enaction.focus_point is not None:
             if np.linalg.norm(enacted_enaction.focus_point) < 200:  # From the center of the robot
                 outcome = OUTCOME_CLOSE_FRONT
@@ -116,16 +113,7 @@ class DeciderCircle(Decider):
         if enacted_enaction.lost_focus:
             outcome = OUTCOME_LOST_FOCUS
 
-        # If impact then override the echo and focus outcome
-        # Not needed because the impact causes the focus
-        # if 'impact' in enacted_interaction:
-        # if enacted_enaction.impact > 0:
-        #     outcome = OUTCOME_IMPACT
-        # if 'blocked' in enacted_interaction:
-        # if enacted_enaction.blocked:
-        #     outcome = OUTCOME_IMPACT
-
-        # If floor then override the echo and focus and impact outcome
+        # If floor then override the focus outcome
         if enacted_enaction.outcome.floor > 0:
             if enacted_enaction.outcome.floor == 0b10:
                 outcome = OUTCOME_FLOOR_LEFT
