@@ -23,15 +23,14 @@ class Floor
     int update();
     int measureFloor();
     void extraDuration(int duration);
-    bool _is_enacting;
     void outcome(JSONVar & outcome_object);
-    int _floor_outcome;
-    // String _debug_message;
+    bool _is_retreating = false;
+    unsigned long _retreat_end_time = 0;
     Wheel _OWM;
     Color _CLR;
+    int _floor_outcome = 0;  // Create a begin() and move this to private?
   private:
-    int _previous_measure_floor;
-    unsigned long _floor_change_retreat_end_time;
+    int _previous_measure_floor = 0;
 };
 
 #endif

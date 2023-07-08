@@ -44,21 +44,6 @@ void Watch::ongoing()
   {
     if (millis() > _action_end_time)
     {
-//      // Trigger the scan interaction
-//      JSONVar json_action;
-//      json_action["action"] = String(_action);
-//      json_action["clock"] = _clock;
-//      _scan = new Scan(_FLO, _HEA, _IMU, _WifiCat, json_action);
-//      _scan -> begin();
-//    }
-//  }
-//  // Execute the Scan interaction and then terminate
-//  else
-//  {
-//    if (_scan -> update() == INTERACTION_TERMINATE)
-//    {
-////      delete _scan; _scan will be deleted by outcome()
-////      _scan = nullptr;
       _duration1 = millis() - _action_start_time;
       _HEA.beginEchoAlignment();
       _step = INTERACTION_TERMINATE;
@@ -73,24 +58,5 @@ void Watch::outcome(JSONVar & outcome_object)
 {
   if (!_HEA._discontinuous)
     _status ="continuous";
-    _HEA._discontinuous = false;
+  _HEA._discontinuous = false;
 }
-
-// Overrides the terminate() method to wait for end of echo scan
-//void Watch::terminate()
-//{
-//  // Turn on the color sensor led
-//  _FLO._CLR.begin_read();
-//
-//  if (_action_end_time < millis() &&  !_FLO._is_enacting && !_HEA._is_enacting_head_alignment)
-//  {
-//    // Read the floor color and return true when done
-//    if (_FLO._CLR.end_read())
-//    {
-//      // When color has been read, proceed to step 3
-//      _step = INTERACTION_SEND;
-//      if (_HEA._discontinuous)
-//        _status ="lost";
-//    }
-//  }
-//}

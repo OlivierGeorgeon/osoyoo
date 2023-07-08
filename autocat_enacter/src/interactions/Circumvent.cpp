@@ -34,7 +34,7 @@ void Circumvent::ongoing()
     _HEA.turnHead(_HEA.head_direction(_focus_x, _focus_y + _focus_speed * (millis()- _action_start_time)/1000));
 
   // Check if Floor Change Retreat
-  if (_FLO._is_enacting)
+  if (_FLO._is_retreating)
   {
     _FLO.extraDuration(RETREAT_EXTRA_DURATION); // Increase retreat duration because need to reverse speed
     _status ="1";

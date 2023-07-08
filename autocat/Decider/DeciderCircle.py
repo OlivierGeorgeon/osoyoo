@@ -87,7 +87,7 @@ class DeciderCircle(Decider):
         # The intended enaction
         self.workspace.memory.egocentric_memory.prompt_point = None  # Remove possible prompt set by another decider
 
-        self.workspace.enactions[self.workspace.clock] = Enaction(self._action, self.workspace.clock, self.workspace.memory)
+        self.workspace.enactions[self.workspace.clock] = Enaction(self._action, self.workspace.clock)
         # return Enaction(self._action, self.workspace.clock, self.workspace.memory)
 
     def outcome(self, enacted_enaction):

@@ -96,5 +96,5 @@ class DeciderWatch(Decider):
             self.action = self.workspace.actions[ACTION_WATCH]
             self.workspace.memory.egocentric_memory.prompt_point = None
 
-        self.workspace.enactions[self.workspace.clock] = Enaction(self.action, self.workspace.clock, self.workspace.memory)
+        self.workspace.enactions[self.workspace.clock] = Enaction(self.action, self.workspace.clock)
         # return Enaction(self.action, self.workspace.clock, self.workspace.memory)

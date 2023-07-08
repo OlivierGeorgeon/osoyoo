@@ -13,14 +13,12 @@
 #define sensor4   A1 // 2nd right sensor
 #define sensor5   A0 // Right most sensor
 
-// Floor::Floor(Wheel& OWM) : _OWM(OWM)
 Floor::Floor()
 {
-  //_OWM = OWM;
-  _is_enacting = false;
-  _previous_measure_floor = 0;
-  _floor_change_retreat_end_time = 0;
-  _floor_outcome = 0;
+//  _is_retreating = false;
+//  _previous_measure_floor = 0;
+//  _retreat_end_time = 0;
+//  _floor_outcome = 0;
   // _debug_message = "";
 }
 
@@ -38,7 +36,7 @@ int Floor::update()
   _previous_measure_floor = current_measure_floor;
 
   // If is not already retreating
-  if (!_is_enacting)
+  if (!_is_retreating)
   {
     // Watch whether the floor has changed
     if (floor_change != 0)
@@ -46,7 +44,7 @@ int Floor::update()
       // digitalWrite(LED_BUILTIN, HIGH); // for debug
       // Start the retreat
       // Serial.println("Floor change " + String(floor_change, BIN) + " Begin retreat at " + String(millis()));
-      _is_enacting = true;
+      _is_retreating = true;
       switch (floor_change)
       {
         case 0b10000:
@@ -59,7 +57,7 @@ int Floor::update()
           _OWM.retreatRight();
           //_OWM.setMotion(-150,-150,-50,-50);
           _floor_outcome = B10;
-          _floor_change_retreat_end_time = millis() + RETREAT_DURATION + 2* RETREAT_EXTRA_DURATION;
+          _retreat_end_time = millis() + RETREAT_DURATION + 2* RETREAT_EXTRA_DURATION;
           break;
         case 0b00111:
         case 0b00101:
@@ -69,30 +67,29 @@ int Floor::update()
         case 0b00001:
           // Retreat left
           _OWM.retreatLeft();
-          // _OWM.setMotion(-50,-50,-150,-150);
           _floor_outcome = B01;
-          _floor_change_retreat_end_time = millis() + RETREAT_DURATION + 2 * RETREAT_EXTRA_DURATION;
+          _retreat_end_time = millis() + RETREAT_DURATION + 2 * RETREAT_EXTRA_DURATION;
           break;
         default:
           // Retreat straight
           _OWM.retreatStrait();
-          // _OWM.setMotion(-150,-150,-150,-150);
           _floor_outcome = B11;
-          _floor_change_retreat_end_time = millis() + RETREAT_DURATION;
+          _retreat_end_time = millis() + RETREAT_DURATION;
           break;
       }
       // _debug_message += String(millis()) + ": floor changed. ";
     }
   }
   // IF currently retreating
-  if (_is_enacting)
+  if (_is_retreating)
   {
     // Check whether the retreat time has elapsed
-    if (millis() > _floor_change_retreat_end_time) {
+    if (millis() > _retreat_end_time)
+    {
       // Stop the retreat
       _OWM.stopMotion();
       // _debug_message += String(millis()) + ": end retreat. ";
-      _is_enacting = false;
+      _is_retreating = false;
     }
   }
   return _floor_outcome;
@@ -100,7 +97,7 @@ int Floor::update()
 
 void Floor::extraDuration(int duration)
 {
-  _floor_change_retreat_end_time += duration;
+  _retreat_end_time += duration;
 }
 
 int Floor::measureFloor()

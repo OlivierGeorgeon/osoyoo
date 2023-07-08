@@ -54,29 +54,21 @@ class DeciderExplore(Decider):
                 activation_level = 2
         return activation_level
 
-    # def propose_intended_enaction(self, enacted_enaction):
-    #     """Propose the next intended enaction from the previous enacted interaction.
-    #     This is the main method of the agent"""
-    #     # Compute a specific outcome suited for this agent
-    #     outcome = self.outcome(enacted_enaction)
-    #     # Compute the intended enaction
-    #     return self.intended_enaction(outcome)
-
-    def outcome(self, enacted_enaction):
+    def outcome(self, enaction):
         """ Convert the enacted interaction into an outcome adapted to the explore behavior """
         outcome = OUTCOME_DEFAULT
 
         # On startup return DEFAULT
-        if enacted_enaction is None:
+        if enaction is None or enaction.outcome is None:
             return outcome
 
         # If color outcome
-        if enacted_enaction.outcome.color_index > 0:
+        if enaction.outcome.color_index > 0:
             outcome = OUTCOME_COLOR
             print("Outcome color")
 
         # Look for the floor experience
-        if enacted_enaction.outcome.floor > 0 and enacted_enaction.outcome.color_index == 0:
+        if enaction.outcome.floor > 0 and enaction.outcome.color_index == 0:
             # If the floor is not colored then figure out if the robot is on the right or on the left
             if self.workspace.memory.phenomenon_memory.phenomena[TER].absolute_affordance() is not None:
                 relative_quaternion = quaternion.cross(self.workspace.memory.body_memory.body_quaternion,
@@ -127,8 +119,7 @@ class DeciderExplore(Decider):
                 print("Swiping to confirmation by:", ego_confirmation)
                 self.action = self.workspace.actions[ACTION_SWIPE]
                 self.workspace.memory.egocentric_memory.prompt_point = ego_confirmation
-                self.workspace.enactions[self.workspace.clock] = Enaction(self.action, self.workspace.clock,
-                                                                          self.workspace.memory)
+                self.workspace.enactions[self.workspace.clock] = Enaction(self.action, self.workspace.clock)
                 playsound('autocat/Assets/R5.wav', False)
             # If not left or right we need to manoeuvre
             else:
@@ -147,10 +138,9 @@ class DeciderExplore(Decider):
                     self.workspace.memory.egocentric_memory.prompt_point = ego_origin
                     playsound('autocat/Assets/R3.wav', False)
                 self.action = self.workspace.actions[ACTION_TURN]
-                self.workspace.enactions[self.workspace.clock] = Enaction(self.action, self.workspace.clock,
-                                                                          self.workspace.memory)
-                self.workspace.enactions[self.workspace.clock + 1] = Enaction(
-                    self.workspace.actions[ACTION_FORWARD], self.workspace.clock + 1, self.workspace.memory)
+                self.workspace.enactions[self.workspace.clock] = Enaction(self.action, self.workspace.clock)
+                self.workspace.enactions[self.workspace.clock + 1] = Enaction(self.workspace.actions[ACTION_FORWARD],
+                                                                              self.workspace.clock + 1)
                 # self.exploration_step = EXPLORATION_STEP_ROTATE
         else:
             # Go to the most interesting pool point
@@ -164,10 +154,9 @@ class DeciderExplore(Decider):
             if self.prompt_index >= self.nb_points:
                 self.prompt_index = 0
             self.action = self.workspace.actions[ACTION_TURN]
-            self.workspace.enactions[self.workspace.clock] = Enaction(self.action, self.workspace.clock,
-                                                                      self.workspace.memory)
+            self.workspace.enactions[self.workspace.clock] = Enaction(self.action, self.workspace.clock)
             self.workspace.enactions[self.workspace.clock + 1] = Enaction(self.workspace.actions[ACTION_FORWARD],
-                                                                 self.workspace.clock + 1, self.workspace.memory)
+                                                                          self.workspace.clock + 1)
             # self.exploration_step = EXPLORATION_STEP_ROTATE
 
         # If the robot is on a color patch and must enact confirmation affordance

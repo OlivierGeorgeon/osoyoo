@@ -36,13 +36,13 @@ void Swipe::ongoing()
   if (_is_focussed)  // Keep the head towards the focus (HEA is inhibited during the action)
     _HEA.turnHead(_HEA.head_direction(_focus_x, _focus_y - _focus_speed * (float)(millis() - _action_start_time)/1000.));
   // Check if Floor Change Retreat
-  if (_FLO._is_enacting)
+  if (_FLO._is_retreating)
   {
     _FLO.extraDuration(RETREAT_EXTRA_DURATION); // Increase retreat duration because need to reverse speed
     _status ="1";
     // Proceed to step 2 for enacting Floor Change Retreat
     _duration1 = millis()- _action_start_time;
-    _action_end_time = 0;
+    _action_end_time = _FLO._retreat_end_time + TURN_SPOT_ENDING_DELAY;
     _step = INTERACTION_TERMINATE;
   }
   // If no floor change, check whether duration has elapsed or impact

@@ -18,20 +18,17 @@ class Enaction:
     3. CtrlRobot computes the outcome received from the robot
     4. CtrlRobot call ternminate(outcome)
     """
-    def __init__(self, action, clock, memory):
-        # The intended enaction
+    def __init__(self, action, clock):
+        """Initialize the enaction upon creation. Will be adjusted before generating the command"""
+        # The initial arguments
         self.action = action
         self.clock = clock
+
+        # the attributes that will be adjusted
+        self.body_quaternion = None
         self.prompt_point = None
         self.focus_point = None
-        self.body_quaternion = None
         self.command = None
-        if memory.egocentric_memory.prompt_point is not None:
-            self.prompt_point = memory.egocentric_memory.prompt_point.copy()
-        if memory.egocentric_memory.focus_point is not None:
-            self.focus_point = memory.egocentric_memory.focus_point.copy()
-        self.command = Command(self.action, self.clock, self.prompt_point, self.focus_point)
-        self.body_quaternion = memory.body_memory.body_quaternion
 
         # The simulation of the enaction in memory
         self.simulation_duration = 0
@@ -41,14 +38,28 @@ class Enaction:
 
         # The outcome
         self.outcome = None
-        self.body_direction_delta = 0
-        self.lost_focus = False
-        self.translation = None
-        self.yaw_matrix = None  # Used by bodyView
-        self.displacement_matrix = None
+        self.body_direction_delta = 0  # Displayed in BodyView
+        self.lost_focus = False  # Used by deciders to possibly trigger scan
+        self.translation = None  # Used by allocentric memory to move the robot
+        self.yaw_matrix = None  # Used by bodyView to rotate compass points
+        self.displacement_matrix = None  # Used by EgocentricMemory to rotate experiences
 
-    def start_simulation(self):
-        """Initialize the simulation of the intended interaction"""
+    def adjust_and_begin(self, memory):
+        """Adjust the spatial modifiers of the enaction.
+        Compute the command to send to the robot.
+        Initialize the simulation"""
+
+        # Initialize the spatial modifiers
+        self.body_quaternion = memory.body_memory.body_quaternion.copy()
+        if memory.egocentric_memory.prompt_point is not None:
+            self.prompt_point = memory.egocentric_memory.prompt_point.copy()
+        if memory.egocentric_memory.focus_point is not None:
+            self.focus_point = memory.egocentric_memory.focus_point.copy()
+
+        # Generate the command to send to the robot
+        self.command = Command(self.action, self.clock, self.prompt_point, self.focus_point)
+
+        # Initialize the simulation of the intended interaction
         self.simulation_step = SIMULATION_STEP_ON
         # Compute the duration and the speed depending and the enaction
         self.simulation_duration = self.action.target_duration
@@ -83,6 +94,8 @@ class Enaction:
         else:
             yaw_quaternion = outcome.yaw_quaternion
         yaw_integration_quaternion = self.body_quaternion.cross(yaw_quaternion)
+        print("previous body_quaternion", repr(self.body_quaternion))
+        print("yaw_integration_quaternion", repr(yaw_integration_quaternion))
 
         # If the robot returns no compass then the body_quaternion is estimated from yaw
         if outcome.compass_point is None:
@@ -100,17 +113,20 @@ class Enaction:
                 dif_q = self.outcome.compass_quaternion.cross(yaw_integration_quaternion.inverse)
                 if dif_q.angle > math.pi:
                     dif_q = -dif_q
+                print("dif_quaternion", repr(yaw_integration_quaternion))
                 self.body_direction_delta = dif_q.axis[2] * dif_q.angle
 
                 # Take the median angle between the compass and the yaw estimate
                 # 0 is compass only, 1 is yaw estimate only
                 new_body_quaternion = self.outcome.compass_quaternion.slerp(yaw_integration_quaternion, 0.5)
+                print("new_body_quaternion", repr(new_body_quaternion))
 
                 # The yaw quaternion is recomputed
                 yaw_quaternion = new_body_quaternion.cross(self.body_quaternion.inverse)
                 if yaw_quaternion.angle > math.pi:
                     yaw_quaternion = -yaw_quaternion
                 self.body_quaternion = new_body_quaternion
+                print("new_body_quaternion", repr(self.body_quaternion))
 
         # Compute the displacement matrix which represents the displacement of the environment
         # relative to the robot (Translates and turns in the opposite direction)

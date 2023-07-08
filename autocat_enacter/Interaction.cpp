@@ -83,7 +83,7 @@ void Interaction::terminate()
   _FLO._CLR.begin_read();
 
   // Serial.println("Interaction.step2()");
-  if (_action_end_time < millis() &&  !_FLO._is_enacting && !_HEA._is_enacting_head_alignment)
+  if (_action_end_time < millis() &&  !_FLO._is_retreating && !_HEA._is_enacting_head_alignment)
   {
     // Read the floor color and return true when done
     if (_FLO._CLR.end_read())

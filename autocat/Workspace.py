@@ -91,7 +91,7 @@ class Workspace:
             if self.clock in self.enactions:
                 # Take the next enaction from the stack
                 self.enaction = self.enactions[self.clock]
-                self.enaction.start_simulation()
+                self.enaction.adjust_and_begin(self.memory)
                 if self.is_imagining:
                     # If imagining then proceed to simulating the enaction
                     self.interaction_step = INTERACTION_STEP_ENACTING
@@ -151,12 +151,12 @@ class Workspace:
         elif user_key.upper() in ACTIONS:
             # Only process actions when the robot is IDLE
             if self.interaction_step == INTERACTION_STEP_IDLE:
-                self.enactions[self.clock] = Enaction(self.actions[user_key.upper()], self.clock, self.memory)
+                self.enactions[self.clock] = Enaction(self.actions[user_key.upper()], self.clock)
         elif user_key.upper() == "/":
             # If key ALIGN then turn and move forward to the prompt
             if self.interaction_step == INTERACTION_STEP_IDLE:
-                self.enactions[self.clock] = Enaction(self.actions[ACTION_TURN], self.clock, self.memory)
-                self.enactions[self.clock + 1] = Enaction(self.actions[ACTION_FORWARD], self.clock + 1, self.memory)
+                self.enactions[self.clock] = Enaction(self.actions[ACTION_TURN], self.clock)
+                self.enactions[self.clock + 1] = Enaction(self.actions[ACTION_FORWARD], self.clock + 1)
         elif user_key.upper() == KEY_CLEAR:
             # Clear the stack of enactions
             playsound('autocat/Assets/R3.wav', False)

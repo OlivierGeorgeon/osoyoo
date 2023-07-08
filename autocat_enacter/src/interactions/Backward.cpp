@@ -51,7 +51,7 @@ void Backward::ongoing()
   }
 
   // Check if Floor Change Retreat
-  if (_FLO._is_enacting)
+  if (_FLO._is_retreating)
   {
     _FLO.extraDuration(RETREAT_EXTRA_DURATION); // Increase retreat duration because need to reverse speed
     _status ="1";
