@@ -6,7 +6,7 @@
 import math
 import numpy as np
 from . Action import ACTION_TURN
-from . Interaction import OUTCOME_DEFAULT
+from . Interaction import OUTCOME_NO_FOCUS
 from . PredefinedInteractions import OUTCOME_LOST_FOCUS, OUTCOME_FOCUS_TOO_CLOSE,  OUTCOME_FOCUS_FAR, OUTCOME_FOCUS_SIDE, \
     OUTCOME_FOCUS_FRONT, OUTCOME_FLOOR, OUTCOME_FOCUS_TOO_FAR
 from ..Robot.Enaction import Enaction
@@ -29,42 +29,38 @@ class DeciderCircle(Decider):
 
         return activation_level
 
-    def outcome(self, enacted_enaction):
-        """ Convert the enacted interaction into an outcome adapted to the circle behavior """
-        outcome = OUTCOME_DEFAULT
-
-        # On startup return DEFAULT
-        if enacted_enaction is None:
-            return outcome
-
-        # If there is a focus point, compute the echo outcome (focus may come from echo or from impact)
-        if enacted_enaction.focus_point is not None:
-            focus_radius = np.linalg.norm(enacted_enaction.focus_point)  # From the center of the robot
-            if focus_radius < FOCUS_TOO_CLOSE_DISTANCE:
-                outcome = OUTCOME_FOCUS_TOO_CLOSE
-            elif focus_radius > FOCUS_TOO_FAR_DISTANCE:
-                outcome = OUTCOME_FOCUS_TOO_FAR
-            elif focus_radius > FOCUS_FAR_DISTANCE:
-                outcome = OUTCOME_FOCUS_FAR
-            else:
-                focus_theta = math.atan2(enacted_enaction.focus_point[1], enacted_enaction.focus_point[0])
-                if math.fabs(focus_theta) < FOCUS_SIDE_ANGLE:
-                    outcome = OUTCOME_FOCUS_FRONT
-                else:
-                    outcome = OUTCOME_FOCUS_SIDE
-
-        if enacted_enaction.lost_focus:
-            outcome = OUTCOME_LOST_FOCUS
-
-        # If floor then override the focus outcome
-        if enacted_enaction.outcome.floor > 0:
-            outcome = OUTCOME_FLOOR
-            # if enacted_enaction.outcome.floor == 0b10:
-            #     outcome = OUTCOME_FLOOR_LEFT
-            # if enacted_enaction.outcome.floor == 0b01:
-            #     outcome = OUTCOME_FLOOR_RIGHT
-
-        return outcome
+    # def outcome(self, enacted_enaction):
+    #     """ Convert the enacted interaction into an outcome adapted to the circle behavior """
+    #     outcome = OUTCOME_NO_FOCUS
+    #
+    #     # On startup return DEFAULT
+    #     if enacted_enaction is None:
+    #         return outcome
+    #
+    #     # If there is a focus point, compute the echo outcome (focus may come from echo or from impact)
+    #     if enacted_enaction.focus_point is not None:
+    #         focus_radius = np.linalg.norm(enacted_enaction.focus_point)  # From the center of the robot
+    #         if focus_radius < FOCUS_TOO_CLOSE_DISTANCE:
+    #             outcome = OUTCOME_FOCUS_TOO_CLOSE
+    #         elif focus_radius > FOCUS_TOO_FAR_DISTANCE:
+    #             outcome = OUTCOME_FOCUS_TOO_FAR
+    #         elif focus_radius > FOCUS_FAR_DISTANCE:
+    #             outcome = OUTCOME_FOCUS_FAR
+    #         else:
+    #             focus_theta = math.atan2(enacted_enaction.focus_point[1], enacted_enaction.focus_point[0])
+    #             if math.fabs(focus_theta) < FOCUS_SIDE_ANGLE:
+    #                 outcome = OUTCOME_FOCUS_FRONT
+    #             else:
+    #                 outcome = OUTCOME_FOCUS_SIDE
+    #
+    #     if enacted_enaction.lost_focus:
+    #         outcome = OUTCOME_LOST_FOCUS
+    #
+    #     # If floor then override the focus outcome
+    #     if enacted_enaction.outcome.floor > 0:
+    #         outcome = OUTCOME_FLOOR
+    #
+    #     return outcome
 
     def select_enaction(self, outcome):
         """Add the next enaction to the stack based on sequence learning and spatial modifiers"""

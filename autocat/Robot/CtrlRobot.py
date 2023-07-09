@@ -2,7 +2,7 @@ import json
 import time
 import socket
 import math
-from pyrr import matrix44, Quaternion
+from pyrr import Quaternion
 from .RobotDefine import ROBOT_SETTINGS
 from .Outcome import Outcome
 
@@ -11,10 +11,6 @@ INTERACTION_STEP_INTENDING = 1
 INTERACTION_STEP_ENACTING = 2
 INTERACTION_STEP_INTEGRATING = 3
 INTERACTION_STEP_REFRESHING = 4
-
-# KEY_EXPERIENCES = 'points'
-# KEY_IMPACT = 'impact'
-# FOCUS_MAX_DELTA = 100  # (mm) Maximum delta to keep focus
 
 
 class CtrlRobot:

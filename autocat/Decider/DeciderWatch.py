@@ -6,7 +6,7 @@
 import math
 import numpy as np
 from . Action import ACTION_WATCH, ACTION_TURN, ACTION_SWIPE, ACTION_FORWARD
-from . Interaction import Interaction, OUTCOME_DEFAULT
+from . Interaction import Interaction, OUTCOME_NO_FOCUS
 from . PredefinedInteractions import OUTCOME_FOCUS_TOO_FAR, OUTCOME_LOST_FOCUS, OUTCOME_FOCUS_SIDE, OUTCOME_FOCUS_FRONT
 from ..Robot.Enaction import Enaction
 from . Decider import Decider, FOCUS_TOO_FAR_DISTANCE, FOCUS_SIDE_ANGLE
@@ -18,9 +18,9 @@ class DeciderWatch(Decider):
 
         # Give higher valence to Watch than to Swipe
         # TODO handle switching between deciders
-        Interaction.create_or_retrieve(workspace.actions[ACTION_SWIPE], OUTCOME_DEFAULT, 1)
-        Interaction.create_or_retrieve(workspace.actions[ACTION_FORWARD], OUTCOME_DEFAULT, 1)
-        Interaction.create_or_retrieve(workspace.actions[ACTION_WATCH], OUTCOME_DEFAULT, 2)
+        Interaction.create_or_retrieve(workspace.actions[ACTION_SWIPE], OUTCOME_FOCUS_FRONT, 1)
+        Interaction.create_or_retrieve(workspace.actions[ACTION_FORWARD], OUTCOME_FOCUS_FRONT, 1)
+        Interaction.create_or_retrieve(workspace.actions[ACTION_WATCH], OUTCOME_FOCUS_FRONT, 2)
 
         self.action = self.workspace.actions[ACTION_WATCH]
 
@@ -28,14 +28,14 @@ class DeciderWatch(Decider):
         """The level of activation of this decider: 0: default, 2 if the terrain has an origin """
         return 4
 
-    def outcome(self, enacted_enaction):
+    def outcome2(self, enacted_enaction):
         """ Convert the enacted interaction into an outcome adapted to the watch behavior """
+
+        outcome = OUTCOME_NO_FOCUS
 
         # On startup
         if enacted_enaction is None:
-            return OUTCOME_FOCUS_FRONT
-
-        outcome = OUTCOME_FOCUS_FRONT
+            return outcome
 
         if enacted_enaction.focus_point is None:
             # If there is no focus then consider it was lost and trigger scan
@@ -45,7 +45,9 @@ class DeciderWatch(Decider):
                 outcome = OUTCOME_FOCUS_TOO_FAR
             else:
                 angle = math.atan2(enacted_enaction.focus_point[1], enacted_enaction.focus_point[0])
-                if math.fabs(angle) > FOCUS_SIDE_ANGLE:
+                if math.fabs(angle) < FOCUS_SIDE_ANGLE:
+                    outcome = OUTCOME_FOCUS_FRONT
+                else:
                     outcome = OUTCOME_FOCUS_SIDE
 
         # DEFAULT when focused on object in near front

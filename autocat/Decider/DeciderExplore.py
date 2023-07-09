@@ -8,7 +8,7 @@ import numpy as np
 from pyrr import quaternion, matrix44
 from playsound import playsound
 from . Action import ACTION_TURN, ACTION_FORWARD, ACTION_SWIPE, ACTION_RIGHTWARD
-from . Interaction import OUTCOME_DEFAULT
+from . Interaction import OUTCOME_NO_FOCUS
 from ..Robot.Enaction import Enaction
 from ..Memory.PhenomenonMemory.PhenomenonMemory import TER
 from . Decider import Decider
@@ -48,7 +48,7 @@ class DeciderExplore(Decider):
 
     def outcome(self, enaction):
         """ Convert the enacted interaction into an outcome adapted to the explore behavior """
-        outcome = OUTCOME_DEFAULT
+        outcome = OUTCOME_NO_FOCUS
 
         # On startup return DEFAULT
         if enaction is None or enaction.outcome is None:

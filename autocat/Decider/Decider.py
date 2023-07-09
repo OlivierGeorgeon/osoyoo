@@ -1,7 +1,11 @@
+import math
+import numpy as np
 from . Action import ACTION_FORWARD, ACTION_SCAN
-from . Interaction import Interaction, OUTCOME_DEFAULT
+from . Interaction import Interaction, OUTCOME_NO_FOCUS
 from . CompositeInteraction import CompositeInteraction
 from . PredefinedInteractions import create_interactions
+from . PredefinedInteractions import OUTCOME_LOST_FOCUS, OUTCOME_FOCUS_TOO_CLOSE,  OUTCOME_FOCUS_FAR, OUTCOME_FOCUS_SIDE, \
+    OUTCOME_FOCUS_FRONT, OUTCOME_FLOOR, OUTCOME_FOCUS_TOO_FAR
 
 FOCUS_TOO_CLOSE_DISTANCE = 200   # (mm) Distance below which OUTCOME_FOCUS_TOO_CLOSE. From robot center
 FOCUS_FAR_DISTANCE = 400         # (mm) Distance beyond which OUTCOME_FOCUS_FAR. Must be farther than forward speed
@@ -13,7 +17,7 @@ class Decider:
     def __init__(self, workspace):
         self.workspace = workspace
         self.action = self.workspace.actions[ACTION_FORWARD]
-        self.anticipated_outcome = OUTCOME_DEFAULT
+        self.anticipated_outcome = OUTCOME_NO_FOCUS
         self.previous_interaction = None
         self.last_interaction = None
 
@@ -27,6 +31,39 @@ class Decider:
         outcome = self.outcome(self.workspace.enaction)
         # Compute the intended enaction
         self.select_enaction(outcome)
+
+    def outcome(self, enacted_enaction):
+        """ Convert the enacted interaction into an outcome adapted to the circle behavior """
+        outcome = OUTCOME_NO_FOCUS
+
+        # On startup return DEFAULT
+        if enacted_enaction is None:
+            return outcome
+
+        # If there is a focus point, compute the echo outcome (focus may come from echo or from impact)
+        if enacted_enaction.focus_point is not None:
+            focus_radius = np.linalg.norm(enacted_enaction.focus_point)  # From the center of the robot
+            if focus_radius < FOCUS_TOO_CLOSE_DISTANCE:
+                outcome = OUTCOME_FOCUS_TOO_CLOSE
+            elif focus_radius > FOCUS_TOO_FAR_DISTANCE:
+                outcome = OUTCOME_FOCUS_TOO_FAR
+            elif focus_radius > FOCUS_FAR_DISTANCE:
+                outcome = OUTCOME_FOCUS_FAR
+            else:
+                focus_theta = math.atan2(enacted_enaction.focus_point[1], enacted_enaction.focus_point[0])
+                if math.fabs(focus_theta) < FOCUS_SIDE_ANGLE:
+                    outcome = OUTCOME_FOCUS_FRONT
+                else:
+                    outcome = OUTCOME_FOCUS_SIDE
+
+        if enacted_enaction.lost_focus:
+            outcome = OUTCOME_LOST_FOCUS
+
+        # If floor then override the focus outcome
+        if enacted_enaction.outcome.floor > 0:
+            outcome = OUTCOME_FLOOR
+
+        return outcome
 
     def select_action(self, outcome):
         """The sequence learning mechanism that proposes the next action"""

@@ -1,6 +1,6 @@
 # import json
 
-OUTCOME_DEFAULT = '0'
+OUTCOME_NO_FOCUS = '0'
 
 
 class Interaction:
@@ -47,8 +47,8 @@ class Interaction:
 # py -m autocat.Decider.Interaction
 if __name__ == '__main__':
     """ demonstrate the usage of Interaction.create_or_retrieve() """
-    interaction00 = Interaction.create_or_retrieve(0, OUTCOME_DEFAULT)  # Create
+    interaction00 = Interaction.create_or_retrieve(0, OUTCOME_NO_FOCUS)  # Create
     interaction01 = Interaction.create_or_retrieve(0, 1)  # Create
-    interaction10 = Interaction.create_or_retrieve(1, OUTCOME_DEFAULT)  # Create
+    interaction10 = Interaction.create_or_retrieve(1, OUTCOME_NO_FOCUS)  # Create
     interaction11 = Interaction.create_or_retrieve(1, 1)  # Create
-    interaction00b = Interaction.create_or_retrieve(0, OUTCOME_DEFAULT)  # Retrieve
+    interaction00b = Interaction.create_or_retrieve(0, OUTCOME_NO_FOCUS)  # Retrieve
