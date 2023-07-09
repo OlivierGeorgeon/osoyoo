@@ -3,6 +3,7 @@
 # Activation 1: default. 3: focus
 ########################################################################################
 
+import math
 import numpy as np
 from . Action import ACTION_TURN
 from . Interaction import OUTCOME_DEFAULT
@@ -16,10 +17,6 @@ class DeciderCircle(Decider):
     def __init__(self, workspace):
         """ Creating our agent """
         super().__init__(workspace)
-
-        # Load the predefined behavior
-        # self.procedural_memory = create_interactions(self.workspace.actions)
-        # self.action = self.workspace.actions[ACTION_FORWARD]
 
     def activation_level(self):
         """Return the activation level of this decider/ 1: default; 3 if focus object """
@@ -44,16 +41,22 @@ class DeciderCircle(Decider):
                 outcome = OUTCOME_FOCUS_TOO_CLOSE
             elif np.linalg.norm(enacted_enaction.focus_point) > 400:  # Must be farther than the forward speed
                 outcome = OUTCOME_FOCUS_FAR
-            elif enacted_enaction.focus_point[1] > 150:
-                outcome = OUTCOME_FOCUS_SIDE  # More that 150 to the left
-            elif enacted_enaction.focus_point[1] > 0:
-                outcome = OUTCOME_FOCUS_FRONT      # between 0 and 150 to the left
-            elif enacted_enaction.focus_point[1] > -150:
-                # outcome = OUTCOME_RIGHT     # Between 0 and -150 to the right
-                outcome = OUTCOME_FOCUS_FRONT     # Between 0 and -150 to the right
             else:
-                # outcome = OUTCOME_FAR_RIGHT  # More that -150 to the right
-                outcome = OUTCOME_FOCUS_SIDE
+                focus_theta = math.atan2(enacted_enaction.focus_point[1], enacted_enaction.focus_point[0])
+                if math.fabs(focus_theta) < math.pi / 6:
+                    outcome = OUTCOME_FOCUS_FRONT
+                else:
+                    outcome = OUTCOME_FOCUS_SIDE
+            # elif enacted_enaction.focus_point[1] > 150:
+            #     outcome = OUTCOME_FOCUS_SIDE  # More that 150 to the left
+            # elif enacted_enaction.focus_point[1] > 0:
+            #     outcome = OUTCOME_FOCUS_FRONT      # between 0 and 150 to the left
+            # elif enacted_enaction.focus_point[1] > -150:
+            #     # outcome = OUTCOME_RIGHT     # Between 0 and -150 to the right
+            #     outcome = OUTCOME_FOCUS_FRONT     # Between 0 and -150 to the right
+            # else:
+            #     # outcome = OUTCOME_FAR_RIGHT  # More that -150 to the right
+            #     outcome = OUTCOME_FOCUS_SIDE
 
         if enacted_enaction.lost_focus:
             outcome = OUTCOME_LOST_FOCUS
@@ -78,7 +81,8 @@ class DeciderCircle(Decider):
         # Set the spatial modifiers
         if self.action.action_code in [ACTION_TURN]:
             # Turn to the direction of the focus
-            self.workspace.memory.egocentric_memory.prompt_point = self.workspace.memory.egocentric_memory.focus_point.copy()
+            self.workspace.memory.egocentric_memory.prompt_point = \
+                self.workspace.memory.egocentric_memory.focus_point.copy()
         else:
             self.workspace.memory.egocentric_memory.prompt_point = None
 

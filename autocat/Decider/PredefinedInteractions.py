@@ -49,17 +49,18 @@ def create_interactions(actions):
     i14 = Interaction.create_or_retrieve(actions[ACTION_TURN], OUTCOME_FOCUS_FRONT, 1)
     CompositeInteraction.create_or_retrieve(i_l, i14)
 
-    # When focus is LEFT or RIGHT then swipe right
-    i44 = Interaction.create_or_retrieve(actions[ACTION_SWIPE], OUTCOME_FOCUS_FRONT, 1)
+    # When focus FRONT then swipe or Watch
+    i44 = Interaction.create_or_retrieve(actions[ACTION_SWIPE], OUTCOME_FOCUS_FRONT, 2)  # Swipe has higher valence
+    iw = Interaction.create_or_retrieve(actions[ACTION_WATCH], OUTCOME_FOCUS_FRONT, 1)
     for interaction in Interaction.interaction_list:
         if interaction.outcome in [OUTCOME_FOCUS_FRONT]:  #, OUTCOME_RIGHT]:
             CompositeInteraction.create_or_retrieve(interaction, i44)
+            CompositeInteraction.create_or_retrieve(interaction, iw)
 
     # When outcome NEARBY then WATCH
-    iw = Interaction.create_or_retrieve(actions[ACTION_WATCH], OUTCOME_FOCUS_FRONT, 1)
-    for interaction in Interaction.interaction_list:
-        if interaction.outcome in [OUTCOME_FOCUS_FRONT]:
-            CompositeInteraction.create_or_retrieve(interaction, iw)
+    # for interaction in Interaction.interaction_list:
+    #     if interaction.outcome in [OUTCOME_FOCUS_FRONT]:
+    #         CompositeInteraction.create_or_retrieve(interaction, iw)
 
     # When FAR FRONT then forward
     i84 = Interaction.create_or_retrieve(actions[ACTION_FORWARD], OUTCOME_FOCUS_FRONT, 1)
@@ -67,15 +68,15 @@ def create_interactions(actions):
         if interaction.outcome == OUTCOME_FOCUS_FAR:
             CompositeInteraction.create_or_retrieve(interaction, i84)
 
-    # When close LEFT or RIGHT then backward
+    # When TOO CLOSE then backward
     i24 = Interaction.create_or_retrieve(actions[ACTION_BACKWARD], OUTCOME_FOCUS_FRONT, 1)
     for interaction in Interaction.interaction_list:
         if interaction.outcome == OUTCOME_FOCUS_TOO_CLOSE:
             CompositeInteraction.create_or_retrieve(interaction, i24)
 
-    # When FAR LEFT or RIGHT then turn
+    # When focus on the SIDE or TOO FAR then turn
     for interaction in Interaction.interaction_list:
-        if interaction.outcome in [OUTCOME_FOCUS_SIDE]:  # , OUTCOME_FAR_RIGHT]:
+        if interaction.outcome in [OUTCOME_FOCUS_SIDE, OUTCOME_FOCUS_TOO_FAR]:  # , OUTCOME_FAR_RIGHT]:
             CompositeInteraction.create_or_retrieve(interaction, i14)
 
     ##################################
