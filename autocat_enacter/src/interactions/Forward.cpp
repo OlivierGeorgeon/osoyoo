@@ -33,9 +33,37 @@ void Forward::ongoing()
     _HEA.turnHead(_HEA.head_direction(_focus_x - _focus_speed * (millis()- _action_start_time)/1000, _focus_y));
 
 
-  // If impact then proceed to phase 2
+  // If obstacle then proceed to step 2
+  if (_caution > 0 && _HEA.get_ultrasonic_measure() < 200) // 200
+  {
+    if (!_HEA._is_enacting_head_alignment)
+      _HEA.beginEchoAlignment();  // Force to look at the obstacle
+    _status ="echo";
+    _duration1 = millis()- _action_start_time;
+    _action_end_time = 0;
+    _FLO._OWM.stopMotion();
+    _step = INTERACTION_TERMINATE;
+  }
+
   int impact = _IMU.get_impact_forward();
-  if (impact > 0) // && !_FLO._is_enacting)
+  // Floor Change Retreat then proceed to phase 2
+  if (_FLO._is_retreating)
+  {
+    // Turn head to the line as if it attracted focus
+    if (_FLO._floor_outcome == B01)
+      _HEA.turnHead(-30);
+    else if (_FLO._floor_outcome == B10)
+      _HEA.turnHead(30);
+    else
+      _HEA.turnHead(0);
+    _FLO.extraDuration(RETREAT_EXTRA_DURATION); // Increase retreat duration because need to reverse speed
+    _status ="1";
+    // Proceed to step 2 for enacting Floor Change Retreat
+    _duration1 = millis() - _action_start_time;
+    _action_end_time = _FLO._retreat_end_time + TURN_SPOT_ENDING_DELAY;
+    _step = INTERACTION_TERMINATE;
+  }
+  else if (impact > 0)
   {
     // If lateral impact, look at the direction of the impact
     if (impact == B01)
@@ -49,30 +77,7 @@ void Forward::ongoing()
     _FLO._OWM.stopMotion();
     _step = INTERACTION_TERMINATE;
   }
-
-  // If obstacle then proceed to step 2
-  if (_caution > 0 && _HEA.get_ultrasonic_measure() < 200) // 200
-  {
-    if (!_HEA._is_enacting_head_alignment)
-      _HEA.beginEchoAlignment();  // Force to look at the obstacle
-    _status ="echo";
-    _duration1 = millis()- _action_start_time;
-    _action_end_time = 0;
-    _FLO._OWM.stopMotion();
-    _step = INTERACTION_TERMINATE;
-  }
-
-  // Floor Change Retreat then proceed to phase 2
-  if (_FLO._is_retreating)
-  {
-    _FLO.extraDuration(RETREAT_EXTRA_DURATION); // Increase retreat duration because need to reverse speed
-    _status ="1";
-    // Proceed to step 2 for enacting Floor Change Retreat
-    _duration1 = millis() - _action_start_time;
-    _action_end_time = _FLO._retreat_end_time + TURN_SPOT_ENDING_DELAY;
-    _step = INTERACTION_TERMINATE;
-  }
-  // If no floor change, check whether duration has elapsed
+  // If no floor change nor impact, check whether duration has elapsed
   else if (_action_end_time < millis())
   {
     if (!_HEA._is_enacting_head_alignment)

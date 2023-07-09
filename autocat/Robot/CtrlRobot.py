@@ -55,7 +55,12 @@ class CtrlRobot:
                     print("Outcome:", outcome_string)
                     # Short outcome are for debug
                     if len(outcome_string) > 100:
-                        self.terminate_enaction(outcome_string)
+                        outcome_dict = json.loads(outcome_string)
+                        if outcome_dict['clock'] == self.workspace.enaction.clock:
+                            self.terminate_enaction(outcome_dict)
+                        else:
+                            # Sometimes the previous outcome was received after the time out and we find it here
+                            print("Received outcome does not match current enaction")
             else:
                 # Timeout: resend the enaction
                 self.workspace.memory = self.workspace.memory_snapshot
@@ -73,11 +78,11 @@ class CtrlRobot:
         # Initialize the timeout
         self.expected_outcome_time = time.time() + self.workspace.enaction.command.timeout()
 
-    def terminate_enaction(self, outcome_string):
+    def terminate_enaction(self, outcome_dict):
         """ Terminate the enaction using the outcome received from the robot."""
 
         # Process the outcome
-        outcome = Outcome(outcome_string)
+        outcome = Outcome(outcome_dict)
 
         # Compute the compass_quaternion
         if outcome.compass_point is not None:

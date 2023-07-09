@@ -53,7 +53,7 @@ ROBOT_SETTINGS_2["compass_offset"] = [0, 0, 0]
 # Robot 3 chez Olivier
 ROBOT_SETTINGS_3 = ROBOT_SETTINGS_0.copy()
 ROBOT_SETTINGS_3["IP"] = {"PetiteIA": "192.168.8.242"}
-ROBOT_SETTINGS_3["forward_speed"] = 190  # (mm/s) Forward translation speed.
+ROBOT_SETTINGS_3["forward_speed"] = 230  # 190 (mm/s) Forward translation speed.
 ROBOT_SETTINGS_3["lateral_speed"] = 160  # (mm/s) Lateral translation speed.
 ROBOT_SETTINGS_3["retreat_distance"] = 80  # 70   # (mm) Distance of the line after retreat
 ROBOT_SETTINGS_3["compass_offset"] = [0, 0, 0]

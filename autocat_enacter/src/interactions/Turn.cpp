@@ -48,8 +48,17 @@ void Turn::ongoing()
   else
     _HEA.turnHead(_target_angle - _IMU._yaw); // Keep looking at destination
 
+  // Check if Floor Change Retreat
+  if (_FLO._is_retreating)
+  {
+    _status ="1";
+    // Proceed to step 2 for enacting Floor Change Retreat
+    _duration1 = millis()- _action_start_time;
+    _action_end_time = _FLO._retreat_end_time + TURN_SPOT_ENDING_DELAY;
+    _step = INTERACTION_TERMINATE;
+  }
   // When reached the target angle or the max duration
-  if (((_target_angle > TURN_SPOT_ENDING_ANGLE) && (_IMU._yaw > _target_angle - TURN_SPOT_ENDING_ANGLE)) ||
+  else if (((_target_angle > TURN_SPOT_ENDING_ANGLE) && (_IMU._yaw > _target_angle - TURN_SPOT_ENDING_ANGLE)) ||
   ((_target_angle < -TURN_SPOT_ENDING_ANGLE) && (_IMU._yaw < _target_angle + TURN_SPOT_ENDING_ANGLE)) ||
   (abs(_target_angle) <= TURN_SPOT_ENDING_ANGLE) ||
   (_action_end_time < millis()))

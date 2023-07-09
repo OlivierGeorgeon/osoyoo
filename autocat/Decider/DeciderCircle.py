@@ -8,9 +8,9 @@ import numpy as np
 from . Action import ACTION_TURN
 from . Interaction import OUTCOME_DEFAULT
 from . PredefinedInteractions import OUTCOME_LOST_FOCUS, OUTCOME_FOCUS_TOO_CLOSE,  OUTCOME_FOCUS_FAR, OUTCOME_FOCUS_SIDE, \
-    OUTCOME_FOCUS_FRONT, OUTCOME_FLOOR_LEFT, OUTCOME_FLOOR_FRONT, OUTCOME_FLOOR_RIGHT
+    OUTCOME_FOCUS_FRONT, OUTCOME_FLOOR, OUTCOME_FOCUS_TOO_FAR
 from ..Robot.Enaction import Enaction
-from . Decider import Decider
+from . Decider import Decider, FOCUS_TOO_CLOSE_DISTANCE, FOCUS_FAR_DISTANCE, FOCUS_TOO_FAR_DISTANCE, FOCUS_SIDE_ANGLE
 
 
 class DeciderCircle(Decider):
@@ -19,12 +19,14 @@ class DeciderCircle(Decider):
         super().__init__(workspace)
 
     def activation_level(self):
-        """Return the activation level of this decider/ 1: default; 3 if focus object """
+        """Return the activation level of this decider/ 1: default; 3 if focus not too far """
         activation_level = 1
 
+        # Activate when the focus is not too far
         if self.workspace.memory.egocentric_memory.focus_point is not None:
-            if np.linalg.norm(self.workspace.memory.egocentric_memory.focus_point) < 500:
+            if np.linalg.norm(self.workspace.memory.egocentric_memory.focus_point) < FOCUS_TOO_FAR_DISTANCE:
                 activation_level = 3
+
         return activation_level
 
     def outcome(self, enacted_enaction):
@@ -37,38 +39,30 @@ class DeciderCircle(Decider):
 
         # If there is a focus point, compute the echo outcome (focus may come from echo or from impact)
         if enacted_enaction.focus_point is not None:
-            if np.linalg.norm(enacted_enaction.focus_point) < 200:  # From the center of the robot
+            focus_radius = np.linalg.norm(enacted_enaction.focus_point)  # From the center of the robot
+            if focus_radius < FOCUS_TOO_CLOSE_DISTANCE:
                 outcome = OUTCOME_FOCUS_TOO_CLOSE
-            elif np.linalg.norm(enacted_enaction.focus_point) > 400:  # Must be farther than the forward speed
+            elif focus_radius > FOCUS_TOO_FAR_DISTANCE:
+                outcome = OUTCOME_FOCUS_TOO_FAR
+            elif focus_radius > FOCUS_FAR_DISTANCE:
                 outcome = OUTCOME_FOCUS_FAR
             else:
                 focus_theta = math.atan2(enacted_enaction.focus_point[1], enacted_enaction.focus_point[0])
-                if math.fabs(focus_theta) < math.pi / 6:
+                if math.fabs(focus_theta) < FOCUS_SIDE_ANGLE:
                     outcome = OUTCOME_FOCUS_FRONT
                 else:
                     outcome = OUTCOME_FOCUS_SIDE
-            # elif enacted_enaction.focus_point[1] > 150:
-            #     outcome = OUTCOME_FOCUS_SIDE  # More that 150 to the left
-            # elif enacted_enaction.focus_point[1] > 0:
-            #     outcome = OUTCOME_FOCUS_FRONT      # between 0 and 150 to the left
-            # elif enacted_enaction.focus_point[1] > -150:
-            #     # outcome = OUTCOME_RIGHT     # Between 0 and -150 to the right
-            #     outcome = OUTCOME_FOCUS_FRONT     # Between 0 and -150 to the right
-            # else:
-            #     # outcome = OUTCOME_FAR_RIGHT  # More that -150 to the right
-            #     outcome = OUTCOME_FOCUS_SIDE
 
         if enacted_enaction.lost_focus:
             outcome = OUTCOME_LOST_FOCUS
 
         # If floor then override the focus outcome
         if enacted_enaction.outcome.floor > 0:
-            if enacted_enaction.outcome.floor == 0b10:
-                outcome = OUTCOME_FLOOR_LEFT
-            if enacted_enaction.outcome.floor == 0b11:
-                outcome = OUTCOME_FLOOR_FRONT
-            if enacted_enaction.outcome.floor == 0b01:
-                outcome = OUTCOME_FLOOR_RIGHT
+            outcome = OUTCOME_FLOOR
+            # if enacted_enaction.outcome.floor == 0b10:
+            #     outcome = OUTCOME_FLOOR_LEFT
+            # if enacted_enaction.outcome.floor == 0b01:
+            #     outcome = OUTCOME_FLOOR_RIGHT
 
         return outcome
 

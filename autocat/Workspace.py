@@ -29,7 +29,7 @@ class Workspace:
         self.robot_id = robot_id
         self.actions = create_actions(robot_id)
         self.memory = Memory(robot_id)
-        if self.robot_id == '3':
+        if self.robot_id == '1':
             self.deciders = {'Explore': DeciderExplore(self), 'Circle': DeciderCircle(self), 'Watch': DeciderWatch(self)}
         else:
             self.deciders = {'Explore': DeciderExplore(self), 'Circle': DeciderCircle(self)}

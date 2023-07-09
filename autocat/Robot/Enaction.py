@@ -184,15 +184,17 @@ class Enaction:
 
         # Impact or block catch focus
         if self.outcome.impact > 0 and self.action.action_code == ACTION_FORWARD:
-            if self.outcome.echo_point is None or np.linalg.norm(self.outcome.echo_point) > 200:
+            if self.outcome.echo_point is not None and np.linalg.norm(self.outcome.echo_point) < 200:
+                # Focus on the object "seen"
+                self.focus_point = self.outcome.echo_point
+            else:
+                # Focus on the object "felt"
                 if self.outcome.impact == 0b01:
                     self.focus_point = np.array([ROBOT_FRONT_X + 10, -ROBOT_FRONT_Y, 0])
                 elif self.outcome.impact == 0b10:
                     self.focus_point = np.array([ROBOT_FRONT_X + 10, ROBOT_FRONT_Y, 0])
                 else:
                     self.focus_point = np.array([ROBOT_FRONT_X + 10, 0, 0])
-            else:
-                self.focus_point = self.outcome.echo_point
             # Reset lost focus to activate DecideCircle
             self.lost_focus = False
             print("CATCH FOCUS IMPACT", self.focus_point)

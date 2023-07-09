@@ -35,9 +35,15 @@ void Swipe::ongoing()
 {
   if (_is_focussed)  // Keep the head towards the focus (HEA is inhibited during the action)
     _HEA.turnHead(_HEA.head_direction(_focus_x, _focus_y - _focus_speed * (float)(millis() - _action_start_time)/1000.));
+
   // Check if Floor Change Retreat
   if (_FLO._is_retreating)
   {
+    // Turn head to the line as if it attracted focus
+    if (_focus_speed > 0)
+      _HEA.turnHead(50);
+    else
+      _HEA.turnHead(-50);
     _FLO.extraDuration(RETREAT_EXTRA_DURATION); // Increase retreat duration because need to reverse speed
     _status ="1";
     // Proceed to step 2 for enacting Floor Change Retreat
@@ -45,9 +51,21 @@ void Swipe::ongoing()
     _action_end_time = _FLO._retreat_end_time + TURN_SPOT_ENDING_DELAY;
     _step = INTERACTION_TERMINATE;
   }
+  // If no floor change, check for impact
+  else if ((_IMU.get_impact_leftwards() > 0) && (_focus_speed >= 0) || (_IMU.get_impact_rightwards() > 0) && (_focus_speed < 0))
+  {
+    // Turn head to the impact side
+    if (_focus_speed > 0)
+      _HEA.turnHead(90);
+    else
+      _HEA.turnHead(-90);
+    _duration1 = millis() - _action_start_time;
+    _FLO._OWM.stopMotion();
+    _step = INTERACTION_TERMINATE;
+    _action_end_time = 0;
+  }
   // If no floor change, check whether duration has elapsed or impact
-  else if ((_action_end_time < millis()) || (_IMU.get_impact_leftwards() > 0) && (_focus_speed >= 0)
-                                         || (_IMU.get_impact_rightwards() > 0) && (_focus_speed < 0))
+  else if (_action_end_time < millis())
   {
     if (!_HEA._is_enacting_head_alignment)
       _HEA.beginEchoAlignment();  // Force HEA

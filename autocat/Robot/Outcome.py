@@ -1,10 +1,9 @@
-import json
+# import json
 import math
 import numpy as np
 import colorsys
 from playsound import playsound
 from pyrr import Quaternion
-# from .Color import category_color
 from .RobotDefine import RETREAT_DISTANCE, RETREAT_DISTANCE_Y, ROBOT_HEAD_X
 from ..Memory.EgocentricMemory.Experience import FLOOR_COLORS
 
@@ -65,9 +64,9 @@ def category_color(color_sensor):
 
 class Outcome:
     """The class thant contains the outcome recieved from the robot"""
-    def __init__(self, outcome_string):
+    def __init__(self, outcome_dict):
 
-        outcome_dict = json.loads(outcome_string)
+        # outcome_dict = json.loads(outcome_string)
         self.action_code = outcome_dict['action']
         self.clock = outcome_dict['clock']
         self.duration1 = outcome_dict['duration1']
