@@ -4,7 +4,7 @@ from pyrr import matrix44, Quaternion
 from playsound import playsound
 from ..Decider.Action import ACTION_FORWARD, ACTION_BACKWARD, ACTION_SWIPE, ACTION_RIGHTWARD, \
     ACTION_TURN, ACTION_TURN_RIGHT, ACTION_SCAN, ACTION_WATCH
-from ..Memory.Memory import SIMULATION_STEP_ON, SIMULATION_TIME_RATIO
+from ..Memory.Memory import SIMULATION_TIME_RATIO
 from .RobotDefine import DEFAULT_YAW, TURN_DURATION, ROBOT_FRONT_X, ROBOT_FRONT_Y
 from .Command import Command
 
@@ -33,7 +33,6 @@ class Enaction:
         # The simulation of the enaction in memory
         self.simulation_duration = 0
         self.simulation_rotation_speed = 0
-        self.simulation_step = 0
         self.simulation_time = 0.
 
         # The outcome
@@ -60,7 +59,7 @@ class Enaction:
         self.command = Command(self.action, self.clock, self.prompt_point, self.focus_point)
 
         # Initialize the simulation of the intended interaction
-        self.simulation_step = SIMULATION_STEP_ON
+        # self.simulation_step = SIMULATION_STEP_ON
         # Compute the duration and the speed depending and the enaction
         self.simulation_duration = self.action.target_duration
         self.simulation_rotation_speed = self.action.rotation_speed_rad

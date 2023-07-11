@@ -14,8 +14,8 @@ GRID_WIDTH = 100   # Number of cells wide
 GRID_HEIGHT = 200  # Number of cells high
 NEAR_HOME = 300    # (mm) Max distance to consider near home
 SIMULATION_TIME_RATIO = 1  # 0.5   # The simulation speed is slower than the real speed because ...
-SIMULATION_STEP_OFF = 0
-SIMULATION_STEP_ON = 1  # More step will be used to take wifi transmission time into account
+# SIMULATION_STEP_OFF = 0
+# SIMULATION_STEP_ON = 1  # More step will be used to take wifi transmission time into account
 
 
 class Memory:
@@ -130,23 +130,27 @@ class Memory:
         else:
             return False
 
-    def simulate(self, intended_enaction, dt):
+    def simulate(self, enaction, dt):
         """Simulate the enaction in memory. Return True during the simulation, and False when it ends"""
-        # Check the target time
-        intended_enaction.simulation_time += dt
-        if intended_enaction.simulation_time > intended_enaction.simulation_duration:
-            intended_enaction.simulation_time = 0.
-            intended_enaction.simulation_step = SIMULATION_STEP_OFF
-            return False
 
-        # Simulate the displacement in egocentric memory
+        # Check the target time
+        ongoing_simulation = True
+        enaction.simulation_time += dt
+        if enaction.simulation_time >= enaction.simulation_duration:
+            dt += enaction.simulation_duration - enaction.simulation_time  # Adjust to the exact duration
+            ongoing_simulation = False
+
+        # The intermediate displacement
+        yaw_quaternion = Quaternion.from_z_rotation((enaction.simulation_rotation_speed * dt))
         way = 1
-        if intended_enaction.action.action_code == ACTION_SWIPE and intended_enaction.command.speed is not None and intended_enaction.command.speed < 0:
+        if enaction.action.action_code == ACTION_SWIPE and enaction.command.speed is not None and enaction.command.speed < 0:
             way = -1
-        translation_matrix = matrix44.create_from_translation(-intended_enaction.action.translation_speed * dt *
-                                                              SIMULATION_TIME_RATIO * way)
-        rotation_matrix = matrix44.create_from_z_rotation(intended_enaction.simulation_rotation_speed * dt)
-        displacement_matrix = matrix44.multiply(rotation_matrix, translation_matrix)
+        translation = enaction.action.translation_speed * dt * SIMULATION_TIME_RATIO * way
+        yaw_matrix = matrix44.create_from_inverse_of_quaternion(yaw_quaternion)
+        translation_matrix = matrix44.create_from_translation(-translation)
+        displacement_matrix = matrix44.multiply(yaw_matrix, translation_matrix)
+
+        # Simulate the displacement of experiences
         for experience in self.egocentric_memory.experiences.values():
             experience.displace(displacement_matrix)
         # Simulate the displacement of the focus and prompt
@@ -157,11 +161,10 @@ class Memory:
             self.egocentric_memory.prompt_point = matrix44.apply_to_vector(displacement_matrix,
                                                                              self.egocentric_memory.prompt_point)
         # Displacement in body memory
-        self.body_memory.body_quaternion = self.body_memory.body_quaternion.cross(
-             Quaternion.from_z_rotation((intended_enaction.simulation_rotation_speed * dt)))
+        self.body_memory.body_quaternion = self.body_memory.body_quaternion.cross(yaw_quaternion)
 
         # Update allocentric memory
-        self.allocentric_memory.robot_point += quaternion.apply_to_vector(self.body_memory.body_quaternion,
-                                            intended_enaction.action.translation_speed * dt * SIMULATION_TIME_RATIO)
-        self.allocentric_memory.place_robot(self.body_memory, intended_enaction.clock)
-        return True
+        self.allocentric_memory.robot_point += quaternion.apply_to_vector(self.body_memory.body_quaternion, translation)
+        self.allocentric_memory.place_robot(self.body_memory, enaction.clock)
+
+        return ongoing_simulation

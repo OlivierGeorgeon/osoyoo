@@ -104,9 +104,8 @@ class CtrlBodyView:
         self.view.label_clock.text = "Next Clock: " + str(self.workspace.clock) \
                                      + ", Decider: " + self.workspace.decider_mode \
                                      + ", Engagement: " + self.workspace.engagement_mode
-        if self.workspace.interaction_step == INTERACTION_STEP_REFRESHING:
+        if self.workspace.interaction_step == INTERACTION_STEP_REFRESHING and self.workspace.enaction.outcome is not None:
             self.view.label.text = self.body_label_azimuth(self.workspace.enaction)
-            # self.view.label_enaction.text = self.workspace.enacted_enaction.body_label()
             self.view.label_enaction.text = self.body_label(self.workspace.enaction.action)
             self.update_body_view()
 

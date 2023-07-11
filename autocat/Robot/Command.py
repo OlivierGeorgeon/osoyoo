@@ -1,6 +1,7 @@
 import json
 import math
 import numpy as np
+from pyrr import Quaternion, matrix44
 from ..Decider.Action import ACTION_FORWARD, ACTION_BACKWARD, ACTION_SWIPE, ACTION_RIGHTWARD, \
     ACTION_TURN, ACTION_TURN_RIGHT, ACTION_TURN_HEAD, ACTION_WATCH
 from .RobotDefine import DEFAULT_YAW
@@ -22,7 +23,7 @@ class Command:
         if prompt_point is not None:
             if self.action.action_code in [ACTION_FORWARD, ACTION_BACKWARD]:
                 self.duration = int(np.linalg.norm(prompt_point) / math.fabs(self.action.translation_speed[0]) * 1000)
-            if self.action.action_code in [ACTION_SWIPE]:  # ACTION_RIGHTWARD
+            if self.action.action_code in [ACTION_SWIPE]:
                 self.duration = int(np.linalg.norm(prompt_point) / math.fabs(self.action.translation_speed[1]) * 1000)
                 if prompt_point[1] < 0:
                     self.speed = -int(self.action.translation_speed[1])  # Negative speed makes swipe right
@@ -53,6 +54,24 @@ class Command:
             #         self.speed = -int(self.action.translation_speed[1])  # Negative speed makes swipe right
             # if self.action.action_code == ACTION_RIGHTWARD:
             #     self.speed = int(self.action.translation_speed[1])
+
+        # The anticipated displacement
+        if self.duration is None:
+            if self.speed is None or self.speed > 0:
+                self.anticipated_translation = action.translation_speed * action.target_duration
+            else:
+                self.anticipated_translation = - action.translation_speed * action.target_duration
+        else:
+            self.anticipated_translation = action.translation_speed * self.duration / 1000
+
+        if self.angle is None:
+            self.anticipated_yaw_quaternion = Quaternion.from_z_rotation(action.rotation_speed_rad * action.target_duration)
+        else:
+            self.anticipated_yaw_quaternion = Quaternion.from_z_rotation(self.angle)
+
+        self.anticipated_yaw_matrix = matrix44.create_from_inverse_of_quaternion(self.anticipated_yaw_quaternion)
+        self.anticipated_displacement_matrix = matrix44.multiply(matrix44.create_from_translation(-self.anticipated_translation),
+                                                     self.anticipated_yaw_matrix)
 
     def serialize(self):
         """Return the command string to send to the robot"""

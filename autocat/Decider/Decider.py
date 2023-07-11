@@ -86,10 +86,8 @@ class Decider:
             self.procedural_memory.append(composite_interaction)
 
         # Selecting the next action to enact
-        self.action = self.workspace.actions[ACTION_SCAN]  # Good for circling around object behavior
-        # proclivity_dict = {}  # dict.fromkeys(ACTION_LIST, 0)
-        # proclivity_dict = {ACTION_FORWARD: 0, ACTION_TURN_LEFT: 0, ACTION_TURN_RIGHT: 0} good for exploring terrain
-        proclivity_dict = {self.workspace.actions[ACTION_FORWARD]: 0}  # Good for touring terrain
+        # Initialize with the first action to select by default
+        proclivity_dict = {self.workspace.actions[ACTION_SCAN]: 0}
         if self.procedural_memory:
             activated_interactions = [ci for ci in self.procedural_memory if ci.pre_interaction == self.last_interaction]
             for ai in activated_interactions:

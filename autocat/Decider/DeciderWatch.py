@@ -3,13 +3,12 @@
 # Activation 4: default.
 ########################################################################################
 
-import math
 import numpy as np
 from . Action import ACTION_WATCH, ACTION_TURN, ACTION_SWIPE, ACTION_FORWARD
-from . Interaction import Interaction, OUTCOME_NO_FOCUS
-from . PredefinedInteractions import OUTCOME_FOCUS_TOO_FAR, OUTCOME_LOST_FOCUS, OUTCOME_FOCUS_SIDE, OUTCOME_FOCUS_FRONT
+from . Interaction import Interaction
+from . PredefinedInteractions import OUTCOME_FOCUS_TOO_FAR, OUTCOME_FOCUS_FRONT
 from ..Robot.Enaction import Enaction
-from . Decider import Decider, FOCUS_TOO_FAR_DISTANCE, FOCUS_SIDE_ANGLE
+from . Decider import Decider
 
 
 class DeciderWatch(Decider):
@@ -28,30 +27,30 @@ class DeciderWatch(Decider):
         """The level of activation of this decider: 0: default, 2 if the terrain has an origin """
         return 4
 
-    def outcome2(self, enacted_enaction):
-        """ Convert the enacted interaction into an outcome adapted to the watch behavior """
-
-        outcome = OUTCOME_NO_FOCUS
-
-        # On startup
-        if enacted_enaction is None:
-            return outcome
-
-        if enacted_enaction.focus_point is None:
-            # If there is no focus then consider it was lost and trigger scan
-            outcome = OUTCOME_LOST_FOCUS
-        else:
-            if np.linalg.norm(enacted_enaction.focus_point) > FOCUS_TOO_FAR_DISTANCE:
-                outcome = OUTCOME_FOCUS_TOO_FAR
-            else:
-                angle = math.atan2(enacted_enaction.focus_point[1], enacted_enaction.focus_point[0])
-                if math.fabs(angle) < FOCUS_SIDE_ANGLE:
-                    outcome = OUTCOME_FOCUS_FRONT
-                else:
-                    outcome = OUTCOME_FOCUS_SIDE
-
-        # DEFAULT when focused on object in near front
-        return outcome
+    # def outcome(self, enacted_enaction):
+    #     """ Convert the enacted interaction into an outcome adapted to the watch behavior """
+    #
+    #     outcome = OUTCOME_NO_FOCUS
+    #
+    #     # On startup
+    #     if enacted_enaction is None:
+    #         return outcome
+    #
+    #     if enacted_enaction.focus_point is None:
+    #         # If there is no focus then consider it was lost and trigger scan
+    #         outcome = OUTCOME_LOST_FOCUS
+    #     else:
+    #         if np.linalg.norm(enacted_enaction.focus_point) > FOCUS_TOO_FAR_DISTANCE:
+    #             outcome = OUTCOME_FOCUS_TOO_FAR
+    #         else:
+    #             angle = math.atan2(enacted_enaction.focus_point[1], enacted_enaction.focus_point[0])
+    #             if math.fabs(angle) < FOCUS_SIDE_ANGLE:
+    #                 outcome = OUTCOME_FOCUS_FRONT
+    #             else:
+    #                 outcome = OUTCOME_FOCUS_SIDE
+    #
+    #     # DEFAULT when focused on object in near front
+    #     return outcome
 
     def select_enaction(self, outcome):
         """Return the next intended interaction"""
