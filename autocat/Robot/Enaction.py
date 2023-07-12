@@ -2,8 +2,8 @@ import math
 import numpy as np
 from pyrr import matrix44, Quaternion
 from playsound import playsound
-from ..Decider.Action import ACTION_FORWARD, ACTION_BACKWARD, ACTION_SWIPE, ACTION_RIGHTWARD, \
-    ACTION_TURN, ACTION_TURN_RIGHT, ACTION_SCAN, ACTION_WATCH
+from ..Decider.Action import ACTION_FORWARD, ACTION_BACKWARD, ACTION_SWIPE, ACTION_RIGHTWARD,  ACTION_TURN, \
+    ACTION_SCAN, ACTION_WATCH
 from ..Memory.Memory import SIMULATION_TIME_RATIO
 from .RobotDefine import DEFAULT_YAW, TURN_DURATION, ROBOT_FRONT_X, ROBOT_FRONT_Y
 from .Command import Command
@@ -43,23 +43,22 @@ class Enaction:
         self.yaw_matrix = None  # Used by bodyView to rotate compass points
         self.displacement_matrix = None  # Used by EgocentricMemory to rotate experiences
 
-    def adjust_and_begin(self, memory):
+    def begin(self):
         """Adjust the spatial modifiers of the enaction.
         Compute the command to send to the robot.
         Initialize the simulation"""
 
-        # Initialize the spatial modifiers
-        self.body_quaternion = memory.body_memory.body_quaternion.copy()
-        if memory.egocentric_memory.prompt_point is not None:
-            self.prompt_point = memory.egocentric_memory.prompt_point.copy()
-        if memory.egocentric_memory.focus_point is not None:
-            self.focus_point = memory.egocentric_memory.focus_point.copy()
+        # Initialize the spatial modifiers # Done before begining the interaction
+        # self.body_quaternion = memory.body_memory.body_quaternion.copy()
+        # if memory.egocentric_memory.prompt_point is not None:
+        #     self.prompt_point = memory.egocentric_memory.prompt_point.copy()
+        # if memory.egocentric_memory.focus_point is not None:
+        #     self.focus_point = memory.egocentric_memory.focus_point.copy()
 
         # Generate the command to send to the robot
         self.command = Command(self.action, self.clock, self.prompt_point, self.focus_point)
 
         # Initialize the simulation of the intended interaction
-        # self.simulation_step = SIMULATION_STEP_ON
         # Compute the duration and the speed depending and the enaction
         self.simulation_duration = self.action.target_duration
         self.simulation_rotation_speed = self.action.rotation_speed_rad
@@ -150,13 +149,15 @@ class Enaction:
                             if self.action.action_code in [ACTION_FORWARD, ACTION_BACKWARD]:
                                 self.translation[0] = self.translation[0] + prediction_error_focus[0]
                                 # Correct the estimated speed of the action
-                                self.action.adjust_translation_speed(self.translation)
+                                if self.command.duration is None:
+                                    self.action.adjust_translation_speed(self.translation)
                         # If the head is sideways then correct lateral displacements
                         if self.outcome.head_angle < -60 or 60 < self.outcome.head_angle:
                             if self.action.action_code in [ACTION_SWIPE, ACTION_RIGHTWARD]:
                                 self.translation[1] = self.translation[1] + prediction_error_focus[1]
                                 # Correct the estimated speed of the action
-                                self.action.adjust_translation_speed(self.translation)
+                                if self.command.duration is None:
+                                    self.action.adjust_translation_speed(self.translation)
                         # Update the displacement matrix according to the new translation
                         translation_matrix = matrix44.create_from_translation(-self.translation)
                         self.displacement_matrix = matrix44.multiply(translation_matrix, self.yaw_matrix)

@@ -14,20 +14,20 @@ class BodyMemory:
         self.compass_offset = np.array(ROBOT_SETTINGS[robot_id]["compass_offset"], dtype=int)
 
     def set_head_direction_degree(self, head_direction_degree: int):
-        """Set the head direction from degree measured relative to x axis [-90,90]"""
+        """Set the head direction from degree measured relative to the robot [-90,90]"""
         assert(-90 <= head_direction_degree <= 90)
         self.head_direction_rad = math.radians(head_direction_degree)
 
     def head_direction_degree(self):
-        """Return the robot's head direction in degrees [-90,90]"""
-        return int(math.degrees(self.head_direction_rad))
+        """Return the robot's head direction relative to the robot in degrees [-90,90]"""
+        return round(math.degrees(self.head_direction_rad))
 
     def body_azimuth(self):
         """Return the azimuth in degree relative to north [0,360["""
         return round((90 - math.degrees(self.get_body_direction_rad())) % 360)
 
     def get_body_direction_rad(self):
-        """Return the body direction ind rad ]-pi,pi]"""
+        """Return the body direction in rad in polar-egocentric reference"""
         # The Z component of the rotation axis gives the sign of the angle
         self.body_quaternion.normalize()  # Test if it prevents NaN sometimes
         return self.body_quaternion.axis[2] * self.body_quaternion.angle
@@ -39,10 +39,11 @@ class BodyMemory:
         return matrix44.create_from_inverse_of_quaternion(self.body_quaternion)
 
     def head_absolute_direction(self):
+        """The head's direction in polar-egocentric reference"""
         return self.get_body_direction_rad() + self.head_direction_rad
 
     def outline(self):
-        """The rectangle occupied by the robot's body - North up"""
+        """The rectangle occupied by the robot's body in polar-egocentric reference"""
         p1 = self.body_quaternion * Vector3([ROBOT_FRONT_X, ROBOT_SIDE, 0])
         p2 = self.body_quaternion * Vector3([-ROBOT_FRONT_X, ROBOT_SIDE, 0])
         p3 = self.body_quaternion * Vector3([-ROBOT_FRONT_X, -ROBOT_SIDE, 0])

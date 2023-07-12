@@ -1,16 +1,18 @@
 import json
 import numpy as np
+from pyrr import quaternion
 from playsound import playsound
 from .Decider.DeciderCircle import DeciderCircle
 from .Decider.DeciderExplore import DeciderExplore
 from .Decider.DeciderWatch import DeciderWatch
 from .Decider.Action import create_actions, ACTION_FORWARD, ACTIONS, ACTION_TURN
-from .Memory.Memory import Memory  #, SIMULATION_STEP_OFF
+from .Memory.Memory import Memory
 from .Integrator.Integrator import Integrator
 from .Robot.Enaction import Enaction
 from .Robot.CtrlRobot import INTERACTION_STEP_IDLE, INTERACTION_STEP_INTENDING, INTERACTION_STEP_ENACTING, \
     INTERACTION_STEP_INTEGRATING, INTERACTION_STEP_REFRESHING
 from .Robot.RobotDefine import ROBOT_FRONT_X
+from .Enaction.SpatialModifier import SpatialModifier
 
 KEY_DECIDER_CIRCLE = "A"  # Automatic mode: controlled by the deciders
 KEY_DECIDER_USER = "M"  # Manual mode : controlled by the user
@@ -56,7 +58,6 @@ class Workspace:
         # REFRESHING: last only one cycle
         if self.interaction_step == INTERACTION_STEP_REFRESHING:
             self.interaction_step = INTERACTION_STEP_IDLE
-            print("Answer", self.answer_message())
 
         # IDLE: Ready to choose the next intended interaction
         if self.interaction_step == INTERACTION_STEP_IDLE:
@@ -89,8 +90,15 @@ class Workspace:
             if self.clock in self.enactions:
                 # Take the next enaction from the stack
                 self.enaction = self.enactions[self.clock]
-                print("Prompt", self.memory.egocentric_memory.prompt_point)
-                self.enaction.adjust_and_begin(self.memory)
+                # Adjust the spatial modifiers
+                self.enaction.body_quaternion = self.memory.body_memory.body_quaternion.copy()
+                if self.memory.egocentric_memory.prompt_point is not None:
+                    self.enaction.prompt_point = self.memory.egocentric_memory.prompt_point.copy()
+                if self.memory.egocentric_memory.focus_point is not None:
+                    self.enaction.focus_point = self.memory.egocentric_memory.focus_point.copy()
+                # self.enaction.adjust_and_begin(self.memory)
+                self.enaction.begin()
+                print("Emit", self.emit_message())
                 if self.is_imagining:
                     # If imagining then proceed to simulating the enaction
                     self.interaction_step = INTERACTION_STEP_ENACTING
@@ -103,10 +111,7 @@ class Workspace:
 
         # ENACTING: update body memory during the robot enaction or the imaginary simulation
         if self.interaction_step == INTERACTION_STEP_ENACTING:
-            # if self.enaction.simulation_step != SIMULATION_STEP_OFF:
-                # self.intended_enaction.simulate(self.memory, dt)
             if not self.memory.simulate(self.enaction, dt):
-                # else:
                 # End of the simulation
                 if self.is_imagining:
                     # Skip INTEGRATING for now
@@ -119,7 +124,6 @@ class Workspace:
             # Restore the memory from the snapshot and integrate the experiences
             self.memory = self.memory_snapshot
             # Update body memory and egocentric memory
-            # self.memory.update_and_add_experiences(self.enacted_enaction)
             self.memory.update_and_add_experiences(self.enaction)
 
             # Call the integrator to create and update the phenomena
@@ -130,7 +134,6 @@ class Workspace:
             self.memory.update_allocentric(self.clock)
 
             # Increment the clock if the enacted interaction was properly received
-            # if self.enacted_enaction.clock >= self.clock:  # don't increment if the robot is behind
             if self.enaction.clock >= self.clock:  # don't increment if the robot is behind
                 # Remove the enaction from the stack (ok if it has already been removed)
                 self.enactions.pop(self.clock, None)
@@ -161,13 +164,24 @@ class Workspace:
             playsound('autocat/Assets/R3.wav', False)
             self.enactions = {}
 
-    def answer_message(self):
+    def emit_message(self):
         """Return the message to answer to another robot"""
         message = {"azimuth": self.memory.body_memory.body_azimuth()}
-        # Return the position of the focus + robot radius in absolute direction
-        p = self.memory.egocentric_to_polar_egocentric(self.memory.egocentric_memory.focus_point)
-        if p is not None:
-            p = p * (np.linalg.norm(p) + ROBOT_FRONT_X / 2) / np.linalg.norm(p)
-            message['x_pos'] = round(p[0])
-            message['y_pos'] = round(p[1])
-        return json.dumps(message)
+
+        # If focus then send polar-egocentric information
+        focus_point = self.memory.egocentric_to_polar_egocentric(self.enaction.focus_point)
+        if focus_point is not None:
+            # The position of the focus
+            # p = p * (np.linalg.norm(p) + ROBOT_FRONT_X / 2) / np.linalg.norm(p)
+            # p = Vector3(p)
+            # p = p.normalize() * (p.length() + ROBOT_FRONT_X / 2)
+            message['focus_x'] = round(focus_point[0])
+            message['focus_y'] = round(focus_point[1])
+
+            # The destination position in polar-egocentric
+            destination_point = quaternion.apply_to_vector(self.enaction.body_quaternion,
+                                                           self.enaction.command.anticipated_translation)
+            message['destination_x'] = round(destination_point[0])
+            message['destination_y'] = round(destination_point[1])
+
+            return json.dumps(message)

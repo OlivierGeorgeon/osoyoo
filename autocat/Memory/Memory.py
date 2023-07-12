@@ -7,15 +7,12 @@ from .BodyMemory import BodyMemory
 from .PhenomenonMemory.PhenomenonMemory import PhenomenonMemory, TER
 from .AllocentricMemory.Hexagonal_geometry import CELL_RADIUS
 from ..Decider.Action import ACTION_SWIPE
-# from ..Utils import rotate_vector_z
 
 
 GRID_WIDTH = 100   # Number of cells wide
 GRID_HEIGHT = 200  # Number of cells high
 NEAR_HOME = 300    # (mm) Max distance to consider near home
 SIMULATION_TIME_RATIO = 1  # 0.5   # The simulation speed is slower than the real speed because ...
-# SIMULATION_STEP_OFF = 0
-# SIMULATION_STEP_ON = 1  # More step will be used to take wifi transmission time into account
 
 
 class Memory:
@@ -88,7 +85,6 @@ class Memory:
         if point is None:
             return None
         return quaternion.apply_to_vector(self.body_memory.body_quaternion, point)
-        # return matrix44.apply_to_vector(self.body_memory.body_direction_matrix(), point)
 
     def egocentric_to_allocentric(self, point):
         """Return the point in allocentric coordinates from the point in egocentric coordinates"""
@@ -146,7 +142,7 @@ class Memory:
         if enaction.action.action_code == ACTION_SWIPE and enaction.command.speed is not None and enaction.command.speed < 0:
             way = -1
         translation = enaction.action.translation_speed * dt * SIMULATION_TIME_RATIO * way
-        yaw_matrix = matrix44.create_from_inverse_of_quaternion(yaw_quaternion)
+        yaw_matrix = matrix44.create_from_quaternion(yaw_quaternion)
         translation_matrix = matrix44.create_from_translation(-translation)
         displacement_matrix = matrix44.multiply(yaw_matrix, translation_matrix)
 
@@ -156,10 +152,10 @@ class Memory:
         # Simulate the displacement of the focus and prompt
         if self.egocentric_memory.focus_point is not None:
             self.egocentric_memory.focus_point = matrix44.apply_to_vector(displacement_matrix,
-                                                                            self.egocentric_memory.focus_point)
+                                                                          self.egocentric_memory.focus_point)
         if self.egocentric_memory.prompt_point is not None:
             self.egocentric_memory.prompt_point = matrix44.apply_to_vector(displacement_matrix,
-                                                                             self.egocentric_memory.prompt_point)
+                                                                           self.egocentric_memory.prompt_point)
         # Displacement in body memory
         self.body_memory.body_quaternion = self.body_memory.body_quaternion.cross(yaw_quaternion)
 
