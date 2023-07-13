@@ -31,6 +31,7 @@ class Enaction:
         self.command = None
 
         # The simulation of the enaction in memory
+        self.is_simulating = False
         self.simulation_duration = 0
         self.simulation_rotation_speed = 0
         self.simulation_time = 0.
@@ -70,6 +71,7 @@ class Enaction:
                 self.simulation_rotation_speed = -self.action.rotation_speed_rad
         self.simulation_duration *= SIMULATION_TIME_RATIO
         self.simulation_rotation_speed *= SIMULATION_TIME_RATIO
+        self.is_simulating = True
 
     def terminate(self, outcome):
         """Computes the azimuth, the yaw, and the displacement. Follow up the focus and the prompt."""

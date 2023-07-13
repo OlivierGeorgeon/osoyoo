@@ -81,7 +81,7 @@ class Memory:
         self.allocentric_memory.update_prompt(allo_prompt, clock)
 
     def egocentric_to_polar_egocentric(self, point):
-        """Return the position of the point relative to the robot in absolute polar direction"""
+        """Convert the position of a point from egocentric to polar-egocentric reference reference"""
         if point is None:
             return None
         return quaternion.apply_to_vector(self.body_memory.body_quaternion, point)
@@ -91,8 +91,13 @@ class Memory:
         # Rotate the point by the body direction and add the body position
         if point is None:
             return None
-        return matrix44.apply_to_vector(self.body_memory.body_direction_matrix(), point) \
-            + self.allocentric_memory.robot_point
+        return self.egocentric_to_polar_egocentric(point) + self.allocentric_memory.robot_point
+        # return matrix44.apply_to_vector(self.body_memory.body_direction_matrix(), point) \
+        #     + self.allocentric_memory.robot_point
+
+    def polar_egocentric_to_egocentric(self, point):
+        """Convert from polar-egocentric to egocentric references"""
+        return matrix44.apply_to_vector(self.body_memory.body_direction_matrix().T, point)
 
     def allocentric_to_egocentric(self, point):
         """Return the point in egocentric coordinates from the point in allocentric coordinates"""
@@ -129,12 +134,15 @@ class Memory:
     def simulate(self, enaction, dt):
         """Simulate the enaction in memory. Return True during the simulation, and False when it ends"""
 
+        if not enaction.is_simulating:
+            # The simulation has finished
+            return False
+
         # Check the target time
-        ongoing_simulation = True
         enaction.simulation_time += dt
         if enaction.simulation_time >= enaction.simulation_duration:
             dt += enaction.simulation_duration - enaction.simulation_time  # Adjust to the exact duration
-            ongoing_simulation = False
+            enaction.is_simulating = False
 
         # The intermediate displacement
         yaw_quaternion = Quaternion.from_z_rotation((enaction.simulation_rotation_speed * dt))
@@ -163,4 +171,4 @@ class Memory:
         self.allocentric_memory.robot_point += quaternion.apply_to_vector(self.body_memory.body_quaternion, translation)
         self.allocentric_memory.place_robot(self.body_memory, enaction.clock)
 
-        return ongoing_simulation
+        return enaction.is_simulating

@@ -19,7 +19,7 @@
 
 import sys
 import pyglet
-from autocat import Workspace, Flock, CtrlRobot, CtrlEgocentricView, CtrlAllocentricView, CtrlBodyView, CtrlPhenomenonView
+from autocat import Flock, Workspace, CtrlRobot, CtrlEgocentricView, CtrlAllocentricView, CtrlBodyView, CtrlPhenomenonView
 from playsound import playsound
 
 if len(sys.argv) < 3:  # Argument 0 is "main.py" when launched in -m mode
@@ -27,40 +27,38 @@ if len(sys.argv) < 3:  # Argument 0 is "main.py" when launched in -m mode
     exit()
 
 # Create the flock of robots
-workspaces = {}
-ctrl_robots = {}
-ctrl_egocentric_views = {}
-for i in range(2, len(sys.argv)):
-    workspace = Workspace(sys.argv[1], sys.argv[i])
-    workspaces[sys.argv[i]] = workspace
-    ctrl_robots[sys.argv[i]] = CtrlRobot(workspace)
-    ctrl_egocentric_views[sys.argv[i]] = CtrlEgocentricView(workspace)
-    ctrl_egocentric_views[sys.argv[i]].view.set_caption("Robot " + sys.argv[i])
-flock = Flock(workspaces)
+# workspaces = {}
+# ctrl_robots = {}
+# ctrl_egocentric_views = {}
+# for i in range(2, len(sys.argv)):
+#     workspace = Workspace(sys.argv[1], sys.argv[i])
+#     workspaces[sys.argv[i]] = workspace
+#     ctrl_robots[sys.argv[i]] = CtrlRobot(workspace)
+#     ctrl_egocentric_views[sys.argv[i]] = CtrlEgocentricView(workspace)
+#     ctrl_egocentric_views[sys.argv[i]].view.set_caption("Robot " + sys.argv[i])
+#
+# # Create the views for the first robot
+# ctrl_allocentric_view = CtrlAllocentricView(workspaces[sys.argv[2]])
+# ctrl_body_view = CtrlBodyView(workspaces[sys.argv[2]])
+# ctrl_phenomenon_view = CtrlPhenomenonView(workspaces[sys.argv[2]])
+# workspaces[sys.argv[2]].ctrl_phenomenon_view = ctrl_phenomenon_view
 
-# Create the views for the first robot
-ctrl_allocentric_view = CtrlAllocentricView(workspaces[sys.argv[2]])
-ctrl_body_view = CtrlBodyView(workspaces[sys.argv[2]])
-ctrl_phenomenon_view = CtrlPhenomenonView(workspaces[sys.argv[2]])
-workspaces[sys.argv[2]].ctrl_phenomenon_view = ctrl_phenomenon_view
-
-if len(sys.argv) > 3:
-    ctrl_egocentric_view2 = CtrlEgocentricView(workspaces[sys.argv[3]])
-    ctrl_egocentric_view2.view.set_caption("Robot " + str(sys.argv[3]))
+flock = Flock(sys.argv)
 
 
-def update(dt):
-    """The updates in the main loop"""
-    for robot_id in workspaces.keys():
-        ctrl_robots[robot_id].main(dt)  # Check if outcome received from the robot
-        workspaces[robot_id].main(dt)
-        ctrl_robots[robot_id].main(dt)  # Check if command to send to the robot
-        ctrl_egocentric_views[robot_id].main(dt)
-    ctrl_allocentric_view.main(dt)
-    ctrl_body_view.main(dt)
-    ctrl_phenomenon_view.main(dt)
+# def update(dt):
+#     """The updates in the main loop"""
+#     for robot_id in workspaces.keys():
+#         ctrl_robots[robot_id].main(dt)  # Check if outcome received from the robot
+#         workspaces[robot_id].main(dt)
+#         ctrl_robots[robot_id].main(dt)  # Check if command to send to the robot
+#         ctrl_egocentric_views[robot_id].main(dt)
+#     ctrl_allocentric_view.main(dt)
+#     ctrl_body_view.main(dt)
+#     ctrl_phenomenon_view.main(dt)
 
 
 playsound('autocat/Assets/R5.wav', False)
-pyglet.clock.schedule_interval(update, 0.1)
+# pyglet.clock.schedule_interval(update, 0.1)
+pyglet.clock.schedule_interval(flock.main, 0.1)
 pyglet.app.run()

@@ -1,10 +1,19 @@
 # import json
 
 OUTCOME_NO_FOCUS = '0'
+OUTCOME_LOST_FOCUS = 'L'
+OUTCOME_FOCUS_TOO_CLOSE = 'TC'  # Go backward
+OUTCOME_FOCUS_FRONT = 'F'  # Swipe or Watch
+OUTCOME_FOCUS_SIDE = 'S'  # Turn
+OUTCOME_FOCUS_FAR = 'FA'  # Go forward
+OUTCOME_FOCUS_TOO_FAR = 'TF'  # U-Turn
+OUTCOME_LIST = [OUTCOME_LOST_FOCUS, OUTCOME_FOCUS_FAR, OUTCOME_FOCUS_TOO_CLOSE, OUTCOME_FOCUS_FRONT,
+                OUTCOME_FOCUS_SIDE, OUTCOME_FOCUS_TOO_FAR]
+OUTCOME_FLOOR = '11'
 
 
 class Interaction:
-    interaction_list = []
+#     interaction_list = []
 
     def __init__(self, action, outcome, valence):
         self.action = action
@@ -25,22 +34,6 @@ class Interaction:
             return (self.action == other.action) and (self.outcome == other.outcome)
         else:
             return False
-
-    @classmethod
-    def create_or_retrieve(cls, action, outcome, valence=None):
-        """ Use this methode to create a new interaction or to retrieve it if it already exists """
-        interaction = Interaction(action, outcome, valence if valence is not None else 0)
-
-        if interaction in cls.interaction_list:
-            i = cls.interaction_list.index(interaction)
-            if valence is not None:
-                cls.interaction_list[i].valence = valence  # Update the valence
-            # print("Retrieving ", cls.interaction_list[i])
-            return cls.interaction_list[i]
-        else:
-            # print("Creating ", interaction)
-            cls.interaction_list.append(interaction)
-            return interaction
 
 
 # Testing Interaction

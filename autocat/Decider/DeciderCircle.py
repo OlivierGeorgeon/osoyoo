@@ -7,6 +7,7 @@ import numpy as np
 from . Action import ACTION_TURN
 from ..Robot.Enaction import Enaction
 from . Decider import Decider, FOCUS_TOO_FAR_DISTANCE
+from . PredefinedInteractions import OUTCOME_FOCUS_TOO_FAR
 
 
 class DeciderCircle(Decider):
@@ -34,8 +35,12 @@ class DeciderCircle(Decider):
         # Set the spatial modifiers
         if self.action.action_code in [ACTION_TURN]:
             # Turn to the direction of the focus
-            self.workspace.memory.egocentric_memory.prompt_point = \
-                self.workspace.memory.egocentric_memory.focus_point.copy()
+            if outcome == OUTCOME_FOCUS_TOO_FAR or self.workspace.memory.egocentric_memory.focus_point is None:
+                # If focus TOO FAR or None then turn around
+                self.workspace.memory.egocentric_memory.prompt_point = np.array([-100, 0, 0], dtype=int)
+            else:
+                self.workspace.memory.egocentric_memory.prompt_point = \
+                    self.workspace.memory.egocentric_memory.focus_point.copy()
         else:
             self.workspace.memory.egocentric_memory.prompt_point = None
 

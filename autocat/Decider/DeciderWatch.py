@@ -3,12 +3,16 @@
 # Activation 4: default.
 ########################################################################################
 
+import json
+import math
+from playsound import playsound
 import numpy as np
+from pyrr import Quaternion, Vector3
 from . Action import ACTION_WATCH, ACTION_TURN, ACTION_SWIPE, ACTION_FORWARD
-from . Interaction import Interaction
-from . PredefinedInteractions import OUTCOME_FOCUS_TOO_FAR, OUTCOME_FOCUS_FRONT
 from ..Robot.Enaction import Enaction
 from . Decider import Decider
+from .. Robot.RobotDefine import ROBOT_FRONT_X
+from . PredefinedInteractions import create_or_retrieve_primitive, OUTCOME_FOCUS_SIDE, OUTCOME_FOCUS_FRONT, OUTCOME_FOCUS_TOO_FAR
 
 
 class DeciderWatch(Decider):
@@ -17,9 +21,9 @@ class DeciderWatch(Decider):
 
         # Give higher valence to Watch than to Swipe
         # TODO handle switching between deciders
-        Interaction.create_or_retrieve(workspace.actions[ACTION_SWIPE], OUTCOME_FOCUS_FRONT, 1)
-        Interaction.create_or_retrieve(workspace.actions[ACTION_FORWARD], OUTCOME_FOCUS_FRONT, 1)
-        Interaction.create_or_retrieve(workspace.actions[ACTION_WATCH], OUTCOME_FOCUS_FRONT, 2)
+        create_or_retrieve_primitive(self.primitive_interactions, workspace.actions[ACTION_SWIPE], OUTCOME_FOCUS_FRONT, 1)
+        create_or_retrieve_primitive(self.primitive_interactions, workspace.actions[ACTION_FORWARD], OUTCOME_FOCUS_FRONT, 1)
+        create_or_retrieve_primitive(self.primitive_interactions, workspace.actions[ACTION_WATCH], OUTCOME_FOCUS_FRONT, 2)
 
         self.action = self.workspace.actions[ACTION_WATCH]
 
@@ -27,30 +31,36 @@ class DeciderWatch(Decider):
         """The level of activation of this decider: 0: default, 2 if the terrain has an origin """
         return 4
 
-    # def outcome(self, enacted_enaction):
-    #     """ Convert the enacted interaction into an outcome adapted to the watch behavior """
-    #
-    #     outcome = OUTCOME_NO_FOCUS
-    #
-    #     # On startup
-    #     if enacted_enaction is None:
-    #         return outcome
-    #
-    #     if enacted_enaction.focus_point is None:
-    #         # If there is no focus then consider it was lost and trigger scan
-    #         outcome = OUTCOME_LOST_FOCUS
-    #     else:
-    #         if np.linalg.norm(enacted_enaction.focus_point) > FOCUS_TOO_FAR_DISTANCE:
-    #             outcome = OUTCOME_FOCUS_TOO_FAR
-    #         else:
-    #             angle = math.atan2(enacted_enaction.focus_point[1], enacted_enaction.focus_point[0])
-    #             if math.fabs(angle) < FOCUS_SIDE_ANGLE:
-    #                 outcome = OUTCOME_FOCUS_FRONT
-    #             else:
-    #                 outcome = OUTCOME_FOCUS_SIDE
-    #
-    #     # DEFAULT when focused on object in near front
-    #     return outcome
+    def outcome(self, enaction):
+        """ Convert the enacted interaction into an outcome adapted to the watch behavior """
+
+        outcome = super().outcome(enaction)
+
+        # If a message was received
+        if self.workspace.message is not None:
+            print("Message", self.workspace.message)
+            message_dict = json.loads(self.workspace.message)
+            # other_body_quaternion = Quaternion.from_z_rotation(math.radians(90 - message_dict["azimuth"]))
+            # if other_body_quaternion.angle > math.pi:
+            #     other_body_quaternion = -other_body_quaternion
+            focus_point = Vector3([message_dict["focus_x"], message_dict["focus_y"], 0])
+            other_body_position = -focus_point * (1 + ROBOT_FRONT_X / focus_point.length)
+            other_destination = other_body_position + Vector3([message_dict["destination_x"], message_dict["destination_y"], 0])
+
+            other_destination_ego = self.workspace.memory.polar_egocentric_to_egocentric(other_destination)
+            other_angle = math.atan2(other_destination_ego[1], other_destination_ego[0])
+            other_direction_quaternion = Quaternion.from_z_rotation(other_angle)
+            if math.fabs(other_angle) > math.pi / 6:
+                # Focus on the other robot's destination
+                print("Other polar destination point", other_destination)
+                print("Other ego destination point", other_destination_ego)
+                print("Other angle", math.degrees(other_angle))
+                playsound('autocat/Assets/chirp.wav', False)
+                self.workspace.memory.egocentric_memory.focus_point = other_destination_ego
+                outcome = OUTCOME_FOCUS_SIDE
+            self.workspace.message = None  # Delete the message
+
+        return outcome
 
     def select_enaction(self, outcome):
         """Return the next intended interaction"""

@@ -3,7 +3,7 @@ from . Interaction import Interaction
 
 
 class CompositeInteraction:
-    composite_interaction_list = []
+    # composite_interaction_list = []
 
     def __init__(self, pre_interaction, post_interaction):
         self.pre_interaction = pre_interaction
@@ -29,34 +29,34 @@ class CompositeInteraction:
         else:
             return False
 
-    @classmethod
-    def create_or_retrieve(cls, pre_interaction, post_interaction):
-        interaction = CompositeInteraction(pre_interaction, post_interaction)
-
-        if interaction in cls.composite_interaction_list:
-            i = cls.composite_interaction_list.index(interaction)
-            # print("Retrieving ", end="")
-            # print(cls.interaction_list[i])
-            return cls.composite_interaction_list[i]
-        else:
-            # print("Creating ", end="")
-            # print(interaction)
-            cls.composite_interaction_list.append(interaction)
-            return interaction
-
-    @classmethod
-    def create_or_reinforce(cls, pre_interaction, post_interaction):
-        interaction = CompositeInteraction(pre_interaction, post_interaction)
-
-        if interaction in cls.composite_interaction_list:
-            i = cls.composite_interaction_list.index(interaction)
-            print("reinforcing:", cls.composite_interaction_list[i].__str__())
-            cls.composite_interaction_list[i].weight += 1
-            return cls.composite_interaction_list[i]
-        else:
-            print("Learning:", interaction.__str__())
-            cls.composite_interaction_list.append(interaction)
-            return interaction
+    # @classmethod
+    # def create_or_retrieve(cls, pre_interaction, post_interaction):
+    #     interaction = CompositeInteraction(pre_interaction, post_interaction)
+    #
+    #     if interaction in cls.composite_interaction_list:
+    #         i = cls.composite_interaction_list.index(interaction)
+    #         # print("Retrieving ", end="")
+    #         # print(cls.interaction_list[i])
+    #         return cls.composite_interaction_list[i]
+    #     else:
+    #         # print("Creating ", end="")
+    #         # print(interaction)
+    #         cls.composite_interaction_list.append(interaction)
+    #         return interaction
+    #
+    # @classmethod
+    # def create_or_reinforce(cls, pre_interaction, post_interaction):
+    #     interaction = CompositeInteraction(pre_interaction, post_interaction)
+    #
+    #     if interaction in cls.composite_interaction_list:
+    #         i = cls.composite_interaction_list.index(interaction)
+    #         print("reinforcing:", cls.composite_interaction_list[i].__str__())
+    #         cls.composite_interaction_list[i].weight += 1
+    #         return cls.composite_interaction_list[i]
+    #     else:
+    #         print("Learning:", interaction.__str__())
+    #         cls.composite_interaction_list.append(interaction)
+    #         return interaction
 
 
 # Testing CompositeInteraction

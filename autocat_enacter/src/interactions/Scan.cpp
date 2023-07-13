@@ -87,13 +87,16 @@ void Scan::ongoing()
 
 void Scan::outcome(JSONVar & outcome_object)
 {
-  // _HEA.outcome_scan(outcome_object);
-
   JSONVar echos;
+  bool has_echo = false;
   for (int i = 0; i < _sign_array.size; i++)
   {
     if (_sign_array.distances[i] > 0 and _sign_array.distances[i]< 10000)
+    {
       echos[String(_sign_array.angles[i])] = _sign_array.distances[i];
+      has_echo = true;
+    }
   }
-  outcome_object["echos"] = echos;
+  if (has_echo)
+    outcome_object["echos"] = echos;
 }

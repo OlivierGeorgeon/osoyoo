@@ -1,6 +1,7 @@
 import json
+import math
 import numpy as np
-from pyrr import quaternion
+from pyrr import quaternion, Quaternion, Vector3
 from playsound import playsound
 from .Decider.DeciderCircle import DeciderCircle
 from .Decider.DeciderExplore import DeciderExplore
@@ -31,7 +32,7 @@ class Workspace:
         self.robot_id = robot_id
         self.actions = create_actions(robot_id)
         self.memory = Memory(robot_id)
-        if self.robot_id == '3':
+        if self.robot_id == '1':
             self.deciders = {'Explore': DeciderExplore(self), 'Circle': DeciderCircle(self), 'Watch': DeciderWatch(self)}
         else:
             self.deciders = {'Explore': DeciderExplore(self), 'Circle': DeciderCircle(self)}
@@ -48,9 +49,13 @@ class Workspace:
         # Controls which phenomenon to display
         self.ctrl_phenomenon_view = None
 
+        # Control the enaction
         self.clock = 0
         self.memory_snapshot = None
         self.is_imagining = False
+
+        # Message from other robot
+        self.message = None
 
     def main(self, dt):
         """The main handler of the interaction cycle:
@@ -98,7 +103,7 @@ class Workspace:
                     self.enaction.focus_point = self.memory.egocentric_memory.focus_point.copy()
                 # self.enaction.adjust_and_begin(self.memory)
                 self.enaction.begin()
-                print("Emit", self.emit_message())
+                # print("Emit", self.emit_message())
                 if self.is_imagining:
                     # If imagining then proceed to simulating the enaction
                     self.interaction_step = INTERACTION_STEP_ENACTING
@@ -166,7 +171,12 @@ class Workspace:
 
     def emit_message(self):
         """Return the message to answer to another robot"""
-        message = {"azimuth": self.memory.body_memory.body_azimuth()}
+
+        # If no ongoing enaction then no message
+        if self.enaction is None:
+            return None
+
+        message = {"robot": self.robot_id, "azimuth": self.memory.body_memory.body_azimuth()}
 
         # If focus then send polar-egocentric information
         focus_point = self.memory.egocentric_to_polar_egocentric(self.enaction.focus_point)
@@ -185,3 +195,9 @@ class Workspace:
             message['destination_y'] = round(destination_point[1])
 
             return json.dumps(message)
+
+    def receive_message(self, message):
+        """Store the last message received from other robots"""
+        # If not message keep the previous one
+        if message is not None:
+            self.message = message
