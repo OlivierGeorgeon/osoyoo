@@ -36,7 +36,7 @@ ROBOT_SETTINGS_0 = {
 
 # Robot 1 in Lyon.
 ROBOT_SETTINGS_1 = ROBOT_SETTINGS_0.copy()
-ROBOT_SETTINGS_1["IP"] = {"A301": "192.168.8.230"}
+ROBOT_SETTINGS_1["IP"] = {"A301": "192.168.8.230", "PetiteIA": "192.168.8.0"}
 ROBOT_SETTINGS_1["forward_speed"] = 300  # (mm/s) Forward translation speed.
 ROBOT_SETTINGS_1["lateral_speed"] = 260  # (mm/s) Lateral translation speed.
 ROBOT_SETTINGS_1["retreat_distance"] = 90  # 70   # (mm) Distance of the line after retreat

@@ -44,17 +44,14 @@ class Enaction:
         self.yaw_matrix = None  # Used by bodyView to rotate compass points
         self.displacement_matrix = None  # Used by EgocentricMemory to rotate experiences
 
+        # The message received from other robot
+        self.message = None
+        self.message_sent = False  # Message sent to other robots
+
     def begin(self):
         """Adjust the spatial modifiers of the enaction.
         Compute the command to send to the robot.
         Initialize the simulation"""
-
-        # Initialize the spatial modifiers # Done before begining the interaction
-        # self.body_quaternion = memory.body_memory.body_quaternion.copy()
-        # if memory.egocentric_memory.prompt_point is not None:
-        #     self.prompt_point = memory.egocentric_memory.prompt_point.copy()
-        # if memory.egocentric_memory.focus_point is not None:
-        #     self.focus_point = memory.egocentric_memory.focus_point.copy()
 
         # Generate the command to send to the robot
         self.command = Command(self.action, self.clock, self.prompt_point, self.focus_point)
@@ -73,24 +70,27 @@ class Enaction:
         self.simulation_rotation_speed *= SIMULATION_TIME_RATIO
         self.is_simulating = True
 
-    def terminate(self, outcome):
+    def terminate(self, outcome, message):
         """Computes the azimuth, the yaw, and the displacement. Follow up the focus and the prompt."""
         self.outcome = outcome
+        self.message = message
 
         # The displacement --------
 
         # Translation integrated from the action's speed multiplied by the duration1
         # TODO Take the yaw into account
-        self.translation = self.action.translation_speed * (float(outcome.duration1) / 1000.0)
-        if self.action.action_code == ACTION_SWIPE and self.command.speed is not None and self.command.speed < 0:
-            self.translation = - self.translation
+        # self.translation = self.action.translation_speed * (float(outcome.duration1) / 1000.0)
+        # if self.action.action_code == ACTION_SWIPE and self.command.speed is not None and self.command.speed < 0:
+        #     self.translation = - self.translation
+        self.translation = self.command.anticipated_translation.copy()
         self.translation += outcome.retreat_translation
         if outcome.blocked:
             self.translation = np.array([0, 0, 0], dtype=int)
 
         # The yaw quaternion
         if outcome.yaw_quaternion is None:
-            yaw_quaternion = Quaternion.from_z_rotation(self.action.target_duration * math.degrees(self.action.rotation_speed_rad))
+            # yaw_quaternion = Quaternion.from_z_rotation(self.action.target_duration * self.action.rotation_speed_rad)
+            yaw_quaternion = self.command.anticipated_yaw_quaternion.copy()
         else:
             yaw_quaternion = outcome.yaw_quaternion
         yaw_integration_quaternion = self.body_quaternion.cross(yaw_quaternion)

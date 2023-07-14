@@ -5,6 +5,7 @@ import math
 from pyrr import Quaternion
 from .RobotDefine import ROBOT_SETTINGS
 from .Outcome import Outcome
+from .Message import Message
 
 INTERACTION_STEP_IDLE = 0
 INTERACTION_STEP_INTENDING = 1
@@ -88,6 +89,16 @@ class CtrlRobot:
             body_direction_rad = math.atan2(-outcome.compass_point[0], -outcome.compass_point[1])
             outcome.compass_quaternion = Quaternion.from_z_rotation(body_direction_rad)
 
+        # Process the message received from other robot
+        message = None
+        if self.workspace.message is not None:
+            message = Message(self.workspace.message)
+            self.workspace.message = None  # Delete the message
+            # If the message contains the focus point
+            # message.other_destination_ego = self.workspace.memory.polar_egocentric_to_egocentric(message.other_destination)
+            # If the message contains the position
+            message.other_destination_ego = self.workspace.memory.allocentric_to_egocentric(message.other_destination)
+
         # Terminate the enaction
-        self.workspace.enaction.terminate(outcome)
+        self.workspace.enaction.terminate(outcome, message)
         self.workspace.interaction_step = INTERACTION_STEP_INTEGRATING

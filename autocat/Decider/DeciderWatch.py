@@ -37,28 +37,16 @@ class DeciderWatch(Decider):
         outcome = super().outcome(enaction)
 
         # If a message was received
-        if self.workspace.message is not None:
-            print("Message", self.workspace.message)
-            message_dict = json.loads(self.workspace.message)
-            # other_body_quaternion = Quaternion.from_z_rotation(math.radians(90 - message_dict["azimuth"]))
-            # if other_body_quaternion.angle > math.pi:
-            #     other_body_quaternion = -other_body_quaternion
-            focus_point = Vector3([message_dict["focus_x"], message_dict["focus_y"], 0])
-            other_body_position = -focus_point * (1 + ROBOT_FRONT_X / focus_point.length)
-            other_destination = other_body_position + Vector3([message_dict["destination_x"], message_dict["destination_y"], 0])
-
-            other_destination_ego = self.workspace.memory.polar_egocentric_to_egocentric(other_destination)
-            other_angle = math.atan2(other_destination_ego[1], other_destination_ego[0])
-            other_direction_quaternion = Quaternion.from_z_rotation(other_angle)
+        if enaction.message is not None:
+            other_angle = math.atan2(enaction.message.other_destination_ego[1],
+                                     enaction.message.other_destination_ego[0])
             if math.fabs(other_angle) > math.pi / 6:
                 # Focus on the other robot's destination
-                print("Other polar destination point", other_destination)
-                print("Other ego destination point", other_destination_ego)
+                print("Other ego destination point", enaction.message.other_destination_ego)
                 print("Other angle", math.degrees(other_angle))
                 playsound('autocat/Assets/chirp.wav', False)
-                self.workspace.memory.egocentric_memory.focus_point = other_destination_ego
+                self.workspace.memory.egocentric_memory.focus_point = enaction.message.other_destination_ego
                 outcome = OUTCOME_FOCUS_SIDE
-            self.workspace.message = None  # Delete the message
 
         return outcome
 

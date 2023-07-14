@@ -32,37 +32,31 @@ class Memory:
         return "Memory Robot position (" + str(round(self.allocentric_memory.robot_point[0])) + "," +\
                                            str(round(self.allocentric_memory.robot_point[1])) + ")"
 
-    def update_and_add_experiences(self, enacted_enaction):
+    def update_and_add_experiences(self, enaction):
         """ Process the enacted interaction to update the memory
         - Move the robot in body memory
         - Move the previous experiences in egocentric_memory
         - Add new experiences in egocentric_memory
         - Move the robot in allocentric_memory
         """
-        self.egocentric_memory.focus_point = enacted_enaction.focus_point
-        self.egocentric_memory.prompt_point = enacted_enaction.prompt_point
+        self.egocentric_memory.focus_point = enaction.focus_point
+        self.egocentric_memory.prompt_point = enaction.prompt_point
 
-        self.body_memory.set_head_direction_degree(enacted_enaction.outcome.head_angle)
+        self.body_memory.set_head_direction_degree(enaction.outcome.head_angle)
         # TODO Keep the simulation and adjust the robot position
         # Translate the robot before applying the yaw
-        # self.allocentric_memory.move(self.body_memory.get_body_direction_rad(), enacted_enaction.translation,
-        #                              enacted_enaction.clock)
-        self.allocentric_memory.move(self.body_memory.body_quaternion, enacted_enaction.translation,
-                                     enacted_enaction.clock)
-        self.body_memory.body_quaternion = enacted_enaction.body_quaternion
+        self.allocentric_memory.move(self.body_memory.body_quaternion, enaction.translation,
+                                     enaction.clock)
+        self.body_memory.body_quaternion = enaction.body_quaternion
 
         # Keep a dictionary of the direction deltas to check gyro_coef is correct
-        self.body_direction_deltas[enacted_enaction.clock] = enacted_enaction.body_direction_delta
-        self.body_direction_deltas = {key: d for key, d in self.body_direction_deltas.items() if key > enacted_enaction.clock-10 }
+        self.body_direction_deltas[enaction.clock] = enaction.body_direction_delta
+        self.body_direction_deltas = {key: d for key, d in self.body_direction_deltas.items() if key > enaction.clock - 10}
         print("Average delta compass-yaw:", round(math.degrees(np.mean(list(self.body_direction_deltas.values()))), 2))
 
-        self.egocentric_memory.update_and_add_experiences(enacted_enaction)
+        self.egocentric_memory.update_and_add_experiences(enaction)
 
-        # # TODO Keep the simulation and adjust the robot position
-        # self.allocentric_memory.move(self.body_memory.body_direction_rad, enacted_interaction['translation'],
-        #                              enacted_interaction['clock'])
-
-        # The integrator may subsequently update the robot's position
+        # The integrator may again update the robot's position
 
     def update_allocentric(self, clock):
         """Update allocentric memory on the basis of body, phenomenon, and egocentric memory"""

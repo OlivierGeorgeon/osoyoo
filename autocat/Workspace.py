@@ -10,6 +10,7 @@ from .Decider.Action import create_actions, ACTION_FORWARD, ACTIONS, ACTION_TURN
 from .Memory.Memory import Memory
 from .Integrator.Integrator import Integrator
 from .Robot.Enaction import Enaction
+from .Robot.Outcome import Outcome
 from .Robot.CtrlRobot import INTERACTION_STEP_IDLE, INTERACTION_STEP_INTENDING, INTERACTION_STEP_ENACTING, \
     INTERACTION_STEP_INTEGRATING, INTERACTION_STEP_REFRESHING
 from .Robot.RobotDefine import ROBOT_FRONT_X
@@ -101,7 +102,6 @@ class Workspace:
                     self.enaction.prompt_point = self.memory.egocentric_memory.prompt_point.copy()
                 if self.memory.egocentric_memory.focus_point is not None:
                     self.enaction.focus_point = self.memory.egocentric_memory.focus_point.copy()
-                # self.enaction.adjust_and_begin(self.memory)
                 self.enaction.begin()
                 # print("Emit", self.emit_message())
                 if self.is_imagining:
@@ -120,9 +120,13 @@ class Workspace:
                 # End of the simulation
                 if self.is_imagining:
                     # Skip INTEGRATING for now
-                    del self.enactions[self.clock]
+                    outcome = Outcome({"action": self.enaction.action.action_code, "clock": self.clock,
+                                       "duration1": 1000, 'status': "I", 'head_angle': 0, 'echo_distance': 10000})
+                    self.enaction.terminate(outcome, None)
+                    # del self.enactions[self.clock]
                     self.clock += 1  # Perhaps not necessary
                     self.interaction_step = INTERACTION_STEP_REFRESHING
+                    # self.interaction_step = INTERACTION_STEP_INTEGRATING
 
         # INTEGRATING: the new enacted interaction (if not imagining)
         if self.interaction_step == INTERACTION_STEP_INTEGRATING:
@@ -173,28 +177,28 @@ class Workspace:
         """Return the message to answer to another robot"""
 
         # If no ongoing enaction then no message
-        if self.enaction is None:
+        if self.enaction is None or self.enaction.message_sent:
             return None
 
-        message = {"robot": self.robot_id, "azimuth": self.memory.body_memory.body_azimuth()}
+        message = {"robot": self.robot_id, "azimuth": self.memory.body_memory.body_azimuth(),
+                   'pos_x': round(self.memory.allocentric_memory.robot_point[0]),
+                   'pos_y': round(self.memory.allocentric_memory.robot_point[1])}
 
         # If focus then send polar-egocentric information
         focus_point = self.memory.egocentric_to_polar_egocentric(self.enaction.focus_point)
         if focus_point is not None:
             # The position of the focus
-            # p = p * (np.linalg.norm(p) + ROBOT_FRONT_X / 2) / np.linalg.norm(p)
-            # p = Vector3(p)
-            # p = p.normalize() * (p.length() + ROBOT_FRONT_X / 2)
             message['focus_x'] = round(focus_point[0])
             message['focus_y'] = round(focus_point[1])
 
-            # The destination position in polar-egocentric
-            destination_point = quaternion.apply_to_vector(self.enaction.body_quaternion,
-                                                           self.enaction.command.anticipated_translation)
-            message['destination_x'] = round(destination_point[0])
-            message['destination_y'] = round(destination_point[1])
+        # The destination position in polar-egocentric
+        destination_point = quaternion.apply_to_vector(self.enaction.body_quaternion,
+                                                       self.enaction.command.anticipated_translation)
+        message['destination_x'] = round(destination_point[0])
+        message['destination_y'] = round(destination_point[1])
 
-            return json.dumps(message)
+        self.enaction.message_sent = True
+        return json.dumps(message)
 
     def receive_message(self, message):
         """Store the last message received from other robots"""

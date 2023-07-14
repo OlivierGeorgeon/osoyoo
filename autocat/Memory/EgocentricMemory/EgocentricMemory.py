@@ -1,10 +1,8 @@
 import numpy as np
-from playsound import playsound
-from pyrr import matrix44
 from ...Memory.EgocentricMemory.Experience import Experience, EXPERIENCE_LOCAL_ECHO, EXPERIENCE_CENTRAL_ECHO, \
-    EXPERIENCE_PLACE, EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_IMPACT
+    EXPERIENCE_PLACE, EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_IMPACT, EXPERIENCE_ROBOT
 from ...Robot.RobotDefine import ROBOT_COLOR_X, ROBOT_FRONT_X, LINE_X, ROBOT_FRONT_Y, ROBOT_HEAD_X, ROBOT_SIDE
-from ...Decider.Action import ACTION_SCAN, ACTION_FORWARD, ACTION_BACKWARD, ACTION_SWIPE, ACTION_RIGHTWARD, ACTION_CIRCUMVENT
+from ...Decider.Action import ACTION_FORWARD, ACTION_BACKWARD, ACTION_SWIPE, ACTION_RIGHTWARD, ACTION_CIRCUMVENT
 import math
 
 EXPERIENCE_PERSISTENCE = 10
@@ -19,99 +17,97 @@ class EgocentricMemory:
         self.experiences = {}
         self.experience_id = 0  # A unique ID for each experience in memory
 
-    def update_and_add_experiences(self, enacted_enaction):
+    def update_and_add_experiences(self, enaction):
         """ Process the enacted interaction to update the egocentric memory
         - Move the previous experiences
         - Add new experiences
         """
-
         # Move the existing experiences
         for experience in self.experiences.values():
-            experience.displace(enacted_enaction.displacement_matrix)
+            experience.displace(enaction.displacement_matrix)
 
         # Add the PLACE experience with the sensed color
-        body_direction_rad = enacted_enaction.body_quaternion.axis[2] * enacted_enaction.body_quaternion.angle
-        place_exp = Experience([ROBOT_COLOR_X, 0, 0], EXPERIENCE_PLACE, body_direction_rad, enacted_enaction.clock,
+        body_direction_rad = enaction.body_quaternion.axis[2] * enaction.body_quaternion.angle
+        place_exp = Experience([ROBOT_COLOR_X, 0, 0], EXPERIENCE_PLACE, body_direction_rad, enaction.clock,
                                self.experience_id, durability=EXPERIENCE_PERSISTENCE,
-                               color_index=enacted_enaction.outcome.color_index)
+                               color_index=enaction.outcome.color_index)
         self.experiences[place_exp.id] = place_exp
         self.experience_id += 1
 
         # The FLOOR experience
-        if enacted_enaction.outcome.floor > 0:
-            if enacted_enaction.outcome.floor == 0b01:
+        if enaction.outcome.floor > 0:
+            if enaction.outcome.floor == 0b01:
                 # Black line on the right
                 point = np.array([LINE_X, 0, 0])  # 100, 0  # 20
-            elif enacted_enaction.outcome.floor == 0b10:
+            elif enaction.outcome.floor == 0b10:
                 # Black line on the left
                 point = np.array([LINE_X, 0, 0])  # 100, 0  # -20
             else:
                 # Black line on the front
                 point = np.array([LINE_X, 0, 0])
-            # Place the experience point
             floor_exp = Experience(point, EXPERIENCE_FLOOR, body_direction_rad,
-                                   enacted_enaction.clock, experience_id=self.experience_id,
-                                   durability=EXPERIENCE_PERSISTENCE, color_index=enacted_enaction.outcome.color_index)
+                                   enaction.clock, experience_id=self.experience_id,
+                                   durability=EXPERIENCE_PERSISTENCE, color_index=enaction.outcome.color_index)
             self.experiences[floor_exp.id] = floor_exp
             self.experience_id += 1
 
         # The ECHO experience
-        if enacted_enaction.outcome.echo_point is not None:
-            echo_exp = Experience(enacted_enaction.outcome.echo_point,
+        if enaction.outcome.echo_point is not None:
+            echo_exp = Experience(enaction.outcome.echo_point,
                                   EXPERIENCE_ALIGNED_ECHO, body_direction_rad,
-                                  enacted_enaction.clock, experience_id=self.experience_id,
-                                  durability=EXPERIENCE_PERSISTENCE, color_index=enacted_enaction.outcome.color_index)
+                                  enaction.clock, experience_id=self.experience_id,
+                                  durability=EXPERIENCE_PERSISTENCE, color_index=enaction.outcome.color_index)
             self.experiences[echo_exp.id] = echo_exp
             self.experience_id += 1
 
-        # The BLOCKED experience
-        # if enacted_enaction.blocked:
-        #     blocked_exp = Experience(ROBOT_FRONT_X, 0, EXPERIENCE_IMPACT, body_direction_rad,
-        #                              enacted_enaction.clock, experience_id=self.experience_id,
-        #                              durability=EXPERIENCE_PERSISTENCE, color_index=enacted_enaction.color_index)
-        #     self.experiences[blocked_exp.id] = blocked_exp
-        #     self.experience_id += 1
-        # else:
         # The IMPACT experience
-        if enacted_enaction.outcome.impact > 0:
-            if enacted_enaction.action.action_code == ACTION_FORWARD:
-                if enacted_enaction.outcome.impact == 0b01:  # Impact on the right
+        if enaction.outcome.impact > 0:
+            if enaction.action.action_code == ACTION_FORWARD:
+                if enaction.outcome.impact == 0b01:  # Impact on the right
                     point = np.array([ROBOT_FRONT_X, -ROBOT_FRONT_Y, 0])
-                elif enacted_enaction.outcome.impact == 0b11:  # Impact on the front
+                elif enaction.outcome.impact == 0b11:  # Impact on the front
                     point = np.array([ROBOT_FRONT_X, 0, 0])
                 else:  # Impact on the left
                     point = np.array([ROBOT_FRONT_X, ROBOT_FRONT_Y, 0])
-            elif enacted_enaction.action.action_code in [ACTION_SWIPE]:
+            elif enaction.action.action_code in [ACTION_SWIPE]:
                 point = np.array([0, ROBOT_SIDE, 0])
-            elif enacted_enaction.action.action_code in [ACTION_RIGHTWARD, ACTION_CIRCUMVENT]:
+            elif enaction.action.action_code in [ACTION_RIGHTWARD, ACTION_CIRCUMVENT]:
                 point = np.array([0, -ROBOT_SIDE, 0])
-            elif enacted_enaction.action.action_code == ACTION_BACKWARD:
-                if enacted_enaction.outcome.impact == 0b01:  # Impact on the right
+            elif enaction.action.action_code == ACTION_BACKWARD:
+                if enaction.outcome.impact == 0b01:  # Impact on the right
                     point = np.array([-ROBOT_FRONT_X, -ROBOT_FRONT_Y, 0])
-                elif enacted_enaction.outcome.impact == 0b11:  # Impact on the front
+                elif enaction.outcome.impact == 0b11:  # Impact on the front
                     point = np.array([-ROBOT_FRONT_X, 0, 0])
                 else:  # Impact on the left
                     point = np.array([-ROBOT_FRONT_X, ROBOT_FRONT_Y, 0])
             impact_exp = Experience(point, EXPERIENCE_IMPACT, body_direction_rad,
-                                    enacted_enaction.clock, experience_id=self.experience_id,
-                                    durability=EXPERIENCE_PERSISTENCE, color_index=enacted_enaction.outcome.color_index)
+                                    enaction.clock, experience_id=self.experience_id,
+                                    durability=EXPERIENCE_PERSISTENCE, color_index=enaction.outcome.color_index)
             self.experiences[impact_exp.id] = impact_exp
             self.experience_id += 1
 
         # The LOCAL ECHO experiences
         local_echos = []
-        for e in enacted_enaction.outcome.echos.items():
+        for e in enaction.outcome.echos.items():
             angle = math.radians(int(e[0]))
             point = np.array([ROBOT_HEAD_X + math.cos(angle) * e[1], math.sin(angle) * e[1], 0])
             local_exp = Experience(point, EXPERIENCE_LOCAL_ECHO, body_direction_rad,
-                                   enacted_enaction.clock, experience_id=self.experience_id,
-                                   durability=EXPERIENCE_PERSISTENCE, color_index=enacted_enaction.outcome.color_index)
+                                   enaction.clock, experience_id=self.experience_id,
+                                   durability=EXPERIENCE_PERSISTENCE, color_index=enaction.outcome.color_index)
             self.experiences[local_exp.id] = local_exp
             self.experience_id += 1
             local_echos.append((angle, e[1], local_exp))
 
         # Add the CENTRAL ECHOs from the LOCAL ECHOs
         self.add_central_echos(local_echos)
+
+        # Add the other robot experience
+        if enaction.message is not None:
+            robot_exp = Experience(enaction.message.other_destination_ego, EXPERIENCE_ROBOT, body_direction_rad,
+                                   enaction.clock, experience_id=self.experience_id, durability=EXPERIENCE_PERSISTENCE,
+                                   color_index=enaction.outcome.color_index)
+            self.experiences[robot_exp.id] = robot_exp
+            self.experience_id += 1
 
         # Remove the experiences from egocentric memory when they are two old
         # self.experiences = [e for e in self.experiences if e.clock >= enacted_interaction["clock"] - e.durability]

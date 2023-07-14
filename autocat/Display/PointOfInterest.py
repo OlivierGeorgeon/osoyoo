@@ -1,6 +1,12 @@
+import math
+import numpy as np
+from pyrr import matrix44
 from pyglet import shapes, gl
 from webcolors import name_to_rgb
-from autocat.Memory.EgocentricMemory.Experience import *
+from ..Memory.EgocentricMemory.Experience import EXPERIENCE_LOCAL_ECHO, EXPERIENCE_CENTRAL_ECHO,  EXPERIENCE_PLACE, \
+    EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_IMPACT, EXPERIENCE_BLOCK, FLOOR_COLORS, EXPERIENCE_FOCUS, \
+    EXPERIENCE_ROBOT
+
 
 # Points of interest that only exist in Body Display
 # (points of interest attached to an interaction have the same type as their interactions)
@@ -27,8 +33,6 @@ class PointOfInterest:
 
         if self.type == EXPERIENCE_PLACE:
             self.points = [30, 0, -20, -20, -20, 20]
-            # if self.color is None:
-            #     self.color = name_to_rgb("LightGreen")
             self.shape = self.batch.add_indexed(3, gl.GL_TRIANGLES, self.group, [0, 1, 2], ('v2i', self.points),
                                                 ('c4B', 3 * (*self.color, self.opacity)))
         if self.type == EXPERIENCE_ALIGNED_ECHO:
@@ -81,6 +85,11 @@ class PointOfInterest:
             self.points = [40, 0, 20, 34, -20, 34, -40, 0, -20, -34, 20, -34]
             self.shape = self.batch.add_indexed(6, gl.GL_TRIANGLES, group, [0, 1, 2, 0, 2, 3, 0, 3, 4, 0, 4, 5],
                                                 ('v2i', self.points), ('c4B', 6 * (*self.color, self.opacity)))
+        if self.type == EXPERIENCE_ROBOT:
+            self.color = name_to_rgb("darkslateBlue")
+            self.points = [20, -16, 20, 16, -20, 16, -20, -16]
+            self.shape = self.batch.add_indexed(4, gl.GL_TRIANGLES, self.group, [0, 1, 2, 0, 2, 3],
+                                                ('v2i', self.points), ('c4B', 4 * (*self.color, self.opacity)))
 
         # Move the point of interest to its position
         position_matrix = matrix44.create_from_translation([x, y, 0]).astype('float64')
@@ -102,16 +111,6 @@ class PointOfInterest:
             else:
                 self.shape.opacity = self.opacity
                 self.shape.color_index = name_to_rgb(color_name)
-
-    # def reset_position(self):
-    #     """ Reset the position of the point of interest """
-    #     self.point = np.array([0, 0, 0], dtype=int)
-    #     # Reset the position of all the points
-    #     if hasattr(self.shape, 'vertices'):
-    #         # If the shape has a list of vertices then reset it
-    #         self.shape.vertices = self.points
-    #     else:
-    #         self.shape.x, self.shape.y = 0, 0  # Circle
 
     def displace(self, displacement_matrix):
         """ Applying the displacement matrix to the point of interest """
@@ -138,15 +137,6 @@ class PointOfInterest:
         """Return True if the age has exceeded the durability"""
         return self.clock + self.durability < clock
 
-    # def keep_or_delete(self, clock):
-    #     """Return True if keep, delete otherwise. Used to refresh egocentric memory"""
-    #     # Keep points of interest Place that are not expired
-    #     # if self.type == EXPERIENCE_PLACE and not self.is_expired(clock):
-    #     if not self.is_expired(clock):
-    #         return True
-    #     self.shape.delete()
-    #     return False
-
     def select_if_near(self, point):
         """ If the point is near the x y coordinate, select this point and return True """
         if math.dist(point, self.point) < 15:
@@ -164,9 +154,6 @@ class PointOfInterest:
         self.opacity = int(max(255 * (self.durability - clock + self.clock) / self.durability, 0))
         # Reset the opacity of the shape
         self.set_color(None)
-        # The shape will be deleted by keep_and_delete
-        # if self.is_expired(clock):
-        #     self.shape.delete()
 
     def __str__(self):
         return "POI of type " + self.type + " at x=" + str(int(self.point[0])) + ", y=" + str(int(self.point[1]))

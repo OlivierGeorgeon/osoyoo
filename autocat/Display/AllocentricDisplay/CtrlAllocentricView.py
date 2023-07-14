@@ -9,7 +9,7 @@ class CtrlAllocentricView:
     def __init__(self, workspace):
         """Control the allocentric view"""
         self.workspace = workspace
-        self.allocentric_view = AllocentricView(self.workspace)
+        self.view = AllocentricView(self.workspace)
         self.next_time_refresh = 0
         self.prompt_point = None
 
@@ -18,11 +18,11 @@ class CtrlAllocentricView:
             """Send user keypress to the workspace to handle"""
             self.workspace.process_user_key(text)
 
-        self.allocentric_view.on_text = on_text
+        self.view.on_text = on_text
 
         def on_mouse_press(x, y, button, modifiers):
             """Open a phenomenon view based on the phenomenon on this cell"""
-            self.prompt_point = self.allocentric_view.mouse_coordinates_to_point(x, y)
+            self.prompt_point = self.view.mouse_coordinates_to_point(x, y)
             cell_x, cell_y = point_to_cell(self.prompt_point)
             phenomenon_id = self.workspace.memory.allocentric_memory.grid[cell_x][cell_y].phenomenon_id
             if phenomenon_id is not None:
@@ -32,7 +32,7 @@ class CtrlAllocentricView:
                 # ctrl_phenomenon_view.update_body_robot()
                 # ctrl_phenomenon_view.update_points_of_interest(phenomenon)
 
-        self.allocentric_view.on_mouse_press = on_mouse_press
+        self.view.on_mouse_press = on_mouse_press
 
         def on_key_press(symbol, modifiers):
             """ Deleting or inserting points of interest """
@@ -48,12 +48,12 @@ class CtrlAllocentricView:
                 ego_point = self.workspace.memory.allocentric_to_egocentric(self.prompt_point)
                 self.workspace.memory.egocentric_memory.prompt_point = ego_point
 
-        self.allocentric_view.on_key_press = on_key_press
+        self.view.on_key_press = on_key_press
 
     def update_view(self):
         """Update the allocentric view from the status in the allocentric grid cells"""
         for c in [c for line in self.workspace.memory.allocentric_memory.grid for c in line]:
-            self.allocentric_view.update_hexagon(c)
+            self.view.update_hexagon(c)
 
     def main(self, dt):
         """Refresh allocentric view"""
