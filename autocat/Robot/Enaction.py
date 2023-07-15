@@ -83,6 +83,10 @@ class Enaction:
         # if self.action.action_code == ACTION_SWIPE and self.command.speed is not None and self.command.speed < 0:
         #     self.translation = - self.translation
         self.translation = self.command.anticipated_translation.copy()
+        if self.command.duration is None:
+            self.translation *= (self.outcome.duration1/(self.action.target_duration * 1000.))
+        else:
+            self.translation *= (self.outcome.duration1/self.command.duration)
         self.translation += outcome.retreat_translation
         if outcome.blocked:
             self.translation = np.array([0, 0, 0], dtype=int)
@@ -205,4 +209,4 @@ class Enaction:
 
         if self.prompt_point is not None:
             self.prompt_point = matrix44.apply_to_vector(self.displacement_matrix, self.prompt_point).astype(int)
-            print("Prompt moved to egocentric: ", self.prompt_point)
+            # print("Prompt moved to egocentric: ", self.prompt_point)

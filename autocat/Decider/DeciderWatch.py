@@ -37,7 +37,7 @@ class DeciderWatch(Decider):
         outcome = super().outcome(enaction)
 
         # If a message was received
-        if enaction.message is not None:
+        if enaction is not None and enaction.message is not None:
             other_angle = math.atan2(enaction.message.other_destination_ego[1],
                                      enaction.message.other_destination_ego[0])
             if math.fabs(other_angle) > math.pi / 6:

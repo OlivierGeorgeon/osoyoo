@@ -38,7 +38,7 @@ class Integrator:
         new_affordances, position_correction = self.workspace.memory.phenomenon_memory.update_phenomena(new_affordances)
 
         # Adjust the robot's position in allocentric memory
-        print("Position correction due to phenomenon update", position_correction)
+        # print("Position correction due to phenomenon update", position_correction)
         self.workspace.memory.allocentric_memory.move(Quaternion([0, 0, 0, 1]), position_correction, self.workspace.clock)
 
         # Create new hypothetical phenomena from remaining affordances

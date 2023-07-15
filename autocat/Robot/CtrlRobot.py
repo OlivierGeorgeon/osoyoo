@@ -95,9 +95,9 @@ class CtrlRobot:
             message = Message(self.workspace.message)
             self.workspace.message = None  # Delete the message
             # If the message contains the focus point
-            # message.other_destination_ego = self.workspace.memory.polar_egocentric_to_egocentric(message.other_destination)
+            message.other_destination_ego = self.workspace.memory.polar_egocentric_to_egocentric(message.other_destination)
             # If the message contains the position
-            message.other_destination_ego = self.workspace.memory.allocentric_to_egocentric(message.other_destination)
+            # message.other_destination_ego = self.workspace.memory.allocentric_to_egocentric(message.other_destination)
 
         # Terminate the enaction
         self.workspace.enaction.terminate(outcome, message)

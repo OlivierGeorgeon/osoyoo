@@ -37,7 +37,7 @@ class Command:
             if self.action.action_code in [ACTION_SWIPE, ACTION_RIGHTWARD]:
                 self.duration = 1000  # 1500
         if self.action.action_code in [ACTION_WATCH]:
-            self.duration = 5000
+            self.duration = 1000  # 5000
 
         if focus_point is not None:
             self.focus_x = int(focus_point[0])  # Convert to python int
@@ -67,7 +67,7 @@ class Command:
         if self.angle is None:
             self.anticipated_yaw_quaternion = Quaternion.from_z_rotation(action.rotation_speed_rad * action.target_duration)
         else:
-            self.anticipated_yaw_quaternion = Quaternion.from_z_rotation(self.angle)
+            self.anticipated_yaw_quaternion = Quaternion.from_z_rotation(math.radians(self.angle))
 
         self.anticipated_yaw_matrix = matrix44.create_from_inverse_of_quaternion(self.anticipated_yaw_quaternion)
         self.anticipated_displacement_matrix = matrix44.multiply(matrix44.create_from_translation(-self.anticipated_translation),

@@ -11,10 +11,9 @@ from .Memory.Memory import Memory
 from .Integrator.Integrator import Integrator
 from .Robot.Enaction import Enaction
 from .Robot.Outcome import Outcome
+from .Robot.Message import Message
 from .Robot.CtrlRobot import INTERACTION_STEP_IDLE, INTERACTION_STEP_INTENDING, INTERACTION_STEP_ENACTING, \
     INTERACTION_STEP_INTEGRATING, INTERACTION_STEP_REFRESHING
-from .Robot.RobotDefine import ROBOT_FRONT_X
-from .Enaction.SpatialModifier import SpatialModifier
 
 KEY_DECIDER_CIRCLE = "A"  # Automatic mode: controlled by the deciders
 KEY_DECIDER_USER = "M"  # Manual mode : controlled by the user
@@ -41,7 +40,6 @@ class Workspace:
 
         self.enactions = {}  # The stack of enactions to enact next
         self.enaction = None
-        # self.enacted_enaction = None
 
         self.decider_mode = KEY_DECIDER_USER
         self.engagement_mode = KEY_ENGAGEMENT_ROBOT
@@ -54,6 +52,7 @@ class Workspace:
         self.clock = 0
         self.memory_snapshot = None
         self.is_imagining = False
+        self.memory_before_imaginary = None
 
         # Message from other robot
         self.message = None
@@ -71,7 +70,8 @@ class Workspace:
             if self.is_imagining:
                 # If stop imagining then restore memory from the snapshot
                 if self.engagement_mode == KEY_ENGAGEMENT_ROBOT:
-                    self.memory = self.memory_snapshot.save()  # Keep the snapshot saved
+                    # self.memory = self.memory_snapshot.save()  # Keep the snapshot saved
+                    self.memory = self.memory_before_imaginary
                     self.is_imagining = False
                     self.interaction_step = INTERACTION_STEP_REFRESHING
                 # (If continue imagining then keep the previous snapshot)
@@ -80,6 +80,7 @@ class Workspace:
                 if self.engagement_mode == KEY_ENGAGEMENT_IMAGINARY:
                     # Start imagining
                     self.memory_snapshot = self.memory.save()  # Fail when trying to save an affordance created during imaginary
+                    self.memory_before_imaginary = self.memory.save()
                     self.is_imagining = True
             # Next automatic decision
             if self.clock not in self.enactions:
@@ -103,13 +104,13 @@ class Workspace:
                 if self.memory.egocentric_memory.focus_point is not None:
                     self.enaction.focus_point = self.memory.egocentric_memory.focus_point.copy()
                 self.enaction.begin()
-                # print("Emit", self.emit_message())
+                self.memory_snapshot = self.memory.save()  # Fail when trying to save an affordance created during imaginary
+                self.interaction_step = INTERACTION_STEP_INTENDING
                 if self.is_imagining:
                     # If imagining then proceed to simulating the enaction
                     self.interaction_step = INTERACTION_STEP_ENACTING
                 else:
                     # Take a snapshot for the simulation and proceed to INTENDING
-                    self.memory_snapshot = self.memory.save()  # Fail when trying to save an affordance created during imaginary
                     self.interaction_step = INTERACTION_STEP_INTENDING
 
         # INTENDING: is handled by CtrlRobot
@@ -120,13 +121,24 @@ class Workspace:
                 # End of the simulation
                 if self.is_imagining:
                     # Skip INTEGRATING for now
-                    outcome = Outcome({"action": self.enaction.action.action_code, "clock": self.clock,
-                                       "duration1": 1000, 'status': "I", 'head_angle': 0, 'echo_distance': 10000})
-                    self.enaction.terminate(outcome, None)
+                    # Anticipate the outcome. No yaw is ok because is based on anticipation
+                    if self.enaction.command.duration is None:
+                        duration1 = self.enaction.action.target_duration * 1000
+                    else:
+                        duration1 = self.enaction.command.duration
+                    outcome = Outcome({"action": self.enaction.action.action_code, "clock": self.clock, "floor": 0,
+                                       "duration1": duration1, 'status': "I", 'head_angle': 0, 'echo_distance': 300})
+                    # Process the message received from other robot
+                    message = None
+                    if self.message is not None:
+                        message = Message(self.message)
+                        self.message = None  # Delete the message
+                        message.other_destination_ego = self.memory.polar_egocentric_to_egocentric(message.other_destination)
+                    self.enaction.terminate(outcome, message)
                     # del self.enactions[self.clock]
-                    self.clock += 1  # Perhaps not necessary
-                    self.interaction_step = INTERACTION_STEP_REFRESHING
-                    # self.interaction_step = INTERACTION_STEP_INTEGRATING
+                    # self.clock += 1
+                    # self.interaction_step = INTERACTION_STEP_REFRESHING
+                    self.interaction_step = INTERACTION_STEP_INTEGRATING
 
         # INTEGRATING: the new enacted interaction (if not imagining)
         if self.interaction_step == INTERACTION_STEP_INTEGRATING:

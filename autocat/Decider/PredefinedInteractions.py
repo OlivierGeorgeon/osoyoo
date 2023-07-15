@@ -44,11 +44,11 @@ def create_or_reinforce_composite(composite_interactions, pre_interaction, post_
 
     if interaction in composite_interactions:
         i = composite_interactions.index(interaction)
-        print("reinforcing:", composite_interactions[i].__str__())
+        # print("reinforcing:", composite_interactions[i].__str__())
         composite_interactions[i].weight += 1
         return composite_interactions[i]
     else:
-        print("Learning:", interaction.__str__())
+        # print("Learning:", interaction.__str__())
         composite_interactions.append(interaction)
         return interaction
 

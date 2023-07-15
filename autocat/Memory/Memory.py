@@ -45,8 +45,7 @@ class Memory:
         self.body_memory.set_head_direction_degree(enaction.outcome.head_angle)
         # TODO Keep the simulation and adjust the robot position
         # Translate the robot before applying the yaw
-        self.allocentric_memory.move(self.body_memory.body_quaternion, enaction.translation,
-                                     enaction.clock)
+        self.allocentric_memory.move(self.body_memory.body_quaternion, enaction.translation, enaction.clock)
         self.body_memory.body_quaternion = enaction.body_quaternion
 
         # Keep a dictionary of the direction deltas to check gyro_coef is correct
@@ -82,9 +81,9 @@ class Memory:
 
     def egocentric_to_allocentric(self, point):
         """Return the point in allocentric coordinates from the point in egocentric coordinates"""
-        # Rotate the point by the body direction and add the body position
         if point is None:
             return None
+        # convert to polar-egocentric and then add the position in allocentric memory
         return self.egocentric_to_polar_egocentric(point) + self.allocentric_memory.robot_point
         # return matrix44.apply_to_vector(self.body_memory.body_direction_matrix(), point) \
         #     + self.allocentric_memory.robot_point
@@ -97,10 +96,11 @@ class Memory:
         """Return the point in egocentric coordinates from the point in allocentric coordinates"""
         if point is None:
             return None
-        # Subtract the body position
+        # Subtract the body position to obtain the polar-egocentric
         ego_point = point - self.allocentric_memory.robot_point
         # Rotate the point by the opposite body direction using the transposed rotation matrix
-        return matrix44.apply_to_vector(self.body_memory.body_direction_matrix().T, ego_point)
+        return self.polar_egocentric_to_egocentric(ego_point)
+        # return matrix44.apply_to_vector(self.body_memory.body_direction_matrix().T, ego_point)
 
     def save(self):
         """Return a clone of memory for memory snapshot"""

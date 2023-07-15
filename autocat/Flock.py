@@ -44,9 +44,8 @@ class Flock:
         self.ctrl_phenomenon_view.main(dt)
 
         # Pass the message from robot '2' to robot '1'
+        if all(key in self.workspaces for key in ['1', '2']):
+            self.workspaces['1'].receive_message(self.workspaces['2'].emit_message())
+        # Pass the message from robot '3' to robot '1'
         if all(key in self.workspaces for key in ['3', '1']):
-            self.workspaces['3'].receive_message(self.workspaces['1'].emit_message())
-
-    # def get_robot_message(self, robot_id):
-    #     """Get an answer message from a robot"""
-    #     return self.workspaces[robot_id].emit_message()
+            self.workspaces['1'].receive_message(self.workspaces['3'].emit_message())
