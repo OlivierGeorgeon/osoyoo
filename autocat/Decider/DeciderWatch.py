@@ -38,14 +38,13 @@ class DeciderWatch(Decider):
 
         # If a message was received
         if enaction is not None and enaction.message is not None:
-            other_angle = math.atan2(enaction.message.other_destination_ego[1],
-                                     enaction.message.other_destination_ego[0])
+            other_angle = math.atan2(enaction.message.ego_position[1], enaction.message.ego_position[0])
             if math.fabs(other_angle) > math.pi / 6:
                 # Focus on the other robot's destination
-                print("Other ego destination point", enaction.message.other_destination_ego)
+                print("Other ego destination point", enaction.message.ego_position)
                 print("Other angle", math.degrees(other_angle))
                 playsound('autocat/Assets/chirp.wav', False)
-                self.workspace.memory.egocentric_memory.focus_point = enaction.message.other_destination_ego
+                self.workspace.memory.egocentric_memory.focus_point = enaction.message.ego_position
                 outcome = OUTCOME_FOCUS_SIDE
 
         return outcome

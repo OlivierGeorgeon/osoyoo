@@ -59,9 +59,9 @@ class CtrlRobot:
                             # Sometimes the previous outcome was received after the time out and we find it here
                             print("Received outcome does not match current enaction")
             else:
-                # Timeout: resend the enaction
+                # Timeout: reinitialize the cycle. This will resend the enaction
                 self.workspace.memory = self.workspace.memory_snapshot
-                self.workspace.interaction_step = INTERACTION_STEP_IDLE
+                self.workspace.interaction_step = INTERACTION_STEP_REFRESHING
                 print("Timeout")
 
     def send_command_to_robot(self):
@@ -90,15 +90,15 @@ class CtrlRobot:
             outcome.compass_quaternion = Quaternion.from_z_rotation(body_direction_rad)
 
         # Process the message received from other robot
-        message = None
-        if self.workspace.message is not None:
-            message = Message(self.workspace.message)
-            self.workspace.message = None  # Delete the message
-            # If the message contains the focus point
-            message.other_destination_ego = self.workspace.memory.polar_egocentric_to_egocentric(message.other_destination)
-            # If the message contains the position
-            # message.other_destination_ego = self.workspace.memory.allocentric_to_egocentric(message.other_destination)
+        # message = None
+        # if self.workspace.message is not None:
+        #     message = Message(self.workspace.message)
+        #     self.workspace.message = None  # Delete the message
+        #     # If the message contains the focus point
+        #     message.other_destination_ego = self.workspace.memory.polar_egocentric_to_egocentric(message.other_destination)
+        #     # If the message contains the position
+        #     # message.other_destination_ego = self.workspace.memory.allocentric_to_egocentric(message.other_destination)
 
         # Terminate the enaction
-        self.workspace.enaction.terminate(outcome, message)
+        self.workspace.enaction.terminate(outcome)
         self.workspace.interaction_step = INTERACTION_STEP_INTEGRATING

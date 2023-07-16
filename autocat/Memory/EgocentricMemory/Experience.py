@@ -1,6 +1,6 @@
 import math
 import numpy as np
-from pyrr import matrix44, quaternion
+from pyrr import matrix44, quaternion, Quaternion
 from ...Robot.RobotDefine import ROBOT_HEAD_X
 
 EXPERIENCE_ALIGNED_ECHO = 'Echo'
@@ -21,7 +21,7 @@ class Experience:
     """Experiences are instances of interactions
     along with the spatial and temporal information of where and when they were enacted"""
 
-    def __init__(self, point, experience_type, body_direction_rad, clock, experience_id, durability=10, color_index=0):
+    def __init__(self, point, experience_type, body_direction_rad, clock, experience_id, durability=10, color_index=0, direction_quaternion=Quaternion([0,0,0,1])):
         """Create an experience to be placed in the memory.
         Args:
         x, y : coordinates relative the robot.
@@ -31,6 +31,7 @@ class Experience:
         self.point = np.array(point)
         self.type = experience_type
         self.absolute_direction_rad = body_direction_rad
+        self.absolute_direction_quaternion = Quaternion.from_z_rotation(body_direction_rad)
         self.clock = clock
         self.id = experience_id
         self.durability = durability
@@ -38,7 +39,10 @@ class Experience:
 
         # The position matrix will cumulate the rotation and translations of the robot
         # Used to compute the position of the experience relative to the robot in egocentric memory
-        self.position_matrix = matrix44.create_from_translation(self.point).astype('float64')
+        direction_matrix = matrix44.create_from_inverse_of_quaternion(direction_quaternion)
+        # self.position_matrix = matrix44.create_from_translation(self.point).astype('float64')
+        self.position_matrix = matrix44.multiply(direction_matrix,
+                                                     matrix44.create_from_translation(self.point).astype('float64'))
         # The position of the robot relative to the experience
         # Used to compute the position of the robot relative to the experience
         relative_sensor_point = -self.point.copy()  # By default the center of the robot.
@@ -48,8 +52,8 @@ class Experience:
             # The position of the echo incorporating the rotation from the head
             head_direction_rad = math.atan2(point[1], point[0] - ROBOT_HEAD_X)
             self.absolute_direction_rad += head_direction_rad  # The absolute direction of the sensor...
+            self.absolute_direction_quaternion *= Quaternion.from_z_rotation(head_direction_rad)
             self.absolute_direction_rad = np.mod(self.absolute_direction_rad, 2*math.pi)  # ...within [0,2pi]
-            # print("Absolute direction rad:", round(math.degrees(self.absolute_direction_rad)), "°")
             translation_from_head_matrix = matrix44.create_from_translation([math.sqrt((point[0]-ROBOT_HEAD_X)**2 + point[1]**2),
                                                                              0, 0])
             position_from_head_matrix = matrix44.multiply(translation_from_head_matrix,
@@ -72,7 +76,8 @@ class Experience:
 
     def body_direction_quaternion(self):
         """Return the quaternion representing the body direction"""
-        return quaternion.create_from_z_rotation(self.absolute_direction_rad)
+        return self.absolute_direction_quaternion
+        # return quaternion.create_from_z_rotation(self.absolute_direction_rad)
 
     def displace(self, displacement_matrix):
         """Displace the experience by the displacement_matrix"""
@@ -80,7 +85,7 @@ class Experience:
         # by miraculously multiplying the position_matrix by the displacement_matrix
         self.position_matrix = matrix44.multiply(self.position_matrix, displacement_matrix)
 
-        # Recompute the experience's coordinates in robot-centric coordinates
+        # Recompute the experience's coordinates in egocentric coordinates
         self.point = matrix44.apply_to_vector(self.position_matrix, [0, 0, 0])
 
     def sensor_point(self):

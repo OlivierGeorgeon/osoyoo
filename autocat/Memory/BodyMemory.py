@@ -28,9 +28,15 @@ class BodyMemory:
 
     def get_body_direction_rad(self):
         """Return the body direction in rad in polar-egocentric reference"""
-        # The Z component of the rotation axis gives the sign of the angle
-        self.body_quaternion.normalize()  # Test if it prevents NaN sometimes
-        return self.body_quaternion.axis[2] * self.body_quaternion.angle
+        # The Z component of the rotation axis gives the sign of the angle if is not NaN
+        if np.isnan(self.body_quaternion.axis[2]):
+            print("Nan quaternion", self.body_quaternion)
+            self.body_quaternion = Quaternion([0., 0., 0., 1.])
+        if self.body_quaternion.z > 0:
+            return self.body_quaternion.angle
+        else:
+            return - self.body_quaternion.angle
+        # return self.body_quaternion.axis[2] * self.body_quaternion.angle
 
     def body_direction_matrix(self):
         """Return the body direction matrix to apply to experiences"""

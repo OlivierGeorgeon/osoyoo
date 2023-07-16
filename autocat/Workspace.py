@@ -10,7 +10,6 @@ from .Decider.Action import create_actions, ACTION_FORWARD, ACTIONS, ACTION_TURN
 from .Memory.Memory import Memory
 from .Integrator.Integrator import Integrator
 from .Robot.Enaction import Enaction
-from .Robot.Outcome import Outcome
 from .Robot.Message import Message
 from .Robot.CtrlRobot import INTERACTION_STEP_IDLE, INTERACTION_STEP_INTENDING, INTERACTION_STEP_ENACTING, \
     INTERACTION_STEP_INTEGRATING, INTERACTION_STEP_REFRESHING
@@ -70,16 +69,13 @@ class Workspace:
             if self.is_imagining:
                 # If stop imagining then restore memory from the snapshot
                 if self.engagement_mode == KEY_ENGAGEMENT_ROBOT:
-                    # self.memory = self.memory_snapshot.save()  # Keep the snapshot saved
                     self.memory = self.memory_before_imaginary
                     self.is_imagining = False
                     self.interaction_step = INTERACTION_STEP_REFRESHING
-                # (If continue imagining then keep the previous snapshot)
             else:
-                # If was not previously imagining then take a new memory snapshot
+                # If start imagining then take a new memory snapshot
                 if self.engagement_mode == KEY_ENGAGEMENT_IMAGINARY:
-                    # Start imagining
-                    self.memory_snapshot = self.memory.save()  # Fail when trying to save an affordance created during imaginary
+                    # self.memory_snapshot = self.memory.save()
                     self.memory_before_imaginary = self.memory.save()
                     self.is_imagining = True
             # Next automatic decision
@@ -89,12 +85,11 @@ class Workspace:
                     decider = max(self.deciders, key=lambda k: self.deciders[k].activation_level())
                     print("Decider:", decider)
                     self.deciders[decider].stack_enaction()
-                    # TODO Manage the enacted_interaction after imagining
-
                 # Case DECIDER_KEY_USER is handled by self.process_user_key()
 
-            # When the next enaction is in the stack
+            # When the next enaction is in the stack, prepare the enaction
             if self.clock in self.enactions:
+                self.memory_snapshot = self.memory.save()
                 # Take the next enaction from the stack
                 self.enaction = self.enactions[self.clock]
                 # Adjust the spatial modifiers
@@ -104,8 +99,6 @@ class Workspace:
                 if self.memory.egocentric_memory.focus_point is not None:
                     self.enaction.focus_point = self.memory.egocentric_memory.focus_point.copy()
                 self.enaction.begin()
-                self.memory_snapshot = self.memory.save()  # Fail when trying to save an affordance created during imaginary
-                self.interaction_step = INTERACTION_STEP_INTENDING
                 if self.is_imagining:
                     # If imagining then proceed to simulating the enaction
                     self.interaction_step = INTERACTION_STEP_ENACTING
@@ -115,35 +108,22 @@ class Workspace:
 
         # INTENDING: is handled by CtrlRobot
 
-        # ENACTING: update body memory during the robot enaction or the imaginary simulation
+        # ENACTING: Simulate the enaction in memory
         if self.interaction_step == INTERACTION_STEP_ENACTING:
-            if not self.memory.simulate(self.enaction, dt):
-                # End of the simulation
-                if self.is_imagining:
-                    # Skip INTEGRATING for now
-                    # Anticipate the outcome. No yaw is ok because is based on anticipation
-                    if self.enaction.command.duration is None:
-                        duration1 = self.enaction.action.target_duration * 1000
-                    else:
-                        duration1 = self.enaction.command.duration
-                    outcome = Outcome({"action": self.enaction.action.action_code, "clock": self.clock, "floor": 0,
-                                       "duration1": duration1, 'status': "I", 'head_angle': 0, 'echo_distance': 300})
-                    # Process the message received from other robot
-                    message = None
-                    if self.message is not None:
-                        message = Message(self.message)
-                        self.message = None  # Delete the message
-                        message.other_destination_ego = self.memory.polar_egocentric_to_egocentric(message.other_destination)
-                    self.enaction.terminate(outcome, message)
-                    # del self.enactions[self.clock]
-                    # self.clock += 1
-                    # self.interaction_step = INTERACTION_STEP_REFRESHING
-                    self.interaction_step = INTERACTION_STEP_INTEGRATING
+            outcome = self.memory.simulate(self.enaction, dt)
+            # If imagining then use the imagined outcome when the simulation is finished
+            if self.is_imagining and outcome is not None:
+                self.enaction.terminate(outcome)
+                self.interaction_step = INTERACTION_STEP_INTEGRATING
+            # If not imagining then CtrlRobot will return the outcome and proceed to INTEGRATING
 
-        # INTEGRATING: the new enacted interaction (if not imagining)
+        # INTEGRATING: the new enacted interaction
         if self.interaction_step == INTERACTION_STEP_INTEGRATING:
             # Restore the memory from the snapshot and integrate the experiences
             self.memory = self.memory_snapshot
+            # Retrieve possible message from other robot
+            self.enaction.message = self.message
+            self.message = None
             # Update body memory and egocentric memory
             self.memory.update_and_add_experiences(self.enaction)
 
@@ -192,16 +172,19 @@ class Workspace:
         if self.enaction is None or self.enaction.message_sent:
             return None
 
-        message = {"robot": self.robot_id, "azimuth": self.memory.body_memory.body_azimuth(),
-                   'pos_x': round(self.memory.allocentric_memory.robot_point[0]),
-                   'pos_y': round(self.memory.allocentric_memory.robot_point[1])}
+        message = {"robot": self.robot_id, "azimuth": self.memory.body_memory.body_azimuth()}
+        # TODO add pos_x pos_y when we have a position relative to a fixed point
+        # 'pos_x': round(self.memory.allocentric_memory.robot_point[0]),
+        # 'pos_y': round(self.memory.allocentric_memory.robot_point[1])}
 
         # If focus then send polar-egocentric information
         focus_point = self.memory.egocentric_to_polar_egocentric(self.enaction.focus_point)
-        if focus_point is not None:
-            # The position of the focus
-            message['focus_x'] = round(focus_point[0])
-            message['focus_y'] = round(focus_point[1])
+        if focus_point is None:
+            return None
+
+        # The position of the focus
+        message['focus_x'] = round(focus_point[0])
+        message['focus_y'] = round(focus_point[1])
 
         # The destination position in polar-egocentric
         destination_point = quaternion.apply_to_vector(self.enaction.body_quaternion,
@@ -212,8 +195,19 @@ class Workspace:
         self.enaction.message_sent = True
         return json.dumps(message)
 
-    def receive_message(self, message):
+    def receive_message(self, message_string):
         """Store the last message received from other robots"""
-        # If not message keep the previous one
-        if message is not None:
-            self.message = message
+        # If no message then keep the previous one
+        if message_string is not None:
+            self.message = Message(message_string)
+            self.message.ego_quaternion = self.message.body_quaternion.cross(self.memory.body_memory.body_quaternion.inverse)
+            print("other angle", math.degrees(self.message.body_quaternion.angle * self.message.body_quaternion.axis[2]))
+            print("this angle", math.degrees(self.memory.body_memory.body_quaternion.angle * self.memory.body_memory.body_quaternion.axis[2]))
+            print("ego angle", math.degrees(self.message.ego_quaternion.angle * self.message.ego_quaternion.axis[2]))
+            if self.message.allo_position is not None:
+                # If allocentric position has been received
+                # TODO use this
+                self.message.ego_position = self.memory.allocentric_to_egocentric(self.message.allo_position)
+            else:
+                # If only focus position was received then we assume this robot is in the other's focus
+                self.message.ego_position = self.memory.polar_egocentric_to_egocentric(self.message.polar_ego_position)
