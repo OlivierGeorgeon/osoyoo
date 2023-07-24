@@ -53,14 +53,6 @@ class CtrlEgocentricView:
 
         self.view.push_handlers(on_mouse_press, on_key_press, on_text)
 
-    # def add_point_of_interest(self, x, y, point_type, group=None):
-    #     """ Adding a point of interest to the view """
-    #     if group is None:
-    #         group = self.view.forefront
-    #     point_of_interest = PointOfInterest(x, y, self.view.batch, group, point_type, self.workspace.clock)
-    #     self.points_of_interest.append(point_of_interest)
-    #     return point_of_interest
-
     def update_body_robot(self):
         """Updates the robot's body to display by the egocentric view"""
         self.view.robot.rotate_head(self.workspace.memory.body_memory.head_direction_degree())
@@ -77,16 +69,11 @@ class CtrlEgocentricView:
                   if (e.clock + e.durability >= self.workspace.clock - 1)]:
             poi = PointOfInterest(0, 0, self.view.batch, self.view.forefront, e.type, e.clock,
                                   color_index=e.color_index)
-            # if e.color is not None:
-            #     poi.color = e.color
             poi.displace(e.position_matrix)
             poi.fade(self.workspace.clock)
             self.points_of_interest.append(poi)
 
         # Re-create the focus point
-        # poi_focus = self.create_poi_focus()
-        # if poi_focus is not None:
-        #     self.points_of_interest.append(poi_focus)
         if self.workspace.memory.egocentric_memory.focus_point is not None:
             focus_poi = PointOfInterest(self.workspace.memory.egocentric_memory.focus_point[0],
                                         self.workspace.memory.egocentric_memory.focus_point[1],
@@ -99,16 +86,6 @@ class CtrlEgocentricView:
                                          self.workspace.memory.egocentric_memory.prompt_point[1],
                                          self.view.batch, self.view.background, POINT_PROMPT, self.workspace.clock)
             self.points_of_interest.append(prompt_poi)
-
-    # def create_poi_focus(self):
-    #     """Create a point of interest corresponding to the focus"""
-    #     agent_focus_point = None
-    #     if self.workspace.memory.egocentric_memory.focus_point is not None:
-    #         x = self.workspace.memory.egocentric_memory.focus_point[0]
-    #         y = self.workspace.memory.egocentric_memory.focus_point[1]
-    #         agent_focus_point = PointOfInterest(x, y, self.view.batch, self.view.forefront, EXPERIENCE_FOCUS,
-    #                                             self.workspace.clock)
-    #     return agent_focus_point
 
     def main(self, dt):
         """Update the egocentric view"""
