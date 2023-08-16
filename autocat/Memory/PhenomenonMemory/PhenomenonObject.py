@@ -104,6 +104,9 @@ class PhenomenonObject(Phenomenon):
                     break  # Remove only the first similar affordance found
             print("Prune:", nb_affordance - len(self.affordances), "affordances removed.")
 
+    def outline(self):
+        return self.convex_hull()
+
     def save(self, experiences):
         """Return a clone of the phenomenon for memory snapshot"""
         # Use the experiences cloned when saving egocentric memory

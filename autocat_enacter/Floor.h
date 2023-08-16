@@ -17,8 +17,7 @@
 class Floor
 {
   public:
-    //Floor(Wheel& _OWM);  // The Wheel object is passed by reference to avoid creating another instance
-    Floor();  // The Wheel object is passed by reference to avoid creating another instance
+    Floor();
     void setup();
     int update();
     int measureFloor();

@@ -180,7 +180,7 @@ class Enaction:
                 self.focus_point = None
                 # playsound('autocat/Assets/R5.wav', False)
         else:
-            # If the robot was not focussed
+            # If the robot was not focussed then check for catch focus
             if self.action.action_code in [ACTION_SCAN, ACTION_FORWARD, ACTION_TURN, ACTION_WATCH] \
                     and self.outcome.echo_point is not None:
                 # Catch focus

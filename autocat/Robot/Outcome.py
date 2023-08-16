@@ -38,7 +38,11 @@ def category_color(color_sensor):
             # 'orange'
             color_index = 2
 
-    # Floor in lyon
+    # Rug at Olivier's
+    if color_index == 3 and hsv[1] < 0.6 and hsv[2] < 0.5:
+        color_index = 0
+
+    # Floor in UCLy lyon
     if (hsv[0] < 0.6) and (hsv[1] < 0.3):  # 0.45  // violet (0.66,0.25,0.398) in DOLL
         #if hsv[0] < 0.7:  # 0.6
             # Not saturate, not violet

@@ -34,7 +34,8 @@ class Workspace:
         if self.robot_id == '1':
             self.deciders = {'Explore': DeciderExplore(self), 'Circle': DeciderCircle(self), 'Watch': DeciderWatch(self)}
         else:
-            self.deciders = {'Explore': DeciderExplore(self), 'Circle': DeciderCircle(self)}
+            # self.deciders = {'Explore': DeciderExplore(self), 'Circle': DeciderCircle(self)}
+            self.deciders = {'Circle': DeciderCircle(self)}
         self.integrator = Integrator(self)
 
         self.enactions = {}  # The stack of enactions to enact next

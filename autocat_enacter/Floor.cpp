@@ -15,11 +15,6 @@
 
 Floor::Floor()
 {
-//  _is_retreating = false;
-//  _previous_measure_floor = 0;
-//  _retreat_end_time = 0;
-//  _floor_outcome = 0;
-  // _debug_message = "";
 }
 
 void Floor::setup()

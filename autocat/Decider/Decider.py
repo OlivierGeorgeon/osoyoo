@@ -8,7 +8,8 @@ from . Interaction import Interaction, OUTCOME_NO_FOCUS, OUTCOME_LOST_FOCUS, OUT
 
 FOCUS_TOO_CLOSE_DISTANCE = 200   # (mm) Distance below which OUTCOME_FOCUS_TOO_CLOSE. From robot center
 FOCUS_FAR_DISTANCE = 400         # (mm) Distance beyond which OUTCOME_FOCUS_FAR. Must be farther than forward speed
-FOCUS_TOO_FAR_DISTANCE = 600     # (mm) Distance beyond which OUTCOME_FOCUS_TOO_FAR
+# FOCUS_TOO_FAR_DISTANCE = 600   # (mm) Distance beyond which OUTCOME_FOCUS_TOO_FAR
+FOCUS_TOO_FAR_DISTANCE = 1600    # For circle behavior
 FOCUS_SIDE_ANGLE = 3.14159 / 6.  # (rad) Angle beyond which OUTCOME_SIDE
 
 
@@ -40,7 +41,7 @@ class Decider:
         if enaction is None:
             return outcome
 
-        # If there is a focus point, compute the echo outcome (focus may come from echo or from impact)
+        # If there is a focus point, compute the focus outcome (focus may come from echo or from impact)
         if enaction.focus_point is not None:
             focus_radius = np.linalg.norm(enaction.focus_point)  # From the center of the robot
             if focus_radius < FOCUS_TOO_CLOSE_DISTANCE:
@@ -81,9 +82,7 @@ class Decider:
 
         # Learning or reinforcing the last composite interaction
         if self.previous_interaction is not None:
-            composite_interaction = create_or_reinforce_composite(self.composite_interactions, self.previous_interaction,
-                                                                             self.last_interaction)
-            self.composite_interactions.append(composite_interaction)
+            create_or_reinforce_composite(self.composite_interactions, self.previous_interaction, self.last_interaction)
 
         # Selecting the next action to enact
         # Initialize with the first action to select by default
@@ -103,4 +102,3 @@ class Decider:
         if proclivity_dict:
             # See https://pythonguides.com/python-find-max-value-in-a-dictionary/
             self.action = max(proclivity_dict, key=proclivity_dict.get)
-

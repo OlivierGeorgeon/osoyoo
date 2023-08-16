@@ -1,5 +1,3 @@
-# import json
-
 OUTCOME_NO_FOCUS = '0'
 OUTCOME_LOST_FOCUS = 'L'
 OUTCOME_FOCUS_TOO_CLOSE = 'TC'  # Go backward
@@ -7,14 +5,12 @@ OUTCOME_FOCUS_FRONT = 'F'  # Swipe or Watch
 OUTCOME_FOCUS_SIDE = 'S'  # Turn
 OUTCOME_FOCUS_FAR = 'FA'  # Go forward
 OUTCOME_FOCUS_TOO_FAR = 'TF'  # U-Turn
-OUTCOME_LIST = [OUTCOME_LOST_FOCUS, OUTCOME_FOCUS_FAR, OUTCOME_FOCUS_TOO_CLOSE, OUTCOME_FOCUS_FRONT,
-                OUTCOME_FOCUS_SIDE, OUTCOME_FOCUS_TOO_FAR]
 OUTCOME_FLOOR = '11'
+OUTCOME_LIST = [OUTCOME_LOST_FOCUS, OUTCOME_FOCUS_FAR, OUTCOME_FOCUS_TOO_CLOSE, OUTCOME_FOCUS_FRONT,
+                OUTCOME_FOCUS_SIDE, OUTCOME_FOCUS_TOO_FAR, OUTCOME_FLOOR]
 
 
 class Interaction:
-#     interaction_list = []
-
     def __init__(self, action, outcome, valence):
         self.action = action
         self.outcome = outcome

@@ -77,6 +77,9 @@ class PhenomenonTerrain(Phenomenon):
             return confirmation_point
         return None
 
+    def outline(self):
+        return self.interpolate(EXPERIENCE_FLOOR)
+
     def phenomenon_label(self):
         """Return the text to display in phenomenon view"""
         label = "Origin: " + str(self.point[0]) + "," + str(self.point[1])

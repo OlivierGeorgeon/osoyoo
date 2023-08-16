@@ -1,6 +1,7 @@
 import math
 import numpy as np
 from scipy.spatial import ConvexHull, QhullError, Delaunay
+from scipy.interpolate import splprep, splev
 
 PHENOMENON_DELTA = 300  # (mm) Distance between affordances to be considered the same phenomenon
 PHENOMENON_INITIAL_CONFIDENCE = 0.0  # 0.2 Initial confidence in the phenomenon
@@ -27,6 +28,7 @@ class Phenomenon:
         self.tour_started = False
         # The hull is used to display the phenomenon's contour
         self.hull_array = None
+        self.delaunay = None
         # Last time the origin affordance was enacted. Used to compute the return to origin.
         self.last_origin_clock = affordance.experience.clock
 
@@ -45,12 +47,18 @@ class Phenomenon:
 
     def convex_hull(self):
         """Return the points of the convex hull containing the phenomenon as a flat list"""
+        # if len(self.affordances) <= 3:
+        #     return None
+        #
+        # return self.interpolate()
+        #
         hull_points = None
         # ConvexHull triggers errors if points are aligned
         try:
             points = np.array([a.point[0:2] for a in self.affordances.values()])
             hull = ConvexHull(points)
             self.hull_array = np.array([points[vertex] for vertex in hull.vertices])
+            self.delaunay = Delaunay(self.hull_array)  # The hull array is computed at the end of the previous cycle
             hull_points = self.hull_array.flatten().astype("int").tolist()
         except QhullError:
             print("Error computing the convex hull: probably not enough points.")
@@ -58,14 +66,44 @@ class Phenomenon:
             print("Error computing the convex hull: probably not enough points.", e)
         return hull_points
 
+    def interpolate(self, experience_type):
+        interpolation = None
+        try:
+            points = np.array([a.point[0:2] for a in self.affordances.values() if a.experience.type == experience_type])
+            # points = np.array([a.point[0:2] for a in self.affordances.values()])
+            center = points.mean(axis=0)
+            center_x = np.mean(points[:, 0])
+            center_y = np.mean(points[:, 1])
+            # angles = np.arctan2(points[:, 1] - center_y, points[:, 0] - center_x)
+            angles = np.arctan2(points[:, 1] - center[1], points[:, 0] - center[0])
+            sorted_indices = np.argsort(angles)
+            sorted_points = points[sorted_indices]
+
+            # Close the loop
+            sorted_points = np.append(sorted_points, [sorted_points[0]], axis=0)
+            # print(repr(sorted_points))
+            # Generate the B-spline representation
+            tck, u = splprep(sorted_points.T, s=50000, per=True)  # s=0.2
+            # Evaluate the B-spline on a finer grid
+            u_new = np.linspace(0, 1, 100)
+            interp = splev(u_new, tck)
+            interpolation = np.array(interp).T.flatten().astype("int").tolist()
+        except IndexError as e:
+            print("Interpolation failed. No points.", e)
+        except TypeError as e:
+            print("Interpolation failed. Not enough points.", e)
+        except ValueError as e:
+            print("Interpolation failed.", e)
+        return interpolation
+
     def is_inside(self, p):
         """True if p is inside the convex hull"""
         # https://stackoverflow.com/questions/16750618/whats-an-efficient-way-to-find-if-a-point-lies-in-the-convex-hull-of-a-point-cl
         is_inside = False
         try:
             # Must reduce to 2 dimensions otherwise the point is not found inside
-            d = Delaunay(self.hull_array)  # The hull array is computed at the end of the previous cycle
-            is_inside = (d.find_simplex(p[0:2]) >= 0)
+            # self.delaunay = Delaunay(self.hull_array)  # The hull array is computed at the end of the previous cycle
+            is_inside = (self.delaunay.find_simplex(p[0:2]) >= 0)
         except IndexError as e:
             print("Error computing the Delaunay: ", e)
         return is_inside

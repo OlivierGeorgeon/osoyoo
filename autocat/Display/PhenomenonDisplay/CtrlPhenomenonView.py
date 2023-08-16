@@ -47,8 +47,6 @@ class CtrlPhenomenonView:
         """Retrieve the new affordances in a phenomenon and create the corresponding points of interest"""
 
         # Delete the points of interest
-        # Crash seem to try to delete twice the shape
-        # self.affordance_displays = [p for p in self.affordance_displays if not p.delete()]
         for poi in self.affordance_displays:
             poi.delete()
         self.affordance_displays = []
@@ -59,7 +57,8 @@ class CtrlPhenomenonView:
             self.affordance_displays.append(ad)
 
         # Draw the phenomenon outline
-        self.view.add_lines(phenomenon.convex_hull(), "black")
+        # self.view.add_lines(phenomenon.convex_hull(), "black")
+        self.view.add_lines(phenomenon.outline(), "black")
 
     def create_affordance_display(self, affordance):
         """Create a point of interest corresponding to the affordance given as parameter"""

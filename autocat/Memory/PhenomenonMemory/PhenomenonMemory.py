@@ -1,5 +1,5 @@
 import numpy as np
-from .PhenomenonObject import PhenomenonObject, OBJECT_EXPERIENCE_TYPES
+from .PhenomenonObject import PhenomenonObject
 from .PhenomenonTerrain import PhenomenonTerrain, TERRAIN_EXPERIENCE_TYPES
 
 TER = 0
