@@ -7,6 +7,7 @@ from ..EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_PLACE
 from ..AllocentricMemory.GridCell import CELL_NO_ECHO, CELL_PHENOMENON
 from ..EgocentricMemory.Experience import EXPERIENCE_FOCUS, EXPERIENCE_PROMPT
 from ...Robot.RobotDefine import ROBOT_FRONT_X, ROBOT_SIDE
+from ...Memory.PhenomenonMemory.PhenomenonMemory import TER
 
 
 class AllocentricMemory:
@@ -76,28 +77,17 @@ class AllocentricMemory:
                 self.apply_status_to_cell(cell_x, cell_y, a.experience.type, a.experience.clock, a.experience.color_index)
                 # Attribute this phenomenon to this cell
                 self.grid[cell_x][cell_y].phenomenon_id = p_id
-            # cell_i, cell_j = point_to_cell(p.point)
-            # self.apply_status_to_cell(cell_i, cell_j, CELL_PHENOMENON, clock, None)  # Mark the origin
+            # # Mark the cell outside the terrain
+            if p_id == TER and p.delaunay is not None:
+                for c in [c for line in self.grid for c in line if not p.is_inside(c.point())]:
+                    c.status[0] = EXPERIENCE_FLOOR
+                    c.phenomenon_id = TER
+                    c.clock_place = clock
 
         # Place the affordances that are not attached to phenomena
         for a in self.affordances:
             cell_x, cell_y = point_to_cell(a.point)
             self.apply_status_to_cell(cell_x, cell_y, a.experience.type, clock, a.experience.color_index)
-
-    # def move(self, body_direction_rad, translation, clock, is_egocentric_translation=True):
-    #     """Move the robot in allocentric memory. Mark the traversed cells Free. Returns the new position"""
-    #     # Compute the robot destination point
-    #     if is_egocentric_translation:
-    #         # TODO Translate between the initial direction and the final direction
-    #         destination_point = self.robot_point + rotate_vector_z(translation, body_direction_rad)
-    #     else:
-    #         destination_point = self.robot_point + translation
-    #     # Check that the robot remains within allocentric memory limits
-    #     body_direction_matrix = matrix44.create_from_z_rotation(-body_direction_rad)
-    #     self.place_robot_translate(body_direction_matrix, self.robot_point, destination_point, clock)
-    #     self.robot_point = destination_point
-    #
-    #     return np.round(destination_point)
 
     def move(self, body_quaternion, translation, clock):
         """Move the robot in allocentric memory. Mark the traversed cells Free. Returns the new position
@@ -134,19 +124,6 @@ class AllocentricMemory:
             c.status[0] = EXPERIENCE_PLACE
             c.clock_place = clock
         # print("Place robot time:", time.time() - start_time, "seconds")
-
-    # def place_robot_translate(self, body_direction_matrix, start, end, clock):
-    #     """Mark the cells traversed by the robot translation"""
-    #     # TODO manage different directions
-    #     p1 = matrix44.apply_to_vector(body_direction_matrix, [ROBOT_FRONT_X, ROBOT_SIDE, 0]) + end
-    #     p2 = matrix44.apply_to_vector(body_direction_matrix, [-ROBOT_FRONT_X, ROBOT_SIDE, 0]) + start
-    #     p3 = matrix44.apply_to_vector(body_direction_matrix, [-ROBOT_FRONT_X, -ROBOT_SIDE, 0]) + start
-    #     p4 = matrix44.apply_to_vector(body_direction_matrix, [ROBOT_FRONT_X, -ROBOT_SIDE, 0]) + end
-    #     outline = np.array([p1, p2, p3, p4])
-    #     polygon = [p[0:2] for p in outline]
-    #     for c in [c for line in self.grid for c in line if c.is_inside(polygon)]:
-    #         c.status[0] = EXPERIENCE_PLACE
-    #         c.clock_place = clock
 
     def clear_phenomena(self):
         """Reset the phenomena from cells"""

@@ -86,8 +86,6 @@ class Memory:
             return None
         # convert to polar-egocentric and then add the position in allocentric memory
         return self.egocentric_to_polar_egocentric(point) + self.allocentric_memory.robot_point
-        # return matrix44.apply_to_vector(self.body_memory.body_direction_matrix(), point) \
-        #     + self.allocentric_memory.robot_point
 
     def polar_egocentric_to_egocentric(self, point):
         """Convert from polar-egocentric to egocentric references"""
@@ -95,15 +93,11 @@ class Memory:
             return None
         # Rotate the point by the opposite body direction using the inverse body quaternion
         return quaternion.apply_to_vector(self.body_memory.body_quaternion.inverse, point)
-        # Rotate the point by the opposite body direction using the transposed rotation matrix
-        # return matrix44.apply_to_vector(self.body_memory.body_direction_matrix().T, point)
 
     def allocentric_to_egocentric(self, point):
         """Return the point in egocentric coordinates from the point in allocentric coordinates"""
         if point is None:
             return None
-        # Subtract the body position to obtain the polar-egocentric and then convert to egocentric
-        # ego_point = point - self.allocentric_memory.robot_point
         return self.polar_egocentric_to_egocentric(point - self.allocentric_memory.robot_point)
 
     def save(self):

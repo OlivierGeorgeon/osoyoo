@@ -14,6 +14,7 @@ class PhenomenonTerrain(Phenomenon):
         # print("New phenomenon terrain with experience clock:", affordance.experience.clock)
         self.confidence = 0.1  # Must not be null to allow position correction
         # If the affordance is color floor then use it as absolute origin
+        self.interpolation_types = [EXPERIENCE_FLOOR]
         if affordance.absolute_point_interest():
             self.absolute_affordance_key = 0
             self.last_origin_clock = affordance.experience.clock
@@ -56,6 +57,9 @@ class PhenomenonTerrain(Phenomenon):
                         a.point += ac
                         print("Affordance clock:", a.experience.clock, "corrected by:", ac, "coef:", coef)
                     self.last_origin_clock = affordance.experience.clock
+            # Interpolate the outline
+            self.convex_hull()
+            self.interpolate()
             return position_correction
         # Affordances that do not belong to this phenomenon must return None
         return None
@@ -78,7 +82,8 @@ class PhenomenonTerrain(Phenomenon):
         return None
 
     def outline(self):
-        return self.interpolate(EXPERIENCE_FLOOR)
+        return self.interpolation_points
+        # return self.interpolate(EXPERIENCE_FLOOR)
 
     def phenomenon_label(self):
         """Return the text to display in phenomenon view"""
