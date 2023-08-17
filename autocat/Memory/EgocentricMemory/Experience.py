@@ -24,7 +24,7 @@ class Experience:
     def __init__(self, point, experience_type, body_direction_rad, clock, experience_id, durability=10, color_index=0, direction_quaternion=Quaternion([0,0,0,1])):
         """Create an experience to be placed in the memory.
         Args:
-        x, y : coordinates relative the robot.
+        point : position of the affordance relative to the robot.
         type : type of experience (i.e. Chock, Block, Echolocalisation, Line etc)
         durability : durability of the experience, when it reach zero the experience should be removed from the memory.
         """

@@ -76,7 +76,7 @@ class PhenomenonTerrain(Phenomenon):
         if self.absolute_affordance() is not None:
             rotation_matrix = self.absolute_affordance().experience.rotation_matrix
             point = np.array([500, 0, 0])
-            print("Computing confirmation point from origin", self.point)
+            # print("Computing confirmation point from origin", self.point)
             confirmation_point = matrix44.apply_to_vector(rotation_matrix, point).astype(int) + self.point
             return confirmation_point
         return None

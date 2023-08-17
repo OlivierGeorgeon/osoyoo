@@ -62,7 +62,10 @@ class Command:
             else:
                 self.anticipated_translation = - action.translation_speed * action.target_duration
         else:
-            self.anticipated_translation = action.translation_speed * self.duration / 1000
+            if self.speed is None or self.speed > 0:
+                self.anticipated_translation = action.translation_speed * self.duration / 1000
+            else:
+                self.anticipated_translation = - action.translation_speed * self.duration / 1000
 
         if self.angle is None:
             self.anticipated_yaw_quaternion = Quaternion.from_z_rotation(action.rotation_speed_rad * action.target_duration)

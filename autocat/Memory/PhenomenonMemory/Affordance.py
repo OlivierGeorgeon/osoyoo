@@ -88,16 +88,16 @@ class Affordance:
         return points
 
     def color_position(self):
-        """Return the position of the color_index patch knowing the position and color of this affordance"""
+        """Return the position of the green patch knowing the position and color of this affordance"""
         # Orthogonal vector
         om = matrix44.create_from_z_rotation(-math.pi / 2)
         vo = matrix44.apply_to_vector(om, self.experience.sensor_point()) / \
              np.linalg.norm(self.experience.sensor_point())
         # Distance along the orthogonal vector
         color_distance = np.array((MIDDLE_COLOR_INDEX - self.experience.color_index) * vo * COLOR_DISTANCE, dtype=int)
-        print("Affordance position:", self.point, "sensor point", self.experience.sensor_point(), "color index",
-              self.experience.color_index)
-        print("New index", MIDDLE_COLOR_INDEX, "at", color_distance)
+        # print("Affordance position:", self.point, "sensor point", self.experience.sensor_point(), "color index",
+        #       self.experience.color_index)
+        print("Relative polar-centric position of green patch", color_distance)
         return color_distance + self.point
 
     def save(self, experiences):

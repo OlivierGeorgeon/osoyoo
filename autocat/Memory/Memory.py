@@ -46,6 +46,7 @@ class Memory:
         self.body_memory.set_head_direction_degree(enaction.outcome.head_angle)
         # TODO Keep the simulation and adjust the robot position
         # Translate the robot before applying the yaw
+        # print("Robot relative translation", enaction.translation)
         self.allocentric_memory.move(self.body_memory.body_quaternion, enaction.translation, enaction.clock)
         self.body_memory.body_quaternion = enaction.body_quaternion
 

@@ -67,34 +67,30 @@ class Phenomenon:
 
     def interpolate(self):
         self.interpolation_points = None
-        try:
-            points = np.array([a.point[0:2] for a in self.affordances.values() if a.experience.type in self.interpolation_types])
-            # points = np.array([a.point[0:2] for a in self.affordances.values()])
-            # Sort in polar coordinates from the center
-            center = points.mean(axis=0)
-            # center_x = np.mean(points[:, 0])
-            # center_y = np.mean(points[:, 1])
-            # angles = np.arctan2(points[:, 1] - center_y, points[:, 0] - center_x)
-            angles = np.arctan2(points[:, 1] - center[1], points[:, 0] - center[0])
-            sorted_indices = np.argsort(angles)
-            sorted_points = points[sorted_indices]
+        points = np.array(
+            [a.point[0:2] for a in self.affordances.values() if a.experience.type in self.interpolation_types])
+        if len(points) > 3:
+            try:
+                center = points.mean(axis=0)
+                angles = np.arctan2(points[:, 1] - center[1], points[:, 0] - center[0])
+                sorted_indices = np.argsort(angles)
+                sorted_points = points[sorted_indices]
 
-            # Close the loop
-            sorted_points = np.append(sorted_points, [sorted_points[0]], axis=0)
-            # print(repr(sorted_points))
-            # Generate the B-spline representation
-            tck, u = splprep(sorted_points.T, s=50000, per=True)  # s=0.2
-            # Evaluate the B-spline on a finer grid
-            u_new = np.linspace(0, 1, 100)
-            interp = splev(u_new, tck)
-            self.interpolation_points = np.array(interp).T.flatten().astype("int").tolist()
-        except IndexError as e:
-            print("Interpolation failed. No points.", e)
-        except TypeError as e:
-            print("Interpolation failed. Not enough points.", e)
-        except ValueError as e:
-            print("Interpolation failed.", e)
-        # return interpolation
+                # Close the loop
+                sorted_points = np.append(sorted_points, [sorted_points[0]], axis=0)
+                # print(repr(sorted_points))
+                # Generate the B-spline representation
+                tck, u = splprep(sorted_points.T, s=50000, per=True)  # s=0.2
+                # Evaluate the B-spline on a finer grid
+                u_new = np.linspace(0, 1, 100)
+                interp = splev(u_new, tck)
+                self.interpolation_points = np.array(interp).T.flatten().astype("int").tolist()
+            except IndexError as e:
+                print("Interpolation failed. No points.", e)
+            except TypeError as e:
+                print("Interpolation failed. Not enough points.", e)
+            except ValueError as e:
+                print("Interpolation failed.", e)
 
     def is_inside(self, p):
         """True if p is inside the convex hull"""

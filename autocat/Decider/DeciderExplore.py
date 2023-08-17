@@ -102,7 +102,7 @@ class DeciderExplore(Decider):
             # If right or left then swipe to home
             if outcome in [OUTCOME_LEFT, OUTCOME_RIGHT]:
                 if outcome == OUTCOME_RIGHT:
-                    ego_confirmation = np.array([0, 280, 0], dtype=int)
+                    ego_confirmation = np.array([0, 280, 0], dtype=int)  # Swipe to the right
                 else:
                     ego_confirmation = np.array([0, -280, 0], dtype=int)
                 print("Swiping to confirmation by:", ego_confirmation)
@@ -115,7 +115,7 @@ class DeciderExplore(Decider):
                 # If near home then go to confirmation prompt
                 if self.workspace.memory.is_near_terrain_origin() or outcome == OUTCOME_COLOR:
                     allo_confirmation = self.workspace.memory.phenomenon_memory.phenomena[TER].confirmation_prompt()
-                    print("Enacting confirmation affordance to", allo_confirmation)
+                    print("Enacting confirmation sequence to", allo_confirmation)
                     ego_confirmation = self.workspace.memory.allocentric_to_egocentric(allo_confirmation)
                     self.workspace.memory.egocentric_memory.prompt_point = ego_confirmation
                     playsound('autocat/Assets/R4.wav', False)
@@ -149,12 +149,12 @@ class DeciderExplore(Decider):
         # If the robot is on a color patch and must enact confirmation affordance
         # (If already on a color then go to confirmation prompt rather than origin prompt)
         # This is used if the robot arrives on a color after turning to go directly to confirmation
-        if TER in self.workspace.memory.phenomenon_memory.phenomena and \
-            self.workspace.memory.phenomenon_memory.phenomena[TER].absolute_affordance() is not None and \
-            self.workspace.clock - self.workspace.memory.phenomenon_memory.phenomena[TER].last_origin_clock \
-                > CLOCK_TO_GO_HOME and outcome == OUTCOME_COLOR:
-            allo_confirmation = self.workspace.memory.phenomenon_memory.phenomena[TER].confirmation_prompt()
-            print("Enacting confirmation affordance to", allo_confirmation)
-            ego_confirmation = self.workspace.memory.allocentric_to_egocentric(allo_confirmation)
-            self.workspace.memory.egocentric_memory.prompt_point = ego_confirmation
-            playsound('autocat/Assets/R4.wav', False)
+        # if TER in self.workspace.memory.phenomenon_memory.phenomena and \
+        #     self.workspace.memory.phenomenon_memory.phenomena[TER].absolute_affordance() is not None and \
+        #     self.workspace.clock - self.workspace.memory.phenomenon_memory.phenomena[TER].last_origin_clock \
+        #         > CLOCK_TO_GO_HOME and outcome == OUTCOME_COLOR:
+        #     allo_confirmation = self.workspace.memory.phenomenon_memory.phenomena[TER].confirmation_prompt()
+        #     print("Enacting confirmation affordance to", allo_confirmation)
+        #     ego_confirmation = self.workspace.memory.allocentric_to_egocentric(allo_confirmation)
+        #     self.workspace.memory.egocentric_memory.prompt_point = ego_confirmation
+        #     playsound('autocat/Assets/R4.wav', False)

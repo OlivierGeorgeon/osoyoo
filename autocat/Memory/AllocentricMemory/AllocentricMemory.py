@@ -77,12 +77,12 @@ class AllocentricMemory:
                 self.apply_status_to_cell(cell_x, cell_y, a.experience.type, a.experience.clock, a.experience.color_index)
                 # Attribute this phenomenon to this cell
                 self.grid[cell_x][cell_y].phenomenon_id = p_id
-            # # Mark the cell outside the terrain
-            if p_id == TER and p.delaunay is not None:
-                for c in [c for line in self.grid for c in line if not p.is_inside(c.point())]:
-                    c.status[0] = EXPERIENCE_FLOOR
-                    c.phenomenon_id = TER
-                    c.clock_place = clock
+            # Mark the cell outside the terrain. (for BICA 2023 paper)
+            # if p_id == TER and p.delaunay is not None:
+            #     for c in [c for line in self.grid for c in line if not p.is_inside(c.point())]:
+            #         c.status[0] = EXPERIENCE_FLOOR
+            #         c.phenomenon_id = TER
+            #         c.clock_place = clock
 
         # Place the affordances that are not attached to phenomena
         for a in self.affordances:
@@ -100,6 +100,7 @@ class AllocentricMemory:
         #     destination_point = self.robot_point + translation
 
         destination_point = self.robot_point + quaternion.apply_to_vector(body_quaternion, translation)
+        # print("Robot destination point", destination_point)
 
         # Mark the cells traversed by the robot
         p1 = quaternion.apply_to_vector(body_quaternion, [ROBOT_FRONT_X, ROBOT_SIDE, 0]) + destination_point
