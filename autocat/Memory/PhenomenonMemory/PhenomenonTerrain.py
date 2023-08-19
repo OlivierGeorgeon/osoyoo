@@ -42,7 +42,6 @@ class PhenomenonTerrain(Phenomenon):
                     self.point += affordance.color_position()
                     # All the position of affordance including this one are adjusted
                     for a in self.affordances.values():
-                        # a.point -= affordance.point
                         a.point -= affordance.color_position()
                 else:
                     # The position correction is the distance of the affordance's green patch to the phenomenon origin

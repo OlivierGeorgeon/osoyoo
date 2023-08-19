@@ -21,10 +21,10 @@ class Message:
         if 'destination_x' in message_dict:
             self.destination = Vector3([message_dict["destination_x"], message_dict["destination_y"], 0])
 
-        self.allo_position = None
+        self.ter_position = None
         if 'pos_x' in message_dict:
-            self.allo_position = Vector3([message_dict["pos_x"], message_dict["pos_y"], 0])
-            self.allo_position += self.destination
+            self.ter_position = Vector3([message_dict["pos_x"], message_dict["pos_y"], 0])
+            self.ter_position += self.destination
 
         self.polar_ego_position = None
         if 'focus_x' in message_dict:

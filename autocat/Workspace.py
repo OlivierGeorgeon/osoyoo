@@ -1,6 +1,5 @@
 import json
 import math
-import numpy as np
 from pyrr import quaternion, Quaternion, Vector3
 from playsound import playsound
 from .Decider.DeciderCircle import DeciderCircle
@@ -8,6 +7,7 @@ from .Decider.DeciderExplore import DeciderExplore
 from .Decider.DeciderWatch import DeciderWatch
 from .Decider.Action import create_actions, ACTION_FORWARD, ACTIONS, ACTION_TURN
 from .Memory.Memory import Memory
+from .Memory.PhenomenonMemory.PhenomenonMemory import TER
 from .Integrator.Integrator import Integrator
 from .Robot.Enaction import Enaction
 from .Robot.Message import Message
@@ -34,8 +34,8 @@ class Workspace:
         if self.robot_id == '1':
             self.deciders = {'Explore': DeciderExplore(self), 'Circle': DeciderCircle(self), 'Watch': DeciderWatch(self)}
         else:
-            self.deciders = {'Explore': DeciderExplore(self), 'Circle': DeciderCircle(self)}
-            # self.deciders = {'Circle': DeciderCircle(self)}
+            # self.deciders = {'Explore': DeciderExplore(self), 'Circle': DeciderCircle(self)}
+            self.deciders = {'Circle': DeciderCircle(self)}
         self.integrator = Integrator(self)
 
         self.enactions = {}  # The stack of enactions to enact next
@@ -169,46 +169,57 @@ class Workspace:
     def emit_message(self):
         """Return the message to answer to another robot"""
 
-        # If no ongoing enaction then no message
+        # Only compute the message once for the current enaction
         if self.enaction is None or self.enaction.message_sent:
             return None
 
         message = {"robot": self.robot_id, "azimuth": self.memory.body_memory.body_azimuth()}
-        # TODO add pos_x pos_y when we have a position relative to a fixed point
-        # 'pos_x': round(self.memory.allocentric_memory.robot_point[0]),
-        # 'pos_y': round(self.memory.allocentric_memory.robot_point[1])}
 
-        # If focus then send polar-egocentric information
-        focus_point = self.memory.egocentric_to_polar_egocentric(self.enaction.focus_point)
-        if focus_point is None:
+        # If the terrain has been found then send the position relative to the terrain origin
+        if TER in self.memory.phenomenon_memory.phenomena:
+            point = self.memory.allocentric_memory.robot_point - self.memory.phenomenon_memory.phenomena[TER].point
+            message['pos_x'] = round(point[0])
+            message['pos_y'] = round(point[1])
+
+        # If ongoing enaction wit focus and message not yet sent then add the enation information
+        if self.enaction is not None and self.enaction.focus_point is not None:
+            focus_point = self.memory.egocentric_to_polar_egocentric(self.enaction.focus_point)
+            # The position of the focus
+            message['focus_x'] = round(focus_point[0])
+            message['focus_y'] = round(focus_point[1])
+            # The destination position in polar-egocentric
+            destination_point = quaternion.apply_to_vector(self.enaction.body_quaternion,
+                                                           self.enaction.command.anticipated_translation)
+            message['destination_x'] = round(destination_point[0])
+            message['destination_y'] = round(destination_point[1])
+
+        # Mark the message for this enaction sent
+        self.enaction.message_sent = True
+        # Send the message of there is position or focus
+        if 'pos_x' in message or 'focus_x' in message:
+            return json.dumps(message)
+        else:
             return None
 
-        # The position of the focus
-        message['focus_x'] = round(focus_point[0])
-        message['focus_y'] = round(focus_point[1])
-
-        # The destination position in polar-egocentric
-        destination_point = quaternion.apply_to_vector(self.enaction.body_quaternion,
-                                                       self.enaction.command.anticipated_translation)
-        message['destination_x'] = round(destination_point[0])
-        message['destination_y'] = round(destination_point[1])
-
-        self.enaction.message_sent = True
-        return json.dumps(message)
-
     def receive_message(self, message_string):
-        """Store the last message received from other robots"""
+        """Store the latest message received from other robots in the Workspace. It will be used during INTEGRATING"""
         # If no message then keep the previous one
         if message_string is not None:
             self.message = Message(message_string)
             self.message.ego_quaternion = self.message.body_quaternion.cross(self.memory.body_memory.body_quaternion.inverse)
-            print("other angle", math.degrees(self.message.body_quaternion.angle * self.message.body_quaternion.axis[2]))
-            print("this angle", math.degrees(self.memory.body_memory.body_quaternion.angle * self.memory.body_memory.body_quaternion.axis[2]))
-            print("ego angle", math.degrees(self.message.ego_quaternion.angle * self.message.ego_quaternion.axis[2]))
-            if self.message.allo_position is not None:
-                # If allocentric position has been received
-                # TODO use this
-                self.message.ego_position = self.memory.allocentric_to_egocentric(self.message.allo_position)
+            # print("other angle", math.degrees(self.message.body_quaternion.angle * self.message.body_quaternion.axis[2]))
+            # print("this angle", math.degrees(self.memory.body_memory.body_quaternion.angle * self.memory.body_memory.body_quaternion.axis[2]))
+            # print("ego angle", math.degrees(self.message.ego_quaternion.angle * self.message.ego_quaternion.axis[2]))
+            if self.message.ter_position is not None:
+                # If position in terrain and the position of this robot knows the position of the terrain
+                if TER in self.memory.phenomenon_memory.phenomena:
+                    allo_point = self.message.ter_position + self.memory.phenomenon_memory.phenomena[TER].point
+                    print("Robot", self.message.robot, "position:", allo_point)
+                    self.message.ego_position = self.memory.allocentric_to_egocentric(allo_point)
+                else:
+                    # If cannot place the robot then flush the message
+                    self.message = None
             else:
                 # If only focus position was received then we assume this robot is in the other's focus
+                # if self.message.polar_ego_position is not None:
                 self.message.ego_position = self.memory.polar_egocentric_to_egocentric(self.message.polar_ego_position)

@@ -44,11 +44,11 @@ ROBOT_SETTINGS_1["compass_offset"] = [0, 0, 0]  # Compass offset can also be add
 
 # Robot 2 in Lyon.
 ROBOT_SETTINGS_2 = ROBOT_SETTINGS_0.copy()
-ROBOT_SETTINGS_2["IP"] = {"A301": "192.168.8.189"}
+ROBOT_SETTINGS_2["IP"] = {"A301": "192.168.8.189", "PetiteIA": "192.168.8.189"}
 ROBOT_SETTINGS_2["forward_speed"] = 230  # (mm/s) Forward translation speed.
 ROBOT_SETTINGS_2["lateral_speed"] = 140  # (mm/s) Lateral translation speed.
 ROBOT_SETTINGS_2["retreat_distance"] = 90
-ROBOT_SETTINGS_2["compass_offset"] = [0, 0, 0]
+ROBOT_SETTINGS_2["compass_offset"] = [-75, 72, 0]
 
 # Robot 3 chez Olivier
 ROBOT_SETTINGS_3 = ROBOT_SETTINGS_0.copy()

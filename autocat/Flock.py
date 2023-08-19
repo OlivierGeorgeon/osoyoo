@@ -43,9 +43,15 @@ class Flock:
         # self.ctrl_body_view.main(dt)
         self.ctrl_phenomenon_view.main(dt)
 
-        # Pass the message from robot '2' to robot '1'
-        if all(key in self.workspaces for key in ['1', '2']):
-            self.workspaces['1'].receive_message(self.workspaces['2'].emit_message())
-        # Pass the message from robot '3' to robot '1'
-        if all(key in self.workspaces for key in ['3', '1']):
-            self.workspaces['1'].receive_message(self.workspaces['3'].emit_message())
+        # Transmit messages between robots
+        for key_sender in self.workspaces.keys():
+            for key_receiver in self.workspaces.keys():
+                if key_sender != key_receiver:
+                    self.workspaces[key_receiver].receive_message(self.workspaces[key_sender].emit_message())
+
+        # # Pass the message from robot '2' to robot '1'
+        # if all(key in self.workspaces for key in ['1', '2']):
+        #     self.workspaces['1'].receive_message(self.workspaces['2'].emit_message())
+        # # Pass the message from robot '3' to robot '1'
+        # if all(key in self.workspaces for key in ['3', '1']):
+        #     self.workspaces['1'].receive_message(self.workspaces['3'].emit_message())
