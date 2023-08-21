@@ -11,7 +11,7 @@
 
 #define WIFI_CHANNEL 10 // 10 was the original value in the Osoyoo demo
 #define PORT 8888
-#define UDP_BUFFER_SIZE 100 // If the received packet exceeds this size, Arduino may crash
+#define UDP_BUFFER_SIZE 150 // If the received packet exceeds this size, Arduino may crash
 
 class WifiCat
 {

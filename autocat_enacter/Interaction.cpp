@@ -50,6 +50,7 @@ Interaction::Interaction(Floor& FLO, Head& HEA, Imu& IMU, WifiCat& WifiCat, JSON
   if (json_action.hasOwnProperty("duration"))
     _target_duration = (int)json_action["duration"];
 
+  // If caution > 0 then check for obstacle when moving forward
   if (json_action.hasOwnProperty("caution"))
     _caution = (int)json_action["caution"];
 

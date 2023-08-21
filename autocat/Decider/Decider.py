@@ -8,8 +8,8 @@ from . Interaction import Interaction, OUTCOME_NO_FOCUS, OUTCOME_LOST_FOCUS, OUT
 
 FOCUS_TOO_CLOSE_DISTANCE = 200   # (mm) Distance below which OUTCOME_FOCUS_TOO_CLOSE. From robot center
 FOCUS_FAR_DISTANCE = 400         # (mm) Distance beyond which OUTCOME_FOCUS_FAR. Must be farther than forward speed
-# FOCUS_TOO_FAR_DISTANCE = 600   # (mm) Distance beyond which OUTCOME_FOCUS_TOO_FAR
-FOCUS_TOO_FAR_DISTANCE = 1600    # For circle behavior
+FOCUS_TOO_FAR_DISTANCE = 600   # (mm) Distance beyond which OUTCOME_FOCUS_TOO_FAR
+# FOCUS_TOO_FAR_DISTANCE = 1600    # For circle behavior
 FOCUS_SIDE_ANGLE = 3.14159 / 6.  # (rad) Angle beyond which OUTCOME_SIDE
 
 

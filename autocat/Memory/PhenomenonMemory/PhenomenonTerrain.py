@@ -5,6 +5,8 @@ from autocat.Memory.EgocentricMemory.Experience import EXPERIENCE_PLACE, EXPERIE
 
 
 TERRAIN_EXPERIENCE_TYPES = [EXPERIENCE_PLACE, EXPERIENCE_FLOOR]
+TERRAIN_INITIAL_CONFIDENCE = 0.1  # Must not be null to allow position correction
+TERRAIN_ORIGIN_CONFIDENCE = 0.2  # When the robot emits its position in the message
 
 
 class PhenomenonTerrain(Phenomenon):
@@ -12,7 +14,7 @@ class PhenomenonTerrain(Phenomenon):
     def __init__(self, affordance):
         super().__init__(affordance)
         # print("New phenomenon terrain with experience clock:", affordance.experience.clock)
-        self.confidence = 0.1  # Must not be null to allow position correction
+        self.confidence = TERRAIN_INITIAL_CONFIDENCE
         # If the affordance is color floor then use it as absolute origin
         self.interpolation_types = [EXPERIENCE_FLOOR]
         if affordance.absolute_point_interest():
@@ -43,6 +45,7 @@ class PhenomenonTerrain(Phenomenon):
                     # All the position of affordance including this one are adjusted
                     for a in self.affordances.values():
                         a.point -= affordance.color_position()
+                    self.confidence = TERRAIN_ORIGIN_CONFIDENCE
                 else:
                     # The position correction is the distance of the affordance's green patch to the phenomenon origin
                     position_correction = - affordance.color_position()

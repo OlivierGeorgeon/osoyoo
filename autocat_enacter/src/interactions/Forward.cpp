@@ -33,7 +33,7 @@ void Forward::ongoing()
     _HEA.turnHead(_HEA.head_direction(_focus_x - _focus_speed * (millis()- _action_start_time)/1000, _focus_y));
 
 
-  // If obstacle then proceed to step 2
+  // If caution mode and obstacle then proceed to step 2
   if (_caution > 0 && _HEA.get_ultrasonic_measure() < 200) // 200
   {
     if (!_HEA._is_enacting_head_alignment)

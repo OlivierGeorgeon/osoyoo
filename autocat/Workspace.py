@@ -8,6 +8,7 @@ from .Decider.DeciderWatch import DeciderWatch
 from .Decider.Action import create_actions, ACTION_FORWARD, ACTIONS, ACTION_TURN
 from .Memory.Memory import Memory
 from .Memory.PhenomenonMemory.PhenomenonMemory import TER
+from .Memory.PhenomenonMemory.PhenomenonTerrain import TERRAIN_INITIAL_CONFIDENCE
 from .Integrator.Integrator import Integrator
 from .Robot.Enaction import Enaction
 from .Robot.Message import Message
@@ -31,11 +32,11 @@ class Workspace:
         self.robot_id = robot_id
         self.actions = create_actions(robot_id)
         self.memory = Memory(robot_id)
-        if self.robot_id == '1':
+        if self.robot_id == '2':
             self.deciders = {'Explore': DeciderExplore(self), 'Circle': DeciderCircle(self), 'Watch': DeciderWatch(self)}
         else:
-            # self.deciders = {'Explore': DeciderExplore(self), 'Circle': DeciderCircle(self)}
-            self.deciders = {'Circle': DeciderCircle(self)}
+            self.deciders = {'Explore': DeciderExplore(self), 'Circle': DeciderCircle(self)}
+            # self.deciders = {'Circle': DeciderCircle(self)}
         self.integrator = Integrator(self)
 
         self.enactions = {}  # The stack of enactions to enact next
@@ -176,7 +177,7 @@ class Workspace:
         message = {"robot": self.robot_id, "azimuth": self.memory.body_memory.body_azimuth()}
 
         # If the terrain has been found then send the position relative to the terrain origin
-        if TER in self.memory.phenomenon_memory.phenomena:
+        if TER in self.memory.phenomenon_memory.phenomena and self.memory.phenomenon_memory.phenomena[TER].confidence > TERRAIN_INITIAL_CONFIDENCE:
             point = self.memory.allocentric_memory.robot_point - self.memory.phenomenon_memory.phenomena[TER].point
             message['pos_x'] = round(point[0])
             message['pos_y'] = round(point[1])
@@ -212,7 +213,7 @@ class Workspace:
             # print("ego angle", math.degrees(self.message.ego_quaternion.angle * self.message.ego_quaternion.axis[2]))
             if self.message.ter_position is not None:
                 # If position in terrain and the position of this robot knows the position of the terrain
-                if TER in self.memory.phenomenon_memory.phenomena:
+                if TER in self.memory.phenomenon_memory.phenomena and self.memory.phenomenon_memory.phenomena[TER].confidence > TERRAIN_INITIAL_CONFIDENCE:
                     allo_point = self.message.ter_position + self.memory.phenomenon_memory.phenomena[TER].point
                     print("Robot", self.message.robot, "position:", allo_point)
                     self.message.ego_position = self.memory.allocentric_to_egocentric(allo_point)

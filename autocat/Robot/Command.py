@@ -19,6 +19,7 @@ class Command:
         self.focus_x = None
         self.focus_y = None
         self.speed = None
+        self.caution = 1  # Check for obstacles when moving forward
 
         if prompt_point is not None:
             if self.action.action_code in [ACTION_FORWARD, ACTION_BACKWARD]:
@@ -88,6 +89,8 @@ class Command:
             command_dict['focus_y'] = self.focus_y
         if self.speed is not None:
             command_dict['speed'] = self.speed
+        if self.caution is not None:
+            command_dict['caution'] = self.caution
         return json.dumps(command_dict)
 
     def timeout(self):
