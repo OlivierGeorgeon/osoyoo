@@ -71,7 +71,8 @@ class Phenomenon:
             [a.point[0:2] for a in self.affordances.values() if a.experience.type in self.interpolation_types])
         if len(points) > 3:
             try:
-                center = points.mean(axis=0)
+                # center = points.mean(axis=0)
+                center = np.array([0, 0, 0])  # Assumes that the terrain is centered in (0,0,0)
                 angles = np.arctan2(points[:, 1] - center[1], points[:, 0] - center[0])
                 sorted_indices = np.argsort(angles)
                 sorted_points = points[sorted_indices]

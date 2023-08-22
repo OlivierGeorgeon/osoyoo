@@ -83,7 +83,7 @@ class Enaction:
         # if self.action.action_code == ACTION_SWIPE and self.command.speed is not None and self.command.speed < 0:
         #     self.translation = - self.translation
         self.translation = self.command.anticipated_translation.copy()
-        if self.command.duration is None:
+        if self.command.duration is None or self.command.duration == 0:
             self.translation *= (self.outcome.duration1/(self.action.target_duration * 1000.))
         else:
             self.translation *= (self.outcome.duration1/self.command.duration)

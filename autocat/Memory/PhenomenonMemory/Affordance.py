@@ -88,7 +88,7 @@ class Affordance:
         return points
 
     def color_position(self):
-        """Return the position of the green patch knowing the position and color of this affordance"""
+        """Return the position of the green patch from position, color, and orientation of this affordance"""
         # Orthogonal vector
         om = matrix44.create_from_z_rotation(-math.pi / 2)
         vo = matrix44.apply_to_vector(om, self.experience.sensor_point()) / \

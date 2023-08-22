@@ -1,7 +1,8 @@
 import numpy as np
 from pyrr import matrix44
 from .Phenomenon import Phenomenon
-from autocat.Memory.EgocentricMemory.Experience import EXPERIENCE_PLACE, EXPERIENCE_FLOOR
+from ...Memory.EgocentricMemory.Experience import EXPERIENCE_PLACE, EXPERIENCE_FLOOR
+from ...Robot.RobotDefine import TERRAIN_RADIUS
 
 
 TERRAIN_EXPERIENCE_TYPES = [EXPERIENCE_PLACE, EXPERIENCE_FLOOR]
@@ -42,16 +43,30 @@ class PhenomenonTerrain(Phenomenon):
                     self.last_origin_clock = affordance.experience.clock
                     # The phenomenon's origin moves to the green patch relative to this affordance
                     self.point += affordance.color_position()
+                    if affordance.experience.sensor_point()[0] < 0:
+                        terrain_offset = np.array(TERRAIN_RADIUS)
+                    else:
+                        terrain_offset = -np.array(TERRAIN_RADIUS)
+                    self.point -= terrain_offset
                     # All the position of affordance including this one are adjusted
                     for a in self.affordances.values():
                         a.point -= affordance.color_position()
+                        a.point += terrain_offset
                     self.confidence = TERRAIN_ORIGIN_CONFIDENCE
                 else:
-                    # The position correction is the distance of the affordance's green patch to the phenomenon origin
                     position_correction = - affordance.color_position()
+                    # If the origin affordance has the opposite orientation then we assume it is the other color patch
+                    # if np.dot(affordance.experience.sensor_point(), self.affordances[self.absolute_affordance_key].experience.sensor_point()) < 0:
+                    #     # If the affordance sensor point is negative then it is the South-West patch
+                    #     print("Affordance sensor point", affordance.experience.sensor_point())
+                    if affordance.experience.sensor_point()[0] < 0:
+                        position_correction += np.array(TERRAIN_RADIUS)
+                    else:
+                        # The North-East patch
+                        position_correction -= np.array(TERRAIN_RADIUS)
                     # Correct the position of the affordances since last time the robot visited the absolute origin
-                    print("Last origin clock:", self.last_origin_clock)
-                    print("Current Affordance clock", affordance.experience.clock)
+                    # print("Last origin clock:", self.last_origin_clock)
+                    # print("Current Affordance clock", affordance.experience.clock)
                     for a in [a for a in self.affordances.values() if a.experience.clock > self.last_origin_clock]:
                         coef = (a.experience.clock - self.last_origin_clock)/(affordance.experience.clock
                                                                               - self.last_origin_clock)
@@ -59,6 +74,7 @@ class PhenomenonTerrain(Phenomenon):
                         a.point += ac
                         print("Affordance clock:", a.experience.clock, "corrected by:", ac, "coef:", coef)
                     self.last_origin_clock = affordance.experience.clock
+
             # Interpolate the outline
             self.convex_hull()
             self.interpolate()
@@ -69,15 +85,17 @@ class PhenomenonTerrain(Phenomenon):
     def origin_point(self):
         """Return the position where to go to check the origin"""
         if self.absolute_affordance() is not None:
-            return self.absolute_affordance().experience.sensor_point() + self.point
+            return self.absolute_affordance().point + self.point
+                # self.absolute_affordance().experience.sensor_poi8nt() + self.point
         else:
             return None
 
     def confirmation_prompt(self):
-        """Return the point to aim at for confirmation of this phenomenon"""
+        """Return the point in polar egocentric coordinates to aim for confirmation of this phenomenon"""
+        # Parallel to the absolute affordance direction
         if self.absolute_affordance() is not None:
             rotation_matrix = self.absolute_affordance().experience.rotation_matrix
-            point = np.array([500, 0, 0])
+            point = np.array([-500, 0, 0])  # Need the opposite
             # print("Computing confirmation point from origin", self.point)
             confirmation_point = matrix44.apply_to_vector(rotation_matrix, point).astype(int) + self.point
             return confirmation_point

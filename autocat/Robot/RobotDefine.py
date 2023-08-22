@@ -20,6 +20,8 @@ LINE_X = 150  # 160              # (mm) X coordinate of the line after retreat
 
 SCAN_DISTANCE = 800
 
+TERRAIN_RADIUS = [770, 920, 0]  # 1200 azimuth 40°
+
 # You must set the compass offset to the center of the circle drawn by the (compass_x, compass_y) points.
 # Display the compass points of interest in Egocentric view.
 # See screenshot docs/first_steps/compass_calibration.png
@@ -48,15 +50,15 @@ ROBOT_SETTINGS_2["IP"] = {"A301": "192.168.8.189", "PetiteIA": "192.168.8.189"}
 ROBOT_SETTINGS_2["forward_speed"] = 230  # (mm/s) Forward translation speed.
 ROBOT_SETTINGS_2["lateral_speed"] = 140  # (mm/s) Lateral translation speed.
 ROBOT_SETTINGS_2["retreat_distance"] = 90
-ROBOT_SETTINGS_2["compass_offset"] = [-30, 40, 0]
+ROBOT_SETTINGS_2["compass_offset"] = [-25, 20, 0] # [-30, 40, 0]
 
 # Robot 3 chez Olivier
 ROBOT_SETTINGS_3 = ROBOT_SETTINGS_0.copy()
-ROBOT_SETTINGS_3["IP"] = {"PetiteIA": "192.168.8.242"}
-ROBOT_SETTINGS_3["forward_speed"] = 230  # 190 (mm/s) Forward translation speed.
-ROBOT_SETTINGS_3["lateral_speed"] = 160  # (mm/s) Lateral translation speed.
+ROBOT_SETTINGS_3["IP"] = {"A301": "192.168.8.242", "PetiteIA": "192.168.8.242"}
+ROBOT_SETTINGS_3["forward_speed"] = 260  # 230  # 190 (mm/s) Forward translation speed.
+ROBOT_SETTINGS_3["lateral_speed"] = 230  # 160  # (mm/s) Lateral translation speed.
 ROBOT_SETTINGS_3["retreat_distance"] = 80  # 70   # (mm) Distance of the line after retreat
-ROBOT_SETTINGS_3["compass_offset"] = [-30, 40, 0]
+ROBOT_SETTINGS_3["compass_offset"] = [0, 0, 0]  # [-30, 40, 0]
 
 # Robot 1 at DOLL
 ROBOT_SETTINGS_11 = ROBOT_SETTINGS_0.copy()

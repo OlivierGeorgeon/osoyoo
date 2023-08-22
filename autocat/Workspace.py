@@ -32,7 +32,7 @@ class Workspace:
         self.robot_id = robot_id
         self.actions = create_actions(robot_id)
         self.memory = Memory(robot_id)
-        if self.robot_id == '2':
+        if self.robot_id == '1':
             self.deciders = {'Explore': DeciderExplore(self), 'Circle': DeciderCircle(self), 'Watch': DeciderWatch(self)}
         else:
             self.deciders = {'Explore': DeciderExplore(self), 'Circle': DeciderCircle(self)}
@@ -174,7 +174,7 @@ class Workspace:
         if self.enaction is None or self.enaction.message_sent:
             return None
 
-        message = {"robot": self.robot_id, "azimuth": self.memory.body_memory.body_azimuth()}
+        message = {"robot": self.robot_id, "clock": self.clock, "azimuth": self.memory.body_memory.body_azimuth()}
 
         # If the terrain has been found then send the position relative to the terrain origin
         if TER in self.memory.phenomenon_memory.phenomena and self.memory.phenomenon_memory.phenomena[TER].confidence > TERRAIN_INITIAL_CONFIDENCE:

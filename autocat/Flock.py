@@ -15,20 +15,24 @@ class Flock:
         self.ctrl_egocentric_views = {}
         self.ctrl_allocentric_views = {}
         self.ctrl_body_views = {}
+        self.ctrl_phenomenon_views = {}
         for i in range(2, len(arguments)):
             workspace = Workspace(arguments[1], arguments[i])
             self.workspaces[arguments[i]] = workspace
             self.ctrl_robots[arguments[i]] = CtrlRobot(workspace)
             self.ctrl_egocentric_views[arguments[i]] = CtrlEgocentricView(workspace)
-            self.ctrl_egocentric_views[arguments[i]].view.set_caption("Robot " + arguments[i])
+            self.ctrl_egocentric_views[arguments[i]].view.set_caption("Egocentric " + arguments[i])
             self.ctrl_allocentric_views[arguments[i]] = CtrlAllocentricView(self.workspaces[arguments[i]])
-            self.ctrl_allocentric_views[arguments[i]].view.set_caption("Robot " + arguments[i])
+            self.ctrl_allocentric_views[arguments[i]].view.set_caption("Allocentric " + arguments[i])
             self.ctrl_body_views[arguments[i]] = CtrlBodyView(self.workspaces[arguments[i]])
             self.ctrl_body_views[arguments[i]].view.set_caption("Robot " + arguments[i])
+            self.ctrl_phenomenon_views[arguments[i]] = CtrlPhenomenonView(self.workspaces[arguments[i]])
+            self.ctrl_phenomenon_views[arguments[i]].view.set_caption("Terrain " + arguments[i])
+            self.workspaces[arguments[i]].ctrl_phenomenon_view = self.ctrl_phenomenon_views[arguments[i]]
 
         # Create the views for the first robot
-        self.ctrl_phenomenon_view = CtrlPhenomenonView(self.workspaces[arguments[2]])
-        self.workspaces[arguments[2]].ctrl_phenomenon_view = self.ctrl_phenomenon_view
+        # self.ctrl_phenomenon_view = CtrlPhenomenonView(self.workspaces[arguments[2]])
+        # self.workspaces[arguments[2]].ctrl_phenomenon_view = self.ctrl_phenomenon_view
 
     def main(self, dt):
         """Update the robots"""
@@ -39,9 +43,7 @@ class Flock:
             self.ctrl_egocentric_views[robot_id].main(dt)
             self.ctrl_allocentric_views[robot_id].main(dt)
             self.ctrl_body_views[robot_id].main(dt)
-        # self.ctrl_allocentric_view.main(dt)
-        # self.ctrl_body_view.main(dt)
-        self.ctrl_phenomenon_view.main(dt)
+            self.ctrl_phenomenon_views[robot_id].main(dt)
 
         # Transmit messages between robots
         for key_sender in self.workspaces.keys():

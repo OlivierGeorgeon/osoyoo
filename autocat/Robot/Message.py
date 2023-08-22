@@ -28,10 +28,10 @@ class Message:
 
         self.polar_ego_position = None
         if 'focus_x' in message_dict:
-            # If focus then override the position
+            # If focus then compute the polar_ego position
             self.focus_point = Vector3([message_dict["focus_x"], message_dict["focus_y"], 0])
             self.polar_ego_position = -self.focus_point * (1 + ROBOT_FRONT_X / self.focus_point.length)
-            self.polar_ego_position += self.destination
+            # self.polar_ego_position += self.destination
 
         # Ego positions to be update by Workspace.receive_message
         self.ego_quaternion = None
