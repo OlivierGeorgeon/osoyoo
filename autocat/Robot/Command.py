@@ -19,7 +19,7 @@ class Command:
         self.focus_x = None
         self.focus_y = None
         self.speed = None
-        self.caution = 1  # Check for obstacles when moving forward
+        self.caution = 0  # 1  # Check for obstacles when moving forward
 
         if prompt_point is not None:
             if self.action.action_code in [ACTION_FORWARD, ACTION_BACKWARD]:

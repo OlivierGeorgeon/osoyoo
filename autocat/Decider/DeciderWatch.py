@@ -3,15 +3,13 @@
 # Activation 4: default.
 ########################################################################################
 
-import json
 import math
 from playsound import playsound
 import numpy as np
-from pyrr import Quaternion, Vector3
 from . Action import ACTION_WATCH, ACTION_TURN, ACTION_SWIPE, ACTION_FORWARD
 from ..Robot.Enaction import Enaction
-from . Decider import Decider
-from .. Robot.RobotDefine import ROBOT_FRONT_X
+from ..Memory.BodyMemory import ENERGY_TIRED
+from . Decider import Decider, FOCUS_TOO_TOO_FAR_DISTANCE
 from . PredefinedInteractions import create_or_retrieve_primitive, OUTCOME_FOCUS_SIDE, OUTCOME_FOCUS_FRONT, OUTCOME_FOCUS_TOO_FAR
 
 
@@ -20,16 +18,19 @@ class DeciderWatch(Decider):
         super().__init__(workspace)
 
         # Give higher valence to Watch than to Swipe
-        # TODO handle switching between deciders
         create_or_retrieve_primitive(self.primitive_interactions, workspace.actions[ACTION_SWIPE], OUTCOME_FOCUS_FRONT, 1)
         create_or_retrieve_primitive(self.primitive_interactions, workspace.actions[ACTION_FORWARD], OUTCOME_FOCUS_FRONT, 1)
         create_or_retrieve_primitive(self.primitive_interactions, workspace.actions[ACTION_WATCH], OUTCOME_FOCUS_FRONT, 2)
+        self.too_far = FOCUS_TOO_TOO_FAR_DISTANCE
 
         self.action = self.workspace.actions[ACTION_WATCH]
 
     def activation_level(self):
-        """The level of activation of this decider: 0: default, 2 if the terrain has an origin """
-        return 4
+        """The level of activation of this decider: 0: default, 4 if low energy """
+        if self.workspace.memory.body_memory.energy < ENERGY_TIRED:
+            return 4
+        else:
+            return 0
 
     def outcome(self, enaction):
         """ Convert the enacted interaction into an outcome adapted to the watch behavior """

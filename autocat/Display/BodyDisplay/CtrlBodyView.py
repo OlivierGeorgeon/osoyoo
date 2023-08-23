@@ -3,8 +3,9 @@ import math
 import numpy as np
 from .BodyView import BodyView
 from autocat.Display.PointOfInterest import PointOfInterest, POINT_COMPASS, POINT_AZIMUTH
-from ...Robot.CtrlRobot import INTERACTION_STEP_REFRESHING, INTERACTION_STEP_ENACTING
+from ...Robot.CtrlRobot import INTERACTION_STEP_REFRESHING
 import circle_fit as cf
+from ...Workspace import KEY_DECREASE, KEY_INCREASE
 
 KEY_OFFSET = 'O'
 
@@ -28,7 +29,13 @@ class CtrlBodyView:
         self.last_used_id = -1
 
         def on_text(text):
-            """Send user keypress to the workspace to handle"""
+            """Process the user key or forward it to the Workspace to handle"""
+            if text.upper() == KEY_DECREASE:
+                self.workspace.memory.body_memory.energy = max(0, self.workspace.memory.body_memory.energy - 0.1)
+                self.workspace.memory_snapshot.body_memory.energy = self.workspace.memory.body_memory.energy
+            elif text.upper() == KEY_INCREASE:
+                self.workspace.memory.body_memory.energy = min(self.workspace.memory.body_memory.energy + 0.1, 1.)
+                self.workspace.memory_snapshot.body_memory.energy = self.workspace.memory.body_memory.energy
             if text.upper() == KEY_OFFSET:
                 # Calibrate the compass
                 points = np.array([[p.point[0], p.point[1]] for p in self.points_of_interest if (p.type == POINT_AZIMUTH)])
@@ -103,7 +110,8 @@ class CtrlBodyView:
         """Called every frame. Update the body view"""
         self.view.label_clock.text = "Next Clock: " + str(self.workspace.clock) \
                                      + ", Decider: " + self.workspace.decider_mode \
-                                     + ", Engagement: " + self.workspace.engagement_mode
+                                     + ", Engagement: " + self.workspace.engagement_mode \
+                                     + ", Energy {:.0f}%".format(self.workspace.memory.body_memory.energy * 100)
         if self.workspace.interaction_step == INTERACTION_STEP_REFRESHING and self.workspace.enaction.outcome is not None:
             self.view.label.text = self.body_label_azimuth(self.workspace.enaction)
             self.view.label_enaction.text = self.body_label(self.workspace.enaction.action)
@@ -111,9 +119,9 @@ class CtrlBodyView:
 
     def body_label(self, action):
         """Return the label to display in the body view"""
-        rotation_speed = "{:.2f}".format(math.degrees(action.rotation_speed_rad))
+        rotation_speed = "{:.2f}°/s".format(math.degrees(action.rotation_speed_rad))
         label = "Speed x: " + str(int(action.translation_speed[0])) + "mm/s, y: " \
-            + str(int(action.translation_speed[1])) + "mm/s, rotation:" + rotation_speed + "°/s"
+            + str(int(action.translation_speed[1])) + "mm/s, rotation:" + rotation_speed
         return label
 
     def body_label_azimuth(self, enaction):

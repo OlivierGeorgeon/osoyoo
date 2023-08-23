@@ -8,8 +8,9 @@ from . Interaction import Interaction, OUTCOME_NO_FOCUS, OUTCOME_LOST_FOCUS, OUT
 
 FOCUS_TOO_CLOSE_DISTANCE = 200   # (mm) Distance below which OUTCOME_FOCUS_TOO_CLOSE. From robot center
 FOCUS_FAR_DISTANCE = 400         # (mm) Distance beyond which OUTCOME_FOCUS_FAR. Must be farther than forward speed
-# FOCUS_TOO_FAR_DISTANCE = 600   # (mm) Distance beyond which OUTCOME_FOCUS_TOO_FAR
-FOCUS_TOO_FAR_DISTANCE = 1600    # For circle behavior
+FOCUS_TOO_FAR_DISTANCE = 600     # (mm) Distance beyond which OUTCOME_FOCUS_TOO_FAR (The robot will get closer
+FOCUS_TOO_TOO_FAR_DISTANCE = 600   # (mm) Distance beyond which OUTCOME_FOCUS_TOO_FAR for Watch behavior
+                                 # Must detect something within too_too_far for touring the terrain
 FOCUS_SIDE_ANGLE = 3.14159 / 6.  # (rad) Angle beyond which OUTCOME_SIDE
 
 
@@ -22,6 +23,7 @@ class Decider:
         self.last_interaction = None
 
         # Load the predefined behavior
+        self.too_far = FOCUS_TOO_FAR_DISTANCE
         self.primitive_interactions = create_primitive_interactions(self.workspace.actions)
         self.composite_interactions = create_composite_interactions(self.workspace.actions, self.primitive_interactions)
 
@@ -46,7 +48,7 @@ class Decider:
             focus_radius = np.linalg.norm(enaction.focus_point)  # From the center of the robot
             if focus_radius < FOCUS_TOO_CLOSE_DISTANCE:
                 outcome = OUTCOME_FOCUS_TOO_CLOSE
-            elif focus_radius > FOCUS_TOO_FAR_DISTANCE:
+            elif focus_radius > self.too_far:  # Different for DeciderCircle or DeciderWatch
                 outcome = OUTCOME_FOCUS_TOO_FAR
             elif focus_radius > FOCUS_FAR_DISTANCE:
                 outcome = OUTCOME_FOCUS_FAR

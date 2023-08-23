@@ -19,8 +19,8 @@ KEY_DECIDER_CIRCLE = "A"  # Automatic mode: controlled by the deciders
 KEY_DECIDER_USER = "M"  # Manual mode : controlled by the user
 KEY_ENGAGEMENT_ROBOT = "R"  # The robot actually enacts the interaction
 KEY_ENGAGEMENT_IMAGINARY = "I"  # The application imagines the interaction but the robot does not enact them
-KEY_DECREASE_CONFIDENCE = "D"
-KEY_INCREASE_CONFIDENCE = "P"
+KEY_DECREASE = "D"
+KEY_INCREASE = "P"
 KEY_CLEAR = "C"  # Clear the stack of interactions to enact next
 
 
@@ -32,11 +32,11 @@ class Workspace:
         self.robot_id = robot_id
         self.actions = create_actions(robot_id)
         self.memory = Memory(robot_id)
-        if self.robot_id == '1':
-            self.deciders = {'Explore': DeciderExplore(self), 'Circle': DeciderCircle(self), 'Watch': DeciderWatch(self)}
-        else:
-            self.deciders = {'Explore': DeciderExplore(self), 'Circle': DeciderCircle(self)}
-            # self.deciders = {'Circle': DeciderCircle(self)}
+        # if self.robot_id == '1':
+        self.deciders = {'Explore': DeciderExplore(self), 'Circle': DeciderCircle(self), 'Watch': DeciderWatch(self)}
+        # else:
+        #     self.deciders = {'Explore': DeciderExplore(self), 'Circle': DeciderCircle(self)}
+        #     # self.deciders = {'Circle': DeciderCircle(self)}
         self.integrator = Integrator(self)
 
         self.enactions = {}  # The stack of enactions to enact next

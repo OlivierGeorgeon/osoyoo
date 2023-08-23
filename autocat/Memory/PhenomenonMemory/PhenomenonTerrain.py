@@ -57,12 +57,11 @@ class PhenomenonTerrain(Phenomenon):
                     position_correction = - affordance.color_position()
                     # If the origin affordance has the opposite orientation then we assume it is the other color patch
                     # if np.dot(affordance.experience.sensor_point(), self.affordances[self.absolute_affordance_key].experience.sensor_point()) < 0:
-                    #     # If the affordance sensor point is negative then it is the South-West patch
-                    #     print("Affordance sensor point", affordance.experience.sensor_point())
                     if affordance.experience.sensor_point()[0] < 0:
+                        # The North-East patch
                         position_correction += np.array(TERRAIN_RADIUS)
                     else:
-                        # The North-East patch
+                        # The South-West patch
                         position_correction -= np.array(TERRAIN_RADIUS)
                     # Correct the position of the affordances since last time the robot visited the absolute origin
                     # print("Last origin clock:", self.last_origin_clock)

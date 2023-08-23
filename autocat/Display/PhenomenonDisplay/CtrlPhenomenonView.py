@@ -2,8 +2,8 @@ import math
 from pyrr import matrix44
 from .PhenomenonView import PhenomenonView
 from .AffordanceDisplay import AffordanceDisplay
-from ...Workspace import KEY_DECREASE_CONFIDENCE, KEY_INCREASE_CONFIDENCE
-from ...Robot.CtrlRobot import INTERACTION_STEP_IDLE, INTERACTION_STEP_REFRESHING
+from ...Workspace import KEY_DECREASE, KEY_INCREASE
+from ...Robot.CtrlRobot import INTERACTION_STEP_REFRESHING
 
 
 class CtrlPhenomenonView:
@@ -18,10 +18,10 @@ class CtrlPhenomenonView:
 
         def on_text(text):
             """Handle user keypress"""
-            if text.upper() == KEY_DECREASE_CONFIDENCE:
-                self.phenomenon.confidence = max(0, self.phenomenon.confidence - 0.1)  # PHENOMENON_CONFIDENCE_LOW
-            elif text.upper() == KEY_INCREASE_CONFIDENCE:
-                self.phenomenon.confidence = min(self.phenomenon.confidence + 0.1, 1.)  # PHENOMENON_CONFIDENCE_HIGH
+            if text.upper() == KEY_DECREASE:
+                self.phenomenon.confidence = max(0, self.phenomenon.confidence - 0.1)
+            elif text.upper() == KEY_INCREASE:
+                self.phenomenon.confidence = min(self.phenomenon.confidence + 0.1, 1.)
             else:
                 # Other keypress are handled by the workspace
                 self.workspace.process_user_key(text)
