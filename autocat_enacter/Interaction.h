@@ -44,6 +44,7 @@ protected:
   unsigned long _action_start_time;
   int _step;
   int _caution = 0;
+  int _span = 40;
 };
 
 #endif

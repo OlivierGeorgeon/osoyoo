@@ -54,6 +54,10 @@ Interaction::Interaction(Floor& FLO, Head& HEA, Imu& IMU, WifiCat& WifiCat, JSON
   if (json_action.hasOwnProperty("caution"))
     _caution = (int)json_action["caution"];
 
+  // The saccade span for scan interaction
+  if (json_action.hasOwnProperty("span"))
+    _span = (int)json_action["span"];
+
   _action_start_time = millis();
   _action_end_time = _action_start_time + _target_duration;
   _status = "0";

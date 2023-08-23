@@ -21,9 +21,7 @@ Scan::Scan(Floor& FCR, Head& HEA, Imu& IMU, WifiCat& WifiCat, JSONVar json_actio
 // STEP 1: Start the interaction
 void Scan::begin()
 {
-  _HEA._next_saccade_time = millis() + 2000;  // Inhibit HEA during the interaction
-  // _HEA.beginEchoScan();
-  // _action_end_time = millis() + 2000;
+  _HEA._next_saccade_time = millis() + 3000;  // Inhibit HEA during the interaction (almost 3s if span = 10°)
   _HEA._is_enacting_head_alignment = false; // Stop current head alignment if any
   _min_ultrasonic_measure = NO_ECHO_DISTANCE;
   _head_angle = _HEA._head_angle;
@@ -31,20 +29,18 @@ void Scan::begin()
   {
     // If head is to the left, start from 80° and scan clockwise
     _head_angle = 80;
-    _head_angle_span = -SCAN_SACCADE_SPAN;
+    _head_angle_span = -_span;
   }
   else
   {
     // If head is to the right, start from -80° and scan counterclockwise
     _head_angle = -80;
-    _head_angle_span = SCAN_SACCADE_SPAN;
+    _head_angle_span = _span;
   }
   _angle_min_ultrasonic_measure = _head_angle;
   _HEA.turnHead(_head_angle); // Start the scan right away
   _next_saccade_time = millis() + SACCADE_DURATION;
-  // _echo_alignment_step = 0;
   _current_index = 0;
-
   _step = INTERACTION_ONGOING;
 }
 
@@ -53,7 +49,6 @@ void Scan::ongoing()
 {
   if (millis() > _next_saccade_time)
   {
-    // _echo_alignment_step++;
     _current_ultrasonic_measure = _HEA.measureUltrasonicEcho();
     _next_saccade_time = millis() + SACCADE_DURATION;
     if (_current_ultrasonic_measure < _min_ultrasonic_measure)

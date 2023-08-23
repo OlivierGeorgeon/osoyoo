@@ -12,10 +12,10 @@ struct significant_array
 {
     // Struct to store the angles and the corresponding measures,
     // and booleans to indicate if the measure are significant
-    int distances[SCAN_SIZE]{0}; // 180/SCAN_SACCADE_SPAN
-    int angles[SCAN_SIZE]{0};
-    bool sign[SCAN_SIZE]{false};
-    int size = SCAN_SIZE;
+    int distances[18]{0}; // 180/SCAN_SACCADE_SPAN
+    int angles[18]{0};
+    bool sign[18]{false};
+    int size = 18;
 };
 
 

@@ -3,7 +3,7 @@ import math
 import numpy as np
 from pyrr import Quaternion, matrix44
 from ..Decider.Action import ACTION_FORWARD, ACTION_BACKWARD, ACTION_SWIPE, ACTION_RIGHTWARD, \
-    ACTION_TURN, ACTION_TURN_RIGHT, ACTION_TURN_HEAD, ACTION_WATCH
+    ACTION_TURN, ACTION_TURN_HEAD, ACTION_WATCH, ACTION_SCAN
 from .RobotDefine import DEFAULT_YAW
 
 ENACTION_DEFAULT_TIMEOUT = 6  # Seconds
@@ -19,7 +19,8 @@ class Command:
         self.focus_x = None
         self.focus_y = None
         self.speed = None
-        self.caution = 0  # 1  # Check for obstacles when moving forward
+        self.caution = None  # 1  # Check for obstacles when moving forward
+        self.span = None
 
         if prompt_point is not None:
             if self.action.action_code in [ACTION_FORWARD, ACTION_BACKWARD]:
@@ -77,6 +78,12 @@ class Command:
         self.anticipated_displacement_matrix = matrix44.multiply(matrix44.create_from_translation(-self.anticipated_translation),
                                                      self.anticipated_yaw_matrix)
 
+        if self.action.action_code == ACTION_FORWARD:
+            self.caution = 1  # Will stop if there is an obstaction on the way
+
+        if self.action.action_code == ACTION_SCAN:
+            self.span = 10
+
     def serialize(self):
         """Return the command string to send to the robot"""
         command_dict = {'clock': self.clock, 'action': self.action.action_code}
@@ -91,6 +98,8 @@ class Command:
             command_dict['speed'] = self.speed
         if self.caution is not None:
             command_dict['caution'] = self.caution
+        if self.span is not None:
+            command_dict['span'] = self.span
         return json.dumps(command_dict)
 
     def timeout(self):

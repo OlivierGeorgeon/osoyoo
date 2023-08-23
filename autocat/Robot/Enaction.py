@@ -8,7 +8,7 @@ from ..Memory.Memory import SIMULATION_TIME_RATIO
 from .RobotDefine import DEFAULT_YAW, TURN_DURATION, ROBOT_FRONT_X, ROBOT_FRONT_Y
 from .Command import Command
 
-FOCUS_MAX_DELTA = 100  # 200 (mm) Maximum delta to keep focus
+FOCUS_MAX_DELTA = 200  # 200 (mm) Maximum delta to keep focus
 
 
 class Enaction:
