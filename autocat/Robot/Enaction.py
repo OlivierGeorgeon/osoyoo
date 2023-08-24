@@ -48,13 +48,22 @@ class Enaction:
         self.message = None
         self.message_sent = False  # Message sent to other robots
 
+    def set_spatial(self, body_quaternion, prompt_point, focus_point):
+        """Set the spatial modifiers of this enaction """
+        self.body_quaternion = body_quaternion.copy()
+        if prompt_point is not None:
+            self.prompt_point = prompt_point.copy()
+        if focus_point is not None:
+            self.focus_point = focus_point.copy()
+        self.command = Command(self.action, self.clock, self.prompt_point, self.focus_point)
+
     def begin(self):
         """Adjust the spatial modifiers of the enaction.
         Compute the command to send to the robot.
         Initialize the simulation"""
 
         # Generate the command to send to the robot
-        self.command = Command(self.action, self.clock, self.prompt_point, self.focus_point)
+        # self.command = Command(self.action, self.clock, self.prompt_point, self.focus_point)
 
         # Initialize the simulation of the intended interaction
         # Compute the duration and the speed depending and the enaction

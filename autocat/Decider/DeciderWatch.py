@@ -70,3 +70,6 @@ class DeciderWatch(Decider):
 
         # Add the enaction to the stack
         self.workspace.enactions[self.workspace.clock] = Enaction(self.action, self.workspace.clock)
+        self.workspace.enactions[self.workspace.clock].set_spatial(self.workspace.memory.body_memory.body_quaternion,
+                                       self.workspace.memory.egocentric_memory.prompt_point,
+                                       self.workspace.memory.egocentric_memory.focus_point)
