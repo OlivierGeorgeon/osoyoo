@@ -11,6 +11,7 @@ from .Memory.PhenomenonMemory.PhenomenonMemory import TER
 from .Memory.PhenomenonMemory.PhenomenonTerrain import TERRAIN_INITIAL_CONFIDENCE
 from .Integrator.Integrator import Integrator
 from .Robot.Enaction import Enaction
+from .Robot.Command import Command
 from .Robot.Message import Message
 from .Robot.CtrlRobot import INTERACTION_STEP_IDLE, INTERACTION_STEP_INTENDING, INTERACTION_STEP_ENACTING, \
     INTERACTION_STEP_INTEGRATING, INTERACTION_STEP_REFRESHING
@@ -96,8 +97,10 @@ class Workspace:
                 self.enaction = self.enactions[self.clock]
                 # Adjust the spatial modifiers
                 self.enaction.body_quaternion = self.memory.body_memory.body_quaternion.copy()
+                print("Next quaternion", self.enaction.body_quaternion)
                 if self.memory.egocentric_memory.prompt_point is not None:
                     self.enaction.prompt_point = self.memory.egocentric_memory.prompt_point.copy()
+                    print("Next prompt", self.enaction.prompt_point)
                 if self.memory.egocentric_memory.focus_point is not None:
                     self.enaction.focus_point = self.memory.egocentric_memory.focus_point.copy()
                 self.enaction.begin()
@@ -160,8 +163,26 @@ class Workspace:
         elif user_key.upper() == "/":
             # If key ALIGN then turn and move forward to the prompt
             if self.interaction_step == INTERACTION_STEP_IDLE:
+                # Prepare the first enaction
                 self.enactions[self.clock] = Enaction(self.actions[ACTION_TURN], self.clock)
+                # Adjust the spatial modifiers
+                self.enactions[self.clock].body_quaternion = self.memory.body_memory.body_quaternion.copy()
+                if self.memory.egocentric_memory.prompt_point is not None:
+                    self.enactions[self.clock].prompt_point = self.memory.egocentric_memory.prompt_point.copy()
+                if self.memory.egocentric_memory.focus_point is not None:
+                    self.enactions[self.clock].focus_point = self.memory.egocentric_memory.focus_point.copy()
+                self.enactions[self.clock].command = Command(self.enactions[self.clock].action, self.clock, self.enactions[self.clock].prompt_point, self.enactions[self.clock].focus_point)
+
+                # prepare the second enaction
                 self.enactions[self.clock + 1] = Enaction(self.actions[ACTION_FORWARD], self.clock + 1)
+                self.enactions[self.clock + 1].body_quaternion = self.enactions[self.clock].command.anticipated_yaw_quaternion * self.memory.body_memory.body_quaternion
+                print("Second quaternion", self.enactions[self.clock + 1].body_quaternion)
+                if self.memory.egocentric_memory.prompt_point is not None:
+                    self.enactions[self.clock + 1].prompt_point = quaternion.apply_to_vector(self.enactions[self.clock].command.anticipated_yaw_quaternion.inverse, self.memory.egocentric_memory.prompt_point)
+                    # self.enactions[self.clock + 1].prompt_point += self.enactions[self.clock].command.anticipated_translation
+                    print("Second prompt", self.enactions[self.clock + 1].prompt_point)
+                if self.memory.egocentric_memory.focus_point is not None:
+                    self.enactions[self.clock + 1].focus_point = quaternion.apply_to_vector(self.enactions[self.clock].command.anticipated_yaw_quaternion.inverse, self.memory.egocentric_memory.focus_point)
         elif user_key.upper() == KEY_CLEAR:
             # Clear the stack of enactions
             playsound('autocat/Assets/R3.wav', False)

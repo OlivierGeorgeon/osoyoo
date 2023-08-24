@@ -171,8 +171,10 @@ int Head::head_direction(int x, int y)
     // The focus is behind the head
     if (y > 0)
       return 90;
-    else
+    else if (y < 0)
       return -90;
+    else
+      return 0;
   }
   else
     // The focus is before the head

@@ -81,8 +81,8 @@ class Command:
         if self.action.action_code == ACTION_FORWARD:
             self.caution = 1  # Will stop if there is an obstaction on the way
 
-        if self.action.action_code == ACTION_SCAN:
-            self.span = 10
+        # if self.action.action_code == ACTION_SCAN:
+        #     self.span = 10
 
     def serialize(self):
         """Return the command string to send to the robot"""

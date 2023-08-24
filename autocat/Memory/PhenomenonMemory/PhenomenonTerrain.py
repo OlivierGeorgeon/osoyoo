@@ -94,9 +94,9 @@ class PhenomenonTerrain(Phenomenon):
         # Parallel to the absolute affordance direction
         if self.absolute_affordance() is not None:
             rotation_matrix = self.absolute_affordance().experience.rotation_matrix
-            point = np.array([-500, 0, 0])  # Need the opposite
+            point = np.array([500, 0, 0])  # Need the opposite
             # print("Computing confirmation point from origin", self.point)
-            confirmation_point = matrix44.apply_to_vector(rotation_matrix, point).astype(int) + self.point
+            confirmation_point = matrix44.apply_to_vector(rotation_matrix, point).astype(int)  # + self.point
             return confirmation_point
         return None
 

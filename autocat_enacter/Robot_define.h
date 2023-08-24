@@ -1,4 +1,4 @@
-#define ROBOT_ID 2 // 0: regular Osoyoo robot, 1: robot BSN, 2: robot UCBL, 3: SHS chez Olivier, 11 to 14: DOLL robots
+#define ROBOT_ID 3 // 0: regular Osoyoo robot, 1: robot BSN, 2: robot UCBL, 3: SHS chez Olivier, 11 to 14: DOLL robots
 
 #define AP_SSID "osoyoo_robot"          // The wifi SSID of this robot in Access Point
 #define ROBOT_HEAD_X 80                 // (mm) X position of the head
@@ -73,13 +73,13 @@
 #define COMPASS_Y_OFFSET  -1225  // -1300  // -1247 // -1300, -1290
 #define ACCELERATION_X_OFFSET -55  // 55  // 35
 #define ACCELERATION_Y_OFFSET 0  // -3        //
-#define ACCELERATION_X_IMPACT_THRESHOLD 200  // Longitudinal impact if acceleration exceeds this threshold
+#define ACCELERATION_X_IMPACT_THRESHOLD 210  // 200 Longitudinal impact if acceleration exceeds this threshold
 #define ACCELERATION_Y_IMPACT_THRESHOLD 200  // lateral impact if acceleration exceeds this threshold
 #define ACCELERATION_X_BLOCK_THRESHOLD 140 // 30 // Robot is blocked if longitudinal acceleration below this threshold
 #define ACCELERATION_Y_BLOCK_THRESHOLD 80 // 100 // Robot is blocked if lateral acceleration below this threshold
 #define GYRO_COEF 1.  // 2.0 // 1.33  // 1.5 si tourne trop, augmenter cette valeur
 #define ROBOT_SERVO_PIN 4
-#define GYRO_IMPACT_THRESHOLD 0.25      // (degree/s) above this threshold: strong z rotation = lateral impact
+#define GYRO_IMPACT_THRESHOLD 0.5 // 0.25      // (degree/s) above this threshold: strong z rotation = lateral impact
 
 #elif ROBOT_ID == 11
 

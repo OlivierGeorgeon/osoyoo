@@ -9,7 +9,7 @@ from . Interaction import Interaction, OUTCOME_NO_FOCUS, OUTCOME_LOST_FOCUS, OUT
 FOCUS_TOO_CLOSE_DISTANCE = 200   # (mm) Distance below which OUTCOME_FOCUS_TOO_CLOSE. From robot center
 FOCUS_FAR_DISTANCE = 400         # (mm) Distance beyond which OUTCOME_FOCUS_FAR. Must be farther than forward speed
 FOCUS_TOO_FAR_DISTANCE = 600     # (mm) Distance beyond which OUTCOME_FOCUS_TOO_FAR (The robot will get closer
-FOCUS_TOO_TOO_FAR_DISTANCE = 600   # (mm) Distance beyond which OUTCOME_FOCUS_TOO_FAR for Watch behavior
+FOCUS_TOO_TOO_FAR_DISTANCE = 1600   # (mm) Distance beyond which OUTCOME_FOCUS_TOO_FAR for Watch behavior
                                  # Must detect something within too_too_far for touring the terrain
 FOCUS_SIDE_ANGLE = 3.14159 / 6.  # (rad) Angle beyond which OUTCOME_SIDE
 

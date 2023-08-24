@@ -5,7 +5,7 @@
 
 import math
 import numpy as np
-from pyrr import quaternion, matrix44
+from pyrr import quaternion, matrix44, Quaternion
 from playsound import playsound
 from . Action import ACTION_TURN, ACTION_FORWARD, ACTION_SWIPE, ACTION_RIGHTWARD
 from . Interaction import OUTCOME_NO_FOCUS
@@ -26,15 +26,18 @@ class DeciderExplore(Decider):
     def __init__(self, workspace):
         super().__init__(workspace)
 
-        point = np.array([-2000, 2000, 0])  # Begin with North West
-        self.prompt_points = [point]
-        # Visit 6 points from North West to south East every pi/6
-        self.nb_points = 6
-        rotation_matrix = matrix44.create_from_z_rotation(-math.pi/6)
-        for i in range(1, self.nb_points):
-            point = matrix44.apply_to_vector(rotation_matrix, point)
-            self.prompt_points.append(point)
+        # point = np.array([-2000, 2000, 0])  # Begin with North West
+        # point = np.array([-920, 770, 0])  # Begin with North West
+        # self.prompt_points = [point]
+        # # Visit 6 points from North West to south East every pi/6
+        # self.nb_points = 6
+        # rotation_matrix = matrix44.create_from_z_rotation(-math.pi/6)
+        # for i in range(1, self.nb_points):
+        #     point = matrix44.apply_to_vector(rotation_matrix, point)
+        #     self.prompt_points.append(point)
         self.prompt_index = 0
+        self.ter_prompt = None
+        self.explore_angle_quaternion = Quaternion.from_z_rotation(math.pi / 3)
         self.action = "-"
 
     def activation_level(self):
@@ -58,6 +61,8 @@ class DeciderExplore(Decider):
         if enaction.outcome.color_index > 0:
             outcome = OUTCOME_COLOR
             print("Outcome color")
+            # Decrease the energy level
+            self.workspace.memory.body_memory.energy -= 0.1
 
         # Look for the floor experience
         if enaction.outcome.floor > 0 and enaction.outcome.color_index == 0:
@@ -95,10 +100,12 @@ class DeciderExplore(Decider):
 
         # Compute the next prompt point
 
+        # It is assumed that the terrain has been found if this decider is activated
+        # if TER in self.workspace.memory.phenomenon_memory.phenomena and \
+        #    self.workspace.memory.phenomenon_memory.phenomena[TER].absolute_affordance() is not None and \
+
         # If time to go home
-        if TER in self.workspace.memory.phenomenon_memory.phenomena and \
-           self.workspace.memory.phenomenon_memory.phenomena[TER].absolute_affordance() is not None and \
-           self.workspace.clock - self.workspace.memory.phenomenon_memory.phenomena[TER].last_origin_clock > CLOCK_TO_GO_HOME:
+        if self.workspace.clock - self.workspace.memory.phenomenon_memory.phenomena[TER].last_origin_clock > CLOCK_TO_GO_HOME:
             # If right or left then swipe to home
             if outcome in [OUTCOME_LEFT, OUTCOME_RIGHT]:
                 if outcome == OUTCOME_RIGHT:
@@ -135,13 +142,18 @@ class DeciderExplore(Decider):
             # Go to the most interesting pool point
             # mip = self.workspace.memory.allocentric_memory.most_interesting_pool(self.workspace.clock)
             # self.workspace.memory.egocentric_memory.prompt_point = self.workspace.memory.allocentric_to_egocentric(mip)
-            # Go successively to the predefined prompt points
-            allo_prompt = self.prompt_points[self.prompt_index]
+
+            # Go successively to the predefined prompt points relative to the terrain center
+            if self.prompt_index == 0:
+                self.ter_prompt = self.workspace.memory.phenomenon_memory.phenomena[TER].affordances[self.workspace.memory.phenomenon_memory.phenomena[TER].absolute_affordance_key].point * 1.2
+            self.ter_prompt = quaternion.apply_to_vector(self.explore_angle_quaternion, self.ter_prompt)
+            # allo_prompt = self.prompt_points[self.prompt_index] + self.workspace.memory.phenomenon_memory.phenomena[TER].point
+            allo_prompt = self.ter_prompt + self.workspace.memory.phenomenon_memory.phenomena[TER].point
             ego_prompt = self.workspace.memory.allocentric_to_egocentric(allo_prompt)
             self.workspace.memory.egocentric_memory.prompt_point = ego_prompt
             self.prompt_index += 1
-            if self.prompt_index >= self.nb_points:
-                self.prompt_index = 0
+            # if self.prompt_index >= self.nb_points:
+            #     self.prompt_index = 0
             self.action = self.workspace.actions[ACTION_TURN]
             self.workspace.enactions[self.workspace.clock] = Enaction(self.action, self.workspace.clock)
             self.workspace.enactions[self.workspace.clock + 1] = Enaction(self.workspace.actions[ACTION_FORWARD],

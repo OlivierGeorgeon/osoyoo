@@ -3,7 +3,7 @@ import numpy as np
 from pyrr import matrix44, Quaternion, Vector3
 from ..Robot.RobotDefine import ROBOT_SETTINGS, ROBOT_FRONT_X, ROBOT_SIDE
 
-ENERGY_TIRED = 0.95  # Level of energy below which the agent is tired
+ENERGY_TIRED = 0.701  # Level of energy below which the agent is tired
 
 
 class BodyMemory:

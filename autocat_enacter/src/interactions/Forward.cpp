@@ -63,7 +63,7 @@ void Forward::ongoing()
     _action_end_time = _FLO._retreat_end_time + TURN_SPOT_ENDING_DELAY;
     _step = INTERACTION_TERMINATE;
   }
-  else if (impact > 0)
+  else if (impact > 0  && _caution >= 0)  // If caution is negative ignore impact
   {
     // If lateral impact, look at the direction of the impact
     if (impact == B01)
