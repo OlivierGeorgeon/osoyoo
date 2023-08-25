@@ -21,12 +21,12 @@ class Memory:
         body memory, egocentric memory, and allocentric memory
     """
 
-    def __init__(self, robot_id):
+    def __init__(self, arena_id, robot_id):
         self.robot_id = robot_id
         self.body_memory = BodyMemory(robot_id)
         self.egocentric_memory = EgocentricMemory()
         self.allocentric_memory = AllocentricMemory(GRID_WIDTH, GRID_HEIGHT, cell_radius=CELL_RADIUS)
-        self.phenomenon_memory = PhenomenonMemory()
+        self.phenomenon_memory = PhenomenonMemory(arena_id)
         self.body_direction_deltas = {}  # Used to calibrate GYRO_COEF
 
     def __str__(self):
@@ -103,7 +103,7 @@ class Memory:
 
     def save(self):
         """Return a clone of memory for memory snapshot"""
-        saved_memory = Memory(self.robot_id)
+        saved_memory = Memory(self.phenomenon_memory.arena_id, self.robot_id)
         # Clone body memory
         saved_memory.body_memory = self.body_memory.save()
         # Clone egocentric memory

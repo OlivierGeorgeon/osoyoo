@@ -20,7 +20,9 @@ LINE_X = 150  # 160              # (mm) X coordinate of the line after retreat
 
 SCAN_DISTANCE = 800
 
-TERRAIN_RADIUS = [770, 920, 0]  # 1200 azimuth 40°
+TERRAIN_RADIUS = {"A301": [770, 920, 0],      # 1200mm azimuth 40°
+                  "PetiteIA": [536, 450, 0],  # 700mm azimuth 50°
+                  "DOLL": [770, 920, 0]}      # To be defined
 
 # You must set the compass offset to the center of the circle drawn by the (compass_x, compass_y) points.
 # Display the compass points of interest in Egocentric view.

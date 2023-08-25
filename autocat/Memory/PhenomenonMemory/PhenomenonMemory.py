@@ -6,7 +6,8 @@ TER = 0
 
 
 class PhenomenonMemory:
-    def __init__(self):
+    def __init__(self, arena_id):
+        self.arena_id = arena_id
         self.phenomena = {}  # Phenomenon 0 is the terrain
         self.phenomenon_id = 0  # Used for object phenomena
 
@@ -14,8 +15,8 @@ class PhenomenonMemory:
         """Create a new phenomenon depending of the type of the affordance"""
         # Must always create a phenomenon
         if affordance.experience.type in TERRAIN_EXPERIENCE_TYPES:
-            self.phenomena[TER] = PhenomenonTerrain(affordance)
-            return 0
+            self.phenomena[TER] = PhenomenonTerrain(affordance, self.arena_id)
+            return TER
         else:
             self.phenomenon_id += 1
             self.phenomena[self.phenomenon_id] = PhenomenonObject(affordance)
@@ -66,7 +67,7 @@ class PhenomenonMemory:
     def save(self, experiences):
         """Return a clone of phenomenon memory for memory snapshot"""
         # Use the experiences cloned when saving egocentric memory
-        saved_phenomenon_memory = PhenomenonMemory()
+        saved_phenomenon_memory = PhenomenonMemory(self.arena_id)
         saved_phenomenon_memory.phenomena = {key: p.save(experiences) for key, p in self.phenomena.items()}
         saved_phenomenon_memory.phenomenon_id = self.phenomenon_id
         return saved_phenomenon_memory

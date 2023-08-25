@@ -12,8 +12,9 @@ TERRAIN_ORIGIN_CONFIDENCE = 0.2  # When the robot emits its position in the mess
 
 class PhenomenonTerrain(Phenomenon):
     """A hypothetical phenomenon related to floor detection"""
-    def __init__(self, affordance):
+    def __init__(self, affordance, arena_id):
         super().__init__(affordance)
+        self.arena_id = arena_id
         # print("New phenomenon terrain with experience clock:", affordance.experience.clock)
         self.confidence = TERRAIN_INITIAL_CONFIDENCE
         # If the affordance is color floor then use it as absolute origin
@@ -44,9 +45,9 @@ class PhenomenonTerrain(Phenomenon):
                     # The phenomenon's origin moves to the green patch relative to this affordance
                     self.point += affordance.color_position()
                     if affordance.experience.sensor_point()[0] < 0:
-                        terrain_offset = np.array(TERRAIN_RADIUS)
+                        terrain_offset = np.array(TERRAIN_RADIUS[self.arena_id])
                     else:
-                        terrain_offset = -np.array(TERRAIN_RADIUS)
+                        terrain_offset = -np.array(TERRAIN_RADIUS[self.arena_id])
                     self.point -= terrain_offset
                     # All the position of affordance including this one are adjusted
                     for a in self.affordances.values():
@@ -59,10 +60,10 @@ class PhenomenonTerrain(Phenomenon):
                     # if np.dot(affordance.experience.sensor_point(), self.affordances[self.absolute_affordance_key].experience.sensor_point()) < 0:
                     if affordance.experience.sensor_point()[0] < 0:
                         # The North-East patch
-                        position_correction += np.array(TERRAIN_RADIUS)
+                        position_correction += np.array(TERRAIN_RADIUS[self.arena_id])
                     else:
                         # The South-West patch
-                        position_correction -= np.array(TERRAIN_RADIUS)
+                        position_correction -= np.array(TERRAIN_RADIUS[self.arena_id])
                     # Correct the position of the affordances since last time the robot visited the absolute origin
                     # print("Last origin clock:", self.last_origin_clock)
                     # print("Current Affordance clock", affordance.experience.clock)
@@ -111,7 +112,7 @@ class PhenomenonTerrain(Phenomenon):
 
     def save(self, experiences):
         """Return a clone of the phenomenon for memory snapshot"""
-        saved_phenomenon = PhenomenonTerrain(self.affordances[0].save(experiences))
+        saved_phenomenon = PhenomenonTerrain(self.affordances[0].save(experiences), self.arena_id)
         super().save(saved_phenomenon, experiences)
         return saved_phenomenon
 

@@ -32,7 +32,7 @@ class Workspace:
         self.arena_id = arena_id
         self.robot_id = robot_id
         self.actions = create_actions(robot_id)
-        self.memory = Memory(robot_id)
+        self.memory = Memory(arena_id, robot_id)
         # if self.robot_id == '1':
         self.deciders = {'Explore': DeciderExplore(self), 'Circle': DeciderCircle(self), 'Watch': DeciderWatch(self)}
         # else:
@@ -180,7 +180,9 @@ class Workspace:
                 second_body_quaternion = self.enactions[self.clock].command.anticipated_yaw_quaternion * self.memory.body_memory.body_quaternion
                 second_prompt_point = quaternion.apply_to_vector(self.enactions[self.clock].command.anticipated_yaw_quaternion.inverse,
                     self.memory.egocentric_memory.prompt_point)
-                second_focus_point = quaternion.apply_to_vector(self.enactions[self.clock].command.anticipated_yaw_quaternion.inverse,
+                second_focus_point = None
+                if self.memory.egocentric_memory.focus_point is not None:
+                    second_focus_point = quaternion.apply_to_vector(self.enactions[self.clock].command.anticipated_yaw_quaternion.inverse,
                     self.memory.egocentric_memory.focus_point)
                 self.enactions[self.clock + 1].set_spatial(second_body_quaternion, second_prompt_point, second_focus_point)
                 # self.enactions[self.clock + 1].body_quaternion = self.enactions[self.clock].command.anticipated_yaw_quaternion * self.memory.body_memory.body_quaternion

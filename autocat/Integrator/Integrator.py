@@ -11,7 +11,6 @@ class Integrator:
     def __init__(self, workspace):
         """Constructor"""
         self.workspace = workspace
-        # self.phenomena = []
 
     def integrate(self):
         """Create phenomena and update cells in allocentric memory"""

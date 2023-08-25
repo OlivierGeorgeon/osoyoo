@@ -39,7 +39,7 @@ def category_color(color_sensor):
             color_index = 2
 
     # Rug at Olivier's
-    if color_index == 3 and hsv[1] < 0.6 and hsv[2] < 0.5:
+    if color_index in [3, 4] and hsv[1] < 0.6 and hsv[2] < 0.5:
         color_index = 0
 
     # Floor in UCLy lyon
