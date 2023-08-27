@@ -110,4 +110,3 @@ class Command:
         if self.angle is not None:
             timeout = math.fabs(self.angle) / DEFAULT_YAW + 4.0  # Turn speed = 45°/s
         return timeout
-

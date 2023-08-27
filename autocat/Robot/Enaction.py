@@ -35,6 +35,9 @@ class Enaction:
         self.simulation_duration = 0
         self.simulation_rotation_speed = 0
         self.simulation_time = 0.
+        self.anticipated_post_body_q = None
+        self.anticipated_post_focus_p = None
+        self.anticipated_post_prompt_p = None
 
         # The outcome
         self.outcome = None
@@ -56,6 +59,12 @@ class Enaction:
         if focus_point is not None:
             self.focus_point = focus_point.copy()
         self.command = Command(self.action, self.clock, self.prompt_point, self.focus_point)
+
+        self.anticipated_post_body_q = self.command.anticipated_yaw_quaternion * self.body_quaternion
+        if prompt_point is not None:
+            self.anticipated_post_prompt_p = matrix44.apply_to_vector(self.command.anticipated_displacement_matrix, self.prompt_point)
+        if focus_point is not None:
+            self.anticipated_post_prompt_p = matrix44.apply_to_vector(self.command.anticipated_displacement_matrix, self.focus_point)
 
     def begin(self):
         """Adjust the spatial modifiers of the enaction.
