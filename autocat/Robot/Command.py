@@ -74,12 +74,13 @@ class Command:
         else:
             self.anticipated_yaw_quaternion = Quaternion.from_z_rotation(math.radians(self.angle))
 
-        self.anticipated_yaw_matrix = matrix44.create_from_inverse_of_quaternion(self.anticipated_yaw_quaternion)
+        # The displacement matrix of the environment relative to the robot
+        self.anticipated_yaw_matrix = matrix44.create_from_quaternion(self.anticipated_yaw_quaternion)
         self.anticipated_displacement_matrix = matrix44.multiply(matrix44.create_from_translation(-self.anticipated_translation),
                                                      self.anticipated_yaw_matrix)
 
         if self.action.action_code == ACTION_FORWARD:
-            self.caution = 1  # Will stop if there is an obstaction on the way
+            self.caution = 1  # 1: stop if there is an obstacle on the way
 
         # if self.action.action_code == ACTION_SCAN:
         #     self.span = 10

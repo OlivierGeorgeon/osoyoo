@@ -115,11 +115,11 @@ class DeciderExplore(Decider):
                 print("Swiping to confirmation by:", ego_confirmation)
                 self.action = self.workspace.actions[ACTION_SWIPE]
                 self.workspace.memory.egocentric_memory.prompt_point = ego_confirmation
-                self.workspace.enactions[self.workspace.clock] = Enaction(self.action, self.workspace.clock)
-                self.workspace.enactions[self.workspace.clock].set_spatial(
-                    self.workspace.memory.body_memory.body_quaternion,
-                    self.workspace.memory.egocentric_memory.prompt_point,
-                    self.workspace.memory.egocentric_memory.focus_point)
+                self.workspace.enactions[self.workspace.clock] = Enaction(self.action, self.workspace.clock, self.workspace.memory)
+                # self.workspace.enactions[self.workspace.clock].set_spatial(
+                #     self.workspace.memory.body_memory.body_quaternion,
+                #     self.workspace.memory.egocentric_memory.prompt_point,
+                #     self.workspace.memory.egocentric_memory.focus_point)
                 playsound('autocat/Assets/R5.wav', False)
             # If not left or right we need to manoeuvre
             else:
@@ -139,31 +139,18 @@ class DeciderExplore(Decider):
                     self.workspace.memory.egocentric_memory.prompt_point = ego_origin
                     playsound('autocat/Assets/R3.wav', False)
                 self.action = self.workspace.actions[ACTION_TURN]
-                self.workspace.enactions[self.workspace.clock] = Enaction(self.action, self.workspace.clock)
-                self.workspace.enactions[self.workspace.clock].set_spatial(
-                    self.workspace.memory.body_memory.body_quaternion,
-                    self.workspace.memory.egocentric_memory.prompt_point,
-                    self.workspace.memory.egocentric_memory.focus_point)
+                self.workspace.enactions[self.workspace.clock] = Enaction(self.action, self.workspace.clock, self.workspace.memory)
+                # self.workspace.enactions[self.workspace.clock].set_spatial(
+                #     self.workspace.memory.body_memory.body_quaternion,
+                #     self.workspace.memory.egocentric_memory.prompt_point,
+                #     self.workspace.memory.egocentric_memory.focus_point)
                 self.workspace.enactions[self.workspace.clock + 1] = Enaction(self.workspace.actions[ACTION_FORWARD],
-                                                                              self.workspace.clock + 1)
-                # second_body_quaternion = self.workspace.enactions[
-                #                              self.workspace.clock].command.anticipated_yaw_quaternion * self.workspace.memory.body_memory.body_quaternion
-                # second_prompt_point = None
-                # if self.workspace.memory.egocentric_memory.prompt_point is not None:
-                #     second_prompt_point = quaternion.apply_to_vector(
-                #         self.workspace.enactions[self.workspace.clock].command.anticipated_yaw_quaternion.inverse,
-                #         self.workspace.memory.egocentric_memory.prompt_point)
-                # second_focus_point = None
-                # if self.workspace.memory.egocentric_memory.focus_point is not None:
-                #     second_focus_point = quaternion.apply_to_vector(
-                #         self.workspace.enactions[self.workspace.clock].command.anticipated_yaw_quaternion.inverse,
-                #         self.workspace.memory.egocentric_memory.focus_point)
-                # self.workspace.enactions[self.workspace.clock + 1].set_spatial(second_body_quaternion,
-                #                                                                second_prompt_point, second_focus_point)
-                self.workspace.enactions[self.workspace.clock + 1].set_spatial(
-                    self.workspace.enactions[self.workspace.clock].anticipated_post_body_q,
-                    self.workspace.enactions[self.workspace.clock].anticipated_post_prompt_p,
-                    self.workspace.enactions[self.workspace.clock].anticipated_post_focus_p)
+                                                                              self.workspace.clock + 1,
+                                                                              self.workspace.enactions[self.workspace.clock].post_memory)
+                # self.workspace.enactions[self.workspace.clock + 1].set_spatial(
+                #     self.workspace.enactions[self.workspace.clock].anticipated_post_body_q,
+                #     self.workspace.enactions[self.workspace.clock].anticipated_post_prompt_p,
+                #     self.workspace.enactions[self.workspace.clock].anticipated_post_focus_p)
 
         else:
             # Go to the most interesting pool point
@@ -182,23 +169,14 @@ class DeciderExplore(Decider):
             # if self.prompt_index >= self.nb_points:
             #     self.prompt_index = 0
             self.action = self.workspace.actions[ACTION_TURN]
-            self.workspace.enactions[self.workspace.clock] = Enaction(self.action, self.workspace.clock)
-            self.workspace.enactions[self.workspace.clock].set_spatial(
-                self.workspace.memory.body_memory.body_quaternion,
-                self.workspace.memory.egocentric_memory.prompt_point,
-                self.workspace.memory.egocentric_memory.focus_point)
-            self.workspace.enactions[self.workspace.clock + 1] = Enaction(self.workspace.actions[ACTION_FORWARD], self.workspace.clock + 1)
-            # second_body_quaternion = self.workspace.enactions[self.workspace.clock].command.anticipated_yaw_quaternion * self.workspace.memory.body_memory.body_quaternion
-            # second_prompt_point = None
-            # if self.workspace.memory.egocentric_memory.prompt_point is not None:
-            #     second_prompt_point = quaternion.apply_to_vector(self.workspace.enactions[self.workspace.clock].command.anticipated_yaw_quaternion.inverse,
-            #                                                  self.workspace.memory.egocentric_memory.prompt_point)
-            # second_focus_point = None
-            # if self.workspace.memory.egocentric_memory.focus_point is not None:
-            #     second_focus_point = quaternion.apply_to_vector(self.workspace.enactions[self.workspace.clock].command.anticipated_yaw_quaternion.inverse,
-            #                                                 self.workspace.memory.egocentric_memory.focus_point)
-            # self.workspace.enactions[self.workspace.clock + 1].set_spatial(second_body_quaternion, second_prompt_point, second_focus_point)
-            self.workspace.enactions[self.workspace.clock + 1].set_spatial(
-                self.workspace.enactions[self.workspace.clock].anticipated_post_body_q,
-                self.workspace.enactions[self.workspace.clock].anticipated_post_prompt_p,
-                self.workspace.enactions[self.workspace.clock].anticipated_post_focus_p)
+            self.workspace.enactions[self.workspace.clock] = Enaction(self.action, self.workspace.clock, self.workspace.memory)
+            # self.workspace.enactions[self.workspace.clock].set_spatial(
+            #     self.workspace.memory.body_memory.body_quaternion,
+            #     self.workspace.memory.egocentric_memory.prompt_point,
+            #     self.workspace.memory.egocentric_memory.focus_point)
+            self.workspace.enactions[self.workspace.clock + 1] = Enaction(self.workspace.actions[ACTION_FORWARD], self.workspace.clock + 1,
+                                                                          self.workspace.enactions[self.workspace.clock].post_memory)
+            # self.workspace.enactions[self.workspace.clock + 1].set_spatial(
+            #     self.workspace.enactions[self.workspace.clock].anticipated_post_body_q,
+            #     self.workspace.enactions[self.workspace.clock].anticipated_post_prompt_p,
+            #     self.workspace.enactions[self.workspace.clock].anticipated_post_focus_p)

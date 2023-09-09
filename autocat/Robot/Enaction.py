@@ -18,26 +18,44 @@ class Enaction:
     3. CtrlRobot computes the outcome received from the robot
     4. CtrlRobot call ternminate(outcome)
     """
-    def __init__(self, action, clock):
+    def __init__(self, action, clock, memory):
         """Initialize the enaction upon creation. Will be adjusted before generating the command"""
         # The initial arguments
         self.action = action
         self.clock = clock
 
         # the attributes that will be adjusted
-        self.body_quaternion = None
+        # self.body_quaternion = None
         self.prompt_point = None
         self.focus_point = None
-        self.command = None
+        # self.command = None
+
+        # The anticipated memory
+        self.body_quaternion = memory.body_memory.body_quaternion.copy()
+        if memory.egocentric_memory.prompt_point is not None:
+            self.prompt_point = memory.egocentric_memory.prompt_point.copy()
+            print("Initialize Enaction clock", self.clock, "prompt", self.prompt_point)
+        if memory.egocentric_memory.focus_point is not None:
+            self.focus_point = memory.egocentric_memory.focus_point.copy()
+        self.command = Command(self.action, self.clock, self.prompt_point, self.focus_point)
+
+        self.post_memory = memory.save()
+
+        self.post_memory.body_memory.body_quaternion = self.command.anticipated_yaw_quaternion * self.body_quaternion
+        if memory.egocentric_memory.prompt_point is not None:
+            self.post_memory.egocentric_memory.prompt_point = matrix44.apply_to_vector(self.command.anticipated_displacement_matrix, self.prompt_point).astype(int)
+            print("Initialize Enaction clock", self.clock, "post prompt", self.post_memory.egocentric_memory.prompt_point)
+        if memory.egocentric_memory.focus_point is not None:
+            self.post_memory.egocentric_memory.focus_point = matrix44.apply_to_vector(self.command.anticipated_displacement_matrix, self.focus_point).astype(int)
 
         # The simulation of the enaction in memory
         self.is_simulating = False
         self.simulation_duration = 0
         self.simulation_rotation_speed = 0
         self.simulation_time = 0.
-        self.anticipated_post_body_q = None
-        self.anticipated_post_focus_p = None
-        self.anticipated_post_prompt_p = None
+        # self.anticipated_post_body_q = None
+        # self.anticipated_post_focus_p = None
+        # self.anticipated_post_prompt_p = None
 
         # The outcome
         self.outcome = None
@@ -51,20 +69,20 @@ class Enaction:
         self.message = None
         self.message_sent = False  # Message sent to other robots
 
-    def set_spatial(self, body_quaternion, prompt_point, focus_point):
-        """Set the spatial modifiers of this enaction """
-        self.body_quaternion = body_quaternion.copy()
-        if prompt_point is not None:
-            self.prompt_point = prompt_point.copy()
-        if focus_point is not None:
-            self.focus_point = focus_point.copy()
-        self.command = Command(self.action, self.clock, self.prompt_point, self.focus_point)
-
-        self.anticipated_post_body_q = self.command.anticipated_yaw_quaternion * self.body_quaternion
-        if prompt_point is not None:
-            self.anticipated_post_prompt_p = matrix44.apply_to_vector(self.command.anticipated_displacement_matrix, self.prompt_point)
-        if focus_point is not None:
-            self.anticipated_post_prompt_p = matrix44.apply_to_vector(self.command.anticipated_displacement_matrix, self.focus_point)
+    # def set_spatial(self, body_quaternion, prompt_point, focus_point):
+    #     """Set the spatial modifiers of this enaction """
+    #     self.body_quaternion = body_quaternion.copy()
+    #     if prompt_point is not None:
+    #         self.prompt_point = prompt_point.copy()
+    #     if focus_point is not None:
+    #         self.focus_point = focus_point.copy()
+    #     self.command = Command(self.action, self.clock, self.prompt_point, self.focus_point)
+    #
+    #     self.anticipated_post_body_q = self.command.anticipated_yaw_quaternion * self.body_quaternion
+    #     if prompt_point is not None:
+    #         self.anticipated_post_prompt_p = matrix44.apply_to_vector(self.command.anticipated_displacement_matrix, self.prompt_point)
+    #     if focus_point is not None:
+    #         self.anticipated_post_focus_p = matrix44.apply_to_vector(self.command.anticipated_displacement_matrix, self.focus_point)
 
     def begin(self):
         """Adjust the spatial modifiers of the enaction.
@@ -227,4 +245,4 @@ class Enaction:
 
         if self.prompt_point is not None:
             self.prompt_point = matrix44.apply_to_vector(self.displacement_matrix, self.prompt_point).astype(int)
-            # print("Prompt moved to egocentric: ", self.prompt_point)
+            print("Terminate Enaction clock", self.clock, "Prompt", self.prompt_point)

@@ -96,13 +96,8 @@ class Workspace:
                 # Take the next enaction from the stack
                 self.enaction = self.enactions[self.clock]
                 # Adjust the spatial modifiers
-                # self.enaction.body_quaternion = self.memory.body_memory.body_quaternion.copy()
-                # print("Next quaternion", self.enaction.body_quaternion)
-                # if self.memory.egocentric_memory.prompt_point is not None:
-                #     self.enaction.prompt_point = self.memory.egocentric_memory.prompt_point.copy()
-                #     print("Next prompt", self.enaction.prompt_point)
-                # if self.memory.egocentric_memory.focus_point is not None:
-                #     self.enaction.focus_point = self.memory.egocentric_memory.focus_point.copy()
+                # TODO: adjust the spatial modifiers ?
+                # Begin the enaction
                 self.enaction.begin()
                 if self.is_imagining:
                     # If imagining then proceed to simulating the enaction
@@ -159,28 +154,20 @@ class Workspace:
         elif user_key.upper() in ACTIONS:
             # Only process actions when the robot is IDLE
             if self.interaction_step == INTERACTION_STEP_IDLE:
-                self.enactions[self.clock] = Enaction(self.actions[user_key.upper()], self.clock)
-                self.enactions[self.clock].set_spatial(self.memory.body_memory.body_quaternion, self.memory.egocentric_memory.prompt_point, self.memory.egocentric_memory.focus_point)
+                self.enactions[self.clock] = Enaction(self.actions[user_key.upper()], self.clock, self.memory)
+                # self.enactions[self.clock].set_spatial(self.memory.body_memory.body_quaternion, self.memory.egocentric_memory.prompt_point, self.memory.egocentric_memory.focus_point)
         elif user_key.upper() == "/":
             # If key ALIGN then turn and move forward to the prompt
             if self.interaction_step == INTERACTION_STEP_IDLE:
                 # Prepare the first enaction
-                self.enactions[self.clock] = Enaction(self.actions[ACTION_TURN], self.clock)
+                self.enactions[self.clock] = Enaction(self.actions[ACTION_TURN], self.clock, self.memory)
                 # Adjust the spatial modifiers
-                self.enactions[self.clock].set_spatial(self.memory.body_memory.body_quaternion, self.memory.egocentric_memory.prompt_point, self.memory.egocentric_memory.focus_point)
+                # self.enactions[self.clock].set_spatial(self.memory.body_memory.body_quaternion, self.memory.egocentric_memory.prompt_point, self.memory.egocentric_memory.focus_point)
                 # prepare the second enaction
-                self.enactions[self.clock + 1] = Enaction(self.actions[ACTION_FORWARD], self.clock + 1)
-                # second_body_quaternion = self.enactions[self.clock].command.anticipated_yaw_quaternion * self.memory.body_memory.body_quaternion
-                # second_prompt_point = quaternion.apply_to_vector(self.enactions[self.clock].command.anticipated_yaw_quaternion.inverse,
-                #     self.memory.egocentric_memory.prompt_point)
-                # second_focus_point = None
-                # if self.memory.egocentric_memory.focus_point is not None:
-                #     second_focus_point = quaternion.apply_to_vector(self.enactions[self.clock].command.anticipated_yaw_quaternion.inverse,
-                #     self.memory.egocentric_memory.focus_point)
-                # self.enactions[self.clock + 1].set_spatial(self.enactions[self.clock].anticipated_post_body_q, second_prompt_point, second_focus_point)
-                self.enactions[self.clock + 1].set_spatial(self.enactions[self.clock].anticipated_post_body_q,
-                                                           self.enactions[self.clock].anticipated_post_prompt_p,
-                                                           self.enactions[self.clock].anticipated_post_focus_p)
+                self.enactions[self.clock + 1] = Enaction(self.actions[ACTION_FORWARD], self.clock + 1, self.enactions[self.clock].post_memory)
+                # self.enactions[self.clock + 1].set_spatial(self.enactions[self.clock].anticipated_post_body_q,
+                #                                            self.enactions[self.clock].anticipated_post_prompt_p,
+                #                                            self.enactions[self.clock].anticipated_post_focus_p)
         elif user_key.upper() == KEY_CLEAR:
             # Clear the stack of enactions
             playsound('autocat/Assets/R3.wav', False)
