@@ -58,9 +58,9 @@ class CtrlAllocentricView:
     def main(self, dt):
         """Refresh allocentric view"""
         # Refresh during the simulation very 250 millisecond
-        if self.workspace.interaction_step == INTERACTION_STEP_ENACTING and time.time() > self.next_time_refresh:
+        if self.workspace.enacter.interaction_step == INTERACTION_STEP_ENACTING and time.time() > self.next_time_refresh:
             self.next_time_refresh = time.time() + 0.250
             self.update_view()
         # Refresh at the end of the interaction cycle
-        if self.workspace.interaction_step == INTERACTION_STEP_REFRESHING:
+        if self.workspace.enacter.interaction_step == INTERACTION_STEP_REFRESHING:
             self.update_view()

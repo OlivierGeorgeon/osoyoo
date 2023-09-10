@@ -79,11 +79,11 @@ class Command:
         self.anticipated_displacement_matrix = matrix44.multiply(matrix44.create_from_translation(-self.anticipated_translation),
                                                      self.anticipated_yaw_matrix)
 
-        if self.action.action_code == ACTION_FORWARD:
-            self.caution = 1  # 1: stop if there is an obstacle on the way
+        # if self.action.action_code == ACTION_FORWARD:
+        #     self.caution = 1  # 1: stop if there is an obstacle on the way
 
-        # if self.action.action_code == ACTION_SCAN:
-        #     self.span = 10
+        if self.action.action_code == ACTION_SCAN:
+            self.span = 10
 
     def serialize(self):
         """Return the command string to send to the robot"""

@@ -30,12 +30,12 @@ class CtrlRobot:
     def main(self, dt):
         """The main handler of the communication to and from the robot."""
         # If INTENDING then send the interaction to the robot
-        if self.workspace.interaction_step == INTERACTION_STEP_INTENDING:
-            self.workspace.interaction_step = INTERACTION_STEP_ENACTING
+        if self.workspace.enacter.interaction_step == INTERACTION_STEP_INTENDING:
+            self.workspace.enacter.interaction_step = INTERACTION_STEP_ENACTING
             self.send_command_to_robot()
 
         # While the robot is enacting the interaction, check for the outcome
-        if self.workspace.interaction_step == INTERACTION_STEP_ENACTING and not self.workspace.is_imagining:
+        if self.workspace.enacter.interaction_step == INTERACTION_STEP_ENACTING and not self.workspace.is_imagining:
             if time.time() < self.expected_outcome_time:
                 outcome_string = None
                 try:
@@ -60,8 +60,8 @@ class CtrlRobot:
                             print("Received outcome does not match current enaction")
             else:
                 # Timeout: reinitialize the cycle. This will resend the enaction
-                self.workspace.memory = self.workspace.memory_snapshot
-                self.workspace.interaction_step = INTERACTION_STEP_REFRESHING
+                self.workspace.memory = self.workspace.enacter.memory_snapshot
+                self.workspace.enacter.interaction_step = INTERACTION_STEP_REFRESHING
                 print("Timeout")
 
     def send_command_to_robot(self):
@@ -101,4 +101,4 @@ class CtrlRobot:
 
         # Terminate the enaction
         self.workspace.enaction.terminate(outcome)
-        self.workspace.interaction_step = INTERACTION_STEP_INTEGRATING
+        self.workspace.enacter.interaction_step = INTERACTION_STEP_INTEGRATING

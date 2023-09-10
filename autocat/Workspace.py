@@ -1,6 +1,5 @@
 import json
-import math
-from pyrr import quaternion, Quaternion, Vector3
+from pyrr import quaternion
 from playsound import playsound
 from .Decider.DeciderCircle import DeciderCircle
 from .Decider.DeciderExplore import DeciderExplore
@@ -11,8 +10,8 @@ from .Memory.PhenomenonMemory.PhenomenonMemory import TER
 from .Memory.PhenomenonMemory.PhenomenonTerrain import TERRAIN_INITIAL_CONFIDENCE
 from .Integrator.Integrator import Integrator
 from .Robot.Enaction import Enaction
-from .Robot.Command import Command
 from .Robot.Message import Message
+from .Enaction.Enacter import Enacter
 from .Robot.CtrlRobot import INTERACTION_STEP_IDLE, INTERACTION_STEP_INTENDING, INTERACTION_STEP_ENACTING, \
     INTERACTION_STEP_INTEGRATING, INTERACTION_STEP_REFRESHING
 
@@ -39,20 +38,21 @@ class Workspace:
         #     self.deciders = {'Explore': DeciderExplore(self), 'Circle': DeciderCircle(self)}
         #     # self.deciders = {'Circle': DeciderCircle(self)}
         self.integrator = Integrator(self)
+        self.enacter = Enacter(self)
 
         self.enactions = {}  # The stack of enactions to enact next
         self.enaction = None
 
         self.decider_mode = KEY_DECIDER_USER
         self.engagement_mode = KEY_ENGAGEMENT_ROBOT
-        self.interaction_step = INTERACTION_STEP_IDLE
+        # self.interaction_step = INTERACTION_STEP_IDLE
 
         # Controls which phenomenon to display
         self.ctrl_phenomenon_view = None
 
         # Control the enaction
         self.clock = 0
-        self.memory_snapshot = None
+        # self.memory_snapshot = None
         self.is_imagining = False
         self.memory_before_imaginary = None
 
@@ -63,18 +63,18 @@ class Workspace:
         """The main handler of the interaction cycle:
         organize the generation of the intended_interaction and the processing of the enacted_interaction."""
         # REFRESHING: last only one cycle
-        if self.interaction_step == INTERACTION_STEP_REFRESHING:
-            self.interaction_step = INTERACTION_STEP_IDLE
+        if self.enacter.interaction_step == INTERACTION_STEP_REFRESHING:
+            self.enacter.interaction_step = INTERACTION_STEP_IDLE
 
         # IDLE: Ready to choose the next intended interaction
-        if self.interaction_step == INTERACTION_STEP_IDLE:
+        if self.enacter.interaction_step == INTERACTION_STEP_IDLE:
             # Manage the memory snapshot
             if self.is_imagining:
                 # If stop imagining then restore memory from the snapshot
                 if self.engagement_mode == KEY_ENGAGEMENT_ROBOT:
                     self.memory = self.memory_before_imaginary
                     self.is_imagining = False
-                    self.interaction_step = INTERACTION_STEP_REFRESHING
+                    self.enacter.interaction_step = INTERACTION_STEP_REFRESHING
             else:
                 # If start imagining then take a new memory snapshot
                 if self.engagement_mode == KEY_ENGAGEMENT_IMAGINARY:
@@ -90,60 +90,62 @@ class Workspace:
                     self.deciders[decider].stack_enaction()
                 # Case DECIDER_KEY_USER is handled by self.process_user_key()
 
-            # When the next enaction is in the stack, prepare the enaction
-            if self.clock in self.enactions:
-                self.memory_snapshot = self.memory.save()
-                # Take the next enaction from the stack
-                self.enaction = self.enactions[self.clock]
-                # Adjust the spatial modifiers
-                # TODO: adjust the spatial modifiers ?
-                # Begin the enaction
-                self.enaction.begin()
-                if self.is_imagining:
-                    # If imagining then proceed to simulating the enaction
-                    self.interaction_step = INTERACTION_STEP_ENACTING
-                else:
-                    # Take a snapshot for the simulation and proceed to INTENDING
-                    self.interaction_step = INTERACTION_STEP_INTENDING
+        self.enacter.main(dt)
 
-        # INTENDING: is handled by CtrlRobot
-
-        # ENACTING: Simulate the enaction in memory
-        if self.interaction_step == INTERACTION_STEP_ENACTING:
-            outcome = self.memory.simulate(self.enaction, dt)
-            # If imagining then use the imagined outcome when the simulation is finished
-            if self.is_imagining and outcome is not None:
-                self.enaction.terminate(outcome)
-                self.interaction_step = INTERACTION_STEP_INTEGRATING
-            # If not imagining then CtrlRobot will return the outcome and proceed to INTEGRATING
-
-        # INTEGRATING: the new enacted interaction
-        if self.interaction_step == INTERACTION_STEP_INTEGRATING:
-            # Restore the memory from the snapshot and integrate the experiences
-            self.memory = self.memory_snapshot
-            # Retrieve possible message from other robot
-            self.enaction.message = self.message
-            self.message = None
-            # Update body memory and egocentric memory
-            self.memory.update_and_add_experiences(self.enaction)
-
-            # Call the integrator to create and update the phenomena
-            # Currently we don't create phenomena in imaginary mode
-            self.integrator.integrate()
-
-            # Update allocentric memory: robot, phenomena, focus
-            self.memory.update_allocentric(self.clock)
-
-            # Increment the clock if the enacted interaction was properly received
-            if self.enaction.clock >= self.clock:  # don't increment if the robot is behind
-                # Remove the enaction from the stack (ok if it has already been removed)
-                self.enactions.pop(self.clock, None)
-                # Increment the clock
-                self.clock += 1
-
-            self.interaction_step = INTERACTION_STEP_REFRESHING
-
-        # REFRESHING: Will be reset to IDLE in the next cycle
+        #     # When the next enaction is in the stack, prepare the enaction
+        #     if self.clock in self.enactions:
+        #         self.memory_snapshot = self.memory.save()
+        #         # Take the next enaction from the stack
+        #         self.enaction = self.enactions[self.clock]
+        #         # Adjust the prompt
+        #         #   For series of enactions, the prompt should be adjusted from the previous enaction
+        #         # Begin the enaction
+        #         self.enaction.begin()
+        #         if self.is_imagining:
+        #             # If imagining then proceed to simulating the enaction
+        #             self.interaction_step = INTERACTION_STEP_ENACTING
+        #         else:
+        #             # Take a snapshot for the simulation and proceed to INTENDING
+        #             self.interaction_step = INTERACTION_STEP_INTENDING
+        #
+        # # INTENDING: is handled by CtrlRobot
+        #
+        # # ENACTING: Simulate the enaction in memory
+        # if self.interaction_step == INTERACTION_STEP_ENACTING:
+        #     outcome = self.memory.simulate(self.enaction, dt)
+        #     # If imagining then use the imagined outcome when the simulation is finished
+        #     if self.is_imagining and outcome is not None:
+        #         self.enaction.terminate(outcome)
+        #         self.interaction_step = INTERACTION_STEP_INTEGRATING
+        #     # If not imagining then CtrlRobot will return the outcome and proceed to INTEGRATING
+        #
+        # # INTEGRATING: the new enacted interaction
+        # if self.interaction_step == INTERACTION_STEP_INTEGRATING:
+        #     # Restore the memory from the snapshot and integrate the experiences
+        #     self.memory = self.memory_snapshot
+        #     # Retrieve possible message from other robot
+        #     self.enaction.message = self.message
+        #     self.message = None
+        #     # Update body memory and egocentric memory
+        #     self.memory.update_and_add_experiences(self.enaction)
+        #
+        #     # Call the integrator to create and update the phenomena
+        #     # Currently we don't create phenomena in imaginary mode
+        #     self.integrator.integrate()
+        #
+        #     # Update allocentric memory: robot, phenomena, focus
+        #     self.memory.update_allocentric(self.clock)
+        #
+        #     # Increment the clock if the enacted interaction was properly received
+        #     if self.enaction.clock >= self.clock:  # don't increment if the robot is behind
+        #         # Remove the enaction from the stack (ok if it has already been removed)
+        #         self.enactions.pop(self.clock, None)
+        #         # Increment the clock
+        #         self.clock += 1
+        #
+        #     self.interaction_step = INTERACTION_STEP_REFRESHING
+        #
+        # # REFRESHING: Will be reset to IDLE in the next cycle
 
     def process_user_key(self, user_key):
         """Process the keypress on the view windows (called by the views)"""
@@ -153,21 +155,32 @@ class Workspace:
             self.engagement_mode = user_key.upper()
         elif user_key.upper() in ACTIONS:
             # Only process actions when the robot is IDLE
-            if self.interaction_step == INTERACTION_STEP_IDLE:
+            if self.enacter.interaction_step == INTERACTION_STEP_IDLE:
                 self.enactions[self.clock] = Enaction(self.actions[user_key.upper()], self.clock, self.memory)
-                # self.enactions[self.clock].set_spatial(self.memory.body_memory.body_quaternion, self.memory.egocentric_memory.prompt_point, self.memory.egocentric_memory.focus_point)
         elif user_key.upper() == "/":
             # If key ALIGN then turn and move forward to the prompt
-            if self.interaction_step == INTERACTION_STEP_IDLE:
-                # Prepare the first enaction
-                self.enactions[self.clock] = Enaction(self.actions[ACTION_TURN], self.clock, self.memory)
-                # Adjust the spatial modifiers
-                # self.enactions[self.clock].set_spatial(self.memory.body_memory.body_quaternion, self.memory.egocentric_memory.prompt_point, self.memory.egocentric_memory.focus_point)
-                # prepare the second enaction
-                self.enactions[self.clock + 1] = Enaction(self.actions[ACTION_FORWARD], self.clock + 1, self.enactions[self.clock].post_memory)
-                # self.enactions[self.clock + 1].set_spatial(self.enactions[self.clock].anticipated_post_body_q,
-                #                                            self.enactions[self.clock].anticipated_post_prompt_p,
-                #                                            self.enactions[self.clock].anticipated_post_focus_p)
+            if self.enacter.interaction_step == INTERACTION_STEP_IDLE:
+                # The first enaction: turn to the prompt
+                e1 = Enaction(self.actions[ACTION_TURN], self.clock, self.memory)
+                self.enactions[self.clock] = e1
+                # Second enaction: move forward to the prompt
+                self.enactions[self.clock + 1] = Enaction(self.actions[ACTION_FORWARD], self.clock + 1, e1.post_memory)
+        elif user_key.upper() == "P" and self.memory.egocentric_memory.focus_point is not None:
+            # If key PUSH and has focus then create the push sequence
+            if self.enacter.interaction_step == INTERACTION_STEP_IDLE:
+                # First enaction: turn to the prompt
+                e0 = Enaction(self.actions[ACTION_TURN], self.clock, self.memory)
+                self.enactions[self.clock] = e0
+                # Second enaction: move forward to the prompt
+                e1 = Enaction(self.actions[ACTION_FORWARD], self.clock + 1, e0.post_memory)
+                self.enactions[self.clock + 1] = e1
+                # Third enaction: turn to the prompt which is copied from the focus because it may be cleared
+                e1.post_memory.egocentric_memory.prompt_point = e1.post_memory.egocentric_memory.focus_point.copy()
+                e2 = Enaction(self.actions[ACTION_TURN], self.clock + 2, e1.post_memory)
+                self.enactions[self.clock + 2] = e2
+                # Fourth enaction: move forward to the new prompt
+                e3 = Enaction(self.actions[ACTION_FORWARD], self.clock + 3, e2.post_memory)
+                self.enactions[self.clock + 3] = e3
         elif user_key.upper() == KEY_CLEAR:
             # Clear the stack of enactions
             playsound('autocat/Assets/R3.wav', False)
@@ -219,7 +232,8 @@ class Workspace:
             # print("ego angle", math.degrees(self.message.ego_quaternion.angle * self.message.ego_quaternion.axis[2]))
             if self.message.ter_position is not None:
                 # If position in terrain and the position of this robot knows the position of the terrain
-                if TER in self.memory.phenomenon_memory.phenomena and self.memory.phenomenon_memory.phenomena[TER].confidence > TERRAIN_INITIAL_CONFIDENCE:
+                if TER in self.memory.phenomenon_memory.phenomena \
+                        and self.memory.phenomenon_memory.phenomena[TER].confidence > TERRAIN_INITIAL_CONFIDENCE:
                     allo_point = self.message.ter_position + self.memory.phenomenon_memory.phenomena[TER].point
                     print("Robot", self.message.robot, "position:", allo_point)
                     self.message.ego_position = self.memory.allocentric_to_egocentric(allo_point)

@@ -101,8 +101,8 @@ class DeciderExplore(Decider):
         # Compute the next prompt point
 
         # It is assumed that the terrain has been found if this decider is activated
-        # if TER in self.workspace.memory.phenomenon_memory.phenomena and \
-        #    self.workspace.memory.phenomenon_memory.phenomena[TER].absolute_affordance() is not None and \
+
+        e1, e2 = None, None
 
         # If time to go home
         if self.workspace.clock - self.workspace.memory.phenomenon_memory.phenomena[TER].last_origin_clock > CLOCK_TO_GO_HOME:
@@ -115,11 +115,8 @@ class DeciderExplore(Decider):
                 print("Swiping to confirmation by:", ego_confirmation)
                 self.action = self.workspace.actions[ACTION_SWIPE]
                 self.workspace.memory.egocentric_memory.prompt_point = ego_confirmation
-                self.workspace.enactions[self.workspace.clock] = Enaction(self.action, self.workspace.clock, self.workspace.memory)
-                # self.workspace.enactions[self.workspace.clock].set_spatial(
-                #     self.workspace.memory.body_memory.body_quaternion,
-                #     self.workspace.memory.egocentric_memory.prompt_point,
-                #     self.workspace.memory.egocentric_memory.focus_point)
+                e1 = Enaction(self.action, self.workspace.clock, self.workspace.memory)
+                # self.workspace.enactions[self.workspace.clock] = e1
                 playsound('autocat/Assets/R5.wav', False)
             # If not left or right we need to manoeuvre
             else:
@@ -139,19 +136,8 @@ class DeciderExplore(Decider):
                     self.workspace.memory.egocentric_memory.prompt_point = ego_origin
                     playsound('autocat/Assets/R3.wav', False)
                 self.action = self.workspace.actions[ACTION_TURN]
-                self.workspace.enactions[self.workspace.clock] = Enaction(self.action, self.workspace.clock, self.workspace.memory)
-                # self.workspace.enactions[self.workspace.clock].set_spatial(
-                #     self.workspace.memory.body_memory.body_quaternion,
-                #     self.workspace.memory.egocentric_memory.prompt_point,
-                #     self.workspace.memory.egocentric_memory.focus_point)
-                self.workspace.enactions[self.workspace.clock + 1] = Enaction(self.workspace.actions[ACTION_FORWARD],
-                                                                              self.workspace.clock + 1,
-                                                                              self.workspace.enactions[self.workspace.clock].post_memory)
-                # self.workspace.enactions[self.workspace.clock + 1].set_spatial(
-                #     self.workspace.enactions[self.workspace.clock].anticipated_post_body_q,
-                #     self.workspace.enactions[self.workspace.clock].anticipated_post_prompt_p,
-                #     self.workspace.enactions[self.workspace.clock].anticipated_post_focus_p)
-
+                e1 = Enaction(self.action, self.workspace.clock, self.workspace.memory)
+                e2 = Enaction(self.workspace.actions[ACTION_FORWARD], self.workspace.clock + 1, e1.post_memory)
         else:
             # Go to the most interesting pool point
             # mip = self.workspace.memory.allocentric_memory.most_interesting_pool(self.workspace.clock)
@@ -169,14 +155,10 @@ class DeciderExplore(Decider):
             # if self.prompt_index >= self.nb_points:
             #     self.prompt_index = 0
             self.action = self.workspace.actions[ACTION_TURN]
-            self.workspace.enactions[self.workspace.clock] = Enaction(self.action, self.workspace.clock, self.workspace.memory)
-            # self.workspace.enactions[self.workspace.clock].set_spatial(
-            #     self.workspace.memory.body_memory.body_quaternion,
-            #     self.workspace.memory.egocentric_memory.prompt_point,
-            #     self.workspace.memory.egocentric_memory.focus_point)
-            self.workspace.enactions[self.workspace.clock + 1] = Enaction(self.workspace.actions[ACTION_FORWARD], self.workspace.clock + 1,
-                                                                          self.workspace.enactions[self.workspace.clock].post_memory)
-            # self.workspace.enactions[self.workspace.clock + 1].set_spatial(
-            #     self.workspace.enactions[self.workspace.clock].anticipated_post_body_q,
-            #     self.workspace.enactions[self.workspace.clock].anticipated_post_prompt_p,
-            #     self.workspace.enactions[self.workspace.clock].anticipated_post_focus_p)
+            e1 = Enaction(self.action, self.workspace.clock, self.workspace.memory)
+            e2 = Enaction(self.workspace.actions[ACTION_FORWARD], self.workspace.clock + 1, e1.post_memory)
+
+        # Add the enactions to the stack
+        self.workspace.enactions[self.workspace.clock] = e1
+        if e2 is not None:
+            self.workspace.enactions[self.workspace.clock + 1] = e2

@@ -112,7 +112,7 @@ class CtrlBodyView:
                                      + ", Decider: " + self.workspace.decider_mode \
                                      + ", Engagement: " + self.workspace.engagement_mode \
                                      + ", Energy {:.0f}%".format(self.workspace.memory.body_memory.energy * 100)
-        if self.workspace.interaction_step == INTERACTION_STEP_REFRESHING and self.workspace.enaction.outcome is not None:
+        if self.workspace.enacter.interaction_step == INTERACTION_STEP_REFRESHING and self.workspace.enaction.outcome is not None:
             self.view.label.text = self.body_label_azimuth(self.workspace.enaction)
             self.view.label_enaction.text = self.body_label(self.workspace.enaction.action)
             self.update_body_view()

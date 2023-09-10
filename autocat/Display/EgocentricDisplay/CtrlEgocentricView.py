@@ -94,5 +94,5 @@ class CtrlEgocentricView:
         self.update_body_robot()
 
         # Update the display of egocentric memory
-        if self.workspace.interaction_step in [INTERACTION_STEP_ENACTING, INTERACTION_STEP_REFRESHING]:
+        if self.workspace.enacter.interaction_step in [INTERACTION_STEP_ENACTING, INTERACTION_STEP_REFRESHING]:
             self.update_points_of_interest()
