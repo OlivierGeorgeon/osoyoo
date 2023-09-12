@@ -1,45 +1,52 @@
-from ..Robot.CtrlRobot import INTERACTION_STEP_IDLE, INTERACTION_STEP_INTENDING, INTERACTION_STEP_ENACTING, \
-    INTERACTION_STEP_INTEGRATING, INTERACTION_STEP_REFRESHING
+from ..Robot.CtrlRobot import ENACTION_STEP_IDLE, ENACTION_STEP_INTENDING, ENACTION_STEP_ENACTING, \
+    ENACTION_STEP_INTEGRATING, ENACTION_STEP_REFRESHING
 
 
 class Enacter:
     def __init__(self, workspace):
         self.workspace = workspace
-        self.interaction_step = INTERACTION_STEP_IDLE
+        self.interaction_step = ENACTION_STEP_IDLE
         self.memory_snapshot = None
 
     def main(self, dt):
         """Controls the enaction."""
-        if self.interaction_step == INTERACTION_STEP_IDLE:
+        if self.interaction_step == ENACTION_STEP_IDLE:
             # When the next enaction is in the stack, prepare the enaction
-            if self.workspace.clock in self.workspace.enactions:
+            # if self.workspace.clock in self.workspace.enactions:
+            if self.workspace.composite_enaction is not None:
+                # Take the current enaction from the composite interaction
+                self.workspace.enaction = self.workspace.composite_enaction.current_enaction()
+                self.workspace.enaction.clock = self.workspace.clock
+
                 self.memory_snapshot = self.workspace.memory.save()
                 # Take the next enaction from the stack
-                self.workspace.enaction = self.workspace.enactions[self.workspace.clock]
+                # self.workspace.enaction = self.workspace.enactions[self.workspace.clock]
                 # Adjust the prompt
                 #   For series of enactions, the prompt should be adjusted from the previous enaction
                 # Begin the enaction
                 self.workspace.enaction.begin()
                 if self.workspace.is_imagining:
                     # If imagining then proceed to simulating the enaction
-                    self.interaction_step = INTERACTION_STEP_ENACTING
+                    self.interaction_step = ENACTION_STEP_ENACTING
                 else:
                     # Take a snapshot for the simulation and proceed to INTENDING
-                    self.interaction_step = INTERACTION_STEP_INTENDING
+                    self.interaction_step = ENACTION_STEP_INTENDING
 
         # INTENDING: is handled by CtrlRobot
 
         # ENACTING: Simulate the enaction in memory
-        if self.interaction_step == INTERACTION_STEP_ENACTING:
+        if self.interaction_step == ENACTION_STEP_ENACTING:
             outcome = self.workspace.memory.simulate(self.workspace.enaction, dt)
             # If imagining then use the imagined outcome when the simulation is finished
             if self.workspace.is_imagining and outcome is not None:
                 self.workspace.enaction.terminate(outcome)
-                self.interaction_step = INTERACTION_STEP_INTEGRATING
+                if not self.workspace.composite_enaction.increment():
+                    self.workspace.composite_enaction = None
+                self.interaction_step = ENACTION_STEP_INTEGRATING
             # If not imagining then CtrlRobot will return the outcome and proceed to INTEGRATING
 
         # INTEGRATING: the new enacted interaction
-        if self.interaction_step == INTERACTION_STEP_INTEGRATING:
+        if self.interaction_step == ENACTION_STEP_INTEGRATING:
             # Restore the memory from the snapshot and integrate the experiences
             self.workspace.memory = self.memory_snapshot
             # Retrieve possible message from other robot
@@ -62,6 +69,6 @@ class Enacter:
                 # Increment the clock
                 self.workspace.clock += 1
 
-            self.interaction_step = INTERACTION_STEP_REFRESHING
+            self.interaction_step = ENACTION_STEP_REFRESHING
 
         # REFRESHING: Will be reset to IDLE in the next cycle

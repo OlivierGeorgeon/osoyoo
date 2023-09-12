@@ -3,7 +3,7 @@ import math
 import numpy as np
 from .BodyView import BodyView
 from autocat.Display.PointOfInterest import PointOfInterest, POINT_COMPASS, POINT_AZIMUTH
-from ...Robot.CtrlRobot import INTERACTION_STEP_REFRESHING
+from ...Robot.CtrlRobot import ENACTION_STEP_REFRESHING
 import circle_fit as cf
 from ...Workspace import KEY_DECREASE, KEY_INCREASE
 
@@ -109,10 +109,10 @@ class CtrlBodyView:
     def main(self, dt):
         """Called every frame. Update the body view"""
         self.view.label_clock.text = "Next Clock: " + str(self.workspace.clock) \
-                                     + ", Decider: " + self.workspace.decider_mode \
+                                     + ", Decider: " + self.workspace.control_mode \
                                      + ", Engagement: " + self.workspace.engagement_mode \
                                      + ", Energy {:.0f}%".format(self.workspace.memory.body_memory.energy * 100)
-        if self.workspace.enacter.interaction_step == INTERACTION_STEP_REFRESHING and self.workspace.enaction.outcome is not None:
+        if self.workspace.enacter.interaction_step == ENACTION_STEP_REFRESHING and self.workspace.enaction.outcome is not None:
             self.view.label.text = self.body_label_azimuth(self.workspace.enaction)
             self.view.label_enaction.text = self.body_label(self.workspace.enaction.action)
             self.update_body_view()

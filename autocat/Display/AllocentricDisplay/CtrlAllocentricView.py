@@ -2,7 +2,7 @@ import time
 from pyglet.window import key
 from .AllocentricView import AllocentricView
 from ...Memory.AllocentricMemory.Hexagonal_geometry import point_to_cell
-from ...Robot.CtrlRobot import INTERACTION_STEP_REFRESHING, INTERACTION_STEP_ENACTING
+from ...Robot.CtrlRobot import ENACTION_STEP_REFRESHING, ENACTION_STEP_ENACTING
 
 
 class CtrlAllocentricView:
@@ -58,9 +58,9 @@ class CtrlAllocentricView:
     def main(self, dt):
         """Refresh allocentric view"""
         # Refresh during the simulation very 250 millisecond
-        if self.workspace.enacter.interaction_step == INTERACTION_STEP_ENACTING and time.time() > self.next_time_refresh:
+        if self.workspace.enacter.interaction_step == ENACTION_STEP_ENACTING and time.time() > self.next_time_refresh:
             self.next_time_refresh = time.time() + 0.250
             self.update_view()
         # Refresh at the end of the interaction cycle
-        if self.workspace.enacter.interaction_step == INTERACTION_STEP_REFRESHING:
+        if self.workspace.enacter.interaction_step == ENACTION_STEP_REFRESHING:
             self.update_view()

@@ -5,13 +5,12 @@ import math
 from pyrr import Quaternion
 from .RobotDefine import ROBOT_SETTINGS
 from .Outcome import Outcome
-from .Message import Message
 
-INTERACTION_STEP_IDLE = 0
-INTERACTION_STEP_INTENDING = 1
-INTERACTION_STEP_ENACTING = 2
-INTERACTION_STEP_INTEGRATING = 3
-INTERACTION_STEP_REFRESHING = 4
+ENACTION_STEP_IDLE = 0
+ENACTION_STEP_INTENDING = 1
+ENACTION_STEP_ENACTING = 2
+ENACTION_STEP_INTEGRATING = 3
+ENACTION_STEP_REFRESHING = 4
 
 
 class CtrlRobot:
@@ -30,12 +29,12 @@ class CtrlRobot:
     def main(self, dt):
         """The main handler of the communication to and from the robot."""
         # If INTENDING then send the interaction to the robot
-        if self.workspace.enacter.interaction_step == INTERACTION_STEP_INTENDING:
-            self.workspace.enacter.interaction_step = INTERACTION_STEP_ENACTING
+        if self.workspace.enacter.interaction_step == ENACTION_STEP_INTENDING:
+            self.workspace.enacter.interaction_step = ENACTION_STEP_ENACTING
             self.send_command_to_robot()
 
         # While the robot is enacting the interaction, check for the outcome
-        if self.workspace.enacter.interaction_step == INTERACTION_STEP_ENACTING and not self.workspace.is_imagining:
+        if self.workspace.enacter.interaction_step == ENACTION_STEP_ENACTING and not self.workspace.is_imagining:
             if time.time() < self.expected_outcome_time:
                 outcome_string = None
                 try:
@@ -61,12 +60,13 @@ class CtrlRobot:
             else:
                 # Timeout: reinitialize the cycle. This will resend the enaction
                 self.workspace.memory = self.workspace.enacter.memory_snapshot
-                self.workspace.enacter.interaction_step = INTERACTION_STEP_REFRESHING
+                self.workspace.enacter.interaction_step = ENACTION_STEP_REFRESHING
                 print("Timeout")
 
     def send_command_to_robot(self):
         """Send the enaction string to the robot and set the timeout"""
-        enaction_string = self.workspace.enaction.command.serialize()
+        # enaction_string = self.workspace.enaction.command.serialize()
+        enaction_string = self.workspace.enaction.serialize()
         print("Sending:", enaction_string)
 
         # Send the intended interaction string to the robot
@@ -89,16 +89,8 @@ class CtrlRobot:
             body_direction_rad = math.atan2(-outcome.compass_point[0], -outcome.compass_point[1])
             outcome.compass_quaternion = Quaternion.from_z_rotation(body_direction_rad)
 
-        # Process the message received from other robot
-        # message = None
-        # if self.workspace.message is not None:
-        #     message = Message(self.workspace.message)
-        #     self.workspace.message = None  # Delete the message
-        #     # If the message contains the focus point
-        #     message.other_destination_ego = self.workspace.memory.polar_egocentric_to_egocentric(message.other_destination)
-        #     # If the message contains the position
-        #     # message.other_destination_ego = self.workspace.memory.allocentric_to_egocentric(message.other_destination)
-
         # Terminate the enaction
         self.workspace.enaction.terminate(outcome)
-        self.workspace.enacter.interaction_step = INTERACTION_STEP_INTEGRATING
+        if not self.workspace.composite_enaction.increment():
+            self.workspace.composite_enaction = None
+        self.workspace.enacter.interaction_step = ENACTION_STEP_INTEGRATING

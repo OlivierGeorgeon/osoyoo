@@ -9,9 +9,10 @@ from pyrr import quaternion, matrix44, Quaternion
 from playsound import playsound
 from . Action import ACTION_TURN, ACTION_FORWARD, ACTION_SWIPE, ACTION_RIGHTWARD
 from . Interaction import OUTCOME_NO_FOCUS
+from . Decider import Decider
 from ..Robot.Enaction import Enaction
 from ..Memory.PhenomenonMemory.PhenomenonMemory import TER
-from . Decider import Decider
+from ..Enaction.CompositeEnaction import CompositeEnaction
 
 CLOCK_TO_GO_HOME = 8  # Number of interactions before going home
 OUTCOME_ORIGIN = "O"
@@ -159,6 +160,9 @@ class DeciderExplore(Decider):
             e2 = Enaction(self.workspace.actions[ACTION_FORWARD], self.workspace.clock + 1, e1.post_memory)
 
         # Add the enactions to the stack
-        self.workspace.enactions[self.workspace.clock] = e1
+        # self.workspace.enactions[self.workspace.clock] = e1
+        enaction_sequence = [e1]
         if e2 is not None:
-            self.workspace.enactions[self.workspace.clock + 1] = e2
+            enaction_sequence.append(e2)
+            # self.workspace.enactions[self.workspace.clock + 1] = e2
+        self.workspace.composite_enaction = CompositeEnaction(enaction_sequence)

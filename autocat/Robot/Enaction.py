@@ -1,4 +1,5 @@
 import math
+import json
 import numpy as np
 from pyrr import matrix44, Quaternion
 from playsound import playsound
@@ -37,7 +38,7 @@ class Enaction:
             print("Initialize Enaction clock", self.clock, "prompt", self.prompt_point)
         if memory.egocentric_memory.focus_point is not None:
             self.focus_point = memory.egocentric_memory.focus_point.copy()
-        self.command = Command(self.action, self.clock, self.prompt_point, self.focus_point)
+        self.command = Command(self.action, self.prompt_point, self.focus_point)
 
         self.post_memory = memory.save()
 
@@ -246,3 +247,15 @@ class Enaction:
         if self.prompt_point is not None:
             self.prompt_point = matrix44.apply_to_vector(self.displacement_matrix, self.prompt_point).astype(int)
             print("Terminate Enaction clock", self.clock, "Prompt", self.prompt_point)
+
+    def current_enaction(self):
+        return self
+
+    def increment(self):
+        return False
+
+    def serialize(self):
+        """Return the command string to send to the robot"""
+        command_dict = {'clock': self.clock}
+        command_dict.update(self.command.command_dict())
+        return json.dumps(command_dict)

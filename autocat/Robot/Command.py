@@ -11,9 +11,9 @@ ENACTION_DEFAULT_TIMEOUT = 6  # Seconds
 
 class Command:
     """A command to send to the robot"""
-    def __init__(self, action, clock, prompt_point, focus_point):
+    def __init__(self, action, prompt_point, focus_point):
         self.action = action
-        self.clock = clock
+        # self.clock = clock
         self.duration = None
         self.angle = None
         self.focus_x = None
@@ -85,9 +85,10 @@ class Command:
         if self.action.action_code == ACTION_SCAN:
             self.span = 10
 
-    def serialize(self):
-        """Return the command string to send to the robot"""
-        command_dict = {'clock': self.clock, 'action': self.action.action_code}
+    def command_dict(self):
+        """Return a dictionary containing the command"""
+        # The clock is not included because it is allocated during the enaction
+        command_dict = {'action': self.action.action_code}
         if self.duration is not None:
             command_dict['duration'] = self.duration
         if self.angle is not None:
@@ -101,7 +102,25 @@ class Command:
             command_dict['caution'] = self.caution
         if self.span is not None:
             command_dict['span'] = self.span
-        return json.dumps(command_dict)
+        return command_dict
+
+    # def serialize(self):
+    #     """Return the command string to send to the robot"""
+    #     command_dict = {'clock': self.clock, 'action': self.action.action_code}
+    #     if self.duration is not None:
+    #         command_dict['duration'] = self.duration
+    #     if self.angle is not None:
+    #         command_dict['angle'] = self.angle
+    #     if self.focus_x is not None:
+    #         command_dict['focus_x'] = self.focus_x
+    #         command_dict['focus_y'] = self.focus_y
+    #     if self.speed is not None:
+    #         command_dict['speed'] = self.speed
+    #     if self.caution is not None:
+    #         command_dict['caution'] = self.caution
+    #     if self.span is not None:
+    #         command_dict['span'] = self.span
+    #     return json.dumps(command_dict)
 
     def timeout(self):
         """Return the timeout expected from this command"""
