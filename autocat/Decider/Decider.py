@@ -30,10 +30,10 @@ class Decider:
     def stack_enaction(self):
         """Propose the next intended enaction from the previous enacted interaction.
         This is the main method of the agent"""
-        # Compute a specific outcome suited for this agent
+        # Compute a specific outcome suited for this agent from the previous enaction
         outcome = self.outcome(self.workspace.enaction)
-        # Compute the intended enaction
-        self.select_enaction(outcome)
+        # Compute the next enaction or composite enaction
+        self.workspace.composite_enaction = self.select_enaction(outcome)
 
     def outcome(self, enaction):
         """ Convert the enacted interaction into an outcome adapted to the circle behavior """

@@ -4,6 +4,7 @@ from playsound import playsound
 from .Decider.DeciderCircle import DeciderCircle
 from .Decider.DeciderExplore import DeciderExplore
 from .Decider.DeciderWatch import DeciderWatch
+from .Decider.DeciderPush import DeciderPush
 from .Decider.Action import create_actions, ACTION_FORWARD, ACTIONS, ACTION_TURN
 from .Memory.Memory import Memory
 from .Memory.PhenomenonMemory.PhenomenonMemory import TER
@@ -34,20 +35,19 @@ class Workspace:
         self.actions = create_actions(robot_id)
         self.memory = Memory(arena_id, robot_id)
         # if self.robot_id == '1':
-        self.deciders = {'Explore': DeciderExplore(self), 'Circle': DeciderCircle(self), 'Watch': DeciderWatch(self)}
+        # self.deciders = {'Explore': DeciderExplore(self), 'Circle': DeciderCircle(self), 'Watch': DeciderWatch(self)}
+        self.deciders = {'Push': DeciderPush(self), 'Watch': DeciderWatch(self)}
         # else:
         #     self.deciders = {'Explore': DeciderExplore(self), 'Circle': DeciderCircle(self)}
         #     # self.deciders = {'Circle': DeciderCircle(self)}
         self.integrator = Integrator(self)
         self.enacter = Enacter(self)
 
-        self.enactions = {}  # The stack of enactions to enact next
         self.composite_enaction = None  # The composite enaction to enact
         self.enaction = None  # The primitive enaction to enact
 
         self.control_mode = KEY_CONTROL_USER
         self.engagement_mode = KEY_ENGAGEMENT_ROBOT
-        # self.interaction_step = INTERACTION_STEP_IDLE
 
         # Controls which phenomenon to display
         self.ctrl_phenomenon_view = None
@@ -83,7 +83,6 @@ class Workspace:
                     self.memory_before_imaginary = self.memory.save()
                     self.is_imagining = True
             # Next automatic decision
-            # if self.clock not in self.enactions:
             if self.composite_enaction is None:
                 if self.control_mode == KEY_CONTROL_DECIDER:
                     # The most activated decider processes the previous enaction and chooses the next enaction
@@ -110,9 +109,7 @@ class Workspace:
             if self.enacter.interaction_step == ENACTION_STEP_IDLE:
                 # The first enaction: turn to the prompt
                 e0 = Enaction(self.actions[ACTION_TURN], self.clock, self.memory)
-                self.enactions[self.clock] = e0
                 # Second enaction: move forward to the prompt
-                # self.enactions[self.clock + 1] = Enaction(self.actions[ACTION_FORWARD], self.clock + 1, e1.post_memory)
                 e1 = Enaction(self.actions[ACTION_FORWARD], self.clock + 1, e0.post_memory)
                 self.composite_enaction = CompositeEnaction([e0, e1])
         elif user_key.upper() == "P" and self.memory.egocentric_memory.focus_point is not None:
@@ -120,22 +117,17 @@ class Workspace:
             if self.enacter.interaction_step == ENACTION_STEP_IDLE:
                 # First enaction: turn to the prompt
                 e0 = Enaction(self.actions[ACTION_TURN], self.clock, self.memory)
-                self.enactions[self.clock] = e0
                 # Second enaction: move forward to the prompt
                 e1 = Enaction(self.actions[ACTION_FORWARD], self.clock + 1, e0.post_memory)
-                self.enactions[self.clock + 1] = e1
                 # Third enaction: turn to the prompt which is copied from the focus because it may be cleared
                 e1.post_memory.egocentric_memory.prompt_point = e1.post_memory.egocentric_memory.focus_point.copy()
                 e2 = Enaction(self.actions[ACTION_TURN], self.clock + 2, e1.post_memory)
-                self.enactions[self.clock + 2] = e2
                 # Fourth enaction: move forward to the new prompt
                 e3 = Enaction(self.actions[ACTION_FORWARD], self.clock + 3, e2.post_memory)
-                self.enactions[self.clock + 3] = e3
                 self.composite_enaction = CompositeEnaction([e0, e1, e2, e3])
         elif user_key.upper() == KEY_CLEAR:
             # Clear the stack of enactions
             playsound('autocat/Assets/R3.wav', False)
-            # self.enactions = {}
             self.composite_enaction = None
 
     def emit_message(self):

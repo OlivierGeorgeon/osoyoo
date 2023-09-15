@@ -92,16 +92,9 @@ class AllocentricMemory:
     def move(self, body_quaternion, translation, clock):
         """Move the robot in allocentric memory. Mark the traversed cells Free. Returns the new position
         If body_quaternion is identity then the translation is allocentric"""
-        # Compute the robot destination point
-        # if is_egocentric_translation:
-        #     # TODO Translate between the initial direction and the final direction
-        #     destination_point = self.robot_point + quaternion.apply_to_vector(body_quaternion, translation)
-        # else:
-        #     destination_point = self.robot_point + translation
 
+        # Move the robot along its body direction
         destination_point = self.robot_point + quaternion.apply_to_vector(body_quaternion, translation)
-        # print("Robot destination point", destination_point)
-
         # Mark the cells traversed by the robot
         p1 = quaternion.apply_to_vector(body_quaternion, [ROBOT_FRONT_X, ROBOT_SIDE, 0]) + destination_point
         p2 = quaternion.apply_to_vector(body_quaternion, [-ROBOT_FRONT_X, ROBOT_SIDE, 0]) + self.robot_point

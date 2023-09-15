@@ -165,4 +165,4 @@ class DeciderExplore(Decider):
         if e2 is not None:
             enaction_sequence.append(e2)
             # self.workspace.enactions[self.workspace.clock + 1] = e2
-        self.workspace.composite_enaction = CompositeEnaction(enaction_sequence)
+        return CompositeEnaction(enaction_sequence)

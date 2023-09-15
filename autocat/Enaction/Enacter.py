@@ -40,7 +40,7 @@ class Enacter:
             # If imagining then use the imagined outcome when the simulation is finished
             if self.workspace.is_imagining and outcome is not None:
                 self.workspace.enaction.terminate(outcome)
-                if not self.workspace.composite_enaction.increment():
+                if not self.workspace.composite_enaction.increment(outcome):
                     self.workspace.composite_enaction = None
                 self.interaction_step = ENACTION_STEP_INTEGRATING
             # If not imagining then CtrlRobot will return the outcome and proceed to INTEGRATING
@@ -65,7 +65,7 @@ class Enacter:
             # Increment the clock if the enacted interaction was properly received
             if self.workspace.enaction.clock >= self.workspace.clock:  # don't increment if the robot is behind
                 # Remove the enaction from the stack (ok if it has already been removed)
-                self.workspace.enactions.pop(self.workspace.clock, None)
+                # self.workspace.enactions.pop(self.workspace.clock, None)
                 # Increment the clock
                 self.workspace.clock += 1
 

@@ -91,6 +91,6 @@ class CtrlRobot:
 
         # Terminate the enaction
         self.workspace.enaction.terminate(outcome)
-        if not self.workspace.composite_enaction.increment():
+        if not self.workspace.composite_enaction.increment(outcome):
             self.workspace.composite_enaction = None
         self.workspace.enacter.interaction_step = ENACTION_STEP_INTEGRATING

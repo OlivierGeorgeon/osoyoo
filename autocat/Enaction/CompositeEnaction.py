@@ -10,10 +10,14 @@ class CompositeEnaction:
         assert self.index < len(self.enactions)
         return self.enactions[self.index]
 
-    def increment(self):
-        """Increment the current_index and return True if there is a next enaction"""
+    def increment(self, outcome):
+        """Move on to the next interaction or return False if end"""
+        # If the enaction failed then abort
+        # if outcome.impact > 0:
+        #     return False
         self.index += 1
-        if self.index < len(self.enactions):
-            return True
-        else:
+        # If no more enactions then return False
+        if self.index >= len(self.enactions):
             return False
+
+        return True

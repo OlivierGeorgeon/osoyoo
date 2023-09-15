@@ -70,4 +70,4 @@ class DeciderWatch(Decider):
 
         # Add the enaction to the stack
         # self.workspace.enactions[self.workspace.clock] = Enaction(self.action, self.workspace.clock, self.workspace.memory)
-        self.workspace.composite_enaction = Enaction(self.action, self.workspace.clock, self.workspace.memory)
+        return Enaction(self.action, self.workspace.clock, self.workspace.memory)
