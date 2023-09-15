@@ -9,6 +9,7 @@ import numpy as np
 from . Action import ACTION_WATCH, ACTION_TURN, ACTION_SWIPE, ACTION_FORWARD
 from ..Robot.Enaction import Enaction
 from ..Memory.BodyMemory import ENERGY_TIRED
+from ..Enaction.CompositeEnaction import CompositeEnaction
 from . Decider import Decider, FOCUS_TOO_TOO_FAR_DISTANCE
 from . PredefinedInteractions import create_or_retrieve_primitive, OUTCOME_FOCUS_SIDE, OUTCOME_FOCUS_FRONT, OUTCOME_FOCUS_TOO_FAR
 
@@ -53,6 +54,16 @@ class DeciderWatch(Decider):
     def select_enaction(self, outcome):
         """Return the next intended interaction"""
 
+        # If far from the origin then return to origin
+        if np.linalg.norm(self.workspace.memory.allocentric_memory.robot_point - self.workspace.memory.phenomenon_memory.origin_point()) > 400:
+            self.workspace.memory.egocentric_memory.prompt_point = \
+                self.workspace.memory.allocentric_to_egocentric(self.workspace.memory.phenomenon_memory.origin_point())
+            # First enaction: turn to the prompt
+            e0 = Enaction(self.workspace.actions[ACTION_TURN], self.workspace.memory)
+            # Second enaction: move forward to the prompt
+            e1 = Enaction(self.workspace.actions[ACTION_FORWARD], e0.post_memory)
+            return CompositeEnaction([e0, e1])
+
         # Call the sequence learning mechanism to select the next action
         self.select_action(outcome)
 
@@ -68,6 +79,5 @@ class DeciderWatch(Decider):
         else:
             self.workspace.memory.egocentric_memory.prompt_point = None
 
-        # Add the enaction to the stack
-        # self.workspace.enactions[self.workspace.clock] = Enaction(self.action, self.workspace.clock, self.workspace.memory)
-        return Enaction(self.action, self.workspace.clock, self.workspace.memory)
+        # Return the selected enaction
+        return Enaction(self.action, self.workspace.memory)

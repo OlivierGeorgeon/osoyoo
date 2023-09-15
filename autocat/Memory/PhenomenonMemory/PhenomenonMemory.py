@@ -11,6 +11,15 @@ class PhenomenonMemory:
         self.phenomena = {}  # Phenomenon 0 is the terrain
         self.phenomenon_id = 0  # Used for object phenomena
 
+    def origin_point(self):
+        """The origin where the robot return for watching"""
+        if TER in self.phenomena:
+            # If the terrain has been identified then the origin is the center of the terrain relative to birth point
+            return self.phenomena[TER].point
+        else:
+            # If the terrain has not been identified then the birth point serves as origin
+            return np.array([0, 0, 0])
+
     def create_phenomenon(self, affordance):
         """Create a new phenomenon depending of the type of the affordance"""
         # Must always create a phenomenon

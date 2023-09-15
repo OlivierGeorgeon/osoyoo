@@ -19,13 +19,13 @@ class Enaction:
     3. CtrlRobot computes the outcome received from the robot
     4. CtrlRobot call ternminate(outcome)
     """
-    def __init__(self, action, clock, memory):
+    def __init__(self, action, memory):
         """Initialize the enaction upon creation. Will be adjusted before generating the command"""
         # The initial arguments
         self.action = action
-        self.clock = clock
 
         # the attributes that will be adjusted
+        self.clock = None
         self.prompt_point = None
         self.focus_point = None
 
@@ -67,13 +67,12 @@ class Enaction:
         self.message = None
         self.message_sent = False  # Message sent to other robots
 
-    def begin(self):
+    def begin(self, clock):
         """Adjust the spatial modifiers of the enaction.
         Compute the command to send to the robot.
         Initialize the simulation"""
 
-        # Generate the command to send to the robot
-        # self.command = Command(self.action, self.clock, self.prompt_point, self.focus_point)
+        self.clock = clock
 
         # Initialize the simulation of the intended interaction
         # Compute the duration and the speed depending and the enaction

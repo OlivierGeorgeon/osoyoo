@@ -35,8 +35,9 @@ class Workspace:
         self.actions = create_actions(robot_id)
         self.memory = Memory(arena_id, robot_id)
         # if self.robot_id == '1':
+        self.deciders = {'Explore': DeciderExplore(self), 'Circle': DeciderCircle(self), 'Watch': DeciderWatch(self), 'Push': DeciderPush(self)}
         # self.deciders = {'Explore': DeciderExplore(self), 'Circle': DeciderCircle(self), 'Watch': DeciderWatch(self)}
-        self.deciders = {'Push': DeciderPush(self), 'Watch': DeciderWatch(self)}
+        # self.deciders = {'Push': DeciderPush(self), 'Watch': DeciderWatch(self)}
         # else:
         #     self.deciders = {'Explore': DeciderExplore(self), 'Circle': DeciderCircle(self)}
         #     # self.deciders = {'Circle': DeciderCircle(self)}
@@ -102,28 +103,27 @@ class Workspace:
         elif user_key.upper() in ACTIONS:
             # Only process actions when the robot is IDLE
             if self.enacter.interaction_step == ENACTION_STEP_IDLE:
-                # self.enactions[self.clock] = Enaction(self.actions[user_key.upper()], self.clock, self.memory)
-                self.composite_enaction = Enaction(self.actions[user_key.upper()], self.clock, self.memory)
+                self.composite_enaction = Enaction(self.actions[user_key.upper()], self.memory)
         elif user_key.upper() == "/":
             # If key ALIGN then turn and move forward to the prompt
             if self.enacter.interaction_step == ENACTION_STEP_IDLE:
                 # The first enaction: turn to the prompt
-                e0 = Enaction(self.actions[ACTION_TURN], self.clock, self.memory)
+                e0 = Enaction(self.actions[ACTION_TURN], self.memory)
                 # Second enaction: move forward to the prompt
-                e1 = Enaction(self.actions[ACTION_FORWARD], self.clock + 1, e0.post_memory)
+                e1 = Enaction(self.actions[ACTION_FORWARD], e0.post_memory)
                 self.composite_enaction = CompositeEnaction([e0, e1])
         elif user_key.upper() == "P" and self.memory.egocentric_memory.focus_point is not None:
             # If key PUSH and has focus then create the push sequence
             if self.enacter.interaction_step == ENACTION_STEP_IDLE:
                 # First enaction: turn to the prompt
-                e0 = Enaction(self.actions[ACTION_TURN], self.clock, self.memory)
+                e0 = Enaction(self.actions[ACTION_TURN], self.memory)
                 # Second enaction: move forward to the prompt
-                e1 = Enaction(self.actions[ACTION_FORWARD], self.clock + 1, e0.post_memory)
+                e1 = Enaction(self.actions[ACTION_FORWARD], e0.post_memory)
                 # Third enaction: turn to the prompt which is copied from the focus because it may be cleared
                 e1.post_memory.egocentric_memory.prompt_point = e1.post_memory.egocentric_memory.focus_point.copy()
-                e2 = Enaction(self.actions[ACTION_TURN], self.clock + 2, e1.post_memory)
+                e2 = Enaction(self.actions[ACTION_TURN], e1.post_memory)
                 # Fourth enaction: move forward to the new prompt
-                e3 = Enaction(self.actions[ACTION_FORWARD], self.clock + 3, e2.post_memory)
+                e3 = Enaction(self.actions[ACTION_FORWARD], e2.post_memory)
                 self.composite_enaction = CompositeEnaction([e0, e1, e2, e3])
         elif user_key.upper() == KEY_CLEAR:
             # Clear the stack of enactions

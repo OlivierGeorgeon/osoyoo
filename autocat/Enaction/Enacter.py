@@ -16,15 +16,11 @@ class Enacter:
             if self.workspace.composite_enaction is not None:
                 # Take the current enaction from the composite interaction
                 self.workspace.enaction = self.workspace.composite_enaction.current_enaction()
-                self.workspace.enaction.clock = self.workspace.clock
-
+                # self.workspace.enaction.clock = self.workspace.clock
+                # Take a memory stapshot to restore at the end of the enaction
                 self.memory_snapshot = self.workspace.memory.save()
-                # Take the next enaction from the stack
-                # self.workspace.enaction = self.workspace.enactions[self.workspace.clock]
-                # Adjust the prompt
-                #   For series of enactions, the prompt should be adjusted from the previous enaction
-                # Begin the enaction
-                self.workspace.enaction.begin()
+                # Begin the enaction and attribute the clock
+                self.workspace.enaction.begin(self.workspace.clock)
                 if self.workspace.is_imagining:
                     # If imagining then proceed to simulating the enaction
                     self.interaction_step = ENACTION_STEP_ENACTING

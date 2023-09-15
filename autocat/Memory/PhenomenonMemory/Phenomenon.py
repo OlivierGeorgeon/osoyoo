@@ -18,7 +18,7 @@ class Phenomenon:
         self.confidence = PHENOMENON_INITIAL_CONFIDENCE
 
         # Record the first affordance of the phenomenon
-        self.point = affordance.point.copy().astype(int)  # The position of the phenomenon = position of the first affordance
+        self.point = affordance.point.copy().astype(int)  # The position of the phenomenon relative to allocentric memo
         affordance.point = np.array([0, 0, 0], dtype=int)  # Position of the first affordance is reset
         self.affordances = {0: affordance}
         self.affordance_id = 0
