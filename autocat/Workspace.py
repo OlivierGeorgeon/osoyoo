@@ -5,7 +5,7 @@ from .Decider.DeciderCircle import DeciderCircle
 from .Decider.DeciderExplore import DeciderExplore
 from .Decider.DeciderWatch import DeciderWatch
 from .Decider.DeciderPush import DeciderPush
-from .Decider.Action import create_actions, ACTION_FORWARD, ACTIONS, ACTION_TURN
+from .Decider.Action import create_actions, ACTION_FORWARD, ACTIONS, ACTION_TURN, ACTION_BACKWARD
 from .Memory.Memory import Memory
 from .Memory.PhenomenonMemory.PhenomenonMemory import TER
 from .Memory.PhenomenonMemory.PhenomenonTerrain import TERRAIN_INITIAL_CONFIDENCE
@@ -35,9 +35,9 @@ class Workspace:
         self.actions = create_actions(robot_id)
         self.memory = Memory(arena_id, robot_id)
         # if self.robot_id == '1':
-        self.deciders = {'Explore': DeciderExplore(self), 'Circle': DeciderCircle(self), 'Watch': DeciderWatch(self), 'Push': DeciderPush(self)}
+        # self.deciders = {'Explore': DeciderExplore(self), 'Circle': DeciderCircle(self), 'Watch': DeciderWatch(self), 'Push': DeciderPush(self)}
         # self.deciders = {'Explore': DeciderExplore(self), 'Circle': DeciderCircle(self), 'Watch': DeciderWatch(self)}
-        # self.deciders = {'Push': DeciderPush(self), 'Watch': DeciderWatch(self)}
+        self.deciders = {'Push': DeciderPush(self), 'Watch': DeciderWatch(self)}
         # else:
         #     self.deciders = {'Explore': DeciderExplore(self), 'Circle': DeciderCircle(self)}
         #     # self.deciders = {'Circle': DeciderCircle(self)}
@@ -111,6 +111,14 @@ class Workspace:
                 e0 = Enaction(self.actions[ACTION_TURN], self.memory)
                 # Second enaction: move forward to the prompt
                 e1 = Enaction(self.actions[ACTION_FORWARD], e0.post_memory)
+                self.composite_enaction = CompositeEnaction([e0, e1])
+        elif user_key.upper() == ":" and self.memory.egocentric_memory.focus_point is not None:
+            # If key ALIGN BACK then turn back and move backward to the prompt
+            if self.enacter.interaction_step == ENACTION_STEP_IDLE:
+                # The first enaction: turn the back to the prompt
+                e0 = Enaction(self.actions[ACTION_TURN], self.memory, turn_back=True)
+                # Second enaction: move forward to the prompt
+                e1 = Enaction(self.actions[ACTION_BACKWARD], e0.post_memory)
                 self.composite_enaction = CompositeEnaction([e0, e1])
         elif user_key.upper() == "P" and self.memory.egocentric_memory.focus_point is not None:
             # If key PUSH and has focus then create the push sequence

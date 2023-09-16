@@ -11,7 +11,7 @@ ENACTION_DEFAULT_TIMEOUT = 6  # Seconds
 
 class Command:
     """A command to send to the robot"""
-    def __init__(self, action, prompt_point, focus_point):
+    def __init__(self, action, prompt_point, focus_point, turn_back):
         self.action = action
         # self.clock = clock
         self.duration = None
@@ -29,8 +29,12 @@ class Command:
                 self.duration = int(np.linalg.norm(prompt_point) / math.fabs(self.action.translation_speed[1]) * 1000)
                 if prompt_point[1] < 0:
                     self.speed = -int(self.action.translation_speed[1])  # Negative speed makes swipe right
-            if self.action.action_code in [ACTION_TURN_HEAD, ACTION_TURN]:  # ACTION_TURN_RIGHT
-                self.angle = int(math.degrees(math.atan2(prompt_point[1], prompt_point[0])))
+            if self.action.action_code in [ACTION_TURN_HEAD, ACTION_TURN]:
+                if turn_back:
+                    # Turn the back to the prompt
+                    self.angle = int(math.degrees(-math.atan2(prompt_point[1], -prompt_point[0])))
+                else:
+                    self.angle = int(math.degrees(math.atan2(prompt_point[1], prompt_point[0])))
         else:
             # Default backward 0.5s
             if self.action.action_code in [ACTION_BACKWARD]:
@@ -76,8 +80,8 @@ class Command:
 
         # The displacement matrix of the environment relative to the robot
         self.anticipated_yaw_matrix = matrix44.create_from_quaternion(self.anticipated_yaw_quaternion)
-        self.anticipated_displacement_matrix = matrix44.multiply(matrix44.create_from_translation(-self.anticipated_translation),
-                                                     self.anticipated_yaw_matrix)
+        self.anticipated_displacement_matrix = matrix44.multiply(
+            matrix44.create_from_translation(-self.anticipated_translation), self.anticipated_yaw_matrix)
 
         # if self.action.action_code == ACTION_FORWARD:
         #     self.caution = 1  # 1: stop if there is an obstacle on the way
@@ -103,24 +107,6 @@ class Command:
         if self.span is not None:
             command_dict['span'] = self.span
         return command_dict
-
-    # def serialize(self):
-    #     """Return the command string to send to the robot"""
-    #     command_dict = {'clock': self.clock, 'action': self.action.action_code}
-    #     if self.duration is not None:
-    #         command_dict['duration'] = self.duration
-    #     if self.angle is not None:
-    #         command_dict['angle'] = self.angle
-    #     if self.focus_x is not None:
-    #         command_dict['focus_x'] = self.focus_x
-    #         command_dict['focus_y'] = self.focus_y
-    #     if self.speed is not None:
-    #         command_dict['speed'] = self.speed
-    #     if self.caution is not None:
-    #         command_dict['caution'] = self.caution
-    #     if self.span is not None:
-    #         command_dict['span'] = self.span
-    #     return json.dumps(command_dict)
 
     def timeout(self):
         """Return the timeout expected from this command"""

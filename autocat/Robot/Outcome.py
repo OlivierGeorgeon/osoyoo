@@ -115,7 +115,8 @@ class Outcome:
                 else:
                     # Black line on the front
                     self.retreat_translation = [-RETREAT_DISTANCE, 0, 0]
-                playsound('autocat/Assets/tiny_beep.wav', False)
+                # playsound('autocat/Assets/tiny_beep.wav', False)
+                playsound('autocat/Assets/cyberpunk3.wav', False)
 
         # Outcome echo
         self.echo_point = None
