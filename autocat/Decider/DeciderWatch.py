@@ -6,7 +6,7 @@
 import math
 from playsound import playsound
 import numpy as np
-from . Action import ACTION_WATCH, ACTION_TURN, ACTION_SWIPE, ACTION_FORWARD
+from . Action import ACTION_WATCH, ACTION_TURN, ACTION_SWIPE, ACTION_FORWARD, ACTION_SCAN
 from ..Robot.Enaction import Enaction
 from ..Memory.BodyMemory import ENERGY_TIRED
 from ..Enaction.CompositeEnaction import CompositeEnaction
@@ -28,7 +28,7 @@ class DeciderWatch(Decider):
 
     def activation_level(self):
         """The level of activation of this decider: 0: default, 4 if low energy """
-        if self.workspace.memory.body_memory.energy < ENERGY_TIRED:
+        if self.workspace.memory.body_memory.energy <= ENERGY_TIRED:
             return 4
         else:
             return 0
@@ -54,6 +54,9 @@ class DeciderWatch(Decider):
     def select_enaction(self, outcome):
         """Return the next intended interaction"""
 
+        # Watching recharges energy: The robot will return to origin when it has regained energy
+        self.workspace.memory.body_memory.energy += 1
+
         # If far from the origin then return to origin
         if np.linalg.norm(self.workspace.memory.allocentric_memory.robot_point - self.workspace.memory.phenomenon_memory.origin_point()) > 400:
             self.workspace.memory.egocentric_memory.prompt_point = \
@@ -66,6 +69,7 @@ class DeciderWatch(Decider):
 
         # Call the sequence learning mechanism to select the next action
         self.select_action(outcome)
+        span = 40
 
         # Set the spatial modifiers
         if self.action.action_code in [ACTION_TURN]:
@@ -78,6 +82,9 @@ class DeciderWatch(Decider):
                     self.workspace.memory.egocentric_memory.focus_point.copy()
         else:
             self.workspace.memory.egocentric_memory.prompt_point = None
+            if self.action.action_code in [ACTION_SCAN]:
+                # Watch carefully
+                span = 10
 
         # Return the selected enaction
-        return Enaction(self.action, self.workspace.memory)
+        return Enaction(self.action, self.workspace.memory, span=span)

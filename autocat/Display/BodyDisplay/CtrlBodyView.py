@@ -31,10 +31,10 @@ class CtrlBodyView:
         def on_text(text):
             """Process the user key or forward it to the Workspace to handle"""
             if text.upper() == KEY_DECREASE:
-                self.workspace.memory.body_memory.energy = max(0, self.workspace.memory.body_memory.energy - 0.1)
+                self.workspace.memory.body_memory.energy = max(0, self.workspace.memory.body_memory.energy - 10)
                 self.workspace.memory_snapshot.body_memory.energy = self.workspace.memory.body_memory.energy
             elif text.upper() == KEY_INCREASE:
-                self.workspace.memory.body_memory.energy = min(self.workspace.memory.body_memory.energy + 0.1, 1.)
+                self.workspace.memory.body_memory.energy = min(self.workspace.memory.body_memory.energy + 10, 100)
                 self.workspace.memory_snapshot.body_memory.energy = self.workspace.memory.body_memory.energy
             if text.upper() == KEY_OFFSET:
                 # Calibrate the compass
@@ -111,7 +111,8 @@ class CtrlBodyView:
         self.view.label_clock.text = "Next Clock: " + str(self.workspace.clock) \
                                      + ", Decider: " + self.workspace.control_mode \
                                      + ", Engagement: " + self.workspace.engagement_mode \
-                                     + ", Energy {:.0f}%".format(self.workspace.memory.body_memory.energy * 100)
+                                     + ", Energy {:d}%".format(self.workspace.memory.body_memory.energy)
+                                     # + ", Energy: " + str(self.workspace.memory.body_memory.energy)
         if self.workspace.enacter.interaction_step == ENACTION_STEP_REFRESHING and self.workspace.enaction.outcome is not None:
             self.view.label.text = self.body_label_azimuth(self.workspace.enaction)
             self.view.label_enaction.text = self.body_label(self.workspace.enaction.action)

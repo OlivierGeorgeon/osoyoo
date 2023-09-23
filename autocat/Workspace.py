@@ -13,8 +13,7 @@ from .Integrator.Integrator import Integrator
 from .Robot.Enaction import Enaction
 from .Robot.Message import Message
 from .Enaction.Enacter import Enacter
-from .Robot.CtrlRobot import ENACTION_STEP_IDLE, ENACTION_STEP_INTENDING, ENACTION_STEP_ENACTING, \
-    ENACTION_STEP_INTEGRATING, ENACTION_STEP_REFRESHING
+from .Robot.CtrlRobot import ENACTION_STEP_IDLE, ENACTION_STEP_REFRESHING
 from .Enaction.CompositeEnaction import CompositeEnaction
 
 KEY_CONTROL_DECIDER = "A"  # Automatic mode: controlled by the deciders
@@ -35,9 +34,9 @@ class Workspace:
         self.actions = create_actions(robot_id)
         self.memory = Memory(arena_id, robot_id)
         # if self.robot_id == '1':
-        # self.deciders = {'Explore': DeciderExplore(self), 'Circle': DeciderCircle(self), 'Watch': DeciderWatch(self), 'Push': DeciderPush(self)}
+        self.deciders = {'Explore': DeciderExplore(self), 'Circle': DeciderCircle(self), 'Watch': DeciderWatch(self), 'Push': DeciderPush(self)}
         # self.deciders = {'Explore': DeciderExplore(self), 'Circle': DeciderCircle(self), 'Watch': DeciderWatch(self)}
-        self.deciders = {'Push': DeciderPush(self), 'Watch': DeciderWatch(self)}
+        # self.deciders = {'Push': DeciderPush(self), 'Watch': DeciderWatch(self)}
         # else:
         #     self.deciders = {'Explore': DeciderExplore(self), 'Circle': DeciderCircle(self)}
         #     # self.deciders = {'Circle': DeciderCircle(self)}
@@ -103,7 +102,7 @@ class Workspace:
         elif user_key.upper() in ACTIONS:
             # Only process actions when the robot is IDLE
             if self.enacter.interaction_step == ENACTION_STEP_IDLE:
-                self.composite_enaction = Enaction(self.actions[user_key.upper()], self.memory)
+                self.composite_enaction = Enaction(self.actions[user_key.upper()], self.memory, span=10)
         elif user_key.upper() == "/":
             # If key ALIGN then turn and move forward to the prompt
             if self.enacter.interaction_step == ENACTION_STEP_IDLE:

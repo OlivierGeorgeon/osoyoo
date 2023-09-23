@@ -52,7 +52,7 @@ ROBOT_SETTINGS_2["IP"] = {"A301": "192.168.8.189", "PetiteIA": "192.168.8.189"}
 ROBOT_SETTINGS_2["forward_speed"] = 230  # (mm/s) Forward translation speed.
 ROBOT_SETTINGS_2["lateral_speed"] = 140  # (mm/s) Lateral translation speed.
 ROBOT_SETTINGS_2["retreat_distance"] = 90
-ROBOT_SETTINGS_2["compass_offset"] = [-25, 20, 0] # [-30, 40, 0]
+ROBOT_SETTINGS_2["compass_offset"] = [-25, 20, 0]  # [-30, 40, 0]
 
 # Robot 3 chez Olivier
 ROBOT_SETTINGS_3 = ROBOT_SETTINGS_0.copy()
@@ -60,7 +60,7 @@ ROBOT_SETTINGS_3["IP"] = {"A301": "192.168.8.242", "PetiteIA": "192.168.8.242"}
 ROBOT_SETTINGS_3["forward_speed"] = 260  # 230  # 190 (mm/s) Forward translation speed.
 ROBOT_SETTINGS_3["lateral_speed"] = 230  # 160  # (mm/s) Lateral translation speed.
 ROBOT_SETTINGS_3["retreat_distance"] = 80  # 70   # (mm) Distance of the line after retreat
-ROBOT_SETTINGS_3["compass_offset"] = [0, 0, 0]  # [-30, 40, 0]
+ROBOT_SETTINGS_3["compass_offset"] = [88, -87, 0]  # [-30, 40, 0]
 
 # Robot 1 at DOLL
 ROBOT_SETTINGS_11 = ROBOT_SETTINGS_0.copy()

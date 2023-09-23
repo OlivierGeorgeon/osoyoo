@@ -70,50 +70,59 @@ def central_echos(echos):
     """Return an array of points representing the centers of streaks of echos"""
 
     _central_echos = []
-    max_delta_dist = 160
-    max_delta_angle = math.radians(20)
-    streaks = [[], [], [], [], [], [], [], [], [], [], [], []]
-    angle_dist = [[], [], [], [], [], [], [], [], [], [], [], []]
+    # max_delta_dist = 160
+    # max_delta_angle = 20
+    streaks = []  # [[], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], []]
     current_id = 0
-    # On trie par angle croissant, pour avoir les streak "préfaites"
-    echos = {int(a): d for a, d in sorted(echos.items(), key=lambda item: int(item[0]))}
+    # echos = {int(a): d for a, d in sorted(echos.items(), key=lambda item: int(item[0]))}
+    echo_list = [[int(a), d] for a, d in echos.items()]
     # print("Sorted echos", echos)
-    for angle, distance in echos.items():
-        check = False
-        for i, streak in enumerate(streaks):
-            if len(streak) > 0 and not check:
-                if any((abs(ele[1] - distance) < max_delta_dist and abs(angle - ele[0]) < max_delta_angle) for ele in
-                       streak):
-                    streak.append((angle, distance))
-                    angle_dist[i].append((math.degrees(angle), distance))
-                    check = True
-        if check:
-            continue
-        if len(streaks[current_id]) == 0:
-            streaks[current_id].append((angle, distance))
-            angle_dist[current_id].append((math.degrees(angle), distance))
-        else:
-            current_id = (current_id + 1)
-            streaks[current_id].append((angle, distance))
-            angle_dist[current_id].append((math.degrees(angle), distance))
+    # Create the streaks
+    current_streak = [echo_list[0]]
+    if len(echo_list) > 1:
+        for angle, distance in echo_list[1:]:
+            # if len(current_streak) == 0:
+            #     current_streak.append([angle, distance])
+            if abs(current_streak[-1][1] - distance) < 50 and abs(angle - current_streak[-1][0]) <= 10:
+                current_streak.append([angle, distance])
+            else:
+                streaks.append(current_streak)
+                current_streak = [[angle, distance]]
+    streaks.append(current_streak)
+
+    # for angle, distance in echo_list:
+    #     check = False
+    #     for streak in streaks:
+    #         if len(streak) > 0 and not check and \
+    #            any((abs(e[1] - distance) < max_delta_dist and abs(angle - e[0]) < max_delta_angle) for e in streak):
+    #             streak.append((angle, distance))
+    #             check = True
+    #     if check:
+    #         continue
+    #     if len(streaks[current_id]) == 0:
+    #         streaks[current_id].append((angle, distance))
+    #     else:
+    #         current_id = (current_id + 1)
+    #         streaks[current_id].append((angle, distance))
+    # Find the middle of the streaks
     for streak in streaks:
         if len(streak) == 0:
             continue
         else:
-            x_mean, y_mean = 0, 0
             if len(streak) % 2 == 0:
-                # Compute the means of x and y values for the two elements at the center of the array
+                # Compute the means of angle and distance values for the two elements at the center of the array
                 a_mean = (streak[int(len(streak) / 2)][0] + streak[int(len(streak) / 2) - 1][0]) / 2.
                 d_mean = (streak[int(len(streak) / 2)][1] + streak[int(len(streak) / 2) - 1][1]) / 2.
                 _central_echos.append([a_mean, d_mean])
             else:
-                # The x and y are at the center of the array
+                # The central echo is at the center point of the streak
                 _central_echos.append([streak[int(len(streak) / 2)][0], streak[int(len(streak) / 2)][1]])
-    # Only return the closest central echo
+    # Sort by distance
     _central_echos = sorted(_central_echos, key=lambda e: e[1])
-    if len(_central_echos) > 1:
-        _central_echos = [_central_echos[0]]
-    print("Central echos", _central_echos)
+    # Only return the closest central echo
+    # if len(_central_echos) > 1:
+    #     _central_echos = [_central_echos[0]]
+    # print("Central echos", _central_echos)
     return _central_echos
 
 
@@ -192,7 +201,7 @@ class Outcome:
 
         # Outcome echo array for SCAN interactions
         self.echos = {}
-        self.central_echos = None
+        self.central_echos = []
         if "echos" in outcome_dict:
             self.echos = outcome_dict['echos']
             print("Echos", self.echos)

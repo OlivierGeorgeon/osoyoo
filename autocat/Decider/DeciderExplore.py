@@ -63,7 +63,7 @@ class DeciderExplore(Decider):
             outcome = OUTCOME_COLOR
             print("Outcome color")
             # Decrease the energy level
-            self.workspace.memory.body_memory.energy -= 0.1
+            self.workspace.memory.body_memory.energy -= 10
 
         # Look for the floor experience
         if enaction.outcome.floor > 0 and enaction.outcome.color_index == 0:

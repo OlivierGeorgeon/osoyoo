@@ -11,7 +11,7 @@ ENACTION_DEFAULT_TIMEOUT = 6  # Seconds
 
 class Command:
     """A command to send to the robot"""
-    def __init__(self, action, prompt_point, focus_point, turn_back):
+    def __init__(self, action, prompt_point, focus_point, turn_back, span):
         self.action = action
         # self.clock = clock
         self.duration = None
@@ -86,8 +86,8 @@ class Command:
         # if self.action.action_code == ACTION_FORWARD:
         #     self.caution = 1  # 1: stop if there is an obstacle on the way
 
-        if self.action.action_code == ACTION_SCAN:
-            self.span = 10
+        if span != 40 and self.action.action_code == ACTION_SCAN:
+            self.span = span
 
     def command_dict(self):
         """Return a dictionary containing the command"""

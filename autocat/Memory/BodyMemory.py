@@ -3,7 +3,7 @@ import numpy as np
 from pyrr import matrix44, Quaternion, Vector3
 from ..Robot.RobotDefine import ROBOT_SETTINGS, ROBOT_FRONT_X, ROBOT_SIDE
 
-ENERGY_TIRED = 0.801  # Level of energy below which the agent is tired
+ENERGY_TIRED = 80  # Level of energy below which the agent is tired
 
 
 class BodyMemory:
@@ -14,7 +14,7 @@ class BodyMemory:
         self.head_direction_rad = .0  # [-pi/2, pi/2] Radian relative to the robot's x axis
         self.body_quaternion = Quaternion([0., 0., 0., 1.])  # The direction of the body initialized to x axis
         self.compass_offset = np.array(ROBOT_SETTINGS[robot_id]["compass_offset"], dtype=int)
-        self.energy = 1.0  # [0,1] The level of energy of the robot
+        self.energy = 100  # [0,100] The level of energy of the robot
 
     def set_head_direction_degree(self, head_direction_degree: int):
         """Set the head direction from degree measured relative to the robot [-90,90]"""

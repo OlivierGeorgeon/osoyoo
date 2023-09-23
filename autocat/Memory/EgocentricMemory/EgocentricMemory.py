@@ -123,61 +123,6 @@ class EgocentricMemory:
         # Remove the experiences from egocentric memory when they are two old
         # self.experiences = [e for e in self.experiences if e.clock >= enacted_interaction["clock"] - e.durability]
 
-    # def add_central_echos(self, echos):
-    #     """In case of a sweep we obtain an array of echo, this function discretizes
-    #     it to try to find the real position of the objects that sent back the echo
-    #
-    #     To do so use 'strikes' which are series of consecutive echoes that are
-    #     close enough to be considered as the same object, and consider that the
-    #     real position of the object is at the middle of the strike"""
-    #
-    #     if len(echos) == 0:
-    #         return
-    #     body_direction_rad = echos[0][2].absolute_direction_rad
-    #     clock = echos[0][2].clock
-    #     max_delta_dist = 160
-    #     max_delta_angle = math.radians(20)
-    #     streaks = [[], [], [], [], [], [], [], [], [], [], [], []]
-    #     angle_dist = [[], [], [], [], [], [], [], [], [], [], [], []]
-    #     current_id = 0
-    #     echos = sorted(echos, key=lambda elem: elem[0])  # on trie par angle, pour avoir les streak "préfaites"
-    #     for angle, distance, interaction in echos:
-    #         check = False
-    #         for i, streak in enumerate(streaks):
-    #             if len(streak) > 0 and not check:
-    #                 if any((abs(ele[1] - distance) < max_delta_dist and abs(angle - ele[0]) < max_delta_angle) for ele in
-    #                        streak):
-    #                     streak.append((angle, distance, interaction))
-    #                     angle_dist[i].append((math.degrees(angle), distance))
-    #                     check = True
-    #         if check:
-    #             continue
-    #         if len(streaks[current_id]) == 0:
-    #             streaks[current_id].append((angle, distance, interaction))
-    #             angle_dist[current_id].append((math.degrees(angle), distance))
-    #         else:
-    #             current_id = (current_id + 1)
-    #             streaks[current_id].append((angle, distance, interaction))
-    #             angle_dist[current_id].append((math.degrees(angle), distance))
-    #     for streak in streaks:
-    #         if len(streak) == 0:
-    #             continue
-    #         else:
-    #             x_mean, y_mean = 0, 0
-    #             if len(streak) % 2 == 0:
-    #                 # Compute the means of x and y values for the two elements at the center of the array
-    #                 x_mean = (streak[int(len(streak) / 2)][2].point[0] + streak[int(len(streak) / 2) - 1][2].point[0]) / 2
-    #                 y_mean = (streak[int(len(streak) / 2)][2].point[1] + streak[int(len(streak) / 2) - 1][2].point[1]) / 2
-    #             else:
-    #                 # The x and y are at the center of the array
-    #                 x_mean = streak[int(len(streak) / 2)][2].point[0]
-    #                 y_mean = streak[int(len(streak) / 2)][2].point[1]
-    #             experience_central_echo = Experience([int(x_mean), int(y_mean), 0], EXPERIENCE_CENTRAL_ECHO,
-    #                                                  body_direction_rad, clock, experience_id=self.experience_id,
-    #                                                  durability=5)
-    #             self.experiences[experience_central_echo.id] = experience_central_echo
-    #             self.experience_id += 1
-
     def save(self):
         """Return a deep clone of egocentric memory for simulation"""
         saved_egocentric_memory = EgocentricMemory()

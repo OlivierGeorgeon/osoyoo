@@ -6,7 +6,7 @@ from playsound import playsound
 from ..Decider.Action import ACTION_FORWARD, ACTION_BACKWARD, ACTION_SWIPE, ACTION_RIGHTWARD,  ACTION_TURN, \
     ACTION_SCAN, ACTION_WATCH
 from ..Memory.Memory import SIMULATION_TIME_RATIO
-from .RobotDefine import DEFAULT_YAW, TURN_DURATION, ROBOT_FRONT_X, ROBOT_FRONT_Y
+from .RobotDefine import DEFAULT_YAW, TURN_DURATION, ROBOT_FRONT_X, ROBOT_FRONT_Y, ROBOT_HEAD_X
 from .Command import Command
 
 FOCUS_MAX_DELTA = 200  # 200 (mm) Maximum delta to keep focus
@@ -19,7 +19,7 @@ class Enaction:
     3. CtrlRobot computes the outcome received from the robot
     4. CtrlRobot call ternminate(outcome)
     """
-    def __init__(self, action, memory, turn_back=False):
+    def __init__(self, action, memory, turn_back=False, span=40):
         """Initialize the enaction upon creation. Will be adjusted before generating the command"""
         # The initial arguments
         self.action = action
@@ -36,7 +36,7 @@ class Enaction:
             # print("Initialize Enaction clock", self.clock, "prompt", self.prompt_point)
         if memory.egocentric_memory.focus_point is not None:
             self.focus_point = memory.egocentric_memory.focus_point.copy()
-        self.command = Command(self.action, self.prompt_point, self.focus_point, turn_back)
+        self.command = Command(self.action, self.prompt_point, self.focus_point, turn_back, span)
 
         # The anticipated memory
         self.post_memory = memory.save()
@@ -155,16 +155,24 @@ class Enaction:
 
         # The focus --------
 
+        # If careful watch then the focus is the first central_echo
+        new_focus = self.outcome.echo_point
+        if self.command.span == 10 and len(self.outcome.central_echos) > 0:
+            central_echo = self.outcome.central_echos[0]
+            x = ROBOT_HEAD_X + math.cos(math.radians(central_echo[0])) * central_echo[1]
+            y = math.sin(math.radians(central_echo[0])) * central_echo[1]
+            new_focus = np.array([x, y, 0], dtype=int)
+
         # If the robot is already focussed then adjust the focus and the displacement
         if self.focus_point is not None:
-            if self.outcome.echo_point is not None:
+            if new_focus is not None:
                 # The error between the expected and the actual position of the echo
                 prediction_focus_point = matrix44.apply_to_vector(self.displacement_matrix, self.focus_point)
-                prediction_error_focus = prediction_focus_point - self.outcome.echo_point
+                prediction_error_focus = prediction_focus_point - new_focus
                 # If the new focus is near the previous focus or the displacement has been continuous.
                 if np.linalg.norm(prediction_error_focus) < FOCUS_MAX_DELTA or self.outcome.status == "continuous":
                     # The focus has been kept
-                    self.focus_point = self.outcome.echo_point
+                    self.focus_point = new_focus
                     print("UPDATE FOCUS by delta", prediction_error_focus)
                     # If the action has been completed
                     if self.outcome.duration1 >= 1000:
@@ -203,14 +211,14 @@ class Enaction:
                     and self.outcome.echo_point is not None:
                 # Catch focus
                 playsound('autocat/Assets/cute_beep2.wav', False)
-                self.focus_point = self.outcome.echo_point
+                self.focus_point = new_focus
                 print("CATCH FOCUS", self.focus_point)
 
         # Impact or block catch focus
         if self.outcome.impact > 0 and self.action.action_code == ACTION_FORWARD:
-            if self.outcome.echo_point is not None and np.linalg.norm(self.outcome.echo_point) < 200:
+            if new_focus is not None and np.linalg.norm(self.outcome.echo_point) < 200:
                 # Focus on the object "seen"
-                self.focus_point = self.outcome.echo_point
+                self.focus_point = new_focus
             else:
                 # Focus on the object "felt"
                 if self.outcome.impact == 0b01:
