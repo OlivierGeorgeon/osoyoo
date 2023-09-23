@@ -66,6 +66,57 @@ def category_color(color_sensor):
     return color_index
 
 
+def central_echos(echos):
+    """Return an array of points representing the centers of streaks of echos"""
+
+    _central_echos = []
+    max_delta_dist = 160
+    max_delta_angle = math.radians(20)
+    streaks = [[], [], [], [], [], [], [], [], [], [], [], []]
+    angle_dist = [[], [], [], [], [], [], [], [], [], [], [], []]
+    current_id = 0
+    # On trie par angle croissant, pour avoir les streak "préfaites"
+    echos = {int(a): d for a, d in sorted(echos.items(), key=lambda item: int(item[0]))}
+    # print("Sorted echos", echos)
+    for angle, distance in echos.items():
+        check = False
+        for i, streak in enumerate(streaks):
+            if len(streak) > 0 and not check:
+                if any((abs(ele[1] - distance) < max_delta_dist and abs(angle - ele[0]) < max_delta_angle) for ele in
+                       streak):
+                    streak.append((angle, distance))
+                    angle_dist[i].append((math.degrees(angle), distance))
+                    check = True
+        if check:
+            continue
+        if len(streaks[current_id]) == 0:
+            streaks[current_id].append((angle, distance))
+            angle_dist[current_id].append((math.degrees(angle), distance))
+        else:
+            current_id = (current_id + 1)
+            streaks[current_id].append((angle, distance))
+            angle_dist[current_id].append((math.degrees(angle), distance))
+    for streak in streaks:
+        if len(streak) == 0:
+            continue
+        else:
+            x_mean, y_mean = 0, 0
+            if len(streak) % 2 == 0:
+                # Compute the means of x and y values for the two elements at the center of the array
+                a_mean = (streak[int(len(streak) / 2)][0] + streak[int(len(streak) / 2) - 1][0]) / 2.
+                d_mean = (streak[int(len(streak) / 2)][1] + streak[int(len(streak) / 2) - 1][1]) / 2.
+                _central_echos.append([a_mean, d_mean])
+            else:
+                # The x and y are at the center of the array
+                _central_echos.append([streak[int(len(streak) / 2)][0], streak[int(len(streak) / 2)][1]])
+    # Only return the closest central echo
+    _central_echos = sorted(_central_echos, key=lambda e: e[1])
+    if len(_central_echos) > 1:
+        _central_echos = [_central_echos[0]]
+    print("Central echos", _central_echos)
+    return _central_echos
+
+
 class Outcome:
     """The class thant contains the outcome recieved from the robot"""
     def __init__(self, outcome_dict):
@@ -126,7 +177,7 @@ class Outcome:
             self.echo_point = np.array([x, y, 0], dtype=int)
 
         # Outcome impact
-        # (The forward translation is already correct since it is integrated during duration1)
+        # (The Enaction will compute the translation based on duration 1)
         self.impact = 0
         if 'impact' in outcome_dict:
             self.impact = outcome_dict['impact']
@@ -141,5 +192,8 @@ class Outcome:
 
         # Outcome echo array for SCAN interactions
         self.echos = {}
+        self.central_echos = None
         if "echos" in outcome_dict:
             self.echos = outcome_dict['echos']
+            print("Echos", self.echos)
+            self.central_echos = central_echos(self.echos)

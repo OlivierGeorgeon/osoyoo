@@ -86,8 +86,8 @@ class Command:
         # if self.action.action_code == ACTION_FORWARD:
         #     self.caution = 1  # 1: stop if there is an obstacle on the way
 
-        # if self.action.action_code == ACTION_SCAN:
-        #     self.span = 10
+        if self.action.action_code == ACTION_SCAN:
+            self.span = 10
 
     def command_dict(self):
         """Return a dictionary containing the command"""
