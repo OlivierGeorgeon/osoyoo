@@ -8,7 +8,7 @@ from playsound import playsound
 import numpy as np
 from . Action import ACTION_WATCH, ACTION_TURN, ACTION_SWIPE, ACTION_FORWARD, ACTION_SCAN
 from ..Robot.Enaction import Enaction
-from ..Memory.BodyMemory import ENERGY_TIRED
+from ..Memory.BodyMemory import ENERGY_TIRED, EXCITATION_LOW
 from ..Enaction.CompositeEnaction import CompositeEnaction
 from . Decider import Decider, FOCUS_TOO_TOO_FAR_DISTANCE
 from . PredefinedInteractions import create_or_retrieve_primitive, OUTCOME_FOCUS_SIDE, OUTCOME_FOCUS_FRONT, OUTCOME_FOCUS_TOO_FAR
@@ -27,8 +27,9 @@ class DeciderWatch(Decider):
         self.action = self.workspace.actions[ACTION_WATCH]
 
     def activation_level(self):
-        """The level of activation of this decider: 0: default, 4 if low energy """
-        if self.workspace.memory.body_memory.energy <= ENERGY_TIRED:
+        """The level of activation is 4 if the agent is not excited and not tired"""
+        if self.workspace.memory.body_memory.excitation < EXCITATION_LOW and \
+                self.workspace.memory.body_memory.energy > ENERGY_TIRED:
             return 4
         else:
             return 0
@@ -54,13 +55,11 @@ class DeciderWatch(Decider):
     def select_enaction(self, outcome):
         """Return the next intended interaction"""
 
-        # Watching recharges energy: The robot will return to origin when it has regained energy
-        self.workspace.memory.body_memory.energy += 1
-
         # If far from the origin then return to origin
         if np.linalg.norm(self.workspace.memory.allocentric_memory.robot_point - self.workspace.memory.phenomenon_memory.origin_point()) > 400:
             self.workspace.memory.egocentric_memory.prompt_point = \
                 self.workspace.memory.allocentric_to_egocentric(self.workspace.memory.phenomenon_memory.origin_point())
+            self.workspace.memory.egocentric_memory.focus_point = None  # Prevent unnatural head movement
             # First enaction: turn to the prompt
             e0 = Enaction(self.workspace.actions[ACTION_TURN], self.workspace.memory)
             # Second enaction: move forward to the prompt

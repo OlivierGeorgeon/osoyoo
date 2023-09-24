@@ -1,6 +1,6 @@
 import math
 import numpy as np
-from pyrr import matrix44
+from pyrr import matrix44, vector
 from autocat.Memory.EgocentricMemory.Experience import EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_CENTRAL_ECHO, \
     EXPERIENCE_FLOOR
 from autocat.Utils import assert_almost_equal_angles
@@ -87,17 +87,18 @@ class Affordance:
             points = [p1, p2, p3] + self.point
         return points
 
-    def color_position(self):
+    def green_point(self):
         """Return the position of the green patch from position, color, and orientation of this affordance"""
         # Orthogonal vector
-        om = matrix44.create_from_z_rotation(-math.pi / 2)
-        vo = matrix44.apply_to_vector(om, self.experience.sensor_point()) / \
-             np.linalg.norm(self.experience.sensor_point())
+        # om = matrix44.create_from_z_rotation(-math.pi / 2)
+        # vo = matrix44.apply_to_vector(om, self.experience.sensor_point()) / \
+        #      np.linalg.norm(self.experience.sensor_point())
+        # vo = matrix44.apply_to_vector(om, vector.normalise(self.experience.sensor_point()))
+        # The orthogonal normalized vector
+        vo = np.cross(vector.normalise(self.experience.sensor_point()), [0, 0, -1])
         # Distance along the orthogonal vector
         color_distance = np.array((MIDDLE_COLOR_INDEX - self.experience.color_index) * vo * COLOR_DISTANCE, dtype=int)
-        # print("Affordance position:", self.point, "sensor point", self.experience.sensor_point(), "color index",
-        #       self.experience.color_index)
-        print("Relative polar-centric position of green patch", color_distance)
+        # print("Relative polar-centric position of green patch", color_distance)
         return color_distance + self.point
 
     def save(self, experiences):

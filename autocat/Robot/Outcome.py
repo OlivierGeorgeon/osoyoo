@@ -68,42 +68,21 @@ def category_color(color_sensor):
 
 def central_echos(echos):
     """Return an array of points representing the centers of streaks of echos"""
-
     _central_echos = []
-    # max_delta_dist = 160
-    # max_delta_angle = 20
-    streaks = []  # [[], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], []]
-    current_id = 0
-    # echos = {int(a): d for a, d in sorted(echos.items(), key=lambda item: int(item[0]))}
-    echo_list = [[int(a), d] for a, d in echos.items()]
-    # print("Sorted echos", echos)
+
     # Create the streaks
+    streaks = []
+    echo_list = [[int(a), d] for a, d in echos.items()]
     current_streak = [echo_list[0]]
     if len(echo_list) > 1:
         for angle, distance in echo_list[1:]:
-            # if len(current_streak) == 0:
-            #     current_streak.append([angle, distance])
-            if abs(current_streak[-1][1] - distance) < 50 and abs(angle - current_streak[-1][0]) <= 10:
+            if abs(current_streak[-1][1] - distance) < 50 and abs(angle - current_streak[-1][0]) <= 50:
                 current_streak.append([angle, distance])
             else:
                 streaks.append(current_streak)
                 current_streak = [[angle, distance]]
     streaks.append(current_streak)
 
-    # for angle, distance in echo_list:
-    #     check = False
-    #     for streak in streaks:
-    #         if len(streak) > 0 and not check and \
-    #            any((abs(e[1] - distance) < max_delta_dist and abs(angle - e[0]) < max_delta_angle) for e in streak):
-    #             streak.append((angle, distance))
-    #             check = True
-    #     if check:
-    #         continue
-    #     if len(streaks[current_id]) == 0:
-    #         streaks[current_id].append((angle, distance))
-    #     else:
-    #         current_id = (current_id + 1)
-    #         streaks[current_id].append((angle, distance))
     # Find the middle of the streaks
     for streak in streaks:
         if len(streak) == 0:
@@ -117,12 +96,14 @@ def central_echos(echos):
             else:
                 # The central echo is at the center point of the streak
                 _central_echos.append([streak[int(len(streak) / 2)][0], streak[int(len(streak) / 2)][1]])
+
     # Sort by distance
     _central_echos = sorted(_central_echos, key=lambda e: e[1])
     # Only return the closest central echo
     # if len(_central_echos) > 1:
     #     _central_echos = [_central_echos[0]]
-    # print("Central echos", _central_echos)
+    print("Central echos", _central_echos)
+
     return _central_echos
 
 

@@ -6,8 +6,8 @@ from ...Robot.RobotDefine import TERRAIN_RADIUS
 
 
 TERRAIN_EXPERIENCE_TYPES = [EXPERIENCE_PLACE, EXPERIENCE_FLOOR]
-TERRAIN_INITIAL_CONFIDENCE = 0.1  # Must not be null to allow position correction
-TERRAIN_ORIGIN_CONFIDENCE = 0.2  # When the robot emits its position in the message
+TERRAIN_INITIAL_CONFIDENCE = 10  # Must not be null to allow position correction
+TERRAIN_ORIGIN_CONFIDENCE = 20  # When the robot emits its position in the message
 
 
 class PhenomenonTerrain(Phenomenon):
@@ -43,38 +43,40 @@ class PhenomenonTerrain(Phenomenon):
                     self.absolute_affordance_key = self.affordance_id
                     self.last_origin_clock = affordance.experience.clock
                     # The phenomenon's origin moves to the green patch relative to this affordance
-                    # self.point += affordance.color_position()
-                    terrain_offset = affordance.color_position()
-                    if affordance.experience.sensor_point()[0] < 0:
+                    terrain_offset = affordance.green_point()
+                    # if affordance.experience.sensor_point()[0] < 0:
+                    if np.dot(affordance.experience.sensor_point(), TERRAIN_RADIUS[self.arena_id]) < 0:
                         terrain_offset -= np.array(TERRAIN_RADIUS[self.arena_id])
                     else:
                         terrain_offset += np.array(TERRAIN_RADIUS[self.arena_id])
+                        print("Opposite origin", affordance.experience.sensor_point())
                     self.point += terrain_offset
                     # All the position of affordance including this one are adjusted
                     for a in self.affordances.values():
-                        # a.point -= affordance.color_position()
                         a.point -= terrain_offset
                     self.confidence = TERRAIN_ORIGIN_CONFIDENCE
                 else:
-                    position_correction = - affordance.color_position()
+                    position_correction = - affordance.green_point()
                     # If the origin affordance has the opposite orientation then we assume it is the other color patch
-                    if affordance.experience.sensor_point()[0] < 0:
+                    # if affordance.experience.sensor_point()[0] < 0:
+                    if np.dot(affordance.experience.sensor_point(), TERRAIN_RADIUS[self.arena_id]) < 0:
                         # The North-East patch
                         position_correction += np.array(TERRAIN_RADIUS[self.arena_id])
                     else:
                         # The South-West patch
                         position_correction -= np.array(TERRAIN_RADIUS[self.arena_id])
+                        print("Opposite origin", affordance.experience.sensor_point())
                     # Correct the position of the affordances since last time the robot visited the absolute origin
                     for a in [a for a in self.affordances.values() if a.experience.clock > self.last_origin_clock]:
                         coef = (a.experience.clock - self.last_origin_clock)/(affordance.experience.clock
                                                                               - self.last_origin_clock)
                         ac = np.array(position_correction * coef, dtype=int)
                         a.point += ac
-                        print("Affordance clock:", a.experience.clock, "corrected by:", ac, "coef:", coef)
+                        # print("Affordance clock:", a.experience.clock, "corrected by:", ac, "coef:", coef)
                     self.last_origin_clock = affordance.experience.clock
 
             # Interpolate the outline
-            self.convex_hull()
+            # self.convex_hull()
             self.interpolate()
             return position_correction
         # Affordances that do not belong to this phenomenon must return None
@@ -83,8 +85,9 @@ class PhenomenonTerrain(Phenomenon):
     def origin_point(self):
         """Return the position where to go to check the origin"""
         if self.absolute_affordance() is not None:
-            return self.absolute_affordance().point + self.point
-                # self.absolute_affordance().experience.sensor_poi8nt() + self.point
+            return self.absolute_affordance().green_point() + self.point
+            # return self.absolute_affordance().point + self.point
+            # self.absolute_affordance().experience.sensor_poi8nt() + self.point
         else:
             return None
 

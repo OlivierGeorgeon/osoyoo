@@ -85,7 +85,7 @@ class CtrlPhenomenonView:
 
         if self.phenomenon is not None:
             self.view.robot_translate = self.workspace.memory.allocentric_memory.robot_point - self.phenomenon.point
-            self.view.label2.text = "Confidence: " + str(round(self.phenomenon.confidence * 100)) + "%"
+            self.view.label2.text = "Confidence: {:d}%".format(self.phenomenon.confidence)
         if self.workspace.enacter.interaction_step == ENACTION_STEP_REFRESHING:
             if self.phenomenon is not None:
                 self.update_affordance_displays(self.phenomenon)

@@ -172,8 +172,8 @@ class Enaction:
                 # If the new focus is near the previous focus or the displacement has been continuous.
                 if np.linalg.norm(prediction_error_focus) < FOCUS_MAX_DELTA or self.outcome.status == "continuous":
                     # The focus has been kept
-                    self.focus_point = new_focus
-                    print("UPDATE FOCUS by delta", prediction_error_focus)
+                    # self.focus_point = new_focus
+                    print("Update focus by delta", prediction_error_focus)
                     # If the action has been completed
                     if self.outcome.duration1 >= 1000:
                         # If the head is forward then correct longitudinal displacements
@@ -195,15 +195,16 @@ class Enaction:
                         self.displacement_matrix = matrix44.multiply(translation_matrix, self.yaw_matrix)
                 else:
                     # The focus was lost
-                    print("LOST FOCUS due to delta", prediction_error_focus)
+                    print("Lost focus due to delta", prediction_error_focus)
                     self.lost_focus = True  # Used by agent_circle
-                    self.focus_point = None
+                    # self.focus_point = None
+                    # self.focus_point = new_focus
                     # playsound('autocat/Assets/R5.wav', False)
             else:
                 # The focus was lost
-                print("LOST FOCUS due to no echo")
+                print("Lost focus due to no echo")
                 self.lost_focus = True  # Used by agent_circle
-                self.focus_point = None
+                # self.focus_point = None
                 # playsound('autocat/Assets/R5.wav', False)
         else:
             # If the robot was not focussed then check for catch focus
@@ -211,15 +212,17 @@ class Enaction:
                     and self.outcome.echo_point is not None:
                 # Catch focus
                 playsound('autocat/Assets/cute_beep2.wav', False)
-                self.focus_point = new_focus
-                print("CATCH FOCUS", self.focus_point)
+                print("Catch focus")
+        self.focus_point = new_focus
+        print("NEW FOCUS", self.focus_point)
 
         # Impact or block catch focus
         if self.outcome.impact > 0 and self.action.action_code == ACTION_FORWARD:
-            if new_focus is not None and np.linalg.norm(self.outcome.echo_point) < 200:
-                # Focus on the object "seen"
-                self.focus_point = new_focus
-            else:
+            # if new_focus is not None and np.linalg.norm(self.outcome.echo_point) < 200:
+            #     # Focus on the object "seen"
+            #     self.focus_point = new_focus
+            if new_focus is None or np.linalg.norm(new_focus) > 200:
+            # else:
                 # Focus on the object "felt"
                 if self.outcome.impact == 0b01:
                     self.focus_point = np.array([ROBOT_FRONT_X + 10, -ROBOT_FRONT_Y, 0])

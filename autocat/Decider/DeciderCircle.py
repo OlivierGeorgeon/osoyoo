@@ -8,6 +8,7 @@ from . Action import ACTION_TURN
 from ..Robot.Enaction import Enaction
 from . Decider import Decider, FOCUS_TOO_FAR_DISTANCE
 from . PredefinedInteractions import OUTCOME_FOCUS_TOO_FAR
+from ..Memory.BodyMemory import EXCITATION_LOW
 
 
 class DeciderCircle(Decider):
@@ -16,13 +17,14 @@ class DeciderCircle(Decider):
         super().__init__(workspace)
 
     def activation_level(self):
-        """Return the activation level of this decider/ 1: default; 3 if focus not too far """
+        """Return the activation level of this decider/ 1: default; 3 if focus not too far and excited"""
         activation_level = 1
 
         # Activate when the focus is not too far
-        if self.workspace.memory.egocentric_memory.focus_point is not None:
-            if np.linalg.norm(self.workspace.memory.egocentric_memory.focus_point) < FOCUS_TOO_FAR_DISTANCE:
-                activation_level = 3
+        if self.workspace.memory.egocentric_memory.focus_point is not None and \
+            np.linalg.norm(self.workspace.memory.egocentric_memory.focus_point) < FOCUS_TOO_FAR_DISTANCE and \
+                self.workspace.memory.body_memory.excitation > EXCITATION_LOW:
+            activation_level = 3
 
         return activation_level
 

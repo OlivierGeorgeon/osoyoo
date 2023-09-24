@@ -4,8 +4,8 @@ from scipy.spatial import ConvexHull, QhullError, Delaunay
 from scipy.interpolate import splprep, splev
 
 PHENOMENON_DELTA = 300  # (mm) Distance between affordances to be considered the same phenomenon
-PHENOMENON_INITIAL_CONFIDENCE = 0.0  # 0.2 Initial confidence in the phenomenon
-PHENOMENON_CONFIDENCE_PRUNE = 0.3  # Confidence threshold above which prune
+PHENOMENON_INITIAL_CONFIDENCE = 0  # 0.2 Initial confidence in the phenomenon
+PHENOMENON_CONFIDENCE_PRUNE = 30  # Confidence threshold above which prune
 
 
 class Phenomenon:
@@ -43,7 +43,6 @@ class Phenomenon:
 
     def compute_center(self):
         """Recompute the center of the phenomenon as the mean of the affordance position"""
-        # https://stackoverflow.com/questions/4355894/how-to-get-center-of-set-of-points-using-python
         points = np.array([a.point for a in self.affordances.values()])
         centroid = points.mean(axis=0)
         return centroid
@@ -69,13 +68,14 @@ class Phenomenon:
         self.interpolation_points = None
         points = np.array(
             [a.point[0:2] for a in self.affordances.values() if a.experience.type in self.interpolation_types])
+        points = np.unique(points, axis=0)
         if len(points) > 3:
             try:
                 # center = points.mean(axis=0)
-                center = np.array([0, 0, 0])  # Assumes that the terrain is centered in (0,0,0)
-                angles = np.arctan2(points[:, 1] - center[1], points[:, 0] - center[0])
-                sorted_indices = np.argsort(angles)
-                sorted_points = points[sorted_indices]
+                # angles = np.arctan2(points[:, 1] - center[1], points[:, 0] - center[0])
+                # Sort by angle from center of terrain [0,0,0]
+                angles = np.arctan2(points[:, 1], points[:, 0])
+                sorted_points = points[np.argsort(angles)]
 
                 # Close the loop
                 sorted_points = np.append(sorted_points, [sorted_points[0]], axis=0)
@@ -85,6 +85,7 @@ class Phenomenon:
                 # Evaluate the B-spline on a finer grid
                 u_new = np.linspace(0, 1, 100)
                 interp = splev(u_new, tck)
+                self.delaunay = Delaunay(np.array(interp).T)
                 self.interpolation_points = np.array(interp).T.flatten().astype("int").tolist()
             except IndexError as e:
                 print("Interpolation failed. No points.", e)
@@ -92,12 +93,14 @@ class Phenomenon:
                 print("Interpolation failed. Not enough points.", e)
             except ValueError as e:
                 print("Interpolation failed.", e)
+            except QhullError:
+                print("The points do not form a valid convex polygon.")
 
     def is_inside(self, p):
-        """True if p is inside the convex hull"""
+        """True if p is inside the convex hull or there is no convex hull"""
         # https://stackoverflow.com/questions/16750618/whats-an-efficient-way-to-find-if-a-point-lies-in-the-convex-hull-of-a-point-cl
-        is_inside = True
-        if self.delaunay is not None:
+        is_inside = False  # True for marking the outside cells in black (in AllocentricMemory.update_affordances)
+        if self.delaunay is not None and p is not None:
             try:
                 # Must reduce to 2 dimensions otherwise the point is not found inside
                 # self.delaunay = Delaunay(self.hull_array)  # The hull array is computed at the end of the previous cycle
@@ -106,6 +109,8 @@ class Phenomenon:
                 print("Error testing inside:", e)
             except TypeError as e:
                 print("Error testing inside:", e)
+        else:
+            print("Delaunay or p is None")
         return is_inside
 
     def phenomenon_label(self):
@@ -126,4 +131,5 @@ class Phenomenon:
         saved_phenomenon.affordance_id = self.affordance_id
         saved_phenomenon.absolute_affordance_key = self.absolute_affordance_key
         saved_phenomenon.last_origin_clock = self.last_origin_clock
+        saved_phenomenon.delaunay = self.delaunay
         return

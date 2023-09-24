@@ -3,7 +3,8 @@ import numpy as np
 from pyrr import matrix44, Quaternion, Vector3
 from ..Robot.RobotDefine import ROBOT_SETTINGS, ROBOT_FRONT_X, ROBOT_SIDE
 
-ENERGY_TIRED = 80  # Level of energy below which the agent is tired
+ENERGY_TIRED = 92  # Level of energy below which the agent wants to go to color patch
+EXCITATION_LOW = 75  # Level of excitation below witch the agent just wants to watch if it is not tired
 
 
 class BodyMemory:
@@ -15,6 +16,24 @@ class BodyMemory:
         self.body_quaternion = Quaternion([0., 0., 0., 1.])  # The direction of the body initialized to x axis
         self.compass_offset = np.array(ROBOT_SETTINGS[robot_id]["compass_offset"], dtype=int)
         self.energy = 100  # [0,100] The level of energy of the robot
+        self.excitation = 100  # [0, 100] The level of excitation
+
+    def update(self, enaction):
+        """Update the body state variables: energy and excitation, head, body direction"""
+        # Update the head
+        self.set_head_direction_degree(enaction.outcome.head_angle)
+        # Body direction
+        self.body_quaternion = enaction.body_quaternion
+
+        # Update energy level
+        if enaction.outcome.color_index > 0 and enaction.outcome.floor > 0:
+            # Fully recharge when color floor
+            self.energy = 100
+        else:
+            # Decrease energy when not color floor
+            self.energy = max(0, self.energy - 1)
+        # Decrease excitation level
+        self.excitation = max(0, self.excitation - 1)
 
     def set_head_direction_degree(self, head_direction_degree: int):
         """Set the head direction from degree measured relative to the robot [-90,90]"""
@@ -67,4 +86,5 @@ class BodyMemory:
         saved_body_memory.body_quaternion = self.body_quaternion.copy()
         saved_body_memory.compass_offset = self.compass_offset.copy()
         saved_body_memory.energy = self.energy
+        saved_body_memory.excitation = self.excitation
         return saved_body_memory

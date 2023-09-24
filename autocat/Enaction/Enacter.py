@@ -43,7 +43,7 @@ class Enacter:
 
         # INTEGRATING: the new enacted interaction
         if self.interaction_step == ENACTION_STEP_INTEGRATING:
-            # Restore the memory from the snapshot and integrate the experiences
+            # Restore the memory from the snapshot
             self.workspace.memory = self.memory_snapshot
             # Retrieve possible message from other robot
             self.workspace.enaction.message = self.workspace.message

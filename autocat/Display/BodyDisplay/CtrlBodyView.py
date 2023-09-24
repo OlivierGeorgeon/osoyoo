@@ -108,11 +108,11 @@ class CtrlBodyView:
 
     def main(self, dt):
         """Called every frame. Update the body view"""
-        self.view.label_clock.text = "Next Clock: " + str(self.workspace.clock) \
-                                     + ", Decider: " + self.workspace.control_mode \
-                                     + ", Engagement: " + self.workspace.engagement_mode \
-                                     + ", Energy {:d}%".format(self.workspace.memory.body_memory.energy)
-                                     # + ", Energy: " + str(self.workspace.memory.body_memory.energy)
+        self.view.label_clock.text = "Clock: {:d}".format(self.workspace.clock) \
+                                     + ", En:{:d}%".format(self.workspace.memory.body_memory.energy) \
+                                     + ", Ex:{:d}%".format(self.workspace.memory.body_memory.excitation) \
+                                     + ", D:" + self.workspace.decider_id \
+                                     + ", " + self.workspace.engagement_mode
         if self.workspace.enacter.interaction_step == ENACTION_STEP_REFRESHING and self.workspace.enaction.outcome is not None:
             self.view.label.text = self.body_label_azimuth(self.workspace.enaction)
             self.view.label_enaction.text = self.body_label(self.workspace.enaction.action)

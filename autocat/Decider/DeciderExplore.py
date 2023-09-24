@@ -11,7 +11,9 @@ from . Action import ACTION_TURN, ACTION_FORWARD, ACTION_SWIPE, ACTION_RIGHTWARD
 from . Interaction import OUTCOME_NO_FOCUS
 from . Decider import Decider
 from ..Robot.Enaction import Enaction
+from ..Memory.BodyMemory import ENERGY_TIRED, EXCITATION_LOW
 from ..Memory.PhenomenonMemory.PhenomenonMemory import TER
+from ..Memory.PhenomenonMemory.PhenomenonTerrain import TERRAIN_ORIGIN_CONFIDENCE
 from ..Enaction.CompositeEnaction import CompositeEnaction
 
 CLOCK_TO_GO_HOME = 8  # Number of interactions before going home
@@ -42,12 +44,16 @@ class DeciderExplore(Decider):
         self.action = "-"
 
     def activation_level(self):
-        """The level of activation of this decider: 0: default, 2 if the terrain has an origin """
+        """The level of activation is 2 if the terrain has confidence and the robot is excited or low energy"""
         activation_level = 0
         # Activate when the terrain phenomenon has an absolute point
         if TER in self.workspace.memory.phenomenon_memory.phenomena:
-            if self.workspace.memory.phenomenon_memory.phenomena[TER].origin_point() is not None:
-                activation_level = 2
+            # if self.workspace.memory.phenomenon_memory.phenomena[TER].origin_point() is not None:
+            if self.workspace.memory.phenomenon_memory.phenomena[TER].confidence >= TERRAIN_ORIGIN_CONFIDENCE:
+                if self.workspace.memory.body_memory.energy < ENERGY_TIRED:
+                    activation_level = 2
+                if self.workspace.memory.body_memory.excitation >= EXCITATION_LOW:
+                    activation_level = 2
         return activation_level
 
     def outcome(self, enaction):
@@ -62,8 +68,8 @@ class DeciderExplore(Decider):
         if enaction.outcome.color_index > 0:
             outcome = OUTCOME_COLOR
             print("Outcome color")
-            # Decrease the energy level
-            self.workspace.memory.body_memory.energy -= 10
+            # The energy level is decreased by CtrlRobot
+            # self.workspace.memory.body_memory.energy -= 10
 
         # Look for the floor experience
         if enaction.outcome.floor > 0 and enaction.outcome.color_index == 0:
@@ -106,7 +112,7 @@ class DeciderExplore(Decider):
         e1, e2 = None, None
 
         # If time to go home
-        if self.workspace.clock - self.workspace.memory.phenomenon_memory.phenomena[TER].last_origin_clock > CLOCK_TO_GO_HOME:
+        if self.workspace.memory.body_memory.energy < ENERGY_TIRED:
             # If right or left then swipe to home
             if outcome in [OUTCOME_LEFT, OUTCOME_RIGHT]:
                 if outcome == OUTCOME_RIGHT:
@@ -117,7 +123,6 @@ class DeciderExplore(Decider):
                 self.action = self.workspace.actions[ACTION_SWIPE]
                 self.workspace.memory.egocentric_memory.prompt_point = ego_confirmation
                 e1 = Enaction(self.action, self.workspace.memory)
-                # self.workspace.enactions[self.workspace.clock] = e1
                 playsound('autocat/Assets/R5.wav', False)
             # If not left or right we need to manoeuvre
             else:
@@ -125,7 +130,6 @@ class DeciderExplore(Decider):
                 if self.workspace.memory.is_near_terrain_origin() or outcome == OUTCOME_COLOR:
                     polar_confirmation = self.workspace.memory.phenomenon_memory.phenomena[TER].confirmation_prompt()
                     print("Enacting confirmation sequence to", polar_confirmation)
-                    # ego_confirmation = self.workspace.memory.allocentric_to_egocentric(allo_confirmation)
                     ego_confirmation = self.workspace.memory.polar_egocentric_to_egocentric(polar_confirmation)
                     self.workspace.memory.egocentric_memory.prompt_point = ego_confirmation
                     playsound('autocat/Assets/R4.wav', False)
@@ -136,6 +140,7 @@ class DeciderExplore(Decider):
                     ego_origin = self.workspace.memory.allocentric_to_egocentric(allo_origin)
                     self.workspace.memory.egocentric_memory.prompt_point = ego_origin
                     playsound('autocat/Assets/R3.wav', False)
+                self.workspace.memory.egocentric_memory.focus_point = None  # Prevent unnatural head movement
                 self.action = self.workspace.actions[ACTION_TURN]
                 e1 = Enaction(self.action, self.workspace.memory)
                 e2 = Enaction(self.workspace.actions[ACTION_FORWARD], e1.post_memory)
@@ -148,10 +153,10 @@ class DeciderExplore(Decider):
             if self.prompt_index == 0:
                 self.ter_prompt = self.workspace.memory.phenomenon_memory.phenomena[TER].affordances[self.workspace.memory.phenomenon_memory.phenomena[TER].absolute_affordance_key].point * 1.2
             self.ter_prompt = quaternion.apply_to_vector(self.explore_angle_quaternion, self.ter_prompt)
-            # allo_prompt = self.prompt_points[self.prompt_index] + self.workspace.memory.phenomenon_memory.phenomena[TER].point
             allo_prompt = self.ter_prompt + self.workspace.memory.phenomenon_memory.phenomena[TER].point
             ego_prompt = self.workspace.memory.allocentric_to_egocentric(allo_prompt)
             self.workspace.memory.egocentric_memory.prompt_point = ego_prompt
+            self.workspace.memory.egocentric_memory.focus_point = None  # Prevent unnatural head movement
             self.prompt_index += 1
             # if self.prompt_index >= self.nb_points:
             #     self.prompt_index = 0
@@ -160,9 +165,7 @@ class DeciderExplore(Decider):
             e2 = Enaction(self.workspace.actions[ACTION_FORWARD], e1.post_memory)
 
         # Add the enactions to the stack
-        # self.workspace.enactions[self.workspace.clock] = e1
         enaction_sequence = [e1]
         if e2 is not None:
             enaction_sequence.append(e2)
-            # self.workspace.enactions[self.workspace.clock + 1] = e2
         return CompositeEnaction(enaction_sequence)

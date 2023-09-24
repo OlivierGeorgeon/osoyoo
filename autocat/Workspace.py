@@ -46,6 +46,7 @@ class Workspace:
         self.composite_enaction = None  # The composite enaction to enact
         self.enaction = None  # The primitive enaction to enact
 
+        self.decider_id = "Manual"
         self.control_mode = KEY_CONTROL_USER
         self.engagement_mode = KEY_ENGAGEMENT_ROBOT
 
@@ -54,7 +55,6 @@ class Workspace:
 
         # Control the enaction
         self.clock = 0
-        # self.memory_snapshot = None
         self.is_imagining = False
         self.memory_before_imaginary = None
 
@@ -86,9 +86,11 @@ class Workspace:
             if self.composite_enaction is None:
                 if self.control_mode == KEY_CONTROL_DECIDER:
                     # The most activated decider processes the previous enaction and chooses the next enaction
-                    decider = max(self.deciders, key=lambda k: self.deciders[k].activation_level())
-                    print("Decider:", decider)
-                    self.deciders[decider].stack_enaction()
+                    self.decider_id = max(self.deciders, key=lambda k: self.deciders[k].activation_level())
+                    print("Decider:", self.decider_id)
+                    self.deciders[self.decider_id].stack_enaction()
+                else:
+                    self.decider_id = "Manual"
                 # Case DECIDER_KEY_USER is handled by self.process_user_key()
 
         self.enacter.main(dt)
