@@ -42,14 +42,13 @@ class PhenomenonTerrain(Phenomenon):
                     # This experience becomes the phenomenon's absolute origin
                     self.absolute_affordance_key = self.affordance_id
                     self.last_origin_clock = affordance.experience.clock
-                    # The phenomenon's origin moves to the green patch relative to this affordance
+                    # The phenomenon's origin moves by the green patch relative to this affordance
                     terrain_offset = affordance.green_point()
-                    # if affordance.experience.sensor_point()[0] < 0:
                     if np.dot(affordance.experience.sensor_point(), TERRAIN_RADIUS[self.arena_id]) < 0:
                         terrain_offset -= np.array(TERRAIN_RADIUS[self.arena_id])
                     else:
                         terrain_offset += np.array(TERRAIN_RADIUS[self.arena_id])
-                        print("Opposite origin", affordance.experience.sensor_point())
+                        # print("Opposite origin", affordance.experience.sensor_point())
                     self.point += terrain_offset
                     # All the position of affordance including this one are adjusted
                     for a in self.affordances.values():
@@ -58,7 +57,6 @@ class PhenomenonTerrain(Phenomenon):
                 else:
                     position_correction = - affordance.green_point()
                     # If the origin affordance has the opposite orientation then we assume it is the other color patch
-                    # if affordance.experience.sensor_point()[0] < 0:
                     if np.dot(affordance.experience.sensor_point(), TERRAIN_RADIUS[self.arena_id]) < 0:
                         # The North-East patch
                         position_correction += np.array(TERRAIN_RADIUS[self.arena_id])
@@ -83,11 +81,11 @@ class PhenomenonTerrain(Phenomenon):
         return None
 
     def origin_point(self):
-        """Return the position where to go to check the origin"""
+        """Return the position where to go to check the origin in allocentric coordinates"""
         if self.absolute_affordance() is not None:
             return self.absolute_affordance().green_point() + self.point
             # return self.absolute_affordance().point + self.point
-            # self.absolute_affordance().experience.sensor_poi8nt() + self.point
+            # self.absolute_affordance().experience.sensor_point() + self.point
         else:
             return None
 

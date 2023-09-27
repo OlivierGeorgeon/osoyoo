@@ -11,7 +11,7 @@ class PhenomenonMemory:
         self.phenomena = {}  # Phenomenon 0 is the terrain
         self.phenomenon_id = 0  # Used for object phenomena
 
-    def origin_point(self):
+    def terrain_center(self):
         """The origin where the robot return for watching"""
         if TER in self.phenomena:
             # If the terrain has been identified then the origin is the center of the terrain relative to birth point

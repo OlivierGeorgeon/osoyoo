@@ -82,7 +82,7 @@ class DeciderPush(Decider):
         elif self.step == STEP_PUSH:
             # Start withdrawing
             # The first enaction: turn the back to the prompt
-            origin = self.workspace.memory.phenomenon_memory.origin_point()  # Birth place or arena center
+            origin = self.workspace.memory.phenomenon_memory.terrain_center()  # Birth place or arena center
             self.workspace.memory.egocentric_memory.prompt_point = self.workspace.memory.allocentric_to_egocentric(origin)
             e0 = Enaction(self.workspace.actions[ACTION_TURN], self.workspace.memory, turn_back=True)
             # Second enaction: move forward to the prompt
