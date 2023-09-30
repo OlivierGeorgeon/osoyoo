@@ -10,8 +10,8 @@ from ..Decider.Action import ACTION_SWIPE
 from ..Robot.Outcome import Outcome
 
 
-GRID_WIDTH = 100   # Number of cells wide
-GRID_HEIGHT = 200  # Number of cells high
+GRID_WIDTH = 15   # 100 Number of cells wide
+GRID_HEIGHT = 45  # 200 Number of cells high
 NEAR_HOME = 300    # (mm) Max distance to consider near home
 SIMULATION_TIME_RATIO = 1  # 0.5   # The simulation speed is slower than the real speed because ...
 

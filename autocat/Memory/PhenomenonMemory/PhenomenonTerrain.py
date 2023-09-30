@@ -8,6 +8,7 @@ from ...Robot.RobotDefine import TERRAIN_RADIUS
 TERRAIN_EXPERIENCE_TYPES = [EXPERIENCE_PLACE, EXPERIENCE_FLOOR]
 TERRAIN_INITIAL_CONFIDENCE = 10  # Must not be null to allow position correction
 TERRAIN_ORIGIN_CONFIDENCE = 20  # When the robot emits its position in the message
+TERRAIN_CIRCUMFERENCE_CONFIDENCE = 30
 
 
 class PhenomenonTerrain(Phenomenon):
@@ -71,6 +72,9 @@ class PhenomenonTerrain(Phenomenon):
                         ac = np.array(position_correction * coef, dtype=int)
                         a.point += ac
                         # print("Affordance clock:", a.experience.clock, "corrected by:", ac, "coef:", coef)
+                    # Increase confidence if not consecutive origin affordances
+                    if affordance.experience.clock - self.last_origin_clock > 5:
+                        self.confidence = TERRAIN_CIRCUMFERENCE_CONFIDENCE
                     self.last_origin_clock = affordance.experience.clock
 
             # Interpolate the outline

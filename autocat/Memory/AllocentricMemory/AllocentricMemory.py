@@ -1,4 +1,5 @@
 import math
+import time
 import numpy as np
 from pyrr import quaternion
 from . Hexagonal_geometry import point_to_cell, get_neighbors
@@ -8,6 +9,7 @@ from ..AllocentricMemory.GridCell import CELL_NO_ECHO, CELL_PHENOMENON
 from ..EgocentricMemory.Experience import EXPERIENCE_FOCUS, EXPERIENCE_PROMPT
 from ...Robot.RobotDefine import ROBOT_FRONT_X, ROBOT_SIDE
 from ...Memory.PhenomenonMemory.PhenomenonMemory import TER
+from ...Memory.PhenomenonMemory.PhenomenonTerrain import TERRAIN_CIRCUMFERENCE_CONFIDENCE
 
 
 class AllocentricMemory:
@@ -67,27 +69,32 @@ class AllocentricMemory:
 
     def update_affordances(self, phenomena, clock):
         """Allocate the phenomena to the cells of allocentric memory"""
+        # start_time = time.time()
         # Clear the previous phenomena
         self.clear_phenomena()
         # Place the phenomena again
         for p_id, p in phenomena.items():
+            # Mark the cells outside the terrain (for BICA 2023 paper)
+            if p_id == TER and p.confidence >= TERRAIN_CIRCUMFERENCE_CONFIDENCE and p.delaunay is not None:
+                for c in [c for line in self.grid for c in line if not p.is_inside(c.point())]:
+                    c.status[0] = EXPERIENCE_FLOOR
+                    c.phenomenon_id = TER
+                    c.clock_place = clock
+            # Mark the affordances of this phenomenon
             for a in p.affordances.values():
-                # Attribute the status of the affordance
-                cell_x, cell_y = point_to_cell(a.point+p.point)
-                self.apply_status_to_cell(cell_x, cell_y, a.experience.type, a.experience.clock, a.experience.color_index)
-                # Attribute this phenomenon to this cell
-                self.grid[cell_x][cell_y].phenomenon_id = p_id
-            # Mark the cell outside the terrain. (for BICA 2023 paper)
-            # if p_id == TER and p.delaunay is not None:
-            #     for c in [c for line in self.grid for c in line if not p.is_inside(c.point())]:
-            #         c.status[0] = EXPERIENCE_FLOOR
-            #         c.phenomenon_id = TER
-            #         c.clock_place = clock
+                if p_id != TER or p.confidence < TERRAIN_CIRCUMFERENCE_CONFIDENCE or a.experience.color_index != 0:
+                    # Attribute the status of the affordance
+                    cell_x, cell_y = point_to_cell(a.point+p.point)
+                    self.apply_status_to_cell(cell_x, cell_y, a.experience.type, a.experience.clock, a.experience.color_index)
+                    # Attribute this phenomenon to this cell
+                    self.grid[cell_x][cell_y].phenomenon_id = p_id
 
         # Place the affordances that are not attached to phenomena
         for a in self.affordances:
             cell_x, cell_y = point_to_cell(a.point)
             self.apply_status_to_cell(cell_x, cell_y, a.experience.type, clock, a.experience.color_index)
+
+        # print("Update allocentric time:", time.time() - start_time, "seconds")
 
     def move(self, body_quaternion, translation, clock):
         """Move the robot in allocentric memory. Mark the traversed cells Free. Returns the new position
@@ -122,7 +129,8 @@ class AllocentricMemory:
     def clear_phenomena(self):
         """Reset the phenomena from cells"""
         for c in [c for line in self.grid for c in line if c.phenomenon_id is not None]:
-            c.status[0] = CELL_UNKNOWN
+            if c.status[0] != EXPERIENCE_PLACE:  # The place experiences are not moved with phenomena
+                c.status[0] = CELL_UNKNOWN
             c.status[1] = CELL_UNKNOWN
             c.clock_phenomenon = 0
             c.phenomenon_id = None
@@ -163,7 +171,7 @@ class AllocentricMemory:
 
     def update_prompt(self, allo_prompt, clock):
         """Update the prompt in allocentric memory"""
-        # Clear the previous focus cell
+        # Clear the previous prompt cell
         if self.prompt_i is not None:
             self.grid[self.prompt_i][self.prompt_j].status[3] = CELL_UNKNOWN
         # Add the new prompt cell

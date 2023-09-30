@@ -54,11 +54,11 @@ class AllocentricView(InteractiveDisplay):
         if self.hexagons[cell.i][cell.j] is None:
             if cell.is_known():
                 # Create the hexagon
-                self.hexagons[cell.i][cell.j] = CellDisplay(cell, self.batch, self.groups)
+                self.hexagons[cell.i][cell.j] = CellDisplay(cell, self.batch, self.groups, self.workspace.clock)
         else:
             if cell.is_known():
                 # Update the hexagon
-                self.hexagons[cell.i][cell.j].update_color(cell)
+                self.hexagons[cell.i][cell.j].update_color(cell, self.workspace.clock)
             else:
                 # Delete the hexagon
                 self.hexagons[cell.i][cell.j].delete()

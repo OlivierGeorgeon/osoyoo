@@ -15,17 +15,17 @@ SCALE_LEVEL_3 = 0.35  # 0.4
 
 class CellDisplay:
     """A cell in the hexagonal grid"""
-    def __init__(self, cell, batch, groups):
+    def __init__(self, cell, batch, groups, clock):
         # Do not store the cell because it may be cloned
         self.batch = batch
 
         # The level 0 hexagon: Pool cell
         self.shape0 = None
-        if cell.is_pool():
-            point_pool = np.array([cell.radius * SCALE_LEVEL_0, 0, 0])
-            rotation_matrix = matrix44.create_from_z_rotation(-math.atan2(math.sqrt(3), -2))
-            point_pool = matrix44.apply_to_vector(rotation_matrix, point_pool)
-            self.shape0 = self.create_shape(cell.point(), point_pool, groups[0])
+        # if cell.is_pool():
+        #     point_pool = np.array([cell.radius * SCALE_LEVEL_0, 0, 0])
+        #     rotation_matrix = matrix44.create_from_z_rotation(-math.atan2(math.sqrt(3), -2))
+        #     point_pool = matrix44.apply_to_vector(rotation_matrix, point_pool)
+        #     self.shape0 = self.create_shape(cell.point(), point_pool, groups[0])
 
         # The level 1 hexagon
         point0 = np.array([cell.radius * SCALE_LEVEL_1, 0, 0])
@@ -39,7 +39,7 @@ class CellDisplay:
         point2 = np.array([cell.radius * SCALE_LEVEL_3, 0, 0])
         self.shape3 = self.create_shape(cell.point(), point2, groups[3])
 
-        self.update_color(cell)
+        self.update_color(cell, clock)
 
     def create_shape(self, cell_point, point, group):
         """Create the hexagonal shape around the center point"""
@@ -54,7 +54,7 @@ class CellDisplay:
         return self.batch.add_indexed(6, gl.GL_TRIANGLES, group, [0, 1, 2, 0, 2, 3, 0, 3, 4, 0, 4, 5],
                                       ('v2i', points), ('c4B', 6 * (*name_to_rgb('white'), 0)))
 
-    def update_color(self, cell):
+    def update_color(self, cell, clock):
         """Update the color and opacity of the shapes based on the cell status"""
         # Level 0 Pool
         if self.shape0 is not None:
@@ -71,6 +71,7 @@ class CellDisplay:
             opacity1 = 0
         if cell.status[0] == EXPERIENCE_PLACE:
             color1 = name_to_rgb('Lavender')  # name_to_rgb('LightGreen')  # name_to_rgb(FLOOR_COLORS[0])
+            opacity1 = int(max(255 * (30 - clock + cell.clock_place) / 30, 0))
         if cell.status[0] == EXPERIENCE_FLOOR:
             if cell.color_index == 0:
                 color1 = name_to_rgb('black')
@@ -95,8 +96,10 @@ class CellDisplay:
             color2 = name_to_rgb('black')
         if cell.status[1] == EXPERIENCE_ALIGNED_ECHO:
             color2 = name_to_rgb('orange')
+            opacity2 = int(max(255 * (10 - clock + cell.clock_interaction) / 10, 0))
         if cell.status[1] == EXPERIENCE_CENTRAL_ECHO:
             color2 = name_to_rgb('sienna')
+            opacity2 = int(max(255 * (10 - clock + cell.clock_interaction) / 10, 0))
         if cell.status[1] == CELL_PHENOMENON:
             color2 = name_to_rgb('yellow')
         # Reset the color of the shape1
@@ -111,6 +114,7 @@ class CellDisplay:
         else:
             if cell.status[2] == CELL_NO_ECHO:
                 color3 = name_to_rgb('CadetBlue')  # CadetBlue LightGreen
+                opacity3 = int(max(255 * (10 - clock + cell.clock_no_echo) / 10, 0))
             else:
                 color3 = name_to_rgb('grey')
                 opacity3 = 0

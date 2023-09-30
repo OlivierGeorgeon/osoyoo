@@ -63,12 +63,12 @@ class Command:
 
         # The anticipated displacement
         if self.duration is None:
-            if self.speed is None or self.speed > 0:
+            if self.speed is None or self.speed > 0 or self.action.action_code in [ACTION_RIGHTWARD]:
                 self.anticipated_translation = action.translation_speed * action.target_duration
             else:
                 self.anticipated_translation = - action.translation_speed * action.target_duration
         else:
-            if self.speed is None or self.speed > 0:
+            if self.speed is None or self.speed > 0 or self.action.action_code in [ACTION_RIGHTWARD]:
                 self.anticipated_translation = action.translation_speed * self.duration / 1000
             else:
                 self.anticipated_translation = - action.translation_speed * self.duration / 1000

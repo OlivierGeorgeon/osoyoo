@@ -19,7 +19,7 @@ class GridCell:
         self.status = [CELL_UNKNOWN,  # Place
                        CELL_UNKNOWN,  # Interaction
                        CELL_UNKNOWN,  # No echo
-                       CELL_UNKNOWN]  # Focus
+                       CELL_UNKNOWN]  # Focus and prompt
         self.color_index = 0
         self.clock_place = 0
         self.clock_interaction = 0

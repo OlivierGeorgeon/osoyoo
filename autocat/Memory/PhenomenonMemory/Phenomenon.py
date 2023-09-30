@@ -103,7 +103,6 @@ class Phenomenon:
         if self.delaunay is not None and p is not None:
             try:
                 # Must reduce to 2 dimensions otherwise the point is not found inside
-                # self.delaunay = Delaunay(self.hull_array)  # The hull array is computed at the end of the previous cycle
                 is_inside = (self.delaunay.find_simplex((p - self.point)[0:2]) >= 0)
             except IndexError as e:
                 print("Error testing inside:", e)
