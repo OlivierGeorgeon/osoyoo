@@ -15,6 +15,8 @@ from ..Memory.BodyMemory import ENERGY_TIRED, EXCITATION_LOW
 from ..Memory.PhenomenonMemory.PhenomenonMemory import TER
 from ..Memory.PhenomenonMemory.PhenomenonTerrain import TERRAIN_ORIGIN_CONFIDENCE
 from ..Enaction.CompositeEnaction import CompositeEnaction
+from ..Robot.RobotDefine import TERRAIN_RADIUS
+
 
 CLOCK_TO_GO_HOME = 8  # Number of interactions before going home
 OUTCOME_ORIGIN = "O"
@@ -75,8 +77,19 @@ class DeciderExplore(Decider):
         if enaction.outcome.floor > 0 and enaction.outcome.color_index == 0:
             # If the floor is not colored then figure out if the robot is on the right or on the left
             if self.workspace.memory.phenomenon_memory.phenomena[TER].absolute_affordance() is not None:
+                # Compute the angle relative to the direction of the terrain. Not working
+                # if np.dot(self.workspace.memory.phenomenon_memory.phenomena[TER].absolute_affordance().experience.sensor_point(), TERRAIN_RADIUS[self.workspace.arena_id]) < 0:
+                #     # The North-East patch
+                #     relative_quaternion = quaternion.cross(self.workspace.memory.body_memory.body_quaternion,
+                #                       quaternion.inverse(TERRAIN_RADIUS[self.workspace.arena_id]))
+                # else:
+                #     relative_quaternion = quaternion.cross(self.workspace.memory.body_memory.body_quaternion,
+                #                       quaternion.inverse(-TERRAIN_RADIUS[self.workspace.arena_id]))
+
                 relative_quaternion = quaternion.cross(self.workspace.memory.body_memory.body_quaternion,
-                                      quaternion.inverse(self.workspace.memory.phenomenon_memory.phenomena[TER].absolute_affordance().experience.body_direction_quaternion()))
+                                                       quaternion.inverse(
+                                                           self.workspace.memory.phenomenon_memory.phenomena[
+                                                               TER].absolute_affordance().experience.body_direction_quaternion()))
                 print("Relative quaternion", repr(relative_quaternion))
                 if quaternion.rotation_angle(relative_quaternion) > math.pi:
                     relative_quaternion = - relative_quaternion  # The quaternion representing the short angle

@@ -1,5 +1,6 @@
 import math
 import numpy as np
+import time
 from pyrr import matrix44, quaternion, Quaternion
 from .EgocentricMemory.EgocentricMemory import EgocentricMemory
 from .AllocentricMemory.AllocentricMemory import AllocentricMemory
@@ -104,6 +105,7 @@ class Memory:
 
     def save(self):
         """Return a clone of memory for memory snapshot"""
+        # start_time = time.time()
         saved_memory = Memory(self.phenomenon_memory.arena_id, self.robot_id)
         # Clone body memory
         saved_memory.body_memory = self.body_memory.save()
@@ -114,6 +116,7 @@ class Memory:
         # Clone phenomenon memory
         saved_memory.phenomenon_memory = self.phenomenon_memory.save(saved_memory.egocentric_memory.experiences)
         saved_memory.body_direction_deltas = {key: d for key, d in self.body_direction_deltas.items()}
+        # print("Save memory duration:", time.time() - start_time, "seconds")
 
         return saved_memory
 

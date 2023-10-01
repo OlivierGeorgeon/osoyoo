@@ -1,4 +1,5 @@
 import math
+import matplotlib.path as mpath
 import numpy as np
 from scipy.spatial import ConvexHull, QhullError, Delaunay
 from scipy.interpolate import splprep, splev
@@ -28,7 +29,8 @@ class Phenomenon:
         self.tour_started = False
         # The hull is used to display the phenomenon's contour
         self.hull_points = None
-        self.delaunay = None
+        self.path = None
+        # self.delaunay = None
         self.interpolation_types = None
         self.interpolation_points = None
 
@@ -84,9 +86,9 @@ class Phenomenon:
                 tck, u = splprep(sorted_points.T, s=50000, per=True)  # s=0.2
                 # Evaluate the B-spline on a finer grid
                 u_new = np.linspace(0, 1, 100)
-                interp = splev(u_new, tck)
-                self.delaunay = Delaunay(np.array(interp).T)
-                self.interpolation_points = np.array(interp).T.flatten().astype("int").tolist()
+                interp_t = np.array(splev(u_new, tck)).T
+                self.interpolation_points = interp_t.flatten().astype("int").tolist()
+                self.path = mpath.Path(interp_t + self.point[0:2])
             except IndexError as e:
                 print("Interpolation failed. No points.", e)
             except TypeError as e:
@@ -97,20 +99,25 @@ class Phenomenon:
                 print("The points do not form a valid convex polygon.")
 
     def is_inside(self, p):
-        """True if p is inside the convex hull or there is no convex hull"""
-        # https://stackoverflow.com/questions/16750618/whats-an-efficient-way-to-find-if-a-point-lies-in-the-convex-hull-of-a-point-cl
-        is_inside = False  # True for marking the outside cells in black (in AllocentricMemory.update_affordances)
-        if self.delaunay is not None and p is not None:
-            try:
-                # Must reduce to 2 dimensions otherwise the point is not found inside
-                is_inside = (self.delaunay.find_simplex((p - self.point)[0:2]) >= 0)
-            except IndexError as e:
-                print("Error testing inside:", e)
-            except TypeError as e:
-                print("Error testing inside:", e)
+        """True if p is inside the terrain"""
+        if p is None or self.path is None:
+            return False
         else:
-            print("Delaunay or p is None")
-        return is_inside
+            return self.path.contains_point(p[0:2])
+
+        # https://stackoverflow.com/questions/16750618/whats-an-efficient-way-to-find-if-a-point-lies-in-the-convex-hull-of-a-point-cl
+        # is_inside = False  # True for marking the outside cells in black (in AllocentricMemory.update_affordances)
+        # if self.delaunay is not None and p is not None:
+        #     try:
+        #         # Must reduce to 2 dimensions otherwise the point is not found inside
+        #         is_inside = (self.delaunay.find_simplex((p - self.point)[0:2]) >= 0)
+        #     except IndexError as e:
+        #         print("Error testing inside:", e)
+        #     except TypeError as e:
+        #         print("Error testing inside:", e)
+        # else:
+        #     print("Delaunay or p is None")
+        # return is_inside
 
     def phenomenon_label(self):
         """Return the text to display in phenomenon view"""
@@ -130,5 +137,5 @@ class Phenomenon:
         saved_phenomenon.affordance_id = self.affordance_id
         saved_phenomenon.absolute_affordance_key = self.absolute_affordance_key
         saved_phenomenon.last_origin_clock = self.last_origin_clock
-        saved_phenomenon.delaunay = self.delaunay
+        saved_phenomenon.path = self.path
         return

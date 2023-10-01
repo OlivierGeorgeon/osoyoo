@@ -1,5 +1,5 @@
 import numpy as np
-from pyrr import matrix44
+from pyrr import matrix44, vector
 from .Phenomenon import Phenomenon
 from ...Memory.EgocentricMemory.Experience import EXPERIENCE_PLACE, EXPERIENCE_FLOOR
 from ...Robot.RobotDefine import TERRAIN_RADIUS
@@ -97,10 +97,16 @@ class PhenomenonTerrain(Phenomenon):
         """Return the point in polar egocentric coordinates to aim for confirmation of this phenomenon"""
         # Parallel to the absolute affordance direction
         if self.absolute_affordance() is not None:
-            rotation_matrix = self.absolute_affordance().experience.rotation_matrix
-            point = np.array([500, 0, 0])  # Need the opposite
-            # print("Computing confirmation point from origin", self.point)
-            confirmation_point = matrix44.apply_to_vector(rotation_matrix, point).astype(int)  # + self.point
+            # Presuppose the orientation of the terrain
+            if np.dot(self.absolute_affordance().experience.sensor_point(), TERRAIN_RADIUS[self.arena_id]) < 0:
+                # The North-East patch
+                confirmation_point = vector.set_length(np.array(TERRAIN_RADIUS[self.arena_id]), 500)
+            else:
+                confirmation_point = vector.set_length(np.array(TERRAIN_RADIUS[self.arena_id]), -500)
+            # Does not presuppose the orientation of the terrain
+            # rotation_matrix = self.absolute_affordance().experience.rotation_matrix
+            # point = np.array([500, 0, 0])  # Need the opposite
+            # confirmation_point = matrix44.apply_to_vector(rotation_matrix, point).astype(int)  # + self.point
             return confirmation_point
         return None
 

@@ -42,9 +42,10 @@ class GridCell:
         return self.status[0] != CELL_UNKNOWN or self.status[1] != CELL_UNKNOWN or self.status[2] != CELL_UNKNOWN \
             or self.status[3] != CELL_UNKNOWN or self.clock_prompt > 0
 
-    def is_inside(self, polygon):
-        """True if this cell is inside the polygon"""
-        path = mpath.Path(polygon)
+    def is_inside(self, path):
+        """True if this cell is inside the path"""
+        # path = mpath.Path(polygon)
+        # return delaunay.find_simplex(self._point[0:2]) >= 0  This is slower
         return path.contains_point(self._point[0:2])
 
     def interest_value(self, clock):

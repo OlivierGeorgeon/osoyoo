@@ -1,4 +1,5 @@
 import math
+import matplotlib.path as mpath
 import time
 import numpy as np
 from pyrr import quaternion
@@ -75,7 +76,7 @@ class AllocentricMemory:
         # Place the phenomena again
         for p_id, p in phenomena.items():
             # Mark the cells outside the terrain (for BICA 2023 paper)
-            if p_id == TER and p.confidence >= TERRAIN_CIRCUMFERENCE_CONFIDENCE and p.delaunay is not None:
+            if p_id == TER and p.confidence >= TERRAIN_CIRCUMFERENCE_CONFIDENCE and p.path is not None:
                 for c in [c for line in self.grid for c in line if not p.is_inside(c.point())]:
                     c.status[0] = EXPERIENCE_FLOOR
                     c.phenomenon_id = TER
@@ -107,8 +108,9 @@ class AllocentricMemory:
         p2 = quaternion.apply_to_vector(body_quaternion, [-ROBOT_FRONT_X, ROBOT_SIDE, 0]) + self.robot_point
         p3 = quaternion.apply_to_vector(body_quaternion, [-ROBOT_FRONT_X, -ROBOT_SIDE, 0]) + self.robot_point
         p4 = quaternion.apply_to_vector(body_quaternion, [ROBOT_FRONT_X, -ROBOT_SIDE, 0]) + destination_point
-        polygon = [p[0:2] for p in [p1, p2, p3, p4]]
-        for c in [c for line in self.grid for c in line if c.is_inside(polygon)]:
+        # polygon = [p[0:2] for p in [p1, p2, p3, p4]]
+        path = mpath.Path([p[0:2] for p in [p1, p2, p3, p4]])
+        for c in [c for line in self.grid for c in line if c.is_inside(path)]:
             c.status[0] = EXPERIENCE_PLACE
             c.clock_place = clock
 
@@ -120,8 +122,8 @@ class AllocentricMemory:
         """Apply the PLACE status to the cells at the position of the robot"""
         # start_time = time.time()
         outline = body_memory.outline() + self.robot_point
-        polygon = [p[0:2] for p in outline]
-        for c in [c for line in self.grid for c in line if c.is_inside(polygon)]:
+        path = mpath.Path([p[0:2] for p in outline])
+        for c in [c for line in self.grid for c in line if c.is_inside(path)]:
             c.status[0] = EXPERIENCE_PLACE
             c.clock_place = clock
         # print("Place robot time:", time.time() - start_time, "seconds")
@@ -153,7 +155,8 @@ class AllocentricMemory:
         # start_time = time.time()
         points = affordance.sensor_triangle()
         triangle = [p[0:2] for p in points]
-        for c in [c for line in self.grid for c in line if c.is_inside(triangle)]:
+        path = mpath.Path(triangle)
+        for c in [c for line in self.grid for c in line if c.is_inside(path)]:
             c.status[2] = CELL_NO_ECHO
             c.clock_no_echo = affordance.experience.clock
         # print("Place echo time:", time.time() - start_time, "seconds")

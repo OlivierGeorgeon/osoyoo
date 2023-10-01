@@ -12,12 +12,10 @@ class Enacter:
         """Controls the enaction."""
         if self.interaction_step == ENACTION_STEP_IDLE:
             # When the next enaction is in the stack, prepare the enaction
-            # if self.workspace.clock in self.workspace.enactions:
             if self.workspace.composite_enaction is not None:
                 # Take the current enaction from the composite interaction
                 self.workspace.enaction = self.workspace.composite_enaction.current_enaction()
-                # self.workspace.enaction.clock = self.workspace.clock
-                # Take a memory stapshot to restore at the end of the enaction
+                # Take a memory snapshot to restore at the end of the enaction
                 self.memory_snapshot = self.workspace.memory.save()
                 # Begin the enaction and attribute the clock
                 self.workspace.enaction.begin(self.workspace.clock)
@@ -60,9 +58,6 @@ class Enacter:
 
             # Increment the clock if the enacted interaction was properly received
             if self.workspace.enaction.clock >= self.workspace.clock:  # don't increment if the robot is behind
-                # Remove the enaction from the stack (ok if it has already been removed)
-                # self.workspace.enactions.pop(self.workspace.clock, None)
-                # Increment the clock
                 self.workspace.clock += 1
 
             self.interaction_step = ENACTION_STEP_REFRESHING
