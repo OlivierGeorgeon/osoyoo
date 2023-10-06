@@ -69,7 +69,7 @@ class DeciderWatch(Decider):
             e1 = Enaction(self.workspace.actions[ACTION_FORWARD], e0.post_memory)
             # Third enaction: scan
             e2 = Enaction(self.workspace.actions[ACTION_SCAN], e1.post_memory, span=10)
-            return CompositeEnaction([e0, e1, e2])
+            return CompositeEnaction([e0, e1])  # , e2])
 
         # Call the sequence learning mechanism to select the next action
         self.select_action(outcome)

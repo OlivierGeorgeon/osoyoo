@@ -4,7 +4,7 @@ from pyrr import matrix44, Quaternion, Vector3
 from ..Robot.RobotDefine import ROBOT_SETTINGS, ROBOT_FRONT_X, ROBOT_SIDE
 
 ENERGY_TIRED = 92  # Level of energy below which the agent wants to go to color patch
-EXCITATION_LOW = 75  # Level of excitation below witch the agent just wants to watch if it is not tired
+EXCITATION_LOW = 60  # 75  # Level of excitation below witch the agent just wants to watch if it is not tired
 
 
 class BodyMemory:

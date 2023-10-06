@@ -9,8 +9,6 @@ ROBOT_FRONT_Y = 80          # (mm) The Y position of the robot front to mark lat
 ROBOT_SIDE = 120            # (mm) The Y position of the outside border of the robot
 ROBOT_COLOR_X = 50          # (mm) The X position of the color sensor
 
-# forward_speed = 180         # (mm/s) Forward translation speed. previous 120.
-# lateral_speed = 110         # (mm/s) Lateral translation speed
 DEFAULT_YAW = 45            # (degree) Default rotation when yaw is not returned by the robot
 TURN_DURATION = 1.000       # (s) The duration of turn left and turn right actions
 TRANSLATE_DURATION = 1.     # (s) The duration of longitudinal or lateral translation
@@ -20,7 +18,10 @@ LINE_X = 150  # 160              # (mm) X coordinate of the line after retreat
 
 SCAN_DISTANCE = 800
 
-TERRAIN_RADIUS = {"A301": [770, 920, 0],      # 1200mm azimuth 40°
+TERRAIN_RADIUS = {"A328": [200, 950, 0],     # 1010mm
+                  # "A328": [713, 713, 0],    # 1010mm azimuth  45
+                  # "A328": [-579, 827, 0],   # 1010mm azimuth  325
+                  "A301": [770, 920, 0],      # 1200mm azimuth 40°
                   "PetiteIA": [536, 450, 0],  # 700mm azimuth 50°
                   "DOLL": [770, 920, 0]}      # To be defined
 
@@ -40,7 +41,7 @@ ROBOT_SETTINGS_0 = {
 
 # Robot 1 in Lyon.
 ROBOT_SETTINGS_1 = ROBOT_SETTINGS_0.copy()
-ROBOT_SETTINGS_1["IP"] = {"A301": "192.168.8.230", "PetiteIA": "192.168.8.0"}
+ROBOT_SETTINGS_1["IP"] = {"A328": "192.168.8.230", "PetiteIA": "192.168.8.0"}
 ROBOT_SETTINGS_1["forward_speed"] = 300  # (mm/s) Forward translation speed.
 ROBOT_SETTINGS_1["lateral_speed"] = 260  # (mm/s) Lateral translation speed.
 ROBOT_SETTINGS_1["retreat_distance"] = 90  # 70   # (mm) Distance of the line after retreat
@@ -48,19 +49,20 @@ ROBOT_SETTINGS_1["compass_offset"] = [0, 0, 0]  # Compass offset can also be add
 
 # Robot 2 in Lyon.
 ROBOT_SETTINGS_2 = ROBOT_SETTINGS_0.copy()
-ROBOT_SETTINGS_2["IP"] = {"A301": "192.168.8.189", "PetiteIA": "192.168.8.189"}
+ROBOT_SETTINGS_2["IP"] = {"A328": "192.168.8.189", "PetiteIA": "192.168.8.189"}
 ROBOT_SETTINGS_2["forward_speed"] = 230  # (mm/s) Forward translation speed.
 ROBOT_SETTINGS_2["lateral_speed"] = 140  # (mm/s) Lateral translation speed.
 ROBOT_SETTINGS_2["retreat_distance"] = 90
-ROBOT_SETTINGS_2["compass_offset"] = [-25, 20, 0]  # [-30, 40, 0]
+ROBOT_SETTINGS_2["compass_offset"] = [0, -40, 0]  # [-30, 40, 0]
 
 # Robot 3 chez Olivier
 ROBOT_SETTINGS_3 = ROBOT_SETTINGS_0.copy()
 ROBOT_SETTINGS_3["IP"] = {"A301": "192.168.8.242", "PetiteIA": "192.168.8.242"}
-ROBOT_SETTINGS_3["forward_speed"] = 280  # 260  # 230  190 (mm/s) Forward translation speed.
+# Lower speed cause the robot to believe the arena is smaller. Reduce speed to prevent pushing outside objects
+ROBOT_SETTINGS_3["forward_speed"] = 250  # 260  # 230  190 (mm/s) Forward translation speed.
 ROBOT_SETTINGS_3["lateral_speed"] = 230  # 160  # (mm/s) Lateral translation speed.
 ROBOT_SETTINGS_3["retreat_distance"] = 80  # 70   # (mm) Distance of the line after retreat
-ROBOT_SETTINGS_3["compass_offset"] = [30, -20, 0]  # [-40, 7, 0]  # [-30, 40, 0]
+ROBOT_SETTINGS_3["compass_offset"] = [50, -50, 0]  # [30, -20, 0]  # [-40, 7, 0]  # [-30, 40, 0]
 
 # Robot 1 at DOLL
 ROBOT_SETTINGS_11 = ROBOT_SETTINGS_0.copy()

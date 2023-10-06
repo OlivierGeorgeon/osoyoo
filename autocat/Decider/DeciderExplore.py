@@ -42,7 +42,7 @@ class DeciderExplore(Decider):
         #     self.prompt_points.append(point)
         self.prompt_index = 0
         self.ter_prompt = None
-        self.explore_angle_quaternion = Quaternion.from_z_rotation(math.pi / 3)
+        self.explore_angle_quaternion = Quaternion.from_z_rotation(math.pi / 3)  # 2
         self.action = "-"
 
     def activation_level(self):
@@ -164,7 +164,7 @@ class DeciderExplore(Decider):
 
             # Go successively to the predefined prompt points relative to the terrain center
             if self.prompt_index == 0:
-                self.ter_prompt = self.workspace.memory.phenomenon_memory.phenomena[TER].affordances[self.workspace.memory.phenomenon_memory.phenomena[TER].absolute_affordance_key].point * 1.2
+                self.ter_prompt = self.workspace.memory.phenomenon_memory.phenomena[TER].affordances[self.workspace.memory.phenomenon_memory.phenomena[TER].absolute_affordance_key].point * 1.2  # 2
             self.ter_prompt = quaternion.apply_to_vector(self.explore_angle_quaternion, self.ter_prompt)
             allo_prompt = self.ter_prompt + self.workspace.memory.phenomenon_memory.phenomena[TER].point
             ego_prompt = self.workspace.memory.allocentric_to_egocentric(allo_prompt)

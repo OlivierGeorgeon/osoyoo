@@ -88,7 +88,8 @@ class AllocentricMemory:
                     cell_x, cell_y = point_to_cell(a.point+p.point)
                     self.apply_status_to_cell(cell_x, cell_y, a.experience.type, a.experience.clock, a.experience.color_index)
                     # Attribute this phenomenon to this cell
-                    self.grid[cell_x][cell_y].phenomenon_id = p_id
+                    if (self.min_i <= cell_x <= self.max_i) and (self.min_j <= cell_y <= self.max_j):
+                        self.grid[cell_x][cell_y].phenomenon_id = p_id
 
         # Place the affordances that are not attached to phenomena
         for a in self.affordances:
@@ -165,24 +166,28 @@ class AllocentricMemory:
         """Update the focus in allocentric memory"""
         # Clear the previous focus cell
         if self.focus_i is not None:
-            self.grid[self.focus_i][self.focus_j].status[3] = CELL_UNKNOWN
+            if (self.min_i <= self.focus_i <= self.max_i) and (self.min_j <= self.focus_j <= self.max_j):
+                self.grid[self.focus_i][self.focus_j].status[3] = CELL_UNKNOWN
         # Add the new focus cell
         if allo_focus is not None:
             self.focus_i, self.focus_j = point_to_cell(allo_focus, self.cell_radius)
-            self.grid[self.focus_i][self.focus_j].status[3] = EXPERIENCE_FOCUS
-            self.grid[self.focus_i][self.focus_j].clock_focus = clock
+            if (self.min_i <= self.focus_i <= self.max_i) and (self.min_j <= self.focus_j <= self.max_j):
+                self.grid[self.focus_i][self.focus_j].status[3] = EXPERIENCE_FOCUS
+                self.grid[self.focus_i][self.focus_j].clock_focus = clock
 
     def update_prompt(self, allo_prompt, clock):
         """Update the prompt in allocentric memory"""
         # Clear the previous prompt cell
         if self.prompt_i is not None:
-            self.grid[self.prompt_i][self.prompt_j].status[3] = CELL_UNKNOWN
+            if (self.min_i <= self.prompt_i <= self.max_i) and (self.min_j <= self.prompt_j <= self.max_j):
+                self.grid[self.prompt_i][self.prompt_j].status[3] = CELL_UNKNOWN
         # Add the new prompt cell
         if allo_prompt is not None:
             self.prompt_i, self.prompt_j = point_to_cell(allo_prompt, self.cell_radius)
-            self.grid[self.prompt_i][self.prompt_j].status[3] = EXPERIENCE_PROMPT
-            self.grid[self.prompt_i][self.prompt_j].clock_prompt = clock
-            print("Prompt in cell", self.prompt_i, ", ", self.prompt_j)
+            if (self.min_i <= self.prompt_i <= self.max_i) and (self.min_j <= self.prompt_j <= self.max_j):
+                self.grid[self.prompt_i][self.prompt_j].status[3] = EXPERIENCE_PROMPT
+                self.grid[self.prompt_i][self.prompt_j].clock_prompt = clock
+                print("Prompt in cell", self.prompt_i, ", ", self.prompt_j)
 
     def save(self, experiences):
         """Retun a clone of allocentric memory for memory snapshot"""
