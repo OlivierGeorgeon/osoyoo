@@ -1,4 +1,4 @@
-#define ROBOT_ID 3 // 0: regular Osoyoo robot, 1: robot BSN, 2: robot UCBL, 3: SHS chez Olivier, 11 to 14: DOLL robots
+#define ROBOT_ID 2 // 0: regular Osoyoo robot, 1: robot BSN, 2: robot UCBL, 3: SHS chez Olivier, 11 to 14: DOLL robots
 
 #define AP_SSID "osoyoo_robot"          // The wifi SSID of this robot in Access Point
 #define ROBOT_HEAD_X 80                 // (mm) X position of the head
@@ -30,7 +30,7 @@
 #define ACCELERATION_X_BLOCK_THRESHOLD 60  // TODO depends whether the interaction starts when the robot is immobile
 #define ACCELERATION_Y_BLOCK_THRESHOLD 80 // 100 // Robot is blocked if lateral acceleration below this threshold
 #define GYRO_COEF 1.0  // 1.2  //  1 // IMU is upright. If turns too much, increase this value
-#define ROBOT_SERVO_PIN 4  // 13 Changed because 13 is used for internal led
+#define ROBOT_SERVO_PIN 6  // 13 Changed because 13 is used for internal led
 #define GYRO_IMPACT_THRESHOLD 0.25      // (degree) above this threshold: strong z rotation = lateral impact
 
 #elif ROBOT_ID == 2
@@ -54,7 +54,7 @@
 #define ACCELERATION_X_BLOCK_THRESHOLD 60 // Below the threshold, the robot is blocked
 #define ACCELERATION_Y_BLOCK_THRESHOLD 80 // Robot is blocked if lateral acceleration below this threshold
 #define GYRO_COEF 1.0 // 1.35 // UMI is upright
-#define ROBOT_SERVO_PIN 4
+#define ROBOT_SERVO_PIN 6
 #define GYRO_IMPACT_THRESHOLD 0.25      // (degree) above this threshold: strong z rotation = lateral impact
 
 #elif ROBOT_ID == 3
@@ -78,7 +78,7 @@
 #define ACCELERATION_X_BLOCK_THRESHOLD 140 // 30 // Robot is blocked if longitudinal acceleration below this threshold
 #define ACCELERATION_Y_BLOCK_THRESHOLD 80 // 100 // Robot is blocked if lateral acceleration below this threshold
 #define GYRO_COEF 1.  // 2.0 // 1.33  // 1.5 si tourne trop, augmenter cette valeur
-#define ROBOT_SERVO_PIN 4
+#define ROBOT_SERVO_PIN 6
 #define GYRO_IMPACT_THRESHOLD 0.5 // 0.25      // (degree/s) above this threshold: strong z rotation = lateral impact
 
 #elif ROBOT_ID == 11

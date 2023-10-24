@@ -50,9 +50,12 @@ void setup()
   Serial.begin(9600);
   Serial.println("Serial initialized");
 
-  // Initialize built-in LED for debugging
+  // Initialize LEDs
 
   pinMode(LED_BUILTIN, OUTPUT);
+  pinMode(RED_LED_PIN, OUTPUT);
+  pinMode(GREEN_LED_PIN, OUTPUT);
+  pinMode(BLUE_LED_PIN, OUTPUT);
 
   // First attempt to initialize IMU
 
@@ -62,7 +65,8 @@ void setup()
 
   WifiCat.begin();
 
-  // Second attempt to initialize IMU (try a second time after some time because sometimes it fails the first time)
+  // Second attempt to initialize IMU (try again because sometimes it fails the first time)
+  // Perhaps something to do with the order in which the imu registers are written.
 
   IMU.setup();
   Serial.println("-- IMU initialized");
@@ -74,10 +78,6 @@ void setup()
 
   HEA.setup();
   Serial.println("-- Head initialized");
-
-  // IMU.setup(); delay(100); IMU.setup(); //delay(100); IMU.setup();
-  // Setup the imu twice otherwise the calibration is wrong. I don't know why.
-  // Probably something to do with the order in which the imu registers are written.
 
   Serial.println("--- Robot is ready ---");
 }
@@ -103,7 +103,6 @@ void loop()
   // Watch for message received from PC. If yes, starts the interaction
 
   if (interaction_step == INTERACTION_DONE)
-    //Step0();
     INT = SEQ.update(interaction_step, INT);
 
   // Update the current interaction and return INTERACTION_DONE when done

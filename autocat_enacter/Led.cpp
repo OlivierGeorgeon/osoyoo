@@ -9,8 +9,6 @@
 
 Led::Led()
 {
-  //blink_end_time = 0;
-  //blink_on = true;
 }
 
 // Blink the LED with period 100ms

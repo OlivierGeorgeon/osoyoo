@@ -1,7 +1,7 @@
 # Autocat
 
 The Autocat project aims at controlling the 
-[osoyoo robot car](https://osoyoo.com/2019/11/08/omni-direction-mecanum-wheel-robotic-kit-v1/) 
+[osoyoo robot car](https://osoyoo.myshopify.com/collections/robot-car/products/osoyoo-omni-directinal-mecanum-wheels-robot-car-kit-for-arduino-mega2560-metal-chassis-dc-speed-encoder-motor-robotic-diy-stem-remote-controlled-educational-mechanical-diy-coding-for-teens-adult?variant=31634199183471) 
 to generate life-like behaviors. 
 
 ## Repository architecture
@@ -17,10 +17,11 @@ to generate life-like behaviors.
 
 ## Getting started
 
-* Move file `docs/first_step/arduino_secrets.h` into folder `autocat_enacter/` and specify your wifi parameters in it. 
+* Move file `docs/first_step/arduino_secrets.h` into folder `autocat_enacter/src/wifi` and specify your wifi parameters in it. 
 * Download file `autocat_enacter.ino` to the robot using the arduino IDE.
 * Read the robot's IP address in the arduino IDE terminal.
-* Run the python application (`main.py`) on your desktop, providing the robot's IP adress as an argument.
+* Configure your arena and the IP address of your robots in `autocat/Robot/RobotDefine.py`
+* Run the `main.py` python application on your desktop with the name of your arena and of your robots as arguments. In our case `python.exe -m main PetiteIA 1`
 
 ## Tuning
 

@@ -24,6 +24,7 @@ public:
   void send();
   int update();
 protected:
+  void color(int c);
   Floor& _FLO;
   Head& _HEA;
   Imu& _IMU;
