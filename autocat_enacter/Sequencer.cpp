@@ -21,22 +21,19 @@
 #include "src/interactions/Forward.h"
 #include "src/interactions/Scan.h"
 #include "src/interactions/Swipe.h"
-// #include "src/interactions/Swipe_right.h"
 #include "src/interactions/Turn.h"
 #include "src/interactions/Turn_head.h"
-// #include "src/interactions/Turn_left.h"
-// #include "src/interactions/Turn_right.h"
 #include "src/interactions/Watch.h"
 
-Sequencer::Sequencer(Floor& FLO, Head& HEA, Imu& IMU, WifiCat& WifiCat) :
-  _FLO(FLO), _HEA(HEA), _IMU(IMU), _WifiCat(WifiCat)
+Sequencer::Sequencer(Floor& FLO, Head& HEA, Imu& IMU, Led& LED, WifiCat& WifiCat) :
+  _FLO(FLO), _HEA(HEA), _IMU(IMU), _LED(LED), _WifiCat(WifiCat)
 {
 }
 
 // Watch the wifi and returns the new interaction to enact if any
 Interaction* Sequencer::update(int& interaction_step, Interaction* INT)
 {
-  digitalWrite(LED_BUILTIN, HIGH); // light the led during transfer
+  digitalWrite(LED_BUILTIN, HIGH); // Dim the led while waiting for an action
   int len = _WifiCat.read(packetBuffer);
   digitalWrite(LED_BUILTIN, LOW);
 
@@ -79,6 +76,12 @@ Interaction* Sequencer::update(int& interaction_step, Interaction* INT)
       previous_clock = clock;
       _IMU.begin();
       _FLO._floor_outcome = 0; // Reset possible floor change when the robot was placed on the floor
+
+      // Set the emotion led
+      if (json_action.hasOwnProperty("color"))
+        _LED.color((int)json_action["color"]);
+      else
+        _LED.color(0);
 
       // Instantiate the interaction
 

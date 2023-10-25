@@ -17,11 +17,16 @@ class Led
 {
 public:
   Led();
+  void setup();
   void blink();
+  void color(int c);
 private:
   unsigned long blink_time = 0;
   unsigned long cycle_count = 0;
   bool blink_on = true;
+  float emotion_red = 0.;
+  float emotion_green = 0.;
+  float emotion_blue = 0.;
 };
 
 #endif

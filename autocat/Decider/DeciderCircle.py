@@ -47,5 +47,4 @@ class DeciderCircle(Decider):
             self.workspace.memory.egocentric_memory.prompt_point = None
 
         # Add the enaction to the stack
-        # self.workspace.enactions[self.workspace.clock] = Enaction(self.action, self.workspace.clock, self.workspace.memory)
-        return Enaction(self.action, self.workspace.memory)
+        return Enaction(self.action, self.workspace.memory, color=2)

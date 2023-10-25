@@ -38,7 +38,7 @@ Head HEA;
 Imu IMU;
 WifiCat WifiCat;
 Led LED;
-Sequencer SEQ(FLO, HEA, IMU, WifiCat);
+Sequencer SEQ(FLO, HEA, IMU, LED, WifiCat);
 
 int interaction_step = 0;
 Interaction* INT  = nullptr;  // The interaction type will depend on the action received from the PC
@@ -50,12 +50,9 @@ void setup()
   Serial.begin(9600);
   Serial.println("Serial initialized");
 
-  // Initialize LEDs
+  // Initialize the LEDs
 
-  pinMode(LED_BUILTIN, OUTPUT);
-  pinMode(RED_LED_PIN, OUTPUT);
-  pinMode(GREEN_LED_PIN, OUTPUT);
-  pinMode(BLUE_LED_PIN, OUTPUT);
+  LED.setup();
 
   // First attempt to initialize IMU
 

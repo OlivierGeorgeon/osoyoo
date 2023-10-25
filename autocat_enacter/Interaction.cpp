@@ -59,42 +59,10 @@ Interaction::Interaction(Floor& FLO, Head& HEA, Imu& IMU, WifiCat& WifiCat, JSON
   if (json_action.hasOwnProperty("span"))
     _span = (int)json_action["span"];
 
-  // The color of the emotion led
-  if (json_action.hasOwnProperty("color"))
-    color((int)json_action["color"]);
-
   _action_start_time = millis();
   _action_end_time = _action_start_time + _target_duration;
   _status = "0";
   _step = INTERACTION_BEGIN;
-}
-
-void Interaction::color(int c)
-{
-  if (c == 1)
-  {
-    analogWrite(RED_LED_PIN, 200);
-    analogWrite(GREEN_LED_PIN, 205);
-    analogWrite(BLUE_LED_PIN, 255);
-  }
-  if (c == 2)
-  {
-    analogWrite(RED_LED_PIN, 0);
-    analogWrite(GREEN_LED_PIN, 255);
-    analogWrite(BLUE_LED_PIN, 0);
-  }
-  if (c == 3)
-  {
-    analogWrite(RED_LED_PIN, 0);
-    analogWrite(GREEN_LED_PIN, 0);
-    analogWrite(BLUE_LED_PIN, 255);
-  }
-  if (c == 4)
-  {
-    analogWrite(RED_LED_PIN, 255);
-    analogWrite(GREEN_LED_PIN, 0);
-    analogWrite(BLUE_LED_PIN, 0);
-  }
 }
 
 void Interaction::begin()

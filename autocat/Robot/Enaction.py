@@ -19,7 +19,7 @@ class Enaction:
     3. CtrlRobot computes the outcome received from the robot
     4. CtrlRobot call ternminate(outcome)
     """
-    def __init__(self, action, memory, turn_back=False, span=40, color=4):
+    def __init__(self, action, memory, turn_back=False, span=40, color=1):
         """Initialize the enaction upon creation. Will be adjusted before generating the command"""
         # The initial arguments
         self.action = action
