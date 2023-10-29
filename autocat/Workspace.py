@@ -146,7 +146,8 @@ class Workspace:
         if self.enaction is None or self.enaction.message_sent:
             return None
 
-        message = {"robot": self.robot_id, "clock": self.clock, "azimuth": self.memory.body_memory.body_azimuth()}
+        message = {"robot": self.robot_id, "clock": self.clock, "azimuth": self.memory.body_memory.body_azimuth(),
+                   "color": self.enaction.command.color}
 
         # If the terrain has been found then send the position relative to the terrain origin
         if TER in self.memory.phenomenon_memory.phenomena and self.memory.phenomenon_memory.phenomena[TER].confidence > TERRAIN_INITIAL_CONFIDENCE:
@@ -154,8 +155,9 @@ class Workspace:
             message['pos_x'] = round(point[0])
             message['pos_y'] = round(point[1])
 
-        # If ongoing enaction wit focus and message not yet sent then add the enation information
-        if self.enaction is not None and self.enaction.focus_point is not None:
+        # If ongoing enaction with focus and message not yet sent then add the enation information
+        if self.enaction.focus_point is not None:
+            # if self.enaction is not None and self.enaction.focus_point is not None:
             focus_point = self.memory.egocentric_to_polar_egocentric(self.enaction.focus_point)
             # The position of the focus
             message['focus_x'] = round(focus_point[0])
@@ -168,7 +170,7 @@ class Workspace:
 
         # Mark the message for this enaction sent
         self.enaction.message_sent = True
-        # Send the message of there is position or focus
+        # Send the message if there is position or focus
         if 'pos_x' in message or 'focus_x' in message:
             return json.dumps(message)
         else:

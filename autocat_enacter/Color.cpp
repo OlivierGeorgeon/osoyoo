@@ -12,11 +12,11 @@
 Color::Color()
 {
   Adafruit_TCS34725 tcs = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_24MS, TCS34725_GAIN_16X);
-  r = 0;
-  g = 0;
-  b = 0;
-  c = 0;
-  is_initialized = false;
+//  r = 0;
+//  g = 0;
+//  b = 0;
+//  c = 0;
+//  is_initialized = false;
 }
 
 void Color::setup()
@@ -51,15 +51,11 @@ void Color::begin_read()
   }
 }
 
-// Read the sensor
+// Wait for led on and then read the sensor and turn led of. Return true when done.
 bool Color::end_read()
 {
   if (is_initialized)
   {
-    // Switch the LED on
-    // digitalWrite(Led_PIN, HIGH);
-
-    // delay(50);  // takes 50ms to read
     if (millis() > _read_start_time + LED_ON_DURATION)
     {
       tcs.getRawData(&r, &g, &b, &c);
@@ -75,6 +71,7 @@ bool Color::end_read()
     return true;
 }
 
+// Generate the outcome_object form previously read sensor
 void Color::outcome(JSONVar & outcome_object)
 {
 

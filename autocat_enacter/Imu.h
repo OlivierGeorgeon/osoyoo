@@ -37,7 +37,7 @@ class Imu
     int get_impact_backward();
     int get_impact_leftwards();
     int get_impact_rightwards();
-    float _yaw;
+    float _yaw = 0;
     float _xSpeed;
     float _xDistance;
     #if ROBOT_COMPASS_TYPE > 0

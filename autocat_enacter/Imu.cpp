@@ -22,7 +22,7 @@
 Imu::Imu()
 {
   // _imu_read_time = 0; initialized in imu.h
-  _yaw = 0;
+  // _yaw = 0;
   //_debug_message = "";
 }
 void Imu::setup()
@@ -241,6 +241,7 @@ void Imu::outcome(JSONVar & outcome_object)
   // Always return the yaw
   #if ROBOT_HAS_MPU6050 == true
   outcome_object["yaw"] = round(_yaw);
+  // _yaw = 0; // Must not reset here or it will be lost if the outcome must be resent
   #endif
 
   // Always return the compass

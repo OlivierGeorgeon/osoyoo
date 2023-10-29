@@ -57,6 +57,7 @@ void setup()
   // First attempt to initialize IMU
 
   IMU.setup();
+  Serial.println("-- IMU initialized");
 
   // Connect to the wifi board
 

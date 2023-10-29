@@ -45,7 +45,7 @@ ROBOT_SETTINGS_1["IP"] = {"A328": "192.168.8.230", "PetiteIA": "192.168.8.0"}
 ROBOT_SETTINGS_1["forward_speed"] = 300  # (mm/s) Forward translation speed.
 ROBOT_SETTINGS_1["lateral_speed"] = 260  # (mm/s) Lateral translation speed.
 ROBOT_SETTINGS_1["retreat_distance"] = 90  # 70   # (mm) Distance of the line after retreat
-ROBOT_SETTINGS_1["compass_offset"] = [0, 0, 0]  # Compass offset can also be added into the C++ code.
+ROBOT_SETTINGS_1["compass_offset"] = [67, -42, 0] # [0, 0, 0]  # Compass offset can also be added into the C++ code.
 
 # Robot 2 in Lyon.
 ROBOT_SETTINGS_2 = ROBOT_SETTINGS_0.copy()
@@ -57,12 +57,20 @@ ROBOT_SETTINGS_2["compass_offset"] = [0, -40, 0]  # [-30, 40, 0]
 
 # Robot 3 chez Olivier
 ROBOT_SETTINGS_3 = ROBOT_SETTINGS_0.copy()
-ROBOT_SETTINGS_3["IP"] = {"A301": "192.168.8.242", "PetiteIA": "192.168.8.242"}
+ROBOT_SETTINGS_3["IP"] = {"A301": "192.168.8.242", "PetiteIA": "192.168.8.108"}  # 242
 # Lower speed cause the robot to believe the arena is smaller. Reduce speed to prevent pushing outside objects
 ROBOT_SETTINGS_3["forward_speed"] = 250  # 260  # 230  190 (mm/s) Forward translation speed.
 ROBOT_SETTINGS_3["lateral_speed"] = 230  # 160  # (mm/s) Lateral translation speed.
 ROBOT_SETTINGS_3["retreat_distance"] = 80  # 70   # (mm) Distance of the line after retreat
-ROBOT_SETTINGS_3["compass_offset"] = [-50, 0, 0]  # [50, -50, 0]  # [30, -20, 0]  # [-40, 7, 0]  # [-30, 40, 0]
+ROBOT_SETTINGS_3["compass_offset"] = [0, 0, 0]  # [-50, 0, 0] [50, -50, 0]  # [30, -20, 0]  # [-40, 7, 0]  # [-30, 40, 0]
+
+# Robot 4 chez Olivier
+ROBOT_SETTINGS_4 = ROBOT_SETTINGS_0.copy()
+ROBOT_SETTINGS_4["IP"] = {"PetiteIA": "192.168.8.242"}  # 108
+ROBOT_SETTINGS_4["forward_speed"] = 300  # 250
+ROBOT_SETTINGS_4["lateral_speed"] = 250  # 230
+ROBOT_SETTINGS_4["retreat_distance"] = 100  # 80
+ROBOT_SETTINGS_4["compass_offset"] = [0, 0, 0]
 
 # Robot 1 at DOLL
 ROBOT_SETTINGS_11 = ROBOT_SETTINGS_0.copy()
@@ -89,6 +97,7 @@ ROBOT_SETTINGS = {
     '1': ROBOT_SETTINGS_1,
     '2': ROBOT_SETTINGS_2,
     '3': ROBOT_SETTINGS_3,
+    '4': ROBOT_SETTINGS_4,
     '11': ROBOT_SETTINGS_11,
     '12': ROBOT_SETTINGS_12,
     '13': ROBOT_SETTINGS_13,

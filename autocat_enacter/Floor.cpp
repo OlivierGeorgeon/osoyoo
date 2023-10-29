@@ -112,8 +112,9 @@ int Floor::measureFloor()
 void Floor::outcome(JSONVar & outcome_object)
 {
   outcome_object["floor"] = _floor_outcome;
+  // TODO Must not reread the color because the led is off
   _CLR.outcome(outcome_object);
   // outcome_object["debug"] = _debug_message;
   // _debug_message = "";
-  _floor_outcome = 0;
+  // _floor_outcome = 0;  // Reset at the beginning of the interaction. Not here because lost if outcome string lost
 }

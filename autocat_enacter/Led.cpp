@@ -46,7 +46,7 @@ void Led::blink()
   float sinValue = sin(0.00628 * millis());  // Calculate the sine value (* 2 * PI / period)
 
   analogWrite(RED_LED_PIN, (sinValue + 1.) * 100. * emotion_red);     // [0,200] Set the LED brightness using PWM
-  analogWrite(GREEN_LED_PIN, (sinValue + 1.) * 105. * emotion_green); // [0,210]
+  analogWrite(GREEN_LED_PIN, (sinValue + 1.) * 110. * emotion_green); // [0,220]
   analogWrite(BLUE_LED_PIN, (sinValue + 1.) * 127.5 * emotion_blue);  // [0,255]
 }
 

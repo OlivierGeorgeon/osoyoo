@@ -31,16 +31,28 @@ def category_color(color_sensor):
         elif hsv[0] > 0.28:
             # 'limeGreen'  # Hue = 0.38, 0.35, 0.37 -- 0.29, 0.33, 0.29, 0.33 -- 0.36, sat 0.68
             color_index = 4
-        elif hsv[0] > 0.175:
+        elif hsv[0] > 0.124:  # Before Robot 4: 0.175:
             # 'gold'  # Hue = 0.25, 0.26 -- 0.20 -- 0.20, 0.20, 0.184, 0.2 -- 0.24, sat 0.68
             color_index = 3
-        elif hsv[0] > 0.05:
+        elif hsv[0] > 0.04:  # Before Robot 4: 0.05:
             # 'orange'
             color_index = 2
+        # else:
+            # Added for Robot 4
+            # if hsv[1] > 0.8:
+            #     color_index = 1
+            # elif hsv[1] > 0.7:
+            #     color_index = 7
+            # else:
+            #     color_index = 0
 
     # Rug at Olivier's
-    if color_index in [3, 4] and hsv[1] < 0.6 and hsv[2] < 0.5:
+    if color_index in [2, 3] and hsv[1] < 0.6 and hsv[2] < 0.5:
         color_index = 0
+    if color_index in [1, 4] and hsv[1] < 0.5:  # Robot 4
+        color_index = 0
+    # if color_index in [1] and hsv[1] < 0.5:  # Robot 4
+    #     color_index = 0
 
     # Floor in UCLy lyon
     if (hsv[0] < 0.6) and (hsv[1] < 0.3):  # 0.45  // violet (0.66,0.25,0.398) in DOLL

@@ -21,11 +21,11 @@ class Color
     void outcome(JSONVar & outcome_object);
   private:
     Adafruit_TCS34725 tcs;
-    bool is_initialized;
-    uint16_t r;
-    uint16_t g;
-    uint16_t b;
-    uint16_t c;
+    bool is_initialized = false;
+    uint16_t r = 0;
+    uint16_t g = 0;
+    uint16_t b = 0;
+    uint16_t c = 0;
     unsigned long _read_start_time;
     bool _is_led_on = false;
 };

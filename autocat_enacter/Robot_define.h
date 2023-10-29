@@ -1,4 +1,4 @@
-#define ROBOT_ID 3 // 0: regular Osoyoo robot, 1: robot BSN, 2: robot UCBL, 3: SHS chez Olivier, 11 to 14: DOLL robots
+#define ROBOT_ID 4 // 0: regular Osoyoo robot, 1: robot BSN, 2: robot UCBL, 3: SHS chez Olivier, 11 to 14: DOLL robots
 
 #define AP_SSID "osoyoo_robot"          // The wifi SSID of this robot in Access Point
 #define ROBOT_HEAD_X 80                 // (mm) X position of the head
@@ -16,17 +16,17 @@
 #define ROBOT_COMPASS_TYPE 2 // "MMC5883"
 #define ROBOT_REAR_RIGHT_WHEEL_COEF 1
 #define ROBOT_REAR_LEFT_WHEEL_COEF 1.2
-#define ROBOT_FRONT_RIGHT_WHEEL_COEF 1
+#define ROBOT_FRONT_RIGHT_WHEEL_COEF 1.2
 #define ROBOT_FRONT_LEFT_WHEEL_COEF 1
 #define TURN_SPOT_MAX_DURATION 2400
-#define TURN_SPOT_ENDING_DELAY 500
-#define TURN_SPOT_ENDING_ANGLE 20  //  25
+#define TURN_SPOT_ENDING_DELAY 400  // 500
+#define TURN_SPOT_ENDING_ANGLE 18  // 20  //  25
 #define ACCELERATION_X_OFFSET -15  // -40
 #define ACCELERATION_Y_OFFSET -30  // -3
 #define COMPASS_X_OFFSET 6982 // 7062 // 7051 // 7022
 #define COMPASS_Y_OFFSET 7320  // 7306 // 7336
-#define ACCELERATION_X_IMPACT_THRESHOLD 200 // -400 // Below the threshold it is a strong deceleration = shock
-#define ACCELERATION_Y_IMPACT_THRESHOLD 200  //  110
+#define ACCELERATION_X_IMPACT_THRESHOLD 250 // 200 // -400 // Below the threshold it is a strong deceleration = shock
+#define ACCELERATION_Y_IMPACT_THRESHOLD 200 //  110
 #define ACCELERATION_X_BLOCK_THRESHOLD 60  // TODO depends whether the interaction starts when the robot is immobile
 #define ACCELERATION_Y_BLOCK_THRESHOLD 80 // 100 // Robot is blocked if lateral acceleration below this threshold
 #define GYRO_COEF 1.0  // 1.2  //  1 // IMU is upright. If turns too much, increase this value
@@ -80,6 +80,30 @@
 #define GYRO_COEF 1.  // 2.0 // 1.33  // 1.5 si tourne trop, augmenter cette valeur
 #define ROBOT_SERVO_PIN 6
 #define GYRO_IMPACT_THRESHOLD 0.5 // 0.25      // (degree/s) above this threshold: strong z rotation = lateral impact
+
+#elif ROBOT_ID == 4
+
+#warning "Compiling for Robot 4"
+#define ROBOT_HAS_MPU6050  true
+#define ROBOT_COMPASS_TYPE 1 //  "HMC5883L"
+#define ROBOT_REAR_LEFT_WHEEL_COEF  0.6
+#define ROBOT_FRONT_LEFT_WHEEL_COEF 0.6
+#define ROBOT_REAR_RIGHT_WHEEL_COEF 0.6
+#define ROBOT_FRONT_RIGHT_WHEEL_COEF 0.6
+#define TURN_SPOT_MAX_DURATION 2400
+#define TURN_SPOT_ENDING_DELAY 200 // 400 for WHEEL_COEFs 0.8
+#define TURN_SPOT_ENDING_ANGLE 10  // 18
+#define COMPASS_X_OFFSET  163
+#define COMPASS_Y_OFFSET  -665
+#define ACCELERATION_X_OFFSET -30
+#define ACCELERATION_Y_OFFSET 0
+#define ACCELERATION_X_IMPACT_THRESHOLD 250
+#define ACCELERATION_Y_IMPACT_THRESHOLD 200
+#define ACCELERATION_X_BLOCK_THRESHOLD 140
+#define ACCELERATION_Y_BLOCK_THRESHOLD 80
+#define GYRO_COEF 1.
+#define ROBOT_SERVO_PIN 6
+#define GYRO_IMPACT_THRESHOLD 0.5
 
 #elif ROBOT_ID == 11
 
