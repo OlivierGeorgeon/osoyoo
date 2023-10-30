@@ -37,24 +37,17 @@ def category_color(color_sensor):
         elif hsv[0] > 0.035:  # Before Robot 4: 0.05:
             # 'orange'
             color_index = 2
-        # else:
-            # Added for Robot 4
-            # if hsv[1] > 0.8:
-            #     color_index = 1
-            # elif hsv[1] > 0.7:
-            #     color_index = 7
-            # else:
-            #     color_index = 0
 
     # Rug at Olivier's
     # Red. Robot 4 sees the rug red
     if color_index in [1] and hsv[1] < 0.5:  # Robot 4
         color_index = 0
     # Orange, yellow
-    if color_index in [2, 3] and hsv[1] < 0.6 and hsv[2] < 0.5:
+    if color_index in [2, 3] and hsv[1] < 0.55:  # Before robot 4 0.6
         color_index = 0
-    # Green. Robot 3 sees the rug green with clear 17. Robot 4 sees green with clear 10 and low saturation.
-    if color_index in [4] and hsv[1] < 0.43 and color_sensor['clear'] > 13:
+    # Green. Robot 3 sees the rug green with clear 17 or 21 or saturation < 0.41.
+    #        Robot 4 sees green with clear 9 or 10 and saturation 0.5.
+    if color_index in [4] and (hsv[1] < 0.46 and color_sensor['clear'] > 13) or hsv[1] < 0.41:
         color_index = 0
 
     # Floor in UCLy lyon

@@ -58,7 +58,7 @@ class DeciderExplore(Decider):
         #     if self.workspace.memory.body_memory.excitation >= EXCITATION_LOW:
         #         activation_level = 2
         if self.workspace.memory.emotional_state() == EMOTION_RELAXED:
-            activation_level = 3
+            activation_level = 1
         return activation_level
 
     def outcome(self, enaction):

@@ -35,7 +35,7 @@ class DeciderWatch(Decider):
         # if self.workspace.memory.body_memory.excitation < EXCITATION_LOW and \
         #         self.workspace.memory.body_memory.energy > ENERGY_TIRED:
         if self.workspace.memory.emotional_state() == EMOTION_SAD:
-            return 4
+            return 1
         else:
             return 0
 

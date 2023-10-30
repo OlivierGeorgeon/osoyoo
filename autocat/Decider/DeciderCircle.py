@@ -19,14 +19,14 @@ class DeciderCircle(Decider):
 
     def activation_level(self):
         """Return the activation level of this decider/ 1: default; 3 if focus not too far and excited"""
-        activation_level = 1
+        activation_level = 0
 
         # When high excitation and the focus is not too far
         # if self.workspace.memory.egocentric_memory.focus_point is not None and \
         #     np.linalg.norm(self.workspace.memory.egocentric_memory.focus_point) < FOCUS_TOO_FAR_DISTANCE and \
         #         self.workspace.memory.body_memory.excitation > EXCITATION_LOW:
         if self.workspace.memory.emotional_state() == EMOTION_HAPPY:
-            activation_level = 3
+            activation_level = 1
 
         return activation_level
 

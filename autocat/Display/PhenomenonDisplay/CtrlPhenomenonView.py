@@ -40,6 +40,7 @@ class CtrlPhenomenonView:
     def update_body_robot(self):
         """Updates the robot's body to display by the phenomenon view"""
         self.view.robot.rotate_head(self.workspace.memory.body_memory.head_direction_degree())
+        self.view.robot.emotion_color(self.workspace.memory.emotional_state())
         if self.phenomenon is not None:
             self.view.phenomenon_point = self.phenomenon.point
 

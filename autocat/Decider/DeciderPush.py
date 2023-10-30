@@ -28,7 +28,7 @@ class DeciderPush(Decider):
 
     def activation_level(self):
         """The level of activation of this decider: -1: default, 5 if focus inside terrain"""
-        activation_level = -1
+        activation_level = 0
 
         # Push objects only when the terrain has been built
         # if TER in self.workspace.memory.phenomenon_memory.phenomena and \
@@ -41,10 +41,10 @@ class DeciderPush(Decider):
         #     else:
         #         print("Focus outside terrain", self.workspace.memory.egocentric_memory.focus_point)
         if self.workspace.memory.emotional_state() == EMOTION_ANGRY:
-            activation_level = 5
+            activation_level = 2
         # Activate during the withdraw step
         if self.step == STEP_PUSH:
-            activation_level = 5
+            activation_level = 2
 
         return activation_level
 
