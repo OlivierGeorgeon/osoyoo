@@ -11,6 +11,13 @@ class PhenomenonMemory:
         self.phenomena = {}  # Phenomenon 0 is the terrain
         self.phenomenon_id = 0  # Used for object phenomena
 
+    def terrain_confidence(self):
+        """Return the confidence in the terrain: 0 if no terrain found yet."""
+        if TER in self.phenomena:
+            return self.phenomena[TER].confidence
+        else:
+            return 0
+
     def terrain_center(self):
         """The origin where the robot return for watching"""
         if TER in self.phenomena:

@@ -34,7 +34,7 @@ def category_color(color_sensor):
         elif hsv[0] > 0.124:  # Before Robot 4: 0.175:
             # 'gold'  # Hue = 0.25, 0.26 -- 0.20 -- 0.20, 0.20, 0.184, 0.2 -- 0.24, sat 0.68
             color_index = 3
-        elif hsv[0] > 0.04:  # Before Robot 4: 0.05:
+        elif hsv[0] > 0.035:  # Before Robot 4: 0.05:
             # 'orange'
             color_index = 2
         # else:
@@ -47,12 +47,15 @@ def category_color(color_sensor):
             #     color_index = 0
 
     # Rug at Olivier's
+    # Red. Robot 4 sees the rug red
+    if color_index in [1] and hsv[1] < 0.5:  # Robot 4
+        color_index = 0
+    # Orange, yellow
     if color_index in [2, 3] and hsv[1] < 0.6 and hsv[2] < 0.5:
         color_index = 0
-    if color_index in [1, 4] and hsv[1] < 0.5:  # Robot 4
+    # Green. Robot 3 sees the rug green with clear 17. Robot 4 sees green with clear 10 and low saturation.
+    if color_index in [4] and hsv[1] < 0.43 and color_sensor['clear'] > 13:
         color_index = 0
-    # if color_index in [1] and hsv[1] < 0.5:  # Robot 4
-    #     color_index = 0
 
     # Floor in UCLy lyon
     if (hsv[0] < 0.6) and (hsv[1] < 0.3):  # 0.45  // violet (0.66,0.25,0.398) in DOLL
@@ -70,8 +73,8 @@ def category_color(color_sensor):
     #     color_index = 0
 
     # Rug at DOLL
-    if (0.2 < hsv[0] < 0.45) and (hsv[1] < 0.45):
-        color_index = 0
+    # if (0.2 < hsv[0] < 0.45) and (hsv[1] < 0.45):
+    #     color_index = 0
 
     # print("Color: ", hsv, FLOOR_COLORS[color_index])
     print("Color:", tuple("{:.3f}".format(x) for x in hsv), FLOOR_COLORS[color_index])

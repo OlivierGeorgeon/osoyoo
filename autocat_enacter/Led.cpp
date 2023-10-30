@@ -42,7 +42,6 @@ void Led::blink()
   }
 
   // Pulse the emotion led
-  //unsigned long currentTime = millis();  // Get the current time in milliseconds
   float sinValue = sin(0.00628 * millis());  // Calculate the sine value (* 2 * PI / period)
 
   analogWrite(RED_LED_PIN, (sinValue + 1.) * 100. * emotion_red);     // [0,200] Set the LED brightness using PWM

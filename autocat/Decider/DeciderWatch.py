@@ -9,6 +9,7 @@ import numpy as np
 from . Action import ACTION_WATCH, ACTION_TURN, ACTION_SWIPE, ACTION_FORWARD, ACTION_SCAN
 from ..Robot.Enaction import Enaction
 from ..Memory.BodyMemory import ENERGY_TIRED, EXCITATION_LOW
+from ..Memory.Memory import EMOTION_SAD
 from ..Enaction.CompositeEnaction import CompositeEnaction
 from . Decider import Decider, FOCUS_TOO_TOO_FAR_DISTANCE, FOCUS_FAR_DISTANCE
 from . PredefinedInteractions import create_or_retrieve_primitive, OUTCOME_FOCUS_SIDE, OUTCOME_FOCUS_FRONT, OUTCOME_FOCUS_TOO_FAR
@@ -31,8 +32,9 @@ class DeciderWatch(Decider):
 
     def activation_level(self):
         """The level of activation is 4 if the agent is not excited and not tired"""
-        if self.workspace.memory.body_memory.excitation < EXCITATION_LOW and \
-                self.workspace.memory.body_memory.energy > ENERGY_TIRED:
+        # if self.workspace.memory.body_memory.excitation < EXCITATION_LOW and \
+        #         self.workspace.memory.body_memory.energy > ENERGY_TIRED:
+        if self.workspace.memory.emotional_state() == EMOTION_SAD:
             return 4
         else:
             return 0

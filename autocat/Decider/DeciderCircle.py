@@ -8,6 +8,7 @@ from . Action import ACTION_TURN
 from ..Robot.Enaction import Enaction
 from . Decider import Decider, FOCUS_TOO_FAR_DISTANCE
 from . PredefinedInteractions import OUTCOME_FOCUS_TOO_FAR
+from ..Memory.Memory import EMOTION_HAPPY
 from ..Memory.BodyMemory import EXCITATION_LOW
 
 
@@ -20,10 +21,11 @@ class DeciderCircle(Decider):
         """Return the activation level of this decider/ 1: default; 3 if focus not too far and excited"""
         activation_level = 1
 
-        # Activate when the focus is not too far
-        if self.workspace.memory.egocentric_memory.focus_point is not None and \
-            np.linalg.norm(self.workspace.memory.egocentric_memory.focus_point) < FOCUS_TOO_FAR_DISTANCE and \
-                self.workspace.memory.body_memory.excitation > EXCITATION_LOW:
+        # When high excitation and the focus is not too far
+        # if self.workspace.memory.egocentric_memory.focus_point is not None and \
+        #     np.linalg.norm(self.workspace.memory.egocentric_memory.focus_point) < FOCUS_TOO_FAR_DISTANCE and \
+        #         self.workspace.memory.body_memory.excitation > EXCITATION_LOW:
+        if self.workspace.memory.emotional_state() == EMOTION_HAPPY:
             activation_level = 3
 
         return activation_level
@@ -47,4 +49,4 @@ class DeciderCircle(Decider):
             self.workspace.memory.egocentric_memory.prompt_point = None
 
         # Add the enaction to the stack
-        return Enaction(self.action, self.workspace.memory, color=2)
+        return Enaction(self.action, self.workspace.memory, color=EMOTION_HAPPY)

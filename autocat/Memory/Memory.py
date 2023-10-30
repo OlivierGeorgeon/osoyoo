@@ -4,17 +4,22 @@ import time
 from pyrr import matrix44, quaternion, Quaternion
 from .EgocentricMemory.EgocentricMemory import EgocentricMemory
 from .AllocentricMemory.AllocentricMemory import AllocentricMemory
-from .BodyMemory import BodyMemory
+from .BodyMemory import BodyMemory, EXCITATION_LOW, ENERGY_TIRED
 from .PhenomenonMemory.PhenomenonMemory import PhenomenonMemory, TER
+from .PhenomenonMemory.PhenomenonTerrain import TERRAIN_ORIGIN_CONFIDENCE
 from .AllocentricMemory.Hexagonal_geometry import CELL_RADIUS
 from ..Decider.Action import ACTION_SWIPE
+from ..Decider.Decider import FOCUS_TOO_FAR_DISTANCE
 from ..Robot.Outcome import Outcome
-
 
 GRID_WIDTH = 20  # 15   # 100 Number of cells wide
 GRID_HEIGHT = 60  # 45  # 200 Number of cells high
 NEAR_HOME = 300    # (mm) Max distance to consider near home
 SIMULATION_TIME_RATIO = 1  # 0.5   # The simulation speed is slower than the real speed because ...
+EMOTION_RELAXED = 1
+EMOTION_HAPPY = 2
+EMOTION_SAD = 3
+EMOTION_ANGRY = 4
 
 
 class Memory:
@@ -33,6 +38,32 @@ class Memory:
     def __str__(self):
         return "Memory Robot position (" + str(round(self.allocentric_memory.robot_point[0])) + "," +\
                                            str(round(self.allocentric_memory.robot_point[1])) + ")"
+
+    def emotional_state(self):
+        """Return the emotional state"""
+        # When high excitation and the focus is not too far: HAPPY, DeciderCircle
+        if self.egocentric_memory.focus_point is not None and \
+            np.linalg.norm(self.egocentric_memory.focus_point) < FOCUS_TOO_FAR_DISTANCE and \
+                self.body_memory.excitation > EXCITATION_LOW:
+            return EMOTION_HAPPY
+
+        # When terrain is confident
+        if self.phenomenon_memory.terrain_confidence() >= TERRAIN_ORIGIN_CONFIDENCE:  # and \
+            if self.body_memory.energy < ENERGY_TIRED or self.body_memory.excitation >= EXCITATION_LOW:
+                # If robot is excited or tired: RELAXED, DeciderExplore
+                return EMOTION_RELAXED
+            # If not excited and not tired : SAD, DeciderWatch
+            # if self.body_memory.excitation <= EXCITATION_LOW and self.body_memory.energy > ENERGY_TIRED:
+            else:
+                # return EMOTION_SAD
+                # If terrain is confident and object inside terrain: ANGRY, DeciderPush
+                # if self.phenomenon_memory.terrain_confidence() >= TERRAIN_ORIGIN_CONFIDENCE:
+                allo_focus = self.egocentric_to_allocentric(self.egocentric_memory.focus_point)
+                if self.phenomenon_memory.phenomena[TER].is_inside(allo_focus):
+                    return EMOTION_ANGRY
+                else:
+                    return EMOTION_SAD
+                    print("Focus outside terrain", self.egocentric_memory.focus_point)
 
     def update_and_add_experiences(self, enaction):
         """ Process the enacted interaction to update the memory
