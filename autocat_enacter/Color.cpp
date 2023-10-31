@@ -5,6 +5,7 @@
 
 #include "Color.h"
 #include "Arduino.h"
+#include "Robot_define.h"
 #include <Wire.h>
 #include <Adafruit_TCS34725.h>
 #include <Arduino_JSON.h>
@@ -29,6 +30,8 @@ void Color::setup()
   if (tcs.begin())
   {
     Serial.println("Color sensor initialized");
+    tcs.setGain(TCS34725_GAIN_4X);  // Gain x4 for better precision
+    tcs.setIntegrationTime(TCS34725_INTEGRATIONTIME_50MS);
     is_initialized = true;
   }
   else
@@ -77,33 +80,24 @@ void Color::outcome(JSONVar & outcome_object)
 
   if (is_initialized)
   {
-    // Scale the measure
-    //red = constrain(red, 90, 190);
-    //red = map(red, 90, 190, 0, 255);
-    //green = constrain(green, 90, 130);
-    //green = map(green, 90, 130, 0, 255);
-    //blue = constrain(blue, 80, 120);
-    //blue = map(blue, 80, 120, 0, 255);
+    // uint16_t colorTemp = tcs.calculateColorTemperature_dn40(r, g, b, c);
+    int red = 0;
+    int green = 0;
+    int blue = 0;
 
-    uint16_t colorTemp = tcs.calculateColorTemperature_dn40(r, g, b, c);
-    int red;
-    int green;
-    int blue;
-
-    if (c == 0)
-      red = green = blue = 0;
-    else
+    if (c > 0)
     {
-      red = (int)((float)r / (float)c * 255.0);
-      green = (int)((float)g / (float)c * 255.0);
-      blue = (int)((float)b / (float)c * 255.0);
+      // Scale the RGB values based on clear and on calibration
+      red = round((float)r / (float)c * 255.0 * WHITE_GREEN / WHITE_RED);
+      green = round((float)g / (float)c * 255.0);  // Green is taken as reference because it is often the highest
+      blue = round((float)b / (float)c * 255.0 * WHITE_GREEN / WHITE_BLUE);
     }
 
     JSONVar colorArray;
     colorArray["red"] = red;
     colorArray["green"] = green;
     colorArray["blue"] = blue;
-    colorArray["temp"] = colorTemp;
+    // colorArray["temp"] = colorTemp;
     colorArray["clear"] = c;
     outcome_object["color"] = colorArray;
   }

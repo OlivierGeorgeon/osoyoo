@@ -1,4 +1,4 @@
-#define ROBOT_ID 4 // 0: regular Osoyoo robot, 1: robot BSN, 2: robot UCBL, 3: SHS chez Olivier, 11 to 14: DOLL robots
+#define ROBOT_ID 3 // 0: regular Osoyoo robot, 1: robot BSN, 2: robot UCBL, 3: SHS chez Olivier, 11 to 14: DOLL robots
 
 #define AP_SSID "osoyoo_robot"          // The wifi SSID of this robot in Access Point
 #define ROBOT_HEAD_X 80                 // (mm) X position of the head
@@ -8,6 +8,9 @@
 #define TURN_TIME 500                   // (ms)
 #define MOVE_TIME 500                   // (ms)
 #define TURN_SPOT_ANGLE 45              // (degree)
+#define WHITE_RED 100.                  // Color sensor calibration red measure of white floor
+#define WHITE_GREEN 100.                // Color sensor calibration green measure of white floor
+#define WHITE_BLUE 100.                 // Color sensor calibration blue measure of white floor
 
 #if ROBOT_ID == 1
 
@@ -80,6 +83,9 @@
 #define GYRO_COEF 1.  // 2.0 // 1.33  // 1.5 si tourne trop, augmenter cette valeur
 #define ROBOT_SERVO_PIN 6
 #define GYRO_IMPACT_THRESHOLD 0.5 // 0.25      // (degree/s) above this threshold: strong z rotation = lateral impact
+#define WHITE_RED 69.
+#define WHITE_GREEN 107.
+#define WHITE_BLUE 94.
 
 #elif ROBOT_ID == 4
 
@@ -104,6 +110,9 @@
 #define GYRO_COEF 1.
 #define ROBOT_SERVO_PIN 6
 #define GYRO_IMPACT_THRESHOLD 0.5
+#define WHITE_RED 89.
+#define WHITE_GREEN 93.
+#define WHITE_BLUE 89.
 
 #elif ROBOT_ID == 11
 

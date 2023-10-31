@@ -16,10 +16,14 @@ def category_color(color_sensor):
     hsv = colorsys.rgb_to_hsv(float(color_sensor['red']) / 256.0, float(color_sensor['green']) / 256.0,
                               float(color_sensor['blue']) / 256.0)
 
+    # Calibration tests on blank sheet
+    # Robot 3 {"red":69,"green":107,"blue":94,"temp":6723,"clear":5796}
+    # Robot 4 {"red":89,"green":93,"blue":89,"temp":5217,"clear":5212}
+
     # 'red'  # Hue = 0 -- 0.0, 0.0, sat 0.59
     color_index = 1
-    if hsv[0] < 0.98:
-        if hsv[0] > 0.9:
+    if hsv[0] < 0.985:  # Before calibration 0.98
+        if hsv[0] > 0.95:  # Before calibration 0.9
             # 'deepPink'  # Hue = 0.94, 0.94, 0.94, 0.96, 0.95, sat 0.54
             color_index = 7
         elif hsv[0] > 0.6:  # 0.7  # 0.6
@@ -31,31 +35,24 @@ def category_color(color_sensor):
         elif hsv[0] > 0.28:
             # 'limeGreen'  # Hue = 0.38, 0.35, 0.37 -- 0.29, 0.33, 0.29, 0.33 -- 0.36, sat 0.68
             color_index = 4
-        elif hsv[0] > 0.124:  # Before Robot 4: 0.175:
+        elif hsv[0] > 0.1:  # Before calibration: 0.175:
             # 'gold'  # Hue = 0.25, 0.26 -- 0.20 -- 0.20, 0.20, 0.184, 0.2 -- 0.24, sat 0.68
             color_index = 3
-        elif hsv[0] > 0.035:  # Before Robot 4: 0.05:
+        elif hsv[0] > 0.02:  # Before calibration: 0.05:
             # 'orange'
             color_index = 2
 
     # Rug at Olivier's
-    # Red. Robot 4 sees the rug red
-    if color_index in [1] and hsv[1] < 0.5:  # Robot 4
-        color_index = 0
-    # Orange, yellow
-    if color_index in [2, 3] and hsv[1] < 0.55:  # Before robot 4 0.6
-        color_index = 0
-    # Green. Robot 3 sees the rug green with clear 17 or 21 or saturation < 0.41.
-    #        Robot 4 sees green with clear 9 or 10 and saturation 0.5.
-    if color_index in [4] and (hsv[1] < 0.46 and color_sensor['clear'] > 13) or hsv[1] < 0.41:
+    # Robots see the rug between red and green with low saturation
+    if color_index in [1, 2, 3, 4] and hsv[1] < 0.3:
         color_index = 0
 
     # Floor in UCLy lyon
-    if (hsv[0] < 0.6) and (hsv[1] < 0.3):  # 0.45  // violet (0.66,0.25,0.398) in DOLL
-        #if hsv[0] < 0.7:  # 0.6
-            # Not saturate, not violet
-            # Floor. Saturation: Table bureau 0.16. Sol bureau 0.17, table olivier 0.21, sol olivier: 0.4, 0.33
-        color_index = 0
+    # if (hsv[0] < 0.6) and (hsv[1] < 0.3):  # 0.45  // violet (0.66,0.25,0.398) in DOLL
+    #     #if hsv[0] < 0.7:  # 0.6
+    #         # Not saturate, not violet
+    #         # Floor. Saturation: Table bureau 0.16. Sol bureau 0.17, table olivier 0.21, sol olivier: 0.4, 0.33
+    #     color_index = 0
         #else:
             # Not saturate but violet
         #    color = 'orchid'  # Hue = 0.75, 0.66 -- 0.66, Saturation = 0.24, 0.34, 0.2 -- 0.2
