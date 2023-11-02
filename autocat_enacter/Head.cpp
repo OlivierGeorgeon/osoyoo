@@ -10,14 +10,14 @@
 
 Head::Head()
 {
-  _is_enacting_head_alignment = false;
-  _is_enacting_echo_scan = false;
-  _penultimate_ultrasonic_measure = 0;
-  _previous_ultrasonic_measure = 1;
-  _min_ultrasonic_measure = 0;
-  _next_saccade_time = 0;
-  _head_angle = 0;
-  _head_angle_span = ALIGN_SACCADE_SPAN;
+  // _is_enacting_head_alignment = false;
+  // _is_enacting_echo_scan = false;
+  // _penultimate_ultrasonic_measure = 0;
+  // _previous_ultrasonic_measure = 1;
+  // _min_ultrasonic_measure = 0;
+  // _next_saccade_time = 0;
+  // _head_angle = 0;
+  // _head_angle_span = ALIGN_SACCADE_SPAN;
 }
 
 void Head::setup()

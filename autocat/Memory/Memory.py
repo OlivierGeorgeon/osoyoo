@@ -41,10 +41,10 @@ class Memory:
 
     def emotional_state(self):
         """Return the emotional state"""
-        # When high excitation and the focus is not too far: HAPPY, DeciderCircle
+        # When no terrain or high excitation and the focus is not too far: HAPPY, DeciderCircle
         if self.egocentric_memory.focus_point is not None and \
-            np.linalg.norm(self.egocentric_memory.focus_point) < FOCUS_TOO_FAR_DISTANCE and \
-                self.body_memory.excitation > EXCITATION_LOW:
+                np.linalg.norm(self.egocentric_memory.focus_point) < FOCUS_TOO_FAR_DISTANCE and \
+                self.body_memory.excitation > EXCITATION_LOW or self.phenomenon_memory.terrain_confidence() == 0:
             return EMOTION_HAPPY
 
         # When terrain is confident

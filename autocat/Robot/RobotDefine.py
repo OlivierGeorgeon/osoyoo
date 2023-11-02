@@ -67,9 +67,9 @@ ROBOT_SETTINGS_3["compass_offset"] = [0, 0, 0]  # [-50, 0, 0] [50, -50, 0]  # [3
 # Robot 4 chez Olivier
 ROBOT_SETTINGS_4 = ROBOT_SETTINGS_0.copy()
 ROBOT_SETTINGS_4["IP"] = {"PetiteIA": "192.168.8.242"}  # 108
-ROBOT_SETTINGS_4["forward_speed"] = 300  # 250
+ROBOT_SETTINGS_4["forward_speed"] = 320  # 250
 ROBOT_SETTINGS_4["lateral_speed"] = 250  # 230
-ROBOT_SETTINGS_4["retreat_distance"] = 100  # 80
+ROBOT_SETTINGS_4["retreat_distance"] = 120  # 80
 ROBOT_SETTINGS_4["compass_offset"] = [0, 0, 0]
 
 # Robot 1 at DOLL

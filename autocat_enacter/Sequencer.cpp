@@ -34,7 +34,7 @@ Sequencer::Sequencer(Floor& FLO, Head& HEA, Imu& IMU, Led& LED, WifiCat& WifiCat
 Interaction* Sequencer::update(int& interaction_step, Interaction* INT)
 {
   digitalWrite(LED_BUILTIN, HIGH); // Dim the led while waiting for an action
-  int len = _WifiCat.read(packetBuffer);
+  int len = _WifiCat.read(_packetBuffer);
   digitalWrite(LED_BUILTIN, LOW);
 
   // If received a new action
@@ -44,7 +44,7 @@ Interaction* Sequencer::update(int& interaction_step, Interaction* INT)
     char action = 0;
     int clock = 0;
 
-    JSONVar json_action = JSON.parse(packetBuffer);
+    JSONVar json_action = JSON.parse(_packetBuffer);
     // Serial.println(myObject);
     if (json_action.hasOwnProperty("action"))
       action = ((const char*) json_action["action"])[0];
@@ -55,7 +55,7 @@ Interaction* Sequencer::update(int& interaction_step, Interaction* INT)
     // If received a string with the same clock then resend the outcome
     // (The previous outcome was sent but the PC did not receive it)
 
-    if (clock == previous_clock)
+    if (clock == _previous_clock)
     {
       if (INT != nullptr)
         INT->send();
@@ -73,7 +73,7 @@ Interaction* Sequencer::update(int& interaction_step, Interaction* INT)
       }
 
       interaction_step = INTERACTION_BEGIN;
-      previous_clock = clock;
+      _previous_clock = clock;
       _IMU.begin();
       _FLO._floor_outcome = 0; // Reset possible floor change when the robot was placed on the floor
 

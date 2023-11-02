@@ -20,12 +20,12 @@ class Color
     bool end_read();
     void outcome(JSONVar & outcome_object);
   private:
-    Adafruit_TCS34725 tcs;
-    bool is_initialized = false;
-    uint16_t r = 0;
-    uint16_t g = 0;
-    uint16_t b = 0;
-    uint16_t c = 0;
+    Adafruit_TCS34725 _tcs; // Integration time and gain will be set by setup()
+    bool _is_initialized = false;
+    uint16_t _r = 0;
+    uint16_t _g = 0;
+    uint16_t _b = 0;
+    uint16_t _c = 0;
     unsigned long _read_start_time;
     bool _is_led_on = false;
 };

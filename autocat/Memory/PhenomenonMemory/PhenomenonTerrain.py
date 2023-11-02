@@ -1,5 +1,6 @@
+import math
 import numpy as np
-from pyrr import matrix44, vector
+from pyrr import matrix44, vector, Quaternion
 from .Phenomenon import Phenomenon
 from ...Memory.EgocentricMemory.Experience import EXPERIENCE_PLACE, EXPERIENCE_FLOOR
 from ...Robot.RobotDefine import TERRAIN_RADIUS
@@ -109,6 +110,19 @@ class PhenomenonTerrain(Phenomenon):
             # confirmation_point = matrix44.apply_to_vector(rotation_matrix, point).astype(int)  # + self.point
             return confirmation_point
         return None
+
+    def origin_direction_quaternion(self):
+        """Return the quaternion representing the direction of the color patch from the center of the terrain"""
+        if self.absolute_affordance() is None:
+            return None
+        if np.dot(self.absolute_affordance().experience.sensor_point(), TERRAIN_RADIUS[self.arena_id]) < 0:
+            # The North-East patch
+            return Quaternion.from_z_rotation(math.atan2(TERRAIN_RADIUS[self.arena_id][1],
+                                                         TERRAIN_RADIUS[self.arena_id][0]))
+        else:
+            # South west patch
+            return Quaternion.from_z_rotation(math.atan2(-TERRAIN_RADIUS[self.arena_id][1],
+                                                         -TERRAIN_RADIUS[self.arena_id][0]))
 
     def outline(self):
         return self.interpolation_points

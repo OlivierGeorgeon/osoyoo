@@ -35,20 +35,20 @@ class Head
     void turnHead(int head_angle);
     int head_direction(int x, int y);
     int get_ultrasonic_measure();
-    int _head_angle;
-    bool _is_enacting_head_alignment;
-    bool _is_enacting_echo_scan;
-    unsigned long _next_saccade_time;
+    int _head_angle = 0;
+    bool _is_enacting_head_alignment = false;
+    bool _is_enacting_echo_scan = false;
+    unsigned long _next_saccade_time = 0;
     bool _discontinuous = false;
   private:
     Servo _head;
-    int _penultimate_ultrasonic_measure = 1;
-    int _previous_ultrasonic_measure = NO_ECHO_DISTANCE;
+    int _penultimate_ultrasonic_measure = 0;
+    int _previous_ultrasonic_measure = 1; // NO_ECHO_DISTANCE;
     int _current_ultrasonic_measure = NO_ECHO_DISTANCE;
-    int _min_ultrasonic_measure = NO_ECHO_DISTANCE;
-    int _angle_min_ultrasonic_measure;
-    int _head_angle_span;
-    int _echo_alignment_step;
+    int _min_ultrasonic_measure = 0;  // NO_ECHO_DISTANCE;
+    // int _angle_min_ultrasonic_measure;
+    int _head_angle_span = ALIGN_SACCADE_SPAN;
+    int _echo_alignment_step = 0;
 };
 
 #endif

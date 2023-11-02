@@ -1,5 +1,18 @@
 import math
-import pyrr
+from pyrr import Quaternion
+
+
+def short_angle(quaternion1, quaternion2):
+    """Return the short angle from q1 to q2, positive if q2 is to the left of q1 (q2 > q1)"""
+    q = quaternion1 * quaternion2.inverse
+    angle = q.angle
+    if angle > math.pi:  # The short angle
+        angle -= 2.0 * math.pi
+    elif angle < -math.pi:
+        angle += 2.0 * math.pi
+    if q.axis[2] > 0:  # The direction of the z axis rotation
+        angle *= -1
+    return angle
 
 
 def assert_almost_equal_angles(angle1, angle2, difference_degrees):
@@ -26,3 +39,35 @@ def assert_almost_equal_angles(angle1, angle2, difference_degrees):
 #         body_direction_degree += 360
 #     return math.radians(body_direction_degree)
 
+# Testing the utils
+# py autocat.Utils.py
+if __name__ == "__main__":
+    q1 = Quaternion.from_z_rotation(math.radians(0))
+    q2 = Quaternion.from_z_rotation(math.radians(10))
+    print("10° to the left of 0°", short_angle(q1, q2), short_angle(q1, q2) > 0)
+    q2 = Quaternion.from_z_rotation(math.radians(170))
+    print("170° to the left of 0°", short_angle(q1, q2), short_angle(q1, q2) > 0)
+    q2 = Quaternion.from_z_rotation(math.radians(-10))
+    print("-10° to the right of 0°", short_angle(q1, q2), short_angle(q1, q2) < 0)
+    q2 = Quaternion.from_z_rotation(math.radians(350))
+    print("350° to the right of 0°", short_angle(q1, q2), short_angle(q1, q2) < 0)
+    q2 = Quaternion.from_z_rotation(math.radians(0))
+    print("0° same as 0°", short_angle(q1, q2), short_angle(q1, q2) == 0)
+    q2 = Quaternion.from_z_rotation(math.radians(360))
+    print("360° same as 0°", short_angle(q1, q2), short_angle(q1, q2) == 0)
+
+    q1 = Quaternion.from_z_rotation(math.radians(90))
+    q2 = Quaternion.from_z_rotation(math.radians(100))
+    print("100° to the left of 90°", short_angle(q1, q2), short_angle(q1, q2) > 0)
+    q2 = Quaternion.from_z_rotation(math.radians(80))
+    print("80° to the right of 90°", short_angle(q1, q2), short_angle(q1, q2) < 0)
+
+    q1 = Quaternion.from_z_rotation(math.radians(180))
+    q2 = Quaternion.from_z_rotation(math.radians(190))
+    print("190° to the left of 180°", short_angle(q1, q2), short_angle(q1, q2) > 0)
+    q2 = Quaternion.from_z_rotation(math.radians(-170))
+    print("-170° to the left of 180°", short_angle(q1, q2), short_angle(q1, q2) > 0)
+    q2 = Quaternion.from_z_rotation(math.radians(170))
+    print("170° to the right of 180°", short_angle(q1, q2), short_angle(q1, q2) < 0)
+    q2 = Quaternion.from_z_rotation(math.radians(-190))
+    print("-190° to the right of 180°", short_angle(q1, q2), short_angle(q1, q2) < 0)

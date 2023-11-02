@@ -12,12 +12,8 @@
 
 Color::Color()
 {
-  Adafruit_TCS34725 tcs = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_24MS, TCS34725_GAIN_16X);
-//  r = 0;
-//  g = 0;
-//  b = 0;
-//  c = 0;
-//  is_initialized = false;
+  // IntegrationTime adds an unnecessary delay to the getRawData() function
+  // tcs = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_50MS, TCS34725_GAIN_4X);
 }
 
 void Color::setup()
@@ -27,17 +23,20 @@ void Color::setup()
   digitalWrite(Led_PIN, LOW);
 
   // Initialize the sensor
-  if (tcs.begin())
+  if (_tcs.begin())
   {
     Serial.println("Color sensor initialized");
-    tcs.setGain(TCS34725_GAIN_4X);  // Gain x4 for better precision
-    tcs.setIntegrationTime(TCS34725_INTEGRATIONTIME_50MS);
-    is_initialized = true;
+    // tcs.disable();
+    _tcs.setGain(TCS34725_GAIN_4X);
+    // Set the integration time in the chip's register without adding an unnecessary delay to the getRawData() function
+    _tcs.write8(TCS34725_ATIME, TCS34725_INTEGRATIONTIME_50MS);
+    // tcs.setIntegrationTime(TCS34725_INTEGRATIONTIME_50MS);
+    _is_initialized = true;
   }
   else
   {
     Serial.println("No TCS34725 found ... check your connections");
-    is_initialized = false;
+    _is_initialized = false;
     //while (1); // halt!
   }
 }
@@ -49,6 +48,7 @@ void Color::begin_read()
   if (!_is_led_on)
   {
     digitalWrite(Led_PIN, HIGH);
+    // tcs.enable();  // Turn the sensor on
     _read_start_time = millis();
     _is_led_on = true;
   }
@@ -57,11 +57,12 @@ void Color::begin_read()
 // Wait for led on and then read the sensor and turn led of. Return true when done.
 bool Color::end_read()
 {
-  if (is_initialized)
+  if (_is_initialized)
   {
     if (millis() > _read_start_time + LED_ON_DURATION)
     {
-      tcs.getRawData(&r, &g, &b, &c);
+      _tcs.getRawData(&_r, &_g, &_b, &_c);
+      // tcs.disable();  // Turn the sensor off
       digitalWrite(Led_PIN, LOW);
       _is_led_on = false;
       return true;
@@ -78,19 +79,19 @@ bool Color::end_read()
 void Color::outcome(JSONVar & outcome_object)
 {
 
-  if (is_initialized)
+  if (_is_initialized)
   {
     // uint16_t colorTemp = tcs.calculateColorTemperature_dn40(r, g, b, c);
     int red = 0;
     int green = 0;
     int blue = 0;
 
-    if (c > 0)
+    if (_c > 0)
     {
       // Scale the RGB values based on clear and on calibration
-      red = round((float)r / (float)c * 255.0 * WHITE_GREEN / WHITE_RED);
-      green = round((float)g / (float)c * 255.0);  // Green is taken as reference because it is often the highest
-      blue = round((float)b / (float)c * 255.0 * WHITE_GREEN / WHITE_BLUE);
+      red = round((float)_r / (float)_c * 255.0 * WHITE_GREEN / WHITE_RED);
+      green = round((float)_g / (float)_c * 255.0);  // Green is taken as reference because it is often the highest
+      blue = round((float)_b / (float)_c * 255.0 * WHITE_GREEN / WHITE_BLUE);
     }
 
     JSONVar colorArray;
@@ -98,7 +99,7 @@ void Color::outcome(JSONVar & outcome_object)
     colorArray["green"] = green;
     colorArray["blue"] = blue;
     // colorArray["temp"] = colorTemp;
-    colorArray["clear"] = c;
+    colorArray["clear"] = _c;
     outcome_object["color"] = colorArray;
   }
 }

@@ -27,8 +27,8 @@ private:
   Led& _LED;
   WifiCat& _WifiCat;
 
-  int previous_clock = -1;
-  char packetBuffer[UDP_BUFFER_SIZE];
+  int _previous_clock = -1;
+  char _packetBuffer[UDP_BUFFER_SIZE];
 };
 
 #endif
