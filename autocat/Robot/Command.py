@@ -101,7 +101,7 @@ class Command:
             command_dict['focus_x'] = self.focus_x
             command_dict['focus_y'] = self.focus_y
         if self.speed is not None:
-            command_dict['speed'] = self.speed
+            command_dict['speed'] = int(self.speed)
         if self.caution is not None:
             command_dict['caution'] = self.caution
         if self.span is not None:

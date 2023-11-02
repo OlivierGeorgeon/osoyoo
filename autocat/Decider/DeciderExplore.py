@@ -5,19 +5,18 @@
 
 import math
 import numpy as np
-from pyrr import quaternion, matrix44, Quaternion
+from pyrr import quaternion, Quaternion
 from playsound import playsound
-from . Action import ACTION_TURN, ACTION_FORWARD, ACTION_SWIPE, ACTION_RIGHTWARD
+from . Action import ACTION_TURN, ACTION_FORWARD, ACTION_SWIPE
 from . Interaction import OUTCOME_NO_FOCUS
 from . Decider import Decider
 from ..Utils import short_angle
 from ..Robot.Enaction import Enaction
-from ..Memory.BodyMemory import ENERGY_TIRED, EXCITATION_LOW
+from ..Memory.BodyMemory import ENERGY_TIRED
 from ..Memory.PhenomenonMemory.PhenomenonMemory import TER
 from ..Memory.PhenomenonMemory.PhenomenonTerrain import TERRAIN_ORIGIN_CONFIDENCE
 from ..Memory.Memory import EMOTION_RELAXED
 from ..Enaction.CompositeEnaction import CompositeEnaction
-from ..Robot.RobotDefine import TERRAIN_RADIUS
 
 
 CLOCK_TO_GO_HOME = 8  # Number of interactions before going home
@@ -74,7 +73,6 @@ class DeciderExplore(Decider):
         if enaction.outcome.color_index > 0:
             outcome = OUTCOME_COLOR
             print("Outcome color")
-            # The energy level is decreased by CtrlRobot
 
         # The floor outcome relative to the terrain origin
         if enaction.outcome.floor > 0 and enaction.outcome.color_index == 0 and \
@@ -82,49 +80,18 @@ class DeciderExplore(Decider):
             angle = short_angle(self.workspace.memory.phenomenon_memory.phenomena[TER].origin_direction_quaternion(),
                                 self.workspace.memory.body_memory.body_quaternion)
             if angle < -math.pi/3:
-                print("OUTCOME Far Right of origin")
+                # print("OUTCOME Far Right of origin")
                 outcome = OUTCOME_FAR_RIGHT
             elif angle < 0:
-                print("OUTCOME Right of origin")
+                # print("OUTCOME Right of origin")
                 outcome = OUTCOME_RIGHT
             elif angle < math.pi/3:
-                print("OUTCOME Left of origin")
+                # print("OUTCOME Left of origin")
                 outcome = OUTCOME_LEFT
             else:
-                print("OUTCOME Far Left of origin")
+                # print("OUTCOME Far Left of origin")
                 outcome = OUTCOME_FAR_LEFT
 
-#            if self.workspace.memory.phenomenon_memory.phenomena[TER].absolute_affordance() is not None:
-                # Compute the angle relative to the direction of the terrain. Not working
-                # if np.dot(self.workspace.memory.phenomenon_memory.phenomena[TER].absolute_affordance().experience.sensor_point(), TERRAIN_RADIUS[self.workspace.arena_id]) < 0:
-                #     # The North-East patch
-                #     relative_quaternion = quaternion.cross(self.workspace.memory.body_memory.body_quaternion,
-                #                       quaternion.inverse(TERRAIN_RADIUS[self.workspace.arena_id]))
-                # else:
-                #     relative_quaternion = quaternion.cross(self.workspace.memory.body_memory.body_quaternion,
-                #                       quaternion.inverse(-TERRAIN_RADIUS[self.workspace.arena_id]))
-                # relative_quaternion = quaternion.cross(self.workspace.memory.body_memory.body_quaternion,
-                #                                        quaternion.inverse(
-                #                                            self.workspace.memory.phenomenon_memory.phenomena[
-                #                                                TER].absolute_affordance().experience.body_direction_quaternion()))
-                # if math.fabs(quaternion.rotation_angle(relative_quaternion)) > math.pi:
-                #     relative_quaternion = - relative_quaternion  # The quaternion representing the short angle
-                # rot = quaternion.rotation_angle(relative_quaternion)
-                # print("Rotation from origin", round(math.degrees(rot)))
-                # if quaternion.rotation_axis(relative_quaternion)[2] > 0:  # Positive z axis rotation
-                #     if rot < math.pi/3:
-                #         print("OUTCOME Left of origin")
-                #         outcome = OUTCOME_LEFT
-                #     elif rot < math.pi:
-                #         print("OUTCOME Far Left of origin")
-                #         outcome = OUTCOME_FAR_LEFT
-                # else:
-                #     if rot < math.pi/3:
-                #         print("OUTCOME Right of origin")
-                #         outcome = OUTCOME_RIGHT
-                #     elif rot < math.pi:
-                #         print("OUTCOME Far Right of origin")
-                #         outcome = OUTCOME_FAR_RIGHT
         return outcome
 
     def select_enaction(self, outcome):

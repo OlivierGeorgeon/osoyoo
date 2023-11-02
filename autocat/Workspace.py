@@ -5,6 +5,7 @@ from .Decider.DeciderCircle import DeciderCircle
 from .Decider.DeciderExplore import DeciderExplore
 from .Decider.DeciderWatch import DeciderWatch
 from .Decider.DeciderPush import DeciderPush
+from .Decider.DeciderArrange import DeciderArrange
 from .Decider.Action import create_actions, ACTION_FORWARD, ACTIONS, ACTION_TURN, ACTION_BACKWARD
 from .Memory.Memory import Memory
 from .Memory.PhenomenonMemory.PhenomenonMemory import TER
@@ -34,7 +35,8 @@ class Workspace:
         self.actions = create_actions(robot_id)
         self.memory = Memory(arena_id, robot_id)
         # if self.robot_id == '1':
-        self.deciders = {'Explore': DeciderExplore(self), 'Circle': DeciderCircle(self), 'Watch': DeciderWatch(self), 'Push': DeciderPush(self)}
+        self.deciders = {'Explore': DeciderExplore(self), 'Circle': DeciderCircle(self), 'Watch': DeciderWatch(self),
+                         'Arrange': DeciderArrange(self)}
         # self.deciders = {'Explore': DeciderExplore(self), 'Circle': DeciderCircle(self), 'Watch': DeciderWatch(self)}
         # self.deciders = {'Push': DeciderPush(self), 'Watch': DeciderWatch(self)}
         # else:

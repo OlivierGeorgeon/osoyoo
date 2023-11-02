@@ -1,5 +1,22 @@
 import math
-from pyrr import Quaternion
+import numpy as np
+from pyrr import Quaternion, line
+
+
+def line_intersection(l1, l2):
+    """Return the intersection of two lines in the x y plane"""
+    # line1 = x1, y1, x2, y2
+    x1, y1, x2, y2 = l1[0][0], l1[0][1], l1[1][0], l1[1][1]
+    # line2 = x3, y3, x4, y4
+    x3, y3, x4, y4 = l2[0][0], l2[0][1], l2[1][0], l2[1][1]
+
+    det = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4)
+    if det == 0:
+        return np.array([0, 0, 0])
+
+    intersection_x = ((x1 * y2 - y1 * x2) * (x3 - x4) - (x1 - x2) * (x3 * y4 - y3 * x4)) / det
+    intersection_y = ((x1 * y2 - y1 * x2) * (y3 - y4) - (y1 - y2) * (x3 * y4 - y3 * x4)) / det
+    return np.array([intersection_x, intersection_y, 0])
 
 
 def short_angle(quaternion1, quaternion2):
@@ -42,6 +59,15 @@ def assert_almost_equal_angles(angle1, angle2, difference_degrees):
 # Testing the utils
 # py autocat.Utils.py
 if __name__ == "__main__":
+    # Check line_intersection
+    l1 = line.create_from_points([-1, -1, 0], [1, 1, 0])
+    l2 = line.create_from_points([-1, 1, 0], [1, -1, 0])
+    print("Intersection", line_intersection(l1, l2), line_intersection(l1, l2) == [0, 0, 0])
+    l1 = line.create_from_points([1, 0, 0], [1, 2, 0])
+    l2 = line.create_from_points([0, 1, 0], [2, 1, 0])
+    print("Intersection", line_intersection(l1, l2), line_intersection(l1, l2) == [1, 1, 0])
+
+    # Check short_angle
     q1 = Quaternion.from_z_rotation(math.radians(0))
     q2 = Quaternion.from_z_rotation(math.radians(10))
     print("10° to the left of 0°", short_angle(q1, q2), short_angle(q1, q2) > 0)
