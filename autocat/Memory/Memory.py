@@ -16,10 +16,11 @@ GRID_WIDTH = 20  # 15   # 100 Number of cells wide
 GRID_HEIGHT = 60  # 45  # 200 Number of cells high
 NEAR_HOME = 300    # (mm) Max distance to consider near home
 SIMULATION_TIME_RATIO = 1  # 0.5   # The simulation speed is slower than the real speed because ...
-EMOTION_RELAXED = 1
-EMOTION_HAPPY = 2
-EMOTION_SAD = 3
-EMOTION_ANGRY = 4
+EMOTION_RELAXED = 1  # White
+EMOTION_HAPPY = 2  # Green
+EMOTION_SAD = 3  # Bleu
+EMOTION_ANGRY = 4  # Red
+EMOTION_UPSET = 5  # Orange (Can't arrange an object from where the robot is)
 
 
 class Memory:
@@ -48,7 +49,7 @@ class Memory:
             return EMOTION_HAPPY
 
         # When terrain is confident
-        if self.phenomenon_memory.terrain_confidence() >= TERRAIN_ORIGIN_CONFIDENCE:  # and \
+        if self.phenomenon_memory.terrain_confidence() >= TERRAIN_ORIGIN_CONFIDENCE:
             if self.body_memory.energy < ENERGY_TIRED or self.body_memory.excitation >= EXCITATION_LOW:
                 # If robot is excited or tired: RELAXED, DeciderExplore
                 return EMOTION_RELAXED
@@ -133,6 +134,14 @@ class Memory:
         if point is None:
             return None
         return self.polar_egocentric_to_egocentric(point - self.allocentric_memory.robot_point)
+
+    def terrain_centric_to_egocentric(self, point):
+        """Return the point in egocentric coordinates from the point in terrain-centric coordinates"""
+        if point is None:
+            return None
+        if self.phenomenon_memory.terrain_confidence() >= TERRAIN_ORIGIN_CONFIDENCE:
+            return self.allocentric_to_egocentric(point + self.phenomenon_memory.phenomena[TER].point)
+        return self.allocentric_to_egocentric(point)
 
     def save(self):
         """Return a clone of memory for memory snapshot"""

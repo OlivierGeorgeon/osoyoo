@@ -31,11 +31,9 @@ class DeciderWatch(Decider):
         self.action = self.workspace.actions[ACTION_WATCH]
 
     def activation_level(self):
-        """The level of activation is 4 if the agent is not excited and not tired"""
-        # if self.workspace.memory.body_memory.excitation < EXCITATION_LOW and \
-        #         self.workspace.memory.body_memory.energy > ENERGY_TIRED:
+        """The level of activation is 2 if the robot is SAD"""
         if self.workspace.memory.emotional_state() == EMOTION_SAD:
-            return 1
+            return 2
         else:
             return 0
 

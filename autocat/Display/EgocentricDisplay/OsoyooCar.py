@@ -1,6 +1,6 @@
 from pyglet import shapes
 from webcolors import name_to_rgb
-from ...Memory.Memory import EMOTION_RELAXED, EMOTION_HAPPY, EMOTION_SAD, EMOTION_ANGRY
+from ...Memory.Memory import EMOTION_RELAXED, EMOTION_HAPPY, EMOTION_SAD, EMOTION_ANGRY, EMOTION_UPSET
 
 
 ROBOT_BODY_COLOR = name_to_rgb("darkslateBlue")
@@ -26,8 +26,8 @@ class OsoyooCar:
         self.RRWheel.anchor_position = 40, 18
 
         # The emotion led
-        self.robotEmotion = shapes.Rectangle(-30, 0, 10, 10, color=name_to_rgb("white"), batch=self.batch, group=self.group)
-        self.robotEmotion.anchor_position = 5, 5
+        self.robot_emotion = shapes.Rectangle(-30, 0, 10, 10, color=name_to_rgb("white"), batch=self.batch, group=self.group)
+        self.robot_emotion.anchor_position = 5, 5
 
         # Create the head
         self.head_x, self.head_y = 80, 0
@@ -43,10 +43,12 @@ class OsoyooCar:
     def emotion_color(self, emotion_code):
         """Colorize the emotion led from the emotion_code"""
         if emotion_code == EMOTION_RELAXED:
-            self.robotEmotion.color = name_to_rgb("LavenderBlush")
+            self.robot_emotion.color = name_to_rgb("LavenderBlush")
         if emotion_code == EMOTION_HAPPY:
-            self.robotEmotion.color = name_to_rgb("LimeGreen")
+            self.robot_emotion.color = name_to_rgb("LimeGreen")
         if emotion_code == EMOTION_SAD:
-            self.robotEmotion.color = name_to_rgb("DodgerBlue")
+            self.robot_emotion.color = name_to_rgb("DodgerBlue")
         if emotion_code == EMOTION_ANGRY:
-            self.robotEmotion.color = name_to_rgb("red")
+            self.robot_emotion.color = name_to_rgb("red")
+        if emotion_code == EMOTION_UPSET:
+            self.robot_emotion.color = name_to_rgb("DarkOrange")

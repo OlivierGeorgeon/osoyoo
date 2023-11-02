@@ -6,19 +6,18 @@
 from playsound import playsound
 import numpy as np
 from pyrr import vector, line
-from . Action import ACTION_SWIPE, ACTION_TURN, ACTION_FORWARD, ACTION_BACKWARD, ACTION_SCAN
+from . Action import ACTION_SWIPE, ACTION_TURN, ACTION_FORWARD, ACTION_BACKWARD, ACTION_SCAN, ACTION_WATCH
 from ..Robot.Enaction import Enaction
 from . Decider import Decider, FOCUS_TOO_FAR_DISTANCE
 from ..Utils import line_intersection
 from .. Enaction.CompositeEnaction import CompositeEnaction
-from ..Memory.Memory import EMOTION_ANGRY
+from ..Memory.Memory import EMOTION_ANGRY, EMOTION_UPSET
 from . Interaction import OUTCOME_FLOOR
 from ..Robot.RobotDefine import TERRAIN_RADIUS
 
 
 STEP_INIT = 0
 STEP_PUSH = 1
-STEP_WITHDRAW = 2
 
 
 class DeciderArrange(Decider):
@@ -32,10 +31,10 @@ class DeciderArrange(Decider):
         """The level of activation of this decider: -1: default, 5 if focus inside terrain"""
         activation_level = 0
         if self.workspace.memory.emotional_state() == EMOTION_ANGRY:
-            activation_level = 2
+            activation_level = 4
         # Activate during the withdraw step
-        if self.step in [STEP_PUSH, STEP_WITHDRAW]:
-            activation_level = 2
+        if self.step == STEP_PUSH:
+            activation_level = 3
         return activation_level
 
     def select_enaction(self, outcome):
@@ -45,25 +44,30 @@ class DeciderArrange(Decider):
         if self.step == STEP_INIT:
             # Go to position and push
             if self.workspace.memory.egocentric_memory.focus_point is not None and outcome != OUTCOME_FLOOR:
-                playsound('autocat/Assets/tiny_cute.wav', False)
                 # Compute the prompt: the intersection of the robot's y axis and the object-target line
-                l1 = line.create_from_points(self.workspace.memory.egocentric_memory.focus_point,
-                                             self.workspace.memory.allocentric_to_egocentric(-np.array(TERRAIN_RADIUS[self.workspace.arena_id])))
-                l2 = line.create_from_points([0, 0, 0], [0, 1, 0])
-                ego_prompt = line_intersection(l1, l2)
-                print("Swiping to align with target by", ego_prompt, "focus", self.workspace.memory.egocentric_memory.focus_point, "target", self.workspace.memory.allocentric_to_egocentric(-np.array(TERRAIN_RADIUS[self.workspace.arena_id])))
-                self.workspace.memory.egocentric_memory.prompt_point = ego_prompt
-                # First enaction: swipe to the prompt
-                e0 = Enaction(self.workspace.actions[ACTION_SWIPE], self.workspace.memory, color=EMOTION_ANGRY)
-                # Second enaction: turn toward the focus
-                e0.post_memory.egocentric_memory.prompt_point = e0.post_memory.egocentric_memory.focus_point.copy()
-                e1 = Enaction(self.workspace.actions[ACTION_TURN], e0.post_memory, color=EMOTION_ANGRY)
-                # Third enaction: push toward the target
-                target_prompt = e1.post_memory.allocentric_to_egocentric(-np.array(TERRAIN_RADIUS[self.workspace.arena_id]))
-                e1.post_memory.egocentric_memory.prompt_point = target_prompt
-                e2 = Enaction(self.workspace.actions[ACTION_FORWARD], e1.post_memory, color=EMOTION_ANGRY)
-                composite_enaction = CompositeEnaction([e0, e1, e2])
-                self.step = STEP_PUSH
+                ego_target = self.workspace.memory.terrain_centric_to_egocentric(-np.array(TERRAIN_RADIUS[self.workspace.arena_id]))
+                if ego_target[0] > self.workspace.memory.egocentric_memory.focus_point[0]:  # The object is behind
+                    playsound('autocat/Assets/tiny_cute.wav', False)
+                    l1 = line.create_from_points(self.workspace.memory.egocentric_memory.focus_point, ego_target)
+                    l2 = line.create_from_points([0, 0, 0], [0, 1, 0])
+                    ego_prompt = line_intersection(l1, l2)
+                    print("Swiping to align with target by", ego_prompt, "focus", self.workspace.memory.egocentric_memory.focus_point, "target", self.workspace.memory.terrain_centric_to_egocentric(-np.array(TERRAIN_RADIUS[self.workspace.arena_id])))
+                    self.workspace.memory.egocentric_memory.prompt_point = ego_prompt
+                    # First enaction: swipe to the prompt
+                    e0 = Enaction(self.workspace.actions[ACTION_SWIPE], self.workspace.memory, color=EMOTION_ANGRY)
+                    # Second enaction: turn toward the focus
+                    e0.post_memory.egocentric_memory.prompt_point = e0.post_memory.egocentric_memory.focus_point.copy()
+                    e1 = Enaction(self.workspace.actions[ACTION_TURN], e0.post_memory, color=EMOTION_ANGRY)
+                    # Third enaction: push toward the target
+                    target_prompt = e1.post_memory.terrain_centric_to_egocentric(-np.array(TERRAIN_RADIUS[self.workspace.arena_id]))
+                    e1.post_memory.egocentric_memory.prompt_point = target_prompt
+                    e2 = Enaction(self.workspace.actions[ACTION_FORWARD], e1.post_memory, color=EMOTION_ANGRY)
+                    composite_enaction = CompositeEnaction([e0, e1, e2])
+                    self.step = STEP_PUSH
+                else:
+                    # If the object is too far, the robot stays put and is upset
+                    print("UPSET, focus", self.workspace.memory.egocentric_memory.focus_point, "target", self.workspace.memory.terrain_centric_to_egocentric(-np.array(TERRAIN_RADIUS[self.workspace.arena_id])))
+                    composite_enaction = Enaction(self.workspace.actions[ACTION_WATCH], self.workspace.memory, span=10, color=EMOTION_UPSET)
             else:
                 # If there is no object then watch (probably never append)
                 print("DeciderArrange is watching")

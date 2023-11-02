@@ -8,7 +8,7 @@ from ...Robot.RobotDefine import TERRAIN_RADIUS
 
 TERRAIN_EXPERIENCE_TYPES = [EXPERIENCE_PLACE, EXPERIENCE_FLOOR]
 TERRAIN_INITIAL_CONFIDENCE = 10  # Must not be null to allow position correction
-TERRAIN_ORIGIN_CONFIDENCE = 20  # When the robot emits its position in the message
+TERRAIN_ORIGIN_CONFIDENCE = 20  # The terrain has an absolute origin
 TERRAIN_CIRCUMFERENCE_CONFIDENCE = 30
 
 

@@ -137,6 +137,8 @@ class Enaction:
 
                 # Take the median angle between the compass and the yaw estimate
                 # 0 is compass only, 1 is yaw estimate only
+                # This is known as a complementary filter
+                # https://forum.arduino.cc/t/guide-to-gyro-and-accelerometer-with-arduino-including-kalman-filtering/57971
                 new_body_quaternion = self.outcome.compass_quaternion.slerp(yaw_integration_quaternion, 0.5)
 
                 # Recompute the yaw quaternion

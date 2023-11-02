@@ -86,4 +86,11 @@ void Led::color(int c)
     emotion_green = 0.;
     emotion_blue = 0.;
   }
+  // Upset: Orange
+  if (c == 5)
+  {
+    emotion_red = 1.;
+    emotion_green = 1.;
+    emotion_blue = 0.;
+  }
 }
