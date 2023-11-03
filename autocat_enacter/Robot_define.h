@@ -107,7 +107,7 @@
 #define ACCELERATION_Y_IMPACT_THRESHOLD 200
 #define ACCELERATION_X_BLOCK_THRESHOLD 140
 #define ACCELERATION_Y_BLOCK_THRESHOLD 80
-#define GYRO_COEF 1.
+#define GYRO_COEF 0.98  // If average(yaw - compass)>0 when turning trigonometric then decrease this value
 #define ROBOT_SERVO_PIN 6
 #define GYRO_IMPACT_THRESHOLD 0.5
 #define WHITE_RED 89.

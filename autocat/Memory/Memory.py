@@ -11,6 +11,7 @@ from .AllocentricMemory.Hexagonal_geometry import CELL_RADIUS
 from ..Decider.Action import ACTION_SWIPE
 from ..Decider.Decider import FOCUS_TOO_FAR_DISTANCE
 from ..Robot.Outcome import Outcome
+from ..Robot.RobotDefine import TERRAIN_RADIUS
 
 GRID_WIDTH = 20  # 15   # 100 Number of cells wide
 GRID_HEIGHT = 60  # 45  # 200 Number of cells high
@@ -29,42 +30,46 @@ class Memory:
     """
 
     def __init__(self, arena_id, robot_id):
+        self.arena_id = arena_id
         self.robot_id = robot_id
         self.body_memory = BodyMemory(robot_id)
         self.egocentric_memory = EgocentricMemory()
         self.allocentric_memory = AllocentricMemory(GRID_WIDTH, GRID_HEIGHT, cell_radius=CELL_RADIUS)
         self.phenomenon_memory = PhenomenonMemory(arena_id)
         self.body_direction_deltas = {}  # Used to calibrate GYRO_COEF
+        self.emotion_code = EMOTION_RELAXED
 
     def __str__(self):
         return "Memory Robot position (" + str(round(self.allocentric_memory.robot_point[0])) + "," +\
                                            str(round(self.allocentric_memory.robot_point[1])) + ")"
 
-    def emotional_state(self):
-        """Return the emotional state"""
+    def appraise_emotion(self):
+        """Update the emotional state code"""
         # When no terrain or high excitation and the focus is not too far: HAPPY, DeciderCircle
         if self.egocentric_memory.focus_point is not None and \
                 np.linalg.norm(self.egocentric_memory.focus_point) < FOCUS_TOO_FAR_DISTANCE and \
                 self.body_memory.excitation > EXCITATION_LOW or self.phenomenon_memory.terrain_confidence() == 0:
-            return EMOTION_HAPPY
+            self.emotion_code = EMOTION_HAPPY
 
         # When terrain is confident
-        if self.phenomenon_memory.terrain_confidence() >= TERRAIN_ORIGIN_CONFIDENCE:
-            if self.body_memory.energy < ENERGY_TIRED or self.body_memory.excitation >= EXCITATION_LOW:
+        else:
+            if self.phenomenon_memory.terrain_confidence() >= TERRAIN_ORIGIN_CONFIDENCE:
                 # If robot is excited or tired: RELAXED, DeciderExplore
-                return EMOTION_RELAXED
-            # If not excited and not tired : SAD, DeciderWatch
-            # if self.body_memory.excitation <= EXCITATION_LOW and self.body_memory.energy > ENERGY_TIRED:
-            else:
-                # return EMOTION_SAD
-                # If terrain is confident and object inside terrain: ANGRY, DeciderPush
-                # if self.phenomenon_memory.terrain_confidence() >= TERRAIN_ORIGIN_CONFIDENCE:
-                allo_focus = self.egocentric_to_allocentric(self.egocentric_memory.focus_point)
-                if self.phenomenon_memory.phenomena[TER].is_inside(allo_focus):
-                    return EMOTION_ANGRY
+                if self.body_memory.energy < ENERGY_TIRED or self.body_memory.excitation >= EXCITATION_LOW or \
+                        self.egocentric_memory.focus_point is None:
+                    self.emotion_code = EMOTION_RELAXED
+                # If not excited and not tired
                 else:
-                    return EMOTION_SAD
-                    print("Focus outside terrain", self.egocentric_memory.focus_point)
+                    # If object inside terrain and closer than target: ANGRY, DeciderPush
+                    allo_focus = self.egocentric_to_allocentric(self.egocentric_memory.focus_point)
+                    ego_target = self.terrain_centric_to_egocentric(-np.array(TERRAIN_RADIUS[self.arena_id]))
+                    is_inside = self.phenomenon_memory.phenomena[TER].is_inside(allo_focus)
+                    is_closer = self.egocentric_memory.focus_point[0] < ego_target[0]
+                    print("Focus inside terrain", is_inside, "focus before target", is_closer)
+                    if is_inside and is_closer:
+                        self.emotion_code = EMOTION_ANGRY
+                    else:
+                        self.emotion_code = EMOTION_SAD
 
     def update_and_add_experiences(self, enaction):
         """ Process the enacted interaction to update the memory
@@ -87,7 +92,7 @@ class Memory:
         # Keep a dictionary of the direction deltas to check gyro_coef is correct
         self.body_direction_deltas[enaction.clock] = enaction.body_direction_delta
         self.body_direction_deltas = {key: d for key, d in self.body_direction_deltas.items() if key > enaction.clock - 10}
-        print("Average delta compass-yaw:", round(math.degrees(np.mean(list(self.body_direction_deltas.values()))), 2))
+        print("Average yaw - compass =", round(math.degrees(np.mean(list(self.body_direction_deltas.values()))), 2))
 
         self.egocentric_memory.update_and_add_experiences(enaction)
 
@@ -147,6 +152,7 @@ class Memory:
         """Return a clone of memory for memory snapshot"""
         # start_time = time.time()
         saved_memory = Memory(self.phenomenon_memory.arena_id, self.robot_id)
+        saved_memory.emotion_code = self.emotion_code
         # Clone body memory
         saved_memory.body_memory = self.body_memory.save()
         # Clone egocentric memory

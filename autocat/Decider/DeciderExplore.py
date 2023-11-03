@@ -50,7 +50,7 @@ class DeciderExplore(Decider):
     def activation_level(self):
         """The level of activation is 2 if the terrain has confidence and the robot is excited or low energy"""
         activation_level = 0
-        if self.workspace.memory.emotional_state() == EMOTION_RELAXED:
+        if self.workspace.memory.emotion_code == EMOTION_RELAXED:
             activation_level = 3
         return activation_level
 
@@ -141,11 +141,10 @@ class DeciderExplore(Decider):
             # Go successively to the predefined prompt points relative to the terrain center
             if self.prompt_index == 0:
                 # self.ter_prompt = self.workspace.memory.phenomenon_memory.phenomena[TER].affordances[self.workspace.memory.phenomenon_memory.phenomena[TER].absolute_affordance_key].point * 1.2  # 2
-                self.ter_prompt = np.array(TERRAIN_RADIUS[self.workspace.arena_id]) * 1.2 + \
-                                  self.workspace.memory.phenomenon_memory.phenomena[TER].point
+                self.ter_prompt = np.array(TERRAIN_RADIUS[self.workspace.arena_id]) * 1.2 # + self.workspace.memory.phenomenon_memory.phenomena[TER].point
             self.ter_prompt = quaternion.apply_to_vector(self.explore_angle_quaternion, self.ter_prompt)
-            allo_prompt = self.ter_prompt + self.workspace.memory.phenomenon_memory.phenomena[TER].point
-            ego_prompt = self.workspace.memory.allocentric_to_egocentric(allo_prompt)
+            # allo_prompt = self.ter_prompt + self.workspace.memory.phenomenon_memory.phenomena[TER].point
+            ego_prompt = self.workspace.memory.terrain_centric_to_egocentric(self.ter_prompt)
             self.workspace.memory.egocentric_memory.prompt_point = ego_prompt
             self.workspace.memory.egocentric_memory.focus_point = None  # Prevent unnatural head movement
             self.prompt_index += 1

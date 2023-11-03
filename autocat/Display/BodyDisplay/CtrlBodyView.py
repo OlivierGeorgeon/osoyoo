@@ -73,7 +73,7 @@ class CtrlBodyView:
 
         # Update the position of the robot
         self.view.robot.rotate_head(self.workspace.memory.body_memory.head_direction_degree())
-        self.view.robot.emotion_color(self.workspace.memory.emotional_state())
+        self.view.robot.emotion_color(self.workspace.memory.emotion_code)
         azimuth = self.workspace.memory.body_memory.body_azimuth()
         self.view.body_rotation_matrix = self.workspace.memory.body_memory.body_direction_matrix()
 

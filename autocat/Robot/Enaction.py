@@ -6,6 +6,7 @@ from playsound import playsound
 from ..Decider.Action import ACTION_FORWARD, ACTION_BACKWARD, ACTION_SWIPE, ACTION_RIGHTWARD,  ACTION_TURN, \
     ACTION_SCAN, ACTION_WATCH
 from ..Memory.Memory import SIMULATION_TIME_RATIO
+from ..Utils import short_angle
 from .RobotDefine import DEFAULT_YAW, TURN_DURATION, ROBOT_FRONT_X, ROBOT_FRONT_Y, ROBOT_HEAD_X
 from .Command import Command
 
@@ -130,10 +131,12 @@ class Enaction:
                     yaw_integration_quaternion = - yaw_integration_quaternion
 
                 # Save the difference to display in BodyView
-                dif_q = self.outcome.compass_quaternion.cross(yaw_integration_quaternion.inverse)
-                if dif_q.angle > math.pi:
-                    dif_q = -dif_q
-                self.body_direction_delta = dif_q.axis[2] * dif_q.angle
+                # dif_q = self.outcome.compass_quaternion.cross(yaw_integration_quaternion.inverse)
+                # if dif_q.angle > math.pi:
+                #     dif_q = -dif_q
+                # self.body_direction_delta = dif_q.axis[2] * dif_q.angle
+                self.body_direction_delta = short_angle(self.outcome.compass_quaternion, yaw_integration_quaternion)
+                # If positive when turning trigonometric direction then the yaw is measured greater than it is
 
                 # Take the median angle between the compass and the yaw estimate
                 # 0 is compass only, 1 is yaw estimate only
@@ -243,9 +246,11 @@ class Enaction:
             print("Terminate Enaction clock", self.clock, "Prompt", self.prompt_point)
 
     def current_enaction(self):
+        """Useful if the enaction is taken as a composite enaction"""
         return self
 
     def increment(self, outcome):
+        """Useful if the enaction is taken as a composite enaction"""
         return False
 
     def serialize(self):

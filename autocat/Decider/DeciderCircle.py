@@ -20,7 +20,7 @@ class DeciderCircle(Decider):
     def activation_level(self):
         """Return the activation level of this decider/ 1: default; 3 if focus not too far and excited"""
         activation_level = 1  # Is the decider by default
-        if self.workspace.memory.emotional_state() == EMOTION_HAPPY:
+        if self.workspace.memory.emotion_code == EMOTION_HAPPY:
             activation_level = 2
         return activation_level
 

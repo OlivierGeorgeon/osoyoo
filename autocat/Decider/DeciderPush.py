@@ -27,7 +27,7 @@ class DeciderPush(Decider):
     def activation_level(self):
         """The level of activation of this decider: -1: default, 5 if focus inside terrain"""
         activation_level = 0
-        if self.workspace.memory.emotional_state() == EMOTION_ANGRY:
+        if self.workspace.memory.emotion_code == EMOTION_ANGRY:
             activation_level = 4
         # Activate during the withdraw step
         if self.step == STEP_PUSH:

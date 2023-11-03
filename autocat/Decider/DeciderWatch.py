@@ -32,7 +32,7 @@ class DeciderWatch(Decider):
 
     def activation_level(self):
         """The level of activation is 2 if the robot is SAD"""
-        if self.workspace.memory.emotional_state() == EMOTION_SAD:
+        if self.workspace.memory.emotion_code == EMOTION_SAD:
             return 2
         else:
             return 0

@@ -88,6 +88,7 @@ class Workspace:
             if self.composite_enaction is None:
                 if self.control_mode == KEY_CONTROL_DECIDER:
                     # The most activated decider processes the previous enaction and chooses the next enaction
+                    self.memory.appraise_emotion()
                     self.decider_id = max(self.deciders, key=lambda k: self.deciders[k].activation_level())
                     print("Decider:", self.decider_id)
                     self.deciders[self.decider_id].stack_enaction()
@@ -106,7 +107,9 @@ class Workspace:
         elif user_key.upper() in ACTIONS:
             # Only process actions when the robot is IDLE
             if self.enacter.interaction_step == ENACTION_STEP_IDLE:
-                self.composite_enaction = Enaction(self.actions[user_key.upper()], self.memory, span=10)
+                self.memory.appraise_emotion()
+                self.composite_enaction = Enaction(self.actions[user_key.upper()], self.memory, span=10,
+                                                   color=self.memory.emotion_code)
         elif user_key.upper() == "/":
             # If key ALIGN then turn and move forward to the prompt
             if self.enacter.interaction_step == ENACTION_STEP_IDLE:

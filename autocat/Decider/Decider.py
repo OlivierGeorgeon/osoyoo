@@ -63,7 +63,7 @@ class Decider:
             outcome = OUTCOME_LOST_FOCUS
 
         # If floor then override the focus outcome
-        if enaction.outcome.floor > 0:
+        if enaction.outcome.floor > 0 or enaction.outcome.impact > 0:  # TODO Test impact
             outcome = OUTCOME_FLOOR
 
         return outcome
