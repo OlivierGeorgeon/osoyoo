@@ -54,11 +54,16 @@ class Memory:
         # When terrain is confident
         else:
             if self.phenomenon_memory.terrain_confidence() >= TERRAIN_ORIGIN_CONFIDENCE:
-                # If robot is excited or tired: RELAXED, DeciderExplore
-                if self.body_memory.energy < ENERGY_TIRED or self.body_memory.excitation >= EXCITATION_LOW or \
-                        self.egocentric_memory.focus_point is None:
+                # If tired: RELAXED, DeciderExplore to go home
+                if self.body_memory.energy < ENERGY_TIRED:
                     self.emotion_code = EMOTION_RELAXED
-                # If not excited and not tired
+                # If not tired and excited: HAPPY, DeciderExplore
+                elif self.body_memory.excitation >= EXCITATION_LOW:
+                    self.emotion_code = EMOTION_RELAXED
+                # If not tired and not excited and not focus: SAD, DeciderWatch
+                elif self.egocentric_memory.focus_point is None:
+                    self.emotion_code = EMOTION_SAD
+                # If not tired and not excited but focus
                 else:
                     # If object inside terrain and closer than target: ANGRY, DeciderPush
                     allo_focus = self.egocentric_to_allocentric(self.egocentric_memory.focus_point)

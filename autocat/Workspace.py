@@ -12,6 +12,7 @@ from .Memory.PhenomenonMemory.PhenomenonMemory import TER
 from .Memory.PhenomenonMemory.PhenomenonTerrain import TERRAIN_INITIAL_CONFIDENCE
 from .Integrator.Integrator import Integrator
 from .Robot.Enaction import Enaction
+from .Robot.Command import DIRECTION_BACK
 from .Robot.Message import Message
 from .Enaction.Enacter import Enacter
 from .Robot.CtrlRobot import ENACTION_STEP_IDLE, ENACTION_STEP_REFRESHING
@@ -122,7 +123,7 @@ class Workspace:
             # If key ALIGN BACK then turn back and move backward to the prompt
             if self.enacter.interaction_step == ENACTION_STEP_IDLE:
                 # The first enaction: turn the back to the prompt
-                e0 = Enaction(self.actions[ACTION_TURN], self.memory, turn_back=True)
+                e0 = Enaction(self.actions[ACTION_TURN], self.memory, direction=DIRECTION_BACK)
                 # Second enaction: move forward to the prompt
                 e1 = Enaction(self.actions[ACTION_BACKWARD], e0.post_memory)
                 self.composite_enaction = CompositeEnaction([e0, e1])

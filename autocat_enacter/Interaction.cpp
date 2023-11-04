@@ -26,7 +26,7 @@ Interaction::Interaction(Floor& FLO, Head& HEA, Imu& IMU, WifiCat& WifiCat, JSON
   // The received string must contain the clock
   _clock = (int)json_action["clock"];
 
-  // The target angle used if there is no focus
+  // The target angle used by Turn and by Turn_head if there is no focus
   if (json_action.hasOwnProperty("angle"))
     _target_angle = (int)json_action["angle"];
 
@@ -35,7 +35,8 @@ Interaction::Interaction(Floor& FLO, Head& HEA, Imu& IMU, WifiCat& WifiCat, JSON
   {
     _focus_x = (int)json_action["focus_x"];
     _focus_y = (int)json_action["focus_y"];
-    _target_focus_angle = atan2(_focus_y, _focus_x) * 180.0 / M_PI; // Direction of the focus relative to the robot
+    _focus_angle = atan2(_focus_y, _focus_x) * 180.0 / M_PI; // Direction of the focus relative to the robot
+    _focus_distance = sqrt(sq((float)_focus_x) + sq((float)_focus_y));  // conversion to float is necessary for some reason
     _is_focussed = true;
   }
   else

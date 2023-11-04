@@ -59,7 +59,9 @@ class DeciderWatch(Decider):
         """Return the next intended interaction"""
 
         # If far from the origin then return to origin
-        if np.linalg.norm(self.workspace.memory.allocentric_memory.robot_point - self.workspace.memory.phenomenon_memory.terrain_center()) > 400:
+        distance_to_center = np.linalg.norm(self.workspace.memory.allocentric_memory.robot_point - self.workspace.memory.phenomenon_memory.terrain_center())
+        print("Distance to center", distance_to_center)
+        if distance_to_center > 200:
             self.workspace.memory.egocentric_memory.prompt_point = \
                 self.workspace.memory.allocentric_to_egocentric(self.workspace.memory.phenomenon_memory.terrain_center())
             self.workspace.memory.egocentric_memory.focus_point = None  # Prevent unnatural head movement
@@ -69,7 +71,7 @@ class DeciderWatch(Decider):
             e1 = Enaction(self.workspace.actions[ACTION_FORWARD], e0.post_memory, color=3)
             # Third enaction: scan
             e2 = Enaction(self.workspace.actions[ACTION_SCAN], e1.post_memory, span=10, color=3)
-            return CompositeEnaction([e0, e1])  # , e2])
+            return CompositeEnaction([e0, e1, e2])  # Scan because it often miss an object
 
         # Call the sequence learning mechanism to select the next action
         self.select_action(outcome)

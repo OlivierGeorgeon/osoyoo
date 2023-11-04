@@ -5,10 +5,10 @@ from pyrr import matrix44
 from playsound import playsound
 from ..Decider.Action import ACTION_FORWARD, ACTION_BACKWARD, ACTION_SWIPE, ACTION_RIGHTWARD,  ACTION_TURN, \
     ACTION_SCAN, ACTION_WATCH
-from ..Memory.Memory import SIMULATION_TIME_RATIO
+from ..Memory.Memory import SIMULATION_TIME_RATIO, EMOTION_RELAXED
 from ..Utils import short_angle
 from .RobotDefine import DEFAULT_YAW, TURN_DURATION, ROBOT_FRONT_X, ROBOT_FRONT_Y, ROBOT_HEAD_X
-from .Command import Command
+from .Command import Command, DIRECTION_FRONT
 
 FOCUS_MAX_DELTA = 200  # 200 (mm) Maximum delta to keep focus
 
@@ -20,7 +20,7 @@ class Enaction:
     3. CtrlRobot computes the outcome received from the robot
     4. CtrlRobot call ternminate(outcome)
     """
-    def __init__(self, action, memory, turn_back=False, span=40, color=1):
+    def __init__(self, action, memory, direction=DIRECTION_FRONT, span=40, color=EMOTION_RELAXED):
         """Initialize the enaction upon creation. Will be adjusted before generating the command"""
         # The initial arguments
         self.action = action
@@ -37,7 +37,7 @@ class Enaction:
             # print("Initialize Enaction clock", self.clock, "prompt", self.prompt_point)
         if memory.egocentric_memory.focus_point is not None:
             self.focus_point = memory.egocentric_memory.focus_point.copy()
-        self.command = Command(self.action, self.prompt_point, self.focus_point, turn_back, span, color)
+        self.command = Command(self.action, self.prompt_point, self.focus_point, direction, span, color)
 
         # The anticipated memory
         self.post_memory = memory.save()
@@ -178,7 +178,7 @@ class Enaction:
                 if np.linalg.norm(prediction_error_focus) < FOCUS_MAX_DELTA or self.outcome.status == "continuous":
                     # The focus has been kept
                     # self.focus_point = new_focus
-                    print("Update focus by delta", prediction_error_focus)
+                    print("Focus prediction error", prediction_error_focus)
                     # If the action has been completed
                     if self.outcome.duration1 >= 1000:
                         # If the head is forward then correct longitudinal displacements
@@ -243,7 +243,7 @@ class Enaction:
 
         if self.prompt_point is not None:
             self.prompt_point = matrix44.apply_to_vector(self.displacement_matrix, self.prompt_point).astype(int)
-            print("Terminate Enaction clock", self.clock, "Prompt", self.prompt_point)
+            # print("Terminate Enaction clock", self.clock, "Prompt", self.prompt_point)
 
     def current_enaction(self):
         """Useful if the enaction is taken as a composite enaction"""

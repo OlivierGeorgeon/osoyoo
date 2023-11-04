@@ -39,10 +39,8 @@ void Turn::ongoing()
 {
   if (_is_focussed)
   {
-    float current_robot_direction = (_target_angle - _IMU._yaw) * M_PI / 180.0;
-    float r = sqrt(sq((float)_focus_x) + sq((float)_focus_y));  // conversion to float is necessary for some reason
-    float current_head_direction = _HEA.head_direction(cos(current_robot_direction) * r, sin(current_robot_direction) * r);
-    // Serial.println("Directions robot: " + String(current_robot_direction) + ", head: " + String((int)current_head_direction) + ", dist: " + String((int)r));
+    float current_focus_direction = (_focus_angle - _IMU._yaw) * M_PI / 180.0;
+    float current_head_direction = _HEA.head_direction(cos(current_focus_direction) * _focus_distance, sin(current_focus_direction) * _focus_distance);
     _HEA.turnHead(current_head_direction);
   }
   else

@@ -7,11 +7,15 @@ from ..Decider.Action import ACTION_FORWARD, ACTION_BACKWARD, ACTION_SWIPE, ACTI
 from .RobotDefine import DEFAULT_YAW
 
 ENACTION_DEFAULT_TIMEOUT = 6  # Seconds
+DIRECTION_FRONT = 0  # Direction code to go to turn to the prompt
+DIRECTION_BACK = 1
+DIRECTION_LEFT = 2
+DIRECTION_RIGHT = 3
 
 
 class Command:
     """A command to send to the robot"""
-    def __init__(self, action, prompt_point, focus_point, turn_back, span, color):
+    def __init__(self, action, prompt_point, focus_point, direction, span, color):
         self.action = action
         self.duration = None
         self.angle = None
@@ -24,15 +28,21 @@ class Command:
 
         if prompt_point is not None:
             if self.action.action_code in [ACTION_FORWARD, ACTION_BACKWARD]:
-                self.duration = int(np.linalg.norm(prompt_point) / math.fabs(self.action.translation_speed[0]) * 1000)
+                self.duration = int(math.fabs(prompt_point[0] / self.action.translation_speed[0] * 1000))
             if self.action.action_code in [ACTION_SWIPE]:
-                self.duration = int(np.linalg.norm(prompt_point) / math.fabs(self.action.translation_speed[1]) * 1000)
+                self.duration = int(math.fabs(prompt_point[1] / self.action.translation_speed[1] * 1000))
                 if prompt_point[1] < 0:
                     self.speed = -int(self.action.translation_speed[1])  # Negative speed makes swipe right
             if self.action.action_code in [ACTION_TURN_HEAD, ACTION_TURN]:
-                if turn_back:
+                if direction == DIRECTION_BACK:
                     # Turn the back to the prompt
                     self.angle = int(math.degrees(-math.atan2(prompt_point[1], -prompt_point[0])))
+                elif direction == DIRECTION_LEFT:
+                    # Turn the the left side to the prompt (-90°)
+                    self.angle = int(math.degrees(math.atan2(-prompt_point[0], prompt_point[1])))
+                elif direction == DIRECTION_RIGHT:
+                    # Turn the the right side to the prompt (+90°)
+                    self.angle = int(math.degrees(math.atan2(prompt_point[0], -prompt_point[1])))
                 else:
                     self.angle = int(math.degrees(math.atan2(prompt_point[1], prompt_point[0])))
         else:

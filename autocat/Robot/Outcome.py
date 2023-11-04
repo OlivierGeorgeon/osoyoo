@@ -16,31 +16,22 @@ def category_color(color_sensor):
     hsv = colorsys.rgb_to_hsv(float(color_sensor['red']) / 256.0, float(color_sensor['green']) / 256.0,
                               float(color_sensor['blue']) / 256.0)
 
-    # Calibration tests on blank sheet
-    # Robot 3 {"red":69,"green":107,"blue":94,"temp":6723,"clear":5796}
-    # Robot 4 {"red":89,"green":93,"blue":89,"temp":5217,"clear":5212}
-
-    # 'red'  # Hue = 0 -- 0.0, 0.0, sat 0.59
-    color_index = 1
-    if hsv[0] < 0.985:  # Before calibration 0.98
-        if hsv[0] > 0.95:  # Before calibration 0.9
-            # 'deepPink'  # Hue = 0.94, 0.94, 0.94, 0.96, 0.95, sat 0.54
-            color_index = 7
-        elif hsv[0] > 0.6:  # 0.7  # 0.6
-            # 'orchid'  # Hue = 0.83 -- 0.66, sat 0.25
-            color_index = 6
-        elif hsv[0] > 0.5:
-            # 'deepSkyBlue'  # Hue = 0.59 -- 0.57, 0.58 -- 0.58, sat 0.86
-            color_index = 5
-        elif hsv[0] > 0.28:
-            # 'limeGreen'  # Hue = 0.38, 0.35, 0.37 -- 0.29, 0.33, 0.29, 0.33 -- 0.36, sat 0.68
-            color_index = 4
-        elif hsv[0] > 0.1:  # Before calibration: 0.175:
-            # 'gold'  # Hue = 0.25, 0.26 -- 0.20 -- 0.20, 0.20, 0.184, 0.2 -- 0.24, sat 0.68
-            color_index = 3
-        elif hsv[0] > 0.02:  # Before calibration: 0.05:
-            # 'orange'
-            color_index = 2
+    if hsv[0] > 0.986 and color_sensor['blue'] < 55:  # Before calibration 0.98
+        color_index = 1  # red
+    elif hsv[0] > 0.95:       # Before calibration 0.9
+        color_index = 7  # deepPink
+    elif hsv[0] > 0.6:      # Hue = 0.83 -- 0.66, sat 0.25
+        color_index = 6  # orchid
+    elif hsv[0] > 0.5:      # Hue = 0.59 -- 0.57, 0.58 -- 0.58, sat 0.86
+        color_index = 5  # deepSkyBlue
+    elif hsv[0] > 0.28:     # Hue = 0.38, 0.35, 0.37 -- 0.29, 0.33, 0.29, 0.33 -- 0.36, sat 0.68
+        color_index = 4  # limeGreen
+    elif hsv[0] > 0.1:      # Before calibration: 0.175:
+        color_index = 3  # gold
+    elif hsv[0] > 0.02:     # Before calibration: 0.05:
+        color_index = 2  # orange
+    else:
+        color_index = 1  # red
 
     # Rug at Olivier's
     # Robots see the rug between red and green with low saturation

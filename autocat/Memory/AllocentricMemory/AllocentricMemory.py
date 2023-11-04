@@ -149,7 +149,8 @@ class AllocentricMemory:
                 self.grid[i][j].status[1] = status
                 self.grid[i][j].clock_interaction = clock
         else:
-            print("Error: cell out of grid, i:", i, "j:", j, "Status:", status)
+            pass
+            # print("Error: cell out of grid, i:", i, "j:", j, "Status:", status)
 
     def mark_echo_area(self, affordance):
         """Mark the area covered by the echolocalization sensor in allocentric memory"""

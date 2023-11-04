@@ -8,6 +8,7 @@ import numpy as np
 from pyrr import vector
 from . Action import ACTION_TURN, ACTION_FORWARD, ACTION_BACKWARD, ACTION_SCAN
 from ..Robot.Enaction import Enaction
+from ..Robot.Command import DIRECTION_BACK
 from . Decider import Decider, FOCUS_TOO_FAR_DISTANCE
 from .. Enaction.CompositeEnaction import CompositeEnaction
 from ..Memory.Memory import EMOTION_ANGRY
@@ -54,13 +55,15 @@ class DeciderPush(Decider):
             else:
                 # If there is no object then watch (probably never happens)
                 print("DeciderPush is watching")
-                composite_enaction = Enaction(self.workspace.actions[ACTION_SCAN], self.workspace.memory, span=10, color=EMOTION_ANGRY)
+                composite_enaction = Enaction(self.workspace.actions[ACTION_SCAN], self.workspace.memory, span=10,
+                                              color=EMOTION_ANGRY)
         else:
             # Start withdrawing
             # The first enaction: turn the back to the prompt
             origin = self.workspace.memory.phenomenon_memory.terrain_center()  # Birth place or arena center
             self.workspace.memory.egocentric_memory.prompt_point = self.workspace.memory.allocentric_to_egocentric(origin)
-            e0 = Enaction(self.workspace.actions[ACTION_TURN], self.workspace.memory, turn_back=True, color=EMOTION_ANGRY)
+            e0 = Enaction(self.workspace.actions[ACTION_TURN], self.workspace.memory, direction=DIRECTION_BACK,
+                          color=EMOTION_ANGRY)
             # Second enaction: move forward to the prompt
             e1 = Enaction(self.workspace.actions[ACTION_BACKWARD], e0.post_memory, color=EMOTION_ANGRY)
             composite_enaction = CompositeEnaction([e0, e1])

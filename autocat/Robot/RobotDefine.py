@@ -60,7 +60,7 @@ ROBOT_SETTINGS_3 = ROBOT_SETTINGS_0.copy()
 ROBOT_SETTINGS_3["IP"] = {"A301": "192.168.8.242", "PetiteIA": "192.168.8.108"}  # 242
 # Lower speed cause the robot to believe the arena is smaller. Reduce speed to prevent pushing outside objects
 ROBOT_SETTINGS_3["forward_speed"] = 250  # 260  # 230  190 (mm/s) Forward translation speed.
-ROBOT_SETTINGS_3["lateral_speed"] = 230  # 160  # (mm/s) Lateral translation speed.
+ROBOT_SETTINGS_3["lateral_speed"] = 170  # 230  160  # (mm/s) Lateral translation speed.
 ROBOT_SETTINGS_3["retreat_distance"] = 80  # 70   # (mm) Distance of the line after retreat
 ROBOT_SETTINGS_3["compass_offset"] = [0, 0, 0]  # [-50, 0, 0] [50, -50, 0]  # [30, -20, 0]  # [-40, 7, 0]  # [-30, 40, 0]
 
@@ -70,7 +70,7 @@ ROBOT_SETTINGS_4["IP"] = {"PetiteIA": "192.168.8.242"}  # 108
 ROBOT_SETTINGS_4["forward_speed"] = 320  # 250
 ROBOT_SETTINGS_4["lateral_speed"] = 250
 ROBOT_SETTINGS_4["retreat_distance"] = 80  # 120  # 80
-ROBOT_SETTINGS_4["compass_offset"] = [77, -8, 0]
+ROBOT_SETTINGS_4["compass_offset"] = [40, -10, 0]
 
 # Robot 1 at DOLL
 ROBOT_SETTINGS_11 = ROBOT_SETTINGS_0.copy()

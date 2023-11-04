@@ -33,7 +33,8 @@ protected:
   char _action = 0;
   int _target_angle = 0;
   int _target_duration = 1000;
-  int _target_focus_angle = 0;
+  int _focus_angle = 0;
+  float _focus_distance = 0;
   bool _is_focussed = false;
   int _focus_x = 0;
   int _focus_y = 0;
