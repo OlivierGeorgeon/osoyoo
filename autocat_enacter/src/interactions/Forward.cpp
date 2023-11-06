@@ -30,7 +30,7 @@ void Forward::begin()
 void Forward::ongoing()
 {
   if (_is_focussed)  // Keep the head towards the focus (HEA is inhibited during the action)
-    _HEA.turnHead(_HEA.head_direction(_focus_x - _focus_speed * (millis()- _action_start_time)/1000, _focus_y));
+    _HEA.turnHead(_HEA.head_direction(_focus_x - _speed * (millis()- _action_start_time)/1000, _focus_y));
 
 
   // If caution mode and obstacle then proceed to step 2

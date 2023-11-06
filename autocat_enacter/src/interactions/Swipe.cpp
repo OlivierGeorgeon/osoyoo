@@ -21,7 +21,7 @@ Swipe::Swipe(Floor& FLO, Head& HEA, Imu& IMU, WifiCat& WifiCat, JSONVar json_act
 // STEP 0: Start the interaction
 void Swipe::begin()
 {
-  if (_focus_speed > 0)
+  if (_speed > 0)
     _FLO._OWM.shiftLeft(SHIFT_SPEED);
   else
     _FLO._OWM.shiftRight(SHIFT_SPEED);
@@ -34,13 +34,13 @@ void Swipe::begin()
 void Swipe::ongoing()
 {
   if (_is_focussed)  // Keep the head towards the focus (HEA is inhibited during the action)
-    _HEA.turnHead(_HEA.head_direction(_focus_x, _focus_y - _focus_speed * (float)(millis() - _action_start_time)/1000.));
+    _HEA.turnHead(_HEA.head_direction(_focus_x, _focus_y - _speed * (float)(millis() - _action_start_time)/1000.));
 
   // Check if Floor Change Retreat
   if (_FLO._is_retreating)
   {
     // Turn head to the line as if it attracted focus
-    if (_focus_speed > 0)
+    if (_speed > 0)
       _HEA.turnHead(50);
     else
       _HEA.turnHead(-50);
@@ -52,10 +52,10 @@ void Swipe::ongoing()
     _step = INTERACTION_TERMINATE;
   }
   // If no floor change, check for impact
-  else if ((_IMU.get_impact_leftwards() > 0) && (_focus_speed >= 0) || (_IMU.get_impact_rightwards() > 0) && (_focus_speed < 0))
+  else if ((_IMU.get_impact_leftwards() > 0) && (_speed >= 0) || (_IMU.get_impact_rightwards() > 0) && (_speed < 0))
   {
     // Turn head to the impact side
-    if (_focus_speed > 0)
+    if (_speed > 0)
       _HEA.turnHead(90);
     else
       _HEA.turnHead(-90);
@@ -78,7 +78,7 @@ void Swipe::ongoing()
 
 void Swipe::outcome(JSONVar & outcome_object)
 {
-  if (_focus_speed > 0)
+  if (_speed > 0)
     _IMU.outcome_leftwards(outcome_object);
   else
     _IMU.outcome_rightwards(outcome_object);

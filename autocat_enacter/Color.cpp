@@ -12,8 +12,6 @@
 
 Color::Color()
 {
-  // IntegrationTime adds an unnecessary delay to the getRawData() function
-  // tcs = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_50MS, TCS34725_GAIN_4X);
 }
 
 void Color::setup()
@@ -35,9 +33,8 @@ void Color::setup()
   }
   else
   {
-    Serial.println("No TCS34725 found ... check your connections");
+    Serial.println("No color sensor TCS34725 found...");
     _is_initialized = false;
-    //while (1); // halt!
   }
 }
 

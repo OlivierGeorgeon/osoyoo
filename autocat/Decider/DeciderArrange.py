@@ -18,10 +18,11 @@ from ..Memory.Memory import EMOTION_ANGRY, EMOTION_UPSET
 from ..Memory.PhenomenonMemory.PhenomenonMemory import TER
 from . Interaction import OUTCOME_FLOOR
 from ..Robot.RobotDefine import TERRAIN_RADIUS
-
+from . Interaction import OUTCOME_LOST_FOCUS
 
 STEP_INIT = 0
-STEP_PUSH = 1
+STEP_ALIGN = 1
+STEP_PUSH = 2
 
 
 class DeciderArrange(Decider):
@@ -38,15 +39,26 @@ class DeciderArrange(Decider):
         if self.workspace.memory.emotion_code == EMOTION_ANGRY:
             activation_level = 4
         # Activation 3 during the withdraw step, same as DeciderExplore
-        if self.step == STEP_PUSH:
+        if self.step in [STEP_ALIGN, STEP_PUSH]:
             activation_level = 3
         return activation_level
 
     def select_enaction(self, outcome):
         """The enactions to push a object to a target place"""
 
-        # If STEP_INIT
-        if self.step == STEP_INIT:
+        # if self.workspace.memory.egocentric_memory.focus_point is not None:
+        #     allo_focus = self.egocentric_to_allocentric(self.workspace.memory.egocentric_memory.focus_point)
+        #     is_inside = self.phenomenon_memory.phenomena[TER].is_inside(allo_focus)
+        # else:
+        #     is_inside = False
+
+        # If previously aligned and lost focus then scan again
+        if self.step == STEP_ALIGN and outcome == OUTCOME_LOST_FOCUS:
+            composite_enaction = Enaction(self.workspace.actions[ACTION_SCAN], self.workspace.memory, span=10,
+                                          color=EMOTION_ANGRY)
+            self.step = STEP_INIT
+        # If STEP_INIT or previously aligned with focus
+        elif self.step in [STEP_ALIGN, STEP_INIT]:
             ego_target = self.workspace.memory.terrain_centric_to_egocentric(
                 -np.array(TERRAIN_RADIUS[self.workspace.arena_id]))
             # If OUTCOME_FLOOR just scan
@@ -59,6 +71,7 @@ class DeciderArrange(Decider):
                 print("object behind target")
                 composite_enaction = Enaction(self.workspace.actions[ACTION_WATCH], self.workspace.memory,
                                               color=EMOTION_UPSET)
+                self.step = STEP_INIT
             # If object to push
             else:
                 l1 = line.create_from_points(self.workspace.memory.egocentric_memory.focus_point, ego_target)
@@ -66,6 +79,7 @@ class DeciderArrange(Decider):
                 ego_prompt_projection = point_closest_point_on_line(np.array([0, 0, 0]), l1)
                 print("Prompt projection:", ego_prompt_projection, "focus:",
                       self.workspace.memory.egocentric_memory.focus_point, "target:", ego_target)
+                self.step = STEP_ALIGN  # May be changed to STEP_PUSH
                 # If robot_point_object-target not aligned
                 if math.fabs(ego_prompt_projection[1]) > 50:
                     # Go to the point from where to push

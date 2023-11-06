@@ -3,6 +3,15 @@ import numpy as np
 from pyrr import Quaternion, line
 
 
+def length_on_line(abscissa, line1):
+    """Return the length of abscissa distance projected to the line"""
+    # slope = math.atan2(line1[1][1] - line1[0][1], line1[1][0] - line1[0][0])
+    # # print("Slope", math.degrees(slope))
+    # return x / math.cos(slope)
+    length = math.sqrt((line1[1][0] - line1[0][0])**2 + (line1[1][1] - line1[0][1])**2)
+    return abscissa * length / (line1[1][0] - line1[0][0])
+
+
 def line_intersection(line1, line2):
     """Return the intersection of two lines in the x y plane"""
     # line1 = x1, y1, x2, y2
@@ -57,9 +66,17 @@ def assert_almost_equal_angles(angle1, angle2, difference_degrees):
 #     return math.radians(body_direction_degree)
 
 # Testing the utils
-# py autocat.Utils.py
+# py autocat\Utils.py
 if __name__ == "__main__":
-    # Check line_intersection()
+    # Test length_on_line()
+    l1 = line.create_from_points([0, 1, 0], [1, 1, 0])
+    # l1 = np.array([[0, 0], [1, 1]])
+    print("Length of 1 on slope 0°:", length_on_line(1, l1), length_on_line(1, l1) == 1)
+    l1 = line.create_from_points([0, 0, 0], [1, 1, 0])
+    length_on_line(1, l1)
+    print("Length of 1 on slope 45°:", length_on_line(1, l1), length_on_line(1, l1) == 1.4142135623730951)
+
+    # Test line_intersection()
     l1 = line.create_from_points([-1, -1, 0], [1, 1, 0])
     l2 = line.create_from_points([-1, 1, 0], [1, -1, 0])
     print("Intersection", line_intersection(l1, l2), line_intersection(l1, l2) == [0, 0, 0])
@@ -67,7 +84,7 @@ if __name__ == "__main__":
     l2 = line.create_from_points([0, 1, 0], [2, 1, 0])
     print("Intersection", line_intersection(l1, l2), line_intersection(l1, l2) == [1, 1, 0])
 
-    # Check short_angle()
+    # Test short_angle()
     q1 = Quaternion.from_z_rotation(math.radians(0))
     q2 = Quaternion.from_z_rotation(math.radians(10))
     print("10° to the left of 0°", short_angle(q1, q2), short_angle(q1, q2) > 0)

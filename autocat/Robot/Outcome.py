@@ -16,7 +16,9 @@ def category_color(color_sensor):
     hsv = colorsys.rgb_to_hsv(float(color_sensor['red']) / 256.0, float(color_sensor['green']) / 256.0,
                               float(color_sensor['blue']) / 256.0)
 
-    if hsv[0] > 0.986 and color_sensor['blue'] < 55:  # Before calibration 0.98
+    if hsv[0] > 0.99:
+        color_index = 1  # red
+    elif hsv[0] > 0.986 and color_sensor['blue'] < 55:  # Before calibration 0.98
         color_index = 1  # red
     elif hsv[0] > 0.95:       # Before calibration 0.9
         color_index = 7  # deepPink

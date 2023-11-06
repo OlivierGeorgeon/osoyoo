@@ -44,6 +44,7 @@ class Command:
                     # Turn the the right side to the prompt (+90°)
                     self.angle = int(math.degrees(math.atan2(prompt_point[0], -prompt_point[1])))
                 else:
+                    # Turn the front to the prompt
                     self.angle = int(math.degrees(math.atan2(prompt_point[1], prompt_point[0])))
         else:
             # Default backward 0.5s
@@ -64,12 +65,8 @@ class Command:
                 self.speed = -int(self.action.translation_speed[0])
             if self.action.action_code in [ACTION_SWIPE, ACTION_RIGHTWARD]:
                 self.speed = int(self.action.translation_speed[1])
-                if prompt_point is not None:  #  and prompt_point[1] > 0:
+                if prompt_point is not None:
                     self.speed = math.copysign(int(self.action.translation_speed[1]), prompt_point[1])
-            #     else:
-            #         self.speed = -int(self.action.translation_speed[1])  # Negative speed makes swipe right
-            # if self.action.action_code == ACTION_RIGHTWARD:
-            #     self.speed = int(self.action.translation_speed[1])
 
         # The anticipated displacement
         if self.duration is None:
@@ -83,6 +80,7 @@ class Command:
             else:
                 self.anticipated_translation = - action.translation_speed * self.duration / 1000
 
+        # The anticipated yaw quaternion
         if self.angle is None:
             self.anticipated_yaw_quaternion = Quaternion.from_z_rotation(action.rotation_speed_rad * action.target_duration)
         else:

@@ -20,7 +20,6 @@ Turn::Turn(Floor& FLO, Head& HEA, Imu& IMU, WifiCat& WifiCat, JSONVar json_actio
 }
 
 // STEP 0: Start the interaction
-// Does not handle focus
 void Turn::begin()
 {
   _action_end_time = millis() + 5000;
@@ -39,6 +38,7 @@ void Turn::ongoing()
 {
   if (_is_focussed)
   {
+    // Keep looking at the focus point
     float current_focus_direction = (_focus_angle - _IMU._yaw) * M_PI / 180.0;
     float current_head_direction = _HEA.head_direction(cos(current_focus_direction) * _focus_distance, sin(current_focus_direction) * _focus_distance);
     _HEA.turnHead(current_head_direction);

@@ -177,8 +177,7 @@ class Enaction:
                 # If the new focus is near the previous focus or the displacement has been continuous.
                 if np.linalg.norm(prediction_error_focus) < FOCUS_MAX_DELTA or self.outcome.status == "continuous":
                     # The focus has been kept
-                    # self.focus_point = new_focus
-                    print("Focus prediction error", prediction_error_focus)
+                    print("Focus kept with prediction error", prediction_error_focus, "moved to ", end="")
                     # If the action has been completed
                     if self.outcome.duration1 >= 1000:
                         # If the head is forward then correct longitudinal displacements
@@ -200,16 +199,15 @@ class Enaction:
                         self.displacement_matrix = matrix44.multiply(translation_matrix, self.yaw_matrix)
                 else:
                     # The focus was lost
-                    print("Lost focus due to delta", prediction_error_focus)
+                    print("New focus with prediction error ", prediction_error_focus, end="")
                     self.lost_focus = True  # Used by agent_circle
                     # self.focus_point = None
                     # self.focus_point = new_focus
                     # playsound('autocat/Assets/R5.wav', False)
             else:
                 # The focus was lost
-                print("Lost focus due to no echo")
+                print("Lost focus due to no echo ", end="")
                 self.lost_focus = True  # Used by agent_circle
-                # self.focus_point = None
                 # playsound('autocat/Assets/R5.wav', False)
         else:
             # If the robot was not focussed then check for catch focus
@@ -217,9 +215,9 @@ class Enaction:
                     and self.outcome.echo_point is not None:
                 # Catch focus
                 playsound('autocat/Assets/cute_beep2.wav', False)
-                print("Catch focus")
+                print("New focus ", end="")
         self.focus_point = new_focus
-        print("NEW FOCUS", self.focus_point)
+        print(self.focus_point)
 
         # Impact or block catch focus
         if self.outcome.impact > 0 and self.action.action_code == ACTION_FORWARD:
@@ -237,7 +235,7 @@ class Enaction:
                     self.focus_point = np.array([ROBOT_FRONT_X + 10, 0, 0])
             # Reset lost focus to activate DecideCircle
             self.lost_focus = False
-            print("CATCH FOCUS IMPACT", self.focus_point)
+            print("Catch focus impact", self.focus_point)
 
         # Move the prompt -----
 

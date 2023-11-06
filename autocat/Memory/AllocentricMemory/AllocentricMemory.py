@@ -188,7 +188,7 @@ class AllocentricMemory:
             if (self.min_i <= self.prompt_i <= self.max_i) and (self.min_j <= self.prompt_j <= self.max_j):
                 self.grid[self.prompt_i][self.prompt_j].status[3] = EXPERIENCE_PROMPT
                 self.grid[self.prompt_i][self.prompt_j].clock_prompt = clock
-                print("Prompt in cell", self.prompt_i, ", ", self.prompt_j)
+                # print("Prompt in cell", self.prompt_i, ", ", self.prompt_j)
 
     def save(self, experiences):
         """Retun a clone of allocentric memory for memory snapshot"""
