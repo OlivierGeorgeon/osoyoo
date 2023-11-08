@@ -1,3 +1,8 @@
+import numpy as np
+from pyrr import Vector3
+from ..Utils import azimuth_to_quaternion
+
+
 # Olivier's robot:
 #   7V: 160 mm
 #   8V: 190 mm
@@ -18,12 +23,16 @@ LINE_X = 150  # 160              # (mm) X coordinate of the line after retreat
 
 SCAN_DISTANCE = 800
 
-TERRAIN_RADIUS = {"A328": [200, 950, 0],     # 1010mm
+TERRAIN_RADIUS = {  # "A328": [200, 950, 0],     # 1010mm
+                  "A328": {"radius": 1010, "azimuth": 45},
                   # "A328": [713, 713, 0],    # 1010mm azimuth  45
                   # "A328": [-579, 827, 0],   # 1010mm azimuth  325
-                  "A301": [770, 920, 0],      # 1200mm azimuth 40°
-                  "PetiteIA": [536, 450, 0],  # 700mm azimuth 50°
-                  "DOLL": [770, 920, 0]}      # To be defined
+                  # "A301": [770, 920, 0],      # 1200mm azimuth 40°
+                  "A301": {"radius": 1200, "azimuth": 50},
+                  # "PetiteIA": [536, 450, 0],  # 700mm azimuth 50°
+                  "PetiteIA": {"radius": 700, "azimuth": 40},
+                  "DOLL": {"radius": 1200, "azimuth": 0}      # To be defined
+}
 
 # You must set the compass offset to the center of the circle drawn by the (compass_x, compass_y) points.
 # Display the compass points of interest in Egocentric view.
@@ -53,7 +62,7 @@ ROBOT_SETTINGS_2["IP"] = {"A328": "192.168.8.189", "PetiteIA": "192.168.8.189"}
 ROBOT_SETTINGS_2["forward_speed"] = 230  # (mm/s) Forward translation speed.
 ROBOT_SETTINGS_2["lateral_speed"] = 140  # (mm/s) Lateral translation speed.
 ROBOT_SETTINGS_2["retreat_distance"] = 90
-ROBOT_SETTINGS_2["compass_offset"] = [0, -40, 0]  # [-30, 40, 0]
+ROBOT_SETTINGS_2["compass_offset"] = [0, 0, 0]  # [-30, 40, 0]
 
 # Robot 3 chez Olivier
 ROBOT_SETTINGS_3 = ROBOT_SETTINGS_0.copy()
@@ -103,3 +112,10 @@ ROBOT_SETTINGS = {
     '13': ROBOT_SETTINGS_13,
     '14': ROBOT_SETTINGS_14,
     }
+
+
+def terrain_color_point(arena_id):
+    """Return the point of the color patch in polar egocentric relative to the terrain center"""
+    return np.array(azimuth_to_quaternion(TERRAIN_RADIUS[arena_id]["azimuth"]) *
+                    Vector3([TERRAIN_RADIUS[arena_id]["radius"], 0, 0]), dtype=int)
+

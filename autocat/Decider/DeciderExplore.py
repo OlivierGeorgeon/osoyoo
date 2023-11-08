@@ -12,7 +12,7 @@ from . Interaction import OUTCOME_NO_FOCUS
 from . Decider import Decider
 from ..Utils import short_angle
 from ..Robot.Enaction import Enaction
-from ..Robot.RobotDefine import TERRAIN_RADIUS
+from ..Robot.RobotDefine import TERRAIN_RADIUS, terrain_color_point
 from ..Memory.BodyMemory import ENERGY_TIRED
 from ..Memory.PhenomenonMemory.PhenomenonMemory import TER
 from ..Memory.PhenomenonMemory.PhenomenonTerrain import TERRAIN_ORIGIN_CONFIDENCE
@@ -141,7 +141,7 @@ class DeciderExplore(Decider):
             # Go successively to the predefined prompt points relative to the terrain center
             if self.prompt_index == 0:
                 # self.ter_prompt = self.workspace.memory.phenomenon_memory.phenomena[TER].affordances[self.workspace.memory.phenomenon_memory.phenomena[TER].absolute_affordance_key].point * 1.2  # 2
-                self.ter_prompt = np.array(TERRAIN_RADIUS[self.workspace.arena_id]) * 1.1 # + self.workspace.memory.phenomenon_memory.phenomena[TER].point
+                self.ter_prompt = terrain_color_point(self.workspace.arena_id) * 1.1 # + self.workspace.memory.phenomenon_memory.phenomena[TER].point
             self.ter_prompt = quaternion.apply_to_vector(self.explore_angle_quaternion, self.ter_prompt)
             # allo_prompt = self.ter_prompt + self.workspace.memory.phenomenon_memory.phenomena[TER].point
             ego_prompt = self.workspace.memory.terrain_centric_to_egocentric(self.ter_prompt)

@@ -3,6 +3,29 @@ import numpy as np
 from pyrr import Quaternion, line
 
 
+def azimuth_to_quaternion(azimuth):
+    """Return the quaternion representing this azimuth from north in degrees"""
+    return Quaternion.from_z_rotation(math.radians(90 - azimuth))
+
+
+def quaternion_to_azimuth(quaternion):
+    """Return the azimuth in degree relative to north [0,360["""
+    return round((90 - math.degrees(quaternion_to_direction_rad(quaternion))) % 360)
+
+
+def quaternion_to_direction_rad(quaternion):
+    """Return the polar-egocentric direction represented by this quaternion in [-pi, pi]"""
+    # The Z component of the rotation axis gives the sign of the angle if is not NaN
+    angle = quaternion.angle
+    if angle > math.pi:  # The short angle
+        angle -= 2.0 * math.pi
+    elif angle < -math.pi:
+        angle += 2.0 * math.pi
+    if not np.isnan(quaternion.z) and quaternion.z < 0:  # The direction of the z axis rotation
+        angle *= -1
+    return angle
+
+
 def length_on_line(abscissa, line1):
     """Return the length of abscissa distance projected to the line"""
     # slope = math.atan2(line1[1][1] - line1[0][1], line1[1][0] - line1[0][0])
@@ -30,15 +53,15 @@ def line_intersection(line1, line2):
 
 def short_angle(quaternion1, quaternion2):
     """Return the short angle from q1 to q2, positive if q2 is to the left of q1 (q2 > q1)"""
-    q = quaternion1 * quaternion2.inverse
-    angle = q.angle
-    if angle > math.pi:  # The short angle
-        angle -= 2.0 * math.pi
-    elif angle < -math.pi:
-        angle += 2.0 * math.pi
-    if q.axis[2] > 0:  # The direction of the z axis rotation
-        angle *= -1
-    return angle
+    return -quaternion_to_direction_rad(quaternion1 * quaternion2.inverse)
+    # angle = q.angle
+    # if angle > math.pi:  # The short angle
+    #     angle -= 2.0 * math.pi
+    # elif angle < -math.pi:
+    #     angle += 2.0 * math.pi
+    # if not np.isnan(q.z) and q.axis[2] > 0:  # The direction of the z axis rotation
+    #     angle *= -1
+    # return angle
 
 
 def assert_almost_equal_angles(angle1, angle2, difference_degrees):
@@ -58,16 +81,43 @@ def assert_almost_equal_angles(angle1, angle2, difference_degrees):
 #     return pyrr.matrix44.apply_to_vector(rotation_matrix, vector)
 
 
-# def body_direction_from_azimuth(azimuth_degree):
-#     """Return the body direction from azimuth measure relative to north [0,360[ degree"""
-#     body_direction_degree = 90 - azimuth_degree  # Degree relative to x axis in trigonometric direction
-#     while body_direction_degree < -180:  # Keep within [-180, 180]
-#         body_direction_degree += 360
-#     return math.radians(body_direction_degree)
 
 # Testing the utils
 # py autocat\Utils.py
 if __name__ == "__main__":
+    # Test quaternion_to_direction_rad()
+    q = Quaternion.from_z_rotation(0)
+    print("Quaternion 0 rad", quaternion_to_direction_rad(q), quaternion_to_direction_rad(q) == 0)
+    q = Quaternion([0., 0., 0., 0.])
+    print("Quaternion null", quaternion_to_direction_rad(q), quaternion_to_direction_rad(q) == 3.141592653589793)
+    q = Quaternion.from_z_rotation(1)
+    print("Quaternion 1 rad", quaternion_to_direction_rad(q), math.isclose(quaternion_to_direction_rad(q), 1))
+    q = Quaternion.from_z_rotation(-1)
+    print("Quaternion -1 rad", quaternion_to_direction_rad(q), math.isclose(quaternion_to_direction_rad(q), -1))
+    print("")
+
+    # Test quaternion_to_azimuth()
+    q = Quaternion.from_z_rotation(0)
+    print("Azimuth 0°", quaternion_to_azimuth(q), quaternion_to_azimuth(q) == 90)
+    q = Quaternion.from_z_rotation(math.radians(90))
+    print("Azimuth 90°", quaternion_to_azimuth(q), math.isclose(quaternion_to_azimuth(q), 0))
+    q = Quaternion.from_z_rotation(math.radians(-90))
+    print("Azimuth -90°", quaternion_to_azimuth(q), math.isclose(quaternion_to_azimuth(q), 180))
+    q = Quaternion.from_z_rotation(math.radians(180))
+    print("Azimuth 180°", quaternion_to_azimuth(q), math.isclose(quaternion_to_azimuth(q), 270))
+    print("")
+
+    # Test azimuth_to_quaternion()
+    a = quaternion_to_azimuth(azimuth_to_quaternion(0))
+    print("Azimuth 0°", a, a == 0)
+    a = quaternion_to_azimuth(azimuth_to_quaternion(180))
+    print("Azimuth 180°", a, a == 180)
+    a = quaternion_to_azimuth(azimuth_to_quaternion(360))
+    print("Azimuth 360°", a, a == 0)
+    a = quaternion_to_azimuth(azimuth_to_quaternion(370))
+    print("Azimuth 370°", a, a == 10)
+    print("")
+
     # Test length_on_line()
     l1 = line.create_from_points([0, 1, 0], [1, 1, 0])
     # l1 = np.array([[0, 0], [1, 1]])
@@ -75,6 +125,7 @@ if __name__ == "__main__":
     l1 = line.create_from_points([0, 0, 0], [1, 1, 0])
     length_on_line(1, l1)
     print("Length of 1 on slope 45°:", length_on_line(1, l1), length_on_line(1, l1) == 1.4142135623730951)
+    print("")
 
     # Test line_intersection()
     l1 = line.create_from_points([-1, -1, 0], [1, 1, 0])
@@ -83,6 +134,7 @@ if __name__ == "__main__":
     l1 = line.create_from_points([1, 0, 0], [1, 2, 0])
     l2 = line.create_from_points([0, 1, 0], [2, 1, 0])
     print("Intersection", line_intersection(l1, l2), line_intersection(l1, l2) == [1, 1, 0])
+    print("")
 
     # Test short_angle()
     q1 = Quaternion.from_z_rotation(math.radians(0))

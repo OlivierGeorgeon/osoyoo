@@ -11,7 +11,7 @@ from .AllocentricMemory.Hexagonal_geometry import CELL_RADIUS
 from ..Decider.Action import ACTION_SWIPE
 from ..Decider.Decider import FOCUS_TOO_FAR_DISTANCE
 from ..Robot.Outcome import Outcome
-from ..Robot.RobotDefine import TERRAIN_RADIUS
+from ..Robot.RobotDefine import TERRAIN_RADIUS, terrain_color_point
 
 GRID_WIDTH = 20  # 15   # 100 Number of cells wide
 GRID_HEIGHT = 60  # 45  # 200 Number of cells high
@@ -67,7 +67,7 @@ class Memory:
                 else:
                     # If object inside terrain and closer than target: ANGRY, DeciderPush
                     allo_focus = self.egocentric_to_allocentric(self.egocentric_memory.focus_point)
-                    ego_target = self.terrain_centric_to_egocentric(-np.array(TERRAIN_RADIUS[self.arena_id]))
+                    ego_target = self.terrain_centric_to_egocentric(-terrain_color_point(self.arena_id))
                     is_inside = self.phenomenon_memory.phenomena[TER].is_inside(allo_focus)
                     is_closer = self.egocentric_memory.focus_point[0] < ego_target[0]
                     print("Focus inside terrain", is_inside, "focus before target", is_closer)

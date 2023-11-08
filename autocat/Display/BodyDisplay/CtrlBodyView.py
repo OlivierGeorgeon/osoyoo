@@ -6,14 +6,15 @@ from autocat.Display.PointOfInterest import PointOfInterest, POINT_COMPASS, POIN
 from ...Robot.CtrlRobot import ENACTION_STEP_REFRESHING
 import circle_fit as cf
 from ...Workspace import KEY_DECREASE, KEY_INCREASE
+from ...Utils import quaternion_to_azimuth
 
 KEY_OFFSET = 'O'
 
 
-def quaternion_to_azimuth(body_quaternion):
-    """Return the azimuth in degree relative to north [0,360["""
-    body_direction_rad = body_quaternion.axis[2] * body_quaternion.angle
-    return round((90 - math.degrees(body_direction_rad)) % 360)
+# def quaternion_to_azimuth(body_quaternion):
+#     """Return the azimuth in degree relative to north [0,360["""
+#     body_direction_rad = body_quaternion.axis[2] * body_quaternion.angle
+#     return round((90 - math.degrees(body_direction_rad)) % 360)
 
 
 class CtrlBodyView:
@@ -44,7 +45,7 @@ class CtrlBodyView:
                     # Find the center of the circle made by the compass points
                     xc, yc, r, sigma = cf.taubinSVD(points)
                     # print("Fit circle", xc, yc, r, sigma)
-                    if 130 < r < 400:
+                    if 130 < r < 500:  # 400
                         # If the radius is in bound then we can update de compass offset
                         delta_offset = np.array([xc, yc, 0], dtype=int)
                         self.workspace.memory.body_memory.compass_offset += delta_offset

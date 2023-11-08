@@ -17,7 +17,7 @@ from .. Enaction.CompositeEnaction import CompositeEnaction
 from ..Memory.Memory import EMOTION_ANGRY, EMOTION_UPSET
 from ..Memory.PhenomenonMemory.PhenomenonMemory import TER
 from . Interaction import OUTCOME_FLOOR
-from ..Robot.RobotDefine import TERRAIN_RADIUS
+from ..Robot.RobotDefine import TERRAIN_RADIUS, terrain_color_point
 from . Interaction import OUTCOME_LOST_FOCUS
 
 STEP_INIT = 0
@@ -60,7 +60,7 @@ class DeciderArrange(Decider):
         # If STEP_INIT or previously aligned with focus
         elif self.step in [STEP_ALIGN, STEP_INIT]:
             ego_target = self.workspace.memory.terrain_centric_to_egocentric(
-                -np.array(TERRAIN_RADIUS[self.workspace.arena_id]))
+                -terrain_color_point(self.workspace.arena_id))
             # If OUTCOME_FLOOR just scan
             if outcome == OUTCOME_FLOOR:
                 self.step = STEP_INIT

@@ -3,7 +3,8 @@ import numpy as np
 from pyrr import matrix44, vector, Quaternion
 from .Phenomenon import Phenomenon
 from ...Memory.EgocentricMemory.Experience import EXPERIENCE_PLACE, EXPERIENCE_FLOOR
-from ...Robot.RobotDefine import TERRAIN_RADIUS
+from ...Robot.RobotDefine import TERRAIN_RADIUS, terrain_color_point
+from ...Utils import azimuth_to_quaternion
 
 
 TERRAIN_EXPERIENCE_TYPES = [EXPERIENCE_PLACE, EXPERIENCE_FLOOR]
@@ -46,10 +47,10 @@ class PhenomenonTerrain(Phenomenon):
                     self.last_origin_clock = affordance.experience.clock
                     # The phenomenon's origin moves by the green patch relative to this affordance
                     terrain_offset = affordance.green_point()
-                    if np.dot(affordance.experience.sensor_point(), TERRAIN_RADIUS[self.arena_id]) < 0:
-                        terrain_offset -= np.array(TERRAIN_RADIUS[self.arena_id])
+                    if np.dot(affordance.experience.sensor_point(), terrain_color_point(self.arena_id)) < 0:
+                        terrain_offset -= terrain_color_point(self.arena_id)
                     else:
-                        terrain_offset += np.array(TERRAIN_RADIUS[self.arena_id])
+                        terrain_offset += terrain_color_point(self.arena_id)
                         # print("Opposite origin", affordance.experience.sensor_point())
                     self.point += terrain_offset
                     # All the position of affordance including this one are adjusted
@@ -59,12 +60,12 @@ class PhenomenonTerrain(Phenomenon):
                 else:
                     position_correction = - affordance.green_point()
                     # If the origin affordance has the opposite orientation then we assume it is the other color patch
-                    if np.dot(affordance.experience.sensor_point(), TERRAIN_RADIUS[self.arena_id]) < 0:
+                    if np.dot(affordance.experience.sensor_point(), terrain_color_point(self.arena_id)) < 0:
                         # The North-East patch
-                        position_correction += np.array(TERRAIN_RADIUS[self.arena_id])
+                        position_correction += terrain_color_point(self.arena_id)
                     else:
                         # The South-West patch
-                        position_correction -= np.array(TERRAIN_RADIUS[self.arena_id])
+                        position_correction -= terrain_color_point(self.arena_id)
                         print("Opposite origin", affordance.experience.sensor_point())
                     # Correct the position of the affordances since last time the robot visited the absolute origin
                     for a in [a for a in self.affordances.values() if a.experience.clock > self.last_origin_clock]:
@@ -99,11 +100,11 @@ class PhenomenonTerrain(Phenomenon):
         # Parallel to the absolute affordance direction
         if self.absolute_affordance() is not None:
             # Presuppose the orientation of the terrain
-            if np.dot(self.absolute_affordance().experience.sensor_point(), TERRAIN_RADIUS[self.arena_id]) < 0:
+            if np.dot(self.absolute_affordance().experience.sensor_point(), terrain_color_point(self.arena_id)) < 0:
                 # The North-East patch
-                confirmation_point = vector.set_length(np.array(TERRAIN_RADIUS[self.arena_id]), 500)
+                confirmation_point = vector.set_length(terrain_color_point(self.arena_id), 500)
             else:
-                confirmation_point = vector.set_length(np.array(TERRAIN_RADIUS[self.arena_id]), -500)
+                confirmation_point = vector.set_length(terrain_color_point(self.arena_id), -500)
             # Does not presuppose the orientation of the terrain
             # rotation_matrix = self.absolute_affordance().experience.rotation_matrix
             # point = np.array([500, 0, 0])  # Need the opposite
@@ -115,14 +116,16 @@ class PhenomenonTerrain(Phenomenon):
         """Return the quaternion representing the direction of the color patch from the center of the terrain"""
         if self.absolute_affordance() is None:
             return None
-        if np.dot(self.absolute_affordance().experience.sensor_point(), TERRAIN_RADIUS[self.arena_id]) < 0:
+        if np.dot(self.absolute_affordance().experience.sensor_point(), terrain_color_point(self.arena_id)) < 0:
             # The North-East patch
-            return Quaternion.from_z_rotation(math.atan2(TERRAIN_RADIUS[self.arena_id][1],
-                                                         TERRAIN_RADIUS[self.arena_id][0]))
+            return azimuth_to_quaternion(TERRAIN_RADIUS[self.arena_id]["azimuth"])
+            # return Quaternion.from_z_rotation(math.atan2(TERRAIN_RADIUS[self.arena_id][1],
+            #                                              TERRAIN_RADIUS[self.arena_id][0]))
         else:
             # South west patch
-            return Quaternion.from_z_rotation(math.atan2(-TERRAIN_RADIUS[self.arena_id][1],
-                                                         -TERRAIN_RADIUS[self.arena_id][0]))
+            return azimuth_to_quaternion(TERRAIN_RADIUS[self.arena_id]["azimuth"] + 180)
+            # return Quaternion.from_z_rotation(math.atan2(-TERRAIN_RADIUS[self.arena_id][1],
+            #                                              -TERRAIN_RADIUS[self.arena_id][0]))
 
     def outline(self):
         return self.interpolation_points
