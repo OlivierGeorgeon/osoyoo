@@ -1,7 +1,7 @@
 import math
 import numpy as np
-from pyrr import matrix44, quaternion, Quaternion
-from ...Robot.RobotDefine import ROBOT_HEAD_X
+from pyrr import matrix44, Quaternion
+from ...Robot.RobotDefine import ROBOT_HEAD_X, ROBOT_COLOR_X, LINE_X
 
 EXPERIENCE_ALIGNED_ECHO = 'Echo'
 EXPERIENCE_LOCAL_ECHO = 'Local_Echo'
@@ -48,8 +48,8 @@ class Experience:
         relative_sensor_point = -self.point.copy()  # By default the center of the robot.
         # The absolute direction of this experience
 
+        # The position of the echo incorporating the rotation from the head
         if self.type in [EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_CENTRAL_ECHO]:
-            # The position of the echo incorporating the rotation from the head
             head_direction_rad = math.atan2(point[1], point[0] - ROBOT_HEAD_X)
             self.absolute_direction_rad += head_direction_rad  # The absolute direction of the sensor...
             self.absolute_direction_quaternion *= Quaternion.from_z_rotation(head_direction_rad)
@@ -64,8 +64,11 @@ class Experience:
                                                      .astype('float64'))
             # The position of the head relative to the echo in allocentric coordinates
             relative_sensor_point = np.array([-point[0] + ROBOT_HEAD_X, -point[1], 0])
+        # The position of the color sensor relative to the floor line
+        elif self.type == EXPERIENCE_FLOOR:
+            relative_sensor_point = -np.array([LINE_X - ROBOT_COLOR_X, 0, 0])
 
-        # The allocentric position of the sensor relative to the allocentric position of the experience
+        # The polar-egocentric position of the sensor relative to the polar_egocentric position of the experience
         body_direction_matrix = matrix44.create_from_z_rotation(-body_direction_rad)
         self._sensor_point = matrix44.apply_to_vector(body_direction_matrix, relative_sensor_point).astype(int)
         angle_sensor = math.atan2(self._sensor_point[1], self._sensor_point[0])

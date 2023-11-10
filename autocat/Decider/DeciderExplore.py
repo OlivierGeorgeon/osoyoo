@@ -5,7 +5,7 @@
 
 import math
 import numpy as np
-from pyrr import quaternion, Quaternion
+from pyrr import quaternion, Quaternion, Vector3
 from playsound import playsound
 from . Action import ACTION_TURN, ACTION_FORWARD, ACTION_SWIPE
 from . Interaction import OUTCOME_NO_FOCUS
@@ -140,10 +140,10 @@ class DeciderExplore(Decider):
 
             # Go successively to the predefined prompt points relative to the terrain center
             if self.prompt_index == 0:
-                # self.ter_prompt = self.workspace.memory.phenomenon_memory.phenomena[TER].affordances[self.workspace.memory.phenomenon_memory.phenomena[TER].absolute_affordance_key].point * 1.2  # 2
-                self.ter_prompt = terrain_color_point(self.workspace.arena_id) * 1.1 # + self.workspace.memory.phenomenon_memory.phenomena[TER].point
+                # self.ter_prompt = terrain_color_point(self.workspace.arena_id) * 1.1
+                self.ter_prompt = self.workspace.memory.phenomenon_memory.phenomena[TER].origin_direction_quaternion() \
+                                  * Vector3([TERRAIN_RADIUS[self.workspace.arena_id]["radius"] * 1.1, 0, 0])
             self.ter_prompt = quaternion.apply_to_vector(self.explore_angle_quaternion, self.ter_prompt)
-            # allo_prompt = self.ter_prompt + self.workspace.memory.phenomenon_memory.phenomena[TER].point
             ego_prompt = self.workspace.memory.terrain_centric_to_egocentric(self.ter_prompt)
             self.workspace.memory.egocentric_memory.prompt_point = ego_prompt
             self.workspace.memory.egocentric_memory.focus_point = None  # Prevent unnatural head movement

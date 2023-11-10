@@ -46,47 +46,48 @@ class DeciderArrange(Decider):
     def select_enaction(self, outcome):
         """The enactions to push a object to a target place"""
 
-        # if self.workspace.memory.egocentric_memory.focus_point is not None:
-        #     allo_focus = self.egocentric_to_allocentric(self.workspace.memory.egocentric_memory.focus_point)
-        #     is_inside = self.phenomenon_memory.phenomena[TER].is_inside(allo_focus)
-        # else:
-        #     is_inside = False
-
-        # If previously aligned and lost focus then scan again
-        if self.step == STEP_ALIGN and outcome == OUTCOME_LOST_FOCUS:
+        print("Step", self.step)
+        # If LOST FOCUS then scan again
+        if outcome == OUTCOME_LOST_FOCUS and self.step in [STEP_INIT, STEP_ALIGN]:
             composite_enaction = Enaction(self.workspace.actions[ACTION_SCAN], self.workspace.memory, span=10,
                                           color=EMOTION_ANGRY)
-            self.step = STEP_INIT
+            self.step = STEP_INIT  # Avoids systematically recalling DeciderArrange
         # If STEP_INIT or previously aligned with focus
         elif self.step in [STEP_ALIGN, STEP_INIT]:
             ego_target = self.workspace.memory.terrain_centric_to_egocentric(
-                -terrain_color_point(self.workspace.arena_id))
+                self.workspace.memory.phenomenon_memory.arrange_point())
+            l1 = line.create_from_points(self.workspace.memory.egocentric_memory.focus_point, ego_target)
+            ego_prompt_intersection = line_intersection(l1, line.create_from_points([0, 0, 0], [0, 1, 0]))
+            ego_prompt_projection = point_closest_point_on_line(np.array([0, 0, 0]), l1)
+            print("Prompt projection:", ego_prompt_projection, "focus:",
+                  self.workspace.memory.egocentric_memory.focus_point, "target:", ego_target)
             # If OUTCOME_FLOOR just scan
             if outcome == OUTCOME_FLOOR:
                 self.step = STEP_INIT
                 composite_enaction = Enaction(self.workspace.actions[ACTION_SCAN], self.workspace.memory, span=10,
                                               color=EMOTION_UPSET)
             # If object behind target just watch
-            elif ego_target[0] < self.workspace.memory.egocentric_memory.focus_point[0]:
-                print("object behind target")
+            elif ego_target[0] - self.workspace.memory.egocentric_memory.focus_point[0] < 0:
+                print("Object behind target:", ego_target[0] - self.workspace.memory.egocentric_memory.focus_point[0])
                 composite_enaction = Enaction(self.workspace.actions[ACTION_WATCH], self.workspace.memory,
                                               color=EMOTION_UPSET)
                 self.step = STEP_INIT
             # If object to push
             else:
-                l1 = line.create_from_points(self.workspace.memory.egocentric_memory.focus_point, ego_target)
-                ego_prompt_intersection = line_intersection(l1, line.create_from_points([0, 0, 0], [0, 1, 0]))
-                ego_prompt_projection = point_closest_point_on_line(np.array([0, 0, 0]), l1)
-                print("Prompt projection:", ego_prompt_projection, "focus:",
-                      self.workspace.memory.egocentric_memory.focus_point, "target:", ego_target)
                 self.step = STEP_ALIGN  # May be changed to STEP_PUSH
-                # If robot_point_object-target not aligned
+                # If robot-object-target not aligned
                 if math.fabs(ego_prompt_projection[1]) > 50:
                     # Go to the point from where to push
                     allo_prompt = self.workspace.memory.egocentric_to_allocentric(ego_prompt_projection)
-                    # If angle to projection point greater than 20°
-                    # if self.workspace.memory.phenomenon_memory.phenomena[TER].is_inside(allo_prompt):
-                    if math.fabs(math.atan2(ego_prompt_projection[0], math.fabs(ego_prompt_projection[1]))) > 0.349:
+                    if self.workspace.memory.is_outside_terrain(ego_prompt_projection):
+                        print("Projection point inaccessible")
+                        composite_enaction = Enaction(self.workspace.actions[ACTION_WATCH], self.workspace.memory,
+                                                      color=EMOTION_UPSET)
+                        self.step = STEP_INIT
+                    # If angle to projection point greater than 20° and projection before object
+                    elif math.fabs(math.atan2(ego_prompt_projection[0], math.fabs(ego_prompt_projection[1]))) > 0.349 and\
+                            self.workspace.memory.egocentric_memory.focus_point[0] - ego_prompt_projection[0] > 100:
+                        # If prompt projection behind object swipe to prompt_intersection
                         self.workspace.memory.egocentric_memory.prompt_point = ego_prompt_projection
                         # Turn the left to the projection
                         if ego_prompt_projection[1] > 0:
@@ -101,16 +102,16 @@ class DeciderArrange(Decider):
                         e1 = Enaction(self.workspace.actions[ACTION_SWIPE], e0.post_memory, color=EMOTION_ANGRY)
                         composite_enaction = CompositeEnaction([e0, e1])
                     # If angle lawer than 20°
+                    elif self.workspace.memory.is_outside_terrain(ego_prompt_intersection):
+                        print("Intersection point inaccessible")
+                        composite_enaction = Enaction(self.workspace.actions[ACTION_WATCH], self.workspace.memory,
+                                                      color=EMOTION_UPSET)
+                        self.step = STEP_INIT
                     else:
                         print("Swipe to intersection", ego_prompt_intersection)
                         self.workspace.memory.egocentric_memory.prompt_point = ego_prompt_intersection
                         composite_enaction = Enaction(self.workspace.actions[ACTION_SWIPE], self.workspace.memory,
                                                       color=EMOTION_ANGRY)
-                    # If prompt outside the terrain
-                    # else:
-                    #     # Just scan again
-                    #     composite_enaction = Enaction(self.workspace.actions[ACTION_SCAN], self.workspace.memory,
-                    #                                   color=EMOTION_ANGRY)
                 # If robot_point-object-target are aligned
                 else:
                     # If robot_direction also aligned by less than 20°

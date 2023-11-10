@@ -1,6 +1,8 @@
 import numpy as np
+from pyrr import Vector3
 from .PhenomenonObject import PhenomenonObject
-from .PhenomenonTerrain import PhenomenonTerrain, TERRAIN_EXPERIENCE_TYPES
+from .PhenomenonTerrain import PhenomenonTerrain, TERRAIN_EXPERIENCE_TYPES, TERRAIN_ORIGIN_CONFIDENCE
+from ...Robot.RobotDefine import TERRAIN_RADIUS
 
 TER = 0
 
@@ -18,14 +20,42 @@ class PhenomenonMemory:
         else:
             return 0
 
-    def terrain_center(self):
-        """The origin where the robot return for watching"""
-        if TER in self.phenomena:
-            # If the terrain has been identified then the origin is the center of the terrain relative to birth point
-            return self.phenomena[TER].point
+    def watch_point(self):
+        """The point where the robot returns for watching in allocentric coordinates"""
+        # If the terrain has been toured
+        if self.terrain_confidence() >= TERRAIN_ORIGIN_CONFIDENCE:
+            # Set the watch point half way between the center and the color patch
+            point = self.phenomena[TER].origin_direction_quaternion() * \
+                    Vector3([TERRAIN_RADIUS[self.arena_id]["radius"] * 0.5, 0, 0])
+            return point + self.phenomena[TER].point
+        # If the terrain has not been identified then et the watch point as the birth point
         else:
-            # If the terrain has not been identified then the birth point serves as origin
             return np.array([0, 0, 0])
+
+    def arrange_point(self):
+        """Return the point where the robot should arrange the objects in terrain centric coordinates"""
+        # If the terrain has been toured
+        if self.terrain_confidence() >= TERRAIN_ORIGIN_CONFIDENCE:
+            # Set the arrange point half way to the other side of the terrain
+            point = self.phenomena[TER].origin_direction_quaternion() * \
+                    Vector3([-TERRAIN_RADIUS[self.arena_id]["radius"] * 0.5, 0, 0])
+            return point  # + self.phenomena[TER].point
+        # If the terrain has not been identified then the arrange point is the birth point
+        else:
+            return np.array([0, 0, 0])
+
+    def is_outside_terrain(self, allo_point):
+        """Return True if allo_point is not None and there is a confident terrain and allo_point is outside"""
+        # If no point then False
+        if allo_point is None:
+            is_outside_terrain = False
+        # If terrain not confident then False
+        elif self.terrain_confidence() < TERRAIN_ORIGIN_CONFIDENCE:
+            is_outside_terrain = False
+        # If the point is outside the confident terrain then True
+        else:
+            is_outside_terrain = not self.phenomena[TER].is_inside(allo_point)
+        return is_outside_terrain
 
     def create_phenomenon(self, affordance):
         """Create a new phenomenon depending of the type of the affordance"""

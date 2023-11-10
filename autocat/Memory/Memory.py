@@ -48,6 +48,7 @@ class Memory:
         # When no terrain or high excitation and the focus is not too far: HAPPY, DeciderCircle
         if self.egocentric_memory.focus_point is not None and \
                 np.linalg.norm(self.egocentric_memory.focus_point) < FOCUS_TOO_FAR_DISTANCE and \
+                not self.is_outside_terrain(self.egocentric_memory.focus_point) and \
                 self.body_memory.excitation > EXCITATION_LOW or self.phenomenon_memory.terrain_confidence() == 0:
             self.emotion_code = EMOTION_HAPPY
 
@@ -66,11 +67,11 @@ class Memory:
                 # If not tired and not excited but focus
                 else:
                     # If object inside terrain and closer than target: ANGRY, DeciderPush
-                    allo_focus = self.egocentric_to_allocentric(self.egocentric_memory.focus_point)
-                    ego_target = self.terrain_centric_to_egocentric(-terrain_color_point(self.arena_id))
-                    is_inside = self.phenomenon_memory.phenomena[TER].is_inside(allo_focus)
+                    # allo_focus = self.egocentric_to_allocentric(self.egocentric_memory.focus_point)
+                    ego_target = self.terrain_centric_to_egocentric(self.phenomenon_memory.arrange_point())
+                    is_inside = not self.is_outside_terrain(self.egocentric_memory.focus_point)
                     is_closer = self.egocentric_memory.focus_point[0] < ego_target[0]
-                    print("Focus inside terrain", is_inside, "focus before target", is_closer)
+                    print("Focus inside terrain:", is_inside, "focus before target:", is_closer)
                     if is_inside and is_closer:
                         self.emotion_code = EMOTION_ANGRY
                     else:
@@ -170,6 +171,21 @@ class Memory:
         # print("Save memory duration:", time.time() - start_time, "seconds")
 
         return saved_memory
+
+    def is_outside_terrain(self, ego_point):
+        """Return True if ego_point is not None and there is a terrain and ego_point is outside"""
+        allo_point = self.egocentric_to_allocentric(ego_point)
+        return self.phenomenon_memory.is_outside_terrain(allo_point)
+        # # If no point then False
+        # if allo_point is None:
+        #     is_outside_terrain = False
+        # # If terrain not confident then False
+        # elif self.phenomenon_memory.terrain_confidence() < TERRAIN_ORIGIN_CONFIDENCE:
+        #     is_outside_terrain = False
+        # # If the point is outside the confident terrain then True
+        # else:
+        #     is_outside_terrain = not self.phenomenon_memory.phenomena[TER].is_inside(allo_point)
+        # return is_outside_terrain
 
     def is_near_terrain_origin(self):
         """Return True if the robot is near the origin of the terrain"""

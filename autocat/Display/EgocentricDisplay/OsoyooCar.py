@@ -50,5 +50,5 @@ class OsoyooCar:
             self.robot_emotion.color = name_to_rgb("DodgerBlue")
         if emotion_code == EMOTION_ANGRY:
             self.robot_emotion.color = name_to_rgb("red")
-        if emotion_code == EMOTION_UPSET:
+        if emotion_code == EMOTION_UPSET:  # Does not display because only sent to the robot by DeciderArrange
             self.robot_emotion.color = name_to_rgb("DarkOrange")

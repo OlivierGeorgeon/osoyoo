@@ -30,7 +30,7 @@ TERRAIN_RADIUS = {  # "A328": [200, 950, 0],     # 1010mm
                   # "A301": [770, 920, 0],      # 1200mm azimuth 40°
                   "A301": {"radius": 1200, "azimuth": 50},
                   # "PetiteIA": [536, 450, 0],  # 700mm azimuth 50°
-                  "PetiteIA": {"radius": 700, "azimuth": 40},
+                  "PetiteIA": {"radius": 600, "azimuth": 50},
                   "DOLL": {"radius": 1200, "azimuth": 0}      # To be defined
 }
 

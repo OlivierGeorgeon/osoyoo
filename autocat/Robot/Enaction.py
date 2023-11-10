@@ -5,6 +5,7 @@ from pyrr import matrix44
 from playsound import playsound
 from ..Decider.Action import ACTION_FORWARD, ACTION_BACKWARD, ACTION_SWIPE, ACTION_RIGHTWARD,  ACTION_TURN, \
     ACTION_SCAN, ACTION_WATCH
+from ..Decider.Decider import CONFIDENCE_NO_FOCUS, CONFIDENCE_NEW_FOCUS, CONFIDENCE_TOUCHED_FOCUS, CONFIDENCE_CONFIRMED_FOCUS
 from ..Memory.Memory import SIMULATION_TIME_RATIO, EMOTION_RELAXED
 from ..Utils import short_angle
 from .RobotDefine import DEFAULT_YAW, TURN_DURATION, ROBOT_FRONT_X, ROBOT_FRONT_Y, ROBOT_HEAD_X
@@ -59,7 +60,8 @@ class Enaction:
         # The outcome
         self.outcome = None
         self.body_direction_delta = 0  # Displayed in BodyView
-        self.lost_focus = False  # Used by deciders to possibly trigger scan
+        # self.lost_focus = False  # Used by deciders to possibly trigger scan
+        self.focus_confidence = CONFIDENCE_NO_FOCUS  # Used by deciders to possibly trigger scan
         self.translation = None  # Used by allocentric memory to move the robot
         self.yaw_matrix = None  # Used by bodyView to rotate compass points
         self.displacement_matrix = None  # Used by EgocentricMemory to rotate experiences
@@ -178,6 +180,7 @@ class Enaction:
                 if np.linalg.norm(prediction_error_focus) < FOCUS_MAX_DELTA or self.outcome.status == "continuous":
                     # The focus has been kept
                     print("Focus kept with prediction error", prediction_error_focus, "moved to ", end="")
+                    self.focus_confidence = CONFIDENCE_CONFIRMED_FOCUS
                     # If the action has been completed
                     if self.outcome.duration1 >= 1000:
                         # If the head is forward then correct longitudinal displacements
@@ -199,25 +202,32 @@ class Enaction:
                         self.displacement_matrix = matrix44.multiply(translation_matrix, self.yaw_matrix)
                 else:
                     # The focus was lost
-                    print("New focus with prediction error ", prediction_error_focus, end="")
-                    self.lost_focus = True  # Used by agent_circle
+                    print("Prediction error:", prediction_error_focus, "New focus:", end="")
+                    # self.lost_focus = True  # DeciderCircle and DeciderArrange may trigger rescan
+                    self.focus_confidence = CONFIDENCE_NEW_FOCUS
                     # self.focus_point = None
                     # self.focus_point = new_focus
                     # playsound('autocat/Assets/R5.wav', False)
             else:
                 # The focus was lost
                 print("Lost focus due to no echo ", end="")
-                self.lost_focus = True  # Used by agent_circle
+                self.focus_confidence = CONFIDENCE_NO_FOCUS
+                # self.lost_focus = True  # Used by agent_circle
                 # playsound('autocat/Assets/R5.wav', False)
         else:
             # If the robot was not focussed then check for catch focus
             if self.action.action_code in [ACTION_SCAN, ACTION_FORWARD, ACTION_TURN, ACTION_WATCH] \
                     and self.outcome.echo_point is not None:
                 # Catch focus
-                playsound('autocat/Assets/cute_beep2.wav', False)
+                # playsound('autocat/Assets/cute_beep2.wav', False)  # DeciderExplore and DeciderWatch often clear focus
+                self.focus_confidence = CONFIDENCE_NEW_FOCUS
                 print("New focus ", end="")
         self.focus_point = new_focus
         print(self.focus_point)
+
+        # Careful scan forces CONFIDENCE_CONFIRMED_FOCUS
+        if self.command.span == 10 and self.focus_point is not None:
+            self.focus_confidence = CONFIDENCE_CONFIRMED_FOCUS
 
         # Impact or block catch focus
         if self.outcome.impact > 0 and self.action.action_code == ACTION_FORWARD:
@@ -234,7 +244,8 @@ class Enaction:
                 else:
                     self.focus_point = np.array([ROBOT_FRONT_X + 10, 0, 0])
             # Reset lost focus to activate DecideCircle
-            self.lost_focus = False
+            # self.lost_focus = False
+            self.focus_confidence = CONFIDENCE_TOUCHED_FOCUS
             print("Catch focus impact", self.focus_point)
 
         # Move the prompt -----
