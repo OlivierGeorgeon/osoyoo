@@ -3,8 +3,8 @@ from webcolors import name_to_rgb
 from ...Memory.Memory import EMOTION_RELAXED, EMOTION_HAPPY, EMOTION_SAD, EMOTION_ANGRY, EMOTION_UPSET
 
 
-ROBOT_BODY_COLOR = name_to_rgb("darkslateBlue")
-ROBOT_HEAD_COLOR = name_to_rgb("lightsteelBlue")
+ROBOT_BODY_COLOR = name_to_rgb("darkSlateBlue")
+ROBOT_HEAD_COLOR = name_to_rgb("lightSteelBlue")
 ROBOT_WHEEL_COLOR = name_to_rgb("darkBlue")
 
 
@@ -26,7 +26,8 @@ class OsoyooCar:
         self.RRWheel.anchor_position = 40, 18
 
         # The emotion led
-        self.robot_emotion = shapes.Rectangle(-30, 0, 10, 10, color=name_to_rgb("white"), batch=self.batch, group=self.group)
+        self.robot_emotion = shapes.Rectangle(-30, 0, 10, 10, color=name_to_rgb("white"), batch=self.batch,
+                                              group=self.group)
         self.robot_emotion.anchor_position = 5, 5
 
         # Create the head

@@ -2,6 +2,7 @@ import math
 import numpy as np
 from pyrr import matrix44, vector, Quaternion
 from .Phenomenon import Phenomenon
+from .Affordance import MIDDLE_COLOR_INDEX, COLOR_DISTANCE
 from ...Memory.EgocentricMemory.Experience import EXPERIENCE_PLACE, EXPERIENCE_FLOOR
 from ...Robot.RobotDefine import TERRAIN_RADIUS, terrain_color_point
 from ...Utils import azimuth_to_quaternion
@@ -46,27 +47,28 @@ class PhenomenonTerrain(Phenomenon):
                     self.absolute_affordance_key = self.affordance_id
                     self.last_origin_clock = affordance.experience.clock
                     # The phenomenon's origin moves by the green patch relative to this affordance
-                    terrain_offset = affordance.green_point()
-                    if np.dot(affordance.experience.sensor_point(), terrain_color_point(self.arena_id)) < 0:
-                        terrain_offset -= terrain_color_point(self.arena_id)
-                    else:
-                        terrain_offset += terrain_color_point(self.arena_id)
-                        # print("Opposite origin", affordance.experience.sensor_point())
+                    # terrain_offset = affordance.green_point()
+                    # if np.dot(affordance.experience.sensor_point(), terrain_color_point(self.arena_id)) < 0:
+                    #     terrain_offset -= terrain_color_point(self.arena_id)
+                    # else:
+                    #     terrain_offset += terrain_color_point(self.arena_id)
+                    terrain_offset = self.terrain_offset(affordance)
                     self.point += terrain_offset
                     # All the position of affordance including this one are adjusted
                     for a in self.affordances.values():
                         a.point -= terrain_offset
                     self.confidence = TERRAIN_ORIGIN_CONFIDENCE
                 else:
-                    position_correction = - affordance.green_point()
-                    # If the origin affordance has the opposite orientation then we assume it is the other color patch
-                    if np.dot(affordance.experience.sensor_point(), terrain_color_point(self.arena_id)) < 0:
-                        # The North-East patch
-                        position_correction += terrain_color_point(self.arena_id)
-                    else:
-                        # The South-West patch
-                        position_correction -= terrain_color_point(self.arena_id)
-                        print("Opposite origin", affordance.experience.sensor_point())
+                    # position_correction = - affordance.green_point()
+                    # # If the origin affordance has the opposite orientation then we assume it is the other color patch
+                    # if np.dot(affordance.experience.sensor_point(), terrain_color_point(self.arena_id)) < 0:
+                    #     # The North-East patch
+                    #     position_correction += terrain_color_point(self.arena_id)
+                    # else:
+                    #     # The South-West patch
+                    #     position_correction -= terrain_color_point(self.arena_id)
+                    #     print("Opposite origin", affordance.experience.sensor_point())
+                    position_correction = - self.terrain_offset(affordance)
                     # Correct the position of the affordances since last time the robot visited the absolute origin
                     for a in [a for a in self.affordances.values() if a.experience.clock > self.last_origin_clock]:
                         coef = (a.experience.clock - self.last_origin_clock)/(affordance.experience.clock
@@ -119,22 +121,39 @@ class PhenomenonTerrain(Phenomenon):
         if np.dot(self.absolute_affordance().experience.sensor_point(), terrain_color_point(self.arena_id)) < 0:
             # The North-East patch
             return azimuth_to_quaternion(TERRAIN_RADIUS[self.arena_id]["azimuth"])
-            # return Quaternion.from_z_rotation(math.atan2(TERRAIN_RADIUS[self.arena_id][1],
-            #                                              TERRAIN_RADIUS[self.arena_id][0]))
         else:
             # South west patch
             return azimuth_to_quaternion(TERRAIN_RADIUS[self.arena_id]["azimuth"] + 180)
-            # return Quaternion.from_z_rotation(math.atan2(-TERRAIN_RADIUS[self.arena_id][1],
-            #                                              -TERRAIN_RADIUS[self.arena_id][0]))
 
     def outline(self):
+        """Return the terrain outline points"""
         return self.interpolation_points
-        # return self.interpolate(EXPERIENCE_FLOOR)
 
     def phenomenon_label(self):
         """Return the text to display in phenomenon view"""
         label = "Origin: " + str(self.point[0]) + "," + str(self.point[1])
         return label
+
+    def terrain_offset(self, affordance):
+        """Compute the offset to adjust the robot position relative to terrain based on this affordance"""
+        # vo = np.cross(vector.normalise(affordance.experience.sensor_point()), [0, 0, -1])
+        # Distance along the orthogonal vector
+        # color_distance = np.array((MIDDLE_COLOR_INDEX - affordance.experience.color_index) * vo * COLOR_DISTANCE, dtype=int)
+        # print("Relative polar-centric position of green patch", color_distance)
+        # terrain_offset = color_distance + affordance.point + affordance.experience.sensor_point()
+
+        if np.dot(affordance.experience.sensor_point(), terrain_color_point(self.arena_id)) < 0:
+            # The North-East patch
+            terrain_offset = affordance.point + affordance.experience.sensor_point() - terrain_color_point(self.arena_id)
+            vo = np.cross(vector.normalise(-terrain_color_point(self.arena_id)), [0, 0, -1])
+        else:
+            # The South-West patch
+            terrain_offset = affordance.point + affordance.experience.sensor_point() + terrain_color_point(self.arena_id)
+            # print("Opposite origin", affordance.experience.sensor_point())
+            vo = np.cross(vector.normalise(-terrain_color_point(self.arena_id)), [0, 0, 1])
+
+        color_distance = np.array((MIDDLE_COLOR_INDEX - affordance.experience.color_index) * vo * COLOR_DISTANCE, dtype=int)
+        return terrain_offset + color_distance
 
     def save(self, experiences):
         """Return a clone of the phenomenon for memory snapshot"""
