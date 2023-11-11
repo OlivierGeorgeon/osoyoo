@@ -114,8 +114,12 @@ ROBOT_SETTINGS = {
     }
 
 
-def terrain_color_point(arena_id):
+def terrain_quaternion(arena_id):
+    """Return the quaternion representing the terrain orientation from center to NE"""
+    return azimuth_to_quaternion(TERRAIN_RADIUS[arena_id]["azimuth"])
+
+
+def terrain_north_east_point(arena_id):
     """Return the point of the color patch in polar egocentric relative to the terrain center"""
-    return np.array(azimuth_to_quaternion(TERRAIN_RADIUS[arena_id]["azimuth"]) *
-                    Vector3([TERRAIN_RADIUS[arena_id]["radius"], 0, 0]), dtype=int)
+    return np.array(terrain_quaternion(arena_id) * Vector3([TERRAIN_RADIUS[arena_id]["radius"], 0, 0]), dtype=int)
 

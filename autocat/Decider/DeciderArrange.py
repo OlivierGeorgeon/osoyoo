@@ -15,9 +15,7 @@ from . Decider import Decider, FOCUS_TOO_FAR_DISTANCE
 from ..Utils import line_intersection
 from .. Enaction.CompositeEnaction import CompositeEnaction
 from ..Memory.Memory import EMOTION_ANGRY, EMOTION_UPSET
-from ..Memory.PhenomenonMemory.PhenomenonMemory import TER
 from . Interaction import OUTCOME_FLOOR
-from ..Robot.RobotDefine import TERRAIN_RADIUS, terrain_color_point
 from . Interaction import OUTCOME_LOST_FOCUS
 
 STEP_INIT = 0

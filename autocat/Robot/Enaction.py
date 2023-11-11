@@ -133,10 +133,6 @@ class Enaction:
                     yaw_integration_quaternion = - yaw_integration_quaternion
 
                 # Save the difference to display in BodyView
-                # dif_q = self.outcome.compass_quaternion.cross(yaw_integration_quaternion.inverse)
-                # if dif_q.angle > math.pi:
-                #     dif_q = -dif_q
-                # self.body_direction_delta = dif_q.axis[2] * dif_q.angle
                 self.body_direction_delta = short_angle(self.outcome.compass_quaternion, yaw_integration_quaternion)
                 # If positive when turning trigonometric direction then the yaw is measured greater than it is
 
@@ -144,7 +140,7 @@ class Enaction:
                 # 0 is compass only, 1 is yaw estimate only
                 # This is known as a complementary filter
                 # https://forum.arduino.cc/t/guide-to-gyro-and-accelerometer-with-arduino-including-kalman-filtering/57971
-                new_body_quaternion = self.outcome.compass_quaternion.slerp(yaw_integration_quaternion, 0.5)
+                new_body_quaternion = self.outcome.compass_quaternion.slerp(yaw_integration_quaternion, 0.75)
 
                 # Recompute the yaw quaternion
                 yaw_quaternion = new_body_quaternion.cross(self.body_quaternion.inverse)

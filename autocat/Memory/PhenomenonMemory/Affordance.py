@@ -87,14 +87,14 @@ class Affordance:
             points = [p1, p2, p3] + self.point
         return points
 
-    def green_point(self):
-        """Return the position of the green patch from position, color, and orientation of this affordance"""
-        # The orthogonal normalized vector
-        vo = np.cross(vector.normalise(self.experience.sensor_point()), [0, 0, -1])
-        # Distance along the orthogonal vector
-        color_distance = np.array((MIDDLE_COLOR_INDEX - self.experience.color_index) * vo * COLOR_DISTANCE, dtype=int)
-        # print("Relative polar-centric position of green patch", color_distance)
-        return color_distance + self.point + self.experience._sensor_point
+    # def green_point(self):
+    #     """Return the position of the green patch from position, color, and orientation of this affordance"""
+    #     # The orthogonal normalized vector
+    #     vo = np.cross(vector.normalise(self.experience.sensor_point()), [0, 0, -1])
+    #     # Distance along the orthogonal vector
+    #     color_distance = np.array((MIDDLE_COLOR_INDEX - self.experience.color_index) * vo * COLOR_DISTANCE, dtype=int)
+    #     # print("Relative polar-centric position of green patch", color_distance)
+    #     return color_distance + self.point + self.experience._sensor_point
 
     def save(self, experiences):
         """Return a cloned affordance for memory snapshot"""

@@ -11,7 +11,6 @@ from .AllocentricMemory.Hexagonal_geometry import CELL_RADIUS
 from ..Decider.Action import ACTION_SWIPE
 from ..Decider.Decider import FOCUS_TOO_FAR_DISTANCE
 from ..Robot.Outcome import Outcome
-from ..Robot.RobotDefine import TERRAIN_RADIUS, terrain_color_point
 
 GRID_WIDTH = 20  # 15   # 100 Number of cells wide
 GRID_HEIGHT = 60  # 45  # 200 Number of cells high
@@ -36,7 +35,7 @@ class Memory:
         self.egocentric_memory = EgocentricMemory()
         self.allocentric_memory = AllocentricMemory(GRID_WIDTH, GRID_HEIGHT, cell_radius=CELL_RADIUS)
         self.phenomenon_memory = PhenomenonMemory(arena_id)
-        self.body_direction_deltas = {}  # Used to calibrate GYRO_COEF
+        self.compass_prediction_error = {}  # Used to calibrate GYRO_COEF
         self.emotion_code = EMOTION_RELAXED
 
     def __str__(self):
@@ -96,9 +95,11 @@ class Memory:
         self.body_memory.update(enaction)
 
         # Keep a dictionary of the direction deltas to check gyro_coef is correct
-        self.body_direction_deltas[enaction.clock] = enaction.body_direction_delta
-        self.body_direction_deltas = {key: d for key, d in self.body_direction_deltas.items() if key > enaction.clock - 10}
-        print("Average yaw - compass =", round(math.degrees(np.mean(list(self.body_direction_deltas.values()))), 2))
+        self.compass_prediction_error[enaction.clock] = enaction.body_direction_delta
+        self.compass_prediction_error = {key: d for key, d in self.compass_prediction_error.items()
+                                         if key > enaction.clock - 10}
+        print("Average compass prediction error (integrated_yaw - compass)=",
+              round(math.degrees(np.mean(list(self.compass_prediction_error.values()))), 2))
 
         self.egocentric_memory.update_and_add_experiences(enaction)
 
@@ -167,7 +168,7 @@ class Memory:
         saved_memory.allocentric_memory = self.allocentric_memory.save(saved_memory.egocentric_memory.experiences)
         # Clone phenomenon memory
         saved_memory.phenomenon_memory = self.phenomenon_memory.save(saved_memory.egocentric_memory.experiences)
-        saved_memory.body_direction_deltas = {key: d for key, d in self.body_direction_deltas.items()}
+        saved_memory.compass_prediction_error = {key: d for key, d in self.compass_prediction_error.items()}
         # print("Save memory duration:", time.time() - start_time, "seconds")
 
         return saved_memory

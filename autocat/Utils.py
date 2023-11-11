@@ -5,7 +5,7 @@ from pyrr import Quaternion, line
 
 def azimuth_to_quaternion(azimuth):
     """Return the quaternion representing this azimuth from north in degrees"""
-    return Quaternion.from_z_rotation(math.radians(90 - azimuth))
+    return Quaternion.from_z_rotation(math.radians(90 - azimuth))  # Wouldn't work with type int
 
 
 def quaternion_to_azimuth(quaternion):
@@ -81,11 +81,11 @@ def assert_almost_equal_angles(angle1, angle2, difference_degrees):
 #     return pyrr.matrix44.apply_to_vector(rotation_matrix, vector)
 
 
-
 # Testing the utils
 # py autocat\Utils.py
 if __name__ == "__main__":
     # Test quaternion_to_direction_rad()
+    print("=== Test quaternion_to_direction_rad(quaternion) ===")
     q = Quaternion.from_z_rotation(0)
     print("Quaternion 0 rad", quaternion_to_direction_rad(q), quaternion_to_direction_rad(q) == 0)
     q = Quaternion([0., 0., 0., 0.])
@@ -97,6 +97,7 @@ if __name__ == "__main__":
     print("")
 
     # Test quaternion_to_azimuth()
+    print("=== Test quaternion_to_azimuth(quaternion) ===")
     q = Quaternion.from_z_rotation(0)
     print("Azimuth 0°", quaternion_to_azimuth(q), quaternion_to_azimuth(q) == 90)
     q = Quaternion.from_z_rotation(math.radians(90))
@@ -108,6 +109,7 @@ if __name__ == "__main__":
     print("")
 
     # Test azimuth_to_quaternion()
+    print("=== Test azimuth_to_quaternion(azimuth) ===")
     a = quaternion_to_azimuth(azimuth_to_quaternion(0))
     print("Azimuth 0°", a, a == 0)
     a = quaternion_to_azimuth(azimuth_to_quaternion(180))
