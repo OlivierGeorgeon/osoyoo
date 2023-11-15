@@ -91,6 +91,10 @@ class CtrlRobot:
 
         # Terminate the enaction
         self.workspace.enaction.terminate(outcome)
-        if not self.workspace.composite_enaction.increment(outcome):
+        # If the composite enaction is over or aborted due to floor or impact
+        if not self.workspace.composite_enaction.increment(outcome) or outcome.floor > 0 or outcome.impact > 0:
             self.workspace.composite_enaction = None
+        else:
+            # TODO find a more systematic solution to follow up spatial memory in a composite interaction
+            self.workspace.composite_enaction.current_enaction().body_quaternion = self.workspace.enaction.body_quaternion.copy()
         self.workspace.enacter.interaction_step = ENACTION_STEP_INTEGRATING

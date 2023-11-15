@@ -39,7 +39,8 @@ class PhenomenonMemory:
             # Set the arrange point half way to the other side of the terrain
             point = self.phenomena[TER].origin_direction_quaternion() * \
                     Vector3([-TERRAIN_RADIUS[self.arena_id]["radius"] * 0.5, 0, 0])
-            return point  # + self.phenomena[TER].point
+            # return point  # Arrange point is on the opposite side
+            return np.array([0, 0, 0])  # Arrange point is the center of the terrain
         # If the terrain has not been identified then the arrange point is the birth point
         else:
             return np.array([0, 0, 0])

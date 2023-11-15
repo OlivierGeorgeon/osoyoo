@@ -29,8 +29,8 @@ TERRAIN_RADIUS = {  # "A328": [200, 950, 0],     # 1010mm
                   # "A328": [-579, 827, 0],   # 1010mm azimuth  325
                   # "A301": [770, 920, 0],      # 1200mm azimuth 40°
                   "A301": {"radius": 1200, "azimuth": 50},
-                  # "PetiteIA": [536, 450, 0],  # 700mm azimuth 50°
-                  "PetiteIA": {"radius": 600, "azimuth": 50},
+                  # "PetiteIA": {"radius": 600, "azimuth": 50},  # Petit tapis
+                  "PetiteIA": {"radius": 1000, "azimuth": 60},  # Grand tapis
                   "DOLL": {"radius": 1200, "azimuth": 0}      # To be defined
 }
 
@@ -79,7 +79,7 @@ ROBOT_SETTINGS_4["IP"] = {"PetiteIA": "192.168.8.242"}  # 108
 ROBOT_SETTINGS_4["forward_speed"] = 320  # 250
 ROBOT_SETTINGS_4["lateral_speed"] = 250
 ROBOT_SETTINGS_4["retreat_distance"] = 80  # 120  # 80
-ROBOT_SETTINGS_4["compass_offset"] = [76, 0, 0]
+ROBOT_SETTINGS_4["compass_offset"] = [50, -5, 0]  # [76, 0, 0]
 
 # Robot 1 at DOLL
 ROBOT_SETTINGS_11 = ROBOT_SETTINGS_0.copy()

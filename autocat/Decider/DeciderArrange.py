@@ -99,7 +99,7 @@ class DeciderArrange(Decider):
                         # Swipe to the prompt
                         e1 = Enaction(self.workspace.actions[ACTION_SWIPE], e0.post_memory, color=EMOTION_ANGRY)
                         composite_enaction = CompositeEnaction([e0, e1])
-                    # If angle lawer than 20°
+                    # If angle lower than 20°
                     elif self.workspace.memory.is_outside_terrain(ego_prompt_intersection):
                         print("Intersection point inaccessible")
                         composite_enaction = Enaction(self.workspace.actions[ACTION_WATCH], self.workspace.memory,
@@ -113,7 +113,8 @@ class DeciderArrange(Decider):
                 # If robot_point-object-target are aligned
                 else:
                     # If robot_direction also aligned by less than 20°
-                    self.workspace.memory.egocentric_memory.prompt_point = ego_target
+                    push_vector = vector.set_length(ego_target, np.linalg.norm(ego_target) - 100)  # subtract the radius of the robot and of the object
+                    self.workspace.memory.egocentric_memory.prompt_point = push_vector  # ego_target
                     if math.fabs(math.atan2(ego_target[1], ego_target[0])) < 0.349:
                         # Push to target
                         self.workspace.memory.egocentric_memory.focus_point = ego_target.copy()  # Look at the destination

@@ -98,7 +98,8 @@ class Memory:
         self.compass_prediction_error[enaction.clock] = enaction.body_direction_delta
         self.compass_prediction_error = {key: d for key, d in self.compass_prediction_error.items()
                                          if key > enaction.clock - 10}
-        print("Average compass prediction error (integrated_yaw - compass)=",
+        print("Compass prediction error (integrated_yaw - compass)=",
+              round(math.degrees(enaction.body_direction_delta), 2), "Average:",
               round(math.degrees(np.mean(list(self.compass_prediction_error.values()))), 2))
 
         self.egocentric_memory.update_and_add_experiences(enaction)
@@ -177,16 +178,6 @@ class Memory:
         """Return True if ego_point is not None and there is a terrain and ego_point is outside"""
         allo_point = self.egocentric_to_allocentric(ego_point)
         return self.phenomenon_memory.is_outside_terrain(allo_point)
-        # # If no point then False
-        # if allo_point is None:
-        #     is_outside_terrain = False
-        # # If terrain not confident then False
-        # elif self.phenomenon_memory.terrain_confidence() < TERRAIN_ORIGIN_CONFIDENCE:
-        #     is_outside_terrain = False
-        # # If the point is outside the confident terrain then True
-        # else:
-        #     is_outside_terrain = not self.phenomenon_memory.phenomena[TER].is_inside(allo_point)
-        # return is_outside_terrain
 
     def is_near_terrain_origin(self):
         """Return True if the robot is near the origin of the terrain"""

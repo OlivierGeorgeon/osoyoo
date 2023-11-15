@@ -89,6 +89,10 @@ void Interaction::terminate()
   // Turn on the color sensor led
   _FLO._CLR.begin_read();
 
+  // Wait after retreating to be sure that the compass measure is not altered by the motors
+//  if (_FLO._is_retreating)
+//    _action_end_time = millis() + 200;
+
   // Serial.println("Interaction.step2()");
   if (_action_end_time < millis() &&  !_FLO._is_retreating && !_HEA._is_enacting_head_alignment)
   {
