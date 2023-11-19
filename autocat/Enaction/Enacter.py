@@ -18,7 +18,7 @@ class Enacter:
                 # Take a memory snapshot to restore at the end of the enaction
                 self.memory_snapshot = self.workspace.memory.save()
                 # Begin the enaction and attribute the clock
-                self.workspace.enaction.begin(self.workspace.clock)
+                self.workspace.enaction.begin(self.workspace.clock, self.workspace.memory.body_memory.body_quaternion)
                 if self.workspace.is_imagining:
                     # If imagining then proceed to simulating the enaction
                     self.interaction_step = ENACTION_STEP_ENACTING

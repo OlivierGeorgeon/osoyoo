@@ -70,12 +70,14 @@ class Enaction:
         self.message = None
         self.message_sent = False  # Message sent to other robots
 
-    def begin(self, clock):
+    def begin(self, clock, body_quaternion):
         """Adjust the spatial modifiers of the enaction.
         Compute the command to send to the robot.
         Initialize the simulation"""
 
         self.clock = clock
+        # Update the body_quaternion to avoid errors in the estimated yaw
+        self.body_quaternion = body_quaternion.copy()
 
         # Initialize the simulation of the intended interaction
         # Compute the duration and the speed depending and the enaction
@@ -119,8 +121,8 @@ class Enaction:
         else:
             yaw_quaternion = outcome.yaw_quaternion
         yaw_integration_quaternion = self.body_quaternion.cross(yaw_quaternion)
-        print("body_quaternion", repr(self.body_quaternion), "cross yaw_quaternion", repr(yaw_quaternion),
-              "= yaw_integration_quaternion", repr(yaw_integration_quaternion))
+        # print("body_quaternion", repr(self.body_quaternion), "cross yaw_quaternion", repr(yaw_quaternion),
+        #       "= yaw_integration_quaternion", repr(yaw_integration_quaternion))
 
         # If the robot returns no compass then the body_quaternion is estimated from yaw
         if outcome.compass_point is None:
@@ -134,7 +136,7 @@ class Enaction:
                 if self.outcome.compass_quaternion.dot(yaw_integration_quaternion) < 0.0:
                     yaw_integration_quaternion = - yaw_integration_quaternion
 
-                print("compass_quaternion", repr(self.outcome.compass_quaternion), "yaw_integration_quaternion", repr(yaw_integration_quaternion))
+                # print("compass_quaternion", repr(self.outcome.compass_quaternion), "yaw_integration_quaternion", repr(yaw_integration_quaternion))
                 # Save the difference to display in BodyView
                 self.body_direction_delta = short_angle(self.outcome.compass_quaternion, yaw_integration_quaternion)
                 # If positive when turning trigonometric direction then the yaw is measured greater than it is
@@ -152,7 +154,7 @@ class Enaction:
 
                 # Update the body_quaternion
                 self.body_quaternion = new_body_quaternion
-                print("new_body_quaternion", repr(self.body_quaternion))
+                # print("new_body_quaternion", repr(self.body_quaternion))
 
         # Compute the displacement matrix which represents the displacement of the environment
         # relative to the robot (Translates and turns in the opposite direction)
