@@ -11,7 +11,7 @@ from ...Utils import azimuth_to_quaternion
 TERRAIN_EXPERIENCE_TYPES = [EXPERIENCE_PLACE, EXPERIENCE_FLOOR]
 TERRAIN_INITIAL_CONFIDENCE = 10  # Must not be null to allow position correction
 TERRAIN_ORIGIN_CONFIDENCE = 20  # The terrain has an absolute origin
-TERRAIN_CIRCUMFERENCE_CONFIDENCE = 30
+TERRAIN_CIRCUMFERENCE_CONFIDENCE = 30  # The terrain has been toured back to origin
 
 
 class PhenomenonTerrain(Phenomenon):

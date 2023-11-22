@@ -144,6 +144,7 @@ class Workspace:
             # Clear the stack of enactions
             playsound('autocat/Assets/R3.wav', False)
             self.composite_enaction = None
+            # TODO: prevent a crash when the enaction has been clear and then an outcome is received after
 
     def emit_message(self):
         """Return the message to answer to another robot"""

@@ -24,13 +24,13 @@ LINE_X = 150  # 160              # (mm) X coordinate of the line after retreat
 SCAN_DISTANCE = 800
 
 TERRAIN_RADIUS = {  # "A328": [200, 950, 0],     # 1010mm
-                  "A328": {"radius": 1010, "azimuth": 45},
+                  "A328": {"radius": 1010, "azimuth": 25},  # 45},
                   # "A328": [713, 713, 0],    # 1010mm azimuth  45
                   # "A328": [-579, 827, 0],   # 1010mm azimuth  325
                   # "A301": [770, 920, 0],      # 1200mm azimuth 40°
                   "A301": {"radius": 1200, "azimuth": 50},
                   # "PetiteIA": {"radius": 600, "azimuth": 50},  # Petit tapis
-                  "PetiteIA": {"radius": 1000, "azimuth": 60},  # Grand tapis
+                  "PetiteIA": {"radius": 1000, "azimuth": 55},  # 60},  # Grand tapis
                   "DOLL": {"radius": 1200, "azimuth": 0}      # To be defined
 }
 
@@ -54,7 +54,7 @@ ROBOT_SETTINGS_1["IP"] = {"A328": "192.168.8.230", "PetiteIA": "192.168.8.0"}
 ROBOT_SETTINGS_1["forward_speed"] = 300  # (mm/s) Forward translation speed.
 ROBOT_SETTINGS_1["lateral_speed"] = 260  # (mm/s) Lateral translation speed.
 ROBOT_SETTINGS_1["retreat_distance"] = 90  # 70   # (mm) Distance of the line after retreat
-ROBOT_SETTINGS_1["compass_offset"] = [67, -42, 0] # [0, 0, 0]  # Compass offset can also be added into the C++ code.
+ROBOT_SETTINGS_1["compass_offset"] = [57, 21, 0]  # [0, 0, 0]  # Compass offset can also be added into the C++ code.
 
 # Robot 2 in Lyon.
 ROBOT_SETTINGS_2 = ROBOT_SETTINGS_0.copy()
@@ -79,7 +79,7 @@ ROBOT_SETTINGS_4["IP"] = {"PetiteIA": "192.168.8.242"}  # 108
 ROBOT_SETTINGS_4["forward_speed"] = 320  # 250
 ROBOT_SETTINGS_4["lateral_speed"] = 250
 ROBOT_SETTINGS_4["retreat_distance"] = 80  # 120  # 80
-ROBOT_SETTINGS_4["compass_offset"] = [50, -5, 0]  # [76, 0, 0]
+ROBOT_SETTINGS_4["compass_offset"] = [50, -16, 0]  # [50, -5, 0]  # [76, 0, 0]
 
 # Robot 1 at DOLL
 ROBOT_SETTINGS_11 = ROBOT_SETTINGS_0.copy()

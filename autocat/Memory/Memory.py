@@ -6,7 +6,7 @@ from .EgocentricMemory.EgocentricMemory import EgocentricMemory
 from .AllocentricMemory.AllocentricMemory import AllocentricMemory
 from .BodyMemory import BodyMemory, EXCITATION_LOW, ENERGY_TIRED
 from .PhenomenonMemory.PhenomenonMemory import PhenomenonMemory, TER
-from .PhenomenonMemory.PhenomenonTerrain import TERRAIN_ORIGIN_CONFIDENCE
+from .PhenomenonMemory.PhenomenonTerrain import TERRAIN_INITIAL_CONFIDENCE, TERRAIN_ORIGIN_CONFIDENCE
 from .AllocentricMemory.Hexagonal_geometry import CELL_RADIUS
 from ..Decider.Action import ACTION_SWIPE
 from ..Decider.Decider import FOCUS_TOO_FAR_DISTANCE
@@ -44,37 +44,38 @@ class Memory:
 
     def appraise_emotion(self):
         """Update the emotional state code"""
-        # When no terrain or high excitation and the focus is not too far: HAPPY, DeciderCircle
+        # When high excitation and the focus is not too far: HAPPY, DeciderCircle until terrain origin confidence
         if self.egocentric_memory.focus_point is not None and \
                 np.linalg.norm(self.egocentric_memory.focus_point) < FOCUS_TOO_FAR_DISTANCE and \
                 not self.is_outside_terrain(self.egocentric_memory.focus_point) and \
-                self.body_memory.excitation > EXCITATION_LOW or self.phenomenon_memory.terrain_confidence() == 0:
+                self.body_memory.excitation > EXCITATION_LOW or \
+                self.phenomenon_memory.terrain_confidence() < TERRAIN_ORIGIN_CONFIDENCE:
             self.emotion_code = EMOTION_HAPPY
-
-        # When terrain is confident
+        # If terrain is confident and focus inside
         else:
-            if self.phenomenon_memory.terrain_confidence() >= TERRAIN_ORIGIN_CONFIDENCE:
-                # If tired: RELAXED, DeciderExplore to go home
-                if self.body_memory.energy < ENERGY_TIRED:
-                    self.emotion_code = EMOTION_RELAXED
-                # If not tired and excited: HAPPY, DeciderExplore
-                elif self.body_memory.excitation >= EXCITATION_LOW:
-                    self.emotion_code = EMOTION_RELAXED
-                # If not tired and not excited and not focus: SAD, DeciderWatch
-                elif self.egocentric_memory.focus_point is None:
-                    self.emotion_code = EMOTION_SAD
-                # If not tired and not excited but focus
+            # When terrain is confident
+            # if self.phenomenon_memory.terrain_confidence() >= TERRAIN_ORIGIN_CONFIDENCE:
+            # If tired: RELAXED, DeciderExplore to go home
+            if self.body_memory.energy < ENERGY_TIRED:
+                self.emotion_code = EMOTION_RELAXED
+            # If not tired and excited: RELAXED, DeciderExplore
+            elif self.body_memory.excitation >= EXCITATION_LOW:
+                self.emotion_code = EMOTION_RELAXED
+            # If not tired and not excited and not focus: SAD, DeciderWatch
+            elif self.egocentric_memory.focus_point is None:
+                self.emotion_code = EMOTION_SAD
+            # If not tired and not excited but focus
+            else:
+                # If object inside terrain and closer than target: ANGRY, DeciderPush
+                ego_target = self.terrain_centric_to_egocentric(self.phenomenon_memory.arrange_point())
+                # is_inside = not self.is_outside_terrain(self.egocentric_memory.focus_point)
+                is_inside = self.is_to_arrange(self.egocentric_memory.focus_point)
+                is_closer = self.egocentric_memory.focus_point[0] < ego_target[0]
+                print("Focus is object to arrange:", is_inside, "focus before target:", is_closer)
+                if is_inside and is_closer:
+                    self.emotion_code = EMOTION_ANGRY
                 else:
-                    # If object inside terrain and closer than target: ANGRY, DeciderPush
-                    # allo_focus = self.egocentric_to_allocentric(self.egocentric_memory.focus_point)
-                    ego_target = self.terrain_centric_to_egocentric(self.phenomenon_memory.arrange_point())
-                    is_inside = not self.is_outside_terrain(self.egocentric_memory.focus_point)
-                    is_closer = self.egocentric_memory.focus_point[0] < ego_target[0]
-                    print("Focus inside terrain:", is_inside, "focus before target:", is_closer)
-                    if is_inside and is_closer:
-                        self.emotion_code = EMOTION_ANGRY
-                    else:
-                        self.emotion_code = EMOTION_SAD
+                    self.emotion_code = EMOTION_SAD
 
     def update_and_add_experiences(self, enaction):
         """ Process the enacted interaction to update the memory
@@ -156,6 +157,14 @@ class Memory:
             return self.allocentric_to_egocentric(point + self.phenomenon_memory.phenomena[TER].point)
         return self.allocentric_to_egocentric(point)
 
+    def egocentric_to_terrain_centric(self, point):
+        """Return the point in terrain egocentric coordinates from the point in egocentric coordinates"""
+        if point is None:
+            return None
+        if self.phenomenon_memory.terrain_confidence() >= TERRAIN_ORIGIN_CONFIDENCE:
+            return self.egocentric_to_allocentric(point) - self.phenomenon_memory.phenomena[TER].point
+        return self.egocentric_to_allocentric(point)
+
     def save(self):
         """Return a clone of memory for memory snapshot"""
         # start_time = time.time()
@@ -173,6 +182,22 @@ class Memory:
         # print("Save memory duration:", time.time() - start_time, "seconds")
 
         return saved_memory
+
+    def is_to_arrange(self, ego_point):
+        """Return True if the focus indicates an object to arrange"""
+        # If no terrain origin then don't arrange object
+        if self.phenomenon_memory.terrain_confidence() <= TERRAIN_INITIAL_CONFIDENCE:
+            return False
+        # If there is a terrain origin, check if the focus is around the terrain center
+        # if self.phenomenon_memory.terrain_confidence() == TERRAIN_ORIGIN_CONFIDENCE:
+        else:
+            terrain_point = self.egocentric_to_terrain_centric(ego_point)
+            print("Terrain point", terrain_point)
+            return np.linalg.norm(terrain_point) < 400
+        # If the terrain has been toured, check if the focus is inside the terrain
+        # TODO Check if inside terrain if the terrain is wide enough
+        # else:
+            return self.is_outside_terrain(ego_point)
 
     def is_outside_terrain(self, ego_point):
         """Return True if ego_point is not None and there is a terrain and ego_point is outside"""

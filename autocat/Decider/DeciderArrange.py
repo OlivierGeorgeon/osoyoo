@@ -45,8 +45,8 @@ class DeciderArrange(Decider):
         """The enactions to push a object to a target place"""
 
         print("Step", self.step)
-        # If LOST FOCUS then scan again
-        if outcome == OUTCOME_LOST_FOCUS and self.step in [STEP_INIT, STEP_ALIGN]:
+        # If LOST FOCUS or impact then scan again
+        if outcome in [OUTCOME_LOST_FOCUS, OUTCOME_FLOOR] and self.step in [STEP_INIT, STEP_ALIGN]:
             composite_enaction = Enaction(self.workspace.actions[ACTION_SCAN], self.workspace.memory, span=10,
                                           color=EMOTION_ANGRY)
             self.step = STEP_INIT  # Avoids systematically recalling DeciderArrange
@@ -57,7 +57,7 @@ class DeciderArrange(Decider):
             l1 = line.create_from_points(self.workspace.memory.egocentric_memory.focus_point, ego_target)
             ego_prompt_intersection = line_intersection(l1, line.create_from_points([0, 0, 0], [0, 1, 0]))
             ego_prompt_projection = point_closest_point_on_line(np.array([0, 0, 0]), l1)
-            print("Prompt projection:", ego_prompt_projection, "focus:",
+            print("Ego prompt projection:", ego_prompt_projection, "focus:",
                   self.workspace.memory.egocentric_memory.focus_point, "target:", ego_target)
             # If OUTCOME_FLOOR just scan
             if outcome == OUTCOME_FLOOR:
@@ -76,14 +76,14 @@ class DeciderArrange(Decider):
                 # If robot-object-target not aligned
                 if math.fabs(ego_prompt_projection[1]) > 50:
                     # Go to the point from where to push
-                    allo_prompt = self.workspace.memory.egocentric_to_allocentric(ego_prompt_projection)
-                    if self.workspace.memory.is_outside_terrain(ego_prompt_projection):
-                        print("Projection point inaccessible")
-                        composite_enaction = Enaction(self.workspace.actions[ACTION_WATCH], self.workspace.memory,
-                                                      color=EMOTION_UPSET)
-                        self.step = STEP_INIT
+                    # TODO: Make it work when the terrain has not been toured
+                    # if self.workspace.memory.is_outside_terrain(ego_prompt_projection):
+                    #     print("Projection point inaccessible")
+                    #     composite_enaction = Enaction(self.workspace.actions[ACTION_WATCH], self.workspace.memory,
+                    #                                   color=EMOTION_UPSET)
+                    #     self.step = STEP_INIT
                     # If angle to projection point greater than 20° and projection before object
-                    elif math.fabs(math.atan2(ego_prompt_projection[0], math.fabs(ego_prompt_projection[1]))) > 0.349 and\
+                    if math.fabs(math.atan2(ego_prompt_projection[0], math.fabs(ego_prompt_projection[1]))) > 0.349 and\
                             self.workspace.memory.egocentric_memory.focus_point[0] - ego_prompt_projection[0] > 100:
                         # If prompt projection behind object swipe to prompt_intersection
                         self.workspace.memory.egocentric_memory.prompt_point = ego_prompt_projection
@@ -99,12 +99,12 @@ class DeciderArrange(Decider):
                         # Swipe to the prompt
                         e1 = Enaction(self.workspace.actions[ACTION_SWIPE], e0.post_memory, color=EMOTION_ANGRY)
                         composite_enaction = CompositeEnaction([e0, e1])
-                    # If angle lower than 20°
-                    elif self.workspace.memory.is_outside_terrain(ego_prompt_intersection):
-                        print("Intersection point inaccessible")
-                        composite_enaction = Enaction(self.workspace.actions[ACTION_WATCH], self.workspace.memory,
-                                                      color=EMOTION_UPSET)
-                        self.step = STEP_INIT
+                    # If angle lower than 20° TODO make it compatible with arange with no terrain
+                    # elif self.workspace.memory.is_outside_terrain(ego_prompt_intersection):
+                    #     print("Intersection point inaccessible")
+                    #     composite_enaction = Enaction(self.workspace.actions[ACTION_WATCH], self.workspace.memory,
+                    #                                   color=EMOTION_UPSET)
+                    #     self.step = STEP_INIT
                     else:
                         print("Swipe to intersection", ego_prompt_intersection)
                         self.workspace.memory.egocentric_memory.prompt_point = ego_prompt_intersection

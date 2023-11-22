@@ -22,7 +22,7 @@ class PhenomenonMemory:
 
     def watch_point(self):
         """The point where the robot returns for watching in allocentric coordinates"""
-        # If the terrain has been toured
+        # If the terrain has has an origin
         if self.terrain_confidence() >= TERRAIN_ORIGIN_CONFIDENCE:
             # Set the watch point half way between the center and the color patch
             point = self.phenomena[TER].origin_direction_quaternion() * \
