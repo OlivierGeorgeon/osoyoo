@@ -101,8 +101,8 @@ class Memory:
                                          if key > enaction.clock - 10}
         print("Compass prediction error (integrated_yaw - compass)=",
               round(math.degrees(enaction.body_direction_delta), 2), "Average:",
-              round(math.degrees(np.mean(list(self.compass_prediction_error.values()))), 2))
-
+              round(math.degrees(np.mean(list(self.compass_prediction_error.values()))), 2), "std:",
+              round(math.degrees(np.std(list(self.compass_prediction_error.values()))), 2))
         self.egocentric_memory.update_and_add_experiences(enaction)
 
         # The integrator may again update the robot's position
@@ -192,7 +192,7 @@ class Memory:
         # if self.phenomenon_memory.terrain_confidence() == TERRAIN_ORIGIN_CONFIDENCE:
         else:
             terrain_point = self.egocentric_to_terrain_centric(ego_point)
-            print("Terrain point", terrain_point)
+            print("Focus in terrain-centric coordinates", terrain_point)
             return np.linalg.norm(terrain_point) < 400
         # If the terrain has been toured, check if the focus is inside the terrain
         # TODO Check if inside terrain if the terrain is wide enough

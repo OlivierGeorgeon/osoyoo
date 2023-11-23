@@ -1,4 +1,4 @@
-#define ROBOT_ID 2 // 0: regular Osoyoo robot, 1: robot BSN, 2: robot UCBL, 3: SHS chez Olivier, 11 to 14: DOLL robots
+#define ROBOT_ID 3 // 0: regular Osoyoo robot, 1: robot BSN, 2: robot UCBL, 3: SHS chez Olivier, 11 to 14: DOLL robots
 
 #define AP_SSID "osoyoo_robot"          // The wifi SSID of this robot in Access Point
 #define ROBOT_HEAD_X 80                 // (mm) X position of the head
@@ -51,8 +51,8 @@
 #define TURN_SPOT_MAX_DURATION 2400
 #define TURN_SPOT_ENDING_DELAY 200  // Rotation speed is about 1° per 10ms
 #define TURN_SPOT_ENDING_ANGLE 10
-#define COMPASS_X_OFFSET 1089      // Previous IMU board: 1421
-#define COMPASS_Y_OFFSET -1547     // Previous IMU board: -1601
+#define COMPASS_X_OFFSET 527 // 651  // 1089      // Previous IMU board: 1421
+#define COMPASS_Y_OFFSET -800  // -987 // -1547     // Previous IMU board: -1601
 #define ACCELERATION_X_OFFSET 0    // Previous IMU board: -550
 #define ACCELERATION_Y_OFFSET -35  // Previous IMU board: 150
 #define ACCELERATION_X_IMPACT_THRESHOLD 250 // -400 // Below the threshold it is a strong deceleration = shock
@@ -78,8 +78,8 @@
 #define TURN_SPOT_MAX_DURATION 2400
 #define TURN_SPOT_ENDING_DELAY 200
 #define TURN_SPOT_ENDING_ANGLE 9 // 5
-#define COMPASS_X_OFFSET  1071  // 1100  // 1005  //  1020,  1060
-#define COMPASS_Y_OFFSET  -1225  // -1300  // -1247 // -1300, -1290
+#define COMPASS_X_OFFSET  870  // 1071  // 1100  // 1005  //  1020,  1060
+#define COMPASS_Y_OFFSET  -1000 // -1225  // -1300  // -1247 // -1300, -1290
 #define ACCELERATION_X_OFFSET -55  // 55  // 35
 #define ACCELERATION_Y_OFFSET 0  // -3        //
 #define ACCELERATION_X_IMPACT_THRESHOLD 210  // 200 Longitudinal impact if acceleration exceeds this threshold
@@ -105,15 +105,15 @@
 #define TURN_SPOT_MAX_DURATION 2400
 #define TURN_SPOT_ENDING_DELAY 200 // 400 for WHEEL_COEFs 0.8
 #define TURN_SPOT_ENDING_ANGLE 10  // 18
-#define COMPASS_X_OFFSET  163
-#define COMPASS_Y_OFFSET  -665
+#define COMPASS_X_OFFSET  155  // 163
+#define COMPASS_Y_OFFSET  -554  // -665
 #define ACCELERATION_X_OFFSET -30
 #define ACCELERATION_Y_OFFSET 0
 #define ACCELERATION_X_IMPACT_THRESHOLD 250
 #define ACCELERATION_Y_IMPACT_THRESHOLD 250
 #define ACCELERATION_X_BLOCK_THRESHOLD 140
 #define ACCELERATION_Y_BLOCK_THRESHOLD 80
-#define GYRO_COEF 0.98  // If average(yaw - compass)>0 when turning trigonometric then decrease this value
+#define GYRO_COEF 0.98  // If average(integrated_yaw - compass)>0 when turning trigonometric (left "1") then decrease this value
 #define ROBOT_SERVO_PIN 6
 #define GYRO_IMPACT_THRESHOLD 0.5
 #define WHITE_RED 89.
@@ -134,8 +134,8 @@
 #define TURN_SPOT_ENDING_ANGLE 15
 #define ACCELERATION_X_OFFSET 0
 #define ACCELERATION_Y_OFFSET 0
-#define COMPASS_X_OFFSET -1155
-#define COMPASS_Y_OFFSET -1150
+#define COMPASS_X_OFFSET -936  // -1155
+#define COMPASS_Y_OFFSET -931  // -1150
 // #define ACCELERATION_IMPACT_THRESHOLD -300
 #define ACCELERATION_X_IMPACT_THRESHOLD 200  // 300 Longitudinal impact if acceleration exceeds this threshold
 #define ACCELERATION_Y_IMPACT_THRESHOLD 200  // 110 lateral impact if acceleration exceeds this threshold

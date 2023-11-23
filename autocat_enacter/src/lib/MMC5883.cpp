@@ -257,7 +257,7 @@ void MMC5883MA::setOffset(int xo, int yo)
 }
 
 // Olivier Georgeon for compatibility with HMC5883
-Vector MMC5883MA::readNormalize(void)
+Vector MMC5883MA::readRaw(void)
 {
     update();
     v.XAxis = (float)sx/5.0 - xOffset;

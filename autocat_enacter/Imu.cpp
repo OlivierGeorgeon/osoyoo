@@ -76,16 +76,17 @@ void Imu::setup()
   }
 
   // Set measurement range
-  compass.setRange(HMC5883L_RANGE_1_3GA);
+  // compass.setRange(HMC5883L_RANGE_1_3GA);  Seems to generate some out-of-range measures in A328
+  compass.setRange(HMC5883L_RANGE_1_9GA);
 
   // Set measurement mode
-  compass.setMeasurementMode(HMC5883L_CONTINOUS);
+  compass.setMeasurementMode(HMC5883L_CONTINOUS);  //HMC5883L_SINGLE);  // HMC5883L_CONTINOUS);
 
   // Set data rate
-  compass.setDataRate(HMC5883L_DATARATE_30HZ); // HMC5883L_DATARATE_15HZ
+  compass.setDataRate(HMC5883L_DATARATE_30HZ);  // HMC5883L_DATARATE_30HZ); // HMC5883L_DATARATE_15HZ
 
   // Set number of samples averaged
-  compass.setSamples(HMC5883L_SAMPLES_4); // HMC5883L_SAMPLES_8
+  compass.setSamples(HMC5883L_SAMPLES_4);  // HMC5883L_SAMPLES_4); // HMC5883L_SAMPLES_8
 
   // Set calibration offset. See HMC5883L_calibration.ino
   compass.setOffset(COMPASS_X_OFFSET, COMPASS_Y_OFFSET);
@@ -299,7 +300,9 @@ void Imu::outcome_rightwards(JSONVar & outcome_object)
 #if ROBOT_COMPASS_TYPE > 0
 void Imu::read_azimuth(JSONVar & outcome_object)
 {
-  Vector norm = compass.readNormalize();
+  // readNormalize() complicates calibration because it multiplies the offset by some coefficient
+  // Vector norm = compass.readNormalize();
+  Vector norm = compass.readRaw();
 
   // Calculate heading
   float heading = atan2(norm.YAxis, norm.XAxis);

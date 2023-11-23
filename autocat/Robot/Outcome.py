@@ -136,7 +136,7 @@ class Outcome:
         self.compass_point = None
         self.compass_quaternion = None  # Is computed by CtrlRobot
         # Also eliminate abnormal values in compass_x or compass_y observed with Robot 2
-        if 'compass_x' in outcome_dict and abs(outcome_dict['compass_x']) < 1000 and abs(outcome_dict['compass_y']) < 1000:
+        if 'compass_x' in outcome_dict:  # and abs(outcome_dict['compass_x']) < 1000 and abs(outcome_dict['compass_y']) < 1000:
             self.compass_point = np.array([outcome_dict['compass_x'], outcome_dict['compass_y'], 0], dtype=int)
 
         # Outcome floor

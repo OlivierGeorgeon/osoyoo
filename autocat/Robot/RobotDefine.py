@@ -8,6 +8,8 @@ from ..Utils import azimuth_to_quaternion
 #   8V: 190 mm
 #
 
+CHECK_OUTSIDE = 0           # 1 if robot checks echos outside terrain
+
 ROBOT_HEAD_X = 80           # (mm) The X position of the head pivot
 ROBOT_FRONT_X = 110         # (mm) The X position of the robot front
 ROBOT_FRONT_Y = 80          # (mm) The Y position of the robot front to mark lateral shocks
@@ -23,14 +25,10 @@ LINE_X = 150  # 160              # (mm) X coordinate of the line after retreat
 
 SCAN_DISTANCE = 800
 
-TERRAIN_RADIUS = {  # "A328": [200, 950, 0],     # 1010mm
-                  "A328": {"radius": 1010, "azimuth": 25},  # 45},
-                  # "A328": [713, 713, 0],    # 1010mm azimuth  45
-                  # "A328": [-579, 827, 0],   # 1010mm azimuth  325
-                  # "A301": [770, 920, 0],      # 1200mm azimuth 40°
-                  "A301": {"radius": 1200, "azimuth": 50},
+TERRAIN_RADIUS = {"A328": {"radius": 990, "azimuth": 25},  # 45},
                   # "PetiteIA": {"radius": 600, "azimuth": 50},  # Petit tapis
                   "PetiteIA": {"radius": 1000, "azimuth": 55},  # 60},  # Grand tapis
+                  "A301": {"radius": 1200, "azimuth": 50},
                   "DOLL": {"radius": 1200, "azimuth": 0}      # To be defined
 }
 
@@ -79,7 +77,7 @@ ROBOT_SETTINGS_4["IP"] = {"PetiteIA": "192.168.8.242"}  # 108
 ROBOT_SETTINGS_4["forward_speed"] = 320  # 250
 ROBOT_SETTINGS_4["lateral_speed"] = 250
 ROBOT_SETTINGS_4["retreat_distance"] = 80  # 120  # 80
-ROBOT_SETTINGS_4["compass_offset"] = [50, -16, 0]  # [50, -5, 0]  # [76, 0, 0]
+ROBOT_SETTINGS_4["compass_offset"] = [0, 0, 0]  # [50, -5, 0]  # [76, 0, 0]
 
 # Robot 1 at DOLL
 ROBOT_SETTINGS_11 = ROBOT_SETTINGS_0.copy()

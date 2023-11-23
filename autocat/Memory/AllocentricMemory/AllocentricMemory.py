@@ -8,7 +8,7 @@ from . GridCell import GridCell, CELL_UNKNOWN
 from ..EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_PLACE
 from ..AllocentricMemory.GridCell import CELL_NO_ECHO, CELL_PHENOMENON
 from ..EgocentricMemory.Experience import EXPERIENCE_FOCUS, EXPERIENCE_PROMPT
-from ...Robot.RobotDefine import ROBOT_FRONT_X, ROBOT_SIDE
+from ...Robot.RobotDefine import ROBOT_FRONT_X, ROBOT_SIDE, CHECK_OUTSIDE
 from ...Memory.PhenomenonMemory.PhenomenonMemory import TER
 from ...Memory.PhenomenonMemory.PhenomenonTerrain import TERRAIN_CIRCUMFERENCE_CONFIDENCE
 
@@ -76,11 +76,12 @@ class AllocentricMemory:
         # Place the phenomena again
         for p_id, p in phenomena.items():
             # Mark the cells outside the terrain (for BICA 2023 paper)
-            if p_id == TER and p.confidence >= TERRAIN_CIRCUMFERENCE_CONFIDENCE and p.path is not None:
-                for c in [c for line in self.grid for c in line if not p.is_inside(c.point())]:
-                    c.status[0] = EXPERIENCE_FLOOR
-                    c.phenomenon_id = TER
-                    c.clock_place = clock
+            if CHECK_OUTSIDE == 1:
+                if p_id == TER and p.confidence >= TERRAIN_CIRCUMFERENCE_CONFIDENCE and p.path is not None:
+                    for c in [c for line in self.grid for c in line if not p.is_inside(c.point())]:
+                        c.status[0] = EXPERIENCE_FLOOR
+                        c.phenomenon_id = TER
+                        c.clock_place = clock
             # Mark the affordances of this phenomenon
             for a in p.affordances.values():
                 if p_id != TER or p.confidence < TERRAIN_CIRCUMFERENCE_CONFIDENCE or a.experience.color_index != 0:

@@ -11,6 +11,7 @@ from pyrr.geometric_tests import point_closest_point_on_line
 from . Action import ACTION_SWIPE, ACTION_TURN, ACTION_FORWARD, ACTION_BACKWARD, ACTION_SCAN, ACTION_WATCH
 from ..Robot.Enaction import Enaction
 from ..Robot.Command import DIRECTION_LEFT, DIRECTION_RIGHT
+from ..Robot.RobotDefine import CHECK_OUTSIDE
 from . Decider import Decider, FOCUS_TOO_FAR_DISTANCE
 from ..Utils import line_intersection
 from .. Enaction.CompositeEnaction import CompositeEnaction
@@ -20,7 +21,7 @@ from . Interaction import OUTCOME_LOST_FOCUS
 
 STEP_INIT = 0
 STEP_ALIGN = 1
-STEP_PUSH = 2
+STEP_WITHDRAW = 2
 
 
 class DeciderArrange(Decider):
@@ -37,7 +38,7 @@ class DeciderArrange(Decider):
         if self.workspace.memory.emotion_code == EMOTION_ANGRY:
             activation_level = 4
         # Activation 3 during the withdraw step, same as DeciderExplore
-        if self.step in [STEP_ALIGN, STEP_PUSH]:
+        if self.step in [STEP_ALIGN, STEP_WITHDRAW]:
             activation_level = 3
         return activation_level
 
@@ -77,13 +78,14 @@ class DeciderArrange(Decider):
                 if math.fabs(ego_prompt_projection[1]) > 50:
                     # Go to the point from where to push
                     # TODO: Make it work when the terrain has not been toured
-                    # if self.workspace.memory.is_outside_terrain(ego_prompt_projection):
-                    #     print("Projection point inaccessible")
-                    #     composite_enaction = Enaction(self.workspace.actions[ACTION_WATCH], self.workspace.memory,
-                    #                                   color=EMOTION_UPSET)
-                    #     self.step = STEP_INIT
+                    if CHECK_OUTSIDE == 1 and \
+                       self.workspace.memory.is_outside_terrain(ego_prompt_projection):
+                        print("Projection point inaccessible")
+                        composite_enaction = Enaction(self.workspace.actions[ACTION_WATCH], self.workspace.memory,
+                                                      color=EMOTION_UPSET)
+                        self.step = STEP_INIT
                     # If angle to projection point greater than 20° and projection before object
-                    if math.fabs(math.atan2(ego_prompt_projection[0], math.fabs(ego_prompt_projection[1]))) > 0.349 and\
+                    elif math.fabs(math.atan2(ego_prompt_projection[0], math.fabs(ego_prompt_projection[1]))) > 0.349 and\
                             self.workspace.memory.egocentric_memory.focus_point[0] - ego_prompt_projection[0] > 100:
                         # If prompt projection behind object swipe to prompt_intersection
                         self.workspace.memory.egocentric_memory.prompt_point = ego_prompt_projection
@@ -100,11 +102,11 @@ class DeciderArrange(Decider):
                         e1 = Enaction(self.workspace.actions[ACTION_SWIPE], e0.post_memory, color=EMOTION_ANGRY)
                         composite_enaction = CompositeEnaction([e0, e1])
                     # If angle lower than 20° TODO make it compatible with arange with no terrain
-                    # elif self.workspace.memory.is_outside_terrain(ego_prompt_intersection):
-                    #     print("Intersection point inaccessible")
-                    #     composite_enaction = Enaction(self.workspace.actions[ACTION_WATCH], self.workspace.memory,
-                    #                                   color=EMOTION_UPSET)
-                    #     self.step = STEP_INIT
+                    elif CHECK_OUTSIDE == 1 and self.workspace.memory.is_outside_terrain(ego_prompt_intersection):
+                        print("Intersection point inaccessible")
+                        composite_enaction = Enaction(self.workspace.actions[ACTION_WATCH], self.workspace.memory,
+                                                      color=EMOTION_UPSET)
+                        self.step = STEP_INIT
                     else:
                         print("Swipe to intersection", ego_prompt_intersection)
                         self.workspace.memory.egocentric_memory.prompt_point = ego_prompt_intersection
@@ -120,13 +122,13 @@ class DeciderArrange(Decider):
                         self.workspace.memory.egocentric_memory.focus_point = ego_target.copy()  # Look at the destination
                         composite_enaction = Enaction(self.workspace.actions[ACTION_FORWARD], self.workspace.memory,
                                                       color=EMOTION_ANGRY)
-                        self.step = STEP_PUSH
+                        self.step = STEP_WITHDRAW
                     # If robot_direction not aligned
                     else:
                         # Turn to target
                         composite_enaction = Enaction(self.workspace.actions[ACTION_TURN], self.workspace.memory,
                                                       color=EMOTION_ANGRY)
-        # If STEP_PUSH
+        # If STEP_WITHDRAW
         else:
             # Slight Withdraw
             self.workspace.memory.egocentric_memory.prompt_point = None
