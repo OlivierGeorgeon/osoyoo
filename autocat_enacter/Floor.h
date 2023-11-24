@@ -19,7 +19,7 @@ class Floor
   public:
     Floor();
     void setup();
-    int update();
+    int update(int interaction_direction);
     int measureFloor();
     void extraDuration(int duration);
     void outcome(JSONVar & outcome_object);

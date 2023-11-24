@@ -1,4 +1,4 @@
-#define ROBOT_ID 3 // 0: regular Osoyoo robot, 1: robot BSN, 2: robot UCBL, 3: SHS chez Olivier, 11 to 14: DOLL robots
+#define ROBOT_ID 4 // 0: regular Osoyoo robot, 1: robot BSN, 2: robot UCBL, 3: SHS chez Olivier, 11 to 14: DOLL robots
 
 #define AP_SSID "osoyoo_robot"          // The wifi SSID of this robot in Access Point
 #define ROBOT_HEAD_X 80                 // (mm) X position of the head
@@ -51,8 +51,8 @@
 #define TURN_SPOT_MAX_DURATION 2400
 #define TURN_SPOT_ENDING_DELAY 200  // Rotation speed is about 1° per 10ms
 #define TURN_SPOT_ENDING_ANGLE 10
-#define COMPASS_X_OFFSET 527 // 651  // 1089      // Previous IMU board: 1421
-#define COMPASS_Y_OFFSET -800  // -987 // -1547     // Previous IMU board: -1601
+#define COMPASS_X_OFFSET 882 // 651  // 1089      // Previous IMU board: 1421
+#define COMPASS_Y_OFFSET -1253  // -987 // -1547     // Previous IMU board: -1601
 #define ACCELERATION_X_OFFSET 0    // Previous IMU board: -550
 #define ACCELERATION_Y_OFFSET -35  // Previous IMU board: 150
 #define ACCELERATION_X_IMPACT_THRESHOLD 250 // -400 // Below the threshold it is a strong deceleration = shock

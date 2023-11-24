@@ -2,6 +2,7 @@ import json
 import math
 from pyrr import Vector3, Quaternion
 from .. Robot.RobotDefine import ROBOT_FRONT_X
+from ..Utils import azimuth_to_quaternion
 
 
 class Message:
@@ -13,9 +14,8 @@ class Message:
         message_dict = json.loads(message_string)
 
         self.robot = message_dict['robot']
-        self.body_quaternion = Quaternion.from_z_rotation(math.radians(90 - message_dict["azimuth"]))
-        # if self.other_body_quaternion.angle > math.pi:
-        #     self.other_body_quaternion *= -1
+        # self.body_quaternion = Quaternion.from_z_rotation(math.radians(90 - message_dict["azimuth"]))
+        self.body_quaternion = azimuth_to_quaternion(message_dict["azimuth"])
 
         self.destination = Vector3([0, 0, 0])
         if 'destination_x' in message_dict:

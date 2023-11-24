@@ -74,3 +74,8 @@ void Backward::outcome(JSONVar & outcome_object)
 {
   _IMU.outcome_backward(outcome_object);
 }
+
+int Backward::direction()
+{
+ return DIRECTION_BACK;
+}

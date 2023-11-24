@@ -39,6 +39,7 @@ class Wheel
     void retreatRight();
     void retreatStrait();
     void retreatLeft();
+    void retreatFront();
     void stopMotion();
     void circumvent(int speed);
   private:

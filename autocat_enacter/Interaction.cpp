@@ -156,3 +156,8 @@ int Interaction::update()
 
   return _step;
 }
+
+int Interaction::direction()
+{
+ return DIRECTION_FRONT;
+}

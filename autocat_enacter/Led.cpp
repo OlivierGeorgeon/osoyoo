@@ -20,11 +20,11 @@ void Led::setup()
   pinMode(BLUE_LED_PIN, OUTPUT);
 }
 
-// Blink the LED with period 100ms
-void Led::blink()
+// Update the LEDs
+void Led::update()
 {
   // cycle_count++;
-  // Blink the builtin led
+  // Blink the builtin led  with period 100ms
   if (millis() > blink_time + BLINK_PERIOD / 2)
   {
     blink_time = millis();
@@ -41,7 +41,7 @@ void Led::blink()
     }
   }
 
-  // Pulse the emotion led
+  // Pulse the emotion led with period 1000ms
   float sinValue = sin(0.00628 * millis());  // Calculate the sine value (* 2 * PI / period)
 
   analogWrite(RED_LED_PIN, (sinValue + 1.) * 100. * emotion_red);     // [0,200] Set the LED brightness using PWM
@@ -49,6 +49,7 @@ void Led::blink()
   analogWrite(BLUE_LED_PIN, (sinValue + 1.) * 127.5 * emotion_blue);  // [0,255]
 }
 
+// Set the Emotion LED color
 void Led::color(int c)
 {
   // Off

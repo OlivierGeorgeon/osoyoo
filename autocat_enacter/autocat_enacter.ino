@@ -1,15 +1,15 @@
 /*
-   ____  __ __  ______   ___     __   ____  ______
-  /    ||  |  ||      | /   \   /  ] /    ||      |
- |  o  ||  |  ||      ||     | /  / |  o  ||      |
- |     ||  |  ||_|  |_||  O  |/  /  |     ||_|  |_|
- |  _  ||  :  |  |  |  |     /   \_ |  _  |  |  |
- |  |  ||     |  |  |  |     \     ||  |  |  |  |
- |__|__| \__,_|  |__|   \___/ \____||__|__|  |__|
+ ____    ___  ______  ____  ______    __   ____  ______
+|    \  /  _]|      ||    ||      |  /  ] /    ||      |
+|  o  )/  [_ |      | |  | |      | /  / |  o  ||      |
+|   _/|    _]|_|  |_| |  | |_|  |_|/  /  |     ||_|  |_|
+|  |  |   [_   |  |   |  |   |  | /   \_ |  _  |  |  |
+|  |  |     |  |  |   |  |   |  | \     ||  |  |  |  |
+|__|  |_____|  |__|  |____|  |__|  \____||__|__|  |__|
 
  Upload autocat_enacter.ino to the OSOYOO robot car
 
-  Spring 2023
+  2023
     Olivier Georgeon
   Spring 2022
    Titouan Knockart, Université Claude Bernard (UCBL), France
@@ -41,6 +41,7 @@ Led LED;
 Sequencer SEQ(FLO, HEA, IMU, LED, WifiCat);
 
 int interaction_step = 0;
+int interaction_direction = 0;
 Interaction* INT  = nullptr;  // The interaction type will depend on the action received from the PC
 
 void setup()
@@ -84,11 +85,11 @@ void loop()
 {
   // Make the built-in led blink to show that the main loop is running properly
 
-  LED.blink();
+  LED.update();
 
   // Behavior Floor Change Retreat
 
-  FLO.update();
+  FLO.update(interaction_direction);
 
   // Behavior Head Echo Alignment
 
@@ -106,5 +107,10 @@ void loop()
   // Update the current interaction and return INTERACTION_DONE when done
 
   if (INT != nullptr)
+  {
     interaction_step = INT->update();
+    interaction_direction = INT->direction();
+  }
+  else
+    interaction_direction = DIRECTION_FRONT;
 }

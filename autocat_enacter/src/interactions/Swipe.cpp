@@ -83,3 +83,12 @@ void Swipe::outcome(JSONVar & outcome_object)
   else
     _IMU.outcome_rightwards(outcome_object);
 }
+
+// The direction used in case of Floor line detection
+int Swipe::direction()
+{
+  if (_speed > 0)
+    return DIRECTION_LEFT;
+  else
+    return DIRECTION_RIGHT;
+}

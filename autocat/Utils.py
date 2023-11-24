@@ -9,7 +9,7 @@ def azimuth_to_quaternion(azimuth):
 
 
 def quaternion_to_azimuth(quaternion):
-    """Return the azimuth in degree relative to north [0,360["""
+    """Return the azimuth in degree represented by this quaternion"""
     return round((90 - math.degrees(quaternion_to_direction_rad(quaternion))) % 360)
 
 
@@ -54,14 +54,6 @@ def line_intersection(line1, line2):
 def short_angle(quaternion1, quaternion2):
     """Return the short angle from q1 to q2, positive if q2 is to the left of q1 (q2 > q1)"""
     return -quaternion_to_direction_rad(quaternion1 * quaternion2.inverse)
-    # angle = q.angle
-    # if angle > math.pi:  # The short angle
-    #     angle -= 2.0 * math.pi
-    # elif angle < -math.pi:
-    #     angle += 2.0 * math.pi
-    # if not np.isnan(q.z) and q.axis[2] > 0:  # The direction of the z axis rotation
-    #     angle *= -1
-    # return angle
 
 
 def assert_almost_equal_angles(angle1, angle2, difference_degrees):
@@ -282,56 +274,3 @@ if __name__ == "__main__":
     body_quaternion = compass_quaternion.slerp(yaw_integration_quaternion, 0.75)  # 0.75
     print("11 azimuth", quaternion_to_azimuth(compass_quaternion), "slerp", quaternion_to_azimuth(yaw_integration_quaternion), "=", quaternion_to_azimuth(body_quaternion))
 
-    # print("--- Investigation ---")
-    # compass_quaternion = azimuth_to_quaternion(111)
-    # print("15 Compass quaternion", compass_quaternion, "azimuth", quaternion_to_azimuth(compass_quaternion))
-    # compass_quaternion = Quaternion([0., 0., -0.18515614, 0.98270911])
-    # print("15 Trace Compass quaternion", compass_quaternion, "azimuth", quaternion_to_azimuth(compass_quaternion))
-    # yaw_integration_quaternion = Quaternion([0., 0., -0.25666968, 0.96649919])
-    # print("15 Trace Yaw integration quaternion", yaw_integration_quaternion, "azimuth", quaternion_to_azimuth(yaw_integration_quaternion))
-    # body_quaternion = compass_quaternion.slerp(yaw_integration_quaternion, 0.75)  # 0.75
-    # print("15 body quaternion", body_quaternion, "azimuth", quaternion_to_azimuth(body_quaternion))
-    # body_direction_delta = math.degrees(short_angle(compass_quaternion, yaw_integration_quaternion))
-    # print("15 prediction error", body_direction_delta, math.isclose(body_direction_delta, -8.404623246925771))
-    # yaw = -32
-    # yaw_quaternion = Quaternion.from_z_rotation(math.radians(yaw))
-    # print("16 yaw", yaw, "yaw quaternion", yaw_quaternion)
-    # yaw_integration_quaternion = body_quaternion.cross(yaw_quaternion)
-    # compass_quaternion = Quaternion([0.,  0., -0.46984835,  0.88274715])
-    # # print("dot", compass_quaternion.dot(yaw_integration_quaternion))
-    # if compass_quaternion.dot(yaw_integration_quaternion) < 0.0:
-    #     yaw_integration_quaternion = - yaw_integration_quaternion
-    # print("16 yaw_integration_quaternion", yaw_integration_quaternion, "azimuth", quaternion_to_azimuth(yaw_integration_quaternion))
-    # print("16 compass_quaternion", compass_quaternion, "azimuth", quaternion_to_azimuth(compass_quaternion))
-    # body_direction_delta = math.degrees(short_angle(compass_quaternion, yaw_integration_quaternion))
-    # print("16 prediction error", body_direction_delta, math.isclose(body_direction_delta, 0.5))
-    # body_quaternion = compass_quaternion.slerp(yaw_integration_quaternion, 0.75)  # 0.75
-    # print("16 azimuth", quaternion_to_azimuth(compass_quaternion), "slerp", quaternion_to_azimuth(yaw_integration_quaternion), "=", quaternion_to_azimuth(body_quaternion))
-    #
-    # compass_quaternion = Quaternion([0.        ,  0.        , -0.46984835,  0.88274715])
-    # print("16 trace compass quaternion", compass_quaternion, "azimuth", quaternion_to_azimuth(compass_quaternion))
-    # yaw_integration_quaternion = Quaternion([0.        , 0.        , 0.24407974, 0.96975516])
-    # print("16 trace yaw_integration_quaternion", yaw_integration_quaternion, "azimuth", quaternion_to_azimuth(yaw_integration_quaternion))
-    # print("16 trace prediction error", math.degrees(short_angle(compass_quaternion, yaw_integration_quaternion)))
-    #
-    # print("---- Investigate ----")
-    # body_quaternion = Quaternion([0., 0., 0.01828479, 0.99983282])
-    # print("14 body_quaternion", repr(body_quaternion), "azimuth", quaternion_to_azimuth(body_quaternion))
-    # yaw_quaternion = Quaternion([0., 0., - 0.12186934, 0.99254615])
-    # print("14 yaw_quaternion", repr(yaw_quaternion), "yaw", -31)
-    # yaw_integration_quaternion = Quaternion([0., 0., - 0.10370047, 0.99460857])
-    # print("14 yaw_integration_quaternion", repr(yaw_integration_quaternion), "azimuth", quaternion_to_azimuth(yaw_integration_quaternion))
-    # compass_quaternion = Quaternion([0., 0., -0.11252807, 0.99364855])
-    # print("14 compass_quaternion", repr(compass_quaternion), "azimuth", quaternion_to_azimuth(compass_quaternion))
-    # body_quaternion = compass_quaternion.slerp(yaw_integration_quaternion, 0.75)  # 0.75
-    # print("14 body_quaternion", repr(body_quaternion), "azimuth", quaternion_to_azimuth(body_quaternion))
-    #
-    # body_quaternion = Quaternion([0., 0., 0.56709214, 0.82365436])
-    # print("15 body_quaternion", repr(body_quaternion), "azimuth", quaternion_to_azimuth(body_quaternion))
-    # yaw_quaternion = Quaternion([0.,0., - 0.26723838, 0.96363045])
-    # print("15 yaw_quaternion", repr(yaw_quaternion), "yaw", -31)
-    # yaw_integration_quaternion = Quaternion([0., 0., 0.3263552, 0.94524721])
-    # print("15 yaw_integration_quaternion", repr(yaw_integration_quaternion), "azimuth", quaternion_to_azimuth(yaw_integration_quaternion))
-    # compass_quaternion = Quaternion([ 0.        ,  0.        , -0.3896081 ,  0.92098074])
-    # print("15 compass_quaternion", repr(compass_quaternion), "azimuth", quaternion_to_azimuth(compass_quaternion))
-    # yaw_integration_quaternion = Quaternion([0.        , 0.        , 0.3263552 , 0.94524721])

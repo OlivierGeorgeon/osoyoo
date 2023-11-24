@@ -1,6 +1,5 @@
 ########################################################################################
-# This decider makes the robot stay in the watch point and watch for objects in its surrounding
-# And also listen for messages from the other robot
+# This decider makes the robot stay in the watch point and watch for object in the center of the terrrain
 # Activation 2 if emotion is SAD
 ########################################################################################
 
@@ -9,14 +8,13 @@ from playsound import playsound
 import numpy as np
 from . Action import ACTION_WATCH, ACTION_TURN, ACTION_SWIPE, ACTION_FORWARD, ACTION_SCAN
 from ..Robot.Enaction import Enaction
-from ..Memory.BodyMemory import ENERGY_TIRED, EXCITATION_LOW
 from ..Memory.Memory import EMOTION_SAD
 from ..Enaction.CompositeEnaction import CompositeEnaction
 from . Decider import Decider  # , FOCUS_TOO_TOO_FAR_DISTANCE, FOCUS_FAR_DISTANCE
 from . PredefinedInteractions import create_or_retrieve_primitive, OUTCOME_FOCUS_SIDE, OUTCOME_FOCUS_FRONT, OUTCOME_FOCUS_TOO_FAR
 
 
-class DeciderWatch(Decider):
+class DeciderWatchCenter(Decider):
     def __init__(self, workspace):
         super().__init__(workspace)
 
@@ -41,25 +39,14 @@ class DeciderWatch(Decider):
         """ Convert the enacted interaction into an outcome adapted to the watch behavior """
 
         outcome = super().outcome(enaction)
-
-        # If a message was received then we focus on the other robot
-        if enaction is not None and enaction.message is not None:
-            other_angle = math.atan2(enaction.message.ego_position[1], enaction.message.ego_position[0])
-            if math.fabs(other_angle) > math.pi / 6:
-                # Focus on the other robot's destination
-                print("Other ego destination point", enaction.message.ego_position)
-                print("Other angle", math.degrees(other_angle))
-                playsound('autocat/Assets/chirp.wav', False)
-                self.workspace.memory.egocentric_memory.focus_point = enaction.message.ego_position
-                outcome = OUTCOME_FOCUS_SIDE
-
         return outcome
 
     def select_enaction(self, outcome):
         """Return the next intended interaction"""
 
-        # If far from watch point then go to watch point
-        distance_to_watch_point = np.linalg.norm(self.workspace.memory.allocentric_memory.robot_point - self.workspace.memory.phenomenon_memory.watch_point())
+        # If far from the origin then return to origin
+        distance_to_watch_point = np.linalg.norm(self.workspace.memory.allocentric_memory.robot_point -
+                                                 self.workspace.memory.phenomenon_memory.watch_point())
         print("Distance to watch point", round(distance_to_watch_point))
         if distance_to_watch_point > 200:
             self.workspace.memory.egocentric_memory.prompt_point = \
@@ -79,9 +66,11 @@ class DeciderWatch(Decider):
 
         # Set the spatial modifiers
         if self.action.action_code in [ACTION_TURN]:
-            if outcome == OUTCOME_FOCUS_TOO_FAR or self.workspace.memory.egocentric_memory.focus_point is None:
-                # If focus TOO FAR or None then turn around
-                self.workspace.memory.egocentric_memory.prompt_point = np.array([-100, 0, 0], dtype=int)
+            if self.workspace.memory.egocentric_memory.focus_point is None or \
+                    not self.workspace.memory.is_to_arrange(self.workspace.memory.egocentric_memory.focus_point):
+                # If no focus or not in the arrange area then turn to the terrain center
+                self.workspace.memory.egocentric_memory.prompt_point = \
+                    self.workspace.memory.terrain_centric_to_egocentric(np.array([0, 0, 0]))
             else:
                 # If focus SIDE then turn to the focus
                 self.workspace.memory.egocentric_memory.prompt_point = \

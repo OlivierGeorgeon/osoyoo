@@ -15,6 +15,7 @@ public:
   void begin() override;
   void ongoing() override;
   void outcome(JSONVar & outcome_object) override;
+  int direction() override;
 private:
 };
 

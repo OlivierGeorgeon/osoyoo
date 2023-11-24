@@ -119,6 +119,13 @@ void Wheel::retreatLeft()
   _is_retreating = true;
 }
 
+// Retreat front when interaction backward
+void Wheel::retreatFront()
+{
+  setMotion(150, 150, 150, 150);
+  _is_retreating = true;
+}
+
 void Wheel::stopMotion()    //Stop
 {
   analogWrite(speedPinLB,0);

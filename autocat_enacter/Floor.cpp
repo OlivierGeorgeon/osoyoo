@@ -3,6 +3,7 @@
   Created by Olivier Georgeon, june 20 2021
   released into the public domain
 */
+#include "Action_define.h"
 #include "Arduino.h"
 #include "Floor.h"
 #include "Wheel.h"
@@ -23,7 +24,7 @@ void Floor::setup()
   _CLR.setup();
 }
 
-int Floor::update()
+int Floor::update(int interaction_direction)
 {
   // Detect change in the floor measure
   int current_measure_floor = measureFloor();
@@ -40,39 +41,69 @@ int Floor::update()
       // Start the retreat
       // Serial.println("Floor change " + String(floor_change, BIN) + " Begin retreat at " + String(millis()));
       _is_retreating = true;
-      switch (floor_change)
+      if (floor_change == 0b00100)
+        _floor_outcome = B11;
+      else if ((floor_change & 0b00011) == 0)
+        _floor_outcome = B10;
+      else if ((floor_change & 0b11000) == 0)
+        _floor_outcome = B01;
+      else
+        _floor_outcome = B11;
+
+//      switch (floor_change)
+//      {
+//        case 0b10000:
+//        case 0b01000:
+//        case 0b11000:
+//        case 0b10100:
+//        case 0b01100:
+//        case 0b11100:
+//          _floor_outcome = B10;
+//          break;
+//        case 0b00111:
+//        case 0b00101:
+//        case 0b00110:
+//        case 0b00011:
+//        case 0b00010:
+//        case 0b00001:
+//          _floor_outcome = B01;
+//          break;
+//        default:
+//          _floor_outcome = B11;
+//      }
+
+      _retreat_end_time = millis() + 5 * RETREAT_DURATION;
+      // If was swiping left then retreat right for 1 second
+      if (interaction_direction == DIRECTION_LEFT)
+        _OWM.retreatRight();
+      // If was swiping right then retreat left for 1 second
+      else if (interaction_direction == DIRECTION_RIGHT)
+        _OWM.retreatLeft();
+      else
       {
-        case 0b10000:
-        case 0b11000:
-        case 0b01000:
-        case 0b11100:
-        case 0b01100:
-        case 0b10100:
-          // Retreat right
-          _OWM.retreatRight();
-          //_OWM.setMotion(-150,-150,-50,-50);
-          _floor_outcome = B10;
-          _retreat_end_time = millis() + RETREAT_DURATION + 2* RETREAT_EXTRA_DURATION;
-          break;
-        case 0b00111:
-        case 0b00101:
-        case 0b00110:
-        case 0b00011:
-        case 0b00010:
-        case 0b00001:
-          // Retreat left
-          _OWM.retreatLeft();
-          _floor_outcome = B01;
-          _retreat_end_time = millis() + RETREAT_DURATION + 2 * RETREAT_EXTRA_DURATION;
-          break;
-        default:
-          // Retreat straight
-          _OWM.retreatStrait();
-          _floor_outcome = B11;
-          _retreat_end_time = millis() + RETREAT_DURATION;
-          break;
-      }
+        _retreat_end_time = millis() + RETREAT_DURATION;
+        // If was moving backward then retreat front for 200ms
+        if (interaction_direction == DIRECTION_BACK)
+          _OWM.retreatFront();
+        // If was moving forward or turning
+        else
+        {
+          // If line in front then retreat strait for 200ms
+          if (_floor_outcome == B11)
+            _OWM.retreatStrait();
+          else
+          {
+            _retreat_end_time = millis() + 2 * RETREAT_DURATION;
+            // if line on the left then retreat right for 400ms
+            if (_floor_outcome == B10)
+              _OWM.retreatRight();
+            // if line on the right then retreat left for 400ms
+            else
+              _OWM.retreatLeft();
+          }
+        }
       // _debug_message += String(millis()) + ": floor changed. ";
+      }
     }
   }
   // IF currently retreating

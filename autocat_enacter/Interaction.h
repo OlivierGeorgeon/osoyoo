@@ -21,6 +21,7 @@ public:
   virtual void ongoing();
   virtual void outcome(JSONVar & outcome_object);
   virtual void terminate();
+  virtual int direction();
   void send();
   int update();
 protected:

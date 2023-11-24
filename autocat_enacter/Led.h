@@ -1,5 +1,5 @@
 /*
-  Led.h - library to control the build in LED.
+  Led.h - library to control the LEDs.
   Created Olivier Georgeon February 15 2023
   Released into the public domain
 */
@@ -18,7 +18,7 @@ class Led
 public:
   Led();
   void setup();
-  void blink();
+  void update();
   void color(int c);
 private:
   unsigned long blink_time = 0;
