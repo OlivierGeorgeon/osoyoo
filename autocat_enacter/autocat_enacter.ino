@@ -83,7 +83,7 @@ void setup()
 
 void loop()
 {
-  // Make the built-in led blink to show that the main loop is running properly
+  // Control the built-in led and the emotion led
 
   LED.update();
 

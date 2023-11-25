@@ -8,10 +8,10 @@ from playsound import playsound
 import numpy as np
 from . Action import ACTION_WATCH, ACTION_TURN, ACTION_SWIPE, ACTION_FORWARD, ACTION_SCAN
 from ..Robot.Enaction import Enaction
-from ..Memory.Memory import EMOTION_SAD
+from ..Memory.Memory import EMOTION_SAD, EMOTION_UPSET
 from ..Enaction.CompositeEnaction import CompositeEnaction
-from . Decider import Decider  # , FOCUS_TOO_TOO_FAR_DISTANCE, FOCUS_FAR_DISTANCE
-from . PredefinedInteractions import create_or_retrieve_primitive, OUTCOME_FOCUS_SIDE, OUTCOME_FOCUS_FRONT, OUTCOME_FOCUS_TOO_FAR
+from . Decider import Decider
+from . PredefinedInteractions import create_or_retrieve_primitive, OUTCOME_FOCUS_FRONT
 
 
 class DeciderWatchCenter(Decider):
@@ -29,8 +29,8 @@ class DeciderWatchCenter(Decider):
         self.action = self.workspace.actions[ACTION_WATCH]
 
     def activation_level(self):
-        """The level of activation is 2 if the robot is SAD"""
-        if self.workspace.memory.emotion_code == EMOTION_SAD:
+        """The level of activation is 2 if the robot is SAD or UPSET"""
+        if self.workspace.memory.emotion_code in [EMOTION_SAD, EMOTION_UPSET]:
             return 2
         else:
             return 0
@@ -72,7 +72,7 @@ class DeciderWatchCenter(Decider):
                 self.workspace.memory.egocentric_memory.prompt_point = \
                     self.workspace.memory.terrain_centric_to_egocentric(np.array([0, 0, 0]))
             else:
-                # If focus SIDE then turn to the focus
+                # If focus to arrange then turn to the focus
                 self.workspace.memory.egocentric_memory.prompt_point = \
                     self.workspace.memory.egocentric_memory.focus_point.copy()
         else:

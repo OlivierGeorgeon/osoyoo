@@ -14,8 +14,8 @@ class Message:
         message_dict = json.loads(message_string)
 
         self.robot = message_dict['robot']
-        # self.body_quaternion = Quaternion.from_z_rotation(math.radians(90 - message_dict["azimuth"]))
         self.body_quaternion = azimuth_to_quaternion(message_dict["azimuth"])
+        self.emotion_code = message_dict["emotion"]
 
         self.destination = Vector3([0, 0, 0])
         if 'destination_x' in message_dict:

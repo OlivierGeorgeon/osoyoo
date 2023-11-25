@@ -6,6 +6,7 @@ from webcolors import name_to_rgb
 from ..Memory.EgocentricMemory.Experience import EXPERIENCE_LOCAL_ECHO, EXPERIENCE_CENTRAL_ECHO,  EXPERIENCE_PLACE, \
     EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_IMPACT, EXPERIENCE_BLOCK, FLOOR_COLORS, EXPERIENCE_FOCUS, \
     EXPERIENCE_ROBOT
+from .EgocentricDisplay.OsoyooCar import EMOTION_COLORS
 
 
 # Points of interest that only exist in Body Display
@@ -86,12 +87,11 @@ class PointOfInterest:
             self.shape = self.batch.add_indexed(6, gl.GL_TRIANGLES, group, [0, 1, 2, 0, 2, 3, 0, 3, 4, 0, 4, 5],
                                                 ('v2i', self.points), ('c4B', 6 * (*self.color, self.opacity)))
         if self.type == EXPERIENCE_ROBOT:
-            self.color = name_to_rgb("lightsteelBlue")
-            # self.points = [20, -16, 20, 16, -20, 16, -20, -16]
-            self.points = [110, 0, 100, 80, -100, 80, -100, -80, 100, -80]
-            # self.points += [200, -25, 210, -25, 210, 25, 200, 25]
-            self.shape = self.batch.add_indexed(5, gl.GL_TRIANGLES, self.group, [0, 1, 2, 0, 2, 3, 0, 3, 4],
-                                                ('v2i', self.points), ('c4B', 5 * (*self.color, self.opacity)))
+            bg_color = name_to_rgb("lightsteelBlue")
+            self.color = name_to_rgb(EMOTION_COLORS[color_index])
+            self.points = [110, 0, 100, 80, -100, 80, -100, -80, 100, -80, -40, -10, -20, -10, -20, 10, -40, 10]
+            self.shape = self.batch.add_indexed(9, gl.GL_TRIANGLES, self.group, [0, 1, 2, 0, 2, 3, 0, 3, 4, 5, 6, 7, 5, 7, 8],
+                                                ('v2i', self.points), ('c4B', 5 * (*bg_color, self.opacity) + 4 * (*self.color, self.opacity)))
 
         # Move the point of interest to its position
         position_matrix = matrix44.create_from_translation([x, y, 0]).astype('float64')
@@ -99,7 +99,12 @@ class PointOfInterest:
 
     def set_color(self, color_name=None):
         """ Set the color or reset it to its default value. Also reset the opacity. """
-        if color_name is None:
+        if self.type == EXPERIENCE_ROBOT:
+            if color_name is None:
+                self.shape.colors[0: 9*4] = 5 * (*name_to_rgb("lightsteelBlue"), self.opacity) + 4 * (*self.color, self.opacity)
+            else:
+                self.shape.colors[0: 9*4] = 5 * (*name_to_rgb("lightsteelBlue"), self.opacity) + 4 * (*name_to_rgb(color_name), self.opacity)
+        elif color_name is None:
             if hasattr(self.shape, 'vertices'):
                 nb_points = int(len(self.shape.vertices) / 2)
                 self.shape.colors[0: nb_points*4] = nb_points * (*self.color, self.opacity)

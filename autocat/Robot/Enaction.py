@@ -8,7 +8,7 @@ from ..Decider.Action import ACTION_FORWARD, ACTION_BACKWARD, ACTION_SWIPE, ACTI
 from ..Decider.Decider import CONFIDENCE_NO_FOCUS, CONFIDENCE_NEW_FOCUS, CONFIDENCE_TOUCHED_FOCUS, CONFIDENCE_CONFIRMED_FOCUS
 from ..Memory.Memory import SIMULATION_TIME_RATIO, EMOTION_RELAXED
 from ..Utils import short_angle
-from .RobotDefine import DEFAULT_YAW, TURN_DURATION, ROBOT_FRONT_X, ROBOT_FRONT_Y, ROBOT_HEAD_X
+from .RobotDefine import DEFAULT_YAW, TURN_DURATION, ROBOT_FRONT_X, ROBOT_FRONT_Y, ROBOT_HEAD_X,  ROBOT_SETTINGS, RETREAT_DISTANCE_Y
 from .Command import Command, DIRECTION_FRONT
 
 FOCUS_MAX_DELTA = 200  # 200 (mm) Maximum delta to keep focus
@@ -25,6 +25,7 @@ class Enaction:
         """Initialize the enaction upon creation. Will be adjusted before generating the command"""
         # The initial arguments
         self.action = action
+        self.robot_id = memory.robot_id
 
         # the attributes that will be adjusted
         self.clock = None
@@ -110,7 +111,21 @@ class Enaction:
             self.translation *= (self.outcome.duration1/(self.action.target_duration * 1000.))
         else:
             self.translation *= (self.outcome.duration1/self.command.duration)
-        self.translation += outcome.retreat_translation
+
+        if self.outcome.floor > 0:
+            # Update the translation
+            if self.outcome.floor == 0b01:
+                # Black line on the right
+                retreat = [-ROBOT_SETTINGS[self.robot_id]["retreat_distance"], RETREAT_DISTANCE_Y, 0]
+            elif self.outcome.floor == 0b10:
+                # Black line on the left
+                retreat = [-ROBOT_SETTINGS[self.robot_id]["retreat_distance"], -RETREAT_DISTANCE_Y, 0]
+            else:
+                # Black line on the front
+                retreat = [-ROBOT_SETTINGS[self.robot_id]["retreat_distance"], 0, 0]
+            playsound('autocat/Assets/cyberpunk3.wav', False)
+            self.translation += retreat
+
         if outcome.blocked:
             self.translation = np.array([0, 0, 0], dtype=int)
 

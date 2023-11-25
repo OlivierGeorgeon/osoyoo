@@ -84,7 +84,8 @@ class AllocentricMemory:
                         c.clock_place = clock
             # Mark the affordances of this phenomenon
             for a in p.affordances.values():
-                if p_id != TER or p.confidence < TERRAIN_CIRCUMFERENCE_CONFIDENCE or a.experience.color_index != 0:
+                # if p_id != TER or p.confidence < TERRAIN_CIRCUMFERENCE_CONFIDENCE or a.experience.color_index != 0:
+                if p.confidence < TERRAIN_CIRCUMFERENCE_CONFIDENCE or a.experience.color_index != 0:
                     # Attribute the status of the affordance
                     cell_x, cell_y = point_to_cell(a.point+p.point)
                     self.apply_status_to_cell(cell_x, cell_y, a.experience.type, a.experience.clock, a.experience.color_index)

@@ -155,7 +155,7 @@ class Workspace:
             return None
 
         message = {"robot": self.robot_id, "clock": self.clock, "azimuth": self.memory.body_memory.body_azimuth(),
-                   "color": self.enaction.command.color}
+                   "emotion": self.memory.emotion_code}
 
         # If the terrain has been found then send the position relative to the terrain origin
         if TER in self.memory.phenomenon_memory.phenomena and self.memory.phenomenon_memory.phenomena[TER].confidence > TERRAIN_INITIAL_CONFIDENCE:

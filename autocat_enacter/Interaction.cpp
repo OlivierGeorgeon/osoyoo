@@ -89,13 +89,13 @@ void Interaction::terminate()
   // Turn on the color sensor led
   _FLO._CLR.begin_read();
 
-  // Wait after retreating to be sure that the compass measure is not altered by the motors
-  // Does not imprive the compass measure
-//  if (_FLO._is_retreating)
-//    _action_end_time = millis() + 500;
+  // If is retreating then wait for immobilization
+  if (_FLO._is_retreating)
+    _action_end_time = millis() + 200;
 
   // Serial.println("Interaction.step2()");
-  if (_action_end_time < millis() &&  !_FLO._is_retreating && !_HEA._is_enacting_head_alignment)
+  // if (_action_end_time < millis() &&  !_FLO._is_retreating && !_HEA._is_enacting_head_alignment)
+  if (_action_end_time < millis() && !_HEA._is_enacting_head_alignment)
   {
     // Read the floor color and return true when done
     if (_FLO._CLR.end_read())

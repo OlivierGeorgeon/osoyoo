@@ -30,7 +30,6 @@ class Phenomenon:
         # The hull is used to display the phenomenon's contour
         self.hull_points = None
         self.path = None
-        # self.delaunay = None
         self.interpolation_types = None
         self.interpolation_points = None
 
@@ -58,7 +57,7 @@ class Phenomenon:
             points = np.array([a.point[0:2] for a in self.affordances.values()])
             hull = ConvexHull(points)
             hull_array = np.array([points[vertex] for vertex in hull.vertices])
-            self.delaunay = Delaunay(hull_array)
+            # self.delaunay = Delaunay(hull_array)
             self.hull_points = hull_array.flatten().astype("int").tolist()
         except QhullError:
             print("Error computing the convex hull: probably not enough points.")
@@ -104,20 +103,6 @@ class Phenomenon:
             return False
         else:
             return self.path.contains_point(p[0:2])
-
-        # https://stackoverflow.com/questions/16750618/whats-an-efficient-way-to-find-if-a-point-lies-in-the-convex-hull-of-a-point-cl
-        # is_inside = False  # True for marking the outside cells in black (in AllocentricMemory.update_affordances)
-        # if self.delaunay is not None and p is not None:
-        #     try:
-        #         # Must reduce to 2 dimensions otherwise the point is not found inside
-        #         is_inside = (self.delaunay.find_simplex((p - self.point)[0:2]) >= 0)
-        #     except IndexError as e:
-        #         print("Error testing inside:", e)
-        #     except TypeError as e:
-        #         print("Error testing inside:", e)
-        # else:
-        #     print("Delaunay or p is None")
-        # return is_inside
 
     def phenomenon_label(self):
         """Return the text to display in phenomenon view"""

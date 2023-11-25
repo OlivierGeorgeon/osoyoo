@@ -1,9 +1,12 @@
 import pyglet
 from pyglet.gl import *
+from pyrr import Matrix44
 from ..EgocentricDisplay.OsoyooCar import OsoyooCar
 from .CellDisplay import CellDisplay
 from ...Memory.AllocentricMemory.Hexagonal_geometry import point_to_cell
+from ...Memory.EgocentricMemory.Experience import EXPERIENCE_ROBOT
 from ..InteractiveDisplay import InteractiveDisplay
+from ..PointOfInterest import PointOfInterest
 
 
 NB_CELL_WIDTH = 30
@@ -39,6 +42,7 @@ class AllocentricView(InteractiveDisplay):
         self.cell_radius = workspace.memory.allocentric_memory.cell_radius
 
         self.hexagons = [[None for _ in range(self.nb_cell_y)] for _ in range(self.nb_cell_x)]
+        self.robot_poi = None  # The other robot point of interest
 
         self.mouse_press_x = 0
         self.mouse_press_y = 0
@@ -79,8 +83,9 @@ class AllocentricView(InteractiveDisplay):
         self.batch.draw()
 
         # Stack the transformation to position the robot
-        glTranslatef(self.workspace.memory.allocentric_memory.robot_point[0],
-                     self.workspace.memory.allocentric_memory.robot_point[1], 0)
+        # glTranslatef(self.workspace.memory.allocentric_memory.robot_point[0],
+        #              self.workspace.memory.allocentric_memory.robot_point[1], 0)
+        glTranslatef(*self.workspace.memory.allocentric_memory.robot_point)
         glRotatef(90 - self.workspace.memory.body_memory.body_azimuth(), 0.0, 0.0, 1.0)
         # Draw the robot
         self.robot.rotate_head(self.workspace.memory.body_memory.head_direction_degree())
@@ -103,3 +108,16 @@ class AllocentricView(InteractiveDisplay):
         self.label.text = "Mouse pos.: " + str(prompt_point[0]) + ", " + str(prompt_point[1])
         self.label.text += ", Cell: " + str(cell_x) + ", " + str(cell_y)
         return cell_x, cell_y
+
+    def update_robot_poi(self, phenomenon):
+        """Update the other robot point of interest if it exists"""
+        if self.robot_poi is not None:
+            self.robot_poi.delete()
+            self.robot_poi = None
+        if phenomenon is not None:
+            self.robot_poi = PointOfInterest(0, 0, self.batch, self.forefront,
+                                             EXPERIENCE_ROBOT, phenomenon.current().experience.clock,
+                                             color_index=phenomenon.current().experience.color_index)
+            rotation = Matrix44.from_z_rotation(-phenomenon.current().experience.absolute_direction_rad)
+            displacement_matrix = Matrix44.from_translation(phenomenon.point) * rotation
+            self.robot_poi.displace(displacement_matrix)

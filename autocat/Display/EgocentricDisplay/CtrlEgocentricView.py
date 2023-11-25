@@ -41,7 +41,7 @@ class CtrlEgocentricView:
 
                 # Mark the new prompt
                 self.workspace.memory.egocentric_memory.prompt_point = self.click_point
-                focus_poi = PointOfInterest(self.click_point[0], self.click_point[1], self.view.batch,
+                focus_poi = PointOfInterest(*self.click_point[0: 2], self.view.batch,
                                             self.view.background, POINT_PROMPT, self.workspace.clock)
                 self.points_of_interest.append(focus_poi)
                 # focus_point.is_selected = True
@@ -76,15 +76,15 @@ class CtrlEgocentricView:
 
         # Re-create the focus point
         if self.workspace.memory.egocentric_memory.focus_point is not None:
-            focus_poi = PointOfInterest(self.workspace.memory.egocentric_memory.focus_point[0],
-                                        self.workspace.memory.egocentric_memory.focus_point[1],
+            focus_poi = PointOfInterest(*self.workspace.memory.egocentric_memory.focus_point[0: 2],
+                                        # self.workspace.memory.egocentric_memory.focus_point[1],
                                         self.view.batch, self.view.forefront, EXPERIENCE_FOCUS, self.workspace.clock)
             self.points_of_interest.append(focus_poi)
 
         # Re-create the prompt point
         if self.workspace.memory.egocentric_memory.prompt_point is not None:
-            prompt_poi = PointOfInterest(self.workspace.memory.egocentric_memory.prompt_point[0],
-                                         self.workspace.memory.egocentric_memory.prompt_point[1],
+            prompt_poi = PointOfInterest(*self.workspace.memory.egocentric_memory.prompt_point[0: 2],
+                                         # self.workspace.memory.egocentric_memory.prompt_point[1],
                                          self.view.batch, self.view.background, POINT_PROMPT, self.workspace.clock)
             self.points_of_interest.append(prompt_poi)
 

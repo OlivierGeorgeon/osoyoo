@@ -2,6 +2,7 @@ import math
 import numpy as np
 from pyrr import matrix44, Quaternion, Vector3
 from ..Robot.RobotDefine import ROBOT_SETTINGS, ROBOT_FRONT_X, ROBOT_SIDE
+from ..Utils import quaternion_to_azimuth, quaternion_to_direction_rad
 
 ENERGY_TIRED = 88  # 90  # 92  # Level of energy below which the agent wants to go to color patch
 EXCITATION_LOW = 95  # 60  # 75  # Level of excitation below witch the agent just wants to watch if it is not tired
@@ -46,19 +47,19 @@ class BodyMemory:
 
     def body_azimuth(self):
         """Return the azimuth in degree relative to north [0,360["""
-        return round((90 - math.degrees(self.get_body_direction_rad())) % 360)
+        return quaternion_to_azimuth(self.body_quaternion)
+        # return round((90 - math.degrees(self.get_body_direction_rad())) % 360)
 
     def get_body_direction_rad(self):
         """Return the body direction in rad in polar-egocentric reference"""
-        # The Z component of the rotation axis gives the sign of the angle if is not NaN
-        if np.isnan(self.body_quaternion.axis[2]):
-            print("Nan quaternion", self.body_quaternion)
-            self.body_quaternion = Quaternion([0., 0., 0., 1.])
-        if self.body_quaternion.z > 0:
-            return self.body_quaternion.angle
-        else:
-            return - self.body_quaternion.angle
-        # return self.body_quaternion.axis[2] * self.body_quaternion.angle
+        return quaternion_to_direction_rad(self.body_quaternion)
+        # if np.isnan(self.body_quaternion.axis[2]):
+        #     print("Nan quaternion", self.body_quaternion)
+        #     self.body_quaternion = Quaternion([0., 0., 0., 1.])
+        # if self.body_quaternion.z > 0:
+        #     return self.body_quaternion.angle
+        # else:
+        #     return - self.body_quaternion.angle
 
     def body_direction_matrix(self):
         """Return the body direction matrix to apply to experiences"""

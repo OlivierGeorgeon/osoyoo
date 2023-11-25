@@ -3,6 +3,7 @@
   Created by Olivier Georgeon, june 20 2021
   released into the public domain
 */
+
 #include "Action_define.h"
 #include "Arduino.h"
 #include "Floor.h"
@@ -31,15 +32,18 @@ int Floor::update(int interaction_direction)
   int floor_change = current_measure_floor ^ _previous_measure_floor; // Bitwise XOR
   _previous_measure_floor = current_measure_floor;
 
-  // If is not already retreating
+  // If is not already retreating then monitor the floor luminosity signal
+
   if (!_is_retreating)
   {
     // Watch whether the floor has changed
     if (floor_change != 0)
     {
       // digitalWrite(LED_BUILTIN, HIGH); // for debug
-      // Start the retreat
       // Serial.println("Floor change " + String(floor_change, BIN) + " Begin retreat at " + String(millis()));
+
+      // Convert the five luminosity-sensor signal to a two-bit code
+
       _is_retreating = true;
       if (floor_change == 0b00100)
         _floor_outcome = B11;
@@ -50,33 +54,13 @@ int Floor::update(int interaction_direction)
       else
         _floor_outcome = B11;
 
-//      switch (floor_change)
-//      {
-//        case 0b10000:
-//        case 0b01000:
-//        case 0b11000:
-//        case 0b10100:
-//        case 0b01100:
-//        case 0b11100:
-//          _floor_outcome = B10;
-//          break;
-//        case 0b00111:
-//        case 0b00101:
-//        case 0b00110:
-//        case 0b00011:
-//        case 0b00010:
-//        case 0b00001:
-//          _floor_outcome = B01;
-//          break;
-//        default:
-//          _floor_outcome = B11;
-//      }
+      // Trigger the appropriate retreat movement
 
-      _retreat_end_time = millis() + 5 * RETREAT_DURATION;
-      // If was swiping left then retreat right for 1 second
+      _retreat_end_time = millis() + RETREAT_DURATION * 2;  // * 5;
+      // If was swiping left then retreat right for 400ms
       if (interaction_direction == DIRECTION_LEFT)
         _OWM.retreatRight();
-      // If was swiping right then retreat left for 1 second
+      // If was swiping right then retreat left for 400ms
       else if (interaction_direction == DIRECTION_RIGHT)
         _OWM.retreatLeft();
       else
@@ -93,7 +77,7 @@ int Floor::update(int interaction_direction)
             _OWM.retreatStrait();
           else
           {
-            _retreat_end_time = millis() + 2 * RETREAT_DURATION;
+            _retreat_end_time = millis() + RETREAT_DURATION * 2;
             // if line on the left then retreat right for 400ms
             if (_floor_outcome == B10)
               _OWM.retreatRight();
@@ -106,10 +90,16 @@ int Floor::update(int interaction_direction)
       }
     }
   }
-  // IF currently retreating
+
+  // If currently retreating then monitor the time out and more flore change
+
   if (_is_retreating)
   {
-    // Check whether the retreat time has elapsed
+    // When the floor changes when retreating sideways, postpone the end time because it may still be on the line
+    if (floor_change != 0 && _floor_outcome != B11)
+      _retreat_end_time = millis() + RETREAT_DURATION;
+
+    // When the retreat time has elapsed, terminate the retreat
     if (millis() > _retreat_end_time)
     {
       // Stop the retreat

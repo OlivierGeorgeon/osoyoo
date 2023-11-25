@@ -67,7 +67,6 @@ class PhenomenonTerrain(Phenomenon):
                     self.last_origin_clock = affordance.experience.clock
 
             # Interpolate the outline
-            # self.convex_hull()
             self.interpolate()
             return - position_correction  # TODO remove the minus sign
         # Affordances that do not belong to this phenomenon must return None

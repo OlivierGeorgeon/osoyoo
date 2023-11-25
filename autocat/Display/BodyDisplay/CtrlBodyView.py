@@ -66,7 +66,7 @@ class CtrlBodyView:
         """ Adding a point of interest to the view """
         if group is None:
             group = self.view.forefront
-        point_of_interest = PointOfInterest(point[0], point[1], self.view.batch, group, point_type, self.workspace.clock)
+        point_of_interest = PointOfInterest(*point[0: 2], self.view.batch, group, point_type, self.workspace.clock)
         self.points_of_interest.append(point_of_interest)
 
     def update_body_view(self):

@@ -20,9 +20,9 @@ ctrl_egocentric_view = CtrlEgocentricView(workspace)
 # Add experiences
 experience0 = Experience([150, 0, 0], EXPERIENCE_FLOOR, 0, 0, experience_id=0, direction_quaternion=Quaternion.from_z_rotation(0.5))
 workspace.memory.egocentric_memory.experiences[0] = experience0
-experience1 = Experience([300, -300, 0],  EXPERIENCE_ALIGNED_ECHO, 0, 1, experience_id=1)
+experience1 = Experience([300, -300, 0],  EXPERIENCE_ALIGNED_ECHO, 0, 0, experience_id=1)
 workspace.memory.egocentric_memory.experiences[1] = experience1
-experience2 = Experience([200, 200, 0],  EXPERIENCE_ROBOT, 0, 1, experience_id=1, direction_quaternion=Quaternion.from_z_rotation(math.radians(-130)))
+experience2 = Experience([200, 200, 0],  EXPERIENCE_ROBOT, 0, -3, experience_id=2, color_index=1, direction_quaternion=Quaternion.from_z_rotation(math.radians(-130)))
 workspace.memory.egocentric_memory.experiences[2] = experience2
 # poi1 = controller.add_point_of_interest(150, 0, EXPERIENCE_FLOOR)
 # controller.points_of_interest.append(poi1)

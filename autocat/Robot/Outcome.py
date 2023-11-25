@@ -4,7 +4,7 @@ import numpy as np
 import colorsys
 from playsound import playsound
 from pyrr import Quaternion
-from .RobotDefine import RETREAT_DISTANCE, RETREAT_DISTANCE_Y, ROBOT_HEAD_X
+from .RobotDefine import ROBOT_HEAD_X
 from ..Memory.EgocentricMemory.Experience import FLOOR_COLORS
 
 
@@ -141,22 +141,21 @@ class Outcome:
 
         # Outcome floor
         self.floor = 0
-        self.retreat_translation = np.array([0, 0, 0], dtype=int)
+        # self.retreat_translation = np.array([0, 0, 0], dtype=int)
         if 'floor' in outcome_dict:
             self.floor = outcome_dict['floor']
-            if outcome_dict['floor'] > 0:
-                # Update the translation
-                if outcome_dict['floor'] == 0b01:
-                    # Black line on the right
-                    self.retreat_translation = [-RETREAT_DISTANCE, RETREAT_DISTANCE_Y, 0]
-                elif outcome_dict['floor'] == 0b10:
-                    # Black line on the left
-                    self.retreat_translation = [-RETREAT_DISTANCE, -RETREAT_DISTANCE_Y, 0]
-                else:
-                    # Black line on the front
-                    self.retreat_translation = [-RETREAT_DISTANCE, 0, 0]
-                # playsound('autocat/Assets/tiny_beep.wav', False)
-                playsound('autocat/Assets/cyberpunk3.wav', False)
+            # if outcome_dict['floor'] > 0:
+            #     # Update the translation
+            #     if outcome_dict['floor'] == 0b01:
+            #         # Black line on the right
+            #         self.retreat_translation = [-RETREAT_DISTANCE, RETREAT_DISTANCE_Y, 0]
+            #     elif outcome_dict['floor'] == 0b10:
+            #         # Black line on the left
+            #         self.retreat_translation = [-RETREAT_DISTANCE, -RETREAT_DISTANCE_Y, 0]
+            #     else:
+            #         # Black line on the front
+            #         self.retreat_translation = [-RETREAT_DISTANCE, 0, 0]
+            #     playsound('autocat/Assets/cyberpunk3.wav', False)
 
         # Outcome echo
         self.echo_point = None

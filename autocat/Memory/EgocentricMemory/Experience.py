@@ -21,7 +21,8 @@ class Experience:
     """Experiences are instances of interactions
     along with the spatial and temporal information of where and when they were enacted"""
 
-    def __init__(self, point, experience_type, body_direction_rad, clock, experience_id, durability=10, color_index=0, direction_quaternion=Quaternion([0,0,0,1])):
+    def __init__(self, point, experience_type, body_direction_rad, clock, experience_id, durability=10, color_index=0,
+                 direction_quaternion=Quaternion([0, 0, 0, 1])):
         """Create an experience to be placed in the memory.
         Args:
         point : position of the affordance relative to the robot.

@@ -2,9 +2,12 @@ import numpy as np
 from pyrr import Vector3
 from .PhenomenonObject import PhenomenonObject
 from .PhenomenonTerrain import PhenomenonTerrain, TERRAIN_EXPERIENCE_TYPES, TERRAIN_ORIGIN_CONFIDENCE
+from .PhenomenonRobot import PhenomenonRobot
 from ...Robot.RobotDefine import TERRAIN_RADIUS
+from ..EgocentricMemory.Experience import EXPERIENCE_ROBOT
 
 TER = 0
+ROBOT1 = -1
 
 
 class PhenomenonMemory:
@@ -64,6 +67,9 @@ class PhenomenonMemory:
         if affordance.experience.type in TERRAIN_EXPERIENCE_TYPES:
             self.phenomena[TER] = PhenomenonTerrain(affordance, self.arena_id)
             return TER
+        if affordance.experience.type == EXPERIENCE_ROBOT:
+            self.phenomena[ROBOT1] = PhenomenonRobot(affordance)
+            return ROBOT1
         else:
             self.phenomenon_id += 1
             self.phenomena[self.phenomenon_id] = PhenomenonObject(affordance)

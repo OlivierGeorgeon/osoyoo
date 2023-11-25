@@ -116,7 +116,7 @@ class EgocentricMemory:
         if enaction.message is not None:
             robot_exp = Experience(enaction.message.ego_position, EXPERIENCE_ROBOT, body_direction_rad,
                                    enaction.clock, experience_id=self.experience_id, durability=EXPERIENCE_PERSISTENCE//3,
-                                   color_index=enaction.outcome.color_index, direction_quaternion=enaction.message.ego_quaternion)
+                                   color_index=enaction.message.emotion_code, direction_quaternion=enaction.message.ego_quaternion)
             self.experiences[robot_exp.id] = robot_exp
             self.experience_id += 1
 

@@ -19,7 +19,7 @@ ROBOT_COLOR_X = 50          # (mm) The X position of the color sensor
 DEFAULT_YAW = 45            # (degree) Default rotation when yaw is not returned by the robot
 TURN_DURATION = 1.000       # (s) The duration of turn left and turn right actions
 TRANSLATE_DURATION = 1.     # (s) The duration of longitudinal or lateral translation
-RETREAT_DISTANCE = 80  # 90       # (mm) Distance travelled during retreat
+# RETREAT_DISTANCE = 90  # 150  # 90       # (mm) Distance travelled during retreat.
 RETREAT_DISTANCE_Y = 20  # 75     # (mm) Y displacement when line is detected on the side
 LINE_X = 150  # 160              # (mm) X coordinate of the line after retreat
 
@@ -68,7 +68,7 @@ ROBOT_SETTINGS_3["IP"] = {"A301": "192.168.8.242", "PetiteIA": "192.168.8.108"} 
 # Lower speed cause the robot to believe the arena is smaller. Reduce speed to prevent pushing outside objects
 ROBOT_SETTINGS_3["forward_speed"] = 250  # 260  # 230  190 (mm/s) Forward translation speed.
 ROBOT_SETTINGS_3["lateral_speed"] = 170  # 230  160  # (mm/s) Lateral translation speed.
-ROBOT_SETTINGS_3["retreat_distance"] = 80  # 70   # (mm) Distance of the line after retreat
+ROBOT_SETTINGS_3["retreat_distance"] = 90  # 70   # (mm) Distance of the line after retreat
 ROBOT_SETTINGS_3["compass_offset"] = [0, 0, 0]  # [-50, 0, 0] [50, -50, 0]  # [30, -20, 0]  # [-40, 7, 0]  # [-30, 40, 0]
 
 # Robot 4 chez Olivier
@@ -76,7 +76,7 @@ ROBOT_SETTINGS_4 = ROBOT_SETTINGS_0.copy()
 ROBOT_SETTINGS_4["IP"] = {"PetiteIA": "192.168.8.242"}  # 108
 ROBOT_SETTINGS_4["forward_speed"] = 320  # 250
 ROBOT_SETTINGS_4["lateral_speed"] = 250
-ROBOT_SETTINGS_4["retreat_distance"] = 80  # 120  # 80
+ROBOT_SETTINGS_4["retreat_distance"] = 150  # Increase it if the line keeps being pushed farther
 ROBOT_SETTINGS_4["compass_offset"] = [0, 0, 0]  # [50, -5, 0]  # [76, 0, 0]
 
 # Robot 1 at DOLL

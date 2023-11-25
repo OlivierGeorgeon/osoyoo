@@ -6,6 +6,7 @@ from ...Memory.Memory import EMOTION_RELAXED, EMOTION_HAPPY, EMOTION_SAD, EMOTIO
 ROBOT_BODY_COLOR = name_to_rgb("darkSlateBlue")
 ROBOT_HEAD_COLOR = name_to_rgb("lightSteelBlue")
 ROBOT_WHEEL_COLOR = name_to_rgb("darkBlue")
+EMOTION_COLORS = ["black", "LavenderBlush", "LimeGreen", "DodgerBlue", "red", "DarkOrange"]
 
 
 class OsoyooCar:
@@ -26,9 +27,9 @@ class OsoyooCar:
         self.RRWheel.anchor_position = 40, 18
 
         # The emotion led
-        self.robot_emotion = shapes.Rectangle(-30, 0, 10, 10, color=name_to_rgb("white"), batch=self.batch,
+        self.robot_emotion = shapes.Rectangle(-30, 0, 20, 20, color=name_to_rgb("white"), batch=self.batch,
                                               group=self.group)
-        self.robot_emotion.anchor_position = 5, 5
+        self.robot_emotion.anchor_position = 10, 10
 
         # Create the head
         self.head_x, self.head_y = 80, 0
@@ -43,13 +44,14 @@ class OsoyooCar:
 
     def emotion_color(self, emotion_code):
         """Colorize the emotion led from the emotion_code"""
-        if emotion_code == EMOTION_RELAXED:
-            self.robot_emotion.color = name_to_rgb("LavenderBlush")
-        if emotion_code == EMOTION_HAPPY:
-            self.robot_emotion.color = name_to_rgb("LimeGreen")
-        if emotion_code == EMOTION_SAD:
-            self.robot_emotion.color = name_to_rgb("DodgerBlue")
-        if emotion_code == EMOTION_ANGRY:
-            self.robot_emotion.color = name_to_rgb("red")
-        if emotion_code == EMOTION_UPSET:  # Does not display because only sent to the robot by DeciderArrange
-            self.robot_emotion.color = name_to_rgb("DarkOrange")
+        self.robot_emotion.color = name_to_rgb(EMOTION_COLORS[emotion_code])
+        # if emotion_code == EMOTION_RELAXED:
+        #     self.robot_emotion.color = name_to_rgb("LavenderBlush")
+        # if emotion_code == EMOTION_HAPPY:
+        #     self.robot_emotion.color = name_to_rgb("LimeGreen")
+        # if emotion_code == EMOTION_SAD:
+        #     self.robot_emotion.color = name_to_rgb("DodgerBlue")
+        # if emotion_code == EMOTION_ANGRY:
+        #     self.robot_emotion.color = name_to_rgb("red")
+        # if emotion_code == EMOTION_UPSET:
+        #     self.robot_emotion.color = name_to_rgb("DarkOrange")

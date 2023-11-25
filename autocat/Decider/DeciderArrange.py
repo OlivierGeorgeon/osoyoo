@@ -64,12 +64,12 @@ class DeciderArrange(Decider):
             if outcome == OUTCOME_FLOOR:
                 self.step = STEP_INIT
                 composite_enaction = Enaction(self.workspace.actions[ACTION_SCAN], self.workspace.memory, span=10,
-                                              color=EMOTION_UPSET)
+                                              color=EMOTION_ANGRY)
             # If object behind target just watch
             elif ego_target[0] - self.workspace.memory.egocentric_memory.focus_point[0] < 0:
                 print("Object behind target:", ego_target[0] - self.workspace.memory.egocentric_memory.focus_point[0])
                 composite_enaction = Enaction(self.workspace.actions[ACTION_WATCH], self.workspace.memory,
-                                              color=EMOTION_UPSET)
+                                              color=EMOTION_ANGRY)
                 self.step = STEP_INIT
             # If object to push
             else:
@@ -77,12 +77,11 @@ class DeciderArrange(Decider):
                 # If robot-object-target not aligned
                 if math.fabs(ego_prompt_projection[1]) > 50:
                     # Go to the point from where to push
-                    # TODO: Make it work when the terrain has not been toured
                     if CHECK_OUTSIDE == 1 and \
                        self.workspace.memory.is_outside_terrain(ego_prompt_projection):
                         print("Projection point inaccessible")
                         composite_enaction = Enaction(self.workspace.actions[ACTION_WATCH], self.workspace.memory,
-                                                      color=EMOTION_UPSET)
+                                                      color=EMOTION_ANGRY)
                         self.step = STEP_INIT
                     # If angle to projection point greater than 20° and projection before object
                     elif math.fabs(math.atan2(ego_prompt_projection[0], math.fabs(ego_prompt_projection[1]))) > 0.349 and\
@@ -101,11 +100,11 @@ class DeciderArrange(Decider):
                         # Swipe to the prompt
                         e1 = Enaction(self.workspace.actions[ACTION_SWIPE], e0.post_memory, color=EMOTION_ANGRY)
                         composite_enaction = CompositeEnaction([e0, e1])
-                    # If angle lower than 20° TODO make it compatible with arange with no terrain
+                    # If angle lower than 20°
                     elif CHECK_OUTSIDE == 1 and self.workspace.memory.is_outside_terrain(ego_prompt_intersection):
                         print("Intersection point inaccessible")
                         composite_enaction = Enaction(self.workspace.actions[ACTION_WATCH], self.workspace.memory,
-                                                      color=EMOTION_UPSET)
+                                                      color=EMOTION_ANGRY)
                         self.step = STEP_INIT
                     else:
                         print("Swipe to intersection", ego_prompt_intersection)
@@ -114,10 +113,10 @@ class DeciderArrange(Decider):
                                                       color=EMOTION_ANGRY)
                 # If robot_point-object-target are aligned
                 else:
-                    # If robot_direction also aligned by less than 20°
+                    # If robot_direction also aligned with target by less than 10°
                     push_vector = vector.set_length(ego_target, np.linalg.norm(ego_target) - 100)  # subtract the radius of the robot and of the object
                     self.workspace.memory.egocentric_memory.prompt_point = push_vector  # ego_target
-                    if math.fabs(math.atan2(ego_target[1], ego_target[0])) < 0.349:
+                    if math.fabs(math.atan2(ego_target[1], ego_target[0])) < 0.17:  # 0.349:
                         # Push to target
                         self.workspace.memory.egocentric_memory.focus_point = ego_target.copy()  # Look at the destination
                         composite_enaction = Enaction(self.workspace.actions[ACTION_FORWARD], self.workspace.memory,

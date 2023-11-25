@@ -69,11 +69,14 @@ class Memory:
                 # If object inside terrain and closer than target: ANGRY, DeciderPush
                 ego_target = self.terrain_centric_to_egocentric(self.phenomenon_memory.arrange_point())
                 # is_inside = not self.is_outside_terrain(self.egocentric_memory.focus_point)
-                is_inside = self.is_to_arrange(self.egocentric_memory.focus_point)
+                is_to_arrange = self.is_to_arrange(self.egocentric_memory.focus_point)
                 is_closer = self.egocentric_memory.focus_point[0] < ego_target[0]
-                print("Focus is object to arrange:", is_inside, "focus before target:", is_closer)
-                if is_inside and is_closer:
-                    self.emotion_code = EMOTION_ANGRY
+                print("Focus is object to arrange:", is_to_arrange, "focus before target:", is_closer)
+                if is_to_arrange:
+                    if is_closer:
+                        self.emotion_code = EMOTION_ANGRY
+                    else:
+                        self.emotion_code = EMOTION_UPSET
                 else:
                     self.emotion_code = EMOTION_SAD
 
