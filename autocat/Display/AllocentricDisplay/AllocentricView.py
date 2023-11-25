@@ -1,6 +1,7 @@
 import pyglet
 from pyglet.gl import *
-from pyrr import Matrix44
+from pyrr import Matrix44, Quaternion
+from ...Utils import quaternion_translation_to_matrix
 from ..EgocentricDisplay.OsoyooCar import OsoyooCar
 from .CellDisplay import CellDisplay
 from ...Memory.AllocentricMemory.Hexagonal_geometry import point_to_cell
@@ -115,9 +116,13 @@ class AllocentricView(InteractiveDisplay):
             self.robot_poi.delete()
             self.robot_poi = None
         if phenomenon is not None:
-            self.robot_poi = PointOfInterest(0, 0, self.batch, self.forefront,
+            quaternion = Quaternion.from_z_rotation(phenomenon.current().experience.absolute_direction_rad)
+            pose_matrix = quaternion_translation_to_matrix(quaternion, phenomenon.point)
+            self.robot_poi = PointOfInterest(pose_matrix, self.batch, self.forefront,
                                              EXPERIENCE_ROBOT, phenomenon.current().experience.clock,
                                              color_index=phenomenon.current().experience.color_index)
-            rotation = Matrix44.from_z_rotation(-phenomenon.current().experience.absolute_direction_rad)
-            displacement_matrix = Matrix44.from_translation(phenomenon.point) * rotation
-            self.robot_poi.displace(displacement_matrix)
+            # rotation = Matrix44.from_z_rotation(-phenomenon.current().experience.absolute_direction_rad)
+            # displacement_matrix = Matrix44.from_translation(phenomenon.point) * rotation
+            # self.robot_poi.displace(displacement_matrix)
+            # q = Quaternion.from_z_rotation(phenomenon.current().experience.absolute_direction_rad)
+            # self.robot_poi.displace(quaternion_translation_to_matrix(q, phenomenon.point))

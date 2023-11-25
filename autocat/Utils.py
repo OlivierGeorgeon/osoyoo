@@ -1,6 +1,12 @@
 import math
 import numpy as np
-from pyrr import Quaternion, line
+from pyrr import Quaternion, line, Matrix44
+
+
+def quaternion_translation_to_matrix(quaternion, translation):
+    """Return the matrix that represents the pose after the rotation and the translation"""
+    # Applied from right to left: rotation and then translation
+    return Matrix44.from_translation(translation) * Matrix44.from_inverse_of_quaternion(quaternion)
 
 
 def azimuth_to_quaternion(azimuth):

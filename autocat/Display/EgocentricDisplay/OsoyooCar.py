@@ -1,6 +1,5 @@
 from pyglet import shapes
 from webcolors import name_to_rgb
-from ...Memory.Memory import EMOTION_RELAXED, EMOTION_HAPPY, EMOTION_SAD, EMOTION_ANGRY, EMOTION_UPSET
 
 
 ROBOT_BODY_COLOR = name_to_rgb("darkSlateBlue")
@@ -45,13 +44,3 @@ class OsoyooCar:
     def emotion_color(self, emotion_code):
         """Colorize the emotion led from the emotion_code"""
         self.robot_emotion.color = name_to_rgb(EMOTION_COLORS[emotion_code])
-        # if emotion_code == EMOTION_RELAXED:
-        #     self.robot_emotion.color = name_to_rgb("LavenderBlush")
-        # if emotion_code == EMOTION_HAPPY:
-        #     self.robot_emotion.color = name_to_rgb("LimeGreen")
-        # if emotion_code == EMOTION_SAD:
-        #     self.robot_emotion.color = name_to_rgb("DodgerBlue")
-        # if emotion_code == EMOTION_ANGRY:
-        #     self.robot_emotion.color = name_to_rgb("red")
-        # if emotion_code == EMOTION_UPSET:
-        #     self.robot_emotion.color = name_to_rgb("DarkOrange")

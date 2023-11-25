@@ -64,11 +64,13 @@ class CtrlPhenomenonView:
     def create_affordance_display(self, affordance):
         """Create a point of interest corresponding to the affordance given as parameter"""
         # Create the point of interest at origin
-        poi = AffordanceDisplay(0, 0, self.view.batch, self.view.forefront, self.view.background,
+        pose_matrix = matrix44.multiply(affordance.experience.rotation_matrix,
+                                        matrix44.create_from_translation(affordance.point).astype('float64'))
+        poi = AffordanceDisplay(pose_matrix, self.view.batch, self.view.forefront, self.view.background,
                                 affordance.experience.type, affordance.experience.clock, affordance.experience.color_index)
         # Displace the point of interest to its position relative to the phenomenon and absolute direction
-        poi.displace(matrix44.multiply(affordance.experience.rotation_matrix,
-                                       matrix44.create_from_translation(affordance.point).astype('float64')))
+        # poi.displace(matrix44.multiply(affordance.experience.rotation_matrix,
+        #                                matrix44.create_from_translation(affordance.point).astype('float64')))
         # Show the echo localization cone
         points = affordance.sensor_triangle()
         # if the affordance has a polygon then add it to the AffordanceDisplay

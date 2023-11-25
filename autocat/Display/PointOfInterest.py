@@ -17,8 +17,9 @@ POINT_PROMPT = 'Prompt'
 
 
 class PointOfInterest:
-    def __init__(self, x, y, batch, group, point_type, clock, color_index=None, durability=10):
-        self.point = np.array([0, 0, 0], dtype=int)  # Will be moved to its position
+    def __init__(self, pose_matrix, batch, group, point_type, clock, color_index=None, durability=10):
+        # self.point = np.array([0, 0, 0], dtype=int)  # Will be moved to its position
+        self.pose_matrix = pose_matrix
         self.batch = batch
         self.group = group
         self.type = point_type
@@ -94,8 +95,8 @@ class PointOfInterest:
                                                 ('v2i', self.points), ('c4B', 5 * (*bg_color, self.opacity) + 4 * (*self.color, self.opacity)))
 
         # Move the point of interest to its position
-        position_matrix = matrix44.create_from_translation([x, y, 0]).astype('float64')
-        self.displace(position_matrix)
+        # position_matrix = matrix44.create_from_translation([x, y, 0]).astype('float64')
+        self.displace(pose_matrix)
 
     def set_color(self, color_name=None):
         """ Set the color or reset it to its default value. Also reset the opacity. """
@@ -119,21 +120,21 @@ class PointOfInterest:
                 self.shape.opacity = self.opacity
                 self.shape.color_index = name_to_rgb(color_name)
 
-    def displace(self, displacement_matrix):
+    def displace(self, pose_matrix):
         """ Applying the displacement matrix to the point of interest """
         #  Rotate and translate the position
-        self.point = matrix44.apply_to_vector(displacement_matrix, self.point)
+        # self.point = matrix44.apply_to_vector(displacement_matrix, self.point)
 
         # If the shape has a list of vertices
         # then apply the displacement matrix to each point. This will rotate the shape
         if hasattr(self.shape, 'vertices'):
             for i in range(0, len(self.shape.vertices)-1, 2):
-                v = matrix44.apply_to_vector(displacement_matrix, [self.shape.vertices[i], self.shape.vertices[i+1], 0])
+                v = matrix44.apply_to_vector(pose_matrix, [self.shape.vertices[i], self.shape.vertices[i + 1], 0])
                 self.shape.vertices[i], self.shape.vertices[i+1] = int(v[0]), int(v[1])
             return
 
         # Points of interest that use pyglet shapes have x and y (Circles)
-        self.shape.x, self.shape.y = self.point[0], self.point[1]
+        # self.shape.x, self.shape.y = self.point[0], self.point[1]
 
     def delete(self):
         """ Delete the shape to remove it from the batch. Return True when deleted """
@@ -146,7 +147,7 @@ class PointOfInterest:
 
     def select_if_near(self, point):
         """ If the point is near the x y coordinate, select this point and return True """
-        if math.dist(point, self.point) < 15:
+        if math.dist(point, matrix44.apply_to_vector(self.pose_matrix, [0, 0, 0])) < 15:
             self.set_color('red')
             self.is_selected = True
             return True
@@ -162,5 +163,5 @@ class PointOfInterest:
         # Reset the opacity of the shape
         self.set_color(None)
 
-    def __str__(self):
-        return "POI of type " + self.type + " at x=" + str(int(self.point[0])) + ", y=" + str(int(self.point[1]))
+    # def __str__(self):
+    #     return "POI of type " + self.type + " at x=" + str(int(self.point[0])) + ", y=" + str(int(self.point[1]))

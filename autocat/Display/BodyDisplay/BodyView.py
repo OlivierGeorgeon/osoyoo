@@ -2,7 +2,7 @@ import pyglet
 from pyglet.gl import *
 import math
 # import numpy
-from pyrr import matrix44
+from pyrr import matrix44, Vector3
 from ..EgocentricDisplay.OsoyooCar import OsoyooCar
 from ..InteractiveDisplay import InteractiveDisplay
 
@@ -24,7 +24,7 @@ class BodyView(InteractiveDisplay):
         self.robot_batch = pyglet.graphics.Batch()
         self.robot = OsoyooCar(self.robot_batch, self.background)
         # self.azimuth = 90  # Degree from north [0, 360] Initialized on the x axis
-        self.body_rotation_matrix = matrix44.create_identity()  # The matrix representing the robot's body rotation
+        # self.body_rotation_matrix = matrix44.create_identity()  # The matrix representing the robot's body rotation
 
         # Define the text area at the bottom of the view
         self.label_batch = pyglet.graphics.Batch()
@@ -66,10 +66,11 @@ class BodyView(InteractiveDisplay):
 
     def on_mouse_press(self, x, y, button, modifiers):
         """ Computing the position of the mouse click relative to the robot in mm and degrees """
-        point = self.mouse_coordinates_to_point(x, y)
+        # point = self.mouse_coordinates_to_point(x, y)
         # Rotate the click point by the opposite rotation of the robot
         # Use the transposed of the robot's body rotation matrix
-        v = matrix44.apply_to_vector(self.body_rotation_matrix.T, point)
+        # v = matrix44.apply_to_vector(self.body_rotation_matrix.T, point)
+        v = self.workspace.memory.body_memory.body_quaternion.inverse * self.mouse_coordinates_to_point(x, y)
         t = round(math.degrees(math.atan2(v[1], v[0])))
         self.label.text = "Click: x:" + str(round(v[0])) + ", y:" + str(round(v[1])) + ", angle:" + str(t) + "°"
 

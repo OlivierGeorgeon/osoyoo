@@ -1,4 +1,4 @@
-from pyrr import matrix44
+from pyrr import Matrix44
 import math
 import numpy as np
 from .BodyView import BodyView
@@ -49,7 +49,7 @@ class CtrlBodyView:
                         # If the radius is in bound then we can update de compass offset
                         delta_offset = np.array([xc, yc, 0], dtype=int)
                         self.workspace.memory.body_memory.compass_offset += delta_offset
-                        position_matrix = matrix44.create_from_translation(-delta_offset).astype('float64')
+                        position_matrix = Matrix44.from_translation(-delta_offset).astype('float64')
                         for p in self.points_of_interest:
                             p.displace(position_matrix)
                         self.view.label.text = "Compass offset adjusted by (" + str(round(xc)) + "," + str(round(yc)) + ")"
@@ -66,7 +66,8 @@ class CtrlBodyView:
         """ Adding a point of interest to the view """
         if group is None:
             group = self.view.forefront
-        point_of_interest = PointOfInterest(*point[0: 2], self.view.batch, group, point_type, self.workspace.clock)
+        pose_matrix = Matrix44.from_translation(point)
+        point_of_interest = PointOfInterest(pose_matrix, self.view.batch, group, point_type, self.workspace.clock)
         self.points_of_interest.append(point_of_interest)
 
     def update_body_view(self):
@@ -75,8 +76,7 @@ class CtrlBodyView:
         # Update the position of the robot
         self.view.robot.rotate_head(self.workspace.memory.body_memory.head_direction_degree())
         self.view.robot.emotion_color(self.workspace.memory.emotion_code)
-        azimuth = self.workspace.memory.body_memory.body_azimuth()
-        self.view.body_rotation_matrix = self.workspace.memory.body_memory.body_direction_matrix()
+        # self.view.body_rotation_matrix = self.workspace.memory.body_memory.body_direction_matrix()
 
         # self.view.label.text = "Azimuth: " + str(azimuth) + "°"
 
@@ -95,6 +95,7 @@ class CtrlBodyView:
                                        self.view.background)
             # self.view.label.text += ", compass: " + str(self.workspace.enacted_enaction.azimuth) + "°"
         else:
+            azimuth = self.workspace.memory.body_memory.body_azimuth()
             x = 330 * math.cos(math.radians(azimuth + 180))
             y = 330 * math.sin(math.radians(azimuth + 180))
             self.add_point_of_interest([x, y, 0], POINT_AZIMUTH, self.view.background)
