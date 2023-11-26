@@ -25,12 +25,13 @@ class Integrator:
             if e.type != EXPERIENCE_LOCAL_ECHO:
                 # The position of the affordance in allocentric memory
                 affordance_point = self.workspace.memory.egocentric_to_allocentric(e.point())
-                new_affordances.append(Affordance(affordance_point, e))
+                new_affordances.append(Affordance(affordance_point, e.type, e.clock, e.color_index,
+                           e.absolute_quaternion(self.workspace.memory.body_memory.body_quaternion),
+                           e.polar_sensor_point(self.workspace.memory.body_memory.body_quaternion)))
                 # print("Experience:", e.type, ", point:", affordance_point)
 
         # Mark the area covered by the echo in allocentric memory
-        for a in [a for a in new_affordances if a.experience.type
-                  in [EXPERIENCE_CENTRAL_ECHO, EXPERIENCE_ALIGNED_ECHO]]:
+        for a in [a for a in new_affordances if a.type in [EXPERIENCE_CENTRAL_ECHO, EXPERIENCE_ALIGNED_ECHO]]:
             self.workspace.memory.allocentric_memory.mark_echo_area(a)
 
         # Try to attach the new affordances to existing phenomena and remove these affordances

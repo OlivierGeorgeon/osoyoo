@@ -53,12 +53,6 @@ class BodyMemory:
         """Return the body direction in rad in polar-egocentric coordinates"""
         return quaternion_to_direction_rad(self.body_quaternion)
 
-    # def body_direction_matrix(self):
-    #     """Return the body direction matrix to apply to experiences"""
-    #     # For some reason the matrix must be the inverse of the angle and also of the quaternion
-    #     # (pyrr seems to be left-handed with matrices but right-handed with quaternions !)
-    #     return matrix44.create_from_inverse_of_quaternion(self.body_quaternion)
-
     def head_absolute_direction(self):
         """The head's direction in polar-egocentric reference"""
         return self.get_body_direction_rad() + self.head_direction_rad

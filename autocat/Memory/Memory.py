@@ -178,9 +178,9 @@ class Memory:
         # Clone egocentric memory
         saved_memory.egocentric_memory = self.egocentric_memory.save()
         # Clone allocentric memory
-        saved_memory.allocentric_memory = self.allocentric_memory.save(saved_memory.egocentric_memory.experiences)
+        saved_memory.allocentric_memory = self.allocentric_memory.save()
         # Clone phenomenon memory
-        saved_memory.phenomenon_memory = self.phenomenon_memory.save(saved_memory.egocentric_memory.experiences)
+        saved_memory.phenomenon_memory = self.phenomenon_memory.save()
         saved_memory.compass_prediction_error = {key: d for key, d in self.compass_prediction_error.items()}
         # print("Save memory duration:", time.time() - start_time, "seconds")
 

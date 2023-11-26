@@ -10,6 +10,7 @@ from ...Memory.EgocentricMemory.Experience import Experience, EXPERIENCE_ALIGNED
 from ...Memory.AllocentricMemory.GridCell import CELL_NO_ECHO
 from ...Memory.AllocentricMemory.Hexagonal_geometry import CELL_RADIUS
 from ...Memory.PhenomenonMemory.Affordance import Affordance
+from ...Utils import quaternion_translation_to_matrix
 
 # Testing CtrlAllocentricView by displaying Allocentric Hexagonal Memory
 # Hover the grid to display the mouse position
@@ -55,9 +56,11 @@ workspace.memory.allocentric_memory.grid[3][-7].status[0] = EXPERIENCE_ALIGNED_E
 workspace.memory.allocentric_memory.most_interesting_pool(0)
 
 # Other robot
-pose_matrix = Matrix44.from_translation([200, 200, 0])
-experienceR = Experience(pose_matrix,  EXPERIENCE_ROBOT, math.radians(-135), -3, experience_id=2, color_index=2)
-affordanceR = Affordance(np.array([500, 500, 0]), experienceR)
+pose_matrix = quaternion_translation_to_matrix(Quaternion.from_z_rotation(math.radians(170)), [200, 200, 0])
+experienceR = Experience(pose_matrix, EXPERIENCE_ROBOT, -3, experience_id=2, color_index=2)
+affordanceR = Affordance(np.array([500, 500, 0]), EXPERIENCE_ROBOT, -3, 2,
+                         experienceR.absolute_quaternion(workspace.memory.body_memory.body_quaternion).copy(),
+                         experienceR.polar_sensor_point(workspace.memory.body_memory.body_quaternion).copy())
 workspace.memory.phenomenon_memory.create_phenomenon(affordanceR)
 
 view_controller = CtrlAllocentricView(workspace)

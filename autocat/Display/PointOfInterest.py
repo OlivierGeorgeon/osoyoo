@@ -18,7 +18,7 @@ POINT_PROMPT = 'Prompt'
 
 class PointOfInterest:
     def __init__(self, pose_matrix, batch, group, point_type, clock, color_index=None, durability=10):
-        self.pose_matrix = pose_matrix
+        self.pose_matrix = matrix44.create_identity()  # Will be moved to the pose_matrix
         self.batch = batch
         self.group = group
         self.type = point_type
@@ -118,13 +118,16 @@ class PointOfInterest:
                 self.shape.opacity = self.opacity
                 self.shape.color_index = name_to_rgb(color_name)
 
-    def displace(self, pose_matrix):
+    def displace(self, displacement_matrix):
         """ Applying the displacement matrix to the point of interest """
+
+        # Update the position matrix
+        self.pose_matrix = matrix44.multiply(self.pose_matrix, displacement_matrix)
 
         # If the shape has a list of vertices then apply the displacement matrix to each point.
         if hasattr(self.shape, 'vertices'):
             for i in range(0, len(self.shape.vertices)-1, 2):
-                v = matrix44.apply_to_vector(pose_matrix, [self.shape.vertices[i], self.shape.vertices[i + 1], 0])
+                v = matrix44.apply_to_vector(displacement_matrix, [self.shape.vertices[i], self.shape.vertices[i + 1], 0])
                 self.shape.vertices[i], self.shape.vertices[i+1] = int(v[0]), int(v[1])
         # Points of interest that use pyglet shapes have x and y (Circles)
         else:

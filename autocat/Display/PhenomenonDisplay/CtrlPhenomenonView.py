@@ -4,6 +4,7 @@ from .PhenomenonView import PhenomenonView
 from .AffordanceDisplay import AffordanceDisplay
 from ...Workspace import KEY_DECREASE, KEY_INCREASE
 from ...Robot.CtrlRobot import ENACTION_STEP_REFRESHING
+from ...Utils import quaternion_translation_to_matrix
 
 
 class CtrlPhenomenonView:
@@ -64,13 +65,12 @@ class CtrlPhenomenonView:
     def create_affordance_display(self, affordance):
         """Create a point of interest corresponding to the affordance given as parameter"""
         # Create the point of interest at origin
-        pose_matrix = matrix44.multiply(affordance.experience.rotation_matrix,
-                                        matrix44.create_from_translation(affordance.point).astype('float64'))
+        # pose_matrix = matrix44.multiply(affordance.experience.rotation_matrix,
+        #                                 matrix44.create_from_translation(affordance.point).astype('float64'))
+        # pose_matrix = quaternion_translation_to_matrix(affordance.experience.quaternion, affordance.point)
+        pose_matrix = quaternion_translation_to_matrix(affordance.quaternion, affordance.point)
         poi = AffordanceDisplay(pose_matrix, self.view.batch, self.view.forefront, self.view.background,
-                                affordance.experience.type, affordance.experience.clock, affordance.experience.color_index)
-        # Displace the point of interest to its position relative to the phenomenon and absolute direction
-        # poi.displace(matrix44.multiply(affordance.experience.rotation_matrix,
-        #                                matrix44.create_from_translation(affordance.point).astype('float64')))
+                                affordance.type, affordance.clock, affordance.color_index)
         # Show the echo localization cone
         points = affordance.sensor_triangle()
         # if the affordance has a polygon then add it to the AffordanceDisplay

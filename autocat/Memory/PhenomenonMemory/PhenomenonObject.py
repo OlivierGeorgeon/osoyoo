@@ -19,7 +19,7 @@ class PhenomenonObject(Phenomenon):
         if yes, add the affordance to the phenomenon, and return the robot's position correction."""
 
         # Only echo experiences
-        if affordance.experience.type not in OBJECT_EXPERIENCE_TYPES:
+        if affordance.type not in OBJECT_EXPERIENCE_TYPES:
             return None  # Must return None to check if this affordance can be associated with another phenomenon
 
         position_correction = np.array([0, 0, 0], dtype=int)
@@ -82,7 +82,7 @@ class PhenomenonObject(Phenomenon):
         phenomenon_points = np.array([a.point for a in self.affordances.values()])
         # head_point = np.array(matrix44.apply_to_vector(affordance.experience.sensor_matrix, [0, 0, 0]))
         # head_point = affordance.experience.sensor_point.copy()
-        dist2 = np.sum((phenomenon_points - affordance.experience.sensor_point())**2, axis=1)
+        dist2 = np.sum((phenomenon_points - affordance.polar_sensor_point)**2, axis=1)
         return list(self.affordances.values())[dist2.argmin()]
 
     def prune(self, affordance):
@@ -107,10 +107,10 @@ class PhenomenonObject(Phenomenon):
     def outline(self):
         return self.convex_hull()
 
-    def save(self, experiences):
+    def save(self):
         """Return a clone of the phenomenon for memory snapshot"""
         # Use the experiences cloned when saving egocentric memory
         # The affordance 0 is not removed
-        saved_phenomenon = PhenomenonObject(self.affordances[0].save(experiences))
-        super().save(saved_phenomenon, experiences)
+        saved_phenomenon = PhenomenonObject(self.affordances[0].save())
+        super().save(saved_phenomenon)
         return saved_phenomenon

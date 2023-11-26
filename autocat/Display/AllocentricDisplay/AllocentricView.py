@@ -116,11 +116,13 @@ class AllocentricView(InteractiveDisplay):
             self.robot_poi.delete()
             self.robot_poi = None
         if phenomenon is not None:
-            quaternion = Quaternion.from_z_rotation(phenomenon.current().experience.absolute_direction_rad)
-            pose_matrix = quaternion_translation_to_matrix(quaternion, phenomenon.point)
-            self.robot_poi = PointOfInterest(pose_matrix, self.batch, self.forefront,
-                                             EXPERIENCE_ROBOT, phenomenon.current().experience.clock,
-                                             color_index=phenomenon.current().experience.color_index)
+            # quaternion = Quaternion.from_z_rotation(phenomenon.current().experience.absolute_direction_rad)
+            # pose_matrix = quaternion_translation_to_matrix(quaternion, phenomenon.point)
+            # pose_matrix = Matrix44.from_translation(phenomenon.point + phenomenon.current().point, dtype=float)
+            pose_matrix = quaternion_translation_to_matrix(phenomenon.current().quaternion, phenomenon.point + phenomenon.current().point)
+            self.robot_poi = PointOfInterest(pose_matrix, self.batch,
+                                             self.forefront, EXPERIENCE_ROBOT, phenomenon.current().clock,
+                                             color_index=phenomenon.current().color_index)
             # rotation = Matrix44.from_z_rotation(-phenomenon.current().experience.absolute_direction_rad)
             # displacement_matrix = Matrix44.from_translation(phenomenon.point) * rotation
             # self.robot_poi.displace(displacement_matrix)
