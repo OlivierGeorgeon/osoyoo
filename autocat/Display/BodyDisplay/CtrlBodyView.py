@@ -1,4 +1,4 @@
-from pyrr import Matrix44
+from pyrr import Matrix44, Quaternion
 import math
 import numpy as np
 from .BodyView import BodyView
@@ -6,7 +6,7 @@ from autocat.Display.PointOfInterest import PointOfInterest, POINT_COMPASS, POIN
 from ...Robot.CtrlRobot import ENACTION_STEP_REFRESHING
 import circle_fit as cf
 from ...Workspace import KEY_DECREASE, KEY_INCREASE
-from ...Utils import quaternion_to_azimuth
+from ...Utils import quaternion_to_azimuth, quaternion_translation_to_matrix, translation_quaternion_to_matrix
 
 KEY_OFFSET = 'O'
 
@@ -39,7 +39,7 @@ class CtrlBodyView:
                 self.workspace.memory_snapshot.body_memory.energy = self.workspace.memory.body_memory.energy
             if text.upper() == KEY_OFFSET:
                 # Calibrate the compass
-                points = np.array([[p.point[0], p.point[1]] for p in self.points_of_interest if (p.type == POINT_AZIMUTH)])
+                points = np.array([p.point()[0: 2] for p in self.points_of_interest if (p.type == POINT_AZIMUTH)])
                 print(repr(points))
                 if points.shape[0] > 2:
                     # Find the center of the circle made by the compass points
@@ -62,11 +62,10 @@ class CtrlBodyView:
 
         self.view.push_handlers(on_text)
 
-    def add_point_of_interest(self, point, point_type, group=None):
+    def add_point_of_interest(self, pose_matrix, point_type, group=None):
         """ Adding a point of interest to the view """
         if group is None:
             group = self.view.forefront
-        pose_matrix = Matrix44.from_translation(point)
         point_of_interest = PointOfInterest(pose_matrix, self.view.batch, group, point_type, self.workspace.clock)
         self.points_of_interest.append(point_of_interest)
 
@@ -89,16 +88,16 @@ class CtrlBodyView:
             poi.displace(self.workspace.enaction.yaw_matrix)
 
         # Add the new points that indicate the south relative to the robot
-        if self.workspace.enaction.outcome.compass_point is not None:
-            self.add_point_of_interest(self.workspace.enaction.outcome.compass_point, POINT_COMPASS)
-            self.add_point_of_interest(self.workspace.enaction.outcome.compass_point, POINT_AZIMUTH,
-                                       self.view.background)
-            # self.view.label.text += ", compass: " + str(self.workspace.enacted_enaction.azimuth) + "°"
+        if self.workspace.enaction.outcome.compass_point is None:
+            # No compass point then show the integrated south
+            q = self.workspace.memory.body_memory.body_quaternion.inverse
+            pose_matrix = translation_quaternion_to_matrix([0, -330, 0], q)
         else:
-            azimuth = self.workspace.memory.body_memory.body_azimuth()
-            x = 330 * math.cos(math.radians(azimuth + 180))
-            y = 330 * math.sin(math.radians(azimuth + 180))
-            self.add_point_of_interest([x, y, 0], POINT_AZIMUTH, self.view.background)
+            # Show the compass south
+            pose_matrix = quaternion_translation_to_matrix(self.workspace.enaction.outcome.compass_quaternion.inverse,
+                                                           self.workspace.enaction.outcome.compass_point)
+            self.add_point_of_interest(pose_matrix, POINT_COMPASS)
+        self.add_point_of_interest(pose_matrix, POINT_AZIMUTH, self.view.background)
 
         # Fade the points of interest
         for poi in self.points_of_interest:

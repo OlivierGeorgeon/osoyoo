@@ -21,15 +21,15 @@ class Experience:
     """Experiences are instances of interactions
     along with the spatial and temporal information of where and when they were enacted"""
 
-    def __init__(self, point, experience_type, body_direction_rad, clock, experience_id, durability=10, color_index=0,
-                 direction_quaternion=Quaternion([0, 0, 0, 1])):
+    def __init__(self, pose_matrix, experience_type, body_direction_rad, clock, experience_id, durability=10, color_index=0):
         """Create an experience to be placed in the memory.
         Args:
         point : position of the affordance relative to the robot.
         type : type of experience (i.e. Chock, Block, Echolocalisation, Line etc)
         durability : durability of the experience, when it reach zero the experience should be removed from the memory.
         """
-        self.point = np.array(point)
+        # self.point = np.array(point)
+        self.position_matrix = pose_matrix
         self.type = experience_type
         self.absolute_direction_rad = body_direction_rad
         self.absolute_direction_quaternion = Quaternion.from_z_rotation(body_direction_rad)
@@ -40,34 +40,36 @@ class Experience:
 
         # The position matrix will cumulate the rotation and translations of the robot
         # Used to compute the position of the experience relative to the robot in egocentric memory
-        direction_matrix = matrix44.create_from_inverse_of_quaternion(direction_quaternion)
+        # direction_matrix = matrix44.create_from_inverse_of_quaternion(direction_quaternion)
         # self.position_matrix = matrix44.create_from_translation(self.point).astype('float64')
-        self.position_matrix = matrix44.multiply(direction_matrix,
-                                                     matrix44.create_from_translation(self.point).astype('float64'))
+        # self.position_matrix = matrix44.multiply(direction_matrix,
+        #                                              matrix44.create_from_translation(self.point).astype('float64'))
         # The position of the robot relative to the experience
         # Used to compute the position of the robot relative to the experience
-        relative_sensor_point = -self.point.copy()  # By default the center of the robot.
+        # relative_sensor_point = -self.point()  # By default the center of the robot.
         # The absolute direction of this experience
 
         # The position of the echo incorporating the rotation from the head
         if self.type in [EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_CENTRAL_ECHO]:
-            head_direction_rad = math.atan2(point[1], point[0] - ROBOT_HEAD_X)
+            head_direction_rad = math.atan2(self.point()[1], self.point()[0] - ROBOT_HEAD_X)
             self.absolute_direction_rad += head_direction_rad  # The absolute direction of the sensor...
             self.absolute_direction_quaternion *= Quaternion.from_z_rotation(head_direction_rad)
             self.absolute_direction_rad = np.mod(self.absolute_direction_rad, 2*math.pi)  # ...within [0,2pi]
-            translation_from_head_matrix = matrix44.create_from_translation([math.sqrt((point[0]-ROBOT_HEAD_X)**2 + point[1]**2),
-                                                                             0, 0])
-            position_from_head_matrix = matrix44.multiply(translation_from_head_matrix,
-                                                          matrix44.create_from_z_rotation(-head_direction_rad))
+            # translation_from_head_matrix = matrix44.create_from_translation([math.sqrt((self.point()[0]-ROBOT_HEAD_X)**2 + self.point()[1]**2),
+            #                                                                  0, 0])
+            # position_from_head_matrix = matrix44.multiply(translation_from_head_matrix,
+            #                                               matrix44.create_from_z_rotation(-head_direction_rad))
             # The position matrix initialized with rotation from the head rather than from the center of the robot
-            self.position_matrix = matrix44.multiply(position_from_head_matrix,
-                                                     matrix44.create_from_translation([ROBOT_HEAD_X, 0, 0])
-                                                     .astype('float64'))
+            # self.position_matrix = matrix44.multiply(position_from_head_matrix,
+            #                                          matrix44.create_from_translation([ROBOT_HEAD_X, 0, 0])
+            #                                          .astype('float64'))
             # The position of the head relative to the echo in allocentric coordinates
-            relative_sensor_point = np.array([-point[0] + ROBOT_HEAD_X, -point[1], 0])
+            relative_sensor_point = np.array([-self.point()[0] + ROBOT_HEAD_X, -self.point()[1], 0])
         # The position of the color sensor relative to the floor line
         elif self.type == EXPERIENCE_FLOOR:
             relative_sensor_point = -np.array([LINE_X - ROBOT_COLOR_X, 0, 0])
+        else:
+            relative_sensor_point = -self.point()  # By default the center of the robot.
 
         # The polar-egocentric position of the sensor relative to the polar_egocentric position of the experience
         body_direction_matrix = matrix44.create_from_z_rotation(-body_direction_rad)
@@ -96,12 +98,17 @@ class Experience:
         """Return a clone of the sensor point relative to the experience"""
         return self._sensor_point.copy()
 
+    def point(self):
+        """Return the point of reference of this point of interest. Used for compass calibration"""
+        # Translate the origin point by the pose
+        return matrix44.apply_to_vector(self.position_matrix, [0, 0, 0])
+
     def save(self):
         """Create a copy of the experience for memory snapshot"""
-        saved_experience = Experience(self.point, self.type, self.absolute_direction_rad, self.clock,
-                                      self.id, self.durability, self.color_index)
         # Clone the position matrix so it can be updated separately
-        saved_experience.position_matrix = self.position_matrix.copy()
+        saved_experience = Experience(self.position_matrix.copy(), self.type, self.absolute_direction_rad, self.clock,
+                                      self.id, self.durability, self.color_index)
+        # saved_experience.position_matrix = self.position_matrix.copy()
         # Reset the absolute directions  TODO Modify so they don't have to be reset
         saved_experience.absolute_direction_rad = self.absolute_direction_rad
         saved_experience._sensor_point = self.sensor_point()  # The cloned experience would compute from the new x y

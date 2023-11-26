@@ -77,15 +77,14 @@ class CtrlEgocentricView:
 
         # Re-create the focus point
         if self.workspace.memory.egocentric_memory.focus_point is not None:
-            focus_poi = PointOfInterest(Matrix44.from_translation(self.workspace.memory.egocentric_memory.focus_point).astype(float),
-                                        self.view.batch, self.view.forefront, EXPERIENCE_FOCUS, self.workspace.clock)
+            p = Matrix44.from_translation(self.workspace.memory.egocentric_memory.focus_point).astype(float)
+            focus_poi = PointOfInterest(p, self.view.batch, self.view.forefront, EXPERIENCE_FOCUS, self.workspace.clock)
             self.points_of_interest.append(focus_poi)
 
         # Re-create the prompt point
         if self.workspace.memory.egocentric_memory.prompt_point is not None:
-            pose_matrix = Matrix44.from_translation(self.workspace.memory.egocentric_memory.prompt_point)
-            prompt_poi = PointOfInterest(pose_matrix,
-                                         self.view.batch, self.view.background, POINT_PROMPT, self.workspace.clock)
+            p = Matrix44.from_translation(self.workspace.memory.egocentric_memory.prompt_point.astype(float))
+            prompt_poi = PointOfInterest(p, self.view.batch, self.view.background, POINT_PROMPT, self.workspace.clock)
             self.points_of_interest.append(prompt_poi)
 
     def main(self, dt):

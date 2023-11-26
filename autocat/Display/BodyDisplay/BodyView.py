@@ -66,10 +66,7 @@ class BodyView(InteractiveDisplay):
 
     def on_mouse_press(self, x, y, button, modifiers):
         """ Computing the position of the mouse click relative to the robot in mm and degrees """
-        # point = self.mouse_coordinates_to_point(x, y)
-        # Rotate the click point by the opposite rotation of the robot
-        # Use the transposed of the robot's body rotation matrix
-        # v = matrix44.apply_to_vector(self.body_rotation_matrix.T, point)
+        # Rotate the click point by the inverse rotation of the robot
         v = self.workspace.memory.body_memory.body_quaternion.inverse * self.mouse_coordinates_to_point(x, y)
         t = round(math.degrees(math.atan2(v[1], v[0])))
         self.label.text = "Click: x:" + str(round(v[0])) + ", y:" + str(round(v[1])) + ", angle:" + str(t) + "°"

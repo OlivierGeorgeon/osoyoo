@@ -1,6 +1,6 @@
 import math
 import numpy as np
-from pyrr import Quaternion
+from pyrr import Quaternion, Matrix44
 import pyglet
 from ...Workspace import Workspace
 from .CtrlAllocentricView import CtrlAllocentricView
@@ -55,7 +55,8 @@ workspace.memory.allocentric_memory.grid[3][-7].status[0] = EXPERIENCE_ALIGNED_E
 workspace.memory.allocentric_memory.most_interesting_pool(0)
 
 # Other robot
-experienceR = Experience([200, 200, 0],  EXPERIENCE_ROBOT, math.radians(-135), -3, experience_id=2, color_index=2)
+pose_matrix = Matrix44.from_translation([200, 200, 0])
+experienceR = Experience(pose_matrix,  EXPERIENCE_ROBOT, math.radians(-135), -3, experience_id=2, color_index=2)
 affordanceR = Affordance(np.array([500, 500, 0]), experienceR)
 workspace.memory.phenomenon_memory.create_phenomenon(affordanceR)
 

@@ -18,7 +18,6 @@ POINT_PROMPT = 'Prompt'
 
 class PointOfInterest:
     def __init__(self, pose_matrix, batch, group, point_type, clock, color_index=None, durability=10):
-        # self.point = np.array([0, 0, 0], dtype=int)  # Will be moved to its position
         self.pose_matrix = pose_matrix
         self.batch = batch
         self.group = group
@@ -74,12 +73,12 @@ class PointOfInterest:
                                                 ('v2i', self.points), ('c4B', 6 * (*self.color, self.opacity)))
         if self.type == POINT_COMPASS:
             self.color = name_to_rgb("RoyalBlue")
-            self.points = [10, 0, 0, -10, 0, 10, -10, 0]
+            self.points = [10, 0, 0, -15, 0, 15, -10, 0]
             self.shape = self.batch.add_indexed(4, gl.GL_TRIANGLES, self.group, [0, 1, 2, 1, 2, 3],
                                                 ('v2i', self.points), ('c4B', 4 * (*self.color, self.opacity)))
         if self.type == POINT_AZIMUTH:
             self.color = name_to_rgb("SteelBlue")
-            self.points = [20, 0, 0, -20, 0, 20, -20, 0]
+            self.points = [20, 0, 0, -30, 0, 30, -20, 0]
             self.shape = self.batch.add_indexed(4, gl.GL_TRIANGLES, self.group, [0, 1, 2, 1, 2, 3],
                                                 ('v2i', self.points), ('c4B', 4 * (*self.color, self.opacity)))
         if self.type == POINT_PROMPT:
@@ -95,7 +94,6 @@ class PointOfInterest:
                                                 ('v2i', self.points), ('c4B', 5 * (*bg_color, self.opacity) + 4 * (*self.color, self.opacity)))
 
         # Move the point of interest to its position
-        # position_matrix = matrix44.create_from_translation([x, y, 0]).astype('float64')
         self.displace(pose_matrix)
 
     def set_color(self, color_name=None):
@@ -122,19 +120,15 @@ class PointOfInterest:
 
     def displace(self, pose_matrix):
         """ Applying the displacement matrix to the point of interest """
-        #  Rotate and translate the position
-        # self.point = matrix44.apply_to_vector(displacement_matrix, self.point)
 
-        # If the shape has a list of vertices
-        # then apply the displacement matrix to each point. This will rotate the shape
+        # If the shape has a list of vertices then apply the displacement matrix to each point.
         if hasattr(self.shape, 'vertices'):
             for i in range(0, len(self.shape.vertices)-1, 2):
                 v = matrix44.apply_to_vector(pose_matrix, [self.shape.vertices[i], self.shape.vertices[i + 1], 0])
                 self.shape.vertices[i], self.shape.vertices[i+1] = int(v[0]), int(v[1])
-            return
-
         # Points of interest that use pyglet shapes have x and y (Circles)
-        # self.shape.x, self.shape.y = self.point[0], self.point[1]
+        else:
+            self.shape.x, self.shape.y = self.point()[0: 2]
 
     def delete(self):
         """ Delete the shape to remove it from the batch. Return True when deleted """
@@ -147,7 +141,7 @@ class PointOfInterest:
 
     def select_if_near(self, point):
         """ If the point is near the x y coordinate, select this point and return True """
-        if math.dist(point, matrix44.apply_to_vector(self.pose_matrix, [0, 0, 0])) < 15:
+        if math.dist(point, self.point()) < 15:
             self.set_color('red')
             self.is_selected = True
             return True
@@ -162,6 +156,11 @@ class PointOfInterest:
         self.opacity = int(max(255 * (self.durability - clock + self.clock) / self.durability, 0))
         # Reset the opacity of the shape
         self.set_color(None)
+
+    def point(self):
+        """Return the point of reference of this point of interest. Used for compass calibration"""
+        # Translate the origin point by the pose
+        return matrix44.apply_to_vector(self.pose_matrix, [0, 0, 0])
 
     # def __str__(self):
     #     return "POI of type " + self.type + " at x=" + str(int(self.point[0])) + ", y=" + str(int(self.point[1]))
