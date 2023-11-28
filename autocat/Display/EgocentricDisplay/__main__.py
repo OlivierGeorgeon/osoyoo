@@ -29,7 +29,7 @@ experience1 = Experience(pose_matrix, EXPERIENCE_ALIGNED_ECHO, 0, experience_id=
 workspace.memory.egocentric_memory.experiences[1] = experience1
 
 pose_matrix = quaternion_translation_to_matrix(Quaternion.from_z_rotation(math.radians(-130)), [200, 200, 0])
-experience2 = Experience(pose_matrix, EXPERIENCE_ROBOT, -3, experience_id=2, color_index=1)
+experience2 = Experience(pose_matrix, EXPERIENCE_ROBOT, -3, experience_id=2, color_index=2)
 workspace.memory.egocentric_memory.experiences[2] = experience2
 # poi1 = controller.add_point_of_interest(150, 0, EXPERIENCE_FLOOR)
 # controller.points_of_interest.append(poi1)

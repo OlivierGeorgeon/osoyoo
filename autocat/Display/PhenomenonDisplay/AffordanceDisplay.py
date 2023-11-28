@@ -1,7 +1,10 @@
+import math
 import numpy as np
 import pyglet
-from autocat.Display.PointOfInterest import PointOfInterest
+from pyrr import matrix44
 from webcolors import name_to_rgb
+from autocat.Display.PointOfInterest import PointOfInterest
+from autocat.Memory.EgocentricMemory.Experience import EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_CENTRAL_ECHO
 
 
 class AffordanceDisplay(PointOfInterest):

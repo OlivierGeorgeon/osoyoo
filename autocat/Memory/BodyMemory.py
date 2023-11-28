@@ -5,7 +5,7 @@ from ..Robot.RobotDefine import ROBOT_SETTINGS, ROBOT_FRONT_X, ROBOT_SIDE
 from ..Utils import quaternion_to_azimuth, quaternion_to_direction_rad
 
 ENERGY_TIRED = 88  # 90  # 92  # Level of energy below which the agent wants to go to color patch
-EXCITATION_LOW = 95  # 60  # 75  # Level of excitation below witch the agent just wants to watch if it is not tired
+EXCITATION_LOW = 95  # 95  # 60  # 75  # Level of excitation below witch the agent just wants to watch if it is not tired
 
 
 class BodyMemory:

@@ -109,7 +109,6 @@ class PhenomenonObject(Phenomenon):
 
     def save(self):
         """Return a clone of the phenomenon for memory snapshot"""
-        # Use the experiences cloned when saving egocentric memory
         # The affordance 0 is not removed
         saved_phenomenon = PhenomenonObject(self.affordances[0].save())
         super().save(saved_phenomenon)

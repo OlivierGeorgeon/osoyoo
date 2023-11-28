@@ -3,7 +3,7 @@ import numpy as np
 from pyrr import Matrix44, Quaternion
 from ...Memory.EgocentricMemory.Experience import Experience, EXPERIENCE_LOCAL_ECHO, EXPERIENCE_CENTRAL_ECHO, \
     EXPERIENCE_PLACE, EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_IMPACT, EXPERIENCE_ROBOT
-from ...Robot.RobotDefine import ROBOT_COLOR_X, ROBOT_FRONT_X, LINE_X, ROBOT_FRONT_Y, ROBOT_HEAD_X, ROBOT_SIDE
+from ...Robot.RobotDefine import ROBOT_COLOR_X, ROBOT_FRONT_X, LINE_X, ROBOT_FRONT_Y, ROBOT_SIDE
 from ...Robot.Outcome import echo_matrix
 from ...Decider.Action import ACTION_FORWARD, ACTION_BACKWARD, ACTION_SWIPE, ACTION_RIGHTWARD, ACTION_CIRCUMVENT
 from ...Utils import quaternion_translation_to_matrix
@@ -30,7 +30,6 @@ class EgocentricMemory:
             experience.displace(enaction.displacement_matrix)
 
         # Add the PLACE experience with the sensed color
-        body_direction_rad = enaction.body_quaternion.axis[2] * enaction.body_quaternion.angle
         pose_matrix = Matrix44.from_translation([ROBOT_COLOR_X, 0, 0], dtype=float)
         place_exp = Experience(pose_matrix, EXPERIENCE_PLACE, enaction.clock, self.experience_id,
                                durability=EXPERIENCE_PERSISTENCE, color_index=enaction.outcome.color_index)
@@ -125,7 +124,7 @@ class EgocentricMemory:
         # self.add_central_echos(local_echos)
 
         # Add the other robot experience
-        if enaction.message is not None:
+        if enaction.message is not None and enaction.message.ego_position is not None:
             pose_m = quaternion_translation_to_matrix(enaction.message.ego_quaternion, enaction.message.ego_position)
             robot_exp = Experience(pose_m, EXPERIENCE_ROBOT, enaction.clock, experience_id=self.experience_id,
                                    durability=EXPERIENCE_PERSISTENCE // 3, color_index=enaction.message.emotion_code)

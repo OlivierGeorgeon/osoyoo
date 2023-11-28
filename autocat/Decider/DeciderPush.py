@@ -47,25 +47,23 @@ class DeciderPush(Decider):
                 target_prompt = vector.set_length(self.workspace.memory.egocentric_memory.focus_point, 700)
                 self.workspace.memory.egocentric_memory.prompt_point = target_prompt
                 # First enaction: turn to the prompt
-                e0 = Enaction(self.workspace.actions[ACTION_TURN], self.workspace.memory, color=EMOTION_ANGRY)
+                e0 = Enaction(self.workspace.actions[ACTION_TURN], self.workspace.memory)
                 # Second enaction: move forward to the prompt
-                e1 = Enaction(self.workspace.actions[ACTION_FORWARD], e0.post_memory, color=EMOTION_ANGRY)
+                e1 = Enaction(self.workspace.actions[ACTION_FORWARD], e0.post_memory)
                 composite_enaction = CompositeEnaction([e0, e1])
                 self.step = STEP_PUSH
             else:
                 # If there is no object then watch (probably never happens)
                 print("DeciderPush is watching")
-                composite_enaction = Enaction(self.workspace.actions[ACTION_SCAN], self.workspace.memory, span=10,
-                                              color=EMOTION_ANGRY)
+                composite_enaction = Enaction(self.workspace.actions[ACTION_SCAN], self.workspace.memory, span=10)
         else:
             # Start withdrawing
             # The first enaction: turn the back to the prompt
             origin = self.workspace.memory.phenomenon_memory.watch_point()  # Birth place or arena center
             self.workspace.memory.egocentric_memory.prompt_point = self.workspace.memory.allocentric_to_egocentric(origin)
-            e0 = Enaction(self.workspace.actions[ACTION_TURN], self.workspace.memory, direction=DIRECTION_BACK,
-                          color=EMOTION_ANGRY)
+            e0 = Enaction(self.workspace.actions[ACTION_TURN], self.workspace.memory, direction=DIRECTION_BACK)
             # Second enaction: move forward to the prompt
-            e1 = Enaction(self.workspace.actions[ACTION_BACKWARD], e0.post_memory, color=EMOTION_ANGRY)
+            e1 = Enaction(self.workspace.actions[ACTION_BACKWARD], e0.post_memory)
             composite_enaction = CompositeEnaction([e0, e1])
             self.step = STEP_INIT
 

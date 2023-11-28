@@ -26,7 +26,9 @@ class OsoyooCar:
         self.RRWheel.anchor_position = 40, 18
 
         # The emotion led
-        self.robot_emotion = shapes.Rectangle(-30, 0, 20, 20, color=name_to_rgb("white"), batch=self.batch,
+        #  (circle end-up below the robot)
+        # self.robot_emotion = shapes.Circle(-30, 0, 10, color=name_to_rgb("green"), batch=self.batch)
+        self.robot_emotion = shapes.Rectangle(-30, 0, 20, 20, color=name_to_rgb(EMOTION_COLORS[2]), batch=self.batch,
                                               group=self.group)
         self.robot_emotion.anchor_position = 10, 10
 

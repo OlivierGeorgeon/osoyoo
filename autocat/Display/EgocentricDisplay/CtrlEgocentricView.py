@@ -1,8 +1,8 @@
 from pyrr import Matrix44
 from pyglet.window import key
 from .EgocentricView import EgocentricView
-from ..PointOfInterest import PointOfInterest, POINT_PROMPT
-from ...Memory.EgocentricMemory.Experience import EXPERIENCE_FOCUS
+from ..PointOfInterest import PointOfInterest, POINT_PROMPT, POINT_ROBOT
+from ...Memory.EgocentricMemory.Experience import EXPERIENCE_FOCUS, EXPERIENCE_ROBOT
 from ...Robot.CtrlRobot import ENACTION_STEP_ENACTING, ENACTION_STEP_REFRESHING
 
 
@@ -69,7 +69,11 @@ class CtrlEgocentricView:
         # Recreate the points of interest from experiences
         for e in [e for e in self.workspace.memory.egocentric_memory.experiences.values()
                   if (e.clock + e.durability >= self.workspace.clock - 1)]:
-            poi = PointOfInterest(e.position_matrix, self.view.batch, self.view.forefront, e.type, e.clock,
+            if e.type == EXPERIENCE_ROBOT:  # Draw the body of the other robot
+                robot_shape = PointOfInterest(e.pose_matrix, self.view.batch, self.view.background, POINT_ROBOT, e.clock)
+                robot_shape.fade(self.workspace.clock)
+                self.points_of_interest.append(robot_shape)
+            poi = PointOfInterest(e.pose_matrix, self.view.batch, self.view.forefront, e.type, e.clock,
                                   color_index=e.color_index)
             # poi.displace(e.position_matrix)
             poi.fade(self.workspace.clock)

@@ -6,7 +6,7 @@ from playsound import playsound
 from ..Decider.Action import ACTION_FORWARD, ACTION_BACKWARD, ACTION_SWIPE, ACTION_RIGHTWARD,  ACTION_TURN, \
     ACTION_SCAN, ACTION_WATCH
 from ..Decider.Decider import CONFIDENCE_NO_FOCUS, CONFIDENCE_NEW_FOCUS, CONFIDENCE_TOUCHED_FOCUS, CONFIDENCE_CONFIRMED_FOCUS
-from ..Memory.Memory import SIMULATION_TIME_RATIO, EMOTION_RELAXED
+from ..Memory.Memory import SIMULATION_TIME_RATIO
 from ..Utils import short_angle
 from .RobotDefine import DEFAULT_YAW, TURN_DURATION, ROBOT_FRONT_X, ROBOT_FRONT_Y, ROBOT_HEAD_X,  ROBOT_SETTINGS, RETREAT_DISTANCE_Y
 from .Command import Command, DIRECTION_FRONT
@@ -21,7 +21,7 @@ class Enaction:
     3. CtrlRobot computes the outcome received from the robot
     4. CtrlRobot call ternminate(outcome)
     """
-    def __init__(self, action, memory, direction=DIRECTION_FRONT, span=40, color=EMOTION_RELAXED):
+    def __init__(self, action, memory, direction=DIRECTION_FRONT, span=40):
         """Initialize the enaction upon creation. Will be adjusted before generating the command"""
         # The initial arguments
         self.action = action
@@ -39,7 +39,7 @@ class Enaction:
             # print("Initialize Enaction clock", self.clock, "prompt", self.prompt_point)
         if memory.egocentric_memory.focus_point is not None:
             self.focus_point = memory.egocentric_memory.focus_point.copy()
-        self.command = Command(self.action, self.prompt_point, self.focus_point, direction, span, color)
+        self.command = Command(self.action, self.prompt_point, self.focus_point, direction, span, memory.emotion_code)
 
         # The anticipated memory
         self.post_memory = memory.save()
@@ -151,7 +151,6 @@ class Enaction:
                 if self.outcome.compass_quaternion.dot(yaw_integration_quaternion) < 0.0:
                     yaw_integration_quaternion = - yaw_integration_quaternion
 
-                # print("compass_quaternion", repr(self.outcome.compass_quaternion), "yaw_integration_quaternion", repr(yaw_integration_quaternion))
                 # Save the difference to display in BodyView
                 self.body_direction_delta = short_angle(self.outcome.compass_quaternion, yaw_integration_quaternion)
                 # If positive when turning trigonometric direction then the yaw is measured greater than it is
@@ -252,7 +251,6 @@ class Enaction:
             #     # Focus on the object "seen"
             #     self.focus_point = new_focus
             if new_focus is None or np.linalg.norm(new_focus) > 200:
-            # else:
                 # Focus on the object "felt"
                 if self.outcome.impact == 0b01:
                     self.focus_point = np.array([ROBOT_FRONT_X + 10, -ROBOT_FRONT_Y, 0])

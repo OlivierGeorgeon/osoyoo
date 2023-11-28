@@ -1,10 +1,8 @@
 import math
-import numpy as np
-from pyrr import matrix44, Vector3, Quaternion
+from pyrr import matrix44
 from autocat.Memory.EgocentricMemory.Experience import EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_CENTRAL_ECHO, \
     EXPERIENCE_FLOOR
 from autocat.Utils import assert_almost_equal_angles, quaternion_to_direction_rad
-from ...Robot.RobotDefine import ROBOT_HEAD_X, ROBOT_COLOR_X, LINE_X
 
 MAX_SIMILAR_DISTANCE = 300    # (mm) Max distance within which affordances are similar
 MAX_SIMILAR_DIRECTION = 15    # (degrees) Max angle within which affordances are similar
@@ -21,26 +19,8 @@ class Affordance:
         self.type = experience_type
         self.clock = clock
         self.color_index = color_index
-        self.quaternion = quaternion
-        self.polar_sensor_point = polar_sensor_point
-
-        # # Compute the absolute direction of the affordance
-        # ego_direction_quaternion = Quaternion.from_matrix(experience.position_matrix)
-        # self.quaternion = ego_direction_quaternion.inverse * self.body_quaternion
-        #
-        # # Compute the polar-egocentric position of the sensor relative to this affordance
-        # # The position of the center of the robot
-        # ego_robot_center = -Vector3(experience.point())
-        # if self.experience.type in [EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_CENTRAL_ECHO]:
-        #     # The position of the head
-        #     ego_head_point = ego_robot_center + [ROBOT_HEAD_X, 0, 0]
-        #     self.relative_sensor_point = body_quaternion * ego_head_point
-        # elif self.experience.type == EXPERIENCE_FLOOR:
-        #     # The position of the color sensor
-        #     ego_color_point = ego_robot_center + [LINE_X - ROBOT_COLOR_X, 0, 0]
-        #     self.relative_sensor_point = body_quaternion * ego_color_point
-        # else:
-        #     self.relative_sensor_point = body_quaternion * ego_robot_center
+        self.quaternion = quaternion  # The direction of the sensor relative to the affordance
+        self.polar_sensor_point = polar_sensor_point  # The position of the sensor relative to the affordance
 
     def absolute_point_interest(self):
         """Return True if this affordance can be used as absolute origin of this phenomenon"""

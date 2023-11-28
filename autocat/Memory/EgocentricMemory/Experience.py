@@ -1,5 +1,3 @@
-import math
-import numpy as np
 from pyrr import matrix44, Quaternion, Vector3
 from ...Robot.RobotDefine import ROBOT_HEAD_X, ROBOT_COLOR_X, LINE_X
 
@@ -29,7 +27,7 @@ class Experience:
         durability : durability of the experience, when it reach zero the experience should be removed from the memory.
         """
         # self.point = np.array(point)
-        self.position_matrix = pose_matrix
+        self.pose_matrix = pose_matrix
         self.type = experience_type
         # self.absolute_direction_rad = body_direction_rad
         # self.absolute_direction_quaternion = Quaternion.from_z_rotation(body_direction_rad)
@@ -63,30 +61,21 @@ class Experience:
     def __str__(self):
         return "(id:" + str(self.id) + ",clock:" + str(self.clock) + ", type:" + self.type + ")"
 
-    # def body_direction_quaternion(self):
-    #     """Return the quaternion representing the body direction"""
-    #     return self.absolute_direction_quaternion
-    #     # return quaternion.create_from_z_rotation(self.absolute_direction_rad)
-
     def displace(self, displacement_matrix):
         """Displace the experience by the displacement_matrix"""
         # Update the position matrix in robot-centric coordinates
         # by miraculously multiplying the position_matrix by the displacement_matrix
-        self.position_matrix = matrix44.multiply(self.position_matrix, displacement_matrix)
-
-    # def sensor_point(self):
-    #     """Return a clone of the sensor point relative to the experience"""
-    #     return self._sensor_point.copy()
+        self.pose_matrix = matrix44.multiply(self.pose_matrix, displacement_matrix)
 
     def point(self):
         """Return the point of reference of this point of interest. Used for compass calibration"""
         # Translate the origin point by the pose
-        return matrix44.apply_to_vector(self.position_matrix, [0., 0., 0.])
+        return matrix44.apply_to_vector(self.pose_matrix, [0., 0., 0.])
 
     def absolute_quaternion(self, body_quaternion):
         """Return a quaternion representing the absolute direction of this experience"""
         # The body quaternion minus the relative direction of the experience
-        return Quaternion.from_matrix(self.position_matrix).inverse * body_quaternion
+        return Quaternion.from_matrix(self.pose_matrix).inverse * body_quaternion
 
     def polar_sensor_point(self, body_quaternion):
         """Return the polar-egocentric position of the sensor relative to this experience"""
@@ -106,7 +95,7 @@ class Experience:
     def save(self):
         """Create a copy of the experience for memory snapshot"""
         # Clone the position matrix so it can be updated separately
-        saved_experience = Experience(self.position_matrix.copy(), self.type, self.clock, self.id, self.durability,
+        saved_experience = Experience(self.pose_matrix.copy(), self.type, self.clock, self.id, self.durability,
                                       self.color_index)
         # saved_experience.position_matrix = self.position_matrix.copy()
         # Reset the absolute directions  TODO Modify so they don't have to be reset

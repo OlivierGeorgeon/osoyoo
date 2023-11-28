@@ -7,7 +7,7 @@ from .CellDisplay import CellDisplay
 from ...Memory.AllocentricMemory.Hexagonal_geometry import point_to_cell
 from ...Memory.EgocentricMemory.Experience import EXPERIENCE_ROBOT
 from ..InteractiveDisplay import InteractiveDisplay
-from ..PointOfInterest import PointOfInterest
+from ..PointOfInterest import PointOfInterest, POINT_ROBOT
 
 
 NB_CELL_WIDTH = 30
@@ -44,6 +44,7 @@ class AllocentricView(InteractiveDisplay):
 
         self.hexagons = [[None for _ in range(self.nb_cell_y)] for _ in range(self.nb_cell_x)]
         self.robot_poi = None  # The other robot point of interest
+        self.body_poi = None
 
         self.mouse_press_x = 0
         self.mouse_press_y = 0
@@ -80,12 +81,10 @@ class AllocentricView(InteractiveDisplay):
         glOrtho(-self.width * self.zoom_level, self.width * self.zoom_level, -self.height * self.zoom_level,
                 self.height * self.zoom_level, 1, -1)
 
-        # Draw the grid
+        # Draw the hexagonal grid
         self.batch.draw()
 
         # Stack the transformation to position the robot
-        # glTranslatef(self.workspace.memory.allocentric_memory.robot_point[0],
-        #              self.workspace.memory.allocentric_memory.robot_point[1], 0)
         glTranslatef(*self.workspace.memory.allocentric_memory.robot_point)
         glRotatef(90 - self.workspace.memory.body_memory.body_azimuth(), 0.0, 0.0, 1.0)
         # Draw the robot
@@ -115,16 +114,13 @@ class AllocentricView(InteractiveDisplay):
         if self.robot_poi is not None:
             self.robot_poi.delete()
             self.robot_poi = None
+            self.body_poi.delete()
+            self.body_poi = None
         if phenomenon is not None:
-            # quaternion = Quaternion.from_z_rotation(phenomenon.current().experience.absolute_direction_rad)
-            # pose_matrix = quaternion_translation_to_matrix(quaternion, phenomenon.point)
-            # pose_matrix = Matrix44.from_translation(phenomenon.point + phenomenon.current().point, dtype=float)
-            pose_matrix = quaternion_translation_to_matrix(phenomenon.current().quaternion, phenomenon.point + phenomenon.current().point)
+            pose_matrix = quaternion_translation_to_matrix(phenomenon.current().quaternion, phenomenon.point +
+                                                           phenomenon.current().point)
+            self.body_poi = PointOfInterest(pose_matrix, self.batch,
+                                             self.forefront, POINT_ROBOT, phenomenon.current().clock)
             self.robot_poi = PointOfInterest(pose_matrix, self.batch,
                                              self.forefront, EXPERIENCE_ROBOT, phenomenon.current().clock,
                                              color_index=phenomenon.current().color_index)
-            # rotation = Matrix44.from_z_rotation(-phenomenon.current().experience.absolute_direction_rad)
-            # displacement_matrix = Matrix44.from_translation(phenomenon.point) * rotation
-            # self.robot_poi.displace(displacement_matrix)
-            # q = Quaternion.from_z_rotation(phenomenon.current().experience.absolute_direction_rad)
-            # self.robot_poi.displace(quaternion_translation_to_matrix(q, phenomenon.point))

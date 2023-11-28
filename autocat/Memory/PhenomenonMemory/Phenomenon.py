@@ -1,7 +1,7 @@
 import math
 import matplotlib.path as mpath
 import numpy as np
-from scipy.spatial import ConvexHull, QhullError, Delaunay
+from scipy.spatial import ConvexHull, QhullError
 from scipy.interpolate import splprep, splev
 
 PHENOMENON_DELTA = 300  # (mm) Distance between affordances to be considered the same phenomenon

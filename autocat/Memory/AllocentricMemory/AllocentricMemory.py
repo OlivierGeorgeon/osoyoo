@@ -5,9 +5,8 @@ import numpy as np
 from pyrr import quaternion
 from . Hexagonal_geometry import point_to_cell, get_neighbors
 from . GridCell import GridCell, CELL_UNKNOWN
-from ..EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_PLACE
-from ..AllocentricMemory.GridCell import CELL_NO_ECHO, CELL_PHENOMENON
-from ..EgocentricMemory.Experience import EXPERIENCE_FOCUS, EXPERIENCE_PROMPT
+from ..EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_PLACE, EXPERIENCE_FOCUS, EXPERIENCE_PROMPT
+from ..AllocentricMemory.GridCell import CELL_NO_ECHO
 from ...Robot.RobotDefine import ROBOT_FRONT_X, ROBOT_SIDE, CHECK_OUTSIDE
 from ...Memory.PhenomenonMemory.PhenomenonMemory import TER
 from ...Memory.PhenomenonMemory.PhenomenonTerrain import TERRAIN_CIRCUMFERENCE_CONFIDENCE
@@ -84,8 +83,8 @@ class AllocentricMemory:
                         c.clock_place = clock
             # Mark the affordances of this phenomenon
             for a in p.affordances.values():
-                # if p_id != TER or p.confidence < TERRAIN_CIRCUMFERENCE_CONFIDENCE or a.experience.color_index != 0:
-                if p.confidence < TERRAIN_CIRCUMFERENCE_CONFIDENCE or a.color_index != 0:
+                if p_id != TER or p.confidence < TERRAIN_CIRCUMFERENCE_CONFIDENCE or a.color_index != 0\
+                        or CHECK_OUTSIDE == 0:
                     # Attribute the status of the affordance
                     cell_x, cell_y = point_to_cell(a.point+p.point)
                     self.apply_status_to_cell(cell_x, cell_y, a.type, a.clock, a.color_index)
