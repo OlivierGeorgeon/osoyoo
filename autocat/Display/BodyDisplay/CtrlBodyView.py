@@ -115,6 +115,9 @@ class CtrlBodyView:
                                      + ", Ex:{:d}%".format(self.workspace.memory.body_memory.excitation) \
                                      + ", D:" + self.workspace.decider_id \
                                      + ", " + self.workspace.engagement_mode
+        # During the interaction:update the head direction
+        self.view.robot.rotate_head(self.workspace.memory.body_memory.head_direction_degree())
+        # At the end of interaction
         if self.workspace.enacter.interaction_step == ENACTION_STEP_REFRESHING and self.workspace.enaction.outcome is not None:
             self.view.label.text = self.body_label_azimuth(self.workspace.enaction)
             self.view.label_enaction.text = self.body_label(self.workspace.enaction.action)

@@ -1,4 +1,4 @@
-#define ROBOT_ID 4 // 0: regular Osoyoo robot, 1: robot BSN, 2: robot UCBL, 3: SHS chez Olivier, 11 to 14: DOLL robots
+#define ROBOT_ID 2 // 0: regular Osoyoo robot, 1: robot BSN, 2: robot UCBL, 3: SHS chez Olivier, 11 to 14: DOLL robots
 
 #define AP_SSID "osoyoo_robot"          // The wifi SSID of this robot in Access Point
 #define ROBOT_HEAD_X 80                 // (mm) X position of the head
@@ -51,15 +51,15 @@
 #define TURN_SPOT_MAX_DURATION 2400
 #define TURN_SPOT_ENDING_DELAY 200  // Rotation speed is about 1° per 10ms
 #define TURN_SPOT_ENDING_ANGLE 10
-#define COMPASS_X_OFFSET 882 // 651  // 1089      // Previous IMU board: 1421
-#define COMPASS_Y_OFFSET -1253  // -987 // -1547     // Previous IMU board: -1601
+#define COMPASS_X_OFFSET 858 // 651  // 1089      // Previous IMU board: 1421
+#define COMPASS_Y_OFFSET -1272  // -987 // -1547     // Previous IMU board: -1601
 #define ACCELERATION_X_OFFSET 0    // Previous IMU board: -550
 #define ACCELERATION_Y_OFFSET -35  // Previous IMU board: 150
 #define ACCELERATION_X_IMPACT_THRESHOLD 250 // -400 // Below the threshold it is a strong deceleration = shock
 #define ACCELERATION_Y_IMPACT_THRESHOLD 200
 #define ACCELERATION_X_BLOCK_THRESHOLD 60 // Below the threshold, the robot is blocked
 #define ACCELERATION_Y_BLOCK_THRESHOLD 80 // Robot is blocked if lateral acceleration below this threshold
-#define GYRO_COEF 1.0 // 1.35 // UMI is upright
+#define GYRO_COEF 0.99  // 1.0
 #define ROBOT_SERVO_PIN 6
 #define GYRO_IMPACT_THRESHOLD 0.25      // (degree) above this threshold: strong z rotation = lateral impact
 #define WHITE_RED 70.
@@ -86,7 +86,7 @@
 #define ACCELERATION_Y_IMPACT_THRESHOLD 200  // lateral impact if acceleration exceeds this threshold
 #define ACCELERATION_X_BLOCK_THRESHOLD 140 // 30 // Robot is blocked if longitudinal acceleration below this threshold
 #define ACCELERATION_Y_BLOCK_THRESHOLD 80 // 100 // Robot is blocked if lateral acceleration below this threshold
-#define GYRO_COEF 1.  // 2.0 // 1.33  // 1.5 si tourne trop, augmenter cette valeur
+#define GYRO_COEF 1.
 #define ROBOT_SERVO_PIN 6
 #define GYRO_IMPACT_THRESHOLD 0.5 // 0.25      // (degree/s) above this threshold: strong z rotation = lateral impact
 #define WHITE_RED 69.

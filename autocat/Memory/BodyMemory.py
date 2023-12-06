@@ -1,11 +1,19 @@
 import math
 import numpy as np
 from pyrr import Quaternion, Vector3
-from ..Robot.RobotDefine import ROBOT_SETTINGS, ROBOT_FRONT_X, ROBOT_SIDE
+from ..Robot.RobotDefine import ROBOT_SETTINGS, ROBOT_FRONT_X, ROBOT_SIDE, ROBOT_HEAD_X
 from ..Utils import quaternion_to_azimuth, quaternion_to_direction_rad
 
-ENERGY_TIRED = 88  # 90  # 92  # Level of energy below which the agent wants to go to color patch
+ENERGY_TIRED = 92  # 88  # 90  # 92  # Level of energy below which the agent wants to go to color patch
 EXCITATION_LOW = 95  # 95  # 60  # 75  # Level of excitation below witch the agent just wants to watch if it is not tired
+
+
+def point_to_echo_direction_distance(point):
+    """Return the head direction in degrees and distance of the echo"""
+    point_from_head = point - np.array([ROBOT_HEAD_X, 0, 0])
+    direction = round(math.degrees(math.atan2(point_from_head[1], point_from_head[0])))
+    distance = round(np.linalg.norm(point_from_head))
+    return direction, distance
 
 
 class BodyMemory:

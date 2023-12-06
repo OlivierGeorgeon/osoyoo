@@ -1,5 +1,6 @@
 from ..Robot.CtrlRobot import ENACTION_STEP_IDLE, ENACTION_STEP_INTENDING, ENACTION_STEP_ENACTING, \
     ENACTION_STEP_INTEGRATING, ENACTION_STEP_REFRESHING
+from ..Memory.PhenomenonMemory.PhenomenonMemory import TERRAIN_ORIGIN_CONFIDENCE
 
 
 class Enacter:
@@ -43,9 +44,14 @@ class Enacter:
         if self.interaction_step == ENACTION_STEP_INTEGRATING:
             # Restore the memory from the snapshot
             self.workspace.memory = self.memory_snapshot
+
             # Retrieve possible message from other robot
-            self.workspace.enaction.message = self.workspace.message
-            self.workspace.message = None
+            if self.workspace.memory.phenomenon_memory.terrain_confidence() >= TERRAIN_ORIGIN_CONFIDENCE and \
+                    self.workspace.message is not None:
+                self.workspace.enaction.message = self.workspace.message
+                print("Message", self.workspace.message.message_string)
+                # self.workspace.message = None
+
             # Update body memory and egocentric memory
             self.workspace.memory.update_and_add_experiences(self.workspace.enaction)
 

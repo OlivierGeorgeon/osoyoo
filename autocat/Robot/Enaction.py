@@ -7,9 +7,11 @@ from ..Decider.Action import ACTION_FORWARD, ACTION_BACKWARD, ACTION_SWIPE, ACTI
     ACTION_SCAN, ACTION_WATCH
 from ..Decider.Decider import CONFIDENCE_NO_FOCUS, CONFIDENCE_NEW_FOCUS, CONFIDENCE_TOUCHED_FOCUS, CONFIDENCE_CONFIRMED_FOCUS
 from ..Memory.Memory import SIMULATION_TIME_RATIO
+from ..Memory.BodyMemory import point_to_echo_direction_distance
 from ..Utils import short_angle
 from .RobotDefine import DEFAULT_YAW, TURN_DURATION, ROBOT_FRONT_X, ROBOT_FRONT_Y, ROBOT_HEAD_X,  ROBOT_SETTINGS, RETREAT_DISTANCE_Y
 from .Command import Command, DIRECTION_FRONT
+from .Outcome import echo_point
 
 FOCUS_MAX_DELTA = 200  # 200 (mm) Maximum delta to keep focus
 
@@ -61,7 +63,6 @@ class Enaction:
         # The outcome
         self.outcome = None
         self.body_direction_delta = 0  # Displayed in BodyView
-        # self.lost_focus = False  # Used by deciders to possibly trigger scan
         self.focus_confidence = CONFIDENCE_NO_FOCUS  # Used by deciders to possibly trigger scan
         self.translation = None  # Used by allocentric memory to move the robot
         self.yaw_matrix = None  # Used by bodyView to rotate compass points
@@ -70,6 +71,9 @@ class Enaction:
         # The message received from other robot
         self.message = None
         self.message_sent = False  # Message sent to other robots
+
+        self.focus_direction_prediction_error = 0
+        self.focus_distance_prediction_error = 0
 
     def begin(self, clock, body_quaternion):
         """Adjust the spatial modifiers of the enaction.
@@ -181,17 +185,22 @@ class Enaction:
         # If careful watch then the focus is the first central_echo
         new_focus = self.outcome.echo_point
         if self.command.span == 10 and len(self.outcome.central_echos) > 0:
-            central_echo = self.outcome.central_echos[0]
-            x = ROBOT_HEAD_X + math.cos(math.radians(central_echo[0])) * central_echo[1]
-            y = math.sin(math.radians(central_echo[0])) * central_echo[1]
-            new_focus = np.array([x, y, 0], dtype=int)
+            # central_echo = self.outcome.central_echos[0]
+            # x = ROBOT_HEAD_X + math.cos(math.radians(central_echo[0])) * central_echo[1]
+            # y = math.sin(math.radians(central_echo[0])) * central_echo[1]
+            # new_focus = np.array([x, y, 0], dtype=int)
+            new_focus = echo_point(*self.outcome.central_echos[0])
 
         # If the robot is already focussed then adjust the focus and the displacement
         if self.focus_point is not None:
             if new_focus is not None:
                 # The error between the expected and the actual position of the echo
+                new_focus_direction, new_focus_distance = point_to_echo_direction_distance(new_focus)
                 prediction_focus_point = matrix44.apply_to_vector(self.displacement_matrix, self.focus_point)
+                prediction_focus_direction, prediction_focus_distance = point_to_echo_direction_distance(prediction_focus_point)
                 prediction_error_focus = prediction_focus_point - new_focus
+                self.focus_direction_prediction_error = prediction_focus_direction - new_focus_direction
+                self.focus_distance_prediction_error = prediction_focus_distance - new_focus_distance
                 # If the new focus is near the previous focus or the displacement has been continuous.
                 if np.linalg.norm(prediction_error_focus) < FOCUS_MAX_DELTA or self.outcome.status == "continuous":
                     # The focus has been kept

@@ -65,11 +65,16 @@ def category_color(color_sensor):
     return color_index
 
 
-def echo_matrix(head_direction, distance):
-    """Return the matrix representing the pose of the echo"""
+def echo_matrix(head_direction, echo_distance):
+    """Return the matrix representing the pose of the echo from direction in degrees and distance"""
     head_quaternion = Quaternion.from_z_rotation(math.radians(head_direction))
-    echo_from_head_matrix = translation_quaternion_to_matrix([distance, 0, 0], head_quaternion)
-    return  Matrix44.from_translation([ROBOT_HEAD_X, 0, 0]) * echo_from_head_matrix
+    echo_from_head_matrix = translation_quaternion_to_matrix([echo_distance, 0, 0], head_quaternion)
+    return Matrix44.from_translation([ROBOT_HEAD_X, 0, 0]) * echo_from_head_matrix
+
+
+def echo_point(head_direction, echo_distance):
+    """Return the egocentric echo point from the head direction and echo distance"""
+    return matrix44.apply_to_vector(echo_matrix(head_direction, echo_distance), np.array([0, 0, 0])).astype(int)
 
 
 def central_echos(echos):

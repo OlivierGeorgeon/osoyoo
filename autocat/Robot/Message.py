@@ -9,8 +9,9 @@ class Message:
     """A message received from another robot"""
     def __init__(self, message_string):
         """Initialize the message object from the message_string"""
+        # Keep message_string for printing
+        self.message_string = message_string
 
-        # print("Message", message_string)
         message_dict = json.loads(message_string)
 
         self.robot = message_dict['robot']

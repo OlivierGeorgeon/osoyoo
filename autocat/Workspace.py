@@ -153,10 +153,11 @@ class Workspace:
                    "emotion": self.memory.emotion_code}
 
         # If the terrain has been found then send the position relative to the terrain origin
-        if TER in self.memory.phenomenon_memory.phenomena and self.memory.phenomenon_memory.phenomena[TER].confidence > TERRAIN_INITIAL_CONFIDENCE:
-            point = self.memory.allocentric_memory.robot_point - self.memory.phenomenon_memory.phenomena[TER].point
-            message['pos_x'] = round(point[0])
-            message['pos_y'] = round(point[1])
+        if TER in self.memory.phenomenon_memory.phenomena and \
+                self.memory.phenomenon_memory.phenomena[TER].confidence > TERRAIN_INITIAL_CONFIDENCE:
+            robot_point = self.memory.terrain_centric_robot_point()
+            message['pos_x'] = round(robot_point[0])
+            message['pos_y'] = round(robot_point[1])
 
         # Add information about the current enaction only once
         if self.enaction is not None and not self.enaction.message_sent:
@@ -177,7 +178,6 @@ class Workspace:
             # Mark the message for this enaction sent
             self.enaction.message_sent = True
 
-        # Send the message if there is position or focus
         return json.dumps(message)
 
     def receive_message(self, message_string):
@@ -193,9 +193,11 @@ class Workspace:
                 # If position in terrain and the position of this robot knows the position of the terrain
                 if TER in self.memory.phenomenon_memory.phenomena \
                         and self.memory.phenomenon_memory.phenomena[TER].confidence > TERRAIN_INITIAL_CONFIDENCE:
-                    allo_point = self.message.ter_position + self.memory.phenomenon_memory.phenomena[TER].point
+                    allo_point = self.memory.terrain_centric_to_allocentric(self.message.ter_position)
+                    # allo_point = self.message.ter_position + self.memory.phenomenon_memory.phenomena[TER].point
                     # print("Robot", self.message.robot, "position:", allo_point)
-                    self.message.ego_position = self.memory.allocentric_to_egocentric(allo_point)
+                    # self.message.ego_position = self.memory.allocentric_to_egocentric(allo_point)
+                    self.message.ego_position = self.memory.terrain_centric_to_egocentric(self.message.ter_position)
                 else:
                     # If cannot place the robot then flush the message
                     self.message = None

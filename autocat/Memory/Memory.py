@@ -4,12 +4,12 @@ import time
 from pyrr import matrix44, quaternion, Quaternion
 from .EgocentricMemory.EgocentricMemory import EgocentricMemory
 from .AllocentricMemory.AllocentricMemory import AllocentricMemory
-from .BodyMemory import BodyMemory, EXCITATION_LOW, ENERGY_TIRED
+from .BodyMemory import BodyMemory, EXCITATION_LOW, ENERGY_TIRED, point_to_echo_direction_distance
 from .PhenomenonMemory.PhenomenonMemory import PhenomenonMemory, TER
 from .PhenomenonMemory.PhenomenonTerrain import TERRAIN_INITIAL_CONFIDENCE, TERRAIN_ORIGIN_CONFIDENCE
 from .AllocentricMemory.Hexagonal_geometry import CELL_RADIUS
 from ..Decider.Action import ACTION_SWIPE
-from ..Decider.Decider import FOCUS_TOO_FAR_DISTANCE
+from ..Decider.Decider import FOCUS_TOO_FAR_DISTANCE, CONFIDENCE_CONFIRMED_FOCUS
 from ..Robot.Outcome import Outcome
 
 GRID_WIDTH = 20  # 15   # 100 Number of cells wide
@@ -36,6 +36,8 @@ class Memory:
         self.allocentric_memory = AllocentricMemory(GRID_WIDTH, GRID_HEIGHT, cell_radius=CELL_RADIUS)
         self.phenomenon_memory = PhenomenonMemory(arena_id)
         self.compass_prediction_error = {}  # Used to calibrate GYRO_COEF
+        self.focus_direction_prediction_error = {}
+        self.focus_distance_prediction_error = {}
         self.emotion_code = EMOTION_RELAXED
 
     def __str__(self):
@@ -98,7 +100,7 @@ class Memory:
         # self.body_memory.body_quaternion = enaction.body_quaternion
         self.body_memory.update(enaction)
 
-        # Keep a dictionary of the direction deltas to check gyro_coef is correct
+        # Track compass prediction error to calibrate gyro_coef is correct
         self.compass_prediction_error[enaction.clock] = enaction.body_direction_delta
         self.compass_prediction_error = {key: d for key, d in self.compass_prediction_error.items()
                                          if key > enaction.clock - 10}
@@ -106,6 +108,22 @@ class Memory:
               round(math.degrees(enaction.body_direction_delta), 2), "Average:",
               round(math.degrees(np.mean(list(self.compass_prediction_error.values()))), 2), "std:",
               round(math.degrees(np.std(list(self.compass_prediction_error.values()))), 2))
+
+        # If focus is confident then track its prediction error
+        if enaction.focus_confidence >= CONFIDENCE_CONFIRMED_FOCUS:
+            self.focus_direction_prediction_error[enaction.clock] = enaction.focus_direction_prediction_error
+            self.focus_direction_prediction_error = {key: d for key, d in self.focus_direction_prediction_error.items()
+                                                     if key > enaction.clock - 10}
+            print("Focus direction prediction error =", enaction.focus_direction_prediction_error,
+                  "Average:", round(np.mean(list(self.focus_direction_prediction_error.values()))),
+                  "std:", round(np.std(list(self.focus_direction_prediction_error.values()))))
+            self.focus_distance_prediction_error[enaction.clock] = enaction.focus_distance_prediction_error
+            self.focus_distance_prediction_error = {key: d for key, d in self.focus_distance_prediction_error.items()
+                                                    if key > enaction.clock - 10}
+            print("Focus distance prediction error =", enaction.focus_distance_prediction_error,
+                  "Average:", round(np.mean(list(self.focus_distance_prediction_error.values()))),
+                  "std:", round(np.std(list(self.focus_distance_prediction_error.values()))))
+
         self.egocentric_memory.update_and_add_experiences(enaction)
 
         # The integrator may again update the robot's position
@@ -168,6 +186,22 @@ class Memory:
             return self.egocentric_to_allocentric(point) - self.phenomenon_memory.phenomena[TER].point
         return self.egocentric_to_allocentric(point)
 
+    def terrain_centric_to_allocentric(self, point):
+        """Return the point in allocentric coordinates from the point in terrain_centric"""
+        if point is None:
+            return None
+        elif self.phenomenon_memory.terrain_confidence() >= TERRAIN_ORIGIN_CONFIDENCE:
+            return point + self.phenomenon_memory.phenomena[TER].point
+        else:
+            return point
+
+    def terrain_centric_robot_point(self):
+        """Return the position of the robot relative to the terrain point"""
+        if self.phenomenon_memory.terrain_confidence() >= TERRAIN_ORIGIN_CONFIDENCE:
+            return self.allocentric_memory.robot_point - self.phenomenon_memory.phenomena[TER].point
+        else:
+            return self.allocentric_memory.robot_point
+
     def save(self):
         """Return a clone of memory for memory snapshot"""
         # start_time = time.time()
@@ -182,6 +216,8 @@ class Memory:
         # Clone phenomenon memory
         saved_memory.phenomenon_memory = self.phenomenon_memory.save()
         saved_memory.compass_prediction_error = {key: d for key, d in self.compass_prediction_error.items()}
+        saved_memory.focus_direction_prediction_error = {key: d for key, d in self.focus_direction_prediction_error.items()}
+        saved_memory.focus_distance_prediction_error = {key: d for key, d in self.focus_distance_prediction_error.items()}
         # print("Save memory duration:", time.time() - start_time, "seconds")
 
         return saved_memory
@@ -248,6 +284,9 @@ class Memory:
                                                                                self.egocentric_memory.prompt_point)
             # Displacement in body memory
             self.body_memory.body_quaternion = self.body_memory.body_quaternion.cross(yaw_quaternion)
+            if self.egocentric_memory.focus_point is not None:
+                head_direction_degree, _ = point_to_echo_direction_distance(self.egocentric_memory.focus_point)
+                self.body_memory.head_direction_rad = math.radians(head_direction_degree)
 
             # Update allocentric memory
             self.allocentric_memory.robot_point += quaternion.apply_to_vector(self.body_memory.body_quaternion, translation)

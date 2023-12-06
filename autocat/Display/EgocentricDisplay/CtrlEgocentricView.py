@@ -42,9 +42,9 @@ class CtrlEgocentricView:
 
                 # Mark the new prompt
                 self.workspace.memory.egocentric_memory.prompt_point = self.click_point
-                focus_poi = PointOfInterest(Matrix44.from_translation(self.click_point), self.view.batch,
-                                            self.view.background, POINT_PROMPT, self.workspace.clock)
-                self.points_of_interest.append(focus_poi)
+                prompt_poi = PointOfInterest(Matrix44.from_translation(self.click_point).astype(float), self.view.batch,
+                                             self.view.background, POINT_PROMPT, self.workspace.clock)
+                self.points_of_interest.append(prompt_poi)
                 # focus_point.is_selected = True
                 # focus_point.set_color('red')
 
