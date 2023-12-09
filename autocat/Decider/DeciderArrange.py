@@ -1,12 +1,12 @@
 ########################################################################################
 # This decider makes the robot arrange an object to a specific place
-# Activation 2: when the robot is angry
+# Activation 4: when the robot is angry
 ########################################################################################
 import math
 
 from playsound import playsound
 import numpy as np
-from pyrr import vector, line, Quaternion
+from pyrr import vector, line
 from pyrr.geometric_tests import point_closest_point_on_line
 from . Action import ACTION_SWIPE, ACTION_TURN, ACTION_FORWARD, ACTION_BACKWARD, ACTION_SCAN, ACTION_WATCH
 from ..Robot.Enaction import Enaction
@@ -15,7 +15,7 @@ from ..Robot.RobotDefine import CHECK_OUTSIDE
 from . Decider import Decider, FOCUS_TOO_FAR_DISTANCE
 from ..Utils import line_intersection
 from .. Enaction.CompositeEnaction import CompositeEnaction
-from ..Memory.Memory import EMOTION_ANGRY, EMOTION_UPSET
+from ..Memory.Memory import EMOTION_ANGRY, ARRANGE_MIN_RADIUS
 from . Interaction import OUTCOME_FLOOR
 from . Interaction import OUTCOME_LOST_FOCUS
 
@@ -80,8 +80,8 @@ class DeciderArrange(Decider):
                         composite_enaction = Enaction(self.workspace.actions[ACTION_WATCH], self.workspace.memory)
                         self.step = STEP_INIT
                     # If angle to projection point greater than 20° and projection before object
-                    elif math.fabs(math.atan2(ego_prompt_projection[0], math.fabs(ego_prompt_projection[1]))) > 0.349 and\
-                            self.workspace.memory.egocentric_memory.focus_point[0] - ego_prompt_projection[0] > 100:
+                    elif math.fabs(math.atan2(ego_prompt_projection[0], math.fabs(ego_prompt_projection[1]))) > 0.349 \
+                            and self.workspace.memory.egocentric_memory.focus_point[0] - ego_prompt_projection[0] > ARRANGE_MIN_RADIUS:
                         # If prompt projection behind object swipe to prompt_intersection
                         self.workspace.memory.egocentric_memory.prompt_point = ego_prompt_projection
                         # Turn the left to the projection
@@ -108,11 +108,12 @@ class DeciderArrange(Decider):
                 # If robot_point-object-target are aligned
                 else:
                     # If robot_direction also aligned with target by less than 10°
-                    push_vector = vector.set_length(ego_target, np.linalg.norm(ego_target) - 100)  # subtract the radius of the robot and of the object
+                    # subtract the radius of the robot and of the object
+                    push_vector = vector.set_length(ego_target, np.linalg.norm(ego_target) - ARRANGE_MIN_RADIUS)
                     self.workspace.memory.egocentric_memory.prompt_point = push_vector  # ego_target
                     if math.fabs(math.atan2(ego_target[1], ego_target[0])) < 0.17:  # 0.349:
                         # Push to target
-                        self.workspace.memory.egocentric_memory.focus_point = ego_target.copy()  # Look at the destination
+                        self.workspace.memory.egocentric_memory.focus_point = ego_target.copy()  # Look at destination
                         composite_enaction = Enaction(self.workspace.actions[ACTION_FORWARD], self.workspace.memory)
                         self.step = STEP_WITHDRAW
                     # If robot_direction not aligned

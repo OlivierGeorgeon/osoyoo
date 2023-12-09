@@ -95,9 +95,9 @@ int Floor::update(int interaction_direction)
 
   if (_is_retreating)
   {
-    // When the floor changes when retreating sideways, postpone the end time because it may still be on the line
+    // When the floor changes when retreating sideways, postpone the end time because robot may still be on the line
     if (floor_change != 0 && _floor_outcome != B11)
-      _retreat_end_time = millis() + RETREAT_DURATION;
+      _retreat_end_time = max(millis() + RETREAT_DURATION, _retreat_end_time);
 
     // When the retreat time has elapsed, terminate the retreat
     if (millis() > _retreat_end_time)

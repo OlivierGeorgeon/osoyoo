@@ -21,6 +21,8 @@ EMOTION_HAPPY = 2  # Green
 EMOTION_SAD = 3  # Bleu
 EMOTION_ANGRY = 4  # Red
 EMOTION_UPSET = 5  # Orange (Can't arrange an object from where the robot is)
+ARRANGE_MIN_RADIUS = 100
+ARRANGE_MAX_RADIUS = 400
 
 
 class Memory:
@@ -81,7 +83,7 @@ class Memory:
                         # If object inside terrain and closer than target: ANGRY, DeciderPush
                         ego_target = self.terrain_centric_to_egocentric(self.phenomenon_memory.arrange_point())
                         is_to_arrange = self.is_to_arrange(self.egocentric_memory.focus_point)
-                        is_closer = self.egocentric_memory.focus_point[0] < ego_target[0]
+                        is_closer = self.egocentric_memory.focus_point[0] < ego_target[0] + ARRANGE_MIN_RADIUS
                         print("Focus near terrain center:", is_to_arrange, "Before terrain center:", is_closer)
                         if is_to_arrange:
                             if is_closer:
@@ -243,15 +245,10 @@ class Memory:
         if self.phenomenon_memory.terrain_confidence() <= TERRAIN_INITIAL_CONFIDENCE:
             return False
         # If there is a terrain origin, check if the focus is around the terrain center
-        # if self.phenomenon_memory.terrain_confidence() == TERRAIN_ORIGIN_CONFIDENCE:
         else:
             terrain_point = self.egocentric_to_terrain_centric(ego_point)
             print("Focus in terrain-centric coordinates", terrain_point)
-            return np.linalg.norm(terrain_point) < 400
-        # If the terrain has been toured, check if the focus is inside the terrain
-        # TODO Check if inside terrain if the terrain is wide enough
-        # else:
-            return self.is_outside_terrain(ego_point)
+            return np.linalg.norm(terrain_point) < ARRANGE_MAX_RADIUS
 
     def is_outside_terrain(self, ego_point):
         """Return True if ego_point is not None and there is a terrain and ego_point is outside"""

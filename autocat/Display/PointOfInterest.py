@@ -1,5 +1,4 @@
 import math
-import numpy as np
 from pyrr import matrix44
 from pyglet import shapes, gl
 from webcolors import name_to_rgb
@@ -60,10 +59,9 @@ class PointOfInterest:
                                                 ('v2i', self.points), ('c4B', 4 * (*self.color, self.opacity)))
         if self.type == EXPERIENCE_IMPACT:
             self.color = name_to_rgb("salmon")
-            # self.points = [0, 0, 30, -30, 30, 30]
             self.points = [-20, 0, 0, 20, 20, 0, 0, -20]
-            self.shape = self.batch.add_indexed(4, gl.GL_TRIANGLES, self.group, [0, 1, 2, 0, 2, 3], ('v2i', self.points),
-                                                ('c4B', 4 * (*self.color, self.opacity)))
+            self.shape = self.batch.add_indexed(4, gl.GL_TRIANGLES, self.group, [0, 1, 2, 0, 2, 3],
+                                                ('v2i', self.points), ('c4B', 4 * (*self.color, self.opacity)))
         if self.type == EXPERIENCE_BLOCK:
             self.color = name_to_rgb("salmon")
             self.points = [0, 0, 30, -30, 30, 30]
@@ -100,24 +98,17 @@ class PointOfInterest:
             self.points = [-40, -10, -20, -10, -20, 10, -40, 10]
             self.shape = self.batch.add_indexed(4, gl.GL_TRIANGLES, self.group, [0, 1, 2, 0, 2, 3],
                                                 ('v2i', self.points), ('c4B', 4 * (*self.color, self.opacity)))
-
         if self.type == POINT_CONE:  # The cone of ECHO affordances
             self.color = name_to_rgb("CadetBlue")
             self.opacity = 64
             self.points = [round(-size), 0, 0, round(0.4 * size), 0, round(-0.4 * size)]
             self.shape = self.batch.add_indexed(3, gl.GL_TRIANGLES, self.group, [0, 1, 2], ('v2i', self.points),
                                                 ('c4B', 3 * (*self.color, self.opacity)))
-
         # Move the point of interest to its position
         self.displace(pose_matrix)
 
     def set_color(self, color_name=None):
         """ Set the color or reset it to its default value. Also reset the opacity. """
-        # if self.type == EXPERIENCE_ROBOT:
-        #     if color_name is None:
-        #         self.shape.colors[0: 9*4] = 5 * (*name_to_rgb("lightsteelBlue"), self.opacity) + 4 * (*self.color, self.opacity)
-        #     else:
-        #         self.shape.colors[0: 9*4] = 5 * (*name_to_rgb("lightsteelBlue"), self.opacity) + 4 * (*name_to_rgb(color_name), self.opacity)
         if color_name is None:
             if hasattr(self.shape, 'vertices'):
                 nb_points = int(len(self.shape.vertices) / 2)
@@ -142,12 +133,13 @@ class PointOfInterest:
         # If the shape has a list of vertices then apply the displacement matrix to each point.
         if hasattr(self.shape, 'vertices'):
             for i in range(0, len(self.shape.vertices)-1, 2):
-                v = matrix44.apply_to_vector(displacement_matrix, [self.shape.vertices[i], self.shape.vertices[i + 1], 0])
+                v = matrix44.apply_to_vector(displacement_matrix,
+                                             [self.shape.vertices[i], self.shape.vertices[i + 1], 0])
                 self.shape.vertices[i], self.shape.vertices[i+1] = int(v[0]), int(v[1])
         # Points of interest that use pyglet shapes have x and y (Circles)
         else:
-            # self.shape.x, self.shape.y = self.point()[0: 2]
-            self.shape.x, self.shape.y, _ = matrix44.apply_to_vector(displacement_matrix, [self.shape.x, self.shape.y, 0])
+            self.shape.x, self.shape.y, _ = matrix44.apply_to_vector(displacement_matrix,
+                                                                     [self.shape.x, self.shape.y, 0])
 
     def delete(self):
         """ Delete the shape to remove it from the batch. Return True when deleted """
@@ -180,6 +172,3 @@ class PointOfInterest:
         """Return the point of reference of this point of interest. Used for compass calibration"""
         # Translate the origin point by the pose
         return matrix44.apply_to_vector(self.pose_matrix, [0, 0, 0])
-
-    # def __str__(self):
-    #     return "POI of type " + self.type + " at x=" + str(int(self.point[0])) + ", y=" + str(int(self.point[1]))

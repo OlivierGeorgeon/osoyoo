@@ -28,7 +28,6 @@ class Decider:
         self.last_interaction = None
 
         # Load the predefined behavior
-        # self.too_far = FOCUS_TOO_FAR_DISTANCE
         self.primitive_interactions = create_primitive_interactions(self.workspace.actions)
         self.composite_interactions = create_composite_interactions(self.workspace.actions, self.primitive_interactions)
 

@@ -19,7 +19,7 @@
 
 import sys
 import pyglet
-from autocat import Flock, Workspace, CtrlRobot, CtrlEgocentricView, CtrlAllocentricView, CtrlBodyView, CtrlPhenomenonView
+from autocat import Flock
 from playsound import playsound
 
 if len(sys.argv) < 3:  # Argument 0 is "main.py" when launched in -m mode
