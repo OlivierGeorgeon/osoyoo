@@ -1,8 +1,6 @@
 import pyglet
 from pyglet.gl import *
 import math
-# import numpy
-from pyrr import matrix44
 from ..EgocentricDisplay.OsoyooCar import OsoyooCar
 from ..InteractiveDisplay import InteractiveDisplay
 
@@ -23,8 +21,6 @@ class BodyView(InteractiveDisplay):
         # Define the robot
         self.robot_batch = pyglet.graphics.Batch()
         self.robot = OsoyooCar(self.robot_batch, self.background)
-        # self.azimuth = 90  # Degree from north [0, 360] Initialized on the x axis
-        self.body_rotation_matrix = matrix44.create_identity()  # The matrix representing the robot's body rotation
 
         # Define the text area at the bottom of the view
         self.label_batch = pyglet.graphics.Batch()
@@ -43,14 +39,13 @@ class BodyView(InteractiveDisplay):
         glClear(GL_COLOR_BUFFER_BIT)
         glLoadIdentity()
 
-        # The transformations are stacked, and applied backward to the vertices
+        # The transformations are stacked, and applied in reversed order to the vertices
 
         # Stack the projection matrix. Centered on (0,0). Fit the window size and zoom factor
         glOrtho(-self.width * self.zoom_level, self.width * self.zoom_level, -self.height * self.zoom_level,
                 self.height * self.zoom_level, 1, -1)
 
         # Stack the rotation of the robot body
-        # glRotatef(90 - self.azimuth, 0.0, 0.0, 1.0)
         glRotatef(90 - self.workspace.memory.body_memory.body_azimuth(), 0.0, 0.0, 1.0)
         # Draw compass points
         self.batch.draw()
@@ -66,10 +61,8 @@ class BodyView(InteractiveDisplay):
 
     def on_mouse_press(self, x, y, button, modifiers):
         """ Computing the position of the mouse click relative to the robot in mm and degrees """
-        point = self.mouse_coordinates_to_point(x, y)
-        # Rotate the click point by the opposite rotation of the robot
-        # Use the transposed of the robot's body rotation matrix
-        v = matrix44.apply_to_vector(self.body_rotation_matrix.T, point)
+        # Rotate the click point by the inverse rotation of the robot
+        v = self.workspace.memory.body_memory.body_quaternion.inverse * self.mouse_coordinates_to_point(x, y)
         t = round(math.degrees(math.atan2(v[1], v[0])))
         self.label.text = "Click: x:" + str(round(v[0])) + ", y:" + str(round(v[1])) + ", angle:" + str(t) + "°"
 

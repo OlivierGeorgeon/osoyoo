@@ -32,7 +32,7 @@ class PhenomenonTerrain(Phenomenon):
         if yes, add the affordance to the phenomenon, and return the robot's position correction."""
 
         # Check if the affordance is acceptable for this phenomenon type
-        if affordance.experience.type in TERRAIN_EXPERIENCE_TYPES:
+        if affordance.type in TERRAIN_EXPERIENCE_TYPES:
             # Add the affordance
             affordance.point = affordance.point.astype(int) - self.point.astype(int)
             self.affordance_id += 1
@@ -45,7 +45,7 @@ class PhenomenonTerrain(Phenomenon):
                 if self.absolute_affordance_key is None:
                     # This experience becomes the phenomenon's absolute origin
                     self.absolute_affordance_key = self.affordance_id
-                    self.last_origin_clock = affordance.experience.clock
+                    self.last_origin_clock = affordance.clock
                     terrain_offset = self.place_prediction_error(affordance)
                     self.point += terrain_offset
                     # All the position of affordance including this one are adjusted
@@ -55,16 +55,15 @@ class PhenomenonTerrain(Phenomenon):
                 else:
                     position_correction = self.place_prediction_error(affordance)
                     # Correct the position of the affordances since last time the robot visited the absolute origin
-                    for a in [a for a in self.affordances.values() if a.experience.clock > self.last_origin_clock]:
-                        coef = (a.experience.clock - self.last_origin_clock)/(affordance.experience.clock
-                                                                              - self.last_origin_clock)
+                    for a in [a for a in self.affordances.values() if a.clock > self.last_origin_clock]:
+                        coef = (a.clock - self.last_origin_clock)/(affordance.clock - self.last_origin_clock)
                         ac = np.array(position_correction * coef, dtype=int)
                         a.point -= ac
                         # print("Affordance clock:", a.experience.clock, "corrected by:", ac, "coef:", coef)
                     # Increase confidence if not consecutive origin affordances
-                    if affordance.experience.clock - self.last_origin_clock > 5:
+                    if affordance.clock - self.last_origin_clock > 5:
                         self.confidence = TERRAIN_CIRCUMFERENCE_CONFIDENCE
-                    self.last_origin_clock = affordance.experience.clock
+                    self.last_origin_clock = affordance.clock
 
             # Interpolate the outline
             self.interpolate()
@@ -76,7 +75,7 @@ class PhenomenonTerrain(Phenomenon):
         """Return the position where to go to check the origin in allocentric coordinates"""
         if self.absolute_affordance() is None:
             return None
-        elif np.dot(self.absolute_affordance().experience.sensor_point(), terrain_north_east_point(self.arena_id)) < 0:
+        elif np.dot(self.absolute_affordance().polar_sensor_point, terrain_north_east_point(self.arena_id)) < 0:
             # North-East
             return terrain_north_east_point(self.arena_id) + self.point
         else:
@@ -89,7 +88,7 @@ class PhenomenonTerrain(Phenomenon):
         # Parallel to the absolute affordance direction
         if self.absolute_affordance() is None:
             return None
-        elif np.dot(self.absolute_affordance().experience.sensor_point(), terrain_north_east_point(self.arena_id)) < 0:
+        elif np.dot(self.absolute_affordance().polar_sensor_point, terrain_north_east_point(self.arena_id)) < 0:
             # North-East
             return vector.set_length(terrain_north_east_point(self.arena_id), 500)
         else:
@@ -104,7 +103,7 @@ class PhenomenonTerrain(Phenomenon):
         """Return the quaternion representing the direction of the color patch from the center of the terrain"""
         if self.absolute_affordance() is None:
             return None
-        if np.dot(self.absolute_affordance().experience.sensor_point(), terrain_north_east_point(self.arena_id)) < 0:
+        if np.dot(self.absolute_affordance().polar_sensor_point, terrain_north_east_point(self.arena_id)) < 0:
             # The North-East patch
             return azimuth_to_quaternion(TERRAIN_RADIUS[self.arena_id]["azimuth"])
         else:
@@ -127,9 +126,9 @@ class PhenomenonTerrain(Phenomenon):
         # The prediction error must be subtracted from the computed position
 
         # The color point along the y axis: red positive, purple negative.
-        color_y = Vector3([0, (MIDDLE_COLOR_INDEX - affordance.experience.color_index) * COLOR_DISTANCE, 0])
+        color_y = Vector3([0, (MIDDLE_COLOR_INDEX - affordance.color_index) * COLOR_DISTANCE, 0])
 
-        if np.dot(affordance.experience.sensor_point(), terrain_north_east_point(self.arena_id)) < 0:
+        if np.dot(affordance.polar_sensor_point, terrain_north_east_point(self.arena_id)) < 0:
             # North-East
             color_point = terrain_north_east_point(self.arena_id) + terrain_quaternion(self.arena_id) * color_y
             # print("Color point NE:", color_point)
@@ -138,13 +137,13 @@ class PhenomenonTerrain(Phenomenon):
             color_point = -terrain_north_east_point(self.arena_id) - terrain_quaternion(self.arena_id) * color_y
             # print("Color point SW:", color_point)
 
-        p_error = affordance.point + affordance.experience.sensor_point() - color_point
+        p_error = affordance.point + affordance.polar_sensor_point - color_point
         # print("Place prediction error", p_error)
         return np.array(p_error, dtype=int)
 
-    def save(self, experiences):
+    def save(self):
         """Return a clone of the phenomenon for memory snapshot"""
-        saved_phenomenon = PhenomenonTerrain(self.affordances[0].save(experiences), self.arena_id)
-        super().save(saved_phenomenon, experiences)
+        saved_phenomenon = PhenomenonTerrain(self.affordances[0].save(), self.arena_id)
+        super().save(saved_phenomenon)
         return saved_phenomenon
 

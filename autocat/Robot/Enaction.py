@@ -5,11 +5,14 @@ from pyrr import matrix44
 from playsound import playsound
 from ..Decider.Action import ACTION_FORWARD, ACTION_BACKWARD, ACTION_SWIPE, ACTION_RIGHTWARD,  ACTION_TURN, \
     ACTION_SCAN, ACTION_WATCH
-from ..Decider.Decider import CONFIDENCE_NO_FOCUS, CONFIDENCE_NEW_FOCUS, CONFIDENCE_TOUCHED_FOCUS, CONFIDENCE_CONFIRMED_FOCUS
-from ..Memory.Memory import SIMULATION_TIME_RATIO, EMOTION_RELAXED
+from ..Decider.Decider import CONFIDENCE_NO_FOCUS, CONFIDENCE_NEW_FOCUS, CONFIDENCE_TOUCHED_FOCUS, \
+    CONFIDENCE_CAREFUL_SCAN, CONFIDENCE_CONFIRMED_FOCUS
+from ..Memory.Memory import SIMULATION_TIME_RATIO
+from ..Memory.BodyMemory import point_to_echo_direction_distance
 from ..Utils import short_angle
-from .RobotDefine import DEFAULT_YAW, TURN_DURATION, ROBOT_FRONT_X, ROBOT_FRONT_Y, ROBOT_HEAD_X,  ROBOT_SETTINGS, RETREAT_DISTANCE_Y
+from .RobotDefine import DEFAULT_YAW, TURN_DURATION, ROBOT_FRONT_X, ROBOT_FRONT_Y, ROBOT_SETTINGS, RETREAT_DISTANCE_Y
 from .Command import Command, DIRECTION_FRONT
+from .Outcome import echo_point
 
 FOCUS_MAX_DELTA = 200  # 200 (mm) Maximum delta to keep focus
 
@@ -21,7 +24,7 @@ class Enaction:
     3. CtrlRobot computes the outcome received from the robot
     4. CtrlRobot call ternminate(outcome)
     """
-    def __init__(self, action, memory, direction=DIRECTION_FRONT, span=40, color=EMOTION_RELAXED):
+    def __init__(self, action, memory, direction=DIRECTION_FRONT, span=40):
         """Initialize the enaction upon creation. Will be adjusted before generating the command"""
         # The initial arguments
         self.action = action
@@ -39,7 +42,7 @@ class Enaction:
             # print("Initialize Enaction clock", self.clock, "prompt", self.prompt_point)
         if memory.egocentric_memory.focus_point is not None:
             self.focus_point = memory.egocentric_memory.focus_point.copy()
-        self.command = Command(self.action, self.prompt_point, self.focus_point, direction, span, color)
+        self.command = Command(self.action, self.prompt_point, self.focus_point, direction, span, memory.emotion_code)
 
         # The anticipated memory
         self.post_memory = memory.save()
@@ -61,7 +64,6 @@ class Enaction:
         # The outcome
         self.outcome = None
         self.body_direction_delta = 0  # Displayed in BodyView
-        # self.lost_focus = False  # Used by deciders to possibly trigger scan
         self.focus_confidence = CONFIDENCE_NO_FOCUS  # Used by deciders to possibly trigger scan
         self.translation = None  # Used by allocentric memory to move the robot
         self.yaw_matrix = None  # Used by bodyView to rotate compass points
@@ -70,6 +72,9 @@ class Enaction:
         # The message received from other robot
         self.message = None
         self.message_sent = False  # Message sent to other robots
+
+        self.focus_direction_prediction_error = 0
+        self.focus_distance_prediction_error = 0
 
     def begin(self, clock, body_quaternion):
         """Adjust the spatial modifiers of the enaction.
@@ -151,7 +156,6 @@ class Enaction:
                 if self.outcome.compass_quaternion.dot(yaw_integration_quaternion) < 0.0:
                     yaw_integration_quaternion = - yaw_integration_quaternion
 
-                # print("compass_quaternion", repr(self.outcome.compass_quaternion), "yaw_integration_quaternion", repr(yaw_integration_quaternion))
                 # Save the difference to display in BodyView
                 self.body_direction_delta = short_angle(self.outcome.compass_quaternion, yaw_integration_quaternion)
                 # If positive when turning trigonometric direction then the yaw is measured greater than it is
@@ -182,17 +186,22 @@ class Enaction:
         # If careful watch then the focus is the first central_echo
         new_focus = self.outcome.echo_point
         if self.command.span == 10 and len(self.outcome.central_echos) > 0:
-            central_echo = self.outcome.central_echos[0]
-            x = ROBOT_HEAD_X + math.cos(math.radians(central_echo[0])) * central_echo[1]
-            y = math.sin(math.radians(central_echo[0])) * central_echo[1]
-            new_focus = np.array([x, y, 0], dtype=int)
+            # central_echo = self.outcome.central_echos[0]
+            # x = ROBOT_HEAD_X + math.cos(math.radians(central_echo[0])) * central_echo[1]
+            # y = math.sin(math.radians(central_echo[0])) * central_echo[1]
+            # new_focus = np.array([x, y, 0], dtype=int)
+            new_focus = echo_point(*self.outcome.central_echos[0])
 
         # If the robot is already focussed then adjust the focus and the displacement
         if self.focus_point is not None:
             if new_focus is not None:
                 # The error between the expected and the actual position of the echo
+                new_focus_direction, new_focus_distance = point_to_echo_direction_distance(new_focus)
                 prediction_focus_point = matrix44.apply_to_vector(self.displacement_matrix, self.focus_point)
+                prediction_focus_direction, prediction_focus_distance = point_to_echo_direction_distance(prediction_focus_point)
                 prediction_error_focus = prediction_focus_point - new_focus
+                self.focus_direction_prediction_error = prediction_focus_direction - new_focus_direction
+                self.focus_distance_prediction_error = prediction_focus_distance - new_focus_distance
                 # If the new focus is near the previous focus or the displacement has been continuous.
                 if np.linalg.norm(prediction_error_focus) < FOCUS_MAX_DELTA or self.outcome.status == "continuous":
                     # The focus has been kept
@@ -219,11 +228,12 @@ class Enaction:
                         self.displacement_matrix = matrix44.multiply(translation_matrix, self.yaw_matrix)
                 else:
                     # The focus was lost
-                    print("Prediction error:", prediction_error_focus, "New focus:", end="")
-                    # self.lost_focus = True  # DeciderCircle and DeciderArrange may trigger rescan
-                    self.focus_confidence = CONFIDENCE_NEW_FOCUS
-                    # self.focus_point = None
-                    # self.focus_point = new_focus
+                    print("Focus delta:", prediction_error_focus, "New focus:", end="")
+                    # Careful scan forces CONFIDENCE_CAREFUL_SCAN
+                    if self.command.span == 10:
+                        self.focus_confidence = CONFIDENCE_CAREFUL_SCAN
+                    else:
+                        self.focus_confidence = CONFIDENCE_NEW_FOCUS
                     # playsound('autocat/Assets/R5.wav', False)
             else:
                 # The focus was lost
@@ -242,17 +252,11 @@ class Enaction:
         self.focus_point = new_focus
         print(self.focus_point)
 
-        # Careful scan forces CONFIDENCE_CONFIRMED_FOCUS
-        if self.command.span == 10 and self.focus_point is not None:
-            self.focus_confidence = CONFIDENCE_CONFIRMED_FOCUS
-
         # Impact or block catch focus
         if self.outcome.impact > 0 and self.action.action_code == ACTION_FORWARD:
             # if new_focus is not None and np.linalg.norm(self.outcome.echo_point) < 200:
             #     # Focus on the object "seen"
-            #     self.focus_point = new_focus
             if new_focus is None or np.linalg.norm(new_focus) > 200:
-            # else:
                 # Focus on the object "felt"
                 if self.outcome.impact == 0b01:
                     self.focus_point = np.array([ROBOT_FRONT_X + 10, -ROBOT_FRONT_Y, 0])
@@ -260,8 +264,6 @@ class Enaction:
                     self.focus_point = np.array([ROBOT_FRONT_X + 10, ROBOT_FRONT_Y, 0])
                 else:
                     self.focus_point = np.array([ROBOT_FRONT_X + 10, 0, 0])
-            # Reset lost focus to activate DecideCircle
-            # self.lost_focus = False
             self.focus_confidence = CONFIDENCE_TOUCHED_FOCUS
             print("Catch focus impact", self.focus_point)
 

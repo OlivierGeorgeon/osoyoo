@@ -1,4 +1,5 @@
 import numpy as np
+from pyrr import Vector3
 import platform
 import subprocess
 import pyglet
@@ -53,4 +54,5 @@ class InteractiveDisplay(pyglet.window.Window):
         """ Return the point in world scale from mouse x and y """
         point_x = (x - self.width / 2) * self.zoom_level * 2
         point_y = (y - self.height / 2) * self.zoom_level * 2
-        return np.array([point_x, point_y, 0], dtype=int)
+        return Vector3([point_x, point_y, 0], dtype=int)
+        # return np.array([point_x, point_y, 0], dtype=int)

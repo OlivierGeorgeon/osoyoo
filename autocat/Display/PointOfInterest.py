@@ -14,11 +14,13 @@ from .EgocentricDisplay.OsoyooCar import EMOTION_COLORS
 POINT_COMPASS = 'Compass'
 POINT_AZIMUTH = 'Azimuth'
 POINT_PROMPT = 'Prompt'
+POINT_CONE = 'Cone'
+POINT_ROBOT = 'PRobot'  # To draw the body of the other robot
 
 
 class PointOfInterest:
-    def __init__(self, x, y, batch, group, point_type, clock, color_index=None, durability=10):
-        self.point = np.array([0, 0, 0], dtype=int)  # Will be moved to its position
+    def __init__(self, pose_matrix, batch, group, point_type, clock, color_index=None, durability=10, size=0):
+        self.pose_matrix = matrix44.create_identity()  # The shape will be displaced to the pose_matrix
         self.batch = batch
         self.group = group
         self.type = point_type
@@ -44,6 +46,7 @@ class PointOfInterest:
         if self.type == EXPERIENCE_LOCAL_ECHO:
             self.color = name_to_rgb("sienna")
             self.shape = shapes.Circle(0, 0, 7, color=self.color, batch=self.batch)
+
         if self.type == EXPERIENCE_CENTRAL_ECHO:
             self.color = name_to_rgb("sienna")
             self.points = [-20, 0, -11, 20, 1, 27, 1, -27, -11, -20]
@@ -73,12 +76,12 @@ class PointOfInterest:
                                                 ('v2i', self.points), ('c4B', 6 * (*self.color, self.opacity)))
         if self.type == POINT_COMPASS:
             self.color = name_to_rgb("RoyalBlue")
-            self.points = [10, 0, 0, -10, 0, 10, -10, 0]
+            self.points = [10, 0, 0, -15, 0, 15, -10, 0]
             self.shape = self.batch.add_indexed(4, gl.GL_TRIANGLES, self.group, [0, 1, 2, 1, 2, 3],
                                                 ('v2i', self.points), ('c4B', 4 * (*self.color, self.opacity)))
         if self.type == POINT_AZIMUTH:
             self.color = name_to_rgb("SteelBlue")
-            self.points = [20, 0, 0, -20, 0, 20, -20, 0]
+            self.points = [20, 0, 0, -30, 0, 30, -20, 0]
             self.shape = self.batch.add_indexed(4, gl.GL_TRIANGLES, self.group, [0, 1, 2, 1, 2, 3],
                                                 ('v2i', self.points), ('c4B', 4 * (*self.color, self.opacity)))
         if self.type == POINT_PROMPT:
@@ -86,25 +89,36 @@ class PointOfInterest:
             self.points = [40, 0, 20, 34, -20, 34, -40, 0, -20, -34, 20, -34]
             self.shape = self.batch.add_indexed(6, gl.GL_TRIANGLES, group, [0, 1, 2, 0, 2, 3, 0, 3, 4, 0, 4, 5],
                                                 ('v2i', self.points), ('c4B', 6 * (*self.color, self.opacity)))
-        if self.type == EXPERIENCE_ROBOT:
-            bg_color = name_to_rgb("lightsteelBlue")
+        if self.type == POINT_ROBOT:  # The body of the other robot
+            self.color = name_to_rgb("lightsteelBlue")
+            self.points = [110, 0, 100, 80, -100, 80, -100, -80, 100, -80]
+            self.shape = self.batch.add_indexed(5, gl.GL_TRIANGLES, self.group, [0, 1, 2, 0, 2, 3, 0, 3, 4],
+                                                ('v2i', self.points), ('c4B', 5 * (*self.color, self.opacity)))
+        if self.type == EXPERIENCE_ROBOT:  # The emotion of the other robot
             self.color = name_to_rgb(EMOTION_COLORS[color_index])
-            self.points = [110, 0, 100, 80, -100, 80, -100, -80, 100, -80, -40, -10, -20, -10, -20, 10, -40, 10]
-            self.shape = self.batch.add_indexed(9, gl.GL_TRIANGLES, self.group, [0, 1, 2, 0, 2, 3, 0, 3, 4, 5, 6, 7, 5, 7, 8],
-                                                ('v2i', self.points), ('c4B', 5 * (*bg_color, self.opacity) + 4 * (*self.color, self.opacity)))
+            # self.shape = shapes.Circle(-30, 0, 10, color=self.color, batch=self.batch)
+            self.points = [-40, -10, -20, -10, -20, 10, -40, 10]
+            self.shape = self.batch.add_indexed(4, gl.GL_TRIANGLES, self.group, [0, 1, 2, 0, 2, 3],
+                                                ('v2i', self.points), ('c4B', 4 * (*self.color, self.opacity)))
+
+        if self.type == POINT_CONE:  # The cone of ECHO affordances
+            self.color = name_to_rgb("CadetBlue")
+            self.opacity = 64
+            self.points = [round(-size), 0, 0, round(0.4 * size), 0, round(-0.4 * size)]
+            self.shape = self.batch.add_indexed(3, gl.GL_TRIANGLES, self.group, [0, 1, 2], ('v2i', self.points),
+                                                ('c4B', 3 * (*self.color, self.opacity)))
 
         # Move the point of interest to its position
-        position_matrix = matrix44.create_from_translation([x, y, 0]).astype('float64')
-        self.displace(position_matrix)
+        self.displace(pose_matrix)
 
     def set_color(self, color_name=None):
         """ Set the color or reset it to its default value. Also reset the opacity. """
-        if self.type == EXPERIENCE_ROBOT:
-            if color_name is None:
-                self.shape.colors[0: 9*4] = 5 * (*name_to_rgb("lightsteelBlue"), self.opacity) + 4 * (*self.color, self.opacity)
-            else:
-                self.shape.colors[0: 9*4] = 5 * (*name_to_rgb("lightsteelBlue"), self.opacity) + 4 * (*name_to_rgb(color_name), self.opacity)
-        elif color_name is None:
+        # if self.type == EXPERIENCE_ROBOT:
+        #     if color_name is None:
+        #         self.shape.colors[0: 9*4] = 5 * (*name_to_rgb("lightsteelBlue"), self.opacity) + 4 * (*self.color, self.opacity)
+        #     else:
+        #         self.shape.colors[0: 9*4] = 5 * (*name_to_rgb("lightsteelBlue"), self.opacity) + 4 * (*name_to_rgb(color_name), self.opacity)
+        if color_name is None:
             if hasattr(self.shape, 'vertices'):
                 nb_points = int(len(self.shape.vertices) / 2)
                 self.shape.colors[0: nb_points*4] = nb_points * (*self.color, self.opacity)
@@ -121,19 +135,19 @@ class PointOfInterest:
 
     def displace(self, displacement_matrix):
         """ Applying the displacement matrix to the point of interest """
-        #  Rotate and translate the position
-        self.point = matrix44.apply_to_vector(displacement_matrix, self.point)
 
-        # If the shape has a list of vertices
-        # then apply the displacement matrix to each point. This will rotate the shape
+        # Update the position matrix
+        self.pose_matrix = matrix44.multiply(self.pose_matrix, displacement_matrix)
+
+        # If the shape has a list of vertices then apply the displacement matrix to each point.
         if hasattr(self.shape, 'vertices'):
             for i in range(0, len(self.shape.vertices)-1, 2):
-                v = matrix44.apply_to_vector(displacement_matrix, [self.shape.vertices[i], self.shape.vertices[i+1], 0])
+                v = matrix44.apply_to_vector(displacement_matrix, [self.shape.vertices[i], self.shape.vertices[i + 1], 0])
                 self.shape.vertices[i], self.shape.vertices[i+1] = int(v[0]), int(v[1])
-            return
-
         # Points of interest that use pyglet shapes have x and y (Circles)
-        self.shape.x, self.shape.y = self.point[0], self.point[1]
+        else:
+            # self.shape.x, self.shape.y = self.point()[0: 2]
+            self.shape.x, self.shape.y, _ = matrix44.apply_to_vector(displacement_matrix, [self.shape.x, self.shape.y, 0])
 
     def delete(self):
         """ Delete the shape to remove it from the batch. Return True when deleted """
@@ -146,7 +160,7 @@ class PointOfInterest:
 
     def select_if_near(self, point):
         """ If the point is near the x y coordinate, select this point and return True """
-        if math.dist(point, self.point) < 15:
+        if math.dist(point, self.point()) < 15:
             self.set_color('red')
             self.is_selected = True
             return True
@@ -162,5 +176,10 @@ class PointOfInterest:
         # Reset the opacity of the shape
         self.set_color(None)
 
-    def __str__(self):
-        return "POI of type " + self.type + " at x=" + str(int(self.point[0])) + ", y=" + str(int(self.point[1]))
+    def point(self):
+        """Return the point of reference of this point of interest. Used for compass calibration"""
+        # Translate the origin point by the pose
+        return matrix44.apply_to_vector(self.pose_matrix, [0, 0, 0])
+
+    # def __str__(self):
+    #     return "POI of type " + self.type + " at x=" + str(int(self.point[0])) + ", y=" + str(int(self.point[1]))

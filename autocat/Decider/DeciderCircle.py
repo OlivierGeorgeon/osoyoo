@@ -43,4 +43,4 @@ class DeciderCircle(Decider):
             self.workspace.memory.egocentric_memory.prompt_point = None
 
         # Add the enaction to the stack
-        return Enaction(self.action, self.workspace.memory, color=EMOTION_HAPPY)
+        return Enaction(self.action, self.workspace.memory)

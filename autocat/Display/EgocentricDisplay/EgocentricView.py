@@ -74,8 +74,6 @@ class EgocentricView(InteractiveDisplay):
         prompt_point = matrix44.apply_to_vector(rotation_matrix, prompt_point).astype(int)
 
         # Cartesian coordinates from the robot axis
-        # z = r * numpy.exp(1j * theta_robot)
-        # mouse_press_x, mouse_press_y = int(z.real), int(z.imag)
         prompt_polar_angle = int(math.degrees(math.atan2(prompt_point[1], prompt_point[0])))
         # Display the mouse click coordinates at the bottom of the view
         self.label1.text = "Click: x:" + str(prompt_point[0]) + ", y:" + str(prompt_point[1]) \

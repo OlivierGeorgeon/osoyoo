@@ -5,9 +5,8 @@ import numpy as np
 from pyrr import quaternion
 from . Hexagonal_geometry import point_to_cell, get_neighbors
 from . GridCell import GridCell, CELL_UNKNOWN
-from ..EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_PLACE
-from ..AllocentricMemory.GridCell import CELL_NO_ECHO, CELL_PHENOMENON
-from ..EgocentricMemory.Experience import EXPERIENCE_FOCUS, EXPERIENCE_PROMPT
+from ..EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_PLACE, EXPERIENCE_FOCUS, EXPERIENCE_PROMPT
+from ..AllocentricMemory.GridCell import CELL_NO_ECHO
 from ...Robot.RobotDefine import ROBOT_FRONT_X, ROBOT_SIDE, CHECK_OUTSIDE
 from ...Memory.PhenomenonMemory.PhenomenonMemory import TER
 from ...Memory.PhenomenonMemory.PhenomenonTerrain import TERRAIN_CIRCUMFERENCE_CONFIDENCE
@@ -84,11 +83,11 @@ class AllocentricMemory:
                         c.clock_place = clock
             # Mark the affordances of this phenomenon
             for a in p.affordances.values():
-                # if p_id != TER or p.confidence < TERRAIN_CIRCUMFERENCE_CONFIDENCE or a.experience.color_index != 0:
-                if p.confidence < TERRAIN_CIRCUMFERENCE_CONFIDENCE or a.experience.color_index != 0:
+                if p_id != TER or p.confidence < TERRAIN_CIRCUMFERENCE_CONFIDENCE or a.color_index != 0\
+                        or CHECK_OUTSIDE == 0:
                     # Attribute the status of the affordance
                     cell_x, cell_y = point_to_cell(a.point+p.point)
-                    self.apply_status_to_cell(cell_x, cell_y, a.experience.type, a.experience.clock, a.experience.color_index)
+                    self.apply_status_to_cell(cell_x, cell_y, a.type, a.clock, a.color_index)
                     # Attribute this phenomenon to this cell
                     if (self.min_i <= cell_x <= self.max_i) and (self.min_j <= cell_y <= self.max_j):
                         self.grid[cell_x][cell_y].phenomenon_id = p_id
@@ -96,7 +95,7 @@ class AllocentricMemory:
         # Place the affordances that are not attached to phenomena
         for a in self.affordances:
             cell_x, cell_y = point_to_cell(a.point)
-            self.apply_status_to_cell(cell_x, cell_y, a.experience.type, clock, a.experience.color_index)
+            self.apply_status_to_cell(cell_x, cell_y, a.type, clock, a.color_index)
 
         # print("Update allocentric time:", time.time() - start_time, "seconds")
 
@@ -162,7 +161,7 @@ class AllocentricMemory:
         path = mpath.Path(triangle)
         for c in [c for line in self.grid for c in line if c.is_inside(path)]:
             c.status[2] = CELL_NO_ECHO
-            c.clock_no_echo = affordance.experience.clock
+            c.clock_no_echo = affordance.clock
         # print("Place echo time:", time.time() - start_time, "seconds")
 
     def update_focus(self, allo_focus, clock):
@@ -192,7 +191,7 @@ class AllocentricMemory:
                 self.grid[self.prompt_i][self.prompt_j].clock_prompt = clock
                 # print("Prompt in cell", self.prompt_i, ", ", self.prompt_j)
 
-    def save(self, experiences):
+    def save(self):
         """Retun a clone of allocentric memory for memory snapshot"""
         # Use the list of experiences cloned when saving egocentric memory
         saved_allocentric_memory = AllocentricMemory(self.width, self.height, self.cell_radius)
@@ -201,8 +200,8 @@ class AllocentricMemory:
         saved_allocentric_memory.focus_j = self.focus_j
         saved_allocentric_memory.prompt_i = self.prompt_i
         saved_allocentric_memory.prompt_j = self.prompt_j
-        saved_allocentric_memory.affordances = [a.save(experiences[a.experience.id]) for a in self.affordances]
-        saved_allocentric_memory.grid = [[c.save(experiences) for c in line] for line in self.grid]
+        saved_allocentric_memory.affordances = [a.save() for a in self.affordances]
+        saved_allocentric_memory.grid = [[c.save() for c in line] for line in self.grid]
 
         return saved_allocentric_memory
 

@@ -64,10 +64,10 @@ class PhenomenonMemory:
     def create_phenomenon(self, affordance):
         """Create a new phenomenon depending of the type of the affordance"""
         # Must always create a phenomenon
-        if affordance.experience.type in TERRAIN_EXPERIENCE_TYPES:
+        if affordance.type in TERRAIN_EXPERIENCE_TYPES:
             self.phenomena[TER] = PhenomenonTerrain(affordance, self.arena_id)
             return TER
-        if affordance.experience.type == EXPERIENCE_ROBOT:
+        if affordance.type == EXPERIENCE_ROBOT:
             self.phenomena[ROBOT1] = PhenomenonRobot(affordance)
             return ROBOT1
         else:
@@ -117,10 +117,10 @@ class PhenomenonMemory:
 
         return remaining_affordances, position_correction
 
-    def save(self, experiences):
+    def save(self):
         """Return a clone of phenomenon memory for memory snapshot"""
         # Use the experiences cloned when saving egocentric memory
         saved_phenomenon_memory = PhenomenonMemory(self.arena_id)
-        saved_phenomenon_memory.phenomena = {key: p.save(experiences) for key, p in self.phenomena.items()}
+        saved_phenomenon_memory.phenomena = {key: p.save() for key, p in self.phenomena.items()}
         saved_phenomenon_memory.phenomenon_id = self.phenomenon_id
         return saved_phenomenon_memory

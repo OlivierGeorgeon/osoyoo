@@ -4,12 +4,12 @@ import time
 from pyrr import matrix44, quaternion, Quaternion
 from .EgocentricMemory.EgocentricMemory import EgocentricMemory
 from .AllocentricMemory.AllocentricMemory import AllocentricMemory
-from .BodyMemory import BodyMemory, EXCITATION_LOW, ENERGY_TIRED
+from .BodyMemory import BodyMemory, EXCITATION_LOW, ENERGY_TIRED, point_to_echo_direction_distance
 from .PhenomenonMemory.PhenomenonMemory import PhenomenonMemory, TER
 from .PhenomenonMemory.PhenomenonTerrain import TERRAIN_INITIAL_CONFIDENCE, TERRAIN_ORIGIN_CONFIDENCE
 from .AllocentricMemory.Hexagonal_geometry import CELL_RADIUS
 from ..Decider.Action import ACTION_SWIPE
-from ..Decider.Decider import FOCUS_TOO_FAR_DISTANCE
+from ..Decider.Decider import FOCUS_TOO_FAR_DISTANCE, CONFIDENCE_CONFIRMED_FOCUS
 from ..Robot.Outcome import Outcome
 
 GRID_WIDTH = 20  # 15   # 100 Number of cells wide
@@ -36,6 +36,8 @@ class Memory:
         self.allocentric_memory = AllocentricMemory(GRID_WIDTH, GRID_HEIGHT, cell_radius=CELL_RADIUS)
         self.phenomenon_memory = PhenomenonMemory(arena_id)
         self.compass_prediction_error = {}  # Used to calibrate GYRO_COEF
+        self.focus_direction_prediction_error = {}
+        self.focus_distance_prediction_error = {}
         self.emotion_code = EMOTION_RELAXED
 
     def __str__(self):
@@ -44,41 +46,56 @@ class Memory:
 
     def appraise_emotion(self):
         """Update the emotional state code"""
-        # When high excitation and the focus is not too far: HAPPY, DeciderCircle until terrain origin confidence
-        if self.egocentric_memory.focus_point is not None and \
-                np.linalg.norm(self.egocentric_memory.focus_point) < FOCUS_TOO_FAR_DISTANCE and \
-                not self.is_outside_terrain(self.egocentric_memory.focus_point) and \
-                self.body_memory.excitation > EXCITATION_LOW or \
-                self.phenomenon_memory.terrain_confidence() < TERRAIN_ORIGIN_CONFIDENCE:
+        # Search terrain origin: Robot HAPPY DeciderCircle
+        if self.phenomenon_memory.terrain_confidence() < TERRAIN_ORIGIN_CONFIDENCE:
+            # When high excitation and the focus is not too far: HAPPY, DeciderCircle until terrain origin confidence
+            # if self.egocentric_memory.focus_point is not None and \
+            #         np.linalg.norm(self.egocentric_memory.focus_point) < FOCUS_TOO_FAR_DISTANCE and \
+            #         not self.is_outside_terrain(self.egocentric_memory.focus_point) and \
+            #         self.body_memory.excitation > EXCITATION_LOW or \
+            #         self.phenomenon_memory.terrain_confidence() < TERRAIN_ORIGIN_CONFIDENCE:
             self.emotion_code = EMOTION_HAPPY
-        # If terrain is confident and focus inside
+        # Terrain origin has been found
         else:
-            # When terrain is confident
-            # if self.phenomenon_memory.terrain_confidence() >= TERRAIN_ORIGIN_CONFIDENCE:
-            # If tired: RELAXED, DeciderExplore to go home
-            if self.body_memory.energy < ENERGY_TIRED:
-                self.emotion_code = EMOTION_RELAXED
-            # If not tired and excited: RELAXED, DeciderExplore
-            elif self.body_memory.excitation >= EXCITATION_LOW:
-                self.emotion_code = EMOTION_RELAXED
-            # If not tired and not excited and not focus: SAD, DeciderWatch
-            elif self.egocentric_memory.focus_point is None:
-                self.emotion_code = EMOTION_SAD
-            # If not tired and not excited but focus
-            else:
-                # If object inside terrain and closer than target: ANGRY, DeciderPush
-                ego_target = self.terrain_centric_to_egocentric(self.phenomenon_memory.arrange_point())
-                # is_inside = not self.is_outside_terrain(self.egocentric_memory.focus_point)
-                is_to_arrange = self.is_to_arrange(self.egocentric_memory.focus_point)
-                is_closer = self.egocentric_memory.focus_point[0] < ego_target[0]
-                print("Focus is object to arrange:", is_to_arrange, "focus before target:", is_closer)
-                if is_to_arrange:
-                    if is_closer:
-                        self.emotion_code = EMOTION_ANGRY
+            # High energy then must circle, explore, watch or arrange
+            if self.body_memory.energy >= ENERGY_TIRED:
+                # High excitation then must circle or explore
+                if self.body_memory.excitation > EXCITATION_LOW:
+                    # Focus inside terrain or not too far: HAPPY DeciderCircle
+                    if self.egocentric_memory.focus_point is not None and \
+                            np.linalg.norm(self.egocentric_memory.focus_point) < FOCUS_TOO_FAR_DISTANCE and \
+                            not self.is_outside_terrain(self.egocentric_memory.focus_point):
+                        self.emotion_code = EMOTION_HAPPY
+                    # No interesting focus: RELAXED, DeciderExplore
                     else:
-                        self.emotion_code = EMOTION_UPSET
+                        self.emotion_code = EMOTION_RELAXED
                 else:
-                    self.emotion_code = EMOTION_SAD
+                    # High energy with low excitation, must watch or arrange
+                    # if self.is_outside_terrain(self.egocentric_memory.focus_point):
+                    if self.egocentric_memory.focus_point is None:
+                        # Focus outside terrain or None then SAD, DeciderWatch
+                        # No focus then SAD, DeciderWatch
+                        self.emotion_code = EMOTION_SAD
+                    # Focus is inside terrain
+                    else:
+                        # If object inside terrain and closer than target: ANGRY, DeciderPush
+                        ego_target = self.terrain_centric_to_egocentric(self.phenomenon_memory.arrange_point())
+                        is_to_arrange = self.is_to_arrange(self.egocentric_memory.focus_point)
+                        is_closer = self.egocentric_memory.focus_point[0] < ego_target[0]
+                        print("Focus near terrain center:", is_to_arrange, "Before terrain center:", is_closer)
+                        if is_to_arrange:
+                            if is_closer:
+                                # Object before center: ANGRY DeciderArrange
+                                self.emotion_code = EMOTION_ANGRY
+                            else:
+                                # Object behind center: UPSET DeciderArrange
+                                self.emotion_code = EMOTION_UPSET
+                        else:
+                            # Object too far from center: SAD DeciderWatch
+                            self.emotion_code = EMOTION_SAD
+            else:
+                # Tired: Robot RELAXED, DeciderExplore to go home
+                self.emotion_code = EMOTION_RELAXED
 
     def update_and_add_experiences(self, enaction):
         """ Process the enacted interaction to update the memory
@@ -98,14 +115,30 @@ class Memory:
         # self.body_memory.body_quaternion = enaction.body_quaternion
         self.body_memory.update(enaction)
 
-        # Keep a dictionary of the direction deltas to check gyro_coef is correct
+        # Track compass prediction error to calibrate gyro_coef is correct
         self.compass_prediction_error[enaction.clock] = enaction.body_direction_delta
         self.compass_prediction_error = {key: d for key, d in self.compass_prediction_error.items()
                                          if key > enaction.clock - 10}
-        print("Compass prediction error (integrated_yaw - compass)=",
+        print("Prediction Error Compass (integrated azimuth - compass)=",
               round(math.degrees(enaction.body_direction_delta), 2), "Average:",
               round(math.degrees(np.mean(list(self.compass_prediction_error.values()))), 2), "std:",
               round(math.degrees(np.std(list(self.compass_prediction_error.values()))), 2))
+
+        # If focus is confident then track its prediction error
+        if enaction.focus_confidence >= CONFIDENCE_CONFIRMED_FOCUS:
+            self.focus_direction_prediction_error[enaction.clock] = enaction.focus_direction_prediction_error
+            self.focus_direction_prediction_error = {key: d for key, d in self.focus_direction_prediction_error.items()
+                                                     if key > enaction.clock - 10}
+            print("Prediction Error Focus (predicted - new direction)=", enaction.focus_direction_prediction_error,
+                  "Average:", round(np.mean(list(self.focus_direction_prediction_error.values()))),
+                  "std:", round(np.std(list(self.focus_direction_prediction_error.values()))))
+            self.focus_distance_prediction_error[enaction.clock] = enaction.focus_distance_prediction_error
+            self.focus_distance_prediction_error = {key: d for key, d in self.focus_distance_prediction_error.items()
+                                                    if key > enaction.clock - 10}
+            print("Prediction Error Focus (predicted - new distance)=", enaction.focus_distance_prediction_error,
+                  "Average:", round(np.mean(list(self.focus_distance_prediction_error.values()))),
+                  "std:", round(np.std(list(self.focus_distance_prediction_error.values()))))
+
         self.egocentric_memory.update_and_add_experiences(enaction)
 
         # The integrator may again update the robot's position
@@ -168,6 +201,22 @@ class Memory:
             return self.egocentric_to_allocentric(point) - self.phenomenon_memory.phenomena[TER].point
         return self.egocentric_to_allocentric(point)
 
+    def terrain_centric_to_allocentric(self, point):
+        """Return the point in allocentric coordinates from the point in terrain_centric"""
+        if point is None:
+            return None
+        elif self.phenomenon_memory.terrain_confidence() >= TERRAIN_ORIGIN_CONFIDENCE:
+            return point + self.phenomenon_memory.phenomena[TER].point
+        else:
+            return point
+
+    def terrain_centric_robot_point(self):
+        """Return the position of the robot relative to the terrain point"""
+        if self.phenomenon_memory.terrain_confidence() >= TERRAIN_ORIGIN_CONFIDENCE:
+            return self.allocentric_memory.robot_point - self.phenomenon_memory.phenomena[TER].point
+        else:
+            return self.allocentric_memory.robot_point
+
     def save(self):
         """Return a clone of memory for memory snapshot"""
         # start_time = time.time()
@@ -178,16 +227,18 @@ class Memory:
         # Clone egocentric memory
         saved_memory.egocentric_memory = self.egocentric_memory.save()
         # Clone allocentric memory
-        saved_memory.allocentric_memory = self.allocentric_memory.save(saved_memory.egocentric_memory.experiences)
+        saved_memory.allocentric_memory = self.allocentric_memory.save()
         # Clone phenomenon memory
-        saved_memory.phenomenon_memory = self.phenomenon_memory.save(saved_memory.egocentric_memory.experiences)
+        saved_memory.phenomenon_memory = self.phenomenon_memory.save()
         saved_memory.compass_prediction_error = {key: d for key, d in self.compass_prediction_error.items()}
+        saved_memory.focus_direction_prediction_error = {key: d for key, d in self.focus_direction_prediction_error.items()}
+        saved_memory.focus_distance_prediction_error = {key: d for key, d in self.focus_distance_prediction_error.items()}
         # print("Save memory duration:", time.time() - start_time, "seconds")
 
         return saved_memory
 
     def is_to_arrange(self, ego_point):
-        """Return True if the focus indicates an object to arrange"""
+        """Return True if the focus within 400mm of the terrain center"""
         # If no terrain origin then don't arrange object
         if self.phenomenon_memory.terrain_confidence() <= TERRAIN_INITIAL_CONFIDENCE:
             return False
@@ -248,6 +299,9 @@ class Memory:
                                                                                self.egocentric_memory.prompt_point)
             # Displacement in body memory
             self.body_memory.body_quaternion = self.body_memory.body_quaternion.cross(yaw_quaternion)
+            if self.egocentric_memory.focus_point is not None:
+                head_direction_degree, _ = point_to_echo_direction_distance(self.egocentric_memory.focus_point)
+                self.body_memory.head_direction_rad = math.radians(head_direction_degree)
 
             # Update allocentric memory
             self.allocentric_memory.robot_point += quaternion.apply_to_vector(self.body_memory.body_quaternion, translation)

@@ -1,13 +1,16 @@
+import math
 import numpy as np
 import pyglet
-from autocat.Display.PointOfInterest import PointOfInterest
+from pyrr import matrix44
 from webcolors import name_to_rgb
+from autocat.Display.PointOfInterest import PointOfInterest
+from autocat.Memory.EgocentricMemory.Experience import EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_CENTRAL_ECHO
 
 
 class AffordanceDisplay(PointOfInterest):
     """Display an affordance: the experience plus the cone"""
-    def __init__(self, x, y, batch, group, background_group, point_type, clock, color=(128, 128, 128), durability=10):
-        super().__init__(x, y, batch, group, point_type, clock, color, durability)
+    def __init__(self, pose_matrix, batch, group, background_group, point_type, clock, color=(128, 128, 128), durability=10):
+        super().__init__(pose_matrix, batch, group, point_type, clock, color, durability)
         self.background_group = background_group
         self.cone = None
 

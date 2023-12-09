@@ -1,7 +1,7 @@
 import math
 import matplotlib.path as mpath
 import numpy as np
-from scipy.spatial import ConvexHull, QhullError, Delaunay
+from scipy.spatial import ConvexHull, QhullError
 from scipy.interpolate import splprep, splev
 
 PHENOMENON_DELTA = 300  # (mm) Distance between affordances to be considered the same phenomenon
@@ -34,7 +34,7 @@ class Phenomenon:
         self.interpolation_points = None
 
         # Last time the origin affordance was enacted. Used to compute the return to origin.
-        self.last_origin_clock = affordance.experience.clock
+        self.last_origin_clock = affordance.clock
 
     def absolute_affordance(self):
         """Return a reference to the absolute origin affordance or None"""
@@ -68,7 +68,7 @@ class Phenomenon:
     def interpolate(self):
         self.interpolation_points = None
         points = np.array(
-            [a.point[0:2] for a in self.affordances.values() if a.experience.type in self.interpolation_types])
+            [a.point[0:2] for a in self.affordances.values() if a.type in self.interpolation_types])
         points = np.unique(points, axis=0)
         if len(points) > 3:
             try:
@@ -111,14 +111,14 @@ class Phenomenon:
             "°. Nb tours:" + str(self.nb_tour)
         return label
 
-    def save(self, saved_phenomenon, experiences):
+    def save(self, saved_phenomenon):
         """Return a clone of the phenomenon for memory snapshot"""
         # Use the experiences cloned when saving egocentric memory
         saved_phenomenon.point = self.point.copy()
         saved_phenomenon.confidence = self.confidence
         saved_phenomenon.nb_tour = self.nb_tour
         saved_phenomenon.tour_started = self.tour_started
-        saved_phenomenon.affordances = {key: a.save(experiences) for key, a in self.affordances.items()}
+        saved_phenomenon.affordances = {key: a.save() for key, a in self.affordances.items()}
         saved_phenomenon.affordance_id = self.affordance_id
         saved_phenomenon.absolute_affordance_key = self.absolute_affordance_key
         saved_phenomenon.last_origin_clock = self.last_origin_clock

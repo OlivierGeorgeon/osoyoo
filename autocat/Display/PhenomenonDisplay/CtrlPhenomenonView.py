@@ -1,9 +1,13 @@
 import math
+import numpy as np
 from pyrr import matrix44
 from .PhenomenonView import PhenomenonView
-from .AffordanceDisplay import AffordanceDisplay
+# from .AffordanceDisplay import AffordanceDisplay
+from ..PointOfInterest import PointOfInterest, POINT_CONE
 from ...Workspace import KEY_DECREASE, KEY_INCREASE
 from ...Robot.CtrlRobot import ENACTION_STEP_REFRESHING
+from ...Utils import quaternion_translation_to_matrix
+from ...Memory.EgocentricMemory.Experience import EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_CENTRAL_ECHO
 
 
 class CtrlPhenomenonView:
@@ -54,27 +58,31 @@ class CtrlPhenomenonView:
 
         # Recreate all affordance displays
         for a in phenomenon.affordances.values():
-            ad = self.create_affordance_display(a)
-            self.affordance_displays.append(ad)
+            ad = self.create_affordance_displays(a)
+            self.affordance_displays.extend(ad)
 
         # Draw the phenomenon outline
         # self.view.add_lines(phenomenon.convex_hull(), "black")
         self.view.add_lines(phenomenon.outline(), "black")
 
-    def create_affordance_display(self, affordance):
-        """Create a point of interest corresponding to the affordance given as parameter"""
-        # Create the point of interest at origin
-        poi = AffordanceDisplay(0, 0, self.view.batch, self.view.forefront, self.view.background,
-                                affordance.experience.type, affordance.experience.clock, affordance.experience.color_index)
-        # Displace the point of interest to its position relative to the phenomenon and absolute direction
-        poi.displace(matrix44.multiply(affordance.experience.rotation_matrix,
-                                       matrix44.create_from_translation(affordance.point).astype('float64')))
-        # Show the echo localization cone
-        points = affordance.sensor_triangle()
-        # if the affordance has a polygon then add it to the AffordanceDisplay
-        if points is not None:
-            poi.add_cone(points, "CadetBlue")
-        return poi
+    def create_affordance_displays(self, affordance):
+        """Return the affordance display for this affordance"""
+        affordance_displays = []
+        pose_matrix = quaternion_translation_to_matrix(affordance.quaternion, affordance.point)
+        if affordance.type in [EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_CENTRAL_ECHO]:
+            cone_display = PointOfInterest(pose_matrix, self.view.batch, self.view.background, POINT_CONE,
+                                           affordance.type, affordance.clock, affordance.color_index,
+                                           np.linalg.norm(affordance.polar_sensor_point))
+            affordance_displays.append(cone_display)
+        poi = PointOfInterest(pose_matrix, self.view.batch, self.view.forefront,
+                              affordance.type, affordance.clock, affordance.color_index)
+        affordance_displays.append(poi)
+        # # Show the echo localization cone
+        # points = affordance.sensor_triangle()
+        # # if the affordance has a polygon then add it to the AffordanceDisplay
+        # if points is not None:
+        #     poi.add_cone(points, "CadetBlue")
+        return affordance_displays
 
     def main(self, dt):
         """Called every frame. Update the phenomenon view"""
@@ -87,6 +95,7 @@ class CtrlPhenomenonView:
         if self.phenomenon is not None:
             self.view.robot_translate = self.workspace.memory.allocentric_memory.robot_point - self.phenomenon.point
             self.view.label2.text = "Confidence: {:d}%".format(self.phenomenon.confidence)
+            self.view.robot.rotate_head(self.workspace.memory.body_memory.head_direction_degree())
         if self.workspace.enacter.interaction_step == ENACTION_STEP_REFRESHING:
             if self.phenomenon is not None:
                 self.update_affordance_displays(self.phenomenon)

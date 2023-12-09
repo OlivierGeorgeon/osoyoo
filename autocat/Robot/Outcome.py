@@ -3,9 +3,10 @@ import math
 import numpy as np
 import colorsys
 from playsound import playsound
-from pyrr import Quaternion
+from pyrr import Quaternion, Matrix44, matrix44
 from .RobotDefine import ROBOT_HEAD_X
 from ..Memory.EgocentricMemory.Experience import FLOOR_COLORS
+from ..Utils import translation_quaternion_to_matrix
 
 
 def category_color(color_sensor):
@@ -62,6 +63,18 @@ def category_color(color_sensor):
     # print("Color: ", hsv, FLOOR_COLORS[color_index])
     print("Color:", tuple("{:.3f}".format(x) for x in hsv), FLOOR_COLORS[color_index])
     return color_index
+
+
+def echo_matrix(head_direction, echo_distance):
+    """Return the matrix representing the pose of the echo from direction in degrees and distance"""
+    head_quaternion = Quaternion.from_z_rotation(math.radians(head_direction))
+    echo_from_head_matrix = translation_quaternion_to_matrix([echo_distance, 0, 0], head_quaternion)
+    return Matrix44.from_translation([ROBOT_HEAD_X, 0, 0]) * echo_from_head_matrix
+
+
+def echo_point(head_direction, echo_distance):
+    """Return the egocentric echo point from the head direction and echo distance"""
+    return matrix44.apply_to_vector(echo_matrix(head_direction, echo_distance), np.array([0, 0, 0])).astype(int)
 
 
 def central_echos(echos):
@@ -141,28 +154,18 @@ class Outcome:
 
         # Outcome floor
         self.floor = 0
-        # self.retreat_translation = np.array([0, 0, 0], dtype=int)
         if 'floor' in outcome_dict:
             self.floor = outcome_dict['floor']
-            # if outcome_dict['floor'] > 0:
-            #     # Update the translation
-            #     if outcome_dict['floor'] == 0b01:
-            #         # Black line on the right
-            #         self.retreat_translation = [-RETREAT_DISTANCE, RETREAT_DISTANCE_Y, 0]
-            #     elif outcome_dict['floor'] == 0b10:
-            #         # Black line on the left
-            #         self.retreat_translation = [-RETREAT_DISTANCE, -RETREAT_DISTANCE_Y, 0]
-            #     else:
-            #         # Black line on the front
-            #         self.retreat_translation = [-RETREAT_DISTANCE, 0, 0]
-            #     playsound('autocat/Assets/cyberpunk3.wav', False)
 
         # Outcome echo
         self.echo_point = None
+        self.echo_matrix = None
         if outcome_dict['echo_distance'] < 10000:
-            x = ROBOT_HEAD_X + math.cos(math.radians(outcome_dict['head_angle'])) * outcome_dict['echo_distance']
-            y = math.sin(math.radians(outcome_dict['head_angle'])) * outcome_dict['echo_distance']
-            self.echo_point = np.array([x, y, 0], dtype=int)
+            self.echo_matrix = echo_matrix(outcome_dict['head_angle'], outcome_dict['echo_distance'])
+            self.echo_point = matrix44.apply_to_vector(self.echo_matrix, [0, 0, 0])
+            # x = ROBOT_HEAD_X + math.cos(math.radians(outcome_dict['head_angle'])) * outcome_dict['echo_distance']
+            # y = math.sin(math.radians(outcome_dict['head_angle'])) * outcome_dict['echo_distance']
+            # self.echo_point = np.array([x, y, 0], dtype=int)
 
         # Outcome impact
         # (The Enaction will compute the translation based on duration 1)

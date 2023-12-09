@@ -110,8 +110,7 @@ class Workspace:
             # Only process actions when the robot is IDLE
             if self.enacter.interaction_step == ENACTION_STEP_IDLE:
                 self.memory.appraise_emotion()
-                self.composite_enaction = Enaction(self.actions[user_key.upper()], self.memory, span=10,
-                                                   color=self.memory.emotion_code)
+                self.composite_enaction = Enaction(self.actions[user_key.upper()], self.memory, span=10)
         elif user_key.upper() == "/":
             # If key ALIGN then turn and move forward to the prompt
             if self.enacter.interaction_step == ENACTION_STEP_IDLE:
@@ -150,39 +149,36 @@ class Workspace:
     def emit_message(self):
         """Return the message to answer to another robot"""
 
-        # Only compute the message once for the current enaction
-        if self.enaction is None or self.enaction.message_sent:
-            return None
-
         message = {"robot": self.robot_id, "clock": self.clock, "azimuth": self.memory.body_memory.body_azimuth(),
                    "emotion": self.memory.emotion_code}
 
         # If the terrain has been found then send the position relative to the terrain origin
-        if TER in self.memory.phenomenon_memory.phenomena and self.memory.phenomenon_memory.phenomena[TER].confidence > TERRAIN_INITIAL_CONFIDENCE:
-            point = self.memory.allocentric_memory.robot_point - self.memory.phenomenon_memory.phenomena[TER].point
-            message['pos_x'] = round(point[0])
-            message['pos_y'] = round(point[1])
+        if TER in self.memory.phenomenon_memory.phenomena and \
+                self.memory.phenomenon_memory.phenomena[TER].confidence > TERRAIN_INITIAL_CONFIDENCE:
+            robot_point = self.memory.terrain_centric_robot_point()
+            message['pos_x'] = round(robot_point[0])
+            message['pos_y'] = round(robot_point[1])
 
-        # If ongoing enaction with focus and message not yet sent then add the enation information
-        if self.enaction.focus_point is not None:
-            # if self.enaction is not None and self.enaction.focus_point is not None:
-            focus_point = self.memory.egocentric_to_polar_egocentric(self.enaction.focus_point)
-            # The position of the focus
-            message['focus_x'] = round(focus_point[0])
-            message['focus_y'] = round(focus_point[1])
+        # Add information about the current enaction only once
+        if self.enaction is not None and not self.enaction.message_sent:
             # The destination position in polar-egocentric
             destination_point = quaternion.apply_to_vector(self.enaction.body_quaternion,
                                                            self.enaction.command.anticipated_translation)
             message['destination_x'] = round(destination_point[0])
             message['destination_y'] = round(destination_point[1])
 
-        # Mark the message for this enaction sent
-        self.enaction.message_sent = True
-        # Send the message if there is position or focus
-        if 'pos_x' in message or 'focus_x' in message:
-            return json.dumps(message)
-        else:
-            return None
+            # The focus point
+            if self.enaction.focus_point is not None:
+                # if self.enaction is not None and self.enaction.focus_point is not None:
+                focus_point = self.memory.egocentric_to_polar_egocentric(self.enaction.focus_point)
+                # The position of the focus
+                message['focus_x'] = round(focus_point[0])
+                message['focus_y'] = round(focus_point[1])
+
+            # Mark the message for this enaction sent
+            self.enaction.message_sent = True
+
+        return json.dumps(message)
 
     def receive_message(self, message_string):
         """Store the latest message received from other robots in the Workspace. It will be used during INTEGRATING"""
@@ -197,9 +193,11 @@ class Workspace:
                 # If position in terrain and the position of this robot knows the position of the terrain
                 if TER in self.memory.phenomenon_memory.phenomena \
                         and self.memory.phenomenon_memory.phenomena[TER].confidence > TERRAIN_INITIAL_CONFIDENCE:
-                    allo_point = self.message.ter_position + self.memory.phenomenon_memory.phenomena[TER].point
-                    print("Robot", self.message.robot, "position:", allo_point)
-                    self.message.ego_position = self.memory.allocentric_to_egocentric(allo_point)
+                    allo_point = self.memory.terrain_centric_to_allocentric(self.message.ter_position)
+                    # allo_point = self.message.ter_position + self.memory.phenomenon_memory.phenomena[TER].point
+                    # print("Robot", self.message.robot, "position:", allo_point)
+                    # self.message.ego_position = self.memory.allocentric_to_egocentric(allo_point)
+                    self.message.ego_position = self.memory.terrain_centric_to_egocentric(self.message.ter_position)
                 else:
                     # If cannot place the robot then flush the message
                     self.message = None

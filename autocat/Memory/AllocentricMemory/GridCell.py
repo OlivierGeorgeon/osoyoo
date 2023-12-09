@@ -72,9 +72,8 @@ class GridCell:
         pool_odd = (-4 * self.i + self.j - 9) % 14 == 0
         return pool_even or pool_odd
 
-    def save(self, experiences):
+    def save(self):
         """Return a clone of the cell to save a snapshot of allocentric memory"""
-        # Use the experiences cloned when saving egocentric memory
         saved_cell = GridCell(self.i, self.j, self.radius)
         # Clone the content
         saved_cell.color_index = self.color_index

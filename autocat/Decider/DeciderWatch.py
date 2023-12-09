@@ -66,11 +66,11 @@ class DeciderWatch(Decider):
                 self.workspace.memory.allocentric_to_egocentric(self.workspace.memory.phenomenon_memory.watch_point())
             self.workspace.memory.egocentric_memory.focus_point = None  # Prevent unnatural head movement
             # First enaction: turn to the prompt
-            e0 = Enaction(self.workspace.actions[ACTION_TURN], self.workspace.memory, color=3)
+            e0 = Enaction(self.workspace.actions[ACTION_TURN], self.workspace.memory)
             # Second enaction: move forward to the prompt
-            e1 = Enaction(self.workspace.actions[ACTION_FORWARD], e0.post_memory, color=3)
+            e1 = Enaction(self.workspace.actions[ACTION_FORWARD], e0.post_memory)
             # Third enaction: scan
-            e2 = Enaction(self.workspace.actions[ACTION_SCAN], e1.post_memory, span=10, color=3)
+            e2 = Enaction(self.workspace.actions[ACTION_SCAN], e1.post_memory, span=10)
             return CompositeEnaction([e0, e1, e2])  # Scan because it often miss an object
 
         # Call the sequence learning mechanism to select the next action
@@ -93,4 +93,4 @@ class DeciderWatch(Decider):
                 span = 10
 
         # Return the selected enaction
-        return Enaction(self.action, self.workspace.memory, span=span, color=3)
+        return Enaction(self.action, self.workspace.memory, span=span)
