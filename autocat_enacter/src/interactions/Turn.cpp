@@ -22,7 +22,7 @@ Turn::Turn(Floor& FLO, Head& HEA, Imu& IMU, WifiCat& WifiCat, JSONVar json_actio
 // STEP 0: Start the interaction
 void Turn::begin()
 {
-  _action_end_time = millis() + 5000;
+  _action_end_time = millis() + 5000;  // Maximum duration in case yaw does not work
   _HEA._next_saccade_time = _action_end_time - SACCADE_DURATION;  // Inhibit HEA during the interaction
   if (_target_angle < - TURN_SPOT_ENDING_ANGLE)
     _FLO._OWM.turnInSpotRight(TURN_SPEED);
@@ -55,15 +55,17 @@ void Turn::ongoing()
     _action_end_time = _FLO._retreat_end_time + TURN_SPOT_ENDING_DELAY;
     _step = INTERACTION_TERMINATE;
   }
+
   // When reached the target angle or the max duration
   else if (((_target_angle > TURN_SPOT_ENDING_ANGLE) && (_IMU._yaw > _target_angle - TURN_SPOT_ENDING_ANGLE)) ||
   ((_target_angle < -TURN_SPOT_ENDING_ANGLE) && (_IMU._yaw < _target_angle + TURN_SPOT_ENDING_ANGLE)) ||
   (abs(_target_angle) <= TURN_SPOT_ENDING_ANGLE) ||
   (_action_end_time < millis()))
   {
-    if (!_HEA._is_enacting_head_alignment)
-        _HEA.beginEchoAlignment();  // Force HEA
-    _duration1 = millis()- _action_start_time;
+    // _HEA._next_saccade_time = millis() - SACCADE_DURATION;  // Terminate HEA inhibition
+    //if (!_HEA._is_enacting_head_alignment)
+        _HEA.beginEchoAlignment();  // Force HEA. It was inhibited during the interaction
+    _duration1 = millis() - _action_start_time;
     _FLO._OWM.stopMotion();
     _action_end_time = millis() + TURN_SPOT_ENDING_DELAY;// give it time to immobilize before terminating interaction
     _step = INTERACTION_TERMINATE;

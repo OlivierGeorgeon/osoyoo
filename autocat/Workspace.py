@@ -153,8 +153,9 @@ class Workspace:
                    "emotion": self.memory.emotion_code}
 
         # If the terrain has been found then send the position relative to the terrain origin
-        if TER in self.memory.phenomenon_memory.phenomena and \
-                self.memory.phenomenon_memory.phenomena[TER].confidence > TERRAIN_INITIAL_CONFIDENCE:
+        # if TER in self.memory.phenomenon_memory.phenomena and \
+        #         self.memory.phenomenon_memory.phenomena[TER].confidence > TERRAIN_INITIAL_CONFIDENCE:
+        if self.memory.phenomenon_memory.terrain_confidence() > TERRAIN_INITIAL_CONFIDENCE:
             robot_point = self.memory.terrain_centric_robot_point()
             message['pos_x'] = round(robot_point[0])
             message['pos_y'] = round(robot_point[1])
@@ -164,14 +165,14 @@ class Workspace:
             # The destination position in polar-egocentric
             destination_point = quaternion.apply_to_vector(self.enaction.body_quaternion,
                                                            self.enaction.command.anticipated_translation)
+            message['destination'] = destination_point.astype(int)
             message['destination_x'] = round(destination_point[0])
             message['destination_y'] = round(destination_point[1])
 
             # The focus point
             if self.enaction.focus_point is not None:
-                # if self.enaction is not None and self.enaction.focus_point is not None:
                 focus_point = self.memory.egocentric_to_polar_egocentric(self.enaction.focus_point)
-                # The position of the focus
+                message['focus'] = focus_point.astype(int)
                 message['focus_x'] = round(focus_point[0])
                 message['focus_y'] = round(focus_point[1])
 
@@ -190,9 +191,10 @@ class Workspace:
             # print("this angle", math.degrees(self.memory.body_memory.body_quaternion.angle * self.memory.body_memory.body_quaternion.axis[2]))
             # print("ego angle", math.degrees(self.message.ego_quaternion.angle * self.message.ego_quaternion.axis[2]))
             if self.message.ter_position is not None:
-                # If position in terrain and the position of this robot knows the position of the terrain
-                if TER in self.memory.phenomenon_memory.phenomena \
-                        and self.memory.phenomenon_memory.phenomena[TER].confidence > TERRAIN_INITIAL_CONFIDENCE:
+                # If position in terrain and this robot knows the position of the terrain
+                # if TER in self.memory.phenomenon_memory.phenomena \
+                #         and self.memory.phenomenon_memory.phenomena[TER].confidence > TERRAIN_INITIAL_CONFIDENCE:
+                if self.memory.phenomenon_memory.terrain_confidence() > TERRAIN_INITIAL_CONFIDENCE:
                     allo_point = self.memory.terrain_centric_to_allocentric(self.message.ter_position)
                     # allo_point = self.message.ter_position + self.memory.phenomenon_memory.phenomena[TER].point
                     # print("Robot", self.message.robot, "position:", allo_point)

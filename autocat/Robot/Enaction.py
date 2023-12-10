@@ -208,32 +208,32 @@ class Enaction:
                     print("Focus kept with prediction error", prediction_error_focus, "moved to ", end="")
                     self.focus_confidence = CONFIDENCE_CONFIRMED_FOCUS
                     # If the action has been completed
-                    if self.outcome.duration1 >= 1000:
-                        # If the head is forward then correct longitudinal displacements
-                        if -20 < self.outcome.head_angle < 20:
-                            if self.action.action_code in [ACTION_FORWARD, ACTION_BACKWARD]:
-                                self.translation[0] = self.translation[0] + prediction_error_focus[0]
-                                # Correct the estimated speed of the action
-                                if self.command.duration is None:
-                                    self.action.adjust_translation_speed(self.translation)
-                        # If the head is sideways then correct lateral displacements
-                        if self.outcome.head_angle < -60 or 60 < self.outcome.head_angle:
-                            if self.action.action_code in [ACTION_SWIPE, ACTION_RIGHTWARD]:
-                                self.translation[1] = self.translation[1] + prediction_error_focus[1]
-                                # Correct the estimated speed of the action
-                                if self.command.duration is None:
-                                    self.action.adjust_translation_speed(self.translation)
-                        # Update the displacement matrix according to the new translation
-                        translation_matrix = matrix44.create_from_translation(-self.translation)
-                        self.displacement_matrix = matrix44.multiply(translation_matrix, self.yaw_matrix)
+                    # if self.outcome.duration1 >= 1000:
+                    #     # If the head is forward then correct longitudinal displacements
+                    #     if -20 < self.outcome.head_angle < 20:
+                    #         if self.action.action_code in [ACTION_FORWARD, ACTION_BACKWARD]:
+                    #             self.translation[0] = self.translation[0] + prediction_error_focus[0]
+                    #             # Correct the estimated speed of the action
+                    #             if self.command.duration is None:
+                    #                 self.action.adjust_translation_speed(self.translation)
+                    #     # If the head is sideways then correct lateral displacements
+                    #     if self.outcome.head_angle < -60 or 60 < self.outcome.head_angle:
+                    #         if self.action.action_code in [ACTION_SWIPE, ACTION_RIGHTWARD]:
+                    #             self.translation[1] = self.translation[1] + prediction_error_focus[1]
+                    #             # Correct the estimated speed of the action
+                    #             if self.command.duration is None:
+                    #                 self.action.adjust_translation_speed(self.translation)
+                    #     # Update the displacement matrix according to the new translation
+                    #     translation_matrix = matrix44.create_from_translation(-self.translation)
+                    #     self.displacement_matrix = matrix44.multiply(translation_matrix, self.yaw_matrix)
                 else:
                     # The focus was lost
                     print("Focus delta:", prediction_error_focus, "New focus:", end="")
                     # Careful scan forces CONFIDENCE_CAREFUL_SCAN
-                    if self.command.span == 10:
-                        self.focus_confidence = CONFIDENCE_CAREFUL_SCAN
-                    else:
-                        self.focus_confidence = CONFIDENCE_NEW_FOCUS
+                    # if self.command.span == 10:
+                    #     self.focus_confidence = CONFIDENCE_CAREFUL_SCAN
+                    # else:
+                    self.focus_confidence = CONFIDENCE_NEW_FOCUS
                     # playsound('autocat/Assets/R5.wav', False)
             else:
                 # The focus was lost
@@ -251,6 +251,10 @@ class Enaction:
                 print("New focus ", end="")
         self.focus_point = new_focus
         print(self.focus_point)
+
+        # Careful scan has extra confidence
+        if self.focus_confidence == CONFIDENCE_NEW_FOCUS and self.command.span == 10:
+            self.focus_confidence = CONFIDENCE_CAREFUL_SCAN
 
         # Impact or block catch focus
         if self.outcome.impact > 0 and self.action.action_code == ACTION_FORWARD:

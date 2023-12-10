@@ -59,16 +59,18 @@ int Floor::update(int interaction_direction)
       _retreat_end_time = millis() + RETREAT_DURATION * 2;  // * 5;
       // If was swiping left then retreat right for 400ms
       if (interaction_direction == DIRECTION_LEFT)
+        // _OWM.retreatRightward();  // The displacement must be handled by the python application
         _OWM.retreatRight();
       // If was swiping right then retreat left for 400ms
       else if (interaction_direction == DIRECTION_RIGHT)
+        // _OWM.retreatLeftward();  // The displacement must be handled by the python application
         _OWM.retreatLeft();
       else
       {
         _retreat_end_time = millis() + RETREAT_DURATION;
         // If was moving backward then retreat front for 200ms
         if (interaction_direction == DIRECTION_BACK)
-          _OWM.retreatFront();
+          _OWM.retreatForward();
         // If was moving forward or turning
         else
         {
@@ -95,9 +97,9 @@ int Floor::update(int interaction_direction)
 
   if (_is_retreating)
   {
-    // When the floor changes when retreating sideways, postpone the end time because it may still be on the line
+    // When the floor changes when retreating sideways, postpone the end time because robot may still be on the line
     if (floor_change != 0 && _floor_outcome != B11)
-      _retreat_end_time = millis() + RETREAT_DURATION;
+      _retreat_end_time = max(millis() + RETREAT_DURATION, _retreat_end_time);
 
     // When the retreat time has elapsed, terminate the retreat
     if (millis() > _retreat_end_time)

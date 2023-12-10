@@ -21,6 +21,8 @@ EMOTION_HAPPY = 2  # Green
 EMOTION_SAD = 3  # Bleu
 EMOTION_ANGRY = 4  # Red
 EMOTION_UPSET = 5  # Orange (Can't arrange an object from where the robot is)
+ARRANGE_MIN_RADIUS = 100
+ARRANGE_MAX_RADIUS = 400
 
 
 class Memory:
@@ -48,12 +50,6 @@ class Memory:
         """Update the emotional state code"""
         # Search terrain origin: Robot HAPPY DeciderCircle
         if self.phenomenon_memory.terrain_confidence() < TERRAIN_ORIGIN_CONFIDENCE:
-            # When high excitation and the focus is not too far: HAPPY, DeciderCircle until terrain origin confidence
-            # if self.egocentric_memory.focus_point is not None and \
-            #         np.linalg.norm(self.egocentric_memory.focus_point) < FOCUS_TOO_FAR_DISTANCE and \
-            #         not self.is_outside_terrain(self.egocentric_memory.focus_point) and \
-            #         self.body_memory.excitation > EXCITATION_LOW or \
-            #         self.phenomenon_memory.terrain_confidence() < TERRAIN_ORIGIN_CONFIDENCE:
             self.emotion_code = EMOTION_HAPPY
         # Terrain origin has been found
         else:
@@ -81,7 +77,8 @@ class Memory:
                         # If object inside terrain and closer than target: ANGRY, DeciderPush
                         ego_target = self.terrain_centric_to_egocentric(self.phenomenon_memory.arrange_point())
                         is_to_arrange = self.is_to_arrange(self.egocentric_memory.focus_point)
-                        is_closer = self.egocentric_memory.focus_point[0] < ego_target[0]
+                        # print("Ego focus", self.egocentric_memory.focus_point)
+                        is_closer = self.egocentric_memory.focus_point[0] < ego_target[0] - ARRANGE_MIN_RADIUS
                         print("Focus near terrain center:", is_to_arrange, "Before terrain center:", is_closer)
                         if is_to_arrange:
                             if is_closer:
@@ -243,15 +240,10 @@ class Memory:
         if self.phenomenon_memory.terrain_confidence() <= TERRAIN_INITIAL_CONFIDENCE:
             return False
         # If there is a terrain origin, check if the focus is around the terrain center
-        # if self.phenomenon_memory.terrain_confidence() == TERRAIN_ORIGIN_CONFIDENCE:
         else:
             terrain_point = self.egocentric_to_terrain_centric(ego_point)
             print("Focus in terrain-centric coordinates", terrain_point)
-            return np.linalg.norm(terrain_point) < 400
-        # If the terrain has been toured, check if the focus is inside the terrain
-        # TODO Check if inside terrain if the terrain is wide enough
-        # else:
-            return self.is_outside_terrain(ego_point)
+            return np.linalg.norm(terrain_point) < ARRANGE_MAX_RADIUS
 
     def is_outside_terrain(self, ego_point):
         """Return True if ego_point is not None and there is a terrain and ego_point is outside"""
@@ -300,8 +292,9 @@ class Memory:
             # Displacement in body memory
             self.body_memory.body_quaternion = self.body_memory.body_quaternion.cross(yaw_quaternion)
             if self.egocentric_memory.focus_point is not None:
+                # Simulate the head to focus alignment
                 head_direction_degree, _ = point_to_echo_direction_distance(self.egocentric_memory.focus_point)
-                self.body_memory.head_direction_rad = math.radians(head_direction_degree)
+                self.body_memory.set_head_direction_degree(head_direction_degree)
 
             # Update allocentric memory
             self.allocentric_memory.robot_point += quaternion.apply_to_vector(self.body_memory.body_quaternion, translation)
