@@ -39,7 +39,9 @@ class Wheel
     void retreatRight();
     void retreatStrait();
     void retreatLeft();
-    void retreatFront();
+    void retreatForward();
+    void retreatLeftward();
+    void retreatRightward();
     void stopMotion();
     void circumvent(int speed);
   private:
@@ -48,8 +50,8 @@ class Wheel
     void rearLeftWheel(int speed_rl);
     void frontRightWheel(int speed_fr);
     void rearRightWheel(int speed_rr);
-    int _direction = 0;
-    bool _is_retreating = false;
+    // int _direction = 0;
+    // bool _is_retreating = false;
 };
 
 #endif

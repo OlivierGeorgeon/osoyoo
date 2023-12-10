@@ -59,12 +59,13 @@ class DeciderArrange(Decider):
             ego_prompt_projection = point_closest_point_on_line(np.array([0, 0, 0]), l1)
             print("Ego prompt projection:", ego_prompt_projection, "focus:",
                   self.workspace.memory.egocentric_memory.focus_point, "target:", ego_target)
-            # If OUTCOME_FLOOR just scan
+            # If OUTCOME_FLOOR just turn around
             if outcome == OUTCOME_FLOOR:
                 self.step = STEP_INIT
-                composite_enaction = Enaction(self.workspace.actions[ACTION_SCAN], self.workspace.memory, span=10)
+                composite_enaction = Enaction(self.workspace.actions[ACTION_TURN], self.workspace.memory, span=10)
             # If object behind target just watch
-            elif ego_target[0] - self.workspace.memory.egocentric_memory.focus_point[0] < 0:
+            # elif ego_target[0] - self.workspace.memory.egocentric_memory.focus_point[0] < 0:
+            elif self.workspace.memory.egocentric_memory.focus_point[0] > ego_target[0] - ARRANGE_MIN_RADIUS:
                 print("Object behind target:", ego_target[0] - self.workspace.memory.egocentric_memory.focus_point[0])
                 composite_enaction = Enaction(self.workspace.actions[ACTION_WATCH], self.workspace.memory)
                 self.step = STEP_INIT

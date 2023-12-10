@@ -59,16 +59,18 @@ int Floor::update(int interaction_direction)
       _retreat_end_time = millis() + RETREAT_DURATION * 2;  // * 5;
       // If was swiping left then retreat right for 400ms
       if (interaction_direction == DIRECTION_LEFT)
+        // _OWM.retreatRightward();  // The displacement must be handled by the python application
         _OWM.retreatRight();
       // If was swiping right then retreat left for 400ms
       else if (interaction_direction == DIRECTION_RIGHT)
+        // _OWM.retreatLeftward();  // The displacement must be handled by the python application
         _OWM.retreatLeft();
       else
       {
         _retreat_end_time = millis() + RETREAT_DURATION;
         // If was moving backward then retreat front for 200ms
         if (interaction_direction == DIRECTION_BACK)
-          _OWM.retreatFront();
+          _OWM.retreatForward();
         // If was moving forward or turning
         else
         {

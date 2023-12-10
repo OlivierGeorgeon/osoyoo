@@ -5,7 +5,7 @@ from ..Robot.RobotDefine import ROBOT_SETTINGS, ROBOT_FRONT_X, ROBOT_SIDE, ROBOT
 from ..Utils import quaternion_to_azimuth, quaternion_to_direction_rad
 
 ENERGY_TIRED = 88  # 88  # 90  # 92  # Level of energy below which the agent wants to go to color patch
-EXCITATION_LOW = 70  # 95  # 60  # 75  # Level of excitation below witch the agent just wants to watch if it is not tired
+EXCITATION_LOW = 70  # 95  # 60  # 75  # Level of excitation below witch Robot just wants to watch if it is not tired
 
 
 def point_to_echo_direction_distance(point):
@@ -46,7 +46,11 @@ class BodyMemory:
 
     def set_head_direction_degree(self, head_direction_degree: int):
         """Set the head direction from degree measured relative to the robot [-90,90]"""
-        assert(-90 <= head_direction_degree <= 90)
+        # assert(-90 <= head_direction_degree <= 90)
+        if head_direction_degree < -90:
+            head_direction_degree = -90
+        if head_direction_degree > 90:
+            head_direction_degree = 90
         self.head_direction_rad = math.radians(head_direction_degree)
 
     def head_direction_degree(self):

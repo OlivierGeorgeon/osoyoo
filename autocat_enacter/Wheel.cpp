@@ -36,19 +36,19 @@ void Wheel::setup()
 void Wheel::turnInSpotLeft(int speed)
 {
   setMotion(-speed, -speed, speed, speed);
-  _direction = 1;
+//  _direction = 1;
 }
 
 void Wheel::goBack(int speed)
 {
   setMotion(-speed, -speed, -speed, -speed);
-  _direction = 2;
+//  _direction = 2;
 }
 
 void Wheel::turnInSpotRight(int speed)
 {
   setMotion(speed, speed, -speed, -speed);
-  _direction = 3;
+//  _direction = 3;
 }
 
 void Wheel::turnFrontLeft(int speed)
@@ -64,66 +64,80 @@ void Wheel::turnFrontRight(int speed)
 void Wheel::shiftLeft(int speed)
 {
   setMotion( -speed, speed, -speed, speed);
-  _direction = 4;
+//  _direction = 4;
 }
 
 void Wheel::shiftRight(int speed)
 {
   setMotion(speed, -speed, speed, -speed);
-  _direction = 6;
+//  _direction = 6;
 }
 
 void Wheel::circumvent(int speed)
 {
   setMotion(speed, -speed * 1.2, speed / 1.2, -speed);  // fl rl rr fr
-  _direction = 9;
+//  _direction = 9;
 }
 
 void Wheel::turnLeft(int speed)
 {
   setMotion( 0, speed, 0, speed);
   //setMotion(0, 0, speed, speed);
-  _direction = 7;
+//  _direction = 7;
 }
 
 void Wheel::goForward(int speed)
 {
   setMotion(speed, speed, speed, speed);
-  _direction = 8;
+//  _direction = 8;
 }
 void Wheel::turnRight(int speed)
 {
   setMotion(speed, 0, speed, 0);
   //setMotion(speed, speed, 0, 0);
-  _direction = 9;
+//  _direction = 9;
 }
 
 // Retreat right when floor sensor sensed on the left
 void Wheel::retreatRight()
 {
   setMotion(-150,-150,-50,-50);
-  _is_retreating = true;
+  //_is_retreating = true;
 }
 
 // Retreat strait when floor sensor sensed in the middle
 void Wheel::retreatStrait()
 {
   setMotion(-150,-150,-150,-150);
-  _is_retreating = true;
+  // _is_retreating = true;
 }
 
 // Retreat left when floor sensor sensed on the right
 void Wheel::retreatLeft()
 {
   setMotion(-50,-50,-150,-150);
-  _is_retreating = true;
+  // _is_retreating = true;
 }
 
-// Retreat front when interaction backward
-void Wheel::retreatFront()
+// Retreat forward when interaction backward
+void Wheel::retreatForward()
 {
   setMotion(150, 150, 150, 150);
-  _is_retreating = true;
+  // _is_retreating = true;
+}
+
+// Retreat to the left when interaction to the right
+void Wheel::retreatLeftward()
+{
+  setMotion( -150, 150, -150, 75);
+  // _is_retreating = true;
+}
+
+// Retreat to the right when interaction to the left
+void Wheel::retreatRightward()
+{
+  setMotion(75, -150, 150, -150);
+  // _is_retreating = true;
 }
 
 void Wheel::stopMotion()    //Stop
@@ -132,8 +146,8 @@ void Wheel::stopMotion()    //Stop
   analogWrite(speedPinRB,0);
   analogWrite(speedPinL,0);
   analogWrite(speedPinR,0);
-  _direction = 0;
-  _is_retreating = false;
+  // _direction = 0;
+  // _is_retreating = false;
 }
 
 void Wheel::setMotion(int speed_fl, int speed_rl, int speed_rr, int speed_fr)
