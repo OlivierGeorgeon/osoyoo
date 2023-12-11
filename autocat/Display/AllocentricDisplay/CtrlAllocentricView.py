@@ -25,10 +25,13 @@ class CtrlAllocentricView:
             """Open a phenomenon view based on the phenomenon on this cell"""
             self.prompt_point = self.view.mouse_coordinates_to_point(x, y)
             cell_x, cell_y = point_to_cell(self.prompt_point)
-            phenomenon_id = self.workspace.memory.allocentric_memory.grid[cell_x][cell_y].phenomenon_id
+            cell = self.workspace.memory.allocentric_memory.grid[cell_x][cell_y]
+            phenomenon_id = cell.phenomenon_id
+            self.view.label_click.text = cell.label()
             if phenomenon_id is not None:
-                print("Displaying Phenomenon", phenomenon_id)
-                self.workspace.ctrl_phenomenon_view.phenomenon = self.workspace.memory.phenomenon_memory.phenomena[phenomenon_id]
+                print("Displaying Phenomenon", cell.phenomenon_id)
+                self.workspace.ctrl_phenomenon_view.phenomenon = \
+                    self.workspace.memory.phenomenon_memory.phenomena[cell.phenomenon_id]
                 # ctrl_phenomenon_view = CtrlPhenomenonView(workspace)
                 # ctrl_phenomenon_view.update_body_robot()
                 # ctrl_phenomenon_view.update_points_of_interest(phenomenon)

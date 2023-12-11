@@ -75,14 +75,15 @@ class DeciderArrange(Decider):
                 # If robot-object-target not aligned
                 if math.fabs(ego_prompt_projection[1]) > 50:
                     # Go to the point from where to push
-                    if CHECK_OUTSIDE == 1 and \
-                       self.workspace.memory.is_outside_terrain(ego_prompt_projection):
+                    if CHECK_OUTSIDE == 1 and self.workspace.memory.is_outside_terrain(ego_prompt_projection):
                         print("Projection point inaccessible")
                         composite_enaction = Enaction(self.workspace.actions[ACTION_WATCH], self.workspace.memory)
                         self.step = STEP_INIT
-                    # If angle to projection point greater than 20° and projection before object
+                    # If angle to projection point greater than 20° and projection far enough from object
                     elif math.fabs(math.atan2(ego_prompt_projection[0], math.fabs(ego_prompt_projection[1]))) > 0.349 \
-                            and self.workspace.memory.egocentric_memory.focus_point[0] - ego_prompt_projection[0] > ARRANGE_MIN_RADIUS:
+                            and self.workspace.memory.egocentric_memory.focus_point[0] - ego_prompt_projection[0] > 0 \
+                            and np.linalg.norm(self.workspace.memory.egocentric_memory.focus_point
+                                               - ego_prompt_projection) > ARRANGE_MIN_RADIUS:
                         # If prompt projection behind object swipe to prompt_intersection
                         self.workspace.memory.egocentric_memory.prompt_point = ego_prompt_projection
                         # Turn the left to the projection
@@ -103,6 +104,7 @@ class DeciderArrange(Decider):
                         composite_enaction = Enaction(self.workspace.actions[ACTION_WATCH], self.workspace.memory)
                         self.step = STEP_INIT
                     else:
+                        vector.set_length(ego_prompt_intersection, max(500, vector.length(ego_prompt_intersection)))
                         print("Swipe to intersection", ego_prompt_intersection)
                         self.workspace.memory.egocentric_memory.prompt_point = ego_prompt_intersection
                         composite_enaction = Enaction(self.workspace.actions[ACTION_SWIPE], self.workspace.memory)

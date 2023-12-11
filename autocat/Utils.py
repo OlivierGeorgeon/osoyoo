@@ -1,6 +1,6 @@
 import math
 import numpy as np
-from pyrr import Quaternion, line, Matrix44
+from pyrr import Quaternion, line, Matrix44, Vector3
 
 
 def quaternion_translation_to_matrix(quaternion, translation):
@@ -60,7 +60,7 @@ def line_intersection(line1, line2):
 
     intersection_x = ((x1 * y2 - y1 * x2) * (x3 - x4) - (x1 - x2) * (x3 * y4 - y3 * x4)) / determinant
     intersection_y = ((x1 * y2 - y1 * x2) * (y3 - y4) - (y1 - y2) * (x3 * y4 - y3 * x4)) / determinant
-    return np.array([intersection_x, intersection_y, 0])
+    return Vector3([intersection_x, intersection_y, 0])
 
 
 def short_angle(quaternion1, quaternion2):

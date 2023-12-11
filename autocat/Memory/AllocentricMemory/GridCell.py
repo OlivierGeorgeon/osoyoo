@@ -19,7 +19,8 @@ class GridCell:
         self.status = [CELL_UNKNOWN,  # Place
                        CELL_UNKNOWN,  # Interaction
                        CELL_UNKNOWN,  # No echo
-                       CELL_UNKNOWN]  # Focus and prompt
+                       CELL_UNKNOWN,  # Focus
+                       CELL_UNKNOWN]  # Prompt
         self.color_index = 0
         self.clock_place = 0
         self.clock_interaction = 0
@@ -33,14 +34,27 @@ class GridCell:
         """String representation of the cell for console display"""
         return "(%+d,%+d)" % (self.i, self.j)
 
+    def label(self):
+        """Label of the cell for display on click in allocentricView"""
+        label = repr(self.status) + " Clocks: ["
+        label += str(self.clock_place) + ", "
+        label += str(self.clock_interaction) + ", "
+        label += str(self.clock_no_echo) + ", "
+        label += str(self.clock_focus) + ", "
+        label += str(self.clock_prompt) + "]"
+        if self.phenomenon_id is not None:
+            label += " Phenomenon:" + str(self.phenomenon_id)
+        return label
+
     def point(self):
         """Return a clone of the cell's point"""
         return self._point.copy()
 
     def is_known(self):
         """Return True if something is known in this cell"""
-        return self.status[0] != CELL_UNKNOWN or self.status[1] != CELL_UNKNOWN or self.status[2] != CELL_UNKNOWN \
-            or self.status[3] != CELL_UNKNOWN or self.clock_prompt > 0
+        return self.status != [CELL_UNKNOWN, CELL_UNKNOWN, CELL_UNKNOWN, CELL_UNKNOWN, CELL_UNKNOWN]
+        # return self.status[0] != CELL_UNKNOWN or self.status[1] != CELL_UNKNOWN or self.status[2] != CELL_UNKNOWN \
+        #     or self.status[3] != CELL_UNKNOWN or self.clock_prompt > 0
 
     def is_inside(self, path):
         """True if this cell is inside the path"""
@@ -76,8 +90,8 @@ class GridCell:
         """Return a clone of the cell to save a snapshot of allocentric memory"""
         saved_cell = GridCell(self.i, self.j, self.radius)
         # Clone the content
-        saved_cell.color_index = self.color_index
         saved_cell.status = self.status.copy()
+        saved_cell.color_index = self.color_index
         saved_cell.clock_place = self.clock_place
         saved_cell.clock_interaction = self.clock_interaction
         saved_cell.clock_phenomenon = self.clock_phenomenon

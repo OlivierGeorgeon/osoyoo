@@ -51,9 +51,12 @@ class AllocentricView(InteractiveDisplay):
 
         # The text at the bottom left
         self.label_batch = pyglet.graphics.Batch()
-        self.label = pyglet.text.Label('', font_name='Verdana', font_size=10, x=10, y=10)  # y=30
+        self.label = pyglet.text.Label('', font_name='Verdana', font_size=10, x=10, y=10)
         self.label.color = (255, 255, 255, 255)
         self.label.batch = self.label_batch
+        self.label_click = pyglet.text.Label('', font_name='Verdana', font_size=10, x=10, y=30)
+        self.label_click.color = (255, 255, 255, 255)
+        self.label_click.batch = self.label_batch
 
     def update_hexagon(self, cell):
         """Create or update or delete an hexagon in allocentric view."""
@@ -119,8 +122,7 @@ class AllocentricView(InteractiveDisplay):
         if phenomenon is not None:
             pose_matrix = quaternion_translation_to_matrix(phenomenon.current().quaternion, phenomenon.point +
                                                            phenomenon.current().point)
-            self.body_poi = PointOfInterest(pose_matrix, self.batch,
-                                             self.forefront, POINT_ROBOT, phenomenon.current().clock)
-            self.robot_poi = PointOfInterest(pose_matrix, self.batch,
-                                             self.forefront, EXPERIENCE_ROBOT, phenomenon.current().clock,
-                                             color_index=phenomenon.current().color_index)
+            self.body_poi = PointOfInterest(pose_matrix, self.batch, self.forefront, POINT_ROBOT,
+                                            phenomenon.current().clock)
+            self.robot_poi = PointOfInterest(pose_matrix, self.batch, self.forefront, EXPERIENCE_ROBOT,
+                                             phenomenon.current().clock, color_index=phenomenon.current().color_index)
