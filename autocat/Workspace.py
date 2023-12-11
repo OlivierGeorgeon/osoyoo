@@ -157,24 +157,22 @@ class Workspace:
         #         self.memory.phenomenon_memory.phenomena[TER].confidence > TERRAIN_INITIAL_CONFIDENCE:
         if self.memory.phenomenon_memory.terrain_confidence() > TERRAIN_INITIAL_CONFIDENCE:
             robot_point = self.memory.terrain_centric_robot_point()
-            message['pos_x'] = round(robot_point[0])
-            message['pos_y'] = round(robot_point[1])
+            message['position'] = robot_point.astype(int).tolist()
+            # message['pos_x'] = round(robot_point[0])
+            # message['pos_y'] = round(robot_point[1])
 
         # Add information about the current enaction only once
         if self.enaction is not None and not self.enaction.message_sent:
             # The destination position in polar-egocentric
-            destination_point = quaternion.apply_to_vector(self.enaction.body_quaternion,
-                                                           self.enaction.command.anticipated_translation)
-            message['destination'] = destination_point.astype(int)
-            message['destination_x'] = round(destination_point[0])
-            message['destination_y'] = round(destination_point[1])
+            # TODO handle destination
+            # destination_point = quaternion.apply_to_vector(self.enaction.body_quaternion,
+            #                                                self.enaction.command.anticipated_translation)
+            # message['destination'] = destination_point.astype(int).tolist()
 
             # The focus point
             if self.enaction.focus_point is not None:
                 focus_point = self.memory.egocentric_to_polar_egocentric(self.enaction.focus_point)
-                message['focus'] = focus_point.astype(int)
-                message['focus_x'] = round(focus_point[0])
-                message['focus_y'] = round(focus_point[1])
+                message['focus'] = focus_point.astype(int).tolist()
 
             # Mark the message for this enaction sent
             self.enaction.message_sent = True

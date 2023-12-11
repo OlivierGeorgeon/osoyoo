@@ -99,18 +99,34 @@ class AllocentricMemory:
 
         # print("Update allocentric time:", time.time() - start_time, "seconds")
 
-    def move(self, body_quaternion, translation, clock):
+    def move(self, direction_quaternion, translation, clock):
         """Move the robot in allocentric memory. Mark the traversed cells Free. Returns the new position
         If body_quaternion is identity then the translation is allocentric"""
 
         # Move the robot along its body direction
-        destination_point = self.robot_point + quaternion.apply_to_vector(body_quaternion, translation)
+        destination_point = self.robot_point + quaternion.apply_to_vector(direction_quaternion, translation)
         # Mark the cells traversed by the robot
-        p1 = quaternion.apply_to_vector(body_quaternion, [ROBOT_FRONT_X, ROBOT_SIDE, 0]) + destination_point
-        p2 = quaternion.apply_to_vector(body_quaternion, [-ROBOT_FRONT_X, ROBOT_SIDE, 0]) + self.robot_point
-        p3 = quaternion.apply_to_vector(body_quaternion, [-ROBOT_FRONT_X, -ROBOT_SIDE, 0]) + self.robot_point
-        p4 = quaternion.apply_to_vector(body_quaternion, [ROBOT_FRONT_X, -ROBOT_SIDE, 0]) + destination_point
-        # polygon = [p[0:2] for p in [p1, p2, p3, p4]]
+        if translation[0] > 0:  # Move back
+            p1 = quaternion.apply_to_vector(direction_quaternion, [ROBOT_FRONT_X, ROBOT_SIDE, 0]) + self.robot_point
+            p2 = quaternion.apply_to_vector(direction_quaternion, [-ROBOT_FRONT_X, ROBOT_SIDE, 0]) + destination_point
+            p3 = quaternion.apply_to_vector(direction_quaternion, [-ROBOT_FRONT_X, -ROBOT_SIDE, 0]) + destination_point
+            p4 = quaternion.apply_to_vector(direction_quaternion, [ROBOT_FRONT_X, -ROBOT_SIDE, 0]) + self.robot_point
+        elif translation[1] > 0:  # Swipe left
+            p1 = quaternion.apply_to_vector(direction_quaternion, [ROBOT_FRONT_X, ROBOT_SIDE, 0]) + destination_point
+            p2 = quaternion.apply_to_vector(direction_quaternion, [-ROBOT_FRONT_X, ROBOT_SIDE, 0]) + destination_point
+            p3 = quaternion.apply_to_vector(direction_quaternion, [-ROBOT_FRONT_X, -ROBOT_SIDE, 0]) + self.robot_point
+            p4 = quaternion.apply_to_vector(direction_quaternion, [ROBOT_FRONT_X, -ROBOT_SIDE, 0]) + self.robot_point
+        elif translation[1] < 0:  # Swipe right
+            p1 = quaternion.apply_to_vector(direction_quaternion, [ROBOT_FRONT_X, ROBOT_SIDE, 0]) + self.robot_point
+            p2 = quaternion.apply_to_vector(direction_quaternion, [-ROBOT_FRONT_X, ROBOT_SIDE, 0]) + self.robot_point
+            p3 = quaternion.apply_to_vector(direction_quaternion, [-ROBOT_FRONT_X, -ROBOT_SIDE, 0]) + destination_point
+            p4 = quaternion.apply_to_vector(direction_quaternion, [ROBOT_FRONT_X, -ROBOT_SIDE, 0]) + destination_point
+        else:  # Move forward
+            p1 = quaternion.apply_to_vector(direction_quaternion, [ROBOT_FRONT_X, ROBOT_SIDE, 0]) + destination_point
+            p2 = quaternion.apply_to_vector(direction_quaternion, [-ROBOT_FRONT_X, ROBOT_SIDE, 0]) + self.robot_point
+            p3 = quaternion.apply_to_vector(direction_quaternion, [-ROBOT_FRONT_X, -ROBOT_SIDE, 0]) + self.robot_point
+            p4 = quaternion.apply_to_vector(direction_quaternion, [ROBOT_FRONT_X, -ROBOT_SIDE, 0]) + destination_point
+
         path = mpath.Path([p[0:2] for p in [p1, p2, p3, p4]])
         for c in [c for line in self.grid for c in line if c.is_inside(path)]:
             c.status[0] = EXPERIENCE_PLACE
@@ -140,15 +156,15 @@ class AllocentricMemory:
             c.phenomenon_id = None
 
     def apply_status_to_cell(self, i, j, status, clock, color_index):
-        """Change the cell status"""
+        """Change the cell status. Keep the max clock"""
         if (self.min_i <= i <= self.max_i) and (self.min_j <= j <= self.max_j):
             if status in [EXPERIENCE_FLOOR, EXPERIENCE_PLACE]:
                 self.grid[i][j].status[0] = status
-                self.grid[i][j].clock_place = clock
+                self.grid[i][j].clock_place = max(clock, self.grid[i][j].clock_place)
                 self.grid[i][j].color_index = color_index
             else:
                 self.grid[i][j].status[1] = status
-                self.grid[i][j].clock_interaction = clock
+                self.grid[i][j].clock_interaction = max(clock, self.grid[i][j].clock_interaction)
         else:
             pass
             # print("Error: cell out of grid, i:", i, "j:", j, "Status:", status)
@@ -182,18 +198,17 @@ class AllocentricMemory:
         # Clear the previous prompt cell
         if self.prompt_i is not None:
             if (self.min_i <= self.prompt_i <= self.max_i) and (self.min_j <= self.prompt_j <= self.max_j):
-                self.grid[self.prompt_i][self.prompt_j].status[3] = CELL_UNKNOWN
+                self.grid[self.prompt_i][self.prompt_j].status[4] = CELL_UNKNOWN
         # Add the new prompt cell
         if allo_prompt is not None:
             self.prompt_i, self.prompt_j = point_to_cell(allo_prompt, self.cell_radius)
             if (self.min_i <= self.prompt_i <= self.max_i) and (self.min_j <= self.prompt_j <= self.max_j):
-                self.grid[self.prompt_i][self.prompt_j].status[3] = EXPERIENCE_PROMPT
+                self.grid[self.prompt_i][self.prompt_j].status[4] = EXPERIENCE_PROMPT
                 self.grid[self.prompt_i][self.prompt_j].clock_prompt = clock
                 # print("Prompt in cell", self.prompt_i, ", ", self.prompt_j)
 
     def save(self):
         """Retun a clone of allocentric memory for memory snapshot"""
-        # Use the list of experiences cloned when saving egocentric memory
         saved_allocentric_memory = AllocentricMemory(self.width, self.height, self.cell_radius)
         saved_allocentric_memory.robot_point = self.robot_point.copy()
         saved_allocentric_memory.focus_i = self.focus_i

@@ -2,6 +2,7 @@ import math
 import numpy as np
 import time
 from pyrr import matrix44, quaternion, Quaternion
+from . import EMOTION_HAPPY, EMOTION_RELAXED, EMOTION_SAD, EMOTION_ANGRY, EMOTION_UPSET
 from .EgocentricMemory.EgocentricMemory import EgocentricMemory
 from .AllocentricMemory.AllocentricMemory import AllocentricMemory
 from .BodyMemory import BodyMemory, EXCITATION_LOW, ENERGY_TIRED, point_to_echo_direction_distance
@@ -16,11 +17,11 @@ GRID_WIDTH = 20  # 15   # 100 Number of cells wide
 GRID_HEIGHT = 60  # 45  # 200 Number of cells high
 NEAR_HOME = 300    # (mm) Max distance to consider near home
 SIMULATION_TIME_RATIO = 1  # 0.5   # The simulation speed is slower than the real speed because ...
-EMOTION_RELAXED = 1  # White
-EMOTION_HAPPY = 2  # Green
-EMOTION_SAD = 3  # Bleu
-EMOTION_ANGRY = 4  # Red
-EMOTION_UPSET = 5  # Orange (Can't arrange an object from where the robot is)
+# EMOTION_RELAXED = 1  # White
+# EMOTION_HAPPY = 2  # Green
+# EMOTION_SAD = 3  # Bleu
+# EMOTION_ANGRY = 4  # Red
+# EMOTION_UPSET = 5  # Orange (Can't arrange an object from where the robot is)
 ARRANGE_MIN_RADIUS = 100
 ARRANGE_MAX_RADIUS = 400
 
@@ -79,9 +80,10 @@ class Memory:
                         is_to_arrange = self.is_to_arrange(self.egocentric_memory.focus_point)
                         # print("Ego focus", self.egocentric_memory.focus_point)
                         is_closer = self.egocentric_memory.focus_point[0] < ego_target[0] - ARRANGE_MIN_RADIUS
-                        print("Focus near terrain center:", is_to_arrange, "Before terrain center:", is_closer)
+                        print("Focus near terrain center:", is_to_arrange, "Before terrain center:", is_closer,
+                              "Other robot angry:", self.phenomenon_memory.other_robot_is_angry())
                         if is_to_arrange:
-                            if is_closer:
+                            if is_closer and not self.phenomenon_memory.other_robot_is_angry():
                                 # Object before center: ANGRY DeciderArrange
                                 self.emotion_code = EMOTION_ANGRY
                             else:

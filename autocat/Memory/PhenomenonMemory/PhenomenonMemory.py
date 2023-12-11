@@ -3,11 +3,12 @@ from pyrr import Vector3
 from .PhenomenonObject import PhenomenonObject
 from .PhenomenonTerrain import PhenomenonTerrain, TERRAIN_EXPERIENCE_TYPES, TERRAIN_ORIGIN_CONFIDENCE
 from .PhenomenonRobot import PhenomenonRobot
+from .. import EMOTION_ANGRY
 from ...Robot.RobotDefine import TERRAIN_RADIUS
 from ..EgocentricMemory.Experience import EXPERIENCE_ROBOT
 
 TER = 0
-ROBOT1 = -1
+ROBOT1 = -1  # The last other robot from which this robot receives a message TODO Handle more robots
 
 
 class PhenomenonMemory:
@@ -116,6 +117,13 @@ class PhenomenonMemory:
             position_correction = np.divide(sum_translation, number_of_add)
 
         return remaining_affordances, position_correction
+
+    def other_robot_is_angry(self):
+        """Return True if there is another robot and it is angry"""
+        if ROBOT1 in self.phenomena and self.phenomena[ROBOT1].current().color_index == EMOTION_ANGRY:
+            return True
+        else:
+            return False
 
     def save(self):
         """Return a clone of phenomenon memory for memory snapshot"""

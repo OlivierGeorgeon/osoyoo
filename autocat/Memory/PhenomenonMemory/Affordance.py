@@ -84,7 +84,6 @@ class Affordance:
         points = None
         if self.type in [EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_CENTRAL_ECHO]:
             # The position of the head from the position of the affordance
-            # p1 = self.experience.sensor_point()
             p1 = self.polar_sensor_point
             # The direction of p2 is orthogonal to the direction of the sensor
             orthogonal_rotation = matrix44.create_from_z_rotation(math.pi/2)
