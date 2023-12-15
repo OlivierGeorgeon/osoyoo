@@ -7,7 +7,7 @@ from .RobotDefine import ROBOT_SETTINGS
 from .Outcome import Outcome
 
 ENACTION_STEP_IDLE = 0
-ENACTION_STEP_INTENDING = 1
+ENACTION_STEP_COMMANDING = 1
 ENACTION_STEP_ENACTING = 2
 ENACTION_STEP_INTEGRATING = 3
 ENACTION_STEP_REFRESHING = 4
@@ -29,7 +29,7 @@ class CtrlRobot:
     def main(self, dt):
         """The main handler of the communication to and from the robot."""
         # If INTENDING then send the interaction to the robot
-        if self.workspace.enacter.interaction_step == ENACTION_STEP_INTENDING:
+        if self.workspace.enacter.interaction_step == ENACTION_STEP_COMMANDING:
             self.workspace.enacter.interaction_step = ENACTION_STEP_ENACTING
             self.send_command_to_robot()
 

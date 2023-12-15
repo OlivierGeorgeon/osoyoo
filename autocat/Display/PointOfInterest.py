@@ -88,7 +88,7 @@ class PointOfInterest:
             self.shape = self.batch.add_indexed(6, gl.GL_TRIANGLES, group, [0, 1, 2, 0, 2, 3, 0, 3, 4, 0, 4, 5],
                                                 ('v2i', self.points), ('c4B', 6 * (*self.color, self.opacity)))
         if self.type == POINT_ROBOT:  # The body of the other robot
-            self.color = name_to_rgb("lightsteelBlue")
+            self.color = name_to_rgb("lightSteelBlue")
             self.points = [110, 0, 100, 80, -100, 80, -100, -80, 100, -80]
             self.shape = self.batch.add_indexed(5, gl.GL_TRIANGLES, self.group, [0, 1, 2, 0, 2, 3, 0, 3, 4],
                                                 ('v2i', self.points), ('c4B', 5 * (*self.color, self.opacity)))

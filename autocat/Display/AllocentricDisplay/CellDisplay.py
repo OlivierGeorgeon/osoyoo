@@ -5,8 +5,9 @@ import math
 import numpy as np
 from . import DISPLAY_POOL
 from ...Memory.EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_BLOCK, \
-    EXPERIENCE_FOCUS, EXPERIENCE_IMPACT, EXPERIENCE_PLACE, EXPERIENCE_CENTRAL_ECHO, EXPERIENCE_PROMPT, FLOOR_COLORS
-from ...Memory.AllocentricMemory.GridCell import CELL_PHENOMENON, CELL_UNKNOWN, CELL_NO_ECHO
+    EXPERIENCE_FOCUS, EXPERIENCE_IMPACT, EXPERIENCE_PLACE, EXPERIENCE_CENTRAL_ECHO, EXPERIENCE_PROMPT, \
+    EXPERIENCE_ROBOT, FLOOR_COLORS
+from ...Memory.AllocentricMemory.GridCell import CELL_UNKNOWN, CELL_NO_ECHO  # , CELL_PHENOMENON
 
 SCALE_LEVEL_0 = 2.5  # 3
 SCALE_LEVEL_1 = 0.8  # 0.9
@@ -96,20 +97,21 @@ class CellDisplay:
         if cell.status[1] == EXPERIENCE_IMPACT:
             color2 = name_to_rgb('salmon')
             opacity2 = int(max(255 * (10 - clock + cell.clock_interaction) / 10, 0))
-        # if cell.status[1] == EXPERIENCE_FLOOR:  # Not used
-        #     color2 = name_to_rgb('black')
+        if cell.status[1] == EXPERIENCE_ROBOT:
+            color2 = name_to_rgb('lightSteelBlue')
+            opacity2 = int(max(255 * (10 - clock + cell.clock_interaction) / 10, 0))
         if cell.status[1] == EXPERIENCE_ALIGNED_ECHO:
             color2 = name_to_rgb('orange')
             opacity2 = int(max(255 * (10 - clock + cell.clock_interaction) / 10, 0))
         if cell.status[1] == EXPERIENCE_CENTRAL_ECHO:
             color2 = name_to_rgb('sienna')
             opacity2 = int(max(255 * (10 - clock + cell.clock_interaction) / 10, 0))
-        if cell.status[1] == CELL_PHENOMENON:
-            color2 = name_to_rgb('yellow')
+        # if cell.status[1] == CELL_PHENOMENON:
+        #     color2 = name_to_rgb('yellow')
         # Reset the color of the shape1
         self.shape2.colors[0:24] = 6 * (*color2, opacity2)
 
-        # Level 3: No echo or focus
+        # Level 3: Focus or Prompt or No Echo
         opacity3 = 255
         if cell.status[3] == EXPERIENCE_FOCUS:
             color3 = name_to_rgb('fireBrick')

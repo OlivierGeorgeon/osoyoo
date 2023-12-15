@@ -56,7 +56,7 @@ class Enaction:
                 matrix44.apply_to_vector(self.command.anticipated_displacement_matrix, self.focus_point).astype(int)
 
         # The simulation of the enaction
-        self.is_simulating = False
+        # self.is_simulating = False
         self.simulation_duration = 0
         self.simulation_rotation_speed = 0
         self.simulation_time = 0.
@@ -66,6 +66,7 @@ class Enaction:
         self.body_direction_delta = 0  # Displayed in BodyView
         self.focus_confidence = CONFIDENCE_NO_FOCUS  # Used by deciders to possibly trigger scan
         self.translation = None  # Used by allocentric memory to move the robot
+        self.yaw_quaternion = None  # Used to compute yaw prediction error
         self.yaw_matrix = None  # Used by bodyView to rotate compass points
         self.displacement_matrix = None  # Used by EgocentricMemory to rotate experiences
 
@@ -97,7 +98,7 @@ class Enaction:
                 self.simulation_rotation_speed = -self.action.rotation_speed_rad
         self.simulation_duration *= SIMULATION_TIME_RATIO
         self.simulation_rotation_speed *= SIMULATION_TIME_RATIO
-        self.is_simulating = True
+        # self.is_simulating = True
         self.simulation_time = 0.
 
     def terminate(self, outcome):
@@ -136,17 +137,17 @@ class Enaction:
 
         # The yaw quaternion
         if outcome.yaw_quaternion is None:
-            # yaw_quaternion = Quaternion.from_z_rotation(self.action.target_duration * self.action.rotation_speed_rad)
-            yaw_quaternion = self.command.anticipated_yaw_quaternion.copy()
+            self.yaw_quaternion = self.command.anticipated_yaw_quaternion.copy()
         else:
-            yaw_quaternion = outcome.yaw_quaternion
-        yaw_integration_quaternion = self.body_quaternion.cross(yaw_quaternion)
+            self.yaw_quaternion = outcome.yaw_quaternion
+        yaw_integration_quaternion = self.body_quaternion.cross(self.yaw_quaternion)
         # print("body_quaternion", repr(self.body_quaternion), "cross yaw_quaternion", repr(yaw_quaternion),
         #       "= yaw_integration_quaternion", repr(yaw_integration_quaternion))
 
         # If the robot returns no compass then the body_quaternion is estimated from yaw
         if outcome.compass_point is None:
             self.body_quaternion = yaw_integration_quaternion
+            corrected_yaw_quaternion = self.yaw_quaternion
         else:
             if self.clock == 0:
                 # On the first interaction, the body_quaternion is given by the compass
@@ -167,9 +168,9 @@ class Enaction:
                 new_body_quaternion = self.outcome.compass_quaternion.slerp(yaw_integration_quaternion, 0.75)
 
                 # Recompute the yaw quaternion
-                yaw_quaternion = new_body_quaternion.cross(self.body_quaternion.inverse)
-                if yaw_quaternion.angle > math.pi:
-                    yaw_quaternion = -yaw_quaternion
+                corrected_yaw_quaternion = new_body_quaternion.cross(self.body_quaternion.inverse)
+                if corrected_yaw_quaternion.angle > math.pi:
+                    corrected_yaw_quaternion = -corrected_yaw_quaternion
 
                 # Update the body_quaternion
                 self.body_quaternion = new_body_quaternion
@@ -177,7 +178,7 @@ class Enaction:
 
         # Compute the displacement matrix which represents the displacement of the environment
         # relative to the robot (Translates and turns in the opposite direction)
-        self.yaw_matrix = matrix44.create_from_quaternion(yaw_quaternion)
+        self.yaw_matrix = matrix44.create_from_quaternion(corrected_yaw_quaternion)
         self.displacement_matrix = matrix44.multiply(matrix44.create_from_translation(-self.translation),
                                                      self.yaw_matrix)
 
