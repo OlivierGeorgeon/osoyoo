@@ -144,10 +144,11 @@ class Enaction:
         # print("body_quaternion", repr(self.body_quaternion), "cross yaw_quaternion", repr(yaw_quaternion),
         #       "= yaw_integration_quaternion", repr(yaw_integration_quaternion))
 
+        corrected_yaw_quaternion = self.yaw_quaternion
         # If the robot returns no compass then the body_quaternion is estimated from yaw
         if outcome.compass_point is None:
             self.body_quaternion = yaw_integration_quaternion
-            corrected_yaw_quaternion = self.yaw_quaternion
+            # corrected_yaw_quaternion = self.yaw_quaternion
         else:
             if self.clock == 0:
                 # On the first interaction, the body_quaternion is given by the compass

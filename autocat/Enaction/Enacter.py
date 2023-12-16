@@ -22,6 +22,7 @@ class Enacter:
         self.interaction_step = ENACTION_STEP_IDLE
         self.memory_snapshot = None
         self.is_simulating = False
+        self.simulation_diration1 = 0
         self.forward_duration1_prediction_error = {}
         self.yaw_prediction_error = {}
         self.compass_prediction_error = {}
@@ -52,13 +53,20 @@ class Enacter:
 
         # ENACTING: Simulate the enaction in memory
         if self.interaction_step == ENACTION_STEP_ENACTING:
-            simulated_outcome = self.simulate(dt)
-            # If imagining then use the imagined outcome when the simulation is finished
-            if self.workspace.is_imagining and simulated_outcome is not None:
-                self.workspace.enaction.terminate(simulated_outcome)
-                if not self.workspace.composite_enaction.increment(simulated_outcome):
-                    self.workspace.composite_enaction = None
-                self.interaction_step = ENACTION_STEP_INTEGRATING
+            if self.is_simulating:
+                self.simulate(dt)
+            else:
+                # If imagining then use the imagined outcome when the simulation is finished
+                simulated_outcome = Outcome(
+                    {"action": self.workspace.enaction.action.action_code, "clock": self.workspace.enaction.clock,
+                     "floor": 0,
+                     "duration1": self.simulation_diration1, 'status': "I", 'head_angle': 0,
+                     'echo_distance': 300})
+                if self.workspace.is_imagining:
+                    self.workspace.enaction.terminate(simulated_outcome)
+                    if not self.workspace.composite_enaction.increment(simulated_outcome):
+                        self.workspace.composite_enaction = None
+                    self.interaction_step = ENACTION_STEP_INTEGRATING
             # If not imagining then CtrlRobot will return the outcome and proceed to INTEGRATING
 
         # INTEGRATING: the new enacted interaction
@@ -74,9 +82,14 @@ class Enacter:
                 # self.workspace.message = None
 
             # Force terminate the simulation
-            if self.is_simulating:
+            if simulated_outcome is None:
                 self.is_simulating = False
-                self.simulate(dt)
+                simulated_outcome = Outcome(
+                    {"action": self.workspace.enaction.action.action_code, "clock": self.workspace.enaction.clock,
+                     "floor": 0,
+                     "duration1": self.simulation_diration1, 'status': "I", 'head_angle': 0,
+                     'echo_distance': 300})
+                print("Force terminate simulation")
             # Compute the prediction errors
             self.prediction_error(simulated_outcome)
 
@@ -103,17 +116,14 @@ class Enacter:
 
         enaction = self.workspace.enaction
         memory = self.workspace.memory
-        duration1 = 0
 
-        # if enaction.is_simulating:
         if self.is_simulating:
             # Check the target time
             enaction.simulation_time += dt
             if enaction.simulation_time >= enaction.simulation_duration:
                 dt += enaction.simulation_duration - enaction.simulation_time  # Adjust to the exact duration
-                # enaction.is_simulating = False
                 self.is_simulating = False
-                duration1 = enaction.simulation_duration * 1000
+                self.simulation_diration1 = enaction.simulation_duration * 1000
 
             # The intermediate displacement
             yaw_quaternion = Quaternion.from_z_rotation((enaction.simulation_rotation_speed * dt))
@@ -138,7 +148,7 @@ class Enacter:
             # Displacement in body memory
             memory.body_memory.body_quaternion = memory.body_memory.body_quaternion.cross(yaw_quaternion)
             if memory.egocentric_memory.focus_point is not None:
-                # Simulate the head to focus alignment
+                # Keep the head aligned to the focus
                 head_direction_degree, _ = point_to_echo_direction_distance(memory.egocentric_memory.focus_point)
                 memory.body_memory.set_head_direction_degree(head_direction_degree)
 
@@ -147,23 +157,18 @@ class Enacter:
             memory.allocentric_memory.place_robot(memory.body_memory, enaction.clock)
             # If crossed the line then stop the simulation
             i, j = point_to_cell(memory.allocentric_memory.robot_point)
-            if memory.allocentric_memory.grid[j][j].status[0] == EXPERIENCE_FLOOR:
-                # enaction.is_simulating = False
+            if (memory.allocentric_memory.min_i <= i <= memory.allocentric_memory.max_i) and \
+                (memory.allocentric_memory.min_j <= j <= memory.allocentric_memory.max_j) and \
+                    memory.allocentric_memory.grid[i][j].status[0] == EXPERIENCE_FLOOR:
                 self.is_simulating = False
-                duration1 = enaction.simulation_time * 1000
+                self.simulation_diration1 = enaction.simulation_time * 1000
 
-        # When the simulation is over, return the simulated outcome
-        # if enaction.is_simulating:
-        if self.is_simulating:
-            return None
-        else:
-            # if enaction.command.duration is None:
-            #     duration1 = enaction.action.target_duration * 1000
-            # else:
-            #     duration1 = enaction.command.duration
-            # The yaw will be computed as if the robot had no imu
-            return Outcome({"action": enaction.action.action_code, "clock": enaction.clock, "floor": 0,
-                            "duration1": duration1, 'status': "I", 'head_angle': 0, 'echo_distance': 300})
+        # # When the simulation is over, return the simulated outcome
+        # if self.is_simulating:
+        #     return None
+        # else:
+        #     return Outcome({"action": enaction.action.action_code, "clock": enaction.clock, "floor": 0,
+        #                     "duration1": self.simulation_diration1, 'status': "I", 'head_angle': 0, 'echo_distance': 300})
 
     def prediction_error(self, simulated_outcome):
         """Compute the prediction errors"""
@@ -174,22 +179,22 @@ class Enacter:
         if self.workspace.enaction.action.action_code in [ACTION_FORWARD, ACTION_SWIPE]:
             pe = simulated_outcome.duration1 - self.workspace.enaction.outcome.duration1
             self.forward_duration1_prediction_error[self.workspace.enaction.clock] = pe
-            self.forward_duration1_prediction_error = {key: d for key, \
-                d in self.forward_duration1_prediction_error.items() if \
-                key > self.workspace.enaction.clock - PREDICTION_ERROR_AVERAGE_SPAN}
-            print("Prediction Error Translate duration1 (simulation - measured)=", pe,
+            self.forward_duration1_prediction_error = {key: d for key,
+                d in self.forward_duration1_prediction_error.items() if
+                    key > self.workspace.enaction.clock - PREDICTION_ERROR_AVERAGE_SPAN}
+            print("Prediction Error Translate duration1 (simulation - measured)=", round(pe),
                   "Average:", round(np.mean(list(self.forward_duration1_prediction_error.values()))),
                   "std:", round(np.std(list(self.forward_duration1_prediction_error.values()))))
 
         # yaw
 
-        pe = -short_angle(enaction.command.anticipated_yaw_quaternion, enaction.yaw_quaternion)
+        pe = math.degrees(-short_angle(enaction.command.anticipated_yaw_quaternion, enaction.yaw_quaternion))
         self.yaw_prediction_error[self.workspace.enaction.clock] = pe
         self.yaw_prediction_error = {key: d for key, d in self.yaw_prediction_error.items() if
                                      key > enaction.clock - PREDICTION_ERROR_AVERAGE_SPAN}
-        print("Prediction Error Yaw (command - measure)=", pe,
-              "Average:", round(np.mean(list(self.yaw_prediction_error.values()))),
-              "std:", round(np.std(list(self.yaw_prediction_error.values()))))
+        print("Prediction Error Yaw (command - measure)=", round(pe, 1),
+              "Average:", round(np.mean(list(self.yaw_prediction_error.values())), 1),
+              "std:", round(np.std(list(self.yaw_prediction_error.values())), 1))
 
         # Compass prediction error to calibrate gyro_coef is correct
 
