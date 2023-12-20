@@ -9,7 +9,7 @@ If you are interested in starting this project, you should read this file first.
 I am that new learner -- trying to figure out how to even start this project.
 
 
-#Busy Life Note
+**Busy Life Note**
 
 I am super busy until the middle of February 2024 -- thus I will update this project page slowly until then. By mid February I will start writing much more often.
 Any questions before? Please email me to:  hschneidermd@alum.mit.edu
