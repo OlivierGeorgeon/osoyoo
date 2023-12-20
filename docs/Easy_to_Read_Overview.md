@@ -3,7 +3,7 @@
 
 Welcome!! Bienvenue!! Tunngasugit!!
 
-(I am in Canada -- these are our official languages -- English, French and a semi-official third (indigenous) language of Inuktut.)
+(I am in Canada -- these are our official languages -- English, French and a semi-official third (indigenous) language of Inuktitut.)
 
 If you are interested in starting this project, you should read this file first. Why? Because it is written from from a first-person viewpoint that tries to answer the big questions of why do this project, how to start, how to implement, and so on. If you think back to learning a new subject in university -- wasn't it better to get tutorial help from a friend who just learned it rather than someone who had already knew the subject for twenty years -- that's because the new learner has in his/her brain the steps that need to be overcome, while the experience person has integrated these steps and may not teach them.
 I am that new learner -- trying to figure out how to even start this project.
