@@ -116,7 +116,7 @@ https://osoyoo.com/manual/V1.3metal-mecanum.pdf_*
 
 Well... the picture of the robot on the front of all three manuals is identical, showing a 3-point tracking module.
 
-![image on the first page of all the PDF manuals](version3.jpg)
+![image on the first page of all the PDF manuals](version3.png)
 
 But, the robot I received has a black acrylic board and 5-point tracking module:
 
