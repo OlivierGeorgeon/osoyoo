@@ -150,21 +150,20 @@ Again, as noted above --I am using the Model 2 manual in my overview of the robo
 
 Before we start constructing the robot car, let's take a look at some of the parts and then quickly take an overview of the documentation. 
 
-There is a metal bottom chassis where the drive motors will be attached. When assembled it will look like this:
+There is a metal bottom chassis where the drive motors will be attached.  (Note that the straps are still loose until the assembly is completed and wires are tucked away.) When assembled it will look like this:
 ![5-point tracking module](underneath.jpg)
 
 Note that there is a separate drive motor for each of the four wheels. Note also there there is no steering apparatus. This is because these are Ilon Mecanum wheels  (or "omni wheels") that can go forwards and backwards, but also sideways. Note that the wheels are constructed of rollers at an angle of 45 degrees to the axis of rotation.
 
 ![mecanum wheels directions of motion](mecanumwheel.png)
 
-
-On top of this metal bottom plate there will be a top acrylic plate. The electronics will all be mounted on this top acrylic plate. 
+On top of this metal bottom plate there will be a top acrylic plate. The electronics will all be mounted on this top acrylic plate.
 
 With regard to the electronics, note that there are three main electronics boards included. One of them is the motor driver board -- this board will control the motors attached to each wheel. Then there is the Mega2560 Arduino board. If you have not worked with Arduino before I will show you all the steps involved -- very easy. The Arduino board is the computer board essentially controlling the robotic car. Into the Arduino board there is a Wifi shield (Esp8266) which will give the system Wifi access. There is a USB cable which plugs into the Arduino board and forms an easy to use interface with your laptop enabling you later to send your software to the Arduino board.
 
 There are some smaller electronics boards also, e.g., Bluetooth module, tracking sensor module, etc. We will discuss them as we use them.
 
-When assembled it will look like this. (Note that the straps are still loose until the assembly is completed and wires are tucked away.)
+When assembled it will look like this:
 ![black acrylic board](wiring.jpg)
 
 Note the blue lithium batteries. In the kit parts there should be a battery charger along with its USB cable which can charge these batteries.
@@ -174,9 +173,13 @@ Before we start building the robot car, let's have a quick look at the documenta
 The PDF Model M2.0 documentation is divided into five "lessons." 
 
 Lesson 1 -- Assembly of the mechanical parts electronic parts, and installing the Arduino IDE
+
 Lesson 2 -- Use of the ultrasonic and servomechanism modules to avoid objects
+
 Lesson 3 -- Use of the 5-point tracking sensor to follow a black track line
+
 Lesson 4 -- Bluetooth interface to the robot car
+
 Lesson 5 -- Wifi interface to the robot car
 
 
