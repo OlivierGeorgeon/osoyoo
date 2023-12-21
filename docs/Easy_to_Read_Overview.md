@@ -117,6 +117,17 @@ Note that there is a separate drive motor for each of the four wheels. Note also
 
 ![mecanum wheels directions of motion](mecanumwheel.png)
 
+With regard to the electronics, note that there are three main electronics boards included. One of them is the motor driver board -- this board will control the motors attached to each wheel. Then there is the Mega2560 Arduino board. If you have not worked with Arduino before I will show you all the steps involved -- very easy. The Arduino board is the computer board essentially controlling the robotic car. Into the Arduino board there is a Wifi shield which will give the system Wifi access. There is a USB cable which plugs into the Arduino board and forms an easy to use interface with your laptop enabling you later to send your software to the Arduino board.
+
+There are some smaller electronics boards also, e.g., tracking sensor module, etc. We will discuss them as we use them.
+
+Note the blue lithium batteries. Note also a battery charger along with its cable which can charge these batteries.
+
+
+
+**Step #5 -- Start to Build the Robot Car -- Mechanical Assembly**
+
+Ok.... you have all the parts, you are somewhat familiar with the parts and you have downloaded the PDF manual. Let's start building....
 
 
 
