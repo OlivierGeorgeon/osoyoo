@@ -82,7 +82,7 @@ I will provide the exact AliExpress link I used to purchase these extra navigati
 [optional suspension modification](https://www.aliexpress.com/p/order/detail.html?orderId=8181122933346371&tracelog=rowan&rowan_id1=logistics_default_20221027_1_en_US_2023-12-01&rowan_msg_id=6371818112293334$c4e092f521e04fa782e9b76ba8415f9f&ck=in_edm_other)
 
 
-**Step #4 -- Starting Constructing the Robot Car **
+**Step #4 -- Starting Constructing the Robot Car**
 
 
 
