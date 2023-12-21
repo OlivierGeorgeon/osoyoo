@@ -96,12 +96,12 @@ A few days (or day -- Amazon.com is very efficient) have gone by and a package a
 
 Open the box, make sure that all the parts are there and are in good condition. (Mine were -- everything included and seemed brand new and in good condition.)
 
-There is a cardboard sheet with a list of parts in Japanese -- you can use it and exercise your brain to learn some new symbols (assuming you don't read/write Japanese) and think about Harnad's concepts of symbols and grounding, e.g., 
-[cca5 inductive analogical soln to grounding problem](https://www.sciencedirect.com/science/article/abs/pii/S1389041722000493?via%3Dihub)
+There is a cardboard sheet with a list of parts in Japanese -- you can use it and exercise your brain to learn some new symbols (assuming you don't read/write Japanese) and think about Harnad's concepts of symbols and grounding, e.g., [cca5 inductive analogical soln to grounding problem](https://www.sciencedirect.com/science/article/abs/pii/S1389041722000493?via%3Dihub)
 
 Or... you can turn the cardboard sheet over and read it in English :)
+![Online link for this cardboard sheet of parts list in English](https://osoyoo.com/2019/11/08/omni-direction-mecanum-wheel-robotic-kit-v1/#4)
 
-There will be a little manul with the car. It really only serves the purpose of telling you to go online and look at the manual there:
+There will be a little manual with the car. It really only serves the purpose of telling you to go online and look at the manual(s) there:
 
 [Osoyoo manual](https://osoyoo.com/?p=49235)
 
@@ -109,7 +109,7 @@ You will go to a busy webpage with all sorts of advertising scrolling by on the 
 If you look at the center of the screen you will see a link to a PDF to download the PDF version of the manual -- do this so you can minimize the time spent on this website :)
 
 Here is the link (although in case it changes, becomes updated, etc in the future you may want to go to the online manual link above):
-[PDF manual for Osoyoo robotic car kit](https://osoyoo.com/manual/202000600-m2.pdf)
+[Useful PDF manual for Osoyoo robotic car kit](https://osoyoo.com/manual/202000600-m2.pdf)
 
 Before we start constructing the robot car, take a look at some of the parts. There is a metal bottom chassis where the drive motors will be attached. On top of this metal bottom plate there will be a top acrylic plate. The electronics will all be mounted on this top acrylic plate.
 
@@ -122,6 +122,15 @@ With regard to the electronics, note that there are three main electronics board
 There are some smaller electronics boards also, e.g., tracking sensor module, etc. We will discuss them as we use them.
 
 Note the blue lithium batteries. Note also a battery charger along with its cable which can charge these batteries.
+
+Before we start building the robot car, let's have a quick look at the documentation (always a good idea no matter what project you are working on).
+
+Please download the PDF rather than use the webpages with quasi-psychedelic advertisements flashing all over your screen. (After looking at the web pages, certainly at the time of this writing, you are wondering to yourself.... 'What kind of junk hardware is this?'  But, let me assure you, the hardware is not only cool but fairly well engineered. Ignore the webpages and download the manual, if you have not already done so.)
+Link to download the PDF (ignore if you already downloaded it above): 
+[Osoyoo manual](https://osoyoo.com/?p=49235)
+
+The PDF Manual for the robot car is decent. Let's take a look at it.
+
 
 
 
