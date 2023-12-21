@@ -60,6 +60,8 @@ Product title: OSOYOO Omni-directinal Mecanum Wheels Robotic Car Kit for Arduino
 Product cost (at time of writing):  US$119.99   (plus about $25 to ship to Canada, but free shipping within USA if you have Prime)
 link:  [amazon product link](https://www.amazon.com/OSOYOO-Omni-directinal-Controlled-Educational-Mechanical/dp/B0821DV5GJ/ref=sr_1_2?crid=1S643UFKFPI0E&keywords=osoyoo+omni+directional+mecanum+wheels+robot+car+kit+for+arduino&qid=1703129510&sprefix=osoyoo+omni-direction%2Caps%2C97&sr=8-2)
 
+Troubleshooting note:  If you are able to allocate sufficient research funds, I would advise purchasing two kits so troubleshooting any issues with the hardware becomes easier. (Disclosure: I did not. I purchased a single kit with the expectation that I could get efficient Amazon.com delivery of a second kit should I need it.)
+
 **Please purchase this exact model noted above** unless you want to make modifications to the code on your own.
 
 In countries outside of Canada and USA, I would still recommend considering Amazon for easy delivery in certain countries where the Amazon service is efficient. In other countries consider the Osoyoo website:
@@ -85,11 +87,17 @@ I will provide the exact AliExpress link I used to purchase these extra navigati
 
 [optional suspension modification](https://www.aliexpress.com/p/order/detail.html?orderId=8181122933346371&tracelog=rowan&rowan_id1=logistics_default_20221027_1_en_US_2023-12-01&rowan_msg_id=6371818112293334$c4e092f521e04fa782e9b76ba8415f9f&ck=in_edm_other)
 
+Troubleshooting note:  If you are able to allocate sufficient research funds, I would advise purchasing two sets of electronic parts so troubleshooting any issues with the hardware becomes easier. (Disclosure: I did not.) 
 
 
-**Step #4 -- Starting Constructing the Robot Car**
 
+**Step #4 -- Start to Build the Robot Car**
 
+A few days (or day -- Amazon.com is very efficient) have gone by and a package arrives at your lab, office (or home perhaps). It's the Osoyoo robotic car kit.
+
+Open the box, make sure that all the parts are there and are in good condition. (Mine were -- everything included and seemed brand new and in good condition.)
+
+There is a cardboard sheet with a list of parts in Japanese -- you can use it and exercise your brain to learn some new symbols (assuming you don't read/write Japanese) and think about 
 
 
 
