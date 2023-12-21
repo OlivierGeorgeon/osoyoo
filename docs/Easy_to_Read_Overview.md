@@ -123,7 +123,7 @@ Ok... let's work backwards from the online manual to the Oyosoo hosting site and
 
 I think this is reasonable as I purchased my kit from Amazon November 2023, and I assume it is already 2024 or later when you the reader are reading this, and most likely you will have a later model as well. Also, it seems that the models and versions are somewhat similar, so my overview should be useful to you regardless of the model that you have. (Look at the version number on your parts list. Also match your robot to the descriptions above. If you have a version 1, i.e., 1.1, 1.2, or 1.3 version robot kit, then download one of the manuals listed agove.)  
 
-For myself and those of you with a Model 2 robot kit (which should be most users in the future, if not a more advanced mode1) we should download this PDF manual:
+For myself and those of you with a Model 2 robot kit (which should be most users in the future, if not a more advanced model) we should download this PDF manual:
  [model 2 PDF manual](https://osoyoo.com/manual/202000600-m2.pdf)
 
 Great -- the robot shown on the cover the manual matches the car I received:
