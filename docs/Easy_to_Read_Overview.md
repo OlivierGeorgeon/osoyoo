@@ -125,6 +125,7 @@ Note the blue lithium batteries. Note also a battery charger along with its cabl
 
 
 
+
 **Step #5 -- Start to Build the Robot Car -- Mechanical Assembly**
 
 Ok.... you have all the parts, you are somewhat familiar with the parts and you have downloaded the PDF manual. Let's start building....
