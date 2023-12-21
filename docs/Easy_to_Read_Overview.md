@@ -61,6 +61,8 @@ link:  [amazon product link](https://www.amazon.com/OSOYOO-Omni-directinal-Contr
 In countries outside of Canada and USA, I would still recommend considering Amazon for easy delivery in certain countries where the Amazon service is efficient. In other countries consider the Osoyoo website:
 [osoyoo website](https://osoyoo.com/)
 
+Note: The Amazon website says this is a kit for teens while the Osoyoo website shows 5 years old building robotic kits (albeit simpler ones). Please keep in mind you are not buying this kit to produce a project for your high school science fair. You are buying this kit to have a grounded physical embodiment of an AI/AGI system which you then can use with tens of thousands lines of your Python code.
+
 
 **Step #3 -- Purchase the extra electronic parts**
 
