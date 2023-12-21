@@ -192,7 +192,7 @@ Assembled chassis (Note that the straps are still loose until the assembly is co
 
 **Step #7 -- Assembly of Electronic Parts on the Acrylic Board above the chassis** 
 
--Follow the instruction manual to prepare the acrylic board and then instll the electronic modules as shown.
+-Follow the instruction manual to prepare the acrylic board and then install the electronic modules as shown.
 
 -To avoid static damage to the electronic components I would strongly advise doing these steps near a sink. Hold onto one of the water pipes to ground yourself and then you can do an operation. Then ground yourself again with each operation. It's ok to let go of the water pipe when you insert the electronics -- if you're not walking around it's unlikely you'll build up much static in a few seconds.
 
