@@ -56,6 +56,18 @@ Product title: OSOYOO Omni-directinal Mecanum Wheels Robotic Car Kit for Arduino
 Product cost (at time of writing):  US$119.99   (plus about $25 to ship to Canada, but free shipping within USA if you have Prime)
 link:  [amazon product link](https://www.amazon.com/OSOYOO-Omni-directinal-Controlled-Educational-Mechanical/dp/B0821DV5GJ/ref=sr_1_2?crid=1S643UFKFPI0E&keywords=osoyoo+omni+directional+mecanum+wheels+robot+car+kit+for+arduino&qid=1703129510&sprefix=osoyoo+omni-direction%2Caps%2C97&sr=8-2)
 
+**Please purchase this exact model noted above** unless you want to make modifications to the code on your own.
+
+In countries outside of Canada and USA, I would still recommend considering Amazon for easy delivery in certain countries where the Amazon service is efficient. In other countries consider the Osoyoo website:
+[osoyoo website](https://osoyoo.com/)
+
+
+**Step #3 -- Purchase the extra electronic parts**
+
+You may not need these extra navigation parts immediately, but since they are purchased from AliExpress and generally delivered from China via slow delivery means (given that the sum total of the parts is about US$30), you may want to order these parts once you decide to go ahead with the project.
+
+
+
 
 
 
