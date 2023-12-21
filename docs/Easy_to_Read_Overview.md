@@ -39,9 +39,22 @@ Your first step should be to decide to build this robotic car project. Are you w
 In terms of monetary cost expect to spend about US$200 on the project (I know the Amazon.com prices are not this high, but shipping to other countries, extra parts from AliExpress, etc will push up the price). 
 
 In terms of electronics expertise, very little is needed if everything gets assembled correctly and all parts are working. If you want to modify the design, if there is more advanced troubleshooting, then of course more is better.
-In terms of software expertise, you need to be comfortable moving around files and using Python. The Arduino IDE and code you can install and copy without great expertise. Of course, if you have the time, you can spend more hours getting more expertise in the Arduino ecosystem and the lower level Python routines.
+In terms of software expertise, you need to be comfortable moving around files and using Python. The Arduino IDE and code you can install and copy without great expertise. Of course, if you have the time, you can spend more hours getting more expertise in the Arduino ecosystem and more familiarity with the systems Python routines used by the project.
 
 **Step #2 -- Purchase the Robot Car kit**
+
+I assume you already have a Windows, Linux or Mac computer to use with this project. I used a Windows PC, and thus I will be describing my experience from a Windows point of view. However, application to Linux or Mac should be straightforward if that's what you are using.
+
+There are two purchases:
+1 - Purchasing the Robot Car Kit
+2 - Purchasing the extra electronic parts
+
+In this section we will talk about purchasing the Robot Car kit.
+Although I am in Canada, and although Osoyoo is actually based in Canada (although the robot kit parts are from China), it is much easier to order from the USA Amazon website:
+
+Product title: OSOYOO Omni-directinal Mecanum Wheels Robotic Car Kit for Arduino Mega2560 Metal Chassis DC Motor DIY STEM Remote Controlled Educational Mechanical DIY Coding for Teens Adult
+Product cost (at time of writing):  US$119.99   (plus about $25 to ship to Canada, but free shipping within USA if you have Prime)
+link:  [amazon product link](https://www.amazon.com/OSOYOO-Omni-directinal-Controlled-Educational-Mechanical/dp/B0821DV5GJ/ref=sr_1_2?crid=1S643UFKFPI0E&keywords=osoyoo+omni+directional+mecanum+wheels+robot+car+kit+for+arduino&qid=1703129510&sprefix=osoyoo+omni-direction%2Caps%2C97&sr=8-2)
 
 
 
