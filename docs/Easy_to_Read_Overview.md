@@ -32,6 +32,8 @@ Even if Tesla Bots, for sake of example, were available, you wouldn't want to us
 
 ![tesla bot gen 2](teslabot.jpg)
 
+
+
 **Step #1 -- Decide if you want to do the Project**
 
 Your first step should be to decide to build this robotic car project. Are you working on an AI/AGI project that it could be useful for? (Actually, it is probably useful for most projects, including LLMs.) Do you have an interest in robotics and would like to see an interface to an AI project?
@@ -40,6 +42,8 @@ In terms of monetary cost expect to spend about US$200 on the project (I know th
 
 In terms of electronics expertise, very little is needed if everything gets assembled correctly and all parts are working. If you want to modify the design, if there is more advanced troubleshooting, then of course more is better.
 In terms of software expertise, you need to be comfortable moving around files and using Python. The Arduino IDE and code you can install and copy without great expertise. Of course, if you have the time, you can spend more hours getting more expertise in the Arduino ecosystem and more familiarity with the systems Python routines used by the project.
+
+
 
 **Step #2 -- Purchase the Robot Car kit**
 
@@ -64,9 +68,26 @@ In countries outside of Canada and USA, I would still recommend considering Amaz
 Note: The Amazon website says this is a kit for teens while the Osoyoo website shows 5 years old building robotic kits (albeit simpler ones). Please keep in mind you are not buying this kit to produce a project for your high school science fair. You are buying this kit to have a grounded physical embodiment of an AI/AGI system which you then can use with tens of thousands lines of your Python code.
 
 
+
 **Step #3 -- Purchase the extra electronic parts**
 
 You may not need these extra navigation parts immediately, but since they are purchased from AliExpress and generally delivered from China via slow delivery means (given that the sum total of the parts is about US$30), you may want to order these parts once you decide to go ahead with the project.
+
+I will provide the exact AliExpress link I used to purchase these extra navigation components:
+
+[flight control sensor](https://www.aliexpress.com/item/1005003478577853.html?spm=a2g0o.order_detail.order_detail_item.3.1437f19cTglF4n)
+[optional hex soecket set screws](https://www.aliexpress.com/item/1005003699221015.html?spm=a2g0o.order_detail.order_detail_item.3.edeef19cPldfHc)
+[optional board spacers](https://www.aliexpress.com/item/1005004818109229.html?spm=a2g0o.order_detail.order_detail_item.3.7b0cf19cGpkdzc)
+[RGB sensor](https://www.aliexpress.com/p/order/detail.html?orderId=8179818649326371&tracelog=rowan&rowan_id1=waiting_to_leave_feedback_20220522_1_en_US_2023-12-16&rowan_msg_id=6371817981864932$1745f75e47ff45f580e4cc8a93d419d6&ck=in_edm_other)
+[optional suspension modification](https://www.aliexpress.com/p/order/detail.html?orderId=8181122933346371&tracelog=rowan&rowan_id1=logistics_default_20221027_1_en_US_2023-12-01&rowan_msg_id=6371818112293334$c4e092f521e04fa782e9b76ba8415f9f&ck=in_edm_other)
+
+
+**Step #4 -- Starting Constructing the Robot Car **
+
+
+
+
+
 
 
 
