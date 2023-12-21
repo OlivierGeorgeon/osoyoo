@@ -96,10 +96,10 @@ A few days (or day -- Amazon.com is very efficient) have gone by and a package a
 
 Open the box, make sure that all the parts are there and are in good condition. (Mine were -- everything included and seemed brand new and in good condition.)
 
-There is a cardboard sheet with a list of parts in Japanese -- you can use it and exercise your brain to learn some new symbols (assuming you don't read/write Japanese) and think about Harnad's concepts of symbols and grounding, e.g., [cca5 inductive analogical soln to grounding problem](https://www.sciencedirect.com/science/article/abs/pii/S1389041722000493?via%3Dihub)
+There is a cardboard sheet with a list of parts in Japanese -- you can use it and exercise your brain to learn some new symbols (assuming you don't read/write Japanese) and think about Harnad's concepts of symbols and grounding, e.g., [grounding problem](https://www.sciencedirect.com/science/article/abs/pii/S1389041722000493?via%3Dihub)
 
 Or... you can turn the cardboard sheet over and read it in English :)
-![Online link for this cardboard sheet of parts list in English](https://osoyoo.com/2019/11/08/omni-direction-mecanum-wheel-robotic-kit-v1/#4)
+[Online link for this cardboard sheet of parts list in English](https://osoyoo.com/2019/11/08/omni-direction-mecanum-wheel-robotic-kit-v1/#4)
 
 There will be a little manual with the car. It really only serves the purpose of telling you to go online and look at the manual(s) there:
 
