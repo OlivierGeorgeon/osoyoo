@@ -83,7 +83,7 @@ I will provide the exact AliExpress link I used to purchase these extra navigati
 
 [optional board spacers](https://www.aliexpress.com/item/1005004818109229.html?spm=a2g0o.order_detail.order_detail_item.3.7b0cf19cGpkdzc)
 
-[RGB sensor](https://www.aliexpress.com/p/order/detail.html?orderId=8179818649326371&tracelog=rowan&rowan_id1=waiting_to_leave_feedback_20220522_1_en_US_2023-12-16&rowan_msg_id=6371817981864932$1745f75e47ff45f580e4cc8a93d419d6&ck=in_edm_other)
+[RGB sensor](https://www.aliexpress.com/item/1005003484925759.html?spm=a2g0o.order_detail.order_detail_item.3.4f67f19cQhDc0g)
 
 [optional suspension modification](https://www.aliexpress.com/p/order/detail.html?orderId=8181122933346371&tracelog=rowan&rowan_id1=logistics_default_20221027_1_en_US_2023-12-01&rowan_msg_id=6371818112293334$c4e092f521e04fa782e9b76ba8415f9f&ck=in_edm_other)
 
