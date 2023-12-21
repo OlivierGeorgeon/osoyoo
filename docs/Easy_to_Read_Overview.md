@@ -11,13 +11,6 @@ Why? Because it is written from from a first-person viewpoint that tries to answ
 I am that new learner -- trying to figure out how to even start this project. Let me guide you into what I believe you will find will be a very advantageous and satisfying project.
 
 
-**Busy Life Note**
-
-I am super busy until the middle of February 2024 -- thus I will update this project readme/wiki slowly until then. By mid February I will start writing much more often.
-Any questions before? Please email me to:  hschneidermd@alum.mit.edu
-
---
-
 ![assembled robot car](robotcar.jpg)
 
 
