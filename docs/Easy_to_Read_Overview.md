@@ -177,7 +177,30 @@ Lesson 5 -- Wifi interface to the robot car -- the Wifi shield has already been 
 
 
 
+**Step #6 -- Assembly of Parts on the Underside of the Chassis** 
 
+-Follow the instruction manual to bolt into place the motor holders. The install the jackscrews and couplings on the motors, and install the motors as shown in the manual. There are nylon tie wraps to hold the extra wires. Note that these motors (one for each wheel) have hall sensors (the white, yellow, orange, green lines) but they are apparently not being used and are just tucked away. Only the ground black and power red wires will go to the electronics through the center hole in the chassis.
+
+-Pay attention when you are installing the Mecanum wheels -- follow the orientation shown in the manual.
+
+-Then install the tracking sensor (which should be a 5-point one in the Model 2) to the chassis as shown.
+
+Assembled chassis (Note that the straps are still loose until the assembly is completed and wires are tucked away.) When assembled it will look like this:
+![5-point tracking module](underneath.jpg)
+
+
+
+**Step #7 -- Assembly of Electronic Parts on the Acrylic Board above the chassis** 
+
+-Follow the instruction manual to prepare the acrylic board and then instll the electronic modules as shown.
+
+-To avoid static damage to the electronic components I would strongly advise doing these steps near a sink. Hold onto one of the water pipes to ground yourself and then you can do an operation. Then ground yourself again with each operation. It's ok to let go of the water pipe when you insert the electronics -- if you're not walking around it's unlikely you'll build up much static in a few seconds.
+
+-Follow the manual very carefully to orientate the electronic modules as shown.
+
+-Then follow the manual and insert the wires connecting the motors to the motor control board.
+
+![inserting motor wires](motorwires.png)
 
 
 
