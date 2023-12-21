@@ -90,7 +90,7 @@ Troubleshooting note:  If you are able to allocate sufficient research funds, I 
 
 
 
-**Step #4 -- Start to Build the Robot Car -- Finding the Documentation**
+**Step #4 -- Receiving the Robot Car Kit -- Finding the Documentation**
 
 A few days (or day -- Amazon.com is very efficient) have gone by and a package arrives at your lab, office (or home perhaps). It's the Osoyoo robotic car kit.
 
@@ -102,7 +102,12 @@ Or... you can turn the cardboard sheet over and read it in English :)
 ![ver3 listing of parts](ver3packlist.jpg)
 
 Wait!! The displayed sheet says version 1.3 but the cardboard sheet that I have says M2.0 (SKU 2020006000). The parts listed are all the same parts in my kit, but it appears I would have version 2 (I assume that is what M2.0 stands for) while the displayed sheet would indicate this is for version 3.
-But...wait again!!  The manual says there are three versions 1.1, 1.2, 1.3 which are distinguished as follows:
+
+Let's see what the manual says.
+There is a little manual with the car. However, it really only serves the purpose of telling you to go online and look at the manual(s) there:
+[Osoyoo manual](https://osoyoo.com/?p=49235)
+
+Hmm.... what version is my robotic car kit? The manual says there are three versions 1.1, 1.2, 1.3 which are distinguished as follows:
 
 *If you received a black acrylic board and 3-point tracking module, please download the V1.1 manual.*
 https://osoyoo.com/manual/V1.1metal-mecanum.pdf
@@ -112,7 +117,6 @@ https://osoyoo.com/manual/V1.2metal-mecanum.pdf
 
 *If you received a black acrylic board and 5-point tracking module, please download the V1.3 manual.*
 https://osoyoo.com/manual/V1.3metal-mecanum.pdf_*
-
 
 Well... the picture of the robot on the front of all three manuals is identical, showing a 3-point tracking module.
 
@@ -124,43 +128,42 @@ But, the robot I received has a black acrylic board and 5-point tracking module:
 
 ![5-point tracking module](underneath.jpg)
 
-Thus, I will assume that I have version 1.3 and thus I will download the V1.3 manual. Therefore, this overview of the robot car will be from the perspective of the 1.3 model.
-I think this is reasonable as I purchased my kit from Amazon November 2023, and I assume it is already 2024 or later when you the reader are reading this, and most likely you will have a later model as well. Also, it seems that the versions are somewhat similar, so my overview should be useful to you regardless of the model that you have.
+But.... why does my cardboard sheet say "M2" which would indicate model 2, i.e., perhaps this is no longer the version 1 series. Ok... let's work backwards from the online manual to the Oyosoo hosting site and let's see if there are other models listed.... yes indeed, there is a Model 2. Thus, I will assume that I have model 2 and thus I will download the M2 manual. Therefore, this overview of the robot car will be from the perspective of the M2 model.
+
+I think this is reasonable as I purchased my kit from Amazon November 2023, and I assume it is already 2024 or later when you the reader are reading this, and most likely you will have a later model as well. Also, it seems that the models and versions are somewhat similar, so my overview should be useful to you regardless of the model that you have.
 
 Ok...therefore we will be downloading this manual:
 [Useful PDF manual for Osoyoo robotic car kit](https://osoyoo.com/manual/202000600-m2.pdf)
 
 
 
-**Step #5 -- Start to Build the Robot Car -- Overview of the Documentation**
+**Step #5 -- Overview of the Parts and of the Documentation**
 
 Ok... you've downloaded PDF manual.
+(I am using Model 2 manual in my overview of the robot car:  [model 2 PDF manual](https://osoyoo.com/manual/202000600-m2.pdf)
 
-![image on the first page of all the PDF manuals](version3.jpg)
+Before we start constructing the robot car, let's take a look at some of the parts and then quickly take an overview of the documentation. 
 
-There will be a little manual with the car. It really only serves the purpose of telling you to go online and look at the manual(s) there:
-
-[Osoyoo manual](https://osoyoo.com/?p=49235)
-
-You will go to a busy webpage with all sorts of advertising scrolling by on the bottom, and possibly the top too. Just ignore this.
-If you look at the center of the screen you will see a link to a PDF to download the PDF version of the manual -- do this so you can minimize the time spent on this website :)
-
-Here is the link (although in case it changes, becomes updated, etc in the future you may want to go to the online manual link above):
-[Useful PDF manual for Osoyoo robotic car kit](https://osoyoo.com/manual/V1.3metal-mecanum.pdf)
-
-
-
-
-
-Before we start constructing the robot car, take a look at some of the parts. There is a metal bottom chassis where the drive motors will be attached. On top of this metal bottom plate there will be a top acrylic plate. The electronics will all be mounted on this top acrylic plate.
+There is a metal bottom chassis where the drive motors will be attached. When assembled it will look like this:
+![5-point tracking module](underneath.jpg)
 
 Note that there is a separate drive motor for each of the four wheels. Note also there there is no steering apparatus. This is because these are Ilon Mecanum wheels that can go forwards and backwards, but also sideways.
 
 ![mecanum wheels directions of motion](mecanumwheel.png)
 
+
+On top of this metal bottom plate there will be a top acrylic plate. The electronics will all be mounted on this top acrylic plate. 
+
 With regard to the electronics, note that there are three main electronics boards included. One of them is the motor driver board -- this board will control the motors attached to each wheel. Then there is the Mega2560 Arduino board. If you have not worked with Arduino before I will show you all the steps involved -- very easy. The Arduino board is the computer board essentially controlling the robotic car. Into the Arduino board there is a Wifi shield which will give the system Wifi access. There is a USB cable which plugs into the Arduino board and forms an easy to use interface with your laptop enabling you later to send your software to the Arduino board.
 
 There are some smaller electronics boards also, e.g., tracking sensor module, etc. We will discuss them as we use them.
+
+When assembled it will look like this:
+![black acrylic board](wiring.jpg)
+
+
+
+
 
 Note the blue lithium batteries. Note also a battery charger along with its cable which can charge these batteries.
 
