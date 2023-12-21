@@ -99,8 +99,6 @@ Open the box, make sure that all the parts are there and are in good condition. 
 There is a cardboard sheet with a list of parts in Japanese -- you can use it and exercise your brain to learn some new symbols (assuming you don't read/write Japanese) and think about Harnad's concepts of symbols and grounding, e.g., 
 [cca5 inductive analogical soln to grounding problem](https://www.sciencedirect.com/science/article/abs/pii/S1389041722000493?via%3Dihub)
 
-[archive preprint](https://github.com/howard8888/insomnia/blob/master/analogical%20inductive%20preprint.pdf)
-
 Or... you can turn the cardboard sheet over and read it in English :)
 
 There will be a little manul with the car. It really only serves the purpose of telling you to go online and look at the manual there:
