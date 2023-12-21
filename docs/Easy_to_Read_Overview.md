@@ -111,6 +111,14 @@ If you look at the center of the screen you will see a link to a PDF to download
 Here is the link (although in case it changes, becomes updated, etc in the future you may want to go to the online manual link above):
 [PDF manual for Osoyoo robotic car kit](https://osoyoo.com/manual/202000600-m2.pdf)
 
+Before we start constructing the robot car, take a look at some of the parts. There is a metal bottom chassis where the drive motors will be attached. On top of this metal bottom plate there will be a top acrylic plate. The electronics will all be mounted on this top acrylic plate.
+
+Note that there is a separate drive motor for each of the four wheels. Note also there there is no steering apparatus. This is because these are Ilon Mecanum wheels that can go forwards and backwards, but also sideways.
+
+[mecanum wheels directions of motion](mecanumwheel.png)
+
+
+
 
 
 
