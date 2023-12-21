@@ -104,17 +104,39 @@ Or... you can turn the cardboard sheet over and read it in English :)
 Wait!! The displayed sheet says version 1.3 but the cardboard sheet that I have says M2.0 (SKU 2020006000). The parts listed are all the same parts in my kit, but it appears I would have version 2 (I assume that is what M2.0 stands for) while the displayed sheet would indicate this is for version 3.
 But...wait again!!  The manual says there are three versions 1.1, 1.2, 1.3 which are distinguished as follows:
 
-*If you received a black acrylic board and 3-point tracking module, please download the V1.1 manual.
+*If you received a black acrylic board and 3-point tracking module, please download the V1.1 manual.*
 https://osoyoo.com/manual/V1.1metal-mecanum.pdf
 
-If you received a transparent acrylic board, please download the V1.2 manual.
+*If you received a transparent acrylic board, please download the V1.2 manual.*
 https://osoyoo.com/manual/V1.2metal-mecanum.pdf
 
-If you received a black acrylic board and 5-point tracking module, please download the V1.3 manual.
+*If you received a black acrylic board and 5-point tracking module, please download the V1.3 manual.*
 https://osoyoo.com/manual/V1.3metal-mecanum.pdf_*
 
 
+Well... the picture of the robot on the front of all three manuals is identical, showing a 3-point tracking module.
 
+![image on the first page of all the PDF manuals](version3.jpg)
+
+But, the robot I received has a black acrylic board and 5-point tracking module:
+
+![black acrylic board](wiring.jpg)
+
+![5-point tracking module](underneath.jpg)
+
+Thus, I will assume that I have version 1.3 and thus I will download the V1.3 manual. Therefore, this overview of the robot car will be from the perspective of the 1.3 model.
+I think this is reasonable as I purchased my kit from Amazon November 2023, and I assume it is already 2024 or later when you the reader are reading this, and most likely you will have a later model as well. Also, it seems that the versions are somewhat similar, so my overview should be useful to you regardless of the model that you have.
+
+Ok...therefore we will be downloading this manual:
+[Useful PDF manual for Osoyoo robotic car kit](https://osoyoo.com/manual/202000600-m2.pdf)
+
+
+
+**Step #5 -- Start to Build the Robot Car -- Overview of the Documentation**
+
+Ok... you've downloaded PDF manual.
+
+![image on the first page of all the PDF manuals](version3.jpg)
 
 There will be a little manual with the car. It really only serves the purpose of telling you to go online and look at the manual(s) there:
 
@@ -124,7 +146,11 @@ You will go to a busy webpage with all sorts of advertising scrolling by on the 
 If you look at the center of the screen you will see a link to a PDF to download the PDF version of the manual -- do this so you can minimize the time spent on this website :)
 
 Here is the link (although in case it changes, becomes updated, etc in the future you may want to go to the online manual link above):
-[Useful PDF manual for Osoyoo robotic car kit](https://osoyoo.com/manual/202000600-m2.pdf)
+[Useful PDF manual for Osoyoo robotic car kit](https://osoyoo.com/manual/V1.3metal-mecanum.pdf)
+
+
+
+
 
 Before we start constructing the robot car, take a look at some of the parts. There is a metal bottom chassis where the drive motors will be attached. On top of this metal bottom plate there will be a top acrylic plate. The electronics will all be mounted on this top acrylic plate.
 
