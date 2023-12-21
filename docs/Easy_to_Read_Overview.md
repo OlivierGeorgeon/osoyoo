@@ -143,7 +143,7 @@ The online version of this manual has a useful parts list which links to the Oso
 
 
 
-**Step #5 -- Overview of the Parts and of the Documentation**
+**Step #5 -- Overview of the Parts and of the Documentation** 
 
 Ok... you've downloaded PDF manual.
 Again, as noted above --I am using the Model 2 manual in my overview of the robot car:  [model 2 PDF manual](https://osoyoo.com/manual/202000600-m2.pdf)
