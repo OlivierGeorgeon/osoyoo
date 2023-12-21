@@ -115,7 +115,7 @@ Before we start constructing the robot car, take a look at some of the parts. Th
 
 Note that there is a separate drive motor for each of the four wheels. Note also there there is no steering apparatus. This is because these are Ilon Mecanum wheels that can go forwards and backwards, but also sideways.
 
-[mecanum wheels directions of motion](mecanumwheel.png)
+![mecanum wheels directions of motion](mecanumwheel.png)
 
 
 
