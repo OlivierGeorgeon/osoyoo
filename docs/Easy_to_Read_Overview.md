@@ -99,7 +99,7 @@ Open the box, make sure that all the parts are there and are in good condition. 
 There is a cardboard sheet with a list of parts in Japanese -- you can use it and exercise your brain to learn some new symbols (assuming you don't read/write Japanese) and think about Harnad's concepts of symbols and grounding, e.g., [grounding problem](https://www.sciencedirect.com/science/article/abs/pii/S1389041722000493?via%3Dihub)
 
 Or... you can turn the cardboard sheet over and read it in English :)
-![ver3 listing of parts](ver3packlist)
+![ver3 listing of parts](ver3packlist.jpg)
 
 
 
