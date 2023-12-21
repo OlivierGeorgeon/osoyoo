@@ -26,6 +26,7 @@ Any questions before? Please email me to:  hschneidermd@alum.mit.edu
 Embodiment is crucial to the emergence of real AGI, as well as understanding the operation of the mammalian brain.
 For a good overview of the importance of grounding your AI/AGI please consider my paper:
 [cca5 inductive analogical soln to grounding problem](https://www.sciencedirect.com/science/article/abs/pii/S1389041722000493?via%3Dihub)
+
 [archive preprint](https://github.com/howard8888/insomnia/blob/master/analogical%20inductive%20preprint.pdf)
 
 Even if Tesla Bots, for sake of example, were available, you wouldn't want to use such a complex system for the prototype stages of your AI/AGI project or theoretical project. You want a capable but simple enough robotic system that you have direct access to via Python, which is what this robotic car project allows. You will now have an embodiment to use with your AI/AGI. Even if you work mainly theoretically, the robotic car project can be very useful in terms of demonstrations and proof of concept.
@@ -97,7 +98,17 @@ A few days (or day -- Amazon.com is very efficient) have gone by and a package a
 
 Open the box, make sure that all the parts are there and are in good condition. (Mine were -- everything included and seemed brand new and in good condition.)
 
-There is a cardboard sheet with a list of parts in Japanese -- you can use it and exercise your brain to learn some new symbols (assuming you don't read/write Japanese) and think about 
+There is a cardboard sheet with a list of parts in Japanese -- you can use it and exercise your brain to learn some new symbols (assuming you don't read/write Japanese) and think about Harnad's concepts of symbols and grounding, e.g., 
+[cca5 inductive analogical soln to grounding problem](https://www.sciencedirect.com/science/article/abs/pii/S1389041722000493?via%3Dihub)
+
+[archive preprint](https://github.com/howard8888/insomnia/blob/master/analogical%20inductive%20preprint.pdf)
+
+Or... you can turn the cardboard sheet over and read it in English :)
+
+There will be a little manul with the car. It really only serves the purpose of telling you to go online and look at the manual there:
+
+[Osoyoo manual](https://osoyoo.com/?p=49235)
+
 
 
 
