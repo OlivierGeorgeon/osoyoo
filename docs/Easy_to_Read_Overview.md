@@ -101,6 +101,19 @@ There is a cardboard sheet with a list of parts in Japanese -- you can use it an
 Or... you can turn the cardboard sheet over and read it in English :)
 ![ver3 listing of parts](ver3packlist.jpg)
 
+Wait!! The displayed sheet says version 1.3 but the cardboard sheet that I have says M2.0 (SKU 2020006000). The parts listed are all the same parts in my kit, but it appears I would have version 2 (I assume that is what M2.0 stands for) while the displayed sheet would indicate this is for version 3.
+But...wait again!!  The manual says there are three versions 1.1, 1.2, 1.3 which are distinguished as follows:
+
+*If you received a black acrylic board and 3-point tracking module, please download the V1.1 manual.
+https://osoyoo.com/manual/V1.1metal-mecanum.pdf
+
+If you received a transparent acrylic board, please download the V1.2 manual.
+https://osoyoo.com/manual/V1.2metal-mecanum.pdf
+
+If you received a black acrylic board and 5-point tracking module, please download the V1.3 manual.
+https://osoyoo.com/manual/V1.3metal-mecanum.pdf_*
+
+
 
 
 There will be a little manual with the car. It really only serves the purpose of telling you to go online and look at the manual(s) there:
