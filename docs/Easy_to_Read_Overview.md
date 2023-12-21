@@ -7,7 +7,7 @@ Welcome!! Bienvenue!! Tunngasugit!!
 
 If you are interested in starting this project, you should read this file first. 
 
-Why? Because it is written from from a first-person viewpoint that tries to answer the big questions of why do this project, how to start, how to implement, and so on. If you think back to learning a new subject in university -- wasn't it better to get tutorial help from a friend who just learned it rather than someone who had already knew the subject for twenty years?  That's because the new learner has in his/her brain the steps that need to be overcome, while the experienced person has integrated these steps and may not teach them.
+Why? Because it is written from from a first-person viewpoint that tries to answer the big questions of why do this project, how to start, how to implement, and so on. If you think back to learning a new subject in university -- wasn't it better to get tutorial help from a friend who just learned it rather than someone who already knew the subject for twenty years?  That's because the new learner has in his/her brain the steps that need to be overcome, while the experienced person has integrated these steps and may not teach them.
 I am that new learner -- trying to figure out how to even start this project. Let me guide you into what I believe you will find will be a very advantageous and satisfying project.
 
 
@@ -32,21 +32,22 @@ Your first step should be to decide to build this robotic car project. Are you w
 
 In terms of monetary cost expect to spend about US$200 on the project (I know the Amazon.com prices are not this high, but shipping to other countries, extra parts from AliExpress, etc will push up the price). 
 
-In terms of electronics expertise, very little is needed if everything gets assembled correctly and all parts are working. If you want to modify the design, if there is more advanced troubleshooting, then of course more is better.
-In terms of software expertise, you need to be comfortable moving around files and using Python. The Arduino IDE and code you can install and copy without great expertise. Of course, if you have the time, you can spend more hours getting more expertise in the Arduino ecosystem and more familiarity with the systems Python routines used by the project.
+In terms of your required electronics expertise, very little is needed if everything gets assembled correctly and all parts are working. If you want to modify the design, if there is more advanced troubleshooting, then of course more is better.
 
+In terms of your required software expertise, only a minimal amount is needed to make the robot work. For example, you need to be comfortable moving around files and running Python code. The Arduino IDE and code you can install and copy without great expertise. Of course, if you have the time, you can spend more hours getting more expertise in the Arduino ecosystem. As well, you will need more expertise in Python if you want to use the robot car for your own research project.
 
 
 **Step #2 -- Purchase the Robot Car kit**
 
-I assume you already have a Windows, Linux or Mac computer to use with this project. I used a Windows PC, and thus I will be describing my experience from a Windows point of view. However, application to Linux or Mac should be straightforward if that's what you are using.
+I assume you already have a Windows, Linux or Mac computer to use with this project. I used a Windows PC, and thus I will be describing my experience from a Windows point of view. However, running Arduino and Python code within Linux or Mac environments should be straightforward if that's what you are using.
 
-There are two purchases:
+There are two purchases to consider:
 1 - Purchasing the Robot Car Kit
+
 2 - Purchasing the extra electronic parts
 
 In this section we will talk about purchasing the Robot Car kit.
-Although I am in Canada, and although Osoyoo is actually based in Canada (although the robot kit parts are from China), it is much easier to order from the USA Amazon website:
+Although I am in Canada, and although the business office representing Osoyoo is actually based in Canada (however the robot kit parts are manufactured in Asia), it is much easier to order from the USA Amazon website:
 
 Product title: OSOYOO Omni-directinal Mecanum Wheels Robotic Car Kit for Arduino Mega2560 Metal Chassis DC Motor DIY STEM Remote Controlled Educational Mechanical DIY Coding for Teens Adult
 Product cost (at time of writing):  US$119.99   (plus about $25 to ship to Canada, but free shipping within USA if you have Prime)
@@ -87,16 +88,13 @@ Troubleshooting note:  If you are able to allocate sufficient research funds, I 
 
 A few days (or day -- Amazon.com is very efficient) have gone by and a package arrives at your lab, office (or home perhaps). It's the Osoyoo robotic car kit.
 
-Open the box, make sure that all the parts are there and are in good condition. (Mine were -- everything included and seemed brand new and in good condition.)
+Open the box, and make sure that all the parts are there and are in good condition. (Mine were -- everything included and seemed brand new and in good condition.)
 
 There is a cardboard sheet with a list of parts in Japanese -- you can use it and exercise your brain to learn some new symbols (assuming you don't read/write Japanese) and think about Harnad's concepts of symbols and grounding, e.g., [grounding problem](https://www.sciencedirect.com/science/article/abs/pii/S1389041722000493?via%3Dihub)
-
 Or... you can turn the cardboard sheet over and read it in English :)
-![ver3 listing of parts](ver3packlist.jpg)
+![model M2.0 parts list](model2parts.png)
 
-Wait!! The displayed sheet says version 1.3 but the cardboard sheet that I have says M2.0 (SKU 2020006000). The parts listed are all the same parts in my kit, but it appears I would have version 2 (I assume that is what M2.0 stands for) while the displayed sheet would indicate this is for version 3.
 
-Let's see what the manual says.
 There is a little manual with the car. However, it really only serves the purpose of telling you to go online and look at the manual(s) there:
 [Osoyoo manual](https://osoyoo.com/?p=49235)
 
@@ -115,26 +113,21 @@ Well... the picture of the robot on the front of all three manuals is identical,
 
 ![image on the first page of all the PDF manuals](version3.png)
 
-But, the robot I received has a black acrylic board and 5-point tracking module:
+But, the robot I received has a black acrylic board and 5-point tracking module. As well, the cardboard parts list I received says "M2" which I assume is a Model 2 version.
 
 ![black acrylic board](wiring.jpg)
 
 ![5-point tracking module](underneath.jpg)
 
-But.... why does my cardboard sheet say "M2" which would indicate model 2, i.e., perhaps this is no longer the version 1 series. Ok... let's work backwards from the online manual to the Oyosoo hosting site and let's see if there are other models listed.... yes indeed, there is a Model 2. Thus, I will assume that I have model 2 and thus I will download the M2 manual. Therefore, this overview of the robot car will be from the perspective of the M2 model.
+Ok... let's work backwards from the online manual to the Oyosoo hosting site and let's see if there are other models listed.... yes indeed, there is a Model 2. Thus, I will assume that I have model 2 and thus I will download the M2 manual. Therefore, this overview of the robot car will be from the perspective of the M2 model.
 
-I think this is reasonable as I purchased my kit from Amazon November 2023, and I assume it is already 2024 or later when you the reader are reading this, and most likely you will have a later model as well. Also, it seems that the models and versions are somewhat similar, so my overview should be useful to you regardless of the model that you have.
+I think this is reasonable as I purchased my kit from Amazon November 2023, and I assume it is already 2024 or later when you the reader are reading this, and most likely you will have a later model as well. Also, it seems that the models and versions are somewhat similar, so my overview should be useful to you regardless of the model that you have. (Look at the version number on your parts list. Also match your robot to the descriptions above. If you have a version 1, i.e., 1.1, 1.2, or 1.3 version robot kit, then download one of the manuals listed agove.)  
 
-Ok...therefore we will be downloading this manual:
-[Useful PDF manual for Osoyoo robotic car kit](https://osoyoo.com/manual/202000600-m2.pdf)
+For myself and those of you with a Model 2 robot kit (which should be most users in the future, if not a more advanced mode1) we should download this PDF manual:
+ [model 2 PDF manual](https://osoyoo.com/manual/202000600-m2.pdf)
 
-
-Let's see....good... the parts list pictorial matches the cardboard sheet I received.
-![model M2.0 parts list](model2parts.png)
-
-Also, the robot shown on the cover the manual matches the car I received:
+Great -- the robot shown on the cover the manual matches the car I received:
 ![Model 2.0 cover image](model2.png)
-
 
 The online version of this manual has a useful parts list which links to the Osoyoo website to buy replacement parts:
 [online Model 2.0 manual](https://osoyoo.com/2022/07/05/v2-metal-chassis-mecanum-wheel-robotic-for-arduino-mega2560-introduction-model-2021006600/#4)
@@ -145,10 +138,10 @@ The online version of this manual has a useful parts list which links to the Oso
 
 **Step #5 -- Overview of the Parts and of the Documentation** 
 
-Ok... you've downloaded PDF manual.
+Ok... at this point you've downloaded the correct PDF manual for your robot car kit.
 Again, as noted above --I am using the Model 2 manual in my overview of the robot car:  [model 2 PDF manual](https://osoyoo.com/manual/202000600-m2.pdf)
 
-Before we start constructing the robot car, let's take a look at some of the parts and then quickly take an overview of the documentation. 
+Before we start constructing the robot car, let's take a look at some of the parts and then quickly do an overview of the documentation. 
 
 There is a metal bottom chassis where the drive motors will be attached.  (Note that the straps are still loose until the assembly is completed and wires are tucked away.) When assembled it will look like this:
 ![5-point tracking module](underneath.jpg)
@@ -163,7 +156,7 @@ With regard to the electronics, note that there are three main electronics board
 
 There are some smaller electronics boards also, e.g., Bluetooth module, tracking sensor module, etc. We will discuss them as we use them.
 
-When assembled it will look like this:
+When assembled the acrylic board on the top of the robot car will look like this:
 ![black acrylic board](wiring.jpg)
 
 Note the blue lithium batteries. In the kit parts there should be a battery charger along with its USB cable which can charge these batteries.
@@ -172,15 +165,15 @@ Before we start building the robot car, let's have a quick look at the documenta
 
 The PDF Model M2.0 documentation is divided into five "lessons." 
 
-Lesson 1 -- Assembly of the mechanical parts electronic parts, and installing the Arduino IDE
+Lesson 1 -- Assembly of the mechanical parts and the electronic parts, and installing the Arduino IDE -- at this point you will have a functioning robot car that you can try out with the self test Arduino code that comes with the robot car.
 
-Lesson 2 -- Use of the ultrasonic and servomechanism modules to avoid objects
+Lesson 2 -- Use of the ultrasonic and servomechanism modules to avoid objects -- you can see the sensors mounted on the servo in the cover image. (I have not yet mounted these sensors.)
 
-Lesson 3 -- Use of the 5-point tracking sensor to follow a black track line
+Lesson 3 -- Use of the 5-point tracking sensor to follow a black track line -- you can see these sensors in the cover image as well as in the underside photo of my assembled robot car.
 
-Lesson 4 -- Bluetooth interface to the robot car
+Lesson 4 -- Bluetooth interface to the robot car -- this board has not been installed in the Wifi shield yet but will allow Bluetooth interfacing.
 
-Lesson 5 -- Wifi interface to the robot car
+Lesson 5 -- Wifi interface to the robot car -- the Wifi shield has already been installed in photo showing the electronics of my assembled robot car.
 
 
 
