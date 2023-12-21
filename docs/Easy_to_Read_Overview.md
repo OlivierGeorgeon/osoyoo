@@ -136,11 +136,24 @@ Ok...therefore we will be downloading this manual:
 [Useful PDF manual for Osoyoo robotic car kit](https://osoyoo.com/manual/202000600-m2.pdf)
 
 
+Let's see....good... the parts list pictorial matches the cardboard sheet I received.
+![model M2.0 parts list](model2parts.png)
+
+Also, the robot shown on the cover the manual matches the car I received:
+![Model 2.0 cover image](model2.png)
+
+
+The online version of this manual has a useful parts list whith links to the Osoyoo website to buy replacement parts:
+[online Model 2.0 manual](https://osoyoo.com/2022/07/05/v2-metal-chassis-mecanum-wheel-robotic-for-arduino-mega2560-introduction-model-2021006600/#4)
+
+
+
+
 
 **Step #5 -- Overview of the Parts and of the Documentation**
 
 Ok... you've downloaded PDF manual.
-(I am using Model 2 manual in my overview of the robot car:  [model 2 PDF manual](https://osoyoo.com/manual/202000600-m2.pdf)
+Again, as noted above --I am using Model 2 manual in my overview of the robot car:  [model 2 PDF manual](https://osoyoo.com/manual/202000600-m2.pdf)
 
 Before we start constructing the robot car, let's take a look at some of the parts and then quickly take an overview of the documentation. 
 
