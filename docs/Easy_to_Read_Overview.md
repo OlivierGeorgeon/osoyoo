@@ -90,7 +90,7 @@ Troubleshooting note:  If you are able to allocate sufficient research funds, I 
 
 
 
-**Step #4 -- Start to Build the Robot Car**
+**Step #4 -- Start to Build the Robot Car -- Finding the Documentation**
 
 A few days (or day -- Amazon.com is very efficient) have gone by and a package arrives at your lab, office (or home perhaps). It's the Osoyoo robotic car kit.
 
@@ -104,6 +104,12 @@ Or... you can turn the cardboard sheet over and read it in English :)
 There will be a little manul with the car. It really only serves the purpose of telling you to go online and look at the manual there:
 
 [Osoyoo manual](https://osoyoo.com/?p=49235)
+
+You will go to a busy webpage with all sorts of advertising scrolling by on the bottom, and possibly the top too. Just ignore this.
+If you look at the center of the screen you will see a link to a PDF to download the PDF version of the manual -- do this so you can minimize the time spent on this website :)
+
+Here is the link (although in case it changes, becomes updated, etc in the future you may want to go to the online manual link above):
+[PDF manual for Osoyoo robotic car kit](https://osoyoo.com/manual/202000600-m2.pdf)
 
 
 
