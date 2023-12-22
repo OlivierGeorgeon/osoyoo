@@ -292,39 +292,37 @@ What to do?
 
 Well.... in the modern world we live in, you can ask ChatGPT/GPT4:
 
+----
 **User**
+
 I just built the Osoyoo Robot Car kit, but it doesn't work. What should I do?
+
 **ChatGPT**
+
 Troubleshooting a newly built Osoyoo Robot Car kit that isn't working can be approached systematically. Here are some steps you can follow:
-
 Check Connections: Ensure all wires and connections are properly and securely connected. This includes checking the motor connections, sensor connections, and power supply.
-
 Battery Check: Verify that the batteries are correctly installed and fully charged. Weak or improperly installed batteries can cause issues.
-
 Review Assembly: Go through the assembly instructions again to make sure everything was put together correctly. Sometimes a small mistake in assembly can cause problems.
-
 Inspect Components: Look for any visible damage to the components like the motors, sensors, or the main control board.
-
 Test Individual Components: If possible, test each component separately. For example, test the motors independently to see if they are functioning.
-
 Software and Firmware: Make sure you've uploaded the correct code to the controller. Also, check if the firmware of the controller is up to date.
-
 Debugging Code: If you have written or modified the code, ensure there are no errors. Sometimes, logical errors in the code can prevent the robot from functioning as expected.
-
 Online Resources and Forums: Check the Osoyoo website or forums for troubleshooting tips. Often, others may have encountered and solved similar issues.
-
 Technical Support: If you've tried all the above and still face issues, consider reaching out to Osoyoo's customer support for help.
-
 Remember, building and troubleshooting a robot kit can be a learning experience, so take your time and be methodical in your approach.
 
+----
 
 Hmmm...actually not bad given the vague question asked. Please note that I am using a December 2023 build of the GPT4 version of ChatGPT. Let's make the prompt more precise:
 
-
+----
 **User**
+
 I just built the Osoyoo Metal Chassis Mecanum Wheel Robotic M2.0  Model: 2020006000. It is also called the "OSOYOO Omni-directinal Mecanum Wheels Robotic Car Kit for Arduino Mega2560 Metal Chassis DC Motor". It also called the "V2.0 Mecanum Wheel Robotic Car Kit for Arduino Mega2560".  The assembly/technical manual for this product can be found at https://osoyoo.com/manual/202000600-m2.pdf .
 The robotic car does not work. I turn on the on/off switch and nothing happens. How can I make the robotic car work?
+
 **ChatGPT**
+
 Error analyzing
 It seems there was an issue with the initial attempt to download the manual. Let me try a different approach to access the manual for the Osoyoo Metal Chassis Mecanum Wheel Robotic M2.0, Model: 2020006000. I will browse the manual to provide specific guidance for troubleshooting your robotic car. Please hold on for a moment. ​​
 
@@ -332,51 +330,39 @@ Error analyzing
 It appears that I am unable to directly download and access the manual from the provided link due to current limitations in my environment. However, I can guide you through some general troubleshooting steps for the Osoyoo Metal Chassis Mecanum Wheel Robotic M2.0, Model: 2020006000. These steps are often helpful in diagnosing common issues with robotic kits:
 
 Power Supply Check: Ensure that the battery or power source is properly connected and charged. If you are using a battery, make sure it's inserted correctly and has sufficient charge.
-
 Connection Verification: Double-check all the connections according to the assembly manual. Ensure that all wires are securely connected to the correct terminals, and there are no loose connections.
-
 Board and Component Inspection: Inspect the Arduino board and other components for any visible signs of damage or improper installation.
-
 Software and Code: If your robotic car requires programming, make sure that the code is correctly uploaded to the Arduino board. Verify that there are no errors in the code and it's compatible with your model.
-
 Motor Testing: Test the motors independently to ensure they are functioning. You can do this by applying power directly to the motors, bypassing the control system.
-
 Sensor Check: If your model includes sensors, verify that they are correctly connected and functioning as expected.
-
 Switch and Indicator Lights: Check the on/off switch to ensure it's working and observe any indicator lights on the board for signs of power or error signals.
-
 Online Support and Forums: Visit the Osoyoo website or online forums for specific troubleshooting tips related to your model. Often, these platforms have discussions on common issues and solutions.
-
 Consult the Manual: Since you have access to the manual, refer to any troubleshooting section it may have. Manuals often include common issues and how to resolve them.
-
 If after these steps your robotic car still does not function, consider reaching out to Osoyoo customer support for further assistance. They can provide model-specific guidance and support. ​
+
+----
 
 Again this is quite a reasonable approach given the limited information ChatGPT had to work with.
 
 Let's upload the  Model 2 Assembly PDF Manual to ChatGPT so it has more information to work with:
 
-
+----
 **User**
+
 assemblymanual.pdf
 
 I just uploaded the assembly manual for the robotic car. Can you give me more precise tips now how to make my broken robotic car work?
+
 **ChatGPT**
+
 To troubleshoot your Osoyoo Mecanum Wheel Robotic Car M2.0, consider these steps:
-
 Battery and Power: Ensure the batteries are correctly installed and charged. Check the power connections, especially the switch and battery box.
-
 Motor Connections: Verify that all motors are properly connected to the Model Y motor driver board. The manual details the specific connections for each motor.
-
 Board Installation: Confirm the Arduino Mega2560 board and the OSOYOO Wifi Shield are properly installed and connected.
-
 Software and Code: Ensure you have correctly installed the Arduino IDE and uploaded the appropriate sketch for your project (e.g., lesson1.ino for basic car assembling). Follow the specific instructions in the manual for code uploading.
-
 Sensor and Module Checks: If your model includes sensors or additional modules, make sure they are correctly connected and configured.
-
 Hardware Assembly: Double-check the assembly of the wheels, chassis, and all components as per the instructions in the manual to ensure everything is correctly aligned and installed.
-
 Debugging: Look for any error messages or indicators when you power on the car or try to execute commands.
-
 For specific instructions and detailed steps, refer to the assembly manual you uploaded. It contains comprehensive guidance for assembling, connecting, and programming your robotic car.
 
 
@@ -389,6 +375,7 @@ Above I wrote about a section of this book:
 The Cleveland Institute of Electronics was a technical college that trained over 40,000 students since 1934 before shutting down in 2022 how to service and maintain the growing field of electronics occurring in the United States and then in the rest of the world. They provided courses of study which are essentially equivalent to "engineering technology" degrees offered by many universities in North America now (i.e., engineering without the hard analytical courses; controversy over whether graduates should be considered professional engineers, however). Cleveland Institute of Electronics was famous for its "Auto-Programmed" learning methods and its troubleshooting techniques -- its graduates were amazing at maintaining radio stations, television stations, airport avionics, governmental/defense electronics and industrial electronics. (The industrial base has changed in North America greatly since the 1930s and there are a myriad of universities providing "easy" engineering technology degrees, and it seems there was no more need for Cleveland Institute of Electronics' rigor in producing its excellent service technologists.) (As well, I guess by 2022 the famous Cleveland Institute of Electronics electronics slide rule was a bit dated :)
 
 The methodology of Herbert A. Simon, Nobel Prize winner, and the Cleveland Institute of Electronics, electronics repair educators, were essentially the same -- break things down into manageable modules. Know what works, and what possibly does not work.
+
 -->Taking this approach you will have the best chance of troubleshooting your malfunctioning robotic car kit.
 (For those of you who already have much experience troubleshooting, I apologize for wasting your time reading this. However, for those of you newer to actually building and troubleshooting stuff with your own hands, this can be an excellent learning opportunity, applicable to many things in life.)
 
@@ -401,6 +388,80 @@ Thus, we will simply use simple logic to troubleshoot. Even a simple VOM/multime
 
 (That said, if you have electronics test equipment, it does speed up things to see what voltages, currents, pulse trains are doing -- you can isolate issues much faster with the equipment, even if you are only swapping out at the board level.)
 
+For the remainder of this section we will consider a modular approach to getting the robotic car to work.
+
+Remember, especially if you live in a winter-climate environment where there is lots of static charge in the low-humidity winter: static electricity will destroy the sensitivie chips on the little electronics boards. Ground yourself (e.g., touch a water pipe) before touching the electronics in these environments.
 
 
+ **Mechanical Issues**
+ This section is for troubleshooting mechanical issues and can be added to with experience, i.e., "under construction" at present.
+ 
+PLEAsE CONTRIBUTE TO THIS SECTION AS YOU ENCOUNTER AND TROUBLESHOOT PROBLEMS
+
+ Some tips at present:
+ 
+ -follow the assembly manual carefully
+ 
+ -if you reverse the assembly of parts then take the time to disassemble and try again (it's easy to get confused with the orientation of both the metal chassis and the acrylic board)
+ -make sure the Mecanum wheels are orientated exactly as shown in the manual
+
+ -make sure the wheels can rotate freely -- careful with the attachments
+
+
+ **Electronics Issues**
+This section is for troubleshooting electronics issues and can be added to with experience, i.e., "under construction" at present.
+
+PLEAsE CONTRIBUTE TO THIS SECTION AS YOU ENCOUNTER AND TROUBLESHOOT PROBLEMS
+
+ Some tips at present:
+ 
+ - ground yourself before touching electronics boards
+
+ - follow the assembly manual carefully -- double check the orientation of the electronics boards before mounting them, and double check the colors and insertion points of every wire
+
+ - before putting the batteries in (or the batter switch is in the OFF position) the following lights should be on when the USB cable attaches to your computer:
+ - 
+   ![cable from Arduino board to my PC](plugcable.jpg)
+
+   -when you put the batteries into the battery holder and turn the battery switch ON, then you should see a voltage number on the voltage display and the following lights on:
+
+   ![assembled robot car](robotcar.jpg)
+
+   - if you don't see a voltage level, and you have a multimeter, measure the batteries directly to make sure they are charged and have a voltage on them (or if you don't have a multimeter, trying recharging them again)
+  
+   - if you don't see lights on, a first step is to remove wires, double check with the manual their locations, and re-insert carefully the wires again
+  
+   - if the above does not work, and you have second Arduino kit, you can try swapping boards to see if you can isolate the problem to one board
+  
+ - 
+
+ **Arduino/Computer Issues**
+ This section is for troubleshooting Arduino/computer issues and can be added to with experience, i.e., "under construction" at present.
+ 
+PLEAsE CONTRIBUTE TO THIS SECTION AS YOU ENCOUNTER AND TROUBLESHOOT PROBLEMS
+
+ Some tips at present:
+ 
+ - follow the assembly manual carefully
+
+ - double check the orientation of the electronics boards before mounting them, and double check the colors and insertion points of every wire
+
+ - use the supplied Oyosoo self-test code for the Arduino -- it should work
+
+ - follow the screenshots shown above in attaching to the Arduino board and uploading code
+
+ - if you have second Arduino kit, you can try swapping boards to see if you can isolate the problem to one board
+
+ - you may want to consider purchasing a cheap Arduino board from a local electronics shop or online electronics retailer (e.g., Amazon sells an Arduino Uno board for US$27 at the time of writing), and setting up the Arduino IDE on your computer and making sure you can upload compiled code to the Arduino board
+
+ - TAKE A MODULAR APPROACH TO STUBBORN ISSUES. For example, make sure the wires coming from the battery compartment have a voltage on them (with a simple voltage tester or multimeter) and then just install the motor controller board with only the power wires and the voltage meter wires. Is there now a voltage displayed?  If so, then hook up the four motors. Is there still a voltage displayed? Then perhaps hook up to the Arduino board without the Wifi shield (pay attention to where you are inserting wires if you do this). Lights come on? Then plug your PC into the Arduino board -- is it detected?  And so on.
+   (It is unfortunate that the motor controller board does not have a modular built-in self-test feature which could be used to make sure that part of the system is working before we need to consider the functioning of the Arduino board.)
+
+ 
+BEFORE PROCEEDING FURTHER, MAKE SURE THE BASIC SELF-TEST PROGRAM OF YOUR OSOYOO ROBOTIC CAR WORKS. YOU NEED TO KNOW THAT THIS WORKS BEFORE ADDING MORE COMPLEXITY TO YOUR PROJECT.
+
+
+**Step #10 -- Adding the Ultrasonic and Servomechanism Components**
+
+ UNDER CONSTRUCTION
  
