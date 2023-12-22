@@ -380,6 +380,9 @@ The methodology of Herbert A. Simon, Nobel Prize winner, and the Cleveland Insti
 (For those of you who already have much experience troubleshooting, I apologize for wasting your time reading this. However, for those of you newer to actually building and troubleshooting stuff with your own hands, this can be an excellent learning opportunity, applicable to many things in life.)
 
 
+![CIE Troubleshooters advertisement](troubleshooters.jpg)
+
+
 **Electronic Component/Digital Oscilliscope Appraoch to Troubleshooting your Robot Car**
 
 Even if you have a full suite of electronics test equipment, particularly a multi-channel digital oscilliscope that can capture pulse trains at the clock speed of the Arduino board, it is not practical to troubleshoot the robot car as such. The reality is that in 2023 at the time of writing, given surface mounted components and given application-specific integrated circuits, unless you are the designer/authorized repair hub of the computer board, it is not possible/feasible/realistic to do component level repairs. 
@@ -396,7 +399,7 @@ Remember, especially if you live in a winter-climate environment where there is 
  **Mechanical Issues**
  This section is for troubleshooting mechanical issues and can be added to with experience, i.e., "under construction" at present.
  
-PLEAsE CONTRIBUTE TO THIS SECTION AS YOU ENCOUNTER AND TROUBLESHOOT PROBLEMS
+PLEASE CONTRIBUTE TO THIS SECTION AS YOU ENCOUNTER AND TROUBLESHOOT PROBLEMS
 
  Some tips at present:
  
@@ -411,7 +414,7 @@ PLEAsE CONTRIBUTE TO THIS SECTION AS YOU ENCOUNTER AND TROUBLESHOOT PROBLEMS
  **Electronics Issues**
 This section is for troubleshooting electronics issues and can be added to with experience, i.e., "under construction" at present.
 
-PLEAsE CONTRIBUTE TO THIS SECTION AS YOU ENCOUNTER AND TROUBLESHOOT PROBLEMS
+PLEASE CONTRIBUTE TO THIS SECTION AS YOU ENCOUNTER AND TROUBLESHOOT PROBLEMS
 
  Some tips at present:
  
@@ -438,7 +441,7 @@ PLEAsE CONTRIBUTE TO THIS SECTION AS YOU ENCOUNTER AND TROUBLESHOOT PROBLEMS
  **Arduino/Computer Issues**
  This section is for troubleshooting Arduino/computer issues and can be added to with experience, i.e., "under construction" at present.
  
-PLEAsE CONTRIBUTE TO THIS SECTION AS YOU ENCOUNTER AND TROUBLESHOOT PROBLEMS
+PLEASE CONTRIBUTE TO THIS SECTION AS YOU ENCOUNTER AND TROUBLESHOOT PROBLEMS
 
  Some tips at present:
  
@@ -460,7 +463,7 @@ PLEAsE CONTRIBUTE TO THIS SECTION AS YOU ENCOUNTER AND TROUBLESHOOT PROBLEMS
  
 BEFORE PROCEEDING FURTHER, MAKE SURE THE BASIC SELF-TEST PROGRAM OF YOUR OSOYOO ROBOTIC CAR WORKS. YOU NEED TO KNOW THAT THIS WORKS BEFORE ADDING MORE COMPLEXITY TO YOUR PROJECT.
 
-![CIE Troubleshooters advertisement](troubleshooters.jpg)
+
 
 
 
