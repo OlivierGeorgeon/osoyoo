@@ -254,7 +254,7 @@ On my PC note that the IDE will not process the file unless the correct board is
 
 -Then click the right arrow to tell the Arduino IDE to compile the Osoyoo self-test code and to upload this code to the Arduino board on the robot.
 You will see message that the code ("sketch") is compiling and then that the code is "uploading"
-![upload code to the Arduino board](clickupload)
+![upload code to the Arduino board](clickupload.png)
 
 -Now unplug the Arduino cable.
 -You should have previously charged the blue lithium batteries in the charger that comes with the robot car kit. (If not do this and come back in an hour.)
