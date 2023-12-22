@@ -365,6 +365,11 @@ Hardware Assembly: Double-check the assembly of the wheels, chassis, and all com
 Debugging: Look for any error messages or indicators when you power on the car or try to execute commands.
 For specific instructions and detailed steps, refer to the assembly manual you uploaded. It contains comprehensive guidance for assembling, connecting, and programming your robotic car.
 
+----
+
+Well.... not bad.... but still not a replacement for human troubleshooting.
+
+
 
 **The Herbert Simon and Cleveland Institute of Electronics Approach to Troubleshooting**
 
