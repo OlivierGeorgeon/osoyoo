@@ -190,7 +190,7 @@ The Wifi board will now actively interface to the Arduino board:
 
 **Step #6 -- Assembly of Parts on the Underside of the Chassis** 
 
--Follow the instruction manual to bolt into place the motor holders. The install the jackscrews and couplings on the motors, and install the motors as shown in the manual. There are nylon tie wraps to hold the extra wires. Note that these motors (one for each wheel) have hall sensors (the white, yellow, orange, green lines) but they are apparently not being used and are just tucked away. Only the ground black and power red wires will go to the electronics through the center hole in the chassis.
+-Follow the instruction manual to bolt into place the motor holders. Then install the jackscrews and couplings on the motors, and install the motors as shown in the manual. There are nylon tie wraps to hold the extra wires. Note that these motors (one for each wheel) have Hall sensors (the white, yellow, orange, green lines) but they are apparently not being used and are just tucked away. Only the ground black and power red wires will go to the electronics through the center hole in the chassis.
 
 -Pay attention when you are installing the Mecanum wheels -- follow the orientation shown in the manual.
 
