@@ -481,5 +481,16 @@ BEFORE PROCEEDING FURTHER, MAKE SURE THE BASIC SELF-TEST PROGRAM OF YOUR OSOYOO 
 
 **Step #10 -- Adding the Ultrasonic and Servomechanism Components**
 
+ The Osoyoo motor is called a "micro servo motor." We tend to interchange the words "servomotor", "servo", "servomechanism", etc in Lesson #2 (i.e., adding the ultrasonic and servomechanism components) in referring to this motor. However, be aware of the actual meaning of these different terms:
+
+ -A "servomotor"  (or sometimes just called a "servo") is generally a rotary motor (but it can be a linear actuator) that produces precise angular position, velocity and acceleration. This is in contrast to a normal motor which will just spin continuously.
+ -A "servomechanism" (or sometimes just called a "servo system" or "servo") is a system that controls position, velocity and acceleration of a mechanical system using some sort of feedback to reduce error generally. Thus, a servomotor combined with some sort of feedback device (e.g., a rotary Hall detector, a potentiometer, etc) forms a servomechanism.
+
+The Osoyoo SG90 Micro Servo Motor can rotate +90 or -90 degrees, and will hold the position, even when no signal is sent. It provides 1.5kg/cm torque and has a speed of 60 degrees in a third of a second. It makes use of the Servo Arduino library.
+
+![servo motor](servomotor.jpg)
+
+
+ 
  UNDER CONSTRUCTION
  
