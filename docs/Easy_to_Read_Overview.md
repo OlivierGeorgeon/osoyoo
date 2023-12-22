@@ -267,7 +267,7 @@ You will see message that the code ("sketch") is compiling and then that the cod
 -Tip: The coefficient of friction of the rollers on the wheels used in the car is low -- it may not overcome the car's inertia and slip often on a smooth floor. To avoid this, put on a surface with a higher coefficient of friction.
 
 
-Congratulations!! You have successfully assembled the basic mechanics of the car, you have successfully wired the basic electronics of the car, and you have successfully ran the basic software functions of the car.
+Congratulations!! You have successfully assembled the basic mechanics of the car, you have successfully wired the basic electronics of the car, and you have successfully run the basic software functions of the car.
 
 My assembled Osoyoo robot car doing a self test (and slipping a bit) on a tile floor:
 
