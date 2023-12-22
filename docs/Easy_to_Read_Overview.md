@@ -158,7 +158,7 @@ There are some smaller electronics boards also, e.g., Bluetooth module, tracking
 When assembled the acrylic board on the top of the robot car will look like this:
 ![black acrylic board](wiring.jpg)
 
-Note the blue lithium batteries. In the kit parts there should be a battery charger along with its USB cable which can charge these batteries.
+Note the blue lithium batteries. In the kit parts there should be a battery charger along with its USB cable which can charge these batteries. 
 
 Before we start building the robot car, let's have a quick look at the documentation (always a good idea no matter what project you are working on).
 
