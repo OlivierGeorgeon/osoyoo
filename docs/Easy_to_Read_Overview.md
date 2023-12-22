@@ -269,6 +269,8 @@ You will see message that the code ("sketch") is compiling and then that the cod
 
 Congratulations!! You have successfully assembled the basic mechanics of the car, you have successfully wired the basic electronics of the car, and you have successfully run the basic software functions of the car.
 
+(A small divergence, but a truly important concept, is that of a modular approach to design, to systems, and so on. In Herbert Simon's "The Sciences of the Artifical" (PDF's are available from many places) he gives the story of Hora and Tempus as skilled watchmakers, but Tempus assembles full watches (faster) while Hora designs and assembles watches via combining independent modules (slower). However, Hora is actually much more efficient since he doesn't have to start over from zero if there is an interruption, but just redo the module, unlike Tempus who has to restart from zero if there is any interruption. The message is that you the reader, should also take this approach to working with complex robotic systems.)
+
 My assembled Osoyoo robot car doing a self test (and slipping a bit) on a tile floor:
 
 ![assembled robot car](robotcar.jpg)
