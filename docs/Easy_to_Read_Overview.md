@@ -257,10 +257,15 @@ You will see message that the code ("sketch") is compiling and then that the cod
 ![upload code to the Arduino board](clickupload.png)
 
 -Now unplug the Arduino cable.
+
 -You should have previously charged the blue lithium batteries in the charger that comes with the robot car kit. (If not do this and come back in an hour.)
+
 -Insert the batteries into the battery box and turn on the robot car
+
 -If everything was assembled correctly and the Arduino code was successfully uploaded, then when the car is turned on, it will go through a small self-test routine for going forward, backward, left, right, diagonal, etc and then stop.
+
 -Tip: The coefficient of friction of the rollers on the wheels used in the car is low -- it may not overcome the car's inertia and slip often on a smooth floor. To avoid this, put on a surface with a higher coefficient of friction.
+
 
 Congratulation!! You have successfully assembled the basic mechanics of the car, you have successfully wired the basic electronics of the car, and you have successfully ran the basic software functions of the car.
 
