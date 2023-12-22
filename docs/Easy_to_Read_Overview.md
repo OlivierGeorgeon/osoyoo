@@ -1,4 +1,3 @@
-<img width="435" alt="image" src="https://github.com/OlivierGeorgeon/osoyoo/assets/7038711/60f2bc7b-4d57-4ac9-8939-484f36bc4173">
 # An Easy-to-Read Overview of the Robot Car Project
 
 Welcome!! Bienvenue!! Tunngasugit!!
