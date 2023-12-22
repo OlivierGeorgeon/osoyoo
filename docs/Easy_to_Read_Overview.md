@@ -166,14 +166,26 @@ Before we start building the robot car, let's have a quick look at the documenta
 The PDF Model M2.0 documentation is divided into five "lessons." 
 
 Lesson 1 -- Assembly of the mechanical parts and the electronic parts, and installing the Arduino IDE -- at this point you will have a functioning robot car that you can try out with the self test Arduino code that comes with the robot car.
+When the car is turned on it will go forward, backward, make a left turn, a right turn, .... and finally make a down diagonal and stop.
+The car will look like this at this point:
+![assembled robot car](robotcar.jpg)
 
 Lesson 2 -- Use of the ultrasonic and servomechanism modules to avoid objects -- you can see the sensors mounted on the servo in the cover image. (I have not yet mounted these sensors.)
+The car will look like this at this point (the ultrasonic module looks like two eyes and it is mounted on the blue servo motor):
+![Model 2.0 cover image](model2.png)
 
-Lesson 3 -- Use of the 5-point tracking sensor to follow a black track line -- you can see these sensors in the cover image as well as in the underside photo of my assembled robot car.
+
+Lesson 3 -- Use of the 5-point tracking sensor to follow a black track line -- you can see these sensors in the cover image just above, as well as in the underside photo of my assembled robot car.
+
 
 Lesson 4 -- Bluetooth interface to the robot car -- this board has not been installed in the Wifi shield yet but will allow Bluetooth interfacing.
+The bluetooth module will be inserted into the Wifi Board:
+![bluetooth module](bluetooth.png)
+
 
 Lesson 5 -- Wifi interface to the robot car -- the Wifi shield has already been installed in photo showing the electronics of my assembled robot car.
+The Wifi board will now actively interface to the Arduino board:
+![wifi](wifi.png)
 
 
 
