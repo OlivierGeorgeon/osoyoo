@@ -2,7 +2,7 @@
 
 Welcome!! Bienvenue!! Tunngasugit!!
 
-(I am in Canada -- these are our official languages -- English, French and a semi-official third (indigenous) language of Inuktitut.) 
+(I am in Canada -- these are our official languages -- English, French and a semi-official third (indigenous) language of Inuktitut.)  
 
 If you are interested in starting this project, you should read this file first. 
 
