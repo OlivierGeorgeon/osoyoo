@@ -1,4 +1,4 @@
-
+<img width="435" alt="image" src="https://github.com/OlivierGeorgeon/osoyoo/assets/7038711/60f2bc7b-4d57-4ac9-8939-484f36bc4173">
 # An Easy-to-Read Overview of the Robot Car Project
 
 Welcome!! Bienvenue!! Tunngasugit!!
@@ -211,10 +211,69 @@ Assembled chassis (Note that the straps are still loose until the assembly is co
 -Follow the manual very carefully to orientate the electronic modules as shown.
 
 -Then follow the manual and insert the wires connecting the motors to the motor control board.
+-Tip: Careful about not wasting wire in threading through the center hole and to the motor control board -- there will not be much excess wire on one side.
+(Also, note that only the red power and black ground wire from the motors are controlled by the motor board. The other colored wires are from the motor's Hall sensor and are not used at this point in the project. Hall sensors can measure the magnitude and orientation of a magnetic field, so, usually a pair or equivalent of magnets rotate without any physical contact and the Hall sensor detects their location, i.e., effectively the location of the rotor of the motor, which can be very useful in precision robotic applications.)
+
+![5-point tracking module](underneath.jpg)
+
+![black acrylic board](wiring.jpg)
 
 ![inserting motor wires](motorwires.png)
 
+-Now connect the motor controller board to the Arduino board and the Wifi shield pass through connectors as shown in the diagram in the manual:
+![connect arduino to motor controller](arduinoconnect.png)
 
+-I then connected the voltage meter and the battery box, although in the manual they also show connection of the servo motor and the 5-point tracking module, which can be done now or later.
+![connect other modules](otherconnect.png)
+
+
+**Step #8 -- Installation of the Arduino IDE and Self-Test Program** 
+
+-Even if you have no experience with Arduino, this step is quite easy.
+-The manual gives you a link to download the Arduino IDE (IDE stands for 'Integrated Development Environment' which many software systems have, i.e., the language and a place to construct your programs all in one area). I did not use it but instead went to https://www.arduino.cc and clicked 'software' which I know is a secure website for Arduino and installed the IDE for Windows from that page. (They also have the IDE for Linux and macOS.)
+This website, i.e., https://www.arduino.cc also has comprehensive documentation on the Arduino hardware and software, including a language reference, examples and tutorials. There actually is a tutorial on "Downloading and installing the Arduino IDE 2" https://docs.arduino.cc/software/ide-v2/tutorials/getting-started/ide-v2-downloading-and-installing
+However, you can simply go to https://www.arduino.cc/en/software, click the download option you want (i.e., choose Windows), and the installation is quite straightforward
+
+-Then as the manual recommends you should go to https://osoyoo.com/driver/mecanum_metal_chassis_m2/m2-lesson1.zip and download the Osoyoo self-test code. Always virus scan files you download and virus scan them again after unzipping. You will find a file "m2-lesson1.ino" which was a clean file when I downloaded it.
+
+
+-Opening the Arduino app on my computer:
+![open Arduino app on my Windows PC](clickarduino.png)
+
+-Plugging the Arduino USB cable from the Arduino board to my PC's USB port
+![cable from Arduino board to my PC](plugcable.jpg)
+
+
+-Go to the Arduino IDE which should be open on your desktop, and click File, Open, and choose the file "m2-lesson1.ino"
+The Arduino IDE will compile the C++ variant code (called a 'sketch' in the Arduino environment) into code that the Arduino board can execute.
+On my PC it looks like this now:
+![loading the self test software](loadide.png)
+
+-Then click 'Tools' in the IDE and make sure the 'Board' is selected as the Mega 2560 (so the IDE knows what type of Arduino board you are using).
+On my PC note that the IDE will not process the file unless the correct board is selected, which the IDE does automatically for me -- Mega2560 on COM3 -- I will select this of course.
+![choose the Arduino board](chooseboard.png)
+
+-Then click the right arrow to tell the Arduino IDE to compile the Osoyoo self-test code and to upload this code to the Arduino board on the robot.
+You will see message that the code ("sketch") is compiling and then that the code is "uploading"
+![upload code to the Arduino board](clickupload)
+
+-Now unplug the Arduino cable.
+-You should have previously charged the blue lithium batteries in the charger that comes with the robot car kit. (If not do this and come back in an hour.)
+-Insert the batteries into the batter box and turn on the robot car
+-If everything was assembled correctly and the Arduino code was successfully uploaded, then when the car is turned on, it will go through a small self-test routine for going forward, backward, left, right, diagonal, etc and then stop.
+-Tip: The coefficient of friction of the rollers on the wheels used in the car is low -- it may not overcome the car's inertia and slip often on a smooth floor. To avoid this, put on a surface with a higher coefficient of friction.
+
+Congratulation!! You have successfully assembled the basic mechanics of the car, you have successfully wired the basic electronics of the car, and you have successfully ran the basic software functions of the car.
+
+My assembled Osoyoo robot car doing a self test (and slipping a bit) on a tile floor:
+
+![assembled robot car](robotcar.jpg)
+
+
+A video of two robot cars constructed and programmed by Olivier Georgeon running on a higher friction surface:
+https://www.youtube.com/watch?v=SWa4VOoAa1U
+
+[![Watch the video](https://img.youtube.com/vi/nTQUwghvy5Q/default.jpg)](https://www.youtube.com/watch?v=SWa4VOoAa1U)
 
 
 
