@@ -153,13 +153,9 @@ class Workspace:
                    "emotion": self.memory.emotion_code}
 
         # If the terrain has been found then send the position relative to the terrain origin
-        # if TER in self.memory.phenomenon_memory.phenomena and \
-        #         self.memory.phenomenon_memory.phenomena[TER].confidence > TERRAIN_INITIAL_CONFIDENCE:
         if self.memory.phenomenon_memory.terrain_confidence() > TERRAIN_INITIAL_CONFIDENCE:
             robot_point = self.memory.terrain_centric_robot_point()
             message['position'] = robot_point.astype(int).tolist()
-            # message['pos_x'] = round(robot_point[0])
-            # message['pos_y'] = round(robot_point[1])
 
         # Add information about the current enaction only once
         if self.enaction is not None and not self.enaction.message_sent:
@@ -190,18 +186,11 @@ class Workspace:
             # print("ego angle", math.degrees(self.message.ego_quaternion.angle * self.message.ego_quaternion.axis[2]))
             if self.message.ter_position is not None:
                 # If position in terrain and this robot knows the position of the terrain
-                # if TER in self.memory.phenomenon_memory.phenomena \
-                #         and self.memory.phenomenon_memory.phenomena[TER].confidence > TERRAIN_INITIAL_CONFIDENCE:
                 if self.memory.phenomenon_memory.terrain_confidence() > TERRAIN_INITIAL_CONFIDENCE:
-                    allo_point = self.memory.terrain_centric_to_allocentric(self.message.ter_position)
-                    # allo_point = self.message.ter_position + self.memory.phenomenon_memory.phenomena[TER].point
-                    # print("Robot", self.message.robot, "position:", allo_point)
-                    # self.message.ego_position = self.memory.allocentric_to_egocentric(allo_point)
                     self.message.ego_position = self.memory.terrain_centric_to_egocentric(self.message.ter_position)
                 else:
                     # If cannot place the robot then flush the message
                     self.message = None
             else:
                 # If only focus position was received then we assume this robot is in the other's focus
-                # if self.message.polar_ego_position is not None:
                 self.message.ego_position = self.memory.polar_egocentric_to_egocentric(self.message.polar_ego_position)

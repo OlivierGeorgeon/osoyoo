@@ -27,7 +27,7 @@ SCAN_DISTANCE = 800
 
 TERRAIN_RADIUS = {"A328": {"radius": 990, "azimuth": 25},  # 45},
                   # "PetiteIA": {"radius": 600, "azimuth": 50},  # Petit tapis
-                  "PetiteIA": {"radius": 1000, "azimuth": 55},  # 60},  # Grand tapis
+                  "PetiteIA": {"radius": 990, "azimuth": 55},  # {1000, 60},  # Grand tapis
                   "A301": {"radius": 1200, "azimuth": 50},
                   "DOLL": {"radius": 1200, "azimuth": 0}      # To be defined
 }

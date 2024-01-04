@@ -17,11 +17,6 @@ GRID_WIDTH = 20  # 15   # 100 Number of cells wide
 GRID_HEIGHT = 60  # 45  # 200 Number of cells high
 NEAR_HOME = 300    # (mm) Max distance to consider near home
 SIMULATION_TIME_RATIO = 1  # 0.5   # The simulation speed is slower than the real speed because ...
-# EMOTION_RELAXED = 1  # White
-# EMOTION_HAPPY = 2  # Green
-# EMOTION_SAD = 3  # Bleu
-# EMOTION_ANGRY = 4  # Red
-# EMOTION_UPSET = 5  # Orange (Can't arrange an object from where the robot is)
 ARRANGE_OBJECT_RADIUS = 50
 ARRANGE_MIN_RADIUS = 100
 ARRANGE_MAX_RADIUS = 400
@@ -39,9 +34,9 @@ class Memory:
         self.egocentric_memory = EgocentricMemory()
         self.allocentric_memory = AllocentricMemory(GRID_WIDTH, GRID_HEIGHT, cell_radius=CELL_RADIUS)
         self.phenomenon_memory = PhenomenonMemory(arena_id)
-        self.compass_prediction_error = {}  # Used to calibrate GYRO_COEF
-        self.focus_direction_prediction_error = {}
-        self.focus_distance_prediction_error = {}
+        # self.compass_prediction_error = {}  # Used to calibrate GYRO_COEF
+        # self.focus_direction_prediction_error = {}
+        # self.focus_distance_prediction_error = {}
         self.emotion_code = EMOTION_RELAXED
 
     def __str__(self):
@@ -108,37 +103,10 @@ class Memory:
         self.egocentric_memory.focus_point = enaction.focus_point
         self.egocentric_memory.prompt_point = enaction.prompt_point
 
-        # self.body_memory.set_head_direction_degree(enaction.outcome.head_angle)
-        # TODO Keep the simulation and adjust the robot position
         # Translate the robot before applying the yaw
         # print("Robot relative translation", enaction.translation)
         self.allocentric_memory.move(self.body_memory.body_quaternion, enaction.translation, enaction.clock)
-        # self.body_memory.body_quaternion = enaction.body_quaternion
         self.body_memory.update(enaction)
-
-        # # Track compass prediction error to calibrate gyro_coef is correct
-        # self.compass_prediction_error[enaction.clock] = enaction.body_direction_delta
-        # self.compass_prediction_error = {key: d for key, d in self.compass_prediction_error.items()
-        #                                  if key > enaction.clock - 10}
-        # print("Prediction Error Compass (integrated azimuth - compass)=",
-        #       round(math.degrees(enaction.body_direction_delta), 2), "Average:",
-        #       round(math.degrees(np.mean(list(self.compass_prediction_error.values()))), 2), "std:",
-        #       round(math.degrees(np.std(list(self.compass_prediction_error.values()))), 2))
-        #
-        # # If focus is confident then track its prediction error
-        # if enaction.focus_confidence >= CONFIDENCE_CONFIRMED_FOCUS:
-        #     self.focus_direction_prediction_error[enaction.clock] = enaction.focus_direction_prediction_error
-        #     self.focus_direction_prediction_error = {key: d for key, d in self.focus_direction_prediction_error.items()
-        #                                              if key > enaction.clock - 10}
-        #     print("Prediction Error Focus (predicted - new direction)=", enaction.focus_direction_prediction_error,
-        #           "Average:", round(np.mean(list(self.focus_direction_prediction_error.values()))),
-        #           "std:", round(np.std(list(self.focus_direction_prediction_error.values()))))
-        #     self.focus_distance_prediction_error[enaction.clock] = enaction.focus_distance_prediction_error
-        #     self.focus_distance_prediction_error = {key: d for key, d in self.focus_distance_prediction_error.items()
-        #                                             if key > enaction.clock - 10}
-        #     print("Prediction Error Focus (predicted - new distance)=", enaction.focus_distance_prediction_error,
-        #           "Average:", round(np.mean(list(self.focus_distance_prediction_error.values()))),
-        #           "std:", round(np.std(list(self.focus_distance_prediction_error.values()))))
 
         self.egocentric_memory.update_and_add_experiences(enaction)
 
@@ -231,9 +199,9 @@ class Memory:
         saved_memory.allocentric_memory = self.allocentric_memory.save()
         # Clone phenomenon memory
         saved_memory.phenomenon_memory = self.phenomenon_memory.save()
-        saved_memory.compass_prediction_error = {key: d for key, d in self.compass_prediction_error.items()}
-        saved_memory.focus_direction_prediction_error = {key: d for key, d in self.focus_direction_prediction_error.items()}
-        saved_memory.focus_distance_prediction_error = {key: d for key, d in self.focus_distance_prediction_error.items()}
+        # saved_memory.compass_prediction_error = {key: d for key, d in self.compass_prediction_error.items()}
+        # saved_memory.focus_direction_prediction_error = {key: d for key, d in self.focus_direction_prediction_error.items()}
+        # saved_memory.focus_distance_prediction_error = {key: d for key, d in self.focus_distance_prediction_error.items()}
         # print("Save memory duration:", time.time() - start_time, "seconds")
 
         return saved_memory
@@ -261,57 +229,3 @@ class Memory:
             return np.linalg.norm(delta) < NEAR_HOME
         else:
             return False
-
-    # def simulate(self, enaction, dt):
-    #     """Simulate the enaction in memory. Return True during the simulation, and False when it ends"""
-    #
-    #     if enaction.is_simulating:
-    #
-    #         # Check the target time
-    #         enaction.simulation_time += dt
-    #         if enaction.simulation_time >= enaction.simulation_duration:
-    #             dt += enaction.simulation_duration - enaction.simulation_time  # Adjust to the exact duration
-    #             enaction.is_simulating = False
-    #
-    #         # The intermediate displacement
-    #         yaw_quaternion = Quaternion.from_z_rotation((enaction.simulation_rotation_speed * dt))
-    #         way = 1
-    #         if enaction.action.action_code == ACTION_SWIPE and enaction.command.speed is not None and enaction.command.speed < 0:
-    #             way = -1
-    #         translation = enaction.action.translation_speed * dt * SIMULATION_TIME_RATIO * way
-    #         yaw_matrix = matrix44.create_from_quaternion(yaw_quaternion)
-    #         translation_matrix = matrix44.create_from_translation(-translation)
-    #         displacement_matrix = matrix44.multiply(yaw_matrix, translation_matrix)
-    #
-    #         # Simulate the displacement of experiences
-    #         for experience in self.egocentric_memory.experiences.values():
-    #             experience.displace(displacement_matrix)
-    #         # Simulate the displacement of the focus and prompt
-    #         if self.egocentric_memory.focus_point is not None:
-    #             self.egocentric_memory.focus_point = matrix44.apply_to_vector(displacement_matrix,
-    #                                                                           self.egocentric_memory.focus_point)
-    #         if self.egocentric_memory.prompt_point is not None:
-    #             self.egocentric_memory.prompt_point = matrix44.apply_to_vector(displacement_matrix,
-    #                                                                            self.egocentric_memory.prompt_point)
-    #         # Displacement in body memory
-    #         self.body_memory.body_quaternion = self.body_memory.body_quaternion.cross(yaw_quaternion)
-    #         if self.egocentric_memory.focus_point is not None:
-    #             # Simulate the head to focus alignment
-    #             head_direction_degree, _ = point_to_echo_direction_distance(self.egocentric_memory.focus_point)
-    #             self.body_memory.set_head_direction_degree(head_direction_degree)
-    #
-    #         # Update allocentric memory
-    #         self.allocentric_memory.robot_point += quaternion.apply_to_vector(self.body_memory.body_quaternion, translation)
-    #         self.allocentric_memory.place_robot(self.body_memory, enaction.clock)
-    #
-    #     # When the simulation is over, return the simulated outcome
-    #     if enaction.is_simulating:
-    #         return None
-    #     else:
-    #         if enaction.command.duration is None:
-    #             duration1 = enaction.action.target_duration * 1000
-    #         else:
-    #             duration1 = enaction.command.duration
-    #         # The yaw will be computed as if the robot had no imu
-    #         return Outcome({"action": enaction.action.action_code, "clock": enaction.clock, "floor": 0,
-    #                         "duration1": duration1, 'status': "I", 'head_angle': 0, 'echo_distance': 300})

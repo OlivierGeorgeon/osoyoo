@@ -112,63 +112,56 @@ class Enacter:
         # REFRESHING: Will be reset to IDLE in the next cycle
 
     def simulate(self, dt):
-        """Simulate the enaction in memory. Return True during the simulation, and False when it ends"""
+        """Simulate the enaction in memory. Reset self.is_simulating at the end"""
 
         enaction = self.workspace.enaction
         memory = self.workspace.memory
 
-        if self.is_simulating:
-            # Check the target time
-            enaction.simulation_time += dt
-            if enaction.simulation_time >= enaction.simulation_duration:
-                dt += enaction.simulation_duration - enaction.simulation_time  # Adjust to the exact duration
-                self.is_simulating = False
-                self.simulation_diration1 = enaction.simulation_duration * 1000
-
-            # The intermediate displacement
-            yaw_quaternion = Quaternion.from_z_rotation((enaction.simulation_rotation_speed * dt))
-            way = 1
-            if enaction.action.action_code == ACTION_SWIPE and enaction.command.speed is not None and enaction.command.speed < 0:
-                way = -1
-            translation = enaction.action.translation_speed * dt * way
-            yaw_matrix = matrix44.create_from_quaternion(yaw_quaternion)
-            translation_matrix = matrix44.create_from_translation(-translation)
-            displacement_matrix = matrix44.multiply(yaw_matrix, translation_matrix)
-
-            # Simulate the displacement of experiences
-            for experience in memory.egocentric_memory.experiences.values():
-                experience.displace(displacement_matrix)
-            # Simulate the displacement of the focus and prompt
-            if memory.egocentric_memory.focus_point is not None:
-                memory.egocentric_memory.focus_point = matrix44.apply_to_vector(displacement_matrix,
-                                                                              memory.egocentric_memory.focus_point)
-            if memory.egocentric_memory.prompt_point is not None:
-                memory.egocentric_memory.prompt_point = matrix44.apply_to_vector(displacement_matrix,
-                                                                               memory.egocentric_memory.prompt_point)
-            # Displacement in body memory
-            memory.body_memory.body_quaternion = memory.body_memory.body_quaternion.cross(yaw_quaternion)
-            if memory.egocentric_memory.focus_point is not None:
-                # Keep the head aligned to the focus
-                head_direction_degree, _ = point_to_echo_direction_distance(memory.egocentric_memory.focus_point)
-                memory.body_memory.set_head_direction_degree(head_direction_degree)
-
-            # Update allocentric memory
-            memory.allocentric_memory.robot_point += quaternion.apply_to_vector(memory.body_memory.body_quaternion, translation)
-            memory.allocentric_memory.place_robot(memory.body_memory, enaction.clock)
-            # If crossed the line then stop the simulation
-            i, j = point_to_cell(memory.allocentric_memory.robot_point)
-            if (memory.allocentric_memory.min_i <= i <= memory.allocentric_memory.max_i) and \
-                (memory.allocentric_memory.min_j <= j <= memory.allocentric_memory.max_j) and \
-                    memory.allocentric_memory.grid[i][j].status[0] == EXPERIENCE_FLOOR:
-                self.is_simulating = False
-                self.simulation_diration1 = enaction.simulation_time * 1000
-
-        # # When the simulation is over, return the simulated outcome
         # if self.is_simulating:
-        #     return None
-        # else:
-        #     return Outcome({"action": enaction.action.action_code, "clock": enaction.clock, "floor": 0,
-        #                     "duration1": self.simulation_diration1, 'status': "I", 'head_angle': 0, 'echo_distance': 300})
+        # Check the target time
+        enaction.simulation_time += dt
+        if enaction.simulation_time >= enaction.simulation_duration:
+            dt += enaction.simulation_duration - enaction.simulation_time  # Adjust to the exact duration
+            self.is_simulating = False
+            self.simulation_diration1 = enaction.simulation_duration * 1000
+
+        # The intermediate displacement
+        yaw_quaternion = Quaternion.from_z_rotation((enaction.simulation_rotation_speed * dt))
+        way = 1
+        if enaction.action.action_code == ACTION_SWIPE and enaction.command.speed is not None and enaction.command.speed < 0:
+            way = -1
+        translation = enaction.action.translation_speed * dt * way
+        yaw_matrix = matrix44.create_from_quaternion(yaw_quaternion)
+        translation_matrix = matrix44.create_from_translation(-translation)
+        displacement_matrix = matrix44.multiply(yaw_matrix, translation_matrix)
+
+        # Simulate the displacement of experiences
+        for experience in memory.egocentric_memory.experiences.values():
+            experience.displace(displacement_matrix)
+        # Simulate the displacement of the focus and prompt
+        if memory.egocentric_memory.focus_point is not None:
+            memory.egocentric_memory.focus_point = matrix44.apply_to_vector(displacement_matrix,
+                                                                          memory.egocentric_memory.focus_point)
+        if memory.egocentric_memory.prompt_point is not None:
+            memory.egocentric_memory.prompt_point = matrix44.apply_to_vector(displacement_matrix,
+                                                                           memory.egocentric_memory.prompt_point)
+        # Displacement in body memory
+        memory.body_memory.body_quaternion = memory.body_memory.body_quaternion.cross(yaw_quaternion)
+        if memory.egocentric_memory.focus_point is not None:
+            # Keep the head aligned to the focus
+            head_direction_degree, _ = point_to_echo_direction_distance(memory.egocentric_memory.focus_point)
+            memory.body_memory.set_head_direction_degree(head_direction_degree)
+
+        # Update allocentric memory
+        memory.allocentric_memory.robot_point += quaternion.apply_to_vector(memory.body_memory.body_quaternion, translation)
+        memory.allocentric_memory.place_robot(memory.body_memory, enaction.clock)
+        # If crossed the line then stop the simulation
+        i, j = point_to_cell(memory.allocentric_memory.robot_point)
+        if (memory.allocentric_memory.min_i <= i <= memory.allocentric_memory.max_i) and \
+            (memory.allocentric_memory.min_j <= j <= memory.allocentric_memory.max_j) and \
+                memory.allocentric_memory.grid[i][j].status[0] == EXPERIENCE_FLOOR:
+            self.is_simulating = False
+            self.simulation_diration1 = enaction.simulation_time * 1000
 
     def prediction_error(self, simulated_outcome):
         """Compute the prediction errors"""
