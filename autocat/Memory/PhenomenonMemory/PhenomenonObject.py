@@ -2,7 +2,7 @@ import numpy as np
 from pyrr import matrix44
 from .Phenomenon import Phenomenon, PHENOMENON_DELTA, PHENOMENON_CONFIDENCE_PRUNE
 from autocat.Memory.EgocentricMemory.Experience import EXPERIENCE_CENTRAL_ECHO, EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_BLOCK, \
-    EXPERIENCE_IMPACT
+    EXPERIENCE_IMPACT, EXPERIENCE_FLOOR
 
 OBJECT_EXPERIENCE_TYPES = [EXPERIENCE_CENTRAL_ECHO, EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_BLOCK, EXPERIENCE_IMPACT]
 
@@ -12,6 +12,7 @@ class PhenomenonObject(Phenomenon):
     def __init__(self, affordance):
         super().__init__(affordance)
         self.absolute_affordance_key = 0  # The initial affordance is the origin
+        self.interpolation_types = [EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_FLOOR]
         # print("New phenomenon Object")
 
     def update(self, affordance):
@@ -70,6 +71,7 @@ class PhenomenonObject(Phenomenon):
             self.affordances[self.affordance_id] = affordance
 
             # Return the correction to apply to the robot's position
+            self.interpolate(s=1)
             return position_correction
         else:
             # This affordance does not belong to this phenomenon
@@ -105,7 +107,9 @@ class PhenomenonObject(Phenomenon):
             print("Prune:", nb_affordance - len(self.affordances), "affordances removed.")
 
     def outline(self):
-        return self.convex_hull()
+        """Return the outline to display in phenomenon view"""
+        return self.interpolation_points
+        # return self.convex_hull()
 
     def save(self):
         """Return a clone of the phenomenon for memory snapshot"""

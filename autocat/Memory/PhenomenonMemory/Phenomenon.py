@@ -65,7 +65,8 @@ class Phenomenon:
             print("Error computing the convex hull: probably not enough points.", e)
         return self.hull_points
 
-    def interpolate(self):
+    def interpolate(self, s=5000):
+        """Compute the interpolation points between the affordances"""
         self.interpolation_points = None
         points = np.array(
             [a.point[0:2] for a in self.affordances.values() if a.type in self.interpolation_types])
@@ -82,10 +83,11 @@ class Phenomenon:
                 sorted_points = np.append(sorted_points, [sorted_points[0]], axis=0)
                 # print(repr(sorted_points))
                 # Generate the B-spline representation
-                tck, u = splprep(sorted_points.T, s=50000, per=True)  # s=0.2
+                tck_u = splprep(sorted_points.T, s=s, per=1)  # s=5000, per=True)  # s=0.2
+                # tck_u = splprep(sorted_points.T)  # s=5000, per=True)  # s=0.2
                 # Evaluate the B-spline on a finer grid
-                u_new = np.linspace(0, 1, 100)
-                interp_t = np.array(splev(u_new, tck)).T
+                finer_u = np.linspace(0, 1, 100)
+                interp_t = np.array(splev(finer_u, tck_u[0])).T
                 self.interpolation_points = interp_t.flatten().astype("int").tolist()
                 self.path = mpath.Path(interp_t + self.point[0:2])
             except IndexError as e:

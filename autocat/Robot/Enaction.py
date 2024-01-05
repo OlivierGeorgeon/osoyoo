@@ -252,7 +252,7 @@ class Enaction:
                 self.focus_confidence = CONFIDENCE_NEW_FOCUS
                 print("New focus ", end="")
         self.focus_point = new_focus
-        print(self.focus_point)
+        print("Focus point", self.focus_point)
 
         # Careful scan has extra confidence
         if self.focus_confidence == CONFIDENCE_NEW_FOCUS and self.command.span == 10:
