@@ -32,7 +32,6 @@ class Enacter:
 
     def main(self, dt):
         """Controls the enaction."""
-        simulated_outcome = None
         if self.interaction_step == ENACTION_STEP_IDLE:
             # When the next enaction is in the stack, prepare the enaction
             if self.workspace.composite_enaction is not None:
@@ -58,12 +57,6 @@ class Enacter:
                 self.simulated_outcome = self.simulate(dt)
             elif self.workspace.is_imagining:
                 # If imagining then use the imagined outcome when the simulation is finished
-                # simulated_outcome = Outcome(
-                #     {"action": self.workspace.enaction.action.action_code, "clock": self.workspace.enaction.clock,
-                #      "floor": 0,
-                #      "duration1": self.simulation_duration1, 'status': "I", 'head_angle': 0,
-                #      'echo_distance': 300})
-                # if self.workspace.is_imagining:
                 print("Simulated outcome", self.simulated_outcome)
                 self.workspace.enaction.terminate(self.simulated_outcome)
                 if not self.workspace.composite_enaction.increment(self.simulated_outcome):
@@ -86,12 +79,8 @@ class Enacter:
             # Force terminate the simulation
             if self.is_simulating:
                 self.is_simulating = False
-                # simulated_outcome = Outcome(
-                #     {"action": self.workspace.enaction.action.action_code, "clock": self.workspace.enaction.clock,
-                #      "floor": 0,
-                #      "duration1": self.simulation_duration1, 'status': "I", 'head_angle': 0,
-                #      'echo_distance': 300})
                 print("Force terminate simulation")
+
             # Compute the prediction errors
             self.prediction_error(self.simulated_outcome)
 
@@ -129,7 +118,8 @@ class Enacter:
         # The intermediate displacement
         yaw_quaternion = Quaternion.from_z_rotation((enaction.simulation_rotation_speed * dt))
         way = 1
-        if enaction.action.action_code == ACTION_SWIPE and enaction.command.speed is not None and enaction.command.speed < 0:
+        if enaction.action.action_code == ACTION_SWIPE and enaction.command.speed is not None \
+                and enaction.command.speed < 0:
             way = -1
         translation = enaction.action.translation_speed * dt * way
         yaw_matrix = matrix44.create_from_quaternion(yaw_quaternion)
@@ -154,9 +144,11 @@ class Enacter:
             memory.body_memory.set_head_direction_degree(head_direction_degree)
 
         # Update allocentric memory
-        memory.allocentric_memory.robot_point += quaternion.apply_to_vector(memory.body_memory.body_quaternion, translation)
+        memory.allocentric_memory.robot_point += quaternion.apply_to_vector(memory.body_memory.body_quaternion,
+                                                                            translation)
         memory.allocentric_memory.place_robot(memory.body_memory, enaction.clock)
-        # If crossed the line then stop the simulation
+
+        # If crossed the line then stop the simulation TODO: check before moving
         i, j = point_to_cell(memory.allocentric_memory.robot_point)
         if (memory.allocentric_memory.min_i <= i <= memory.allocentric_memory.max_i) and \
             (memory.allocentric_memory.min_j <= j <= memory.allocentric_memory.max_j) and \
@@ -189,30 +181,23 @@ class Enacter:
             pe = simulated_outcome.duration1 - self.workspace.enaction.outcome.duration1
             self.forward_duration1_prediction_error[self.workspace.enaction.clock] = pe
             self.forward_duration1_prediction_error.pop(self.workspace.enaction.clock - PREDICTION_ERROR_WINDOW, None)
-            # self.forward_duration1_prediction_error = {key: d for key,
-            #     d in self.forward_duration1_prediction_error.items() if
-            #         key > self.workspace.enaction.clock - PREDICTION_ERROR_AVERAGE_SPAN}
             print("Prediction Error Translate duration1 (simulation - measured)=", round(pe),
-                  "Average:", round(np.mean(list(self.forward_duration1_prediction_error.values()))),
-                  "std:", round(np.std(list(self.forward_duration1_prediction_error.values()))))
+                  "Average:", round(float(np.mean(list(self.forward_duration1_prediction_error.values())))),
+                  "std:", round(float(np.std(list(self.forward_duration1_prediction_error.values())))))
 
         # yaw
 
         pe = math.degrees(-short_angle(enaction.command.anticipated_yaw_quaternion, enaction.yaw_quaternion))
         self.yaw_prediction_error[self.workspace.enaction.clock] = pe
         self.yaw_prediction_error.pop(enaction.clock - PREDICTION_ERROR_WINDOW, None)
-        # self.yaw_prediction_error = {key: d for key, d in self.yaw_prediction_error.items() if
-        #                              key > enaction.clock - PREDICTION_ERROR_AVERAGE_SPAN}
         print("Prediction Error Yaw (command - measure)=", round(pe, 1),
-              "Average:", round(np.mean(list(self.yaw_prediction_error.values())), 1),
-              "std:", round(np.std(list(self.yaw_prediction_error.values())), 1))
+              "Average:", round(float(np.mean(list(self.yaw_prediction_error.values()))), 1),
+              "std:", round(float(np.std(list(self.yaw_prediction_error.values()))), 1))
 
         # Compass prediction error to calibrate gyro_coef is correct
 
         self.compass_prediction_error[self.workspace.enaction.clock] = self.workspace.enaction.body_direction_delta
         self.compass_prediction_error.pop(self.workspace.enaction.clock - PREDICTION_ERROR_WINDOW, None)
-        # self.compass_prediction_error = {key: d for key, d in self.compass_prediction_error.items()
-        #                                  if key > self.workspace.enaction.clock - PREDICTION_ERROR_AVERAGE_SPAN}
         print("Prediction Error Compass (integrated direction - compass measure)=",
               round(math.degrees(self.workspace.enaction.body_direction_delta), 2), "Average:",
               round(math.degrees(np.mean(list(self.compass_prediction_error.values()))), 2), "std:",
@@ -221,17 +206,17 @@ class Enacter:
         # If focus is confident then track its prediction error
 
         if self.workspace.enaction.focus_confidence >= CONFIDENCE_CONFIRMED_FOCUS:
-            self.focus_direction_prediction_error[self.workspace.enaction.clock] = self.workspace.enaction.focus_direction_prediction_error
+            self.focus_direction_prediction_error[self.workspace.enaction.clock] = \
+                self.workspace.enaction.focus_direction_prediction_error
             self.focus_direction_prediction_error.pop(self.workspace.enaction.clock - PREDICTION_ERROR_WINDOW, None)
-            # self.focus_direction_prediction_error = {key: d for key, d in self.focus_direction_prediction_error.items()
-            #                                          if key > self.workspace.enaction.clock - PREDICTION_ERROR_AVERAGE_SPAN}
-            print("Prediction Error Focus direction (integration - measure)=", self.workspace.enaction.focus_direction_prediction_error,
-                  "Average:", round(np.mean(list(self.focus_direction_prediction_error.values()))),
-                  "std:", round(np.std(list(self.focus_direction_prediction_error.values()))))
-            self.focus_distance_prediction_error[self.workspace.enaction.clock] = self.workspace.enaction.focus_distance_prediction_error
+            print("Prediction Error Focus direction (integration - measure)=",
+                  self.workspace.enaction.focus_direction_prediction_error,
+                  "Average:", round(float(np.mean(list(self.focus_direction_prediction_error.values())))),
+                  "std:", round(float(np.std(list(self.focus_direction_prediction_error.values())))))
+            self.focus_distance_prediction_error[self.workspace.enaction.clock] = \
+                self.workspace.enaction.focus_distance_prediction_error
             self.focus_distance_prediction_error.pop(self.workspace.enaction.clock - PREDICTION_ERROR_WINDOW, None)
-            # self.focus_distance_prediction_error = {key: d for key, d in self.focus_distance_prediction_error.items()
-            #                                         if key > self.workspace.enaction.clock - PREDICTION_ERROR_AVERAGE_SPAN}
-            print("Prediction Error Focus distance (integration - measure)=", self.workspace.enaction.focus_distance_prediction_error,
-                  "Average:", round(np.mean(list(self.focus_distance_prediction_error.values()))),
-                  "std:", round(np.std(list(self.focus_distance_prediction_error.values()))))
+            print("Prediction Error Focus distance (integration - measure)=",
+                  self.workspace.enaction.focus_distance_prediction_error,
+                  "Average:", round(float(np.mean(list(self.focus_distance_prediction_error.values())))),
+                  "std:", round(float(np.std(list(self.focus_distance_prediction_error.values())))))

@@ -12,11 +12,12 @@ PHENOMENON_CONFIDENCE_PRUNE = 30  # Confidence threshold above which prune
 class Phenomenon:
     """The parent class of all phenomena types"""
     def __init__(self, affordance):
-        """Constructor
-        Parameters:
-            affordance: the first affordance that serves as the origin of the phenomenon
-            """
+        """A phenomenon is constructed from an initial affordance"""
         self.confidence = PHENOMENON_INITIAL_CONFIDENCE
+        self.category = None
+        self.quaternion = None
+        self.north_east_point = None
+        self.shape = None
 
         # Record the first affordance of the phenomenon
         self.point = affordance.point.copy().astype(int)  # The position of the phenomenon relative to allocentric memo
@@ -35,6 +36,16 @@ class Phenomenon:
 
         # Last time the origin affordance was enacted. Used to compute the return to origin.
         self.last_origin_clock = affordance.clock
+
+    def set_shape(self, north_east_point, quaternion, shape):
+        """Set the attributes of the shape, initially from affordance, and then from its category"""
+        self.north_east_point = north_east_point.copy()
+        self.quaternion = quaternion.copy()
+        self.shape = shape  # May be None
+
+    def get_shape(self):
+        """Return the attributes of the shape. Used by subclasses"""
+        return self.north_east_point, self.quaternion, self.shape
 
     def absolute_affordance(self):
         """Return a reference to the absolute origin affordance or None"""
@@ -99,6 +110,10 @@ class Phenomenon:
             except QhullError:
                 print("The points do not form a valid convex polygon.")
 
+    def outline(self):
+        """Return the terrain outline points"""
+        return self.interpolation_points
+
     def is_inside(self, p):
         """True if p is inside the terrain"""
         if p is None or self.path is None:
@@ -115,7 +130,6 @@ class Phenomenon:
 
     def save(self, saved_phenomenon):
         """Return a clone of the phenomenon for memory snapshot"""
-        # Use the experiences cloned when saving egocentric memory
         saved_phenomenon.point = self.point.copy()
         saved_phenomenon.confidence = self.confidence
         saved_phenomenon.nb_tour = self.nb_tour
@@ -125,4 +139,7 @@ class Phenomenon:
         saved_phenomenon.absolute_affordance_key = self.absolute_affordance_key
         saved_phenomenon.last_origin_clock = self.last_origin_clock
         saved_phenomenon.path = self.path
+        saved_phenomenon.category = self.category
+        saved_phenomenon.quaternion = self.quaternion
+        saved_phenomenon.north_east_point = self.north_east_point
         return

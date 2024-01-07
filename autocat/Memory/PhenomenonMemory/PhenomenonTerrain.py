@@ -4,7 +4,7 @@ from pyrr import vector, Vector3, Quaternion
 from .Phenomenon import Phenomenon
 from .Affordance import MIDDLE_COLOR_INDEX, COLOR_DISTANCE
 from ...Memory.EgocentricMemory.Experience import EXPERIENCE_PLACE, EXPERIENCE_FLOOR
-from ...Robot.RobotDefine import TERRAIN_RADIUS, terrain_quaternion, terrain_north_east_point
+from ...Robot.RobotDefine import TERRAIN_RADIUS, terrain_quaternion, terrain_north_east_point, ROBOT_FRONT_X
 from ...Utils import azimuth_to_quaternion
 
 
@@ -27,6 +27,9 @@ class PhenomenonTerrain(Phenomenon):
             self.absolute_affordance_key = 0
             self.last_origin_clock = affordance.experience.clock
 
+        # Default shape TODO: learn the shape
+        self.set_shape(terrain_north_east_point(self.arena_id), terrain_quaternion(self.arena_id), None)
+
     def update(self, affordance):
         """Test if the affordance is within the acceptable delta from the position of the phenomenon,
         if yes, add the affordance to the phenomenon, and return the robot's position correction."""
@@ -42,7 +45,8 @@ class PhenomenonTerrain(Phenomenon):
             # Check if this affordance is absolute
             if affordance.absolute_point_interest():
                 # If the phenomenon does not have an absolute origin yet then this affordance becomes the absolute
-                if self.absolute_affordance_key is None:
+                # if self.absolute_affordance_key is None:
+                if self.confidence < TERRAIN_ORIGIN_CONFIDENCE:
                     # This experience becomes the phenomenon's absolute origin
                     self.absolute_affordance_key = self.affordance_id
                     self.last_origin_clock = affordance.clock
@@ -53,6 +57,7 @@ class PhenomenonTerrain(Phenomenon):
                         a.point -= terrain_offset
                     self.confidence = TERRAIN_ORIGIN_CONFIDENCE
                 else:
+                    # If the category is recognized
                     position_correction = self.place_prediction_error(affordance)
                     # Correct the position of the affordances since last time the robot visited the absolute origin
                     for a in [a for a in self.affordances.values() if a.clock > self.last_origin_clock]:
@@ -73,26 +78,28 @@ class PhenomenonTerrain(Phenomenon):
 
     def origin_point(self):
         """Return the position where to go to check the origin in allocentric coordinates"""
+        north_east_point, _, _ = self.get_shape()
         if self.absolute_affordance() is None:
             return None
-        elif np.dot(self.absolute_affordance().polar_sensor_point, terrain_north_east_point(self.arena_id)) < 0:
+        elif np.dot(self.absolute_affordance().polar_sensor_point, north_east_point) < 0:
             # North-East
-            return terrain_north_east_point(self.arena_id) + self.point
+            return north_east_point + self.point
         else:
-            return -terrain_north_east_point(self.arena_id) + self.point
+            return -north_east_point + self.point
 
         # return self.absolute_affordance().green_point() + self.point
 
     def confirmation_prompt(self):
         """Return the point in polar egocentric coordinates to aim for confirmation of this phenomenon"""
+        north_east_point, _, _ = self.get_shape()
         # Parallel to the absolute affordance direction
         if self.absolute_affordance() is None:
             return None
-        elif np.dot(self.absolute_affordance().polar_sensor_point, terrain_north_east_point(self.arena_id)) < 0:
+        elif np.dot(self.absolute_affordance().polar_sensor_point, north_east_point) < 0:
             # North-East
-            return vector.set_length(terrain_north_east_point(self.arena_id), 500)
+            return vector.set_length(north_east_point, 500)
         else:
-            return vector.set_length(terrain_north_east_point(self.arena_id), -500)
+            return vector.set_length(north_east_point, -500)
         # Does not presuppose the orientation of the terrain
         # rotation_matrix = self.absolute_affordance().experience.rotation_matrix
         # point = np.array([500, 0, 0])  # Need the opposite
@@ -101,18 +108,20 @@ class PhenomenonTerrain(Phenomenon):
 
     def origin_direction_quaternion(self):
         """Return the quaternion representing the direction of the color patch from the center of the terrain"""
+        north_east_point, quaternion, _ = self.get_shape()
         if self.absolute_affordance() is None:
             return None
-        if np.dot(self.absolute_affordance().polar_sensor_point, terrain_north_east_point(self.arena_id)) < 0:
+        if np.dot(self.absolute_affordance().polar_sensor_point, north_east_point) < 0:
             # The North-East patch
-            return azimuth_to_quaternion(TERRAIN_RADIUS[self.arena_id]["azimuth"])
+            return quaternion
         else:
             # South west patch
-            return azimuth_to_quaternion(TERRAIN_RADIUS[self.arena_id]["azimuth"] + 180)
+            return quaternion * Quaternion.from_z_rotation(math.pi)
+            # return azimuth_to_quaternion(TERRAIN_RADIUS[self.arena_id]["azimuth"] + 180)
 
-    def outline(self):
-        """Return the terrain outline points"""
-        return self.interpolation_points
+    # def outline(self):
+    #     """Return the terrain outline points"""
+    #     return self.interpolation_points
 
     def phenomenon_label(self):
         """Return the text to display in phenomenon view"""
@@ -125,16 +134,18 @@ class PhenomenonTerrain(Phenomenon):
         # Positive prediction error means reducing the position computed through path integration
         # The prediction error must be subtracted from the computed position
 
+        north_east_point, quaternion, _ = self.get_shape()
+        north_east_place = vector.set_length(north_east_point, vector.length(north_east_point) - ROBOT_FRONT_X)
         # The color point along the y axis: red positive, purple negative.
         color_y = Vector3([0, (MIDDLE_COLOR_INDEX - affordance.color_index) * COLOR_DISTANCE, 0])
 
-        if np.dot(affordance.polar_sensor_point, terrain_north_east_point(self.arena_id)) < 0:
+        if np.dot(affordance.polar_sensor_point, north_east_point) < 0:
             # North-East
-            color_point = terrain_north_east_point(self.arena_id) + terrain_quaternion(self.arena_id) * color_y
+            color_point = north_east_point + quaternion * color_y
             # print("Color point NE:", color_point)
         else:
             # South-West
-            color_point = -terrain_north_east_point(self.arena_id) - terrain_quaternion(self.arena_id) * color_y
+            color_point = -north_east_point - quaternion * color_y
             # print("Color point SW:", color_point)
 
         p_error = affordance.point + affordance.polar_sensor_point - color_point
@@ -146,4 +157,3 @@ class PhenomenonTerrain(Phenomenon):
         saved_phenomenon = PhenomenonTerrain(self.affordances[0].save(), self.arena_id)
         super().save(saved_phenomenon)
         return saved_phenomenon
-

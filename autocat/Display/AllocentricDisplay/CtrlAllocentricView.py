@@ -29,7 +29,7 @@ class CtrlAllocentricView:
             phenomenon_id = cell.phenomenon_id
             self.view.label_click.text = cell.label()
             if phenomenon_id is not None:
-                print("Displaying Phenomenon", cell.phenomenon_id)
+                # print("Displaying Phenomenon", cell.phenomenon_id)
                 self.workspace.ctrl_phenomenon_view.phenomenon = \
                     self.workspace.memory.phenomenon_memory.phenomena[cell.phenomenon_id]
                 # ctrl_phenomenon_view = CtrlPhenomenonView(workspace)

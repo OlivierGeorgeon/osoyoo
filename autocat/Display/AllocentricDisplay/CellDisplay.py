@@ -67,7 +67,7 @@ class CellDisplay:
             self.shape0.colors[0:24] = 6 * (*color0, 255)
 
         # Level 1
-        color1 = name_to_rgb('white')
+        color1 = name_to_rgb('blue')
         opacity1 = 255
         if cell.status[0] == CELL_UNKNOWN:
             color1 = name_to_rgb('grey')

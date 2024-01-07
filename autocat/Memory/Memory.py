@@ -13,7 +13,7 @@ from ..Decider.Action import ACTION_SWIPE
 from ..Decider.Decider import FOCUS_TOO_FAR_DISTANCE, CONFIDENCE_CONFIRMED_FOCUS
 from ..Robot.Outcome import Outcome
 
-GRID_WIDTH = 20  # 15   # 100 Number of cells wide
+GRID_WIDTH = 30  # 15   # 100 Number of cells wide
 GRID_HEIGHT = 60  # 45  # 200 Number of cells high
 NEAR_HOME = 300    # (mm) Max distance to consider near home
 SIMULATION_TIME_RATIO = 1  # 0.5   # The simulation speed is slower than the real speed because ...
@@ -118,7 +118,7 @@ class Memory:
         self.allocentric_memory.place_robot(self.body_memory, clock)
 
         # Mark the affordances
-        self.allocentric_memory.update_affordances(self.phenomenon_memory.phenomena, clock)
+        self.allocentric_memory.update_affordances(self.phenomenon_memory, clock)
 
         # Update the focus in allocentric memory
         allo_focus = self.egocentric_to_allocentric(self.egocentric_memory.focus_point)

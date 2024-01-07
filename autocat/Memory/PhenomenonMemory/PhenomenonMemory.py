@@ -1,11 +1,12 @@
 import numpy as np
 from pyrr import Vector3
+from .PhenomenonCategory import PhenomenonCategory
 from .PhenomenonObject import PhenomenonObject
 from .PhenomenonTerrain import PhenomenonTerrain, TERRAIN_EXPERIENCE_TYPES, TERRAIN_ORIGIN_CONFIDENCE
 from .PhenomenonRobot import PhenomenonRobot
 from .. import EMOTION_ANGRY
+from ..EgocentricMemory.Experience import EXPERIENCE_ROBOT, EXPERIENCE_FLOOR
 from ...Robot.RobotDefine import TERRAIN_RADIUS
-from ..EgocentricMemory.Experience import EXPERIENCE_ROBOT
 
 TER = 0
 ROBOT1 = -1  # The last other robot from which this robot receives a message TODO Handle more robots
@@ -16,6 +17,12 @@ class PhenomenonMemory:
         self.arena_id = arena_id
         self.phenomena = {}  # Phenomenon 0 is the terrain
         self.phenomenon_id = 0  # Used for object phenomena
+
+        # Initialize the phenomenon categories
+        category_terrain = PhenomenonCategory(EXPERIENCE_FLOOR, TERRAIN_RADIUS[self.arena_id]["short_radius"],
+                                              TERRAIN_RADIUS[self.arena_id]["radius"],
+                                              TERRAIN_RADIUS[self.arena_id]["azimuth"])
+        self.phenomenon_categories = {TER: category_terrain}  # Phenomenon_category 0 is the terrain
 
     def terrain_confidence(self):
         """Return the confidence in the terrain: 0 if no terrain found yet."""
@@ -127,8 +134,8 @@ class PhenomenonMemory:
 
     def save(self):
         """Return a clone of phenomenon memory for memory snapshot"""
-        # Use the experiences cloned when saving egocentric memory
         saved_phenomenon_memory = PhenomenonMemory(self.arena_id)
-        saved_phenomenon_memory.phenomena = {key: p.save() for key, p in self.phenomena.items()}
+        saved_phenomenon_memory.phenomenon_categories = {k: c.save() for k, c in self.phenomenon_categories.items()}
+        saved_phenomenon_memory.phenomena = {k: p.save() for k, p in self.phenomena.items()}
         saved_phenomenon_memory.phenomenon_id = self.phenomenon_id
         return saved_phenomenon_memory

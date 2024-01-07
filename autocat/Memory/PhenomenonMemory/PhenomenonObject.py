@@ -106,10 +106,9 @@ class PhenomenonObject(Phenomenon):
                     break  # Remove only the first similar affordance found
             print("Prune:", nb_affordance - len(self.affordances), "affordances removed.")
 
-    def outline(self):
-        """Return the outline to display in phenomenon view"""
-        return self.interpolation_points
-        # return self.convex_hull()
+    # def outline(self):
+    #     """Return the outline to display in phenomenon view"""
+    #     # return self.convex_hull()
 
     def save(self):
         """Return a clone of the phenomenon for memory snapshot"""

@@ -23,13 +23,13 @@ TRANSLATE_DURATION = 1.     # (s) The duration of longitudinal or lateral transl
 RETREAT_DISTANCE_Y = 20  # 75     # (mm) Y displacement when line is detected on the side
 LINE_X = 150  # 160              # (mm) X coordinate of the line after retreat
 
-SCAN_DISTANCE = 800
+# SCAN_DISTANCE = 800
 
-TERRAIN_RADIUS = {"A328": {"radius": 990, "azimuth": 25},  # 45},
+TERRAIN_RADIUS = {"A328": {"radius": 990, "azimuth": 25, "short_radius": 600},  # 45},
                   # "PetiteIA": {"radius": 600, "azimuth": 50},  # Petit tapis
-                  "PetiteIA": {"radius": 990, "azimuth": 55},  # {1000, 60},  # Grand tapis
+                  "PetiteIA": {"radius": 1100, "azimuth": 55, "short_radius": 650},  # {990, 60},  # Grand tapis
                   "A301": {"radius": 1200, "azimuth": 50},
-                  "DOLL": {"radius": 1200, "azimuth": 0}      # To be defined
+                  "DOLL": {"radius": 1200, "azimuth": 0, "short_radius": 1000}      # To be defined
 }
 
 # You must set the compass offset to the center of the circle drawn by the (compass_x, compass_y) points.

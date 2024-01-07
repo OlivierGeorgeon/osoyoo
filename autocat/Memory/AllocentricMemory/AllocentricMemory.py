@@ -9,7 +9,7 @@ from ..EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_PLACE, EX
 from ..AllocentricMemory.GridCell import CELL_NO_ECHO
 from ...Robot.RobotDefine import ROBOT_FRONT_X, ROBOT_SIDE, CHECK_OUTSIDE
 from ...Memory.PhenomenonMemory.PhenomenonMemory import TER
-from ...Memory.PhenomenonMemory.PhenomenonTerrain import TERRAIN_CIRCUMFERENCE_CONFIDENCE
+from ...Memory.PhenomenonMemory.PhenomenonTerrain import TERRAIN_CIRCUMFERENCE_CONFIDENCE, TERRAIN_ORIGIN_CONFIDENCE
 
 
 class AllocentricMemory:
@@ -67,13 +67,13 @@ class AllocentricMemory:
             output += "\n"
         return output
 
-    def update_affordances(self, phenomena, clock):
+    def update_affordances(self, phenomenon_memory, clock):
         """Allocate the phenomena to the cells of allocentric memory"""
         # start_time = time.time()
         # Clear the previous phenomena
-        self.clear_phenomena()
+        self.clear_grid_status()
         # Place the phenomena again
-        for p_id, p in phenomena.items():
+        for p_id, p in phenomenon_memory.phenomena.items():
             # Mark the cells outside the terrain (for BICA 2023 paper)
             if CHECK_OUTSIDE == 1:
                 if p_id == TER and p.confidence >= TERRAIN_CIRCUMFERENCE_CONFIDENCE and p.path is not None:
@@ -81,10 +81,19 @@ class AllocentricMemory:
                         c.status[0] = EXPERIENCE_FLOOR
                         c.phenomenon_id = TER
                         c.clock_place = clock
+            # If terrain category has been recognised
+            if p_id == TER and p.confidence >= TERRAIN_ORIGIN_CONFIDENCE:
+                # Draw the terrain from the category
+                for point in phenomenon_memory.phenomenon_categories[TER].shape:
+                    cell_x, cell_y = point_to_cell(point + p.point)
+                    self.apply_status_to_cell(cell_x, cell_y, EXPERIENCE_FLOOR, p.last_origin_clock, 0)
+                    # Attribute this phenomenon to this cell
+                    if (self.min_i <= cell_x <= self.max_i) and (self.min_j <= cell_y <= self.max_j):
+                        self.grid[cell_x][cell_y].phenomenon_id = p_id
             # Mark the affordances of this phenomenon
             for a in p.affordances.values():
-                if p_id != TER or p.confidence < TERRAIN_CIRCUMFERENCE_CONFIDENCE or a.color_index != 0\
-                        or CHECK_OUTSIDE == 0:
+                if (p_id != TER or p.confidence < TERRAIN_CIRCUMFERENCE_CONFIDENCE or a.color_index != 0
+                        or CHECK_OUTSIDE == 0) and a.type != EXPERIENCE_PLACE:
                     # Attribute the status of the affordance
                     cell_x, cell_y = point_to_cell(a.point+p.point)
                     self.apply_status_to_cell(cell_x, cell_y, a.type, a.clock, a.color_index)
@@ -146,8 +155,8 @@ class AllocentricMemory:
             c.clock_place = clock
         # print("Place robot time:", time.time() - start_time, "seconds")
 
-    def clear_phenomena(self):
-        """Reset the phenomena from cells"""
+    def clear_grid_status(self):
+        """Reset the status of all cells except PLACE status"""
         for c in [c for line in self.grid for c in line if c.phenomenon_id is not None]:
             if c.status[0] != EXPERIENCE_PLACE:  # The place experiences are not moved with phenomena
                 c.status[0] = CELL_UNKNOWN
