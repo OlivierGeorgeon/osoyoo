@@ -3,7 +3,7 @@ import numpy as np
 from pyrr import Matrix44, Quaternion
 from ...Memory.EgocentricMemory.Experience import Experience, EXPERIENCE_LOCAL_ECHO, EXPERIENCE_CENTRAL_ECHO, \
     EXPERIENCE_PLACE, EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_IMPACT, EXPERIENCE_ROBOT
-from ...Robot.RobotDefine import ROBOT_COLOR_X, ROBOT_FRONT_X, LINE_X, ROBOT_FRONT_Y, ROBOT_SIDE
+from ...Robot.RobotDefine import ROBOT_COLOR_SENSOR_X, ROBOT_FLOOR_SENSOR_X, LINE_X, ROBOT_CHASSIS_Y, ROBOT_OUTSIDE_Y
 from ...Robot.Outcome import echo_matrix
 from ...Decider.Action import ACTION_FORWARD, ACTION_BACKWARD, ACTION_SWIPE, ACTION_RIGHTWARD, ACTION_CIRCUMVENT
 from ...Utils import quaternion_translation_to_matrix
@@ -30,7 +30,7 @@ class EgocentricMemory:
             experience.displace(enaction.displacement_matrix)
 
         # Add the PLACE experience with the sensed color
-        pose_matrix = Matrix44.from_translation([ROBOT_COLOR_X, 0, 0], dtype=float)
+        pose_matrix = Matrix44.from_translation([ROBOT_COLOR_SENSOR_X, 0, 0], dtype=float)
         place_exp = Experience(pose_matrix, EXPERIENCE_PLACE, enaction.clock, self.experience_id,
                                durability=EXPERIENCE_PERSISTENCE, color_index=enaction.outcome.color_index)
         self.experiences[place_exp.id] = place_exp
@@ -67,29 +67,29 @@ class EgocentricMemory:
         if enaction.outcome.impact > 0:
             if enaction.action.action_code == ACTION_FORWARD:
                 if enaction.outcome.impact == 0b01:  # Impact on the right
-                    pose_matrix = Matrix44.from_translation([ROBOT_FRONT_X, -ROBOT_FRONT_Y, 0], dtype=float)
+                    pose_matrix = Matrix44.from_translation([ROBOT_FLOOR_SENSOR_X, -ROBOT_CHASSIS_Y, 0], dtype=float)
                     # point = np.array([ROBOT_FRONT_X, -ROBOT_FRONT_Y, 0])
                 elif enaction.outcome.impact == 0b11:  # Impact on the front
-                    pose_matrix = Matrix44.from_translation([ROBOT_FRONT_X, 0, 0], dtype=float)
+                    pose_matrix = Matrix44.from_translation([ROBOT_FLOOR_SENSOR_X, 0, 0], dtype=float)
                     # point = np.array([ROBOT_FRONT_X, 0, 0])
                 else:  # Impact on the left
-                    pose_matrix = Matrix44.from_translation([ROBOT_FRONT_X, ROBOT_FRONT_Y, 0], dtype=float)
+                    pose_matrix = Matrix44.from_translation([ROBOT_FLOOR_SENSOR_X, ROBOT_CHASSIS_Y, 0], dtype=float)
                     # point = np.array([ROBOT_FRONT_X, ROBOT_FRONT_Y, 0])
             elif enaction.action.action_code in [ACTION_SWIPE]:
-                pose_matrix = Matrix44.from_translation([0, ROBOT_SIDE, 0], dtype=float)
+                pose_matrix = Matrix44.from_translation([0, ROBOT_OUTSIDE_Y, 0], dtype=float)
                 # point = np.array([0, ROBOT_SIDE, 0])
             elif enaction.action.action_code in [ACTION_RIGHTWARD, ACTION_CIRCUMVENT]:
-                pose_matrix = Matrix44.from_translation([0, -ROBOT_SIDE, 0], dtype=float)
+                pose_matrix = Matrix44.from_translation([0, -ROBOT_OUTSIDE_Y, 0], dtype=float)
                 # point = np.array([0, -ROBOT_SIDE, 0])
             elif enaction.action.action_code == ACTION_BACKWARD:
                 if enaction.outcome.impact == 0b01:  # Impact on the right
-                    pose_matrix = Matrix44.from_translation([-ROBOT_FRONT_X, -ROBOT_FRONT_Y, 0], dtype=float)
+                    pose_matrix = Matrix44.from_translation([-ROBOT_FLOOR_SENSOR_X, -ROBOT_CHASSIS_Y, 0], dtype=float)
                     # point = np.array([-ROBOT_FRONT_X, -ROBOT_FRONT_Y, 0])
                 elif enaction.outcome.impact == 0b11:  # Impact on the front
-                    pose_matrix = Matrix44.from_translation([-ROBOT_FRONT_X, 0, 0], dtype=float)
+                    pose_matrix = Matrix44.from_translation([-ROBOT_FLOOR_SENSOR_X, 0, 0], dtype=float)
                     # point = np.array([-ROBOT_FRONT_X, 0, 0])
                 else:  # Impact on the left
-                    pose_matrix = Matrix44.from_translation([-ROBOT_FRONT_X, ROBOT_FRONT_Y, 0], dtype=float)
+                    pose_matrix = Matrix44.from_translation([-ROBOT_FLOOR_SENSOR_X, ROBOT_CHASSIS_Y, 0], dtype=float)
                     # point = np.array([-ROBOT_FRONT_X, ROBOT_FRONT_Y, 0])
             impact_exp = Experience(pose_matrix, EXPERIENCE_IMPACT, enaction.clock, experience_id=self.experience_id,
                                     durability=EXPERIENCE_PERSISTENCE, color_index=enaction.outcome.color_index)

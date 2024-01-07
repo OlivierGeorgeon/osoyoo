@@ -7,7 +7,7 @@ from . Hexagonal_geometry import point_to_cell, get_neighbors
 from . GridCell import GridCell, CELL_UNKNOWN
 from ..EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_PLACE, EXPERIENCE_FOCUS, EXPERIENCE_PROMPT
 from ..AllocentricMemory.GridCell import CELL_NO_ECHO
-from ...Robot.RobotDefine import ROBOT_FRONT_X, ROBOT_SIDE, CHECK_OUTSIDE
+from ...Robot.RobotDefine import ROBOT_CHASSIS_X, ROBOT_OUTSIDE_Y, CHECK_OUTSIDE
 from ...Memory.PhenomenonMemory.PhenomenonMemory import TER
 from ...Memory.PhenomenonMemory.PhenomenonTerrain import TERRAIN_CIRCUMFERENCE_CONFIDENCE, TERRAIN_ORIGIN_CONFIDENCE
 
@@ -116,25 +116,25 @@ class AllocentricMemory:
         destination_point = self.robot_point + quaternion.apply_to_vector(direction_quaternion, translation)
         # Mark the cells traversed by the robot
         if translation[0] > 0:  # Move back
-            p1 = quaternion.apply_to_vector(direction_quaternion, [ROBOT_FRONT_X, ROBOT_SIDE, 0]) + self.robot_point
-            p2 = quaternion.apply_to_vector(direction_quaternion, [-ROBOT_FRONT_X, ROBOT_SIDE, 0]) + destination_point
-            p3 = quaternion.apply_to_vector(direction_quaternion, [-ROBOT_FRONT_X, -ROBOT_SIDE, 0]) + destination_point
-            p4 = quaternion.apply_to_vector(direction_quaternion, [ROBOT_FRONT_X, -ROBOT_SIDE, 0]) + self.robot_point
+            p1 = quaternion.apply_to_vector(direction_quaternion, [ROBOT_CHASSIS_X, ROBOT_OUTSIDE_Y, 0]) + self.robot_point
+            p2 = quaternion.apply_to_vector(direction_quaternion, [-ROBOT_CHASSIS_X, ROBOT_OUTSIDE_Y, 0]) + destination_point
+            p3 = quaternion.apply_to_vector(direction_quaternion, [-ROBOT_CHASSIS_X, -ROBOT_OUTSIDE_Y, 0]) + destination_point
+            p4 = quaternion.apply_to_vector(direction_quaternion, [ROBOT_CHASSIS_X, -ROBOT_OUTSIDE_Y, 0]) + self.robot_point
         elif translation[1] > 0:  # Swipe left
-            p1 = quaternion.apply_to_vector(direction_quaternion, [ROBOT_FRONT_X, ROBOT_SIDE, 0]) + destination_point
-            p2 = quaternion.apply_to_vector(direction_quaternion, [-ROBOT_FRONT_X, ROBOT_SIDE, 0]) + destination_point
-            p3 = quaternion.apply_to_vector(direction_quaternion, [-ROBOT_FRONT_X, -ROBOT_SIDE, 0]) + self.robot_point
-            p4 = quaternion.apply_to_vector(direction_quaternion, [ROBOT_FRONT_X, -ROBOT_SIDE, 0]) + self.robot_point
+            p1 = quaternion.apply_to_vector(direction_quaternion, [ROBOT_CHASSIS_X, ROBOT_OUTSIDE_Y, 0]) + destination_point
+            p2 = quaternion.apply_to_vector(direction_quaternion, [-ROBOT_CHASSIS_X, ROBOT_OUTSIDE_Y, 0]) + destination_point
+            p3 = quaternion.apply_to_vector(direction_quaternion, [-ROBOT_CHASSIS_X, -ROBOT_OUTSIDE_Y, 0]) + self.robot_point
+            p4 = quaternion.apply_to_vector(direction_quaternion, [ROBOT_CHASSIS_X, -ROBOT_OUTSIDE_Y, 0]) + self.robot_point
         elif translation[1] < 0:  # Swipe right
-            p1 = quaternion.apply_to_vector(direction_quaternion, [ROBOT_FRONT_X, ROBOT_SIDE, 0]) + self.robot_point
-            p2 = quaternion.apply_to_vector(direction_quaternion, [-ROBOT_FRONT_X, ROBOT_SIDE, 0]) + self.robot_point
-            p3 = quaternion.apply_to_vector(direction_quaternion, [-ROBOT_FRONT_X, -ROBOT_SIDE, 0]) + destination_point
-            p4 = quaternion.apply_to_vector(direction_quaternion, [ROBOT_FRONT_X, -ROBOT_SIDE, 0]) + destination_point
+            p1 = quaternion.apply_to_vector(direction_quaternion, [ROBOT_CHASSIS_X, ROBOT_OUTSIDE_Y, 0]) + self.robot_point
+            p2 = quaternion.apply_to_vector(direction_quaternion, [-ROBOT_CHASSIS_X, ROBOT_OUTSIDE_Y, 0]) + self.robot_point
+            p3 = quaternion.apply_to_vector(direction_quaternion, [-ROBOT_CHASSIS_X, -ROBOT_OUTSIDE_Y, 0]) + destination_point
+            p4 = quaternion.apply_to_vector(direction_quaternion, [ROBOT_CHASSIS_X, -ROBOT_OUTSIDE_Y, 0]) + destination_point
         else:  # Move forward
-            p1 = quaternion.apply_to_vector(direction_quaternion, [ROBOT_FRONT_X, ROBOT_SIDE, 0]) + destination_point
-            p2 = quaternion.apply_to_vector(direction_quaternion, [-ROBOT_FRONT_X, ROBOT_SIDE, 0]) + self.robot_point
-            p3 = quaternion.apply_to_vector(direction_quaternion, [-ROBOT_FRONT_X, -ROBOT_SIDE, 0]) + self.robot_point
-            p4 = quaternion.apply_to_vector(direction_quaternion, [ROBOT_FRONT_X, -ROBOT_SIDE, 0]) + destination_point
+            p1 = quaternion.apply_to_vector(direction_quaternion, [ROBOT_CHASSIS_X, ROBOT_OUTSIDE_Y, 0]) + destination_point
+            p2 = quaternion.apply_to_vector(direction_quaternion, [-ROBOT_CHASSIS_X, ROBOT_OUTSIDE_Y, 0]) + self.robot_point
+            p3 = quaternion.apply_to_vector(direction_quaternion, [-ROBOT_CHASSIS_X, -ROBOT_OUTSIDE_Y, 0]) + self.robot_point
+            p4 = quaternion.apply_to_vector(direction_quaternion, [ROBOT_CHASSIS_X, -ROBOT_OUTSIDE_Y, 0]) + destination_point
 
         path = mpath.Path([p[0:2] for p in [p1, p2, p3, p4]])
         for c in [c for line in self.grid for c in line if c.is_inside(path)]:

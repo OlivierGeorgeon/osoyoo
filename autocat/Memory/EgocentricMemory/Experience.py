@@ -1,5 +1,5 @@
 from pyrr import matrix44, Quaternion, Vector3
-from ...Robot.RobotDefine import ROBOT_HEAD_X, ROBOT_COLOR_X, LINE_X
+from ...Robot.RobotDefine import ROBOT_HEAD_X, ROBOT_COLOR_SENSOR_X, LINE_X
 
 EXPERIENCE_ALIGNED_ECHO = 'Echo'
 EXPERIENCE_LOCAL_ECHO = 'Local_Echo'
@@ -88,7 +88,7 @@ class Experience:
         elif self.type == EXPERIENCE_FLOOR:
             # The position of the color sensor
             # ego_color_point = (ego_robot_center + [LINE_X - ROBOT_COLOR_X, 0, 0])
-            return body_quaternion * (ego_robot_center + [LINE_X - ROBOT_COLOR_X, 0, 0])
+            return body_quaternion * (ego_robot_center + [LINE_X - ROBOT_COLOR_SENSOR_X, 0, 0])
         else:
             return body_quaternion * ego_robot_center
 

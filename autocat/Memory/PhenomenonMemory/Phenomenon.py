@@ -1,6 +1,7 @@
 import math
 import matplotlib.path as mpath
 import numpy as np
+from pyrr import Quaternion
 from scipy.spatial import ConvexHull, QhullError
 from scipy.interpolate import splprep, splev
 
@@ -43,15 +44,33 @@ class Phenomenon:
         self.quaternion = quaternion.copy()
         self.shape = shape  # May be None
 
-    def get_shape(self):
-        """Return the attributes of the shape. Used by subclasses"""
-        return self.north_east_point, self.quaternion, self.shape
-
     def absolute_affordance(self):
         """Return a reference to the absolute origin affordance or None"""
         if self.absolute_affordance_key is None:
             return None
         return self.affordances[self.absolute_affordance_key]
+
+    def origin_point(self):
+        """Return the position where to go to check the origin in allocentric coordinates"""
+        # north_east_point, _, _ = self.get_shape()
+        if self.absolute_affordance() is None:
+            return None
+        elif np.dot(self.absolute_affordance().polar_sensor_point, self.north_east_point) < 0:
+            # North-East
+            return self.north_east_point + self.point
+        else:
+            return -self.north_east_point + self.point
+
+    def origin_direction_quaternion(self):
+        """Return the quaternion representing the direction of the color patch from the center of the terrain"""
+        if self.absolute_affordance() is None:
+            return None
+        if np.dot(self.absolute_affordance().polar_sensor_point, self.north_east_point) < 0:
+            # The North-East patch
+            return self.quaternion
+        else:
+            # South west patch
+            return self.quaternion * Quaternion.from_z_rotation(math.pi)
 
     def compute_center(self):
         """Recompute the center of the phenomenon as the mean of the affordance position"""
@@ -95,7 +114,7 @@ class Phenomenon:
                 # print(repr(sorted_points))
                 # Generate the B-spline representation
                 tck_u = splprep(sorted_points.T, s=s, per=1)  # s=5000, per=True)  # s=0.2
-                # tck_u = splprep(sorted_points.T)  # s=5000, per=True)  # s=0.2
+                # tck_u = splprep(sorted_points.T, s=10*len(points), per=True)  # s=5000, per=True)  # s=0.2
                 # Evaluate the B-spline on a finer grid
                 finer_u = np.linspace(0, 1, 100)
                 interp_t = np.array(splev(finer_u, tck_u[0])).T

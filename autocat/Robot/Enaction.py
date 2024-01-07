@@ -10,7 +10,7 @@ from ..Decider.Decider import CONFIDENCE_NO_FOCUS, CONFIDENCE_NEW_FOCUS, CONFIDE
 from ..Memory.Memory import SIMULATION_TIME_RATIO
 from ..Memory.BodyMemory import point_to_echo_direction_distance
 from ..Utils import short_angle
-from .RobotDefine import DEFAULT_YAW, TURN_DURATION, ROBOT_FRONT_X, ROBOT_FRONT_Y, ROBOT_SETTINGS, RETREAT_DISTANCE_Y
+from .RobotDefine import DEFAULT_YAW, TURN_DURATION, ROBOT_FLOOR_SENSOR_X, ROBOT_CHASSIS_Y, ROBOT_SETTINGS, RETREAT_DISTANCE_Y
 from .Command import Command, DIRECTION_FRONT
 from .Outcome import echo_point
 
@@ -265,11 +265,11 @@ class Enaction:
             if new_focus is None or np.linalg.norm(new_focus) > 200:
                 # Focus on the object "felt"
                 if self.outcome.impact == 0b01:
-                    self.focus_point = np.array([ROBOT_FRONT_X + 10, -ROBOT_FRONT_Y, 0])
+                    self.focus_point = np.array([ROBOT_FLOOR_SENSOR_X + 10, -ROBOT_CHASSIS_Y, 0])
                 elif self.outcome.impact == 0b10:
-                    self.focus_point = np.array([ROBOT_FRONT_X + 10, ROBOT_FRONT_Y, 0])
+                    self.focus_point = np.array([ROBOT_FLOOR_SENSOR_X + 10, ROBOT_CHASSIS_Y, 0])
                 else:
-                    self.focus_point = np.array([ROBOT_FRONT_X + 10, 0, 0])
+                    self.focus_point = np.array([ROBOT_FLOOR_SENSOR_X + 10, 0, 0])
             self.focus_confidence = CONFIDENCE_TOUCHED_FOCUS
             print("Catch focus impact", self.focus_point)
 

@@ -1,7 +1,7 @@
 import math
 import numpy as np
 from pyrr import Quaternion, Vector3
-from ..Robot.RobotDefine import ROBOT_SETTINGS, ROBOT_FRONT_X, ROBOT_SIDE, ROBOT_HEAD_X
+from ..Robot.RobotDefine import ROBOT_SETTINGS, ROBOT_CHASSIS_X, ROBOT_OUTSIDE_Y, ROBOT_HEAD_X
 from ..Utils import quaternion_to_azimuth, quaternion_to_direction_rad
 
 ENERGY_TIRED = 80  # 88  # 90  # 92  # Level of energy below which the agent wants to go to color patch
@@ -71,10 +71,10 @@ class BodyMemory:
 
     def outline(self):
         """The rectangle occupied by the robot's body in polar-egocentric reference"""
-        p1 = self.body_quaternion * Vector3([ROBOT_FRONT_X, ROBOT_SIDE, 0])
-        p2 = self.body_quaternion * Vector3([-ROBOT_FRONT_X, ROBOT_SIDE, 0])
-        p3 = self.body_quaternion * Vector3([-ROBOT_FRONT_X, -ROBOT_SIDE, 0])
-        p4 = self.body_quaternion * Vector3([ROBOT_FRONT_X, -ROBOT_SIDE, 0])
+        p1 = self.body_quaternion * Vector3([ROBOT_CHASSIS_X, ROBOT_OUTSIDE_Y, 0])
+        p2 = self.body_quaternion * Vector3([-ROBOT_CHASSIS_X, ROBOT_OUTSIDE_Y, 0])
+        p3 = self.body_quaternion * Vector3([-ROBOT_CHASSIS_X, -ROBOT_OUTSIDE_Y, 0])
+        p4 = self.body_quaternion * Vector3([ROBOT_CHASSIS_X, -ROBOT_OUTSIDE_Y, 0])
         return np.array([p1, p2, p3, p4])
 
     def save(self):

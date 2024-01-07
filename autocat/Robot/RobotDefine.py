@@ -10,11 +10,12 @@ from ..Utils import azimuth_to_quaternion
 
 CHECK_OUTSIDE = 0           # 1 if robot checks echos outside terrain
 
+ROBOT_COLOR_SENSOR_X = 50   # (mm) The X position of the color sensor
 ROBOT_HEAD_X = 80           # (mm) The X position of the head pivot
-ROBOT_FRONT_X = 110         # (mm) The X position of the robot front
-ROBOT_FRONT_Y = 80          # (mm) The Y position of the robot front to mark lateral shocks
-ROBOT_SIDE = 120            # (mm) The Y position of the outside border of the robot
-ROBOT_COLOR_X = 50          # (mm) The X position of the color sensor
+ROBOT_CHASSIS_X = 100       # (mm) The X position of the robot front chassis
+ROBOT_FLOOR_SENSOR_X = 110  # (mm) The X position of the robot floor sensor
+ROBOT_CHASSIS_Y = 80        # (mm) The Y position of the robot front to mark lateral shocks
+ROBOT_OUTSIDE_Y = 120       # (mm) The Y position of the outside border of the robot
 
 DEFAULT_YAW = 45            # (degree) Default rotation when yaw is not returned by the robot
 TURN_DURATION = 1.000       # (s) The duration of turn left and turn right actions

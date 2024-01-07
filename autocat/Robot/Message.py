@@ -1,7 +1,7 @@
 import json
 import math
 from pyrr import Vector3, Quaternion
-from .. Robot.RobotDefine import ROBOT_FRONT_X
+from .. Robot.RobotDefine import ROBOT_FLOOR_SENSOR_X
 from ..Utils import azimuth_to_quaternion
 
 
@@ -34,7 +34,7 @@ class Message:
             # If focus then compute the polar_ego position
             # self.focus_point = Vector3([message_dict["focus_x"], message_dict["focus_y"], 0])
             self.focus_point = Vector3(message_dict["focus"])
-            self.polar_ego_position = -self.focus_point * (1 + ROBOT_FRONT_X / self.focus_point.length)
+            self.polar_ego_position = -self.focus_point * (1 + ROBOT_FLOOR_SENSOR_X / self.focus_point.length)
             # self.polar_ego_position += self.destination
 
         # Ego positions to be update by Workspace.receive_message

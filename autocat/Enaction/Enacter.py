@@ -1,16 +1,17 @@
 import math
 import numpy as np
-from pyrr import Quaternion, quaternion, matrix44
+from pyrr import Quaternion, Vector3, matrix44
 from ..Robot.CtrlRobot import ENACTION_STEP_IDLE, ENACTION_STEP_COMMANDING, ENACTION_STEP_ENACTING, \
     ENACTION_STEP_INTEGRATING, ENACTION_STEP_REFRESHING
+from ..Robot.RobotDefine import ROBOT_FLOOR_SENSOR_X, ROBOT_SETTINGS
 from ..Memory.PhenomenonMemory.PhenomenonMemory import TERRAIN_ORIGIN_CONFIDENCE
 from ..Memory.BodyMemory import point_to_echo_direction_distance
 from ..Decider.Action import ACTION_SWIPE, ACTION_FORWARD
 from ..Decider.Decider import CONFIDENCE_CONFIRMED_FOCUS
 from ..Robot.Outcome import Outcome
-from ..Memory.AllocentricMemory.Hexagonal_geometry import point_to_cell
+from ..Memory.AllocentricMemory.Hexagonal_geometry import point_to_cell, CELL_RADIUS
 from ..Memory.EgocentricMemory.Experience import EXPERIENCE_FLOOR
-from ..Utils import short_angle
+from ..Utils import short_angle, quaternion_to_direction_rad
 
 
 PREDICTION_ERROR_WINDOW = 10
@@ -44,6 +45,7 @@ class Enacter:
                 self.is_simulating = True
                 if self.workspace.is_imagining:
                     # If imagining then proceed to simulating the enaction
+                    print("Simulated command", self.workspace.enaction.serialize())
                     self.interaction_step = ENACTION_STEP_ENACTING
                 else:
                     # If not imagining then proceed to COMMANDING to send the command to the robot
@@ -57,7 +59,6 @@ class Enacter:
                 self.simulated_outcome = self.simulate(dt)
             elif self.workspace.is_imagining:
                 # If imagining then use the imagined outcome when the simulation is finished
-                print("Simulated outcome", self.simulated_outcome)
                 self.workspace.enaction.terminate(self.simulated_outcome)
                 if not self.workspace.composite_enaction.increment(self.simulated_outcome):
                     self.workspace.composite_enaction = None
@@ -144,20 +145,39 @@ class Enacter:
             memory.body_memory.set_head_direction_degree(head_direction_degree)
 
         # Update allocentric memory
-        memory.allocentric_memory.robot_point += quaternion.apply_to_vector(memory.body_memory.body_quaternion,
-                                                                            translation)
-        memory.allocentric_memory.place_robot(memory.body_memory, enaction.clock)
+        memory.allocentric_memory.robot_point += memory.body_memory.body_quaternion * Vector3(translation)
 
-        # If crossed the line then stop the simulation TODO: check before moving
-        i, j = point_to_cell(memory.allocentric_memory.robot_point)
-        if (memory.allocentric_memory.min_i <= i <= memory.allocentric_memory.max_i) and \
-            (memory.allocentric_memory.min_j <= j <= memory.allocentric_memory.max_j) and \
-                memory.allocentric_memory.grid[i][j].status[0] == EXPERIENCE_FLOOR:
-            self.is_simulating = False
-            self.simulation_duration1 = enaction.simulation_time * 1000
-            floor = 3
-        else:
-            floor = 0
+        # If crossed the line then stop the simulation (must do before marking the place
+        floor = 0
+        color_index = 0
+        yaw = round(math.degrees(quaternion_to_direction_rad(enaction.command.anticipated_yaw_quaternion)))
+        if enaction.action.action_code in [ACTION_FORWARD, ACTION_SWIPE]:
+            floor_i, floor_j = point_to_cell(memory.allocentric_memory.robot_point +
+                                             memory.body_memory.body_quaternion * Vector3([ROBOT_FLOOR_SENSOR_X,
+                                                                                           0, 0]))
+            if (memory.allocentric_memory.min_i <= floor_i <= memory.allocentric_memory.max_i) and \
+                (memory.allocentric_memory.min_j <= floor_j <= memory.allocentric_memory.max_j) and \
+                    memory.allocentric_memory.grid[floor_i][floor_j].status[0] == EXPERIENCE_FLOOR:
+                self.is_simulating = False
+                self.simulation_duration1 = enaction.simulation_time * 1000
+                if enaction.action.action_code == ACTION_FORWARD:
+                    floor = 3
+                    self.simulation_duration1 += 400  # Add the inertia
+                else:
+                    if enaction.command.speed is None or enaction.command.speed > 0:
+                        # Swipe left
+                        floor = 2
+                        yaw = 45
+                    else:
+                        # Swipe right
+                        floor = 1
+                        yaw = -45
+                color_index = memory.allocentric_memory.grid[floor_i][floor_j].color_index
+            else:
+                floor = 0
+
+        # Mark the place
+        memory.allocentric_memory.place_robot(memory.body_memory, enaction.clock)
 
         # Simulate an echo from the focus point
         if memory.egocentric_memory.focus_point is None:
@@ -166,10 +186,11 @@ class Enacter:
             head_angle, echo_distance = point_to_echo_direction_distance(memory.egocentric_memory.focus_point)
 
         # Return the simulated outcome
-        return Outcome({"action": self.workspace.enaction.action.action_code, "clock": self.workspace.enaction.clock,
-                        "floor": floor,
-                        "duration1": self.simulation_duration1, 'status': "I",
-                        'head_angle': head_angle, 'echo_distance': echo_distance})
+        outcome_string = {"action": self.workspace.enaction.action.action_code, "clock": self.workspace.enaction.clock,
+                          "floor": floor, "duration1": self.simulation_duration1, "status": "I", "yaw": yaw,
+                          "head_angle": head_angle, "echo_distance": echo_distance, "color_index": color_index}
+        # print("Simulated outcome", outcome_string)
+        return Outcome(outcome_string)
 
     def prediction_error(self, simulated_outcome):
         """Compute the prediction errors"""

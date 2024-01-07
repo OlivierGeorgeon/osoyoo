@@ -11,7 +11,7 @@ from pyrr.geometric_tests import point_closest_point_on_line
 from . Action import ACTION_SWIPE, ACTION_TURN, ACTION_FORWARD, ACTION_BACKWARD, ACTION_SCAN, ACTION_WATCH
 from ..Robot.Enaction import Enaction
 from ..Robot.Command import DIRECTION_LEFT, DIRECTION_RIGHT
-from ..Robot.RobotDefine import CHECK_OUTSIDE, ROBOT_FRONT_X
+from ..Robot.RobotDefine import CHECK_OUTSIDE, ROBOT_FLOOR_SENSOR_X
 from ..Robot.Outcome import echo_point
 from . Decider import Decider, FOCUS_TOO_FAR_DISTANCE
 from ..Utils import line_intersection
@@ -86,7 +86,7 @@ class DeciderArrange(Decider):
                     # If angle to projection point greater than 20° and projection far enough from object
                     elif math.fabs(math.atan2(ego_prompt_projection[0], math.fabs(ego_prompt_projection[1]))) > 0.349 \
                             and object_point[0] - ego_prompt_projection[0] > 0 \
-                            and np.linalg.norm(object_point - ego_prompt_projection) > ROBOT_FRONT_X + ARRANGE_OBJECT_RADIUS:  #ARRANGE_MIN_RADIUS:
+                            and np.linalg.norm(object_point - ego_prompt_projection) > ROBOT_FLOOR_SENSOR_X + ARRANGE_OBJECT_RADIUS:  #ARRANGE_MIN_RADIUS:
                         # If prompt projection behind object swipe to prompt_intersection
                         self.workspace.memory.egocentric_memory.prompt_point = ego_prompt_projection
                         # Turn the left to the projection
@@ -115,7 +115,7 @@ class DeciderArrange(Decider):
                 else:
                     # If robot_direction also aligned with target by less than 10°
                     # subtract the radius of the robot and of the object
-                    push_vector = vector.set_length(ego_target, np.linalg.norm(ego_target) - ROBOT_FRONT_X + ARRANGE_OBJECT_RADIUS)  # ARRANGE_MIN_RADIUS)
+                    push_vector = vector.set_length(ego_target, np.linalg.norm(ego_target) - ROBOT_FLOOR_SENSOR_X + ARRANGE_OBJECT_RADIUS)  # ARRANGE_MIN_RADIUS)
                     self.workspace.memory.egocentric_memory.prompt_point = push_vector  # ego_target
                     if math.fabs(math.atan2(ego_target[1], ego_target[0])) < 0.17:  # 0.349:
                         # Push to target
