@@ -1,5 +1,6 @@
+import numpy as np
 from pyrr import matrix44, Quaternion, Vector3
-from ...Robot.RobotDefine import ROBOT_HEAD_X, ROBOT_COLOR_SENSOR_X, LINE_X
+from ...Robot.RobotDefine import ROBOT_HEAD_X, ROBOT_COLOR_SENSOR_X, ROBOT_FLOOR_SENSOR_X
 
 EXPERIENCE_ALIGNED_ECHO = 'Echo'
 EXPERIENCE_LOCAL_ECHO = 'Local_Echo'
@@ -82,15 +83,18 @@ class Experience:
         # The position of the center of the robot
         ego_robot_center = -Vector3(self.point())
         if self.type in [EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_CENTRAL_ECHO]:
-            # The position of the head
-            # ego_head_point = ego_robot_center + [ROBOT_HEAD_X, 0, 0]
+            # The position of the head relative to the echo
             return body_quaternion * (ego_robot_center + [ROBOT_HEAD_X, 0, 0])
         elif self.type == EXPERIENCE_FLOOR:
-            # The position of the color sensor
-            # ego_color_point = (ego_robot_center + [LINE_X - ROBOT_COLOR_X, 0, 0])
-            return body_quaternion * (ego_robot_center + [LINE_X - ROBOT_COLOR_SENSOR_X, 0, 0])
+            # The position of the color sensor at the end of the interaction relative to the experience
+            # return body_quaternion * (ego_robot_center + [LINE_X - ROBOT_COLOR_SENSOR_X, 0, 0])
+            return body_quaternion * (ego_robot_center + [ROBOT_COLOR_SENSOR_X, 0, 0])
+            # return body_quaternion * (ego_robot_center + [ROBOT_FLOOR_SENSOR_X, 0, 0])
+            # return body_quaternion * Vector3([ROBOT_COLOR_SENSOR_X - ROBOT_FLOOR_SENSOR_X, 0, 0])
         else:
-            return body_quaternion * ego_robot_center
+            # The other sensors are at the position of the experience
+            return Vector3([0, 0, 0])
+            # return body_quaternion * ego_robot_center
 
     def save(self):
         """Create a copy of the experience for memory snapshot"""

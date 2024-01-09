@@ -1,9 +1,10 @@
 import math
 import matplotlib.path as mpath
 import numpy as np
-from pyrr import Quaternion
+from pyrr import Quaternion, Vector3
 from scipy.spatial import ConvexHull, QhullError
 from scipy.interpolate import splprep, splev
+from ...Robot.RobotDefine import LINE_X, ROBOT_COLOR_SENSOR_X
 
 PHENOMENON_DELTA = 300  # (mm) Distance between affordances to be considered the same phenomenon
 PHENOMENON_INITIAL_CONFIDENCE = 0  # 0.2 Initial confidence in the phenomenon
@@ -15,14 +16,18 @@ class Phenomenon:
     def __init__(self, affordance):
         """A phenomenon is constructed from an initial affordance"""
         self.confidence = PHENOMENON_INITIAL_CONFIDENCE
+        self.phenomenon_type = None
         self.category = None
-        self.quaternion = None
-        self.north_east_point = None
-        self.shape = None
+        # Initial shape is unknown
+        self.origin_direction_quaternion = Quaternion([0., 0., 0., 1.])
+        self.relative_origin_point = np.array([0, 0, 0])
+        self.shape = []
 
         # Record the first affordance of the phenomenon
-        self.point = affordance.point.copy().astype(int)  # The position of the phenomenon relative to allocentric memo
-        affordance.point = np.array([0, 0, 0], dtype=int)  # Position of the first affordance is reset
+        # The phenomenon is placed in allocentric memory at the position of the initial affordance
+        self.point = affordance.point.copy().astype(int)
+        # The initial affordance is placed at the origin of the phenomenon
+        affordance.point = np.array([0, 0, 0], dtype=int)
         self.affordances = {0: affordance}
         self.affordance_id = 0
         self.absolute_affordance_key = None
@@ -38,11 +43,11 @@ class Phenomenon:
         # Last time the origin affordance was enacted. Used to compute the return to origin.
         self.last_origin_clock = affordance.clock
 
-    def set_shape(self, north_east_point, quaternion, shape):
-        """Set the attributes of the shape, initially from affordance, and then from its category"""
-        self.north_east_point = north_east_point.copy()
-        self.quaternion = quaternion.copy()
-        self.shape = shape  # May be None
+    # def set_shape(self, north_east_point, quaternion, shape):
+    #     """Set the attributes of the shape, initially from affordance, and then from its category"""
+    #     self.north_east_point = north_east_point.copy()
+    #     self.quaternion = quaternion.copy()
+    #     self.shape = shape  # May be None
 
     def absolute_affordance(self):
         """Return a reference to the absolute origin affordance or None"""
@@ -50,27 +55,35 @@ class Phenomenon:
             return None
         return self.affordances[self.absolute_affordance_key]
 
-    def origin_point(self):
-        """Return the position where to go to check the origin in allocentric coordinates"""
-        # north_east_point, _, _ = self.get_shape()
-        if self.absolute_affordance() is None:
-            return None
-        elif np.dot(self.absolute_affordance().polar_sensor_point, self.north_east_point) < 0:
-            # North-East
-            return self.north_east_point + self.point
-        else:
-            return -self.north_east_point + self.point
+    # def origin_point(self):
+    #     """Return the position where to go to check the origin in allocentric coordinates"""
+    #     # north_east_point, _, _ = self.get_shape()
+    #     if self.absolute_affordance() is None:
+    #         return None
+    #     elif np.dot(self.absolute_affordance().polar_sensor_point, self.north_east_point) < 0:
+    #         # North-East
+    #         return self.north_east_point + self.point
+    #     else:
+    #         return -self.north_east_point + self.point
 
-    def origin_direction_quaternion(self):
-        """Return the quaternion representing the direction of the color patch from the center of the terrain"""
-        if self.absolute_affordance() is None:
-            return None
-        if np.dot(self.absolute_affordance().polar_sensor_point, self.north_east_point) < 0:
-            # The North-East patch
-            return self.quaternion
+    def recognize(self, category):
+        """Update the quaternion, origin, and shape of this phenomenon from the category"""
+        if np.dot(self.absolute_affordance().polar_sensor_point, category.quaternion * Vector3([1., 0., 0.])) < 0:
+            # Origin is North-East
+            self.origin_direction_quaternion = category.quaternion.copy()
         else:
-            # South west patch
-            return self.quaternion * Quaternion.from_z_rotation(math.pi)
+            # Origin is South-West
+            self.origin_direction_quaternion = category.quaternion * Quaternion.from_z_rotation(math.pi)
+        # The new relative origin is the position of green patch from the phenomenon center
+        new_relative_origin = np.array(self.origin_direction_quaternion *
+                                       Vector3([category.long_radius - LINE_X + ROBOT_COLOR_SENSOR_X, 0, 0]), dtype=int)
+        self.shape = category.shape.copy()
+        # The position of the phenomenon is adjusted by the difference in relative origin
+        terrain_offset = new_relative_origin - self.relative_origin_point  # TODO check how it works with colors
+        self.point -= terrain_offset
+        for a in self.affordances.values():
+            a.point += terrain_offset
+        self.relative_origin_point = new_relative_origin
 
     def compute_center(self):
         """Recompute the center of the phenomenon as the mean of the affordance position"""
@@ -117,9 +130,10 @@ class Phenomenon:
                 # tck_u = splprep(sorted_points.T, s=10*len(points), per=True)  # s=5000, per=True)  # s=0.2
                 # Evaluate the B-spline on a finer grid
                 finer_u = np.linspace(0, 1, 100)
-                interp_t = np.array(splev(finer_u, tck_u[0])).T
-                self.interpolation_points = interp_t.flatten().astype("int").tolist()
-                self.path = mpath.Path(interp_t + self.point[0:2])
+                interp = np.array(splev(finer_u, tck_u[0]))
+                self.shape = np.column_stack((interp[0], interp[1], np.zeros(100)))
+                self.interpolation_points = interp.T.flatten().astype("int").tolist()
+                self.path = mpath.Path(interp.T + self.point[0:2])
             except IndexError as e:
                 print("Interpolation failed. No points.", e)
             except TypeError as e:
@@ -131,7 +145,8 @@ class Phenomenon:
 
     def outline(self):
         """Return the terrain outline points"""
-        return self.interpolation_points
+        return np.array([p[0:2] for p in self.shape]).flatten().astype("int").tolist()
+        # return self.interpolation_points
 
     def is_inside(self, p):
         """True if p is inside the terrain"""
@@ -159,6 +174,7 @@ class Phenomenon:
         saved_phenomenon.last_origin_clock = self.last_origin_clock
         saved_phenomenon.path = self.path
         saved_phenomenon.category = self.category
-        saved_phenomenon.quaternion = self.quaternion
-        saved_phenomenon.north_east_point = self.north_east_point
+        saved_phenomenon.origin_direction_quaternion = self.origin_direction_quaternion.copy()
+        saved_phenomenon.relative_origin_point = self.relative_origin_point.copy()
+        saved_phenomenon.shape = self.shape.copy()
         return

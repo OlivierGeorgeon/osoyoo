@@ -19,12 +19,12 @@ class Affordance:
         self.type = experience_type
         self.clock = clock
         self.color_index = color_index
-        self.quaternion = quaternion  # The direction of the sensor relative to the affordance
+        self.quaternion = quaternion  # The absolute direction of this affordance
         self.polar_sensor_point = polar_sensor_point  # The position of the sensor relative to the affordance
 
-    def absolute_point_interest(self):
-        """Return True if this affordance can be used as absolute origin of this phenomenon"""
-        return self.type == EXPERIENCE_FLOOR and self.color_index > 0
+    # def absolute_point_interest(self):
+    #     """Return True if this affordance can be used as absolute origin of this phenomenon"""
+    #     return self.type == EXPERIENCE_FLOOR and self.color_index > 0
 
     def absolute_direction_rad(self):
         """Return the absolute direction of this affordance"""

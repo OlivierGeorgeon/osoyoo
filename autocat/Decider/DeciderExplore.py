@@ -70,7 +70,7 @@ class DeciderExplore(Decider):
         # The floor outcome relative to the terrain origin
         if enaction.outcome.floor > 0 and enaction.outcome.color_index == 0 and \
                 self.workspace.memory.phenomenon_memory.terrain_confidence() >= TERRAIN_ORIGIN_CONFIDENCE:
-            angle = short_angle(self.workspace.memory.phenomenon_memory.phenomena[TER].origin_direction_quaternion(),
+            angle = short_angle(self.workspace.memory.phenomenon_memory.phenomena[TER].origin_direction_quaternion,
                                 self.workspace.memory.body_memory.body_quaternion)
             if angle < -math.pi/3:
                 # print("OUTCOME Far Right of origin")
@@ -124,7 +124,8 @@ class DeciderExplore(Decider):
                     playsound('autocat/Assets/R4.wav', False)
                 else:
                     # If not near home then go to origin prompt
-                    allo_origin = self.workspace.memory.phenomenon_memory.phenomena[TER].origin_point()
+                    allo_origin = self.workspace.memory.phenomenon_memory.phenomena[TER].relative_origin_point + \
+                                  self.workspace.memory.phenomenon_memory.phenomena[TER].point
                     print("Going from", self.workspace.memory.allocentric_memory.robot_point, "to origin sensor point", allo_origin)
                     ego_origin = self.workspace.memory.allocentric_to_egocentric(allo_origin)
                     self.workspace.memory.egocentric_memory.prompt_point = ego_origin
@@ -141,7 +142,7 @@ class DeciderExplore(Decider):
             # Go successively to the predefined prompt points relative to the terrain center
             if self.prompt_index == 0:
                 # self.ter_prompt = terrain_color_point(self.workspace.arena_id) * 1.1
-                self.ter_prompt = self.workspace.memory.phenomenon_memory.phenomena[TER].origin_direction_quaternion() \
+                self.ter_prompt = self.workspace.memory.phenomenon_memory.phenomena[TER].origin_direction_quaternion \
                                   * Vector3([TERRAIN_RADIUS[self.workspace.arena_id]["radius"] * 1.1, 0, 0])
             self.ter_prompt = quaternion.apply_to_vector(self.explore_angle_quaternion, self.ter_prompt)
             ego_prompt = self.workspace.memory.terrain_centric_to_egocentric(self.ter_prompt)

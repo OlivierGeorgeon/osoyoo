@@ -36,7 +36,7 @@ class PhenomenonMemory:
         # If the terrain has has an origin
         if self.terrain_confidence() >= TERRAIN_ORIGIN_CONFIDENCE:
             # Set the watch point half way between the center and the color patch
-            point = self.phenomena[TER].origin_direction_quaternion() * \
+            point = self.phenomena[TER].origin_direction_quaternion * \
                     Vector3([TERRAIN_RADIUS[self.arena_id]["radius"] * 0.5, 0, 0])
             return point + self.phenomena[TER].point
         # If the terrain has not been identified then et the watch point as the birth point
@@ -48,7 +48,7 @@ class PhenomenonMemory:
         # If the terrain has been toured
         if self.terrain_confidence() >= TERRAIN_ORIGIN_CONFIDENCE:
             # Set the arrange point half way to the other side of the terrain
-            point = self.phenomena[TER].origin_direction_quaternion() * \
+            point = self.phenomena[TER].origin_direction_quaternion * \
                     Vector3([-TERRAIN_RADIUS[self.arena_id]["radius"] * 0.5, 0, 0])
             # return point  # Arrange point is on the opposite side
             return np.array([0, 0, 0])  # Arrange point is the center of the terrain
@@ -73,7 +73,7 @@ class PhenomenonMemory:
         """Create a new phenomenon depending of the type of the affordance"""
         # Must always create a phenomenon
         if affordance.type in TERRAIN_EXPERIENCE_TYPES:
-            self.phenomena[TER] = PhenomenonTerrain(affordance, self.arena_id)
+            self.phenomena[TER] = PhenomenonTerrain(affordance)
             return TER
         if affordance.type == EXPERIENCE_ROBOT:
             self.phenomena[ROBOT1] = PhenomenonRobot(affordance)
@@ -113,6 +113,11 @@ class PhenomenonMemory:
             for phenomenon in self.phenomena.values():
                 delta = phenomenon.update(affordance)
                 if delta is not None:
+                    # Check if this phenomenon is recognized
+                    for category in self.phenomenon_categories.values():
+                        if category.is_type_of(phenomenon):
+                            phenomenon.recognize(category)
+                            print("Phenomenon recognized!")
                     remaining_affordances.remove(affordance)
                     # Null correction do not count (to be improved)
                     if round(np.linalg.norm(delta)) > 0:

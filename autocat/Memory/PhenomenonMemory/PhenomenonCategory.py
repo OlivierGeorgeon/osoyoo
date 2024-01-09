@@ -4,37 +4,38 @@ from ..AllocentricMemory.Hexagonal_geometry import CELL_RADIUS
 from ..EgocentricMemory.Experience import EXPERIENCE_FLOOR
 from ...Utils import azimuth_to_quaternion
 from .Affordance import MIDDLE_COLOR_INDEX, COLOR_DISTANCE
+from .PhenomenonTerrain import TERRAIN_ORIGIN_CONFIDENCE, TERRAIN_RECOGNIZE_CONFIDENCE
 
 point_distance = CELL_RADIUS
 
 
-def oval_shape(r, lr, azimuth_quaternion):
+def oval_shape(short_radius, long_radius, azimuth_quaternion):
     """Compute the list of points drawing the oval shape"""
-    segment = lr - r
+    segment = long_radius - short_radius
 
     # Create points on the right half-circle
-    theta = np.linspace(np.pi / 2, -np.pi / 2, int(np.pi * r / point_distance), endpoint=False)
-    x = r * np.cos(theta)
-    y = r * np.sin(theta)
+    theta = np.linspace(np.pi / 2, -np.pi / 2, int(np.pi * short_radius / point_distance), endpoint=False)
+    x = short_radius * np.cos(theta)
+    y = short_radius * np.sin(theta)
     z = np.zeros(len(x))
     right_circle = np.column_stack((x, y, z)) + np.array([segment, 0, 0])
 
     # Create point on the bottom side
     x = np.linspace(segment, -segment, int(2 * segment / point_distance), endpoint=False)
-    y = np.full(len(x), -r)
+    y = np.full(len(x), -short_radius)
     z = np.zeros(len(x))
     bottom_side = np.column_stack((x, y, z))
 
     # Create points on the left half-circle
-    theta = np.linspace(3 * np.pi / 2, np.pi / 2, int(np.pi * r / point_distance), endpoint=False)
-    x = r * np.cos(theta)
-    y = r * np.sin(theta)
+    theta = np.linspace(3 * np.pi / 2, np.pi / 2, int(np.pi * short_radius / point_distance), endpoint=False)
+    x = short_radius * np.cos(theta)
+    y = short_radius * np.sin(theta)
     z = np.zeros(len(x))
     left_circle = np.column_stack((x, y, z)) + np.array([-segment, 0, 0])
 
     # Create point on the top side
     x = np.linspace(-segment, segment, int(2 * segment / point_distance), endpoint=False)
-    y = np.full(len(x), r)
+    y = np.full(len(x), short_radius)
     z = np.zeros(len(x))
     top_side = np.column_stack((x, y, z))
 
@@ -83,7 +84,9 @@ class PhenomenonCategory:
 
     def is_type_of(self, phenomenon):
         """Return True if the phenomenon has the same experience type and is of similar shape"""
-        return self.experience_type in phenomenon.interpolation_types
+        # Only recognize phenomena that have origin confidence
+        return phenomenon.confidence >= TERRAIN_RECOGNIZE_CONFIDENCE and \
+               self.experience_type == phenomenon.phenomenon_type
 
     def save(self):
         """Return a cloned phenomenon category for memory snapshot"""

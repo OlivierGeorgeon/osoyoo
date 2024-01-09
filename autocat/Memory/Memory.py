@@ -14,7 +14,7 @@ from ..Decider.Decider import FOCUS_TOO_FAR_DISTANCE, CONFIDENCE_CONFIRMED_FOCUS
 from ..Robot.Outcome import Outcome
 
 GRID_WIDTH = 30  # 15   # 100 Number of cells wide
-GRID_HEIGHT = 60  # 45  # 200 Number of cells high
+GRID_HEIGHT = 70  # 45  # 200 Number of cells high
 NEAR_HOME = 300    # (mm) Max distance to consider near home
 SIMULATION_TIME_RATIO = 1  # 0.5   # The simulation speed is slower than the real speed because ...
 ARRANGE_OBJECT_RADIUS = 50
@@ -225,7 +225,8 @@ class Memory:
     def is_near_terrain_origin(self):
         """Return True if the robot is near the origin of the terrain"""
         if TER in self.phenomenon_memory.phenomena:
-            delta = self.phenomenon_memory.phenomena[TER].origin_point() - self.allocentric_memory.robot_point
+            delta = self.phenomenon_memory.phenomena[TER].relative_origin_point + \
+                    self.phenomenon_memory.phenomena[TER].point - self.allocentric_memory.robot_point
             return np.linalg.norm(delta) < NEAR_HOME
         else:
             return False
