@@ -1,7 +1,6 @@
 import matplotlib.path as mpath
 from .Hexagonal_geometry import cell_to_point
 
-# CELL_PHENOMENON = 'phenomenon'
 CELL_UNKNOWN = 'Unknown'
 CELL_NO_ECHO = 'no_echo'
 

@@ -64,20 +64,22 @@ class PhenomenonTerrain(Phenomenon):
                     self.confidence = TERRAIN_ORIGIN_CONFIDENCE
                     # The terrain position is moved to the green sensor position relative to this FLOOR affordance
                     # (Assume the pattern of the color patch)
-                    # The terrain origin remains equal to the terrain position
-                    color_y = Vector3([0, (MIDDLE_COLOR_INDEX - affordance.color_index) * COLOR_DISTANCE, 0])
-                    color_point = self.origin_direction_quaternion * color_y
-                    terrain_offset = np.array(affordance.point + affordance.polar_sensor_point - color_point, dtype=int)
-                    # terrain_offset = self.place_prediction_error(affordance)
+                    # The terrain origin remains at the terrain position
+                    # color_y = Vector3([0, (MIDDLE_COLOR_INDEX - affordance.color_index) * COLOR_DISTANCE, 0])
+                    # color_point = self.origin_direction_quaternion * color_y
+                    # terrain_offset = np.array(affordance.point + affordance.polar_sensor_point - color_point, dtype=int)
+                    # terrain_offset = affordance.point + affordance.polar_green_point()
+                    terrain_offset = self.distance_to_origin(affordance)
                     self.point += terrain_offset
                     for a in self.affordances.values():
                         a.point -= terrain_offset
                 elif np.dot(affordance.polar_sensor_point, self.origin_direction_quaternion * Vector3([10., 0, 0])) < 0:
                     # If this affordance is in the direction of the origin
-                    color_y = Vector3([0, (MIDDLE_COLOR_INDEX - affordance.color_index) * COLOR_DISTANCE, 0])
-                    affordance_green_sensor_point = affordance.point + affordance.polar_sensor_point - affordance.quaternion * color_y - self.relative_origin_point
-                    print("Affordance sensor point ", affordance.point + affordance.polar_sensor_point, "affordance green sensor point", affordance_green_sensor_point)
-                    position_correction = affordance_green_sensor_point
+                    # color_y = Vector3([0, (MIDDLE_COLOR_INDEX - affordance.color_index) * COLOR_DISTANCE, 0])
+                    # affordance_green_sensor_point = affordance.point + affordance.polar_sensor_point - affordance.quaternion * color_y - self.relative_origin_point
+                    # terrain_offset = affordance_green_sensor_point
+                    # position_correction = affordance.point + affordance.polar_green_point() - self.relative_origin_point
+                    position_correction = self.distance_to_origin(affordance)
                     # Correct the position of the affordances since last time the robot visited the absolute origin
                     for a in [a for a in self.affordances.values() if a.clock > self.last_origin_clock]:
                         coef = (a.clock - self.last_origin_clock)/(affordance.clock - self.last_origin_clock)
@@ -118,30 +120,13 @@ class PhenomenonTerrain(Phenomenon):
         label = "Origin: " + str(self.point[0]) + "," + str(self.point[1])
         return label
 
-    def place_prediction_error(self, affordance):
-        """Return the distance computed from the affordance place minus the color_point place.
-        prediction_error = computed_place(affordance) - desired_place(terrain)"""
+    def distance_to_origin(self, affordance):
+        """Return the distance between the affordance's green point and the origin point"""
         # Positive prediction error means reducing the position computed through path integration
         # The prediction error must be subtracted from the computed position
-
-        # north_east_point, quaternion, _ = self.get_shape()
-        # north_east_place = vector.set_length(self.north_east_point, vector.length(self.north_east_point) - ROBOT_FLOOR_SENSOR_X)
-        # The color point along the y axis: red positive, purple negative.
-        color_y = Vector3([0, (MIDDLE_COLOR_INDEX - affordance.color_index) * COLOR_DISTANCE, 0])
-        color_point = self.relative_origin_point + self.origin_direction_quaternion * color_y
-
-        # if np.dot(affordance.polar_sensor_point, self.north_east_point) < 0:
-        #     # North-East
-        #     color_point = self.north_east_point + self.quaternion * color_y
-        #     # print("Color point NE:", color_point)
-        # else:
-        #     # South-West
-        #     color_point = -self.north_east_point - self.quaternion * color_y
-        #     # print("Color point SW:", color_point)
-
-        p_error = affordance.point + affordance.polar_sensor_point - color_point
+        p_error = affordance.point + affordance.polar_green_point() - self.relative_origin_point
         # print("Place prediction error", p_error)
-        return np.array(p_error, dtype=int)
+        return p_error
 
     def save(self):
         """Return a clone of the phenomenon for memory snapshot"""

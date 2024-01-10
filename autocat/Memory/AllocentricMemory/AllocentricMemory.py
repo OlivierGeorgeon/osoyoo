@@ -179,6 +179,14 @@ class AllocentricMemory:
             pass
             # print("Error: cell out of grid, i:", i, "j:", j, "Status:", status)
 
+    def clear_cell(self, i, j, clock):
+        """Reset status0 and color of that cell"""
+        if (self.min_i <= i <= self.max_i) and (self.min_j <= j <= self.max_j):
+            self.grid[i][j].status[0] = CELL_UNKNOWN
+            self.grid[i][j].clock_place = clock
+            self.grid[i][j].color_index = 0
+            self.grid[i][j].phenomenon_id = None
+
     def mark_echo_area(self, affordance):
         """Mark the area covered by the echolocalization sensor in allocentric memory"""
         # start_time = time.time()

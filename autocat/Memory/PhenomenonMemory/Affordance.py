@@ -1,5 +1,6 @@
 import math
-from pyrr import matrix44
+import numpy as np
+from pyrr import matrix44, Vector3
 from ..EgocentricMemory.Experience import EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_CENTRAL_ECHO, \
     EXPERIENCE_FLOOR
 from ...Utils import assert_almost_equal_angles, quaternion_to_direction_rad
@@ -21,10 +22,6 @@ class Affordance:
         self.color_index = color_index
         self.quaternion = quaternion  # The absolute direction of this affordance
         self.polar_sensor_point = polar_sensor_point  # The position of the sensor relative to the affordance
-
-    # def absolute_point_interest(self):
-    #     """Return True if this affordance can be used as absolute origin of this phenomenon"""
-    #     return self.type == EXPERIENCE_FLOOR and self.color_index > 0
 
     def absolute_direction_rad(self):
         """Return the absolute direction of this affordance"""
@@ -93,6 +90,12 @@ class Affordance:
             # Add the position of the affordance to the position of the triangle
             points = [p1, p2, p3] + self.point
         return points
+
+    def polar_green_point(self):
+        """Return the point of the expected green patch, polar-centric relative to this affordance"""
+        # The color point along the y axis: red positive, purple negative.
+        color_y = Vector3([0, (MIDDLE_COLOR_INDEX - self.color_index) * COLOR_DISTANCE, 0])
+        return np.array(self.polar_sensor_point - self.quaternion * color_y, dtype=int)
 
     def save(self):
         """Return a cloned affordance for memory snapshot"""

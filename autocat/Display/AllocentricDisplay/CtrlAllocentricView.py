@@ -1,9 +1,11 @@
 import time
-from pyglet.window import key
+from pyglet.window import key, mouse
 from .AllocentricView import AllocentricView
 from ...Memory.AllocentricMemory.Hexagonal_geometry import point_to_cell
 from ...Memory.PhenomenonMemory.PhenomenonMemory import ROBOT1
 from ...Robot.CtrlRobot import ENACTION_STEP_REFRESHING, ENACTION_STEP_ENACTING
+from ...Memory.EgocentricMemory.Experience import EXPERIENCE_FLOOR
+from ...Memory.AllocentricMemory.GridCell import CELL_UNKNOWN
 
 
 class CtrlAllocentricView:
@@ -22,19 +24,33 @@ class CtrlAllocentricView:
         self.view.on_text = on_text
 
         def on_mouse_press(x, y, button, modifiers):
-            """Open a phenomenon view based on the phenomenon on this cell"""
+            """Display the label of this cell"""
             self.prompt_point = self.view.mouse_coordinates_to_point(x, y)
             cell_x, cell_y = point_to_cell(self.prompt_point)
             cell = self.workspace.memory.allocentric_memory.grid[cell_x][cell_y]
-            phenomenon_id = cell.phenomenon_id
-            self.view.label_click.text = cell.label()
-            if phenomenon_id is not None:
+
+            # Change cell status
+            if button == mouse.RIGHT:
+                if modifiers & key.MOD_SHIFT:
+                    # Clear the FLOOR status
+                    self.workspace.memory.allocentric_memory.clear_cell(cell_x, cell_y, self.workspace.clock)
+                elif modifiers & key.MOD_CTRL:
+                    # Mark a green FLOOR cell
+                    self.workspace.memory.allocentric_memory.apply_status_to_cell(cell_x, cell_y, EXPERIENCE_FLOOR,
+                                                                                  self.workspace.clock, 4)
+                else:
+                    # Mark a FLOOR cell
+                    self.workspace.memory.allocentric_memory.apply_status_to_cell(cell_x, cell_y, EXPERIENCE_FLOOR,
+                                                                                  self.workspace.clock, 0)
+                self.update_view()
+            # if cell.phenomenon_id is not None:
                 # print("Displaying Phenomenon", cell.phenomenon_id)
-                self.workspace.ctrl_phenomenon_view.phenomenon = \
-                    self.workspace.memory.phenomenon_memory.phenomena[cell.phenomenon_id]
+                # self.workspace.ctrl_phenomenon_view.phenomenon = \
+                #     self.workspace.memory.phenomenon_memory.phenomena[cell.phenomenon_id]
                 # ctrl_phenomenon_view = CtrlPhenomenonView(workspace)
                 # ctrl_phenomenon_view.update_body_robot()
                 # ctrl_phenomenon_view.update_points_of_interest(phenomenon)
+            self.view.label_click.text = cell.label()
 
         self.view.on_mouse_press = on_mouse_press
 

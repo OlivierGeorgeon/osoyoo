@@ -55,4 +55,3 @@ class InteractiveDisplay(pyglet.window.Window):
         point_x = (x - self.width / 2) * self.zoom_level * 2
         point_y = (y - self.height / 2) * self.zoom_level * 2
         return Vector3([point_x, point_y, 0], dtype=int)
-        # return np.array([point_x, point_y, 0], dtype=int)
