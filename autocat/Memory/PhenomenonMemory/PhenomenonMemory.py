@@ -120,7 +120,7 @@ class PhenomenonMemory:
                     if round(np.linalg.norm(delta)) > 0:
                         sum_translation += delta.astype(int)
                         number_of_add += 1
-                    # Don't look the other phenomena
+                    # Don't look at the other phenomena
                     break
         if number_of_add > 0:
             position_correction = np.divide(sum_translation, number_of_add)
