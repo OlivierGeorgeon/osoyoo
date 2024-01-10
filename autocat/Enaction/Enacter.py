@@ -187,9 +187,10 @@ class Enacter:
 
         # Return the simulated outcome
         outcome_string = {"action": self.workspace.enaction.action.action_code, "clock": self.workspace.enaction.clock,
-                          "floor": floor, "duration1": self.simulation_duration1, "status": "I", "yaw": yaw,
+                          "floor": floor, "duration1": round(self.simulation_duration1), "status": "I", "yaw": yaw,
                           "head_angle": head_angle, "echo_distance": echo_distance, "color_index": color_index}
-        # print("Simulated outcome", outcome_string)
+        if not self.is_simulating:
+            print("Simulated outcome", outcome_string)
         return Outcome(outcome_string)
 
     def prediction_error(self, simulated_outcome):

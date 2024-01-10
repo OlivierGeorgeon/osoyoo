@@ -5,6 +5,7 @@ from pyrr import Quaternion, Vector3
 from scipy.spatial import ConvexHull, QhullError
 from scipy.interpolate import splprep, splev
 from ...Robot.RobotDefine import LINE_X, ROBOT_COLOR_SENSOR_X
+from . import TERRAIN_RECOGNIZE_CONFIDENCE
 
 PHENOMENON_DELTA = 300  # (mm) Distance between affordances to be considered the same phenomenon
 PHENOMENON_INITIAL_CONFIDENCE = 0  # 0.2 Initial confidence in the phenomenon
@@ -43,28 +44,18 @@ class Phenomenon:
         # Last time the origin affordance was enacted. Used to compute the return to origin.
         self.last_origin_clock = affordance.clock
 
-    # def set_shape(self, north_east_point, quaternion, shape):
-    #     """Set the attributes of the shape, initially from affordance, and then from its category"""
-    #     self.north_east_point = north_east_point.copy()
-    #     self.quaternion = quaternion.copy()
-    #     self.shape = shape  # May be None
-
     def absolute_affordance(self):
         """Return a reference to the absolute origin affordance or None"""
         if self.absolute_affordance_key is None:
             return None
         return self.affordances[self.absolute_affordance_key]
 
-    # def origin_point(self):
-    #     """Return the position where to go to check the origin in allocentric coordinates"""
-    #     # north_east_point, _, _ = self.get_shape()
-    #     if self.absolute_affordance() is None:
-    #         return None
-    #     elif np.dot(self.absolute_affordance().polar_sensor_point, self.north_east_point) < 0:
-    #         # North-East
-    #         return self.north_east_point + self.point
-    #     else:
-    #         return -self.north_east_point + self.point
+    def category_clue(self):
+        """If RECOGNITION confidence then return the experience type else return None"""
+        if self.confidence >= TERRAIN_RECOGNIZE_CONFIDENCE:
+            return self.phenomenon_type
+        else:
+            return None
 
     def recognize(self, category):
         """Update the quaternion, origin, and shape of this phenomenon from the category"""

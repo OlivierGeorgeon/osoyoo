@@ -4,7 +4,7 @@ from ..AllocentricMemory.Hexagonal_geometry import CELL_RADIUS
 from ..EgocentricMemory.Experience import EXPERIENCE_FLOOR
 from ...Utils import azimuth_to_quaternion
 from .Affordance import MIDDLE_COLOR_INDEX, COLOR_DISTANCE
-from .PhenomenonTerrain import TERRAIN_ORIGIN_CONFIDENCE, TERRAIN_RECOGNIZE_CONFIDENCE
+from . import TERRAIN_RECOGNIZE_CONFIDENCE
 
 point_distance = CELL_RADIUS
 
@@ -83,10 +83,10 @@ class PhenomenonCategory:
             return None
 
     def is_type_of(self, phenomenon):
-        """Return True if the phenomenon has the same experience type and is of similar shape"""
+        """Return True if the phenomenon has the same experience type and and RECOGNIZE confidence"""
         # Only recognize phenomena that have origin confidence
         return phenomenon.confidence >= TERRAIN_RECOGNIZE_CONFIDENCE and \
-               self.experience_type == phenomenon.phenomenon_type
+            self.experience_type == phenomenon.phenomenon_type
 
     def save(self):
         """Return a cloned phenomenon category for memory snapshot"""

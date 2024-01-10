@@ -113,11 +113,8 @@ class PhenomenonMemory:
             for phenomenon in self.phenomena.values():
                 delta = phenomenon.update(affordance)
                 if delta is not None:
-                    # Check if this phenomenon is recognized
-                    for category in self.phenomenon_categories.values():
-                        if category.is_type_of(phenomenon):
-                            phenomenon.recognize(category)
-                            print("Phenomenon recognized!")
+                    # Check if this phenomenon can be recognized
+                    self.recognize_category(phenomenon)
                     remaining_affordances.remove(affordance)
                     # Null correction do not count (to be improved)
                     if round(np.linalg.norm(delta)) > 0:
@@ -129,6 +126,16 @@ class PhenomenonMemory:
             position_correction = np.divide(sum_translation, number_of_add)
 
         return remaining_affordances, position_correction
+
+    def recognize_category(self, phenomenon):
+        """Check if this phenomenon can be recognized"""
+        clue = phenomenon.category_clue()
+        if clue is not None:
+            for key, category in self.phenomenon_categories.items():
+                if category.experience_type == clue:
+                    phenomenon.recognize(category)
+                    print("Category recognized:", key)
+                    break
 
     def other_robot_is_angry(self):
         """Return True if there is another robot and it is angry"""

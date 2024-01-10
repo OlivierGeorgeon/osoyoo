@@ -1,39 +1,31 @@
 import math
 import numpy as np
-from pyrr import vector, Vector3, Quaternion
+from pyrr import Vector3
+from . import TERRAIN_RECOGNIZE_CONFIDENCE
 from .Phenomenon import Phenomenon
-from .Affordance import MIDDLE_COLOR_INDEX, COLOR_DISTANCE
 from ...Memory.EgocentricMemory.Experience import EXPERIENCE_PLACE, EXPERIENCE_FLOOR
-from ...Robot.RobotDefine import TERRAIN_RADIUS, terrain_quaternion, terrain_north_east_point, ROBOT_FLOOR_SENSOR_X
-from ...Utils import azimuth_to_quaternion, quaternion_to_direction_rad
+from ...Utils import short_angle
 
 
 TERRAIN_EXPERIENCE_TYPES = [EXPERIENCE_PLACE, EXPERIENCE_FLOOR]
 TERRAIN_INITIAL_CONFIDENCE = 10  # Must not be null to allow position correction
 TERRAIN_ORIGIN_CONFIDENCE = 20  # The terrain has an absolute origin
-TERRAIN_RECOGNIZE_CONFIDENCE = 30  # The terrain has been toured back to origin
 
 
 class PhenomenonTerrain(Phenomenon):
     """A hypothetical phenomenon related to floor detection"""
     def __init__(self, affordance):
         super().__init__(affordance)
-        # self.arena_id = arena_id
         self.phenomenon_type = EXPERIENCE_FLOOR
-        # print("New phenomenon terrain with experience clock:", affordance.experience.clock)
         self.confidence = TERRAIN_INITIAL_CONFIDENCE
-        # If the affordance is color floor then use it as absolute origin
         self.interpolation_types = [EXPERIENCE_FLOOR]
+
+        # If the affordance is color floor then use it as absolute origin
         if affordance.type == EXPERIENCE_FLOOR and affordance.color_index > 0:
             self.absolute_affordance_key = 0
             self.last_origin_clock = affordance.experience.clock
-            self.origin_direction_quaternion = affordance.quaternion * Quaternion.from_z_rotation(math.pi)
+            self.origin_direction_quaternion = affordance.quaternion.copy()
             self.confidence = TERRAIN_ORIGIN_CONFIDENCE
-            # The terrain position is moved to the green sensor position relative to this FLOOR affordance
-            terrain_offset = -self.place_prediction_error(affordance)
-            self.point += terrain_offset
-            for a in self.affordances.values():
-                a.point -= terrain_offset
 
         # Default shape TODO: learn the shape
         # self.set_shape(terrain_north_east_point(self.arena_id), terrain_quaternion(self.arena_id), None)
@@ -65,21 +57,17 @@ class PhenomenonTerrain(Phenomenon):
                     # The terrain position is moved to the green sensor position relative to this FLOOR affordance
                     # (Assume the pattern of the color patch)
                     # The terrain origin remains at the terrain position
-                    # color_y = Vector3([0, (MIDDLE_COLOR_INDEX - affordance.color_index) * COLOR_DISTANCE, 0])
-                    # color_point = self.origin_direction_quaternion * color_y
-                    # terrain_offset = np.array(affordance.point + affordance.polar_sensor_point - color_point, dtype=int)
                     # terrain_offset = affordance.point + affordance.polar_green_point()
-                    terrain_offset = self.distance_to_origin(affordance)
+                    terrain_offset = self.vector_toward_origin(affordance)
                     self.point += terrain_offset
                     for a in self.affordances.values():
                         a.point -= terrain_offset
-                elif np.dot(affordance.polar_sensor_point, self.origin_direction_quaternion * Vector3([10., 0, 0])) < 0:
-                    # If this affordance is in the direction of the origin
-                    # color_y = Vector3([0, (MIDDLE_COLOR_INDEX - affordance.color_index) * COLOR_DISTANCE, 0])
-                    # affordance_green_sensor_point = affordance.point + affordance.polar_sensor_point - affordance.quaternion * color_y - self.relative_origin_point
-                    # terrain_offset = affordance_green_sensor_point
+                elif abs(short_angle(affordance.quaternion, self.origin_direction_quaternion)) < math.pi / 2 \
+                        or self.confidence >= TERRAIN_RECOGNIZE_CONFIDENCE:
+                    # If this affordance is in the direction of the origin or terrain is recognized
+                    # else:
                     # position_correction = affordance.point + affordance.polar_green_point() - self.relative_origin_point
-                    position_correction = self.distance_to_origin(affordance)
+                    position_correction = self.vector_toward_origin(affordance)
                     # Correct the position of the affordances since last time the robot visited the absolute origin
                     for a in [a for a in self.affordances.values() if a.clock > self.last_origin_clock]:
                         coef = (a.clock - self.last_origin_clock)/(affordance.clock - self.last_origin_clock)
@@ -120,15 +108,20 @@ class PhenomenonTerrain(Phenomenon):
         label = "Origin: " + str(self.point[0]) + "," + str(self.point[1])
         return label
 
-    def distance_to_origin(self, affordance):
+    def vector_toward_origin(self, affordance):
         """Return the distance between the affordance's green point and the origin point"""
         # Positive prediction error means reducing the position computed through path integration
         # The prediction error must be subtracted from the computed position
-        p_error = affordance.point + affordance.polar_green_point() - self.relative_origin_point
-        # print("Place prediction error", p_error)
-        return p_error
+        if abs(short_angle(affordance.quaternion, self.origin_direction_quaternion)) < math.pi / 2:
+            # Vector to origin
+            v = affordance.point + affordance.polar_green_point() - self.relative_origin_point
+        else:
+            # Vector to opposite of the origin
+            v = affordance.point + affordance.polar_green_point() + self.relative_origin_point
+        # print("Place prediction error", v)
+        return v
 
-    def save(self):
+    def save(self, saved_phenomenon=None):
         """Return a clone of the phenomenon for memory snapshot"""
         saved_phenomenon = PhenomenonTerrain(self.affordances[0].save())
         super().save(saved_phenomenon)

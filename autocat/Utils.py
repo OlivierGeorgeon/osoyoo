@@ -64,7 +64,7 @@ def line_intersection(line1, line2):
 
 
 def short_angle(quaternion1, quaternion2):
-    """Return the short angle from q1 to q2, positive if q2 is to the left of q1 (q2 > q1)"""
+    """Return the short angle in radian from q1 to q2, positive if q2 is to the left of q1 (q2 > q1)"""
     return -quaternion_to_direction_rad(quaternion1 * quaternion2.inverse)
 
 
