@@ -26,6 +26,7 @@ KEY_ENGAGEMENT_IMAGINARY = "I"  # The application imagines the interaction but t
 KEY_DECREASE = "D"
 KEY_INCREASE = "P"
 KEY_CLEAR = "C"  # Clear the stack of interactions to enact next
+KEY_PREDICTION_ERROR = "E"
 
 
 class Workspace:
@@ -144,7 +145,9 @@ class Workspace:
             # Clear the stack of enactions
             playsound('autocat/Assets/R3.wav', False)
             self.composite_enaction = None
-            # TODO: prevent a crash when the enaction has been clear and then an outcome is received after
+            # TODO: prevent a crash when the enaction has been cleared and then an outcome is received after
+        elif user_key.upper() == KEY_PREDICTION_ERROR:
+            self.enacter.display_prediction_errors()
 
     def emit_message(self):
         """Return the message to answer to another robot"""

@@ -1,9 +1,10 @@
 from pyrr import Matrix44
-from pyglet.window import key
+from pyglet.window import key, mouse
 from .EgocentricView import EgocentricView
 from ..PointOfInterest import PointOfInterest, POINT_PROMPT, POINT_ROBOT
 from ...Memory.EgocentricMemory.Experience import EXPERIENCE_FOCUS, EXPERIENCE_ROBOT
 from ...Robot.CtrlRobot import ENACTION_STEP_ENACTING, ENACTION_STEP_REFRESHING
+from ...Enaction.Plot import plot
 
 
 class CtrlEgocentricView:
@@ -15,44 +16,70 @@ class CtrlEgocentricView:
         self.synthesizer = workspace.integrator
         self.points_of_interest = []
         self.last_action = None
-        self.click_point = None
+        # self.click_point = None
 
         def on_mouse_press(x, y, button, modifiers):
             """ Selecting or unselecting points of interest """
-            self.click_point = self.view.get_prompt_point(x, y, button, modifiers)
-            for p in [p for p in self.points_of_interest if p.select_if_near(self.click_point)]:
+            click_point = self.view.get_prompt_point(x, y, button, modifiers)
+            # Display select a point of interest and display its clock
+            for p in [p for p in self.points_of_interest if p.select_if_near(click_point)]:
                 self.view.label2.text = "Point clock: " + str(p.clock)
 
+            if button == mouse.RIGHT:
+                if modifiers & key.MOD_SHIFT:
+                    # Delete the prompt
+                    self.delete_prompt()
+                else:
+                    # Remove the previous prompt
+                    for p in self.points_of_interest:
+                        if p.type == POINT_PROMPT:
+                            p.delete()
+                            self.points_of_interest.remove(p)
+                    # Mark the new prompt
+                    self.workspace.memory.egocentric_memory.prompt_point = click_point
+                    prompt_poi = PointOfInterest(Matrix44.from_translation(click_point).astype(float), self.view.batch,
+                                                 self.view.background, POINT_PROMPT, self.workspace.clock)
+                    self.points_of_interest.append(prompt_poi)
+
         def on_key_press(symbol, modifiers):
-            """ Deleting or inserting points of interest """
+            """ Delete the prompt and the selected points of interest """
             if symbol == key.DELETE:
                 # Remove the prompt
-                self.workspace.memory.egocentric_memory.prompt_point = None
-                # Remove the selected points
-                for p in self.points_of_interest:
-                    if p.is_selected or p.type == POINT_PROMPT:
-                        p.delete()
-                        self.points_of_interest.remove(p)
-            if symbol == key.INSERT:
-                # Remove the previous prompt
-                for p in self.points_of_interest:
-                    if p.type == POINT_PROMPT:
-                        p.delete()
-                        self.points_of_interest.remove(p)
+                self.delete_prompt()
+                # self.workspace.memory.egocentric_memory.prompt_point = None
+                # # Remove the selected points
+                # for p in self.points_of_interest:
+                #     if p.is_selected or p.type == POINT_PROMPT:
+                #         p.delete()
+                #         self.points_of_interest.remove(p)
 
-                # Mark the new prompt
-                self.workspace.memory.egocentric_memory.prompt_point = self.click_point
-                prompt_poi = PointOfInterest(Matrix44.from_translation(self.click_point).astype(float), self.view.batch,
-                                             self.view.background, POINT_PROMPT, self.workspace.clock)
-                self.points_of_interest.append(prompt_poi)
-                # focus_point.is_selected = True
-                # focus_point.set_color('red')
+            # if symbol == key.INSERT:
+            #     # Remove the previous prompt
+            #     for p in self.points_of_interest:
+            #         if p.type == POINT_PROMPT:
+            #             p.delete()
+            #             self.points_of_interest.remove(p)
+            #
+            #     # Mark the new prompt
+            #     self.workspace.memory.egocentric_memory.prompt_point = self.click_point
+            #     prompt_poi = PointOfInterest(Matrix44.from_translation(self.click_point).astype(float), self.view.batch,
+            #                                  self.view.background, POINT_PROMPT, self.workspace.clock)
+            #     self.points_of_interest.append(prompt_poi)
 
         def on_text(text):
             """Send user keypress to the workspace to handle"""
             self.workspace.process_user_key(text)
 
         self.view.push_handlers(on_mouse_press, on_key_press, on_text)
+
+    def delete_prompt(self):
+        """Delete the prompt"""
+        self.workspace.memory.egocentric_memory.prompt_point = None
+        # Remove the selected points
+        for p in self.points_of_interest:
+            if p.is_selected or p.type == POINT_PROMPT:
+                p.delete()
+                self.points_of_interest.remove(p)
 
     def update_body_robot(self):
         """Updates the robot's body to display by the egocentric view"""

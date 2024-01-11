@@ -33,10 +33,10 @@ class CtrlBodyView:
             """Process the user key or forward it to the Workspace to handle"""
             if text.upper() == KEY_DECREASE:
                 self.workspace.memory.body_memory.energy = max(0, self.workspace.memory.body_memory.energy - 10)
-                self.workspace.memory_snapshot.body_memory.energy = self.workspace.memory.body_memory.energy
+                # self.workspace.memory_snapshot.body_memory.energy = self.workspace.memory.body_memory.energy
             elif text.upper() == KEY_INCREASE:
                 self.workspace.memory.body_memory.energy = min(self.workspace.memory.body_memory.energy + 10, 100)
-                self.workspace.memory_snapshot.body_memory.energy = self.workspace.memory.body_memory.energy
+                # self.workspace.memory_snapshot.body_memory.energy = self.workspace.memory.body_memory.energy
             if text.upper() == KEY_OFFSET:
                 # Calibrate the compass
                 points = np.array([p.point()[0: 2] for p in self.points_of_interest if (p.type == POINT_AZIMUTH)])

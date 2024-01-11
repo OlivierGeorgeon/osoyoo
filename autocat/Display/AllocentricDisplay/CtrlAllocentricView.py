@@ -14,7 +14,7 @@ class CtrlAllocentricView:
         self.workspace = workspace
         self.view = AllocentricView(self.workspace)
         self.next_time_refresh = 0
-        self.prompt_point = None
+        # self.prompt_point = None
 
         # Handlers
         def on_text(text):
@@ -25,23 +25,31 @@ class CtrlAllocentricView:
 
         def on_mouse_press(x, y, button, modifiers):
             """Display the label of this cell"""
-            self.prompt_point = self.view.mouse_coordinates_to_point(x, y)
-            cell_x, cell_y = point_to_cell(self.prompt_point)
+            click_point = self.view.mouse_coordinates_to_point(x, y)
+            cell_x, cell_y = point_to_cell(click_point)
             cell = self.workspace.memory.allocentric_memory.grid[cell_x][cell_y]
 
             # Change cell status
             if button == mouse.RIGHT:
                 if modifiers & key.MOD_SHIFT:
+                    self.delete_prompt()
                     # Clear the FLOOR status
                     self.workspace.memory.allocentric_memory.clear_cell(cell_x, cell_y, self.workspace.clock)
                 elif modifiers & key.MOD_CTRL:
+                    # Mark a FLOOR cell
+                    self.workspace.memory.allocentric_memory.apply_status_to_cell(cell_x, cell_y, EXPERIENCE_FLOOR,
+                                                                                  self.workspace.clock, 0)
+                elif modifiers & key.MOD_ALT:
                     # Mark a green FLOOR cell
                     self.workspace.memory.allocentric_memory.apply_status_to_cell(cell_x, cell_y, EXPERIENCE_FLOOR,
                                                                                   self.workspace.clock, 4)
                 else:
-                    # Mark a FLOOR cell
-                    self.workspace.memory.allocentric_memory.apply_status_to_cell(cell_x, cell_y, EXPERIENCE_FLOOR,
-                                                                                  self.workspace.clock, 0)
+                    # Mark the prompt
+                    self.workspace.memory.allocentric_memory.update_prompt(click_point, self.workspace.clock)
+                    # Store the prompt in egocentric memory
+                    ego_point = self.workspace.memory.allocentric_to_egocentric(click_point)
+                    self.workspace.memory.egocentric_memory.prompt_point = ego_point
+
                 self.update_view()
             # if cell.phenomenon_id is not None:
                 # print("Displaying Phenomenon", cell.phenomenon_id)
@@ -57,18 +65,25 @@ class CtrlAllocentricView:
         def on_key_press(symbol, modifiers):
             """ Deleting or inserting points of interest """
             if symbol == key.DELETE:
-                self.workspace.memory.egocentric_memory.prompt_point = None
-                self.workspace.memory.allocentric_memory.update_prompt(None, self.workspace.clock)
-                self.update_view()
-            if symbol == key.INSERT:
-                # Mark the prompt in allocentric view
-                self.workspace.memory.allocentric_memory.update_prompt(self.prompt_point, self.workspace.clock)
-                self.update_view()
-                # Store the prompt in egocentric memory
-                ego_point = self.workspace.memory.allocentric_to_egocentric(self.prompt_point)
-                self.workspace.memory.egocentric_memory.prompt_point = ego_point
-
+                self.delete_prompt()
+                # self.workspace.memory.egocentric_memory.prompt_point = None
+                # self.workspace.memory.allocentric_memory.update_prompt(None, self.workspace.clock)
+                # self.update_view()
+            # if symbol == key.INSERT:
+            #     # Mark the prompt in allocentric view
+            #     self.workspace.memory.allocentric_memory.update_prompt(self.prompt_point, self.workspace.clock)
+            #     self.update_view()
+            #     # Store the prompt in egocentric memory
+            #     ego_point = self.workspace.memory.allocentric_to_egocentric(self.prompt_point)
+            #     self.workspace.memory.egocentric_memory.prompt_point = ego_point
+            #
         self.view.on_key_press = on_key_press
+
+    def delete_prompt(self):
+        """Delete the prompt"""
+        self.workspace.memory.egocentric_memory.prompt_point = None
+        self.workspace.memory.allocentric_memory.update_prompt(None, self.workspace.clock)
+        self.update_view()
 
     def update_view(self):
         """Update the allocentric view from the status in the allocentric grid cells"""

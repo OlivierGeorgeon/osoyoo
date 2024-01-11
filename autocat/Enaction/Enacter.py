@@ -12,6 +12,7 @@ from ..Robot.Outcome import Outcome
 from ..Memory.AllocentricMemory.Hexagonal_geometry import point_to_cell
 from ..Memory.EgocentricMemory.Experience import EXPERIENCE_FLOOR
 from ..Utils import short_angle, quaternion_to_direction_rad
+from .Plot import plot
 
 
 PREDICTION_ERROR_WINDOW = 10
@@ -253,3 +254,14 @@ class Enacter:
                       round(terrain.origin_prediction_error[self.workspace.enaction.clock]),
                       "Average:", round(float(np.mean(list(terrain.origin_prediction_error.values())))),
                       "std:", round(float(np.std(list(terrain.origin_prediction_error.values())))))
+
+    def display_prediction_errors(self):
+        """Show the prediction error plots"""
+        plot(self.workspace.enacter.forward_duration1_prediction_error, "Forward duration (ms)")
+        plot(self.workspace.enacter.yaw_prediction_error, "Yaw (degrees)")
+        plot(self.compass_prediction_error, "Compass (degree)")
+        plot(self.focus_direction_prediction_error, "Focus direction (degree)")
+        plot(self.focus_distance_prediction_error, "Focus distance (mm)")
+        terrain = self.workspace.memory.phenomenon_memory.terrain()
+        if terrain is not None:
+            plot(terrain.origin_prediction_error, "Terrain origin (mm)")
