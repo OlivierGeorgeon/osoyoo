@@ -24,6 +24,13 @@ class PhenomenonMemory:
                                               TERRAIN_RADIUS[self.arena_id]["azimuth"])
         self.phenomenon_categories = {TER: category_terrain}  # Phenomenon_category 0 is the terrain
 
+    def terrain(self):
+        """Return the terrain phenomenon or None"""
+        if TER in self.phenomena:
+            return self.phenomena[TER]
+        else:
+            return None
+
     def terrain_confidence(self):
         """Return the confidence in the terrain: 0 if no terrain found yet."""
         if TER in self.phenomena:

@@ -6,7 +6,7 @@ from . import EMOTION_HAPPY, EMOTION_RELAXED, EMOTION_SAD, EMOTION_ANGRY, EMOTIO
 from .EgocentricMemory.EgocentricMemory import EgocentricMemory
 from .AllocentricMemory.AllocentricMemory import AllocentricMemory
 from .BodyMemory import BodyMemory, EXCITATION_LOW, ENERGY_TIRED, point_to_echo_direction_distance
-from .PhenomenonMemory.PhenomenonMemory import PhenomenonMemory, TER
+from .PhenomenonMemory.PhenomenonMemory import PhenomenonMemory
 from .PhenomenonMemory.PhenomenonTerrain import TERRAIN_INITIAL_CONFIDENCE, TERRAIN_ORIGIN_CONFIDENCE
 from .AllocentricMemory.Hexagonal_geometry import CELL_RADIUS
 from ..Decider.Action import ACTION_SWIPE
@@ -76,7 +76,7 @@ class Memory:
                         is_to_arrange = self.is_to_arrange(self.egocentric_memory.focus_point)
                         # print("Ego focus", self.egocentric_memory.focus_point)
                         # if object is closer than target point (minus the radius to prevent keeping pushing)
-                        is_closer = self.egocentric_memory.focus_point[0] < ego_target[0] - ARRANGE_OBJECT_RADIUS # ARRANGE_MIN_RADIUS
+                        is_closer = self.egocentric_memory.focus_point[0] < ego_target[0] - ARRANGE_OBJECT_RADIUS
                         print("Focus near terrain center:", is_to_arrange, "Before terrain center:", is_closer,
                               "Other robot angry:", self.phenomenon_memory.other_robot_is_angry())
                         if is_to_arrange:
@@ -159,7 +159,7 @@ class Memory:
         if point is None:
             return None
         if self.phenomenon_memory.terrain_confidence() >= TERRAIN_ORIGIN_CONFIDENCE:
-            return self.allocentric_to_egocentric(point + self.phenomenon_memory.phenomena[TER].point)
+            return self.allocentric_to_egocentric(point + self.phenomenon_memory.terrain().point)
         return self.allocentric_to_egocentric(point)
 
     def egocentric_to_terrain_centric(self, point):
@@ -167,7 +167,7 @@ class Memory:
         if point is None:
             return None
         if self.phenomenon_memory.terrain_confidence() >= TERRAIN_ORIGIN_CONFIDENCE:
-            return self.egocentric_to_allocentric(point) - self.phenomenon_memory.phenomena[TER].point
+            return self.egocentric_to_allocentric(point) - self.phenomenon_memory.terrain().point
         return self.egocentric_to_allocentric(point)
 
     def terrain_centric_to_allocentric(self, point):
@@ -175,14 +175,14 @@ class Memory:
         if point is None:
             return None
         elif self.phenomenon_memory.terrain_confidence() >= TERRAIN_ORIGIN_CONFIDENCE:
-            return point + self.phenomenon_memory.phenomena[TER].point
+            return point + self.phenomenon_memory.terrain().point
         else:
             return point
 
     def terrain_centric_robot_point(self):
         """Return the position of the robot relative to the terrain point"""
         if self.phenomenon_memory.terrain_confidence() >= TERRAIN_ORIGIN_CONFIDENCE:
-            return self.allocentric_memory.robot_point - self.phenomenon_memory.phenomena[TER].point
+            return self.allocentric_memory.robot_point - self.phenomenon_memory.terrain().point
         else:
             return self.allocentric_memory.robot_point
 
@@ -199,9 +199,6 @@ class Memory:
         saved_memory.allocentric_memory = self.allocentric_memory.save()
         # Clone phenomenon memory
         saved_memory.phenomenon_memory = self.phenomenon_memory.save()
-        # saved_memory.compass_prediction_error = {key: d for key, d in self.compass_prediction_error.items()}
-        # saved_memory.focus_direction_prediction_error = {key: d for key, d in self.focus_direction_prediction_error.items()}
-        # saved_memory.focus_distance_prediction_error = {key: d for key, d in self.focus_distance_prediction_error.items()}
         # print("Save memory duration:", time.time() - start_time, "seconds")
 
         return saved_memory
@@ -224,9 +221,9 @@ class Memory:
 
     def is_near_terrain_origin(self):
         """Return True if the robot is near the origin of the terrain"""
-        if TER in self.phenomenon_memory.phenomena:
-            delta = self.phenomenon_memory.phenomena[TER].relative_origin_point + \
-                    self.phenomenon_memory.phenomena[TER].point - self.allocentric_memory.robot_point
+        terrain = self.phenomenon_memory.terrain()
+        if terrain is not None:
+            delta = terrain.relative_origin_point + terrain.point - self.allocentric_memory.robot_point
             return np.linalg.norm(delta) < NEAR_HOME
         else:
             return False

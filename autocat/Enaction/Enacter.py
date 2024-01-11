@@ -3,13 +3,13 @@ import numpy as np
 from pyrr import Quaternion, Vector3, matrix44
 from ..Robot.CtrlRobot import ENACTION_STEP_IDLE, ENACTION_STEP_COMMANDING, ENACTION_STEP_ENACTING, \
     ENACTION_STEP_INTEGRATING, ENACTION_STEP_REFRESHING
-from ..Robot.RobotDefine import ROBOT_FLOOR_SENSOR_X, ROBOT_SETTINGS
-from ..Memory.PhenomenonMemory.PhenomenonMemory import TERRAIN_ORIGIN_CONFIDENCE, TER
+from ..Robot.RobotDefine import ROBOT_FLOOR_SENSOR_X
+from ..Memory.PhenomenonMemory.PhenomenonMemory import TERRAIN_ORIGIN_CONFIDENCE
 from ..Memory.BodyMemory import point_to_echo_direction_distance
 from ..Decider.Action import ACTION_SWIPE, ACTION_FORWARD
 from ..Decider.Decider import CONFIDENCE_CONFIRMED_FOCUS
 from ..Robot.Outcome import Outcome
-from ..Memory.AllocentricMemory.Hexagonal_geometry import point_to_cell, CELL_RADIUS
+from ..Memory.AllocentricMemory.Hexagonal_geometry import point_to_cell
 from ..Memory.EgocentricMemory.Experience import EXPERIENCE_FLOOR
 from ..Utils import short_angle, quaternion_to_direction_rad
 
@@ -31,7 +31,6 @@ class Enacter:
         self.compass_prediction_error = {}            # (degree)
         self.focus_direction_prediction_error = {}    # (degree)
         self.focus_distance_prediction_error = {}     # (mm)
-        self.origin_prediction_error = {}            # (mm) The error along the floor color measure
 
     def main(self, dt):
         """Controls the enaction."""
@@ -84,9 +83,6 @@ class Enacter:
                 self.is_simulating = False
                 print("Force terminate simulation")
 
-            # Compute the prediction errors
-            self.prediction_error(self.simulated_outcome)
-
             # Update body memory and egocentric memory
             self.workspace.memory.update_and_add_experiences(self.workspace.enaction)
 
@@ -95,6 +91,9 @@ class Enacter:
 
             # Update allocentric memory: robot, phenomena, focus
             self.workspace.memory.update_allocentric(self.workspace.clock)
+
+            # Track the prediction errors
+            self.prediction_error(self.simulated_outcome)
 
             # Increment the clock if the enacted interaction was properly received
             if self.workspace.enaction.clock >= self.workspace.clock:  # don't increment if the robot is behind
@@ -244,13 +243,13 @@ class Enacter:
                   "Average:", round(float(np.mean(list(self.focus_distance_prediction_error.values())))),
                   "std:", round(float(np.std(list(self.focus_distance_prediction_error.values())))))
 
-        # Track the terrain origin prediction error
+        # Trace the terrain origin prediction error
 
-        if TER in self.workspace.memory.phenomenon_memory.phenomena and \
-                self.workspace.memory.phenomenon_memory.phenomena[TER].origin_prediction_error is not None:
-            pe = self.workspace.memory.phenomenon_memory.phenomena[TER].origin_prediction_error
-            self.origin_prediction_error[self.workspace.enaction.clock] = pe
-            self.origin_prediction_error.pop(self.workspace.enaction.clock - PREDICTION_ERROR_WINDOW, None)
-            print("Prediction Error Terrain origin (integration - measure)=", round(pe),
-                  "Average:", round(float(np.mean(list(self.origin_prediction_error.values())))),
-                  "std:", round(float(np.std(list(self.origin_prediction_error.values())))))
+        terrain = self.workspace.memory.phenomenon_memory.terrain()
+        if terrain is not None:
+            terrain.origin_prediction_error.pop(self.workspace.enaction.clock - PREDICTION_ERROR_WINDOW, None)
+            if self.workspace.enaction.clock in terrain.origin_prediction_error:
+                print("Prediction Error Terrain origin (integration - measure)=",
+                      round(terrain.origin_prediction_error[self.workspace.enaction.clock]),
+                      "Average:", round(float(np.mean(list(terrain.origin_prediction_error.values())))),
+                      "std:", round(float(np.std(list(terrain.origin_prediction_error.values())))))

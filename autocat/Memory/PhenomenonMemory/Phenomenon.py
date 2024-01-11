@@ -22,7 +22,7 @@ class Phenomenon:
         # Initial shape is unknown
         self.origin_direction_quaternion = Quaternion([0., 0., 0., 1.])
         self.relative_origin_point = np.array([0, 0, 0])
-        self.shape = []
+        self.shape = []  # Used to display the shape
 
         # Record the first affordance of the phenomenon
         # The phenomenon is placed in allocentric memory at the position of the initial affordance
@@ -37,12 +37,14 @@ class Phenomenon:
         self.tour_started = False
         # The hull is used to display the phenomenon's contour
         self.hull_points = None
-        self.path = None
+        self.path = None  # Used to test is_inside
         self.interpolation_types = None
-        self.interpolation_points = None
+        # self.interpolation_points = None
 
         # Last time the origin affordance was enacted. Used to compute the return to origin.
         self.last_origin_clock = affordance.clock
+
+        self.origin_prediction_error = {}  # (mm) The error along the floor color measure
 
     def absolute_affordance(self):
         """Return a reference to the absolute origin affordance or None"""
@@ -101,7 +103,7 @@ class Phenomenon:
 
     def interpolate(self, s=5000):
         """Compute the interpolation points between the affordances"""
-        self.interpolation_points = None
+        # self.interpolation_points = None
         points = np.array(
             [a.point[0:2] for a in self.affordances.values() if a.type in self.interpolation_types])
         points = np.unique(points, axis=0)
@@ -121,10 +123,10 @@ class Phenomenon:
                 # tck_u = splprep(sorted_points.T, s=10*len(points), per=True)  # s=5000, per=True)  # s=0.2
                 # Evaluate the B-spline on a finer grid
                 finer_u = np.linspace(0, 1, 100)
-                interp = np.array(splev(finer_u, tck_u[0]))
-                self.shape = np.column_stack((interp[0], interp[1], np.zeros(100)))
-                self.interpolation_points = interp.T.flatten().astype("int").tolist()
-                self.path = mpath.Path(interp.T + self.point[0:2])
+                interpolated_points = np.array(splev(finer_u, tck_u[0]))  # Two dimensional [[x0,...,xn][y0,...,yn]]
+                self.shape = np.column_stack((interpolated_points[0], interpolated_points[1], np.zeros(100)))
+                # self.interpolation_points = interp.T.flatten().astype("int").tolist()
+                self.path = mpath.Path(interpolated_points.T + self.point[0:2])  # Two dimensional [[x0, y0]...[xn, yn]]
             except IndexError as e:
                 print("Interpolation failed. No points.", e)
             except TypeError as e:
@@ -168,4 +170,5 @@ class Phenomenon:
         saved_phenomenon.origin_direction_quaternion = self.origin_direction_quaternion.copy()
         saved_phenomenon.relative_origin_point = self.relative_origin_point.copy()
         saved_phenomenon.shape = self.shape.copy()
+        saved_phenomenon.origin_prediction_error = {k: v for k, v in self.origin_prediction_error.items()}
         return
