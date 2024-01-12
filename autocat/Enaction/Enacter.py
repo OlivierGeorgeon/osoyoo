@@ -1,5 +1,6 @@
 import math
 import numpy as np
+import matplotlib
 from pyrr import Quaternion, Vector3, matrix44
 from ..Robot.CtrlRobot import ENACTION_STEP_IDLE, ENACTION_STEP_COMMANDING, ENACTION_STEP_ENACTING, \
     ENACTION_STEP_INTEGRATING, ENACTION_STEP_REFRESHING
@@ -12,10 +13,7 @@ from ..Robot.Outcome import Outcome
 from ..Memory.AllocentricMemory.Hexagonal_geometry import point_to_cell
 from ..Memory.EgocentricMemory.Experience import EXPERIENCE_FLOOR
 from ..Utils import short_angle, quaternion_to_direction_rad
-from .Plot import plot
-
-
-PREDICTION_ERROR_WINDOW = 10
+from .Plot import plot, PREDICTION_ERROR_WINDOW
 
 
 class Enacter:
@@ -217,14 +215,15 @@ class Enacter:
               "Average:", round(float(np.mean(list(self.yaw_prediction_error.values()))), 1),
               "std:", round(float(np.std(list(self.yaw_prediction_error.values()))), 1))
 
-        # Compass prediction error to calibrate gyro_coef is correct
+        # Compass prediction error
 
-        self.compass_prediction_error[self.workspace.enaction.clock] = self.workspace.enaction.body_direction_delta
+        self.compass_prediction_error[self.workspace.enaction.clock] = \
+            math.degrees(self.workspace.enaction.body_direction_delta)
         self.compass_prediction_error.pop(self.workspace.enaction.clock - PREDICTION_ERROR_WINDOW, None)
         print("Prediction Error Compass (integrated direction - compass measure)=",
-              round(math.degrees(self.workspace.enaction.body_direction_delta), 2), "Average:",
-              round(math.degrees(np.mean(list(self.compass_prediction_error.values()))), 2), "std:",
-              round(math.degrees(np.std(list(self.compass_prediction_error.values()))), 2))
+              round(self.compass_prediction_error[self.workspace.enaction.clock], 2), "Average:",
+              round(np.mean(list(self.compass_prediction_error.values())), 2), "std:",
+              round(np.std(list(self.compass_prediction_error.values())), 2))
 
         # If focus is confident then track its prediction error
 
@@ -257,11 +256,15 @@ class Enacter:
 
     def display_prediction_errors(self):
         """Show the prediction error plots"""
-        plot(self.workspace.enacter.forward_duration1_prediction_error, "Forward duration (ms)")
-        plot(self.workspace.enacter.yaw_prediction_error, "Yaw (degrees)")
-        plot(self.compass_prediction_error, "Compass (degree)")
-        plot(self.focus_direction_prediction_error, "Focus direction (degree)")
-        plot(self.focus_distance_prediction_error, "Focus distance (mm)")
+        # The agg backend avoids interfering with pyglet windows
+        # https://matplotlib.org/stable/users/explain/figure/backends.html
+        matplotlib.use('agg')
+
+        plot(self.workspace.enacter.forward_duration1_prediction_error, "Translation duration (ms)", "Translation")
+        plot(self.workspace.enacter.yaw_prediction_error, "Yaw (degrees)", "yaw")
+        plot(self.compass_prediction_error, "Compass (degree)", "Compass")
+        plot(self.focus_direction_prediction_error, "Focus direction (degree)", "Focus_direction")
+        plot(self.focus_distance_prediction_error, "Focus distance (mm)", "Focus_distance")
         terrain = self.workspace.memory.phenomenon_memory.terrain()
         if terrain is not None:
-            plot(terrain.origin_prediction_error, "Terrain origin (mm)")
+            plot(terrain.origin_prediction_error, "Terrain origin (mm)", "Origin")

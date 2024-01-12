@@ -61,16 +61,23 @@ class Phenomenon:
 
     def recognize(self, category):
         """Update the quaternion, origin, and shape of this phenomenon from the category"""
+        # The TERRAIN origin depends on the orientation of the absolute affordance
+        # TODO move this to PhenomenonTerrain
         if np.dot(self.absolute_affordance().polar_sensor_point, category.quaternion * Vector3([1., 0., 0.])) < 0:
             # Origin is North-East
             self.origin_direction_quaternion = category.quaternion.copy()
         else:
             # Origin is South-West
             self.origin_direction_quaternion = category.quaternion * Quaternion.from_z_rotation(math.pi)
+
         # The new relative origin is the position of green patch from the phenomenon center
         new_relative_origin = np.array(self.origin_direction_quaternion *
                                        Vector3([category.long_radius - LINE_X + ROBOT_COLOR_SENSOR_X, 0, 0]), dtype=int)
+
+        # The phenomenon's shape is copied from the category's shape
         self.shape = category.shape.copy()
+        self.set_path()
+
         # The position of the phenomenon is adjusted by the difference in relative origin
         terrain_offset = new_relative_origin - self.relative_origin_point  # TODO check how it works with colors
         self.point -= terrain_offset
@@ -123,10 +130,13 @@ class Phenomenon:
                 # tck_u = splprep(sorted_points.T, s=10*len(points), per=True)  # s=5000, per=True)  # s=0.2
                 # Evaluate the B-spline on a finer grid
                 finer_u = np.linspace(0, 1, 100)
-                interpolated_points = np.array(splev(finer_u, tck_u[0]))  # Two dimensional [[x0,...,xn][y0,...,yn]]
+                # Computes the interpolation points: Two dimensional [[x0,...,x100][y0,...,y100]]
+                interpolated_points = np.array(splev(finer_u, tck_u[0]))
+                # Convert into 3D points [[x0, y0, 0]...[x100, y100, 0]]
                 self.shape = np.column_stack((interpolated_points[0], interpolated_points[1], np.zeros(100)))
-                # self.interpolation_points = interp.T.flatten().astype("int").tolist()
-                self.path = mpath.Path(interpolated_points.T + self.point[0:2])  # Two dimensional [[x0, y0]...[xn, yn]]
+                # Set the path
+                self.set_path()
+                # self.path = mpath.Path(interpolated_points.T + self.point[0:2])  # Two dimensional [[x0, y0]...[xn, yn]]
             except IndexError as e:
                 print("Interpolation failed. No points.", e)
             except TypeError as e:
@@ -137,12 +147,19 @@ class Phenomenon:
                 print("The points do not form a valid convex polygon.")
 
     def outline(self):
-        """Return the terrain outline points"""
+        """Return the terrain outline 2D points as list of integers"""
+        # Convert into flat list of 2D points [x0, y0, x1, y1, ...,x100, y100]
         return np.array([p[0:2] for p in self.shape]).flatten().astype("int").tolist()
         # return self.interpolation_points
 
+    def set_path(self):
+        """Set the path representing the terrain outline used to test is_inside"""
+        # Must not be recomputed on each call to is_inside()
+        # Need a closed loop two dimensional array [[x0, y0],...,[x100, y100][x0, y0]]
+        self.path = mpath.Path(np.array([p[0:2] for p in self.shape]) + self.shape[0][0:2])
+
     def is_inside(self, p):
-        """True if p is inside the terrain"""
+        """True if p is inside the phenomenon"""
         if p is None or self.path is None:
             return False
         else:
