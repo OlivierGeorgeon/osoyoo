@@ -6,7 +6,7 @@ from .PhenomenonTerrain import PhenomenonTerrain, TERRAIN_EXPERIENCE_TYPES, TERR
 from .PhenomenonRobot import PhenomenonRobot
 from .. import EMOTION_ANGRY
 from ..EgocentricMemory.Experience import EXPERIENCE_ROBOT, EXPERIENCE_FLOOR
-from ...Robot.RobotDefine import TERRAIN_RADIUS
+from ...Robot.RobotDefine import TERRAIN_RADIUS, ROBOT_FLOOR_SENSOR_X, ROBOT_OUTSIDE_Y
 
 TER = 0
 ROBOT1 = -1  # The last other robot from which this robot receives a message TODO Handle more robots
@@ -22,7 +22,8 @@ class PhenomenonMemory:
         category_terrain = PhenomenonCategory(EXPERIENCE_FLOOR, TERRAIN_RADIUS[self.arena_id]["short_radius"],
                                               TERRAIN_RADIUS[self.arena_id]["radius"],
                                               TERRAIN_RADIUS[self.arena_id]["azimuth"])
-        self.phenomenon_categories = {TER: category_terrain}  # Phenomenon_category 0 is the terrain
+        category_robot = PhenomenonCategory(EXPERIENCE_ROBOT, ROBOT_FLOOR_SENSOR_X, ROBOT_OUTSIDE_Y, 0)
+        self.phenomenon_categories = {TER: category_terrain, ROBOT1: category_robot}
 
     def terrain(self):
         """Return the terrain phenomenon or None"""
@@ -83,7 +84,10 @@ class PhenomenonMemory:
             self.phenomena[TER] = PhenomenonTerrain(affordance)
             return TER
         if affordance.type == EXPERIENCE_ROBOT:
-            self.phenomena[ROBOT1] = PhenomenonRobot(affordance)
+            robot1 = PhenomenonRobot(affordance)
+            self.phenomena[ROBOT1] = robot1
+            # Immediately recognized as a robot phenomenon
+            robot1.recognize(self.phenomenon_categories[ROBOT1])
             return ROBOT1
         else:
             self.phenomenon_id += 1

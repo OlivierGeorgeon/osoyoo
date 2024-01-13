@@ -1,6 +1,7 @@
 import math
 import numpy as np
 import matplotlib
+import os
 from pyrr import Quaternion, Vector3, matrix44
 from ..Robot.CtrlRobot import ENACTION_STEP_IDLE, ENACTION_STEP_COMMANDING, ENACTION_STEP_ENACTING, \
     ENACTION_STEP_INTEGRATING, ENACTION_STEP_REFRESHING
@@ -254,12 +255,15 @@ class Enacter:
                       "Average:", round(float(np.mean(list(terrain.origin_prediction_error.values())))),
                       "std:", round(float(np.std(list(terrain.origin_prediction_error.values())))))
 
-    def display_prediction_errors(self):
+    def plot_prediction_errors(self):
         """Show the prediction error plots"""
         # The agg backend avoids interfering with pyglet windows
         # https://matplotlib.org/stable/users/explain/figure/backends.html
         matplotlib.use('agg')
-
+        # Create the log directory if it does not exist because it is not included in git
+        if not os.path.exists("log"):
+            os.makedirs("log")
+        # Generate the plots
         plot(self.workspace.enacter.forward_duration1_prediction_error, "Translation duration (ms)", "Translation")
         plot(self.workspace.enacter.yaw_prediction_error, "Yaw (degrees)", "yaw")
         plot(self.compass_prediction_error, "Compass (degree)", "Compass")

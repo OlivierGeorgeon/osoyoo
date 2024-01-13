@@ -5,7 +5,7 @@ from pyrr import Quaternion, Vector3
 from scipy.spatial import ConvexHull, QhullError
 from scipy.interpolate import splprep, splev
 from ...Robot.RobotDefine import LINE_X, ROBOT_COLOR_SENSOR_X
-from . import TERRAIN_RECOGNIZE_CONFIDENCE
+from . import PHENOMENON_RECOGNIZE_CONFIDENCE, PHENOMENON_RECOGNIZED_CONFIDENCE
 
 PHENOMENON_DELTA = 300  # (mm) Distance between affordances to be considered the same phenomenon
 PHENOMENON_INITIAL_CONFIDENCE = 0  # 0.2 Initial confidence in the phenomenon
@@ -54,36 +54,17 @@ class Phenomenon:
 
     def category_clue(self):
         """If RECOGNITION confidence then return the experience type else return None"""
-        if self.confidence >= TERRAIN_RECOGNIZE_CONFIDENCE:
+        if self.confidence >= PHENOMENON_RECOGNIZE_CONFIDENCE:
             return self.phenomenon_type
         else:
             return None
 
     def recognize(self, category):
         """Update the quaternion, origin, and shape of this phenomenon from the category"""
-        # The TERRAIN origin depends on the orientation of the absolute affordance
-        # TODO move this to PhenomenonTerrain
-        if np.dot(self.absolute_affordance().polar_sensor_point, category.quaternion * Vector3([1., 0., 0.])) < 0:
-            # Origin is North-East
-            self.origin_direction_quaternion = category.quaternion.copy()
-        else:
-            # Origin is South-West
-            self.origin_direction_quaternion = category.quaternion * Quaternion.from_z_rotation(math.pi)
-
-        # The new relative origin is the position of green patch from the phenomenon center
-        new_relative_origin = np.array(self.origin_direction_quaternion *
-                                       Vector3([category.long_radius - LINE_X + ROBOT_COLOR_SENSOR_X, 0, 0]), dtype=int)
-
         # The phenomenon's shape is copied from the category's shape
         self.shape = category.shape.copy()
         self.set_path()
-
-        # The position of the phenomenon is adjusted by the difference in relative origin
-        terrain_offset = new_relative_origin - self.relative_origin_point  # TODO check how it works with colors
-        self.point -= terrain_offset
-        for a in self.affordances.values():
-            a.point += terrain_offset
-        self.relative_origin_point = new_relative_origin
+        self.confidence = PHENOMENON_RECOGNIZED_CONFIDENCE
 
     def compute_center(self):
         """Recompute the center of the phenomenon as the mean of the affordance position"""
@@ -171,6 +152,11 @@ class Phenomenon:
             str(round(math.degrees(self.affordances[0].experience.absolute_direction_rad))) + \
             "°. Nb tours:" + str(self.nb_tour)
         return label
+
+    def vector_toward_origin(self, affordance):
+        """Return the distance computed from the affordance point minus the phenomenon point."""
+        # By default the origin is at the center of the phenomenon
+        return np.array(affordance.point - self.point, dtype=int)
 
     def save(self, saved_phenomenon):
         """Return a clone of the phenomenon for memory snapshot"""

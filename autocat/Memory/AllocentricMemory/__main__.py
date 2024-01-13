@@ -1,11 +1,12 @@
 # from .HexaGrid import HexaGrid
 from .AllocentricMemory import AllocentricMemory
+from .Hexagonal_geometry import CELL_RADIUS
 from .test_AllocentricMemory import test_move, test_convert_pos_in_cell
 
 # Testing Allocentric Memory
 # py -m autocat.Memory.AllocentricMemory
 
-allocentric_memory = AllocentricMemory(10, 11)
+allocentric_memory = AllocentricMemory(10, 11, CELL_RADIUS)
 # Displaying the hexagonal grid in the console.
 print(allocentric_memory)
 

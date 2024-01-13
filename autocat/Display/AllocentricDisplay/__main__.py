@@ -36,34 +36,36 @@ workspace.memory.allocentric_memory.grid[-1][-2].status[0] = EXPERIENCE_PLACE
 workspace.memory.allocentric_memory.grid[-1][-3].status[0] = EXPERIENCE_PLACE
 
 # Pool cells
-workspace.memory.allocentric_memory.grid[-2][1].status[0] = EXPERIENCE_ALIGNED_ECHO
-workspace.memory.allocentric_memory.grid[-1][-4].status[0] = EXPERIENCE_ALIGNED_ECHO
-workspace.memory.allocentric_memory.grid[0][0].status[0] = EXPERIENCE_ALIGNED_ECHO
+workspace.memory.allocentric_memory.grid[-2][1].status[1] = EXPERIENCE_ALIGNED_ECHO
+workspace.memory.allocentric_memory.grid[-1][-4].status[1] = EXPERIENCE_ALIGNED_ECHO
+workspace.memory.allocentric_memory.grid[0][0].status[1] = EXPERIENCE_ALIGNED_ECHO
 workspace.memory.allocentric_memory.grid[0][5].status[0] = EXPERIENCE_PLACE
-workspace.memory.allocentric_memory.grid[0][-5].status[0] = EXPERIENCE_ALIGNED_ECHO
-workspace.memory.allocentric_memory.grid[1][4].status[0] = EXPERIENCE_ALIGNED_ECHO
+workspace.memory.allocentric_memory.grid[0][-5].status[1] = EXPERIENCE_ALIGNED_ECHO
+workspace.memory.allocentric_memory.grid[1][4].status[1] = EXPERIENCE_ALIGNED_ECHO
 workspace.memory.allocentric_memory.grid[1][-6].status[0] = EXPERIENCE_PLACE
-workspace.memory.allocentric_memory.grid[1][-1].status[0] = EXPERIENCE_ALIGNED_ECHO
+workspace.memory.allocentric_memory.grid[1][-1].status[1] = EXPERIENCE_ALIGNED_ECHO
 workspace.memory.allocentric_memory.grid[2][-2].status[0] = EXPERIENCE_PLACE
-workspace.memory.allocentric_memory.grid[2][3].status[0] = EXPERIENCE_ALIGNED_ECHO
+workspace.memory.allocentric_memory.grid[2][3].status[1] = EXPERIENCE_ALIGNED_ECHO
 workspace.memory.allocentric_memory.grid[3][2].status[0] = EXPERIENCE_PLACE
-workspace.memory.allocentric_memory.grid[3][-2].status[0] = EXPERIENCE_ALIGNED_ECHO
-workspace.memory.allocentric_memory.grid[4][2].status[0] = EXPERIENCE_ALIGNED_ECHO
-workspace.memory.allocentric_memory.grid[2][-6].status[0] = EXPERIENCE_ALIGNED_ECHO
-workspace.memory.allocentric_memory.grid[3][-7].status[0] = EXPERIENCE_ALIGNED_ECHO
+workspace.memory.allocentric_memory.grid[3][-2].status[1] = EXPERIENCE_ALIGNED_ECHO
+workspace.memory.allocentric_memory.grid[4][2].status[1] = EXPERIENCE_ALIGNED_ECHO
+workspace.memory.allocentric_memory.grid[2][-6].status[1] = EXPERIENCE_ALIGNED_ECHO
+workspace.memory.allocentric_memory.grid[3][-7].status[1] = EXPERIENCE_ALIGNED_ECHO
 
 # Interesting pool
 workspace.memory.allocentric_memory.most_interesting_pool(0)
 
 # Other robot
-pose_matrix = quaternion_translation_to_matrix(Quaternion.from_z_rotation(math.radians(170)), [200, 200, 0])
+pose_matrix = quaternion_translation_to_matrix(Quaternion.from_z_rotation(math.radians(170)), [0, 0, 0])
 experienceR = Experience(pose_matrix, EXPERIENCE_ROBOT, -3, experience_id=2, color_index=2)
 affordanceR = Affordance(np.array([500, 500, 0]), EXPERIENCE_ROBOT, -3, 2,
                          experienceR.absolute_quaternion(workspace.memory.body_memory.body_quaternion).copy(),
                          experienceR.polar_sensor_point(workspace.memory.body_memory.body_quaternion).copy())
 workspace.memory.phenomenon_memory.create_phenomenon(affordanceR)
 
-view_controller = CtrlAllocentricView(workspace)
-view_controller.update_view()
+workspace.memory.allocentric_memory.update_affordances(workspace.memory.phenomenon_memory, 0)
+
+ctrl_allocentric_view = CtrlAllocentricView(workspace)
+ctrl_allocentric_view.update_view()
 
 pyglet.app.run()

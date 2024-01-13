@@ -1,11 +1,12 @@
 import math
 import numpy as np
-from pyrr import Vector3
-from . import TERRAIN_RECOGNIZE_CONFIDENCE
+from pyrr import Vector3, Quaternion
+from . import PHENOMENON_RECOGNIZE_CONFIDENCE
 from .Phenomenon import Phenomenon
 from .Affordance import Affordance
 from ...Memory.EgocentricMemory.Experience import EXPERIENCE_PLACE, EXPERIENCE_FLOOR
 from ...Utils import short_angle
+from ...Robot.RobotDefine import LINE_X, ROBOT_COLOR_SENSOR_X
 
 
 TERRAIN_EXPERIENCE_TYPES = [EXPERIENCE_PLACE, EXPERIENCE_FLOOR]
@@ -62,7 +63,7 @@ class PhenomenonTerrain(Phenomenon):
                     for a in self.affordances.values():
                         a.point -= terrain_offset
                 elif abs(short_angle(affordance.quaternion, self.origin_direction_quaternion)) < math.pi / 2 \
-                        or self.confidence >= TERRAIN_RECOGNIZE_CONFIDENCE:
+                        or self.confidence >= PHENOMENON_RECOGNIZE_CONFIDENCE:
                     # If this affordance is in the direction of the origin or terrain is recognized
                     # else:
                     position_correction = self.vector_toward_origin(affordance)
@@ -77,7 +78,7 @@ class PhenomenonTerrain(Phenomenon):
                         # print("Affordance clock:", a.experience.clock, "corrected by:", ac, "coef:", coef)
                     # Increase confidence if not consecutive origin affordances
                     # if affordance.clock - self.last_origin_clock > 5:
-                    self.confidence = TERRAIN_RECOGNIZE_CONFIDENCE
+                    self.confidence = PHENOMENON_RECOGNIZE_CONFIDENCE
                     self.last_origin_clock = affordance.clock
 
             # Interpolate the outline
@@ -85,6 +86,30 @@ class PhenomenonTerrain(Phenomenon):
             return - position_correction  # TODO remove the minus sign
         # Affordances that do not belong to this phenomenon must return None
         return None
+
+    def recognize(self, category):
+        """Recognize the terrain"""
+        super().recognize(category)
+
+        # The TERRAIN origin depends on the orientation of the absolute affordance
+        # TODO move this to PhenomenonTerrain
+        if np.dot(self.absolute_affordance().polar_sensor_point, category.quaternion * Vector3([1., 0., 0.])) < 0:
+            # Origin is North-East
+            self.origin_direction_quaternion = category.quaternion.copy()
+        else:
+            # Origin is South-West
+            self.origin_direction_quaternion = category.quaternion * Quaternion.from_z_rotation(math.pi)
+
+        # The new relative origin is the position of green patch from the phenomenon center
+        new_relative_origin = np.array(self.origin_direction_quaternion *
+                                       Vector3([category.long_radius - LINE_X + ROBOT_COLOR_SENSOR_X, 0, 0]), dtype=int)
+
+        # The position of the phenomenon is adjusted by the difference in relative origin
+        terrain_offset = new_relative_origin - self.relative_origin_point  # TODO check how it works with colors
+        self.point -= terrain_offset
+        for a in self.affordances.values():
+            a.point += terrain_offset
+        self.relative_origin_point = new_relative_origin
 
     def confirmation_prompt(self):
         """Return the point in polar egocentric coordinates to aim for confirmation of this phenomenon"""

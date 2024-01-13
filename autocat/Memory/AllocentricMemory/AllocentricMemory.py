@@ -5,12 +5,13 @@ import numpy as np
 from pyrr import quaternion
 from . Hexagonal_geometry import point_to_cell, get_neighbors
 from . GridCell import GridCell, CELL_UNKNOWN
-from ..EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_PLACE, EXPERIENCE_FOCUS, EXPERIENCE_PROMPT
+from ..EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_PLACE, EXPERIENCE_FOCUS, EXPERIENCE_PROMPT, \
+    EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_IMPACT
 from ..AllocentricMemory.GridCell import CELL_NO_ECHO
 from ...Robot.RobotDefine import ROBOT_CHASSIS_X, ROBOT_OUTSIDE_Y, CHECK_OUTSIDE
-from ...Memory.PhenomenonMemory.PhenomenonMemory import TER
+from ...Memory.PhenomenonMemory.PhenomenonMemory import TER, ROBOT1
 from ...Memory.PhenomenonMemory.PhenomenonTerrain import TERRAIN_ORIGIN_CONFIDENCE
-from ..PhenomenonMemory import TERRAIN_RECOGNIZE_CONFIDENCE
+from ..PhenomenonMemory import PHENOMENON_RECOGNIZE_CONFIDENCE
 
 
 class AllocentricMemory:
@@ -77,7 +78,7 @@ class AllocentricMemory:
         for p_id, p in phenomenon_memory.phenomena.items():
             # Mark the cells outside the terrain (for BICA 2023 paper)
             if CHECK_OUTSIDE == 1:
-                if p_id == TER and p.confidence >= TERRAIN_RECOGNIZE_CONFIDENCE and p.path is not None:
+                if p_id == TER and p.confidence >= PHENOMENON_RECOGNIZE_CONFIDENCE and p.path is not None:
                     for c in [c for line in self.grid for c in line if not p.is_inside(c.point())]:
                         c.status[0] = EXPERIENCE_FLOOR
                         c.phenomenon_id = TER
@@ -85,16 +86,24 @@ class AllocentricMemory:
             # If terrain category has been recognised
             if p_id == TER and p.confidence >= TERRAIN_ORIGIN_CONFIDENCE:
                 # Draw the terrain from its shape
-                # for point in phenomenon_memory.phenomenon_categories[TER].shape:
                 for point in p.shape:
                     cell_x, cell_y = point_to_cell(point + p.point)
                     self.apply_status_to_cell(cell_x, cell_y, EXPERIENCE_FLOOR, p.last_origin_clock, 0)
                     # Attribute this phenomenon to this cell
                     if (self.min_i <= cell_x <= self.max_i) and (self.min_j <= cell_y <= self.max_j):
                         self.grid[cell_x][cell_y].phenomenon_id = p_id
+            if p_id == ROBOT1:
+                # Draw the other robot from its shape
+                for point in p.shape:
+                    cell_x, cell_y = point_to_cell(point + p.point)
+                    self.apply_status_to_cell(cell_x, cell_y, EXPERIENCE_ALIGNED_ECHO, p.last_origin_clock, 0)
+                    self.apply_status_to_cell(cell_x, cell_y, EXPERIENCE_IMPACT, p.last_origin_clock, 0)
+                    # Attribute this phenomenon to this cell
+                    if (self.min_i <= cell_x <= self.max_i) and (self.min_j <= cell_y <= self.max_j):
+                        self.grid[cell_x][cell_y].phenomenon_id = p_id
             # Mark the affordances of this phenomenon
             for a in p.affordances.values():
-                if (p_id != TER or p.confidence < TERRAIN_RECOGNIZE_CONFIDENCE or a.color_index != 0
+                if (p_id != TER or p.confidence < PHENOMENON_RECOGNIZE_CONFIDENCE or a.color_index != 0
                     or CHECK_OUTSIDE == 0) and a.type != EXPERIENCE_PLACE:
                     # Attribute the status of the affordance
                     cell_x, cell_y = point_to_cell(a.point+p.point)

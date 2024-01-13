@@ -146,7 +146,7 @@ class Workspace:
             self.composite_enaction = None
             # TODO: prevent a crash when the enaction has been cleared and then an outcome is received after
         elif user_key.upper() == KEY_PREDICTION_ERROR:
-            self.enacter.display_prediction_errors()
+            self.enacter.plot_prediction_errors()
 
     def emit_message(self):
         """Return the message to answer to another robot"""
