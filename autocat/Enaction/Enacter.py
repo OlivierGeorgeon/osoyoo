@@ -8,12 +8,12 @@ from ..Robot.CtrlRobot import ENACTION_STEP_IDLE, ENACTION_STEP_COMMANDING, ENAC
 from ..Robot.RobotDefine import ROBOT_FLOOR_SENSOR_X
 from ..Memory.PhenomenonMemory.PhenomenonMemory import TERRAIN_ORIGIN_CONFIDENCE
 from ..Memory.BodyMemory import point_to_echo_direction_distance
-from ..Decider.Action import ACTION_SWIPE, ACTION_FORWARD
+from ..Decider.Action import ACTION_SWIPE, ACTION_FORWARD, ACTION_SCAN
 from ..Decider.Decider import CONFIDENCE_CONFIRMED_FOCUS
 from ..Robot.Outcome import Outcome
 from ..Memory.AllocentricMemory.Hexagonal_geometry import point_to_cell
-from ..Memory.EgocentricMemory.Experience import EXPERIENCE_FLOOR
-from ..Utils import short_angle, quaternion_to_direction_rad
+from ..Memory.EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO
+from ..Utils import short_angle, quaternion_to_direction_rad, assert_almost_equal_angles
 from .Plot import plot, PREDICTION_ERROR_WINDOW
 
 
@@ -141,12 +141,15 @@ class Enacter:
         if memory.egocentric_memory.focus_point is not None:
             # Keep the head aligned to the focus
             head_direction_degree, _ = point_to_echo_direction_distance(memory.egocentric_memory.focus_point)
+            head_direction_degree = max(-90, min(head_direction_degree, 90))
             memory.body_memory.set_head_direction_degree(head_direction_degree)
+        else:
+            head_direction_degree = memory.body_memory.head_direction_degree()
 
         # Update allocentric memory
         memory.allocentric_memory.robot_point += memory.body_memory.body_quaternion * Vector3(translation)
 
-        # If crossed the line then stop the simulation (must do before marking the place
+        # If crossed the line then stop the simulation (must do before marking the place)
         floor = 0
         color_index = 0
         yaw = round(math.degrees(quaternion_to_direction_rad(enaction.command.anticipated_yaw_quaternion)))
@@ -175,14 +178,35 @@ class Enacter:
             else:
                 floor = 0
 
+        # Simulate an echo from the nearest phenomenon
+        echoes = []
+        for p in [p for p in self.workspace.memory.phenomenon_memory.phenomena.values() if p.phenomenon_type == EXPERIENCE_ALIGNED_ECHO]:
+            ego_point = self.workspace.memory.allocentric_to_egocentric(p.point)
+            a, d = point_to_echo_direction_distance(ego_point)
+            if enaction.action.action_code == ACTION_SCAN and assert_almost_equal_angles(math.radians(a), 0, 90) or \
+                    assert_almost_equal_angles(math.radians(a), math.radians(head_direction_degree), 35):
+                echoes.append([a, d])
+        # Look for the echo added by the user
+        for ij in self.workspace.memory.allocentric_memory.user_added_echos:
+            p = self.workspace.memory.allocentric_memory.grid[ij[0]][ij[1]].point()
+            a, d = point_to_echo_direction_distance(self.workspace.memory.allocentric_to_egocentric(p))
+            if enaction.action.action_code == ACTION_SCAN and assert_almost_equal_angles(math.radians(a), 0, 90) or \
+                    assert_almost_equal_angles(math.radians(a), math.radians(head_direction_degree), 35):
+                echoes.append([a, d])
+        if len(echoes) > 0:
+            np_echoes = np.array(echoes, dtype=int)
+            head_angle, echo_distance = np_echoes[np.argmin(np_echoes[:, 1])]
+        else:
+            head_angle, echo_distance = 0, 10000
+
         # Mark the place
         memory.allocentric_memory.place_robot(memory.body_memory, enaction.clock)
 
         # Simulate an echo from the focus point
-        if memory.egocentric_memory.focus_point is None:
-            head_angle, echo_distance = 0, 10000
-        else:
-            head_angle, echo_distance = point_to_echo_direction_distance(memory.egocentric_memory.focus_point)
+        # if memory.egocentric_memory.focus_point is None:
+        #     head_angle, echo_distance = 0, 10000
+        # else:
+        #     head_angle, echo_distance = point_to_echo_direction_distance(memory.egocentric_memory.focus_point)
 
         # Return the simulated outcome
         outcome_string = {"action": self.workspace.enaction.action.action_code, "clock": self.workspace.enaction.clock,

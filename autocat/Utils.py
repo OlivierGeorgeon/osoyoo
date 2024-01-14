@@ -29,12 +29,17 @@ def quaternion_to_direction_rad(quaternion):
     """Return the polar-egocentric direction represented by this quaternion in [-pi, pi]"""
     # The Z component of the rotation axis gives the sign of the angle if is not NaN
     angle = quaternion.angle
-    if angle > math.pi:  # The short angle
-        angle -= 2.0 * math.pi
-    elif angle < -math.pi:
-        angle += 2.0 * math.pi
-    if not np.isnan(quaternion.z) and quaternion.z < 0:  # The direction of the z axis rotation
-        angle *= -1
+    if np.isnan(angle):
+        print("Angle is Nan for quaternion", repr(quaternion))
+        # It printed Quaternion([0., 0., 0., 1.]) but I can't reproduce how its ".angle" is Nan
+        angle = 0  # Try to fix a NaN error. I don't know when angle would be NaN
+    else:
+        if angle > math.pi:  # The short angle
+            angle -= 2.0 * math.pi
+        elif angle < -math.pi:
+            angle += 2.0 * math.pi
+        if not np.isnan(quaternion.z) and quaternion.z < 0:  # The direction of the z axis rotation
+            angle *= -1
     return angle
 
 
@@ -138,6 +143,7 @@ if __name__ == "__main__":
     print("")
 
     # Test short_angle()
+    print("=== Test short angle ===")
     q1 = Quaternion.from_z_rotation(math.radians(0))
     q2 = Quaternion.from_z_rotation(math.radians(10))
     print("10° to the left of 0°", short_angle(q1, q2), short_angle(q1, q2) > 0)
@@ -281,3 +287,6 @@ if __name__ == "__main__":
     body_quaternion = compass_quaternion.slerp(yaw_integration_quaternion, 0.75)  # 0.75
     print("11 azimuth", quaternion_to_azimuth(compass_quaternion), "slerp", quaternion_to_azimuth(yaw_integration_quaternion), "=", quaternion_to_azimuth(body_quaternion))
 
+    # Test assert_almost_egal_angle
+    t = assert_almost_equal_angles(0, math.radians(-176), 90)
+    print("Angle -176° and 0° not almost equal", t == False)

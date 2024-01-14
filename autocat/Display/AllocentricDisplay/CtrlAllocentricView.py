@@ -4,8 +4,9 @@ from .AllocentricView import AllocentricView
 from ...Memory.AllocentricMemory.Hexagonal_geometry import point_to_cell
 from ...Memory.PhenomenonMemory.PhenomenonMemory import ROBOT1
 from ...Robot.CtrlRobot import ENACTION_STEP_REFRESHING, ENACTION_STEP_ENACTING
-from ...Memory.EgocentricMemory.Experience import EXPERIENCE_FLOOR
+from ...Memory.EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO
 from ...Memory.AllocentricMemory.GridCell import CELL_UNKNOWN
+from ...Memory.BodyMemory import point_to_echo_direction_distance
 
 
 class CtrlAllocentricView:
@@ -14,7 +15,6 @@ class CtrlAllocentricView:
         self.workspace = workspace
         self.view = AllocentricView(self.workspace)
         self.next_time_refresh = 0
-        # self.prompt_point = None
 
         # Handlers
         def on_text(text):
@@ -31,18 +31,42 @@ class CtrlAllocentricView:
 
             # Change cell status
             if button == mouse.RIGHT:
+                # SHIFT clear the cell and all the prompts
                 if modifiers & key.MOD_SHIFT:
                     self.delete_prompt()
                     # Clear the FLOOR status
                     self.workspace.memory.allocentric_memory.clear_cell(cell_x, cell_y, self.workspace.clock)
+                # CTRL ALT: toggle COLOR FLOOR
+                elif modifiers & key.MOD_CTRL and modifiers & key.MOD_ALT:
+                    if cell.status[0] == EXPERIENCE_FLOOR and cell.color_index > 0:
+                        cell.status[0] = CELL_UNKNOWN
+                        cell.color_index = 0
+                    else:
+                        # Mark a green FLOOR cell
+                        self.workspace.memory.allocentric_memory.apply_status_to_cell(cell_x, cell_y, EXPERIENCE_FLOOR,
+                                                                                      self.workspace.clock, 4)
+                # CTRL: Toggle FLOOR
                 elif modifiers & key.MOD_CTRL:
-                    # Mark a FLOOR cell
-                    self.workspace.memory.allocentric_memory.apply_status_to_cell(cell_x, cell_y, EXPERIENCE_FLOOR,
-                                                                                  self.workspace.clock, 0)
+                    if cell.status[0] == EXPERIENCE_FLOOR and cell.color_index == 0:
+                        cell.status[0] = CELL_UNKNOWN
+                    else:
+                        # Mark a FLOOR cell
+                        self.workspace.memory.allocentric_memory.apply_status_to_cell(cell_x, cell_y, EXPERIENCE_FLOOR,
+                                                                                      self.workspace.clock, 0)
+                # ALT: Toggle ECHO
                 elif modifiers & key.MOD_ALT:
-                    # Mark a green FLOOR cell
-                    self.workspace.memory.allocentric_memory.apply_status_to_cell(cell_x, cell_y, EXPERIENCE_FLOOR,
-                                                                                  self.workspace.clock, 4)
+                    if cell.status[1] == EXPERIENCE_ALIGNED_ECHO:
+                        cell.status[1] = CELL_UNKNOWN
+                        cell.color_index = 0
+                        # if (cell_x, cell_y) in self.workspace.memory.allocentric_memory.user_added_echos:
+                        self.workspace.memory.allocentric_memory.user_added_echos.remove((cell_x, cell_y))
+                    else:
+                        # Mark an echo cell
+                        self.workspace.memory.allocentric_memory.apply_status_to_cell(cell_x, cell_y,
+                                                                                      EXPERIENCE_ALIGNED_ECHO,
+                                                                                      self.workspace.clock, 0)
+                        self.workspace.memory.allocentric_memory.user_added_echos.append((cell_x, cell_y))
+                # No modifier: move the prompt
                 else:
                     # Mark the prompt
                     self.workspace.memory.allocentric_memory.update_prompt(click_point, self.workspace.clock)
@@ -63,20 +87,10 @@ class CtrlAllocentricView:
         self.view.on_mouse_press = on_mouse_press
 
         def on_key_press(symbol, modifiers):
-            """ Deleting or inserting points of interest """
+            """ Deleting the prompt"""
             if symbol == key.DELETE:
                 self.delete_prompt()
-                # self.workspace.memory.egocentric_memory.prompt_point = None
-                # self.workspace.memory.allocentric_memory.update_prompt(None, self.workspace.clock)
-                # self.update_view()
-            # if symbol == key.INSERT:
-            #     # Mark the prompt in allocentric view
-            #     self.workspace.memory.allocentric_memory.update_prompt(self.prompt_point, self.workspace.clock)
-            #     self.update_view()
-            #     # Store the prompt in egocentric memory
-            #     ego_point = self.workspace.memory.allocentric_to_egocentric(self.prompt_point)
-            #     self.workspace.memory.egocentric_memory.prompt_point = ego_point
-            #
+
         self.view.on_key_press = on_key_press
 
     def delete_prompt(self):

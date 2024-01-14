@@ -58,6 +58,8 @@ class AllocentricMemory:
                     cell_j = -self.height + j
                 self.grid[i].append(GridCell(cell_i, cell_j, self.cell_radius))
 
+        self.user_added_echos = []  # List of mutable tuples to be easily copied
+
     def __str__(self):
         output = ""
         for j in range(self.max_j, self.min_j - 1, -1):
@@ -245,6 +247,7 @@ class AllocentricMemory:
         saved_allocentric_memory.prompt_j = self.prompt_j
         saved_allocentric_memory.affordances = [a.save() for a in self.affordances]
         saved_allocentric_memory.grid = [[c.save() for c in line] for line in self.grid]
+        saved_allocentric_memory.user_added_echos = [e for e in self.user_added_echos]
 
         return saved_allocentric_memory
 

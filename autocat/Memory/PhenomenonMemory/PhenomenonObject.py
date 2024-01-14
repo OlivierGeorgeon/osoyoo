@@ -12,6 +12,7 @@ class PhenomenonObject(Phenomenon):
     def __init__(self, affordance):
         super().__init__(affordance)
         self.absolute_affordance_key = 0  # The initial affordance is the origin
+        self.phenomenon_type = EXPERIENCE_ALIGNED_ECHO
         self.interpolation_types = [EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_FLOOR]
         # print("New phenomenon Object")
 

@@ -46,11 +46,6 @@ class DeciderArrange(Decider):
 
     def select_enaction(self, outcome):
         """The enactions to push a object to a target place"""
-        # The point center of the object
-        direction, distance = point_to_echo_direction_distance(self.workspace.memory.egocentric_memory.focus_point)
-        # object_point = self.workspace.memory.egocentric_memory.focus_point
-        object_point = echo_point(direction, distance + ARRANGE_OBJECT_RADIUS)
-
         print("Step", self.step)
         # If LOST FOCUS or impact then scan again
         if outcome in [OUTCOME_LOST_FOCUS, OUTCOME_FLOOR] and self.step in [STEP_INIT, STEP_ALIGN]:
@@ -58,6 +53,10 @@ class DeciderArrange(Decider):
             self.step = STEP_INIT  # Avoids systematically recalling DeciderArrange
         # If STEP_INIT or previously aligned with focus
         elif self.step in [STEP_ALIGN, STEP_INIT]:
+            # The point center of the object
+            direction, distance = point_to_echo_direction_distance(self.workspace.memory.egocentric_memory.focus_point)
+            # object_point = self.workspace.memory.egocentric_memory.focus_point
+            object_point = echo_point(direction, distance + ARRANGE_OBJECT_RADIUS)
             ego_target = self.workspace.memory.terrain_centric_to_egocentric(
                 self.workspace.memory.phenomenon_memory.arrange_point())
             l1 = line.create_from_points(object_point, ego_target)

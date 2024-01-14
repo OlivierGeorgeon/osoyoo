@@ -10,6 +10,7 @@ EXCITATION_LOW = 95  # 95  # 60  # 75  # Level of excitation below witch Robot j
 
 def point_to_echo_direction_distance(point):
     """Return the head direction in degrees and distance of the echo"""
+    # Warning: may return a backward head direction
     point_from_head = point - np.array([ROBOT_HEAD_X, 0, 0])
     direction = round(math.degrees(math.atan2(point_from_head[1], point_from_head[0])))
     distance = round(np.linalg.norm(point_from_head))

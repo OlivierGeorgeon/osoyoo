@@ -33,6 +33,10 @@ class GridCell:
         """String representation of the cell for console display"""
         return "(%+d,%+d)" % (self.i, self.j)
 
+    # def __eq__(self, other):
+    #     """Cells are equal if they have the same position"""
+    #     return other.i == self.i and other.j == self.j
+
     def label(self):
         """Label of the cell for display on click in allocentricView"""
         label = repr(self.status) + " Clocks: ["
