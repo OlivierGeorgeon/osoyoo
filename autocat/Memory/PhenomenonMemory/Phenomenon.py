@@ -154,9 +154,13 @@ class Phenomenon:
         return label
 
     def vector_toward_origin(self, affordance):
-        """Return the distance computed from the affordance point minus the phenomenon point."""
+        """Return the vector computed from the affordance point minus the phenomenon point."""
         # By default the origin is at the center of the phenomenon
         return np.array(affordance.point - self.point, dtype=int)
+
+    def latest_added_affordance(self):
+        """Return the latest affordance added to this phenomenon"""
+        return self.affordances[self.affordance_id]
 
     def save(self, saved_phenomenon):
         """Return a clone of the phenomenon for memory snapshot"""

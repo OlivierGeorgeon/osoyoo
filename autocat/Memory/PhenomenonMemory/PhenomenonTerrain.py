@@ -77,8 +77,8 @@ class PhenomenonTerrain(Phenomenon):
                         a.point -= ac
                         # print("Affordance clock:", a.experience.clock, "corrected by:", ac, "coef:", coef)
                     # Increase confidence if not consecutive origin affordances
-                    if affordance.clock - self.last_origin_clock > 5:
-                        self.confidence = PHENOMENON_RECOGNIZE_CONFIDENCE
+                    # if affordance.clock - self.last_origin_clock > 5:
+                    self.confidence = PHENOMENON_RECOGNIZE_CONFIDENCE
                     self.last_origin_clock = affordance.clock
 
             # Interpolate the outline
@@ -92,7 +92,6 @@ class PhenomenonTerrain(Phenomenon):
         super().recognize(category)
 
         # The TERRAIN origin depends on the orientation of the absolute affordance
-        # TODO move this to PhenomenonTerrain
         if np.dot(self.absolute_affordance().polar_sensor_point, category.quaternion * Vector3([1., 0., 0.])) < 0:
             # Origin is North-East
             self.origin_direction_quaternion = category.quaternion.copy()
@@ -105,7 +104,7 @@ class PhenomenonTerrain(Phenomenon):
                                        Vector3([category.long_radius - LINE_X + ROBOT_COLOR_SENSOR_X, 0, 0]), dtype=int)
 
         # The position of the phenomenon is adjusted by the difference in relative origin
-        terrain_offset = new_relative_origin - self.relative_origin_point  # TODO check how it works with colors
+        terrain_offset = new_relative_origin - self.relative_origin_point
         self.point -= terrain_offset
         for a in self.affordances.values():
             a.point += terrain_offset

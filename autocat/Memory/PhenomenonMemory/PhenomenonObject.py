@@ -1,5 +1,6 @@
 import numpy as np
-from pyrr import matrix44
+from pyrr import Vector3
+from . import PHENOMENON_RECOGNIZE_CONFIDENCE
 from .Phenomenon import Phenomenon, PHENOMENON_DELTA, PHENOMENON_CONFIDENCE_PRUNE
 from autocat.Memory.EgocentricMemory.Experience import EXPERIENCE_CENTRAL_ECHO, EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_BLOCK, \
     EXPERIENCE_IMPACT, EXPERIENCE_FLOOR
@@ -11,6 +12,7 @@ class PhenomenonObject(Phenomenon):
     """A hypothetical phenomenon related to echo localization"""
     def __init__(self, affordance):
         super().__init__(affordance)
+        self.confidence = PHENOMENON_RECOGNIZE_CONFIDENCE
         self.absolute_affordance_key = 0  # The initial affordance is the origin
         self.phenomenon_type = EXPERIENCE_ALIGNED_ECHO
         self.interpolation_types = [EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_FLOOR]
@@ -51,7 +53,9 @@ class PhenomenonObject(Phenomenon):
                     position_correction = -relative_affordance_point
                     print("Phenomenon position correction:", position_correction)
             else:
-                position_correction = np.array(self.confidence * delta, dtype=int)
+                # TODO Manage position correction when object is recognize
+                # position_correction = np.array(self.confidence / 100. * delta, dtype=int)
+                pass
 
             # Check if a new tour has started when reaching opposite direction
             if affordance.is_opposite_to(self.affordances[0]):
@@ -60,7 +64,7 @@ class PhenomenonObject(Phenomenon):
             if self.tour_started and affordance.is_clockwise_from(self.affordances[0]):
                 self.tour_started = False
                 self.nb_tour += 1
-                self.confidence = min(self.confidence + 0.2, 1.)
+                self.confidence = min(self.confidence + 20, 1.)
 
             # Move the new affordance's position to relative reference
             affordance.point = relative_affordance_point + position_correction
@@ -73,10 +77,22 @@ class PhenomenonObject(Phenomenon):
 
             # Return the correction to apply to the robot's position
             self.interpolate(s=1)
+            print("Phenomenon position correction:", position_correction)
             return position_correction
         else:
             # This affordance does not belong to this phenomenon
             return None  # Must return None to check if this affordance can be associated with another phenomenon
+
+    def recognize(self, category):
+        """Recognize the object to arrange"""
+        super().recognize(category)
+        # The position is moved to the center of the object
+        # The terrain point is moved along the latest affordance's direction by the category's radius
+        terrain_offset = np.array(self.latest_added_affordance().point + self.latest_added_affordance().quaternion * Vector3([category.short_radius, 0., 0.]), dtype=int)
+        self.point += terrain_offset
+        for a in self.affordances.values():
+            a.point -= terrain_offset
+        # self.relative_origin_point = new_relative_origin  TODO check if we need that
 
     def reference_affordance(self, affordance):
         """Find the previous affordance that serves as the reference to correct the position"""

@@ -16,7 +16,8 @@ from ..Robot.Outcome import echo_point
 from . Decider import Decider, FOCUS_TOO_FAR_DISTANCE
 from ..Utils import line_intersection
 from ..Enaction.CompositeEnaction import CompositeEnaction
-from ..Memory.Memory import EMOTION_ANGRY, ARRANGE_OBJECT_RADIUS  # , ARRANGE_MIN_RADIUS
+from ..Memory.Memory import EMOTION_ANGRY  # , ARRANGE_MIN_RADIUS
+from ..Memory.PhenomenonMemory import ARRANGE_OBJECT_RADIUS
 from ..Memory.BodyMemory import point_to_echo_direction_distance
 from . Interaction import OUTCOME_FLOOR
 from . Interaction import OUTCOME_LOST_FOCUS

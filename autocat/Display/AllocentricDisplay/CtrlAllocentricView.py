@@ -2,11 +2,9 @@ import time
 from pyglet.window import key, mouse
 from .AllocentricView import AllocentricView
 from ...Memory.AllocentricMemory.Hexagonal_geometry import point_to_cell
-from ...Memory.PhenomenonMemory.PhenomenonMemory import ROBOT1
 from ...Robot.CtrlRobot import ENACTION_STEP_REFRESHING, ENACTION_STEP_ENACTING
 from ...Memory.EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO
 from ...Memory.AllocentricMemory.GridCell import CELL_UNKNOWN
-from ...Memory.BodyMemory import point_to_echo_direction_distance
 
 
 class CtrlAllocentricView:
@@ -90,6 +88,7 @@ class CtrlAllocentricView:
             """ Deleting the prompt"""
             if symbol == key.DELETE:
                 self.delete_prompt()
+                self.workspace.memory.allocentric_memory.user_added_echos = []
 
         self.view.on_key_press = on_key_press
 

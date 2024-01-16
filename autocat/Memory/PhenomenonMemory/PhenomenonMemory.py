@@ -1,15 +1,17 @@
 import numpy as np
 from pyrr import Vector3
+from . import ARRANGE_OBJECT_RADIUS
 from .PhenomenonCategory import PhenomenonCategory
 from .PhenomenonObject import PhenomenonObject
 from .PhenomenonTerrain import PhenomenonTerrain, TERRAIN_EXPERIENCE_TYPES, TERRAIN_ORIGIN_CONFIDENCE
 from .PhenomenonRobot import PhenomenonRobot
 from .. import EMOTION_ANGRY
-from ..EgocentricMemory.Experience import EXPERIENCE_ROBOT, EXPERIENCE_FLOOR
+from ..EgocentricMemory.Experience import EXPERIENCE_ROBOT, EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO
 from ...Robot.RobotDefine import TERRAIN_RADIUS, ROBOT_FLOOR_SENSOR_X, ROBOT_OUTSIDE_Y
 
 TER = 0
 ROBOT1 = -1  # The last other robot from which this robot receives a message TODO Handle more robots
+BOX = 1
 
 
 class PhenomenonMemory:
@@ -23,7 +25,8 @@ class PhenomenonMemory:
                                               TERRAIN_RADIUS[self.arena_id]["radius"],
                                               TERRAIN_RADIUS[self.arena_id]["azimuth"])
         category_robot = PhenomenonCategory(EXPERIENCE_ROBOT, ROBOT_FLOOR_SENSOR_X, ROBOT_OUTSIDE_Y, 0)
-        self.phenomenon_categories = {TER: category_terrain, ROBOT1: category_robot}
+        category_box = PhenomenonCategory(EXPERIENCE_ALIGNED_ECHO, ARRANGE_OBJECT_RADIUS, ARRANGE_OBJECT_RADIUS, 0)
+        self.phenomenon_categories = {TER: category_terrain, ROBOT1: category_robot, BOX: category_box}
 
     def terrain(self):
         """Return the terrain phenomenon or None"""
@@ -150,7 +153,7 @@ class PhenomenonMemory:
 
     def other_robot_is_angry(self):
         """Return True if there is another robot and it is angry"""
-        if ROBOT1 in self.phenomena and self.phenomena[ROBOT1].current().color_index == EMOTION_ANGRY:
+        if ROBOT1 in self.phenomena and self.phenomena[ROBOT1].latest_added_affordance().color_index == EMOTION_ANGRY:
             return True
         else:
             return False

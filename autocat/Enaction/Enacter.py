@@ -2,11 +2,11 @@ import math
 import numpy as np
 import matplotlib
 import os
-from pyrr import Quaternion, Vector3, matrix44
+from pyrr import Quaternion, Vector3, matrix44, vector3
 from ..Robot.CtrlRobot import ENACTION_STEP_IDLE, ENACTION_STEP_COMMANDING, ENACTION_STEP_ENACTING, \
     ENACTION_STEP_INTEGRATING, ENACTION_STEP_REFRESHING
 from ..Robot.RobotDefine import ROBOT_FLOOR_SENSOR_X
-from ..Memory.PhenomenonMemory.PhenomenonMemory import TERRAIN_ORIGIN_CONFIDENCE
+from ..Memory.PhenomenonMemory.PhenomenonMemory import TERRAIN_ORIGIN_CONFIDENCE, BOX
 from ..Memory.BodyMemory import point_to_echo_direction_distance
 from ..Decider.Action import ACTION_SWIPE, ACTION_FORWARD, ACTION_SCAN
 from ..Decider.Decider import CONFIDENCE_CONFIRMED_FOCUS
@@ -181,9 +181,11 @@ class Enacter:
         # Simulate an echo from the nearest phenomenon
         echoes = []
         for p in [p for p in self.workspace.memory.phenomenon_memory.phenomena.values() if p.phenomenon_type == EXPERIENCE_ALIGNED_ECHO]:
-            ego_point = self.workspace.memory.allocentric_to_egocentric(p.point)
-            a, d = point_to_echo_direction_distance(ego_point)
-            if enaction.action.action_code == ACTION_SCAN and assert_almost_equal_angles(math.radians(a), 0, 90) or \
+            ego_center_point = self.workspace.memory.allocentric_to_egocentric(p.point)
+            a, d = point_to_echo_direction_distance(ego_center_point)
+            # Subtract the phenomenon's radius to obtain the egocentric echo distance
+            d -= self.workspace.memory.phenomenon_memory.phenomenon_categories[BOX].long_radius
+            if d > 0 and enaction.action.action_code == ACTION_SCAN and assert_almost_equal_angles(math.radians(a), 0, 90) or \
                     assert_almost_equal_angles(math.radians(a), math.radians(head_direction_degree), 35):
                 echoes.append([a, d])
         # Look for the echo added by the user
@@ -247,8 +249,8 @@ class Enacter:
         self.compass_prediction_error.pop(self.workspace.enaction.clock - PREDICTION_ERROR_WINDOW, None)
         print("Prediction Error Compass (integrated direction - compass measure)=",
               round(self.compass_prediction_error[self.workspace.enaction.clock], 2), "Average:",
-              round(np.mean(list(self.compass_prediction_error.values())), 2), "std:",
-              round(np.std(list(self.compass_prediction_error.values())), 2))
+              round(float(np.mean(list(self.compass_prediction_error.values()))), 2), "std:",
+              round(float(np.std(list(self.compass_prediction_error.values()))), 2))
 
         # If focus is confident then track its prediction error
 

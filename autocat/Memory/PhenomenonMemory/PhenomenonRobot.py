@@ -37,26 +37,15 @@ class PhenomenonRobot(Phenomenon):
         """Recognize the robot category and adjust the shape to the orientation"""
         super().recognize(category)
         # Rotate the shape to the orientation of the robot
-        self.shape = np.array([(self.current().quaternion * Vector3(p)) for p in self.shape])
+        self.shape = np.array([(self.latest_added_affordance().quaternion * Vector3(p)) for p in self.shape])
         self.set_path()
 
-    # def vector_toward_origin(self, affordance):
-    #     """Return the distance computed from the affordance point minus the phenomenon point."""
-    #     # By default the origin is at the center of the phenomenon
-    #     return np.array(affordance.point - self.point, dtype=int)
-
-    def current(self):
-        """Return the current affordance that characterize the phenomenon"""
-        return self.affordances[self.affordance_id]
-
+    # def latest_added_affordance(self):
+    #     """Return the latest affordance added to this phenomenon"""
+    #     return self.affordances[self.affordance_id]
+    #
     def save(self):
         """Return a clone of the phenomenon for memory snapshot"""
         saved_phenomenon = PhenomenonRobot(self.affordances[0].save())
         super().save(saved_phenomenon)
         return saved_phenomenon
-    #     saved_phenomenon = PhenomenonRobot(self.affordances[0].save())
-    #     saved_phenomenon.point = self.point.copy()
-    #     saved_phenomenon.confidence = self.confidence
-    #     saved_phenomenon.affordances = {key: a.save() for key, a in self.affordances.items()}
-    #     saved_phenomenon.affordance_id = self.affordance_id
-    #     return saved_phenomenon

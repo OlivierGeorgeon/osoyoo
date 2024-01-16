@@ -1,6 +1,5 @@
 import pyglet
 from pyglet.gl import *
-from pyrr import Matrix44, Quaternion
 from ...Utils import quaternion_translation_to_matrix
 from ..EgocentricDisplay.OsoyooCar import OsoyooCar
 from .CellDisplay import CellDisplay
@@ -120,9 +119,11 @@ class AllocentricView(InteractiveDisplay):
             self.body_poi.delete()
             self.body_poi = None
         if phenomenon is not None:
-            pose_matrix = quaternion_translation_to_matrix(phenomenon.current().quaternion, phenomenon.point +
-                                                           phenomenon.current().point)
+            pose_matrix = quaternion_translation_to_matrix(phenomenon.latest_added_affordance().quaternion,
+                                                           phenomenon.point +
+                                                           phenomenon.latest_added_affordance().point)
             self.body_poi = PointOfInterest(pose_matrix, self.batch, self.forefront, POINT_ROBOT,
-                                            phenomenon.current().clock)
+                                            phenomenon.latest_added_affordance().clock)
             self.robot_poi = PointOfInterest(pose_matrix, self.batch, self.forefront, EXPERIENCE_ROBOT,
-                                             phenomenon.current().clock, color_index=phenomenon.current().color_index)
+                                             phenomenon.latest_added_affordance().clock,
+                                             color_index=phenomenon.latest_added_affordance().color_index)
