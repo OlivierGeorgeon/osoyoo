@@ -77,8 +77,8 @@ class PhenomenonTerrain(Phenomenon):
                         a.point -= ac
                         # print("Affordance clock:", a.experience.clock, "corrected by:", ac, "coef:", coef)
                     # Increase confidence if not consecutive origin affordances
-                    # if affordance.clock - self.last_origin_clock > 5:
-                    self.confidence = PHENOMENON_RECOGNIZE_CONFIDENCE
+                    if affordance.clock - self.last_origin_clock > 5:
+                        self.confidence = PHENOMENON_RECOGNIZE_CONFIDENCE
                     self.last_origin_clock = affordance.clock
 
             # Interpolate the outline

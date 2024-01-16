@@ -37,9 +37,10 @@ class Workspace:
         self.actions = create_actions(robot_id)
         self.memory = Memory(arena_id, robot_id)
         # if self.robot_id == '1':
-        self.deciders = {'Explore': DeciderExplore(self), 'Circle': DeciderCircle(self),
-                         'Watch': DeciderWatchCenter(self), 'Arrange': DeciderArrange(self)}
+        # self.deciders = {'Explore': DeciderExplore(self), 'Circle': DeciderCircle(self),
+        #                  'Watch': DeciderWatchCenter(self), 'Arrange': DeciderArrange(self)}
         # self.deciders = {'Explore': DeciderExplore(self), 'Circle': DeciderCircle(self), 'Watch': DeciderWatch(self)}
+        self.deciders = {'Circle': DeciderCircle(self), 'Explore': DeciderExplore(self)}
         # self.deciders = {'Push': DeciderPush(self), 'Watch': DeciderWatch(self)}
         # else:
         #     self.deciders = {'Explore': DeciderExplore(self), 'Circle': DeciderCircle(self)}

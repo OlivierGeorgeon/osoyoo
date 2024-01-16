@@ -16,6 +16,7 @@ from ..Robot.RobotDefine import TERRAIN_RADIUS, terrain_north_east_point
 from ..Memory.BodyMemory import ENERGY_TIRED
 from ..Memory.PhenomenonMemory.PhenomenonMemory import TER
 from ..Memory.PhenomenonMemory.PhenomenonTerrain import TERRAIN_ORIGIN_CONFIDENCE
+from ..Memory.PhenomenonMemory import PHENOMENON_RECOGNIZED_CONFIDENCE
 from ..Memory.Memory import EMOTION_RELAXED
 from ..Enaction.CompositeEnaction import CompositeEnaction
 
@@ -141,9 +142,11 @@ class DeciderExplore(Decider):
 
             # Go successively to the predefined prompt points relative to the terrain center
             if self.prompt_index == 0:
-                # self.ter_prompt = terrain_color_point(self.workspace.arena_id) * 1.1
                 self.ter_prompt = self.workspace.memory.phenomenon_memory.phenomena[TER].origin_direction_quaternion \
                                   * Vector3([TERRAIN_RADIUS[self.workspace.arena_id]["radius"] * 1.1, 0, 0])
+                # When the terrain has not been recognized, its origin is on the side
+                if self.workspace.memory.phenomenon_memory.terrain_confidence() < PHENOMENON_RECOGNIZED_CONFIDENCE:
+                    self.ter_prompt += self.workspace.memory.phenomenon_memory.phenomenon_categories[TER].north_east_point
             self.ter_prompt = quaternion.apply_to_vector(self.explore_angle_quaternion, self.ter_prompt)
             ego_prompt = self.workspace.memory.terrain_centric_to_egocentric(self.ter_prompt)
             self.workspace.memory.egocentric_memory.prompt_point = ego_prompt

@@ -94,7 +94,7 @@ class CtrlPhenomenonView:
 
         if self.phenomenon is not None:
             self.view.robot_translate = self.workspace.memory.allocentric_memory.robot_point - self.phenomenon.point
-            self.view.label2.text = "Confidence: {:d}%".format(self.phenomenon.confidence)
+            self.view.label2.text = "Confidence: {:d}%".format(int(self.phenomenon.confidence))  # TODO check why somtimes the confidence is a float
             self.view.robot.rotate_head(self.workspace.memory.body_memory.head_direction_degree())
         if self.workspace.enacter.interaction_step == ENACTION_STEP_REFRESHING:
             if self.phenomenon is not None:

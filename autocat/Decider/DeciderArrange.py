@@ -56,20 +56,20 @@ class DeciderArrange(Decider):
             # The point center of the object
             direction, distance = point_to_echo_direction_distance(self.workspace.memory.egocentric_memory.focus_point)
             # object_point = self.workspace.memory.egocentric_memory.focus_point
-            object_point = echo_point(direction, distance + ARRANGE_OBJECT_RADIUS)
+            object_center = echo_point(direction, distance + ARRANGE_OBJECT_RADIUS)  # Presuppose the object's radius
             ego_target = self.workspace.memory.terrain_centric_to_egocentric(
                 self.workspace.memory.phenomenon_memory.arrange_point())
-            l1 = line.create_from_points(object_point, ego_target)
+            l1 = line.create_from_points(object_center, ego_target)
             ego_prompt_intersection = line_intersection(l1, line.create_from_points([0, 0, 0], [0, 1, 0]))
             ego_prompt_projection = point_closest_point_on_line(np.array([0, 0, 0]), l1)
-            print("Ego prompt projection:", ego_prompt_projection, "focus:", object_point, "target:", ego_target)
+            print("Ego prompt projection:", ego_prompt_projection, "focus:", object_center, "target:", ego_target)
             # If OUTCOME_FLOOR just turn around
             if outcome == OUTCOME_FLOOR:
                 self.step = STEP_INIT
                 composite_enaction = Enaction(self.workspace.actions[ACTION_TURN], self.workspace.memory, span=10)
             # If object behind target just watch (minus the radius to prevent keeping pushing)
-            elif object_point[0] > ego_target[0] - ARRANGE_OBJECT_RADIUS:  # - ARRANGE_MIN_RADIUS:
-                print("Object behind target:", ego_target[0] - object_point[0])
+            elif object_center[0] > ego_target[0] - ARRANGE_OBJECT_RADIUS:  # - ARRANGE_MIN_RADIUS:
+                print("Object behind target:", ego_target[0] - object_center[0])
                 composite_enaction = Enaction(self.workspace.actions[ACTION_WATCH], self.workspace.memory)
                 self.step = STEP_INIT
             # If object to push
@@ -84,10 +84,11 @@ class DeciderArrange(Decider):
                         self.step = STEP_INIT
                     # If angle to projection point greater than 20° and projection far enough from object
                     elif math.fabs(math.atan2(ego_prompt_projection[0], math.fabs(ego_prompt_projection[1]))) > 0.349 \
-                            and object_point[0] - ego_prompt_projection[0] > 0 \
-                            and np.linalg.norm(object_point - ego_prompt_projection) > ROBOT_FLOOR_SENSOR_X + ARRANGE_OBJECT_RADIUS:  #ARRANGE_MIN_RADIUS:
+                            and object_center[0] - ego_prompt_projection[0] > 0 \
+                            and np.linalg.norm(object_center - ego_prompt_projection) > ROBOT_FLOOR_SENSOR_X + ARRANGE_OBJECT_RADIUS:  #ARRANGE_MIN_RADIUS:
                         # If prompt projection behind object swipe to prompt_intersection
                         self.workspace.memory.egocentric_memory.prompt_point = ego_prompt_projection
+                        print("Turn and swipe to prompt projection", ego_prompt_projection)
                         # Turn the left to the projection
                         if ego_prompt_projection[1] > 0:
                             # Turn the left to the prompt

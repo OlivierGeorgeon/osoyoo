@@ -14,10 +14,10 @@ from ..Decider.Decider import FOCUS_TOO_FAR_DISTANCE, CONFIDENCE_CONFIRMED_FOCUS
 from ..Robot.Outcome import Outcome
 
 GRID_WIDTH = 30  # 15   # 100 Number of cells wide
-GRID_HEIGHT = 70  # 45  # 200 Number of cells high
+GRID_HEIGHT = 100  # 70  # 45  # 200 Number of cells high
 NEAR_HOME = 300    # (mm) Max distance to consider near home
 SIMULATION_TIME_RATIO = 1  # 0.5   # The simulation speed is slower than the real speed because ...
-ARRANGE_OBJECT_RADIUS = 50
+ARRANGE_OBJECT_RADIUS = 40
 ARRANGE_MIN_RADIUS = 100
 ARRANGE_MAX_RADIUS = 400
 
