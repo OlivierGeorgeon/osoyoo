@@ -12,6 +12,7 @@ EXPERIENCE_FOCUS = 'Focus'
 EXPERIENCE_PLACE = 'Place'
 EXPERIENCE_PROMPT = 'Prompt'
 EXPERIENCE_ROBOT = 'Robot'
+EXPERIENCE_TOUCH = 'touch'
 FLOOR_COLORS = {0: 'LightSlateGrey', 1: 'red', 2: 'darkOrange', 3: 'gold', 4: 'limeGreen', 5: 'deepSkyBlue',
                 6: 'orchid', 7: 'deepPink'}
 

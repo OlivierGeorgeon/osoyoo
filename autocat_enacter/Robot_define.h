@@ -1,4 +1,4 @@
-#define ROBOT_ID 4 // 0: regular Osoyoo robot, 1: robot BSN, 2: robot UCBL, 3: SHS chez Olivier, 11 to 14: DOLL robots
+#define ROBOT_ID 1 // 0: regular Osoyoo robot, 1: robot BSN, 2: robot UCBL, 3: SHS chez Olivier, 11 to 14: DOLL robots
 
 #define AP_SSID "osoyoo_robot"          // The wifi SSID of this robot in Access Point
 #define ROBOT_HEAD_X 80                 // (mm) X position of the head
@@ -11,6 +11,8 @@
 #define WHITE_RED 100.                  // Color sensor calibration red measure of white floor
 #define WHITE_GREEN 100.                // Color sensor calibration green measure of white floor
 #define WHITE_BLUE 100.                 // Color sensor calibration blue measure of white floor
+
+#define TOUCH_PIN 52
 
 #if ROBOT_ID == 1
 

@@ -24,7 +24,7 @@ class Enaction:
     3. CtrlRobot computes the outcome received from the robot
     4. CtrlRobot call ternminate(outcome)
     """
-    def __init__(self, action, memory, direction=DIRECTION_FRONT, span=40):
+    def __init__(self, action, memory, direction=DIRECTION_FRONT, span=40, caution=0):
         """Initialize the enaction upon creation. Will be adjusted before generating the command"""
         # The initial arguments
         self.action = action
@@ -42,7 +42,8 @@ class Enaction:
             # print("Initialize Enaction clock", self.clock, "prompt", self.prompt_point)
         if memory.egocentric_memory.focus_point is not None:
             self.focus_point = memory.egocentric_memory.focus_point.copy()
-        self.command = Command(self.action, self.prompt_point, self.focus_point, direction, span, memory.emotion_code)
+        self.command = Command(self.action, self.prompt_point, self.focus_point, direction, span, memory.emotion_code,
+                               caution)
 
         # The anticipated memory
         self.post_memory = memory.save()

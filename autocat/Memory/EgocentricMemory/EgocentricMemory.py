@@ -2,7 +2,7 @@ import math
 import numpy as np
 from pyrr import Matrix44, Quaternion
 from ...Memory.EgocentricMemory.Experience import Experience, EXPERIENCE_LOCAL_ECHO, EXPERIENCE_CENTRAL_ECHO, \
-    EXPERIENCE_PLACE, EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_IMPACT, EXPERIENCE_ROBOT
+    EXPERIENCE_PLACE, EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_IMPACT, EXPERIENCE_ROBOT, EXPERIENCE_TOUCH
 from ...Robot.RobotDefine import ROBOT_COLOR_SENSOR_X, ROBOT_FLOOR_SENSOR_X, LINE_X, ROBOT_CHASSIS_Y, ROBOT_OUTSIDE_Y
 from ...Robot.Outcome import echo_matrix
 from ...Decider.Action import ACTION_FORWARD, ACTION_BACKWARD, ACTION_SWIPE, ACTION_RIGHTWARD, ACTION_CIRCUMVENT
@@ -129,6 +129,14 @@ class EgocentricMemory:
             robot_exp = Experience(pose_m, EXPERIENCE_ROBOT, enaction.clock, experience_id=self.experience_id,
                                    durability=EXPERIENCE_PERSISTENCE // 3, color_index=enaction.message.emotion_code)
             self.experiences[robot_exp.id] = robot_exp
+            self.experience_id += 1
+
+        # Add the touch experience
+        if enaction.outcome.touch:
+            pose_m = Matrix44.from_translation([ROBOT_FLOOR_SENSOR_X, 0, 0], dtype=float)
+            touch_exp = Experience(pose_m, EXPERIENCE_TOUCH, enaction.clock, experience_id=self.experience_id,
+                                   durability=EXPERIENCE_PERSISTENCE, color_index=0)
+            self.experiences[touch_exp.id] = touch_exp
             self.experience_id += 1
 
         # Remove the experiences from egocentric memory when they are two old

@@ -190,3 +190,8 @@ class Outcome:
             self.echos = outcome_dict['echos']
             print("Echos", self.echos)
             self.central_echos = central_echos(self.echos)
+
+        # Outcome touch
+        self.touch = 0
+        if 'touch' in outcome_dict:
+            self.touch = outcome_dict['touch']

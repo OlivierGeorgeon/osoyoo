@@ -15,7 +15,7 @@ DIRECTION_RIGHT = 3
 
 class Command:
     """A command to send to the robot"""
-    def __init__(self, action, prompt_point, focus_point, direction, span, color):
+    def __init__(self, action, prompt_point, focus_point, direction, span, color, caution):
         self.action = action
         self.duration = None
         self.angle = None
@@ -25,6 +25,7 @@ class Command:
         self.caution = None  # 1  # Check for obstacles when moving forward
         self.span = None
         self.color = color
+        self.caution = None
 
         if prompt_point is not None:
             if self.action.action_code in [ACTION_FORWARD, ACTION_BACKWARD]:
@@ -92,7 +93,8 @@ class Command:
             matrix44.create_from_translation(-self.anticipated_translation), self.anticipated_yaw_matrix)
 
         # if self.action.action_code == ACTION_FORWARD:
-        #     self.caution = 1  # 1: stop if there is an obstacle on the way
+        if caution > 0:
+            self.caution = caution  # 1: stop if there is an obstacle on the way
 
         if span != 40 and self.action.action_code == ACTION_SCAN:
             self.span = span

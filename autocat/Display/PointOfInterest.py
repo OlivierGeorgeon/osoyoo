@@ -4,7 +4,7 @@ from pyglet import shapes, gl
 from webcolors import name_to_rgb
 from ..Memory.EgocentricMemory.Experience import EXPERIENCE_LOCAL_ECHO, EXPERIENCE_CENTRAL_ECHO,  EXPERIENCE_PLACE, \
     EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_IMPACT, EXPERIENCE_BLOCK, FLOOR_COLORS, EXPERIENCE_FOCUS, \
-    EXPERIENCE_ROBOT
+    EXPERIENCE_ROBOT, EXPERIENCE_TOUCH
 from .EgocentricDisplay.OsoyooCar import EMOTION_COLORS
 
 
@@ -67,6 +67,11 @@ class PointOfInterest:
             self.points = [0, 0, 30, -30, 30, 30]
             self.shape = self.batch.add_indexed(3, gl.GL_TRIANGLES, self.group, [0, 1, 2], ('v2i', self.points),
                                                 ('c4B', 3 * (*self.color, self.opacity)))
+        if self.type == EXPERIENCE_TOUCH:
+            self.color = name_to_rgb("IndianRed")
+            self.points = [-20, 0, 0, 40, 20, 0, 0, -40]
+            self.shape = self.batch.add_indexed(4, gl.GL_TRIANGLES, self.group, [0, 1, 2, 0, 2, 3],
+                                                ('v2i', self.points), ('c4B', 4 * (*self.color, self.opacity)))
         if self.type == EXPERIENCE_FOCUS:
             self.color = name_to_rgb("fireBrick")
             self.points = [40, 0, 20, 34, -20, 34, -40, 0, -20, -34, 20, -34]

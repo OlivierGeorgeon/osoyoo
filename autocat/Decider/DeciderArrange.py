@@ -119,9 +119,10 @@ class DeciderArrange(Decider):
                     push_vector = vector.set_length(ego_target, np.linalg.norm(ego_target) - ROBOT_FLOOR_SENSOR_X + ARRANGE_OBJECT_RADIUS)  # ARRANGE_MIN_RADIUS)
                     self.workspace.memory.egocentric_memory.prompt_point = push_vector  # ego_target
                     if math.fabs(math.atan2(ego_target[1], ego_target[0])) < 0.17:  # 0.349:
-                        # Push to target
+                        # Push toward target
                         self.workspace.memory.egocentric_memory.focus_point = ego_target.copy()  # Look at destination
-                        composite_enaction = Enaction(self.workspace.actions[ACTION_FORWARD], self.workspace.memory)
+                        composite_enaction = Enaction(self.workspace.actions[ACTION_FORWARD], self.workspace.memory,
+                                                      caution=1)
                         self.step = STEP_WITHDRAW
                     # If robot_direction not aligned
                     else:

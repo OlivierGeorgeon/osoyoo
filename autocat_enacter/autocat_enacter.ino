@@ -79,6 +79,8 @@ void setup()
   Serial.println("-- Head initialized");
 
   Serial.println("--- Robot is ready ---");
+
+  pinMode(TOUCH_PIN, INPUT_PULLUP);
 }
 
 void loop()

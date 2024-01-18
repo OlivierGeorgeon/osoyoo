@@ -12,6 +12,7 @@
 #include "Interaction.h"
 #include "led.h"
 #include "Action_define.h"
+#include "Robot_define.h"
 
 Interaction::Interaction(Floor& FLO, Head& HEA, Imu& IMU, WifiCat& WifiCat, JSONVar json_action) :
   _FLO(FLO), _HEA(HEA), _IMU(IMU), _WifiCat(WifiCat)
@@ -123,6 +124,10 @@ void Interaction::send()
   // The outcome for the specific interaction subclass
   outcome(outcome_object);
   outcome_object["status"] = _status;
+
+  // Check if the robot touches an object with the contact sensor
+  if (!digitalRead(TOUCH_PIN))
+    outcome_object["touch"] = 1;
 
   // Send the outcome to the PC
   String outcome_json_string = JSON.stringify(outcome_object);
