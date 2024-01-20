@@ -16,11 +16,10 @@ from ..Robot.Outcome import echo_point
 from . Decider import Decider, FOCUS_TOO_FAR_DISTANCE
 from ..Utils import line_intersection
 from ..Enaction.CompositeEnaction import CompositeEnaction
-from ..Memory.Memory import EMOTION_ANGRY  # , ARRANGE_MIN_RADIUS
+from ..Memory.Memory import EMOTION_ANGRY
 from ..Memory.PhenomenonMemory import ARRANGE_OBJECT_RADIUS
 from ..Memory.BodyMemory import point_to_echo_direction_distance
-from . Interaction import OUTCOME_FLOOR
-from . Interaction import OUTCOME_LOST_FOCUS
+from . Interaction import OUTCOME_FLOOR, OUTCOME_LOST_FOCUS, OUTCOME_TOUCH
 
 STEP_INIT = 0
 STEP_ALIGN = 1
@@ -68,6 +67,15 @@ class DeciderArrange(Decider):
             if outcome == OUTCOME_FLOOR:
                 self.step = STEP_INIT
                 composite_enaction = Enaction(self.workspace.actions[ACTION_TURN], self.workspace.memory, span=10)
+            # If OUTCOME_TOUCH then push to target point without caution
+            elif outcome == OUTCOME_TOUCH:
+                push_vector = vector.set_length(ego_target, np.linalg.norm(ego_target) - ROBOT_FLOOR_SENSOR_X +
+                                                ARRANGE_OBJECT_RADIUS)
+                self.workspace.memory.egocentric_memory.prompt_point = push_vector
+                self.workspace.memory.egocentric_memory.focus_point = ego_target.copy()  # Look at destination
+                composite_enaction = Enaction(self.workspace.actions[ACTION_FORWARD], self.workspace.memory,
+                                              caution=0)
+                self.step = STEP_WITHDRAW
             # If object behind target just watch (minus the radius to prevent keeping pushing)
             elif object_center[0] > ego_target[0] - ARRANGE_OBJECT_RADIUS:  # - ARRANGE_MIN_RADIUS:
                 print("Object behind target:", ego_target[0] - object_center[0])
@@ -123,7 +131,7 @@ class DeciderArrange(Decider):
                         self.workspace.memory.egocentric_memory.focus_point = ego_target.copy()  # Look at destination
                         composite_enaction = Enaction(self.workspace.actions[ACTION_FORWARD], self.workspace.memory,
                                                       caution=1)
-                        self.step = STEP_WITHDRAW
+                        self.step = STEP_ALIGN
                     # If robot_direction not aligned
                     else:
                         # Turn to target

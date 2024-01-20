@@ -26,7 +26,7 @@ LINE_X = 150  # 160              # (mm) X coordinate of the line after retreat
 
 # SCAN_DISTANCE = 800
 
-TERRAIN_RADIUS = {"A328": {"radius": 1100, "azimuth": 25, "short_radius": 800},  #  990 x 600  45},
+TERRAIN_RADIUS = {"A328": {"radius": 1100, "azimuth": 25, "short_radius": 800},  #  25 990 x 600  45},
                   # "PetiteIA": {"radius": 600, "azimuth": 50},  # Petit tapis
                   "PetiteIA": {"radius": 1100, "azimuth": 55, "short_radius": 650},  # {990, 60},  # Grand tapis
                   "A301": {"radius": 1200, "azimuth": 50},

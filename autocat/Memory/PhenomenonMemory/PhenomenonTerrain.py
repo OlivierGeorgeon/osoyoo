@@ -3,7 +3,7 @@ import numpy as np
 from pyrr import Vector3, Quaternion
 from . import PHENOMENON_RECOGNIZE_CONFIDENCE
 from .Phenomenon import Phenomenon
-from .Affordance import Affordance
+from .Affordance import Affordance, MIDDLE_COLOR_INDEX, COLOR_DISTANCE
 from ...Memory.EgocentricMemory.Experience import EXPERIENCE_PLACE, EXPERIENCE_FLOOR
 from ...Utils import short_angle
 from ...Robot.RobotDefine import LINE_X, ROBOT_COLOR_SENSOR_X
@@ -137,14 +137,24 @@ class PhenomenonTerrain(Phenomenon):
         """Return the distance between the affordance's green point and the origin point"""
         # Positive prediction error means reducing the position computed through path integration
         # The prediction error must be subtracted from the computed position
+
+        # The color point along the y axis: red positive, purple negative.
+        color_y = Vector3([0, (MIDDLE_COLOR_INDEX - affordance.color_index) * COLOR_DISTANCE, 0])
+
         if abs(short_angle(affordance.quaternion, self.origin_direction_quaternion)) < math.pi / 2:
-            # Vector to origin
-            v = affordance.point + affordance.polar_green_point() - self.relative_origin_point
+            # Vector to origin  TODO Test
+            # Trust the terrain direction
+            v = affordance.point + affordance.polar_sensor_point - self.origin_direction_quaternion * color_y - self.relative_origin_point
+            # Trust the affordance direction
+            # v = affordance.point + affordance.polar_green_point() - self.relative_origin_point
         else:
-            # Vector to opposite of the origin
-            v = affordance.point + affordance.polar_green_point() + self.relative_origin_point
+            # Vector to opposite of the origin TODO Test
+            # Trust the terrain direction
+            v = affordance.point + affordance.polar_sensor_point - self.origin_direction_quaternion * color_y + self.relative_origin_point
+            # Trust the affordance direction
+            # v = affordance.point + affordance.polar_green_point() + self.relative_origin_point
         # print("Place prediction error", v)
-        return v
+        return np.array(v, dtype=int)
 
     def save(self, saved_phenomenon=None):
         """Return a clone of the phenomenon for memory snapshot"""
