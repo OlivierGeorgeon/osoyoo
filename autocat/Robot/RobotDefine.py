@@ -78,7 +78,7 @@ ROBOT_SETTINGS_4["IP"] = {"PetiteIA": "192.168.8.242"}  # 108
 ROBOT_SETTINGS_4["forward_speed"] = 300  # 320
 ROBOT_SETTINGS_4["lateral_speed"] = 200  # 50
 ROBOT_SETTINGS_4["retreat_distance"] = 150  # Increase it if the line keeps being pushed farther
-ROBOT_SETTINGS_4["compass_offset"] = [0, 0, 0]  # [33, -5, 0]  # [50, -5, 0]  # [76, 0, 0]
+ROBOT_SETTINGS_4["compass_offset"] = [-38, -56, 0]  # [33, -5, 0]  # [50, -5, 0]  # [76, 0, 0]
 
 # Robot 1 at DOLL
 ROBOT_SETTINGS_11 = ROBOT_SETTINGS_0.copy()

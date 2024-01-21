@@ -144,11 +144,15 @@ class DeciderExplore(Decider):
             if self.prompt_index == 0:
                 self.ter_prompt = self.workspace.memory.phenomenon_memory.phenomena[TER].origin_direction_quaternion \
                                   * Vector3([TERRAIN_RADIUS[self.workspace.arena_id]["radius"] * 1.1, 0, 0])
-                # When the terrain has not been recognized, its origin is on the side
-                if self.workspace.memory.phenomenon_memory.terrain_confidence() < PHENOMENON_RECOGNIZED_CONFIDENCE:
-                    self.ter_prompt += self.workspace.memory.phenomenon_memory.phenomenon_categories[TER].north_east_point
             self.ter_prompt = quaternion.apply_to_vector(self.explore_angle_quaternion, self.ter_prompt)
-            ego_prompt = self.workspace.memory.terrain_centric_to_egocentric(self.ter_prompt)
+            # When the terrain has not been recognized, add the terrain radius
+            if self.workspace.memory.phenomenon_memory.terrain_confidence() < PHENOMENON_RECOGNIZED_CONFIDENCE:
+                # self.ter_prompt += self.workspace.memory.phenomenon_memory.phenomenon_categories[TER].north_east_point
+                ego_prompt = self.workspace.memory.terrain_centric_to_egocentric(self.ter_prompt +
+                    self.workspace.memory.phenomenon_memory.phenomena[TER].origin_direction_quaternion
+                    * Vector3([-TERRAIN_RADIUS[self.workspace.arena_id]["radius"], 0, 0]))
+            else:
+                ego_prompt = self.workspace.memory.terrain_centric_to_egocentric(self.ter_prompt)
             self.workspace.memory.egocentric_memory.prompt_point = ego_prompt
             self.workspace.memory.egocentric_memory.focus_point = None  # Prevent unnatural head movement
             self.prompt_index += 1
