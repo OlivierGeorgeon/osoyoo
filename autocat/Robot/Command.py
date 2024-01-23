@@ -27,6 +27,7 @@ class Command:
         self.color = color
         self.caution = None
 
+        # Compute the duration and angle
         if prompt_point is not None:
             if self.action.action_code in [ACTION_FORWARD, ACTION_BACKWARD]:
                 self.duration = int(math.fabs(prompt_point[0] / self.action.translation_speed[0] * 1000))
@@ -57,6 +58,7 @@ class Command:
         if self.action.action_code in [ACTION_WATCH]:
             self.duration = 1000  # 5000
 
+        # Compute the focus
         if focus_point is not None:
             self.focus_x = int(focus_point[0])  # Convert to python int
             self.focus_y = int(focus_point[1])
@@ -69,35 +71,35 @@ class Command:
                 if prompt_point is not None:
                     self.speed = math.copysign(int(self.action.translation_speed[1]), prompt_point[1])
 
-        # The anticipated displacement
-        if self.duration is None:
-            if self.speed is None or self.speed > 0 or self.action.action_code in [ACTION_RIGHTWARD]:
-                self.anticipated_translation = action.translation_speed * action.target_duration
-            else:
-                self.anticipated_translation = - action.translation_speed * action.target_duration
-        else:
-            if self.speed is None or self.speed > 0 or self.action.action_code in [ACTION_RIGHTWARD]:
-                self.anticipated_translation = action.translation_speed * self.duration / 1000
-            else:
-                self.anticipated_translation = - action.translation_speed * self.duration / 1000
-
-        # The anticipated yaw quaternion
-        if self.angle is None:
-            self.anticipated_yaw_quaternion = Quaternion.from_z_rotation(action.rotation_speed_rad * action.target_duration)
-        else:
-            self.anticipated_yaw_quaternion = Quaternion.from_z_rotation(math.radians(self.angle))
-
-        # The displacement matrix of the environment relative to the robot
-        self.anticipated_yaw_matrix = matrix44.create_from_quaternion(self.anticipated_yaw_quaternion)
-        self.anticipated_displacement_matrix = matrix44.multiply(
-            matrix44.create_from_translation(-self.anticipated_translation), self.anticipated_yaw_matrix)
-
-        # if self.action.action_code == ACTION_FORWARD:
+        # The additional fields of the command packet
         if caution > 0:
             self.caution = caution  # 1: stop if there is an obstacle on the way
 
         if span != 40 and self.action.action_code == ACTION_SCAN:
             self.span = span
+
+        # The anticipated displacement
+        if self.duration is None:
+            if self.speed is None or self.speed > 0 or self.action.action_code in [ACTION_RIGHTWARD]:
+                self.predicted_translation = action.translation_speed * action.target_duration
+            else:
+                self.predicted_translation = - action.translation_speed * action.target_duration
+        else:
+            if self.speed is None or self.speed > 0 or self.action.action_code in [ACTION_RIGHTWARD]:
+                self.predicted_translation = action.translation_speed * self.duration / 1000
+            else:
+                self.predicted_translation = - action.translation_speed * self.duration / 1000
+
+        # The anticipated yaw quaternion
+        if self.angle is None:
+            self.predicted_yaw_quaternion = Quaternion.from_z_rotation(action.rotation_speed_rad * action.target_duration)
+        else:
+            self.predicted_yaw_quaternion = Quaternion.from_z_rotation(math.radians(self.angle))
+
+        # The displacement matrix of the environment relative to the robot
+        self.predicted_yaw_matrix = matrix44.create_from_quaternion(self.predicted_yaw_quaternion)
+        self.predicted_displacement_matrix = matrix44.multiply(
+            matrix44.create_from_translation(-self.predicted_translation), self.predicted_yaw_matrix)
 
     def command_dict(self):
         """Return a dictionary containing the command"""

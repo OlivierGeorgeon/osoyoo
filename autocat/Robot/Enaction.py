@@ -13,6 +13,7 @@ from ..Utils import short_angle
 from .RobotDefine import DEFAULT_YAW, TURN_DURATION, ROBOT_FLOOR_SENSOR_X, ROBOT_CHASSIS_Y, ROBOT_SETTINGS, RETREAT_DISTANCE_Y
 from .Command import Command, DIRECTION_FRONT
 from .Outcome import echo_point
+from ..Memory.PhenomenonMemory import PHENOMENON_RECOGNIZED_CONFIDENCE
 
 FOCUS_MAX_DELTA = 200  # 200 (mm) Maximum delta to keep focus
 
@@ -35,6 +36,30 @@ class Enaction:
         self.prompt_point = None
         self.focus_point = None
 
+        self.predicted_floor = 0
+
+        # If move forward, stop at the terrain border
+        if memory.phenomenon_memory.terrain_confidence() >= PHENOMENON_RECOGNIZED_CONFIDENCE and self.action.action_code == ACTION_FORWARD:
+            # The shape of the terrain in egocentric coordinates
+            ego_shape = np.array([memory.terrain_centric_to_egocentric(p) for p in memory.phenomenon_memory.terrain().shape])
+            # Loop over the points where the y coordinate changes sign
+            for i in np.where(np.diff(np.sign(ego_shape[:, 1])))[0]:
+                if abs(ego_shape[i+1][0] - ego_shape[i][0]) < 5:
+                    self.predicted_floor = 3
+                    x_line = ego_shape[i][0]
+                else:
+                    slope = (ego_shape[i+1][1] - ego_shape[i][1])/(ego_shape[i+1][0] - ego_shape[i][0])
+                    x_line = ego_shape[i][0] - ego_shape[i][1]/slope
+                    if ego_shape[i][0] > ego_shape[i + 1][0]:
+                        self.predicted_floor = 1
+                    else:
+                        self.predicted_floor = 3
+                if x_line > 0:
+                    print("intersection point", memory.phenomenon_memory.terrain().shape[i], "Distance", x_line)
+                    if memory.egocentric_memory.prompt_point is not None and memory.egocentric_memory.prompt_point[0] > x_line:
+                        memory.egocentric_memory.prompt_point = np.array([x_line - ROBOT_FLOOR_SENSOR_X, 0, 0], dtype=int)
+                    break
+
         # The command to the robot
         self.body_quaternion = memory.body_memory.body_quaternion.copy()
         if memory.egocentric_memory.prompt_point is not None:
@@ -47,14 +72,14 @@ class Enaction:
 
         # The anticipated memory
         self.post_memory = memory.save()
-        self.post_memory.allocentric_memory.move(self.body_quaternion, self.command.anticipated_translation, self.clock)
-        self.post_memory.body_memory.body_quaternion = self.command.anticipated_yaw_quaternion * self.body_quaternion
+        self.post_memory.allocentric_memory.move(self.body_quaternion, self.command.predicted_translation, self.clock)
+        self.post_memory.body_memory.body_quaternion = self.command.predicted_yaw_quaternion * self.body_quaternion
         if memory.egocentric_memory.prompt_point is not None:
             self.post_memory.egocentric_memory.prompt_point = \
-                matrix44.apply_to_vector(self.command.anticipated_displacement_matrix, self.prompt_point).astype(int)
+                matrix44.apply_to_vector(self.command.predicted_displacement_matrix, self.prompt_point).astype(int)
         if memory.egocentric_memory.focus_point is not None:
             self.post_memory.egocentric_memory.focus_point = \
-                matrix44.apply_to_vector(self.command.anticipated_displacement_matrix, self.focus_point).astype(int)
+                matrix44.apply_to_vector(self.command.predicted_displacement_matrix, self.focus_point).astype(int)
 
         # The simulation of the enaction
         # self.is_simulating = False
@@ -113,7 +138,7 @@ class Enaction:
         # self.translation = self.action.translation_speed * (float(outcome.duration1) / 1000.0)
         # if self.action.action_code == ACTION_SWIPE and self.command.speed is not None and self.command.speed < 0:
         #     self.translation = - self.translation
-        self.translation = self.command.anticipated_translation.copy()
+        self.translation = self.command.predicted_translation.copy()
         if self.command.duration is None or self.command.duration == 0:
             self.translation *= (self.outcome.duration1/(self.action.target_duration * 1000.))
         else:
@@ -138,7 +163,7 @@ class Enaction:
 
         # The yaw quaternion
         if outcome.yaw_quaternion is None:
-            self.yaw_quaternion = self.command.anticipated_yaw_quaternion.copy()
+            self.yaw_quaternion = self.command.predicted_yaw_quaternion.copy()
         else:
             self.yaw_quaternion = outcome.yaw_quaternion
         yaw_integration_quaternion = self.body_quaternion.cross(self.yaw_quaternion)

@@ -73,8 +73,8 @@ class PhenomenonTerrain(Phenomenon):
                             a.point -= ac
                             # print("Affordance clock:", a.experience.clock, "corrected by:", ac, "coef:", coef)
                         # Increase confidence if not consecutive origin affordances
-                        if affordance.clock - self.last_origin_clock > 5:
-                            self.confidence = PHENOMENON_RECOGNIZE_CONFIDENCE
+                        # if affordance.clock - self.last_origin_clock > 5:
+                        self.confidence = PHENOMENON_RECOGNIZE_CONFIDENCE
                         self.last_origin_clock = affordance.clock
                 # Black line: Compute the position correction based on the nearest point in the terrain shape
                 # DOES NOT WORK: Must use the point on the trajectory rather than the closest point
@@ -141,7 +141,7 @@ class PhenomenonTerrain(Phenomenon):
         else:
             # Vector to opposite of the origin
             # Trust the terrain direction
-            v = affordance.point + affordance.polar_sensor_point - self.origin_direction_quaternion * color_y + self.relative_origin_point
+            v = affordance.point + affordance.polar_sensor_point + self.origin_direction_quaternion * color_y + self.relative_origin_point
             # Trust the affordance direction
             # v = affordance.point + affordance.polar_green_point() + self.relative_origin_point
         # print("Place prediction error", v)

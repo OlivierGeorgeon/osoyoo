@@ -86,7 +86,7 @@ class AllocentricMemory:
                         c.phenomenon_id = TER
                         c.clock_place = clock
             # If terrain category has been recognised
-            if p_id == TER and p.confidence >= TERRAIN_ORIGIN_CONFIDENCE:
+            if p_id == TER and p.confidence >= PHENOMENON_RECOGNIZE_CONFIDENCE:  # TERRAIN_ORIGIN_CONFIDENCE:
                 # Draw the terrain from its shape
                 for point in p.shape:
                     cell_x, cell_y = point_to_cell(point + p.point)
@@ -94,25 +94,26 @@ class AllocentricMemory:
                     # Attribute this phenomenon to this cell
                     if (self.min_i <= cell_x <= self.max_i) and (self.min_j <= cell_y <= self.max_j):
                         self.grid[cell_x][cell_y].phenomenon_id = p_id
-            if p_id == ROBOT1:
-                # Draw the other robot from its shape
-                for point in p.shape:
-                    cell_x, cell_y = point_to_cell(point + p.point)
-                    self.apply_status_to_cell(cell_x, cell_y, EXPERIENCE_ALIGNED_ECHO, p.last_origin_clock, 0)
-                    self.apply_status_to_cell(cell_x, cell_y, EXPERIENCE_IMPACT, p.last_origin_clock, 0)
-                    # Attribute this phenomenon to this cell
-                    if (self.min_i <= cell_x <= self.max_i) and (self.min_j <= cell_y <= self.max_j):
-                        self.grid[cell_x][cell_y].phenomenon_id = p_id
-            # Mark the affordances of this phenomenon
-            for a in p.affordances.values():
-                if (p_id != TER or p.confidence < PHENOMENON_RECOGNIZE_CONFIDENCE or a.color_index != 0
-                    or CHECK_OUTSIDE == 0) and a.type != EXPERIENCE_PLACE:
-                    # Attribute the status of the affordance
-                    cell_x, cell_y = point_to_cell(a.point+p.point)
-                    self.apply_status_to_cell(cell_x, cell_y, a.type, a.clock, a.color_index)
-                    # Attribute this phenomenon to this cell
-                    if (self.min_i <= cell_x <= self.max_i) and (self.min_j <= cell_y <= self.max_j):
-                        self.grid[cell_x][cell_y].phenomenon_id = p_id
+            else:
+                if p_id == ROBOT1:
+                    # Draw the other robot from its shape
+                    for point in p.shape:
+                        cell_x, cell_y = point_to_cell(point + p.point)
+                        self.apply_status_to_cell(cell_x, cell_y, EXPERIENCE_ALIGNED_ECHO, p.last_origin_clock, 0)
+                        self.apply_status_to_cell(cell_x, cell_y, EXPERIENCE_IMPACT, p.last_origin_clock, 0)
+                        # Attribute this phenomenon to this cell
+                        if (self.min_i <= cell_x <= self.max_i) and (self.min_j <= cell_y <= self.max_j):
+                            self.grid[cell_x][cell_y].phenomenon_id = p_id
+                # Mark the affordances of this phenomenon
+                for a in p.affordances.values():
+                    if (p_id != TER or p.confidence < PHENOMENON_RECOGNIZE_CONFIDENCE or a.color_index != 0
+                        or CHECK_OUTSIDE == 0) and a.type != EXPERIENCE_PLACE:
+                        # Attribute the status of the affordance
+                        cell_x, cell_y = point_to_cell(a.point+p.point)
+                        self.apply_status_to_cell(cell_x, cell_y, a.type, a.clock, a.color_index)
+                        # Attribute this phenomenon to this cell
+                        if (self.min_i <= cell_x <= self.max_i) and (self.min_j <= cell_y <= self.max_j):
+                            self.grid[cell_x][cell_y].phenomenon_id = p_id
 
         # Place the affordances that are not attached to phenomena
         for a in self.affordances:

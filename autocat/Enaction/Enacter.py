@@ -152,7 +152,7 @@ class Enacter:
         # If crossed the line then stop the simulation (must do before marking the place)
         floor = 0
         color_index = 0
-        yaw = round(math.degrees(quaternion_to_direction_rad(enaction.command.anticipated_yaw_quaternion)))
+        yaw = round(math.degrees(quaternion_to_direction_rad(enaction.command.predicted_yaw_quaternion)))
         if enaction.action.action_code in [ACTION_FORWARD, ACTION_SWIPE]:
             floor_i, floor_j = point_to_cell(memory.allocentric_memory.robot_point +
                                              memory.body_memory.body_quaternion * Vector3([ROBOT_FLOOR_SENSOR_X,
@@ -235,7 +235,7 @@ class Enacter:
 
         # yaw
 
-        pe = math.degrees(-short_angle(enaction.command.anticipated_yaw_quaternion, enaction.yaw_quaternion))
+        pe = math.degrees(-short_angle(enaction.command.predicted_yaw_quaternion, enaction.yaw_quaternion))
         self.yaw_prediction_error[self.workspace.enaction.clock] = pe
         self.yaw_prediction_error.pop(enaction.clock - PREDICTION_ERROR_WINDOW, None)
         print("Prediction Error Yaw (command - measure)=", round(pe, 1),
