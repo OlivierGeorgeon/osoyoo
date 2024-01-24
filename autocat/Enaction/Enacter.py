@@ -6,6 +6,8 @@ from pyrr import Quaternion, Vector3, matrix44, vector3
 from ..Robot.CtrlRobot import ENACTION_STEP_IDLE, ENACTION_STEP_COMMANDING, ENACTION_STEP_ENACTING, \
     ENACTION_STEP_INTEGRATING, ENACTION_STEP_REFRESHING
 from ..Robot.RobotDefine import ROBOT_FLOOR_SENSOR_X
+from ..Memory.Memory import Memory
+from ..Memory.PhenomenonMemory import PHENOMENON_RECOGNIZED_CONFIDENCE
 from ..Memory.PhenomenonMemory.PhenomenonMemory import TERRAIN_ORIGIN_CONFIDENCE, BOX
 from ..Memory.BodyMemory import point_to_echo_direction_distance
 from ..Decider.Action import ACTION_SWIPE, ACTION_FORWARD, ACTION_SCAN
@@ -106,7 +108,7 @@ class Enacter:
     def simulate(self, dt):
         """Simulate the enaction in memory. Reset self.is_simulating when the simulation ends"""
         enaction = self.workspace.enaction
-        memory = self.workspace.memory
+        memory: Memory = self.workspace.memory
 
         # Check whether target time is elapsed
         enaction.simulation_time += dt
@@ -153,53 +155,64 @@ class Enacter:
         floor = 0
         color_index = 0
         yaw = round(math.degrees(quaternion_to_direction_rad(enaction.command.predicted_yaw_quaternion)))
-        if enaction.action.action_code in [ACTION_FORWARD, ACTION_SWIPE]:
-            floor_i, floor_j = point_to_cell(memory.allocentric_memory.robot_point +
-                                             memory.body_memory.body_quaternion * Vector3([ROBOT_FLOOR_SENSOR_X,
-                                                                                           0, 0]))
-            if (memory.allocentric_memory.min_i <= floor_i <= memory.allocentric_memory.max_i) and \
-                (memory.allocentric_memory.min_j <= floor_j <= memory.allocentric_memory.max_j) and \
-                    memory.allocentric_memory.grid[floor_i][floor_j].status[0] == EXPERIENCE_FLOOR:
-                self.is_simulating = False
-                self.simulation_duration1 = enaction.simulation_time * 1000
-                if enaction.action.action_code == ACTION_FORWARD:
-                    floor = 3
-                    self.simulation_duration1 += 400  # Add the inertia
-                else:
-                    if enaction.command.speed is None or enaction.command.speed > 0:
-                        # Swipe left
-                        floor = 2
-                        yaw = 45
+        if memory.phenomenon_memory.terrain_confidence() < PHENOMENON_RECOGNIZED_CONFIDENCE:
+            if enaction.action.action_code in [ACTION_FORWARD, ACTION_SWIPE]:
+                floor_i, floor_j = point_to_cell(memory.allocentric_memory.robot_point +
+                                                 memory.body_memory.body_quaternion * Vector3([ROBOT_FLOOR_SENSOR_X,
+                                                                                               0, 0]))
+                if (memory.allocentric_memory.min_i <= floor_i <= memory.allocentric_memory.max_i) and \
+                    (memory.allocentric_memory.min_j <= floor_j <= memory.allocentric_memory.max_j) and \
+                        memory.allocentric_memory.grid[floor_i][floor_j].status[0] == EXPERIENCE_FLOOR:
+                    self.is_simulating = False
+                    self.simulation_duration1 = enaction.simulation_time * 1000
+                    if enaction.action.action_code == ACTION_FORWARD:
+                        floor = 3
+                        self.simulation_duration1 += 400  # Add the inertia
                     else:
-                        # Swipe right
-                        floor = 1
-                        yaw = -45
-                color_index = memory.allocentric_memory.grid[floor_i][floor_j].color_index
-            else:
-                floor = 0
-
-        # Simulate an echo from the nearest phenomenon
-        echoes = []
-        for p in [p for p in self.workspace.memory.phenomenon_memory.phenomena.values() if p.phenomenon_type == EXPERIENCE_ALIGNED_ECHO]:
-            ego_center_point = self.workspace.memory.allocentric_to_egocentric(p.point)
-            a, d = point_to_echo_direction_distance(ego_center_point)
-            # Subtract the phenomenon's radius to obtain the egocentric echo distance
-            d -= self.workspace.memory.phenomenon_memory.phenomenon_categories[BOX].long_radius
-            if d > 0 and enaction.action.action_code == ACTION_SCAN and assert_almost_equal_angles(math.radians(a), 0, 90) or \
-                    assert_almost_equal_angles(math.radians(a), math.radians(head_direction_degree), 35):
-                echoes.append([a, d])
-        # Look for the echo added by the user
-        for ij in self.workspace.memory.allocentric_memory.user_added_echos:
-            p = self.workspace.memory.allocentric_memory.grid[ij[0]][ij[1]].point()
-            a, d = point_to_echo_direction_distance(self.workspace.memory.allocentric_to_egocentric(p))
-            if enaction.action.action_code == ACTION_SCAN and assert_almost_equal_angles(math.radians(a), 0, 90) or \
-                    assert_almost_equal_angles(math.radians(a), math.radians(head_direction_degree), 35):
-                echoes.append([a, d])
-        if len(echoes) > 0:
-            np_echoes = np.array(echoes, dtype=int)
-            head_angle, echo_distance = np_echoes[np.argmin(np_echoes[:, 1])]
+                        if enaction.command.speed is None or enaction.command.speed > 0:
+                            # Swipe left
+                            floor = 2
+                            yaw = 45
+                        else:
+                            # Swipe right
+                            floor = 1
+                            yaw = -45
+                    color_index = memory.allocentric_memory.grid[floor_i][floor_j].color_index
+                else:
+                    floor = 0
         else:
-            head_angle, echo_distance = 0, 10000
+            floor = enaction.predicted_floor
+            if floor == 2:
+                yaw = 45
+            elif floor == 1:
+                yaw = -45
+
+        # Compute the simulated echo
+        echoes = [[enaction.predicted_head_direction, enaction.predicted_echo_distance]]
+        # for p in [p for p in self.workspace.memory.phenomenon_memory.phenomena.values() if p.phenomenon_type == EXPERIENCE_ALIGNED_ECHO]:
+        #     ego_center_point = self.workspace.memory.allocentric_to_egocentric(p.point)
+        #     a, d = point_to_echo_direction_distance(ego_center_point)
+        #     # Subtract the phenomenon's radius to obtain the egocentric echo distance
+        #     d -= self.workspace.memory.phenomenon_memory.phenomenon_categories[BOX].long_radius
+        #     if d > 0 and enaction.action.action_code == ACTION_SCAN and assert_almost_equal_angles(math.radians(a), 0, 90) or \
+        #             assert_almost_equal_angles(math.radians(a), math.radians(head_direction_degree), 35):
+        #         echoes.append([a, d])
+
+        # Process the cells added by the user
+        for ij in self.workspace.memory.allocentric_memory.user_cells:
+            cell = self.workspace.memory.allocentric_memory.grid[ij[0]][ij[1]]
+            if cell.status[1] == EXPERIENCE_ALIGNED_ECHO:
+                p = cell.point()
+                a, d = point_to_echo_direction_distance(self.workspace.memory.allocentric_to_egocentric(p))
+                if enaction.action.action_code == ACTION_SCAN and assert_almost_equal_angles(math.radians(a), 0, 90) or \
+                        assert_almost_equal_angles(math.radians(a), math.radians(head_direction_degree), 35):
+                    echoes.append([a, d])
+        # if len(echoes) > 0:
+        np_echoes = np.array(echoes, dtype=int)
+        head_angle, echo_distance = np_echoes[np.argmin(np_echoes[:, 1])]
+
+        # else:
+        #     head_angle, echo_distance = 0, 10000
 
         # Mark the place
         memory.allocentric_memory.place_robot(memory.body_memory, enaction.clock)
@@ -217,6 +230,8 @@ class Enacter:
         # Print the simulated outcome at the end of the simulation
         if not self.is_simulating:
             print("Simulated outcome", outcome_string)
+            # Empty the list of cells to be processed
+            self.workspace.memory.allocentric_memory.user_cells = []
         return Outcome(outcome_string)
 
     def prediction_error(self, simulated_outcome):
@@ -225,8 +240,8 @@ class Enacter:
 
         # Translation duration1
 
-        if self.workspace.enaction.action.action_code in [ACTION_FORWARD, ACTION_SWIPE]:
-            pe = simulated_outcome.duration1 - self.workspace.enaction.outcome.duration1
+        if self.workspace.enaction.action.action_code in [ACTION_FORWARD]:  #, ACTION_SWIPE]:
+            pe = (simulated_outcome.duration1 - self.workspace.enaction.outcome.duration1)/self.workspace.enaction.outcome.duration1
             self.forward_duration1_prediction_error[self.workspace.enaction.clock] = pe
             self.forward_duration1_prediction_error.pop(self.workspace.enaction.clock - PREDICTION_ERROR_WINDOW, None)
             print("Prediction Error Translate duration1 (simulation - measured)=", round(pe),
@@ -290,7 +305,7 @@ class Enacter:
         if not os.path.exists("log"):
             os.makedirs("log")
         # Generate the plots
-        plot(self.workspace.enacter.forward_duration1_prediction_error, "Translation duration (ms)", "Translation")
+        plot(self.workspace.enacter.forward_duration1_prediction_error, "Forward duration (%)", "Translation")
         plot(self.workspace.enacter.yaw_prediction_error, "Yaw (degrees)", "yaw")
         plot(self.compass_prediction_error, "Compass (degree)", "Compass")
         plot(self.focus_direction_prediction_error, "Focus direction (degree)", "Focus_direction")

@@ -1,4 +1,4 @@
-#define ROBOT_ID 4 // 0: regular Osoyoo robot, 1: robot BSN, 2: robot UCBL, 3: SHS chez Olivier, 11 to 14: DOLL robots
+#define ROBOT_ID 3 // 0: regular Osoyoo robot, 1: robot BSN, 2: robot UCBL, 3: SHS chez Olivier, 11 to 14: DOLL robots
 
 #define AP_SSID "osoyoo_robot"          // The wifi SSID of this robot in Access Point
 #define ROBOT_HEAD_X 80                 // (mm) X position of the head
@@ -78,8 +78,8 @@
 #define ROBOT_REAR_RIGHT_WHEEL_COEF 1.0  //                                     0.9 26/02/2023
 #define ROBOT_FRONT_RIGHT_WHEEL_COEF 1.0 // 1.1 20/05/2023 // 1.0 04/04/2023 // 1.1 26/02/2023 // 1.2 29/05/2022
 #define TURN_SPOT_MAX_DURATION 2400
-#define TURN_SPOT_ENDING_DELAY 200
-#define TURN_SPOT_ENDING_ANGLE 9 // 5
+#define TURN_SPOT_ENDING_DELAY 150 // 200
+#define TURN_SPOT_ENDING_ANGLE 6 // 9 // 5
 #define COMPASS_X_OFFSET  870  // 1071  // 1100  // 1005  //  1020,  1060
 #define COMPASS_Y_OFFSET  -1000 // -1225  // -1300  // -1247 // -1300, -1290
 #define ACCELERATION_X_OFFSET -55  // 55  // 35

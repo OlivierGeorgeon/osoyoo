@@ -9,11 +9,14 @@ from ..Decider.Decider import CONFIDENCE_NO_FOCUS, CONFIDENCE_NEW_FOCUS, CONFIDE
     CONFIDENCE_CAREFUL_SCAN, CONFIDENCE_CONFIRMED_FOCUS
 from ..Memory.Memory import SIMULATION_TIME_RATIO
 from ..Memory.BodyMemory import point_to_echo_direction_distance
-from ..Utils import short_angle
+from ..Memory.EgocentricMemory.Experience import EXPERIENCE_ALIGNED_ECHO
+from ..Memory.PhenomenonMemory.PhenomenonMemory import BOX
+from ..Utils import short_angle, assert_almost_equal_angles
 from .RobotDefine import DEFAULT_YAW, TURN_DURATION, ROBOT_FLOOR_SENSOR_X, ROBOT_CHASSIS_Y, ROBOT_SETTINGS, RETREAT_DISTANCE_Y
 from .Command import Command, DIRECTION_FRONT
 from .Outcome import echo_point
 from ..Memory.PhenomenonMemory import PHENOMENON_RECOGNIZED_CONFIDENCE
+
 
 FOCUS_MAX_DELTA = 200  # 200 (mm) Maximum delta to keep focus
 
@@ -38,27 +41,57 @@ class Enaction:
 
         self.predicted_floor = 0
 
-        # If move forward, stop at the terrain border
-        if memory.phenomenon_memory.terrain_confidence() >= PHENOMENON_RECOGNIZED_CONFIDENCE and self.action.action_code == ACTION_FORWARD:
+        # If terrain is recognized, predict the floor outcome
+        if memory.phenomenon_memory.terrain_confidence() >= PHENOMENON_RECOGNIZED_CONFIDENCE:
             # The shape of the terrain in egocentric coordinates
             ego_shape = np.array([memory.terrain_centric_to_egocentric(p) for p in memory.phenomenon_memory.terrain().shape])
-            # Loop over the points where the y coordinate changes sign
-            for i in np.where(np.diff(np.sign(ego_shape[:, 1])))[0]:
-                if abs(ego_shape[i+1][0] - ego_shape[i][0]) < 5:
-                    self.predicted_floor = 3
-                    x_line = ego_shape[i][0]
-                else:
-                    slope = (ego_shape[i+1][1] - ego_shape[i][1])/(ego_shape[i+1][0] - ego_shape[i][0])
-                    x_line = ego_shape[i][0] - ego_shape[i][1]/slope
-                    if ego_shape[i][0] > ego_shape[i + 1][0]:
-                        self.predicted_floor = 1
-                    else:
+            if self.action.action_code == ACTION_FORWARD:
+                # Loop over the points where the y coordinate changes sign
+                for i in np.where(np.diff(np.sign(ego_shape[:, 1])))[0]:
+                    if abs(ego_shape[i+1][0] - ego_shape[i][0]) < 5:
                         self.predicted_floor = 3
-                if x_line > 0:
-                    print("intersection point", memory.phenomenon_memory.terrain().shape[i], "Distance", x_line)
-                    if memory.egocentric_memory.prompt_point is not None and memory.egocentric_memory.prompt_point[0] > x_line:
-                        memory.egocentric_memory.prompt_point = np.array([x_line - ROBOT_FLOOR_SENSOR_X, 0, 0], dtype=int)
-                    break
+                        x_line = ego_shape[i][0]
+                    else:
+                        slope = (ego_shape[i+1][1] - ego_shape[i][1])/(ego_shape[i+1][0] - ego_shape[i][0])
+                        x_line = ego_shape[i][0] - ego_shape[i][1]/slope
+                        if ego_shape[i][0] > ego_shape[i + 1][0]:
+                            self.predicted_floor = 1
+                        else:
+                            self.predicted_floor = 2
+                    if x_line > 0:
+                        print("intersection point", memory.phenomenon_memory.terrain().shape[i], "Distance", x_line)
+                        if memory.egocentric_memory.prompt_point is not None and memory.egocentric_memory.prompt_point[0] > x_line:
+                            memory.egocentric_memory.prompt_point = np.array([x_line - ROBOT_FLOOR_SENSOR_X, 0, 0], dtype=int)
+                        else:
+                            self.predicted_floor = 0
+                        break
+            elif self.action.action_code == ACTION_SWIPE:
+                # Loop over the points where the y coordinate pass the floor sensor
+                for i in np.where(np.diff(np.sign(ego_shape[:, 0] - ROBOT_FLOOR_SENSOR_X)))[0]:
+                    if abs(ego_shape[i+1][1] - ego_shape[i][1]) == 0:
+                        y_line = ego_shape[i][1]
+                    else:
+                        slope = (ego_shape[i+1][0] - ego_shape[i][0])/(ego_shape[i+1][1] - ego_shape[i][1])
+                        y_line = ego_shape[i][1] - ego_shape[i][0]/slope
+                    if memory.egocentric_memory.prompt_point is None or memory.egocentric_memory.prompt_point[1] > 0:
+                        swipe_left = True
+                    else:
+                        swipe_left = False
+                    if swipe_left and y_line > 0:  # Swipe left
+                        self.predicted_floor = 2
+                        if memory.egocentric_memory.prompt_point is not None and memory.egocentric_memory.prompt_point[1] > y_line:
+                            memory.egocentric_memory.prompt_point = np.array([0, y_line, 0], dtype=int)
+                        else:
+                            self.predicted_floor = 0
+                        break
+                    elif not swipe_left and y_line < 0:  # Swipe right
+                        self.predicted_floor = 1
+                        if memory.egocentric_memory.prompt_point is not None and memory.egocentric_memory.prompt_point[1] < y_line:
+                            memory.egocentric_memory.prompt_point = np.array([0, y_line, 0], dtype=int)
+                        else:
+                            self.predicted_floor = 0
+                        break
+            print("Predicted floor", self.predicted_floor)
 
         # The command to the robot
         self.body_quaternion = memory.body_memory.body_quaternion.copy()
@@ -70,7 +103,7 @@ class Enaction:
         self.command = Command(self.action, self.prompt_point, self.focus_point, direction, span, memory.emotion_code,
                                caution)
 
-        # The anticipated memory
+        # The predicted memory
         self.post_memory = memory.save()
         self.post_memory.allocentric_memory.move(self.body_quaternion, self.command.predicted_translation, self.clock)
         self.post_memory.body_memory.body_quaternion = self.command.predicted_yaw_quaternion * self.body_quaternion
@@ -80,6 +113,22 @@ class Enaction:
         if memory.egocentric_memory.focus_point is not None:
             self.post_memory.egocentric_memory.focus_point = \
                 matrix44.apply_to_vector(self.command.predicted_displacement_matrix, self.focus_point).astype(int)
+            a, _ = point_to_echo_direction_distance(self.post_memory.egocentric_memory.focus_point)
+            self.post_memory.body_memory.head_direction_rad = a
+
+        # Predict the echo outcome from the nearest phenomenon
+        self.predicted_head_direction = self.post_memory.body_memory.head_direction_rad
+        self.predicted_echo_distance = 10000
+        for p in [p for p in self.post_memory.phenomenon_memory.phenomena.values()
+                  if p.phenomenon_type == EXPERIENCE_ALIGNED_ECHO]:
+            ego_center_point = self.post_memory.allocentric_to_egocentric(p.point)
+            a, d = point_to_echo_direction_distance(ego_center_point)
+            # Subtract the phenomenon's radius to obtain the egocentric echo distance
+            d -= self.post_memory.phenomenon_memory.phenomenon_categories[BOX].long_radius
+            if d > 0 and self.action.action_code == ACTION_SCAN and assert_almost_equal_angles(math.radians(a), 0, 90) \
+                    or assert_almost_equal_angles(math.radians(a), self.post_memory.body_memory.head_direction_rad, 35):
+                self.predicted_head_direction = a
+                self.predicted_echo_distance = d
 
         # The simulation of the enaction
         # self.is_simulating = False

@@ -29,41 +29,49 @@ class CtrlAllocentricView:
 
             # Change cell status
             if button == mouse.RIGHT:
-                # SHIFT clear the cell and all the prompts
+                # SHIFT clear the cell and the prompts
                 if modifiers & key.MOD_SHIFT:
                     self.delete_prompt()
                     # Clear the FLOOR status
                     self.workspace.memory.allocentric_memory.clear_cell(cell_x, cell_y, self.workspace.clock)
+                    if (cell_x, cell_y) in self.workspace.memory.allocentric_memory.user_cells:
+                        self.workspace.memory.allocentric_memory.user_cells.remove((cell_x, cell_y))
                 # CTRL ALT: toggle COLOR FLOOR
                 elif modifiers & key.MOD_CTRL and modifiers & key.MOD_ALT:
                     if cell.status[0] == EXPERIENCE_FLOOR and cell.color_index > 0:
                         cell.status[0] = CELL_UNKNOWN
                         cell.color_index = 0
+                        if (cell_x, cell_y) in self.workspace.memory.allocentric_memory.user_cells:
+                            self.workspace.memory.allocentric_memory.user_cells.remove((cell_x, cell_y))
                     else:
                         # Mark a green FLOOR cell
                         self.workspace.memory.allocentric_memory.apply_status_to_cell(cell_x, cell_y, EXPERIENCE_FLOOR,
                                                                                       self.workspace.clock, 4)
+                        self.workspace.memory.allocentric_memory.user_cells.append((cell_x, cell_y))
                 # CTRL: Toggle FLOOR
                 elif modifiers & key.MOD_CTRL:
                     if cell.status[0] == EXPERIENCE_FLOOR and cell.color_index == 0:
                         cell.status[0] = CELL_UNKNOWN
+                        if (cell_x, cell_y) in self.workspace.memory.allocentric_memory.user_cells:
+                            self.workspace.memory.allocentric_memory.user_cells.remove((cell_x, cell_y))
                     else:
                         # Mark a FLOOR cell
                         self.workspace.memory.allocentric_memory.apply_status_to_cell(cell_x, cell_y, EXPERIENCE_FLOOR,
                                                                                       self.workspace.clock, 0)
+                        self.workspace.memory.allocentric_memory.user_cells.append((cell_x, cell_y))
                 # ALT: Toggle ECHO
                 elif modifiers & key.MOD_ALT:
                     if cell.status[1] == EXPERIENCE_ALIGNED_ECHO:
                         cell.status[1] = CELL_UNKNOWN
                         cell.color_index = 0
-                        # if (cell_x, cell_y) in self.workspace.memory.allocentric_memory.user_added_echos:
-                        self.workspace.memory.allocentric_memory.user_added_echos.remove((cell_x, cell_y))
+                        if (cell_x, cell_y) in self.workspace.memory.allocentric_memory.user_cells:
+                            self.workspace.memory.allocentric_memory.user_cells.remove((cell_x, cell_y))
                     else:
                         # Mark an echo cell
                         self.workspace.memory.allocentric_memory.apply_status_to_cell(cell_x, cell_y,
                                                                                       EXPERIENCE_ALIGNED_ECHO,
                                                                                       self.workspace.clock, 0)
-                        self.workspace.memory.allocentric_memory.user_added_echos.append((cell_x, cell_y))
+                        self.workspace.memory.allocentric_memory.user_cells.append((cell_x, cell_y))
                 # No modifier: move the prompt
                 else:
                     # Mark the prompt
@@ -88,7 +96,7 @@ class CtrlAllocentricView:
             """ Deleting the prompt"""
             if symbol == key.DELETE:
                 self.delete_prompt()
-                self.workspace.memory.allocentric_memory.user_added_echos = []
+                self.workspace.memory.allocentric_memory.user_cells = []
 
         self.view.on_key_press = on_key_press
 

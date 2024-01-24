@@ -132,7 +132,7 @@ void Wheel::stopMotion()    //Stop
   analogWrite(speedPinL,0);
   analogWrite(speedPinR,0);
 
-  // Fast stop
+  // Fast stop (not sure)
   digitalWrite(RightMotorDirPin1,LOW);
   digitalWrite(RightMotorDirPin2,LOW);
   digitalWrite(LeftMotorDirPin1,LOW);
