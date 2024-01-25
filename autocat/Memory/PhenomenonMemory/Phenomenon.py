@@ -4,7 +4,6 @@ import numpy as np
 from pyrr import Quaternion, Vector3
 from scipy.spatial import ConvexHull, QhullError
 from scipy.interpolate import splprep, splev
-from ...Robot.RobotDefine import LINE_X, ROBOT_COLOR_SENSOR_X
 from . import PHENOMENON_RECOGNIZE_CONFIDENCE, PHENOMENON_RECOGNIZED_CONFIDENCE
 
 PHENOMENON_DELTA = 300  # (mm) Distance between affordances to be considered the same phenomenon

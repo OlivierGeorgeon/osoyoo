@@ -40,6 +40,8 @@ class Enaction:
         self.focus_point = None
 
         self.predicted_floor = 0
+        self.predicted_distance_to_line = None
+        self.retreat_distance = None
 
         # If terrain is recognized, predict the floor outcome
         if memory.phenomenon_memory.terrain_confidence() >= PHENOMENON_RECOGNIZED_CONFIDENCE:
@@ -61,7 +63,8 @@ class Enaction:
                     if x_line > 0:
                         print("intersection point", memory.phenomenon_memory.terrain().shape[i], "Distance", x_line)
                         if memory.egocentric_memory.prompt_point is not None and memory.egocentric_memory.prompt_point[0] > x_line:
-                            memory.egocentric_memory.prompt_point = np.array([x_line - ROBOT_FLOOR_SENSOR_X, 0, 0], dtype=int)
+                            self.predicted_distance_to_line = x_line
+                            # memory.egocentric_memory.prompt_point = np.array([x_line - ROBOT_FLOOR_SENSOR_X, 0, 0], dtype=int)
                         else:
                             self.predicted_floor = 0
                         break
@@ -80,14 +83,16 @@ class Enaction:
                     if swipe_left and y_line > 0:  # Swipe left
                         self.predicted_floor = 2
                         if memory.egocentric_memory.prompt_point is not None and memory.egocentric_memory.prompt_point[1] > y_line:
-                            memory.egocentric_memory.prompt_point = np.array([0, y_line, 0], dtype=int)
+                            self.predicted_distance_to_line = y_line
+                            # memory.egocentric_memory.prompt_point = np.array([0, y_line, 0], dtype=int)
                         else:
                             self.predicted_floor = 0
                         break
                     elif not swipe_left and y_line < 0:  # Swipe right
                         self.predicted_floor = 1
                         if memory.egocentric_memory.prompt_point is not None and memory.egocentric_memory.prompt_point[1] < y_line:
-                            memory.egocentric_memory.prompt_point = np.array([0, y_line, 0], dtype=int)
+                            self.predicted_distance_to_line = y_line
+                            # memory.egocentric_memory.prompt_point = np.array([0, y_line, 0], dtype=int)
                         else:
                             self.predicted_floor = 0
                         break
@@ -197,15 +202,15 @@ class Enaction:
             # Update the translation
             if self.outcome.floor == 0b01:
                 # Black line on the right
-                retreat = [-ROBOT_SETTINGS[self.robot_id]["retreat_distance"], RETREAT_DISTANCE_Y, 0]
+                self.retreat_distance = np.array([-ROBOT_SETTINGS[self.robot_id]["retreat_distance"], 0, 0])  #RETREAT_DISTANCE_Y, 0]
             elif self.outcome.floor == 0b10:
                 # Black line on the left
-                retreat = [-ROBOT_SETTINGS[self.robot_id]["retreat_distance"], -RETREAT_DISTANCE_Y, 0]
+                self.retreat_distance = np.array([-ROBOT_SETTINGS[self.robot_id]["retreat_distance"], 0, 0])  # -RETREAT_DISTANCE_Y, 0]
             else:
                 # Black line on the front
-                retreat = [-ROBOT_SETTINGS[self.robot_id]["retreat_distance"], 0, 0]
+                self.retreat_distance = np.array([-ROBOT_SETTINGS[self.robot_id]["retreat_distance"], 0, 0])
             playsound('autocat/Assets/cyberpunk3.wav', False)
-            self.translation += retreat
+            self.translation += self.retreat_distance
 
         if outcome.blocked:
             self.translation = np.array([0, 0, 0], dtype=int)

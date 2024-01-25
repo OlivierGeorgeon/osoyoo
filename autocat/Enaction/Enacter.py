@@ -5,7 +5,7 @@ import os
 from pyrr import Quaternion, Vector3, matrix44, vector3
 from ..Robot.CtrlRobot import ENACTION_STEP_IDLE, ENACTION_STEP_COMMANDING, ENACTION_STEP_ENACTING, \
     ENACTION_STEP_INTEGRATING, ENACTION_STEP_REFRESHING
-from ..Robot.RobotDefine import ROBOT_FLOOR_SENSOR_X
+from ..Robot.RobotDefine import ROBOT_FLOOR_SENSOR_X, ROBOT_SETTINGS
 from ..Memory.Memory import Memory
 from ..Memory.PhenomenonMemory import PHENOMENON_RECOGNIZED_CONFIDENCE
 from ..Memory.PhenomenonMemory.PhenomenonMemory import TERRAIN_ORIGIN_CONFIDENCE, BOX
@@ -167,7 +167,7 @@ class Enacter:
                     self.simulation_duration1 = enaction.simulation_time * 1000
                     if enaction.action.action_code == ACTION_FORWARD:
                         floor = 3
-                        self.simulation_duration1 += 400  # Add the inertia
+                        # self.simulation_duration1 += 400  # Add the inertia
                     else:
                         if enaction.command.speed is None or enaction.command.speed > 0:
                             # Swipe left
@@ -180,12 +180,16 @@ class Enacter:
                     color_index = memory.allocentric_memory.grid[floor_i][floor_j].color_index
                 else:
                     floor = 0
-        else:
+        elif enaction.predicted_distance_to_line is not None:
             floor = enaction.predicted_floor
-            if floor == 2:
-                yaw = 45
-            elif floor == 1:
+            if floor == 1:
                 yaw = -45
+            elif floor == 2:
+                yaw = 45
+            if enaction.action.action_code == ACTION_FORWARD:
+                self.simulation_duration1 = (enaction.predicted_distance_to_line - ROBOT_FLOOR_SENSOR_X) * 1000 / ROBOT_SETTINGS[self.workspace.robot_id]["forward_speed"]
+            else:
+                self.simulation_duration1 = enaction.predicted_distance_to_line * 1000 / ROBOT_SETTINGS[self.workspace.robot_id]["lateral_speed"]
 
         # Compute the simulated echo
         echoes = [[enaction.predicted_head_direction, enaction.predicted_echo_distance]]

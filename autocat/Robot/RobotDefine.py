@@ -22,7 +22,7 @@ TURN_DURATION = 1.000       # (s) The duration of turn left and turn right actio
 TRANSLATE_DURATION = 1.     # (s) The duration of longitudinal or lateral translation
 # RETREAT_DISTANCE = 90  # 150  # 90       # (mm) Distance travelled during retreat.
 RETREAT_DISTANCE_Y = 20  # 75     # (mm) Y displacement when line is detected on the side
-LINE_X = 150  # 160              # (mm) X coordinate of the line after retreat
+# LINE_X = 150  # 160              # (mm) X coordinate of the line after retreat
 
 # SCAN_DISTANCE = 800
 
@@ -77,7 +77,7 @@ ROBOT_SETTINGS_4 = ROBOT_SETTINGS_0.copy()
 ROBOT_SETTINGS_4["IP"] = {"PetiteIA": "192.168.8.242"}  # 108
 ROBOT_SETTINGS_4["forward_speed"] = 330  # 320
 ROBOT_SETTINGS_4["lateral_speed"] = 200  # 50
-ROBOT_SETTINGS_4["retreat_distance"] = 150  # Increase it if the line keeps being pushed farther
+ROBOT_SETTINGS_4["retreat_distance"] = 40  # 150 Increase it if the line keeps being pushed farther
 ROBOT_SETTINGS_4["compass_offset"] = [0, 0, 0]  # [33, -5, 0]  # [50, -5, 0]  # [76, 0, 0]
 
 # Robot 1 at DOLL

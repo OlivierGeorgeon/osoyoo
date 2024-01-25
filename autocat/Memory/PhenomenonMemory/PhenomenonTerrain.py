@@ -6,7 +6,6 @@ from .Phenomenon import Phenomenon
 from .Affordance import Affordance, MIDDLE_COLOR_INDEX, COLOR_DISTANCE
 from ...Memory.EgocentricMemory.Experience import EXPERIENCE_PLACE, EXPERIENCE_FLOOR
 from ...Utils import short_angle
-from ...Robot.RobotDefine import LINE_X, ROBOT_COLOR_SENSOR_X
 
 
 TERRAIN_EXPERIENCE_TYPES = [EXPERIENCE_PLACE, EXPERIENCE_FLOOR]
@@ -104,8 +103,15 @@ class PhenomenonTerrain(Phenomenon):
             self.origin_direction_quaternion = category.quaternion * Quaternion.from_z_rotation(math.pi)
 
         # The new relative origin is the position of green patch from the phenomenon center
+        # new_relative_origin = np.array(self.origin_direction_quaternion *
+        #                                Vector3([category.long_radius - LINE_X + ROBOT_COLOR_SENSOR_X, 0, 0]), dtype=int)
+        # new_relative_origin = np.array(self.origin_direction_quaternion *
+        #                                Vector3([category.long_radius, 0, 0]), dtype=int)
         new_relative_origin = np.array(self.origin_direction_quaternion *
-                                       Vector3([category.long_radius - LINE_X + ROBOT_COLOR_SENSOR_X, 0, 0]), dtype=int)
+                                       Vector3([category.long_radius - np.linalg.norm(self.absolute_affordance().polar_sensor_point), 0, 0]), dtype=int)
+
+        # new_relative_origin = np.array(self.origin_direction_quaternion *
+        #                                Vector3([category.long_radius, 0, 0]), dtype=int) + self.absolute_affordance().polar_sensor_point.astype(int)
 
         # The position of the phenomenon is adjusted by the difference in relative origin
         terrain_offset = new_relative_origin - self.relative_origin_point

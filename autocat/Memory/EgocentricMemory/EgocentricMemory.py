@@ -3,7 +3,7 @@ import numpy as np
 from pyrr import Matrix44, Quaternion
 from ...Memory.EgocentricMemory.Experience import Experience, EXPERIENCE_LOCAL_ECHO, EXPERIENCE_CENTRAL_ECHO, \
     EXPERIENCE_PLACE, EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_IMPACT, EXPERIENCE_ROBOT, EXPERIENCE_TOUCH
-from ...Robot.RobotDefine import ROBOT_COLOR_SENSOR_X, ROBOT_FLOOR_SENSOR_X, LINE_X, ROBOT_CHASSIS_Y, ROBOT_OUTSIDE_Y
+from ...Robot.RobotDefine import ROBOT_COLOR_SENSOR_X, ROBOT_FLOOR_SENSOR_X, ROBOT_CHASSIS_Y, ROBOT_OUTSIDE_Y
 from ...Robot.Outcome import echo_matrix
 from ...Decider.Action import ACTION_FORWARD, ACTION_BACKWARD, ACTION_SWIPE, ACTION_RIGHTWARD, ACTION_CIRCUMVENT
 from ...Utils import quaternion_translation_to_matrix
@@ -40,15 +40,15 @@ class EgocentricMemory:
         if enaction.outcome.floor > 0:
             if enaction.outcome.floor == 0b01:
                 # Black line on the right
-                pose_matrix = quaternion_translation_to_matrix(Quaternion.from_z_rotation(0.), [LINE_X, 0, 0])
+                pose_matrix = quaternion_translation_to_matrix(Quaternion.from_z_rotation(0.), np.array([ROBOT_FLOOR_SENSOR_X, 0, 0]) - enaction.retreat_distance)
                 # point = np.array([LINE_X, 0, 0])  # 100, 0  # 20
             elif enaction.outcome.floor == 0b10:
                 # Black line on the left
-                pose_matrix = quaternion_translation_to_matrix(Quaternion.from_z_rotation(0.), [LINE_X, 0, 0])
+                pose_matrix = quaternion_translation_to_matrix(Quaternion.from_z_rotation(0.), np.array([ROBOT_FLOOR_SENSOR_X, 0, 0]) - enaction.retreat_distance)
                 # point = np.array([LINE_X, 0, 0])  # 100, 0  # -20
             else:
                 # Black line on the front
-                pose_matrix = quaternion_translation_to_matrix(Quaternion.from_z_rotation(0.), [LINE_X, 0, 0])
+                pose_matrix = quaternion_translation_to_matrix(Quaternion.from_z_rotation(0.), np.array([ROBOT_FLOOR_SENSOR_X, 0, 0]) - enaction.retreat_distance)
                 # point = np.array([LINE_X, 0, 0])
             floor_exp = Experience(pose_matrix, EXPERIENCE_FLOOR, enaction.clock, experience_id=self.experience_id,
                                    durability=EXPERIENCE_PERSISTENCE, color_index=enaction.outcome.color_index)
