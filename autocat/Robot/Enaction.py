@@ -1,7 +1,7 @@
 import math
 import json
 import numpy as np
-from pyrr import matrix44
+from pyrr import matrix44, Vector3
 from playsound import playsound
 from ..Decider.Action import ACTION_FORWARD, ACTION_BACKWARD, ACTION_SWIPE, ACTION_RIGHTWARD,  ACTION_TURN, \
     ACTION_SCAN, ACTION_WATCH
@@ -41,7 +41,7 @@ class Enaction:
 
         self.predicted_floor = 0
         self.predicted_distance_to_line = None
-        self.retreat_distance = None
+        self.line_point = None
 
         # If terrain is recognized, predict the floor outcome
         if memory.phenomenon_memory.terrain_confidence() >= PHENOMENON_RECOGNIZED_CONFIDENCE:
@@ -198,22 +198,22 @@ class Enaction:
         else:
             self.translation *= (self.outcome.duration1/self.command.duration)
 
-        if self.outcome.floor > 0:
-            # Update the translation
-            if self.outcome.floor == 0b01:
-                # Black line on the right
-                self.retreat_distance = np.array([-ROBOT_SETTINGS[self.robot_id]["retreat_distance"], 0, 0])  #RETREAT_DISTANCE_Y, 0]
-            elif self.outcome.floor == 0b10:
-                # Black line on the left
-                self.retreat_distance = np.array([-ROBOT_SETTINGS[self.robot_id]["retreat_distance"], 0, 0])  # -RETREAT_DISTANCE_Y, 0]
-            else:
-                # Black line on the front
-                self.retreat_distance = np.array([-ROBOT_SETTINGS[self.robot_id]["retreat_distance"], 0, 0])
-            playsound('autocat/Assets/cyberpunk3.wav', False)
-            self.translation += self.retreat_distance
-
-        if outcome.blocked:
-            self.translation = np.array([0, 0, 0], dtype=int)
+        # if self.outcome.floor > 0:
+        #     # Update the translation
+        #     if self.outcome.floor == 0b01:
+        #         # Black line on the right
+        #         self.retreat_distance = np.array([-ROBOT_SETTINGS[self.robot_id]["retreat_distance"], 0, 0])  #RETREAT_DISTANCE_Y, 0]
+        #     elif self.outcome.floor == 0b10:
+        #         # Black line on the left
+        #         self.retreat_distance = np.array([-ROBOT_SETTINGS[self.robot_id]["retreat_distance"], 0, 0])  # -RETREAT_DISTANCE_Y, 0]
+        #     else:
+        #         # Black line on the front
+        #         self.retreat_distance = np.array([-ROBOT_SETTINGS[self.robot_id]["retreat_distance"], 0, 0])
+        #     playsound('autocat/Assets/cyberpunk3.wav', False)
+        #     self.translation += self.retreat_distance
+        #
+        # if outcome.blocked:
+        #     self.translation = np.array([0, 0, 0], dtype=int)
 
         # The yaw quaternion
         if outcome.yaw_quaternion is None:
@@ -256,6 +256,18 @@ class Enaction:
                 # Update the body_quaternion
                 self.body_quaternion = new_body_quaternion
                 # print("new_body_quaternion", repr(self.body_quaternion))
+
+        # The retreat distance
+        if self.outcome.floor > 0:
+            # Update the translation
+            front_point = Vector3([ROBOT_FLOOR_SENSOR_X, 0, 0])
+            self.line_point = front_point + Vector3([ROBOT_SETTINGS[self.robot_id]["retreat_distance"], 0, 0])
+            self.translation += front_point - self.yaw_quaternion * self.line_point
+            playsound('autocat/Assets/cyberpunk3.wav', False)
+            # self.translation += self.line_point
+
+        if outcome.blocked:
+            self.translation = np.array([0, 0, 0], dtype=int)
 
         # Compute the displacement matrix which represents the displacement of the environment
         # relative to the robot (Translates and turns in the opposite direction)

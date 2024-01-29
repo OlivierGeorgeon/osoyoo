@@ -12,7 +12,7 @@ from . Interaction import OUTCOME_NO_FOCUS
 from . Decider import Decider
 from ..Utils import short_angle
 from ..Robot.Enaction import Enaction
-from ..Robot.RobotDefine import TERRAIN_RADIUS, terrain_north_east_point
+from ..Robot.RobotDefine import TERRAIN_RADIUS
 from ..Memory.BodyMemory import ENERGY_TIRED
 from ..Memory.PhenomenonMemory.PhenomenonMemory import TER
 from ..Memory.PhenomenonMemory.PhenomenonTerrain import TERRAIN_ORIGIN_CONFIDENCE

@@ -40,16 +40,13 @@ class EgocentricMemory:
         if enaction.outcome.floor > 0:
             if enaction.outcome.floor == 0b01:
                 # Black line on the right
-                pose_matrix = quaternion_translation_to_matrix(Quaternion.from_z_rotation(0.), np.array([ROBOT_FLOOR_SENSOR_X, 0, 0]) - enaction.retreat_distance)
-                # point = np.array([LINE_X, 0, 0])  # 100, 0  # 20
+                pose_matrix = quaternion_translation_to_matrix(Quaternion.from_z_rotation(0.), enaction.line_point)
             elif enaction.outcome.floor == 0b10:
                 # Black line on the left
-                pose_matrix = quaternion_translation_to_matrix(Quaternion.from_z_rotation(0.), np.array([ROBOT_FLOOR_SENSOR_X, 0, 0]) - enaction.retreat_distance)
-                # point = np.array([LINE_X, 0, 0])  # 100, 0  # -20
+                pose_matrix = quaternion_translation_to_matrix(Quaternion.from_z_rotation(0.), enaction.line_point)
             else:
                 # Black line on the front
-                pose_matrix = quaternion_translation_to_matrix(Quaternion.from_z_rotation(0.), np.array([ROBOT_FLOOR_SENSOR_X, 0, 0]) - enaction.retreat_distance)
-                # point = np.array([LINE_X, 0, 0])
+                pose_matrix = quaternion_translation_to_matrix(Quaternion.from_z_rotation(0.), enaction.line_point)
             floor_exp = Experience(pose_matrix, EXPERIENCE_FLOOR, enaction.clock, experience_id=self.experience_id,
                                    durability=EXPERIENCE_PERSISTENCE, color_index=enaction.outcome.color_index)
             self.experiences[floor_exp.id] = floor_exp

@@ -187,9 +187,11 @@ class Enacter:
             elif floor == 2:
                 yaw = 45
             if enaction.action.action_code == ACTION_FORWARD:
-                self.simulation_duration1 = (enaction.predicted_distance_to_line - ROBOT_FLOOR_SENSOR_X) * 1000 / ROBOT_SETTINGS[self.workspace.robot_id]["forward_speed"]
+                self.simulation_duration1 = (enaction.predicted_distance_to_line - ROBOT_FLOOR_SENSOR_X) * 1000 / \
+                                            ROBOT_SETTINGS[self.workspace.robot_id]["forward_speed"]
             else:
-                self.simulation_duration1 = enaction.predicted_distance_to_line * 1000 / ROBOT_SETTINGS[self.workspace.robot_id]["lateral_speed"]
+                self.simulation_duration1 = enaction.predicted_distance_to_line * 1000 / \
+                                            ROBOT_SETTINGS[self.workspace.robot_id]["lateral_speed"]
 
         # Compute the simulated echo
         echoes = [[enaction.predicted_head_direction, enaction.predicted_echo_distance]]
@@ -244,7 +246,7 @@ class Enacter:
 
         # Translation duration1
 
-        if self.workspace.enaction.action.action_code in [ACTION_FORWARD]:  #, ACTION_SWIPE]:
+        if self.workspace.enaction.action.action_code in [ACTION_FORWARD] and self.workspace.enaction.outcome.duration1 != 0:  #, ACTION_SWIPE]:
             pe = (simulated_outcome.duration1 - self.workspace.enaction.outcome.duration1)/self.workspace.enaction.outcome.duration1
             self.forward_duration1_prediction_error[self.workspace.enaction.clock] = pe
             self.forward_duration1_prediction_error.pop(self.workspace.enaction.clock - PREDICTION_ERROR_WINDOW, None)

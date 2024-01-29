@@ -1,7 +1,3 @@
-import numpy as np
-from pyrr import Vector3
-from ..Utils import azimuth_to_quaternion
-
 
 # Olivier's robot:
 #   7V: 160 mm
@@ -20,7 +16,6 @@ ROBOT_OUTSIDE_Y = 120       # (mm) The Y position of the outside border of the r
 DEFAULT_YAW = 45            # (degree) Default rotation when yaw is not returned by the robot
 TURN_DURATION = 1.000       # (s) The duration of turn left and turn right actions
 TRANSLATE_DURATION = 1.     # (s) The duration of longitudinal or lateral translation
-# RETREAT_DISTANCE = 90  # 150  # 90       # (mm) Distance travelled during retreat.
 RETREAT_DISTANCE_Y = 20  # 75     # (mm) Y displacement when line is detected on the side
 # LINE_X = 150  # 160              # (mm) X coordinate of the line after retreat
 
@@ -41,6 +36,7 @@ TERRAIN_RADIUS = {"A328": {"radius": 1100, "azimuth": 25, "short_radius": 800}, 
 # compass_y must be near 0 when the robot is North or South.
 
 ROBOT_SETTINGS_0 = {
+    "IP": {},
     "forward_speed": 300,  # (mm/s) Forward translation speed.
     "lateral_speed": 140,  # (mm/s) Lateral translation speed.
     "retreat_distance": 80,  # 70   # (mm) Distance of the line after retreat
@@ -113,12 +109,11 @@ ROBOT_SETTINGS = {
     }
 
 
-def terrain_quaternion(arena_id):
-    """Return the quaternion representing the terrain orientation from center to NE"""
-    return azimuth_to_quaternion(TERRAIN_RADIUS[arena_id]["azimuth"])
+# def terrain_quaternion(arena_id):
+#     """Return the quaternion representing the terrain orientation from center to NE"""
+#     return azimuth_to_quaternion(TERRAIN_RADIUS[arena_id]["azimuth"])
 
-
-def terrain_north_east_point(arena_id):
-    """Return the point of the color patch in polar egocentric relative to the terrain center"""
-    return np.array(terrain_quaternion(arena_id) * Vector3([TERRAIN_RADIUS[arena_id]["radius"], 0, 0]), dtype=int)
+# def terrain_north_east_point(arena_id):
+#     """Return the point of the color patch in polar egocentric relative to the terrain center"""
+#     return np.array(terrain_quaternion(arena_id) * Vector3([TERRAIN_RADIUS[arena_id]["radius"], 0, 0]), dtype=int)
 
