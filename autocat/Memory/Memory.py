@@ -30,6 +30,7 @@ class Memory:
     def __init__(self, arena_id, robot_id):
         self.arena_id = arena_id
         self.robot_id = robot_id
+        self.clock = 0
         self.body_memory = BodyMemory(robot_id)
         self.egocentric_memory = EgocentricMemory()
         self.allocentric_memory = AllocentricMemory(GRID_WIDTH, GRID_HEIGHT, cell_radius=CELL_RADIUS)
@@ -190,6 +191,7 @@ class Memory:
         """Return a clone of memory for memory snapshot"""
         # start_time = time.time()
         saved_memory = Memory(self.phenomenon_memory.arena_id, self.robot_id)
+        saved_memory.clock = self.clock
         saved_memory.emotion_code = self.emotion_code
         # Clone body memory
         saved_memory.body_memory = self.body_memory.save()

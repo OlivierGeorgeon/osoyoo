@@ -45,7 +45,7 @@ class Enacter:
                 # Take a memory snapshot to restore at the end of the enaction
                 self.memory_snapshot = self.workspace.memory.save()
                 # Begin the enaction and attribute the clock
-                self.workspace.enaction.begin(self.workspace.clock, self.workspace.memory.body_memory.body_quaternion)
+                self.workspace.enaction.begin(self.workspace.memory.clock, self.workspace.memory.body_memory.body_quaternion)
                 self.simulation_time = 0  # Don't forget to reset the timer
                 self.is_simulating = True
                 if self.workspace.is_imagining:
@@ -96,14 +96,14 @@ class Enacter:
             self.workspace.integrator.integrate()
 
             # Update allocentric memory: robot, phenomena, focus
-            self.workspace.memory.update_allocentric(self.workspace.clock)
+            self.workspace.memory.update_allocentric(self.workspace.memory.clock)
 
             # Track the prediction errors
             self.prediction_error(self.simulated_outcome)
 
             # Increment the clock if the enacted interaction was properly received
-            if self.workspace.enaction.clock >= self.workspace.clock:  # don't increment if the robot is behind
-                self.workspace.clock += 1
+            if self.workspace.enaction.clock >= self.workspace.memory.clock:  # don't increment if the robot is behind
+                self.workspace.memory.clock += 1
 
             self.interaction_step = ENACTION_STEP_REFRESHING
 

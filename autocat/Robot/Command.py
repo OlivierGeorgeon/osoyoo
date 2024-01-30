@@ -5,7 +5,7 @@ from ..Decider.Action import ACTION_FORWARD, ACTION_BACKWARD, ACTION_SWIPE, ACTI
     ACTION_TURN_HEAD
 from .RobotDefine import DEFAULT_YAW, DEFAULT_ACTION_DURATION
 
-ENACTION_DEFAULT_TIMEOUT = 6  # Seconds
+ENACTION_MIN_TIMEOUT = 2.  # Seconds
 DIRECTION_FRONT = 0  # Direction code to go to turn to the prompt
 DIRECTION_BACK = 1
 DIRECTION_LEFT = 2
@@ -112,9 +112,9 @@ class Command:
 
     def timeout(self):
         """Return the timeout expected from this command"""
-        timeout = ENACTION_DEFAULT_TIMEOUT
+        # timeout = ENACTION_DEFAULT_TIMEOUT
         # if self.duration is not None:
-        timeout = self.duration / 1000. + 2.
+        timeout = self.duration / 1000. + ENACTION_MIN_TIMEOUT
         # if self.angle is not None:
         # timeout = math.fabs(self.angle) / DEFAULT_YAW + 4.0  # Turn speed = 45°/s
         return timeout

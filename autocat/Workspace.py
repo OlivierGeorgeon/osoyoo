@@ -59,7 +59,7 @@ class Workspace:
         self.ctrl_phenomenon_view = None
 
         # Control the enaction
-        self.clock = 0
+        # self.clock = 0
         self.is_imagining = False
         self.memory_before_imaginary = None
 
@@ -152,7 +152,7 @@ class Workspace:
     def emit_message(self):
         """Return the message to answer to another robot"""
 
-        message = {"robot": self.robot_id, "clock": self.clock, "azimuth": self.memory.body_memory.body_azimuth(),
+        message = {"robot": self.robot_id, "clock": self.memory.clock, "azimuth": self.memory.body_memory.body_azimuth(),
                    "emotion": self.memory.emotion_code}
 
         # If the terrain has been found then send the position relative to the terrain origin

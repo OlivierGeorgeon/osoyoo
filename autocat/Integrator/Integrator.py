@@ -18,7 +18,7 @@ class Integrator:
 
         # The new experiences generated during this round
         new_experiences = [e for e in self.workspace.memory.egocentric_memory.experiences.values()
-                           if (e.clock >= self.workspace.clock)]
+                           if (e.clock >= self.workspace.memory.clock)]
 
         # The new affordances
         new_affordances = []
@@ -42,7 +42,7 @@ class Integrator:
         # Adjust the robot's position in allocentric memory
         # print("Position correction due to phenomenon update", position_correction)
         self.workspace.memory.allocentric_memory.move(Quaternion([0, 0, 0, 1]), position_correction,
-                                                      self.workspace.clock)
+                                                      self.workspace.memory.clock)
         # Create new hypothetical phenomena from remaining affordances
         self.workspace.memory.phenomenon_memory.create_phenomena(new_affordances)
 

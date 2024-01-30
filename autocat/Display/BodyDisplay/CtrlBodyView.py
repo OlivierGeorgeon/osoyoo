@@ -66,7 +66,7 @@ class CtrlBodyView:
         """ Adding a point of interest to the view """
         if group is None:
             group = self.view.forefront
-        point_of_interest = PointOfInterest(pose_matrix, self.view.batch, group, point_type, self.workspace.clock)
+        point_of_interest = PointOfInterest(pose_matrix, self.view.batch, group, point_type, self.workspace.memory.clock)
         self.points_of_interest.append(point_of_interest)
 
     def update_body_view(self):
@@ -101,16 +101,16 @@ class CtrlBodyView:
 
         # Fade the points of interest
         for poi in self.points_of_interest:
-            poi.fade(self.workspace.clock)
+            poi.fade(self.workspace.memory.clock)
         # Keep only the points of interest during their durability
         for p in self.points_of_interest:
-            if p.is_expired(self.workspace.clock):
+            if p.is_expired(self.workspace.memory.clock):
                 p.delete()
-        self.points_of_interest = [p for p in self.points_of_interest if not p.is_expired(self.workspace.clock)]
+        self.points_of_interest = [p for p in self.points_of_interest if not p.is_expired(self.workspace.memory.clock)]
 
     def main(self, dt):
         """Called every frame. Update the body view"""
-        self.view.label_clock.text = "Clock: {:d}".format(self.workspace.clock) \
+        self.view.label_clock.text = "Clock: {:d}".format(self.workspace.memory.clock) \
                                      + ", En:{:d}%".format(self.workspace.memory.body_memory.energy) \
                                      + ", Ex:{:d}%".format(self.workspace.memory.body_memory.excitation) \
                                      + ", D:" + self.workspace.decider_id \
