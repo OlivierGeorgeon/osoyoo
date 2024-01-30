@@ -3,8 +3,7 @@ import json
 import numpy as np
 from pyrr import matrix44, Vector3
 from playsound import playsound
-from ..Decider.Action import ACTION_FORWARD, ACTION_BACKWARD, ACTION_SWIPE, ACTION_RIGHTWARD,  ACTION_TURN, \
-    ACTION_SCAN, ACTION_WATCH
+from ..Decider.Action import ACTION_FORWARD, ACTION_TURN, ACTION_SCAN, ACTION_WATCH
 from ..Decider.Decider import CONFIDENCE_NO_FOCUS, CONFIDENCE_NEW_FOCUS, CONFIDENCE_TOUCHED_FOCUS, \
     CONFIDENCE_CAREFUL_SCAN, CONFIDENCE_CONFIRMED_FOCUS
 from ..Memory.Memory import SIMULATION_TIME_RATIO
@@ -12,12 +11,10 @@ from ..Memory.BodyMemory import point_to_echo_direction_distance
 from ..Memory.EgocentricMemory.Experience import EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_FLOOR
 from ..Memory.PhenomenonMemory.PhenomenonMemory import BOX
 from ..Utils import short_angle, assert_almost_equal_angles
-from .RobotDefine import DEFAULT_YAW, ROBOT_FLOOR_SENSOR_X, ROBOT_CHASSIS_Y, ROBOT_SETTINGS, RETREAT_DISTANCE_Y
+from .RobotDefine import DEFAULT_YAW, ROBOT_FLOOR_SENSOR_X, ROBOT_CHASSIS_Y, ROBOT_SETTINGS
 from .Command import Command, DIRECTION_FRONT
 from .Outcome import Outcome, echo_point
 from ..Memory.AllocentricMemory.Hexagonal_geometry import point_to_cell
-
-from ..Memory.PhenomenonMemory import PHENOMENON_RECOGNIZED_CONFIDENCE
 
 
 FOCUS_MAX_DELTA = 200  # 200 (mm) Maximum delta to keep focus
@@ -41,90 +38,33 @@ class Enaction:
         self.prompt_point = None
         self.focus_point = None
 
-        predicted_outcome_dict = {"action": self.action.action_code, "clock": self.clock}
-        # self.predicted_floor = 0
+        predicted_outcome_dict = {"clock": self.clock, "action": self.action.action_code}
         self.predicted_distance_to_line = None
         self.line_point = None
-
-        # If terrain is recognized, predict the floor outcome
-        # if memory.phenomenon_memory.terrain_confidence() >= PHENOMENON_RECOGNIZED_CONFIDENCE:
-        #     # The shape of the terrain in egocentric coordinates
-        #     ego_shape = np.array([memory.terrain_centric_to_egocentric(p) for p in memory.phenomenon_memory.terrain().shape])
-        #     if self.action.action_code == ACTION_FORWARD:
-        #         # Loop over the points where the y coordinate changes sign
-        #         for i in np.where(np.diff(np.sign(ego_shape[:, 1])))[0]:
-        #             if abs(ego_shape[i+1][0] - ego_shape[i][0]) < 5:
-        #                 predicted_outcome_dict["floor"] = 3
-        #                 x_line = ego_shape[i][0]
-        #             else:
-        #                 slope = (ego_shape[i+1][1] - ego_shape[i][1])/(ego_shape[i+1][0] - ego_shape[i][0])
-        #                 x_line = ego_shape[i][0] - ego_shape[i][1]/slope
-        #                 if ego_shape[i][0] > ego_shape[i + 1][0]:
-        #                     predicted_outcome_dict["floor"] = 1
-        #                 else:
-        #                     predicted_outcome_dict["floor"] = 2
-        #             if x_line > 0:
-        #                 print("intersection point", memory.phenomenon_memory.terrain().shape[i], "Distance", x_line)
-        #                 if memory.egocentric_memory.prompt_point is not None and memory.egocentric_memory.prompt_point[0] > x_line:
-        #                     self.predicted_distance_to_line = x_line
-        #                     # memory.egocentric_memory.prompt_point = np.array([x_line - ROBOT_FLOOR_SENSOR_X, 0, 0], dtype=int)
-        #                 else:
-        #                     predicted_outcome_dict["floor"] = 0
-        #                 break
-        #     elif self.action.action_code == ACTION_SWIPE:
-        #         # Loop over the points where the y coordinate pass the floor sensor
-        #         for i in np.where(np.diff(np.sign(ego_shape[:, 0] - ROBOT_FLOOR_SENSOR_X)))[0]:
-        #             if abs(ego_shape[i+1][1] - ego_shape[i][1]) == 0:
-        #                 y_line = ego_shape[i][1]
-        #             else:
-        #                 slope = (ego_shape[i+1][0] - ego_shape[i][0])/(ego_shape[i+1][1] - ego_shape[i][1])
-        #                 y_line = ego_shape[i][1] - ego_shape[i][0]/slope
-        #             if memory.egocentric_memory.prompt_point is None or memory.egocentric_memory.prompt_point[1] > 0:
-        #                 swipe_left = True
-        #             else:
-        #                 swipe_left = False
-        #             if swipe_left and y_line > 0:  # Swipe left
-        #                 self.predicted_floor = 2
-        #                 if memory.egocentric_memory.prompt_point is not None and memory.egocentric_memory.prompt_point[1] > y_line:
-        #                     self.predicted_distance_to_line = y_line
-        #                     # memory.egocentric_memory.prompt_point = np.array([0, y_line, 0], dtype=int)
-        #                 else:
-        #                     predicted_outcome_dict["floor"] = 0
-        #                 break
-        #             elif not swipe_left and y_line < 0:  # Swipe right
-        #                 predicted_outcome_dict["floor"] = 1
-        #                 if memory.egocentric_memory.prompt_point is not None and memory.egocentric_memory.prompt_point[1] < y_line:
-        #                     self.predicted_distance_to_line = y_line
-        #                     # memory.egocentric_memory.prompt_point = np.array([0, y_line, 0], dtype=int)
-        #                 else:
-        #                     predicted_outcome_dict["floor"] = 0
-        #                 break
-        #     # print("Predicted floor", self.predicted_floor)
 
         # The command to the robot
         self.body_quaternion = memory.body_memory.body_quaternion.copy()
         if memory.egocentric_memory.prompt_point is not None:
             self.prompt_point = memory.egocentric_memory.prompt_point.copy()
-            # print("Initialize Enaction clock", self.clock, "prompt", self.prompt_point)
         if memory.egocentric_memory.focus_point is not None:
             self.focus_point = memory.egocentric_memory.focus_point.copy()
         self.command = Command(self.action, self.prompt_point, self.focus_point, direction, span, memory.emotion_code,
                                caution)
 
-        # If terrain is recognized, predict the floor outcome
+        # Try to predict the floor outcome
         predicted_terrain_outcome = memory.predict_terrain_outcome(self)
         predicted_outcome_dict.update(predicted_terrain_outcome)
 
         # The predicted memory
         self.predicted_memory = memory.save()
-        self.predicted_memory.allocentric_memory.move(self.body_quaternion, self.command.predicted_translation, self.clock)
-        self.predicted_memory.body_memory.body_quaternion = self.command.predicted_yaw_quaternion * self.body_quaternion
+        self.predicted_memory.allocentric_memory.move(self.body_quaternion, self.command.intended_translation, self.clock)
+        self.predicted_memory.body_memory.body_quaternion = self.command.intended_yaw_quaternion * self.body_quaternion
         if memory.egocentric_memory.prompt_point is not None:
             self.predicted_memory.egocentric_memory.prompt_point = \
-                matrix44.apply_to_vector(self.command.predicted_displacement_matrix, self.prompt_point).astype(int)
+                matrix44.apply_to_vector(self.command.intended_displacement_matrix, self.prompt_point).astype(int)
         if memory.egocentric_memory.focus_point is not None:
             self.predicted_memory.egocentric_memory.focus_point = \
-                matrix44.apply_to_vector(self.command.predicted_displacement_matrix, self.focus_point).astype(int)
+                matrix44.apply_to_vector(self.command.intended_displacement_matrix, self.focus_point).astype(int)
             a, _ = point_to_echo_direction_distance(self.predicted_memory.egocentric_memory.focus_point)
             self.predicted_memory.body_memory.head_direction_rad = a
 
@@ -140,7 +80,7 @@ class Enaction:
             print("index", predicted_outcome_dict["color_index"])
 
         # Predict the echo outcome from the nearest phenomenon
-        predicted_outcome_dict["head_angle"] = self.predicted_memory.body_memory.head_direction_rad
+        predicted_outcome_dict["head_angle"] = round(self.predicted_memory.body_memory.head_direction_rad)
         predicted_outcome_dict["echo_distance"] = 10000
         for p in [p for p in self.predicted_memory.phenomenon_memory.phenomena.values()
                   if p.phenomenon_type == EXPERIENCE_ALIGNED_ECHO]:
@@ -150,24 +90,23 @@ class Enaction:
             d -= self.predicted_memory.phenomenon_memory.phenomenon_categories[BOX].long_radius
             if d > 0 and self.action.action_code == ACTION_SCAN and assert_almost_equal_angles(math.radians(a), 0, 90) \
                     or assert_almost_equal_angles(math.radians(a), self.predicted_memory.body_memory.head_direction_rad, 35):
-                predicted_outcome_dict["head_angle"] = a
-                predicted_outcome_dict["echo_distance"] = d
+                predicted_outcome_dict["head_angle"] = round(a)
+                predicted_outcome_dict["echo_distance"] = round(d)
 
         if "yaw" not in predicted_outcome_dict:
             predicted_outcome_dict["yaw"] = self.command.angle
         self.predicted_outcome = Outcome(predicted_outcome_dict)
 
         # The simulation of the enaction
-        # self.is_simulating = False
         self.simulation_duration = 0
         self.simulation_rotation_speed = 0
-        self.simulation_time = 0.
+        # self.simulation_time = 0.
 
         # The outcome
         self.outcome = None
         self.body_direction_delta = 0  # Displayed in BodyView
         self.focus_confidence = CONFIDENCE_NO_FOCUS  # Used by deciders to possibly trigger scan
-        self.translation = None  # Used by allocentric memory to move the robot
+        self.translation = self.command.intended_translation.copy()  # Used by allocentric memory to move the robot
         self.yaw_quaternion = None  # Used to compute yaw prediction error
         self.yaw_matrix = None  # Used by bodyView to rotate compass points
         self.displacement_matrix = None  # Used by EgocentricMemory to rotate experiences
@@ -185,24 +124,22 @@ class Enaction:
         Initialize the simulation"""
 
         self.clock = clock
+        self.predicted_outcome.set_clock(clock)
+        print("Predicted outcome", self.predicted_outcome)
         # Update the body_quaternion to avoid errors in the estimated yaw
         self.body_quaternion = body_quaternion.copy()
 
         # Initialize the simulation of the intended interaction
         # Compute the duration and the speed depending and the enaction
-        # self.simulation_duration = self.action.target_duration
         self.simulation_rotation_speed = self.action.rotation_speed_rad
-        # if self.command.duration is not None:
         self.simulation_duration = self.command.duration / 1000
-        # if self.command.angle is not None:
         if self.action.action_code in [ACTION_TURN]:
             self.simulation_duration = math.fabs(self.command.angle) * self.action.target_duration / DEFAULT_YAW
-            if self.command.angle < 0:  # and self.action.action_code != ACTION_TURN_RIGHT:
+            if self.command.angle < 0:
                 self.simulation_rotation_speed = -self.action.rotation_speed_rad
         self.simulation_duration *= SIMULATION_TIME_RATIO
         self.simulation_rotation_speed *= SIMULATION_TIME_RATIO
-        # self.is_simulating = True
-        self.simulation_time = 0.
+        # self.simulation_time = 0.
 
     def terminate(self, outcome):
         """Computes the azimuth, the yaw, and the displacement. Follow up the focus and the prompt."""
@@ -211,47 +148,22 @@ class Enaction:
         # The displacement --------
 
         # Translation integrated from the action's speed multiplied by the duration1
-        # TODO Take the yaw into account
-        # self.translation = self.action.translation_speed * (float(outcome.duration1) / 1000.0)
-        # if self.action.action_code == ACTION_SWIPE and self.command.speed is not None and self.command.speed < 0:
-        #     self.translation = - self.translation
-        self.translation = self.command.predicted_translation.copy()
-        if self.command.duration is None or self.command.duration == 0:
-            self.translation *= (self.outcome.duration1/(self.action.target_duration * 1000.))
-        else:
-            self.translation *= (self.outcome.duration1/self.command.duration)
-
-        # if self.outcome.floor > 0:
-        #     # Update the translation
-        #     if self.outcome.floor == 0b01:
-        #         # Black line on the right
-        #         self.retreat_distance = np.array([-ROBOT_SETTINGS[self.robot_id]["retreat_distance"], 0, 0])  #RETREAT_DISTANCE_Y, 0]
-        #     elif self.outcome.floor == 0b10:
-        #         # Black line on the left
-        #         self.retreat_distance = np.array([-ROBOT_SETTINGS[self.robot_id]["retreat_distance"], 0, 0])  # -RETREAT_DISTANCE_Y, 0]
-        #     else:
-        #         # Black line on the front
-        #         self.retreat_distance = np.array([-ROBOT_SETTINGS[self.robot_id]["retreat_distance"], 0, 0])
-        #     playsound('autocat/Assets/cyberpunk3.wav', False)
-        #     self.translation += self.retreat_distance
-        #
-        # if outcome.blocked:
-        #     self.translation = np.array([0, 0, 0], dtype=int)
+        # self.translation = self.command.predicted_translation.copy()
+        if self.command.duration > 0:  # TODO don't send actions TURN with angle 0 (decider circle)
+        #     self.translation *= 1000. * self.outcome.duration1 / self.action.target_duration
+        # else:
+            self.translation *= self.outcome.duration1 / self.command.duration
 
         # The yaw quaternion
         if outcome.yaw_quaternion is None:
-            self.yaw_quaternion = self.command.predicted_yaw_quaternion.copy()
+            self.yaw_quaternion = self.command.intended_yaw_quaternion.copy()
         else:
             self.yaw_quaternion = outcome.yaw_quaternion
         yaw_integration_quaternion = self.body_quaternion.cross(self.yaw_quaternion)
-        # print("body_quaternion", repr(self.body_quaternion), "cross yaw_quaternion", repr(yaw_quaternion),
-        #       "= yaw_integration_quaternion", repr(yaw_integration_quaternion))
-
         corrected_yaw_quaternion = self.yaw_quaternion
         # If the robot returns no compass then the body_quaternion is estimated from yaw
         if outcome.compass_point is None:
             self.body_quaternion = yaw_integration_quaternion
-            # corrected_yaw_quaternion = self.yaw_quaternion
         else:
             if self.clock == 0:
                 # On the first interaction, the body_quaternion is given by the compass
@@ -278,16 +190,13 @@ class Enaction:
 
                 # Update the body_quaternion
                 self.body_quaternion = new_body_quaternion
-                # print("new_body_quaternion", repr(self.body_quaternion))
 
         # The retreat distance
         if self.outcome.floor > 0:
-            # Update the translation
             front_point = Vector3([ROBOT_FLOOR_SENSOR_X, 0, 0])
             self.line_point = front_point + Vector3([ROBOT_SETTINGS[self.robot_id]["retreat_distance"], 0, 0])
             self.translation += front_point - self.yaw_quaternion * self.line_point
             playsound('autocat/Assets/cyberpunk3.wav', False)
-            # self.translation += self.line_point
 
         if outcome.blocked:
             self.translation = np.array([0, 0, 0], dtype=int)
@@ -356,7 +265,6 @@ class Enaction:
                 # The focus was lost
                 print("Lost focus due to no echo ", end="")
                 self.focus_confidence = CONFIDENCE_NO_FOCUS
-                # self.lost_focus = True  # Used by agent_circle
                 # playsound('autocat/Assets/R5.wav', False)
         else:
             # If the robot was not focussed then check for catch focus
@@ -375,8 +283,6 @@ class Enaction:
 
         # Impact or block catch focus
         if self.outcome.impact > 0 and self.action.action_code == ACTION_FORWARD:
-            # if new_focus is not None and np.linalg.norm(self.outcome.echo_point) < 200:
-            #     # Focus on the object "seen"
             if new_focus is None or np.linalg.norm(new_focus) > 200:
                 # Focus on the object "felt"
                 if self.outcome.impact == 0b01:
@@ -392,7 +298,6 @@ class Enaction:
 
         if self.prompt_point is not None:
             self.prompt_point = matrix44.apply_to_vector(self.displacement_matrix, self.prompt_point).astype(int)
-            # print("Terminate Enaction clock", self.clock, "Prompt", self.prompt_point)
 
     def current_enaction(self):
         """Useful if the enaction is taken as a composite enaction"""

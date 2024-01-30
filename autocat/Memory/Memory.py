@@ -9,7 +9,7 @@ from .PhenomenonMemory.PhenomenonMemory import PhenomenonMemory
 from .PhenomenonMemory.PhenomenonTerrain import TERRAIN_INITIAL_CONFIDENCE, TERRAIN_ORIGIN_CONFIDENCE
 from .AllocentricMemory.Hexagonal_geometry import CELL_RADIUS
 from ..Decider.Decider import FOCUS_TOO_FAR_DISTANCE
-from ..Decider.Action import ACTION_FORWARD, ACTION_SWIPE
+from ..Decider.Action import ACTION_FORWARD, ACTION_SWIPE, ACTION_RIGHTWARD
 from .PhenomenonMemory import PHENOMENON_RECOGNIZED_CONFIDENCE
 from ..Robot.RobotDefine import ROBOT_FLOOR_SENSOR_X, ROBOT_SETTINGS
 
@@ -255,13 +255,13 @@ class Memory:
                         print("intersection point", self.phenomenon_memory.terrain().shape[i], "Distance", x_line)
                         duration1 = (x_line - ROBOT_FLOOR_SENSOR_X) * 1000 / ROBOT_SETTINGS[self.robot_id]["forward_speed"]
                         if duration1 < enaction.command.duration:
-                            predicted_outcome_terrain["duration1"] = duration1
+                            predicted_outcome_terrain["duration1"] = round(duration1)
                         else:
                             predicted_outcome_terrain["duration1"] = enaction.command.duration
                             predicted_outcome_terrain["floor"] = 0
                             predicted_outcome_terrain["yaw"] = 0
                         break
-            elif enaction.action.action_code == ACTION_SWIPE:
+            elif enaction.action.action_code in [ACTION_SWIPE, ACTION_RIGHTWARD]:
                 # Translate the shape by the position of the floor sensor so we can check the sign of the x coordinate
                 ego_shape -= np.array([ROBOT_FLOOR_SENSOR_X, 0, 0])  #
                 # Loop over the points where the x coordinate pass the floor sensor
@@ -274,7 +274,7 @@ class Memory:
                     if enaction.command.speed_y > 0 and y_line > 0:  # Swipe left
                         duration1 = y_line * 1000 / ROBOT_SETTINGS[self.robot_id]["lateral_speed"]
                         if duration1 < enaction.command.duration:
-                            predicted_outcome_terrain["duration1"] = duration1
+                            predicted_outcome_terrain["duration1"] = round(duration1)
                             predicted_outcome_terrain["floor"] = 2
                             predicted_outcome_terrain["yaw"] = 45
                         else:
@@ -285,7 +285,7 @@ class Memory:
                     elif enaction.command.speed_y < 0 and y_line < 0:  # Swipe right
                         duration1 = -y_line * 1000 / ROBOT_SETTINGS[self.robot_id]["lateral_speed"]
                         if duration1 < enaction.command.duration:
-                            predicted_outcome_terrain["duration1"] = duration1
+                            predicted_outcome_terrain["duration1"] = round(duration1)
                             predicted_outcome_terrain["floor"] = 1
                             predicted_outcome_terrain["yaw"] = -45
                         else:

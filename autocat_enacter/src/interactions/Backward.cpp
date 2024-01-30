@@ -34,8 +34,8 @@ void Backward::begin()
 // STEP 1: Control the enaction
 void Backward::ongoing()
 {
-  if (_is_focussed)  // Keep the head towards the focus (HEA is inhibited during the action)
-    _HEA.turnHead(_HEA.head_direction(_focus_x + _speed * (millis()- _action_start_time)/1000, _focus_y));
+  if (_is_focussed)  // Keep the head towards the focus (HEA is inhibited during the action) (speed is negative)
+    _HEA.turnHead(_HEA.head_direction(_focus_x - _speed * (millis()- _action_start_time)/1000, _focus_y));
 
   // If impact then proceed to phase 2
   int impact = _IMU.get_impact_backward();
