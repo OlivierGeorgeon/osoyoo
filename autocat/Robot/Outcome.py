@@ -1,4 +1,5 @@
 # import json
+import json
 import math
 import numpy as np
 import colorsys
@@ -6,7 +7,7 @@ from playsound import playsound
 from pyrr import Quaternion, Matrix44, matrix44
 from .RobotDefine import ROBOT_HEAD_X
 from ..Memory.EgocentricMemory.Experience import FLOOR_COLORS
-from ..Utils import translation_quaternion_to_matrix
+from ..Utils import translation_quaternion_to_matrix, quaternion_to_direction_rad
 
 
 def category_color(color_sensor):
@@ -122,13 +123,13 @@ class Outcome:
     """The class thant contains the outcome recieved from the robot"""
     def __init__(self, outcome_dict):
 
-        # outcome_dict = json.loads(outcome_string)
+        self.outcome_dict = outcome_dict
         self.action_code = outcome_dict['action']
         self.clock = outcome_dict['clock']
         self.duration1 = outcome_dict['duration1']
         self.status = outcome_dict['status']
         self.head_angle = outcome_dict['head_angle']
-        self.retreat_translation = np.array([0, 0, 0], dtype=int)
+        # self.retreat_translation = np.array([0, 0, 0], dtype=int)
 
         # Floor color
         self.color_index = 0
@@ -195,3 +196,29 @@ class Outcome:
         self.touch = 0
         if 'touch' in outcome_dict:
             self.touch = outcome_dict['touch']
+
+    def _str__(self):
+        # s = '{"clock":' + str(self.clock)
+        # s += ', "action:"' + self.action_code
+        # s += ', "duration1:"' + str(self.duration1)
+        # s += ', "status:"' + self.status
+        # s += ', ":head_angle"' + str(self.head_angle)
+        # if self.color_index:
+        #     s += ', "color_index:"' + str(self.color_index)
+        # if self.yaw_quaternion is not None:
+        #     s += ', "yaw:"' + str(round(math.degrees(quaternion_to_direction_rad(self.yaw_quaternion))))
+        # if self.azimuth is not None:
+        #     s += ', "azimuth:"' + self.azimuth
+        # if self.compass_point is not None:
+        #     s += ', "compass_x:"' + str(round(self.compass_point[0]))
+        #     s += ', "compass_y:"' + str(round(self.compass_point[1]))
+        # if self.floor:
+        #     s += ', "floor:"' + self.floor
+        # if self.echo_point is not None:
+        #     a, d =
+        #     s += ', ":"' + self
+        #     s += ', ":"' + self
+        #
+        # s += ', ":"' + self
+        # self.head_angle = outcome_dict['head_angle']
+        return json.dump(self.outcome_dict)

@@ -134,7 +134,7 @@ class DeciderExplore(Decider):
                 self.workspace.memory.egocentric_memory.focus_point = None  # Prevent unnatural head movement
                 self.action = self.workspace.actions[ACTION_TURN]
                 e1 = Enaction(self.action, self.workspace.memory)
-                e2 = Enaction(self.workspace.actions[ACTION_FORWARD], e1.post_memory)
+                e2 = Enaction(self.workspace.actions[ACTION_FORWARD], e1.predicted_memory)
         else:
             # Go to the most interesting pool point
             # mip = self.workspace.memory.allocentric_memory.most_interesting_pool(self.workspace.clock)
@@ -160,7 +160,7 @@ class DeciderExplore(Decider):
             #     self.prompt_index = 0
             self.action = self.workspace.actions[ACTION_TURN]
             e1 = Enaction(self.action, self.workspace.memory)
-            e2 = Enaction(self.workspace.actions[ACTION_FORWARD], e1.post_memory)
+            e2 = Enaction(self.workspace.actions[ACTION_FORWARD], e1.predicted_memory)
 
         # Add the enactions to the stack
         enaction_sequence = [e1]

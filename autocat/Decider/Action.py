@@ -1,6 +1,6 @@
 import math
 import numpy as np
-from ..Robot.RobotDefine import ROBOT_SETTINGS, DEFAULT_YAW, TURN_DURATION, TRANSLATE_DURATION
+from ..Robot.RobotDefine import ROBOT_SETTINGS, DEFAULT_YAW  # , TURN_DURATION, TRANSLATE_DURATION
 
 ACTION_FORWARD = '8'
 ACTION_BACKWARD = '2'
@@ -69,24 +69,24 @@ def create_actions(robot_id):
     action_dictionary = {}
 
     forward_speed = np.array([x_speed, 0, 0], dtype=float)
-    action_dictionary[ACTION_FORWARD] = Action(ACTION_FORWARD, forward_speed, 0, TRANSLATE_DURATION)
+    action_dictionary[ACTION_FORWARD] = Action(ACTION_FORWARD, forward_speed, 0, 1.)
 
     backward_speed = np.array([-x_speed, 0, 0], dtype=float)
-    action_dictionary[ACTION_BACKWARD] = Action(ACTION_BACKWARD, backward_speed, 0, TRANSLATE_DURATION)
+    action_dictionary[ACTION_BACKWARD] = Action(ACTION_BACKWARD, backward_speed, 0, 0.5)
 
     leftward_speed = np.array([0, y_speed, 0], dtype=float)
-    action_dictionary[ACTION_SWIPE] = Action(ACTION_SWIPE, leftward_speed, 0, TRANSLATE_DURATION)
+    action_dictionary[ACTION_SWIPE] = Action(ACTION_SWIPE, leftward_speed, 0, 1.)
 
     rightward_speed = np.array([0, -y_speed, 0], dtype=float)
-    action_dictionary[ACTION_RIGHTWARD] = Action(ACTION_RIGHTWARD, rightward_speed, 0, TRANSLATE_DURATION)
+    action_dictionary[ACTION_RIGHTWARD] = Action(ACTION_RIGHTWARD, rightward_speed, 0, 1.)
 
-    action_dictionary[ACTION_CIRCUMVENT] = Action(ACTION_CIRCUMVENT, rightward_speed, 0, TRANSLATE_DURATION)
+    action_dictionary[ACTION_CIRCUMVENT] = Action(ACTION_CIRCUMVENT, rightward_speed, 0, 1.)
 
     null_speed = np.array([0, 0, 0], dtype=float)
-    rotation_speed = math.radians(DEFAULT_YAW) / TURN_DURATION
-    action_dictionary[ACTION_TURN] = Action(ACTION_TURN, null_speed, rotation_speed, TURN_DURATION)
+    rotation_speed = math.radians(DEFAULT_YAW)  # / 1.
+    action_dictionary[ACTION_TURN] = Action(ACTION_TURN, null_speed, rotation_speed, 1.)
 
-    action_dictionary[ACTION_TURN_RIGHT] = Action(ACTION_TURN_RIGHT, null_speed, -rotation_speed, TURN_DURATION)
+    action_dictionary[ACTION_TURN_RIGHT] = Action(ACTION_TURN_RIGHT, null_speed, -rotation_speed, 1.)
 
     action_dictionary[ACTION_SCAN] = Action(ACTION_SCAN, null_speed, 0, 2)
     action_dictionary[ACTION_ALIGN_HEAD] = Action(ACTION_ALIGN_HEAD, null_speed, 0, 1)

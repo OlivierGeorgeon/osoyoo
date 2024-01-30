@@ -108,7 +108,7 @@ class DeciderArrange(Decider):
                             e0 = Enaction(self.workspace.actions[ACTION_TURN], self.workspace.memory,
                                           direction=DIRECTION_RIGHT)
                         # Swipe to the prompt
-                        e1 = Enaction(self.workspace.actions[ACTION_SWIPE], e0.post_memory)
+                        e1 = Enaction(self.workspace.actions[ACTION_SWIPE], e0.predicted_memory)
                         composite_enaction = CompositeEnaction([e0, e1])
                     # If angle lower than 20°
                     elif CHECK_OUTSIDE == 1 and self.workspace.memory.is_outside_terrain(ego_prompt_intersection):

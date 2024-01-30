@@ -49,7 +49,7 @@ class DeciderPush(Decider):
                 # First enaction: turn to the prompt
                 e0 = Enaction(self.workspace.actions[ACTION_TURN], self.workspace.memory)
                 # Second enaction: move forward to the prompt
-                e1 = Enaction(self.workspace.actions[ACTION_FORWARD], e0.post_memory)
+                e1 = Enaction(self.workspace.actions[ACTION_FORWARD], e0.predicted_memory)
                 composite_enaction = CompositeEnaction([e0, e1])
                 self.step = STEP_PUSH
             else:
@@ -63,7 +63,7 @@ class DeciderPush(Decider):
             self.workspace.memory.egocentric_memory.prompt_point = self.workspace.memory.allocentric_to_egocentric(origin)
             e0 = Enaction(self.workspace.actions[ACTION_TURN], self.workspace.memory, direction=DIRECTION_BACK)
             # Second enaction: move forward to the prompt
-            e1 = Enaction(self.workspace.actions[ACTION_BACKWARD], e0.post_memory)
+            e1 = Enaction(self.workspace.actions[ACTION_BACKWARD], e0.predicted_memory)
             composite_enaction = CompositeEnaction([e0, e1])
             self.step = STEP_INIT
 

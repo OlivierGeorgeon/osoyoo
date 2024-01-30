@@ -68,9 +68,9 @@ class DeciderWatch(Decider):
             # First enaction: turn to the prompt
             e0 = Enaction(self.workspace.actions[ACTION_TURN], self.workspace.memory)
             # Second enaction: move forward to the prompt
-            e1 = Enaction(self.workspace.actions[ACTION_FORWARD], e0.post_memory)
+            e1 = Enaction(self.workspace.actions[ACTION_FORWARD], e0.predicted_memory)
             # Third enaction: scan
-            e2 = Enaction(self.workspace.actions[ACTION_SCAN], e1.post_memory, span=10)
+            e2 = Enaction(self.workspace.actions[ACTION_SCAN], e1.predicted_memory, span=10)
             return CompositeEnaction([e0, e1, e2])  # Scan because it often miss an object
 
         # Call the sequence learning mechanism to select the next action

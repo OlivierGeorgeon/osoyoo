@@ -120,8 +120,7 @@ class Enacter:
         # The intermediate displacement
         yaw_quaternion = Quaternion.from_z_rotation((enaction.simulation_rotation_speed * dt))
         way = 1
-        if enaction.action.action_code == ACTION_SWIPE and enaction.command.speed is not None \
-                and enaction.command.speed < 0:
+        if enaction.action.action_code == ACTION_SWIPE and enaction.command.speed_y < 0:
             way = -1
         translation = enaction.action.translation_speed * dt * way
         yaw_matrix = matrix44.create_from_quaternion(yaw_quaternion)
@@ -180,21 +179,25 @@ class Enacter:
                     color_index = memory.allocentric_memory.grid[floor_i][floor_j].color_index
                 else:
                     floor = 0
-        elif enaction.predicted_distance_to_line is not None:
-            floor = enaction.predicted_floor
-            if floor == 1:
-                yaw = -45
-            elif floor == 2:
-                yaw = 45
-            if enaction.action.action_code == ACTION_FORWARD:
-                self.simulation_duration1 = (enaction.predicted_distance_to_line - ROBOT_FLOOR_SENSOR_X) * 1000 / \
-                                            ROBOT_SETTINGS[self.workspace.robot_id]["forward_speed"]
-            else:
-                self.simulation_duration1 = enaction.predicted_distance_to_line * 1000 / \
-                                            ROBOT_SETTINGS[self.workspace.robot_id]["lateral_speed"]
+        else:
+            floor = enaction.predicted_outcome.floor
+            yaw = enaction.predicted_outcome.outcome_dict["yaw"]
+            self.simulation_duration1 = enaction.predicted_outcome.duration1
+            color_index = enaction.predicted_outcome.color_index
+            # floor = enaction.predicted_floor
+            # if floor == 1:
+            #     yaw = -45
+            # elif floor == 2:
+            #     yaw = 45
+            # if enaction.action.action_code == ACTION_FORWARD:
+            #     self.simulation_duration1 = (enaction.predicted_distance_to_line - ROBOT_FLOOR_SENSOR_X) * 1000 / \
+            #                                 ROBOT_SETTINGS[self.workspace.robot_id]["forward_speed"]
+            # else:
+            #     self.simulation_duration1 = enaction.predicted_distance_to_line * 1000 / \
+            #                                 ROBOT_SETTINGS[self.workspace.robot_id]["lateral_speed"]
 
         # Compute the simulated echo
-        echoes = [[enaction.predicted_head_direction, enaction.predicted_echo_distance]]
+        echoes = [[enaction.predicted_outcome.head_angle, enaction.predicted_outcome.outcome_dict["echo_distance"]]]
         # for p in [p for p in self.workspace.memory.phenomenon_memory.phenomena.values() if p.phenomenon_type == EXPERIENCE_ALIGNED_ECHO]:
         #     ego_center_point = self.workspace.memory.allocentric_to_egocentric(p.point)
         #     a, d = point_to_echo_direction_distance(ego_center_point)

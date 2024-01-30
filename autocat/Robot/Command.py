@@ -17,24 +17,25 @@ class Command:
     """A command to send to the robot"""
     def __init__(self, action, prompt_point, focus_point, direction, span, color, caution):
         self.action = action
-        self.duration = None
-        self.angle = None
+        self.duration = action.target_duration * 1000  # Default duration
+        self.angle = round(math.degrees(action.rotation_speed_rad * action.target_duration))
         self.focus_x = None
         self.focus_y = None
-        self.speed = None
+        self.speed_x = self.action.translation_speed[0]
+        self.speed_y = self.action.translation_speed[1]
         self.caution = None  # 1  # Check for obstacles when moving forward
         self.span = None
         self.color = color
         self.caution = None
 
-        # Compute the duration and angle
+        # Override the default duration and angle on the basis of the prompt
         if prompt_point is not None:
             if self.action.action_code in [ACTION_FORWARD, ACTION_BACKWARD]:
                 self.duration = int(math.fabs(prompt_point[0] / self.action.translation_speed[0] * 1000))
             if self.action.action_code in [ACTION_SWIPE]:
                 self.duration = int(math.fabs(prompt_point[1] / self.action.translation_speed[1] * 1000))
                 if prompt_point[1] < 0:
-                    self.speed = -int(self.action.translation_speed[1])  # Negative speed makes swipe right
+                    self.speed_y = -int(self.action.translation_speed[1])  # Negative speed makes swipe right
             if self.action.action_code in [ACTION_TURN_HEAD, ACTION_TURN]:
                 if direction == DIRECTION_BACK:
                     # Turn the back to the prompt
@@ -48,28 +49,29 @@ class Command:
                 else:
                     # Turn the front to the prompt
                     self.angle = int(math.degrees(math.atan2(prompt_point[1], prompt_point[0])))
-        else:
-            # Default backward 0.5s
-            if self.action.action_code in [ACTION_BACKWARD]:
-                self.duration = 500
-            # Default sidewards 1.5s
-            if self.action.action_code in [ACTION_SWIPE, ACTION_RIGHTWARD]:
-                self.duration = 1000  # 1500
-        if self.action.action_code in [ACTION_WATCH]:
-            self.duration = 1000  # 5000
+        # else:
+        #     # Default duration when no prompt
+        #     if self.action.action_code in [ACTION_BACKWARD]:
+        #         self.duration = 500
+        #     # Default sidewards 1.5s
+        #     else:  # if self.action.action_code in [ACTION_SWIPE, ACTION_RIGHTWARD, ACTION_FORWARD]:
+        #         self.duration = 1000  # 1500
+        # # The default duration of WATCH independent of the prompt
+        # if self.action.action_code in [ACTION_WATCH]:
+        #     self.duration = 1000  # 5000
 
         # Compute the focus
         if focus_point is not None:
             self.focus_x = int(focus_point[0])  # Convert to python int
             self.focus_y = int(focus_point[1])
             if self.action.action_code == ACTION_FORWARD:
-                self.speed = int(self.action.translation_speed[0])
+                self.speed_x = int(self.action.translation_speed[0])
             if self.action.action_code == ACTION_BACKWARD:
-                self.speed = -int(self.action.translation_speed[0])
+                self.speed_x = -int(self.action.translation_speed[0])  # TODO remove the negative sign also in Backward.cpp
             if self.action.action_code in [ACTION_SWIPE, ACTION_RIGHTWARD]:
-                self.speed = int(self.action.translation_speed[1])
+                # self.speed_y = int(self.action.translation_speed[1])
                 if prompt_point is not None:
-                    self.speed = math.copysign(int(self.action.translation_speed[1]), prompt_point[1])
+                    self.speed_y = math.copysign(int(self.action.translation_speed[1]), prompt_point[1])
 
         # The additional fields of the command packet
         if caution > 0:
@@ -79,22 +81,23 @@ class Command:
             self.span = span
 
         # The anticipated displacement
-        if self.duration is None:
-            if self.speed is None or self.speed > 0 or self.action.action_code in [ACTION_RIGHTWARD]:
-                self.predicted_translation = action.translation_speed * action.target_duration
-            else:
-                self.predicted_translation = - action.translation_speed * action.target_duration
+        # if self.duration is None:
+        #     if self.speed is None or self.speed > 0 or self.action.action_code in [ACTION_RIGHTWARD]:
+        #         self.predicted_translation = action.translation_speed * action.target_duration
+        #     else:
+        #         self.predicted_translation = - action.translation_speed * action.target_duration
+        # else:
+        # if self.speed is None or self.speed > 0 or self.action.action_code in [ACTION_RIGHTWARD]:
+        if self.speed_y >= 0 or self.action.action_code in [ACTION_RIGHTWARD]:
+            self.predicted_translation = action.translation_speed * self.duration / 1000
         else:
-            if self.speed is None or self.speed > 0 or self.action.action_code in [ACTION_RIGHTWARD]:
-                self.predicted_translation = action.translation_speed * self.duration / 1000
-            else:
-                self.predicted_translation = - action.translation_speed * self.duration / 1000
+            self.predicted_translation = - action.translation_speed * self.duration / 1000
 
         # The anticipated yaw quaternion
-        if self.angle is None:
-            self.predicted_yaw_quaternion = Quaternion.from_z_rotation(action.rotation_speed_rad * action.target_duration)
-        else:
-            self.predicted_yaw_quaternion = Quaternion.from_z_rotation(math.radians(self.angle))
+        # if self.angle is None:
+        #     self.predicted_yaw_quaternion = Quaternion.from_z_rotation(action.rotation_speed_rad * action.target_duration)
+        # else:
+        self.predicted_yaw_quaternion = Quaternion.from_z_rotation(math.radians(self.angle))
 
         # The displacement matrix of the environment relative to the robot
         self.predicted_yaw_matrix = matrix44.create_from_quaternion(self.predicted_yaw_quaternion)
@@ -105,15 +108,17 @@ class Command:
         """Return a dictionary containing the command"""
         # The clock is not included because it is allocated during the enaction
         command_dict = {'action': self.action.action_code}
-        if self.duration is not None:
+        if self.duration != self.action.target_duration * 1000:
             command_dict['duration'] = self.duration
-        if self.angle is not None:
+        if self.angle != round(math.degrees(self.action.rotation_speed_rad * self.action.target_duration)):
             command_dict['angle'] = self.angle
         if self.focus_x is not None:
             command_dict['focus_x'] = self.focus_x
             command_dict['focus_y'] = self.focus_y
-        if self.speed is not None:
-            command_dict['speed'] = int(self.speed)
+        if self.action.action_code in [ACTION_SWIPE, ACTION_RIGHTWARD]:
+            command_dict['speed'] = int(self.speed_y)
+        elif self.focus_x is not None:
+            command_dict['speed'] = int(self.speed_x)
         if self.caution is not None:
             command_dict['caution'] = self.caution
         if self.span is not None:
