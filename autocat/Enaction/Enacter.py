@@ -1,7 +1,5 @@
 import math
 import numpy as np
-import matplotlib
-import os
 from pyrr import Quaternion, Vector3, matrix44
 from ..Robot.CtrlRobot import ENACTION_STEP_IDLE, ENACTION_STEP_COMMANDING, ENACTION_STEP_ENACTING, \
     ENACTION_STEP_INTEGRATING, ENACTION_STEP_REFRESHING
@@ -16,7 +14,8 @@ from ..Robot.Outcome import Outcome
 from ..Memory.AllocentricMemory.Hexagonal_geometry import point_to_cell
 from ..Memory.EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO
 from ..Utils import short_angle, quaternion_to_direction_rad, assert_almost_equal_angles
-from .Plot import plot, PREDICTION_ERROR_WINDOW
+# from .Plot import plot, PREDICTION_ERROR_WINDOW
+from ..Integrator.Integrator import integrate
 
 
 class Enacter:
@@ -29,11 +28,11 @@ class Enacter:
         # self.simulation_duration1 = 0
         self.simulated_outcome = None
 
-        self.forward_duration1_prediction_error = {}  # (ms)
-        self.yaw_prediction_error = {}                # (degree)
-        self.compass_prediction_error = {}            # (degree)
-        self.focus_direction_prediction_error = {}    # (degree)
-        self.focus_distance_prediction_error = {}     # (mm)
+        # self.forward_duration1_prediction_error = {}  # (ms)
+        # self.yaw_prediction_error = {}                # (degree)
+        # self.compass_prediction_error = {}            # (degree)
+        # self.focus_direction_prediction_error = {}    # (degree)
+        # self.focus_distance_prediction_error = {}     # (mm)
 
     def main(self, dt):
         """Controls the enaction."""
@@ -48,9 +47,9 @@ class Enacter:
                 self.workspace.enaction.begin(self.workspace.memory.clock, self.workspace.memory.body_memory.body_quaternion)
                 self.simulation_time = 0  # Don't forget to reset the timer
                 self.is_simulating = True
+                print("Command", self.workspace.enaction.command.serialize())
                 if self.workspace.is_imagining:
                     # If imagining then proceed to simulating the enaction
-                    print("Simulated command", self.workspace.enaction.serialize())
                     self.interaction_step = ENACTION_STEP_ENACTING
                 else:
                     # If not imagining then proceed to COMMANDING to send the command to the robot
@@ -93,13 +92,14 @@ class Enacter:
             self.workspace.memory.update_and_add_experiences(self.workspace.enaction)
 
             # Call the integrator to create and update the phenomena
-            self.workspace.integrator.integrate()
+            integrate(self.workspace.memory)
 
             # Update allocentric memory: robot, phenomena, focus
             self.workspace.memory.update_allocentric(self.workspace.memory.clock)
 
             # Track the prediction errors
-            self.prediction_error(self.simulated_outcome)
+            # self.prediction_error(self.simulated_outcome)
+            self.workspace.prediction_error.log(self.workspace.enaction)
 
             # Increment the clock if the enacted interaction was properly received
             if self.workspace.enaction.clock >= self.workspace.memory.clock:  # don't increment if the robot is behind
@@ -191,8 +191,8 @@ class Enacter:
             simulated_outcome_dict['duration1'] = enaction.predicted_outcome.duration1
             simulated_outcome_dict['color_index'] = enaction.predicted_outcome.color_index
             # Stop the simulation after the predicted duration1
-            if self.simulation_time * 1000 > enaction.predicted_outcome.duration1:
-                self.is_simulating = False
+            # if self.simulation_time * 1000 > enaction.predicted_outcome.duration1:
+            #     self.is_simulating = False
 
         # Compute the simulated echo
         echoes = [[enaction.predicted_outcome.head_angle, enaction.predicted_outcome.echo_distance]]
@@ -230,82 +230,82 @@ class Enacter:
             # print("Simulated outcome", simulated_outcome)
             return simulated_outcome
 
-    def prediction_error(self, simulated_outcome):
-        """Compute the prediction errors"""
-        enaction = self.workspace.enaction
-
-        # Translation duration1
-
-        if self.workspace.enaction.action.action_code in [ACTION_FORWARD] and self.workspace.enaction.outcome.duration1 != 0:  #, ACTION_SWIPE]:
-            pe = (simulated_outcome.duration1 - self.workspace.enaction.outcome.duration1)/self.workspace.enaction.outcome.duration1
-            self.forward_duration1_prediction_error[self.workspace.enaction.clock] = pe
-            self.forward_duration1_prediction_error.pop(self.workspace.enaction.clock - PREDICTION_ERROR_WINDOW, None)
-            print("Prediction Error Translate duration1 (simulation - measured)=", round(pe),
-                  "Average:", round(float(np.mean(list(self.forward_duration1_prediction_error.values())))),
-                  "std:", round(float(np.std(list(self.forward_duration1_prediction_error.values())))))
-
-        # yaw
-
-        pe = math.degrees(-short_angle(enaction.command.intended_yaw_quaternion, enaction.yaw_quaternion))
-        self.yaw_prediction_error[self.workspace.enaction.clock] = pe
-        self.yaw_prediction_error.pop(enaction.clock - PREDICTION_ERROR_WINDOW, None)
-        print("Prediction Error Yaw (command - measure)=", round(pe, 1),
-              "Average:", round(float(np.mean(list(self.yaw_prediction_error.values()))), 1),
-              "std:", round(float(np.std(list(self.yaw_prediction_error.values()))), 1))
-
-        # Compass prediction error
-
-        self.compass_prediction_error[self.workspace.enaction.clock] = \
-            math.degrees(self.workspace.enaction.body_direction_delta)
-        self.compass_prediction_error.pop(self.workspace.enaction.clock - PREDICTION_ERROR_WINDOW, None)
-        print("Prediction Error Compass (integrated direction - compass measure)=",
-              round(self.compass_prediction_error[self.workspace.enaction.clock], 2), "Average:",
-              round(float(np.mean(list(self.compass_prediction_error.values()))), 2), "std:",
-              round(float(np.std(list(self.compass_prediction_error.values()))), 2))
-
-        # If focus is confident then track its prediction error
-
-        if self.workspace.enaction.focus_confidence >= CONFIDENCE_CONFIRMED_FOCUS:
-            self.focus_direction_prediction_error[self.workspace.enaction.clock] = \
-                self.workspace.enaction.focus_direction_prediction_error
-            self.focus_direction_prediction_error.pop(self.workspace.enaction.clock - PREDICTION_ERROR_WINDOW, None)
-            print("Prediction Error Focus direction (integration - measure)=",
-                  self.workspace.enaction.focus_direction_prediction_error,
-                  "Average:", round(float(np.mean(list(self.focus_direction_prediction_error.values())))),
-                  "std:", round(float(np.std(list(self.focus_direction_prediction_error.values())))))
-            self.focus_distance_prediction_error[self.workspace.enaction.clock] = \
-                self.workspace.enaction.focus_distance_prediction_error
-            self.focus_distance_prediction_error.pop(self.workspace.enaction.clock - PREDICTION_ERROR_WINDOW, None)
-            print("Prediction Error Focus distance (integration - measure)=",
-                  self.workspace.enaction.focus_distance_prediction_error,
-                  "Average:", round(float(np.mean(list(self.focus_distance_prediction_error.values())))),
-                  "std:", round(float(np.std(list(self.focus_distance_prediction_error.values())))))
-
-        # Trace the terrain origin prediction error
-
-        terrain = self.workspace.memory.phenomenon_memory.terrain()
-        if terrain is not None:
-            terrain.origin_prediction_error.pop(self.workspace.enaction.clock - PREDICTION_ERROR_WINDOW, None)
-            if self.workspace.enaction.clock in terrain.origin_prediction_error:
-                print("Prediction Error Terrain origin (integration - measure)=",
-                      round(terrain.origin_prediction_error[self.workspace.enaction.clock]),
-                      "Average:", round(float(np.mean(list(terrain.origin_prediction_error.values())))),
-                      "std:", round(float(np.std(list(terrain.origin_prediction_error.values())))))
-
-    def plot_prediction_errors(self):
-        """Show the prediction error plots"""
-        # The agg backend avoids interfering with pyglet windows
-        # https://matplotlib.org/stable/users/explain/figure/backends.html
-        matplotlib.use('agg')
-        # Create the log directory if it does not exist because it is not included in git
-        if not os.path.exists("log"):
-            os.makedirs("log")
-        # Generate the plots
-        plot(self.workspace.enacter.forward_duration1_prediction_error, "Forward duration (%)", "Translation")
-        plot(self.workspace.enacter.yaw_prediction_error, "Yaw (degrees)", "yaw")
-        plot(self.compass_prediction_error, "Compass (degree)", "Compass")
-        plot(self.focus_direction_prediction_error, "Focus direction (degree)", "Focus_direction")
-        plot(self.focus_distance_prediction_error, "Focus distance (mm)", "Focus_distance")
-        terrain = self.workspace.memory.phenomenon_memory.terrain()
-        if terrain is not None:
-            plot(terrain.origin_prediction_error, "Terrain origin (mm)", "Origin")
+    # def prediction_error(self, simulated_outcome):
+    #     """Compute the prediction errors"""
+    #     enaction = self.workspace.enaction
+    #
+    #     # Translation duration1
+    #
+    #     if self.workspace.enaction.action.action_code in [ACTION_FORWARD] and self.workspace.enaction.outcome.duration1 != 0:  #, ACTION_SWIPE]:
+    #         pe = (simulated_outcome.duration1 - self.workspace.enaction.outcome.duration1)/self.workspace.enaction.outcome.duration1
+    #         self.forward_duration1_prediction_error[self.workspace.enaction.clock] = pe
+    #         self.forward_duration1_prediction_error.pop(self.workspace.enaction.clock - PREDICTION_ERROR_WINDOW, None)
+    #         print("Prediction Error Translate duration1 (simulation - measured)=", round(pe),
+    #               "Average:", round(float(np.mean(list(self.forward_duration1_prediction_error.values())))),
+    #               "std:", round(float(np.std(list(self.forward_duration1_prediction_error.values())))))
+    #
+    #     # yaw
+    #
+    #     pe = math.degrees(-short_angle(enaction.command.intended_yaw_quaternion, enaction.yaw_quaternion))
+    #     self.yaw_prediction_error[self.workspace.enaction.clock] = pe
+    #     self.yaw_prediction_error.pop(enaction.clock - PREDICTION_ERROR_WINDOW, None)
+    #     print("Prediction Error Yaw (command - measure)=", round(pe, 1),
+    #           "Average:", round(float(np.mean(list(self.yaw_prediction_error.values()))), 1),
+    #           "std:", round(float(np.std(list(self.yaw_prediction_error.values()))), 1))
+    #
+    #     # Compass prediction error
+    #
+    #     self.compass_prediction_error[self.workspace.enaction.clock] = \
+    #         math.degrees(self.workspace.enaction.body_direction_delta)
+    #     self.compass_prediction_error.pop(self.workspace.enaction.clock - PREDICTION_ERROR_WINDOW, None)
+    #     print("Prediction Error Compass (integrated direction - compass measure)=",
+    #           round(self.compass_prediction_error[self.workspace.enaction.clock], 2), "Average:",
+    #           round(float(np.mean(list(self.compass_prediction_error.values()))), 2), "std:",
+    #           round(float(np.std(list(self.compass_prediction_error.values()))), 2))
+    #
+    #     # If focus is confident then track its prediction error
+    #
+    #     if self.workspace.enaction.focus_confidence >= CONFIDENCE_CONFIRMED_FOCUS:
+    #         self.focus_direction_prediction_error[self.workspace.enaction.clock] = \
+    #             self.workspace.enaction.focus_direction_prediction_error
+    #         self.focus_direction_prediction_error.pop(self.workspace.enaction.clock - PREDICTION_ERROR_WINDOW, None)
+    #         print("Prediction Error Focus direction (integration - measure)=",
+    #               self.workspace.enaction.focus_direction_prediction_error,
+    #               "Average:", round(float(np.mean(list(self.focus_direction_prediction_error.values())))),
+    #               "std:", round(float(np.std(list(self.focus_direction_prediction_error.values())))))
+    #         self.focus_distance_prediction_error[self.workspace.enaction.clock] = \
+    #             self.workspace.enaction.focus_distance_prediction_error
+    #         self.focus_distance_prediction_error.pop(self.workspace.enaction.clock - PREDICTION_ERROR_WINDOW, None)
+    #         print("Prediction Error Focus distance (integration - measure)=",
+    #               self.workspace.enaction.focus_distance_prediction_error,
+    #               "Average:", round(float(np.mean(list(self.focus_distance_prediction_error.values())))),
+    #               "std:", round(float(np.std(list(self.focus_distance_prediction_error.values())))))
+    #
+    #     # Trace the terrain origin prediction error
+    #
+    #     terrain = self.workspace.memory.phenomenon_memory.terrain()
+    #     if terrain is not None:
+    #         terrain.origin_prediction_error.pop(self.workspace.enaction.clock - PREDICTION_ERROR_WINDOW, None)
+    #         if self.workspace.enaction.clock in terrain.origin_prediction_error:
+    #             print("Prediction Error Terrain origin (integration - measure)=",
+    #                   round(terrain.origin_prediction_error[self.workspace.enaction.clock]),
+    #                   "Average:", round(float(np.mean(list(terrain.origin_prediction_error.values())))),
+    #                   "std:", round(float(np.std(list(terrain.origin_prediction_error.values())))))
+    #
+    # def plot_prediction_errors(self):
+    #     """Show the prediction error plots"""
+    #     # The agg backend avoids interfering with pyglet windows
+    #     # https://matplotlib.org/stable/users/explain/figure/backends.html
+    #     matplotlib.use('agg')
+    #     # Create the log directory if it does not exist because it is not included in git
+    #     if not os.path.exists("log"):
+    #         os.makedirs("log")
+    #     # Generate the plots
+    #     plot(self.workspace.enacter.forward_duration1_prediction_error, "Forward duration (%)", "Translation")
+    #     plot(self.workspace.enacter.yaw_prediction_error, "Yaw (degrees)", "yaw")
+    #     plot(self.compass_prediction_error, "Compass (degree)", "Compass")
+    #     plot(self.focus_direction_prediction_error, "Focus direction (degree)", "Focus_direction")
+    #     plot(self.focus_distance_prediction_error, "Focus distance (mm)", "Focus_distance")
+    #     terrain = self.workspace.memory.phenomenon_memory.terrain()
+    #     if terrain is not None:
+    #         plot(terrain.origin_prediction_error, "Terrain origin (mm)", "Origin")

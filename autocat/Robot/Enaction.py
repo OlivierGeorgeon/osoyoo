@@ -14,7 +14,8 @@ from ..Utils import short_angle, assert_almost_equal_angles
 from .RobotDefine import DEFAULT_YAW, ROBOT_FLOOR_SENSOR_X, ROBOT_CHASSIS_Y, ROBOT_SETTINGS
 from .Command import Command, DIRECTION_FRONT
 from .Outcome import Outcome, echo_point
-from ..Memory.AllocentricMemory.Hexagonal_geometry import point_to_cell
+# from ..Memory.AllocentricMemory.Hexagonal_geometry import point_to_cell
+from ..Enaction.Predict import predict_outcome
 
 
 FOCUS_MAX_DELTA = 200  # 200 (mm) Maximum delta to keep focus
@@ -34,11 +35,11 @@ class Enaction:
         self.robot_id = memory.robot_id
 
         # the attributes that will be adjusted
-        self.clock = None
+        self.clock = memory.clock
         self.prompt_point = None
         self.focus_point = None
 
-        predicted_outcome_dict = {"clock": self.clock, "action": self.action.action_code}
+        # predicted_outcome_dict = {"clock": self.clock, "action": self.action.action_code}
         self.predicted_distance_to_line = None
         self.line_point = None
 
@@ -48,15 +49,15 @@ class Enaction:
             self.prompt_point = memory.egocentric_memory.prompt_point.copy()
         if memory.egocentric_memory.focus_point is not None:
             self.focus_point = memory.egocentric_memory.focus_point.copy()
-        self.command = Command(self.action, self.prompt_point, self.focus_point, direction, span, memory.emotion_code,
-                               caution)
+        self.command = Command(self.action, self.clock, self.prompt_point, self.focus_point, direction, span,
+                               memory.emotion_code, caution)
 
-        # Try to predict the floor outcome
-        predicted_terrain_outcome = memory.predict_terrain_outcome(self)
-        predicted_outcome_dict.update(predicted_terrain_outcome)
+        # Compute the predicted outcome
+        predicted_outcome_dict = predict_outcome(self.command, memory)
 
         # The predicted memory
         self.predicted_memory = memory.save()
+        self.predicted_memory.clock = memory.clock
         self.predicted_memory.allocentric_memory.move(self.body_quaternion, self.command.intended_translation, self.clock)
         self.predicted_memory.body_memory.body_quaternion = self.command.intended_yaw_quaternion * self.body_quaternion
         if memory.egocentric_memory.prompt_point is not None:
@@ -69,15 +70,15 @@ class Enaction:
             self.predicted_memory.body_memory.head_direction_rad = a
 
         # Predict the floor color
-        floor_i, floor_j = point_to_cell(self.predicted_memory.allocentric_memory.robot_point +
-                                         self.predicted_memory.body_memory.body_quaternion * Vector3([ROBOT_FLOOR_SENSOR_X,
-                                                                                       0, 0]))
-        print("Color in cell (", floor_i, floor_j, ")")
-        if (self.predicted_memory.allocentric_memory.min_i <= floor_i <= self.predicted_memory.allocentric_memory.max_i) and \
-                (self.predicted_memory.allocentric_memory.min_j <= floor_j <= self.predicted_memory.allocentric_memory.max_j) and \
-                self.predicted_memory.allocentric_memory.grid[floor_i][floor_j].status[0] == EXPERIENCE_FLOOR:
-            predicted_outcome_dict["color_index"] = self.predicted_memory.allocentric_memory.grid[floor_i][floor_j].color_index
-            print("index", predicted_outcome_dict["color_index"])
+        # floor_i, floor_j = point_to_cell(self.predicted_memory.allocentric_memory.robot_point +
+        #                                  self.predicted_memory.body_memory.body_quaternion * Vector3([ROBOT_FLOOR_SENSOR_X,
+        #                                                                                0, 0]))
+        # print("Color in cell (", floor_i, floor_j, ")")
+        # if (self.predicted_memory.allocentric_memory.min_i <= floor_i <= self.predicted_memory.allocentric_memory.max_i) and \
+        #         (self.predicted_memory.allocentric_memory.min_j <= floor_j <= self.predicted_memory.allocentric_memory.max_j) and \
+        #         self.predicted_memory.allocentric_memory.grid[floor_i][floor_j].status[0] == EXPERIENCE_FLOOR:
+        #     predicted_outcome_dict["color_index"] = self.predicted_memory.allocentric_memory.grid[floor_i][floor_j].color_index
+        #     print("index", predicted_outcome_dict["color_index"])
 
         # Predict the echo outcome from the nearest phenomenon
         predicted_outcome_dict["head_angle"] = round(self.predicted_memory.body_memory.head_direction_rad)
@@ -94,7 +95,7 @@ class Enaction:
                 predicted_outcome_dict["echo_distance"] = round(d)
 
         if "yaw" not in predicted_outcome_dict:
-            predicted_outcome_dict["yaw"] = self.command.angle
+            predicted_outcome_dict["yaw"] = self.command.yaw
         self.predicted_outcome = Outcome(predicted_outcome_dict)
 
         # The simulation of the enaction
@@ -134,8 +135,8 @@ class Enaction:
         self.simulation_rotation_speed = self.action.rotation_speed_rad
         self.simulation_duration = self.command.duration / 1000
         if self.action.action_code in [ACTION_TURN]:
-            self.simulation_duration = math.fabs(self.command.angle) * self.action.target_duration / DEFAULT_YAW
-            if self.command.angle < 0:
+            self.simulation_duration = math.fabs(self.command.yaw) * self.action.target_duration / DEFAULT_YAW
+            if self.command.yaw < 0:
                 self.simulation_rotation_speed = -self.action.rotation_speed_rad
         self.simulation_duration *= SIMULATION_TIME_RATIO
         self.simulation_rotation_speed *= SIMULATION_TIME_RATIO
@@ -307,8 +308,8 @@ class Enaction:
         """Useful if the enaction is taken as a composite enaction"""
         return False
 
-    def serialize(self):
-        """Return the command string to send to the robot"""
-        command_dict = {'clock': self.clock}
-        command_dict.update(self.command.command_dict())
-        return json.dumps(command_dict)
+    # def serialize(self):
+    #     """Return the command string to send to the robot"""
+    #     command_dict = {'clock': self.clock}
+    #     command_dict.update(self.command.command_dict())
+    #     return json.dumps(command_dict)
