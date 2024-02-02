@@ -4,6 +4,7 @@ from pyrr import Quaternion, matrix44
 from ..Decider.Action import ACTION_FORWARD, ACTION_BACKWARD, ACTION_SWIPE, ACTION_RIGHTWARD, ACTION_TURN, \
     ACTION_TURN_HEAD
 from .RobotDefine import DEFAULT_ACTION_DURATION
+from ..Utils import translation_quaternion_to_matrix
 
 ENACTION_MIN_TIMEOUT = 2.  # Seconds
 DIRECTION_FRONT = 0  # Direction code to go to turn to the prompt
@@ -67,13 +68,6 @@ class Command:
                 if prompt_point is not None:
                     self.speed_y = math.copysign(int(self.action.translation_speed[1]), prompt_point[1])
 
-        # The additional fields of the command packet
-        # if caution > 0:
-        #     self.caution = caution  # 1: stop if there is an obstacle on the way
-        #
-        # if span != 40 and self.action.action_code == ACTION_SCAN:
-        #     self.span = span
-
         # The intended translation
         if self.speed_y >= 0 or self.action.action_code in [ACTION_RIGHTWARD]:
             self.intended_translation = action.translation_speed * self.duration / 1000
@@ -83,10 +77,14 @@ class Command:
         # The intended yaw quaternion
         self.intended_yaw_quaternion = Quaternion.from_z_rotation(math.radians(self.yaw))
 
-        # The intended matrix of the environment relative to the robot
-        self.intended_yaw_matrix = matrix44.create_from_quaternion(self.intended_yaw_quaternion)
-        self.intended_displacement_matrix = matrix44.multiply(
-            matrix44.create_from_translation(-self.intended_translation), self.intended_yaw_matrix)
+        # The intended matrix of the environment's displacement relative to the robot
+        # self.intended_yaw_matrix = matrix44.create_from_quaternion(self.intended_yaw_quaternion)
+        # self.intended_displacement_matrix = matrix44.multiply(
+        #     matrix44.create_from_translation(-self.intended_translation), self.intended_yaw_matrix)
+        # self.intended_displacement_matrix = quaternion_translation_to_matrix(self.intended_yaw_quaternion,
+        #                                                                      -self.intended_translation)
+        self.intended_displacement_matrix = translation_quaternion_to_matrix(-self.intended_translation,
+                                                                             self.intended_yaw_quaternion.inverse)
 
     def serialize(self):
         """Return the json string to send to the robot"""

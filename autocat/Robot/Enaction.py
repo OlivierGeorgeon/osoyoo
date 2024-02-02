@@ -10,7 +10,7 @@ from ..Memory.Memory import SIMULATION_TIME_RATIO
 from ..Memory.BodyMemory import point_to_echo_direction_distance
 from ..Memory.EgocentricMemory.Experience import EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_FLOOR
 from ..Memory.PhenomenonMemory.PhenomenonMemory import BOX
-from ..Utils import short_angle, assert_almost_equal_angles
+from ..Utils import short_angle, assert_almost_equal_angles, translation_quaternion_to_matrix
 from .RobotDefine import DEFAULT_YAW, ROBOT_FLOOR_SENSOR_X, ROBOT_CHASSIS_Y, ROBOT_SETTINGS
 from .Command import Command, DIRECTION_FRONT
 from .Outcome import Outcome, echo_point
@@ -69,19 +69,8 @@ class Enaction:
             a, _ = point_to_echo_direction_distance(self.predicted_memory.egocentric_memory.focus_point)
             self.predicted_memory.body_memory.head_direction_rad = a
 
-        # Predict the floor color
-        # floor_i, floor_j = point_to_cell(self.predicted_memory.allocentric_memory.robot_point +
-        #                                  self.predicted_memory.body_memory.body_quaternion * Vector3([ROBOT_FLOOR_SENSOR_X,
-        #                                                                                0, 0]))
-        # print("Color in cell (", floor_i, floor_j, ")")
-        # if (self.predicted_memory.allocentric_memory.min_i <= floor_i <= self.predicted_memory.allocentric_memory.max_i) and \
-        #         (self.predicted_memory.allocentric_memory.min_j <= floor_j <= self.predicted_memory.allocentric_memory.max_j) and \
-        #         self.predicted_memory.allocentric_memory.grid[floor_i][floor_j].status[0] == EXPERIENCE_FLOOR:
-        #     predicted_outcome_dict["color_index"] = self.predicted_memory.allocentric_memory.grid[floor_i][floor_j].color_index
-        #     print("index", predicted_outcome_dict["color_index"])
-
         # Predict the echo outcome from the nearest phenomenon
-        predicted_outcome_dict["head_angle"] = round(self.predicted_memory.body_memory.head_direction_rad)
+        predicted_outcome_dict["head_angle"] = self.predicted_memory.body_memory.head_direction_degree()
         predicted_outcome_dict["echo_distance"] = 10000
         for p in [p for p in self.predicted_memory.phenomenon_memory.phenomena.values()
                   if p.phenomenon_type == EXPERIENCE_ALIGNED_ECHO]:
@@ -206,8 +195,9 @@ class Enaction:
         # Compute the displacement matrix which represents the displacement of the environment
         # relative to the robot (Translates and turns in the opposite direction)
         self.yaw_matrix = matrix44.create_from_quaternion(corrected_yaw_quaternion)
-        self.displacement_matrix = matrix44.multiply(matrix44.create_from_translation(-self.translation),
-                                                     self.yaw_matrix)
+        # self.displacement_matrix = matrix44.multiply(matrix44.create_from_translation(-self.translation),
+        #                                              self.yaw_matrix)
+        self.displacement_matrix = translation_quaternion_to_matrix(-self.translation, corrected_yaw_quaternion.inverse)
 
         # The focus --------
 
@@ -308,9 +298,3 @@ class Enaction:
     def increment(self, outcome):
         """Useful if the enaction is taken as a composite enaction"""
         return False
-
-    # def serialize(self):
-    #     """Return the command string to send to the robot"""
-    #     command_dict = {'clock': self.clock}
-    #     command_dict.update(self.command.command_dict())
-    #     return json.dumps(command_dict)

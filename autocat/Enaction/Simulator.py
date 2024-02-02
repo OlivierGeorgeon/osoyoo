@@ -8,34 +8,44 @@ from ..Decider.Action import ACTION_SWIPE, ACTION_FORWARD, ACTION_SCAN
 from ..Robot.Outcome import Outcome
 from ..Memory.AllocentricMemory.Hexagonal_geometry import point_to_cell
 from ..Memory.EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO
-from ..Utils import quaternion_to_direction_rad, assert_almost_equal_angles
+from ..Utils import assert_almost_equal_angles
 
 
 class Simulator:
     def __init__(self, workspace):
         self.workspace = workspace
+        self.is_simulating = False
         self.simulation_time = 0
         self.simulated_outcome_dict = {}
 
     def begin(self):
+        """Begin the simulation"""
+        self.is_simulating = True
         self.simulation_time = 0
+        # Initialize all the required fields because sometimes simulate is not called
         self.simulated_outcome_dict = {"clock": self.workspace.enaction.clock,
                                        "action": self.workspace.enaction.action.action_code,
-                                       'duration1': self.workspace.enaction.simulation_duration * 1000,
+                                       "duration1": self.workspace.enaction.simulation_duration * 1000,
+                                       "head_angle": self.workspace.enaction.predicted_outcome.head_angle,
+                                       "echo_distance": self.workspace.enaction.predicted_outcome.echo_distance,
+                                       "yaw": self.workspace.enaction.command.yaw,
                                        "floor": 0, "color_index": 0, "status": "S"}
 
     def simulate(self, dt):
-        """Simulate the enaction. Return True during the simulation and False when the simulation ends"""
+        """Simulate the enaction in the current memory"""
         enaction = self.workspace.enaction
         memory = self.workspace.memory
-        is_simulating = True
+
+        # If the simulation is over, do nothing while waiting for the actual outcome
+        if not self.is_simulating:
+            return
 
         # dt *= 2
         # Check whether target time is elapsed
         self.simulation_time += dt
         if self.simulation_time >= enaction.simulation_duration:
             dt += enaction.simulation_duration - self.simulation_time  # Adjust to the exact duration
-            is_simulating = False
+            self.is_simulating = False
             self.simulated_outcome_dict['duration1'] = enaction.simulation_duration * 1000
 
         # The intermediate displacement
@@ -71,11 +81,12 @@ class Simulator:
         # Update allocentric memory
         memory.allocentric_memory.robot_point += memory.body_memory.body_quaternion * Vector3(translation)
 
-        # If crossed the line then stop the simulation (must do before marking the place)
+        # If crossed the line then stop the simulation
+        # Must check before marking the place, and terminate to prevent overriding duration1
         # floor = 0
         # color_index = 0
-        self.simulated_outcome_dict['yaw'] = round(
-            math.degrees(quaternion_to_direction_rad(enaction.command.intended_yaw_quaternion)))
+        # self.simulated_outcome_dict['yaw'] = round(
+        #     math.degrees(quaternion_to_direction_rad(enaction.command.intended_yaw_quaternion)))
         if memory.phenomenon_memory.terrain_confidence() < PHENOMENON_RECOGNIZED_CONFIDENCE:
             if enaction.action.action_code in [ACTION_FORWARD, ACTION_SWIPE]:
                 floor_i, floor_j = point_to_cell(memory.allocentric_memory.robot_point +
@@ -84,7 +95,7 @@ class Simulator:
                 if (memory.allocentric_memory.min_i <= floor_i <= memory.allocentric_memory.max_i) and \
                         (memory.allocentric_memory.min_j <= floor_j <= memory.allocentric_memory.max_j) and \
                         memory.allocentric_memory.grid[floor_i][floor_j].status[0] == EXPERIENCE_FLOOR:
-                    is_simulating = False
+                    self.is_simulating = False
                     self.simulated_outcome_dict['duration1'] = round(self.simulation_time * 1000)
                     if enaction.action.action_code == ACTION_FORWARD:
                         self.simulated_outcome_dict['floor'] = 3
@@ -107,8 +118,8 @@ class Simulator:
             self.simulated_outcome_dict['duration1'] = enaction.predicted_outcome.duration1
             self.simulated_outcome_dict['color_index'] = enaction.predicted_outcome.color_index
             # Stop the simulation after the predicted duration1
-            # if self.simulation_time * 1000 > enaction.predicted_outcome.duration1:
-            #     self.is_simulating = False
+            if self.simulation_time * 1000 > enaction.predicted_outcome.duration1:
+                self.is_simulating = False
 
         # Compute the simulated echo
         echoes = [[enaction.predicted_outcome.head_angle, enaction.predicted_outcome.echo_distance]]
@@ -133,13 +144,15 @@ class Simulator:
         np_echoes = np.array(echoes, dtype=int)
         a, d = np_echoes[np.argmin(np_echoes[:, 1])]
         self.simulated_outcome_dict['head_angle'], self.simulated_outcome_dict['echo_distance'] = int(a), int(d)
+
         # Mark the place
         memory.allocentric_memory.place_robot(memory.body_memory, enaction.clock)
-
-        return is_simulating
+        #
+        # return self.is_simulating
 
     def end(self):
         """Terminate the simulation and return the simulated outcome"""
         # Empty the list of cells to be processed
         self.workspace.memory.allocentric_memory.user_cells = []
+        self.is_simulating = False
         return Outcome(self.simulated_outcome_dict)

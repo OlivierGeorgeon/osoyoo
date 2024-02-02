@@ -13,7 +13,7 @@ from ..Decider.Decider import FOCUS_TOO_FAR_DISTANCE
 # from ..Decider.Action import ACTION_FORWARD, ACTION_SWIPE, ACTION_RIGHTWARD
 # from .PhenomenonMemory import PHENOMENON_RECOGNIZED_CONFIDENCE
 # from ..Robot.RobotDefine import ROBOT_FLOOR_SENSOR_X, ROBOT_SETTINGS
-
+from ..Integrator.Integrator import integrate
 
 GRID_WIDTH = 30  # 15   # 100 Number of cells wide
 GRID_HEIGHT = 100  # 70  # 45  # 200 Number of cells high
@@ -110,22 +110,24 @@ class Memory:
         self.egocentric_memory.update_and_add_experiences(enaction)
 
         # The integrator may again update the robot's position
+        # Call the integrator to create and update the phenomena
+        integrate(self)
 
-    def update_allocentric(self, clock):
+        # def update_allocentric(self, clock):
         """Update allocentric memory on the basis of body, phenomenon, and egocentric memory"""
         # Mark the cells where is the robot
-        self.allocentric_memory.place_robot(self.body_memory, clock)
+        self.allocentric_memory.place_robot(self.body_memory, self.clock)
 
         # Mark the affordances
-        self.allocentric_memory.update_affordances(self.phenomenon_memory, clock)
+        self.allocentric_memory.update_affordances(self.phenomenon_memory, self.clock)
 
         # Update the focus in allocentric memory
         allo_focus = self.egocentric_to_allocentric(self.egocentric_memory.focus_point)
-        self.allocentric_memory.update_focus(allo_focus, clock)
+        self.allocentric_memory.update_focus(allo_focus, self.clock)
 
         # Update the prompt in allocentric memory
         allo_prompt = self.egocentric_to_allocentric(self.egocentric_memory.prompt_point)
-        self.allocentric_memory.update_prompt(allo_prompt, clock)
+        self.allocentric_memory.update_prompt(allo_prompt, self.clock)
 
     def egocentric_to_polar_egocentric(self, point):
         """Convert the position of a point from egocentric to polar-egocentric reference"""
