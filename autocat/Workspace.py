@@ -14,6 +14,7 @@ from .Robot.Enaction import Enaction
 from .Robot.Command import DIRECTION_BACK
 from .Robot.Message import Message
 from .Enaction.Enacter import Enacter
+from .Enaction.Simulator import Simulator
 from .Robot.CtrlRobot import ENACTION_STEP_IDLE, ENACTION_STEP_REFRESHING
 from .Enaction.CompositeEnaction import CompositeEnaction
 from .Integrator.PredictionError import PredictionError
@@ -46,6 +47,7 @@ class Workspace:
         #     self.deciders = {'Explore': DeciderExplore(self), 'Circle': DeciderCircle(self)}
         #     # self.deciders = {'Circle': DeciderCircle(self)}
         self.enacter = Enacter(self)
+        self.simulator = Simulator(self)
         self.prediction_error = PredictionError(self)
 
         self.composite_enaction = None  # The composite enaction to enact

@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
 import os
+from pyrr import Quaternion
 from ..Decider.Action import ACTION_FORWARD
 from ..Utils import short_angle
 from ..Decider.Decider import CONFIDENCE_CONFIRMED_FOCUS
@@ -40,7 +41,7 @@ def plot(data_dict, caption, file_name):
 
 class PredictionError:
     def __init__(self, workspace):
-        """Initialize the prediction arror arrays"""
+        """Initialize the prediction error arrays"""
         self.workspace = workspace
         self.forward_duration1 = {}  # (ms)
         self.yaw = {}  # (degree)
@@ -64,12 +65,15 @@ class PredictionError:
                   "std:", round(float(np.std(list(self.forward_duration1.values())))))
         # yaw
 
-        pe = math.degrees(-short_angle(enaction.command.intended_yaw_quaternion, enaction.yaw_quaternion))
+        # pe = math.degrees(-short_angle(enaction.command.intended_yaw_quaternion, enaction.yaw_quaternion))
+        pe = math.degrees(-short_angle(Quaternion.from_z_rotation(math.radians(computed_outcome.yaw)),
+                                       enaction.yaw_quaternion))
         self.yaw[enaction.clock] = pe
         self.yaw.pop(enaction.clock - PREDICTION_ERROR_WINDOW, None)
         print("Prediction Error Yaw (command - measure)=", round(pe, 1),
               "Average:", round(float(np.mean(list(self.yaw.values()))), 1),
               "std:", round(float(np.std(list(self.yaw.values()))), 1))
+
         # Compass prediction error
 
         self.compass[enaction.clock] = math.degrees(enaction.body_direction_delta)

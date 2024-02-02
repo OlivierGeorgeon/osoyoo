@@ -57,7 +57,7 @@ class Enaction:
 
         # The predicted memory
         self.predicted_memory = memory.save()
-        self.predicted_memory.clock = memory.clock
+        self.predicted_memory.clock = memory.clock + 1
         self.predicted_memory.allocentric_memory.move(self.body_quaternion, self.command.intended_translation, self.clock)
         self.predicted_memory.body_memory.body_quaternion = self.command.intended_yaw_quaternion * self.body_quaternion
         if memory.egocentric_memory.prompt_point is not None:
@@ -119,13 +119,14 @@ class Enaction:
         self.focus_direction_prediction_error = 0
         self.focus_distance_prediction_error = 0
 
-    def begin(self, clock, body_quaternion):
+    def begin(self, body_quaternion):
         """Adjust the spatial modifiers of the enaction.
         Compute the command to send to the robot.
         Initialize the simulation"""
 
-        self.clock = clock
-        self.predicted_outcome.set_clock(clock)
+        # self.clock = clock
+        # self.command.clock = clock
+        # self.predicted_outcome.set_clock(clock)
         print("Predicted outcome", self.predicted_outcome)
         # Update the body_quaternion to avoid errors in the estimated yaw
         self.body_quaternion = body_quaternion.copy()

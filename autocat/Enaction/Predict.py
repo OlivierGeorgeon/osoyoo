@@ -5,6 +5,8 @@ from ..Memory.AllocentricMemory.Hexagonal_geometry import point_to_cell
 from ..Memory.EgocentricMemory.Experience import EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_FLOOR
 from ..Robot.RobotDefine import ROBOT_FLOOR_SENSOR_X, ROBOT_SETTINGS
 
+RETREAT_YAW = 45
+
 
 def predict_outcome(command, memory):
     """Return the predicted outcome of executing this command in this memory"""
@@ -30,10 +32,10 @@ def predict_outcome(command, memory):
                     x_line = ego_shape[i][0] - ego_shape[i][1] / slope
                     if ego_shape[i][0] > ego_shape[i + 1][0]:
                         predicted_outcome["floor"] = 1
-                        predicted_outcome["yaw"] = -45
+                        predicted_outcome["yaw"] = -RETREAT_YAW
                     else:
                         predicted_outcome["floor"] = 2
-                        predicted_outcome["yaw"] = 45
+                        predicted_outcome["yaw"] = RETREAT_YAW
                 # If the line intersection is before the robot
                 if x_line > 0:
                     # print("intersection point", memory.phenomenon_memory.terrain().shape[i], "Distance", x_line)
@@ -62,24 +64,16 @@ def predict_outcome(command, memory):
                     if duration1 < command.duration:
                         predicted_outcome["duration1"] = round(duration1)
                         predicted_outcome["floor"] = 2
-                        predicted_outcome["yaw"] = 45
+                        predicted_outcome["yaw"] = RETREAT_YAW
                         predicted_outcome["color_index"] = cell_color(np.array([ROBOT_FLOOR_SENSOR_X, y_line, 0]), memory)
-                    # else:
-                    #     predicted_outcome["duration1"] = command.duration
-                    #     predicted_outcome["floor"] = 0
-                    #     predicted_outcome["yaw"] = 0
                     break
                 elif command.speed_y < 0 and y_line < 0:  # Swipe right
                     duration1 = -y_line * 1000 / ROBOT_SETTINGS[memory.robot_id]["lateral_speed"]
                     if duration1 < command.duration:
                         predicted_outcome["duration1"] = round(duration1)
                         predicted_outcome["floor"] = 1
-                        predicted_outcome["yaw"] = -45
+                        predicted_outcome["yaw"] = -RETREAT_YAW
                         predicted_outcome["color_index"] = cell_color(np.array([ROBOT_FLOOR_SENSOR_X, y_line, 0]), memory)
-                    # else:
-                    #     predicted_outcome["duration1"] = command.duration
-                    #     predicted_outcome["floor"] = 0
-                    #     predicted_outcome["yaw"] = 0
                     break
     return predicted_outcome
 
