@@ -1,20 +1,17 @@
 import math
-import json
 import numpy as np
 from pyrr import matrix44, Vector3
 from playsound import playsound
 from ..Decider.Action import ACTION_FORWARD, ACTION_TURN, ACTION_SCAN, ACTION_WATCH
 from ..Decider.Decider import CONFIDENCE_NO_FOCUS, CONFIDENCE_NEW_FOCUS, CONFIDENCE_TOUCHED_FOCUS, \
     CONFIDENCE_CAREFUL_SCAN, CONFIDENCE_CONFIRMED_FOCUS
-from ..Memory.Memory import SIMULATION_TIME_RATIO
 from ..Memory.BodyMemory import point_to_echo_direction_distance
 from ..Memory.EgocentricMemory.Experience import EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_FLOOR
 from ..Memory.PhenomenonMemory.PhenomenonMemory import BOX
 from ..Utils import short_angle, assert_almost_equal_angles, translation_quaternion_to_matrix
-from .RobotDefine import DEFAULT_YAW, ROBOT_FLOOR_SENSOR_X, ROBOT_CHASSIS_Y, ROBOT_SETTINGS
+from .RobotDefine import ROBOT_FLOOR_SENSOR_X, ROBOT_CHASSIS_Y, ROBOT_SETTINGS
 from .Command import Command, DIRECTION_FRONT
 from .Outcome import Outcome, echo_point
-# from ..Memory.AllocentricMemory.Hexagonal_geometry import point_to_cell
 from ..Enaction.Predict import predict_outcome
 
 
@@ -88,8 +85,8 @@ class Enaction:
         self.predicted_outcome = Outcome(predicted_outcome_dict)
 
         # The simulation of the enaction
-        self.simulation_duration = 0
-        self.simulation_rotation_speed = 0
+        # self.simulation_duration = 0
+        # self.simulation_rotation_speed = 0
         # self.simulation_time = 0.
 
         # The outcome
@@ -113,24 +110,21 @@ class Enaction:
         Compute the command to send to the robot.
         Initialize the simulation"""
 
-        # self.clock = clock
-        # self.command.clock = clock
-        # self.predicted_outcome.set_clock(clock)
+        print("Command", self.command.serialize())
         print("Predicted outcome", self.predicted_outcome)
         # Update the body_quaternion to avoid errors in the estimated yaw
         self.body_quaternion = body_quaternion.copy()
 
-        # Initialize the simulation of the intended interaction
-        # Compute the duration and the speed depending and the enaction
-        self.simulation_rotation_speed = self.action.rotation_speed_rad
-        self.simulation_duration = self.command.duration / 1000
-        if self.action.action_code in [ACTION_TURN]:
-            self.simulation_duration = math.fabs(self.command.yaw) * self.action.target_duration / DEFAULT_YAW
-            if self.command.yaw < 0:
-                self.simulation_rotation_speed = -self.action.rotation_speed_rad
-        self.simulation_duration *= SIMULATION_TIME_RATIO
-        self.simulation_rotation_speed *= SIMULATION_TIME_RATIO
-        # self.simulation_time = 0.
+        # # Initialize the simulation of the intended interaction
+        # # Compute the duration and the speed depending and the enaction
+        # self.simulation_rotation_speed = self.action.rotation_speed_rad
+        # self.simulation_duration = self.command.duration / 1000
+        # if self.action.action_code in [ACTION_TURN]:
+        #     self.simulation_duration = math.fabs(self.command.yaw) * self.action.target_duration / DEFAULT_YAW
+        #     if self.command.yaw < 0:
+        #         self.simulation_rotation_speed = -self.action.rotation_speed_rad
+        # self.simulation_duration *= SIMULATION_TIME_RATIO
+        # self.simulation_rotation_speed *= SIMULATION_TIME_RATIO
 
     def terminate(self, outcome):
         """Computes the azimuth, the yaw, and the displacement. Follow up the focus and the prompt."""
@@ -140,10 +134,11 @@ class Enaction:
 
         # Translation integrated from the action's speed multiplied by the duration1
         # self.translation = self.command.predicted_translation.copy()
-        if self.command.duration > 0:  # TODO don't send actions TURN with angle 0 (decider circle)
+        # if self.command.duration > 0:  # TODO don't send actions TURN with angle 0 (decider circle)
         #     self.translation *= 1000. * self.outcome.duration1 / self.action.target_duration
         # else:
-            self.translation *= self.outcome.duration1 / self.command.duration
+        #     self.translation *= self.outcome.duration1 / self.command.duration
+        self.translation = self.command.speed * self.outcome.duration1 / 1000
 
         # The yaw quaternion
         if outcome.yaw_quaternion is None:
@@ -287,7 +282,6 @@ class Enaction:
             print("Catch focus impact", self.focus_point)
 
         # Move the prompt -----
-
         if self.prompt_point is not None:
             self.prompt_point = matrix44.apply_to_vector(self.displacement_matrix, self.prompt_point).astype(int)
 

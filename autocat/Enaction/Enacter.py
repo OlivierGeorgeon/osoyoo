@@ -1,7 +1,6 @@
 from ..Robot.CtrlRobot import ENACTION_STEP_IDLE, ENACTION_STEP_COMMANDING, ENACTION_STEP_ENACTING, \
     ENACTION_STEP_INTEGRATING, ENACTION_STEP_REFRESHING
 from ..Memory.PhenomenonMemory.PhenomenonMemory import TERRAIN_ORIGIN_CONFIDENCE
-from ..Integrator.Integrator import integrate
 
 
 class Enacter:
@@ -9,9 +8,6 @@ class Enacter:
         self.workspace = workspace
         self.interaction_step = ENACTION_STEP_IDLE
         self.memory_snapshot = None
-        self.is_simulating = False
-        # self.simulation_time = 0
-        # self.simulated_outcome = None
 
     def main(self, dt):
         """Controls the enaction."""
@@ -24,8 +20,7 @@ class Enacter:
                 self.memory_snapshot = self.workspace.memory.save()
                 # Begin the enaction
                 self.workspace.enaction.begin(self.workspace.memory.body_memory.body_quaternion)
-                # self.simulation_time = 0  # Don't forget to reset the timer
-                self.is_simulating = True
+                # Begin the simulation
                 self.workspace.simulator.begin()
                 print("Command", self.workspace.enaction.command.serialize())
                 if self.workspace.is_imagining:
@@ -39,10 +34,7 @@ class Enacter:
 
         # ENACTING: Simulate the enaction in memory
         if self.interaction_step == ENACTION_STEP_ENACTING:
-            # if self.is_simulating:
             self.workspace.simulator.simulate(dt)
-                # if not self.is_simulating:
-                #     self.simulated_outcome = self.workspace.simulator.end()
             # If imagining then use the simulated outcome when the simulation is finished
             if self.workspace.is_imagining and not self.workspace.simulator.is_simulating:
                 simulated_outcome = self.workspace.simulator.end()
@@ -56,37 +48,21 @@ class Enacter:
         if self.interaction_step == ENACTION_STEP_INTEGRATING:
             # Restore the memory from the snapshot
             self.workspace.memory = self.memory_snapshot
-
             # Retrieve possible message from other robot
             if self.workspace.memory.phenomenon_memory.terrain_confidence() >= TERRAIN_ORIGIN_CONFIDENCE and \
                     self.workspace.message is not None:
                 self.workspace.enaction.message = self.workspace.message
                 print("Message", self.workspace.message.message_string)
-                # self.workspace.message = None
-
             # Force terminate the simulation
-            # if self.is_simulating:
-            #     self.is_simulating = False
             simulated_outcome = self.workspace.simulator.end()
-                # print("Force terminate simulation")
             print("Simulated outcome", simulated_outcome)
-
             # Update memory
             self.workspace.memory.update_and_add_experiences(self.workspace.enaction)
-
-            # # Call the integrator to create and update the phenomena
-            # integrate(self.workspace.memory)
-            #
-            # # Update allocentric memory: robot, phenomena, focus
-            # self.workspace.memory.update_allocentric(self.workspace.memory.clock)
-
             # Track the prediction errors
             self.workspace.prediction_error.log(self.workspace.enaction)
-
             # Increment the clock if the enacted interaction was properly received
             if self.workspace.enaction.clock >= self.workspace.memory.clock:  # don't increment if the robot is behind
                 self.workspace.memory.clock += 1
-
             self.interaction_step = ENACTION_STEP_REFRESHING
 
         # REFRESHING: Will be reset to IDLE in the next cycle

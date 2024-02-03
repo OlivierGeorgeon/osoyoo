@@ -8,7 +8,9 @@ from ..Decider.Action import ACTION_SWIPE, ACTION_FORWARD, ACTION_SCAN
 from ..Robot.Outcome import Outcome
 from ..Memory.AllocentricMemory.Hexagonal_geometry import point_to_cell
 from ..Memory.EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO
-from ..Utils import assert_almost_equal_angles
+from ..Utils import assert_almost_equal_angles, translation_quaternion_to_matrix
+
+SIMULATION_SPEED = 1  # 0.5
 
 
 class Simulator:
@@ -17,15 +19,29 @@ class Simulator:
         self.is_simulating = False
         self.simulation_time = 0
         self.simulated_outcome_dict = {}
+        self.simulation_rotation_speed = 0
+        self.simulation_duration = 0
 
     def begin(self):
         """Begin the simulation"""
         self.is_simulating = True
         self.simulation_time = 0
-        # Initialize all the required fields because sometimes simulate is not called
+
+        # Initialize the simulation of the intended interaction
+        # Compute the duration and the speed
+        self.simulation_rotation_speed = self.workspace.enaction.action.rotation_speed_rad * SIMULATION_SPEED
+        self.simulation_duration = self.workspace.enaction.command.duration / 1000. * SIMULATION_SPEED
+        # if self.action.action_code in [ACTION_TURN]:
+        #     self.simulation_duration = math.fabs(self.command.yaw) * self.action.target_duration / DEFAULT_YAW
+        #     if self.command.yaw < 0:
+        #         self.simulation_rotation_speed = -self.action.rotation_speed_rad
+        # self.simulation_duration *= SIMULATION_TIME_RATIO
+        # self.simulation_rotation_speed *= SIMULATION_TIME_RATIO
+
+        # Initialize all the required fields of the outcome because sometimes simulate is not called
         self.simulated_outcome_dict = {"clock": self.workspace.enaction.clock,
                                        "action": self.workspace.enaction.action.action_code,
-                                       "duration1": self.workspace.enaction.simulation_duration * 1000,
+                                       "duration1": self.workspace.enaction.command.duration,
                                        "head_angle": self.workspace.enaction.predicted_outcome.head_angle,
                                        "echo_distance": self.workspace.enaction.predicted_outcome.echo_distance,
                                        "yaw": self.workspace.enaction.command.yaw,
@@ -43,20 +59,22 @@ class Simulator:
         # dt *= 2
         # Check whether target time is elapsed
         self.simulation_time += dt
-        if self.simulation_time >= enaction.simulation_duration:
-            dt += enaction.simulation_duration - self.simulation_time  # Adjust to the exact duration
+        if self.simulation_time >= self.simulation_duration:
+            dt += self.simulation_duration - self.simulation_time  # Adjust to the exact duration
             self.is_simulating = False
-            self.simulated_outcome_dict['duration1'] = enaction.simulation_duration * 1000
+            # The duration1 is the intended duration
+            # self.simulated_outcome_dict['duration1'] = self.simulation_duration * 1000
 
         # The intermediate displacement
-        yaw_quaternion = Quaternion.from_z_rotation((enaction.simulation_rotation_speed * dt))
-        way = 1
-        if enaction.action.action_code == ACTION_SWIPE and enaction.command.speed_y < 0:
-            way = -1
-        translation = enaction.action.translation_speed * dt * way
-        yaw_matrix = matrix44.create_from_quaternion(yaw_quaternion)
-        translation_matrix = matrix44.create_from_translation(-translation)
-        displacement_matrix = matrix44.multiply(yaw_matrix, translation_matrix)
+        yaw_quaternion = Quaternion.from_z_rotation((self.simulation_rotation_speed * dt))
+        # way = 1
+        # if enaction.action.action_code == ACTION_SWIPE and enaction.command.speed[1] < 0:
+        #     way = -1
+        translation = enaction.command.speed * dt * SIMULATION_SPEED  # * way
+        # yaw_matrix = matrix44.create_from_quaternion(yaw_quaternion)
+        # translation_matrix = matrix44.create_from_translation(-translation)
+        # displacement_matrix = matrix44.multiply(yaw_matrix, translation_matrix)
+        displacement_matrix = translation_quaternion_to_matrix(-translation, yaw_quaternion.inverse)
 
         # Simulate the displacement of experiences
         for experience in memory.egocentric_memory.experiences.values():
@@ -100,7 +118,7 @@ class Simulator:
                     if enaction.action.action_code == ACTION_FORWARD:
                         self.simulated_outcome_dict['floor'] = 3
                     else:
-                        if enaction.command.speed_y > 0:
+                        if enaction.command.speed[1] > 0:
                             # Swipe left
                             self.simulated_outcome_dict['floor'] = 2
                             self.simulated_outcome_dict['yaw'] = 45
@@ -147,12 +165,11 @@ class Simulator:
 
         # Mark the place
         memory.allocentric_memory.place_robot(memory.body_memory, enaction.clock)
-        #
-        # return self.is_simulating
 
     def end(self):
         """Terminate the simulation and return the simulated outcome"""
-        # Empty the list of cells to be processed
+        # Empty the list of cells clicked by the user
         self.workspace.memory.allocentric_memory.user_cells = []
+        # Force stop the simulation if it is not yet stopped
         self.is_simulating = False
         return Outcome(self.simulated_outcome_dict)

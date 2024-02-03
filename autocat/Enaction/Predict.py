@@ -59,7 +59,7 @@ def predict_outcome(command, memory):
                 else:
                     slope = (ego_shape[i + 1][0] - ego_shape[i][0]) / (ego_shape[i + 1][1] - ego_shape[i][1])
                     y_line = ego_shape[i][1] - ego_shape[i][0] / slope
-                if command.speed_y > 0 and y_line > 0:  # Swipe left
+                if command.speed[1] > 0 and y_line > 0:  # Swipe left
                     duration1 = y_line * 1000 / ROBOT_SETTINGS[memory.robot_id]["lateral_speed"]
                     if duration1 < command.duration:
                         predicted_outcome["duration1"] = round(duration1)
@@ -67,7 +67,7 @@ def predict_outcome(command, memory):
                         predicted_outcome["yaw"] = RETREAT_YAW
                         predicted_outcome["color_index"] = cell_color(np.array([ROBOT_FLOOR_SENSOR_X, y_line, 0]), memory)
                     break
-                elif command.speed_y < 0 and y_line < 0:  # Swipe right
+                elif command.speed[1] < 0 and y_line < 0:  # Swipe right
                     duration1 = -y_line * 1000 / ROBOT_SETTINGS[memory.robot_id]["lateral_speed"]
                     if duration1 < command.duration:
                         predicted_outcome["duration1"] = round(duration1)

@@ -18,7 +18,6 @@ from ..Integrator.Integrator import integrate
 GRID_WIDTH = 30  # 15   # 100 Number of cells wide
 GRID_HEIGHT = 100  # 70  # 45  # 200 Number of cells high
 NEAR_HOME = 300    # (mm) Max distance to consider near home
-SIMULATION_TIME_RATIO = 1  # 0.5   # The simulation speed is slower than the real speed because ...
 ARRANGE_MIN_RADIUS = 100
 ARRANGE_MAX_RADIUS = 400
 

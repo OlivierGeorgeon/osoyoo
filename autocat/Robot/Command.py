@@ -22,24 +22,28 @@ class Command:
         self.clock = clock
         self.duration = action.target_duration * 1000  # Default duration
         self.yaw = round(math.degrees(action.rotation_speed_rad * action.target_duration))
-        self.speed_x = self.action.translation_speed[0]
-        self.speed_y = self.action.translation_speed[1]
+        self.speed = self.action.translation_speed.copy()
+        # self.speed_y = self.action.translation_speed[1]
         self.color = color
         self.caution = caution
         self.span = span
 
-        # The focus fields are optional
-        self.focus_x = None
-        self.focus_y = None
+        # The focus is optional
+        if focus_point is None:
+            self.focus = None
+        else:
+            self.focus = focus_point.copy()
+        # self.focus_y = None
 
         # Override the default duration and yaw on the basis of the prompt
         if prompt_point is not None:
             if self.action.action_code in [ACTION_FORWARD, ACTION_BACKWARD]:
                 self.duration = int(math.fabs(prompt_point[0] / self.action.translation_speed[0] * 1000))
-            if self.action.action_code in [ACTION_SWIPE]:
+            if self.action.action_code in [ACTION_SWIPE, ACTION_RIGHTWARD]:
                 self.duration = int(math.fabs(prompt_point[1] / self.action.translation_speed[1] * 1000))
-                if prompt_point[1] < 0:
-                    self.speed_y = -int(self.action.translation_speed[1])  # Negative speed makes swipe right
+                self.speed[1] = math.copysign(int(self.action.translation_speed[1]), prompt_point[1])
+                # if prompt_point[1] < 0:
+                #     self.speed[1] = -int(self.action.translation_speed[1])  # Negative speed makes swipe right
             if self.action.action_code in [ACTION_TURN_HEAD, ACTION_TURN]:
                 if direction == DIRECTION_BACK:
                     # Turn the back to the prompt
@@ -57,19 +61,16 @@ class Command:
                 self.yaw = round(math.degrees(yaw))
 
         # Compute the focus
-        if focus_point is not None:
-            self.focus_x = int(focus_point[0])  # Convert to python int
-            self.focus_y = int(focus_point[1])
-            if self.action.action_code in [ACTION_FORWARD, ACTION_BACKWARD]:
-                self.speed_x = int(self.action.translation_speed[0])
-            # if self.action.action_code == ACTION_BACKWARD:
-            #     self.speed_x = -int(self.action.translation_speed[0])
-            if self.action.action_code in [ACTION_SWIPE, ACTION_RIGHTWARD]:
-                if prompt_point is not None:
-                    self.speed_y = math.copysign(int(self.action.translation_speed[1]), prompt_point[1])
+        # if focus_point is not None:
+        #     self.focus_x = int(focus_point[0])  # Convert to python int
+        #     self.focus_y = int(focus_point[1])
+            # if self.action.action_code in [ACTION_FORWARD, ACTION_BACKWARD]:
+            #     self.speed[0] = int(self.action.translation_speed[0])
+        # if self.action.action_code in [ACTION_SWIPE, ACTION_RIGHTWARD] and prompt_point is not None:
+        #     self.speed[1] = math.copysign(int(self.action.translation_speed[1]), prompt_point[1])
 
         # The intended translation
-        if self.speed_y >= 0 or self.action.action_code in [ACTION_RIGHTWARD]:
+        if self.speed[1] >= 0 or self.action.action_code in [ACTION_RIGHTWARD]:
             self.intended_translation = action.translation_speed * self.duration / 1000
         else:
             self.intended_translation = - action.translation_speed * self.duration / 1000
@@ -78,11 +79,6 @@ class Command:
         self.intended_yaw_quaternion = Quaternion.from_z_rotation(math.radians(self.yaw))
 
         # The intended matrix of the environment's displacement relative to the robot
-        # self.intended_yaw_matrix = matrix44.create_from_quaternion(self.intended_yaw_quaternion)
-        # self.intended_displacement_matrix = matrix44.multiply(
-        #     matrix44.create_from_translation(-self.intended_translation), self.intended_yaw_matrix)
-        # self.intended_displacement_matrix = quaternion_translation_to_matrix(self.intended_yaw_quaternion,
-        #                                                                      -self.intended_translation)
         self.intended_displacement_matrix = translation_quaternion_to_matrix(-self.intended_translation,
                                                                              self.intended_yaw_quaternion.inverse)
 
@@ -94,14 +90,14 @@ class Command:
             command_dict['duration'] = self.duration
         if self.yaw != round(math.degrees(self.action.rotation_speed_rad * self.action.target_duration)):
             command_dict['angle'] = self.yaw
-        if self.focus_x is not None:
-            command_dict['focus_x'] = self.focus_x
-            command_dict['focus_y'] = self.focus_y
+        if self.focus is not None:
+            command_dict['focus_x'] = int(self.focus[0])
+            command_dict['focus_y'] = int(self.focus[1])
         # Send the speed if SWIPE or focus
         if self.action.action_code in [ACTION_SWIPE, ACTION_RIGHTWARD]:
-            command_dict['speed'] = int(self.speed_y)
-        elif self.focus_x is not None:
-            command_dict['speed'] = int(self.speed_x)
+            command_dict['speed'] = int(self.speed[1])
+        elif self.focus is not None:
+            command_dict['speed'] = int(self.speed[0])
         if self.caution > 0:
             command_dict['caution'] = self.caution
         if self.span != 40:
