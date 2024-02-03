@@ -26,10 +26,10 @@ def predict_outcome(command, memory):
                 if abs(ego_shape[i + 1][0] - ego_shape[i][0]) < 5:
                     predicted_outcome["floor"] = 3
                     predicted_outcome["yaw"] = 0
-                    x_line = ego_shape[i][0]
+                    x = ego_shape[i][0]
                 else:
                     slope = (ego_shape[i + 1][1] - ego_shape[i][1]) / (ego_shape[i + 1][0] - ego_shape[i][0])
-                    x_line = ego_shape[i][0] - ego_shape[i][1] / slope
+                    x = ego_shape[i][0] - ego_shape[i][1] / slope
                     if ego_shape[i][0] > ego_shape[i + 1][0]:
                         predicted_outcome["floor"] = 1
                         predicted_outcome["yaw"] = -RETREAT_YAW
@@ -37,12 +37,11 @@ def predict_outcome(command, memory):
                         predicted_outcome["floor"] = 2
                         predicted_outcome["yaw"] = RETREAT_YAW
                 # If the line intersection is before the robot
-                if x_line > 0:
-                    # print("intersection point", memory.phenomenon_memory.terrain().shape[i], "Distance", x_line)
-                    duration1 = (x_line - ROBOT_FLOOR_SENSOR_X) * 1000 / ROBOT_SETTINGS[memory.robot_id]["forward_speed"]
+                if x > 0:
+                    duration1 = (x - ROBOT_FLOOR_SENSOR_X) * 1000 / ROBOT_SETTINGS[memory.robot_id]["forward_speed"]
                     if duration1 < command.duration:
                         predicted_outcome["duration1"] = round(duration1)
-                        predicted_outcome["color_index"] = cell_color(np.array([x_line, 0, 0]), memory)
+                        predicted_outcome["color_index"] = cell_color(np.array([x, 0, 0]), memory)
                     else:
                         # Must reset the floor and yaw set above
                         predicted_outcome["floor"] = 0
@@ -55,25 +54,25 @@ def predict_outcome(command, memory):
             # Loop over the points where the x coordinate pass the floor sensor
             for i in np.where(np.diff(np.sign(ego_shape[:, 0])))[0]:
                 if abs(ego_shape[i + 1][1] - ego_shape[i][1]) == 0:
-                    y_line = ego_shape[i][1]
+                    y = ego_shape[i][1]
                 else:
                     slope = (ego_shape[i + 1][0] - ego_shape[i][0]) / (ego_shape[i + 1][1] - ego_shape[i][1])
-                    y_line = ego_shape[i][1] - ego_shape[i][0] / slope
-                if command.speed[1] > 0 and y_line > 0:  # Swipe left
-                    duration1 = y_line * 1000 / ROBOT_SETTINGS[memory.robot_id]["lateral_speed"]
+                    y = ego_shape[i][1] - ego_shape[i][0] / slope
+                if command.speed[1] > 0 and y > 0:  # Swipe left
+                    duration1 = y * 1000 / ROBOT_SETTINGS[memory.robot_id]["lateral_speed"]
                     if duration1 < command.duration:
                         predicted_outcome["duration1"] = round(duration1)
                         predicted_outcome["floor"] = 2
                         predicted_outcome["yaw"] = RETREAT_YAW
-                        predicted_outcome["color_index"] = cell_color(np.array([ROBOT_FLOOR_SENSOR_X, y_line, 0]), memory)
+                        predicted_outcome["color_index"] = cell_color(np.array([ROBOT_FLOOR_SENSOR_X, y, 0]), memory)
                     break
-                elif command.speed[1] < 0 and y_line < 0:  # Swipe right
-                    duration1 = -y_line * 1000 / ROBOT_SETTINGS[memory.robot_id]["lateral_speed"]
+                elif command.speed[1] < 0 and y < 0:  # Swipe right
+                    duration1 = -y * 1000 / ROBOT_SETTINGS[memory.robot_id]["lateral_speed"]
                     if duration1 < command.duration:
                         predicted_outcome["duration1"] = round(duration1)
                         predicted_outcome["floor"] = 1
                         predicted_outcome["yaw"] = -RETREAT_YAW
-                        predicted_outcome["color_index"] = cell_color(np.array([ROBOT_FLOOR_SENSOR_X, y_line, 0]), memory)
+                        predicted_outcome["color_index"] = cell_color(np.array([ROBOT_FLOOR_SENSOR_X, y, 0]), memory)
                     break
     return predicted_outcome
 
@@ -81,7 +80,7 @@ def predict_outcome(command, memory):
 def cell_color(ego_point, memory):
     """Return the color index of the cell at the point provided in egocentric coordinates"""
     floor_i, floor_j = point_to_cell(memory.egocentric_to_allocentric(ego_point))
-    print("Color in cell (", floor_i, floor_j, ")")
+    # print("Color in cell (", floor_i, floor_j, ")")
     if (memory.allocentric_memory.min_i <= floor_i <= memory.allocentric_memory.max_i) and \
             (memory.allocentric_memory.min_j <= floor_j <= memory.allocentric_memory.max_j) and \
             memory.allocentric_memory.grid[floor_i][floor_j].status[0] == EXPERIENCE_FLOOR:

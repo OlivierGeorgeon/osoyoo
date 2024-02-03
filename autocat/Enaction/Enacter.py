@@ -22,7 +22,6 @@ class Enacter:
                 self.workspace.enaction.begin(self.workspace.memory.body_memory.body_quaternion)
                 # Begin the simulation
                 self.workspace.simulator.begin()
-                print("Command", self.workspace.enaction.command.serialize())
                 if self.workspace.is_imagining:
                     # If imagining then proceed to simulating the enaction
                     self.interaction_step = ENACTION_STEP_ENACTING

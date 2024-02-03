@@ -54,7 +54,7 @@ class Enaction:
 
         # The predicted memory
         self.predicted_memory = memory.save()
-        self.predicted_memory.clock = memory.clock + 1
+        self.predicted_memory.clock += 1
         self.predicted_memory.allocentric_memory.move(self.body_quaternion, self.command.intended_translation, self.clock)
         self.predicted_memory.body_memory.body_quaternion = self.command.intended_yaw_quaternion * self.body_quaternion
         if memory.egocentric_memory.prompt_point is not None:
@@ -84,11 +84,6 @@ class Enaction:
             predicted_outcome_dict["yaw"] = self.command.yaw
         self.predicted_outcome = Outcome(predicted_outcome_dict)
 
-        # The simulation of the enaction
-        # self.simulation_duration = 0
-        # self.simulation_rotation_speed = 0
-        # self.simulation_time = 0.
-
         # The outcome
         self.outcome = None
         self.body_direction_delta = 0  # Displayed in BodyView
@@ -115,17 +110,6 @@ class Enaction:
         # Update the body_quaternion to avoid errors in the estimated yaw
         self.body_quaternion = body_quaternion.copy()
 
-        # # Initialize the simulation of the intended interaction
-        # # Compute the duration and the speed depending and the enaction
-        # self.simulation_rotation_speed = self.action.rotation_speed_rad
-        # self.simulation_duration = self.command.duration / 1000
-        # if self.action.action_code in [ACTION_TURN]:
-        #     self.simulation_duration = math.fabs(self.command.yaw) * self.action.target_duration / DEFAULT_YAW
-        #     if self.command.yaw < 0:
-        #         self.simulation_rotation_speed = -self.action.rotation_speed_rad
-        # self.simulation_duration *= SIMULATION_TIME_RATIO
-        # self.simulation_rotation_speed *= SIMULATION_TIME_RATIO
-
     def terminate(self, outcome):
         """Computes the azimuth, the yaw, and the displacement. Follow up the focus and the prompt."""
         self.outcome = outcome
@@ -133,11 +117,6 @@ class Enaction:
         # The displacement --------
 
         # Translation integrated from the action's speed multiplied by the duration1
-        # self.translation = self.command.predicted_translation.copy()
-        # if self.command.duration > 0:  # TODO don't send actions TURN with angle 0 (decider circle)
-        #     self.translation *= 1000. * self.outcome.duration1 / self.action.target_duration
-        # else:
-        #     self.translation *= self.outcome.duration1 / self.command.duration
         self.translation = self.command.speed * self.outcome.duration1 / 1000
 
         # The yaw quaternion
@@ -190,8 +169,6 @@ class Enaction:
         # Compute the displacement matrix which represents the displacement of the environment
         # relative to the robot (Translates and turns in the opposite direction)
         self.yaw_matrix = matrix44.create_from_quaternion(corrected_yaw_quaternion)
-        # self.displacement_matrix = matrix44.multiply(matrix44.create_from_translation(-self.translation),
-        #                                              self.yaw_matrix)
         self.displacement_matrix = translation_quaternion_to_matrix(-self.translation, corrected_yaw_quaternion.inverse)
 
         # The focus --------
@@ -199,10 +176,6 @@ class Enaction:
         # If careful watch then the focus is the first central_echo
         new_focus = self.outcome.echo_point
         if self.command.span == 10 and len(self.outcome.central_echos) > 0:
-            # central_echo = self.outcome.central_echos[0]
-            # x = ROBOT_HEAD_X + math.cos(math.radians(central_echo[0])) * central_echo[1]
-            # y = math.sin(math.radians(central_echo[0])) * central_echo[1]
-            # new_focus = np.array([x, y, 0], dtype=int)
             new_focus = echo_point(*self.outcome.central_echos[0])
 
         # If the robot is already focussed then adjust the focus and the displacement

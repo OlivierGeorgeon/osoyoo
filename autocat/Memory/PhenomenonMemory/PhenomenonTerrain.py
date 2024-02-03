@@ -39,8 +39,9 @@ class PhenomenonTerrain(Phenomenon):
             self.affordances[self.affordance_id] = affordance
             position_correction = np.array([0, 0, 0], dtype=int)
 
-            # Check if this affordance is absolute
+            # If find black line
             if affordance.type == EXPERIENCE_FLOOR:
+                # If color
                 if affordance.color_index > 0:
                     # If the phenomenon does not have an absolute origin yet then this affordance becomes the absolute
                     if self.confidence < TERRAIN_ORIGIN_CONFIDENCE:
@@ -76,13 +77,13 @@ class PhenomenonTerrain(Phenomenon):
                         self.confidence = PHENOMENON_RECOGNIZE_CONFIDENCE
                         self.last_origin_clock = affordance.clock
                 # Black line: Compute the position correction based on the nearest point in the terrain shape
-                # DOES NOT WORK: Must use the point on the trajectory rather than the closest point
-                # elif self.confidence >= PHENOMENON_RECOGNIZED_CONFIDENCE:
-                #     distances = np.linalg.norm(self.shape - affordance.point, axis=1)
-                #     closest_point = self.shape[np.argmin(distances)]
-                #     position_correction = np.array(affordance.point - closest_point, dtype=int)
-                #     print("Nearest shape point", closest_point, "Position correction", position_correction)
-                #     affordance.point -= position_correction
+                # TODO use the point on the trajectory rather than the closest point
+                elif self.confidence >= PHENOMENON_RECOGNIZED_CONFIDENCE:
+                    distances = np.linalg.norm(self.shape - affordance.point, axis=1)
+                    closest_point = self.shape[np.argmin(distances)]
+                    position_correction = np.array(affordance.point - closest_point, dtype=int)
+                    print("Nearest shape point", closest_point, "Position correction", position_correction)
+                    affordance.point -= position_correction
 
             # Interpolate the outline
             self.interpolate()

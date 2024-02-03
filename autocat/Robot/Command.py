@@ -1,6 +1,6 @@
 import json
 import math
-from pyrr import Quaternion, matrix44
+from pyrr import Quaternion
 from ..Decider.Action import ACTION_FORWARD, ACTION_BACKWARD, ACTION_SWIPE, ACTION_RIGHTWARD, ACTION_TURN, \
     ACTION_TURN_HEAD
 from .RobotDefine import DEFAULT_ACTION_DURATION
@@ -23,7 +23,6 @@ class Command:
         self.duration = action.target_duration * 1000  # Default duration
         self.yaw = round(math.degrees(action.rotation_speed_rad * action.target_duration))
         self.speed = self.action.translation_speed.copy()
-        # self.speed_y = self.action.translation_speed[1]
         self.color = color
         self.caution = caution
         self.span = span
@@ -33,7 +32,6 @@ class Command:
             self.focus = None
         else:
             self.focus = focus_point.copy()
-        # self.focus_y = None
 
         # Override the default duration and yaw on the basis of the prompt
         if prompt_point is not None:
@@ -56,24 +54,16 @@ class Command:
                     yaw = math.atan2(prompt_point[0], -prompt_point[1])
                 else:
                     # Turn the front to the prompt
-                    yaw = math.atan2(prompt_point[1], prompt_point[0])
-                self.duration = abs(round(1000. * yaw / self.action.rotation_speed_rad))
-                self.yaw = round(math.degrees(yaw))
-
-        # Compute the focus
-        # if focus_point is not None:
-        #     self.focus_x = int(focus_point[0])  # Convert to python int
-        #     self.focus_y = int(focus_point[1])
-            # if self.action.action_code in [ACTION_FORWARD, ACTION_BACKWARD]:
-            #     self.speed[0] = int(self.action.translation_speed[0])
-        # if self.action.action_code in [ACTION_SWIPE, ACTION_RIGHTWARD] and prompt_point is not None:
-        #     self.speed[1] = math.copysign(int(self.action.translation_speed[1]), prompt_point[1])
+                    yaw_rad = math.atan2(prompt_point[1], prompt_point[0])
+                self.duration = abs(round(1000. * yaw_rad / self.action.rotation_speed_rad))
+                self.yaw = round(math.degrees(yaw_rad))
 
         # The intended translation
-        if self.speed[1] >= 0 or self.action.action_code in [ACTION_RIGHTWARD]:
-            self.intended_translation = action.translation_speed * self.duration / 1000
-        else:
-            self.intended_translation = - action.translation_speed * self.duration / 1000
+        # if self.speed[1] >= 0 or self.action.action_code in [ACTION_RIGHTWARD]:
+        #     self.intended_translation = action.translation_speed * self.duration / 1000
+        # else:
+        #     self.intended_translation = - action.translation_speed * self.duration / 1000
+        self.intended_translation = self.speed * self.duration / 1000.
 
         # The intended yaw quaternion
         self.intended_yaw_quaternion = Quaternion.from_z_rotation(math.radians(self.yaw))
@@ -108,9 +98,6 @@ class Command:
 
     def timeout(self):
         """Return the timeout expected from this command"""
-        # timeout = ENACTION_DEFAULT_TIMEOUT
-        # if self.duration is not None:
         timeout = self.duration / 1000. + ENACTION_MIN_TIMEOUT
-        # if self.angle is not None:
-        # timeout = math.fabs(self.angle) / DEFAULT_YAW + 4.0  # Turn speed = 45°/s
+        # print("Time out", timeout)
         return timeout

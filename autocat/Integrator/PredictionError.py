@@ -57,7 +57,7 @@ class PredictionError:
         # Translation FORWARD duration1
 
         if enaction.action.action_code in [ACTION_FORWARD] and actual_outcome.duration1 != 0:
-            pe = (computed_outcome.duration1 - actual_outcome.duration1) / actual_outcome.duration1
+            pe = (computed_outcome.duration1 - actual_outcome.duration1)  # / actual_outcome.duration1
             self.forward_duration1[enaction.clock] = pe
             self.forward_duration1.pop(actual_outcome.clock - PREDICTION_ERROR_WINDOW, None)
             print("Prediction Error Translate duration1 (simulation - measured)=", round(pe),
@@ -119,7 +119,7 @@ class PredictionError:
         if not os.path.exists("log"):
             os.makedirs("log")
         # Generate the plots
-        plot(self.forward_duration1, "Forward duration (%)", "Translation")
+        plot(self.forward_duration1, "Forward duration (ms)", "Forward_duration")
         plot(self.yaw, "Yaw (degrees)", "yaw")
         plot(self.compass, "Compass (degree)", "Compass")
         plot(self.focus_direction, "Focus direction (degree)", "Focus_direction")

@@ -9,6 +9,7 @@ from ..Robot.Outcome import Outcome
 from ..Memory.AllocentricMemory.Hexagonal_geometry import point_to_cell
 from ..Memory.EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO
 from ..Utils import assert_almost_equal_angles, translation_quaternion_to_matrix
+from .Predict import RETREAT_YAW
 
 SIMULATION_SPEED = 1  # 0.5
 
@@ -26,19 +27,10 @@ class Simulator:
         """Begin the simulation"""
         self.is_simulating = True
         self.simulation_time = 0
-
-        # Initialize the simulation of the intended interaction
-        # Compute the duration and the speed
         self.simulation_rotation_speed = self.workspace.enaction.action.rotation_speed_rad * SIMULATION_SPEED
         self.simulation_duration = self.workspace.enaction.command.duration / 1000. * SIMULATION_SPEED
-        # if self.action.action_code in [ACTION_TURN]:
-        #     self.simulation_duration = math.fabs(self.command.yaw) * self.action.target_duration / DEFAULT_YAW
-        #     if self.command.yaw < 0:
-        #         self.simulation_rotation_speed = -self.action.rotation_speed_rad
-        # self.simulation_duration *= SIMULATION_TIME_RATIO
-        # self.simulation_rotation_speed *= SIMULATION_TIME_RATIO
 
-        # Initialize all the required fields of the outcome because sometimes simulate is not called
+        # Initialize all the required fields of the outcome because sometimes simulate() is not called
         self.simulated_outcome_dict = {"clock": self.workspace.enaction.clock,
                                        "action": self.workspace.enaction.action.action_code,
                                        "duration1": self.workspace.enaction.command.duration,
@@ -56,24 +48,18 @@ class Simulator:
         if not self.is_simulating:
             return
 
-        # dt *= 2
         # Check whether target time is elapsed
         self.simulation_time += dt
         if self.simulation_time >= self.simulation_duration:
-            dt += self.simulation_duration - self.simulation_time  # Adjust to the exact duration
+            # Adjust to the exact duration
+            dt += self.simulation_duration - self.simulation_time
             self.is_simulating = False
             # The duration1 is the intended duration
             # self.simulated_outcome_dict['duration1'] = self.simulation_duration * 1000
 
-        # The intermediate displacement
+        # The delta displacement
+        translation = enaction.command.speed * dt * SIMULATION_SPEED
         yaw_quaternion = Quaternion.from_z_rotation((self.simulation_rotation_speed * dt))
-        # way = 1
-        # if enaction.action.action_code == ACTION_SWIPE and enaction.command.speed[1] < 0:
-        #     way = -1
-        translation = enaction.command.speed * dt * SIMULATION_SPEED  # * way
-        # yaw_matrix = matrix44.create_from_quaternion(yaw_quaternion)
-        # translation_matrix = matrix44.create_from_translation(-translation)
-        # displacement_matrix = matrix44.multiply(yaw_matrix, translation_matrix)
         displacement_matrix = translation_quaternion_to_matrix(-translation, yaw_quaternion.inverse)
 
         # Simulate the displacement of experiences
@@ -86,33 +72,29 @@ class Simulator:
         if memory.egocentric_memory.prompt_point is not None:
             memory.egocentric_memory.prompt_point = matrix44.apply_to_vector(displacement_matrix,
                                                                              memory.egocentric_memory.prompt_point)
-        # Displacement in body memory
+        # Simulate the rotations in body memory
         memory.body_memory.body_quaternion = memory.body_memory.body_quaternion.cross(yaw_quaternion)
+
+        # Simulate the movement of the head to the focus
         if memory.egocentric_memory.focus_point is not None:
-            # Keep the head aligned to the focus
             head_direction_degree, _ = point_to_echo_direction_distance(memory.egocentric_memory.focus_point)
             head_direction_degree = max(-90, min(head_direction_degree, 90))
             memory.body_memory.set_head_direction_degree(head_direction_degree)
         else:
             head_direction_degree = memory.body_memory.head_direction_degree()
 
-        # Update allocentric memory
+        # Simulate the displacement in allocentric memory
         memory.allocentric_memory.robot_point += memory.body_memory.body_quaternion * Vector3(translation)
 
         # If crossed the line then stop the simulation
         # Must check before marking the place, and terminate to prevent overriding duration1
-        # floor = 0
-        # color_index = 0
-        # self.simulated_outcome_dict['yaw'] = round(
-        #     math.degrees(quaternion_to_direction_rad(enaction.command.intended_yaw_quaternion)))
         if memory.phenomenon_memory.terrain_confidence() < PHENOMENON_RECOGNIZED_CONFIDENCE:
             if enaction.action.action_code in [ACTION_FORWARD, ACTION_SWIPE]:
-                floor_i, floor_j = point_to_cell(memory.allocentric_memory.robot_point +
-                                                 memory.body_memory.body_quaternion * Vector3([ROBOT_FLOOR_SENSOR_X,
-                                                                                               0, 0]))
-                if (memory.allocentric_memory.min_i <= floor_i <= memory.allocentric_memory.max_i) and \
-                        (memory.allocentric_memory.min_j <= floor_j <= memory.allocentric_memory.max_j) and \
-                        memory.allocentric_memory.grid[floor_i][floor_j].status[0] == EXPERIENCE_FLOOR:
+                i, j = point_to_cell(memory.allocentric_memory.robot_point +
+                                     memory.body_memory.body_quaternion * Vector3([ROBOT_FLOOR_SENSOR_X, 0, 0]))
+                if (memory.allocentric_memory.min_i <= i <= memory.allocentric_memory.max_i) and \
+                        (memory.allocentric_memory.min_j <= j <= memory.allocentric_memory.max_j) and \
+                        memory.allocentric_memory.grid[i][j].status[0] == EXPERIENCE_FLOOR:
                     self.is_simulating = False
                     self.simulated_outcome_dict['duration1'] = round(self.simulation_time * 1000)
                     if enaction.action.action_code == ACTION_FORWARD:
@@ -121,12 +103,12 @@ class Simulator:
                         if enaction.command.speed[1] > 0:
                             # Swipe left
                             self.simulated_outcome_dict['floor'] = 2
-                            self.simulated_outcome_dict['yaw'] = 45
+                            self.simulated_outcome_dict['yaw'] = RETREAT_YAW
                         else:
                             # Swipe right
                             self.simulated_outcome_dict['floor'] = 1
-                            self.simulated_outcome_dict['yaw'] = -45
-                    self.simulated_outcome_dict['color_index'] = memory.allocentric_memory.grid[floor_i][floor_j].color_index
+                            self.simulated_outcome_dict['yaw'] = -RETREAT_YAW
+                    self.simulated_outcome_dict['color_index'] = memory.allocentric_memory.grid[i][j].color_index
                 else:
                     self.simulated_outcome_dict['floor'] = 0
         else:
@@ -139,26 +121,19 @@ class Simulator:
             if self.simulation_time * 1000 > enaction.predicted_outcome.duration1:
                 self.is_simulating = False
 
-        # Compute the simulated echo
+        # The echoes predicted from known phenomena
         echoes = [[enaction.predicted_outcome.head_angle, enaction.predicted_outcome.echo_distance]]
-        # for p in [p for p in self.workspace.memory.phenomenon_memory.phenomena.values() if p.phenomenon_type == EXPERIENCE_ALIGNED_ECHO]:
-        #     ego_center_point = self.workspace.memory.allocentric_to_egocentric(p.point)
-        #     a, d = point_to_echo_direction_distance(ego_center_point)
-        #     # Subtract the phenomenon's radius to obtain the egocentric echo distance
-        #     d -= self.workspace.memory.phenomenon_memory.phenomenon_categories[BOX].long_radius
-        #     if d > 0 and enaction.action.action_code == ACTION_SCAN and assert_almost_equal_angles(math.radians(a), 0, 90) or \
-        #             assert_almost_equal_angles(math.radians(a), math.radians(head_direction_degree), 35):
-        #         echoes.append([a, d])
-
-        # Process the cells added by the user
+        # The echoes added by the user
         for ij in memory.allocentric_memory.user_cells:
             cell = memory.allocentric_memory.grid[ij[0]][ij[1]]
             if cell.status[1] == EXPERIENCE_ALIGNED_ECHO:
                 p = cell.point()
                 a, d = point_to_echo_direction_distance(memory.allocentric_to_egocentric(p))
-                if enaction.action.action_code == ACTION_SCAN and assert_almost_equal_angles(math.radians(a), 0, 90) or \
+                if enaction.action.action_code == ACTION_SCAN and \
+                        assert_almost_equal_angles(math.radians(a), 0, 90) or \
                         assert_almost_equal_angles(math.radians(a), math.radians(head_direction_degree), 35):
                     echoes.append([a, d])
+        # The closest echo
         np_echoes = np.array(echoes, dtype=int)
         a, d = np_echoes[np.argmin(np_echoes[:, 1])]
         self.simulated_outcome_dict['head_angle'], self.simulated_outcome_dict['echo_distance'] = int(a), int(d)
