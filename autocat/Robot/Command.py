@@ -45,13 +45,13 @@ class Command:
             if self.action.action_code in [ACTION_TURN_HEAD, ACTION_TURN]:
                 if direction == DIRECTION_BACK:
                     # Turn the back to the prompt
-                    yaw = -math.atan2(prompt_point[1], -prompt_point[0])
+                    yaw_rad = -math.atan2(prompt_point[1], -prompt_point[0])
                 elif direction == DIRECTION_LEFT:
                     # Turn the left side to the prompt (-90°)
-                    yaw = math.atan2(-prompt_point[0], prompt_point[1])
+                    yaw_rad = math.atan2(-prompt_point[0], prompt_point[1])
                 elif direction == DIRECTION_RIGHT:
                     # Turn the right side to the prompt (+90°)
-                    yaw = math.atan2(prompt_point[0], -prompt_point[1])
+                    yaw_rad = math.atan2(prompt_point[0], -prompt_point[1])
                 else:
                     # Turn the front to the prompt
                     yaw_rad = math.atan2(prompt_point[1], prompt_point[0])
@@ -59,10 +59,6 @@ class Command:
                 self.yaw = round(math.degrees(yaw_rad))
 
         # The intended translation
-        # if self.speed[1] >= 0 or self.action.action_code in [ACTION_RIGHTWARD]:
-        #     self.intended_translation = action.translation_speed * self.duration / 1000
-        # else:
-        #     self.intended_translation = - action.translation_speed * self.duration / 1000
         self.intended_translation = self.speed * self.duration / 1000.
 
         # The intended yaw quaternion

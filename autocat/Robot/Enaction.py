@@ -6,8 +6,8 @@ from ..Decider.Action import ACTION_FORWARD, ACTION_TURN, ACTION_SCAN, ACTION_WA
 from ..Decider.Decider import CONFIDENCE_NO_FOCUS, CONFIDENCE_NEW_FOCUS, CONFIDENCE_TOUCHED_FOCUS, \
     CONFIDENCE_CAREFUL_SCAN, CONFIDENCE_CONFIRMED_FOCUS
 from ..Memory.BodyMemory import point_to_echo_direction_distance
-from ..Memory.EgocentricMemory.Experience import EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_FLOOR
-from ..Memory.PhenomenonMemory.PhenomenonMemory import BOX
+# from ..Memory.EgocentricMemory.Experience import EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_FLOOR
+# from ..Memory.PhenomenonMemory.PhenomenonMemory import BOX
 from ..Utils import short_angle, assert_almost_equal_angles, translation_quaternion_to_matrix
 from .RobotDefine import ROBOT_FLOOR_SENSOR_X, ROBOT_CHASSIS_Y, ROBOT_SETTINGS
 from .Command import Command, DIRECTION_FRONT
@@ -36,8 +36,7 @@ class Enaction:
         self.prompt_point = None
         self.focus_point = None
 
-        # predicted_outcome_dict = {"clock": self.clock, "action": self.action.action_code}
-        self.predicted_distance_to_line = None
+        # self.predicted_distance_to_line = None
         self.line_point = None
 
         # The command to the robot
@@ -49,40 +48,44 @@ class Enaction:
         self.command = Command(self.action, self.clock, self.prompt_point, self.focus_point, direction, span,
                                memory.emotion_code, caution)
 
-        # Compute the predicted outcome
-        predicted_outcome_dict = predict_outcome(self.command, memory)
-
         # The predicted memory
         self.predicted_memory = memory.save()
         self.predicted_memory.clock += 1
-        self.predicted_memory.allocentric_memory.move(self.body_quaternion, self.command.intended_translation, self.clock)
-        self.predicted_memory.body_memory.body_quaternion = self.command.intended_yaw_quaternion * self.body_quaternion
-        if memory.egocentric_memory.prompt_point is not None:
-            self.predicted_memory.egocentric_memory.prompt_point = \
-                matrix44.apply_to_vector(self.command.intended_displacement_matrix, self.prompt_point).astype(int)
-        if memory.egocentric_memory.focus_point is not None:
-            self.predicted_memory.egocentric_memory.focus_point = \
-                matrix44.apply_to_vector(self.command.intended_displacement_matrix, self.focus_point).astype(int)
-            a, _ = point_to_echo_direction_distance(self.predicted_memory.egocentric_memory.focus_point)
-            self.predicted_memory.body_memory.head_direction_rad = a
 
-        # Predict the echo outcome from the nearest phenomenon
-        predicted_outcome_dict["head_angle"] = self.predicted_memory.body_memory.head_direction_degree()
-        predicted_outcome_dict["echo_distance"] = 10000
-        for p in [p for p in self.predicted_memory.phenomenon_memory.phenomena.values()
-                  if p.phenomenon_type == EXPERIENCE_ALIGNED_ECHO]:
-            ego_center_point = self.predicted_memory.allocentric_to_egocentric(p.point)
-            a, d = point_to_echo_direction_distance(ego_center_point)
-            # Subtract the phenomenon's radius to obtain the egocentric echo distance
-            d -= self.predicted_memory.phenomenon_memory.phenomenon_categories[BOX].long_radius
-            if d > 0 and self.action.action_code == ACTION_SCAN and assert_almost_equal_angles(math.radians(a), 0, 90) \
-                    or assert_almost_equal_angles(math.radians(a), self.predicted_memory.body_memory.head_direction_rad, 35):
-                predicted_outcome_dict["head_angle"] = round(a)
-                predicted_outcome_dict["echo_distance"] = round(d)
+        # Compute the predicted outcome and the predicted memory
+        self.predicted_outcome = predict_outcome(self.command, self.predicted_memory)
 
-        if "yaw" not in predicted_outcome_dict:
-            predicted_outcome_dict["yaw"] = self.command.yaw
-        self.predicted_outcome = Outcome(predicted_outcome_dict)
+        # The predicted memory
+        # self.predicted_memory = memory.save()
+        # self.predicted_memory.clock += 1
+        # self.predicted_memory.allocentric_memory.move(self.body_quaternion, self.command.intended_translation, self.clock)
+        # self.predicted_memory.body_memory.body_quaternion = self.command.intended_yaw_quaternion * self.body_quaternion
+        # if memory.egocentric_memory.prompt_point is not None:
+        #     self.predicted_memory.egocentric_memory.prompt_point = \
+        #         matrix44.apply_to_vector(self.command.intended_displacement_matrix, self.prompt_point).astype(int)
+        # if memory.egocentric_memory.focus_point is not None:
+        #     self.predicted_memory.egocentric_memory.focus_point = \
+        #         matrix44.apply_to_vector(self.command.intended_displacement_matrix, self.focus_point).astype(int)
+        #     a, _ = point_to_echo_direction_distance(self.predicted_memory.egocentric_memory.focus_point)
+        #     self.predicted_memory.body_memory.head_direction_rad = a
+        #
+        # # Predict the echo outcome from the nearest phenomenon
+        # predicted_outcome_dict["head_angle"] = self.predicted_memory.body_memory.head_direction_degree()
+        # predicted_outcome_dict["echo_distance"] = 10000
+        # for p in [p for p in self.predicted_memory.phenomenon_memory.phenomena.values()
+        #           if p.phenomenon_type == EXPERIENCE_ALIGNED_ECHO]:
+        #     ego_center_point = self.predicted_memory.allocentric_to_egocentric(p.point)
+        #     a, d = point_to_echo_direction_distance(ego_center_point)
+        #     # Subtract the phenomenon's radius to obtain the egocentric echo distance
+        #     d -= self.predicted_memory.phenomenon_memory.phenomenon_categories[BOX].long_radius
+        #     if d > 0 and self.action.action_code == ACTION_SCAN and assert_almost_equal_angles(math.radians(a), 0, 90) \
+        #             or assert_almost_equal_angles(math.radians(a), self.predicted_memory.body_memory.head_direction_rad, 35):
+        #         predicted_outcome_dict["head_angle"] = round(a)
+        #         predicted_outcome_dict["echo_distance"] = round(d)
+        #
+        # if "yaw" not in predicted_outcome_dict:
+        #     predicted_outcome_dict["yaw"] = self.command.yaw
+        # self.predicted_outcome = Outcome(predicted_outcome_dict)
 
         # The outcome
         self.outcome = None
