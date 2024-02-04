@@ -11,12 +11,6 @@ from ...Utils import quaternion_to_azimuth, quaternion_translation_to_matrix, tr
 KEY_OFFSET = 'O'
 
 
-# def quaternion_to_azimuth(body_quaternion):
-#     """Return the azimuth in degree relative to north [0,360["""
-#     body_direction_rad = body_quaternion.axis[2] * body_quaternion.angle
-#     return round((90 - math.degrees(body_direction_rad)) % 360)
-
-
 class CtrlBodyView:
     """Controls the body view"""
     def __init__(self, workspace):
@@ -94,7 +88,7 @@ class CtrlBodyView:
             pose_matrix = translation_quaternion_to_matrix([0, -330, 0], q)
         else:
             # Show the compass south
-            pose_matrix = quaternion_translation_to_matrix(self.workspace.enaction.outcome.compass_quaternion.inverse,
+            pose_matrix = quaternion_translation_to_matrix(self.workspace.enaction.compass_quaternion.inverse,
                                                            self.workspace.enaction.outcome.compass_point)
             self.add_point_of_interest(pose_matrix, POINT_COMPASS)
         self.add_point_of_interest(pose_matrix, POINT_AZIMUTH, self.view.background)
@@ -133,9 +127,9 @@ class CtrlBodyView:
     def body_label_azimuth(self, enaction):
         """Return the label to display in the body view"""
         azimuth = quaternion_to_azimuth(enaction.body_quaternion)
-        if enaction.outcome.compass_quaternion is None:
+        if enaction.compass_quaternion is None:
             return "Azimuth: " + str(azimuth)
         else:
-            compass = quaternion_to_azimuth(enaction.outcome.compass_quaternion)
+            compass = quaternion_to_azimuth(enaction.compass_quaternion)
             return "Azimuth: " + str(azimuth) + ", compass: " + str(compass) + ", delta: " + \
                    "{:.2f}".format(math.degrees(enaction.body_direction_delta))

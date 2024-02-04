@@ -19,7 +19,7 @@ def predict_outcome(command, memory):
 
     # By default, predict the intended duration1, yaw, and floor: 0.
     predicted_outcome = {"clock": command.clock, "action": command.action.action_code, "duration1": command.duration,
-                         "yaw": command.yaw, "floor": 0, "status": "P"}
+                         "yaw": command.yaw, "floor": 0}
 
     # If terrain is recognized, adjust the floor, duration1, and yaw outcome
     if memory.phenomenon_memory.terrain_confidence() >= PHENOMENON_RECOGNIZED_CONFIDENCE:

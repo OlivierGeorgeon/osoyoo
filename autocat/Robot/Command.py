@@ -58,15 +58,15 @@ class Command:
                 self.duration = abs(round(1000. * yaw_rad / self.action.rotation_speed_rad))
                 self.yaw = round(math.degrees(yaw_rad))
 
-        # The intended translation
-        self.intended_translation = self.speed * self.duration / 1000.
-
-        # The intended yaw quaternion
-        self.intended_yaw_quaternion = Quaternion.from_z_rotation(math.radians(self.yaw))
-
-        # The intended matrix of the environment's displacement relative to the robot
-        self.intended_displacement_matrix = translation_quaternion_to_matrix(-self.intended_translation,
-                                                                             self.intended_yaw_quaternion.inverse)
+        # # The intended translation
+        # self.intended_translation = self.speed * self.duration / 1000.
+        #
+        # # The intended yaw quaternion
+        # self.intended_yaw_quaternion = Quaternion.from_z_rotation(math.radians(self.yaw))
+        #
+        # # The intended matrix of the environment's displacement relative to the robot
+        # self.intended_displacement_matrix = translation_quaternion_to_matrix(-self.intended_translation,
+        #                                                                      self.intended_yaw_quaternion.inverse)
 
     def serialize(self):
         """Return the json string to send to the robot"""

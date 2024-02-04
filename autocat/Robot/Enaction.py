@@ -1,17 +1,15 @@
 import math
 import numpy as np
-from pyrr import matrix44, Vector3
+from pyrr import matrix44, Vector3, Quaternion
 from playsound import playsound
 from ..Decider.Action import ACTION_FORWARD, ACTION_TURN, ACTION_SCAN, ACTION_WATCH
 from ..Decider.Decider import CONFIDENCE_NO_FOCUS, CONFIDENCE_NEW_FOCUS, CONFIDENCE_TOUCHED_FOCUS, \
     CONFIDENCE_CAREFUL_SCAN, CONFIDENCE_CONFIRMED_FOCUS
 from ..Memory.BodyMemory import point_to_echo_direction_distance
-# from ..Memory.EgocentricMemory.Experience import EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_FLOOR
-# from ..Memory.PhenomenonMemory.PhenomenonMemory import BOX
-from ..Utils import short_angle, assert_almost_equal_angles, translation_quaternion_to_matrix
+from ..Utils import short_angle, translation_quaternion_to_matrix
 from .RobotDefine import ROBOT_FLOOR_SENSOR_X, ROBOT_CHASSIS_Y, ROBOT_SETTINGS
 from .Command import Command, DIRECTION_FRONT
-from .Outcome import Outcome, echo_point
+from .Outcome import echo_point
 from ..Enaction.Predict import predict_outcome
 
 
@@ -30,21 +28,19 @@ class Enaction:
         # The initial arguments
         self.action = action
         self.robot_id = memory.robot_id
-
-        # the attributes that will be adjusted
         self.clock = memory.clock
-        self.prompt_point = None
-        self.focus_point = None
+        self.compass_offset = memory.body_memory.compass_offset
 
-        # self.predicted_distance_to_line = None
-        self.line_point = None
-
-        # The command to the robot
+        # Copy spatial modifiers
         self.body_quaternion = memory.body_memory.body_quaternion.copy()
+        self.prompt_point = None
         if memory.egocentric_memory.prompt_point is not None:
             self.prompt_point = memory.egocentric_memory.prompt_point.copy()
+        self.focus_point = None
         if memory.egocentric_memory.focus_point is not None:
             self.focus_point = memory.egocentric_memory.focus_point.copy()
+
+        # The command to the robot
         self.command = Command(self.action, self.clock, self.prompt_point, self.focus_point, direction, span,
                                memory.emotion_code, caution)
 
@@ -55,51 +51,24 @@ class Enaction:
         # Compute the predicted outcome and the predicted memory
         self.predicted_outcome = predict_outcome(self.command, self.predicted_memory)
 
-        # The predicted memory
-        # self.predicted_memory = memory.save()
-        # self.predicted_memory.clock += 1
-        # self.predicted_memory.allocentric_memory.move(self.body_quaternion, self.command.intended_translation, self.clock)
-        # self.predicted_memory.body_memory.body_quaternion = self.command.intended_yaw_quaternion * self.body_quaternion
-        # if memory.egocentric_memory.prompt_point is not None:
-        #     self.predicted_memory.egocentric_memory.prompt_point = \
-        #         matrix44.apply_to_vector(self.command.intended_displacement_matrix, self.prompt_point).astype(int)
-        # if memory.egocentric_memory.focus_point is not None:
-        #     self.predicted_memory.egocentric_memory.focus_point = \
-        #         matrix44.apply_to_vector(self.command.intended_displacement_matrix, self.focus_point).astype(int)
-        #     a, _ = point_to_echo_direction_distance(self.predicted_memory.egocentric_memory.focus_point)
-        #     self.predicted_memory.body_memory.head_direction_rad = a
-        #
-        # # Predict the echo outcome from the nearest phenomenon
-        # predicted_outcome_dict["head_angle"] = self.predicted_memory.body_memory.head_direction_degree()
-        # predicted_outcome_dict["echo_distance"] = 10000
-        # for p in [p for p in self.predicted_memory.phenomenon_memory.phenomena.values()
-        #           if p.phenomenon_type == EXPERIENCE_ALIGNED_ECHO]:
-        #     ego_center_point = self.predicted_memory.allocentric_to_egocentric(p.point)
-        #     a, d = point_to_echo_direction_distance(ego_center_point)
-        #     # Subtract the phenomenon's radius to obtain the egocentric echo distance
-        #     d -= self.predicted_memory.phenomenon_memory.phenomenon_categories[BOX].long_radius
-        #     if d > 0 and self.action.action_code == ACTION_SCAN and assert_almost_equal_angles(math.radians(a), 0, 90) \
-        #             or assert_almost_equal_angles(math.radians(a), self.predicted_memory.body_memory.head_direction_rad, 35):
-        #         predicted_outcome_dict["head_angle"] = round(a)
-        #         predicted_outcome_dict["echo_distance"] = round(d)
-        #
-        # if "yaw" not in predicted_outcome_dict:
-        #     predicted_outcome_dict["yaw"] = self.command.yaw
-        # self.predicted_outcome = Outcome(predicted_outcome_dict)
-
         # The outcome
         self.outcome = None
         self.body_direction_delta = 0  # Displayed in BodyView
         self.focus_confidence = CONFIDENCE_NO_FOCUS  # Used by deciders to possibly trigger scan
-        self.translation = self.command.intended_translation.copy()  # Used by allocentric memory to move the robot
+        # self.translation = self.command.intended_translation.copy()  # Used by allocentric memory to move the robot
+        self.translation = None  # Used by allocentric memory to move the robot
         self.yaw_quaternion = None  # Used to compute yaw prediction error
+        self.compass_quaternion = None  # Include the compass offset correction
         self.yaw_matrix = None  # Used by bodyView to rotate compass points
         self.displacement_matrix = None  # Used by EgocentricMemory to rotate experiences
+        self.line_point = None
 
         # The message received from other robot
         self.message = None
-        self.message_sent = False  # Message sent to other robots
+        # Message sent to other robots
+        self.message_sent = False
 
+        # Prediction error
         self.focus_direction_prediction_error = 0
         self.focus_distance_prediction_error = 0
 
@@ -123,41 +92,56 @@ class Enaction:
         self.translation = self.command.speed * self.outcome.duration1 / 1000
 
         # The yaw quaternion
-        if outcome.yaw_quaternion is None:
-            self.yaw_quaternion = self.command.intended_yaw_quaternion.copy()
+        # if outcome.yaw_quaternion is None:
+        #     self.yaw_quaternion = self.command.intended_yaw_quaternion.copy()
+        # else:
+        #     self.yaw_quaternion = outcome.yaw_quaternion
+        if outcome.yaw is None:
+            # If the yaw is not measured then use predicted yaw TODO use the measured floor
+            self.yaw_quaternion = Quaternion.from_z_rotation(math.radians(self.predicted_outcome.yaw))
         else:
-            self.yaw_quaternion = outcome.yaw_quaternion
-        yaw_integration_quaternion = self.body_quaternion.cross(self.yaw_quaternion)
-        corrected_yaw_quaternion = self.yaw_quaternion
+            self.yaw_quaternion = Quaternion.from_z_rotation(math.radians(self.outcome.yaw))
+
+        # The new body quaternion computed by integrating the yaw
+        body_quaternion_integrated = self.body_quaternion.cross(self.yaw_quaternion)
+
         # If the robot returns no compass then the body_quaternion is estimated from yaw
+        # corrected_yaw_quaternion = self.yaw_quaternion
         if outcome.compass_point is None:
-            self.body_quaternion = yaw_integration_quaternion
+            self.body_quaternion = body_quaternion_integrated
         else:
+            # If the robot returns compass
+            # Compute the compass_quaternion. Subtract the offset from robot_define.py
+            self.outcome.compass_point -= self.compass_offset
+            # The compass point indicates the south so we must take the opposite and rotate by pi/2
+            body_direction_rad = math.atan2(-self.outcome.compass_point[0], -self.outcome.compass_point[1])
+            self.compass_quaternion = Quaternion.from_z_rotation(body_direction_rad)
+
             if self.clock == 0:
                 # On the first interaction, the body_quaternion is given by the compass
-                self.body_quaternion = self.outcome.compass_quaternion
+                self.body_quaternion = self.compass_quaternion
             else:
                 # After the first interaction, the body_quaternion is averaged of the compass and the yaw integration
-                if self.outcome.compass_quaternion.dot(yaw_integration_quaternion) < 0.0:
-                    yaw_integration_quaternion = - yaw_integration_quaternion
+                if self.compass_quaternion.dot(body_quaternion_integrated) < 0.0:
+                    body_quaternion_integrated = - body_quaternion_integrated
 
                 # Save the difference to display in BodyView
-                self.body_direction_delta = short_angle(self.outcome.compass_quaternion, yaw_integration_quaternion)
+                self.body_direction_delta = short_angle(self.compass_quaternion, body_quaternion_integrated)
                 # If positive when turning trigonometric direction then the yaw is measured greater than it is
 
                 # Take the median angle between the compass and the yaw estimate
                 # 0 is compass only, 1 is yaw estimate only
                 # This is known as a complementary filter
                 # https://forum.arduino.cc/t/guide-to-gyro-and-accelerometer-with-arduino-including-kalman-filtering/57971
-                new_body_quaternion = self.outcome.compass_quaternion.slerp(yaw_integration_quaternion, 0.75)
+                body_quaternion_corrected = self.compass_quaternion.slerp(body_quaternion_integrated, 0.75)
 
                 # Recompute the yaw quaternion
-                corrected_yaw_quaternion = new_body_quaternion.cross(self.body_quaternion.inverse)
-                if corrected_yaw_quaternion.angle > math.pi:
-                    corrected_yaw_quaternion = -corrected_yaw_quaternion
+                self.yaw_quaternion = body_quaternion_corrected.cross(self.body_quaternion.inverse)
+                if self.yaw_quaternion.angle > math.pi:
+                    self.yaw_quaternion = -self.yaw_quaternion
 
                 # Update the body_quaternion
-                self.body_quaternion = new_body_quaternion
+                self.body_quaternion = body_quaternion_corrected
 
         # The retreat distance
         if self.outcome.floor > 0:
@@ -171,8 +155,8 @@ class Enaction:
 
         # Compute the displacement matrix which represents the displacement of the environment
         # relative to the robot (Translates and turns in the opposite direction)
-        self.yaw_matrix = matrix44.create_from_quaternion(corrected_yaw_quaternion)
-        self.displacement_matrix = translation_quaternion_to_matrix(-self.translation, corrected_yaw_quaternion.inverse)
+        self.yaw_matrix = matrix44.create_from_quaternion(self.yaw_quaternion)
+        self.displacement_matrix = translation_quaternion_to_matrix(-self.translation, self.yaw_quaternion.inverse)
 
         # The focus --------
 

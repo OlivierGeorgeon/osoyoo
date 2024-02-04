@@ -81,19 +81,17 @@ class CtrlRobot:
         # Process the outcome
         outcome = Outcome(outcome_dict)
 
-        # Compute the compass_quaternion
-        if outcome.compass_point is not None:
-            # Subtract the offset from robot_define.py
-            outcome.compass_point -= self.workspace.memory.body_memory.compass_offset
-            # The compass point indicates the south so we must take the opposite and rotate by pi/2
-            body_direction_rad = math.atan2(-outcome.compass_point[0], -outcome.compass_point[1])
-            outcome.compass_quaternion = Quaternion.from_z_rotation(body_direction_rad)
-
+        # # Compute the compass_quaternion
+        # if outcome.compass_point is not None:
+        #     # Subtract the offset from robot_define.py
+        #     outcome.compass_point -= self.workspace.memory.body_memory.compass_offset
+        #     # The compass point indicates the south so we must take the opposite and rotate by pi/2
+        #     body_direction_rad = math.atan2(-outcome.compass_point[0], -outcome.compass_point[1])
+        #     outcome.compass_quaternion = Quaternion.from_z_rotation(body_direction_rad)
+        #
         # Terminate the enaction
         self.workspace.enaction.terminate(outcome)
         # If the composite enaction is over or aborted due to floor or impact
         if not self.workspace.composite_enaction.increment(outcome) or outcome.floor > 0 or outcome.impact > 0:
             self.workspace.composite_enaction = None
-        # else:
-        #     self.workspace.composite_enaction.current_enaction().body_quaternion = self.workspace.enaction.body_quaternion.copy()
         self.workspace.enacter.interaction_step = ENACTION_STEP_INTEGRATING

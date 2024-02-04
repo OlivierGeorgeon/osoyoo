@@ -35,9 +35,10 @@ class Simulator:
                                        "action": self.workspace.enaction.action.action_code,
                                        "duration1": self.workspace.enaction.command.duration,
                                        "head_angle": self.workspace.enaction.predicted_outcome.head_angle,
-                                       "echo_distance": self.workspace.enaction.predicted_outcome.echo_distance,
-                                       "yaw": self.workspace.enaction.command.yaw,
-                                       "floor": 0, "color_index": 0, "status": "S"}
+                                       # "echo_distance": self.workspace.enaction.predicted_outcome.echo_distance,
+                                       # "yaw": self.workspace.enaction.command.yaw,
+                                       # "floor": 0, "color_index": 0,"status": "S"
+                                       }
 
     def simulate(self, dt):
         """Simulate the enaction in the current memory"""
