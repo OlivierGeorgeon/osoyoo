@@ -28,7 +28,7 @@ class Memory:
         self.robot_id = robot_id
         self.clock = 0
         self.body_memory = BodyMemory(robot_id)
-        self.egocentric_memory = EgocentricMemory()
+        self.egocentric_memory = EgocentricMemory(robot_id)
         self.allocentric_memory = AllocentricMemory(GRID_WIDTH, GRID_HEIGHT, cell_radius=CELL_RADIUS)
         self.phenomenon_memory = PhenomenonMemory(arena_id)
         self.emotion_code = EMOTION_RELAXED
@@ -94,12 +94,12 @@ class Memory:
         - Add new experiences in egocentric_memory
         - Move the robot in allocentric_memory
         """
-        self.egocentric_memory.focus_point = enaction.focus_point
-        self.egocentric_memory.prompt_point = enaction.prompt_point
+        self.egocentric_memory.focus_point = enaction.trajectory.focus_point
+        self.egocentric_memory.prompt_point = enaction.trajectory.prompt_point
 
         # Translate the robot before applying the yaw
         # print("Robot relative translation", enaction.translation)
-        self.allocentric_memory.move(self.body_memory.body_quaternion, enaction.translation, enaction.clock)
+        self.allocentric_memory.move(self.body_memory.body_quaternion, enaction.trajectory.translation, enaction.clock)
         self.body_memory.update(enaction)
 
         self.egocentric_memory.update_and_add_experiences(enaction)

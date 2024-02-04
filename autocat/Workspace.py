@@ -171,8 +171,8 @@ class Workspace:
             # message['destination'] = destination_point.astype(int).tolist()
 
             # The focus point
-            if self.enaction.focus_point is not None:
-                focus_point = self.memory.egocentric_to_polar_egocentric(self.enaction.focus_point)
+            if self.enaction.trajectory.focus_point is not None:
+                focus_point = self.memory.egocentric_to_polar_egocentric(self.enaction.trajectory.focus_point)
                 message['focus'] = focus_point.astype(int).tolist()
 
             # Mark the message for this enaction sent

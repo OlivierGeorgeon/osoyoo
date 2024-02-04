@@ -79,7 +79,7 @@ class CtrlBodyView:
         # yaw = self.workspace.intended_enaction.yaw
         # displacement_matrix = matrix44.create_from_z_rotation(math.radians(yaw))
         for poi in [p for p in self.points_of_interest if p.type == POINT_COMPASS]:
-            poi.displace(self.workspace.enaction.yaw_matrix)
+            poi.displace(self.workspace.enaction.trajectory.yaw_matrix)
 
         # Add the new points that indicate the south relative to the robot
         if self.workspace.enaction.outcome.compass_point is None:
@@ -88,7 +88,7 @@ class CtrlBodyView:
             pose_matrix = translation_quaternion_to_matrix([0, -330, 0], q)
         else:
             # Show the compass south
-            pose_matrix = quaternion_translation_to_matrix(self.workspace.enaction.compass_quaternion.inverse,
+            pose_matrix = quaternion_translation_to_matrix(self.workspace.enaction.trajectory.compass_quaternion.inverse,
                                                            self.workspace.enaction.outcome.compass_point)
             self.add_point_of_interest(pose_matrix, POINT_COMPASS)
         self.add_point_of_interest(pose_matrix, POINT_AZIMUTH, self.view.background)
@@ -126,10 +126,10 @@ class CtrlBodyView:
 
     def body_label_azimuth(self, enaction):
         """Return the label to display in the body view"""
-        azimuth = quaternion_to_azimuth(enaction.body_quaternion)
-        if enaction.compass_quaternion is None:
+        azimuth = quaternion_to_azimuth(enaction.trajectory.body_quaternion)
+        if enaction.trajectory.compass_quaternion is None:
             return "Azimuth: " + str(azimuth)
         else:
-            compass = quaternion_to_azimuth(enaction.compass_quaternion)
+            compass = quaternion_to_azimuth(enaction.trajectory.compass_quaternion)
             return "Azimuth: " + str(azimuth) + ", compass: " + str(compass) + ", delta: " + \
-                   "{:.2f}".format(math.degrees(enaction.body_direction_delta))
+                   "{:.2f}".format(math.degrees(enaction.trajectory.body_direction_delta))

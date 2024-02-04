@@ -49,20 +49,20 @@ class Decider:
             return outcome
 
         # If there is a focus point, compute the focus outcome (focus may come from echo or from impact)
-        if enaction.focus_point is not None:
-            focus_radius = np.linalg.norm(enaction.focus_point)  # From the center of the robot
+        if enaction.trajectory.focus_point is not None:
+            focus_radius = np.linalg.norm(enaction.trajectory.focus_point)  # From the center of the robot
             # If focus is TOO FAR then DeciderCircle won't go after it
             if focus_radius > FOCUS_TOO_FAR_DISTANCE:  # self.too_far:  # Different for DeciderCircle or DeciderWatch
                 outcome = OUTCOME_FOCUS_TOO_FAR
             # If the terrain is confident and the focus is outside then it is considered TOO FAR
-            elif self.workspace.memory.is_outside_terrain(enaction.focus_point):
+            elif self.workspace.memory.is_outside_terrain(enaction.trajectory.focus_point):
                 outcome = OUTCOME_FOCUS_TOO_FAR
             # Focus FAR: DeciderCircle will move closer
             elif focus_radius > FOCUS_FAR_DISTANCE:
                 outcome = OUTCOME_FOCUS_FAR
             # Not TOO CLOSE and not TOO FAR: check if its on the SIDE
             elif focus_radius > FOCUS_TOO_CLOSE_DISTANCE:
-                focus_theta = math.atan2(enaction.focus_point[1], enaction.focus_point[0])
+                focus_theta = math.atan2(enaction.trajectory.focus_point[1], enaction.trajectory.focus_point[0])
                 if math.fabs(focus_theta) < FOCUS_SIDE_ANGLE:
                     outcome = OUTCOME_FOCUS_FRONT
                 else:
@@ -72,7 +72,7 @@ class Decider:
                 outcome = OUTCOME_FOCUS_TOO_CLOSE
 
         # LOST FOCUS: DeciderCircle and DeciderArrange will scan again
-        if enaction.focus_confidence <= CONFIDENCE_NEW_FOCUS:  # enaction.lost_focus:
+        if enaction.trajectory.focus_confidence <= CONFIDENCE_NEW_FOCUS:  # enaction.lost_focus:
             outcome = OUTCOME_LOST_FOCUS
 
         # If TOUCH then override the focus outcome

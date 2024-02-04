@@ -1,8 +1,6 @@
 import json
 import time
 import socket
-import math
-from pyrr import Quaternion
 from .RobotDefine import ROBOT_SETTINGS
 from .Outcome import Outcome
 
@@ -53,7 +51,10 @@ class CtrlRobot:
                     if len(outcome_string) > 100:
                         outcome_dict = json.loads(outcome_string)
                         if outcome_dict['clock'] == self.workspace.enaction.clock:
-                            self.terminate_enaction(outcome_dict)
+                            # Terminate the enaction
+                            self.workspace.enaction.terminate(Outcome(outcome_dict))
+                            self.workspace.enacter.interaction_step = ENACTION_STEP_INTEGRATING
+                            # self.terminate_enaction(outcome_dict)
                         else:
                             # Sometimes the previous outcome was received after the time out and we find it here
                             print("Received outcome does not match current enaction")
@@ -66,7 +67,6 @@ class CtrlRobot:
     def send_command_to_robot(self):
         """Send the enaction string to the robot and set the timeout"""
         enaction_string = self.workspace.enaction.command.serialize()
-        # enaction_string = self.workspace.enaction.serialize()
         # print("Sending:", enaction_string)
 
         # Send the intended interaction string to the robot
@@ -75,23 +75,15 @@ class CtrlRobot:
         # Initialize the timeout
         self.expected_outcome_time = time.time() + self.workspace.enaction.command.timeout()
 
-    def terminate_enaction(self, outcome_dict):
-        """ Terminate the enaction using the outcome received from the robot."""
-
-        # Process the outcome
-        outcome = Outcome(outcome_dict)
-
-        # # Compute the compass_quaternion
-        # if outcome.compass_point is not None:
-        #     # Subtract the offset from robot_define.py
-        #     outcome.compass_point -= self.workspace.memory.body_memory.compass_offset
-        #     # The compass point indicates the south so we must take the opposite and rotate by pi/2
-        #     body_direction_rad = math.atan2(-outcome.compass_point[0], -outcome.compass_point[1])
-        #     outcome.compass_quaternion = Quaternion.from_z_rotation(body_direction_rad)
-        #
-        # Terminate the enaction
-        self.workspace.enaction.terminate(outcome)
-        # If the composite enaction is over or aborted due to floor or impact
-        if not self.workspace.composite_enaction.increment(outcome) or outcome.floor > 0 or outcome.impact > 0:
-            self.workspace.composite_enaction = None
-        self.workspace.enacter.interaction_step = ENACTION_STEP_INTEGRATING
+    # def terminate_enaction(self, outcome_dict):
+    #     """ Terminate the enaction using the outcome received from the robot."""
+    #
+    #     # Process the outcome
+    #     outcome = Outcome(outcome_dict)
+    #
+    #     # Terminate the enaction
+    #     self.workspace.enaction.terminate(outcome)
+    #     # If the composite enaction is over or aborted due to floor or impact
+    #     if not self.workspace.composite_enaction.increment(outcome) or outcome.floor > 0 or outcome.impact > 0:
+    #         self.workspace.composite_enaction = None
+    #     self.workspace.enacter.interaction_step = ENACTION_STEP_INTEGRATING

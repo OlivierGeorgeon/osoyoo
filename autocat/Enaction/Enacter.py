@@ -38,8 +38,8 @@ class Enacter:
             if self.workspace.is_imagining and not self.workspace.simulator.is_simulating:
                 simulated_outcome = self.workspace.simulator.end()
                 self.workspace.enaction.terminate(simulated_outcome)
-                if not self.workspace.composite_enaction.increment(simulated_outcome):
-                    self.workspace.composite_enaction = None
+                # if not self.workspace.composite_enaction.increment(simulated_outcome):
+                #     self.workspace.composite_enaction = None
                 self.interaction_step = ENACTION_STEP_INTEGRATING
             # If not imagining then CtrlRobot will terminate the enaction and proceed to INTEGRATING
 
@@ -63,5 +63,8 @@ class Enacter:
             if self.workspace.enaction.clock >= self.workspace.memory.clock:  # don't increment if the robot is behind
                 self.workspace.memory.clock += 1
             self.interaction_step = ENACTION_STEP_REFRESHING
+            # If the composite enaction is over or aborted due to floor or impact
+            if not self.workspace.composite_enaction.increment():  # or outcome.floor > 0 or outcome.impact > 0:
+                self.workspace.composite_enaction = None
 
         # REFRESHING: Will be reset to IDLE in the next cycle

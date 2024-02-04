@@ -1,6 +1,7 @@
 
 
 class CompositeEnaction:
+    """A composite enaction is a series of promitive interactions"""
     def __init__(self, enactions):
         self.enactions = enactions
         self.index = 0
@@ -10,14 +11,13 @@ class CompositeEnaction:
         assert self.index < len(self.enactions)
         return self.enactions[self.index]
 
-    def increment(self, outcome):
+    def increment(self):
         """Move on to the next interaction or return False if end"""
-        # If the enaction failed then abort
-        # if outcome.impact > 0:
-        #     return False
+        # If the primitive enaction failed then abort
+        if not self.enactions[self.index].succeed():
+            return False
         self.index += 1
         # If no more enactions then return False
         if self.index >= len(self.enactions):
             return False
-
         return True

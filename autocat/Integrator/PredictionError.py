@@ -67,7 +67,7 @@ class PredictionError:
 
         # pe = math.degrees(-short_angle(enaction.command.intended_yaw_quaternion, enaction.yaw_quaternion))
         pe = math.degrees(-short_angle(Quaternion.from_z_rotation(math.radians(computed_outcome.yaw)),
-                                       enaction.yaw_quaternion))
+                                       enaction.trajectory.yaw_quaternion))
         self.yaw[enaction.clock] = pe
         self.yaw.pop(enaction.clock - PREDICTION_ERROR_WINDOW, None)
         print("Prediction Error Yaw (command - measure)=", round(pe, 1),
@@ -76,7 +76,7 @@ class PredictionError:
 
         # Compass prediction error
 
-        self.compass[enaction.clock] = math.degrees(enaction.body_direction_delta)
+        self.compass[enaction.clock] = math.degrees(enaction.trajectory.body_direction_delta)
         self.compass.pop(actual_outcome.clock - PREDICTION_ERROR_WINDOW, None)
         print("Prediction Error Compass (integrated direction - compass measure)=",
               round(self.compass[enaction.clock], 2), "Average:",
@@ -85,17 +85,17 @@ class PredictionError:
 
         # If focus is confident then track its prediction error
 
-        if enaction.focus_confidence >= CONFIDENCE_CONFIRMED_FOCUS:
-            self.focus_direction[actual_outcome.clock] = enaction.focus_direction_prediction_error
+        if enaction.trajectory.focus_confidence >= CONFIDENCE_CONFIRMED_FOCUS:
+            self.focus_direction[actual_outcome.clock] = enaction.trajectory.focus_direction_prediction_error
             self.focus_direction.pop(actual_outcome.clock - PREDICTION_ERROR_WINDOW, None)
             print("Prediction Error Focus direction (integration - measure)=",
-                  enaction.focus_direction_prediction_error,
+                  enaction.trajectory.focus_direction_prediction_error,
                   "Average:", round(float(np.mean(list(self.focus_direction.values())))),
                   "std:", round(float(np.std(list(self.focus_direction.values())))))
-            self.focus_distance[enaction.clock] = enaction.focus_distance_prediction_error
+            self.focus_distance[enaction.clock] = enaction.trajectory.focus_distance_prediction_error
             self.focus_distance.pop(enaction.clock - PREDICTION_ERROR_WINDOW, None)
             print("Prediction Error Focus distance (integration - measure)=",
-                  enaction.focus_distance_prediction_error,
+                  enaction.trajectory.focus_distance_prediction_error,
                   "Average:", round(float(np.mean(list(self.focus_distance.values())))),
                   "std:", round(float(np.std(list(self.focus_distance.values())))))
 
