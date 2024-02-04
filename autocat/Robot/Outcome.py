@@ -176,6 +176,7 @@ class Outcome:
         self.echo_matrix = None
         self.echo_distance = 10000
         if 'echo_distance' in outcome_dict and outcome_dict['echo_distance'] < 10000:
+            self.echo_distance = outcome_dict['echo_distance']
             self.echo_matrix = echo_matrix(outcome_dict['head_angle'], outcome_dict['echo_distance'])
             self.echo_point = matrix44.apply_to_vector(self.echo_matrix, [0, 0, 0])
 

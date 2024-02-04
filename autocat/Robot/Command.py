@@ -1,10 +1,8 @@
 import json
 import math
-from pyrr import Quaternion
 from ..Decider.Action import ACTION_FORWARD, ACTION_BACKWARD, ACTION_SWIPE, ACTION_RIGHTWARD, ACTION_TURN, \
     ACTION_TURN_HEAD
 from .RobotDefine import DEFAULT_ACTION_DURATION
-from ..Utils import translation_quaternion_to_matrix
 
 ENACTION_MIN_TIMEOUT = 2.  # Seconds
 DIRECTION_FRONT = 0  # Direction code to go to turn to the prompt
@@ -57,16 +55,6 @@ class Command:
                     yaw_rad = math.atan2(prompt_point[1], prompt_point[0])
                 self.duration = abs(round(1000. * yaw_rad / self.action.rotation_speed_rad))
                 self.yaw = round(math.degrees(yaw_rad))
-
-        # # The intended translation
-        # self.intended_translation = self.speed * self.duration / 1000.
-        #
-        # # The intended yaw quaternion
-        # self.intended_yaw_quaternion = Quaternion.from_z_rotation(math.radians(self.yaw))
-        #
-        # # The intended matrix of the environment's displacement relative to the robot
-        # self.intended_displacement_matrix = translation_quaternion_to_matrix(-self.intended_translation,
-        #                                                                      self.intended_yaw_quaternion.inverse)
 
     def serialize(self):
         """Return the json string to send to the robot"""

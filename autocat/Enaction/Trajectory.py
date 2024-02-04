@@ -23,14 +23,8 @@ class Trajectory:
         self.robot_id = memory.robot_id
         self.compass_offset = memory.body_memory.compass_offset
 
+        # Track the displacement
         self.body_quaternion = memory.body_memory.body_quaternion.copy()
-        self.prompt_point = None
-        if memory.egocentric_memory.prompt_point is not None:
-            self.prompt_point = memory.egocentric_memory.prompt_point.copy()
-        self.focus_point = None
-        if memory.egocentric_memory.focus_point is not None:
-            self.focus_point = memory.egocentric_memory.focus_point.copy()
-
         self.body_direction_delta = 0  # Displayed in BodyView
         self.focus_confidence = CONFIDENCE_NO_FOCUS  # Used by deciders to possibly trigger scan
         self.translation = None  # Used by allocentric memory to move the robot
@@ -41,8 +35,16 @@ class Trajectory:
         self.focus_direction_prediction_error = 0
         self.focus_distance_prediction_error = 0
 
-    def terminate(self, outcome):
-        """Compute the elapsed trajectory from the outcome"""
+        # Track the focus
+        self.prompt_point = None
+        if memory.egocentric_memory.prompt_point is not None:
+            self.prompt_point = memory.egocentric_memory.prompt_point.copy()
+        self.focus_point = None
+        if memory.egocentric_memory.focus_point is not None:
+            self.focus_point = memory.egocentric_memory.focus_point.copy()
+
+    def track_displacement(self, outcome):
+        """Compute the displacement from the duration1, yaw, floor, impact"""
         # The displacement --------
 
         # Translation integrated from the action's speed multiplied by the duration1
@@ -100,7 +102,7 @@ class Trajectory:
             front_point = Vector3([ROBOT_FLOOR_SENSOR_X, 0, 0])
             line_point = front_point + Vector3([ROBOT_SETTINGS[self.robot_id]["retreat_distance"], 0, 0])
             self.translation += front_point - self.yaw_quaternion * line_point
-            playsound('autocat/Assets/cyberpunk3.wav', False)
+            # playsound('autocat/Assets/cyberpunk3.wav', False)
 
         if outcome.blocked:
             self.translation = np.array([0, 0, 0], dtype=int)
@@ -110,6 +112,8 @@ class Trajectory:
         self.yaw_matrix = matrix44.create_from_quaternion(self.yaw_quaternion)
         self.displacement_matrix = translation_quaternion_to_matrix(-self.translation, self.yaw_quaternion.inverse)
 
+    def track_focus(self, outcome):
+        """Track the focus"""
         # The focus --------
 
         # If careful watch then the focus is the first central_echo
