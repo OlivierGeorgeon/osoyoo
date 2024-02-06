@@ -33,7 +33,7 @@ In terms of monetary cost expect to spend about US$200 on the project (I know th
 
 In terms of your required electronics expertise, very little is needed if everything gets assembled correctly and all parts are working. If you want to modify the design, if there is more advanced troubleshooting, then of course more is better.
 
-In terms of your required software expertise, only a minimal amount is needed to make the robot work. For example, you need to be comfortable moving around files and running Python code. The Arduino IDE and code you can install and copy without great expertise. Of course, if you have the time, you can spend more hours getting more expertise in the Arduino ecosystem. As well, you will need more expertise in Python if you want to use the robot car for your own research project.
+In terms of your required software expertise, only a minimal amount is needed to make the robot work. For example, you need to be comfortable moving around files and running Python code. The Arduino IDE and code you can install and copy without great expertise (I will show you how below). Of course, if you have the time, you can spend more hours getting more expertise in the Arduino ecosystem. As well, you will need more expertise in Python if you want to use the robot car for your own research project.
 
 
 **Step #2 -- Purchase the Robot Car kit**
@@ -48,7 +48,7 @@ There are two purchases to consider:
 In this section we will talk about purchasing the Robot Car kit.
 Although I am in Canada, and although the business office representing Osoyoo is actually based in Canada (however the robot kit parts are manufactured in Asia), it is much easier to order from the USA Amazon website:
 
-Product title: OSOYOO Omni-directinal Mecanum Wheels Robotic Car Kit for Arduino Mega2560 Metal Chassis DC Motor DIY STEM Remote Controlled Educational Mechanical DIY Coding for Teens Adult
+Product title: OSOYOO Omni-directional Mecanum Wheels Robotic Car Kit for Arduino Mega2560 Metal Chassis DC Motor DIY STEM Remote Controlled Educational Mechanical DIY Coding for Teens Adult
 Product cost (at time of writing):  US$119.99   (plus about $25 to ship to Canada, but free shipping within USA if you have Prime)
 link:  [amazon product link](https://www.amazon.com/OSOYOO-Omni-directinal-Controlled-Educational-Mechanical/dp/B0821DV5GJ/ref=sr_1_2?crid=1S643UFKFPI0E&keywords=osoyoo+omni+directional+mecanum+wheels+robot+car+kit+for+arduino&qid=1703129510&sprefix=osoyoo+omni-direction%2Caps%2C97&sr=8-2)
 
@@ -59,7 +59,7 @@ Troubleshooting note:  If you are able to allocate sufficient research funds, I 
 In countries outside of Canada and USA, I would still recommend considering Amazon for easy delivery in certain countries where the Amazon service is efficient. In other countries consider the Osoyoo website:
 [osoyoo website](https://osoyoo.com/)
 
-Note: The Amazon website says this is a kit for teens while the Osoyoo website shows 5 years old building robotic kits (albeit simpler ones). Please keep in mind you are not buying this kit to produce a project for your high school science fair. You are buying this kit to have a grounded physical embodiment of an AI/AGI system which you then can use with tens of thousands lines of your Python code.
+Note: The Amazon website says this is a kit for teens while the Osoyoo website shows 5 years old building robotic kits (albeit simpler ones). Please keep in mind you are not buying this kit to produce a project for your high school science fair. You are buying this kit to have a grounded physical embodiment of an AI/AGI system which you then can use with tens of thousands of lines of your Python code.
 
 
 
@@ -112,15 +112,15 @@ Well... the picture of the robot on the front of all three manuals is identical,
 
 ![image on the first page of all the PDF manuals](version3.png)
 
-But, the robot I received has a black acrylic board and 5-point tracking module. As well, the cardboard parts list I received says "M2" which I assume is a Model 2 version.
+However, the robot I received has a black acrylic board and 5-point tracking module. As well, the cardboard parts list I received says "M2" which I assume is a Model 2 version.
 
 ![black acrylic board](wiring.jpg)
 
 ![5-point tracking module](underneath.jpg)
 
-Ok... let's work backwards from the online manual to the Oyosoo hosting site and let's see if there are other models listed.... yes indeed, there is a Model 2. Thus, I will assume that I have model 2 and thus I will download the M2 manual. Therefore, this overview of the robot car will be from the perspective of the M2 model.
+Ok... let's work backwards from the online manual to the Osoyoo hosting site and let's see if there are other models listed.... yes indeed, there is a Model 2. Thus, I will assume that I have model 2 and thus I will download the M2 manual. Therefore, this overview of the robot car will be from the perspective of the M2 model.
 
-I think this is reasonable as I purchased my kit from Amazon November 2023, and I assume it is already 2024 or later when you the reader are reading this, and most likely you will have a later model as well. Also, it seems that the models and versions are somewhat similar, so my overview should be useful to you regardless of the model that you have. (Look at the version number on your parts list. Also match your robot to the descriptions above. If you have a version 1, i.e., 1.1, 1.2, or 1.3 version robot kit, then download one of the manuals listed agove.)  
+I think this is reasonable as I purchased my kit from Amazon November 2023, and I assume it is already 2024 or later when you the reader are reading this, and most likely you will have a later model as well. Also, it seems that the models and versions are somewhat similar, so my overview should be useful to you regardless of the model that you have. (Look at the version number on your parts list. Also match your robot to the descriptions above. If you have a version 1, i.e., 1.1, 1.2, or 1.3 version robot kit, then download one of the manuals listed above.)  
 
 For myself and those of you with a Model 2 robot kit (which should be most users in the future, if not a more advanced model) we should download this PDF manual:
  [model 2 PDF manual](https://osoyoo.com/manual/202000600-m2.pdf)
@@ -151,7 +151,7 @@ Note that there is a separate drive motor for each of the four wheels. Note also
 
 On top of this metal bottom plate there will be a top acrylic plate. The electronics will all be mounted on this top acrylic plate.
 
-With regard to the electronics, note that there are three main electronics boards included. One of them is the motor driver board -- this board will control the motors attached to each wheel. Then there is the Mega2560 Arduino board. If you have not worked with Arduino before I will show you all the steps involved -- very easy. The Arduino board is the computer board essentially controlling the robotic car. Into the Arduino board there is a Wifi shield (Esp8266) which will give the system Wifi access. There is a USB cable which plugs into the Arduino board and forms an easy to use interface with your laptop enabling you later to send your software to the Arduino board.
+With regard to the electronics, note that there are three main electronics boards included. One of them is the motor driver board -- this board will control the motors attached to each wheel. Then there is the Mega2560 Arduino board. If you have not worked with Arduino before I will show you all the steps involved -- very easy. The Arduino board is the computer board essentially controlling the robotic car. Into the Arduino board there is a Wi-Fi shield (Esp8266) which will give the system Wi-Fi access. There is a USB cable which plugs into the Arduino board and forms an easy to use interface with your laptop enabling you later to send your software to the Arduino board. (I will show you how to use the Arduino board and the Arduino IDE below -- it's very easy, whether you have much experience or not in the area.)
 
 There are some smaller electronics boards also, e.g., Bluetooth module, tracking sensor module, etc. We will discuss them as we use them.
 
@@ -164,27 +164,41 @@ Before we start building the robot car, let's have a quick look at the documenta
 
 The PDF Model M2.0 documentation is divided into five "lessons." 
 
-Lesson 1 -- Assembly of the mechanical parts and the electronic parts, and installing the Arduino IDE -- at this point you will have a functioning robot car that you can try out with the self test Arduino code that comes with the robot car.
+Lesson 1 -- Assembly of the mechanical parts and the electronic parts and installing the Arduino IDE -- at this point you will have a functioning robot car that you can try out with the self test Arduino code that comes with the robot car.
 When the car is turned on it will go forward, backward, make a left turn, a right turn, .... and finally make a down diagonal and stop.
+
+(Below I will give you a very brief hands-on tutorial on setting up an Arduino development environment ("IDE" means "integrated development environment", which just means a software application that lets you program in some sort of language or environment -- in this case code for the Arduino board and transferring these programs to your robot car). Do not worry if you don't have much experience with Arduino or coding -- I will show you how to get software onto the Arduino board of your robot car. However, of course, if you want to use your robotic car for robotics projects, knowing how to code in Python will be necessary later on.
+What is an "Arduino" board? It's a microcontroller board adopted by the hobbyist community over a decade ago. A "microcontroller board" is a board with a computer chip, RAM, meory for programs and input/output circuits so that you can use the board to control electronmechanical devices, such as a robotic car in this case. The Arduino board is open source, inexpensive and can be found at electronic parts distributors all over the world. However, it comes with the robotic car kit so you don't need to go out and buy it separately, unless you want to have a second board for experimentation.)
+
 The car will look like this at this point:
 ![assembled robot car](robotcar.jpg)
 
 Lesson 2 -- Use of the ultrasonic and servomechanism modules to avoid objects -- you can see the sensors mounted on the servo in the cover image. (I have not yet mounted these sensors.)
-The car will look like this at this point (the ultrasonic module looks like two eyes and it is mounted on the blue servo motor):
+(I will give you a very brief tutorial on ultrasonic detectors and servomechanisms below.)
+
+The car will look like this at this point (the ultrasonic module looks like two eyes, and it is mounted on the blue servo motor):
 ![Model 2.0 cover image](model2.png)
 
 
 Lesson 3 -- Use of the 5-point tracking sensor to follow a black track line -- you can see these sensors in the cover image just above, as well as in the underside photo of my assembled robot car.
 
 
-Lesson 4 -- Bluetooth interface to the robot car -- this board has not been installed in the Wifi shield yet but will allow Bluetooth interfacing.
-The bluetooth module will be inserted into the Wifi Board:
+Lesson 4 -- Bluetooth interface to the robot car -- this board has not been installed in the Wi-Fi shield yet but will allow Bluetooth interfacing.
+
+(Bluetooth and Wi-Fi are both wireless mechanisms that allow computer devices to talk to each other and the Internet without using wires (i.e., that is why they are "wireless"). 
+-Wi-Fi is mainly used to connect computer devices to the Interent. Usually a computerized device communicates to a local area netwowrk (LAN) router which then communicates to the Internet, e.g., over a cable TV cable in a house, a telephone line designed for high speed data exchange, a fiberoptic cable, and so on, which attaches the router to the Internet backbone eventually through an Internet provider, which in Canada typically is one of the telephone companies.*
+-Bluetooth, on the other hand, typically is used to connect computer devices between each other and over short distances. For example, a Bluetooth keyboard will use radio signals to allow a computer keyboard to communicate with your laptop without needing a wired cable for the keyboard. Bluetooth is slower than Wi-Fi and usually has a shorter range of ten meters or less. However, Bluetooth is actually a full wireless communication technology. Bluetooth can work without WiFi and without the Internet, although in most situations, Bluetooth is used with both. For example, you might be  listening to a podcast on your Bluetooth earbuds which wireless communicate with your Bluetooth cellphone. Your cellphone also has Wi-Fi and is attached by Wi-Fi to the router in your house which is attached to the Internet and allows the podcast to stream into your cellphone.)
+
+The Bluetooth module will be inserted into the Wi-Fi Board:
 ![bluetooth module](bluetooth.png)
 
 
-Lesson 5 -- Wifi interface to the robot car -- the Wifi shield has already been installed in photo showing the electronics of my assembled robot car.
-The Wifi board will now actively interface to the Arduino board:
-![wifi](wifi.png)
+Lesson 5 -- Wi-Fi interface to the robot car -- the Wi-Fi shield has already been installed in photo showing the electronics of my assembled robot car.
+
+(As noted above, Bluetooth and Wi-Fi are both wireless mechanisms that allow computer devices to talk to each other and the Internet without using wires. -Wi-Fi is mainly used to connect computer devices to the Interent, e.g., your laptop can wireless communicate using Wi-Fi with a router that interfaces to the Internet, allowing you Internet access on your laptop. Bluetooth, on the other hand, typically is used to connect computer devices between each other and over short distances, e.g., a Bluetooth keyboard can wirelessly communicate with your laptop.)
+
+The Wi-Fi board will now actively interface to the Arduino board:
+![Wi-Fi](Wi-Fi.png)
 
 
 
@@ -219,7 +233,7 @@ Assembled chassis (Note that the straps are still loose until the assembly is co
 
 ![inserting motor wires](motorwires.png)
 
--Now connect the motor controller board to the Arduino board and the Wifi shield pass through connectors as shown in the diagram in the manual:
+-Now connect the motor controller board to the Arduino board and the Wi-Fi shield pass through connectors as shown in the diagram in the manual:
 ![connect arduino to motor controller](arduinoconnect.png)
 
 -I then connected the voltage meter and the battery box, although in the manual they also show connection of the servo motor and the 5-point tracking module, which can be done now or later.
@@ -229,7 +243,12 @@ Assembled chassis (Note that the straps are still loose until the assembly is co
 **Step #8 -- Installation of the Arduino IDE and Self-Test Program** 
 
 -Even if you have no experience with Arduino, this step is quite easy.
--The manual gives you a link to download the Arduino IDE (IDE stands for 'Integrated Development Environment' which many software systems have, i.e., the language and a place to construct your programs all in one area). I did not use it but instead went to https://www.arduino.cc and clicked 'software' which I know is a secure website for Arduino and installed the IDE for Windows from that page. (They also have the IDE for Linux and macOS.)
+
+-As noted above:
+- Arduino development environment: "IDE" means "integrated development environment", which just means a software application that lets you program in some sort of language or environment which in this case is code for the Arduino board and transferring these programs to your robot car
+- What is an "Arduino" board? It's a microcontroller board adopted by the hobbyist community over a decade ago. A "microcontroller board" is a board with a computer chip, RAM, meory for programs and input/output circuits so that you can use the board to control electronmechanical devices, such as a robotic car in this case. The Arduino board is open source, inexpensive and can be found at electronic parts distributors all over the world. However, it comes with the robotic car kit so you don't need to go out and buy it separately, unless you want to have a second board for experimentation.
+  
+-The manual gives you a link to download the Arduino IDE. I did not use it but instead went to https://www.arduino.cc and clicked 'software' which I know is a secure website for Arduino and installed the IDE for Windows from that page. (They also have the IDE for Linux and macOS.)
 This website, i.e., https://www.arduino.cc also has comprehensive documentation on the Arduino hardware and software, including a language reference, examples and tutorials. There actually is a tutorial on "Downloading and installing the Arduino IDE 2" https://docs.arduino.cc/software/ide-v2/tutorials/getting-started/ide-v2-downloading-and-installing
 However, you can simply go to https://www.arduino.cc/en/software, click the download option you want (i.e., choose Windows), and the installation is quite straightforward
 
@@ -358,7 +377,7 @@ I just uploaded the assembly manual for the robotic car. Can you give me more pr
 To troubleshoot your Osoyoo Mecanum Wheel Robotic Car M2.0, consider these steps:
 Battery and Power: Ensure the batteries are correctly installed and charged. Check the power connections, especially the switch and battery box.
 Motor Connections: Verify that all motors are properly connected to the Model Y motor driver board. The manual details the specific connections for each motor.
-Board Installation: Confirm the Arduino Mega2560 board and the OSOYOO Wifi Shield are properly installed and connected.
+Board Installation: Confirm the Arduino Mega2560 board and the OSOYOO Wi-Fi Shield are properly installed and connected.
 Software and Code: Ensure you have correctly installed the Arduino IDE and uploaded the appropriate sketch for your project (e.g., lesson1.ino for basic car assembling). Follow the specific instructions in the manual for code uploading.
 Sensor and Module Checks: If your model includes sensors or additional modules, make sure they are correctly connected and configured.
 Hardware Assembly: Double-check the assembly of the wheels, chassis, and all components as per the instructions in the manual to ensure everything is correctly aligned and installed.
@@ -468,7 +487,7 @@ PLEASE CONTRIBUTE TO THIS SECTION AS YOU ENCOUNTER AND TROUBLESHOOT PROBLEMS
 
  - you may want to consider purchasing a cheap Arduino board from a local electronics shop or online electronics retailer (e.g., Amazon sells an Arduino Uno board for US$27 at the time of writing), and setting up the Arduino IDE on your computer and making sure you can upload compiled code to the Arduino board
 
- - TAKE A MODULAR APPROACH TO STUBBORN ISSUES. For example, make sure the wires coming from the battery compartment have a voltage on them (with a simple voltage tester or multimeter) and then just install the motor controller board with only the power wires and the voltage meter wires. Does the board light come on? Is there now a voltage displayed?  If so, then hook up the four motors. Is there still a voltage displayed? Then perhaps hook up to the Arduino board without the Wifi shield (pay attention to where you are inserting wires if you do this). Lights come on? Then plug your PC into the Arduino board -- is it detected?  And so on.
+ - TAKE A MODULAR APPROACH TO STUBBORN ISSUES. For example, make sure the wires coming from the battery compartment have a voltage on them (with a simple voltage tester or multimeter) and then just install the motor controller board with only the power wires and the voltage meter wires. Does the board light come on? Is there now a voltage displayed?  If so, then hook up the four motors. Is there still a voltage displayed? Then perhaps hook up to the Arduino board without the Wi-Fi shield (pay attention to where you are inserting wires if you do this). Lights come on? Then plug your PC into the Arduino board -- is it detected?  And so on.
    (It is unfortunate that the motor controller board does not have a fuller modular built-in self-test feature which could be used to make sure that part of the system is working before we need to consider the functioning of the Arduino board.)
 
  
