@@ -187,7 +187,7 @@ Lesson 4 -- Bluetooth interface to the robot car -- this board has not been inst
 
 (Bluetooth and Wi-Fi are both wireless mechanisms that allow computer devices to talk to each other and the Internet without using wires (i.e., that is why they are "wireless"). 
 
--Wi-Fi is mainly used to connect computer devices to the Interent. Usually a computerized device communicates to a local area netwowrk (LAN) router which then communicates to the Internet, e.g., over a cable TV cable in a house, a telephone line designed for high speed data exchange, a fiberoptic cable, and so on, which attaches the router which then goes to an Internet Service Provider (in Canada generally one of the telephone/cellphone/cable TV companies) to the Internet backbone.
+-Wi-Fi is mainly used to connect computer devices to the Internet. Usually a computerized device communicates to a local area netwowrk (LAN) router which then communicates to the Internet, e.g., over a cable TV cable in a house, a telephone line designed for high speed data exchange, a fiberoptic cable, and so on, which attaches the router which then goes to an Internet Service Provider (in Canada generally one of the telephone/cellphone/cable TV companies) to the Internet backbone.
 
 -Bluetooth, on the other hand, typically is used to connect computer devices between each other and over short distances. For example, a Bluetooth keyboard will use radio signals to allow a computer keyboard to communicate with your laptop without needing a wired cable for the keyboard. Bluetooth is slower than Wi-Fi and usually has a shorter range of ten meters or less. However, Bluetooth is actually a full wireless communication technology. Bluetooth can work without WiFi and without the Internet, although in most situations, Bluetooth is used with both. For example, you might be  listening to a podcast on your Bluetooth earbuds which wirelessly communicate with your Bluetooth-enabled cellphone. Your cellphone also has Wi-Fi and is attached by Wi-Fi to the router in your house which is attached to the Internet and allows the podcast to stream into your cellphone.)
 
@@ -197,7 +197,7 @@ The Bluetooth module will be inserted into the Wi-Fi Board:
 
 Lesson 5 -- Wi-Fi interface to the robot car -- the Wi-Fi shield has already been installed in photo showing the electronics of my assembled robot car.
 
-(As noted above, Bluetooth and Wi-Fi are both wireless mechanisms that allow computer devices to talk to each other and the Internet without using wires. -Wi-Fi is mainly used to connect computer devices to the Interent, e.g., your laptop can wireless communicate using Wi-Fi with a router that interfaces to the Internet, allowing you Internet access on your laptop. Bluetooth, on the other hand, typically is used to connect computer devices between each other and over short distances, e.g., a Bluetooth keyboard can wirelessly communicate with your laptop.)
+(As noted above, Bluetooth and Wi-Fi are both wireless mechanisms that allow computer devices to talk to each other and the Internet without using wires. -Wi-Fi is mainly used to connect computer devices to the Internet, e.g., your laptop can wireless communicate using Wi-Fi with a router that interfaces to the Internet, allowing you Internet access on your laptop. Bluetooth, on the other hand, typically is used to connect computer devices between each other and over short distances, e.g., a Bluetooth keyboard can wirelessly communicate with your laptop.)
 
 The Wi-Fi board will now actively interface to the Arduino board:
 ![Wi-Fi](Wi-Fi.png)
