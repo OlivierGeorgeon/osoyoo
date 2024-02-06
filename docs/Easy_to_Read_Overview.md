@@ -200,7 +200,7 @@ Lesson 5 -- Wi-Fi interface to the robot car -- the Wi-Fi shield has already bee
 (As noted above, Bluetooth and Wi-Fi are both wireless mechanisms that allow computer devices to talk to each other and the Internet without using wires. -Wi-Fi is mainly used to connect computer devices to the Internet, e.g., your laptop can wireless communicate using Wi-Fi with a router that interfaces to the Internet, allowing you Internet access on your laptop. Bluetooth, on the other hand, typically is used to connect computer devices between each other and over short distances, e.g., a Bluetooth keyboard can wirelessly communicate with your laptop.)
 
 The Wi-Fi board will now actively interface to the Arduino board:
-![Wi-Fi](Wi-Fi.png)
+![Wi-Fi](wifi.png)
 
 
 
