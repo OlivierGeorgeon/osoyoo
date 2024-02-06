@@ -508,14 +508,14 @@ BEFORE PROCEEDING FURTHER, MAKE SURE THE BASIC SELF-TEST PROGRAM OF YOUR OSOYOO 
 
 **Step #10 -- Adding the Ultrasonic and Servomechanism Components**
 
- The Osoyoo motor is called a "micro servo motor." We tend to interchange the words "servomotor", "servo", "servomechanism", etc in Lesson #2 (i.e., adding the ultrasonic and servomechanism components) in referring to this motor. However, be aware of the actual meaning of these different terms:
-
  -An "ultrasonic distance sensor" is effectively an ultrasonic transducer (generates ultrasonic waves) and an ultrasonic sensor (detects ultrasonic energy). (A "transceiver" is a device that both transmits and receives a signal.) An ultrasonic transceiver can measure distances by seeing how long it takes for an ultrasonic sound wave to hit a target and reflect back to the sensor. From the the time delay and the speed of sound the distance can be computed.
 
- -The Osoyoo ultrasonic distance measuring transducer sensroy sends out 40KHz ultrasonic sound pulses and waits for their echos to return, with the time (and thus distance) as the width of the produced TTL pulse.
+ -The Osoyoo ultrasonic distance measuring transducer/sensor sends out 40KHz ultrasonic sound pulses and waits for their echos to return, with the time (and thus distance) as the width of the produced TTL pulse.
 
 ![ultrasonic transducer](ultrasonic.jpg)
 
+ The Osoyoo motor is called a "micro servo motor." We tend to interchange the words "servomotor", "servo", "servomechanism", etc in Lesson #2 (i.e., adding the ultrasonic and servomechanism components) in referring to this motor. However, be aware of the actual meaning of these different terms:
+ 
  -A "servomotor"  (or sometimes just called a "servo") is generally a rotary motor (but it can be a linear actuator) that produces precise angular position, velocity and acceleration. This is in contrast to a normal motor which will just spin continuously.
  
  -A "servomechanism" (or sometimes just called a "servo system" or "servo") is a system that controls position, velocity and acceleration of a mechanical system using some sort of feedback to reduce error generally. Thus, a servomotor combined with some sort of feedback device (e.g., a rotary Hall detector, a potentiometer, etc) forms a servomechanism.
