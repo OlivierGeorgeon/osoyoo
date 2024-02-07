@@ -636,7 +636,9 @@ It happens quickly -- this is my screen less than a second after clicking the ar
  -This bilaterian primitive brain gave rise to the brains of just about all the animals we see around us -- insects, worms, fish, mice and you the reader :)
  e.g., Peterson, K. J., & Davidson, E. H. (2000). Regulatory evolution and the origin of the bilaterians. Proceedings of the National Academy of Sciences, 97(9), 4430-4433.
 
- ![bilaterians](bilaterians.jpg)
+ ![bilaterians](bilaterians.jpeg)
+
+ 
  
 
 
