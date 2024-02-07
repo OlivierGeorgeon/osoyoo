@@ -694,7 +694,7 @@ OK.... as mentioned above, the IR Tracker Sensor was already physcially installe
 
 -You will have a 7pin female to female wire harness that came with the robotic car kit. Install as shown in the Manual's Lesson 3 illustration. It attaches from the IR Tracker Sensor to the Wi-Fi board that is seated on top of the Ardinuo board.
 
-![arraywiring](arraywiring!)
+![arraywiring](arraywiring.png)
 
 
 
