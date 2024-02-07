@@ -673,7 +673,7 @@ It happens quickly -- this is my screen less than a second after clicking the ar
 
  ![IR function](IRfunction.jpg)
  
--The output of the Opto Interrupter sensor is feed into a a hex inverter with Schmitt-triggers. The Schmitt-trigger will take the photosensor inputs and at some threshold give a TTL output pulse which then can be fed to the Ardinuo board.
+-The output of the Opto Interrupter sensor is fed into a a hex inverter with Schmitt-triggers. The Schmitt-trigger will take the photosensor inputs and at some threshold give a TTL output pulse which then can be fed to the Ardinuo board.
 
 Feedback loop of a Schmitt trigger.
 
@@ -694,7 +694,36 @@ OK.... as mentioned above, the IR Tracker Sensor was already physcially installe
 
 -You will have a 7pin female to female wire harness that came with the robotic car kit. Install as shown in the Manual's Lesson 3 illustration. It attaches from the IR Tracker Sensor to the Wi-Fi board that is seated on top of the Ardinuo board.
 
+-Tip: Make sure the black wire is the one going to "GND" (i.e., ground) when you plug the connector into the IR array. Then the cable splits into the black/red and 5 other wires. Make sure the black wire goes into "GND" pin on the Wi-Fi/Ardinuo board and the red wire goe to the "5V" pin. Then the wire beside the red wire should be the yellow wire coming from the sensor #0, and the white wire coming from sensor #4. The pins are labeled on the Wi-Fi/Ardinuo board.
+
+
 ![arraywiring](arraywiring.png)
+
+Your robotic car still has the code from Lesson 2 on it. However, when you turn on the power you will see the LED's light up on the IR Array Sensor board as shown below. Also, use this photo for an idea how the wires look when wired up.
+
+![arrayon](arrayon.jpg)
+
+OK.... now we have to install new code to make use of the IR Sensor array.
+
+-Open the Arduino IDE exactly as described above. As well, the manual shows several screens of the Arduino IDE. Make sure your Arduino IDE is configured exactly like before (i.e., correct Arduino board is specified).
+
+-Click 'Open' and load in m2-lesson3.ino
+
+-Then attach the USB cable to the Arduino board connector on the robot car, exactly like you did above when we uploaded software to the car's Arduino board. (The power on your robot car should be turned off -- the cable will supply power to the Arduino board. Plug the cable first into the Arduino board, i.e., the unpowered side, then plug the cable into your laptop (better to do this when your laptop is powered off, but in the real world, most of us will not bother to do this, and almost always fine if no extreme static discharges/shorts/etc.)
+
+-Now click the upload arrow (green arrow inside a circle at the top left corner).
+
+The software in m2-lesson3.ino will now be uploaded to the Arduino board in your robotic car.
+It happens quickly -- this is my screen less than a second after clicking the arrow:
+
+ ![lesson3upload](lesson3upload.png)
+
+
+ Now you have to adjust the sensitivity of the IR sensors......
+ Trying it out ........
+
+ 
+
 
 
 
