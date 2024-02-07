@@ -619,8 +619,29 @@ It happens quickly -- this is my screen less than a second after clicking the ar
  ![scanningnewdirection](scanningnewdirection.jpg)
 
  The robotic car will then turn away from the wall and continue in a new direction.
+
  
  ![robotturning](robotturning.jpg)
+
+ You are probably thinking to yourself now, "Well.... I have constructed a cute little toy."  Well.... maybe. But as the keen scientist you are, you realize two important things right now:
+
+ -1. Ahhh.... I have working robotic car that I can later hook up to my thousands of lines of Python code. I will be able to interface the real world to my theoretical ideas :)
+
+ -2. Hmmm..... I actually have the secret of the intelligent life on our planet in front of me now.
+
+ -There is evidence in Torridon Group in Scotland of multicellular life over a billion years ago. There is evidence of obvious bilaterian animals (i.e., left and right side like us and like our robot car, and go forward, left, right and backwards) from the Cambrian Explosion about 550 million years ago. Thus, we can be bold and assume the first bilaterians emerged 700 million years ago, i.e., lots and lots of time for the brain to evolve to better and better functionality for the environments the animal was in.
+
+ -A lot of evidence that the bilaterian brain only evolved once, e.g., Holland, L. Z., Carvalho, J. E., Escriva, H., Laudet, V., Schubert, M., Shimeld, S. M., & Yu, J. K. (2013). Evolution of bilaterian central nervous systems: a single origin?. EvoDevo, 4, 1-20.
+
+ -This bilaterian primitive brain gave rise to the brains of just about all the animals we see around us -- insects, worms, fish, mice and you the reader :)
+ e.g., Peterson, K. J., & Davidson, E. H. (2000). Regulatory evolution and the origin of the bilaterians. Proceedings of the National Academy of Sciences, 97(9), 4430-4433.
+
+ ![bilaterians](bilaterians.jpg)
+ 
+
+
+
+
 -
 -
 -
