@@ -638,7 +638,7 @@ It happens quickly -- this is my screen less than a second after clicking the ar
 
  ![bilaterians](bilaterians.jpeg)
 
- -Most of the animal world's brains (i.e., insects, worms and all the vertebrates) evolved from these first primitive bilaterians. Intelligence on Earth stems from a creature with a left and  right and that could go forward to food and that tried to go backwards/turn away from danger (evolutionarily-wise this is what will propagate creatures into the future). This is what our Osoyoo robotic car can now do!!  It can go forward (well... maybe in the next step it can go forward to positive valence items or we can program it to do so) and it can escape from dangers such as hitting a 'predator' such as the wall above.
+ -Most of the animal world's brains (i.e., insects, worms and all the vertebrates) evolved from these first primitive bilaterians. Intelligence on Earth stems from a creature with a left and  right and that could go forward to food and that tried to go backwards/turn away from danger (evolutionarily-wise this is what will propagate creatures into the future). This is what our Osoyoo robotic car can now do!!  It can go forward (well... maybe in the next step it can go forward to positive food-like items or we can program it to do so) and it can escape from dangers such as hitting a 'predator' such as the wall above.
 
  -This is not a toy.  This is the basis for intelligent life on our planet :)
  
@@ -651,6 +651,65 @@ It happens quickly -- this is my screen less than a second after clicking the ar
 **Step #11 -- Adding and Using the 5-Point Tracking Sensor**
  
 
+ -The Osoyoo 5-channel IR Tracker Sensor is an array of five infrared sensors that the Ardinuo can read as digital bits inputs. There is an on-board potentiometer to adjust the sensitivity of the sensors, i.e., at what point do they trigger. The advantage of an array of five sensors is that the car can detect the center of line and the edges outside the line at the same time -- very useful for following lines and borders. 
+
+-The IR Tracker Sensor was already physcially installed on the car when we first built the car above.
+
+![underneath](underneath)
+
+
+ The sensor array can detect when the car is following a line:
+ ![straight](straight)
+
+ The sensor array can detect when the car is off-center:
+ ![offcenter](offcenter)
+
+ -The IR sensors are Everlight ITR9909 Opto Interrupter sensors. Each device consists of an infrared LED (typically gallium-aluminum-arsenide structure) and an NPN (therefore typically silicon structure) phototransistor, along the same optical axis. Running at 50mA each device will dissipate typically 75mW of power, with an output at about 940nm (infrared is radiation with a wavelength between 780nm to 1mm (which is 1,000,000nm). (IRA 780--1400nm -- penetrates skin and eye -- high power/long exposure can damage the retina -- there are actually guidelines on exposures of humans to laser radiation between 180nm and 1000um; IRB 1.4um - 3um; IRC 'far IR' 3um-1000um -- superficial absorption by skin) 
+ -Why use IR sensors? Because there is visible light all around us that will interfere with the sensor detection. (Yes, of course there is is IR light from the sun, so the robotic car will obviously work better indoors than outside in the sun when it is using this sensor array.) (Of interest, Tesla is using only visible light from cameras, as opposed to radar and LIDAR signals that other car manufacturers are using, for autonomous driving, on the basis that humans deal with visible light, so the car autonomous driving system should deal with visible light as well.)
+ 
+-(I know.... more than anyone wants to know about a cheap, relatively simple IR sensor :)  
+
+-(Essentially the collector current of the NPN phototransistor peaks when the device is sensing the reflection of the IR signal at about 3mm -- by 7mm distance it drops to 50% and by 15mm distance (or if the reflection is obscured by the terrain, for example) it drops to 20% of the peak collector current -- this is what the output of the device is and how it senses the environment, i.e., if anything obstructs the reflection of the IR light.)
+
+ ![IR function](IRfunction.jpeg)
+ 
+-The output of the Opto Interrupter sensor is feed into a a hex inverter with Schmitt-triggers. The Schmitt-trigger will take the photosensor inputs and at some threshold give a TTL output pulse which then can be fed to the Ardinuo board.
+
+Feedback loop of a Schmitt trigger.
+
+![schmitt](schmitt.png)
+
+
+Actual hex inverter Schmitt trigger integrated circuit.
+
+
+![schmittic](schmittic)
+
+
+-
+-
+OK.... as mentioned above, the IR Tracker Sensor was already physcially installed on the car when we first built the car above. However, we now have to wire it up to the Ardinuo board.
+
+-Go to Lesson 3 in the Osoyoo Manual.
+
+-You will have a 7pin female to female wire harness that came with the robotic car kit. Install as shown in the Manual's Lesson 3 illustration. It attaches from the IR Tracker Sensor to the Wi-Fi board that is seated on top of the Ardinuo board.
+
+![arraywiring](arraywiring!)
+
+
+
+
+
+
+
+
+
+
+
+
+-
+
+-
  
 
  
