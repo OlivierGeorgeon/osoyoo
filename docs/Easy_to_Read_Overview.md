@@ -580,11 +580,17 @@ BEFORE PROCEEDING FURTHER, MAKE SURE THE BASIC SELF-TEST PROGRAM OF YOUR OSOYOO 
 
 
 Then download the demonstration software for the ultrasound detector.
--The link shown in the manual works fine -- you will have folder containing m2-lesson2.ino which will work with the Arduino development environment (IDE). 
+
+-The link shown in the manual works fine -- you will have folder containing m2-lesson2.ino which will work with the Arduino development environment (IDE).
+
 -Always virus scan files when you download them. I virus scanned this file -- it is fine according to NAV Feb 6, 2024 (of course, as would be expected).
+
 -Then open the Arduino IDE exactly as described above. As well, the manual shows several screen of the Arduino IDE. Make sure your Arduino IDE is configured exactly like before (i.e., correct Arduino board is specified).
+
 -Click 'Open' and load in m2-lesson2.ino
+
 -Then attach the USB cable to the Arduino board connector on the robot car, exactly like you did above when we uploaded software to the car's Arduino board.
+
 -Now click the upload arrow (green arrow inside a circle at the top left corner).
 
 The software in m2-lesson2.ino will now be uploaded to the Arduino board in your robotic car.
