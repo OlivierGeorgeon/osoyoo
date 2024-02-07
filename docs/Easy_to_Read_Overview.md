@@ -520,11 +520,71 @@ BEFORE PROCEEDING FURTHER, MAKE SURE THE BASIC SELF-TEST PROGRAM OF YOUR OSOYOO 
  
  -A "servomechanism" (or sometimes just called a "servo system" or "servo") is a system that controls position, velocity and acceleration of a mechanical system using some sort of feedback to reduce error generally. Thus, a servomotor combined with some sort of feedback device (e.g., a rotary Hall detector, a potentiometer, etc) forms a servomechanism.
 
-The Osoyoo SG90 Micro Servo Motor can rotate +90 or -90 degrees, and will hold the position, even when no signal is sent. It provides 1.5kg/cm torque and has a speed of 60 degrees in a third of a second. It makes use of the Servo Arduino library.
+ -The Osoyoo SG90 Micro Servo Motor can rotate +90 or -90 degrees, and will hold the position, even when no signal is sent. It provides 1.5kg/cm torque and has a speed of 60 degrees in a third of a second. It makes use of the Servo Arduino library.
 
 ![servo motor](servomotor.jpg)
 
 
  
- UNDER CONSTRUCTION
+ At this point please make sure your robot car performed the self-test correctly as described above in Step #8 (with Step #9 for troubleshooting). Do not start this new step #10 unless your car has been built, the electronics wired up, the Arduino software downloaded and the self-test peformed as above (i.e., turn the car on and it will perform a number of self-test maneuvers spinning different combinations of wheels).
+
+ In the Osoyoo Manual now turn to Lesson 2 "Obstacle Avoidance Robot Car."
+
+ Complete the hardware installation of the Ultrasonic Module as shown in the manual. 
+
+ Note: The manual says to use M1.4*8 screws to mount the holder for the Ultrasonic Module. However, my kit came with M1.5-8 screws and nuts, which worked fine.
+ Tip: If you don't have small needle-nose pliers to hold the small nuts in place, take a piece of transparent adhesive tape (e.g., Scotch-brand tape) and hold the nut in place with it until the screw starts threading.
+ Tip: It says not to install the M2-4 self-tapping screw to hold the module to the servo motor until the alignment process is complete -- follow this advice. When the robot car boots up later, you will need to make sure the ultrasonic sensor is facing forward before screwing it in place.
+
+ Complete the circuit wiring as shown in the manual.
+ Tip: If it is hard to see the pin numbers exactly, count slots from the end of the board. Thus the slot 13 ("D13") is the fifth emtpy socket from the end of that connector, for example.
+ Tip: The brown wire is the ground wire from the Servo motor -- make sure that is the one that goes to the "GND" socket on the Model-Y board, and so on for the other wires.
+
+ Below is a photo of the robot car wired up as specified. (Please use the diagrams in the manual -- they are more clear. Below is simply to show what the final wired up configuration looks like.)
+
+ ![ultrasound wiring](ultrasoundwiring.jpg)
+
+
+Then download the demonstration software for the ultrasound detector.
+The link shown in the manual works fine -- you will have folder containing m2-lesson2.ino which will work with the Arduino development environment (IDE). 
+Then open the Arduino IDE exactly as described above. As well, the manual shows several screen of the Arduino IDE. Make sure your Arduino IDE is configured exactly like before (i.e., correct Arduino board is specified).
+Click 'Open' and load in m2-lesson2.ino
+Then attach the USB cable to the Arduino board connector on the robot car, exactly like you did above when we uploaded software to the car's Arduino board.
+Now click the upload arrow (green arrow inside a circle at the top left corner).
+The software in m2-lesson2.ino will now be uploaded to the Arduino board in your robotic car.
+It happens quickly -- this is my screen less than a second after clicking the arrow:
+
+ ![lesson2upload](lesson2upload.jpg)
+
+
+ Now you have to align the ultrasonic sensor. The manual makes it sound complicated, but it is not.
+ Turn on the robotic car power switch.
+ If everything was installed correctly (especially the wires) and the software upload was done, then most likely you will see the ultrasonic sensor move from side to side .
+ Then the ultrasonic sensor will stop in a position for about 5 seconds. This position should be facing forward. If it is not, then pull off the sensor and put it back on the servo motor but in a forward facing direction. Once this is done you can screw the sensor in place.
+
+ Now you can try out the ultrasound sensor in your robotic car.
+
+ Turn on the power switch. The robotic car will go forward until it gets close to a wall and then stops before hitting the wall:
+
+ ![stopsbeforewall](stopsbeforewall.jpg)
+
+ For comparison, a typical robotic vacuum cleaner, at the time of this writing, will actually bang into the wall before changing direction.
+
+  ![roomba](roomba.jpg)
+
+  The robotic car will now scan directions for a new path without obstacles.
+  
+ ![scanningnewdirection](scanningnewdirection.jpg)
+
+ The robotic car will then turn away from the wall and continue in a new direction.
+ 
+ ![robotturning](robotturning.jpg)
+
+
+**Step #11 -- Adding and Using the 5-Point Tracking Sensor**
+ 
+
+ 
+
+ 
  
