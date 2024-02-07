@@ -655,14 +655,14 @@ It happens quickly -- this is my screen less than a second after clicking the ar
 
 -The IR Tracker Sensor was already physcially installed on the car when we first built the car above.
 
-![underneath](underneath)
+![underneath](underneath.jpg)
 
 
  The sensor array can detect when the car is following a line:
- ![straight](straight)
+ ![straight](straight.jpg)
 
  The sensor array can detect when the car is off-center:
- ![offcenter](offcenter)
+ ![offcenter](offcenter.jpg)
 
  -The IR sensors are Everlight ITR9909 Opto Interrupter sensors. Each device consists of an infrared LED (typically gallium-aluminum-arsenide structure) and an NPN (therefore typically silicon structure) phototransistor, along the same optical axis. Running at 50mA each device will dissipate typically 75mW of power, with an output at about 940nm (infrared is radiation with a wavelength between 780nm to 1mm (which is 1,000,000nm). (IRA 780--1400nm -- penetrates skin and eye -- high power/long exposure can damage the retina -- there are actually guidelines on exposures of humans to laser radiation between 180nm and 1000um; IRB 1.4um - 3um; IRC 'far IR' 3um-1000um -- superficial absorption by skin) 
  -Why use IR sensors? Because there is visible light all around us that will interfere with the sensor detection. (Yes, of course there is is IR light from the sun, so the robotic car will obviously work better indoors than outside in the sun when it is using this sensor array.) (Of interest, Tesla is using only visible light from cameras, as opposed to radar and LIDAR signals that other car manufacturers are using, for autonomous driving, on the basis that humans deal with visible light, so the car autonomous driving system should deal with visible light as well.)
@@ -671,7 +671,7 @@ It happens quickly -- this is my screen less than a second after clicking the ar
 
 -(Essentially the collector current of the NPN phototransistor peaks when the device is sensing the reflection of the IR signal at about 3mm -- by 7mm distance it drops to 50% and by 15mm distance (or if the reflection is obscured by the terrain, for example) it drops to 20% of the peak collector current -- this is what the output of the device is and how it senses the environment, i.e., if anything obstructs the reflection of the IR light.)
 
- ![IR function](IRfunction.jpeg)
+ ![IR function](IRfunction.jpg)
  
 -The output of the Opto Interrupter sensor is feed into a a hex inverter with Schmitt-triggers. The Schmitt-trigger will take the photosensor inputs and at some threshold give a TTL output pulse which then can be fed to the Ardinuo board.
 
@@ -683,7 +683,7 @@ Feedback loop of a Schmitt trigger.
 Actual hex inverter Schmitt trigger integrated circuit.
 
 
-![schmittic](schmittic)
+![schmittic](schmittic.png)
 
 
 -
