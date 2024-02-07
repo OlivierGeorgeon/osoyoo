@@ -482,6 +482,10 @@ PLEASE CONTRIBUTE TO THIS SECTION AS YOU ENCOUNTER AND TROUBLESHOOT PROBLEMS
  **Electronics Issues**
 This section is for troubleshooting electronics issues and can be added to with experience, i.e., "under construction" at present.
 
+- -->The robotic car appears to want to drive in reverse all the time when I run the Ultrasonic Obstacle avoidance lesson.
+- Put your hand in front of the Ultrasonic Transducer. Does the car then try to 'escape' the obstruction by going forward? Most likely you have reversed the wiring of the electric drive motors. Reverse the pin plug-in's to what they should be, and the car will work properly -- the car will go forward until it senses an obstruction, and then reverse to escape the obstruction.
+-
+- 
 PLEASE CONTRIBUTE TO THIS SECTION AS YOU ENCOUNTER AND TROUBLESHOOT PROBLEMS
 
  Some tips at present:
