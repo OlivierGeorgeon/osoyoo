@@ -585,11 +585,11 @@ Then download the demonstration software for the ultrasound detector.
 
 -Always virus scan files when you download them. I virus scanned this file -- it is fine according to NAV Feb 6, 2024 (of course, as would be expected).
 
--Then open the Arduino IDE exactly as described above. As well, the manual shows several screen of the Arduino IDE. Make sure your Arduino IDE is configured exactly like before (i.e., correct Arduino board is specified).
+-Then open the Arduino IDE exactly as described above. As well, the manual shows several screens of the Arduino IDE. Make sure your Arduino IDE is configured exactly like before (i.e., correct Arduino board is specified).
 
 -Click 'Open' and load in m2-lesson2.ino
 
--Then attach the USB cable to the Arduino board connector on the robot car, exactly like you did above when we uploaded software to the car's Arduino board.
+-Then attach the USB cable to the Arduino board connector on the robot car, exactly like you did above when we uploaded software to the car's Arduino board. (The power on your robot car should be turned off -- the cable will supply power to the Arduino board. Plug the cable first into the Arduino board, i.e., the unpowered side, then plug the cable into your laptop (better to do this when your laptop is powered off, but in the real world, most of us will not bother to do this, and almost always fine if no extreme static discharges/shorts/etc.)
 
 -Now click the upload arrow (green arrow inside a circle at the top left corner).
 
