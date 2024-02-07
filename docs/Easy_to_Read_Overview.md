@@ -554,7 +554,7 @@ Now click the upload arrow (green arrow inside a circle at the top left corner).
 The software in m2-lesson2.ino will now be uploaded to the Arduino board in your robotic car.
 It happens quickly -- this is my screen less than a second after clicking the arrow:
 
- ![lesson2upload](lesson2upload.jpg)
+ ![lesson2upload](lesson2upload.png)
 
 
  Now you have to align the ultrasonic sensor. The manual makes it sound complicated, but it is not.
