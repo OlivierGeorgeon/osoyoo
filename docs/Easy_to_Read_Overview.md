@@ -23,7 +23,10 @@ Even if Tesla Bots, for sake of example, were available, you wouldn't want to us
 
 ![tesla bot gen 2](teslabot.jpg)
 
-
+-
+-
+-
+-
 
 **Step #1 -- Decide if you want to do the Project**
 
@@ -35,6 +38,10 @@ In terms of your required electronics expertise, very little is needed if everyt
 
 In terms of your required software expertise, only a minimal amount is needed to make the robot work. For example, you need to be comfortable moving around files and running Python code. The Arduino IDE and code you can install and copy without great expertise (I will show you how below). Of course, if you have the time, you can spend more hours getting more expertise in the Arduino ecosystem. As well, you will need more expertise in Python if you want to use the robot car for your own research project.
 
+-
+-
+-
+-
 
 **Step #2 -- Purchase the Robot Car kit**
 
@@ -61,7 +68,10 @@ In countries outside of Canada and USA, I would still recommend considering Amaz
 
 Note: The Amazon website says this is a kit for teens while the Osoyoo website shows 5 years old building robotic kits (albeit simpler ones). Please keep in mind you are not buying this kit to produce a project for your high school science fair. You are buying this kit to have a grounded physical embodiment of an AI/AGI system which you then can use with tens of thousands of lines of your Python code.
 
-
+-
+-
+-
+-
 
 **Step #3 -- Purchase the extra electronic parts**
 
@@ -81,7 +91,10 @@ I will provide the exact AliExpress link I used to purchase these extra navigati
 
 Troubleshooting note:  If you are able to allocate sufficient research funds, I would advise purchasing two sets of electronic parts so troubleshooting any issues with the hardware becomes easier. (Disclosure: I did not.) 
 
-
+-
+-
+-
+-
 
 **Step #4 -- Receiving the Robot Car Kit -- Finding the Documentation**
 
@@ -132,7 +145,10 @@ The online version of this manual has a useful parts list which links to the Oso
 [online Model 2.0 manual](https://osoyoo.com/2022/07/05/v2-metal-chassis-mecanum-wheel-robotic-for-arduino-mega2560-introduction-model-2021006600/#4)
 
 
-
+-
+-
+-
+-
 
 
 **Step #5 -- Overview of the Parts and of the Documentation** 
@@ -202,7 +218,10 @@ Lesson 5 -- Wi-Fi interface to the robot car -- the Wi-Fi shield has already bee
 The Wi-Fi board will now actively interface to the Arduino board:
 ![Wi-Fi](wifi.png)
 
-
+-
+-
+-
+-
 
 **Step #6 -- Assembly of Parts on the Underside of the Chassis** 
 
@@ -215,7 +234,10 @@ The Wi-Fi board will now actively interface to the Arduino board:
 Assembled chassis (Note that the straps are still loose until the assembly is completed and wires are tucked away.) When assembled it will look like this:
 ![5-point tracking module](underneath.jpg)
 
-
+-
+-
+-
+-
 
 **Step #7 -- Assembly of Electronic Parts on the Acrylic Board above the chassis** 
 
@@ -240,7 +262,10 @@ Assembled chassis (Note that the straps are still loose until the assembly is co
 
 -I then connected the voltage meter and the battery box, although in the manual they also show connection of the servo motor and the 5-point tracking module, which can be done now or later.
 ![connect other modules](otherconnect.png)
-
+-
+-
+-
+-
 
 **Step #8 -- Installation of the Arduino IDE and Self-Test Program** 
 
@@ -308,7 +333,10 @@ https://www.youtube.com/watch?v=SWa4VOoAa1U
 
 [![Watch the video](https://img.youtube.com/vi/nTQUwghvy5Q/default.jpg)](https://www.youtube.com/watch?v=SWa4VOoAa1U)
 
-
+-
+-
+-
+-
 
 **Step #9 -- Troubleshooting** 
 
@@ -501,10 +529,10 @@ PLEASE CONTRIBUTE TO THIS SECTION AS YOU ENCOUNTER AND TROUBLESHOOT PROBLEMS
  
 BEFORE PROCEEDING FURTHER, MAKE SURE THE BASIC SELF-TEST PROGRAM OF YOUR OSOYOO ROBOTIC CAR WORKS. YOU NEED TO KNOW THAT THIS WORKS BEFORE ADDING MORE COMPLEXITY TO YOUR PROJECT.
 
-
-
-
-
+-
+-
+-
+-
 
 **Step #10 -- Adding the Ultrasonic and Servomechanism Components**
 
@@ -579,7 +607,10 @@ It happens quickly -- this is my screen less than a second after clicking the ar
  The robotic car will then turn away from the wall and continue in a new direction.
  
  ![robotturning](robotturning.jpg)
-
+-
+-
+-
+-
 
 **Step #11 -- Adding and Using the 5-Point Tracking Sensor**
  
