@@ -567,12 +567,12 @@ BEFORE PROCEEDING FURTHER, MAKE SURE THE BASIC SELF-TEST PROGRAM OF YOUR OSOYOO 
  Complete the hardware installation of the Ultrasonic Module as shown in the manual. 
 
  Note: The manual says to use M1.4*8 screws to mount the holder for the Ultrasonic Module. However, my kit came with M1.5-8 screws and nuts, which worked fine.
- Tip: If you don't have small needle-nose pliers to hold the small nuts in place, take a piece of transparent adhesive tape (e.g., Scotch-brand tape) and hold the nut in place with it until the screw starts threading.
- Tip: It says not to install the M2-4 self-tapping screw to hold the module to the servo motor until the alignment process is complete -- follow this advice. When the robot car boots up later, you will need to make sure the ultrasonic sensor is facing forward before screwing it in place.
+ -Tip: If you don't have small needle-nose pliers to hold the small nuts in place, take a piece of transparent adhesive tape (e.g., Scotch-brand tape) and hold the nut in place with it until the screw starts threading.
+ -Tip: It says not to install the M2-4 self-tapping screw to hold the module to the servo motor until the alignment process is complete -- follow this advice. When the robot car boots up later, you will need to make sure the ultrasonic sensor is facing forward before screwing it in place.
 
  Complete the circuit wiring as shown in the manual.
- Tip: If it is hard to see the pin numbers exactly, count slots from the end of the board. Thus the slot 13 ("D13") is the fifth emtpy socket from the end of that connector, for example.
- Tip: The brown wire is the ground wire from the Servo motor -- make sure that is the one that goes to the "GND" socket on the Model-Y board, and so on for the other wires.
+ -Tip: If it is hard to see the pin numbers exactly, count slots from the end of the board. Thus the slot 13 ("D13") is the fifth emtpy socket from the end of that connector, for example.
+ -Tip: The brown wire is the ground wire from the Servo motor -- make sure that is the one that goes to the "GND" socket on the Model-Y board, and so on for the other wires.
 
  Below is a photo of the robot car wired up as specified. (Please use the diagrams in the manual -- they are more clear. Below is simply to show what the final wired up configuration looks like.)
 
@@ -580,11 +580,13 @@ BEFORE PROCEEDING FURTHER, MAKE SURE THE BASIC SELF-TEST PROGRAM OF YOUR OSOYOO 
 
 
 Then download the demonstration software for the ultrasound detector.
-The link shown in the manual works fine -- you will have folder containing m2-lesson2.ino which will work with the Arduino development environment (IDE). 
-Then open the Arduino IDE exactly as described above. As well, the manual shows several screen of the Arduino IDE. Make sure your Arduino IDE is configured exactly like before (i.e., correct Arduino board is specified).
-Click 'Open' and load in m2-lesson2.ino
-Then attach the USB cable to the Arduino board connector on the robot car, exactly like you did above when we uploaded software to the car's Arduino board.
-Now click the upload arrow (green arrow inside a circle at the top left corner).
+-The link shown in the manual works fine -- you will have folder containing m2-lesson2.ino which will work with the Arduino development environment (IDE). 
+-Always virus scan files when you download them. I virus scanned this file -- it is fine according to NAV Feb 6, 2024 (of course, as would be expected).
+-Then open the Arduino IDE exactly as described above. As well, the manual shows several screen of the Arduino IDE. Make sure your Arduino IDE is configured exactly like before (i.e., correct Arduino board is specified).
+-Click 'Open' and load in m2-lesson2.ino
+-Then attach the USB cable to the Arduino board connector on the robot car, exactly like you did above when we uploaded software to the car's Arduino board.
+-Now click the upload arrow (green arrow inside a circle at the top left corner).
+
 The software in m2-lesson2.ino will now be uploaded to the Arduino board in your robotic car.
 It happens quickly -- this is my screen less than a second after clicking the arrow:
 
