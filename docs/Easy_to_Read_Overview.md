@@ -638,11 +638,10 @@ It happens quickly -- this is my screen less than a second after clicking the ar
 
  ![bilaterians](bilaterians.jpeg)
 
+ -Most of the animal world's brains (i.e., insects, worms and all the vertebrates) evolved from these first primitive bilaterians. Intelligence on Earth stems from a creature with a left and  right and that could go forward to food and that tried to go backwards/turn away from danger (evolutionarily-wise this is what will propagate creatures into the future). This is what our Osoyoo robotic car can now do!!  It can go forward (well... maybe in the next step it can go forward to positive valence items or we can program it to do so) and it can escape from dangers such as hitting a 'predator' such as the wall above.
+
+ -This is not a toy.  This is the basis for intelligent life on our planet :)
  
- 
-
-
-
 
 -
 -
