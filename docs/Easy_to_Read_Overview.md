@@ -261,6 +261,11 @@ Assembled chassis (Note that the straps are still loose until the assembly is co
 -Tip: Careful about not wasting wire in threading through the center hole and to the motor control board -- there will not be much excess wire on one side.
 (Also, note that only the red power and black ground wire from the motors are controlled by the motor board. The other colored wires are from the motor's Hall sensor and are not used at this point in the project. Hall sensors can measure the magnitude and orientation of a magnetic field, so, usually a pair or equivalent of magnets rotate without any physical contact and the Hall sensor detects their location, i.e., effectively the location of the rotor of the motor, which can be very useful in precision robotic applications.)
 
+(The Osoyoo "Model Y 2.0 Motor Driver Board for Arduino Robotic Car Kit" is a 4-channel H-bridge motor driver. H-brdige circuits allow voltage to be applied across a load in either direction, which is very useful for controlling the rotation direction of a DC motor such as used in the robotic car. A simple, silicon transistor H-bridge circuit is shown below -- as can be seen it looks like an 'H' thus the name. The Osoyoo board uses the PT5126 chip as a DC motor driver, which can supply up to 2.8Amps at a voltage of 2 - 24 volts, useful for bidirectional control of electric motors. It is a single-channel chip, so I am not sure how Osoyoo gets the 4-channels -- perhaps in the future reverse engineer the board and see how it works exactly. They specify using two such chips in their product specifications, although just by looking at the layout of the PCB it looks like there are 4 such chips, although the lettering on the chip packages are faded so I cannot read the parts numbers, which would make more sense.)
+
+![siliconHbridge](siliconHbridge.png)
+
+
 ![5-point tracking module](underneath.jpg)
 
 ![black acrylic board](wiring.jpg)
