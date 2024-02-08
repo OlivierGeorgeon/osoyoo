@@ -663,14 +663,23 @@ It happens quickly -- this is my screen less than a second after clicking the ar
 
  -This is not a toy.  This is the basis for intelligent life on our planet :)
  
+-
+-
+-
+-
 
--
--
--
--
-**Step #11 -- Avoiding Obstacles**
+**Step #11 -- Avoiding Obstacles with the IR Obstacle Avoidance Module**
 
-**Step #11 -- Adding and Using the 5-Point Tracking Sensor**
+One of the versions of the Osoyoo Robot Car kit comes with an additional lesson explaining using the Osoyoo IR Obstacle Avoidance module. My kit did not come with this lesson, and thus its use is not described here.
+
+The Osoyoo IR Obstacle Avoidance module is exactly what is sounds like -- there is an infrared LED projecting infrared light outwards and and infrared detector, attempting to detect the reflection of this IR light, which it can do from 2 to 30 cm away, at an angle up to about 35 degrees. 
+
+![IRobstacle](IRobstacle.png)
+![IRcar](IRcar.png)
+
+
+
+**Step #12 -- Adding and Using the 5-Point Tracking Sensor**
  
 
  -The Osoyoo 5-channel IR Tracker Sensor is an array of five infrared sensors that the Ardinuo can read as digital bits inputs. There is an on-board potentiometer to adjust the sensitivity of the sensors, i.e., at what point do they trigger. The advantage of an array of five sensors is that the car can detect the center of line and the edges outside the line at the same time -- very useful for following lines and borders. 
@@ -686,7 +695,7 @@ It happens quickly -- this is my screen less than a second after clicking the ar
  The sensor array can detect when the car is off-center:
  ![offcenter](offcenter.jpg)
 
- -The IR sensors are Everlight ITR9909 Opto Interrupter sensors. Each device consists of an infrared LED (typically gallium-aluminum-arsenide structure) and an NPN (therefore typically silicon structure) phototransistor, along the same optical axis. Running at 50mA each device will dissipate typically 75mW of power (hmmm.... P=E*I, thus 5 volts (?dropped down... I did not measure...but can perhaps later) * 50mA = 250mW actually but 75mW taken from the spec sheet -- perhaps it is what the LED itself and not associated resistors and phototransistor, etc, dissipate) with an output at about 940nm (infrared is radiation with a wavelength between 780nm to 1mm (which is 1,000,000nm). (IRA 780--1400nm -- penetrates skin and eye -- high power/long exposure can damage the retina -- there are actually guidelines on exposures of humans to laser radiation between 180nm and 1000um; IRB 1.4um - 3um; IRC 'far IR' 3um-1000um -- superficial absorption by skin).
+ -The IR sensors are Everlight ITR9909 Opto Interrupter sensors. Each device consists of an infrared LED (typically gallium-aluminum-arsenide structure) and an NPN (therefore typically silicon structure) phototransistor, along the same optical axis. Spec sheet gives 50mA current and 75mW power dissipation but these are maximums -- probably running at much lower currents (hmmm.... P=E*I, thus 5 volts * 50mA = 250mW actually  -- perhaps 75mW maximum is what the LED itself and not associated resistors and phototransistor, etc,can dissipate) with an output at about 940nm (infrared is radiation with a wavelength between 780nm to 1mm (which is 1,000,000nm). (IRA 780--1400nm -- penetrates skin and eye -- high power/long exposure can damage the retina -- there are actually guidelines on exposures of humans to laser radiation between 180nm and 1000um; IRB 1.4um - 3um; IRC 'far IR' 3um-1000um -- superficial absorption by skin).
  -Why use IR sensors? Because there is visible light all around us that will interfere with the sensor detection. (Yes, of course there is is IR light from the sun, so the robotic car will obviously work better indoors than outside in the sun when it is using this sensor array.) (Of interest, Tesla is using only visible light from cameras, as opposed to radar and LIDAR signals that other car manufacturers are using, for autonomous driving, on the basis that humans deal with visible light, so the car autonomous driving system should deal with visible light as well.)
  
 -(I know.... more than anyone wants to know about a cheap, relatively simple IR sensor :)  
