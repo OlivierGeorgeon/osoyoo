@@ -176,6 +176,16 @@ When assembled the acrylic board on the top of the robot car will look like this
 
 Note the blue lithium batteries. In the kit parts there should be a battery charger along with its USB cable which can charge these batteries. 
 
+(These batteries are "18650" batteries, a standard lithium battery, indicating an 18mm diameter by a 65mm length. I am not sure why the industry standard add the '0' to
+get the full number of '18650'. Osoyoo does not specify the battery chemistry but this product number is a Lithium-ion 3.7volt standard part developed by Panasonic in the
+1990s (used in laptops often), and generally were graphite anodes and lithium-metal oxide cathodes. Each 18650 had a capacity of about 2500mA-h (Osoyoo notes they are 2000mAh).
+Of interest, 2.5A*3.7volts*1 hour = 9.25 watt-hour x 2 batteries ~= 20 watt-hrs = 0.02 kWh. In comparison the cheapest Tesla EV Model 3 (cheaper than an average internal
+combustion engine vehicle at the time of this writing) has a battery with 54kWh -- equivalent to having about 6000 of the 18650 batteries. Alas, not as many as required to
+generate the 1,000,000 kWh in the Tesla Semi which would be about 100,000 of the Osoyoo 18650 batteries -- yes, one would have to purchase many, many Osoyoo robotic car kits to
+build an electric car or electric semi truck :)
+
+
+
 Before we start building the robot car, let's have a quick look at the documentation (always a good idea no matter what project you are working on).
 
 The PDF Model M2.0 documentation is divided into five "lessons." 
@@ -647,6 +657,7 @@ It happens quickly -- this is my screen less than a second after clicking the ar
 -
 -
 -
+**Step #11 -- Avoiding Obstacles**
 
 **Step #11 -- Adding and Using the 5-Point Tracking Sensor**
  
