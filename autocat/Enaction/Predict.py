@@ -111,14 +111,13 @@ def predict_outcome(command, memory):
     #     memory.body_memory.head_direction_rad = a
 
     # Predict the echo outcome from the nearest object phenomenon
-
-    # predicted_outcome["head_angle"] = memory.body_memory.head_direction_degree()
-    # predicted_outcome["echo_distance"] = 10000
     for p in [p for p in memory.phenomenon_memory.phenomena.values() if p.phenomenon_type == EXPERIENCE_ALIGNED_ECHO]:
         ego_center_point = memory.allocentric_to_egocentric(p.point)
         a, d = point_to_echo_direction_distance(ego_center_point)
-        # Subtract the phenomenon's radius to obtain the egocentric echo distance
-        d -= memory.phenomenon_memory.phenomenon_categories[BOX].long_radius
+        # if the phenomenon is recognized then subtract its radius to obtain the egocentric echo distance
+        if p.category is not None:
+            d -= p.category.short_radius
+            # d -= memory.phenomenon_memory.phenomenon_categories[BOX].long_radius
         if d > 0 and command.action.action_code == ACTION_SCAN and assert_almost_equal_angles(math.radians(a), 0, 90) \
                 or assert_almost_equal_angles(math.radians(a), memory.body_memory.head_direction_rad, 35):
             outcome_dict["head_angle"] = round(a)

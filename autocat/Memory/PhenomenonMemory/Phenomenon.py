@@ -1,7 +1,7 @@
 import math
 import matplotlib.path as mpath
 import numpy as np
-from pyrr import Quaternion, Vector3
+from pyrr import Quaternion
 from scipy.spatial import ConvexHull, QhullError
 from scipy.interpolate import splprep, splev
 from . import PHENOMENON_RECOGNIZE_CONFIDENCE, PHENOMENON_RECOGNIZED_CONFIDENCE
@@ -59,7 +59,8 @@ class Phenomenon:
             return None
 
     def recognize(self, category):
-        """Update the quaternion, origin, and shape of this phenomenon from the category"""
+        """Update the category, confidence, shape, and path of this phenomenon"""
+        self.category = category
         # The phenomenon's shape is copied from the category's shape
         self.shape = category.shape.copy()
         self.set_path()
@@ -116,7 +117,6 @@ class Phenomenon:
                 self.shape = np.column_stack((interpolated_points[0], interpolated_points[1], np.zeros(100)))
                 # Set the path
                 self.set_path()
-                # self.path = mpath.Path(interpolated_points.T + self.point[0:2])  # Two dimensional [[x0, y0]...[xn, yn]]
             except IndexError as e:
                 print("Interpolation failed. No points.", e)
             except TypeError as e:
