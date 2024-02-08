@@ -793,11 +793,11 @@ The car will now follow a black line (2 - 3 cm wide) on a white background.
 
 Go to Lesson 4 in the Osoyoo Manual and follow the instructions to insert the Bluetooth Module (which comes with the kit) in to the Wi-Fi board shield (which is, of course, on top of the Arduino board):
 
-![insertbluetooth](insertbluetooth.jpg)
+![insertbluetooth](insertbluetooth.png)
 
 Then use two jumpers to connect B_TX and B_RX of the bluetooth board to pins D19 and D18 as shown in the manual and below:
 
-![bluetoothwiring](bluetoothwiring.jpg)
+![bluetoothwiring](bluetoothwiring.png)
 
 
 software
