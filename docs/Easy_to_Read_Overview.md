@@ -795,7 +795,7 @@ Go to Lesson 4 in the Osoyoo Manual and follow the instructions to insert the Bl
 
 ![insertbluetooth](insertbluetooth.png)
 
-Then use two jumpers to connect B_TX and B_RX of the bluetooth board to pins D19 and D18 as shown in the manual and below:
+Then use two jumpers to connect B_TX and B_RX of the Wi-Fi shield to pins D19 and D18 of the Arduino board as shown in the manual and below:
 
 ![bluetoothwiring](bluetoothwiring.png)
 
