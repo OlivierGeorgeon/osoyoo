@@ -677,7 +677,10 @@ The Osoyoo IR Obstacle Avoidance module is exactly what is sounds like -- there 
 ![IRobstacle](IRobstacle.png)
 ![IRcar](IRcar.png)
 
-
+-
+-
+-
+-
 
 **Step #12 -- Adding and Using the 5-Point Tracking Sensor**
  
