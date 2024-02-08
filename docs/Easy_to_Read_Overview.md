@@ -753,13 +753,55 @@ It happens quickly -- this is my screen less than a second after clicking the ar
  ![lesson3upload](lesson3upload.png)
 
 
- Now you have to adjust the sensitivity of the IR sensors......
- Trying it out ........
 
- 
+ Now you have to adjust the sensitivity of the IR sensors, i.e. you want a black surface to reduce reflection back to the sensor, which will be indicated by the LED turning on on the IR array sensor board.
+-you can make your own test sheet -- take the electrical tape that came with the kit and put some strips on a piece of white paper
+
+![tapesheet](tapesheet.jpg)
+
+-hold up the car with one hand (since the tires will start spinning)
+-turn on the Power
+-with your other hand, put a small Phillips screwdriver (the small one that came with the kit works well) into the potentiometer on the IR sensor array board (arrow points to in the picture below) and adjust it so that the LED's turn on when the black electrical tape is placed underneath the detectors, and the LED's turn off when the white sheet is placed underneath
+
+![adjustIR](adjustIR.png)
+
+![whitesurface](whitesurface.jpg)
+![blacksurface](blacksurface.jpg)
+
+Here is a small test I did. I put a black mat in the middle of this mostly white floor (yes... the small black squares do confuse the car at times when one of the sensors detect the black square but it turns a bit and then continues). Once the car reaches the black mat it ends up trapped there because all its detectors turn on since the surface is all black (the code is expecting a thinner black line to follow).
+
+![attracted](attracted.jpg)
+![stuck](stuck.jpg)
 
 
+The car will now follow a black line (2 - 3 cm wide) on a white background.
 
+-
+-
+-
+-
+
+
+**Step #13 -- Adding Bluetooth Control of the Robotic Car**
+
+ As noted above, Bluetooth and Wi-Fi are both wireless mechanisms that allow computer devices to talk to each other and the Internet without using wires (i.e., that is why they are "wireless"). 
+
+-Wi-Fi is mainly used to connect computer devices to the Internet. Usually a computerized device communicates to a local area netwowrk (LAN) router which then communicates to the Internet, e.g., over a cable TV cable in a house, a telephone line designed for high speed data exchange, a fiberoptic cable, and so on, which attaches the router which then goes to an Internet Service Provider (in Canada generally one of the telephone/cellphone/cable TV companies) to the Internet backbone.
+
+-Bluetooth, on the other hand, typically is used to connect computer devices between each other and over short distances. For example, a Bluetooth keyboard will use radio signals to allow a computer keyboard to communicate with your laptop without needing a wired cable for the keyboard. Bluetooth is slower than Wi-Fi and usually has a shorter range of ten meters or less. However, Bluetooth is actually a full wireless communication technology. Bluetooth can work without WiFi and without the Internet, although in most situations, Bluetooth is used with both. For example, you might be  listening to a podcast on your Bluetooth earbuds which wirelessly communicate with your Bluetooth-enabled cellphone. Your cellphone also has Wi-Fi and is attached by Wi-Fi to the router in your house which is attached to the Internet and allows the podcast to stream into your cellphone.
+
+
+Go to Lesson 4 in the Osoyoo Manual and follow the instructions to insert the Bluetooth Module (which comes with the kit) in to the Wi-Fi board shield (which is, of course, on top of the Arduino board):
+
+![insertbluetooth](insertbluetooth.jpg)
+
+Then use two jumpers to connect B_TX and B_RX of the bluetooth board to pins D19 and D18 as shown in the manual and below:
+
+![bluetoothwiring](bluetoothwiring.jpg)
+
+
+software
+using.....
 
 
 
