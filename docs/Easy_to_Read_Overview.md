@@ -897,7 +897,6 @@ New wiring changes to make:
 
 ![rewiring](rewiring.png)
 
-![wifiwiring](wifiwiring.png)
 
 ![wificlose](wificlose.png)
 
@@ -915,47 +914,115 @@ A folder WiFiEsp-master.zip will download
 
 -Open up the Arduino IDE (similar to above in earlier steps) but this time click Sketch, Library, Add ZIP Library, select WiFiEsp-master.zip
 
+-This worked quite well on laptop:
+
 
 ![addlibrary](addlibrary.png)
 
 
+--wi-Fi Software--
 
 
+Just like the other Steps above (i.e., "Lessons" in the Osoyoo manual) there is demo software that will work with the Wi-Fi shield in your robotic car.
 
-New software to download:
+-The link shown in the manual works fine -- you will have folder containing m2-lesson5.ino which will work with the Arduino development environment (IDE). The manual also shows you what some of the Arduino IDE screens will look like.
 
--The link shown in the manual works fine -- you will have folder containing m2-lesson4.ino which will work with the Arduino development environment (IDE). The manual also shows you what some of the Arduino IDE screens will look like.
+-Unlike the other lessons, in this lesson there is a lesson5a and a lesson5b software demos.  In the lesson5a demo the Wi-Fi board on the robot car becomes the Wi-Fi access point ("hotspot" is the term used by the Osoyoo manual) and your cellphone (aghhhh.... let's hope Osoyoo created a valid app for Android this time :) becomes the client. In the lesson5b demo the Wi-Fi board on the robot car becomes a node (i.e., a client) in the LAN where the robot car is operating -- we will specify the LAN's router's Wi-Fi SSID and password to the robot car, but still end up using the cellphone app to control the car (agghhh.... given what I wrote above let's hope Osoyoo created working apps for Android this time :)  
 
--Always virus scan files when you download them. I virus scanned this file -- it is fine according to NAV Feb 8, 2024 (of course, as would be expected).
+-OK.... it is usually simpler for a device to become a hotspot (i.e., simpler from the software creation point of view; many new products on Kickstarter, for example, just have their Internet-enabled device become a hotspot so they don't have to worry about logging into a LAN which always becomes more complicated than it sounds due to security layers on some LANs) thus let's choose lesson5a software where the Wi-Fi car becomes the hotspot.
 
--Then open the Arduino IDE exactly as described above. As well, the manual shows several screens of the Arduino IDE. Make sure your Arduino IDE is configured exactly like before (i.e., correct Arduino board is specified).
+-(I would have chosen the option where I don't have to use a mobile phone app, but given that both 5a and 5b use an Osoyoo mobile phone app, let's go with lesson5a demo.)
 
--Click 'Open' and load in m2-lesson4.ino
+-Ok... when you unzip folder m2-lesson5 folder, you will see the folder m2-lesson5a
+
+-Always virus scan files when you download them and when you extract them. I virus scanned this folder -- it is fine according to NAV Feb 9, 2024 (of course, as would be expected).
+
+-Then open the Arduino IDE exactly as described above in earlier Steps (or "lessons"). As well, the manual shows several screens of the Arduino IDE. Make sure your Arduino IDE is configured exactly like before (i.e., correct Arduino board is specified).
+
+-Click 'Open' and load in m2-lesson5a.ino
 
 -Then attach the USB cable to the Arduino board connector on the robot car, exactly like you did above when we uploaded software to the car's Arduino board. (The power on your robot car should be turned off -- the cable will supply power to the Arduino board. Plug the cable first into the Arduino board, i.e., the unpowered side, then plug the cable into your laptop (better to do this when your laptop is powered off, but in the real world, most of us will not bother to do this, and almost always fine if no extreme static discharges/shorts/etc.)
 
 -Now click the upload arrow (green arrow inside a circle at the top left corner).
 
--The software in m2-lesson4.ino will now be uploaded to the Arduino board in your robotic car.
-
-
-
-
-
-
-
+-The software in m2-lesson5a.ino will now be uploaded to the Arduino board in your robotic car.
 
 
 ![downloadlesson5a](downloadlesson5a.png)
 
 
+-To make sure that the Wi-Fi board (mounted on the Arduino board) in your robot car is now acting as a hotspot, you need to open your Arduino "serial monitor" -- click Tools and then click Serial Monitor
+
 ![choosemonitor](choosemonitor.png)
 
+-This is the screenshot from my computer -- after a few seconds you will see that the Wi-Fi board is acting as a local access point (i.e., hotspot). The IP address shown on my computer (i.e., on the Serial Monitor) is 192.168.4.1 with a message to browse to http://192.168.4.1 for access.
 
 ![serialmonitor](serialmonitor.png)
 
 
+Ok.... now we need the Osoyoo mobile app to access the Wi-Fi hotspot on your robot car and use that communication link with the hotspot to control the car.
+
+
+--Installing the Osoyoo Mobile App--
+
+-If you have an Apple phone then you will go to the Apple Store
+
+-However, since I have an Android phone (Pixel 7) I will go to the Google Play store
+
+-The Osoyoo Manual Lesson 5 advises to search "Osoyoo Wifi UDP Robot Car Controller"
+
+-Unfortunately when I do this search (Feb 9, 2024) the only app that appears in the Google Play store is "Osoyoo IoT UDP Robot APP" -- well, better than nothing, and maybe it will do the same thing.... so this app is installed on my Android cellphone
+
+![searchplay](searchplay.png)
+
+-Ok we open the Osoyoo IoT UDP Robot APP
+
+-Then go to Settings and enter the IP address this app should access (since we want it to access the Wi-Fi board on the robot car)
+
+![appsettings](wifiapp.png)
+
+-Ok...now go to the main page of the app.
+
 ![wifiapp](wifiapp.png)
+
+-Ok... turn on the robot car
+
+-Let's click a button on the app.... go forward
+
+The car goes forward.
+
+Click backwards, left and right.
+
+They all work .... we can control the robot car via Wi-Fi.
+
+![wifiworks](wifiworks)
+
+
+Success :)
+
+![gptrequest](gptrequest.png)
+![successpic](successpic.png)
+
+Well, you probably notice you are at the end of the Osoyoo Manual now. Does this mean that we're at the end of the Basic Overview of the robot car?
+
+No, not yet.
+
+Let's take a look at some of the code we've been transferring to the Arduino board via the Arduino IDE, and try modifying some of it.
+
+
+-
+-
+-
+-
+
+
+**Step #15 -- Software Modifications -- Basic Parameter Changes**
+
+
+![chooseboard](chooseboard.png)
+
+
+
 
 
 
