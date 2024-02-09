@@ -814,7 +814,7 @@ We really just want to try out the Bluetooth capabilities of the robot car -- it
 
 We still have a few extra of the female to male connectors. Ok... let's bend the metal prongs that should have been in the slot connectors at D18 and D19, and put the female part of the connectors on them. Done... easy. Ok.... we can solder together the male to male connectors coming from the B_TX and B_RX of the Wi-Fi board but even easier we can jab the two metal parts into each other's plastic enclosure and then twist the metal parts together for an electrical connection (another few seconds and the job is done :).
 
-Picture showing the missing slots for the higher numbered D pins and the hack (i.e., solution):
+Picture showing the missing slots for the higher numbered D pins and the hack (female ends pressure-forced onto the bent underlying stiff wires of D18 and D19 on the Arduino board and their male ends on the other side forced into the plastic of the male ends of the wires coming from B_TX and B_RX of the Wi-Fi board with male ends of both wires twisted together giving mechanical stability and electrical continuity -- in the upper right portion of the photograph -- yellow male to tan male wire, orange male to white male wire):
 
 ![connectorhack](connectorhack.jpg)
 
