@@ -181,7 +181,7 @@ get the full number of '18650'. Osoyoo does not specify the battery chemistry bu
 1990s (used in laptops often), and generally were graphite anodes and lithium-metal oxide cathodes. Each 18650 had a capacity of about 2500mA-h (Osoyoo notes they are 2000mAh).
 Of interest, 2.5A*3.7volts*1 hour = 9.25 watt-hour x 2 batteries ~= 20 watt-hrs = 0.02 kWh. In comparison the cheapest Tesla EV Model 3 (cheaper than an average internal
 combustion engine vehicle at the time of this writing) has a battery with 54kWh -- equivalent to having about 6000 of the 18650 batteries. Alas, not as many as required to
-generate the 1,000,000 kWh in the Tesla Semi which would be about 100,000 of the Osoyoo 18650 batteries -- yes, one would have to purchase many, many Osoyoo robotic car kits to
+generate the thousand kWh in the Tesla Semi which would be about 100,000 of the Osoyoo 18650 batteries -- yes, one would have to purchase many, many Osoyoo robotic car kits to
 build an electric car or electric semi truck :)
 
 
@@ -213,9 +213,11 @@ Lesson 4 -- Bluetooth interface to the robot car -- this board has not been inst
 
 (Bluetooth and Wi-Fi are both wireless mechanisms that allow computer devices to talk to each other and the Internet without using wires (i.e., that is why they are "wireless"). 
 
--Wi-Fi is mainly used to connect computer devices to the Internet. Usually a computerized device communicates to a local area netwowrk (LAN) router which then communicates to the Internet, e.g., over a cable TV cable in a house, a telephone line designed for high speed data exchange, a fiberoptic cable, and so on, which attaches the router which then goes to an Internet Service Provider (in Canada generally one of the telephone/cellphone/cable TV companies) to the Internet backbone.
+-Almost everyone in the modern world is familiar with Wi-Fi which is mainly used to wirelessly connect computer devices to the Internet -- a computerized device communicates to a local area netwowrk (LAN) router which then communicates to the Internet via an Internet Service Provider (in Canada generally one of the telephone/cellphone/cable TV companies) to the Internet backbone.
 
--Bluetooth, on the other hand, typically is used to connect computer devices between each other and over short distances. For example, a Bluetooth keyboard will use radio signals to allow a computer keyboard to communicate with your laptop without needing a wired cable for the keyboard. Bluetooth is slower than Wi-Fi and usually has a shorter range of ten meters or less. However, Bluetooth is actually a full wireless communication technology. Bluetooth can work without WiFi and without the Internet, although in most situations, Bluetooth is used with both. For example, you might be  listening to a podcast on your Bluetooth earbuds which wirelessly communicate with your Bluetooth-enabled cellphone. Your cellphone also has Wi-Fi and is attached by Wi-Fi to the router in your house which is attached to the Internet and allows the podcast to stream into your cellphone.)
+-All of us have probably used Bluetooth at some time, especially if we have "Bluetooth" earbuds that wireless connect to our cellphones -- that is the purpose of Bluetooth, i.e., used to wirelessly connect computer devices between each other and over short distance. Bluetooth has been commercially available since 1999 but never worked well (trouble pairing two devices to each other was a common consumer complaint) until the large cellphone manufacturers started engineering better Bluetooth pairs in the cellphone and the earbuds. Depending on the engineering effort, modern Bluetooth devices can work great or can be terrible. Bluetooth operates at typically 2.4GHz (with enough of a one megaHertz bandwidth for a clear audio transmission to your earbuds:) and is a spread spectrum technology with typically Gaussian frequency-shift keying modulation (essentially a common FM technique, used in many devices, e.g., perhaps your garage door opener if you have one for a house or apartment building; the Gaussian filtering makes the transitions smoother and reduces the sideband (generation will end up being interference to an adjacent frequency channel; lots of tricks going back decades for single-sideband, etc)). Note that the frequency modulation has nothing to do with the frequency hopping. The frequency-shift keying FM is within a frequency channel. However, Bluetooth frequently hops between different channel (i.e., frequency main channels). This Frequency-Hopping Spread Spectrum technique reduces interference with other signals, perhaps another Bluetooth device, and has the effect of producing a secure signal (since the signal is jumping around all the time so hard to intercept) that is robust in noisy environments. However, both Bluetooth devices must change frequencies in synch via a pseudorandom sequence used in the protocol. Lots of requirements -- if the engineering of the products is poor, Bluetooth is much more troublesome than modern Wi-Fi. Bluetooth 4.0 in 2010 addressed many of the limitations of using Bluetooth between real-world devices and finally Bluetooth 5.0 in 2016 smoothed out the consumer experience with a myriad of engineering improvements over the original Bluetooth from the 1990s.)
+
+
 
 The Bluetooth module will be inserted into the Wi-Fi Board:
 ![bluetooth module](bluetooth.png)
@@ -223,7 +225,7 @@ The Bluetooth module will be inserted into the Wi-Fi Board:
 
 Lesson 5 -- Wi-Fi interface to the robot car -- the Wi-Fi shield has already been installed in photo showing the electronics of my assembled robot car.
 
-(As noted above, Bluetooth and Wi-Fi are both wireless mechanisms that allow computer devices to talk to each other and the Internet without using wires. -Wi-Fi is mainly used to connect computer devices to the Internet, e.g., your laptop can wireless communicate using Wi-Fi with a router that interfaces to the Internet, allowing you Internet access on your laptop. Bluetooth, on the other hand, typically is used to connect computer devices between each other and over short distances, e.g., a Bluetooth keyboard can wirelessly communicate with your laptop.)
+As noted above, Bluetooth and Wi-Fi are both wireless mechanisms that allow computer devices to talk to each other and the Internet without using wires.
 
 The Wi-Fi board will now actively interface to the Arduino board:
 ![Wi-Fi](wifi.png)
@@ -261,7 +263,7 @@ Assembled chassis (Note that the straps are still loose until the assembly is co
 -Tip: Careful about not wasting wire in threading through the center hole and to the motor control board -- there will not be much excess wire on one side.
 (Also, note that only the red power and black ground wire from the motors are controlled by the motor board. The other colored wires are from the motor's Hall sensor and are not used at this point in the project. Hall sensors can measure the magnitude and orientation of a magnetic field, so, usually a pair or equivalent of magnets rotate without any physical contact and the Hall sensor detects their location, i.e., effectively the location of the rotor of the motor, which can be very useful in precision robotic applications.)
 
-(The Osoyoo "Model Y 2.0 Motor Driver Board for Arduino Robotic Car Kit" is a 4-channel H-bridge motor driver. H-brdige circuits allow voltage to be applied across a load in either direction, which is very useful for controlling the rotation direction of a DC motor such as used in the robotic car. A simple, silicon transistor H-bridge circuit is shown below -- as can be seen it looks like an 'H' thus the name. The Osoyoo board uses the PT5126 chip as a DC motor driver, which can supply up to 2.8Amps at a voltage of 2 - 24 volts, useful for bidirectional control of electric motors. It is a single-channel chip, so I am not sure how Osoyoo gets the 4-channels -- perhaps in the future reverse engineer the board and see how it works exactly. They specify using two such chips in their product specifications, although just by looking at the layout of the PCB it looks like there are 4 such chips, although the lettering on the chip packages are faded so I cannot read the parts numbers, which would make more sense.)
+(The Osoyoo "Model Y 2.0 Motor Driver Board for Arduino Robotic Car Kit" is a 4-channel H-bridge motor driver. H-bridge circuits allow voltage to be applied across a load in either direction, which is very useful for controlling the rotation direction of a DC motor such as used in the robotic car. A simple, silicon transistor H-bridge circuit is shown below -- as can be seen it looks like an 'H' thus the name. The Osoyoo board uses the PT5126 chip as a DC motor driver, which can supply up to 2.8Amps at a voltage of 2 - 24 volts, useful for bidirectional control of electric motors. It is a single-channel chip, so I am not sure how Osoyoo gets the 4-channels -- perhaps in the future reverse engineer the board and see how it works exactly. They specify using two such chips in their product specifications, although just by looking at the layout of the PCB it looks like there are 4 such chips, although the lettering on the chip packages are faded so I cannot read the parts numbers, which would make more sense.)
 
 ![siliconHbridge](siliconHbridge.png)
 
@@ -786,9 +788,8 @@ The car will now follow a black line (2 - 3 cm wide) on a white background.
 
  As noted above, Bluetooth and Wi-Fi are both wireless mechanisms that allow computer devices to talk to each other and the Internet without using wires (i.e., that is why they are "wireless"). 
 
--Wi-Fi is mainly used to connect computer devices to the Internet. Usually a computerized device communicates to a local area netwowrk (LAN) router which then communicates to the Internet, e.g., over a cable TV cable in a house, a telephone line designed for high speed data exchange, a fiberoptic cable, and so on, which attaches the router which then goes to an Internet Service Provider (in Canada generally one of the telephone/cellphone/cable TV companies) to the Internet backbone.
+-As noted above, all of us have probably used Bluetooth at some time, especially if we have "Bluetooth" earbuds that wireless connect to our cellphones -- that is the purpose of Bluetooth, i.e., used to wirelessly connect computer devices between each other and over short distance. Bluetooth has been commercially available since 1999 but never worked well (trouble pairing two devices to each other was a common consumer complaint) until the large cellphone manufacturers started engineering better Bluetooth pairs in the cellphone and the earbuds. Depending on the engineering effort, modern Bluetooth devices can work great or can be terrible. Bluetooth operates at typically 2.4GHz (with enough of a one megaHertz bandwidth for a clear audio transmission to your earbuds:) and is a spread spectrum technology with typically Gaussian frequency-shift keying modulation (essentially a common FM technique, used in many devices, e.g., perhaps your garage door opener if you have one for a house or apartment building; the Gaussian filtering makes the transitions smoother and reduces the sideband (generation will end up being interference to an adjacent frequency channel; lots of tricks going back decades for single-sideband, etc)). Note that the frequency modulation has nothing to do with the frequency hopping. The frequency-shift keying FM is within a frequency channel. However, Bluetooth frequently hops between different channel (i.e., frequency main channels). This Frequency-Hopping Spread Spectrum technique reduces interference with other signals, perhaps another Bluetooth device, and has the effect of producing a secure signal (since the signal is jumping around all the time so hard to intercept) that is robust in noisy environments. However, both Bluetooth devices must change frequencies in synch via a pseudorandom sequence used in the protocol. Lots of requirements -- if the engineering of the products is poor, Bluetooth is much more troublesome than modern Wi-Fi. Bluetooth 4.0 in 2010 addressed many of the limitations of using Bluetooth between real-world devices and finally Bluetooth 5.0 in 2016 smoothed out the consumer experience with a myriad of engineering improvements over the original Bluetooth from the 1990s.
 
--Bluetooth, on the other hand, typically is used to connect computer devices between each other and over short distances. For example, a Bluetooth keyboard will use radio signals to allow a computer keyboard to communicate with your laptop without needing a wired cable for the keyboard. Bluetooth is slower than Wi-Fi and usually has a shorter range of ten meters or less. However, Bluetooth is actually a full wireless communication technology. Bluetooth can work without WiFi and without the Internet, although in most situations, Bluetooth is used with both. For example, you might be  listening to a podcast on your Bluetooth earbuds which wirelessly communicate with your Bluetooth-enabled cellphone. Your cellphone also has Wi-Fi and is attached by Wi-Fi to the router in your house which is attached to the Internet and allows the podcast to stream into your cellphone.
 
 
 Go to Lesson 4 in the Osoyoo Manual and follow the instructions to insert the Bluetooth Module (which comes with the kit) in to the Wi-Fi board shield (which is, of course, on top of the Arduino board):
@@ -802,6 +803,8 @@ Then use two jumpers to connect B_TX and B_RX of the Wi-Fi shield to pins D19 an
 Ahhh.... problem!!
 
 My Arduino board actually appears defective -- they did not install slots for the higher numbered D pins (there seem to be slots everywhere else).
+
+Ok.... did I overlook this in unpacking my robotic car kit..... yup.... early photographs of unpacking show the connector missing when I unpacked (and you can see that in photographs above). Ok... that doesn't really help much.... I'm not sure if I would have returned the kit to Amazon given that everything seems to work ok on the Arduino board.... but still... sort of bad that a connector is missing from the board -- perhaps never installed in manufacture since the Board looks like it is brand new otherwise....
 
 Ok.... in engineering there are kludges and hacks. A "kludge" tends to be a quick fix with a negative connotation as well as requiring other kludges to fix the original kludge. On the other hand, a "hack" done well can be quite elegant and an overall solution. 
 
@@ -842,7 +845,19 @@ Disconnected my Pixel 7. Turned it off. Turned robotic car power off and then on
 
 Aghhh.... would have liked to have tried out the app.... but can come back to this issue.
 
-Hopefully you the reader will be able to pair your smartphone and have more success installing and trying out the imitiation driving app.
+Plan at this time:
+-can consider Bluetooth in the future as communication medium if essential, e.g., get an Arduino library routine for Bluetooth, perhaps try another Bluetooth board, and get a PyPI library routine for Bluetooth, and see if my Python programs can communicate with the Arduino board
+-at this time, given that no Android version of the app exists and my friend's iPhone cannot pair with the Bluetooth board (iPhone's are nicely engineered products) although my Pixel can pair (although it seems the abilities of my Pixel are better than any phone I've ever used -- always robust no matter how terrible cell phone signals or Wi-Fi signals are, more than nicely engineered but incredibly engineered), I'm not going to expend more effort on this issue
+-perhaps try another friend's cellphone if the opportunity presents itself (the iPhone I tried was 4 years old; perhaps newer iPhones are as robust as the Pixel7 cellphone in pairing with Bluetooth devices)
+-given that Bluetooth is not required for the next lesson, time to move on.....
+
+I just asked GPT4 for a picture to illustrate my feelings to you the reader. Here is what it drew (first time, no regenerations):
+
+![horsetonextlesson](horsetonextlesson.png)
+
+
+
+Hopefully you the reader will be able to Bluetooth pair your smartphone and have more success installing and trying out the imitiation Bluetooth driving app.
 
 -
 -
