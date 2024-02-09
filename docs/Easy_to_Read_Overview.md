@@ -989,7 +989,9 @@ Ok.... now we need the Osoyoo mobile app to access the Wi-Fi hotspot on your rob
 
 -Ok... turn on the robot car
 
--Let's click a button on the app.... go forward
+-Remember, the car's Wi-Fi board will be the new server, i.e., Wi-Fi access spot or hotspot. Thus, turn off the cellphone Internet you may have. Disconnect from your workplace's LAN or your home's Wi-Fi LAN. In the Settings of your smartphone, for to Internet, and choose "osoyoo_robot". (It may say "no Internet access" -- ignore this warning since you are not accessing the Internet, you are accessing the robotic car.) Thus, at this point, when you look at the Wi-Fi connection of your cellphone, it should be to "osoyoo_robot".  (Some cellphones may try to switch back to your regular Wi-Fi settings after a minute of no Internet activity -- if your phone does this, please turn this option off. You want to stay connected to "osoyoo_robot".)
+
+-Now, let's click a button on the app.... go forward
 
 The car goes forward.
 
