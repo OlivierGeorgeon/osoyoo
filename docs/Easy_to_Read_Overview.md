@@ -895,6 +895,8 @@ New wiring changes to make:
 
 -Now connect D18 and D19 to E_RX and E_TX on the Wi-Fi board.
 
+(Note. In the picture below the orange wire actually is going to E_TX and then the male-male hacked connection and then to D19, and similarly the yellow wire is going to E_RX and then to D18 via the other male-to-male hacked connection, which is a reveral of the yellow and orange in the schematic diagram, i.e., colors are reversed, but the wiring is the same.)
+
 ![rewiring](rewiring.png)
 
 
@@ -902,7 +904,7 @@ New wiring changes to make:
 
 --Software Installation--
 
---Libary Software--
+--Library Software--
 
 In this step there is now an extra requirement to download and update an Arduino library zip file.
 
@@ -914,22 +916,22 @@ A folder WiFiEsp-master.zip will download
 
 -Open up the Arduino IDE (similar to above in earlier steps) but this time click Sketch, Library, Add ZIP Library, select WiFiEsp-master.zip
 
--This worked quite well on laptop:
+-This worked quite well on my computer:
 
 
 ![addlibrary](addlibrary.png)
 
 
---wi-Fi Software--
+--Wi-Fi Software--
 
 
 Just like the other Steps above (i.e., "Lessons" in the Osoyoo manual) there is demo software that will work with the Wi-Fi shield in your robotic car.
 
--The link shown in the manual works fine -- you will have folder containing m2-lesson5.ino which will work with the Arduino development environment (IDE). The manual also shows you what some of the Arduino IDE screens will look like.
+-The link shown in the manual works fine -- you will download a folder containing m2-lesson5.ino which will work with the Arduino development environment (IDE). The manual also shows you what some of the Arduino IDE screens will look like.
 
 -Unlike the other lessons, in this lesson there is a lesson5a and a lesson5b software demos.  In the lesson5a demo the Wi-Fi board on the robot car becomes the Wi-Fi access point ("hotspot" is the term used by the Osoyoo manual) and your cellphone (aghhhh.... let's hope Osoyoo created a valid app for Android this time :) becomes the client. In the lesson5b demo the Wi-Fi board on the robot car becomes a node (i.e., a client) in the LAN where the robot car is operating -- we will specify the LAN's router's Wi-Fi SSID and password to the robot car, but still end up using the cellphone app to control the car (agghhh.... given what I wrote above let's hope Osoyoo created working apps for Android this time :)  
 
--OK.... it is usually simpler for a device to become a hotspot (i.e., simpler from the software creation point of view; many new products on Kickstarter, for example, just have their Internet-enabled device become a hotspot so they don't have to worry about logging into a LAN which always becomes more complicated than it sounds due to security layers on some LANs) thus let's choose lesson5a software where the Wi-Fi car becomes the hotspot.
+-OK.... it is usually simpler for a device to become a hotspot (i.e., simpler from the software creation point of view; many new products on Kickstarter start-up innovation site, for example, just have their Internet-enabled device become a hotspot so they don't have to worry about logging into a LAN (which always becomes more complicated than it sounds due to security layers on some LANs). Thus let's choose lesson5a software where the Wi-Fi car becomes the hotspot.
 
 -(I would have chosen the option where I don't have to use a mobile phone app, but given that both 5a and 5b use an Osoyoo mobile phone app, let's go with lesson5a demo.)
 
@@ -979,7 +981,7 @@ Ok.... now we need the Osoyoo mobile app to access the Wi-Fi hotspot on your rob
 
 -Then go to Settings and enter the IP address this app should access (since we want it to access the Wi-Fi board on the robot car)
 
-![appsettings](wifiapp.png)
+![appsettings](appsettings.png)
 
 -Ok...now go to the main page of the app.
 
@@ -995,7 +997,7 @@ Click backwards, left and right.
 
 They all work .... we can control the robot car via Wi-Fi.
 
-![wifiworks](wifiworks)
+![wifiworks](wifiworks.jpg)
 
 
 Success :)
