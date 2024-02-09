@@ -899,7 +899,7 @@ New software to download:
 
 -The software in m2-lesson4.ino will now be uploaded to the Arduino board in your robotic car.
 
-![wifiwiring](wifiwiring.png)
+![wificlose](wificlose)
 
 ![rewiring](rewiring.png)
 
