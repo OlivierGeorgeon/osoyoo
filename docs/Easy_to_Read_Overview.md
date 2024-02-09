@@ -857,6 +857,8 @@ Plan at this time:
 
 -perhaps try another friend's cellphone if the opportunity presents itself (the iPhone I tried was 4 years old; perhaps newer iPhones are as robust as the Pixel7 cellphone in pairing with Bluetooth devices)
 
+-research into Bluetooth board used by Osoyoo -- it is the "HC02 Bluetooth Module" which supports Bluetooth 2.0 although it talks about Bluetooth BLE 4.0; perhaps try a different more recently released pin-compatible Bluetooth module for the Arduino board and quickly see if it can pair more easily with an iPhone (since we need an iPhone to run the app) and if it works compatibly with the Osoyoo setup and software
+
 -given that Bluetooth is not required for the next lesson, time to move on.....
 
 
