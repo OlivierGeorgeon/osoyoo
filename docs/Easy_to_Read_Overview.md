@@ -853,7 +853,7 @@ Plan at this time:
 
 -can consider Bluetooth in the future as communication medium if essential, e.g., get an Arduino library routine for Bluetooth, perhaps try another Bluetooth board, and get a PyPI library routine for Bluetooth, and see if my Python programs can communicate with the Arduino board
 
--at this time, given that no Android version of the app exists and my friend's iPhone cannot pair with the Bluetooth board (iPhone's are nicely engineered products) although my Pixel can pair (although it seems the abilities of my Pixel are better than any phone I've ever used -- always robust no matter how terrible cell phone signals or Wi-Fi signals are, more than nicely engineered but incredibly engineered), I'm not going to expend more effort on this issue
+-at this time, given that no Android version of the app exists and my friend's iPhone cannot pair with the Bluetooth board (iPhone's are nicely engineered products) although my Pixel can pair (although it seems the abilities of my Pixel are better than any phone I've ever used -- always robust no matter how terrible cell phone signals or Wi-Fi signals are --incredibly engineered), I'm not going to expend more effort on this issue
 
 -perhaps try another friend's cellphone if the opportunity presents itself (the iPhone I tried was 4 years old; perhaps newer iPhones are as robust as the Pixel7 cellphone in pairing with Bluetooth devices)
 
@@ -877,16 +877,49 @@ Hopefully you the reader will be able to Bluetooth pair your smartphone and have
 
 **Step #14 -- Adding Wi-Fi Control of the Robotic Car**
 
+Ok... let's hope we have better luck with Wi-Fi compared to Bluetooth in the Step above.
+
+
+Go to Lesson 5 in the Osoyoo Manual.
+
+---Hardware Installation--
+
 The Wi-Fi shield was installed into the Arduino board above when the robotic car was first built.
+
+--Wiring Installation--
 
 New wiring changes to make:
 
 -Remove the connections from the Wi-Fi B_TX and B_RX to D18 and D19 (the ones requiring a hack above).
-(In my case I just removed from the Wi-Fi board -- I didn't want to untwist the connectors and nor pull the connectors off the fragile bent pins of D18 and D19.)
+(In my case I just removed from the Wi-Fi board since we will still require connection to D18 and D19 for the Wi-Fi functionality.)
 
 -Now connect D18 and D19 to E_RX and E_TX on the Wi-Fi board.
 
+![rewiring](rewiring.png)
+
 ![wifiwiring](wifiwiring.png)
+
+![wificlose](wificlose.png)
+
+--Software Installation--
+
+--Libary Software--
+
+In this step there is now an extra requirement to download and update an Arduino library zip file.
+
+-download the library zip file from the link provided in the Osoyoo Manual Lesson 5 
+(In the Manual version I was using the link went to:  http://osoyoo.com/driver/mecanum_metal_chassis/for_mega2560/WiFiEsp-master.zip )
+A folder WiFiEsp-master.zip will download
+
+-virus scan the file always after downloading and before clicking or using
+
+-Open up the Arduino IDE (similar to above in earlier steps) but this time click Sketch, Library, Add ZIP Library, select WiFiEsp-master.zip
+
+
+![addlibrary](addlibrary.png)
+
+
+
 
 
 New software to download:
@@ -905,12 +938,12 @@ New software to download:
 
 -The software in m2-lesson4.ino will now be uploaded to the Arduino board in your robotic car.
 
-![wificlose](wificlose.png)
-
-![rewiring](rewiring.png)
 
 
-![addlibrary](addlibrary.png)
+
+
+
+
 
 
 ![downloadlesson5a](downloadlesson5a.png)
