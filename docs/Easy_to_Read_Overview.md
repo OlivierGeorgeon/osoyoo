@@ -846,10 +846,15 @@ Disconnected my Pixel 7. Turned it off. Turned robotic car power off and then on
 Aghhh.... would have liked to have tried out the app.... but can come back to this issue.
 
 Plan at this time:
+
 -can consider Bluetooth in the future as communication medium if essential, e.g., get an Arduino library routine for Bluetooth, perhaps try another Bluetooth board, and get a PyPI library routine for Bluetooth, and see if my Python programs can communicate with the Arduino board
+
 -at this time, given that no Android version of the app exists and my friend's iPhone cannot pair with the Bluetooth board (iPhone's are nicely engineered products) although my Pixel can pair (although it seems the abilities of my Pixel are better than any phone I've ever used -- always robust no matter how terrible cell phone signals or Wi-Fi signals are, more than nicely engineered but incredibly engineered), I'm not going to expend more effort on this issue
+
 -perhaps try another friend's cellphone if the opportunity presents itself (the iPhone I tried was 4 years old; perhaps newer iPhones are as robust as the Pixel7 cellphone in pairing with Bluetooth devices)
+
 -given that Bluetooth is not required for the next lesson, time to move on.....
+
 
 I just asked GPT4 for a picture to illustrate my feelings to you the reader. Here is what it drew (first time, no regenerations):
 
@@ -893,6 +898,21 @@ New software to download:
 -Now click the upload arrow (green arrow inside a circle at the top left corner).
 
 -The software in m2-lesson4.ino will now be uploaded to the Arduino board in your robotic car.
+
+
+![addlibrary](addlibrary.png)
+
+
+![downloadlesson5a](downloadlesson5a.png)
+
+
+![choosemonitor](choosemonitor.png)
+
+
+![serialmonitor](serialmonitor.png)
+
+
+![wifiapp](wifiapp.png)
 
 
 
