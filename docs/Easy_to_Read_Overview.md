@@ -813,13 +813,73 @@ Picture showing the missing slots for the higher numbered D pins and the hack (i
 
 ![connectorhack](connectorhack.jpg)
 
+Now you need to download the software for controlling the robotic car with Bluetooth.
+
+-The link shown in the manual works fine -- you will have folder containing m2-lesson4.ino which will work with the Arduino development environment (IDE). The manual also shows you what some of the Arduino IDE screens will look like.
+
+-Always virus scan files when you download them. I virus scanned this file -- it is fine according to NAV Feb 8, 2024 (of course, as would be expected).
+
+-Then open the Arduino IDE exactly as described above. As well, the manual shows several screens of the Arduino IDE. Make sure your Arduino IDE is configured exactly like before (i.e., correct Arduino board is specified).
+
+-Click 'Open' and load in m2-lesson4.ino
+
+-Then attach the USB cable to the Arduino board connector on the robot car, exactly like you did above when we uploaded software to the car's Arduino board. (The power on your robot car should be turned off -- the cable will supply power to the Arduino board. Plug the cable first into the Arduino board, i.e., the unpowered side, then plug the cable into your laptop (better to do this when your laptop is powered off, but in the real world, most of us will not bother to do this, and almost always fine if no extreme static discharges/shorts/etc.)
+
+-Now click the upload arrow (green arrow inside a circle at the top left corner).
+
+-The software in m2-lesson4.ino will now be uploaded to the Arduino board in your robotic car.
 
 
+Ok... software successfully loaded. Let's see if I can pair my cellphone (an Android Pixel 7) with the Bluetooth board on the robotic car. Success -- it detects a device called HC02 which is from the robotic car and successfully pairs with it.
+
+Ok...now to download the mobile app and control the robotic car from my cellphone. Search for the "Osoyoo Imitiation Driving" app. Found on the Google Play store. Download.....
+Aghhh another problem!!  Error message that this program is too old for my cellphone.
+
+Ok.... I have an older Android phone... try again... same error message that the "Osoyoo Imitiation Driving" app is too old for the older cellphone (which may have had an Android OS update in the past). 
+
+Ok.... borrow an iPhone from a friend. Able to install the "Osoyoo Imitiation Driving" app but.... the iPhone refuses to pair with the robotic car Bluetooth. 
+Disconnected my Pixel 7. Turned it off. Turned robotic car power off and then on again. Still unable to pair with the robotic car Bluetooth.
+
+Aghhh.... would have liked to have tried out the app.... but can come back to this issue.
+
+Hopefully you the reader will be able to pair your smartphone and have more success installing and trying out the imitiation driving app.
+
+-
+-
+-
+-
+
+**Step #14 -- Adding Wi-Fi Control of the Robotic Car**
+
+The Wi-Fi shield was installed into the Arduino board above when the robotic car was first built.
+
+New wiring changes to make:
+
+-Remove the connections from the Wi-Fi B_TX and B_RX to D18 and D19 (the ones requiring a hack above).
+(In my case I just removed from the Wi-Fi board -- I didn't want to untwist the connectors and nor pull the connectors off the fragile bent pins of D18 and D19.)
+
+-Now connect D18 and D19 to E_RX and E_TX on the Wi-Fi board.
+
+![wifiwiring](wifiwiring.png)
 
 
-Pl
-software
-using.....
+New software to download:
+
+-The link shown in the manual works fine -- you will have folder containing m2-lesson4.ino which will work with the Arduino development environment (IDE). The manual also shows you what some of the Arduino IDE screens will look like.
+
+-Always virus scan files when you download them. I virus scanned this file -- it is fine according to NAV Feb 8, 2024 (of course, as would be expected).
+
+-Then open the Arduino IDE exactly as described above. As well, the manual shows several screens of the Arduino IDE. Make sure your Arduino IDE is configured exactly like before (i.e., correct Arduino board is specified).
+
+-Click 'Open' and load in m2-lesson4.ino
+
+-Then attach the USB cable to the Arduino board connector on the robot car, exactly like you did above when we uploaded software to the car's Arduino board. (The power on your robot car should be turned off -- the cable will supply power to the Arduino board. Plug the cable first into the Arduino board, i.e., the unpowered side, then plug the cable into your laptop (better to do this when your laptop is powered off, but in the real world, most of us will not bother to do this, and almost always fine if no extreme static discharges/shorts/etc.)
+
+-Now click the upload arrow (green arrow inside a circle at the top left corner).
+
+-The software in m2-lesson4.ino will now be uploaded to the Arduino board in your robotic car.
+
+
 
 
 
