@@ -1,4 +1,4 @@
-# An Easy-to-Read Overview of the Robot Car Project
+# An Easy-to-Read Overview of the Robot Car Project: The Basics
 
 Welcome!! Bienvenue!! Tunngasugit!!
 
@@ -898,6 +898,10 @@ New software to download:
 -Now click the upload arrow (green arrow inside a circle at the top left corner).
 
 -The software in m2-lesson4.ino will now be uploaded to the Arduino board in your robotic car.
+
+![wifiwiring](wifiwiring.png)
+
+![rewiring](rewiring.png)
 
 
 ![addlibrary](addlibrary.png)
