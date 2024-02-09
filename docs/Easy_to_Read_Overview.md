@@ -804,7 +804,7 @@ Ahhh.... problem!!
 
 My Arduino board actually appears defective -- they did not install slots for the higher numbered D pins (there seem to be slots everywhere else).
 
-![missingconnector](missingconnector.jpg)
+![missingconnector](missingconnector.png)
 
 Ok.... did I overlook this in unpacking my robotic car kit..... yup.... early photographs of unpacking show the connector missing when I unpacked (and you can see that in photographs above). Ok... that doesn't really help much.... I'm not sure if I would have returned the kit to Amazon given that everything seems to work ok on the Arduino board.... but still... sort of bad that a connector is missing from the board -- perhaps never installed in manufacture since the Board looks like it is brand new otherwise....
 
