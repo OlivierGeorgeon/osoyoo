@@ -799,7 +799,25 @@ Then use two jumpers to connect B_TX and B_RX of the Wi-Fi shield to pins D19 an
 
 ![bluetoothwiring](bluetoothwiring.png)
 
+Ahhh.... problem!!
 
+My Arduino board actually appears defective -- they did not install slots for the higher numbered D pins (there seem to be slots everywhere else).
+
+Ok.... in engineering there are kludges and hacks. A "kludge" tends to be a quick fix with a negative connotation as well as requiring other kludges to fix the original kludge. On the other hand, a "hack" done well can be quite elegant and an overall solution. 
+
+We really just want to try out the Bluetooth capabilities of the robot car -- it will not be an essential feature we will be using later to interface our Python project to the robotic car (well... we didn't think so.... it could be.... there are not only Wi-Fi libraries for Python code but Bluetooth libraries too... so let's just try out the feature for now in a quick fashion, so a hack is ok). The proper solution would be to get a new Arduino Board (low cost part that is unlikely to be repaired) or purchase a slot and solder onto the board so board is properly re-furbished -- lots of delays and effort for little advantage. A simple and actually good hack would be to solder the male connectors to the other male connectors -- we have fine soldering irons capable of doing so easily (and our low-heat drop-the-solder-blob technique we've developed over the years :)  However, let's try an even more simple hack.
+
+We still have a few extra of the female to male connectors. Ok... let's bend the metal prongs that should have been in the slot connectors at D18 and D19, and put the female part of the connectors on them. Done... easy. Ok.... we can solder together the male to male connectors coming from the B_TX and B_RX of the Wi-Fi board but even easier we can jab the two metal parts into each other's plastic enclosure and then twist the metal parts together for an electrical connection (another few seconds and the job is done :).
+
+Picture showing the missing slots for the higher numbered D pins and the hack (i.e., solution):
+
+![connectorhack](connectorhack.jpg)
+
+
+
+
+
+Pl
 software
 using.....
 
