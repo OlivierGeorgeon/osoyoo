@@ -1037,7 +1037,7 @@ The human programmer, in this case a programmer at Osoyoo, writes a program whic
 
 The Arduino IDE is somewhat weak compared to other professional IDEs for software development. For example, debugging software is often an area where programmers spend much of their time, and these tools are weak in the Arduino IDE. Often software developers may use another IDE with an Arduino extension, e.g., Visual Studio Code with the Arduino extension, for serious Arduino software development.  However, nonetheless, the Arduino IDE includes a number of useful tools. Above we used, for example, the Serial Monitor tool.
 
-The Sketch language that Arduino uses is largely standard C/C++ -- often the syntax, structures and semantics of C/C++ will work. However, the structure of the Sketch and the libraries provided are specifically designed to work with Arduino boards. 
+The Sketch language that Arduino uses is largely standard C/C++ -- often the syntax, structures and semantics of C/C++ will work. However, the structure of the Sketch and the libraries provided are specifically designed to work with Arduino boards. (Apparently the standard GNU C++ compiler is used to compile Arduino programs, so despite the splitting of whether Ardinuou is C or C++ or a special form, it is being compiled by GNU C++ compiler which allows both C and C++ code compilation and whatever libraries Arduino is using. However, the Ardinuou build process is somewhat specific to Ardinuo. The Sketch 'ino' file is preprocessed so that it becomes valid C++ code (i.e., valid C++ syntax as well), then this code is compiled by avr-gcc into machine language for the selected target microcontroller with linking with the specific Arduino libraries.)
 
 The basic structure of an Arduino Sketch consists of two main parts -- 'setup()' and 'loop()'
 
@@ -1093,6 +1093,11 @@ You can try changing the values for the TURN_SPEED (turning speed) and the SHIFT
 
 The Arduino website provides thorough documentation of the Arduino board and the Arduino programming language and environment:  https://docs.arduino.cc/
 
+
+-
+-
+-
+-
 
 
 
