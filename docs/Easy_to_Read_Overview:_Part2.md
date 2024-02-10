@@ -97,14 +97,7 @@ Alternatively, to let the robot provide its own wifi osoyoo_robot as an access p
 # 2 load autocat_enacter.ino sketch and associated files #
 
 /*
- ____    ___  ______  ____  ______    __   ____  ______
-|    \  /  _]|      ||    ||      |  /  ] /    ||      |
-|  o  )/  [_ |      | |  | |      | /  / |  o  ||      |
-|   _/|    _]|_|  |_| |  | |_|  |_|/  /  |     ||_|  |_|
-|  |  |   [_   |  |   |  |   |  | /   \_ |  _  |  |  |
-|  |  |     |  |  |   |  |   |  | \     ||  |  |  |  |
-|__|  |_____|  |__|  |____|  |__|  \____||__|__|  |__|
-
+ 
  Upload autocat_enacter.ino to the OSOYOO robot car
 
   2023
@@ -242,10 +235,10 @@ This page explains how to test the PetitCat robot using the PetitCatTester.py fi
 
 
 #!/usr/bin/env python
-# Olivier Georgeon, 2023.
-# This code is used to teach Developmental AI.
-# Requires:
-#   - A PetiCat robot https://github.com/OlivierGeorgeon/osoyoo/wiki
+#Olivier Georgeon, 2023.
+#This code is used to teach Developmental AI.
+#Requires:
+#- A PetiCat robot https://github.com/OlivierGeorgeon/osoyoo/wiki
 
 import socket
 import keyboard
@@ -304,10 +297,10 @@ class PetitCatTester:
         return _outcome
 
 
-# Test the wifi interface by controlling the robot from the console
-# Provide the Robot's IP address as a launch argument
-# py PetitCatTester.py 192.168.8.242
-if __name__ == '__main__':
+#Test the wifi interface by controlling the robot from the console
+#Provide the Robot's IP address as a launch argument
+#py PetitCatTester.py 192.168.8.242
+if__name__ == '__main__':
     robot_ip = UDP_IP
     if len(sys.argv) > 1:
         robot_ip = sys.argv[1]
