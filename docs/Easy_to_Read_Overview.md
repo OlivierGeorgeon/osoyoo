@@ -612,7 +612,7 @@ Then download the demonstration software for the ultrasound detector.
 
 -Click 'Open' and load in m2-lesson2.ino
 
--Then attach the USB cable to the Arduino board connector on the robot car, exactly like you did above when we uploaded software to the car's Arduino board. (The power on your robot car should be turned off -- the cable will supply power to the Arduino board. Plug the cable first into the Arduino board, i.e., the unpowered side, then plug the cable into your laptop (better to do this when your laptop is powered off, but in the real world, most of us will not bother to do this, and almost always fine if no extreme static discharges/shorts/etc.)
+-Then attach the USB cable to the Arduino board connector on the robot car, exactly like you did above when we uploaded software to the car's Arduino board. The power on your robot car should be turned off -- the cable will supply power to the Arduino board.
 
 -Now click the upload arrow (green arrow inside a circle at the top left corner).
 
@@ -745,7 +745,7 @@ OK.... now we have to install new code to make use of the IR Sensor array.
 
 -Click 'Open' and load in m2-lesson3.ino
 
--Then attach the USB cable to the Arduino board connector on the robot car, exactly like you did above when we uploaded software to the car's Arduino board. (The power on your robot car should be turned off -- the cable will supply power to the Arduino board. Plug the cable first into the Arduino board, i.e., the unpowered side, then plug the cable into your laptop (better to do this when your laptop is powered off, but in the real world, most of us will not bother to do this, and almost always fine if no extreme static discharges/shorts/etc.)
+-Then attach the USB cable to the Arduino board connector on the robot car, exactly like you did above when we uploaded software to the car's Arduino board. (The power on your robot car should be turned off -- the cable will supply power to the Arduino board. 
 
 -Now click the upload arrow (green arrow inside a circle at the top left corner).
 
@@ -828,7 +828,7 @@ Now you need to download the software for controlling the robotic car with Bluet
 
 -Click 'Open' and load in m2-lesson4.ino
 
--Then attach the USB cable to the Arduino board connector on the robot car, exactly like you did above when we uploaded software to the car's Arduino board. (The power on your robot car should be turned off -- the cable will supply power to the Arduino board. Plug the cable first into the Arduino board, i.e., the unpowered side, then plug the cable into your laptop (better to do this when your laptop is powered off, but in the real world, most of us will not bother to do this, and almost always fine if no extreme static discharges/shorts/etc.)
+-Then attach the USB cable to the Arduino board connector on the robot car, exactly like you did above when we uploaded software to the car's Arduino board. (The power on your robot car should be turned off -- the cable will supply power to the Arduino board. )
 
 -Now click the upload arrow (green arrow inside a circle at the top left corner).
 
@@ -943,7 +943,7 @@ Just like the other Steps above (i.e., "Lessons" in the Osoyoo manual) there is 
 
 -Click 'Open' and load in m2-lesson5a.ino
 
--Then attach the USB cable to the Arduino board connector on the robot car, exactly like you did above when we uploaded software to the car's Arduino board. (The power on your robot car should be turned off -- the cable will supply power to the Arduino board. Plug the cable first into the Arduino board, i.e., the unpowered side, then plug the cable into your laptop (better to do this when your laptop is powered off, but in the real world, most of us will not bother to do this, and almost always fine if no extreme static discharges/shorts/etc.)
+-Then attach the USB cable to the Arduino board connector on the robot car, exactly like you did above when we uploaded software to the car's Arduino board. (The power on your robot car should be turned off -- the cable will supply power to the Arduino board. )
 
 -Now click the upload arrow (green arrow inside a circle at the top left corner).
 
@@ -1037,7 +1037,7 @@ The human programmer, in this case a programmer at Osoyoo, writes a program whic
 
 The Arduino IDE is somewhat weak compared to other professional IDEs for software development. For example, debugging software is often an area where programmers spend much of their time, and these tools are weak in the Arduino IDE. Often software developers may use another IDE with an Arduino extension, e.g., Visual Studio Code with the Arduino extension, for serious Arduino software development.  However, nonetheless, the Arduino IDE includes a number of useful tools. Above we used, for example, the Serial Monitor tool.
 
-The Sketch language that Arduino uses is largely standard C/C++ -- often the syntax, structures and semantics of C/C++ will work. However, the structure of the Sketch and the libraries provided are specifically designed to work with Arduino boards. (Apparently the standard GNU C++ compiler is used to compile Arduino programs, so despite the splitting of whether Ardinuou is C or C++ or a special form, it is being compiled by GNU C++ compiler which allows both C and C++ code compilation and whatever libraries Arduino is using. However, the Ardinuou build process is somewhat specific to Ardinuo. The Sketch 'ino' file is preprocessed so that it becomes valid C++ code (i.e., valid C++ syntax as well), then this code is compiled by avr-gcc into machine language for the selected target microcontroller with linking with the specific Arduino libraries.)
+The Sketch language that Arduino uses is largely standard C/C++ -- often the syntax, structures and semantics of C/C++ will work. However, the structure of the Sketch and the libraries provided are specifically designed to work with Arduino boards. (Apparently the standard GNU C++ compiler is used to compile Arduino programs, so despite the splitting of whether Ardinuou is C or C++ or a special form, it is being compiled by GNU C++ compiler which allows both C and C++ code compilation and whatever libraries Arduino is using. However, the Ardinuo build process is somewhat specific to Ardinuo. The Sketch 'ino' file is preprocessed so that it becomes valid C++ code (i.e., valid C++ syntax as well), then this code is compiled by avr-gcc into machine language for the selected target microcontroller with linking with the specific Arduino libraries.)
 
 The basic structure of an Arduino Sketch consists of two main parts -- 'setup()' and 'loop()'
 
@@ -1050,9 +1050,9 @@ The next part of the structure is the 'loop()' function which runs repeatedly --
 
 ![line221](line221.png)
 
-Look at the code of m2-lesson5a.in  -- we see the 'loop()' function at lines 221 - 249. It is waiting for Wi-Fi packets and then processes the charcters received. As can be seen if there is an 'A' then this means to call the function go_advance(SPEED), i.e., for the robot car to go forward.
+Look at the code of m2-lesson5a.in  -- we see the 'loop()' function at lines 221 - 249. It is waiting for Wi-Fi packets and then processes the character(s) received. As can be seen if there is an 'A' then this means to call the function go_advance(SPEED), i.e., for the robot car to go forward.
 
-Let's look in the code to see where the function go_advance() is defined -- lines 50 - 55. This calls 4 functions (which by their names seems to relate to each of wheels of the robot car) -- RL_fwd(), RR_fwd(), FR_fwd(), FL_fwd().   Ok... let's go see where these functions, or one of them, is defined. We see at lines 142-147 RL_fwd() is defined -- it says to digitalWrite(LeftMotorDirPin1B, HIGH).  The function digitalWrite() won't be defined here since it is a fundamental part of the Arduino programming language which writes a HIGH or LOW value (i.e., becomes voltage) to a digital pin on the Arduino board -- this it can turn on or turn off the motor for that wheel in this case. 
+Let's look in the code to see where the function go_advance() is defined -- lines 50 - 55. This calls four functions (which by their names seems to relate to each of the wheels of the robot car) -- RL_fwd(), RR_fwd(), FR_fwd(), FL_fwd().   Ok... let's go see where these functions, or one of them, is defined. We see at lines 142-147 RL_fwd() is defined -- it says to digitalWrite(LeftMotorDirPin1B, HIGH).  The function digitalWrite() won't be defined here since it is a fundamental part of the Arduino programming language which writes a HIGH or LOW value (i.e., becomes voltage) to a digital pin on the Arduino board. 
 
 Note that the function go_advance(SPEED) has a parameter 'SPEED'. Let's see where this parameter is defined. If we look at line 14 it defines SPEED as 150. This parameter SPEED ends up being passed to the function RL_fwd() (as well as the other ones for the other wheels) where in RL_fwd we see at line 146 that it is passed to the function 'analogWrite()'.  The function 'analogWrite()' is a fundamental part of the Arduino programming language which outputs a variable voltage on a digital pin which effectively simulates an analog output (via PWM pulse width modulation where the duty cycle of different sized pulses within a time period determines the average voltage output). This is how the brightness of an LED or the speed of a motor can be adjusted.
 
@@ -1061,15 +1061,15 @@ Note that the function go_advance(SPEED) has a parameter 'SPEED'. Let's see wher
 
 Let's try an experiment now. We will lower the value of the parameter SPEED and let's see the effect it has when the Arduino board controls the robot car.
 
-The Arduino IDE should be opened up on your computer. Put your mouse inside the IDE's Window. You can move around and if click at a certain line or character of text, you can easily modify it.
+The Arduino IDE should be opened up on your computer. Put your mouse inside the IDE's Window. You can move around and if you click at a certain line or character of text, you can easily modify it.
 
 Go to Line 14 and change the value of the SPEED parameter to 55. Line 14 should look like this now:
 
 ![changespeed55](changespeed55.png)
 
-This program, i.e., Sketch, is human readable and actually essentially C code with a structure and specialized functions for the Arduino environment. We now have to convert this C code (i.e., the Sketch program you just modified) into the binary code which will run on the Mega2560 Ardinuo board in our robot car, and then actually upload the compiled binary code to the Mega2560 board.
+This program, i.e., Sketch, is human readable and actually essentially C-like code with a structure and specialized functions for the Arduino environment. We now have to convert this C-like code (i.e., the Sketch program you just modified) into the binary code which will run on the Mega2560 Ardinuo board in our robot car, and then actually upload the compiled binary code to the Mega2560 board.
 
--Just as in the demo software examples in the various steps above, attach the USB cable to the Arduino board connector on the robot car, exactly like you did above when we uploaded software to the car's Arduino board. (The power on your robot car should be turned off -- the cable will supply power to the Arduino board. Plug the cable first into the Arduino board, i.e., the unpowered side, then plug the cable into your laptop (better to do this when your laptop is powered off, but in the real world, most of us will not bother to do this, and almost always fine if no extreme static discharges/shorts/etc.)
+-Just as in the demo software examples in the various steps above, attach the USB cable to the Arduino board connector on the robot car, exactly like you did above when we uploaded software to the car's Arduino board. (The power on your robot car should be turned off -- the cable will supply power to the Arduino board.) 
 
 -Now click the upload arrow (green arrow inside a circle at the top left corner). Look at the bottom of the Arduino IDE -- you will see messages as the human readable Sketch gets compiled into binary bytes and uploaded to the Arduino board.
 
