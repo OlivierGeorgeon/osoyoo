@@ -203,6 +203,10 @@ combustion engine vehicle at the time of this writing) has a battery with 54kWh 
 generate the thousand kWh in the Tesla Semi which would be about 100,000 of the Osoyoo 18650 batteries -- yes, one would have to purchase many, many Osoyoo robotic car kits to
 build an electric car or electric semi truck :)
 
+After you construct the robot car and it is being used (especially by others) make sure the batter compartment is closed as seen in the picture below:
+
+![batterylid](batterylid.png)
+
 
 
 Before we start building the robot car, let's have a quick look at the documentation (always a good idea no matter what project you are working on).
