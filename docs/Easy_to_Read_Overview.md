@@ -1083,7 +1083,7 @@ This program, i.e., Sketch, is human readable and actually essentially C-like co
 
 -Ok now open the Osoyoo IoT UDP Robot APP (or, if you have, like me, the OSOYOO IoT APP, then open that one).
 
--(Settings should be saved from when you used the App previously, but if not, go to Settings on the App and enter the IP address this app should access (since we want it to access the Wi-Fi board on the robot car) (You can see the IP address in the Arduino IDE. In my setup it was 192.168.4.1 with UDP Incoming Port 8888 )
+-(Settings should be saved from when you used the App previously, but if not, go to Settings on the App and enter the IP address this app should access (since we want it to access the Wi-Fi board on the robot car) (You can see the IP address in the Arduino IDE. In my setup it was 192.168.4.1 with UDP Incoming Port 8888))
 
 --Ok...now go to the main page of the Osoyoo IoT UDP Robot APP/OSOYOO IoT APP, and press the forward button. The car will go forward, but much slower.
 
