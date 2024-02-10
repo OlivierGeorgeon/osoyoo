@@ -189,7 +189,7 @@ When assembled the acrylic board on the top of the robot car will look like this
 Note the blue lithium batteries. In the kit parts there should be a battery charger along with its USB cable which can charge these batteries. 
 
 ****
-WARNING: Osoyoo gives warnings about reversing the polarity or short-circuiting the batteries. Please follow these warnings. Reversing polarity (pay attention when you insert the batteries) or short-circuiting these lithium batteries, despite their low voltage, can result in high currents that will damage electronic parts and pose a theoretical fire hazard. Always exert caution when dealing with lithium batteries.
+WARNING: Osoyoo gives warnings about reversing the polarity or short-circuiting the batteries. Please follow these warnings. Reversing polarity (pay attention when you insert the batteries) or short-circuiting these lithium batteries, despite their low voltage, can result in high currents that will damage electronic parts and pose a fire hazard. Always exert caution when dealing with lithium batteries.
 ****
 
 (These batteries are "18650" batteries, a standard lithium battery, indicating an 18mm diameter by a 65mm length. I am not sure why the industry standard add the '0' to
