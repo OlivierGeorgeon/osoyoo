@@ -75,8 +75,10 @@ class PhenomenonObject(Phenomenon):
             self.affordance_id += 1
             self.affordances[self.affordance_id] = affordance
 
+            # if the phenomenon is not recognized, recompute the shape
+            if self.category is None:
+                self.interpolate(s=1)
             # Return the correction to apply to the robot's position
-            self.interpolate(s=1)
             print("Phenomenon position correction:", position_correction)
             return position_correction
         else:
@@ -84,11 +86,12 @@ class PhenomenonObject(Phenomenon):
             return None  # Must return None to check if this affordance can be associated with another phenomenon
 
     def recognize(self, category):
-        """Recognize the object to arrange"""
+        """Set the object's category, shape, path, confidence. Adjust its position according to the latest affordance"""
         super().recognize(category)
         # The position is moved to the center of the object
         # The terrain point is moved along the latest affordance's direction by the category's radius
         object_offset = np.array(self.latest_added_affordance().point + self.latest_added_affordance().quaternion * Vector3([category.short_radius, 0., 0.]), dtype=int)
+        print("object offset:", object_offset)
         self.point += object_offset
         for a in self.affordances.values():
             a.point -= object_offset

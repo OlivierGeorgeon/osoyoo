@@ -63,9 +63,9 @@ class PhenomenonTerrain(Phenomenon):
                         # If this affordance is in the direction of the origin or terrain is recognized
                         # else:
                         position_correction = self.vector_toward_origin(affordance)
-                        # Prediction error is the opposite of the position_correction projected along the color direction
-                        self.origin_prediction_error[affordance.clock] = np.dot(-position_correction, affordance.quaternion
-                                                                                * Vector3([0., 1., 0.]))
+                        # Prediction error is opposite of the position_correction projected along the color direction
+                        self.origin_prediction_error[affordance.clock] = np.dot(-position_correction,
+                                                                         affordance.quaternion * Vector3([0., 1., 0.]))
                         # Correct the position of the affordances since last time the robot visited the absolute origin
                         for a in [a for a in self.affordances.values() if a.clock > self.last_origin_clock]:
                             coef = (a.clock - self.last_origin_clock)/(affordance.clock - self.last_origin_clock)
@@ -74,7 +74,7 @@ class PhenomenonTerrain(Phenomenon):
                             # print("Affordance clock:", a.experience.clock, "corrected by:", ac, "coef:", coef)
                         # Increase confidence if not consecutive origin affordances
                         # if affordance.clock - self.last_origin_clock > 5:
-                        self.confidence = PHENOMENON_RECOGNIZE_CONFIDENCE
+                        self.confidence = max(PHENOMENON_RECOGNIZE_CONFIDENCE, self.confidence)
                         self.last_origin_clock = affordance.clock
                 # Black line: Compute the position correction based on the nearest point in the terrain shape
                 # TODO use the point on the trajectory rather than the closest point
@@ -85,14 +85,16 @@ class PhenomenonTerrain(Phenomenon):
                     print("Nearest shape point", closest_point, "Position correction", position_correction)
                     affordance.point -= position_correction
 
-            # Interpolate the outline
-            self.interpolate()
+            # if the phenomenon is not recognized, recompute the shape
+            if self.category is None:
+                self.interpolate()
+
             return - position_correction  # TODO remove the minus sign
         # Affordances that do not belong to this phenomenon must return None
         return None
 
     def recognize(self, category):
-        """Recognize the terrain"""
+        """Set the terrain's category, shape, path, confidence. Adjust its position to the latest affordance"""
         super().recognize(category)
 
         # The TERRAIN origin depends on the orientation of the absolute affordance
@@ -104,18 +106,12 @@ class PhenomenonTerrain(Phenomenon):
             self.origin_direction_quaternion = category.quaternion * Quaternion.from_z_rotation(math.pi)
 
         # The new relative origin is the position of green patch from the phenomenon center
-        # new_relative_origin = np.array(self.origin_direction_quaternion *
-        #                                Vector3([category.long_radius - LINE_X + ROBOT_COLOR_SENSOR_X, 0, 0]), dtype=int)
-        # new_relative_origin = np.array(self.origin_direction_quaternion *
-        #                                Vector3([category.long_radius, 0, 0]), dtype=int)
-        new_relative_origin = np.array(self.origin_direction_quaternion *
-                                       Vector3([category.long_radius - np.linalg.norm(self.absolute_affordance().polar_sensor_point), 0, 0]), dtype=int)
-
-        # new_relative_origin = np.array(self.origin_direction_quaternion *
-        #                                Vector3([category.long_radius, 0, 0]), dtype=int) + self.absolute_affordance().polar_sensor_point.astype(int)
+        new_relative_origin = np.array(self.origin_direction_quaternion * Vector3([category.long_radius -
+            np.linalg.norm(self.absolute_affordance().polar_sensor_point), 0, 0]), dtype=int)
 
         # The position of the phenomenon is adjusted by the difference in relative origin
         terrain_offset = new_relative_origin - self.relative_origin_point
+        # print("Terrain offset", terrain_offset)
         self.point -= terrain_offset
         for a in self.affordances.values():
             a.point += terrain_offset

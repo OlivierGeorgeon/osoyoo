@@ -142,13 +142,14 @@ class PhenomenonMemory:
         return remaining_affordances, position_correction
 
     def recognize_category(self, phenomenon):
-        """Check if this phenomenon can be recognized"""
+        """If this phenomenon is recognized then set its category, shape, path, confidence"""
         clue = phenomenon.category_clue()
         if clue is not None:
             for key, category in self.phenomenon_categories.items():
-                if category.experience_type == clue:
+                if category.experience_type == clue and phenomenon.category is None:
                     phenomenon.recognize(category)
-                    print("Category recognized:", key)
+                    # print("Category recognized:", key)
+                    # Only one category can match the phenomenon
                     break
 
     def other_robot_is_angry(self):
@@ -161,7 +162,9 @@ class PhenomenonMemory:
     def save(self):
         """Return a clone of phenomenon memory for memory snapshot"""
         saved_phenomenon_memory = PhenomenonMemory(self.arena_id)
-        saved_phenomenon_memory.phenomenon_categories = {k: c.save() for k, c in self.phenomenon_categories.items()}
+        # No need to clone the categories because they never change
+        # saved_phenomenon_memory.phenomenon_categories = {k: c.save() for k, c in self.phenomenon_categories.items()}
+        saved_phenomenon_memory.phenomenon_categories = {k: c for k, c in self.phenomenon_categories.items()}
         saved_phenomenon_memory.phenomena = {k: p.save() for k, p in self.phenomena.items()}
         saved_phenomenon_memory.phenomenon_id = self.phenomenon_id
         return saved_phenomenon_memory

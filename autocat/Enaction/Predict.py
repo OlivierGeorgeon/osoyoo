@@ -1,15 +1,13 @@
 import math
 import numpy as np
-from pyrr import matrix44, Quaternion, Vector3
 from ..Decider.Action import ACTION_FORWARD, ACTION_SWIPE, ACTION_RIGHTWARD, ACTION_SCAN
 from ..Memory.PhenomenonMemory import PHENOMENON_RECOGNIZED_CONFIDENCE
-from ..Memory.PhenomenonMemory.PhenomenonMemory import BOX
 from ..Memory.AllocentricMemory.Hexagonal_geometry import point_to_cell
 from ..Memory.EgocentricMemory.Experience import EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_FLOOR
 from ..Robot.RobotDefine import ROBOT_FLOOR_SENSOR_X, ROBOT_SETTINGS
 from ..Robot.Outcome import Outcome
 from ..Memory.BodyMemory import point_to_echo_direction_distance
-from ..Utils import assert_almost_equal_angles, translation_quaternion_to_matrix
+from ..Utils import assert_almost_equal_angles
 from .Trajectory import Trajectory
 
 RETREAT_YAW = 45
@@ -26,7 +24,8 @@ def predict_outcome(command, memory):
     # If terrain is recognized, adjust the floor, duration1, and yaw outcome
     if memory.phenomenon_memory.terrain_confidence() >= PHENOMENON_RECOGNIZED_CONFIDENCE:
         # The shape of the terrain in egocentric coordinates
-        ego_shape = np.array([memory.terrain_centric_to_egocentric(p) for p in memory.phenomenon_memory.terrain().shape])
+        ego_shape = np.apply_along_axis(memory.terrain_centric_to_egocentric, 1,
+                                        memory.phenomenon_memory.terrain().shape)
         if command.action.action_code == ACTION_FORWARD:
             # Loop over the points where the y coordinate changes sign
             for i in np.where(np.diff(np.sign(ego_shape[:, 1])))[0]:
@@ -87,28 +86,10 @@ def predict_outcome(command, memory):
     trajectory = Trajectory(memory, command.yaw, command.speed, command.span)
     trajectory.track_displacement(Outcome(outcome_dict))
 
-    # translation = command.speed * predicted_outcome["duration1"] / 1000
-    # yaw_quaternion = Quaternion.from_z_rotation(math.radians(predicted_outcome["yaw"]))
-    # # yaw_quaternion = command.intended_yaw_quaternion
-    # if predicted_outcome["floor"] > 0:
-    #     front_point = Vector3([ROBOT_FLOOR_SENSOR_X, 0, 0])
-    #     line_point = front_point + Vector3([ROBOT_SETTINGS[memory.robot_id]["retreat_distance"], 0, 0])
-    #     translation += front_point - yaw_quaternion * line_point
-    # displacement_matrix = translation_quaternion_to_matrix(-translation, yaw_quaternion.inverse)
-
     # Apply the displacement to memory
 
     memory.allocentric_memory.move(memory.body_memory.body_quaternion, trajectory.translation, command.clock)
     memory.body_memory.body_quaternion = memory.body_memory.body_quaternion.cross(trajectory.yaw_quaternion)
-    # memory.body_memory.body_quaternion = command.intended_yaw_quaternion * memory.body_memory.body_quaternion  # works
-    # if memory.egocentric_memory.prompt_point is not None:
-    #     memory.egocentric_memory.prompt_point = \
-    #         matrix44.apply_to_vector(trajectory.displacement_matrix, memory.egocentric_memory.prompt_point).astype(int)
-    # if memory.egocentric_memory.focus_point is not None:
-    #     memory.egocentric_memory.focus_point = \
-    #         matrix44.apply_to_vector(trajectory.displacement_matrix, memory.egocentric_memory.focus_point).astype(int)
-    #     a, _ = point_to_echo_direction_distance(memory.egocentric_memory.focus_point)
-    #     memory.body_memory.head_direction_rad = a
 
     # Predict the echo outcome from the nearest object phenomenon
     for p in [p for p in memory.phenomenon_memory.phenomena.values() if p.phenomenon_type == EXPERIENCE_ALIGNED_ECHO]:
@@ -117,7 +98,6 @@ def predict_outcome(command, memory):
         # if the phenomenon is recognized then subtract its radius to obtain the egocentric echo distance
         if p.category is not None:
             d -= p.category.short_radius
-            # d -= memory.phenomenon_memory.phenomenon_categories[BOX].long_radius
         if d > 0 and command.action.action_code == ACTION_SCAN and assert_almost_equal_angles(math.radians(a), 0, 90) \
                 or assert_almost_equal_angles(math.radians(a), memory.body_memory.head_direction_rad, 35):
             outcome_dict["head_angle"] = round(a)
@@ -136,7 +116,6 @@ def predict_outcome(command, memory):
 def cell_color(ego_point, memory):
     """Return the color index of the cell at the point provided in egocentric coordinates"""
     floor_i, floor_j = point_to_cell(memory.egocentric_to_allocentric(ego_point))
-    # print("Color in cell (", floor_i, floor_j, ")")
     if (memory.allocentric_memory.min_i <= floor_i <= memory.allocentric_memory.max_i) and \
             (memory.allocentric_memory.min_j <= floor_j <= memory.allocentric_memory.max_j) and \
             memory.allocentric_memory.grid[floor_i][floor_j].status[0] == EXPERIENCE_FLOOR:
