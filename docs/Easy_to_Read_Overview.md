@@ -1,6 +1,7 @@
 # An Easy-to-Read Overview of the Robot Car Project: The Basics
 
 Initial draft by Howard Schneider, Feb 9, 2024
+
 (but anyone can modify this document and I do not maintain the document)
 
 hschneidermd@alum.mit.edu
