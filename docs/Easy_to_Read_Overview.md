@@ -5,12 +5,13 @@ Initial draft by Howard Schneider
 
 hschneidermd@alum.mit.edu
 
-##
 Initial draft Feb 9, 2024
 
 (This is a public document that can be modified with others who have access -- if anything doesn't make sense, please ignore.)
 (No use of high voltage or anything dangerous is specified in this document.)
 (Questions, corrections, suggestions? -- please contact me.)
+##
+
 
 
 
