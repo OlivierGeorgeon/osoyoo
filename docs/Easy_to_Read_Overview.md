@@ -1022,18 +1022,76 @@ Let's take a look at some of the code we've been transferring to the Arduino boa
 
 **Step #15 -- Software Modifications -- Basic Parameter Changes**
 
-Above we discussed only briefly how to use the Arduino IDE ("integrated development environment", which just means a software application that lets you program in some sort of language or environment).  We simply downloaded demo code into the Arduino IDE and then transferred the processed code from your desktop/laptop computer to the Arduino board in your robot car.
+For this Step #15, please open the Arduino IDE exactly as described above in earlier Steps (or "lessons").
 
-We will now take a more detailed look at the Arduino IDE and how we can actually modify some of the code it is processing for transfer to the robot car.
+Then click 'Open' and load in m2-lesson5a.ino (although it may not be necessary as this code may still be in the IDE's main window since it was the last code we processed)
 
+We will use the Sketch (i.e., human readable program) of m2-lesson5a.ino for this Step #15. Please open it up so the discussion below makes more sense.
 
-
-
-
-![chooseboard](chooseboard.png)
+![downloadlesson5a](downloadlesson5a.png)
 
 
+Above we discussed only briefly how to use the Arduino IDE (Integrated Development Environment). We simply downloaded demo code into the Arduino IDE and then transferred the processed code from your desktop/laptop computer to the Arduino board in your robot car. However, the Arduino IDE is a bona fide IDE -- it allows writing, editing, compiling, debugging, and transferring software to run on a variety of different Arduino and non-Arduino boards.
 
+The human programmer, in this case a programmer at Osoyoo, writes a program which is called a "sketch" in the Arduino ecosystem. (However, when you see the word "sketch" just think program.) The Arduino IDE then compiles this human-readable program into binary code which can run on the microcontroller board specified (above we specified the Mega2560 board). Then the Arduino IDE uploads this compiled binary code to the Arduino board (or to a non-Arduino board if that is what you specified in compiling the code). When you turn on the Arduino board this code runs, as we saw in the many examples above.
+
+The Arduino IDE is somewhat weak compared to other professional IDEs for software development. For example, debugging software is often an area where programmers spend much of their time, and these tools are weak in the Arduino IDE. Often software developers may use another IDE with an Arduino extension, e.g., Visual Studio Code with the Arduino extension, for serious Arduino software development.  However, nonetheless, the Arduino IDE includes a number of useful tools. Above we used, for example, the Serial Monitor tool.
+
+The Sketch language that Arduino uses is largely standard C/C++ -- often the syntax, structures and semantics of C/C++ will work. However, the structure of the Sketch and the libraries provided are specifically designed to work with Arduino boards. 
+
+The basic structure of an Arduino Sketch consists of two main parts -- 'setup()' and 'loop()'
+
+The 'setup()' function runs at the start of the program (after includes, various function definitions, etc) and does initial setup housekeeping such as configuring pin modes on the Arduino board. If we look at the code of m2-lesson5a.ino then we see this function at lines 188 - 218. It is initialzing serial ports, it's checking for the presence of the Wi-Fi shield, it sends out a message useful for debugging that we'ere connected to the network, and so on.
+
+![line188](line188.png)
+
+
+The next part of the structure is the 'loop()' function which runs repeatedly -- this is where the main logic of an Arduino Sketch program usually is.
+
+![line221](line221.png)
+
+Look at the code of m2-lesson5a.in  -- we see the 'loop()' function at lines 221 - 249. It is waiting for Wi-Fi packets and then processes the charcters received. As can be seen if there is an 'A' then this means to call the function go_advance(SPEED), i.e., for the robot car to go forward.
+
+Let's look in the code to see where the function go_advance() is defined -- lines 50 - 55. This calls 4 functions (which by their names seems to relate to each of wheels of the robot car) -- RL_fwd(), RR_fwd(), FR_fwd(), FL_fwd().   Ok... let's go see where these functions, or one of them, is defined. We see at lines 142-147 RL_fwd() is defined -- it says to digitalWrite(LeftMotorDirPin1B, HIGH).  The function digitalWrite() won't be defined here since it is a fundamental part of the Arduino programming language which writes a HIGH or LOW value (i.e., becomes voltage) to a digital pin on the Arduino board -- this it can turn on or turn off the motor for that wheel in this case. 
+
+Note that the function go_advance(SPEED) has a parameter 'SPEED'. Let's see where this parameter is defined. If we look at line 14 it defines SPEED as 150. This parameter SPEED ends up being passed to the function RL_fwd() (as well as the other ones for the other wheels) where in RL_fwd we see at line 146 that it is passed to the function 'analogWrite()'.  The function 'analogWrite()' is a fundamental part of the Arduino programming language which outputs a variable voltage on a digital pin which effectively simulates an analog output (via PWM pulse width modulation where the duty cycle of different sized pulses within a time period determines the average voltage output). This is how the brightness of an LED or the speed of a motor can be adjusted.
+
+![line10](line10.png)
+
+
+Let's try an experiment now. We will lower the value of the parameter SPEED and let's see the effect it has when the Arduino board controls the robot car.
+
+The Arduino IDE should be opened up on your computer. Put your mouse inside the IDE's Window. You can move around and if click at a certain line or character of text, you can easily modify it.
+
+Go to Line 14 and change the value of the SPEED parameter to 55. Line 14 should look like this now:
+
+![changespeed55](changespeed55.png)
+
+This program, i.e., Sketch, is human readable and actually essentially C code with a structure and specialized functions for the Arduino environment. We now have to convert this C code (i.e., the Sketch program you just modified) into the binary code which will run on the Mega2560 Ardinuo board in our robot car, and then actually upload the compiled binary code to the Mega2560 board.
+
+-Just as in the demo software examples in the various steps above, attach the USB cable to the Arduino board connector on the robot car, exactly like you did above when we uploaded software to the car's Arduino board. (The power on your robot car should be turned off -- the cable will supply power to the Arduino board. Plug the cable first into the Arduino board, i.e., the unpowered side, then plug the cable into your laptop (better to do this when your laptop is powered off, but in the real world, most of us will not bother to do this, and almost always fine if no extreme static discharges/shorts/etc.)
+
+-Now click the upload arrow (green arrow inside a circle at the top left corner). Look at the bottom of the Arduino IDE -- you will see messages as the human readable Sketch gets compiled into binary bytes and uploaded to the Arduino board.
+
+-The modified software (i.e., where you set SPEED parameter to a value of 55) is now in the robot car. Let's try it out.
+
+-Unplug the cable from the car to the computer.
+
+-Turn on the car.
+
+-Go to your cellphone and go to Settings. Then change your Internet Wi-Fi to "osoyoo_robot"
+
+-Ok now open the Osoyoo IoT UDP Robot APP (or, if you have, like me, the OSOYOO IoT APP, then open that one).
+
+-(Settings should be saved from when you used the App previously, but if not, go to Settings on the App and enter the IP address this app should access (since we want it to access the Wi-Fi board on the robot car) (You can see the IP address in the Arduino IDE. In my setup it was 192.168.4.1 with UDP Incoming Port 8888 )
+
+--Ok...now go to the main page of the Osoyoo IoT UDP Robot APP/OSOYOO IoT APP, and press the forward button. The car will go forward, but much slower.
+
+Congratulations -- you just modified your first Arduino program.
+
+You can try changing the values for the TURN_SPEED (turning speed) and the SHIFT_SPEED (parallel shifting speed) parameters, and see the effect on the performance of the robot car.
+
+The Arduino website provides thorough documentation of the Arduino board and the Arduino programming language and environment:  https://docs.arduino.cc/
 
 
 
