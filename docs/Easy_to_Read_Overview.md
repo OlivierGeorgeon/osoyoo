@@ -1,10 +1,18 @@
 # An Easy-to-Read Overview of the Robot Car Project: The Basics
 
-Initial draft by Howard Schneider, Feb 9, 2024
-
-(but anyone can modify this document and I do not maintain the document)
+Initial draft by Howard Schneider
 
 hschneidermd@alum.mit.edu
+
+####
+Initial draft Feb 9, 2024
+
+(This is a public document that can be modified with others who have access -- if anything doesn't make sense, please ignore.)
+(No use of high voltage or anything dangerous is specified in this document.)
+(Questions, corrections, suggestions? -- please contact me.)
+####
+start of document
+####
 
 
 Welcome!! Bienvenue!! Tunngasugit!!
@@ -1109,6 +1117,14 @@ You can try changing the values for the TURN_SPEED (turning speed) and the SHIFT
 
 The Arduino website provides thorough documentation of the Arduino board and the Arduino programming language and environment:  https://docs.arduino.cc/
 
+####
+Initial draft Feb 9, 2024
+
+(This is a public document that can be modified with others who have access -- if anything doesn't make sense, please ignore.)
+(No use of high voltage or anything dangerous is specified in this document.)
+####
+end of document
+####
 
 -
 -
