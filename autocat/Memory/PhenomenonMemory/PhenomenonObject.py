@@ -75,8 +75,10 @@ class PhenomenonObject(Phenomenon):
             self.affordance_id += 1
             self.affordances[self.affordance_id] = affordance
 
+            # if the phenomenon is not recognized, recompute the shape
+            if self.category is None:
+                self.interpolate(s=1)
             # Return the correction to apply to the robot's position
-            self.interpolate(s=1)
             print("Phenomenon position correction:", position_correction)
             return position_correction
         else:
@@ -84,15 +86,15 @@ class PhenomenonObject(Phenomenon):
             return None  # Must return None to check if this affordance can be associated with another phenomenon
 
     def recognize(self, category):
-        """Recognize the object to arrange"""
+        """Set the object's category, shape, path, confidence. Adjust its position according to the latest affordance"""
         super().recognize(category)
         # The position is moved to the center of the object
         # The terrain point is moved along the latest affordance's direction by the category's radius
-        terrain_offset = np.array(self.latest_added_affordance().point + self.latest_added_affordance().quaternion * Vector3([category.short_radius, 0., 0.]), dtype=int)
-        self.point += terrain_offset
+        object_offset = np.array(self.latest_added_affordance().point + self.latest_added_affordance().quaternion * Vector3([category.short_radius, 0., 0.]), dtype=int)
+        print("object offset:", object_offset)
+        self.point += object_offset
         for a in self.affordances.values():
-            a.point -= terrain_offset
-        # self.relative_origin_point = new_relative_origin  TODO check if we need that
+            a.point -= object_offset
 
     def reference_affordance(self, affordance):
         """Find the previous affordance that serves as the reference to correct the position"""
@@ -122,10 +124,6 @@ class PhenomenonObject(Phenomenon):
                     self.affordances = {key: val for key, val in self.affordances.items() if val != a or key == 0}
                     break  # Remove only the first similar affordance found
             print("Prune:", nb_affordance - len(self.affordances), "affordances removed.")
-
-    # def outline(self):
-    #     """Return the outline to display in phenomenon view"""
-    #     # return self.convex_hull()
 
     def save(self):
         """Return a clone of the phenomenon for memory snapshot"""

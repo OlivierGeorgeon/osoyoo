@@ -5,7 +5,7 @@ from ..Robot.RobotDefine import ROBOT_SETTINGS, ROBOT_CHASSIS_X, ROBOT_OUTSIDE_Y
 from ..Utils import quaternion_to_azimuth, quaternion_to_direction_rad
 
 ENERGY_TIRED = 80  # 88  # 90  # 92  # Level of energy below which the agent wants to go to color patch
-EXCITATION_LOW = 0  # 95  # 60  # 75  # Level of excitation below witch Robot just wants to watch if it is not tired
+EXCITATION_LOW = 95  # 95  # 60  # 75  # Level of excitation below witch Robot just wants to watch if it is not tired
 
 
 def point_to_echo_direction_distance(point):
@@ -33,7 +33,7 @@ class BodyMemory:
         # Update the head
         self.set_head_direction_degree(enaction.outcome.head_angle)
         # Body direction
-        self.body_quaternion = enaction.body_quaternion
+        self.body_quaternion = enaction.trajectory.body_quaternion
 
         # Update energy level
         if enaction.outcome.color_index > 0 and enaction.outcome.floor > 0:

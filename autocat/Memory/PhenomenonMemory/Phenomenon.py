@@ -1,7 +1,7 @@
 import math
 import matplotlib.path as mpath
 import numpy as np
-from pyrr import Quaternion, Vector3
+from pyrr import Quaternion
 from scipy.spatial import ConvexHull, QhullError
 from scipy.interpolate import splprep, splev
 from . import PHENOMENON_RECOGNIZE_CONFIDENCE, PHENOMENON_RECOGNIZED_CONFIDENCE
@@ -21,7 +21,7 @@ class Phenomenon:
         # Initial shape is unknown
         self.origin_direction_quaternion = Quaternion([0., 0., 0., 1.])
         self.relative_origin_point = np.array([0, 0, 0])
-        self.shape = []  # Used to display the shape
+        self.shape = np.empty([3, 3])  # Used to display the shape
 
         # Record the first affordance of the phenomenon
         # The phenomenon is placed in allocentric memory at the position of the initial affordance
@@ -59,11 +59,14 @@ class Phenomenon:
             return None
 
     def recognize(self, category):
-        """Update the quaternion, origin, and shape of this phenomenon from the category"""
+        """Update the category, confidence, shape, and path of this phenomenon"""
+        # if self.category is None:
+        self.category = category
         # The phenomenon's shape is copied from the category's shape
         self.shape = category.shape.copy()
         self.set_path()
         self.confidence = PHENOMENON_RECOGNIZED_CONFIDENCE
+        print("Phenomenon recognized:", category.experience_type)
 
     def compute_center(self):
         """Recompute the center of the phenomenon as the mean of the affordance position"""
@@ -116,7 +119,6 @@ class Phenomenon:
                 self.shape = np.column_stack((interpolated_points[0], interpolated_points[1], np.zeros(100)))
                 # Set the path
                 self.set_path()
-                # self.path = mpath.Path(interpolated_points.T + self.point[0:2])  # Two dimensional [[x0, y0]...[xn, yn]]
             except IndexError as e:
                 print("Interpolation failed. No points.", e)
             except TypeError as e:
@@ -129,14 +131,15 @@ class Phenomenon:
     def outline(self):
         """Return the terrain outline 2D points as list of integers"""
         # Convert into flat list of 2D points [x0, y0, x1, y1, ...,x100, y100]
-        return np.array([p[0:2] for p in self.shape]).flatten().astype("int").tolist()
-        # return self.interpolation_points
+        return self.shape[:, 0:2].flatten().astype("int").tolist()
+        # return np.array([p[0:2] for p in self.shape]).flatten().astype("int").tolist()
 
     def set_path(self):
         """Set the path representing the terrain outline used to test is_inside"""
         # Must not be recomputed on each call to is_inside()
         # Need a closed loop two dimensional array [[x0, y0],...,[x100, y100][x0, y0]]
-        self.path = mpath.Path(np.array([p[0:2] for p in self.shape]) + self.shape[0][0:2])
+        self.path = mpath.Path(self.shape[:, 0:2] + self.shape[0][0:2])
+        # self.path = mpath.Path(np.array([p[0:2] for p in self.shape]) + self.shape[0][0:2])
 
     def is_inside(self, p):
         """True if p is inside the phenomenon"""
@@ -171,10 +174,12 @@ class Phenomenon:
         saved_phenomenon.affordance_id = self.affordance_id
         saved_phenomenon.absolute_affordance_key = self.absolute_affordance_key
         saved_phenomenon.last_origin_clock = self.last_origin_clock
-        saved_phenomenon.path = self.path
         saved_phenomenon.category = self.category
         saved_phenomenon.origin_direction_quaternion = self.origin_direction_quaternion.copy()
         saved_phenomenon.relative_origin_point = self.relative_origin_point.copy()
         saved_phenomenon.shape = self.shape.copy()
+        # if self.path is not None:
+        #     saved_phenomenon.path = self.path.copy()
+        saved_phenomenon.set_path()  # recompute the path from the shape. Perhaps we can just copy the path
         saved_phenomenon.origin_prediction_error = {k: v for k, v in self.origin_prediction_error.items()}
         return

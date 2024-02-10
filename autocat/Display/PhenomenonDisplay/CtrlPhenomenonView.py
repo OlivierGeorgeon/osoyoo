@@ -1,8 +1,6 @@
 import math
 import numpy as np
-from pyrr import matrix44
 from .PhenomenonView import PhenomenonView
-# from .AffordanceDisplay import AffordanceDisplay
 from ..PointOfInterest import PointOfInterest, POINT_CONE
 from ...Workspace import KEY_DECREASE, KEY_INCREASE
 from ...Robot.CtrlRobot import ENACTION_STEP_REFRESHING
@@ -62,7 +60,6 @@ class CtrlPhenomenonView:
             self.affordance_displays.extend(ad)
 
         # Draw the phenomenon outline
-        # self.view.add_lines(phenomenon.convex_hull(), "black")
         self.view.add_lines(phenomenon.outline(), "black")
 
     def create_affordance_displays(self, affordance):
@@ -77,11 +74,6 @@ class CtrlPhenomenonView:
         poi = PointOfInterest(pose_matrix, self.view.batch, self.view.forefront,
                               affordance.type, affordance.clock, affordance.color_index)
         affordance_displays.append(poi)
-        # # Show the echo localization cone
-        # points = affordance.sensor_triangle()
-        # # if the affordance has a polygon then add it to the AffordanceDisplay
-        # if points is not None:
-        #     poi.add_cone(points, "CadetBlue")
         return affordance_displays
 
     def main(self, dt):

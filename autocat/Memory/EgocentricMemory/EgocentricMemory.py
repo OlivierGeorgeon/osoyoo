@@ -1,9 +1,10 @@
 import math
-import numpy as np
-from pyrr import Matrix44, Quaternion
+from playsound import playsound
+from pyrr import Matrix44, Quaternion, Vector3
 from ...Memory.EgocentricMemory.Experience import Experience, EXPERIENCE_LOCAL_ECHO, EXPERIENCE_CENTRAL_ECHO, \
     EXPERIENCE_PLACE, EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_IMPACT, EXPERIENCE_ROBOT, EXPERIENCE_TOUCH
-from ...Robot.RobotDefine import ROBOT_COLOR_SENSOR_X, ROBOT_FLOOR_SENSOR_X, ROBOT_CHASSIS_Y, ROBOT_OUTSIDE_Y
+from ...Robot.RobotDefine import ROBOT_COLOR_SENSOR_X, ROBOT_FLOOR_SENSOR_X, ROBOT_CHASSIS_Y, ROBOT_OUTSIDE_Y, \
+    ROBOT_SETTINGS
 from ...Robot.Outcome import echo_matrix
 from ...Decider.Action import ACTION_FORWARD, ACTION_BACKWARD, ACTION_SWIPE, ACTION_RIGHTWARD, ACTION_CIRCUMVENT
 from ...Utils import quaternion_translation_to_matrix
@@ -14,7 +15,8 @@ EXPERIENCE_PERSISTENCE = 10
 class EgocentricMemory:
     """Stores and manages the egocentric memory"""
 
-    def __init__(self):
+    def __init__(self, robot_id):
+        self.robot_id = robot_id
         self.prompt_point = None  # The point where the agent is prompted do go
         self.focus_point = None  # The point where the agent is focusing
         self.experiences = {}
@@ -27,7 +29,7 @@ class EgocentricMemory:
         """
         # Move the existing experiences
         for experience in self.experiences.values():
-            experience.displace(enaction.displacement_matrix)
+            experience.displace(enaction.trajectory.displacement_matrix)
 
         # Add the PLACE experience with the sensed color
         pose_matrix = Matrix44.from_translation([ROBOT_COLOR_SENSOR_X, 0, 0], dtype=float)
@@ -38,15 +40,17 @@ class EgocentricMemory:
 
         # The FLOOR experience
         if enaction.outcome.floor > 0:
+            playsound('autocat/Assets/cyberpunk3.wav', False)
+            line_point = Vector3([ROBOT_FLOOR_SENSOR_X + ROBOT_SETTINGS[self.robot_id]["retreat_distance"], 0, 0])
             if enaction.outcome.floor == 0b01:
                 # Black line on the right
-                pose_matrix = quaternion_translation_to_matrix(Quaternion.from_z_rotation(0.), enaction.line_point)
+                pose_matrix = quaternion_translation_to_matrix(Quaternion.from_z_rotation(0.), line_point)
             elif enaction.outcome.floor == 0b10:
                 # Black line on the left
-                pose_matrix = quaternion_translation_to_matrix(Quaternion.from_z_rotation(0.), enaction.line_point)
+                pose_matrix = quaternion_translation_to_matrix(Quaternion.from_z_rotation(0.), line_point)
             else:
                 # Black line on the front
-                pose_matrix = quaternion_translation_to_matrix(Quaternion.from_z_rotation(0.), enaction.line_point)
+                pose_matrix = quaternion_translation_to_matrix(Quaternion.from_z_rotation(0.), line_point)
             floor_exp = Experience(pose_matrix, EXPERIENCE_FLOOR, enaction.clock, experience_id=self.experience_id,
                                    durability=EXPERIENCE_PERSISTENCE, color_index=enaction.outcome.color_index)
             self.experiences[floor_exp.id] = floor_exp
@@ -141,7 +145,7 @@ class EgocentricMemory:
 
     def save(self):
         """Return a deep clone of egocentric memory for simulation"""
-        saved_egocentric_memory = EgocentricMemory()
+        saved_egocentric_memory = EgocentricMemory(self.robot_id)
         if self.focus_point is not None:
             saved_egocentric_memory.focus_point = self.focus_point.copy()
         if self.prompt_point is not None:

@@ -9,15 +9,11 @@ from .PhenomenonMemory.PhenomenonMemory import PhenomenonMemory
 from .PhenomenonMemory.PhenomenonTerrain import TERRAIN_INITIAL_CONFIDENCE, TERRAIN_ORIGIN_CONFIDENCE
 from .AllocentricMemory.Hexagonal_geometry import CELL_RADIUS
 from ..Decider.Decider import FOCUS_TOO_FAR_DISTANCE
-from ..Decider.Action import ACTION_FORWARD, ACTION_SWIPE, ACTION_RIGHTWARD
-from .PhenomenonMemory import PHENOMENON_RECOGNIZED_CONFIDENCE
-from ..Robot.RobotDefine import ROBOT_FLOOR_SENSOR_X, ROBOT_SETTINGS
-
+from ..Integrator.Integrator import integrate
 
 GRID_WIDTH = 30  # 15   # 100 Number of cells wide
 GRID_HEIGHT = 100  # 70  # 45  # 200 Number of cells high
 NEAR_HOME = 300    # (mm) Max distance to consider near home
-SIMULATION_TIME_RATIO = 1  # 0.5   # The simulation speed is slower than the real speed because ...
 ARRANGE_MIN_RADIUS = 100
 ARRANGE_MAX_RADIUS = 400
 
@@ -30,13 +26,11 @@ class Memory:
     def __init__(self, arena_id, robot_id):
         self.arena_id = arena_id
         self.robot_id = robot_id
+        self.clock = 0
         self.body_memory = BodyMemory(robot_id)
-        self.egocentric_memory = EgocentricMemory()
+        self.egocentric_memory = EgocentricMemory(robot_id)
         self.allocentric_memory = AllocentricMemory(GRID_WIDTH, GRID_HEIGHT, cell_radius=CELL_RADIUS)
         self.phenomenon_memory = PhenomenonMemory(arena_id)
-        # self.compass_prediction_error = {}  # Used to calibrate GYRO_COEF
-        # self.focus_direction_prediction_error = {}
-        # self.focus_distance_prediction_error = {}
         self.emotion_code = EMOTION_RELAXED
 
     def __str__(self):
@@ -100,33 +94,34 @@ class Memory:
         - Add new experiences in egocentric_memory
         - Move the robot in allocentric_memory
         """
-        self.egocentric_memory.focus_point = enaction.focus_point
-        self.egocentric_memory.prompt_point = enaction.prompt_point
+        self.egocentric_memory.focus_point = enaction.trajectory.focus_point
+        self.egocentric_memory.prompt_point = enaction.trajectory.prompt_point
 
         # Translate the robot before applying the yaw
         # print("Robot relative translation", enaction.translation)
-        self.allocentric_memory.move(self.body_memory.body_quaternion, enaction.translation, enaction.clock)
+        self.allocentric_memory.move(self.body_memory.body_quaternion, enaction.trajectory.translation, enaction.clock)
         self.body_memory.update(enaction)
 
         self.egocentric_memory.update_and_add_experiences(enaction)
 
         # The integrator may again update the robot's position
+        # Call the integrator to create and update the phenomena
+        integrate(self)
 
-    def update_allocentric(self, clock):
         """Update allocentric memory on the basis of body, phenomenon, and egocentric memory"""
         # Mark the cells where is the robot
-        self.allocentric_memory.place_robot(self.body_memory, clock)
+        self.allocentric_memory.place_robot(self.body_memory, self.clock)
 
         # Mark the affordances
-        self.allocentric_memory.update_affordances(self.phenomenon_memory, clock)
+        self.allocentric_memory.update_affordances(self.phenomenon_memory, self.clock)
 
         # Update the focus in allocentric memory
         allo_focus = self.egocentric_to_allocentric(self.egocentric_memory.focus_point)
-        self.allocentric_memory.update_focus(allo_focus, clock)
+        self.allocentric_memory.update_focus(allo_focus, self.clock)
 
         # Update the prompt in allocentric memory
         allo_prompt = self.egocentric_to_allocentric(self.egocentric_memory.prompt_point)
-        self.allocentric_memory.update_prompt(allo_prompt, clock)
+        self.allocentric_memory.update_prompt(allo_prompt, self.clock)
 
     def egocentric_to_polar_egocentric(self, point):
         """Convert the position of a point from egocentric to polar-egocentric reference"""
@@ -190,6 +185,7 @@ class Memory:
         """Return a clone of memory for memory snapshot"""
         # start_time = time.time()
         saved_memory = Memory(self.phenomenon_memory.arena_id, self.robot_id)
+        saved_memory.clock = self.clock
         saved_memory.emotion_code = self.emotion_code
         # Clone body memory
         saved_memory.body_memory = self.body_memory.save()
@@ -227,71 +223,3 @@ class Memory:
             return np.linalg.norm(delta) < NEAR_HOME
         else:
             return False
-
-    def predict_terrain_outcome(self, enaction):
-        """Return the outcome fields related to the terrain"""
-        predicted_outcome_terrain = {"status": "I", "duration1": enaction.command.duration}
-        # If terrain is recognized, predict the floor outcome
-        if self.phenomenon_memory.terrain_confidence() >= PHENOMENON_RECOGNIZED_CONFIDENCE:
-            # The shape of the terrain in egocentric coordinates
-            ego_shape = np.array([self.terrain_centric_to_egocentric(p) for p in self.phenomenon_memory.terrain().shape])
-            if enaction.action.action_code == ACTION_FORWARD:
-                # Loop over the points where the y coordinate changes sign
-                for i in np.where(np.diff(np.sign(ego_shape[:, 1])))[0]:
-                    if abs(ego_shape[i+1][0] - ego_shape[i][0]) < 5:
-                        predicted_outcome_terrain["floor"] = 3
-                        predicted_outcome_terrain["yaw"] = 0
-                        x_line = ego_shape[i][0]
-                    else:
-                        slope = (ego_shape[i+1][1] - ego_shape[i][1])/(ego_shape[i+1][0] - ego_shape[i][0])
-                        x_line = ego_shape[i][0] - ego_shape[i][1]/slope
-                        if ego_shape[i][0] > ego_shape[i + 1][0]:
-                            predicted_outcome_terrain["floor"] = 1
-                            predicted_outcome_terrain["yaw"] = -45
-                        else:
-                            predicted_outcome_terrain["floor"] = 2
-                            predicted_outcome_terrain["yaw"] = 45
-                    if x_line > 0:
-                        print("intersection point", self.phenomenon_memory.terrain().shape[i], "Distance", x_line)
-                        duration1 = (x_line - ROBOT_FLOOR_SENSOR_X) * 1000 / ROBOT_SETTINGS[self.robot_id]["forward_speed"]
-                        if duration1 < enaction.command.duration:
-                            predicted_outcome_terrain["duration1"] = round(duration1)
-                        else:
-                            predicted_outcome_terrain["duration1"] = enaction.command.duration
-                            predicted_outcome_terrain["floor"] = 0
-                            predicted_outcome_terrain["yaw"] = 0
-                        break
-            elif enaction.action.action_code in [ACTION_SWIPE, ACTION_RIGHTWARD]:
-                # Translate the shape by the position of the floor sensor so we can check the sign of the x coordinate
-                ego_shape -= np.array([ROBOT_FLOOR_SENSOR_X, 0, 0])  #
-                # Loop over the points where the x coordinate pass the floor sensor
-                for i in np.where(np.diff(np.sign(ego_shape[:, 0])))[0]:
-                    if abs(ego_shape[i+1][1] - ego_shape[i][1]) == 0:
-                        y_line = ego_shape[i][1]
-                    else:
-                        slope = (ego_shape[i+1][0] - ego_shape[i][0])/(ego_shape[i+1][1] - ego_shape[i][1])
-                        y_line = ego_shape[i][1] - ego_shape[i][0]/slope
-                    if enaction.command.speed_y > 0 and y_line > 0:  # Swipe left
-                        duration1 = y_line * 1000 / ROBOT_SETTINGS[self.robot_id]["lateral_speed"]
-                        if duration1 < enaction.command.duration:
-                            predicted_outcome_terrain["duration1"] = round(duration1)
-                            predicted_outcome_terrain["floor"] = 2
-                            predicted_outcome_terrain["yaw"] = 45
-                        else:
-                            predicted_outcome_terrain["duration1"] = enaction.command.duration
-                            predicted_outcome_terrain["floor"] = 0
-                            predicted_outcome_terrain["yaw"] = 0
-                        break
-                    elif enaction.command.speed_y < 0 and y_line < 0:  # Swipe right
-                        duration1 = -y_line * 1000 / ROBOT_SETTINGS[self.robot_id]["lateral_speed"]
-                        if duration1 < enaction.command.duration:
-                            predicted_outcome_terrain["duration1"] = round(duration1)
-                            predicted_outcome_terrain["floor"] = 1
-                            predicted_outcome_terrain["yaw"] = -45
-                        else:
-                            predicted_outcome_terrain["duration1"] = enaction.command.duration
-                            predicted_outcome_terrain["floor"] = 0
-                            predicted_outcome_terrain["yaw"] = 0
-                        break
-            # print("Predicted floor", self.predicted_floor)
-        return predicted_outcome_terrain

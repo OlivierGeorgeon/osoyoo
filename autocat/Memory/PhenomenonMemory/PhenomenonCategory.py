@@ -116,6 +116,6 @@ class PhenomenonCategory:
         return phenomenon.confidence >= PHENOMENON_RECOGNIZE_CONFIDENCE and \
                self.experience_type == phenomenon.phenomenon_type
 
-    def save(self):
-        """Return a cloned phenomenon category for memory snapshot"""
-        return PhenomenonCategory(self.experience_type, self.short_radius, self.long_radius, self.azimuth)
+    # def save(self):
+    #     """Return a cloned phenomenon category for memory snapshot"""
+    #     return PhenomenonCategory(self.experience_type, self.short_radius, self.long_radius, self.azimuth)

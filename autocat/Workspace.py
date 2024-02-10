@@ -8,15 +8,16 @@ from .Decider.DeciderWatchCenter import DeciderWatchCenter
 from .Decider.DeciderArrange import DeciderArrange
 from .Decider.Action import create_actions, ACTION_FORWARD, ACTIONS, ACTION_TURN, ACTION_BACKWARD
 from .Memory.Memory import Memory
-from .Memory.PhenomenonMemory.PhenomenonMemory import TER
 from .Memory.PhenomenonMemory.PhenomenonTerrain import TERRAIN_INITIAL_CONFIDENCE
-from .Integrator.Integrator import Integrator
+# from .Integrator.Integrator import Integrator
 from .Robot.Enaction import Enaction
 from .Robot.Command import DIRECTION_BACK
 from .Robot.Message import Message
 from .Enaction.Enacter import Enacter
+from .Enaction.Simulator import Simulator
 from .Robot.CtrlRobot import ENACTION_STEP_IDLE, ENACTION_STEP_REFRESHING
 from .Enaction.CompositeEnaction import CompositeEnaction
+from .Integrator.PredictionError import PredictionError
 
 KEY_CONTROL_DECIDER = "A"  # Automatic mode: controlled by the deciders
 KEY_CONTROL_USER = "M"  # Manual mode : controlled by the user
@@ -45,8 +46,9 @@ class Workspace:
         # else:
         #     self.deciders = {'Explore': DeciderExplore(self), 'Circle': DeciderCircle(self)}
         #     # self.deciders = {'Circle': DeciderCircle(self)}
-        self.integrator = Integrator(self)
         self.enacter = Enacter(self)
+        self.simulator = Simulator(self)
+        self.prediction_error = PredictionError(self)
 
         self.composite_enaction = None  # The composite enaction to enact
         self.enaction = None  # The primitive enaction to enact
@@ -59,7 +61,7 @@ class Workspace:
         self.ctrl_phenomenon_view = None
 
         # Control the enaction
-        self.clock = 0
+        # self.clock = 0
         self.is_imagining = False
         self.memory_before_imaginary = None
 
@@ -147,12 +149,12 @@ class Workspace:
             self.composite_enaction = None
             # TODO: prevent a crash when the enaction has been cleared and then an outcome is received after
         elif user_key.upper() == KEY_PREDICTION_ERROR:
-            self.enacter.plot_prediction_errors()
+            self.prediction_error.plot()
 
     def emit_message(self):
         """Return the message to answer to another robot"""
 
-        message = {"robot": self.robot_id, "clock": self.clock, "azimuth": self.memory.body_memory.body_azimuth(),
+        message = {"robot": self.robot_id, "clock": self.memory.clock, "azimuth": self.memory.body_memory.body_azimuth(),
                    "emotion": self.memory.emotion_code}
 
         # If the terrain has been found then send the position relative to the terrain origin
@@ -169,8 +171,8 @@ class Workspace:
             # message['destination'] = destination_point.astype(int).tolist()
 
             # The focus point
-            if self.enaction.focus_point is not None:
-                focus_point = self.memory.egocentric_to_polar_egocentric(self.enaction.focus_point)
+            if self.enaction.trajectory.focus_point is not None:
+                focus_point = self.memory.egocentric_to_polar_egocentric(self.enaction.trajectory.focus_point)
                 message['focus'] = focus_point.astype(int).tolist()
 
             # Mark the message for this enaction sent

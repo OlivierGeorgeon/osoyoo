@@ -11,12 +11,6 @@ from ...Utils import quaternion_to_azimuth, quaternion_translation_to_matrix, tr
 KEY_OFFSET = 'O'
 
 
-# def quaternion_to_azimuth(body_quaternion):
-#     """Return the azimuth in degree relative to north [0,360["""
-#     body_direction_rad = body_quaternion.axis[2] * body_quaternion.angle
-#     return round((90 - math.degrees(body_direction_rad)) % 360)
-
-
 class CtrlBodyView:
     """Controls the body view"""
     def __init__(self, workspace):
@@ -66,7 +60,7 @@ class CtrlBodyView:
         """ Adding a point of interest to the view """
         if group is None:
             group = self.view.forefront
-        point_of_interest = PointOfInterest(pose_matrix, self.view.batch, group, point_type, self.workspace.clock)
+        point_of_interest = PointOfInterest(pose_matrix, self.view.batch, group, point_type, self.workspace.memory.clock)
         self.points_of_interest.append(point_of_interest)
 
     def update_body_view(self):
@@ -85,7 +79,7 @@ class CtrlBodyView:
         # yaw = self.workspace.intended_enaction.yaw
         # displacement_matrix = matrix44.create_from_z_rotation(math.radians(yaw))
         for poi in [p for p in self.points_of_interest if p.type == POINT_COMPASS]:
-            poi.displace(self.workspace.enaction.yaw_matrix)
+            poi.displace(self.workspace.enaction.trajectory.yaw_matrix)
 
         # Add the new points that indicate the south relative to the robot
         if self.workspace.enaction.outcome.compass_point is None:
@@ -94,23 +88,23 @@ class CtrlBodyView:
             pose_matrix = translation_quaternion_to_matrix([0, -330, 0], q)
         else:
             # Show the compass south
-            pose_matrix = quaternion_translation_to_matrix(self.workspace.enaction.outcome.compass_quaternion.inverse,
+            pose_matrix = quaternion_translation_to_matrix(self.workspace.enaction.trajectory.compass_quaternion.inverse,
                                                            self.workspace.enaction.outcome.compass_point)
             self.add_point_of_interest(pose_matrix, POINT_COMPASS)
         self.add_point_of_interest(pose_matrix, POINT_AZIMUTH, self.view.background)
 
         # Fade the points of interest
         for poi in self.points_of_interest:
-            poi.fade(self.workspace.clock)
+            poi.fade(self.workspace.memory.clock)
         # Keep only the points of interest during their durability
         for p in self.points_of_interest:
-            if p.is_expired(self.workspace.clock):
+            if p.is_expired(self.workspace.memory.clock):
                 p.delete()
-        self.points_of_interest = [p for p in self.points_of_interest if not p.is_expired(self.workspace.clock)]
+        self.points_of_interest = [p for p in self.points_of_interest if not p.is_expired(self.workspace.memory.clock)]
 
     def main(self, dt):
         """Called every frame. Update the body view"""
-        self.view.label_clock.text = "Clock: {:d}".format(self.workspace.clock) \
+        self.view.label_clock.text = "Clock: {:d}".format(self.workspace.memory.clock) \
                                      + ", En:{:d}%".format(self.workspace.memory.body_memory.energy) \
                                      + ", Ex:{:d}%".format(self.workspace.memory.body_memory.excitation) \
                                      + ", D:" + self.workspace.decider_id \
@@ -132,10 +126,10 @@ class CtrlBodyView:
 
     def body_label_azimuth(self, enaction):
         """Return the label to display in the body view"""
-        azimuth = quaternion_to_azimuth(enaction.body_quaternion)
-        if enaction.outcome.compass_quaternion is None:
+        azimuth = quaternion_to_azimuth(enaction.trajectory.body_quaternion)
+        if enaction.trajectory.compass_quaternion is None:
             return "Azimuth: " + str(azimuth)
         else:
-            compass = quaternion_to_azimuth(enaction.outcome.compass_quaternion)
+            compass = quaternion_to_azimuth(enaction.trajectory.compass_quaternion)
             return "Azimuth: " + str(azimuth) + ", compass: " + str(compass) + ", delta: " + \
-                   "{:.2f}".format(math.degrees(enaction.body_direction_delta))
+                   "{:.2f}".format(math.degrees(enaction.trajectory.body_direction_delta))
