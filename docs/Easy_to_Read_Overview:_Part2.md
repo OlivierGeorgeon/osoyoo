@@ -22,5 +22,5 @@ In this second part to our adventure, we will now turn the toy-like robot car in
 
 Saddle up!! Let's get going on the most exciting part of our journey....
 
-![horsetonextlesson](horsetonextlesson.jpg)
+![horsetonextlesson](horsetonextlesson.png)
 
