@@ -459,7 +459,7 @@ Red		5
 
 
 Figure 6: The common cathode RGB LED on pins 2, 3, 5, and its cathode connected to the ground via a 10kΩ resistor. Flat side on the right.
-![emotionledinstall](emotionledinstall.jpeg)
+![emotionledinstall](emotionledinstall.jpg)
 
 
 
