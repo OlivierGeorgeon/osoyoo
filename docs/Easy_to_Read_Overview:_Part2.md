@@ -26,6 +26,8 @@ Saddle up!! Let's get going on the most exciting part of our journey....
 
 
 # under construction#
+information below taken from Olivier's GitHub documentation, and will be incorporated into the documentation
+
 
 # 1   install libraries into IDE #
 
