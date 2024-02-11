@@ -1,4 +1,3 @@
-import math
 import numpy as np
 from . Action import ACTION_FORWARD, ACTION_SCAN
 from . PredefinedInteractions import create_or_retrieve_primitive, create_primitive_interactions, \
@@ -8,18 +7,6 @@ from ..Integrator.OutcomeCode import outcome_code
 from . Action import ACTION_TURN
 from ..Robot.Enaction import Enaction
 from ..Memory.Memory import EMOTION_HAPPY
-
-# FOCUS_TOO_CLOSE_DISTANCE = 200   # (mm) Distance below which OUTCOME_FOCUS_TOO_CLOSE. From robot center
-# FOCUS_FAR_DISTANCE = 400         # (mm) Distance beyond which OUTCOME_FOCUS_FAR. Must be farther than forward speed
-# FOCUS_TOO_FAR_DISTANCE = 600     # (mm) Distance beyond which OUTCOME_FOCUS_TOO_FAR (The robot will get closer
-# # FOCUS_TOO_TOO_FAR_DISTANCE = 1600   # (mm) Distance beyond which OUTCOME_FOCUS_TOO_FAR for Watch behavior
-#                                  # Must detect something within too_too_far for touring the terrain
-# FOCUS_SIDE_ANGLE = 3.14159 / 6.  # (rad) Angle beyond which OUTCOME_SIDE
-# CONFIDENCE_NO_FOCUS = 0
-# CONFIDENCE_NEW_FOCUS = 1
-# CONFIDENCE_TOUCHED_FOCUS = 2
-# CONFIDENCE_CAREFUL_SCAN = 3
-# CONFIDENCE_CONFIRMED_FOCUS = 4
 
 
 class Decider:
@@ -46,10 +33,15 @@ class Decider:
         This is the main method of the agent"""
         # Compute a specific outcome suited for this agent from the previous enaction
         # outcome = self.outcome(self.workspace.enaction)
-        outcome = outcome_code(self.workspace.memory, self.workspace.enaction)
-        print("OUTCOME", outcome)
+        # outcome = outcome_code(self.workspace.memory, self.workspace.enaction)
+        # print("OUTCOME", outcome)
         # Compute the next enaction or composite enaction
-        self.workspace.composite_enaction = self.select_enaction(outcome)
+        # self.workspace.composite_enaction = self.select_enaction(outcome)
+        self.workspace.composite_enaction = self.select_enaction(self.workspace.enaction.outcome_code)
+
+    def propose_enaction(self):
+        """Return a proposed interaction"""
+        return self.select_enaction(self.workspace.enaction.outcome_code)
 
     def select_enaction(self, outcome):
         """Add the next enaction to the stack based on sequence learning and spatial modifiers"""
@@ -71,51 +63,6 @@ class Decider:
 
         # Add the enaction to the stack
         return Enaction(self.action, self.workspace.memory)
-
-    # def outcome(self, enaction):
-    #     """ Convert the enacted interaction into an outcome adapted to the circle behavior """
-    #     outcome = OUTCOME_NO_FOCUS
-    #
-    #     # On startup return NO_FOCUS
-    #     if enaction is None:
-    #         return outcome
-    #
-    #     # If there is a focus point, compute the focus outcome (focus may come from echo or from impact)
-    #     if enaction.trajectory.focus_point is not None:
-    #         focus_radius = np.linalg.norm(enaction.trajectory.focus_point)  # From the center of the robot
-    #         # If focus is TOO FAR then DeciderCircle won't go after it
-    #         if focus_radius > FOCUS_TOO_FAR_DISTANCE:  # self.too_far:  # Different for DeciderCircle or DeciderWatch
-    #             outcome = OUTCOME_FOCUS_TOO_FAR
-    #         # If the terrain is confident and the focus is outside then it is considered TOO FAR
-    #         elif self.workspace.memory.is_outside_terrain(enaction.trajectory.focus_point):
-    #             outcome = OUTCOME_FOCUS_TOO_FAR
-    #         # Focus FAR: DeciderCircle will move closer
-    #         elif focus_radius > FOCUS_FAR_DISTANCE:
-    #             outcome = OUTCOME_FOCUS_FAR
-    #         # Not TOO CLOSE and not TOO FAR: check if its on the SIDE
-    #         elif focus_radius > FOCUS_TOO_CLOSE_DISTANCE:
-    #             focus_theta = math.atan2(enaction.trajectory.focus_point[1], enaction.trajectory.focus_point[0])
-    #             if math.fabs(focus_theta) < FOCUS_SIDE_ANGLE:
-    #                 outcome = OUTCOME_FOCUS_FRONT
-    #             else:
-    #                 outcome = OUTCOME_FOCUS_SIDE
-    #         # Focus TOO CLOSE: DeciderCircle and DeciderWatch will move backward
-    #         else:
-    #             outcome = OUTCOME_FOCUS_TOO_CLOSE
-    #
-    #     # LOST FOCUS: DeciderCircle and DeciderArrange will scan again
-    #     if enaction.trajectory.focus_confidence <= CONFIDENCE_NEW_FOCUS:  # enaction.lost_focus:
-    #         outcome = OUTCOME_LOST_FOCUS
-    #
-    #     # If TOUCH then override the focus outcome
-    #     if enaction.outcome.touch:
-    #         outcome = OUTCOME_TOUCH
-    #
-    #     # If FLOOR then override other outcome
-    #     if enaction.outcome.floor > 0 or enaction.outcome.impact > 0:  # TODO Test impact
-    #         outcome = OUTCOME_FLOOR
-    #
-    #     return outcome
 
     def select_action(self, outcome):
         """The sequence learning mechanism that proposes the next action"""

@@ -131,7 +131,7 @@ class DeciderExplore(Decider):
                     ego_origin = self.workspace.memory.allocentric_to_egocentric(allo_origin)
                     self.workspace.memory.egocentric_memory.prompt_point = ego_origin
                     playsound('autocat/Assets/R3.wav', False)
-                self.workspace.memory.egocentric_memory.focus_point = None  # Prevent unnatural head movement
+                # self.workspace.memory.egocentric_memory.focus_point = None  # Prevent unnatural head movement TODO manage focus after decision
                 self.action = self.workspace.actions[ACTION_TURN]
                 e1 = Enaction(self.action, self.workspace.memory)
                 e2 = Enaction(self.workspace.actions[ACTION_FORWARD], e1.predicted_memory)
@@ -154,7 +154,7 @@ class DeciderExplore(Decider):
             else:
                 ego_prompt = self.workspace.memory.terrain_centric_to_egocentric(self.ter_prompt)
             self.workspace.memory.egocentric_memory.prompt_point = ego_prompt
-            self.workspace.memory.egocentric_memory.focus_point = None  # Prevent unnatural head movement
+            # self.workspace.memory.egocentric_memory.focus_point = None  # Prevent unnatural head movement TODO manage focus after decision
             self.prompt_index += 1
             # if self.prompt_index >= self.nb_points:
             #     self.prompt_index = 0

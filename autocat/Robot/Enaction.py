@@ -32,11 +32,21 @@ class Enaction:
 
         # The actual outcome
         self.outcome = None
+        self.outcome_code = ""
 
         # The message received from other robot
         self.message = None
         # Message sent to other robots
         self.message_sent = False
+
+    def __hash__(self):
+        """The hash is the action code """
+        # TODO improve
+        return self.action.action_code
+
+    def __eq__(self, other):
+        """Enactions are equal if they have the same hash"""
+        return self.__hash__() == other.__hash__()
 
     def begin(self, body_quaternion):
         """Adjust the spatial modifiers of the enaction.

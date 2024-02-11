@@ -94,9 +94,18 @@ class Workspace:
                 if self.control_mode == KEY_CONTROL_DECIDER:
                     # The most activated decider processes the previous enaction and chooses the next enaction
                     self.memory.appraise_emotion()
-                    self.decider_id = max(self.deciders, key=lambda k: self.deciders[k].activation_level())
-                    print("Decider:", self.decider_id)
-                    self.deciders[self.decider_id].stack_enaction()
+                    # self.decider_id = max(self.deciders, key=lambda k: self.deciders[k].activation_level())
+                    # print("Decider:", self.decider_id)
+                    # self.deciders[self.decider_id].stack_enaction()
+                    # All deciders propose an enaction with an activation value
+                    proposed_enactions = []
+                    for name, decider in self.deciders.items():
+                        proposed_enactions.append([name, decider.propose_enaction(), decider.activation_level()])
+                    # The enaction that has the highest activation is selected
+                    print("Proposed enactions", proposed_enactions)
+                    most_activated = proposed_enactions.index(max(proposed_enactions, key=lambda p: p[2]))
+                    print("Decider:", proposed_enactions[most_activated][0])
+                    self.composite_enaction = proposed_enactions[most_activated][1]
                 else:
                     self.decider_id = "Manual"
                 # Case DECIDER_KEY_USER is handled by self.process_user_key()

@@ -1,7 +1,7 @@
 from ..Robot.CtrlRobot import ENACTION_STEP_IDLE, ENACTION_STEP_COMMANDING, ENACTION_STEP_ENACTING, \
     ENACTION_STEP_INTEGRATING, ENACTION_STEP_REFRESHING
 from ..Memory.PhenomenonMemory.PhenomenonMemory import TERRAIN_ORIGIN_CONFIDENCE
-
+from ..Integrator.OutcomeCode import outcome_code
 
 class Enacter:
     def __init__(self, workspace):
@@ -55,6 +55,8 @@ class Enacter:
             print("Simulated outcome", simulated_outcome)
             # Update memory
             self.workspace.memory.update_and_add_experiences(self.workspace.enaction)
+            # Compute the outcome code
+            self.workspace.enaction.outcome_code = outcome_code(self.workspace.memory, self.workspace.enaction)
             # Track the prediction errors
             self.workspace.prediction_error.log(self.workspace.enaction)
             # Increment the clock if the enacted interaction was properly received

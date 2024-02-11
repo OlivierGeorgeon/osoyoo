@@ -57,4 +57,5 @@ def outcome_code(memory, enaction):
     if enaction.outcome.floor > 0 or enaction.outcome.impact > 0:  # TODO Test impact
         outcome = OUTCOME_FLOOR
 
+    print("OUTCOME", outcome)
     return outcome

@@ -6,6 +6,15 @@ class CompositeEnaction:
         self.enactions = enactions
         self.index = 0
 
+    def __hash__(self):
+        """The hash is the action code """
+        # TODO improve
+        return self.enactions[0].__hash__()
+
+    def __eq__(self, other):
+        """Enactions are equal if they have the same hash"""
+        return self.__hash__() == other.__hash__()
+
     def current_enaction(self):
         """Return the enaction at the current index"""
         assert self.index < len(self.enactions)

@@ -48,7 +48,7 @@ class DeciderArrange(Decider):
         """The enactions to push a object to a target place"""
         print("Step", self.step)
         # If LOST FOCUS or impact then scan again
-        if outcome in [OUTCOME_LOST_FOCUS, OUTCOME_FLOOR] and self.step in [STEP_INIT, STEP_ALIGN]:
+        if (outcome in [OUTCOME_LOST_FOCUS, OUTCOME_FLOOR] or self.workspace.memory.egocentric_memory.focus_point is None) and self.step in [STEP_INIT, STEP_ALIGN]:
             composite_enaction = Enaction(self.workspace.actions[ACTION_SCAN], self.workspace.memory, span=10)
             self.step = STEP_INIT  # Avoids systematically recalling DeciderArrange
         # If STEP_INIT or previously aligned with focus
