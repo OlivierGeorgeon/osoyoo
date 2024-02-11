@@ -94,15 +94,14 @@ class Phenomenon:
     def interpolate(self, s=5000):
         """Compute the interpolation points between the affordances"""
         # self.interpolation_points = None
-        points = np.array(
-            [a.point[0:2] for a in self.affordances.values() if a.type in self.interpolation_types])
+        points = np.array([a.point[0:2] for a in self.affordances.values() if a.type in self.interpolation_types])
         points = np.unique(points, axis=0)
         if len(points) > 3:
             try:
-                # center = points.mean(axis=0)
-                # angles = np.arctan2(points[:, 1] - center[1], points[:, 0] - center[0])
-                # Sort by angle from center of terrain [0,0,0]
-                angles = np.arctan2(points[:, 1], points[:, 0])
+                center = points.mean(axis=0)
+                # Sort by angle from center of points
+                angles = np.arctan2(points[:, 1] - center[1], points[:, 0] - center[0])
+                # angles = np.arctan2(points[:, 1], points[:, 0])
                 sorted_points = points[np.argsort(angles)]
 
                 # Close the loop
@@ -137,9 +136,11 @@ class Phenomenon:
     def set_path(self):
         """Set the path representing the terrain outline used to test is_inside"""
         # Must not be recomputed on each call to is_inside()
-        # Need a closed loop two dimensional array [[x0, y0],...,[x100, y100][x0, y0]]
-        self.path = mpath.Path(self.shape[:, 0:2] + self.shape[0][0:2])
+        # Need a closed loop two dimensional array [[x0, y0],...,[x100, y100],[x0, y0]]
+        # self.path = mpath.Path(np.append(self.shape[:, 0:2], self.shape[0:1, 0:2], axis=0))
         # self.path = mpath.Path(np.array([p[0:2] for p in self.shape]) + self.shape[0][0:2])
+        # self.path = mpath.Path(np.append(self.shape, self.shape[0:1, :], axis=0)[:, 0:2])
+        self.path = mpath.Path(self.shape[:, 0:2])
 
     def is_inside(self, p):
         """True if p is inside the phenomenon"""
@@ -178,8 +179,6 @@ class Phenomenon:
         saved_phenomenon.origin_direction_quaternion = self.origin_direction_quaternion.copy()
         saved_phenomenon.relative_origin_point = self.relative_origin_point.copy()
         saved_phenomenon.shape = self.shape.copy()
-        # if self.path is not None:
-        #     saved_phenomenon.path = self.path.copy()
         saved_phenomenon.set_path()  # recompute the path from the shape. Perhaps we can just copy the path
         saved_phenomenon.origin_prediction_error = {k: v for k, v in self.origin_prediction_error.items()}
         return

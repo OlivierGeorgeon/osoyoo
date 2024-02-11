@@ -72,11 +72,12 @@ class BodyMemory:
 
     def outline(self):
         """The rectangle occupied by the robot's body in polar-egocentric reference"""
-        p1 = self.body_quaternion * Vector3([ROBOT_CHASSIS_X, ROBOT_OUTSIDE_Y, 0])
-        p2 = self.body_quaternion * Vector3([-ROBOT_CHASSIS_X, ROBOT_OUTSIDE_Y, 0])
-        p3 = self.body_quaternion * Vector3([-ROBOT_CHASSIS_X, -ROBOT_OUTSIDE_Y, 0])
-        p4 = self.body_quaternion * Vector3([ROBOT_CHASSIS_X, -ROBOT_OUTSIDE_Y, 0])
-        return np.array([p1, p2, p3, p4])
+        return np.array([
+            self.body_quaternion * Vector3([ROBOT_CHASSIS_X, ROBOT_OUTSIDE_Y, 0]),
+            self.body_quaternion * Vector3([-ROBOT_CHASSIS_X, ROBOT_OUTSIDE_Y, 0]),
+            self.body_quaternion * Vector3([-ROBOT_CHASSIS_X, -ROBOT_OUTSIDE_Y, 0]),
+            self.body_quaternion * Vector3([ROBOT_CHASSIS_X, -ROBOT_OUTSIDE_Y, 0])])
+        # return np.array([p1, p2, p3, p4])
 
     def save(self):
         """Return a clone of bodymemory to save a snapshot of memory"""

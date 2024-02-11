@@ -1,6 +1,8 @@
 import math
 import numpy as np
-from pyrr import Quaternion, line, Matrix44, Vector3
+from pyrr import Quaternion, line, Matrix44, Vector3, matrix44
+
+from autocat.Robot.RobotDefine import ROBOT_HEAD_X
 
 
 def quaternion_translation_to_matrix(quaternion, translation):
@@ -79,10 +81,17 @@ def assert_almost_equal_angles(angle1, angle2, difference_degrees):
     quaternion2 = Quaternion.from_z_rotation(angle2)
     return abs(short_angle(quaternion1, quaternion2)) < math.radians(difference_degrees)
 
-    # # https://stackoverflow.com/questions/27255080/python-unittesting-test-whether-two-angles-are-almost-equal
-    # c2 = (math.sin(angle1) - math.sin(angle2)) ** 2 + (math.cos(angle1) - math.cos(angle2)) ** 2
-    # angle_diff = math.acos((2.0 - c2) / 2.0)
-    # return abs(angle_diff) < math.radians(difference_degrees)
+
+def echo_matrix(head_direction, echo_distance):
+    """Return the matrix representing the pose of the echo from direction in degrees and distance"""
+    head_quaternion = Quaternion.from_z_rotation(math.radians(head_direction))
+    echo_from_head_matrix = translation_quaternion_to_matrix([echo_distance, 0, 0], head_quaternion)
+    return Matrix44.from_translation([ROBOT_HEAD_X, 0, 0]) * echo_from_head_matrix
+
+
+def echo_point(head_direction, echo_distance):
+    """Return the egocentric echo point from the head direction and echo distance"""
+    return matrix44.apply_to_vector(echo_matrix(head_direction, echo_distance), np.array([0, 0, 0])).astype(int)
 
 
 # Testing the utils

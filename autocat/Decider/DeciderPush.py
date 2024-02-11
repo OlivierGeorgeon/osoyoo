@@ -9,7 +9,8 @@ from pyrr import vector
 from . Action import ACTION_TURN, ACTION_FORWARD, ACTION_BACKWARD, ACTION_SCAN
 from ..Robot.Enaction import Enaction
 from ..Robot.Command import DIRECTION_BACK
-from . Decider import Decider, FOCUS_TOO_FAR_DISTANCE
+from . Decider import Decider
+from ..Integrator.OutcomeCode import FOCUS_TOO_FAR_DISTANCE
 from .. Enaction.CompositeEnaction import CompositeEnaction
 from ..Memory.Memory import EMOTION_ANGRY
 from . Interaction import OUTCOME_FLOOR

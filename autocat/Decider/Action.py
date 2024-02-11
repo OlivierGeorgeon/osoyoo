@@ -88,7 +88,7 @@ def create_actions(robot_id):
 
     action_dictionary[ACTION_TURN_RIGHT] = Action(ACTION_TURN_RIGHT, null_speed, -rotation_speed, 1.)
 
-    action_dictionary[ACTION_SCAN] = Action(ACTION_SCAN, null_speed, 0, 2)
+    action_dictionary[ACTION_SCAN] = Action(ACTION_SCAN, null_speed, 0, 3)
     action_dictionary[ACTION_ALIGN_HEAD] = Action(ACTION_ALIGN_HEAD, null_speed, 0, 1)
     action_dictionary[ACTION_TURN_HEAD] = Action(ACTION_TURN_HEAD, null_speed, 0, 1)
 

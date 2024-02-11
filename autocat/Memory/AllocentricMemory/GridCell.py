@@ -1,4 +1,3 @@
-import matplotlib.path as mpath
 from .Hexagonal_geometry import cell_to_point
 
 CELL_UNKNOWN = 'Unknown'
@@ -7,11 +6,11 @@ CELL_NO_ECHO = 'no_echo'
 
 class GridCell:
     """This class represents an hexagonal cell in allocentric memory"""
-    def __init__(self, i, j, cell_radius):
+    def __init__(self, i, j):
         """Constructor of the class, i and j are the coordinates of the cell in the grid"""
         self.i = i
         self.j = j
-        self.radius = cell_radius  # The radius of the outer circle
+        # self.radius = cell_radius  # The radius of the outer circle
 
         self._point = cell_to_point(i, j)  # Must not be changed
 
@@ -33,10 +32,6 @@ class GridCell:
         """String representation of the cell for console display"""
         return "(%+d,%+d)" % (self.i, self.j)
 
-    # def __eq__(self, other):
-    #     """Cells are equal if they have the same position"""
-    #     return other.i == self.i and other.j == self.j
-
     def label(self):
         """Label of the cell for display on click in allocentricView"""
         label = repr(self.status) + " Clocks: ["
@@ -56,12 +51,9 @@ class GridCell:
     def is_known(self):
         """Return True if something is known in this cell"""
         return self.status != [CELL_UNKNOWN, CELL_UNKNOWN, CELL_UNKNOWN, CELL_UNKNOWN, CELL_UNKNOWN]
-        # return self.status[0] != CELL_UNKNOWN or self.status[1] != CELL_UNKNOWN or self.status[2] != CELL_UNKNOWN \
-        #     or self.status[3] != CELL_UNKNOWN or self.clock_prompt > 0
 
     def is_inside(self, path):
         """True if this cell is inside the path"""
-        # path = mpath.Path(polygon)
         # return delaunay.find_simplex(self._point[0:2]) >= 0  This is slower
         return path.contains_point(self._point[0:2])
 
@@ -91,7 +83,7 @@ class GridCell:
 
     def save(self):
         """Return a clone of the cell to save a snapshot of allocentric memory"""
-        saved_cell = GridCell(self.i, self.j, self.radius)
+        saved_cell = GridCell(self.i, self.j)
         # Clone the content
         saved_cell.status = self.status.copy()
         saved_cell.color_index = self.color_index

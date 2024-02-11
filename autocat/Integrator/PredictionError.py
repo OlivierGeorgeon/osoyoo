@@ -6,7 +6,7 @@ import os
 from pyrr import Quaternion
 from ..Decider.Action import ACTION_FORWARD
 from ..Utils import short_angle
-from ..Decider.Decider import CONFIDENCE_CONFIRMED_FOCUS
+from ..Integrator.OutcomeCode import CONFIDENCE_CONFIRMED_FOCUS
 
 PREDICTION_ERROR_WINDOW = 100
 

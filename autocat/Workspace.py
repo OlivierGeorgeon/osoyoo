@@ -1,6 +1,7 @@
 import json
 from playsound import playsound
-from .Decider.DeciderCircle import DeciderCircle
+from .Decider.Decider import Decider
+# from .Decider.DeciderCircle import DeciderCircle
 from .Decider.DeciderExplore import DeciderExplore
 from .Decider.DeciderWatch import DeciderWatch
 from .Decider.DeciderPush import DeciderPush
@@ -9,7 +10,6 @@ from .Decider.DeciderArrange import DeciderArrange
 from .Decider.Action import create_actions, ACTION_FORWARD, ACTIONS, ACTION_TURN, ACTION_BACKWARD
 from .Memory.Memory import Memory
 from .Memory.PhenomenonMemory.PhenomenonTerrain import TERRAIN_INITIAL_CONFIDENCE
-# from .Integrator.Integrator import Integrator
 from .Robot.Enaction import Enaction
 from .Robot.Command import DIRECTION_BACK
 from .Robot.Message import Message
@@ -38,7 +38,7 @@ class Workspace:
         self.actions = create_actions(robot_id)
         self.memory = Memory(arena_id, robot_id)
         # if self.robot_id == '1':
-        self.deciders = {'Explore': DeciderExplore(self), 'Circle': DeciderCircle(self),
+        self.deciders = {'Explore': DeciderExplore(self), 'Circle': Decider(self),
                          'Watch': DeciderWatchCenter(self), 'Arrange': DeciderArrange(self)}
         # self.deciders = {'Explore': DeciderExplore(self), 'Circle': DeciderCircle(self), 'Watch': DeciderWatch(self)}
         # self.deciders = {'Circle': DeciderCircle(self), 'Explore': DeciderExplore(self)}
@@ -186,9 +186,6 @@ class Workspace:
         if message_string is not None:
             self.message = Message(message_string)
             self.message.ego_quaternion = self.message.body_quaternion.cross(self.memory.body_memory.body_quaternion.inverse)
-            # print("other angle", math.degrees(self.message.body_quaternion.angle * self.message.body_quaternion.axis[2]))
-            # print("this angle", math.degrees(self.memory.body_memory.body_quaternion.angle * self.memory.body_memory.body_quaternion.axis[2]))
-            # print("ego angle", math.degrees(self.message.ego_quaternion.angle * self.message.ego_quaternion.axis[2]))
             if self.message.ter_position is not None:
                 # If position in terrain and this robot knows the position of the terrain
                 if self.memory.phenomenon_memory.terrain_confidence() > TERRAIN_INITIAL_CONFIDENCE:

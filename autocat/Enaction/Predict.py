@@ -1,5 +1,6 @@
 import math
 import numpy as np
+import time
 from ..Decider.Action import ACTION_FORWARD, ACTION_SWIPE, ACTION_RIGHTWARD, ACTION_SCAN
 from ..Memory.PhenomenonMemory import PHENOMENON_RECOGNIZED_CONFIDENCE
 from ..Memory.AllocentricMemory.Hexagonal_geometry import point_to_cell
@@ -24,8 +25,10 @@ def predict_outcome(command, memory):
     # If terrain is recognized, adjust the floor, duration1, and yaw outcome
     if memory.phenomenon_memory.terrain_confidence() >= PHENOMENON_RECOGNIZED_CONFIDENCE:
         # The shape of the terrain in egocentric coordinates
+        # start_time = time.time()
         ego_shape = np.apply_along_axis(memory.terrain_centric_to_egocentric, 1,
                                         memory.phenomenon_memory.terrain().shape)
+        # print("compute ego shape:", (time.time() - start_time) * 1000, "milliseconds")
         if command.action.action_code == ACTION_FORWARD:
             # Loop over the points where the y coordinate changes sign
             for i in np.where(np.diff(np.sign(ego_shape[:, 1])))[0]:

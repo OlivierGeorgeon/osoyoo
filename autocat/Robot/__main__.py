@@ -1,5 +1,5 @@
 from pyrr import matrix44
-from .Outcome import echo_matrix
+from ..Utils import echo_matrix
 
 # Testing CtrlRobot
 # py -m autocat.Robot

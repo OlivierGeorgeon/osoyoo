@@ -4,7 +4,7 @@
 ########################################################################################
 import math
 
-from playsound import playsound
+# from playsound import playsound
 import numpy as np
 from pyrr import vector, line
 from pyrr.geometric_tests import point_closest_point_on_line
@@ -12,9 +12,9 @@ from . Action import ACTION_SWIPE, ACTION_TURN, ACTION_FORWARD, ACTION_BACKWARD,
 from ..Robot.Enaction import Enaction
 from ..Robot.Command import DIRECTION_LEFT, DIRECTION_RIGHT
 from ..Robot.RobotDefine import CHECK_OUTSIDE, ROBOT_FLOOR_SENSOR_X
-from ..Robot.Outcome import echo_point
-from . Decider import Decider, FOCUS_TOO_FAR_DISTANCE
-from ..Utils import line_intersection
+from . Decider import Decider
+from ..Integrator.OutcomeCode import FOCUS_TOO_FAR_DISTANCE
+from ..Utils import line_intersection, echo_point
 from ..Enaction.CompositeEnaction import CompositeEnaction
 from ..Memory.Memory import EMOTION_ANGRY
 from ..Memory.PhenomenonMemory import ARRANGE_OBJECT_RADIUS
@@ -55,7 +55,6 @@ class DeciderArrange(Decider):
         elif self.step in [STEP_ALIGN, STEP_INIT]:
             # The point center of the object
             direction, distance = point_to_echo_direction_distance(self.workspace.memory.egocentric_memory.focus_point)
-            # object_point = self.workspace.memory.egocentric_memory.focus_point
             object_center = echo_point(direction, distance + ARRANGE_OBJECT_RADIUS)  # Presuppose the object's radius
             ego_target = self.workspace.memory.terrain_centric_to_egocentric(
                 self.workspace.memory.phenomenon_memory.arrange_point())
@@ -85,7 +84,8 @@ class DeciderArrange(Decider):
             else:
                 self.step = STEP_ALIGN  # May be changed to STEP_PUSH
                 # If robot-object-target not aligned
-                if math.fabs(ego_prompt_projection[1]) > 50:
+                if abs(object_center[1]) > 20 or abs(ego_target[1]) > 100:
+                    # if math.fabs(ego_prompt_projection[1]) > 20:
                     # Go to the point from where to push
                     if CHECK_OUTSIDE == 1 and self.workspace.memory.is_outside_terrain(ego_prompt_projection):
                         print("Projection point inaccessible")
@@ -94,7 +94,8 @@ class DeciderArrange(Decider):
                     # If angle to projection point greater than 20° and projection far enough from object
                     elif math.fabs(math.atan2(ego_prompt_projection[0], math.fabs(ego_prompt_projection[1]))) > 0.349 \
                             and object_center[0] - ego_prompt_projection[0] > 0 \
-                            and np.linalg.norm(object_center - ego_prompt_projection) > ROBOT_FLOOR_SENSOR_X + ARRANGE_OBJECT_RADIUS:  #ARRANGE_MIN_RADIUS:
+                            and np.linalg.norm(object_center - ego_prompt_projection) > ROBOT_FLOOR_SENSOR_X + \
+                            ARRANGE_OBJECT_RADIUS:
                         # If prompt projection behind object swipe to prompt_intersection
                         self.workspace.memory.egocentric_memory.prompt_point = ego_prompt_projection
                         print("Turn and swipe to prompt projection", ego_prompt_projection)
@@ -124,7 +125,8 @@ class DeciderArrange(Decider):
                 else:
                     # If robot_direction also aligned with target by less than 10°
                     # subtract the radius of the robot and of the object
-                    push_vector = vector.set_length(ego_target, np.linalg.norm(ego_target) - ROBOT_FLOOR_SENSOR_X + ARRANGE_OBJECT_RADIUS)  # ARRANGE_MIN_RADIUS)
+                    push_vector = vector.set_length(ego_target, np.linalg.norm(ego_target) - ROBOT_FLOOR_SENSOR_X +
+                                                    ARRANGE_OBJECT_RADIUS)
                     self.workspace.memory.egocentric_memory.prompt_point = push_vector  # ego_target
                     if math.fabs(math.atan2(ego_target[1], ego_target[0])) < 0.17:  # 0.349:
                         # Push toward target

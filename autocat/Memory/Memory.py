@@ -8,7 +8,7 @@ from .PhenomenonMemory import ARRANGE_OBJECT_RADIUS
 from .PhenomenonMemory.PhenomenonMemory import PhenomenonMemory
 from .PhenomenonMemory.PhenomenonTerrain import TERRAIN_INITIAL_CONFIDENCE, TERRAIN_ORIGIN_CONFIDENCE
 from .AllocentricMemory.Hexagonal_geometry import CELL_RADIUS
-from ..Decider.Decider import FOCUS_TOO_FAR_DISTANCE
+from ..Integrator.OutcomeCode import FOCUS_TOO_FAR_DISTANCE
 from ..Integrator.Integrator import integrate
 
 GRID_WIDTH = 30  # 15   # 100 Number of cells wide
@@ -127,6 +127,7 @@ class Memory:
         """Convert the position of a point from egocentric to polar-egocentric reference"""
         if point is None:
             return None
+        print("point", point)
         return quaternion.apply_to_vector(self.body_memory.body_quaternion, point)
 
     def egocentric_to_allocentric(self, point):
