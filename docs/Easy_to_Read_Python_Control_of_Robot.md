@@ -16,7 +16,9 @@ Welcome!! Bienvenue!! Tunngasugit!!
 
 (I am in Canada -- these are our official languages -- English, French and a semi-official third (indigenous) language of Inuktitut.)
 
-You have already built your Osoyoo Robot Car and learned how to modify and upload its software (well.... change some parameters at least). 
+You have already built your Osoyoo Robot Car and learned how to modify and upload its software (well.... at least you learned how to change some parameters). 
+
+If you have not done Part I, i.e., building and using the Osoyoo Robot Car then please read the document "An Easy to Read Overview of the Robot Car Project." 
 
 In this second part to our adventure, we will now turn the toy-like robot car into a serious Python controlled autonomous robot.
 
