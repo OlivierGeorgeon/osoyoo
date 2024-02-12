@@ -1,6 +1,6 @@
 
 
-# An Easy-to-Read Overview of the Robot Car Project: Modifying for Python Control
+# Part II: An Easy-to-Read Overview of the Robot Car Project: Modifying for Python Control
 
 ##
 
@@ -18,9 +18,15 @@ Welcome!! Bienvenue!! Tunngasugit!!
 
 You have already built your Osoyoo Robot Car and learned how to modify and upload its software (well.... at least you learned how to change some parameters). 
 
-If you have not done Part I, i.e., building and using the Osoyoo Robot Car then please read the document "An Easy to Read Overview of the Robot Car Project." 
+If you have not done Part I, i.e., building and using the Osoyoo Robot Car then please read the document "An Easy to Read Overview of the Robot Car Project: The Basics" 
 
-In this second part to our adventure, we will now turn the toy-like robot car into a serious Python controlled autonomous robot.
+This is the "Part I":
+
+https://github.com/OlivierGeorgeon/osoyoo/blob/master/docs/Easy_to_Read_Overview.md
+
+
+
+In this second part (i.e., "Part II") to our adventure, we will now turn the toy-like robot car into a serious Python controlled autonomous robot.
 
 Saddle up!! Let's get going on the most exciting part of our journey....
 
