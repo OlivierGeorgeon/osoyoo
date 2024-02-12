@@ -1,4 +1,16 @@
-# An Easy-to-Read Overview of the Robot Car Project: The Basics
+# Part I: An Easy-to-Read Overview of the Robot Car Project: The Basics
+
+##
+
+Initial draft Feb 9, 2024
+
+(This is a public document that can be modified by others who have access -- if anything doesn't make sense, please ignore. A year from now, for example, I may not be aware of the full contents of this document any longer or what is still current.)
+(No use of high voltage or anything dangerous is specified in this document.)
+(Questions, corrections, suggestions? -- please contact me via my GitHub link.)
+##
+
+
+
 
 Welcome!! Bienvenue!! Tunngasugit!!
 
@@ -176,6 +188,10 @@ When assembled the acrylic board on the top of the robot car will look like this
 
 Note the blue lithium batteries. In the kit parts there should be a battery charger along with its USB cable which can charge these batteries. 
 
+****
+WARNING: Osoyoo gives warnings about reversing the polarity or short-circuiting the batteries. Please follow these warnings. Reversing polarity (pay attention when you insert the batteries) or short-circuiting these lithium batteries, despite their low voltage, can result in high currents that will damage electronic parts and pose a fire hazard. Always exert caution when dealing with lithium batteries.
+****
+
 (These batteries are "18650" batteries, a standard lithium battery, indicating an 18mm diameter by a 65mm length. I am not sure why the industry standard add the '0' to
 get the full number of '18650'. Osoyoo does not specify the battery chemistry but this product number is a Lithium-ion 3.7volt standard part developed by Panasonic in the
 1990s (used in laptops often), and generally were graphite anodes and lithium-metal oxide cathodes. Each 18650 had a capacity of about 2500mA-h (Osoyoo notes they are 2000mAh).
@@ -183,6 +199,10 @@ Of interest, 2.5A*3.7volts*1 hour = 9.25 watt-hour x 2 batteries ~= 20 watt-hrs 
 combustion engine vehicle at the time of this writing) has a battery with 54kWh -- equivalent to having about 6000 of the 18650 batteries. Alas, not as many as required to
 generate the thousand kWh in the Tesla Semi which would be about 100,000 of the Osoyoo 18650 batteries -- yes, one would have to purchase many, many Osoyoo robotic car kits to
 build an electric car or electric semi truck :)
+
+After you construct the robot car and it is being used (especially by others) make sure the battery compartment is closed as seen in the picture below:
+
+![batterylid](batterylid.png)
 
 
 
@@ -297,7 +317,7 @@ Assembled chassis (Note that the straps are still loose until the assembly is co
 -Anti-Warning: Arduino boards are inexpensive!! Consider buying a cheap one (available at Amazon as well as many electronics part suppliers around the world) and experimenting with it on its own.
 
 - (There is a large and active hobbyist community using Arduino and similar microcontroller boards to build projects. Go to your school or community library (or newsstand) and take a look at the January 2024 issue of Make magazine. (Or look at just about any other issue -- there are always Arduino and similar projects in Make magazine.) (You can purchase online PDF's of Make magazine issues at https://makezine.com/ but given that the Make community is about hands-on (as opposed to virtual) construction projects, it's nice to have the physical magazine in your hands. Nonetheless, an online guide to microcontroller boards is frequently posted on Make's website. At the time of this writing it is: https://makezine.com/comparison/boards/ )
-- The January 2024 vol 87 Make magazine compares 81 different microcontroller boards available. There are various different Arduino boards available with different amounts of memory and different physical sizes, as well as voltage requirements. The Arduino Uno is probably the most used microcontroller board in the world, with all sorts of options available. The Arduino Nano is less than 2cm in width. While the Raspberry Pi is also listed along with the other microcontroller boards due to its small size and low cost, the Raspberry Pi is really a microprocessor computer system board intended to function as a low cost fully functional computer running Linux, which was an amazing achievement when it was released over a decade ago. It has a large development community, and can be used to control projects, as Make magazine frequently shows. It too is available in various configurations. For example, the Raspberry Pi Pico board (more of a microcontroller board) is also about 2cm in width and was released in 2021 at the amazing price of US$4 which is even more amazing that this board can be programmed in C, C++, MicroPython, CircuitPython and can even run deep learning code such as TensorFlow Lite. The Jan 2024 Make magazine has an article on how to build a US$25 real oscilliscope by using the Raspberry Pico.
+- The January 2024 vol 87 Make magazine compares 81 different microcontroller boards available. There are various different Arduino boards available with different amounts of memory and different physical sizes, as well as voltage requirements. The Arduino Uno is probably the best-known hobbyist microcontroller board, with all sorts of options available. The Arduino Nano is less than 2cm in width. While the Raspberry Pi is also listed along with the other microcontroller boards due to its small size and low cost, the Raspberry Pi is really a microprocessor computer system board intended to function as a low cost fully functional computer running Linux, which was an amazing achievement when it was released over a decade ago. It has a large development community, and can be used to control projects, as Make magazine frequently shows. It too is available in various configurations. For example, the Raspberry Pi Pico board (more of a microcontroller board) is also about 2cm in width and was released in 2021 at the amazing price of US$4 which is even more amazing that this board can be programmed in C, C++, MicroPython, CircuitPython and can even run deep learning code such as TensorFlow Lite. The Jan 2024 Make magazine has an article on how to build a US$25 real oscilliscope by using the Raspberry Pico.
 - Pythonistas are probably familiar with MicroPython boards that now can directly run Python 3 code. Adafruit boards are frequently used by MicroPython/CircuitPython coders although they have never achieved the popularity of, for example, Arduino boards. As well, MicroPython/CircuitPython is not fully compatible with many of the library and PyPI modules used in Python programs. (CircuitPython is a fork based on MicroPython. It is easier to use, especially with the AdaFruit boards it was intended for.)  However, there is an active AdaFruit development community, and they too are available in various configurations and sizes. For example, the Jan 2024 Make magazine gives a project using an AdaFruit board to make wearable intelligent fabric. A variety of other boards are listed in the Jan 2024 Make magazine comparison. Of interest, many boards can use the Arduino IDE and/or MicroPython/CircuitPython and/or C/C++. In 2022, in fact, Arduino started officially supporting MicroPython on a number of its boards, and a MicroPython IDE can be downloaded from Arduino. Given that the Raspberry Pi can function as a full Linux computer system, any Python code along with whatever libraries are required, can be run on it.)
   
 -The manual gives you a link to download the Arduino IDE. I did not use it but instead went to https://www.arduino.cc and clicked 'software' which I know is a secure website for Arduino and installed the IDE for Windows from that page. (They also have the IDE for Linux and macOS.)
@@ -859,6 +879,15 @@ Plan at this time:
 
 -research into Bluetooth board used by Osoyoo -- it is the "HC02 Bluetooth Module" which supports Bluetooth 2.0 although it talks about Bluetooth BLE 4.0; perhaps try a different more recently released pin-compatible Bluetooth module for the Arduino board and quickly see if it can pair more easily with an iPhone (since we need an iPhone to run the app) and if it works compatibly with the Osoyoo setup and software
 
+![hc02pins](hc02pins.png)
+
+For example, here is an inexpensive ($US10 from Amazon.com) more recent HC05 Bluetooth Module with similar pin functionality:
+
+![hc05](hc05.png)
+
+![hc05pins](hc05pins.png)
+
+
 -given that Bluetooth is not required for the next lesson, time to move on.....
 
 
@@ -1093,6 +1122,16 @@ You can try changing the values for the TURN_SPEED (turning speed) and the SHIFT
 
 The Arduino website provides thorough documentation of the Arduino board and the Arduino programming language and environment:  https://docs.arduino.cc/
 
+##
+****
+Initial draft Feb 9, 2024
+
+(This is a public document that can be modified by others who have access -- if anything doesn't make sense, please ignore.)
+(No use of high voltage or anything dangerous is specified in this document.)
+
+end of document
+****
+##
 
 -
 -
