@@ -226,7 +226,7 @@ char pass[] = "test1234"
 
 -Now open the Serial Monitor on the Arduino IDE. You will see something like this written:
 
-![ipssid](ipssid.png)
+![ipconnected](ipconnected.png)
 
 Wite down the IP address you, in this exmaple, it would be "10.0.0.41" -- you will need this address for the App running on your smartphone -- it will tell the App where the robot car is connected.
 
@@ -273,10 +273,13 @@ They all work .... we can control the robot car via Wi-F i -- this time with bot
 ![wifiworks](wifiworks.jpg)
 
 
-Success :)  Celebrate.... because we will be moving onto more technical details in a few moments.....
+Success :)  
 
-![gptrequest](gptrequest.png)
-![successpic](successpic.png)
+Celebrate.... because we will be moving onto more technical details in a few moments.....
+
+For a moment, you can pretend you just created a great new robot to be used on the Star Ship Enterprise (NCC-1701-D, of course). Picard is most pleased with your genius, and invites you for a cup of tea, Earl Grey, of course. 
+
+![logogpt4startrek])(logogpt4startrek.jpg)
 
 -
 -
