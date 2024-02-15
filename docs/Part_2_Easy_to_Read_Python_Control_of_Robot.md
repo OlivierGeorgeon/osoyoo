@@ -61,6 +61,8 @@ In this Step #1 of Part II we will consider the big picture, i.e., what are the 
 
 The PetitCat Project is an open-source project based on the work of Prof Olivier Georgeon and his colleagues and students at UCLY Lyon Catholic University. 
 
+The big picture (i.e., overview) of the project is: The Python module PetitCat.py running as a Python module as part of your Python program on your desktop/laptop communicates via Wi-Fi to the robot car. The Arduino program PetitCat.ino compiled to Arduino code running on the Arduino board on the robot car communicates via Wi-Fi with PetitCat.py.
+
 
 ![bigpicture](bigpicture.png)
 
@@ -75,14 +77,55 @@ Let's review the nomenclature of the project, i.e., the names referring to diffe
 
 The "PetitCat" project == the "Robot Car" project == the "Osoyoo Robot Car" project 
 
+-Python main file:
+
+PetitCat.py == PetitCaMain.py == PetitCatTester.py
+
+-Arduino board main file:
+
+PetitCat.ino == autocat_enacter.ino
+
+-GitHub folder for Python files:
+
+/PetitCat_python == /TestROS   
+
+https://github.com/OlivierGeorgeon/TestROS
+
+---> Go to this GitHub folder. If you click open PetitCat.py == PetitCaMain.py == PetitCatTester.py you see the standard library files PYthon will import automatically. 
+
+
+-GitHub folder for Arduino files:
+
+/PetitCat_arduino == /osoyoo/autocat_enacter
+
+https://github.com/OlivierGeorgeon/osoyoo/tree/master/autocat_enacter
+
+---> Go to this GitHub folder (following the link in the line above). You will see that in addition to the main code PetitCat.ino == autocat_enacter.ino there are good number of header .h and code .cpp files. All these will need to be cloned and copied into the IDE later. 
+
+As well, the library Arduino_JSON will have to be added later to the Arduino IDE via the IDE's Library Manager.
+
+-
+-
+-
 -
 
 
 
+**Step #2 -- Using your House/Workplace Wi-Fi to Communicate with the Robot Car**
 
-**Step #14 -- Adding Wi-Fi Control of the Robotic Car**
+In Part I in one of the last Steps we created a Wi-Fi server ("hotspot") out of the Arduino board's Wi-Fi shield, and we logged our smartphone into this Wi-Fi server ("hotspot"). Then we used an app on our phone to control the robot car via a Wi-Fil linkage between the two.
 
-Ok... let's hope we have better luck with Wi-Fi compared to Bluetooth in the Step above.
+In this new step we make the robot car act as an ordinary devide on our home/workplace LAN (local area network). This is just a tiny bit more complicated (actually, really not.... if your Wi-Fi does not have strange security layers it should work well) than before, but more useful. Indeed, in Part II for communication of the robot car with our Python program, we will want every device (i.e, the Arduino board Wi-Fi and the desktop/laptop Wi-Fi ) to log into the same LAN (local area network).
+
+In this Step #2 we will not be doing any programming of our own, but use the software already prepared by Osoyoo.
+
+Before you start this step you need to find out the following information about the Wi-Fi in your house/workplace:
+
+-SSID -- this is the name of your network, e.g., if the name of the network you log into is "Jones" then your SSID is "Jones".
+
+-Pasword -- this is your password you use to log into your network, e.g., if the password to log into your Wi-Fi is "test1234" then your password is "test1234".
+
+
 
 
 Go to Lesson 5 in the Osoyoo Manual.
