@@ -28,9 +28,17 @@ https://github.com/OlivierGeorgeon/osoyoo/blob/master/docs/Easy_to_Read_Overview
 
 In this second part (i.e., "Part II") to our adventure, we will now turn the toy-like robot car into a serious Python controlled autonomous robot.
 
+In the following part (i.e., "Part III"), we will then use our Python-controlled robot car for AI/Cognitive Science experiments and demonstrations.
+
+
 Saddle up!! Let's get going on the most exciting part of our journey....
 
 ![horsetonextlesson](horsetonextlesson.png)
+
+-
+-
+-
+-
 
 
 **Step #1 -- The Big Picture: The PetitCat Project**
