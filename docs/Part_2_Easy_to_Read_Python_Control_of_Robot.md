@@ -51,8 +51,6 @@ Saddle up!! Let's get going on the most exciting part of our journey....
 
 -
 -
--
--
 
 
 **Step #1 -- The Big Picture: The PetitCat Project**
