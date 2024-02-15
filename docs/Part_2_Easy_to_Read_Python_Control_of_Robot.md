@@ -1,6 +1,6 @@
 
 
-# Part II: An Easy-to-Read Overview of the Robot Car Project: Modifying for Python Control
+# Part II: An Easy-to-Read Overview of the Robot Car ("PetitCat") Project: Modifying for Python Control
 
 ##
 
