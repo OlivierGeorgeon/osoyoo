@@ -228,7 +228,7 @@ char pass[] = "test1234"
 
 ![ipconnected](ipconnected.png)
 
-Wite down the IP address you, in this exmaple, it would be "10.0.0.41" -- you will need this address for the App running on your smartphone -- it will tell the App where the robot car is connected.
+Wite down the IP address you, in this example, it would be "10.0.0.41" -- you will need this address for the App running on your smartphone -- it will tell the App where the robot car is connected.
 
 
 --Phone APP software--
