@@ -156,6 +156,7 @@ Previously (should already be done) wiring changes to make:
 
 ![wificlose](wificlose.png)
 
+
 --Software Installation--
 
 --Library Software--
@@ -175,6 +176,7 @@ A folder WiFiEsp-master.zip will download
 -Open up the Arduino IDE (similar to above in earlier steps) but this time click Sketch, Library, Add ZIP Library, select WiFiEsp-master.zip
 
 ![addlibrary](addlibrary.png)
+Lesson5b Arduino code being compiled and uploaded to the robot car -- with this new code the robot car's Wi-Fi board will log onto your house/workplace Wi-Fi
 
 
 --Wi-Fi Software--
