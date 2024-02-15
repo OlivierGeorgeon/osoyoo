@@ -192,14 +192,32 @@ In the lesson5b demo the Wi-Fi board on the robot car becomes a node (i.e., a cl
 
 -Then attach the USB cable to the Arduino board connector on the robot car, exactly like you did in Part I Steps when we uploaded software to the car's Arduino board. (The power on your robot car should be turned off -- the cable will supply power to the Arduino board. )
 
+--> YOU NEED TO MODIFY THIS SOFTWARE
+
+You now need to tell the software what your Wi-Fi SSID and password are.
+
+For example, if the name of the network you log into is "Jones" then your SSID is "Jones" and if the password to log into your Wi-Fi is "test1234" then your password is "test1234".
+
+Look at lines 180 and 181 (or equivalent lines if the software has changed since the time of this writing).  Modify the lines as follows:
+
+char ssid[] = "Jones"
+
+char pass[] = "test1234"
+
+
 -Now click the upload arrow (green arrow inside a circle at the top left corner).
 
--The software in m2-lesson5b.ino will now be uploaded to the Arduino board in your robotic car.
+-The software in m2-lesson5b.ino (modified with your Wi-Fi SSID and password) will now be uploaded to the Arduino board in your robotic car.
 
 
 --Phone APP software--
 
-Ok.... now we need the Osoyoo mobile app to access the Wi-Fi hotspot on your robot car and use that communication link with the hotspot to control the car.
+We already add the phone app software in the Step in Part I when we tried out the Wi-Fi board. Thus, there should not be anything for you do now with regard to installing new app's on your smartphone.
+
+In case you did not do this or you un-installed the app from your phone:
+
+
+Ok.... now we need the Osoyoo mobile app to access the common house/workplace Wi-Fi  which both your cellphone and the robot car will use to communicate with each other.
 
 --Installing the Osoyoo Mobile App--
 
@@ -225,15 +243,13 @@ Ok.... now we need the Osoyoo mobile app to access the Wi-Fi hotspot on your rob
 
 -Ok... turn on the robot car
 
--Remember, the car's Wi-Fi board will be the new server, i.e., Wi-Fi access spot or hotspot. Thus, turn off the cellphone Internet you may have. Disconnect from your workplace's LAN or your home's Wi-Fi LAN. In the Settings of your smartphone, look for Internet settings, and choose "osoyoo_robot". (It may say "no Internet access" -- ignore this warning since you are not accessing the Internet, you are accessing the robotic car.) Thus, at this point, when you look at the Wi-Fi connection of your cellphone, it should be to "osoyoo_robot".  (Some cellphones may try to switch back to your regular Wi-Fi settings after a minute of no Internet activity -- if your phone does this, please turn this option off. You want to stay connected to "osoyoo_robot".)
-
 -Now, let's click a button on the app.... go forward
 
 The car goes forward.
 
 Click backwards, left and right.
 
-They all work .... we can control the robot car via Wi-Fi.
+They all work .... we can control the robot car via Wi-F i -- this time with both the robot car and cellphone attached to the same house/workplace Wi-Fi router.
 
 ![wifiworks](wifiworks.jpg)
 
@@ -243,6 +259,10 @@ Success :)
 ![gptrequest](gptrequest.png)
 ![successpic](successpic.png)
 
+-
+-
+-
+-
 
 
 
