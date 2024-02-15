@@ -11,6 +11,16 @@ Initial draft Feb 9, 2024
 (The use of a horseback ride below is only a metaphor -- horses are pretty big in real life and quite scary to get on and even more scary to fall off:)
 (Questions, corrections, suggestions? -- please contact me via my GitHub link.)
 ##
+-
+-
+-
+-
+![bigpicture](bigpicture.png)
+-
+-
+-
+-
+
 
 Welcome!! Bienvenue!! Tunngasugit!!
 
