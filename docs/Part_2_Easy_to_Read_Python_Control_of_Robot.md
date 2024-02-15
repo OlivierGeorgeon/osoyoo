@@ -204,7 +204,7 @@ You now need to tell the software what your Wi-Fi SSID and password are.
 
 For example, if the name of the network you log into is "Jones" then your SSID is "Jones" and if the password to log into your Wi-Fi is "test1234" then your password is "test1234".
 
-Look at lines 180 and 181 (or equivalent lines if the software has changed since the time of this writing).  Modify the lines as follows:
+--> Look at lines 180 and 181 (or equivalent lines if the software has changed since the time of this writing).  Modify the lines as follows:
 
 char ssid[] = "Jones"
 
@@ -214,6 +214,10 @@ char pass[] = "test1234"
 -Now click the upload arrow (green arrow inside a circle at the top left corner).
 
 -The software in m2-lesson5b.ino (modified with your Wi-Fi SSID and password) will now be uploaded to the Arduino board in your robotic car.
+
+![lesson5b](leson5b.png)
+
+
 
 # under construction#
 
