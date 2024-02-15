@@ -314,7 +314,7 @@ Do the same for the "Adafruit TCS34725 by Adafruit" library, and click to instal
 
 Thus at this point when you search for Installed libraries you should see this on the Library Manager:
 
-[installedlibs](installedlibs.png)
+![installedlibs](installedlibs.png)
 
 -
 -
@@ -325,9 +325,9 @@ Thus at this point when you search for Installed libraries you should see this o
 
 As we discussed in Part I, the Arduino IDE uses a C++ compiler (the GNU GCC toolchain actually) -- it compiles C and C++ code. Thus, Arduino programs are really C/C++ code.
 
-Learning to code in C and C++ is beyond the scope of this tutorial, and in any case most readers probably already have some experience in this area. However, this and the next Step (or two.... pending to editing of how much material to include) is just to make sure for readers will limited (or it has been many years) experience in C/C++ you feel a bit more comfortable with the code (as well as some idiosyncracies about Arduino program structure). 
+Learning to code in C and C++ is beyond the scope of this tutorial, and in any case most readers probably already have some experience in this area. However, this and the next Step (or two.... pending to editing of how much material to include) is just to make sure for readers with limited (or it has been many years) experience in C/C++  feel a bit more comfortable with the code (as well as some idiosyncracies about Arduino program structure). 
 
-C is the original procedural C programming language. C++ is a more modern object-oriented programming language with a richer set of features (particularly in memory management) and standard library. We will not be distinguishing between the two in this and the next Steps. (C# is similar to C++. It was created by Microsoft in the late 1990s and originally developed for Windows platforms and Microsoft's .NET ecosystem, although it can now run on macOS and Linux. We will not be discussing it here.)
+C is the original procedural C programming language. C++ is a more modern object-oriented programming language with a richer set of features (particularly in memory management) and in its standard library. We will not be distinguishing between the two in this and the next Steps since the compiler will compile both sets of code. (C# is similar to C++. It was created by Microsoft in the late 1990s and originally developed for Windows platforms and Microsoft's .NET ecosystem, although it can now run on macOS and Linux. We will not be discussing it here.)
 
 For readers with no background in C/C++ consider the many excellent and free (or some at small fees) courses and tutorials available online. However, the tutorial in this and the next Step(s) will give you some exposure to C/C++ in particular for the Arduino projects.
 
