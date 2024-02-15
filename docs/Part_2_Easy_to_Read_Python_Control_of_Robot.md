@@ -246,6 +246,8 @@ In case you did not do this or you un-installed the app from your phone:
 -Unfortunately when I do this search (Feb 9, 2024) the only app that appears in the Google Play store is "Osoyoo IoT UDP Robot APP" -- well, better than nothing, and maybe it will do the same thing.... so this app is installed on my Android cellphone
 
 
+---> Your smartphone App is installed. (Whether it is called "Osoyoo Wifi UDP Robot Car Controller" or "Osoyoo IoT UDP Robot APP").
+
 Now we have to go to the settings section of the phone App.
 
 -Ok we open the Osoyoo IoT UDP Robot APP
