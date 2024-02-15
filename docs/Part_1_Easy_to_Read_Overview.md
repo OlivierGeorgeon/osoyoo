@@ -634,6 +634,8 @@ Then download the demonstration software for the ultrasound detector.
 
 -Then attach the USB cable to the Arduino board connector on the robot car, exactly like you did above when we uploaded software to the car's Arduino board. The power on your robot car should be turned off -- the cable will supply power to the Arduino board.
 
+-(Note: In theory, Arduino boards can remain powered while you connect your also powered USB cable from your desktop/laptop to the Arduino board. Most modern USB interfaces are designed for 'hot swapping.' However, if there are momentary shorts or static discharges as the pins go into the connector or other parts get disturbed, it is generally better if the board is unpowered.)
+
 -Now click the upload arrow (green arrow inside a circle at the top left corner).
 
 The software in m2-lesson2.ino will now be uploaded to the Arduino board in your robotic car.
