@@ -161,7 +161,7 @@ Previously (should already be done) wiring changes to make:
 
 --Library Software--
 
-We already add this library software in the Step in Part I when we tried out the Wi-Fi board. Thus, there should not be anything for you do now with regard to loading library software.
+We already added this library software in the Step in Part I when we tried out the Wi-Fi board. Thus, there should not be anything for you do now with regard to loading library software.
 
 In case you did not do this or the Arduino IDE was re-installed:
 
