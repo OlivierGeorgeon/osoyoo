@@ -212,6 +212,9 @@ char ssid[] = "Jones"
 
 char pass[] = "test1234"
 
+![ssid](ssid.png)
+
+
 
 -Now click the upload arrow (green arrow inside a circle at the top left corner).
 
@@ -221,8 +224,11 @@ char pass[] = "test1234"
 
 
 
-# under construction#
+-Now open the Serial Monitor on the Arduino IDE. You will see something like this written:
 
+![ipssid](ipssid.png)
+
+Wite down the IP address you, in this exmaple, it would be "10.0.0.41" -- you will need this address for the App running on your smartphone -- it will tell the App where the robot car is connected.
 
 
 --Phone APP software--
@@ -230,11 +236,6 @@ char pass[] = "test1234"
 We already add the phone app software in the Step in Part I when we tried out the Wi-Fi board. Thus, there should not be anything for you do now with regard to installing new app's on your smartphone.
 
 In case you did not do this or you un-installed the app from your phone:
-
-
-Ok.... now we need the Osoyoo mobile app to access the common house/workplace Wi-Fi  which both your cellphone and the robot car will use to communicate with each other.
-
---Installing the Osoyoo Mobile App--
 
 -If you have an Apple phone then you will go to the Apple Store
 
@@ -244,13 +245,16 @@ Ok.... now we need the Osoyoo mobile app to access the common house/workplace Wi
 
 -Unfortunately when I do this search (Feb 9, 2024) the only app that appears in the Google Play store is "Osoyoo IoT UDP Robot APP" -- well, better than nothing, and maybe it will do the same thing.... so this app is installed on my Android cellphone
 
-![searchplay](searchplay.png)
+
+Now we have to go to the settings section of the phone App.
 
 -Ok we open the Osoyoo IoT UDP Robot APP
 
--Then go to Settings and enter the IP address this app should access (since we want it to access the Wi-Fi board on the robot car)
+-Then go to Settings and enter the IP address we saw in the Serial Monitor. In this example, we would enter "10.0.0.41" (you will enter, of course, the IP address your Serial Monitor showed you -- this is the address the robot car is using).
 
-![appsettings](appsettings.png)
+-You can leave the other settings such as the default Ports unchanged
+
+Your smartphone App should now be able to control your robot car. Let's try it out.
 
 -Ok...now go to the main page of the app.
 
@@ -269,7 +273,7 @@ They all work .... we can control the robot car via Wi-F i -- this time with bot
 ![wifiworks](wifiworks.jpg)
 
 
-Success :)
+Success :)  Celebrate.... because we will be moving onto more technical details in a few moments.....
 
 ![gptrequest](gptrequest.png)
 ![successpic](successpic.png)
