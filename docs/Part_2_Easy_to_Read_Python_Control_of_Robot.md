@@ -57,6 +57,8 @@ Saddle up!! Let's get going on the most exciting part of our journey....
 
 **Step #1 -- The Big Picture: The PetitCat Project**
 
+Ok.... you are in the saddle, riding high on your horse. Now it's time to survey the landscape before moving on....
+
 As noted above, in Part I you already built your Osoyoo Robot Car. You learned how to use the Arduino IDE to upload software to the robot car, and how to control the car from your cellphone via the Wi-Fi in your house or workplace. You also learned a little bit about the software running on the Arduino and how to modify some of the parameters in the Arduino code.
 
 In this Part II you will learn how to transform your Osoyoo Robot Car into a robot car which any of your Python programs will be able to control and communicate with. We call this project the "PetitCat" project or the "Robot Car" project or the "Osoyoo Robot Car" project -- they all mean the same thing and may be used at different places in the documentation. 
