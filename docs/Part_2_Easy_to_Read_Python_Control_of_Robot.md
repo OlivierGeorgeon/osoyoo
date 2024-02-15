@@ -260,7 +260,7 @@ Your smartphone App should now be able to control your robot car. Let's try it o
 
 -Ok...now go to the main page of the app.
 
-![wifiapp](wifiapp.png)
+![appsmall](appsmall.png)
 
 -Ok... turn on the robot car
 
@@ -289,6 +289,49 @@ For a moment, you can pretend you just created a great new robot to be used on t
 -
 
 
+**Step #3 --Getting More Experience with the Arduino IDE -- The Library Manager**
+
+In this Step we will learn how to use the Arduino IDE library manager, and we will then install some of the Arduino libraries that our PetitCat project code will later need to use.
+
+An Arduino library is essentially C++ code consisting of various C++ classes and functions that perform some related function. For example, a Wi-Fi library would provide functionality with regard to sending and receiving information via Wi-Fi. For example, a JSON library would provide functionality with regard to JSON operations. (JSON is a popular data format which simply consists of (key:value) pairs. However, the key-value pairs can be nested and structured and held in arrays. Although verbose, it is human readable.) For example, a JSON library would help with parsing JSON data, generating JSON data and processing JSON data.
+
+Your Arduino IDE should still be on from the previous step. (If not, open up the Arduino IDE.)
+
+If you go to Tools you can click "Manage Libraries..."  or you can just click the icon on the left column of the page where you see a bunch of library books.
+
+The "Library Manager" will now appear in a column to the left of the code.
+
+You can use the Library Manager to add and remove libraries from your Arduino projects.
+
+
+![libmanager](libmanager.png)
+
+You already installed in Part I (when we were getting the robot car to communicate via Wi-Fi and act as its own hotspot server) the library WiFiESP. You can see in the illustration above that this library is already installed in your Arduino IDE.  (If it is not, then please install it along with the other librares we will install below.)
+
+We want to install a JSON library also. Search for JSON (or you can go through all the libraries available, although that takes a good amount of time). Choose "Arduino_JSON by Arduino" and click to install it.
+
+Do the same for the "Adafruit TCS34725 by Adafruit" library, and click to install it. There will be a question about dependencies -- generally you should respond 'Yes' since the libary may need some of these dependencies at some point in order to function. (This library will be used later for an additional color sensor we will be attaching to the robot car.)
+
+Thus at this point when you search for Installed libraries you should see this on the Library Manager:
+
+[installedlibs](installedlibs.png)
+
+-
+-
+-
+-
+
+**Step #4 --Getting More Experience with the Arduino IDE -- Simple C/C++ Coding**
+
+As we discussed in Part I, the Arduino IDE uses a C++ compiler (the GNU GCC toolchain actually) -- it compiles C and C++ code. Thus, Arduino programs are really C/C++ code.
+
+Learning to code in C and C++ is beyond the scope of this tutorial, and in any case most readers probably already have some experience in this area. However, this and the next Step (or two.... pending to editing of how much material to include) is just to make sure for readers will limited (or it has been many years) experience in C/C++ you feel a bit more comfortable with the code (as well as some idiosyncracies about Arduino program structure). 
+
+C is the original procedural C programming language. C++ is a more modern object-oriented programming language with a richer set of features (particularly in memory management) and standard library. We will not be distinguishing between the two in this and the next Steps. (C# is similar to C++. It was created by Microsoft in the late 1990s and originally developed for Windows platforms and Microsoft's .NET ecosystem, although it can now run on macOS and Linux. We will not be discussing it here.)
+
+For readers with no background in C/C++ consider the many excellent and free (or some at small fees) courses and tutorials available online. However, the tutorial in this and the next Step(s) will give you some exposure to C/C++ in particular for the Arduino projects.
+
+You do not need to be able to code in C/C++. The purpose of the PetitCat project is to construct an interface that will allow your thousands of lines of Python code to communicate with the robot car. However, given that the robot car is powered by C/C++ code, understanding a tiny bit about C/C++ can be helpful in understanding how we make the robot car communicate with the Python programs.
 
 
 # under construction#
