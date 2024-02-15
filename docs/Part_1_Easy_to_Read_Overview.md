@@ -918,7 +918,14 @@ I just asked GPT4 for a picture to illustrate my feelings to you the reader. Her
 
 ![horsetonextlesson](horsetonextlesson.png)
 
+-
+-
 
+I just asked GPT4 to draw a logo for the PetitCat project in the style of Jackson Pollock to illustrate my feelings. Here is what it drew (first time, no regenerations):
+![logogpt4pollack](logogpt4pollack.jpg)
+
+-
+-
 
 Hopefully you the reader will be able to Bluetooth pair your smartphone and have more success installing and trying out the imitiation Bluetooth driving app.
 
