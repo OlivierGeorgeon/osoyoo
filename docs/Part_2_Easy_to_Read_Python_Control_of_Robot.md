@@ -55,6 +55,17 @@ The PetitCat Project is an open-source project based on the work of Prof Olivier
 ![bigpicture](bigpicture.png)
 
 
+Nomenclature
+
+As this project evolves, names used to describe various parts of the project may change, although they will describe the same piece of code or the same folder of code, etc.
+
+Let's review the nomenclature of the project, i.e., the names referring to different parts of the project.
+
+-Overall project:
+
+The "PetitCat" project == the "Robot Car" project == the "Osoyoo Robot Car" project 
+
+-
 
 
 
