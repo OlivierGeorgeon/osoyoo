@@ -233,7 +233,7 @@ Wite down the IP address you, in this example, it would be "10.0.0.41" -- you wi
 
 --Phone APP software--
 
-We already add the phone app software in the Step in Part I when we tried out the Wi-Fi board. Thus, there should not be anything for you do now with regard to installing new app's on your smartphone.
+We already add the phone app software in the Step in Part I when we tried out the Wi-Fi board. Thus, there should not be anything for you do now with regard to installing new app's on your smartphone. However, you will have to change the settings, as shown below. IMPORTANT: You must change the settings in the smartphone App since the robot car is no longer a hotspot but is logged onto your home/workplace Wi-Fi now.
 
 In case you did not do this or you un-installed the app from your phone:
 
