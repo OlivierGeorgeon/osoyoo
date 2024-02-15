@@ -215,7 +215,7 @@ char pass[] = "test1234"
 
 -The software in m2-lesson5b.ino (modified with your Wi-Fi SSID and password) will now be uploaded to the Arduino board in your robotic car.
 
-![lesson5b](leson5b.png)
+![lesson5b](lesson5b.png)
 
 
 
