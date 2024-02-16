@@ -11,13 +11,13 @@ Make sure your PC is connected to the same wifi as the robot.
 
 Clone this project or download the file [test_remote_control_robot.py](../../tests/test_remote_control_robot.py).
 
-Run test_remote_control_robot.py with the IP address of you robot as an argument. For example: 
+Run `test_remote_control_robot.py` with the IP address of you robot as an argument. For example: 
 
 ```
 py test_remote_control_robot.py 192.168.8.242
 ```
 
-Press the action keys. The robot executes your commands. Your python terminal displays the logs as in Figure 1. 
+Press the action keys (Table 1). The robot executes your commands. Your python terminal displays the logs as in Figure 1. 
 
 ![trace](trace.png)
 Figure 1: The trace showing the enaction of three interactions
