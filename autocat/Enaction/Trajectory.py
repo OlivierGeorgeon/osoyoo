@@ -1,7 +1,6 @@
 import math
 import numpy as np
 from pyrr import matrix44, Vector3, Quaternion
-from playsound import playsound
 from ..Decider.Action import ACTION_FORWARD, ACTION_TURN, ACTION_SCAN, ACTION_WATCH
 from ..Integrator.OutcomeCode import CONFIDENCE_NO_FOCUS, CONFIDENCE_NEW_FOCUS, CONFIDENCE_TOUCHED_FOCUS, \
     CONFIDENCE_CAREFUL_SCAN, CONFIDENCE_CONFIRMED_FOCUS
@@ -101,7 +100,6 @@ class Trajectory:
             front_point = Vector3([ROBOT_FLOOR_SENSOR_X, 0, 0])
             line_point = front_point + Vector3([ROBOT_SETTINGS[self.robot_id]["retreat_distance"], 0, 0])
             self.translation += front_point - self.yaw_quaternion * line_point
-            # playsound('autocat/Assets/cyberpunk3.wav', False)
 
         if outcome.blocked:
             self.translation = np.array([0, 0, 0], dtype=int)
@@ -140,18 +138,15 @@ class Trajectory:
                     # The focus was lost
                     print("Focus delta:", prediction_error_focus, "New focus:", end="")
                     self.focus_confidence = CONFIDENCE_NEW_FOCUS
-                    # playsound('autocat/Assets/R5.wav', False)
             else:
                 # The focus was lost
                 print("Lost focus due to no echo ", end="")
                 self.focus_confidence = CONFIDENCE_NO_FOCUS
-                # playsound('autocat/Assets/R5.wav', False)
         else:
             # If the robot was not focussed then check for catch focus
             if outcome.action_code in [ACTION_SCAN, ACTION_FORWARD, ACTION_TURN, ACTION_WATCH] \
                     and outcome.echo_point is not None:
                 # Catch focus
-                # playsound('autocat/Assets/cute_beep2.wav', False)  # DeciderExplore and DeciderWatch often clear focus
                 self.focus_confidence = CONFIDENCE_NEW_FOCUS
                 print("New focus ", end="")
         self.focus_point = new_focus

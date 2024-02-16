@@ -3,7 +3,6 @@ from . Action import ACTION_FORWARD, ACTION_SCAN
 from . PredefinedInteractions import create_or_retrieve_primitive, create_primitive_interactions, \
     create_composite_interactions, create_or_reinforce_composite
 from . Interaction import OUTCOME_NO_FOCUS, OUTCOME_FOCUS_TOO_FAR
-from ..Integrator.OutcomeCode import outcome_code
 from . Action import ACTION_TURN
 from ..Robot.Enaction import Enaction
 from ..Memory.Memory import EMOTION_HAPPY

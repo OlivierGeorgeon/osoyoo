@@ -1,5 +1,5 @@
 import math
-from playsound import playsound
+# from playsound import playsound
 from pyrr import Matrix44, Quaternion, Vector3
 
 import autocat.Utils
@@ -41,7 +41,7 @@ class EgocentricMemory:
 
         # The FLOOR experience
         if enaction.outcome.floor > 0:
-            playsound('autocat/Assets/cyberpunk3.wav', False)
+            # playsound('autocat/Assets/cyberpunk3.wav', False)
             line_point = Vector3([ROBOT_FLOOR_SENSOR_X + ROBOT_SETTINGS[self.robot_id]["retreat_distance"], 0, 0])
             if enaction.outcome.floor == 0b01:
                 # Black line on the right

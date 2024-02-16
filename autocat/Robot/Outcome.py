@@ -1,7 +1,7 @@
 import json
 import numpy as np
 import colorsys
-from playsound import playsound
+# from playsound import playsound
 from pyrr import matrix44
 from ..Memory.EgocentricMemory.Experience import FLOOR_COLORS
 from ..Utils import echo_matrix
@@ -165,8 +165,8 @@ class Outcome:
         self.impact = 0
         if 'impact' in outcome_dict:
             self.impact = outcome_dict['impact']
-            if self.impact > 0:
-                playsound('autocat/Assets/cute_beep1.wav', False)
+            # if self.impact > 0:
+            #     playsound('autocat/Assets/cute_beep1.wav', False)
 
         # Outcome blocked
         # (The Enaction will reset the translation)

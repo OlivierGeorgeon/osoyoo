@@ -1,5 +1,6 @@
 import json
-from playsound import playsound
+import pyglet
+# from playsound import playsound
 from .Decider.Decider import Decider
 # from .Decider.DeciderCircle import DeciderCircle
 from .Decider.DeciderExplore import DeciderExplore
@@ -67,6 +68,16 @@ class Workspace:
 
         # Message from other robot
         self.message = None
+
+        # Load sounds
+        self.startup_sound = pyglet.media.load('autocat/Assets/R5.wav', streaming=False)
+        self.clear_sound = pyglet.media.load('autocat/Assets/R3.wav', streaming=False)
+        self.near_home_sound = pyglet.media.load('autocat/Assets/R4.wav', streaming=False)
+        self.push_sound = pyglet.media.load('autocat/Assets/tiny_cute.wav', streaming=False)
+        self.message_sound = pyglet.media.load('autocat/Assets/chirp.wav', streaming=False)
+        self.floor_sound = pyglet.media.load('autocat/Assets/cyberpunk3.wav', streaming=False)
+        self.impact_sound = pyglet.media.load('autocat/Assets/cute_beep1.wav', streaming=False)
+        self.startup_sound.play()
 
     def main(self, dt):
         """The main handler of the interaction cycle:
@@ -154,7 +165,8 @@ class Workspace:
                 self.composite_enaction = CompositeEnaction([e0, e1, e2, e3])
         elif user_key.upper() == KEY_CLEAR:
             # Clear the stack of enactions
-            playsound('autocat/Assets/R3.wav', False)
+            # playsound('autocat/Assets/R3.wav', False)
+            self.clear_sound.play()
             self.composite_enaction = None
             # TODO: prevent a crash when the enaction has been cleared and then an outcome is received after
         elif user_key.upper() == KEY_PREDICTION_ERROR:

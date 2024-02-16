@@ -15,11 +15,7 @@ ROBOT_OUTSIDE_Y = 120       # (mm) The Y position of the outside border of the r
 
 DEFAULT_YAW = 45                  # (degree) Default rotation when yaw is not returned by the robot
 DEFAULT_ACTION_DURATION = 1000    # (ms) The default duration of actions (value of Interaction.h/_target_duration )
-# TRANSLATE_DURATION = 1.         # (s) The duration of longitudinal or lateral translation
-RETREAT_DISTANCE_Y = 20  # 75     # (mm) Y displacement when line is detected on the side
-# LINE_X = 150  # 160             # (mm) X coordinate of the line after retreat
-
-# SCAN_DISTANCE = 800
+# RETREAT_DISTANCE_Y = 20  # 75     # (mm) Y displacement when line is detected on the side
 
 TERRAIN_RADIUS = {"A328": {"radius": 1100, "azimuth": 25, "short_radius": 800},  #  25 990 x 600  45},
                   # "PetiteIA": {"radius": 600, "azimuth": 50},  # Petit tapis

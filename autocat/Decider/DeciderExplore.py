@@ -6,7 +6,7 @@
 import math
 import numpy as np
 from pyrr import quaternion, Quaternion, Vector3
-from playsound import playsound
+# from playsound import playsound
 from . Action import ACTION_TURN, ACTION_FORWARD, ACTION_SWIPE
 from . Interaction import OUTCOME_NO_FOCUS
 from . Decider import Decider
@@ -113,7 +113,8 @@ class DeciderExplore(Decider):
                 self.action = self.workspace.actions[ACTION_SWIPE]
                 self.workspace.memory.egocentric_memory.prompt_point = ego_confirmation
                 e1 = Enaction(self.action, self.workspace.memory)
-                playsound('autocat/Assets/R5.wav', False)
+                # playsound('autocat/Assets/R5.wav', False)
+                self.workspace.startup_sound.play()
             # If not left or right we need to manoeuvre
             else:
                 # If near home then go to confirmation prompt
@@ -122,7 +123,8 @@ class DeciderExplore(Decider):
                     print("Enacting confirmation sequence to", polar_confirmation)
                     ego_confirmation = self.workspace.memory.polar_egocentric_to_egocentric(polar_confirmation)
                     self.workspace.memory.egocentric_memory.prompt_point = ego_confirmation
-                    playsound('autocat/Assets/R4.wav', False)
+                    # playsound('autocat/Assets/R4.wav', False)
+                    self.workspace.near_home_sound.play()
                 else:
                     # If not near home then go to origin prompt
                     allo_origin = self.workspace.memory.phenomenon_memory.phenomena[TER].relative_origin_point + \
@@ -130,7 +132,8 @@ class DeciderExplore(Decider):
                     print("Going from", self.workspace.memory.allocentric_memory.robot_point, "to origin sensor point", allo_origin)
                     ego_origin = self.workspace.memory.allocentric_to_egocentric(allo_origin)
                     self.workspace.memory.egocentric_memory.prompt_point = ego_origin
-                    playsound('autocat/Assets/R3.wav', False)
+                    # playsound('autocat/Assets/R3.wav', False)
+                    self.workspace.clear_sound.play()
                 # self.workspace.memory.egocentric_memory.focus_point = None  # Prevent unnatural head movement TODO manage focus after decision
                 self.action = self.workspace.actions[ACTION_TURN]
                 e1 = Enaction(self.action, self.workspace.memory)

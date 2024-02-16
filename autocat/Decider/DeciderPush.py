@@ -3,7 +3,7 @@
 # Activation 2: when the robot is angry
 ########################################################################################
 
-from playsound import playsound
+# from playsound import playsound
 import numpy as np
 from pyrr import vector
 from . Action import ACTION_TURN, ACTION_FORWARD, ACTION_BACKWARD, ACTION_SCAN
@@ -43,7 +43,8 @@ class DeciderPush(Decider):
         if self.step == STEP_INIT:
             # Start pushing
             if self.workspace.memory.egocentric_memory.focus_point is not None and outcome != OUTCOME_FLOOR:
-                playsound('autocat/Assets/tiny_cute.wav', False)
+                # playsound('autocat/Assets/tiny_cute.wav', False)
+                self.workspace.push_sound.play()
                 # Compute the prompt
                 target_prompt = vector.set_length(self.workspace.memory.egocentric_memory.focus_point, 700)
                 self.workspace.memory.egocentric_memory.prompt_point = target_prompt

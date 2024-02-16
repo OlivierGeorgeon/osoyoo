@@ -5,11 +5,10 @@
 ########################################################################################
 
 import math
-from playsound import playsound
+# from playsound import playsound
 import numpy as np
 from . Action import ACTION_WATCH, ACTION_TURN, ACTION_SWIPE, ACTION_FORWARD, ACTION_SCAN
 from ..Robot.Enaction import Enaction
-from ..Memory.BodyMemory import ENERGY_TIRED, EXCITATION_LOW
 from ..Memory.Memory import EMOTION_SAD
 from ..Enaction.CompositeEnaction import CompositeEnaction
 from . Decider import Decider  # , FOCUS_TOO_TOO_FAR_DISTANCE, FOCUS_FAR_DISTANCE
@@ -49,7 +48,8 @@ class DeciderWatch(Decider):
                 # Focus on the other robot's destination
                 print("Other ego destination point", enaction.message.ego_position)
                 print("Other angle", math.degrees(other_angle))
-                playsound('autocat/Assets/chirp.wav', False)
+                # playsound('autocat/Assets/chirp.wav', False)
+                self.workspace.message_sound.play()
                 self.workspace.memory.egocentric_memory.focus_point = enaction.message.ego_position
                 outcome = OUTCOME_FOCUS_SIDE
 

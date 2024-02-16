@@ -20,17 +20,17 @@ class Simulator:
         self.is_simulating = False
         self.simulation_time = 0
         self.simulated_outcome_dict = {}
-        self.simulation_rotation_speed = 0
+        # self.simulation_rotation_speed = 0
         self.simulation_duration = 0
 
     def begin(self):
         """Begin the simulation"""
         self.is_simulating = True
         self.simulation_time = 0
-        self.simulation_rotation_speed = self.workspace.enaction.action.rotation_speed_rad * SIMULATION_SPEED
-        if self.workspace.enaction.command.yaw < 0:
-            self.simulation_rotation_speed *= -1.
-        self.simulation_duration = self.workspace.enaction.command.duration / 1000. * SIMULATION_SPEED
+        # self.simulation_rotation_speed = self.workspace.enaction.action.rotation_speed_rad * SIMULATION_SPEED
+        # if self.workspace.enaction.command.yaw < 0:
+        #     self.simulation_rotation_speed *= -1.
+        self.simulation_duration = self.workspace.enaction.command.duration / SIMULATION_SPEED / 1000.
 
         # Initialize all the required fields of the outcome because sometimes simulate() is not called
         self.simulated_outcome_dict = {"clock": self.workspace.enaction.clock,
@@ -62,7 +62,8 @@ class Simulator:
 
         # The delta displacement
         translation = enaction.command.speed * dt * SIMULATION_SPEED
-        yaw_quaternion = Quaternion.from_z_rotation((self.simulation_rotation_speed * dt))
+        # simulation_rotation_speed = self.workspace.enaction.action.rotation_speed_rad * SIMULATION_SPEED
+        yaw_quaternion = Quaternion.from_z_rotation((enaction.command.rotation_speed_rad * SIMULATION_SPEED * dt))
         displacement_matrix = translation_quaternion_to_matrix(-translation, yaw_quaternion.inverse)
 
         # Simulate the displacement of experiences
