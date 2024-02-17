@@ -132,15 +132,15 @@ class Trajectory:
                 # If the new focus is near the previous focus or the displacement has been continuous.
                 if np.linalg.norm(prediction_error_focus) < FOCUS_MAX_DELTA or outcome.status == "continuous":
                     # The focus has been kept
-                    print("Focus kept with prediction error", prediction_error_focus, "moved to ", end="")
+                    print("Focus kept with prediction error", prediction_error_focus, "moved to ", new_focus)
                     self.focus_confidence = CONFIDENCE_CONFIRMED_FOCUS
                 else:
                     # The focus was lost
-                    print("Focus delta:", prediction_error_focus, "New focus:", end="")
+                    print("Focus delta:", prediction_error_focus, "New focus:", new_focus)
                     self.focus_confidence = CONFIDENCE_NEW_FOCUS
             else:
                 # The focus was lost
-                print("Lost focus due to no echo ", end="")
+                print("Lost focus due to no echo ", new_focus)
                 self.focus_confidence = CONFIDENCE_NO_FOCUS
         else:
             # If the robot was not focussed then check for catch focus
@@ -148,7 +148,7 @@ class Trajectory:
                     and outcome.echo_point is not None:
                 # Catch focus
                 self.focus_confidence = CONFIDENCE_NEW_FOCUS
-                print("New focus ", end="")
+                print("New focus ", new_focus)
         self.focus_point = new_focus
         # print("Focus point", self.focus_point)
 

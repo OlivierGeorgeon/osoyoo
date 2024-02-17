@@ -95,6 +95,10 @@ class DeciderExplore(Decider):
         #           ", Outcome: " + str(outcome))
 
         # Compute a specific outcome TODO improve this
+
+        if self.workspace.memory.phenomenon_memory.terrain_confidence() == 0:
+            return None
+
         outcome_code = self.outcome(enaction)
 
         # Compute the next prompt point
@@ -163,7 +167,6 @@ class DeciderExplore(Decider):
             self.prompt_index += 1
             # if self.prompt_index >= self.nb_points:
             #     self.prompt_index = 0
-            # self.action = self.workspace.actions[ACTION_TURN]
             e1 = Enaction(self.workspace.actions[ACTION_TURN], self.workspace.memory)
             e2 = Enaction(self.workspace.actions[ACTION_FORWARD], e1.predicted_memory)
 

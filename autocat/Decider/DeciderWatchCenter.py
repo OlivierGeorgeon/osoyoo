@@ -18,12 +18,9 @@ class DeciderWatchCenter(Decider):
         super().__init__(workspace)
 
         # Give higher valence to Watch than to Swipe
-        create_or_retrieve_primitive(self.primitive_interactions, workspace.actions[ACTION_SWIPE], OUTCOME_FOCUS_FRONT, 1)
-        create_or_retrieve_primitive(self.primitive_interactions, workspace.actions[ACTION_FORWARD], OUTCOME_FOCUS_FRONT, 1)
-        create_or_retrieve_primitive(self.primitive_interactions, workspace.actions[ACTION_WATCH], OUTCOME_FOCUS_FRONT, 2)
-
-        # TODO check the impact of removing default action watch
-        # self.action = self.workspace.actions[ACTION_WATCH]
+        # create_or_retrieve_primitive(self.primitive_interactions, workspace.actions[ACTION_SWIPE], OUTCOME_FOCUS_FRONT, 1)
+        # create_or_retrieve_primitive(self.primitive_interactions, workspace.actions[ACTION_FORWARD], OUTCOME_FOCUS_FRONT, 1)
+        # create_or_retrieve_primitive(self.primitive_interactions, workspace.actions[ACTION_WATCH], OUTCOME_FOCUS_FRONT, 2)
 
     def activation_level(self):
         """The level of activation is 2 if the robot is SAD or UPSET"""
@@ -31,11 +28,6 @@ class DeciderWatchCenter(Decider):
             return 2
         else:
             return 0
-
-    # def outcome(self, enaction):
-    #     """ Convert the enacted interaction into an outcome adapted to the watch behavior """
-    #     outcome = super().outcome(enaction)
-    #     return outcome
 
     def select_enaction(self, enaction):
         """Return the next intended interaction"""

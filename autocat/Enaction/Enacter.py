@@ -55,7 +55,7 @@ class Enacter:
             simulated_outcome = self.workspace.simulator.end()
             print("Simulated outcome", simulated_outcome)
             # Update memory
-            self.workspace.memory.update_and_add_experiences(self.workspace.enaction)
+            self.workspace.memory.update(self.workspace.enaction)
             # Compute the outcome code
             self.workspace.enaction.outcome_code = outcome_code(self.workspace.memory,
                                                    self.workspace.enaction.trajectory, self.workspace.enaction.outcome)

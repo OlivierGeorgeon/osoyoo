@@ -71,8 +71,8 @@ class Memory:
                         # print("Ego focus", self.egocentric_memory.focus_point)
                         # if object is closer than target point (minus the radius to prevent keeping pushing)
                         is_closer = self.egocentric_memory.focus_point[0] < ego_target[0] - ARRANGE_OBJECT_RADIUS
-                        print("Focus near terrain center:", is_to_arrange, "Before terrain center:", is_closer,
-                              "Other robot angry:", self.phenomenon_memory.other_robot_is_angry())
+                        print("Focus near terrain center:", is_to_arrange, ". Before terrain center:", is_closer,
+                              ". Other robot angry:", self.phenomenon_memory.other_robot_is_angry())
                         if is_to_arrange:
                             if is_closer and not self.phenomenon_memory.other_robot_is_angry():
                                 # Object before center: ANGRY DeciderArrange
@@ -87,7 +87,7 @@ class Memory:
                 # Tired: Robot RELAXED, DeciderExplore to go home
                 self.emotion_code = EMOTION_RELAXED
 
-    def update_and_add_experiences(self, enaction):
+    def update(self, enaction):
         """ Process the enacted interaction to update the memory
         - Move the robot in body memory
         - Move the previous experiences in egocentric_memory
@@ -102,6 +102,11 @@ class Memory:
         self.allocentric_memory.move(self.body_memory.body_quaternion, enaction.trajectory.translation, enaction.clock)
         self.body_memory.update(enaction)
 
+        # Compute the other robot's position relative to the current state of memory
+        if enaction.message is not None:
+            enaction.message.set_position_matrix(self)
+
+        # Update egocentric memory
         self.egocentric_memory.update_and_add_experiences(enaction)
 
         # The integrator may again update the robot's position

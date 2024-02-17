@@ -101,8 +101,8 @@ def predict_outcome(command, memory):
         # if the phenomenon is recognized then subtract its radius to obtain the egocentric echo distance
         if p.category is not None:
             d -= p.category.short_radius
-        if d > 0 and command.action.action_code == ACTION_SCAN and assert_almost_equal_angles(math.radians(a), 0, 90) \
-                or assert_almost_equal_angles(math.radians(a), memory.body_memory.head_direction_rad, 35):
+        if d > 0 and (command.action.action_code == ACTION_SCAN and assert_almost_equal_angles(math.radians(a), 0, 90)
+                      or assert_almost_equal_angles(math.radians(a), memory.body_memory.head_direction_rad, 35)):
             outcome_dict["head_angle"] = round(a)
             outcome_dict["echo_distance"] = round(d)
 

@@ -1,18 +1,17 @@
 import numpy as np
-from . Action import ACTION_FORWARD, ACTION_SCAN
+from . Action import ACTION_SCAN
 from . PredefinedInteractions import create_or_retrieve_primitive, create_primitive_interactions, \
     create_composite_interactions, create_or_reinforce_composite
-from . Interaction import OUTCOME_NO_FOCUS, OUTCOME_FOCUS_TOO_FAR
+from . Interaction import OUTCOME_FOCUS_TOO_FAR
 from . Action import ACTION_TURN
 from ..Robot.Enaction import Enaction
 from ..Memory.Memory import EMOTION_HAPPY
 
 
 class Decider:
+    """The parent class Decider generates the circle behavior"""
     def __init__(self, workspace):
         self.workspace = workspace
-        # self.action = self.workspace.actions[ACTION_FORWARD]
-        # self.anticipated_outcome = OUTCOME_NO_FOCUS
         self.previous_interaction = None
         self.last_interaction = None
 
@@ -27,19 +26,10 @@ class Decider:
             activation_level = 2
         return activation_level
 
-    # def stack_enaction(self):
-    #     """Propose the next intended enaction from the previous enacted interaction.
-    #     This is the main method of the agent"""
-    #     # Compute a specific outcome suited for this agent from the previous enaction
-    #     # outcome = self.outcome(self.workspace.enaction)
-    #     # outcome = outcome_code(self.workspace.memory, self.workspace.enaction)
-    #     # print("OUTCOME", outcome)
-    #     # Compute the next enaction or composite enaction
-    #     # self.workspace.composite_enaction = self.select_enaction(outcome)
-    #     self.workspace.composite_enaction = self.select_enaction(self.workspace.enaction.outcome_code)
-
     def propose_enaction(self):
         """Return a proposed interaction"""
+        if self.workspace.enaction is None:
+            return Enaction(self.workspace.actions[ACTION_SCAN], self.workspace.memory)
         return self.select_enaction(self.workspace.enaction)
 
     def select_enaction(self, enaction):
@@ -51,7 +41,8 @@ class Decider:
         # Set the spatial modifiers
         if action.action_code in [ACTION_TURN]:
             # Turn to the direction of the focus
-            if enaction.outcome_code == OUTCOME_FOCUS_TOO_FAR or self.workspace.memory.egocentric_memory.focus_point is None:
+            if enaction.outcome_code == OUTCOME_FOCUS_TOO_FAR or \
+                    self.workspace.memory.egocentric_memory.focus_point is None:
                 # If focus TOO FAR or None then turn around
                 self.workspace.memory.egocentric_memory.prompt_point = np.array([-100, 0, 0], dtype=int)
             else:
@@ -65,7 +56,7 @@ class Decider:
 
     def select_action(self, enaction):
         """The sequence learning mechanism that proposes the next action"""
-        # Recording previous interaction
+        # Recording previous interaction (call this decider every cycle to record every interaction
         self.previous_interaction = self.last_interaction
         self.last_interaction = create_or_retrieve_primitive(self.primitive_interactions, enaction.action,
                                                              enaction.outcome_code)
@@ -85,7 +76,8 @@ class Decider:
         # Initialize with the first action to select by default
         proclivity_dict = {self.workspace.actions[ACTION_SCAN]: 0}
         if self.composite_interactions:
-            activated_interactions = [ci for ci in self.composite_interactions if ci.pre_interaction == self.last_interaction]
+            activated_interactions = [ci for ci in self.composite_interactions if
+                                      ci.pre_interaction == self.last_interaction]
             for ai in activated_interactions:
                 # print("activated interaction", ai)
                 if ai.post_interaction.action in proclivity_dict:
