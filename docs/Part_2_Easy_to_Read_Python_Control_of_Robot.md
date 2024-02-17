@@ -83,28 +83,26 @@ Let's review the nomenclature of the project, i.e., the names referring to diffe
 
 The "PetitCat" project == the "Robot Car" project == the "Osoyoo Robot Car" project 
 
+-GibHub folder for project:   https://github.com/OlivierGeorgeon/osoyoo
+
 -Python main file:
 
-PetitCat.py == PetitCaMain.py == PetitCatTester.py
+PetitCat.py == PetitCaMain.py == PetitCatTester.py == test_remote_control_robot.py
+
+-GitHub folder for Python files: /osoyoo/petitcat_arduino/
+
+https://github.com/OlivierGeorgeon/osoyoo/tree/master/petitcat_arduino
+
+---> Go to this GitHub folder. If you click open PetitCat.py == PetitCaMain.py == PetitCatTester.py == test_remote_control_robot.py you see the standard library files PYthon will import automatically. 
 
 -Arduino board main file:
 
-PetitCat.ino == autocat_enacter.ino
-
--GitHub folder for Python files:
-
-/PetitCat_python == /TestROS   
-
-https://github.com/OlivierGeorgeon/TestROS
-
----> Go to this GitHub folder. If you click open PetitCat.py == PetitCaMain.py == PetitCatTester.py you see the standard library files PYthon will import automatically. 
-
-
+PetitCat.ino == autocat_enacter.ino == petitcat_arduino.ino
 -GitHub folder for Arduino files:
 
-/PetitCat_arduino == /osoyoo/autocat_enacter
+PetitCat_arduino.ino == autocat_enacter.ino
 
-https://github.com/OlivierGeorgeon/osoyoo/tree/master/autocat_enacter
+https://github.com/OlivierGeorgeon/osoyoo/blob/master/petitcat_arduino/petitcat_arduino.ino
 
 ---> Go to this GitHub folder (following the link in the line above). You will see that in addition to the main code PetitCat.ino == autocat_enacter.ino there are good number of header .h and code .cpp files. All these will need to be cloned and copied into the IDE later. 
 
