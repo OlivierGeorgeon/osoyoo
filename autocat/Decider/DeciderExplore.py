@@ -6,7 +6,6 @@
 import math
 import numpy as np
 from pyrr import quaternion, Quaternion, Vector3
-# from playsound import playsound
 from . Action import ACTION_TURN, ACTION_FORWARD, ACTION_SWIPE
 from . Interaction import OUTCOME_NO_FOCUS
 from . Decider import Decider
@@ -46,7 +45,7 @@ class DeciderExplore(Decider):
         self.prompt_index = 0
         self.ter_prompt = None
         self.explore_angle_quaternion = Quaternion.from_z_rotation(math.pi / 3)  # 2
-        self.action = "-"
+        # self.action = "-"
 
     def activation_level(self):
         """The level of activation is 2 if the terrain has confidence and the robot is excited or low energy"""
@@ -88,12 +87,15 @@ class DeciderExplore(Decider):
 
         return outcome
 
-    def select_enaction(self, outcome):
+    def select_enaction(self, enaction):
         """Return the next intended interaction"""
         # Tracing the last interaction
-        if self.action is not None:
-            print("Action: " + str(self.action) + ", Anticipation: " + str(self.anticipated_outcome) +
-                  ", Outcome: " + str(outcome))
+        # if self.action is not None:
+        #     print("Action: " + str(self.action) + ", Anticipation: " + str(self.anticipated_outcome) +
+        #           ", Outcome: " + str(outcome))
+
+        # Compute a specific outcome TODO improve this
+        outcome_code = self.outcome(enaction)
 
         # Compute the next prompt point
 
@@ -104,21 +106,21 @@ class DeciderExplore(Decider):
         # If time to go home
         if self.workspace.memory.body_memory.energy < ENERGY_TIRED:
             # If right or left then swipe to home
-            if outcome in [OUTCOME_LEFT, OUTCOME_RIGHT]:
-                if outcome == OUTCOME_RIGHT:
+            if outcome_code in [OUTCOME_LEFT, OUTCOME_RIGHT]:
+                if outcome_code == OUTCOME_RIGHT:
                     ego_confirmation = np.array([0, 280, 0], dtype=int)  # Swipe to the right
                 else:
                     ego_confirmation = np.array([0, -280, 0], dtype=int)
                 print("Swiping to confirmation by:", ego_confirmation)
-                self.action = self.workspace.actions[ACTION_SWIPE]
+                # action = self.workspace.actions[ACTION_SWIPE]
                 self.workspace.memory.egocentric_memory.prompt_point = ego_confirmation
-                e1 = Enaction(self.action, self.workspace.memory)
+                e1 = Enaction(self.workspace.actions[ACTION_SWIPE], self.workspace.memory)
                 # playsound('autocat/Assets/R5.wav', False)
                 self.workspace.startup_sound.play()
             # If not left or right we need to manoeuvre
             else:
                 # If near home then go to confirmation prompt
-                if self.workspace.memory.is_near_terrain_origin() or outcome == OUTCOME_COLOR:
+                if self.workspace.memory.is_near_terrain_origin() or outcome_code == OUTCOME_COLOR:
                     polar_confirmation = self.workspace.memory.phenomenon_memory.phenomena[TER].confirmation_prompt()
                     print("Enacting confirmation sequence to", polar_confirmation)
                     ego_confirmation = self.workspace.memory.polar_egocentric_to_egocentric(polar_confirmation)
@@ -135,8 +137,8 @@ class DeciderExplore(Decider):
                     # playsound('autocat/Assets/R3.wav', False)
                     self.workspace.clear_sound.play()
                 # self.workspace.memory.egocentric_memory.focus_point = None  # Prevent unnatural head movement TODO manage focus after decision
-                self.action = self.workspace.actions[ACTION_TURN]
-                e1 = Enaction(self.action, self.workspace.memory)
+                # action = self.workspace.actions[ACTION_TURN]
+                e1 = Enaction(self.workspace.actions[ACTION_TURN], self.workspace.memory)
                 e2 = Enaction(self.workspace.actions[ACTION_FORWARD], e1.predicted_memory)
         else:
             # Go to the most interesting pool point
@@ -161,11 +163,11 @@ class DeciderExplore(Decider):
             self.prompt_index += 1
             # if self.prompt_index >= self.nb_points:
             #     self.prompt_index = 0
-            self.action = self.workspace.actions[ACTION_TURN]
-            e1 = Enaction(self.action, self.workspace.memory)
+            # self.action = self.workspace.actions[ACTION_TURN]
+            e1 = Enaction(self.workspace.actions[ACTION_TURN], self.workspace.memory)
             e2 = Enaction(self.workspace.actions[ACTION_FORWARD], e1.predicted_memory)
 
-        # Add the enactions to the stack
+        # Return the composite enaction
         enaction_sequence = [e1]
         if e2 is not None:
             enaction_sequence.append(e2)

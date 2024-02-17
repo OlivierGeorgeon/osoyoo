@@ -127,7 +127,6 @@ class Memory:
         """Convert the position of a point from egocentric to polar-egocentric reference"""
         if point is None:
             return None
-        print("point", point)
         return quaternion.apply_to_vector(self.body_memory.body_quaternion, point)
 
     def egocentric_to_allocentric(self, point):

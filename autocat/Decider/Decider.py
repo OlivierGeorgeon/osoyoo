@@ -11,8 +11,8 @@ from ..Memory.Memory import EMOTION_HAPPY
 class Decider:
     def __init__(self, workspace):
         self.workspace = workspace
-        self.action = self.workspace.actions[ACTION_FORWARD]
-        self.anticipated_outcome = OUTCOME_NO_FOCUS
+        # self.action = self.workspace.actions[ACTION_FORWARD]
+        # self.anticipated_outcome = OUTCOME_NO_FOCUS
         self.previous_interaction = None
         self.last_interaction = None
 
@@ -27,31 +27,31 @@ class Decider:
             activation_level = 2
         return activation_level
 
-    def stack_enaction(self):
-        """Propose the next intended enaction from the previous enacted interaction.
-        This is the main method of the agent"""
-        # Compute a specific outcome suited for this agent from the previous enaction
-        # outcome = self.outcome(self.workspace.enaction)
-        # outcome = outcome_code(self.workspace.memory, self.workspace.enaction)
-        # print("OUTCOME", outcome)
-        # Compute the next enaction or composite enaction
-        # self.workspace.composite_enaction = self.select_enaction(outcome)
-        self.workspace.composite_enaction = self.select_enaction(self.workspace.enaction.outcome_code)
+    # def stack_enaction(self):
+    #     """Propose the next intended enaction from the previous enacted interaction.
+    #     This is the main method of the agent"""
+    #     # Compute a specific outcome suited for this agent from the previous enaction
+    #     # outcome = self.outcome(self.workspace.enaction)
+    #     # outcome = outcome_code(self.workspace.memory, self.workspace.enaction)
+    #     # print("OUTCOME", outcome)
+    #     # Compute the next enaction or composite enaction
+    #     # self.workspace.composite_enaction = self.select_enaction(outcome)
+    #     self.workspace.composite_enaction = self.select_enaction(self.workspace.enaction.outcome_code)
 
     def propose_enaction(self):
         """Return a proposed interaction"""
-        return self.select_enaction(self.workspace.enaction.outcome_code)
+        return self.select_enaction(self.workspace.enaction)
 
-    def select_enaction(self, outcome):
+    def select_enaction(self, enaction):
         """Add the next enaction to the stack based on sequence learning and spatial modifiers"""
 
         # Call the sequence learning mechanism to select the next action
-        self.select_action(outcome)
+        action = self.select_action(enaction)
 
         # Set the spatial modifiers
-        if self.action.action_code in [ACTION_TURN]:
+        if action.action_code in [ACTION_TURN]:
             # Turn to the direction of the focus
-            if outcome == OUTCOME_FOCUS_TOO_FAR or self.workspace.memory.egocentric_memory.focus_point is None:
+            if enaction.outcome_code == OUTCOME_FOCUS_TOO_FAR or self.workspace.memory.egocentric_memory.focus_point is None:
                 # If focus TOO FAR or None then turn around
                 self.workspace.memory.egocentric_memory.prompt_point = np.array([-100, 0, 0], dtype=int)
             else:
@@ -61,21 +61,21 @@ class Decider:
             self.workspace.memory.egocentric_memory.prompt_point = None
 
         # Add the enaction to the stack
-        return Enaction(self.action, self.workspace.memory)
+        return Enaction(action, self.workspace.memory)
 
-    def select_action(self, outcome):
+    def select_action(self, enaction):
         """The sequence learning mechanism that proposes the next action"""
         # Recording previous interaction
         self.previous_interaction = self.last_interaction
-        self.last_interaction = create_or_retrieve_primitive(self.primitive_interactions, self.action, outcome)
+        self.last_interaction = create_or_retrieve_primitive(self.primitive_interactions, enaction.action,
+                                                             enaction.outcome_code)
 
         # Tracing the last interaction
-        if self.action is not None:
-            print("Action: " + str(self.action) +
-                  ", Anticipation: " + str(self.anticipated_outcome) +
-                  ", Outcome: " + str(outcome) +
-                  ", Satisfaction: (anticipation: " + str(self.anticipated_outcome == outcome) +
-                  ", valence: " + str(self.last_interaction.valence) + ")")
+        print("Action: " + str(enaction.action) +
+              ", Anticipation: " + str(enaction.predicted_outcome_code) +
+              ", Outcome: " + str(enaction.outcome_code) +
+              ", Satisfaction: (anticipation: " + str(enaction.predicted_outcome_code == enaction.outcome_code) +
+              ", valence: " + str(self.last_interaction.valence) + ")")
 
         # Learning or reinforcing the last composite interaction
         if self.previous_interaction is not None:
@@ -96,6 +96,4 @@ class Decider:
         #     print(k.__str__(), "proclivity", v)
 
         # Select the action that has the highest proclivity value
-        if proclivity_dict:
-            # See https://pythonguides.com/python-find-max-value-in-a-dictionary/
-            self.action = max(proclivity_dict, key=proclivity_dict.get)
+        return max(proclivity_dict, key=proclivity_dict.get)

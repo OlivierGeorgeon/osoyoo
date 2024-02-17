@@ -1,8 +1,6 @@
 import json
 import pyglet
-# from playsound import playsound
 from .Decider.Decider import Decider
-# from .Decider.DeciderCircle import DeciderCircle
 from .Decider.DeciderExplore import DeciderExplore
 from .Decider.DeciderWatch import DeciderWatch
 from .Decider.DeciderPush import DeciderPush
@@ -39,8 +37,8 @@ class Workspace:
         self.actions = create_actions(robot_id)
         self.memory = Memory(arena_id, robot_id)
         # if self.robot_id == '1':
-        self.deciders = {'Explore': DeciderExplore(self), 'Circle': Decider(self),
-                         'Watch': DeciderWatchCenter(self), 'Arrange': DeciderArrange(self)}
+        self.deciders = {'Explore': DeciderExplore(self), 'Circle ': Decider(self),
+                         'Watch C': DeciderWatchCenter(self), 'Arrange': DeciderArrange(self)}
         # self.deciders = {'Explore': DeciderExplore(self), 'Circle': DeciderCircle(self), 'Watch': DeciderWatch(self)}
         # self.deciders = {'Circle': DeciderCircle(self), 'Explore': DeciderExplore(self)}
         # self.deciders = {'Push': DeciderPush(self), 'Watch': DeciderWatch(self)}
@@ -62,7 +60,6 @@ class Workspace:
         self.ctrl_phenomenon_view = None
 
         # Control the enaction
-        # self.clock = 0
         self.is_imagining = False
         self.memory_before_imaginary = None
 
@@ -113,7 +110,9 @@ class Workspace:
                     for name, decider in self.deciders.items():
                         proposed_enactions.append([name, decider.propose_enaction(), decider.activation_level()])
                     # The enaction that has the highest activation is selected
-                    print("Proposed enactions", proposed_enactions)
+                    print("Proposed enactions:")  # , ' '.join(e.__str__() for line in proposed_enactions for e in line))
+                    for p in proposed_enactions:
+                        print(" ", p[0], ":", p[1], p[2])
                     most_activated = proposed_enactions.index(max(proposed_enactions, key=lambda p: p[2]))
                     print("Decider:", proposed_enactions[most_activated][0])
                     self.composite_enaction = proposed_enactions[most_activated][1]
@@ -165,7 +164,6 @@ class Workspace:
                 self.composite_enaction = CompositeEnaction([e0, e1, e2, e3])
         elif user_key.upper() == KEY_CLEAR:
             # Clear the stack of enactions
-            # playsound('autocat/Assets/R3.wav', False)
             self.clear_sound.play()
             self.composite_enaction = None
             # TODO: prevent a crash when the enaction has been cleared and then an outcome is received after

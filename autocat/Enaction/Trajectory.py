@@ -150,7 +150,7 @@ class Trajectory:
                 self.focus_confidence = CONFIDENCE_NEW_FOCUS
                 print("New focus ", end="")
         self.focus_point = new_focus
-        print("Focus point", self.focus_point)
+        # print("Focus point", self.focus_point)
 
         # Careful scan has extra confidence
         if self.focus_confidence == CONFIDENCE_NEW_FOCUS and self.span == 10:
@@ -167,7 +167,7 @@ class Trajectory:
                 else:
                     self.focus_point = np.array([ROBOT_FLOOR_SENSOR_X + 10, 0, 0])
             self.focus_confidence = CONFIDENCE_TOUCHED_FOCUS
-            print("Catch focus impact", self.focus_point)
+            # print("Catch focus impact", self.focus_point)
 
         # Move the prompt -----
         if self.prompt_point is not None:

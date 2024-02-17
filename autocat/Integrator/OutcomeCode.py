@@ -14,48 +14,47 @@ CONFIDENCE_CAREFUL_SCAN = 3
 CONFIDENCE_CONFIRMED_FOCUS = 4
 
 
-def outcome_code(memory, enaction):
-    """ Return the outcome code from the enaction in memory"""
-    outcome = OUTCOME_NO_FOCUS
+def outcome_code(memory, trajectory, outcome):
+    """ Return the outcome code from the trajectory and the outcome in memory"""
+    code = OUTCOME_NO_FOCUS
 
     # On startup return NO_FOCUS
-    if enaction is None:
-        return outcome
+    if trajectory is None:
+        return code
 
     # If there is a focus point, compute the focus outcome (focus may come from echo or from impact)
-    if enaction.trajectory.focus_point is not None:
-        focus_radius = np.linalg.norm(enaction.trajectory.focus_point)  # From the center of the robot
+    if trajectory.focus_point is not None:
+        focus_radius = np.linalg.norm(trajectory.focus_point)  # From the center of the robot
         # If focus is TOO FAR then DeciderCircle won't go after it
         if focus_radius > FOCUS_TOO_FAR_DISTANCE:  # self.too_far:  # Different for DeciderCircle or DeciderWatch
-            outcome = OUTCOME_FOCUS_TOO_FAR
+            code = OUTCOME_FOCUS_TOO_FAR
         # If the terrain is confident and the focus is outside then it is considered TOO FAR
-        elif memory.is_outside_terrain(enaction.trajectory.focus_point):
-            outcome = OUTCOME_FOCUS_TOO_FAR
+        elif memory.is_outside_terrain(trajectory.focus_point):
+            code = OUTCOME_FOCUS_TOO_FAR
         # Focus FAR: DeciderCircle will move closer
         elif focus_radius > FOCUS_FAR_DISTANCE:
-            outcome = OUTCOME_FOCUS_FAR
+            code = OUTCOME_FOCUS_FAR
         # Not TOO CLOSE and not TOO FAR: check if its on the SIDE
         elif focus_radius > FOCUS_TOO_CLOSE_DISTANCE:
-            focus_theta = math.atan2(enaction.trajectory.focus_point[1], enaction.trajectory.focus_point[0])
+            focus_theta = math.atan2(trajectory.focus_point[1], trajectory.focus_point[0])
             if math.fabs(focus_theta) < FOCUS_SIDE_ANGLE:
-                outcome = OUTCOME_FOCUS_FRONT
+                code = OUTCOME_FOCUS_FRONT
             else:
-                outcome = OUTCOME_FOCUS_SIDE
+                code = OUTCOME_FOCUS_SIDE
         # Focus TOO CLOSE: DeciderCircle and DeciderWatch will move backward
         else:
-            outcome = OUTCOME_FOCUS_TOO_CLOSE
+            code = OUTCOME_FOCUS_TOO_CLOSE
 
     # LOST FOCUS: DeciderCircle and DeciderArrange will scan again
-    if enaction.trajectory.focus_confidence <= CONFIDENCE_NEW_FOCUS:  # enaction.lost_focus:
-        outcome = OUTCOME_LOST_FOCUS
+    if trajectory.focus_confidence <= CONFIDENCE_NEW_FOCUS:  # enaction.lost_focus:
+        code = OUTCOME_LOST_FOCUS
 
     # If TOUCH then override the focus outcome
-    if enaction.outcome.touch:
-        outcome = OUTCOME_TOUCH
+    if outcome.touch:
+        code = OUTCOME_TOUCH
 
     # If FLOOR then override other outcome
-    if enaction.outcome.floor > 0 or enaction.outcome.impact > 0:  # TODO Test impact
-        outcome = OUTCOME_FLOOR
+    if outcome.floor > 0 or outcome.impact > 0:  # TODO Test impact
+        code = OUTCOME_FLOOR
 
-    print("OUTCOME", outcome)
-    return outcome
+    return code

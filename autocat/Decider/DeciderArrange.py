@@ -3,8 +3,6 @@
 # Activation 4: when the robot is angry
 ########################################################################################
 import math
-
-# from playsound import playsound
 import numpy as np
 from pyrr import vector, line
 from pyrr.geometric_tests import point_closest_point_on_line
@@ -30,7 +28,7 @@ class DeciderArrange(Decider):
     def __init__(self, workspace):
         super().__init__(workspace)
         self.too_far = FOCUS_TOO_FAR_DISTANCE
-        self.action = self.workspace.actions[ACTION_SCAN]
+        # self.action = self.workspace.actions[ACTION_SCAN]
         self.step = STEP_INIT
 
     def activation_level(self):
@@ -44,11 +42,11 @@ class DeciderArrange(Decider):
             activation_level = 3
         return activation_level
 
-    def select_enaction(self, outcome):
+    def select_enaction(self, enaction):
         """The enactions to push a object to a target place"""
         print("Step", self.step)
         # If LOST FOCUS or impact then scan again
-        if (outcome in [OUTCOME_LOST_FOCUS, OUTCOME_FLOOR] or self.workspace.memory.egocentric_memory.focus_point is None) and self.step in [STEP_INIT, STEP_ALIGN]:
+        if (enaction.outcome_code in [OUTCOME_LOST_FOCUS, OUTCOME_FLOOR] or self.workspace.memory.egocentric_memory.focus_point is None) and self.step in [STEP_INIT, STEP_ALIGN]:
             composite_enaction = Enaction(self.workspace.actions[ACTION_SCAN], self.workspace.memory, span=10)
             self.step = STEP_INIT  # Avoids systematically recalling DeciderArrange
         # If STEP_INIT or previously aligned with focus
@@ -63,11 +61,11 @@ class DeciderArrange(Decider):
             ego_prompt_projection = point_closest_point_on_line(np.array([0, 0, 0]), l1)
             print("Ego prompt projection:", ego_prompt_projection, "focus:", object_center, "target:", ego_target)
             # If OUTCOME_FLOOR just turn around
-            if outcome == OUTCOME_FLOOR:
+            if enaction.outcome_code == OUTCOME_FLOOR:
                 self.step = STEP_INIT
                 composite_enaction = Enaction(self.workspace.actions[ACTION_TURN], self.workspace.memory, span=10)
             # If OUTCOME_TOUCH then push to target point without caution
-            elif outcome == OUTCOME_TOUCH:
+            elif enaction.outcome_code == OUTCOME_TOUCH:
                 push_vector = vector.set_length(ego_target, np.linalg.norm(ego_target) - ROBOT_FLOOR_SENSOR_X +
                                                 ARRANGE_OBJECT_RADIUS)
                 self.workspace.memory.egocentric_memory.prompt_point = push_vector

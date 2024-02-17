@@ -1,6 +1,7 @@
 from .Command import Command, DIRECTION_FRONT
 from ..Enaction.Predict import predict_outcome
 from ..Enaction.Trajectory import Trajectory
+from ..Integrator.OutcomeCode import outcome_code
 
 
 class Enaction:
@@ -30,6 +31,12 @@ class Enaction:
         # Initialize the trajectory
         self.trajectory = Trajectory(memory, self.predicted_outcome.yaw, self.command.speed, self.command.span)
 
+        # The predicted outcome code
+        self.predicted_outcome_code = outcome_code(self.predicted_memory, self.trajectory, self.predicted_outcome)
+
+        # The key used for hash
+        self.key = (self.action.action_code, self.predicted_outcome_code)
+
         # The actual outcome
         self.outcome = None
         self.outcome_code = ""
@@ -40,13 +47,18 @@ class Enaction:
         self.message_sent = False
 
     def __hash__(self):
-        """The hash is the action code """
-        # TODO improve
-        return self.action.action_code
+        """Return the hash computed from the key"""
+        return hash(self.key)
 
     def __eq__(self, other):
-        """Enactions are equal if they have the same hash"""
-        return self.__hash__() == other.__hash__()
+        """Enactions are equal if they have the same action and predicted outcome"""
+        if isinstance(other, Enaction):
+            return self.key == other.key
+        return NotImplemented
+
+    def __str__(self):
+        """Return a representation of the key tuple (action, predicted outcome)"""
+        return self.key.__str__()
 
     def begin(self, body_quaternion):
         """Adjust the spatial modifiers of the enaction.
