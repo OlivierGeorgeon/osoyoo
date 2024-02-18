@@ -330,7 +330,9 @@ Save the repository as a zip file.  (If you are not sure how to do this, see a f
 
 On the Arduino IDE click 'Sketch' and then 'Include Library' then 'ADD Zip Library'. Then select the zip file for the repository. This will get stored as a new library in your IDE.
 
-There is still another library you must install -- the MPU6050 inertial measurement unit (IMU) library. (We will later add an IMU hardware board to the project.) The MPU-6050 uses MEMS (microelectromechanical system) integrated circuit fabrication technology to create a 3-axis (x,y,z) gyroscope and accelerometer in a single chip. the gyroscope measures the rotational velocity which allows navigation information with regard to spins and orientation. The accelerometer measures accelerations along the orthogonal axes. By mathematically integrating the accelerations they can be converted to velocity and by further integration they can be converted to change in position. Keep in mind the accelerometer will measure the acceleration due to gravity, and it is necessary to distinguish between accelerations measured due to gravity from accelerations due to movement of the robot car.)
+There is still another library you must install -- the MPU6050 inertial measurement unit (IMU) library. (We will later add an IMU hardware board to the project.) 
+
+(The MPU-6050 uses MEMS (microelectromechanical system) integrated circuit fabrication technology to create a 3-axis (x,y,z) gyroscope and accelerometer in a single chip. The gyroscope measures the rotational velocity which allows navigation information with regard to spins and orientation. The accelerometer measures accelerations along the orthogonal axes. By mathematically integrating the accelerations they can be converted to velocity and by further integration they can be converted to change in position. Keep in mind the accelerometer will measure the acceleration due to gravity, and it is necessary to distinguish between accelerations measured due to gravity from accelerations due to movement of the robot car.)
 
 Go to the GitHub repository Arduino-MPU6050
 
