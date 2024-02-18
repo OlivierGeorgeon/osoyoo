@@ -424,7 +424,7 @@ The chip in the Arduino Mega board on the robot car project is an ATmega2560 chi
 
 The ATmega2560 chip is made by MicroChip Technology which does not reveal the manufacturing technology details but the chip is a modern chip believed to be fabricated at the 90nm or 65nm node (i.e. equivalent) feature size (very economical node sizes at the time of this writing versus the very expensive 4nm node size discussed above used by Apple for the A16), in contrast to the 10,000nm element size used by the first Intel 8008 (quasi) 8-bit chips. As well the ATmega2560 has a host of modern features such as including  within the one chip all the components needed for flash memory, SRAM, digital input and output, analog input and output, etc. 
 
-Understanding of the complex technologies that allow inexpensive chips to power the Arduino board in the robot car is not required, but is should be appreciated. And thus we move onto the title of this section, that due to the complex technologies doing all the hard work for us behind the scenes, all we really need to know is simple electronics to do great things with the Arduino board powering our robot car project.
+Understanding of the complex technologies that allow inexpensive chips to power the Arduino board in the robot car is not required, but should be appreciated. And thus we move onto the title of this section, that due to the complex technologies doing all the hard work for us behind the scenes, all we really need to know is simple electronics to do great things with the Arduino board powering our robot car project.
 
 If you vaguely recall the electronics you learned in high school physics, that is more than enough to do amazing things with the Arduino board.
 
