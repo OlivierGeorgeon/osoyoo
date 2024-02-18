@@ -85,28 +85,29 @@ The "PetitCat" project == the "Robot Car" project == the "Osoyoo Robot Car" proj
 
 -GibHub folder for project:   https://github.com/OlivierGeorgeon/osoyoo
 
+
 -Python main file:
 
 PetitCat.py == PetitCaMain.py == PetitCatTester.py == test_remote_control_robot.py
 
--GitHub folder for Python files: /osoyoo/petitcat_arduino/
+-GitHub folder for Python files: /osoyoo/tests/
 
-https://github.com/OlivierGeorgeon/osoyoo/tree/master/petitcat_arduino
+https://github.com/OlivierGeorgeon/osoyoo/tree/master/tests
 
 ---> Go to this GitHub folder. If you click open PetitCat.py == PetitCaMain.py == PetitCatTester.py == test_remote_control_robot.py you see the standard library files PYthon will import automatically. 
+
 
 -Arduino board main file:
 
 PetitCat.ino == autocat_enacter.ino == petitcat_arduino.ino
+
 -GitHub folder for Arduino files:
 
-PetitCat_arduino.ino == autocat_enacter.ino
+/osoyoo/petitcat_arduino/
 
 https://github.com/OlivierGeorgeon/osoyoo/blob/master/petitcat_arduino/petitcat_arduino.ino
 
----> Go to this GitHub folder (following the link in the line above). You will see that in addition to the main code PetitCat.ino == autocat_enacter.ino there are good number of header .h and code .cpp files. All these will need to be cloned and copied into the IDE later. 
-
-As well, the library Arduino_JSON will have to be added later to the Arduino IDE via the IDE's Library Manager.
+---> Go to this GitHub folder. You will see that in addition to the main code PetitCat.ino == autocat_enacter.ino there are a good number of header .h and code .cpp files. All these will need to be cloned and copied into the IDE later. 
 
 -
 -
@@ -321,15 +322,36 @@ Thus at this point when you search for Installed libraries you should see this o
 
 **Step #4 --Getting More Experience with the Arduino IDE -- Simple C/C++ Coding**
 
-As we discussed in Part I, the Arduino IDE uses a C++ compiler (the GNU GCC toolchain actually) -- it compiles C and C++ code. Thus, Arduino programs are really C/C++ code.
+As we discussed in Part I, the Arduino IDE uses a C++ compiler (the GNU GCC toolchain for the particular microcontroller being used) -- it compiles C and C++ code. Thus, Arduino programs are really C/C++ code.
 
-Learning to code in C and C++ is beyond the scope of this tutorial, and in any case most readers probably already have some experience in this area. However, this and the next Step (or two.... pending to editing of how much material to include) is just to make sure for readers with limited (or it has been many years) experience in C/C++  feel a bit more comfortable with the code (as well as some idiosyncracies about Arduino program structure). 
+Learning to code in C and C++ is beyond the scope of this tutorial, and in any case most readers probably already have some experience in this area. However, this and the next Step (or two.... pending to editing of how much material to include) is just to make sure for readers with limited experience in C/C++  feel a bit more comfortable with the code (as well as some idiosyncracies about Arduino program structure). 
 
 C is the original procedural C programming language. C++ is a more modern object-oriented programming language with a richer set of features (particularly in memory management) and in its standard library. We will not be distinguishing between the two in this and the next Steps since the compiler will compile both sets of code. (C# is similar to C++. It was created by Microsoft in the late 1990s and originally developed for Windows platforms and Microsoft's .NET ecosystem, although it can now run on macOS and Linux. We will not be discussing it here.)
 
+On a technical note, the Arduino IDE looks at what type of board you are trying to run your Sketch (i.e., '.ino' file) (which is really C/C++ code) on. If an AVR microcontroller board is chosen (Arduino Uno, Mega or Nano board) then the AVR GCC compiler is used. If the microcontroller board is based on an ARM microcontroller (e.g., the Arduino Duet) then it uses the ARM version of the GCC compiler, and so on. In the case of an AVR microcontroller (such as the board which is used by the robot car of this project, at the time of this writing) the following compiler toolchain components are used:
+- Preprocessor prepares the code for compilation (e.g., includes libraries, considers compilation directives, etc)
+- Compiler AVR-GCC converts the preprocessed source code into assembly language for the target AVR microcontroller
+- Assembler AVR-AS converts the assembly language code into machine code object files -- occurs for each source file in a project
+- Linker AVR-LD links the object files from the different Sketch files, libariers and the Arduino core code, into a single executable file, ensuring the machine code will correctly map to the AVR microcontroller's memory spaces, producing an ELF (executable and linkable format) file
+- AVR-OBJCOPY then converts the ELF file into a HEX file which is a text representation of the binary data which will be loaded into the Arduino microcontroller's flash memory
+- Uploader tool AVRDUDE then transfers the HEX file to the microcontroller's flash memory by communicating with the bootloader on the Arduino AVR-microcontroller board
+
+In the Arduino IDE, when 'Upload' is clicked in the IDE then above sequence of compile and upload steps occur.
+
+The Arduino CLI (available as a download from the Arduino website) allows compiling and uploading Arduino code at the command line, without the use of the IDE. Or, the usage of the above individual tools can be used at the commmand line, e.g., avr-gcc to compile and link files, avr-objcopy to convert to a HEX listing, and avrdude to upload the HEX file to the Arduino AVR-based microcontroller board. However, here we only consider the usage of the Arduino IDE to compile and upload code to the robot car's Arduino board.
+
 For readers with no background in C/C++ consider the many excellent and free (or some at small fees) courses and tutorials available online. However, the tutorial in this and the next Step(s) will give you some exposure to C/C++ in particular for the Arduino projects.
 
-You do not need to be able to code in C/C++. The purpose of the PetitCat project is to construct an interface that will allow your thousands of lines of Python code to communicate with the robot car. However, given that the robot car is powered by C/C++ code, understanding a tiny bit about C/C++ can be helpful in understanding how we make the robot car communicate with the Python programs.
+You do not need to be able to code in C/C++. The purpose of the PetitCat project is to construct an interface that will allow your thousands of lines of Python code to communicate with the robot car, and then use this ability for various cognitive science/AI experiments and demonstrations. However, given that the robot car is powered by C/C++ code, understanding a tiny bit about C/C++ can be helpful in understanding how we make the robot car communicate with the Python programs.
+
+
+
+
+
+
+
+
+
 
 
 # under construction#
