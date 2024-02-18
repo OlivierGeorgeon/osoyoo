@@ -67,7 +67,7 @@ In this Step #1 of Part II we will consider the big picture, i.e., what are the 
 
 The PetitCat Project is an open-source project based on the work of Prof Olivier Georgeon and his colleagues and students at UCLY Lyon Catholic University. 
 
-The big picture (i.e., overview) of the project is: The Python module PetitCat.py (or PetitCatMain.py -- see below about redundant nomenclature) running as a Python module as part of your Python program on your desktop/laptop communicates via Wi-Fi to the robot car. The Arduino program PetitCat.ino compiled to Arduino code running on the Arduino board on the robot car communicates via Wi-Fi with PetitCat.py (or "PetitCatMain.py" depending on nomenclature used).
+The big picture (i.e., overview) of the project is: The Python module PetitCat.py (or test_remote_control_robot.py -- see below about redundant nomenclature) running as a Python module as part of your Python program on your desktop/laptop communicates via Wi-Fi to the robot car. The Arduino program PetitCat.ino compiled to Arduino code running on the Arduino board on the robot car communicates via Wi-Fi with PetitCat.py (or "PetitCatMain.py" depending on nomenclature used).
 
 
 ![bigpicture](bigpicture.png)
