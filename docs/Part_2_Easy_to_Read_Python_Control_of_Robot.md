@@ -315,6 +315,30 @@ Thus at this point when you search for Installed libraries you should see this o
 
 ![libsinstalled](libsinstalled.png)
 
+There is one more library you must install -- the HLC5883L compass function library.
+
+Go to the GitHub repository Arduino-HMC5883L
+
+https://github.com/jarzebski/Arduino-HMC5883L
+
+Save the repository as a zip file.
+
+On the Arduino IDE click 'Sketch' and then 'Include Library' then 'ADD Zip Library'. Then select the zip file for the repository. This will get stored as a new library in your IDE.
+
+If you click Sketch, Include Libraries, you will see at the bottom of the menu a list of "Contributed Libraries':
+
+Adafruit BusIO
+
+Adafruit TCS34725
+
+Arduino JSON
+
+Aduino-HMC5883L
+
+Wifi-Esp
+
+
+
 -
 -
 -
