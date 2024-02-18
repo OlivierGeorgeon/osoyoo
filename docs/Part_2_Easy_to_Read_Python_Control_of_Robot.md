@@ -416,7 +416,7 @@ Microprocessor integrated circuits (again, representing an incredible fusion of 
 
 ![signetics](signetics.jpg)
 
-The Intel 8008 quasi-8-bit microprocessor was released in 1972. It used 10,000nm silicon sized elements, ran at a clock speed ofr 0.5MHz. Then in 1974 the Intel 8080 was released -- a more robust 8-bit microprocessor design. The 8080 is often credited with starting the personal computer (PC) industry. For example, the Altair 8800 (based on the 8080 chip) was on the cover of the January 1975 issue of Popular Electronics. For example, Bill Gate and Paul Allen started Microsoft writing a version of BASIC for the Altair 8800. 
+The Intel 8008 quasi-8-bit microprocessor was released in 1972. It used 10,000nm silicon sized elements, ran at a clock speed of 0.5MHz. Then in 1974 the Intel 8080 was released -- a more robust 8-bit microprocessor design. The 8080 is often credited with starting the personal computer (PC) industry. For example, the Altair 8800 (based on the 8080 chip) was on the cover of the January 1975 issue of Popular Electronics. For example, Bill Gate and Paul Allen started Microsoft writing a version of BASIC for the Altair 8800. 
 
 ![popelectronics](popelectronics.jpg)
 
