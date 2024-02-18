@@ -70,7 +70,7 @@ The PetitCat Project is an open-source project based on the work of Prof Olivier
 The big picture (i.e., overview) of the project is: The Python module PetitCat.py (or test_remote_control_robot.py -- see below about redundant nomenclature) running as a Python module as part of your Python program on your desktop/laptop communicates via Wi-Fi to the robot car. The Arduino program PetitCat.ino compiled to Arduino code running on the Arduino board on the robot car communicates via Wi-Fi with PetitCat.py (or "PetitCatMain.py" depending on nomenclature used).
 
 
-![bigpicture with new name for python code](overview with test_remote name.png)
+![bigpicture with new name for python code](bigpicture_newname.png)
 
 
 Nomenclature
