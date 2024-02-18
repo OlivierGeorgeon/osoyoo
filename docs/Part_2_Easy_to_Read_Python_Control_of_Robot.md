@@ -294,6 +294,8 @@ In this Step we will learn how to use the Arduino IDE library manager, and we wi
 
 An Arduino library is essentially C++ code consisting of various C++ classes and functions that perform some related function. For example, a Wi-Fi library would provide functionality with regard to sending and receiving information via Wi-Fi. For example, a JSON library would provide functionality with regard to JSON operations. (JSON is a popular data format which simply consists of (key:value) pairs. However, the key-value pairs can be nested and structured and held in arrays. Although verbose, it is human readable.) For example, a JSON library would help with parsing JSON data, generating JSON data and processing JSON data.
 
+--Installing Libraries from within the Arduino IDE Ecosystem--
+
 Your Arduino IDE should still be on from the previous step. (If not, open up the Arduino IDE.)
 
 If you go to Tools you can click "Manage Libraries..."  or you can just click the icon on the left column of the page where you see a bunch of library books.
@@ -315,7 +317,10 @@ Thus at this point when you search for Installed libraries you should see this o
 
 ![libsinstalled](libsinstalled.png)
 
-There is one more library you must install -- the HLC5883L compass function library.
+
+--Manually Installing Third-Party Libraries --
+
+There is another library you must install -- the HLC5883L compass function library. (The HMC5883L is a three-axis (x,y,z) digital compass/magnetometer module that is installed and used later as part of the project. It is based on orthogonally situated magnetoresistive sensors. It provides raw data related to measured magnetic fields and does not adjust the outputs for variations in the Earth's magnetic field required for more accurate navigation. By the 1800's ships housed the ship's compass in a binnacle which contained soft iron spheres or sometimes actual magnets to help counteract the ship's magnetic fields -- something you can see if you ever look at old ships or visit museums. In modern ships there is GPS correction of the compass to deal with the deviations in the field in different locations on Earth.)
 
 Go to the GitHub repository Arduino-HMC5883L
 
@@ -324,6 +329,17 @@ https://github.com/jarzebski/Arduino-HMC5883L
 Save the repository as a zip file.
 
 On the Arduino IDE click 'Sketch' and then 'Include Library' then 'ADD Zip Library'. Then select the zip file for the repository. This will get stored as a new library in your IDE.
+
+There is still another library you must install -- the MPU6050 inertial measurement unit (IMU) library. (We will later add an IMU hardware board to the project.) The MPU-6050 uses MEMS (microelectromechanical system) integrated circuit fabrication technology to create a 3-axis (x,y,z) gyroscope and accelerometer in a single chip. the gyroscope measures the rotational velocity which allows navigation information with regard to spins and orientation. The accelerometer measures accelerations along the orthogonal axes. By mathematically integrating the accelerations they can be converted to velocity and by further integration they can be converted to change in position. Keep in mind the accelerometer will measure the acceleration due to gravity, and it is necessary to distinguish between accelerations measured due to gravity from accelerations due to movement of the robot car.)
+
+Go to the GitHub repository Arduino-MPU6050
+
+https://github.com/jarzebski/Arduino-MPU6050
+
+On the Arduino IDE click 'Sketch' and then 'Include Library' then 'ADD Zip Library'. Then select the zip file for the repository. This will get stored as a new library in your IDE.
+
+
+--See What Libraries Have Been Installed--
 
 If you click Sketch, Include Libraries, you will see at the bottom of the menu a list of "Contributed Libraries':
 
@@ -337,14 +353,20 @@ Aduino-HMC5883L
 
 Wifi-Esp
 
+At the time of this writing the project is specified to use these libraries:
+
+![libsused](libsused.png)
 
 
+
 -
 -
 -
 -
 
-**Step #4 --Getting More Experience with the Arduino IDE -- Simple C/C++ Coding**
+**Step #4 --Simple C/C++ Coding and (Possibly) Preventing Dementia**
+
+No, this section title is not a typo. Keep reading, and see how with acquiring very simple C/C++ knowledge (which most readers probably already have) you can possibly prevent or delay Alzheimer's (and possibly other types of) dementia with the robot car.
 
 As we discussed in Part I, the Arduino IDE uses a C++ compiler (the GNU GCC toolchain for the particular microcontroller being used) -- it compiles C and C++ code. Thus, Arduino programs are really C/C++ code.
 
@@ -368,11 +390,57 @@ For readers with no background in C/C++ consider the many excellent and free (or
 
 You do not need to be able to code in C/C++. The purpose of the PetitCat project is to construct an interface that will allow your thousands of lines of Python code to communicate with the robot car, and then use this ability for various cognitive science/AI experiments and demonstrations. However, given that the robot car is powered by C/C++ code, understanding a tiny bit about C/C++ can be helpful in understanding how we make the robot car communicate with the Python programs.
 
+Ok... above it was written "....Keep reading, and see how with acquiring very simple C/C++ knowledge you can possibly prevent or delay Alzheimer's (and possibly other types of) dementia with the robot car."  Was this just clickbait to keep me reading your boring paragraphs?  Well.... no :)  Ok.... are you going to write now that by using my brain to learn something new (like the material in your boring paragraphs above and learning some C/C++ coding below) that will prevent or delay dementia and my brain will stay extra healthy?  Well... maybe. Any intellectual stimulation is good for the brain and lots of studies indicate it may indeed keep the brain much healthier througout the lifetime. But, no... it's not this. We will really build a more definitive prevention of Alzheimer's (possibly -- research is still lacking -- read the cautions below -- this is just for fun, not for real medical use!!) with our robot car project.
+
+Synchronous acitivity of large groups of neurons generate oscillatory electrical signals which can be measured on the scalp of the head (EEG). We believe that the synchronous activity of neurons allows different parts of the brain to communicate with each other. (Although.... if you want to consider a more nuanced look at the subject, consider reading- Schneider, H. (2022). Causal cognitive architecture 3: a solution to the binding problem. Cognitive Systems Research, 72, 88-115.) In dementias we see pertubation of the EEG rhythms we believe are needed for cognition. A number of studies have shown that stimulation in the 40-Hz "gamma" EEG range of oscillations can improve Alzheimer's Disease symptoms in mouse models of the disease (Chan, D., Suk, H. J., Jackson, B., Milman, N. P., Stark, D., Beach, S. D., & Tsai, L. H. (2021). Induction of specific brain oscillations may restore neural circuits and be used for the treatment of Alzheimer's disease. Journal of Internal Medicine, 290(5), 993-1009.) A study on humans also showed similar results (e.g., Chan, D., Suk, H. J., Jackson, B. L., Milman, N. P., Stark, D., Klerman, E. B., ... & Tsai, L. H. (2021). Gamma frequency sensory stimulation in probable mild Alzheimer’s dementia patients: results of a preliminary clinical trial.) (There is a warning in the next paragraph -- if this warning has been deleted please do not build this project without reading.)
+
+There is an LED on the Arduino board already wired up to digital output D13. If we flash this at 40Hz there will be a 40Hz visual stimuli which if we look at could (theoretically) prevent and improve dementias. (Also the fluctuations may possibly cause servomotor movements which can even better give a 40Hz visual and auditory stimulation to the brain.  But.... again.... you should not do this because the research is still incomplete and there are actually dangers of staring at 40Hz signals such as risks of triggering seizures in sensitive individuals, triggering migraines in certain individuals, causing eye strain, and the potential for uknown effects. The reason medical research is done is because sometimes treatments end up causing more harm than good. We are building this project just for fun, not for medical usage!!
+
+(Note: "GENUS" is not a typo for "Genius" but stands for Gamma-Entrainment-Using-Sensory stimuli at 40 Hz)
+
+![stimulate40Hz](stimulate40hz.jpg)
 
 
 
+# under construction#
 
 
+
+**Step #5 --Simple Electronics Is All You Need (to do great things with the robot car project)**
+
+No, the electronics in the Arduino board is not simple. It actually represents an incredible fusion of human scientific and engineering knowledge. Making chips requires advanced mathematics, advanced chemical engineering, advanced materials science, advanced quantum mechanics, advanced radio frequency electrical engineering, advanced circuit electrical engineering, advanced computational design, advanced optical physics, advanced manufacturing engineering, and on and on. It is a triumph of human creativity and cooperation to produce the commonplace chips (these days) we can inexpensively have running the Arduino boards such as the one used in the robot car project.
+
+The chip (i.e., integrated circuit microcontroller) on the Arduino board in the robot car project is an 8-bit chip architecture. (In general, 8-bit means the chip has a data bus width and registers of 8 bits in width, i.e., it handles data in 8 bit chunks. However, the address bus in almost all 8 bit chips are wider than 8 bits since addressing only 256 bits would be very limiting.)
+
+Microprocessor integrated circuits (again, representing an incredible fusion of human scientific and engineering knowledge -- far from simple electronics) came out in the 1970s. The Intel 4004 was released in 1971. It was a 4-bit chip (i.e., processed data in 4 bit chunks). However, by 1972 the Signetic 2650 had been designed (although for commercial reasons it was not sold until 1975 -- a delay which hurt its prospects of success) -- this 8-bit chip tried to duplicate the circuits found on expensive minicomputers.
+
+![signetics](signetics.jpg)
+
+The Intel 8008 quasi-8-bit microprocessor was released in 1972. It used 10,000nm silicon sized elements, ran at a clock speed ofr 0.5MHz. Then in 1974 the Intel 8080 was released -- a more robust 8-bit microprocessor design. The 8080 is often credited with starting the personal computer (PC) industry. For example, the Altair 8800 (based on the 8080 chip) was on the cover of the January 1975 issue of Popular Electronics. For example, Bill Gate and Paul Allen started Microsoft writing a version of BASIC for the Altair 8800. 
+
+![popelectronics](popelectronics.jpg)
+
+The chip in the Arduino Mega board on the robot car project is an ATmega2560 chip. It is an 8-bit chip but reflects the exponential improvements in chipmaking that have occurred since the release of older 8-bit chips such as the Intel 8008 and Intel 8080. As noted above, the Intel 8008 was fabricated with element sizes (i.e., elements of the silicon photolithographed, where the size refers to the smallest half-pitch of a feature, typically the gate length of a transistor) of 10 microns or 10,000 nanometers. In contrast, current, for example, Apple A16 chips use 4nm element size (actually equivalent element size, this is a FinFET process in more than one dimension). 
+
+The ATmega2560 chip is made by MicroChip Technology which does not reveal the manufacturing technology details but the chip is a modern chip believed to be fabricated at the 90nm or 65nm node (i.e. equivalent) feature size (very economical node sizes at the time of this writing versus the very expensive 4nm node size discussed above used by Apple for the A16), in contrast to the 10,000nm element size used by the first Intel 8008 (quasi) 8-bit chips. As well the ATmega2560 has a host of modern features such as including  within the one chip all the components needed for flash memory, SRAM, digital input and output, analog input and output, etc. 
+
+Understanding of the complex technologies that allow inexpensive chips to power the Arduino board in the robot car is not required, but is should be appreciated. And thus we move onto the title of this section, that due to the complex technologies doing all the hard work for us behind the scenes, all we really need to know is simple electronics to do great things with the Arduino board powering our robot car project.
+
+If you vaguely recall the electronics you learned in high school physics, that is more than enough to do amazing things with the Arduino board.
+
+You should know how to build a circuit, e.g., attach a light bulb to one end of a battery, and the other end to the other end of the battery so that you have a circuit.
+
+You should know Ohm's law. If you attach an LED (as opposed to a light bulb) to a battery you will also need a resistor to reduce the current (otherwise the LED will burn out from a very high current that flows). Ohm's law says:  V = IR where V is the voltage in volts, I the current in amps, and R is the resistance in ohms. If you have not seen this before it is better to think about it as I = V/R. Think about I current as the flow of a water. The higher the water is (V voltage) then the more flow will occur down the river. However, the higher the resistance to the flow, e.g., rocks, earth, etc (R resistance), then the less current that flows.
+
+For example, if we want to attach a green LED to the 5volt output of the Arduino board, then what resistor should be in series with the LED?
+
+A green LED has a voltage drop of about 2 volts therefore there will be 3 volts pushing current around the circuit. A simple green LED generally runs properly at 20mA. Therefore by Ohms law R = V/I = 3volts/20mA = 3volts/.02A = 150 ohms. Thus, we would want a 150-ohm resistor in series with the green LED.
+
+The brown line on the resistor means '1'. The next green line means '5'. The next brown line means 1 zero after that, i.e., 150 ohms. (The last gold line means the resistor is +/- 5% of this value):
+
+![resis150](resis150.jpg)
+
+![colcode](colcode.png)
 
 
 
