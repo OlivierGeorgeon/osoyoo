@@ -4,7 +4,7 @@
 
 ##
 
-Initial draft Feb 15, 2024
+Initial draft Feb 15, 2024 
 
 (This is a public document that can be modified by others who have access -- if anything doesn't make sense, please ignore. A year from now, for example, I may not be aware of the full contents of this document any longer or what is still current.) 
 (No use of high voltage or anything dangerous is specified in this document.)
