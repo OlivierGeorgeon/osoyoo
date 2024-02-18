@@ -326,7 +326,7 @@ Go to the GitHub repository Arduino-HMC5883L
 
 https://github.com/jarzebski/Arduino-HMC5883L
 
-Save the repository as a zip file.  (If you are not sure how to do this, see a few paragraphs below where I show you step-by-step how to clone the GitHub repository onto your computer, make it a zip file and then include is as a new library.)
+Save the repository as a zip file.  (If you are not sure how to do this, see a few paragraphs below where I show you step-by-step how to clone the GitHub repository onto your computer, make it a zip file and then include it as a new library.)
 
 On the Arduino IDE click 'Sketch' and then 'Include Library' then 'ADD Zip Library'. Then select the zip file for the repository. This will get stored as a new library in your IDE.
 
