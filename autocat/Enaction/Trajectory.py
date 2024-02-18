@@ -12,17 +12,19 @@ FOCUS_MAX_DELTA = 200  # 200 (mm) Maximum delta to keep focus
 
 
 class Trajectory:
-    def __init__(self, memory, intended_yaw, speed, span):
+    """Used to compute the displacement, and to keep track of the prompt and the focus"""
+    def __init__(self, memory, command):
         """Record the initial conditions of this trajectory"""
-        self.intended_yaw = intended_yaw
-        self.speed = speed
-        self.span = span
+        # self.intended_yaw = intended_yaw
+        self.speed = command.speed
+        self.span = command.span
 
         self.robot_id = memory.robot_id
         self.compass_offset = memory.body_memory.compass_offset
 
         # Track the displacement
         self.body_quaternion = memory.body_memory.body_quaternion.copy()
+        self.head_direction_rad = memory.body_memory.head_direction_rad
         self.body_direction_delta = 0  # Displayed in BodyView
         self.focus_confidence = CONFIDENCE_NO_FOCUS  # Used by deciders to possibly trigger scan
         self.translation = None  # Used by allocentric memory to move the robot
@@ -33,15 +35,16 @@ class Trajectory:
         self.focus_direction_prediction_error = 0
         self.focus_distance_prediction_error = 0
 
-        # Track the focus
+        # The prompt
         self.prompt_point = None
         if memory.egocentric_memory.prompt_point is not None:
             self.prompt_point = memory.egocentric_memory.prompt_point.copy()
+        # The focus
         self.focus_point = None
         if memory.egocentric_memory.focus_point is not None:
             self.focus_point = memory.egocentric_memory.focus_point.copy()
 
-    def track_displacement(self, outcome):
+    def track_displacement(self, intended_yaw, outcome):
         """Compute the displacement from the duration1, yaw, floor, impact"""
         # The displacement --------
 
@@ -51,7 +54,7 @@ class Trajectory:
         # The yaw quaternion
         if outcome.yaw is None:
             # If the yaw is not measured then use predicted yaw TODO recompute yaw if floor
-            self.yaw_quaternion = Quaternion.from_z_rotation(math.radians(self.intended_yaw))
+            self.yaw_quaternion = Quaternion.from_z_rotation(math.radians(intended_yaw))
         else:
             self.yaw_quaternion = Quaternion.from_z_rotation(math.radians(outcome.yaw))
 
@@ -109,16 +112,25 @@ class Trajectory:
         self.yaw_matrix = matrix44.create_from_quaternion(self.yaw_quaternion)
         self.displacement_matrix = translation_quaternion_to_matrix(-self.translation, self.yaw_quaternion.inverse)
 
-    def track_focus(self, outcome):
-        """Track the focus"""
-        # The focus --------
+        # Move the focus
+        if self.focus_point is not None:
+            self.focus_point = matrix44.apply_to_vector(self.displacement_matrix, self.focus_point).astype(int)
+            # Keep head towards focus
+            self.head_direction_rad = min(max(-math.pi/2, math.atan2(self.focus_point[1], self.focus_point[0])), math.pi/2)
 
-        # If careful watch then the focus is the first central_echo
+        # Move the prompt
+        if self.prompt_point is not None:
+            self.prompt_point = matrix44.apply_to_vector(self.displacement_matrix, self.prompt_point).astype(int)
+
+    def track_echo(self, outcome):
+        """Keep the focus to the echo_point, and compute the focus_confidence"""
+
         new_focus = outcome.echo_point
+        # If careful watch and there are central echoes then the focus is the first (closest)
         if self.span == 10 and len(outcome.central_echos) > 0:
             new_focus = echo_point(*outcome.central_echos[0])
 
-        # If the robot is already focussed then adjust the focus and the displacement
+        # If the robot was focussed then adjust the focus and the displacement
         if self.focus_point is not None:
             if new_focus is not None:
                 # The error between the expected and the actual position of the echo
@@ -132,7 +144,7 @@ class Trajectory:
                 # If the new focus is near the previous focus or the displacement has been continuous.
                 if np.linalg.norm(prediction_error_focus) < FOCUS_MAX_DELTA or outcome.status == "continuous":
                     # The focus has been kept
-                    print("Focus kept with prediction error", prediction_error_focus, "moved to ", new_focus)
+                    # print("Focus kept with prediction error", prediction_error_focus, "moved to ", new_focus)
                     self.focus_confidence = CONFIDENCE_CONFIRMED_FOCUS
                 else:
                     # The focus was lost
@@ -140,17 +152,21 @@ class Trajectory:
                     self.focus_confidence = CONFIDENCE_NEW_FOCUS
             else:
                 # The focus was lost
-                print("Lost focus due to no echo ", new_focus)
+                # print("Lost focus due to no echo ", new_focus)
                 self.focus_confidence = CONFIDENCE_NO_FOCUS
-        else:
-            # If the robot was not focussed then check for catch focus
-            if outcome.action_code in [ACTION_SCAN, ACTION_FORWARD, ACTION_TURN, ACTION_WATCH] \
-                    and outcome.echo_point is not None:
-                # Catch focus
-                self.focus_confidence = CONFIDENCE_NEW_FOCUS
-                print("New focus ", new_focus)
+                # self.head_direction_rad = math.atan2(self.focus_point[1], self.focus_point[0])  # look at old focus
+
+        # If the robot was not focussed then check for catch focus
+        elif new_focus is not None:
+            # if outcome.action_code in [ACTION_SCAN, ACTION_FORWARD, ACTION_TURN, ACTION_WATCH] \
+            #         and outcome.echo_point is not None:
+            # Catch focus
+            self.focus_confidence = CONFIDENCE_NEW_FOCUS
+            # print("New focus ", new_focus)
+
         self.focus_point = new_focus
-        # print("Focus point", self.focus_point)
+        if new_focus is not None:
+            self.head_direction_rad = min(max(-math.pi/2, math.atan2(new_focus[1], new_focus[0])), math.pi/2)
 
         # Careful scan has extra confidence
         if self.focus_confidence == CONFIDENCE_NEW_FOCUS and self.span == 10:
@@ -169,6 +185,7 @@ class Trajectory:
             self.focus_confidence = CONFIDENCE_TOUCHED_FOCUS
             # print("Catch focus impact", self.focus_point)
 
-        # Move the prompt -----
-        if self.prompt_point is not None:
-            self.prompt_point = matrix44.apply_to_vector(self.displacement_matrix, self.prompt_point).astype(int)
+        # # Move the prompt -----
+        # if self.prompt_point is not None:
+        #     self.prompt_point = matrix44.apply_to_vector(self.displacement_matrix, self.prompt_point).astype(int)
+        #     print("trajectory prompt 1", self.prompt_point)

@@ -29,7 +29,7 @@ class Decider:
     def propose_enaction(self):
         """Return a proposed interaction"""
         if self.workspace.enaction is None:
-            return Enaction(self.workspace.actions[ACTION_SCAN], self.workspace.memory)
+            return Enaction(self.workspace.actions[ACTION_SCAN], self.workspace.memory.save())
         return self.select_enaction(self.workspace.enaction)
 
     def select_enaction(self, enaction):
@@ -52,7 +52,7 @@ class Decider:
             self.workspace.memory.egocentric_memory.prompt_point = None
 
         # Add the enaction to the stack
-        return Enaction(action, self.workspace.memory)
+        return Enaction(action, self.workspace.memory.save())
 
     def select_action(self, enaction):
         """The sequence learning mechanism that proposes the next action"""

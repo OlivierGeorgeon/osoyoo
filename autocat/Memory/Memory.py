@@ -96,6 +96,7 @@ class Memory:
         """
         self.egocentric_memory.focus_point = enaction.trajectory.focus_point
         self.egocentric_memory.prompt_point = enaction.trajectory.prompt_point
+        print("Trajectory prompt", enaction.trajectory.prompt_point)
 
         # Translate the robot before applying the yaw
         # print("Robot relative translation", enaction.translation)

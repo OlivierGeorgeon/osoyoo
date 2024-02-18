@@ -1,38 +1,33 @@
 from .Command import Command, DIRECTION_FRONT
-from ..Enaction.Predict import predict_outcome
+from ..Enaction.Predict import generate_prediction
 from ..Enaction.Trajectory import Trajectory
 from ..Integrator.OutcomeCode import outcome_code
 
 
 class Enaction:
-    """An Enaction object handles the enaction of an interaction by the robot
-    1. Workspace instantiates the enaction
-    2. CtrlRobot sends the command to the robot
-    3. CtrlRobot computes the outcome received from the robot
-    4. CtrlRobot call ternminate(outcome)
-    """
+    """An enaction is defined by its action and its predicted outcome code.
+    It contains a command, predicted memory, predicted outcome, actual trajectory, and actual outcome."""
+
     def __init__(self, action, memory, direction=DIRECTION_FRONT, span=40, caution=0):
-        """Initialize the enaction upon creation. Will be adjusted before generating the command"""
+        """Generate the command, predicted memory, and predicted outcome."""
         # The initial arguments
         self.action = action
+        self.predicted_memory = memory  # must be a clone of the current memory
         self.clock = memory.clock
 
         # Generate the command to the robot
         self.command = Command(self.action, self.clock, memory.egocentric_memory.prompt_point,
                                memory.egocentric_memory.focus_point, direction, span, memory.emotion_code, caution)
 
-        # Initialize the predicted memory
-        self.predicted_memory = memory.save()
+        # Initialize the actual trajectory (clone again the necessary elements of memory)
+        self.trajectory = Trajectory(memory, self.command)
+
+        # Generate the predicted memory and the predicted outcome
         self.predicted_memory.clock += 1
-
-        # Compute the predicted outcome and update the predicted memory
-        self.predicted_outcome = predict_outcome(self.command, self.predicted_memory)
-
-        # Initialize the trajectory
-        self.trajectory = Trajectory(memory, self.predicted_outcome.yaw, self.command.speed, self.command.span)
+        self.predicted_outcome, self.predicted_outcome_code = generate_prediction(self.command, self.predicted_memory)
 
         # The predicted outcome code
-        self.predicted_outcome_code = outcome_code(self.predicted_memory, self.trajectory, self.predicted_outcome)
+        # self.predicted_outcome_code = outcome_code(self.predicted_memory, self.trajectory, self.predicted_outcome)
 
         # The key used for hash
         self.key = (self.action.action_code, self.predicted_outcome_code)
@@ -44,7 +39,7 @@ class Enaction:
         # The message received from other robot
         self.message = None
         # Message sent to other robots
-        self.message_sent = False
+        self.is_message_sent = False
 
     def __hash__(self):
         """Return the hash computed from the key"""
@@ -61,20 +56,16 @@ class Enaction:
         return self.key.__str__()
 
     def begin(self, body_quaternion):
-        """Adjust the spatial modifiers of the enaction.
-        Compute the command to send to the robot.
-        Initialize the simulation"""
-
+        """Update the body_quaternion to avoid errors in the estimated yaw"""
         print("Command", self.command.serialize())
         print("Predicted outcome", self.predicted_outcome)
-        # Update the body_quaternion to avoid errors in the estimated yaw
         self.trajectory.body_quaternion = body_quaternion.copy()
 
     def terminate(self, outcome):
-        """Computes the body_quaternion, the translation, the displacement_matrix, the focus and the prompt."""
+        """Computes the actual trajectory: body_quaternion, translation, displacement_matrix, focus, and prompt."""
         self.outcome = outcome
-        self.trajectory.track_displacement(self.outcome)
-        self.trajectory.track_focus(self.outcome)
+        self.trajectory.track_displacement(self.predicted_outcome.yaw, self.outcome)
+        self.trajectory.track_echo(self.outcome)
 
     def succeed(self):
         """Return True if the enaction succeeded: no floor or impact outcome"""

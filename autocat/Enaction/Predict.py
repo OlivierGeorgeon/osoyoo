@@ -10,12 +10,13 @@ from ..Robot.Outcome import Outcome
 from ..Memory.BodyMemory import point_to_echo_direction_distance
 from ..Utils import assert_almost_equal_angles
 from .Trajectory import Trajectory
+from ..Integrator.OutcomeCode import outcome_code
 
 RETREAT_YAW = 45
 
 
-def predict_outcome(command, memory):
-    """Return the predicted outcome of executing this command in this memory"""
+def generate_prediction(command, memory):
+    """Apply the command to memory. Return the predicted outcome."""
 
     # By default, predict the intended duration1, yaw, and floor: 0.
     outcome_dict = {"clock": command.clock, "action": command.action.action_code, "duration1": command.duration,
@@ -86,13 +87,21 @@ def predict_outcome(command, memory):
                     break
 
     # Compute the displacement in memory
-    trajectory = Trajectory(memory, command.yaw, command.speed, command.span)
-    trajectory.track_displacement(Outcome(outcome_dict))
+    trajectory = Trajectory(memory, command)
+    trajectory.track_displacement(command.yaw, Outcome(outcome_dict))
 
     # Apply the displacement to memory
 
     memory.allocentric_memory.move(memory.body_memory.body_quaternion, trajectory.translation, command.clock)
     memory.body_memory.body_quaternion = memory.body_memory.body_quaternion.cross(trajectory.yaw_quaternion)
+    memory.body_memory.head_direction_rad = trajectory.head_direction_rad
+    memory.egocentric_memory.focus_point = trajectory.focus_point
+    memory.egocentric_memory.prompt_point = trajectory.prompt_point
+
+    # # Move the focus and prompt
+    # trajectory.track_focus(Outcome(outcome_dict))
+    # memory.body_memory.head_direction_rad = trajectory.head_direction_rad
+    # memory.egocentric_memory.focus_point = trajectory.focus_point
 
     # Predict the echo outcome from the nearest object phenomenon
     for p in [p for p in memory.phenomenon_memory.phenomena.values() if p.phenomenon_type == EXPERIENCE_ALIGNED_ECHO]:
@@ -108,12 +117,14 @@ def predict_outcome(command, memory):
 
     predicted_outcome = Outcome(outcome_dict)
 
-    # Move the focus and prompt
-    trajectory.track_focus(predicted_outcome)
-    memory.egocentric_memory.focus_point = trajectory.focus_point
-    memory.egocentric_memory.prompt_point = trajectory.prompt_point
+    # Update focus based on echo
+    trajectory.track_echo(predicted_outcome)
+    # memory.egocentric_memory.focus_point = trajectory.focus_point
+    # memory.egocentric_memory.prompt_point = trajectory.prompt_point
 
-    return predicted_outcome
+    code = outcome_code(memory, trajectory, predicted_outcome)
+
+    return predicted_outcome, code
 
 
 def cell_color(ego_point, memory):

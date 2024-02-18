@@ -111,39 +111,38 @@ class DeciderExplore(Decider):
         if self.workspace.memory.body_memory.energy < ENERGY_TIRED:
             # If right or left then swipe to home
             if outcome_code in [OUTCOME_LEFT, OUTCOME_RIGHT]:
+                e_memory = self.workspace.memory.save()
                 if outcome_code == OUTCOME_RIGHT:
-                    ego_confirmation = np.array([0, 280, 0], dtype=int)  # Swipe to the right
+                    e_memory.egocentric_memory.prompt_point = np.array([0, 280, 0], dtype=int)  # Swipe to the right
+                    e_memory.egocentric_memory.focus_point = np.array([280, 280, 0], dtype=int)
                 else:
-                    ego_confirmation = np.array([0, -280, 0], dtype=int)
-                print("Swiping to confirmation by:", ego_confirmation)
-                # action = self.workspace.actions[ACTION_SWIPE]
-                self.workspace.memory.egocentric_memory.prompt_point = ego_confirmation
-                e1 = Enaction(self.workspace.actions[ACTION_SWIPE], self.workspace.memory)
-                # playsound('autocat/Assets/R5.wav', False)
+                    e_memory.egocentric_memory.prompt_point = np.array([0, -280, 0], dtype=int)
+                    e_memory.egocentric_memory.focus_point = np.array([280, -280, 0], dtype=int)
+                # print("Swiping to confirmation by:", ego_confirmation)
+                # self.workspace.memory.egocentric_memory.prompt_point = ego_confirmation
+                e1 = Enaction(self.workspace.actions[ACTION_SWIPE], e_memory)
                 self.workspace.startup_sound.play()
             # If not left or right we need to manoeuvre
             else:
                 # If near home then go to confirmation prompt
+                e_memory = self.workspace.memory.save()
                 if self.workspace.memory.is_near_terrain_origin() or outcome_code == OUTCOME_COLOR:
                     polar_confirmation = self.workspace.memory.phenomenon_memory.phenomena[TER].confirmation_prompt()
-                    print("Enacting confirmation sequence to", polar_confirmation)
+                    # print("Enacting confirmation sequence to", polar_confirmation)
                     ego_confirmation = self.workspace.memory.polar_egocentric_to_egocentric(polar_confirmation)
-                    self.workspace.memory.egocentric_memory.prompt_point = ego_confirmation
-                    # playsound('autocat/Assets/R4.wav', False)
+                    e_memory.egocentric_memory.prompt_point = ego_confirmation
                     self.workspace.near_home_sound.play()
                 else:
                     # If not near home then go to origin prompt
                     allo_origin = self.workspace.memory.phenomenon_memory.phenomena[TER].relative_origin_point + \
                                   self.workspace.memory.phenomenon_memory.phenomena[TER].point
-                    print("Going from", self.workspace.memory.allocentric_memory.robot_point, "to origin sensor point", allo_origin)
+                    # print("Going from", self.workspace.memory.allocentric_memory.robot_point, "to origin sensor point", allo_origin)
                     ego_origin = self.workspace.memory.allocentric_to_egocentric(allo_origin)
-                    self.workspace.memory.egocentric_memory.prompt_point = ego_origin
-                    # playsound('autocat/Assets/R3.wav', False)
+                    e_memory.egocentric_memory.prompt_point = ego_origin
                     self.workspace.clear_sound.play()
-                # self.workspace.memory.egocentric_memory.focus_point = None  # Prevent unnatural head movement TODO manage focus after decision
-                # action = self.workspace.actions[ACTION_TURN]
-                e1 = Enaction(self.workspace.actions[ACTION_TURN], self.workspace.memory)
-                e2 = Enaction(self.workspace.actions[ACTION_FORWARD], e1.predicted_memory)
+                e_memory.egocentric_memory.focus_point = None  # Prevent unnatural head movement
+                e1 = Enaction(self.workspace.actions[ACTION_TURN], e_memory)
+                e2 = Enaction(self.workspace.actions[ACTION_FORWARD], e1.predicted_memory.save())
         else:
             # Go to the most interesting pool point
             # mip = self.workspace.memory.allocentric_memory.most_interesting_pool(self.workspace.clock)
@@ -162,13 +161,14 @@ class DeciderExplore(Decider):
                     * Vector3([-TERRAIN_RADIUS[self.workspace.arena_id]["radius"], 0, 0]))
             else:
                 ego_prompt = self.workspace.memory.terrain_centric_to_egocentric(self.ter_prompt)
-            self.workspace.memory.egocentric_memory.prompt_point = ego_prompt
-            # self.workspace.memory.egocentric_memory.focus_point = None  # Prevent unnatural head movement TODO manage focus after decision
+            e_memory = self.workspace.memory.save()
+            e_memory.egocentric_memory.prompt_point = ego_prompt
+            e_memory.egocentric_memory.focus_point = None  # Prevent unnatural head movement
             self.prompt_index += 1
             # if self.prompt_index >= self.nb_points:
             #     self.prompt_index = 0
-            e1 = Enaction(self.workspace.actions[ACTION_TURN], self.workspace.memory)
-            e2 = Enaction(self.workspace.actions[ACTION_FORWARD], e1.predicted_memory)
+            e1 = Enaction(self.workspace.actions[ACTION_TURN], e_memory)
+            e2 = Enaction(self.workspace.actions[ACTION_FORWARD], e1.predicted_memory.save())
 
         # Return the composite enaction
         enaction_sequence = [e1]

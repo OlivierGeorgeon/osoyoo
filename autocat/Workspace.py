@@ -135,35 +135,36 @@ class Workspace:
             # Only process actions when the robot is IDLE
             if self.enacter.interaction_step == ENACTION_STEP_IDLE:
                 self.memory.appraise_emotion()
-                self.composite_enaction = Enaction(self.actions[user_key.upper()], self.memory, span=10)
+                self.composite_enaction = Enaction(self.actions[user_key.upper()], self.memory.save(), span=10)
         elif user_key.upper() == "/":
             # If key ALIGN then turn and move forward to the prompt
             if self.enacter.interaction_step == ENACTION_STEP_IDLE:
                 # The first enaction: turn to the prompt
-                e0 = Enaction(self.actions[ACTION_TURN], self.memory)
+                e0 = Enaction(self.actions[ACTION_TURN], self.memory.save())
                 # Second enaction: move forward to the prompt
-                e1 = Enaction(self.actions[ACTION_FORWARD], e0.predicted_memory)
+                e1 = Enaction(self.actions[ACTION_FORWARD], e0.predicted_memory.save())
                 self.composite_enaction = CompositeEnaction([e0, e1])
         elif user_key.upper() == ":" and self.memory.egocentric_memory.focus_point is not None:
             # If key ALIGN BACK then turn back and move backward to the prompt
             if self.enacter.interaction_step == ENACTION_STEP_IDLE:
                 # The first enaction: turn the back to the prompt
-                e0 = Enaction(self.actions[ACTION_TURN], self.memory, direction=DIRECTION_BACK)
+                e0 = Enaction(self.actions[ACTION_TURN], self.memory.save(), direction=DIRECTION_BACK)
                 # Second enaction: move forward to the prompt
-                e1 = Enaction(self.actions[ACTION_BACKWARD], e0.predicted_memory)
+                e1 = Enaction(self.actions[ACTION_BACKWARD], e0.predicted_memory.save())
                 self.composite_enaction = CompositeEnaction([e0, e1])
         elif user_key.upper() == "P" and self.memory.egocentric_memory.focus_point is not None:
             # If key PUSH and has focus then create the push sequence
             if self.enacter.interaction_step == ENACTION_STEP_IDLE:
                 # First enaction: turn to the prompt
-                e0 = Enaction(self.actions[ACTION_TURN], self.memory)
+                e0 = Enaction(self.actions[ACTION_TURN], self.memory.save())
                 # Second enaction: move forward to the prompt
-                e1 = Enaction(self.actions[ACTION_FORWARD], e0.predicted_memory)
+                e1 = Enaction(self.actions[ACTION_FORWARD], e0.predicted_memory.save())
                 # Third enaction: turn to the prompt which is copied from the focus because it may be cleared
-                e1.predicted_memory.egocentric_memory.prompt_point = e1.predicted_memory.egocentric_memory.focus_point.copy()
-                e2 = Enaction(self.actions[ACTION_TURN], e1.predicted_memory)
+                e2_memory = e1.predicted_memory.save()
+                e2_memory.egocentric_memory.prompt_point = e1.predicted_memory.egocentric_memory.focus_point.copy()
+                e2 = Enaction(self.actions[ACTION_TURN], e2_memory)
                 # Fourth enaction: move forward to the new prompt
-                e3 = Enaction(self.actions[ACTION_FORWARD], e2.predicted_memory)
+                e3 = Enaction(self.actions[ACTION_FORWARD], e2.predicted_memory.save())
                 self.composite_enaction = CompositeEnaction([e0, e1, e2, e3])
         elif user_key.upper() == KEY_CLEAR:
             # Clear the stack of enactions
@@ -176,8 +177,8 @@ class Workspace:
     def emit_message(self):
         """Return the message to answer to another robot"""
 
-        message = {"robot": self.robot_id, "clock": self.memory.clock, "azimuth": self.memory.body_memory.body_azimuth(),
-                   "emotion": self.memory.emotion_code}
+        message = {"robot": self.robot_id, "clock": self.memory.clock,
+                   "azimuth": self.memory.body_memory.body_azimuth(), "emotion": self.memory.emotion_code}
 
         # If the terrain has been found then send the position relative to the terrain origin
         if self.memory.phenomenon_memory.terrain_confidence() > TERRAIN_INITIAL_CONFIDENCE:
@@ -185,7 +186,7 @@ class Workspace:
             message['position'] = robot_point.astype(int).tolist()
 
         # Add information about the current enaction only once
-        if self.enaction is not None and not self.enaction.message_sent:
+        if self.enaction is not None and not self.enaction.is_message_sent:
             # The destination position in polar-egocentric
             # TODO handle destination
             # destination_point = quaternion.apply_to_vector(self.enaction.body_quaternion,
@@ -198,7 +199,7 @@ class Workspace:
                 message['focus'] = focus_point.astype(int).tolist()
 
             # Mark the message for this enaction sent
-            self.enaction.message_sent = True
+            self.enaction.is_message_sent = True
 
         return json.dumps(message)
 

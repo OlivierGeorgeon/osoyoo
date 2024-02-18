@@ -32,60 +32,39 @@ class DeciderWatchCenter(Decider):
     def select_enaction(self, enaction):
         """Return the next intended interaction"""
 
-        # If far from the origin then return to origin
-        # distance_to_watch_point = np.linalg.norm(self.workspace.memory.allocentric_memory.robot_point -
-        #                                          self.workspace.memory.phenomenon_memory.watch_point())
-
-        ego_watch_point = self.workspace.memory.allocentric_to_egocentric(self.workspace.memory.phenomenon_memory.watch_point())
-        ego_arrange_point = self.workspace.memory.terrain_centric_to_egocentric(self.workspace.memory.phenomenon_memory.arrange_point())
-        # print("Distance to watch point", round(distance_to_watch_point))
+        ego_watch_point = self.workspace.memory.allocentric_to_egocentric(
+            self.workspace.memory.phenomenon_memory.watch_point())
+        ego_arrange_point = self.workspace.memory.terrain_centric_to_egocentric(
+            self.workspace.memory.phenomenon_memory.arrange_point())
 
         # If far from watch point then go to watch point
         if np.linalg.norm(ego_watch_point) > 200:
-            # if distance_to_watch_point > 200:
-            self.workspace.memory.egocentric_memory.prompt_point = \
-                self.workspace.memory.allocentric_to_egocentric(self.workspace.memory.phenomenon_memory.watch_point())
-            self.workspace.memory.egocentric_memory.prompt_point = ego_watch_point
-            # self.workspace.memory.egocentric_memory.focus_point = None  # TODO pass a saved memory to the interaction
+            e_memory = self.workspace.memory.save()
+            # self.workspace.memory.egocentric_memory.prompt_point = \
+            #     self.workspace.memory.allocentric_to_egocentric(self.workspace.memory.phenomenon_memory.watch_point())
+            e_memory.egocentric_memory.prompt_point = ego_watch_point
+            e_memory.egocentric_memory.focus_point = None
             # First enaction: turn to the prompt
-            e0 = Enaction(self.workspace.actions[ACTION_TURN], self.workspace.memory)
+            e0 = Enaction(self.workspace.actions[ACTION_TURN], e_memory)
             # Second enaction: move forward to the prompt
-            e1 = Enaction(self.workspace.actions[ACTION_FORWARD], e0.predicted_memory)
+            e1 = Enaction(self.workspace.actions[ACTION_FORWARD], e0.predicted_memory.save())
             # Third enaction: scan
-            e2 = Enaction(self.workspace.actions[ACTION_SCAN], e1.predicted_memory, span=10)
-            composite_enaction = CompositeEnaction([e0, e1])  # , e2])  # Scan because it often miss an object
+            e2 = Enaction(self.workspace.actions[ACTION_SCAN], e1.predicted_memory.save(), span=10)
+            composite_enaction = CompositeEnaction([e0, e1, e2])  # Scan because it often miss an object
 
-        # If facing arrange point then WATCH
+        # If facing arrange point then WATCH ahead
         elif abs(math.atan2(ego_arrange_point[1], ego_arrange_point[0])) < 0.349:
-            composite_enaction = Enaction(self.workspace.actions[ACTION_WATCH], self.workspace.memory)
+            e_memory = self.workspace.memory.save()
+            e_memory.egocentric_memory.prompt_point = None
+            e_memory.egocentric_memory.focus_point = np.array([200, 0, 0])
+            composite_enaction = Enaction(self.workspace.actions[ACTION_WATCH], e_memory)
 
         # If not facing arrange point then turn to arrange point
         else:
-            self.workspace.memory.egocentric_memory.prompt_point = ego_arrange_point
-            composite_enaction = Enaction(self.workspace.actions[ACTION_TURN], self.workspace.memory)
-
-            # # Call the sequence learning mechanism to select the next action
-            #
-            # action = self.select_action(enaction)
-            # span = 40
-            #
-            # # Set the spatial modifiers
-            # if action.action_code in [ACTION_TURN]:
-            #     if self.workspace.memory.egocentric_memory.focus_point is None or \
-            #             not self.workspace.memory.is_to_arrange(self.workspace.memory.egocentric_memory.focus_point):
-            #         # If no focus or not in the arrange area then turn to the terrain center
-            #         self.workspace.memory.egocentric_memory.prompt_point = \
-            #             self.workspace.memory.terrain_centric_to_egocentric(np.array([0, 0, 0]))
-            #     else:
-            #         # If focus to arrange then turn to the focus
-            #         self.workspace.memory.egocentric_memory.prompt_point = \
-            #             self.workspace.memory.egocentric_memory.focus_point.copy()
-            # else:
-            #     self.workspace.memory.egocentric_memory.prompt_point = None
-            #     if action.action_code in [ACTION_SCAN]:
-            #         # Scan carefully
-            #         span = 10
-            # composite_enaction = Enaction(action, self.workspace.memory, span=span)
+            e_memory = self.workspace.memory.save()
+            e_memory.egocentric_memory.prompt_point = ego_arrange_point
+            e_memory.egocentric_memory.focus_point = ego_arrange_point
+            composite_enaction = Enaction(self.workspace.actions[ACTION_TURN], e_memory)
 
         # Return the selected enaction
         return composite_enaction
