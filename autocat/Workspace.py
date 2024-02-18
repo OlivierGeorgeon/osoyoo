@@ -1,7 +1,6 @@
 import json
-from playsound import playsound
+import pyglet
 from .Decider.Decider import Decider
-# from .Decider.DeciderCircle import DeciderCircle
 from .Decider.DeciderExplore import DeciderExplore
 from .Decider.DeciderWatch import DeciderWatch
 from .Decider.DeciderPush import DeciderPush
@@ -38,8 +37,8 @@ class Workspace:
         self.actions = create_actions(robot_id)
         self.memory = Memory(arena_id, robot_id)
         # if self.robot_id == '1':
-        self.deciders = {'Explore': DeciderExplore(self), 'Circle': Decider(self),
-                         'Watch': DeciderWatchCenter(self), 'Arrange': DeciderArrange(self)}
+        self.deciders = {'Explore': DeciderExplore(self), 'Circle ': Decider(self),
+                         'Watch C': DeciderWatchCenter(self), 'Arrange': DeciderArrange(self)}
         # self.deciders = {'Explore': DeciderExplore(self), 'Circle': DeciderCircle(self), 'Watch': DeciderWatch(self)}
         # self.deciders = {'Circle': DeciderCircle(self), 'Explore': DeciderExplore(self)}
         # self.deciders = {'Push': DeciderPush(self), 'Watch': DeciderWatch(self)}
@@ -61,12 +60,21 @@ class Workspace:
         self.ctrl_phenomenon_view = None
 
         # Control the enaction
-        # self.clock = 0
         self.is_imagining = False
         self.memory_before_imaginary = None
 
         # Message from other robot
         self.message = None
+
+        # Load sounds
+        self.startup_sound = pyglet.media.load('autocat/Assets/R5.wav', streaming=False)
+        self.clear_sound = pyglet.media.load('autocat/Assets/R3.wav', streaming=False)
+        self.near_home_sound = pyglet.media.load('autocat/Assets/R4.wav', streaming=False)
+        self.push_sound = pyglet.media.load('autocat/Assets/tiny_cute.wav', streaming=False)
+        self.message_sound = pyglet.media.load('autocat/Assets/chirp.wav', streaming=False)
+        self.floor_sound = pyglet.media.load('autocat/Assets/cyberpunk3.wav', streaming=False)
+        self.impact_sound = pyglet.media.load('autocat/Assets/cute_beep1.wav', streaming=False)
+        self.startup_sound.play()
 
     def main(self, dt):
         """The main handler of the interaction cycle:
@@ -100,9 +108,14 @@ class Workspace:
                     # All deciders propose an enaction with an activation value
                     proposed_enactions = []
                     for name, decider in self.deciders.items():
-                        proposed_enactions.append([name, decider.propose_enaction(), decider.activation_level()])
+                        activation = decider.activation_level()  # Must compute before proposing
+                        enaction = decider.propose_enaction()
+                        if enaction is not None:
+                            proposed_enactions.append([name, enaction, activation])
                     # The enaction that has the highest activation is selected
-                    print("Proposed enactions", proposed_enactions)
+                    print("Proposed enactions:")  # , ' '.join(e.__str__() for line in proposed_enactions for e in line))
+                    for p in proposed_enactions:
+                        print(" ", p[0], ":", p[1], p[2])
                     most_activated = proposed_enactions.index(max(proposed_enactions, key=lambda p: p[2]))
                     print("Decider:", proposed_enactions[most_activated][0])
                     self.composite_enaction = proposed_enactions[most_activated][1]
@@ -122,39 +135,40 @@ class Workspace:
             # Only process actions when the robot is IDLE
             if self.enacter.interaction_step == ENACTION_STEP_IDLE:
                 self.memory.appraise_emotion()
-                self.composite_enaction = Enaction(self.actions[user_key.upper()], self.memory, span=10)
+                self.composite_enaction = Enaction(self.actions[user_key.upper()], self.memory.save(), span=10)
         elif user_key.upper() == "/":
             # If key ALIGN then turn and move forward to the prompt
             if self.enacter.interaction_step == ENACTION_STEP_IDLE:
                 # The first enaction: turn to the prompt
-                e0 = Enaction(self.actions[ACTION_TURN], self.memory)
+                e0 = Enaction(self.actions[ACTION_TURN], self.memory.save())
                 # Second enaction: move forward to the prompt
-                e1 = Enaction(self.actions[ACTION_FORWARD], e0.predicted_memory)
+                e1 = Enaction(self.actions[ACTION_FORWARD], e0.predicted_memory.save())
                 self.composite_enaction = CompositeEnaction([e0, e1])
         elif user_key.upper() == ":" and self.memory.egocentric_memory.focus_point is not None:
             # If key ALIGN BACK then turn back and move backward to the prompt
             if self.enacter.interaction_step == ENACTION_STEP_IDLE:
                 # The first enaction: turn the back to the prompt
-                e0 = Enaction(self.actions[ACTION_TURN], self.memory, direction=DIRECTION_BACK)
+                e0 = Enaction(self.actions[ACTION_TURN], self.memory.save(), direction=DIRECTION_BACK)
                 # Second enaction: move forward to the prompt
-                e1 = Enaction(self.actions[ACTION_BACKWARD], e0.predicted_memory)
+                e1 = Enaction(self.actions[ACTION_BACKWARD], e0.predicted_memory.save())
                 self.composite_enaction = CompositeEnaction([e0, e1])
         elif user_key.upper() == "P" and self.memory.egocentric_memory.focus_point is not None:
             # If key PUSH and has focus then create the push sequence
             if self.enacter.interaction_step == ENACTION_STEP_IDLE:
                 # First enaction: turn to the prompt
-                e0 = Enaction(self.actions[ACTION_TURN], self.memory)
+                e0 = Enaction(self.actions[ACTION_TURN], self.memory.save())
                 # Second enaction: move forward to the prompt
-                e1 = Enaction(self.actions[ACTION_FORWARD], e0.predicted_memory)
+                e1 = Enaction(self.actions[ACTION_FORWARD], e0.predicted_memory.save())
                 # Third enaction: turn to the prompt which is copied from the focus because it may be cleared
-                e1.predicted_memory.egocentric_memory.prompt_point = e1.predicted_memory.egocentric_memory.focus_point.copy()
-                e2 = Enaction(self.actions[ACTION_TURN], e1.predicted_memory)
+                e2_memory = e1.predicted_memory.save()
+                e2_memory.egocentric_memory.prompt_point = e1.predicted_memory.egocentric_memory.focus_point.copy()
+                e2 = Enaction(self.actions[ACTION_TURN], e2_memory)
                 # Fourth enaction: move forward to the new prompt
-                e3 = Enaction(self.actions[ACTION_FORWARD], e2.predicted_memory)
+                e3 = Enaction(self.actions[ACTION_FORWARD], e2.predicted_memory.save())
                 self.composite_enaction = CompositeEnaction([e0, e1, e2, e3])
         elif user_key.upper() == KEY_CLEAR:
             # Clear the stack of enactions
-            playsound('autocat/Assets/R3.wav', False)
+            self.clear_sound.play()
             self.composite_enaction = None
             # TODO: prevent a crash when the enaction has been cleared and then an outcome is received after
         elif user_key.upper() == KEY_PREDICTION_ERROR:
@@ -163,8 +177,8 @@ class Workspace:
     def emit_message(self):
         """Return the message to answer to another robot"""
 
-        message = {"robot": self.robot_id, "clock": self.memory.clock, "azimuth": self.memory.body_memory.body_azimuth(),
-                   "emotion": self.memory.emotion_code}
+        message = {"robot": self.robot_id, "clock": self.memory.clock,
+                   "azimuth": self.memory.body_memory.body_azimuth(), "emotion": self.memory.emotion_code}
 
         # If the terrain has been found then send the position relative to the terrain origin
         if self.memory.phenomenon_memory.terrain_confidence() > TERRAIN_INITIAL_CONFIDENCE:
@@ -172,7 +186,7 @@ class Workspace:
             message['position'] = robot_point.astype(int).tolist()
 
         # Add information about the current enaction only once
-        if self.enaction is not None and not self.enaction.message_sent:
+        if self.enaction is not None and not self.enaction.is_message_sent:
             # The destination position in polar-egocentric
             # TODO handle destination
             # destination_point = quaternion.apply_to_vector(self.enaction.body_quaternion,
@@ -185,7 +199,7 @@ class Workspace:
                 message['focus'] = focus_point.astype(int).tolist()
 
             # Mark the message for this enaction sent
-            self.enaction.message_sent = True
+            self.enaction.is_message_sent = True
 
         return json.dumps(message)
 
@@ -194,14 +208,4 @@ class Workspace:
         # If no message then keep the previous one
         if message_string is not None:
             self.message = Message(message_string)
-            self.message.ego_quaternion = self.message.body_quaternion.cross(self.memory.body_memory.body_quaternion.inverse)
-            if self.message.ter_position is not None:
-                # If position in terrain and this robot knows the position of the terrain
-                if self.memory.phenomenon_memory.terrain_confidence() > TERRAIN_INITIAL_CONFIDENCE:
-                    self.message.ego_position = self.memory.terrain_centric_to_egocentric(self.message.ter_position)
-                else:
-                    # If cannot place the robot then flush the message
-                    self.message = None
-            else:
-                # If only focus position was received then we assume this robot is in the other's focus
-                self.message.ego_position = self.memory.polar_egocentric_to_egocentric(self.message.polar_ego_position)
+

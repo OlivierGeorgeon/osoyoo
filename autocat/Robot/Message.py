@@ -2,7 +2,9 @@ import json
 import math
 from pyrr import Vector3, Quaternion
 from .. Robot.RobotDefine import ROBOT_FLOOR_SENSOR_X
+from ..Memory.PhenomenonMemory.PhenomenonTerrain import TERRAIN_INITIAL_CONFIDENCE
 from ..Utils import azimuth_to_quaternion
+from ..Utils import quaternion_translation_to_matrix
 
 
 class Message:
@@ -38,5 +40,26 @@ class Message:
             # self.polar_ego_position += self.destination
 
         # Ego positions to be update by Workspace.receive_message
-        self.ego_quaternion = None
-        self.ego_position = None
+        self.position_matrix = None
+        # self.ego_quaternion = None
+        # self.ego_position = None
+
+    def set_position_matrix(self, memory):
+        """Return the position matrix of the other robot in this egocentric memory"""
+        # The relative position if available
+        if self.ter_position is not None:
+            # If position in terrain and this robot knows the position of the terrain
+            if memory.phenomenon_memory.terrain_confidence() > TERRAIN_INITIAL_CONFIDENCE:
+                ego_position = memory.terrain_centric_to_egocentric(self.ter_position)
+            else:
+                # If cannot place the robot then no position matrix
+                return
+        elif self.polar_ego_position is not None:
+            # If only focus position was received then we assume this robot is in the other's focus
+            ego_position = memory.polar_egocentric_to_egocentric(self.polar_ego_position)
+        else:
+            return
+        # The relative direction of the other robot
+        ego_quaternion = self.body_quaternion.cross(memory.body_memory.body_quaternion.inverse)
+        # The position matrix
+        self.position_matrix = quaternion_translation_to_matrix(ego_quaternion, ego_position)

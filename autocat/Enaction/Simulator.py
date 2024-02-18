@@ -20,17 +20,17 @@ class Simulator:
         self.is_simulating = False
         self.simulation_time = 0
         self.simulated_outcome_dict = {}
-        self.simulation_rotation_speed = 0
+        # self.simulation_rotation_speed = 0
         self.simulation_duration = 0
 
     def begin(self):
         """Begin the simulation"""
         self.is_simulating = True
         self.simulation_time = 0
-        self.simulation_rotation_speed = self.workspace.enaction.action.rotation_speed_rad * SIMULATION_SPEED
-        if self.workspace.enaction.command.yaw < 0:
-            self.simulation_rotation_speed *= -1.
-        self.simulation_duration = self.workspace.enaction.command.duration / 1000. * SIMULATION_SPEED
+        # self.simulation_rotation_speed = self.workspace.enaction.action.rotation_speed_rad * SIMULATION_SPEED
+        # if self.workspace.enaction.command.yaw < 0:
+        #     self.simulation_rotation_speed *= -1.
+        self.simulation_duration = self.workspace.enaction.command.duration / SIMULATION_SPEED / 1000.
 
         # Initialize all the required fields of the outcome because sometimes simulate() is not called
         self.simulated_outcome_dict = {"clock": self.workspace.enaction.clock,
@@ -57,12 +57,10 @@ class Simulator:
             # Adjust to the exact duration
             dt += self.simulation_duration - self.simulation_time
             self.is_simulating = False
-            # The duration1 is the intended duration
-            # self.simulated_outcome_dict['duration1'] = self.simulation_duration * 1000
 
         # The delta displacement
         translation = enaction.command.speed * dt * SIMULATION_SPEED
-        yaw_quaternion = Quaternion.from_z_rotation((self.simulation_rotation_speed * dt))
+        yaw_quaternion = Quaternion.from_z_rotation(enaction.command.rotation_speed_rad * SIMULATION_SPEED * dt)
         displacement_matrix = translation_quaternion_to_matrix(-translation, yaw_quaternion.inverse)
 
         # Simulate the displacement of experiences
@@ -85,6 +83,11 @@ class Simulator:
             memory.body_memory.set_head_direction_degree(head_direction_degree)
         else:
             head_direction_degree = memory.body_memory.head_direction_degree()
+
+        # Simulate the movement of the head when SCAN
+        if enaction.action.action_code == ACTION_SCAN:
+            head_angle = -90 + 180 * self.simulation_time * SIMULATION_SPEED / enaction.action.target_duration
+            memory.body_memory.set_head_direction_degree(head_angle)
 
         # Simulate the displacement in allocentric memory
         memory.allocentric_memory.robot_point += memory.body_memory.body_quaternion * Vector3(translation)

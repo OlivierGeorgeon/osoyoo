@@ -6,7 +6,6 @@
 import math
 import numpy as np
 from pyrr import quaternion, Quaternion, Vector3
-from playsound import playsound
 from . Action import ACTION_TURN, ACTION_FORWARD, ACTION_SWIPE
 from . Interaction import OUTCOME_NO_FOCUS
 from . Decider import Decider
@@ -46,7 +45,7 @@ class DeciderExplore(Decider):
         self.prompt_index = 0
         self.ter_prompt = None
         self.explore_angle_quaternion = Quaternion.from_z_rotation(math.pi / 3)  # 2
-        self.action = "-"
+        # self.action = "-"
 
     def activation_level(self):
         """The level of activation is 2 if the terrain has confidence and the robot is excited or low energy"""
@@ -88,53 +87,53 @@ class DeciderExplore(Decider):
 
         return outcome
 
-    def select_enaction(self, outcome):
-        """Return the next intended interaction"""
-        # Tracing the last interaction
-        if self.action is not None:
-            print("Action: " + str(self.action) + ", Anticipation: " + str(self.anticipated_outcome) +
-                  ", Outcome: " + str(outcome))
+    def select_enaction(self, enaction):
+        """Propose the next enaction"""
 
-        # Compute the next prompt point
+        if self.workspace.memory.phenomenon_memory.terrain_confidence() == 0:
+            return None
 
-        # It is assumed that the terrain has been found if this decider is activated
+        outcome_code = self.outcome(enaction)
 
         e1, e2 = None, None
 
         # If time to go home
         if self.workspace.memory.body_memory.energy < ENERGY_TIRED:
             # If right or left then swipe to home
-            if outcome in [OUTCOME_LEFT, OUTCOME_RIGHT]:
-                if outcome == OUTCOME_RIGHT:
-                    ego_confirmation = np.array([0, 280, 0], dtype=int)  # Swipe to the right
+            if outcome_code in [OUTCOME_LEFT, OUTCOME_RIGHT]:
+                e_memory = self.workspace.memory.save()
+                e_memory.emotion_code = EMOTION_RELAXED
+                if outcome_code == OUTCOME_RIGHT:
+                    e_memory.egocentric_memory.prompt_point = np.array([0, 280, 0], dtype=int)  # Swipe to the right
+                    e_memory.egocentric_memory.focus_point = np.array([280, 280, 0], dtype=int)
                 else:
-                    ego_confirmation = np.array([0, -280, 0], dtype=int)
-                print("Swiping to confirmation by:", ego_confirmation)
-                self.action = self.workspace.actions[ACTION_SWIPE]
-                self.workspace.memory.egocentric_memory.prompt_point = ego_confirmation
-                e1 = Enaction(self.action, self.workspace.memory)
-                playsound('autocat/Assets/R5.wav', False)
+                    e_memory.egocentric_memory.prompt_point = np.array([0, -280, 0], dtype=int)
+                    e_memory.egocentric_memory.focus_point = np.array([280, -280, 0], dtype=int)
+                # print("Swiping to confirmation by:", ego_confirmation)
+                e1 = Enaction(self.workspace.actions[ACTION_SWIPE], e_memory)
+                self.workspace.startup_sound.play()
             # If not left or right we need to manoeuvre
             else:
                 # If near home then go to confirmation prompt
-                if self.workspace.memory.is_near_terrain_origin() or outcome == OUTCOME_COLOR:
+                e_memory = self.workspace.memory.save()
+                e_memory.emotion_code = EMOTION_RELAXED
+                if self.workspace.memory.is_near_terrain_origin() or outcome_code == OUTCOME_COLOR:
                     polar_confirmation = self.workspace.memory.phenomenon_memory.phenomena[TER].confirmation_prompt()
-                    print("Enacting confirmation sequence to", polar_confirmation)
+                    # print("Enacting confirmation sequence to", polar_confirmation)
                     ego_confirmation = self.workspace.memory.polar_egocentric_to_egocentric(polar_confirmation)
-                    self.workspace.memory.egocentric_memory.prompt_point = ego_confirmation
-                    playsound('autocat/Assets/R4.wav', False)
+                    e_memory.egocentric_memory.prompt_point = ego_confirmation
+                    self.workspace.near_home_sound.play()
                 else:
                     # If not near home then go to origin prompt
                     allo_origin = self.workspace.memory.phenomenon_memory.phenomena[TER].relative_origin_point + \
                                   self.workspace.memory.phenomenon_memory.phenomena[TER].point
-                    print("Going from", self.workspace.memory.allocentric_memory.robot_point, "to origin sensor point", allo_origin)
+                    # print("Going from", self.workspace.memory.allocentric_memory.robot_point, "to origin sensor point", allo_origin)
                     ego_origin = self.workspace.memory.allocentric_to_egocentric(allo_origin)
-                    self.workspace.memory.egocentric_memory.prompt_point = ego_origin
-                    playsound('autocat/Assets/R3.wav', False)
-                # self.workspace.memory.egocentric_memory.focus_point = None  # Prevent unnatural head movement TODO manage focus after decision
-                self.action = self.workspace.actions[ACTION_TURN]
-                e1 = Enaction(self.action, self.workspace.memory)
-                e2 = Enaction(self.workspace.actions[ACTION_FORWARD], e1.predicted_memory)
+                    e_memory.egocentric_memory.prompt_point = ego_origin
+                    self.workspace.clear_sound.play()
+                e_memory.egocentric_memory.focus_point = None  # Prevent unnatural head movement
+                e1 = Enaction(self.workspace.actions[ACTION_TURN], e_memory)
+                e2 = Enaction(self.workspace.actions[ACTION_FORWARD], e1.predicted_memory.save())
         else:
             # Go to the most interesting pool point
             # mip = self.workspace.memory.allocentric_memory.most_interesting_pool(self.workspace.clock)
@@ -147,22 +146,22 @@ class DeciderExplore(Decider):
             self.ter_prompt = quaternion.apply_to_vector(self.explore_angle_quaternion, self.ter_prompt)
             # When the terrain has not been recognized, add the terrain radius
             if self.workspace.memory.phenomenon_memory.terrain_confidence() < PHENOMENON_RECOGNIZED_CONFIDENCE:
-                # self.ter_prompt += self.workspace.memory.phenomenon_memory.phenomenon_categories[TER].north_east_point
                 ego_prompt = self.workspace.memory.terrain_centric_to_egocentric(self.ter_prompt +
-                    self.workspace.memory.phenomenon_memory.phenomena[TER].origin_direction_quaternion
-                    * Vector3([-TERRAIN_RADIUS[self.workspace.arena_id]["radius"], 0, 0]))
+                             self.workspace.memory.phenomenon_memory.phenomena[TER].origin_direction_quaternion
+                             * Vector3([-TERRAIN_RADIUS[self.workspace.arena_id]["radius"], 0, 0]))
             else:
                 ego_prompt = self.workspace.memory.terrain_centric_to_egocentric(self.ter_prompt)
-            self.workspace.memory.egocentric_memory.prompt_point = ego_prompt
-            # self.workspace.memory.egocentric_memory.focus_point = None  # Prevent unnatural head movement TODO manage focus after decision
+            e_memory = self.workspace.memory.save()
+            e_memory.emotion_code = EMOTION_RELAXED
+            e_memory.egocentric_memory.prompt_point = ego_prompt
+            e_memory.egocentric_memory.focus_point = None  # Prevent unnatural head movement
             self.prompt_index += 1
             # if self.prompt_index >= self.nb_points:
             #     self.prompt_index = 0
-            self.action = self.workspace.actions[ACTION_TURN]
-            e1 = Enaction(self.action, self.workspace.memory)
-            e2 = Enaction(self.workspace.actions[ACTION_FORWARD], e1.predicted_memory)
+            e1 = Enaction(self.workspace.actions[ACTION_TURN], e_memory)
+            e2 = Enaction(self.workspace.actions[ACTION_FORWARD], e1.predicted_memory.save())
 
-        # Add the enactions to the stack
+        # Return the composite enaction
         enaction_sequence = [e1]
         if e2 is not None:
             enaction_sequence.append(e2)

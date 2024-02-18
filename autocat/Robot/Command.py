@@ -21,6 +21,7 @@ class Command:
         self.duration = action.target_duration * 1000  # Default duration
         self.yaw = round(math.degrees(action.rotation_speed_rad * action.target_duration))
         self.speed = self.action.translation_speed.copy()
+        self.rotation_speed = 0
         self.color = color
         self.caution = caution
         self.span = span
@@ -38,8 +39,6 @@ class Command:
             if self.action.action_code in [ACTION_SWIPE, ACTION_RIGHTWARD]:
                 self.duration = int(math.fabs(prompt_point[1] / self.action.translation_speed[1] * 1000))
                 self.speed[1] = math.copysign(int(self.action.translation_speed[1]), prompt_point[1])
-                # if prompt_point[1] < 0:
-                #     self.speed[1] = -int(self.action.translation_speed[1])  # Negative speed makes swipe right
             if self.action.action_code in [ACTION_TURN_HEAD, ACTION_TURN]:
                 if direction == DIRECTION_BACK:
                     # Turn the back to the prompt
@@ -55,6 +54,7 @@ class Command:
                     yaw_rad = math.atan2(prompt_point[1], prompt_point[0])
                 self.duration = abs(round(1000. * yaw_rad / self.action.rotation_speed_rad))
                 self.yaw = round(math.degrees(yaw_rad))
+        self.rotation_speed_rad = math.copysign(self.action.rotation_speed_rad, self.yaw)  # For simulator
 
     def serialize(self):
         """Return the json string to send to the robot"""

@@ -1,8 +1,5 @@
 import math
-from playsound import playsound
 from pyrr import Matrix44, Quaternion, Vector3
-
-import autocat.Utils
 from ...Memory.EgocentricMemory.Experience import Experience, EXPERIENCE_LOCAL_ECHO, EXPERIENCE_CENTRAL_ECHO, \
     EXPERIENCE_PLACE, EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_IMPACT, EXPERIENCE_ROBOT, EXPERIENCE_TOUCH
 from ...Robot.RobotDefine import ROBOT_COLOR_SENSOR_X, ROBOT_FLOOR_SENSOR_X, ROBOT_CHASSIS_Y, ROBOT_OUTSIDE_Y, \
@@ -41,7 +38,7 @@ class EgocentricMemory:
 
         # The FLOOR experience
         if enaction.outcome.floor > 0:
-            playsound('autocat/Assets/cyberpunk3.wav', False)
+            # playsound('autocat/Assets/cyberpunk3.wav', False)
             line_point = Vector3([ROBOT_FLOOR_SENSOR_X + ROBOT_SETTINGS[self.robot_id]["retreat_distance"], 0, 0])
             if enaction.outcome.floor == 0b01:
                 # Black line on the right
@@ -127,10 +124,11 @@ class EgocentricMemory:
         # self.add_central_echos(local_echos)
 
         # Add the other robot experience
-        if enaction.message is not None and enaction.message.ego_position is not None:
-            pose_m = quaternion_translation_to_matrix(enaction.message.ego_quaternion, enaction.message.ego_position)
-            robot_exp = Experience(pose_m, EXPERIENCE_ROBOT, enaction.clock, experience_id=self.experience_id,
-                                   durability=EXPERIENCE_PERSISTENCE // 3, color_index=enaction.message.emotion_code)
+        if enaction.message is not None and enaction.message.position_matrix is not None:
+            # pose_m = quaternion_translation_to_matrix(enaction.message.ego_quaternion, enaction.message.ego_position)
+            robot_exp = Experience(enaction.message.position_matrix, EXPERIENCE_ROBOT, enaction.clock,
+                                   experience_id=self.experience_id, durability=EXPERIENCE_PERSISTENCE // 3,
+                                   color_index=enaction.message.emotion_code)
             self.experiences[robot_exp.id] = robot_exp
             self.experience_id += 1
 
