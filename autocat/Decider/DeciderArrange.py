@@ -22,6 +22,8 @@ from ..Memory.PhenomenonMemory import ARRANGE_OBJECT_RADIUS
 
 ARRANGE_MIN_RADIUS = 100
 ARRANGE_MAX_RADIUS = 400
+ARRANGE_ALIGNED_Y_MAX_OBJECT = 20   # The max Y on the robot-object axis to trigger pushing
+ARRANGE_ALIGNED_Y_MAX_OFFSET = 100  # The max Y on the robot-object-axis to consider aligned
 
 STEP_INIT = 0
 STEP_ALIGN = 1
@@ -49,6 +51,9 @@ class DeciderArrange(Decider):
         """The enactions to push a object to a target place"""
         print("Step", self.step)
 
+        ego_target = self.workspace.memory.terrain_centric_to_egocentric(
+            self.workspace.memory.phenomenon_memory.arrange_point())
+
         # If robot too close to target point then withdraw
         if self.is_to_withdraw():
             # Slight Withdraw
@@ -66,13 +71,20 @@ class DeciderArrange(Decider):
             composite_enaction = Enaction(self.workspace.actions[ACTION_SCAN], enaction_memory, span=10)
             self.step = STEP_INIT  # Avoids systematically recalling DeciderArrange
 
+        # If OUTCOME_TOUCH then push to target point without caution
+        elif enaction.outcome_code == OUTCOME_TOUCH:
+            enaction_memory = self.workspace.memory.save()
+            enaction_memory.egocentric_memory.prompt_point = np.array([ego_target[0] - ROBOT_FLOOR_SENSOR_X -
+                                                                       ARRANGE_OBJECT_RADIUS, 0, 0])
+            enaction_memory.egocentric_memory.focus_point = ego_target  # Look at target
+            composite_enaction = Enaction(self.workspace.actions[ACTION_FORWARD], enaction_memory, caution=0)
+            self.step = STEP_WITHDRAW
+
         # If there is an object to arrange
         elif self.is_to_arrange():
             # The point center of the object
             direction, distance = point_to_echo_direction_distance(self.workspace.memory.egocentric_memory.focus_point)
             object_center = echo_point(direction, distance + ARRANGE_OBJECT_RADIUS)  # Presuppose the object's radius
-            ego_target = self.workspace.memory.terrain_centric_to_egocentric(
-                self.workspace.memory.phenomenon_memory.arrange_point())
             l1 = line.create_from_points(object_center, ego_target)
             ego_intersection = line_intersection(l1, line.create_from_points([0, 0, 0], [0, 1, 0]))
             ego_projection = point_closest_point_on_line(np.array([0, 0, 0]), l1)
@@ -86,16 +98,6 @@ class DeciderArrange(Decider):
                 enaction_memory.egocentric_memory.focus_point = np.array([-500, 0, 0])  # Look ahead
                 composite_enaction = Enaction(self.workspace.actions[ACTION_TURN], enaction_memory, span=10)
 
-            # If OUTCOME_TOUCH then push to target point without caution
-            elif enaction.outcome_code == OUTCOME_TOUCH:
-                enaction_memory = self.workspace.memory.save()
-                enaction_memory.egocentric_memory.prompt_point = np.array([ego_target[0] - ROBOT_FLOOR_SENSOR_X -
-                                                                           ARRANGE_OBJECT_RADIUS, 0, 0])
-                enaction_memory.egocentric_memory.focus_point = ego_target  # Look at target
-                # self.workspace.memory.egocentric_memory.prompt_point = push_vector
-                # self.workspace.memory.egocentric_memory.focus_point = ego_target.copy()  # Look at destination
-                composite_enaction = Enaction(self.workspace.actions[ACTION_FORWARD], enaction_memory, caution=0)
-                self.step = STEP_WITHDRAW
             # If object behind target just watch (minus the radius to prevent keeping pushing)
             elif object_center[0] > ego_target[0] - ARRANGE_OBJECT_RADIUS:  # - ARRANGE_MIN_RADIUS:
                 print("Object behind target:", ego_target[0] - object_center[0])
@@ -109,8 +111,7 @@ class DeciderArrange(Decider):
             else:
                 self.step = STEP_ALIGN  # May be changed to STEP_PUSH
                 # If robot-object-target not aligned
-                # if abs(object_center[1]) > 20 or abs(ego_target[1]) > 100:
-                if abs(ego_projection[1]) > 20:
+                if abs(ego_projection[1]) > ARRANGE_ALIGNED_Y_MAX_OFFSET:
                     # Go to the point from where to push
                     if CHECK_OUTSIDE == 1 and self.workspace.memory.is_outside_terrain(ego_projection):
                         print("Projection point inaccessible")
@@ -154,20 +155,19 @@ class DeciderArrange(Decider):
                         e_memory.egocentric_memory.prompt_point = ego_intersection
                         e_memory.egocentric_memory.focus_point = object_center  # Look at object
                         composite_enaction = Enaction(self.workspace.actions[ACTION_SWIPE], e_memory)
+
                 # If robot-object-target are aligned and object in front of robot
-                elif abs(object_center[1]) <= 30:
+                elif abs(object_center[1]) < ARRANGE_ALIGNED_Y_MAX_OBJECT:
                     # If robot_direction also aligned with target by less than 10°
                     # subtract the radius of the robot and of the object
                     push_vector = vector.set_length(ego_target, np.linalg.norm(ego_target) - ROBOT_FLOOR_SENSOR_X -
                                                     ARRANGE_OBJECT_RADIUS)
                     self.workspace.memory.egocentric_memory.prompt_point = push_vector  # ego_target
-                    # if math.fabs(math.atan2(ego_target[1], ego_target[0])) < 0.17:  # 0.349:
                     # Push toward target
-                    # self.workspace.memory.egocentric_memory.focus_point = ego_target.copy()  # Look at destination
                     e_memory = self.workspace.memory.save()
                     e_memory.egocentric_memory.prompt_point = np.array([ego_target[0] - ROBOT_FLOOR_SENSOR_X -
                                                                         ARRANGE_OBJECT_RADIUS, 0, 0])
-                    e_memory.egocentric_memory.focus_point = object_center  # Look at object
+                    e_memory.egocentric_memory.focus_point = ego_target  # Look at target
                     composite_enaction = Enaction(self.workspace.actions[ACTION_FORWARD], e_memory, caution=1)
                     self.step = STEP_ALIGN
                 # If robot-object-target are aligned but object not in front of robot
@@ -196,14 +196,16 @@ class DeciderArrange(Decider):
             return False
 
         # If focus too far from terrain center then don't arrange object
-        terrain_point = self.workspace.memory.egocentric_to_terrain_centric(self.workspace.memory.egocentric_memory.focus_point)
+        terrain_point = self.workspace.memory.egocentric_to_terrain_centric(
+            self.workspace.memory.egocentric_memory.focus_point)
         # print("Focus in terrain-centric coordinates", terrain_point)
         if np.linalg.norm(terrain_point) > ARRANGE_MAX_RADIUS:
             print("Focus too far from terrain center:", np.linalg.norm(terrain_point))
             return False
 
         # If object farther than target point then don't arrange object
-        ego_target = self.workspace.memory.terrain_centric_to_egocentric(self.workspace.memory.phenomenon_memory.arrange_point())
+        ego_target = self.workspace.memory.terrain_centric_to_egocentric(
+            self.workspace.memory.phenomenon_memory.arrange_point())
         # print("Ego focus", self.egocentric_memory.focus_point)
         # if object is closer than target point (minus the radius to prevent keeping pushing)
         if self.workspace.memory.egocentric_memory.focus_point[0] > ego_target[0] - ARRANGE_OBJECT_RADIUS:
@@ -220,4 +222,5 @@ class DeciderArrange(Decider):
 
     def is_to_withdraw(self):
         """Return True if the robot is too close to the target point"""
-        return np.linalg.norm(self.workspace.memory.terrain_centric_to_egocentric(self.workspace.memory.phenomenon_memory.arrange_point())) < 300
+        return np.linalg.norm(self.workspace.memory.terrain_centric_to_egocentric(
+            self.workspace.memory.phenomenon_memory.arrange_point())) < 300

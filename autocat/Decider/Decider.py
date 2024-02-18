@@ -37,22 +37,22 @@ class Decider:
 
         # Call the sequence learning mechanism to select the next action
         action = self.select_action(enaction)
+        e_memory = self.workspace.memory.save()
+        e_memory.emotion_code = EMOTION_HAPPY
 
         # Set the spatial modifiers
         if action.action_code in [ACTION_TURN]:
             # Turn to the direction of the focus
-            if enaction.outcome_code == OUTCOME_FOCUS_TOO_FAR or \
-                    self.workspace.memory.egocentric_memory.focus_point is None:
+            if enaction.outcome_code == OUTCOME_FOCUS_TOO_FAR or e_memory.egocentric_memory.focus_point is None:
                 # If focus TOO FAR or None then turn around
-                self.workspace.memory.egocentric_memory.prompt_point = np.array([-100, 0, 0], dtype=int)
+                e_memory.egocentric_memory.prompt_point = np.array([-100, 0, 0], dtype=int)
             else:
-                self.workspace.memory.egocentric_memory.prompt_point = \
-                    self.workspace.memory.egocentric_memory.focus_point.copy()
+                e_memory.egocentric_memory.prompt_point = self.workspace.memory.egocentric_memory.focus_point.copy()
         else:
-            self.workspace.memory.egocentric_memory.prompt_point = None
+            e_memory.egocentric_memory.prompt_point = None
 
         # Add the enaction to the stack
-        return Enaction(action, self.workspace.memory.save())
+        return Enaction(action, e_memory)
 
     def select_action(self, enaction):
         """The sequence learning mechanism that proposes the next action"""

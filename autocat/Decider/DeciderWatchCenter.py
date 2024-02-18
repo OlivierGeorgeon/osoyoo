@@ -37,11 +37,11 @@ class DeciderWatchCenter(Decider):
         ego_arrange_point = self.workspace.memory.terrain_centric_to_egocentric(
             self.workspace.memory.phenomenon_memory.arrange_point())
 
+        e_memory = self.workspace.memory.save()
+        e_memory.emotion_code = EMOTION_SAD
+
         # If far from watch point then go to watch point
         if np.linalg.norm(ego_watch_point) > 200:
-            e_memory = self.workspace.memory.save()
-            # self.workspace.memory.egocentric_memory.prompt_point = \
-            #     self.workspace.memory.allocentric_to_egocentric(self.workspace.memory.phenomenon_memory.watch_point())
             e_memory.egocentric_memory.prompt_point = ego_watch_point
             e_memory.egocentric_memory.focus_point = None
             # First enaction: turn to the prompt
@@ -52,16 +52,14 @@ class DeciderWatchCenter(Decider):
             e2 = Enaction(self.workspace.actions[ACTION_SCAN], e1.predicted_memory.save(), span=10)
             composite_enaction = CompositeEnaction([e0, e1, e2])  # Scan because it often miss an object
 
-        # If facing arrange point then WATCH ahead
+        # If facing arrange point then WATCH arrange point
         elif abs(math.atan2(ego_arrange_point[1], ego_arrange_point[0])) < 0.349:
-            e_memory = self.workspace.memory.save()
             e_memory.egocentric_memory.prompt_point = None
-            e_memory.egocentric_memory.focus_point = np.array([200, 0, 0])
+            e_memory.egocentric_memory.focus_point = ego_arrange_point
             composite_enaction = Enaction(self.workspace.actions[ACTION_WATCH], e_memory)
 
         # If not facing arrange point then turn to arrange point
         else:
-            e_memory = self.workspace.memory.save()
             e_memory.egocentric_memory.prompt_point = ego_arrange_point
             e_memory.egocentric_memory.focus_point = ego_arrange_point
             composite_enaction = Enaction(self.workspace.actions[ACTION_TURN], e_memory)

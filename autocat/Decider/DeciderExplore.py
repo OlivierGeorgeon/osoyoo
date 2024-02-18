@@ -88,22 +88,12 @@ class DeciderExplore(Decider):
         return outcome
 
     def select_enaction(self, enaction):
-        """Return the next intended interaction"""
-        # Tracing the last interaction
-        # if self.action is not None:
-        #     print("Action: " + str(self.action) + ", Anticipation: " + str(self.anticipated_outcome) +
-        #           ", Outcome: " + str(outcome))
-
-        # Compute a specific outcome TODO improve this
+        """Propose the next enaction"""
 
         if self.workspace.memory.phenomenon_memory.terrain_confidence() == 0:
             return None
 
         outcome_code = self.outcome(enaction)
-
-        # Compute the next prompt point
-
-        # It is assumed that the terrain has been found if this decider is activated
 
         e1, e2 = None, None
 
@@ -112,6 +102,7 @@ class DeciderExplore(Decider):
             # If right or left then swipe to home
             if outcome_code in [OUTCOME_LEFT, OUTCOME_RIGHT]:
                 e_memory = self.workspace.memory.save()
+                e_memory.emotion_code = EMOTION_RELAXED
                 if outcome_code == OUTCOME_RIGHT:
                     e_memory.egocentric_memory.prompt_point = np.array([0, 280, 0], dtype=int)  # Swipe to the right
                     e_memory.egocentric_memory.focus_point = np.array([280, 280, 0], dtype=int)
@@ -119,13 +110,13 @@ class DeciderExplore(Decider):
                     e_memory.egocentric_memory.prompt_point = np.array([0, -280, 0], dtype=int)
                     e_memory.egocentric_memory.focus_point = np.array([280, -280, 0], dtype=int)
                 # print("Swiping to confirmation by:", ego_confirmation)
-                # self.workspace.memory.egocentric_memory.prompt_point = ego_confirmation
                 e1 = Enaction(self.workspace.actions[ACTION_SWIPE], e_memory)
                 self.workspace.startup_sound.play()
             # If not left or right we need to manoeuvre
             else:
                 # If near home then go to confirmation prompt
                 e_memory = self.workspace.memory.save()
+                e_memory.emotion_code = EMOTION_RELAXED
                 if self.workspace.memory.is_near_terrain_origin() or outcome_code == OUTCOME_COLOR:
                     polar_confirmation = self.workspace.memory.phenomenon_memory.phenomena[TER].confirmation_prompt()
                     # print("Enacting confirmation sequence to", polar_confirmation)
@@ -155,13 +146,13 @@ class DeciderExplore(Decider):
             self.ter_prompt = quaternion.apply_to_vector(self.explore_angle_quaternion, self.ter_prompt)
             # When the terrain has not been recognized, add the terrain radius
             if self.workspace.memory.phenomenon_memory.terrain_confidence() < PHENOMENON_RECOGNIZED_CONFIDENCE:
-                # self.ter_prompt += self.workspace.memory.phenomenon_memory.phenomenon_categories[TER].north_east_point
                 ego_prompt = self.workspace.memory.terrain_centric_to_egocentric(self.ter_prompt +
-                    self.workspace.memory.phenomenon_memory.phenomena[TER].origin_direction_quaternion
-                    * Vector3([-TERRAIN_RADIUS[self.workspace.arena_id]["radius"], 0, 0]))
+                             self.workspace.memory.phenomenon_memory.phenomena[TER].origin_direction_quaternion
+                             * Vector3([-TERRAIN_RADIUS[self.workspace.arena_id]["radius"], 0, 0]))
             else:
                 ego_prompt = self.workspace.memory.terrain_centric_to_egocentric(self.ter_prompt)
             e_memory = self.workspace.memory.save()
+            e_memory.emotion_code = EMOTION_RELAXED
             e_memory.egocentric_memory.prompt_point = ego_prompt
             e_memory.egocentric_memory.focus_point = None  # Prevent unnatural head movement
             self.prompt_index += 1

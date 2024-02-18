@@ -46,7 +46,9 @@ def outcome_code(memory, trajectory, outcome):
             code = OUTCOME_FOCUS_TOO_CLOSE
 
     # LOST FOCUS: DeciderCircle and DeciderArrange will scan again
-    if trajectory.focus_confidence <= CONFIDENCE_NEW_FOCUS:  # enaction.lost_focus:
+    if trajectory.focus_confidence == CONFIDENCE_NO_FOCUS:
+        code = OUTCOME_NO_FOCUS
+    elif trajectory.focus_confidence <= CONFIDENCE_NEW_FOCUS:  # enaction.lost_focus:
         code = OUTCOME_LOST_FOCUS
 
     # If TOUCH then override the focus outcome

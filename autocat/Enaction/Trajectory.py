@@ -46,14 +46,13 @@ class Trajectory:
 
     def track_displacement(self, intended_yaw, outcome):
         """Compute the displacement from the duration1, yaw, floor, impact"""
-        # The displacement --------
 
         # Translation integrated from the action's speed multiplied by the duration1
         self.translation = self.speed * outcome.duration1 / 1000
 
         # The yaw quaternion
         if outcome.yaw is None:
-            # If the yaw is not measured then use predicted yaw TODO recompute yaw if floor
+            # If the yaw is not measured then use predicted yaw
             self.yaw_quaternion = Quaternion.from_z_rotation(math.radians(intended_yaw))
         else:
             self.yaw_quaternion = Quaternion.from_z_rotation(math.radians(outcome.yaw))
@@ -134,17 +133,16 @@ class Trajectory:
         if self.focus_point is not None:
             if new_focus is not None:
                 # The error between the expected and the actual position of the echo
-                new_focus_direction, new_focus_distance = point_to_echo_direction_distance(new_focus)
-                prediction_focus_point = matrix44.apply_to_vector(self.displacement_matrix, self.focus_point)
-                prediction_focus_direction, prediction_focus_distance = \
-                    point_to_echo_direction_distance(prediction_focus_point)
-                prediction_error_focus = prediction_focus_point - new_focus
-                self.focus_direction_prediction_error = prediction_focus_direction - new_focus_direction
-                self.focus_distance_prediction_error = prediction_focus_distance - new_focus_distance
+                new_focus_a, new_focus_d = point_to_echo_direction_distance(new_focus)
+                # prediction_focus_point = matrix44.apply_to_vector(self.displacement_matrix, self.focus_point)
+                prediction_focus_a, prediction_focus_d = point_to_echo_direction_distance(self.focus_point)
+                self.focus_direction_prediction_error = prediction_focus_a - new_focus_a
+                self.focus_distance_prediction_error = prediction_focus_d - new_focus_d
+                prediction_error_focus = self.focus_point - new_focus
                 # If the new focus is near the previous focus or the displacement has been continuous.
                 if np.linalg.norm(prediction_error_focus) < FOCUS_MAX_DELTA or outcome.status == "continuous":
                     # The focus has been kept
-                    # print("Focus kept with prediction error", prediction_error_focus, "moved to ", new_focus)
+                    print("Focus kept with prediction error", prediction_error_focus, "moved to ", new_focus)
                     self.focus_confidence = CONFIDENCE_CONFIRMED_FOCUS
                 else:
                     # The focus was lost
@@ -185,7 +183,3 @@ class Trajectory:
             self.focus_confidence = CONFIDENCE_TOUCHED_FOCUS
             # print("Catch focus impact", self.focus_point)
 
-        # # Move the prompt -----
-        # if self.prompt_point is not None:
-        #     self.prompt_point = matrix44.apply_to_vector(self.displacement_matrix, self.prompt_point).astype(int)
-        #     print("trajectory prompt 1", self.prompt_point)

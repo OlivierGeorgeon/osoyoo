@@ -208,14 +208,4 @@ class Workspace:
         # If no message then keep the previous one
         if message_string is not None:
             self.message = Message(message_string)
-            # self.message.ego_quaternion = self.message.body_quaternion.cross(self.memory.body_memory.body_quaternion.inverse)
-            # if self.message.ter_position is not None:
-            #     # If position in terrain and this robot knows the position of the terrain
-            #     if self.memory.phenomenon_memory.terrain_confidence() > TERRAIN_INITIAL_CONFIDENCE:
-            #         self.message.ego_position = self.memory.terrain_centric_to_egocentric(self.message.ter_position)
-            #     else:
-            #         # If cannot place the robot then flush the message
-            #         self.message = None
-            # else:
-            #     # If only focus position was received then we assume this robot is in the other's focus
-            #     self.message.ego_position = self.memory.polar_egocentric_to_egocentric(self.message.polar_ego_position)
+
