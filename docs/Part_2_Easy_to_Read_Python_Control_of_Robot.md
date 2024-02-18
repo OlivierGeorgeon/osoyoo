@@ -336,7 +336,29 @@ Go to the GitHub repository Arduino-MPU6050
 
 https://github.com/jarzebski/Arduino-MPU6050
 
-On the Arduino IDE click 'Sketch' and then 'Include Library' then 'ADD Zip Library'. Then select the zip file for the repository. This will get stored as a new library in your IDE.
+You need to copy this repository into a zip file.
+
+Here is a quick way.
+
+Make sure you have Git installed on your computer. 
+
+https://git-scm.com/downloads
+
+(Git is a version control system, i.e., tracks changes being made to the source code as software is developed. In the early days of software development, people would have to back up this and that part of their programs, either manually or via simple batch files. It often became quite complicated to keep track what changes were backed up and where, in order to recover, for example, software to an earlier version if there were some issues with the current version. Then automated version control systems started to appear. Git is a distributed version control system (each developer actually has a complete copy of the repository and all the software changes made to the code in it, and thus a software developer can work offline without immediate access to some central computer server holding the code). Git was created by Linus Torvalds (famous as being the creator and lead developer of the Linux operating system) for developers to use while working on pieces of the Linux system, and became a standard software tool used in the industry. Git allows easy branching and merging of pieces of the software with automatic documentation of who committed what pieces of software.)
+
+At the command line (e.g., Windows in my case) write: 
+
+>git clone https://github.com/jarzebski/Arduino-MPU6050
+
+![clonempu6050](clonempu6050.png)
+
+You will now see on your computer (Windows PC in my case) a folder with the repository copied.
+
+Now use WinZip or an equivalent zip tool to zip the folder. In my case I ended up with the file "Arduino-MPU6050.zip"
+
+![savezip](savezip.png)
+
+As mentioned above, oOn the Arduino IDE click 'Sketch' and then 'Include Library' then 'ADD Zip Library'. Then select the zip file for the repository which will be "Arduino-MPU6050.zip". This will get stored as a new library in your IDE.
 
 
 --See What Libraries Have Been Installed--
@@ -351,7 +373,12 @@ Arduino JSON
 
 Aduino-HMC5883L
 
+Arduino-MPU6050
+
 Wifi-Esp
+
+![contriblibs](contriblibs.png)
+
 
 At the time of this writing the project is specified to use these libraries:
 
