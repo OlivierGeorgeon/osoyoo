@@ -313,7 +313,9 @@ Do the same for the "Adafruit TCS34725 by Adafruit" library, and click to instal
 
 Thus at this point when you search for Installed libraries you should see this on the Library Manager:
 
-![installedlibs](installedlibs.png)
+![![Uploading image.png…]()
+
+![libsinstalled](libsinstalled.png)
 
 -
 -
