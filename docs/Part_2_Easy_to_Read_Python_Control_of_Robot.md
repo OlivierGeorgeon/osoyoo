@@ -360,7 +360,7 @@ Now use WinZip or an equivalent zip tool to zip the folder. In my case I ended u
 
 ![savezip](savezip.png)
 
-As mentioned above, oOn the Arduino IDE click 'Sketch' and then 'Include Library' then 'ADD Zip Library'. Then select the zip file for the repository which will be "Arduino-MPU6050.zip". This will get stored as a new library in your IDE.
+As mentioned above, on the Arduino IDE click 'Sketch' and then 'Include Library' then 'ADD Zip Library'. Then select the zip file for the repository which will be "Arduino-MPU6050.zip". This will get stored as a new library in your IDE.
 
 
 --See What Libraries Have Been Installed--
