@@ -426,7 +426,7 @@ The ATmega2560 chip is made by MicroChip Technology which does not reveal the ma
 
 Understanding of the complex technologies that allow inexpensive chips to power the Arduino board in the robot car is not required, but should be appreciated. And thus we move onto the title of this section, that due to the complex technologies doing all the hard work for us behind the scenes, all we really need to know is simple electronics to do great things with the Arduino board powering our robot car project.
 
-If you vaguely recall the electronics you learned in high school physics, that is more than enough to do amazing things with the Arduino board.
+If you vaguely recall the electronics you learned in high school physics class (or an after-school program perhaps, or on your own somewhere in your academic journey), that is more than enough to do amazing things with the Arduino board.
 
 You should know how to build a circuit, e.g., attach a light bulb to one end of a battery, and the other end to the other end of the battery so that you have a circuit.
 
