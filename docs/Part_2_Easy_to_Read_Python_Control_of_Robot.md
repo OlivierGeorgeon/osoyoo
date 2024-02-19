@@ -635,7 +635,7 @@ Note: I have some 220 ohm resistors in my electronics workshop but no 150 ohm re
 
 Let's put one of the leads of the (220 ohm) resistor into the GND (ground) pin which you can see labelled at the 4th pin from the right edge (i.e., the edge closest to the USB socket). Then let's attach the other lead of the resistor to the negative lead of the LED with the jumper cable.
 
-![resis150](resis150.jpg)
+![resistorground](resistorground.png)
 
 (This photo was taken after the code was written and uploaded to the Arduino -- the green LED was on while the photo was snapped. Note the black electronics jumper attaching to the negative lead of the LED with the other lead of the resistor.
 
