@@ -506,7 +506,7 @@ In any case, your brain is being stimulated at 40Hz which might enhance your cog
 
 (Even if you are not a known risk for photosensitive, it is best to perform this demonstration in a well-lit room (reduces contrast with the red flashing LED) and do not stare at the LED, and do not do so for extended periods of time. Again, we did this project for fun, and not to test out a medical therapy.)
 
-If it doesn't seem that the LED is flashing, try this quick trick. Put a '1' in front of the 12msec delay times. Thus the delay will be 120 + 120 =~ loop of 250msec, i.e., 4Hz which you will easily be able to perceive as flashing:
+If it doesn't seem that the LED is flashing, try this quick trick. Put a '0' after the 12msec delay times. Thus the delay will be 120 + 120 =~ loop of 250msec, i.e., 4Hz which you will easily be able to perceive as flashing:
 
 ![code4Hz](code4Hz.png)
 
