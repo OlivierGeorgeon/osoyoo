@@ -521,7 +521,7 @@ There is no code in the setup() function. Let's remove it. (Which you can do by 
 
 ![commentoutsetup](commentoutsetup.png)
 
-No click the button to compile and upload the code. What happens?
+Now click the button to compile and upload the code. What happens?
 
 You will get a compilation error. When the code is linked together by compiler toolchain, it expects to see a setup() function.
 
