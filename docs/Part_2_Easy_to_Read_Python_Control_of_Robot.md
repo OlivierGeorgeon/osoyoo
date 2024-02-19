@@ -517,21 +517,19 @@ I left off the semi-colon at line 4. What will the compiler do? You should try t
 ![line4](line4.png)
 
 Note: Image is taken from older code. Please make the flash rate 0.125Hertz for these compiler experiments.
+-
+
 
 
 Here's what happens when I click the green upload arrow on the Arduino IDE:
 
 ![line4compile](line4compile.png)
 
-Note: Image is taken from older code. Please make the flash rate 0.125Hertz for these compiler experiments.
-
 Restore the code, i.e., put the semi-colon back at the end of line 4, and press the upload button. Now everything should compile and upload to the Arduino board successfully.
 
 Let's try something else. In line 13 write 'low' rather than 'LOW' in the delay() function. Click the upload button. What happens?
 
 ![lownodeclare](lownodeclare.png)
-
-Note: Image is taken from older code. Please make the flash rate 0.125Hertz for these compiler experiments.
 
 The program is expecting to see something it knows the value of. It doesn't know what 'low' means in this function.
 
@@ -540,6 +538,7 @@ Restore your code. Now move line 4 (i.e, pinMode) and insert it after line 10. T
 ![pinmodemoved](pinmodemoved.png)
 
 Note: Image is taken from older code. Please make the flash rate 0.125Hertz for these compiler experiments.
+-
 
 It should work ok.
 
@@ -548,6 +547,7 @@ There is no code in the setup() function. Let's remove it. (Which you can do by 
 ![commentoutsetup](commentoutsetup.png)
 
 Note: Image is taken from older code. Please make the flash rate 0.125Hertz for these compiler experiments.
+-
 
 Now click the button to compile and upload the code. What happens?
 
