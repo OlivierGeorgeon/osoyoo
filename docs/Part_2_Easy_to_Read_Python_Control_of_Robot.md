@@ -481,7 +481,7 @@ Some people may perceive the LED to be continuously on rather than flashing. (Th
 
 If it doesn't seem that the LED is flashing, try this quick trick. Put a '1' in front of the 12msec delay times. Thus the delay will be 120 + 120 =~ loop of 250msec, i.e., 4Hz which you will easily be able to perceive as flashing:
 
-[code4Hz](code4Hz.png)
+![code4Hz](code4Hz.png)
 
 If you can't see flashing at 4Hz you need to troubleshoot the code and the Arduino board.
 
@@ -497,11 +497,11 @@ Ok.... let's experiment with the code syntax and the compiler a little bit.
 
 I left off the semi-colon at line 4. You should try this too.
 
-[line4](line4.png)
+![line4](line4.png)
 
 Here's what happens when I click the green upload arrow on the Arduino IDE:
 
-[line4compile](line4compile.png)
+![line4compile](line4compile.png)
 
 Restore the code, i.e., put the semi-colon back at the end of line 4, and press the upload button. Now everything should compile and upload to the Arduino board successfully.
 
