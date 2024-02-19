@@ -653,7 +653,7 @@ Let's see what happens.....
 
 ![resistorground](resistorground.png)
 
-Success!! The new green LED flashes once each 8 seconds.
+Success!! The new green LED flashes once each 8 seconds (on 2 seconds then off 6 seconds).
 
 You have mastered simple C/C++ coding for the Arduino and simple electronics for the Arduino. You should feel great -- it's ok to throw yourself another celebration :)
 
