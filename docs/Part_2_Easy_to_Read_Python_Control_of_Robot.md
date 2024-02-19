@@ -658,7 +658,7 @@ Success!! The new green LED flashes once each 8 seconds.
 You have mastered simple C/C++ coding for the Arduino and simple electronics for the Arduino. You should feel great -- it's ok to throw yourself another celebration :)
 
 
-![successpic](successpic.png)
+![successpicfemale](successpicfemale.png)
 
 -
 -
