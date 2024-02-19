@@ -404,7 +404,7 @@ In Step 4, we describe experiments where there is a relatively fast flashing lig
 
 
 
-No, this section title is not a typo. Keep reading, and see how with acquiring very simple C/C++ knowledge (which most readers probably already have) you can possibly prevent or delay Alzheimer's (and possibly other types of) dementia with the robot car.
+No, this section title is not a typo. Keep reading, and see how with acquiring very simple C/C++ knowledge (which most readers probably already have) one could possibly prevent or delay Alzheimer's (and possibly other types of) dementia with the robot car. (CAUTION: We will only do this theoretically as part of learning some new coding. We will NOT build anything therapeutic or anything to be used seriously.)
 
 As we discussed in Part I, the Arduino IDE uses a C++ compiler (the GNU GCC toolchain for the particular microcontroller being used) -- it compiles C and C++ code. Thus, Arduino programs are really C/C++ code.
 
@@ -438,7 +438,7 @@ There is an LED on the Arduino board already wired up to digital output D13. If 
 
 ![stimulate40Hz](stimulate40hz.jpg)
 
-Ok.... let's start writing our program to flash an LED at 40Hz (and improve cognitive function maybe?)
+Ok.... let's start writing our program to flash an LED at 40Hz (and improve cognitive function maybe?) (CAUTION: We will only do this theoretically as part of learning some new coding. We will NOT build anything therapeutic or anything to be used seriously.)
 
 Go to the Arduino IDE. Click File. Click New Sketch. A new window should pop up on your screen. (You can close the Arduino IDE screen in the background.)
 
@@ -493,36 +493,36 @@ Alternative code to consider if you are at photosensitive risk for seizures. Als
 -
 -
 
-
 Click the green right facing arrow at the top of the screen (i.e., compile and upload code to the Arduino board).
 
-The red LED on the Wi-Fi shield (reflecting the status of the D13 pin) will now flash at 40Hz. (Or if you did the alternative demonstration, it will gently come on for 2 seconds and then go off for 6 seconds, and repeat.)
+The red LED on the Wi-Fi shield (reflecting the status of the D13 pin) will now flash at 40Hz. (Or if you did the alternative demonstration, it will gently come on for 2 seconds and then go off for 6 seconds, and repeat.) DO NOT STARE AT THE LED. USE IN A WELL LIT-ROOM. READ THE WARNINGS ABOVE BEFORE BUILDING.
 
 ![flashon](flashon.jpg)
 
 Some people may perceive the  40Hz LED to be continuously on rather than flashing. (The threshold for most of the population to perceive a flashing light is from 15-60Hz.) It also depends on the environment in which the LED is viewed in.
 
-In any case, your brain is being stimulated at 40Hz which might enhance your cognitive function. However, please don't stare at the LED. As mentioned above in the warnings, this is just a fun project. Maybe it can really help or prevent or delay Alzheimer's Disease and other cognitive impairments, or maybe medical research will prove it be ineffective and possibly dangerous. Thus, please don't use it any serious way (and read the warnings about seizure risk above again). 
+In any case, in theory such an apparatus would stimulate the brain at 40Hz which might enhance  cognitive function. However, as mentioned above, this is just a fun project. Maybe it can really help or prevent or delay Alzheimer's Disease and other cognitive impairments, or maybe medical research will prove it be ineffective and possibly dangerous. It was just considered theoretically to help make learning some new coding interesting.
 
-(Even if you are not a known risk for photosensitive, it is best to perform this demonstration in a well-lit room (reduces contrast with the red flashing LED) and do not stare at the LED, and do not do so for extended periods of time. Again, we did this project for fun, and not to test out a medical therapy.)
+For safety, we will now change the code to the safer alternative demonstration of flashing at 0.125Hertz, i.e., once per 8 seconds.
 
-If it doesn't seem that the LED is flashing, try this quick trick. Put a '0' after the 12msec delay times. Thus the delay will be 120 + 120 =~ loop of 250msec, i.e., 4Hz which you will easily be able to perceive as flashing:
+![slowflash](slowflash.png)
 
-![code4Hz](code4Hz.png)
-
-If you can't see flashing at 4Hz then you need to troubleshoot the code and the Arduino board.
+While some people may not be able to see flashing at 40 Hertz, at 0.125 Hertz you should be able to see the light come on and go off. If you can't see this now, then you need to troubleshoot the code and the Arduino board.
 
 
-Ok.... let's experiment with the code syntax and the compiler a little bit. (WARNING: If you are at known risk for photosensitive seizures or for anyone, please change the frequency of blinking to 0.125Hertz as shown above. Also, do not stare at the LED or use in a dark room.) PLEASE MAKE THE FLASH RATE AT 0.125Hertz FOR THESE EXPERIMENTS -- safe and easy to see the LED go on and off at this very slow rate (but give it a few seconds :)
+Ok.... let's experiment with the code syntax and the compiler a little bit. WARNING: Frequency should be at 0.125Hertz for all these experiments.
 
-I left off the semi-colon at line 4. You should try this too.
+I left off the semi-colon at line 4. What will the compiler do? You should try this too.
 
 ![line4](line4.png)
+
 Note: Image is taken from older code. Please make the flash rate 0.125Hertz for these compiler experiments.
+
 
 Here's what happens when I click the green upload arrow on the Arduino IDE:
 
 ![line4compile](line4compile.png)
+
 Note: Image is taken from older code. Please make the flash rate 0.125Hertz for these compiler experiments.
 
 Restore the code, i.e., put the semi-colon back at the end of line 4, and press the upload button. Now everything should compile and upload to the Arduino board successfully.
@@ -530,6 +530,7 @@ Restore the code, i.e., put the semi-colon back at the end of line 4, and press 
 Let's try something else. In line 13 write 'low' rather than 'LOW' in the delay() function. Click the upload button. What happens?
 
 ![lownodeclare](lownodeclare.png)
+
 Note: Image is taken from older code. Please make the flash rate 0.125Hertz for these compiler experiments.
 
 The program is expecting to see something it knows the value of. It doesn't know what 'low' means in this function.
@@ -537,6 +538,7 @@ The program is expecting to see something it knows the value of. It doesn't know
 Restore your code. Now move line 4 (i.e, pinMode) and insert it after line 10. Thus, instead of calling it once at the start of the program you will call it each loop. It is more efficient to just call it once at the start of the program, but this should work too. Give it a try. Upload the program.
 
 ![pinmodemoved](pinmodemoved.png)
+
 Note: Image is taken from older code. Please make the flash rate 0.125Hertz for these compiler experiments.
 
 It should work ok.
@@ -544,6 +546,7 @@ It should work ok.
 There is no code in the setup() function. Let's remove it. (Which you can do by commenting it out.) You should try this too:
 
 ![commentoutsetup](commentoutsetup.png)
+
 Note: Image is taken from older code. Please make the flash rate 0.125Hertz for these compiler experiments.
 
 Now click the button to compile and upload the code. What happens?
