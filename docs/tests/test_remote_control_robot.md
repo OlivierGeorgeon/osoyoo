@@ -33,6 +33,7 @@ Table 1 summarizes the recognized actions. The choice of keys was made for a sta
 These actions are interrupted if the robot detects a black line on the floor or an impact against an obstacle.
 
 Table 1: Main recognized commands
+
 |Action key| Command|
 |---|---|
 | 1 | Turn in the spot to the left by 45°|
@@ -59,6 +60,7 @@ Some optional fields only apply to some commands indicated in the _Command_ colu
 | `"duration"` | 2, 4, 8| Optional | The duration of the translation in milliseconds| 
 | `"angle"` | 1 | Optional | The angle of rotation in degrees. Negative angles turn right |
 | `"span"` | - | Optional | The span of the saccades during the scan in degrees |
+| `"caution"` | 8 | Optional | =1: move cautiously means stopping when touching an object|
 
 During the interaction, the robot will keep its head towards the focus point defined by `"focus_x"` and `"focus_y"` coordinates. 
 
@@ -68,6 +70,7 @@ Table 3 summarizes the main fields sent by the robots in the outcome packet.
 Some fields are not returned for all the interactions.
 
 Table 3: Main outcome fields.
+
 |Field| Description |
 |---|---|
 | `"clock"` | The clock sent back for checking | 
@@ -82,3 +85,4 @@ Table 3: Main outcome fields.
 | `"duration"` | Total duration of the interaction in ms. | 
 | `"impact"` | Impact event triggered by the IMU board: 0: None, 1: left, 2: right, 3: front. | 
 | `"echoes"` | The array of echoes gathered during scanning. | 
+| `"touch"` | The touch sensor senses an object in front of the robot (to be documented)|
