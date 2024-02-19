@@ -397,6 +397,9 @@ At the time of this writing the project is specified to use these libraries:
 ![seizurewarn](seizurewarn.png)
 In Step 4, we describe experiments where there is a relatively fast flashing light. There is a risk in sensitive individuals of triggering seizures (as well as migraines). If this applies to you or you have any risk towards seizures, do NOT flash the light at high speed -- instructions are given below for flashing the LED at a much lower rate. (Triggering seizures in photosensitive individuals is increased by exposure to a frequency of 5 to 30 Hertz (it can still occur at 40 Hertz), bright lights, high contrast, and the duration of exposure. A frequency of 0.125 Hertz (one gentle turn on of the LED every 8 seconds) in a well-lit room is used in the alternative demonstration.)
 
+WARNING: This is written for an intended target audience of educated researchers in cognitive science and artificial intelligence, who might be interested in a theoretical aspect of approaching cognition as a means to help them learn new coding/system details. It is not written as a do-it-yourself therapeutic project and it is not written for those not educated in the field.
+
+
 -
 
 **Step #4 --Simple C/C++ Coding and (Possibly) Preventing Dementia**
@@ -485,6 +488,8 @@ This is what my program looks like:
 
 ![seizurewarn](seizurewarn.png)
 Although the LED is low-power, this still represents a relatively fast flashing light. There is a risk in sensitive individuals of triggering seizures (as well as migraines). If this applies to you or you have any risk towards seizures, do NOT flash the light at high speed -- instructions are given below for flashing the LED at a much lower rate. (Triggering seizures in photosensitive individuals is increased by exposure to a frequency of 5 to 30 Hertz  (it can still occur at 40 Hertz), bright lights, high contrast, and the duration of exposure. A frequency of 0.125 Hertz (one gentle turn on of the LED every 8 seconds) in a well-lit room (to reduce contrast) is used in the alternative demonstration.)
+
+WARNING: This is written for an intended target audience of educated researchers in cognitive science and artificial intelligence, who might be interested in a theoretical aspect of approaching cognition as a means to help them learn new coding/system details. It is not written as a do-it-yourself therapeutic project and it is not written for those not educated in the field.
 
 ![slowflash](slowflash.png)
 
