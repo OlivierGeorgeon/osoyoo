@@ -504,9 +504,9 @@ The red LED on the Wi-Fi shield (reflecting the status of the D13 pin) will now 
 
 ![flashon](flashon.jpg)
 
-Some people may perceive the  40Hz LED to be continuously on rather than flashing. (The threshold for most of the population to perceive a flashing light is from 15-60Hz.) It also depends on the environment in which the LED is viewed in.
+Some people may perceive the  40Hz LED to be continuously on rather than flashing. (The threshold for most of the population to perceive a flashing light is from 15-60Hz.) It also depends on the environment in which the LED is viewed in. PLEASE DO NOT STARE AT THE LED. PLEASE USE IN A WELL-LIT ROOM. PLEASE HEED ALL WARNINGS GIVEN ABOVE.
 
-In any case, in theory such an apparatus would stimulate the brain at 40Hz which might enhance  cognitive function. However, as mentioned above, this is just a fun project. Maybe it can really help or prevent or delay Alzheimer's Disease and other cognitive impairments, or maybe medical research will prove it be ineffective, despite positive trials at the time of writing. It was just considered theoretically here to help make learning some new coding interesting.
+In any case, in theory such an apparatus would stimulate the brain at 40Hz which might enhance  cognitive function. However, as mentioned above, this is just a fun project. Maybe it can really help or prevent or delay Alzheimer's Disease and other cognitive impairments, or maybe medical research will prove it to be ineffective, despite positive trials at the time of writing. It was just considered theoretically here to help make learning some new coding interesting. (Please do not use in any serious manner.)
 
 For safety, we will now change the code to the safer alternative demonstration of flashing at 0.125Hertz, i.e., once per 8 seconds.
 
