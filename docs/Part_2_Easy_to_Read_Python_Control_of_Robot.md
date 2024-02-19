@@ -507,7 +507,7 @@ Restore the code, i.e., put the semi-colon back at the end of line 4, and press 
 
 Let's try something else. In line 13 write 'low' rather than 'LOW' in the delay() function. Click the upload button. What happens?
 
-[lownodeclare](lownodeclare.png)
+![lownodeclare](lownodeclare.png)
 
 The program is expecting to see something it knows the value of. It doesn't know what 'low' means in this function.
 
