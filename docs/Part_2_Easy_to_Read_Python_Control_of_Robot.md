@@ -651,7 +651,7 @@ This is my code:
 
 Let's see what happens.....
 
-![resis150.jpg]
+![resistorground](resistorground.png)
 
 Success!! The new green LED flashes once each 8 seconds.
 
