@@ -395,7 +395,7 @@ At the time of this writing the project is specified to use these libraries:
 
 
 ![seizurewarn](seizurewarn.png)
-In Step 4, we describe experiments where there is a relatively fast flashing light. There is a risk in sensitive individuals of triggering seizures (as well as migraines). If this applies to you or you have any risk towards seizures, do NOT flash the light at high speed -- instructions are given below for flashing at much lower, safer rate.
+In Step 4, we describe experiments where there is a relatively fast flashing light. There is a risk in sensitive individuals of triggering seizures (as well as migraines). If this applies to you or you have any risk towards seizures, do NOT flash the light at high speed -- instructions are given below for flashing the LED at a much lower rate. (Triggering seizures in photosensitive individuals is increased by exposure to a frequency of 5 to 30 Hertz, bright lights, high conrast, and the duration of exposure. A frequency of 0.125 Hertz (one gentle turn on of the LED every 8 seconds) in a well-lit room is used in the alternative demonstration.)
 
 -
 
@@ -480,9 +480,21 @@ This is what my program looks like:
 
 ![flashsketch](flashsketch.png)
 
+-
+-
+
+![seizurewarn](seizurewarn.png)
+In Step 4, we describe experiments where there is a relatively fast flashing light. There is a risk in sensitive individuals of triggering seizures (as well as migraines). If this applies to you or you have any risk towards seizures, do NOT flash the light at high speed -- instructions are given below for flashing the LED at a much lower rate. (Triggering seizures in photosensitive individuals is increased by exposure to a frequency of 5 to 30 Hertz, bright lights, high conrast, and the duration of exposure. A frequency of 0.125 Hertz (one gentle turn on of the LED every 8 seconds) in a well-lit room (to reduce contrast) is used in the alternative demonstration.)
+
+Alternative code to consider if you are at photosensitive risk for seizures. Also use the demonstration in well-lit room to reduce contrast with the brightness of the LED. Also, do not stare at the LED and do not look at it for very long.
+
+-
+-
+
+
 Click the green right facing arrow at the top of the screen (i.e., compile and upload code to the Arduino board).
 
-The red LED on the Wi-Fi shield (reflecting the status of the D13 pin) will now flash at 40Hz.
+The red LED on the Wi-Fi shield (reflecting the status of the D13 pin) will now flash at 40Hz. (Or if you did the alternative demonstration, it will gently come on for 2 seconds and then go off for 6 seconds, and repeat.)
 
 ![flashon](flashon.jpg)
 
@@ -496,13 +508,12 @@ If you can't see flashing at 4Hz you need to troubleshoot the code and the Ardui
 
 Assuming you could see flashing at 4Hz, now restore the code back to the delays of 12msec so we have 40Hz flashing. Click the green arrow and upload the restored code back to the Arduino board of your robot car.
 
-Can you perceive a bit of flashing now? Maybe? In any case, your brain is being stimulated at 40Hz which might enhance your cognitive function. However, please don't stare at the LED. As mentioned above in the warnings, this is just a fun project. Maybe it can really help or prevent or delay Alzheimer's Disease and other cognitive impairments, or maybe medical research will prove it be ineffective and possibly dangerous. Thus, please don't use it any serious way (and read the warnings above again).
+Can you perceive a bit of flashing now? Maybe? In any case, your brain is being stimulated at 40Hz which might enhance your cognitive function. However, please don't stare at the LED. As mentioned above in the warnings, this is just a fun project. Maybe it can really help or prevent or delay Alzheimer's Disease and other cognitive impairments, or maybe medical research will prove it be ineffective and possibly dangerous. Thus, please don't use it any serious way (and read the warnings about seizure risk above again). 
 
-Before we end the Step, lets play with the code and compiler a little bit.
+(Even if you are not a known risk for photosensitive, it is best to perform this demonstration in a well-lit room (reduces contrast with the red flashing LED) and do not stare at the LED, and do not do so for extended periods of time. Again, we did this project for fun, and not to test out a medical therapy.)
 
-First, let's figure out at what frequency you can perceive the 40Hz visual stimulation. Adjust the delay values and upload the code. For example, if 4Hz was flashing but 40Hz was not, try 20Hz, and then if that works, try 30Hz and if that doesn't work for you (i.e., it seems the red LED is solid rather than flashing) try 25Hz, and so on. For myself, I was able to perceive flashing best at above 14 + 14 + 1 = 29msec per loop, i.e., under 35Hz. Faster than that, I was not sure if I saw distinct flashing or imagined it.
 
-Ok.... let's experiment with the code syntax and the compiler a little bit. 
+Ok.... let's experiment with the code syntax and the compiler a little bit. (WARNING: If you are at known risk for photosensitive seizures or for anyone, please change the frequency of blinking to 0.125Hertz as shwon above. Also, do not stare at the LED or use in a dark room.)
 
 I left off the semi-colon at line 4. You should try this too.
 
