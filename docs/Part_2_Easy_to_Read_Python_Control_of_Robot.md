@@ -437,7 +437,7 @@ Ok.... the LED on the Arduino board on the robot car is wired up to digital pin 
 
 If you look closely at the Wi-Fi shield there is an "LED13"  (the printing is scraped off a bit in the photo below) on this shield which reflects the state of the D13 pin:
 
-![flashoff](flashoff.pn)
+![flashoff](flashoff.png)
 
 First of all, all Arduino programs need to have a setup() function and a loop() function. (In my Arduino IDE, when I click new sketch I actually get an Arduino code template with these two functions already in place, albeit empty with no lines of code inside.)
 
