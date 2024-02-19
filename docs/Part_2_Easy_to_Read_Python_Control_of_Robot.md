@@ -471,7 +471,6 @@ The brown line on the resistor means '1'. The next green line means '5'. The nex
 
 ![Resistor_4_band_Table](Resistor_4_band_Table.png)
 
-![colcode](colcode.png)
 
 This is a circuit with a voltage source, a switch at the positive side of the battery, a resistor, and an LED. When the switch closes the LED comes on. You can think of a digital output of the Arduino board as the switch with a 5 Volt positive voltage on it. When the digital output goes 'HIGH' on the Arduino board, it effectively closes like the mechanical switch does (although it doesn't have any mechanical moving parts, of course) and current flows around in this circuit.
 
