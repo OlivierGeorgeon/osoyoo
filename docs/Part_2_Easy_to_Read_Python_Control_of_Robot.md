@@ -500,7 +500,7 @@ The red LED on the Wi-Fi shield (reflecting the status of the D13 pin) will now 
 
 ![flashon](flashon.jpg)
 
-Some people may perceive the  40Hz LED to be continuously on rather than flashing. (The threshold for most of the population to perceive a flashing light is from 15-60Hz.) It also depends on the environment in whcih the LED is viewed in.
+Some people may perceive the  40Hz LED to be continuously on rather than flashing. (The threshold for most of the population to perceive a flashing light is from 15-60Hz.) It also depends on the environment in which the LED is viewed in.
 
 In any case, your brain is being stimulated at 40Hz which might enhance your cognitive function. However, please don't stare at the LED. As mentioned above in the warnings, this is just a fun project. Maybe it can really help or prevent or delay Alzheimer's Disease and other cognitive impairments, or maybe medical research will prove it be ineffective and possibly dangerous. Thus, please don't use it any serious way (and read the warnings about seizure risk above again). 
 
