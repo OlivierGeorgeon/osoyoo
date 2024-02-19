@@ -513,33 +513,38 @@ If it doesn't seem that the LED is flashing, try this quick trick. Put a '0' aft
 If you can't see flashing at 4Hz then you need to troubleshoot the code and the Arduino board.
 
 
-Ok.... let's experiment with the code syntax and the compiler a little bit. (WARNING: If you are at known risk for photosensitive seizures or for anyone, please change the frequency of blinking to 0.125Hertz as shown above. Also, do not stare at the LED or use in a dark room.) PLEASE LEAVE THE FLASH RATE AT 0.125Hertz FOR THESE EXPERIMENTS -- safe and easy to see the LED go on and off at this very slow rate (but give it a few seconds :)
+Ok.... let's experiment with the code syntax and the compiler a little bit. (WARNING: If you are at known risk for photosensitive seizures or for anyone, please change the frequency of blinking to 0.125Hertz as shown above. Also, do not stare at the LED or use in a dark room.) PLEASE MAKE THE FLASH RATE AT 0.125Hertz FOR THESE EXPERIMENTS -- safe and easy to see the LED go on and off at this very slow rate (but give it a few seconds :)
 
 I left off the semi-colon at line 4. You should try this too.
 
 ![line4](line4.png)
+Note: Image is taken from older code. Please make the flash rate 0.125Hertz for these compiler experiments.
 
 Here's what happens when I click the green upload arrow on the Arduino IDE:
 
 ![line4compile](line4compile.png)
+Note: Image is taken from older code. Please make the flash rate 0.125Hertz for these compiler experiments.
 
 Restore the code, i.e., put the semi-colon back at the end of line 4, and press the upload button. Now everything should compile and upload to the Arduino board successfully.
 
 Let's try something else. In line 13 write 'low' rather than 'LOW' in the delay() function. Click the upload button. What happens?
 
 ![lownodeclare](lownodeclare.png)
+Note: Image is taken from older code. Please make the flash rate 0.125Hertz for these compiler experiments.
 
 The program is expecting to see something it knows the value of. It doesn't know what 'low' means in this function.
 
 Restore your code. Now move line 4 (i.e, pinMode) and insert it after line 10. Thus, instead of calling it once at the start of the program you will call it each loop. It is more efficient to just call it once at the start of the program, but this should work too. Give it a try. Upload the program.
 
 ![pinmodemoved](pinmodemoved.png)
+Note: Image is taken from older code. Please make the flash rate 0.125Hertz for these compiler experiments.
 
 It should work ok.
 
 There is no code in the setup() function. Let's remove it. (Which you can do by commenting it out.) You should try this too:
 
 ![commentoutsetup](commentoutsetup.png)
+Note: Image is taken from older code. Please make the flash rate 0.125Hertz for these compiler experiments.
 
 Now click the button to compile and upload the code. What happens?
 
