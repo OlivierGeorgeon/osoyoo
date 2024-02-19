@@ -429,10 +429,108 @@ There is an LED on the Arduino board already wired up to digital output D13. If 
 
 ![stimulate40Hz](stimulate40hz.jpg)
 
+Ok.... let's start writing our program to flash an LED at 40Hz (and improve cognitive function maybe?)
+
+Go to the Arduino IDE. Click File. Click New Sketch. A new window should pop up on your screen. (You can close the Arduino IDE screen in the background.)
+
+Ok.... the LED on the Arduino board on the robot car is wired up to digital pin output 13 already (i.e., it is already soldered directly on the board from the factory -- no discrete wires are necessary). Even if you have much experience coding in C/C++ how do you get the LED to start flashing?  Writing a C/C++ program for Arduino is similar but still different enough than writing C/C++ code that goes to a monitor or other computers.
+
+If you look closely at the Wi-Fi shield there is an "LED13"  (the printing is scraped off a bit in the photo below) on this shield which reflects the state of the D13 pin:
+
+![flashoff](flashoff.pn)
+
+First of all, all Arduino programs need to have a setup() function and a loop() function. (In my Arduino IDE, when I click new sketch I actually get an Arduino code template with these two functions already in place, albeit empty with no lines of code inside.)
+
+The setup() function runs only once when the Arduino board is powered up (or reset). After the setup() function finishes its programmed tasks (i.e., whatever you tell it to do) it then automatically calls the loop() function.
+
+The loop() function runs over and over again (hence, its name of 'loop'). In our case, we want the Arduino board to flash an LED (for a fraction of second, but long enough to see hopefully) and then wait a certain delay. At that point the code gets to the end of the loop and starts again. We program the delay so that the loop runs 40 times each second, and thus the LED is flashing at 40Hz (which was our goal above.)
+
+Before you start coding this project your Arduino IDE screen should look like this:
 
 
-# under construction#
+![blanksketch](blanksketch.png)
 
+You can name the Sketch (i.e., program) whatever you'd like -- just click on the right side to the tabs and rename the tab. As you can see I called my program (i.e., my Sketch) "flash_40Hz". (You don't have to, and can use the default name the Arduino IDE choses for you.)
+
+Even if you have coded in C/C++ before, the Arduino board uses particular functions. Let's review some of them right now.
+
+-pinMode(pin, mode) -- It tells Arduino IDE that a specific pin should be configured to behave as an input (mode=INPUT) or an output (mode=OUTPUT).
+
+-digitalWrite(pin, value) -- It tells a particular pin on the Arduino board to go to value=LOW or value=HIGH. If value is HIGH then the pin will go to 5 volts (the voltage used in the Arduino board in the robot car) and thus if an LED is attached the LED will turn on. If the vlaue is LOW then the pin will go to ground (i.e., 0 volts).
+
+-delay(value) -- It tells the Arduino microcontroller to stop running the program for the specified delay (in milliseconds) and then once the delay period is over to continue executing the program.
+(An advanced way of doing this is using the millis() function to return the number of milliseconds that have elapsed and so the Arduino board can be checking other inputs or doing other things rather than just totally shutting down, as occurs with the delay() function.)
+
+-Also, in C/C++ coding and in Arduino programs, a double forward slash, i.e., //, means a comment -- text you write which is for other human programmers (or you at a later time when you might have forgotten what the code is supposed to do), and which the computer ignores
+
+-Also, in C/C++ coding and in Arduino programs, lines of code typically end with a semicolon, i.e., ;  (although if a loop or if/then is being specified then after the 'if', 'for' or 'while' keyword, there will be braces, e.g.,  for (int i =0; i<5; i++) { ...... lines of code here }
+
+Now that you know what the structure of an Arduino program looks like and now that you know these very important functions (well, important for programming Arduino boards), try to write an Arduino program that blinks the LED on the robot car's Arduino board.
+
+This is what my program looks like:
+
+![flashsketch](flashsketch.png)
+
+Click the green right facing arrow at the top of the screen (i.e., compile and upload code to the Arduino board).
+
+The red LED on the Wi-Fi shield (reflecting the status of the D13 pin) will now flash at 40Hz.
+
+![flashon](flashon.jpg)
+
+Some people may perceive the LED to be continuously on rather than flashing. (The threshold for most of the population to perceive a flashing light is from 15-60Hz.) It also depends on the environment in whcih the LED is viewed in.
+
+If it doesn't seem that the LED is flashing, try this quick trick. Put a '1' in front of the 12msec delay times. Thus the delay will be 120 + 120 =~ loop of 250msec, i.e., 4Hz which you will easily be able to perceive as flashing:
+
+[code4Hz](code4Hz.png)
+
+If you can't see flashing at 4Hz you need to troubleshoot the code and the Arduino board.
+
+Assuming you could see flashing at 4Hz, now restore the code back to the delays of 12msec so we have 40Hz flashing. Click the green arrow and upload the restored code back to the Arduino board of your robot car.
+
+Can you perceive a bit of flashing now? Maybe? In any case, your brain is being stimulated at 40Hz which might enhance your cognitive function. However, please don't stare at the LED. As mentioned above in the warnings, this is just a fun project. Maybe it can really help or prevent or delay Alzheimer's Disease and other cognitive impairments, or maybe medical research will prove it be ineffective and possibly dangerous. Thus, please don't use it any serious way (and read the warnings above again).
+
+Before we end the Step, lets play with the code and compiler a little bit.
+
+First, let's figure out at what frequency you can perceive the 40Hz visual stimulation. Adjust the delay values and upload the code. For example, if 4Hz was flashing but 40Hz was not, try 20Hz, and then if that works, try 30Hz and if that doesn't work for you (i.e., it seems the red LED is solid rather than flashing) try 25Hz, and so on. For myself, I was able to perceive flashing best at above 14 + 14 + 1 = 29msec per loop, i.e., under 35Hz. Faster than that, I was not sure if I saw distinct flashing or imagined it.
+
+Ok.... let's experiment with the code syntax and the compiler a little bit. 
+
+I left off the semi-colon at line 4. You should try this too.
+
+[line4](line4.png)
+
+Here's what happens when I click the green upload arrow on the Arduino IDE:
+
+[line4compile](line4compile.png)
+
+Restore the code, i.e., put the semi-colon back at the end of line 4, and press the upload button. Now everything should compile and upload to the Arduino board successfully.
+
+Let's try something else. In line 13 write 'low' rather than 'LOW' in the delay() function. Click the upload button. What happens?
+
+[lownodeclare](lownodeclare.png)
+
+The program is expecting to see something it knows the value of. It doesn't know what 'low' means in this function.
+
+Restore your code. Now move line 4 (i.e, pinMode) and insert it after line 10. Thus, instead of calling it once at the start of the program you will call it each loop. It is more efficient to just call it once at the start of the program, but this should work too. Give it a try. Upload the program.
+
+![pinmodemoved](pinmodemoved.png)
+
+It should work ok.
+
+There is no code in the setup() function. Let's remove it. (Which you can do by commenting it out.) You should try this too:
+
+![commentoutsetup](commentoutsetup.png)
+
+No click the button to compile and upload the code. What happens?
+
+You will get a compilation error. When the code is linked together by compiler toolchain, it expects to see a setup() function.
+
+Restore your code, i.e., uncomment the setup() function. Everything should work well now again, i.e., the code compiles and uploads to the Arduino board.
+
+-
+-
+-
+-
 
 
 **Step #5 --Simple Electronics Is All You Need (to do great things with the robot car project)**
@@ -486,6 +584,12 @@ Note that the flat surface of the LED goes to the negative part of the power sou
 
 # under construction#
 information below taken from Olivier's GitHub documentation, and will be incorporated into the documentation
+
+
+
+
+
+
 
 
 # 1   install libraries into IDE #
