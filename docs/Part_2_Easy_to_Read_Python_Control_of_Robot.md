@@ -565,7 +565,9 @@ Restore your code, i.e., uncomment the setup() function. Everything should work 
 
 **Step #5 --Simple Electronics Is All You Need (to do great things with the robot car project)**
 
+
 --The Incredible Complexity of the Electronics Behind the Arduino Board--
+
 
 No, the electronics in the Arduino board is not simple. (Note: If English is not your first language, or if you are an automated grammar checker, you are probably saying the grammar is incorrect here. However, the word "electronics" really means at this point in common usage "electronics technology" which is correctly treated as non-plural.) It (i.e., the electronics in this Arduino board) actually represents an incredible fusion of human scientific and engineering knowledge. Making chips requires advanced mathematics, advanced chemical engineering, advanced materials science, advanced quantum mechanics, advanced radio frequency electrical engineering, advanced circuit electrical engineering, advanced computational design, advanced optical physics, advanced manufacturing engineering, and on and on. It is a triumph of human creativity and cooperation to produce the commonplace chips (these days) we can inexpensively have running the Arduino boards such as the one used in the robot car project.
 
@@ -584,7 +586,10 @@ The chip in the Arduino Mega board on the robot car project is an ATmega2560 chi
 The ATmega2560 chip is made by MicroChip Technology which does not reveal the manufacturing technology details but the chip is a modern chip believed to be fabricated at the 90nm or 65nm node (i.e. equivalent) feature size (very economical node sizes at the time of this writing versus the very expensive 4nm node size discussed above used by Apple for the A16), in contrast to the 10,000nm element size used by the first Intel 8008 (quasi) 8-bit chips. As well the ATmega2560 has a host of modern features such as including  within the one chip all the components needed for flash memory, SRAM, digital input and output, analog input and output, etc. 
 
 
+
 --SIMPLE ELECTRONICS IS ALL YOU NEED (SOMETIMES)--
+
+
 Understanding of the complex technologies that allow inexpensive chips to power the Arduino board in the robot car is not required, but should be appreciated. And thus we move onto the title of this section, that due to the complex technologies doing all the hard work for us behind the scenes, all we really need to know is simple electronics to do great things with the Arduino board powering our robot car project. 
 
 (Reality check-- Simple electronics is fine for now. But in reality, whenever you want to do interesting projects in the real world in any subject, more knowledge is always better, including more knowledge of electronics.)
