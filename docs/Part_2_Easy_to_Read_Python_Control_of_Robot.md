@@ -467,6 +467,8 @@ A green LED has a voltage drop of about 2 volts therefore there will be 3 volts 
 
 The brown line on the resistor means '1'. The next green line means '5'. The next brown line means 1 zero after that, i.e., 150 ohms. (The last gold line means the resistor is +/- 5% of this value):
 
+![resis150](resis150.jpg)
+
 ![Resistor_4_band_Table](Resistor_4_band_Table.png)
 
 ![colcode](colcode.png)
