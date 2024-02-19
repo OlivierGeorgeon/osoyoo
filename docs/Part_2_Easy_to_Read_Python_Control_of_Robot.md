@@ -543,7 +543,7 @@ There is no code in the setup() function. Let's remove it. (Which you can do by 
 
 Now click the button to compile and upload the code. What happens?
 
-You will get a compilation error. When the code is linked together by compiler toolchain, it expects to see a setup() function.
+You will get a compilation error. When the code is linked together by the compiler toolchain, it expects to see a setup() function.
 
 Restore your code, i.e., uncomment the setup() function. Everything should work well now again, i.e., the code compiles and uploads to the Arduino board.
 
