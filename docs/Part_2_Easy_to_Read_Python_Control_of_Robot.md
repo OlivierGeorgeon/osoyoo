@@ -716,7 +716,7 @@ If you look at the upper right corner of the IDE you will see a circle with some
 
 --CONDITIONAL BRANCHING:  THE 'IF' STATEMENT--
 
-Any programming language needs a conditional branch, and most, like C/C++ have an 'if' statement.
+Any programming language needs a conditional branch, and most, like C/C++, have an 'if' statement.
 
 Let's try to code an example where we don't need to give the program any inputs (since we haven't learned the functions required to do that, yet).
 
@@ -729,6 +729,23 @@ Here's the simple code I used to do this:
 Here's the output seen at the Serial Monitor:
 
 ![fibmsg](fibmsg.png)
+
+
+-- SPECIFYING ITERATION : 'FOR', 'WHILE' STATEMENTS--
+
+Just about all programming languages have control flow statements which specify iteration. The 'for' statement is a common looping structure and is included in C/C++.
+
+Many languages, including C/C++, also support looping with a 'while' loop. If we don't know the range or number of iterations (as we often do when using a 'For' loop), then a 'while' loop is a good choice for iteration.
+
+Try to use these statements in your own code.
+
+Below the code above has been modified so that it prints out (i.e., on the Serial Monitor) "reset" five times each time the variables are reset (to keep variable 'a' less than 100).
+
+![forloop](forloop.png)
+
+You can see that "reset" is printed out five times when the variables are reset:
+
+![formsg](formsg.png)
 
 
 
