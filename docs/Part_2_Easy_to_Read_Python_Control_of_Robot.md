@@ -724,7 +724,7 @@ Start with the numbers 0 and 1, and compute a Fibonacci series (i.e., add the la
 
 Here's the simple code I used to do this:
 
-!fibcode](fibcode.png)
+![fibcode](fibcode.png)
 
 Here's the output seen at the Serial Monitor:
 
