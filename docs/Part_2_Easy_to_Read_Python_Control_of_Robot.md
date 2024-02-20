@@ -73,7 +73,7 @@ The big picture (i.e., overview) of the project is: The Python module PetitCat.p
 ![bigpicture with new name for python code](bigpicture_newname.png)
 
 
-Nomenclature
+--NOMENCLATURE--
 
 As this project evolves, names used to describe various parts of the project may change, although they will describe the same piece of code or the same folder of code, etc.
 
@@ -134,11 +134,11 @@ Before you start this step you need to find out the following information about 
 
 Go to Lesson 5 in the Osoyoo Manual.
 
----Hardware Installation--
+---HARDWARE INSTALLATION--
 
 The Wi-Fi shield was installed into the Arduino board above when the robotic car was first built. Thus, there should not be anything for you to do with regard to hardware installation.
 
---Wiring Installation--
+--WIRING INSTALLATION--
 
 Similarly, we already made the wiring changes in the Step in Part I when we tried out the Wi-Fi board. Thus, there should not be anything for you do now with regard to wiring.
 
@@ -156,7 +156,7 @@ Previously (should already be done) wiring changes to make:
 ![wificlose](wificlose.png)
 
 
---Software Installation--
+--SOFTWARE INSTALLATION--
 
 --Library Software--
 
@@ -294,7 +294,8 @@ In this Step we will learn how to use the Arduino IDE library manager, and we wi
 
 An Arduino library is essentially C++ code consisting of various C++ classes and functions that perform some related function. For example, a Wi-Fi library would provide functionality with regard to sending and receiving information via Wi-Fi. For example, a JSON library would provide functionality with regard to JSON operations. (JSON is a popular data format which simply consists of (key:value) pairs. However, the key-value pairs can be nested and structured and held in arrays. Although verbose, it is human readable.) For example, a JSON library would help with parsing JSON data, generating JSON data and processing JSON data.
 
---Installing Libraries from within the Arduino IDE Ecosystem--
+
+--INSTALLING LIBRARIES FROM WITHIN THE ARDUINO IDE ECOSYSTEM--
 
 Your Arduino IDE should still be on from the previous step. (If not, open up the Arduino IDE.)
 
@@ -318,7 +319,7 @@ Thus at this point when you search for Installed libraries you should see this o
 ![libsinstalled](libsinstalled.png)
 
 
---Manually Installing Third-Party Libraries --
+--MANUALLY INSTALLING THIRD-PARTY LIBRARIES--
 
 There is another library you must install -- the HLC5883L compass function library. (The HMC5883L is a three-axis (x,y,z) digital compass/magnetometer module that is installed and used later as part of the project. It is based on orthogonally situated magnetoresistive sensors. It provides raw data related to measured magnetic fields and does not adjust the outputs for variations in the Earth's magnetic field required for more accurate navigation. By the 1800's ships housed the ship's compass in a binnacle which contained soft iron spheres or sometimes actual magnets to help counteract the ship's magnetic fields -- something you can see if you ever look at old ships or visit museums. In modern ships there is GPS correction of the compass to deal with the deviations in the field in different locations on Earth.)
 
@@ -406,6 +407,9 @@ WARNING: This is written for an intended target audience of educated researchers
 
 No, this section title is not a typo. Keep reading, and see how with acquiring very simple C/C++ knowledge (which most readers probably already have) one could possibly prevent or delay Alzheimer's (and possibly other types of) dementia with the robot car. (CAUTION: We will only do this theoretically as part of learning some new coding. We will NOT build anything therapeutic or anything to be used seriously.)
 
+
+--C/C++ IN THE ARDUINO ENVIRONMENT--
+
 As we discussed in Part I, the Arduino IDE uses a C++ compiler (the GNU GCC toolchain for the particular microcontroller being used) -- it compiles C and C++ code. Thus, Arduino programs are really C/C++ code.
 
 Learning to code in C and C++ is beyond the scope of this tutorial, and in any case most readers probably already have some experience in this area. However, this and the next Step (or two.... pending editing of how much material to include) is just to make sure that readers with limited experience in C/C++  feel a bit more comfortable with the code (as well as some idiosyncracies about Arduino program structure). 
@@ -428,6 +432,9 @@ For readers with no background in C/C++ consider the many excellent and free (or
 
 You do not need to be able to code in C/C++. The purpose of the PetitCat project is to construct an interface that will allow your thousands of lines of Python code to communicate with the robot car, and then use this ability for various cognitive science/AI experiments and demonstrations. However, given that the robot car is powered by C/C++ code, understanding a tiny bit about C/C++ can be helpful in understanding how we make the robot car communicate with the Python programs.
 
+
+--FLASHING LIGHTS AND POSSIBLE IMPROVED COGNITION?? --
+
 Ok... above it was written "....Keep reading, and see how with acquiring very simple C/C++ knowledge you can possibly prevent or delay Alzheimer's (and possibly other types of) dementia with the robot car."  You may be thinking, 'Was this just clickbait to keep me reading your boring paragraphs?'  Well.... no :)  Ok.... so then you may think, 'Are you going to write now that by using my brain to learn something new (like the material in your boring paragraphs above and learning some C/C++ coding below) that will prevent or delay dementia and my brain will stay extra healthy?'  Well... maybe. Any intellectual stimulation is good for the brain and lots of studies indicate it may indeed keep the brain much healthier throughout the lifetime. But, no... it's not this. We will really build a more definitive prevention of Alzheimer's (possibly -- research is still lacking -- read the cautions below -- this is just for fun, not for real medical use!!) with our robot car project.
 
 Synchronous acitivity of large groups of neurons generate oscillatory electrical signals which can be measured on the scalp of the head (EEG). It is believed that the synchronous activity of neurons allows different parts of the brain to communicate with each other. (Although.... if you want to consider a more nuanced look at the subject, consider reading- Schneider, H. (2022). Causal cognitive architecture 3: a solution to the binding problem. Cognitive Systems Research, 72, 88-115.) In dementias we see pertubation of the EEG rhythms believed to be needed for cognition. A number of studies have shown that stimulation in the 40-Hz "gamma" EEG range of oscillations can improve Alzheimer's Disease symptoms in mouse models of the disease (Chan, D., Suk, H. J., Jackson, B., Milman, N. P., Stark, D., Beach, S. D., & Tsai, L. H. (2021). Induction of specific brain oscillations may restore neural circuits and be used for the treatment of Alzheimer's disease. Journal of Internal Medicine, 290(5), 993-1009.) A study on humans also showed similar results (e.g., Chan, D., Suk, H. J., Jackson, B. L., Milman, N. P., Stark, D., Klerman, E. B., ... & Tsai, L. H. (2021). Gamma frequency sensory stimulation in probable mild Alzheimer’s dementia patients: results of a preliminary clinical trial.) (There is a warning in the next paragraph -- if this warning has been deleted please do not build this project without reading.)
@@ -437,6 +444,9 @@ There is an LED on the Arduino board already wired up to digital output D13. If 
 (Note: "GENUS" is not a typo for "Genius" but stands for Gamma-Entrainment-Using-Sensory stimuli at 40 Hz)
 
 ![stimulate40Hz](stimulate40hz.jpg)
+
+
+--ARDUINO SKETCH TO FLASH THE ONBOARD LED--
 
 Ok.... let's start writing our program to flash an LED at 40Hz (and improve cognitive function maybe?) (CAUTION: We will only do this theoretically as part of learning some new coding. We will NOT build anything therapeutic or anything to be used seriously.)
 
@@ -512,6 +522,8 @@ For safety, we will now change the code to the safer alternative demonstration o
 While some people may not be able to see flashing at 40 Hertz, at 0.125 Hertz you should be able to see the light come on and go off. If you can't see this now, then you need to troubleshoot the code and the Arduino board.
 
 
+--EXPERIMENTING WITH THE ARDUINO COMPILER (WITHIN THE IDE)--
+
 Ok.... let's experiment with the code syntax and the compiler a little bit. WARNING: Frequency should be at 0.125Hertz for all these experiments.
 
 I left off the semi-colon at line 4. What will the compiler do? You should try this too.
@@ -566,7 +578,7 @@ Restore your code, i.e., uncomment the setup() function. Everything should work 
 **Step #5 --Simple Electronics Is All You Need (to do great things with the robot car project)**
 
 
---The Incredible Complexity of the Electronics Behind the Arduino Board--
+--THE INCREDIBLE COMPLEXITY OF THE ELECTRONICS BEHIND THE ARDUINO BOARD--
 
 
 No, the electronics in the Arduino board is not simple. (Note: If English is not your first language, or if you are an automated grammar checker, you are probably saying the grammar is incorrect here. However, the word "electronics" really means at this point in common usage "electronics technology" which is correctly treated as non-plural.) It (i.e., the electronics in this Arduino board) actually represents an incredible fusion of human scientific and engineering knowledge. Making chips requires advanced mathematics, advanced chemical engineering, advanced materials science, advanced quantum mechanics, advanced radio frequency electrical engineering, advanced circuit electrical engineering, advanced computational design, advanced optical physics, advanced manufacturing engineering, and on and on. It is a triumph of human creativity and cooperation to produce the commonplace chips (these days) we can inexpensively have running the Arduino boards such as the one used in the robot car project.
@@ -585,6 +597,20 @@ The chip in the Arduino Mega board on the robot car project is an ATmega2560 chi
 
 The ATmega2560 chip is made by MicroChip Technology which does not reveal the manufacturing technology details but the chip is a modern chip believed to be fabricated at the 90nm or 65nm node (i.e. equivalent) feature size (very economical node sizes at the time of this writing versus the very expensive 4nm node size discussed above used by Apple for the A16), in contrast to the 10,000nm element size used by the first Intel 8008 (quasi) 8-bit chips. As well the ATmega2560 has a host of modern features such as including  within the one chip all the components needed for flash memory, SRAM, digital input and output, analog input and output, etc. 
 
+
+--INPUT/OUTPUT PIN'S ON THE ARDUINO MEGA 2560--
+
+[pinout](pinout.png)
+
+This diagram shows the pinout's on the Arduino Mega 2560 board in the robot car.
+
+Digital pins can be configured as digital inputs or outputs (as we did in the previous Step in flashing the LED). Pins D0 and D1 are also used for serial communication with the computer via the USB. 
+
+Analog input pins can measure voltages between 0 and 5 volts where are useful to measure analog quantities from various sensors.
+
+The board can supply 5 volts and 3.3 volts. VIN on the other hand is power in, i.e., a 5 volt input supply from a battery for example (as opposed to the 5 volts from the USB connector when attached to a computer).
+
+Note the ground pins -- these are important when we build circuits taking the outputs from digital pins -- the other side of the circuit must return to the ground pin.
 
 
 --SIMPLE ELECTRONICS IS ALL YOU NEED (SOMETIMES)--
@@ -665,11 +691,45 @@ You have mastered simple C/C++ coding for the Arduino and simple electronics for
 -
 -
 
-**Step #6 --Getting More Experience with the Arduino Coding -- r**
+**Step #6 --Getting More Experience with the Arduino Coding --**
 
 Before moving on to consider the Arduino and Python code of the PetitCat project, getting a bit more experience with Arduino coding may be helpful. Again, while you are not expected to do C/C++ coding for the the PetitCat project (indeed, the purpose of PetitCat is to abstract away the C/C++/Arduino coding and let you interface your Python code to the robot car project), learning a bit more simple coding can help you better understand what the project code is doing.
 
-In this Step we will learn .....
+--SERIAL MONITOR--
+
+In a typical C/C++ program on your laptop/desktop it's easy to print the value of variables, etc on your screen, and as such you can see what your program is doing. In the Arduino IDE we can use the Serial Monitor to do something similar.
+
+Serial.begin(baud rate) -- this function sets up serial commmunication between the Arduino board and another computer, in this case your laptop/desktop where the IDE's Serial Monitor is running
+
+Serial.println(variable/constant/string) -- sends the variable, constant or string you specify over the serial connection
+
+Let's add some Serial.println() messages from the previous program flashing the LED to the Serial Monitor in the Arduino IDE.
+
+This is the code I wrote (you should try modifying your previous program and writing something also on your own):
+
+![serialprintcode](serialprintcode.png)
+
+If you look at the upper right corner of the IDE you will see a circle with some dots in it. Click it -- the Serial Monitor will now appear at the bottom of the screen. The serial monitor will display the Serial.println() messages from the Arduino board:
+
+![serialprintmsg](serialprintmsg.png)
+
+
+--CONDITIONAL BRANCHING:  THE 'IF' STATEMENT--
+
+Any programming language needs a conditional branch, and most, like C/C++ have an 'if' statement.
+
+Let's try to code an example where we don't need to give the program any inputs (since we haven't learned the functions required to do that, yet).
+
+Start with the numbers 0 and 1, and compute a Fibonacci series (i.e., add the last number with the previous one). When a three-digit number occurs, stop. Print out all intermediate results on the Serial Monitor.
+
+Here's the simple code I used to do this:
+
+!fibcode](fibcode.png)
+
+Here's the output seen at the Serial Monitor:
+
+![fibmsg](fibmsg.png)
+
 
 
 
