@@ -600,7 +600,7 @@ The ATmega2560 chip is made by MicroChip Technology which does not reveal the ma
 
 --INPUT/OUTPUT PIN'S ON THE ARDUINO MEGA 2560--
 
-[pinout](pinout.png)
+![pinout](pinout.png)
 
 This diagram shows the pinout's on the Arduino Mega 2560 board in the robot car.
 
