@@ -757,9 +757,9 @@ Let's rewrite the code to use the 'While' statement (although the 'For' statemen
 
 ![while](while.png)
 
-This is the output from the Serial Monitor:
+Use the Serial Monitor to take a look at the output of this code.
 
-![whilemsg](whilemsg.png)
+
 
 When you code in another language, e.g. Python, you know that your best friend for debugging programs or seeing how something works, is not an advanced debugger (which are indeed great), but the humble "print" statement. Same thing in the Arduino IDE. If you are not sure if your code is working properly or you want to see how something is working in more detail, use the "Serial.println" statement and the Serial Monitor. For example, if you are not sure about the "While" statement in your code you could write something like this:
 
@@ -776,6 +776,7 @@ Most programming languages provide many mechanisms for abstracting code, especia
 We will continue to improve the previous code that computes Fibonacci series by incorporating a user defined function.
 
 .....
+
 .....
 
 
@@ -784,6 +785,7 @@ We will continue to improve the previous code that computes Fibonacci series by 
 We haven't paid much attention to the style in which we write our Arduino programs, but like other languages, there are ways which are more standard and pleasant for other humans to read your code.
 
 ..........
+
 ..........
 
 
@@ -792,9 +794,13 @@ We haven't paid much attention to the style in which we write our Arduino progra
 We've learned to use the Arduino board for digital outputs, e.g., the built-in function digitalWrite(output pin, LOW/HIGH). Now let's just very basically learn how to use the Arduino board to read a digital input.
 
 ......
+
 ......
 
-
+-
+-
+-
+-
 
 
 **Step #7 --Arduino Analog Inputs and Outputs and Measuring with a Multimeter --**
@@ -811,8 +817,13 @@ If you are working on the Arduino board including working on the robot car proje
 
 
 ......
+
 ......
 
+-
+-
+-
+-
 
 
 
@@ -948,38 +959,75 @@ Compilation error: arduino_secrets.h: No such file or directory
 --SUCCESSFULLY COMPILING THE PROJECT REPO IN THE ARDUINO IDE--
 
 .....
+
 .....
+
+-
+-
+-
+-
 
 **Step #9 --Preliminary Testing of the PetitCat Code: Python <--> Arduino --**
 
 .....
+
 .....
+-
+-
+-
+-
 
 **Step #10 --Installing the Digital Compass and Intertial Measurement Unit --**
 
 .....
+
 .....
 
+-
+-
+-
+-
 
 **Step #11 --Installing the Color Sensor --**
 
 ......
+
 ......
+-
+-
+-
+-
 
 
 **Step #12  --Full Testing of the PetitCat Code: Python <--> Arduino --**
 
 ......
+
 ......
+-
+-
+-
+-
 
 **Step #13  --Using the PetitCat Code: Active Inference  --**
 .....
+
 .....
+-
+-
+-
+-
 
 
 **Step #14  --Using PetitCat for AI and Cognitive Science: Part III  --**
 .....
+
 .....
+-
+-
+-
+-
+
 
 
 
