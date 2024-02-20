@@ -765,7 +765,7 @@ When you code in another language, e.g. Python, you know that your best friend f
 
 ![whiledebug](whiledebug.png)
 
-Most readers probably have already had thousands of hours of experience of debugging and refactoring code, so this tutorial may seem childish (although still useful to quickly learn some features of the way Arduino code operates), but if you don't have this background experience, use the "Serial.println" statement and experiment and debug code. Unless you take a formal course somewhere on writing C/C++ code and using high-level debugging tools, you are going to have to learn this material on your own -- the "Serial.println" statement will be your best friend :)
+Most readers probably have already had thousands of hours of experience of debugging and refactoring code, so this tutorial may seem childish (although still useful to quickly learn some features of the way Arduino code operates), but if you don't have this background experience, use the "Serial.println" statement and experiment and debug code. The "Serial.println" statement will become your best friend :)
 
 ![bestfriends](bestfriends.png)
 
