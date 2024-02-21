@@ -965,15 +965,16 @@ We can manually include any files in subdirectories via the include statement #i
 
 Thus, in the main ino program "petitcat_arduino.ino we add the line #include "src/wifi/arduino_secrets.h" :
 
-![secret](secret.h)
+![secret](secret.png)
 
-Let's compile again -- click
+Let's compile again -- click the green checkmark (verify button) near the left-hand corner of the Arduino IDE main screen. 
 
 This time we get this error:
 
-.....
 
-.....
+....
+
+....
 
 Using library Arduino-HMC5883L-dev in folder: C:\Users\howar\OneDrive\Documents\Arduino\libraries\Arduino-HMC5883L-dev (legacy)
 
@@ -984,7 +985,7 @@ exit status 1
 Compilation error: no matching function for call to 'HMC5883L::setOffset(int, int)'
 
 
-
+# under construction#
 
 
 --SUCCESSFULLY COMPILING THE PROJECT REPO IN THE ARDUINO IDE--
@@ -1062,7 +1063,7 @@ Compilation error: no matching function for call to 'HMC5883L::setOffset(int, in
 
 
 
-# under construction#
+
 
 
 
