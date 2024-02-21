@@ -922,8 +922,13 @@ In my case it did not -- "compilation error: arduino_secrets.h: no such file or 
 
 ![secretsh](secretsh.png)
 
+-
+-
 
 --TROUBLESHOOTING  #1 COMPILATION ERRORS--
+-
+-
+
 
 Ok.... the program did not compile. Let's look at the extended compiler messages, and start troubleshooting:
 
@@ -990,16 +995,20 @@ Now to make the Arduino IDE access these files in subdirectories we need to manu
 
 Let's compile again -- click the green checkmark (verify button) near the left-hand corner of the Arduino IDE main screen. 
 
-The previous secret.h issue seems to be resolved (well.... the compiler did not generate an error message about it). But there is another error.
+The previous secret.h issue seems to be resolved (well.... the compiler did not generate an error message about it). 
 
 But.... we got another compilation error:
 
 "Compilation error: no matching function for call to 'HMC5883L::setOffset(int, int)'"
 
-
+-
+-
 --TROUBLESHOOTING  #2 COMPILATION ERRORS--
+-
+-
 
-Ok.... let's start troubleshooting by looking at the extended compiler messages and error:
+
+Ok.... let's start troubleshooting by looking at the extended compiler messages and error generated:
 
 ---------------------------------------------------
 
