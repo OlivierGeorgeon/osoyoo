@@ -922,48 +922,68 @@ In my case it did not -- "compilation error: arduino_secrets.h: no such file or 
 
 ![secretsh](secretsh.png)
 
-Thus, look at the extended compiler messages, and start troubleshooting.
+
+--TROUBLESHOOTING  #1 COMPILATION ERRORS--
+
+Ok.... the program did not compile. Let's look at the extended compiler messages, and start troubleshooting:
+
+---------------------------------------------------
 
 FQBN: arduino:avr:uno
+
 Using board 'uno' from platform in folder: C:\Users\howar\AppData\Local\Arduino15\packages\arduino\hardware\avr\1.8.6
+
 Using core 'arduino' from platform in folder: C:\Users\howar\AppData\Local\Arduino15\packages\arduino\hardware\avr\1.8.6
 
-Detecting libraries used...
-C:\Users\howar\AppData\Local\Arduino15\packages\arduino\tools\avr-gcc\7.3.0-atmel3.6.1-arduino7/bin/avr-g++ -c -g -Os -w -std=gnu++11 -fpermissive -fno-exceptions -ffunction-sections -fdata-sections -fno-threadsafe-statics -Wno-error=narrowing -flto -w -x c++ -E -CC -mmcu=atmega328p -DF_CPU=16000000L -DARDUINO=10607 -DARDUINO_AVR_UNO -DARDUINO_ARCH_AVR -IC:\Users\howar\AppData\Local\Arduino15\packages\arduino\hardware\avr\1.8.6\cores\arduino -IC:\Users\howar\AppData\Local\Arduino15\packages\arduino\hardware\avr\1.8.6\variants\standard 
-....
-....
-IC:\Users\howar\AppData\Local\Arduino15\packages\arduino\hardware\avr\1.8.6\libraries\Wire\src -IC:\Users\howar\AppData\Local\Arduino15\libraries\Servo\src -IC:\Users\howar\OneDrive\Documents\Arduino\libraries\Arduino-HMC5883L-dev C:\Users\howar\AppData\Local\Temp\arduino\sketches\F46E52024E025C3DF34C17E974EB4F88\sketch\src\wifi\WifiCat.cpp -o nul
-Alternatives for arduino_secrets.h: []
+..
+
+..
+
 ResolveLibrary(arduino_secrets.h)
+
   -> candidates: []
+  
 C:\Users\howar\OneDrive\Documents\Arduino\osoyoo\petitcat_arduino\src\wifi\WifiCat.cpp:11:10: fatal error: arduino_secrets.h: No such file or directory
+
  #include "arduino_secrets.h"
           ^~~~~~~~~~~~~~~~~~~
+	  
 compilation terminated.
+
 exit status 1
 
 Compilation error: arduino_secrets.h: No such file or directory
 
+---------------------------------------------------
 
---TROUBLESHOOTING  #1 COMPILATION ERRORS--
 
 The file arduino_secrets.h is standard way of storing confidential information such as login passwords (for example, for Wi-Fi networks) that your project will require but you want to keep apart from the other code. In Git systems we can add "arduino_secrets.h" to the .gitignore file and so it will not be uploaded to other repositories.
 
-Indeed, if we explore around the robot car project GitHub repository, we find a file arduino_secrets.h but not containing actual passwords:
+Indeed, if we explore around the robot car project GitHub repository, we find in another folder a file arduino_secrets.h but not containing actual passwords:
+
+---------------------------------------------------
 
 #define SECRET_WIFI_TYPE "STA" // Access point : "AP" pr Station (through router): "STA"
+
 #define SECRET_SSID "Your wifi SSID"
+
 #define SECRET_PASS "Your password"
 
-We will populate these fields once we seriously try out the code with the robot car Arduino board and Wi-Fi shield. For now, we trying to get the code to compile and will leave arduino_secrets.h in this form.
+---------------------------------------------------
 
-We see from the compiler errors that C:\Users\howar\OneDrive\Documents\Arduino\osoyoo\petitcat_arduino\src\wifi\WifiCat.cpp:11:10: fatal error: arduino_secrets.h: No such file or directory -- we need to copy the file arduino_secrets.h to the src subfolder and then in turn to the wifi subfolder, all of the Sketchbook folder. In my computer the Sketchbook folder is c:\Users\howar\OneDrive\Documents\Arduino
+We will populate these fields later once we seriously try out the code with the robot car Arduino board and Wi-Fi shield. For now, we are just trying to get the code to compile and will leave arduino_secrets.h in this form.
 
-Also, the Arduino IDE does not normally support subdirectories in a Sketch -- all the .cpp and .h files should be in the root folder of the main Sketch (i.e., ino file). Thus, unlike in other programming environments, any subdirectories in the Arduino environment have to specially be handled.
+We see from the compiler errors that " C:\Users\howar\OneDrive\Documents\Arduino\osoyoo\petitcat_arduino\src\wifi\WifiCat.cpp:11:10: fatal error: arduino_secrets.h: No such file or directory "
 
-We can manually include any files in subdirectories via the include statement #include along with a relative path.
+Unlike other language development environments where this is taken for granted, the Arduino IDE does not normally support subdirectories in a Sketch -- all the .cpp and .h files should be in the root folder of the main Sketch (i.e., ino file). Thus, unlike in other programming environments, any subdirectories in the Arduino environment have to specially be handled.
 
-Thus, in the main ino program "petitcat_arduino.ino we add the line #include "src/wifi/arduino_secrets.h" :
+In my computer the Sketchbook folder is c:\Users\howar\OneDrive\Documents\Arduino. The root folder is petitcat_arduino -- thus we see the cpp and h files on the Arduino IDE Sketch screen. However, Sketchbook folder also contains a src subfolder which also contains a wifi subfolder.
+
+ --> Therefore, we need to copy the file arduino_secrets.h to the src subfolder and then in turn to the wifi subfolder. We do this.
+
+Now to make the Arduino IDE access these files in subdirectories we need to manually include any files in the root directory's subdirectories via the include statement #include along with a relative path.
+
+--> Therefore, in the main ino program "petitcat_arduino.ino we add the line #include "src/wifi/arduino_secrets.h" :
 
 ![secret](secret.png)
 
@@ -972,17 +992,20 @@ Let's compile again -- click the green checkmark (verify button) near the left-h
 
 The previous secret.h issue seems to be resolved (well.... the compiler did not generate an error message about it). But there is another error.
 
+But.... we got another compilation error:
 
---TROUBLESHOOTING  #1 COMPILATION ERRORS--
-
-We just compiled again the code.
-
-This time we get this error:
+"Compilation error: no matching function for call to 'HMC5883L::setOffset(int, int)'"
 
 
-....
+--TROUBLESHOOTING  #2 COMPILATION ERRORS--
 
-....
+Ok.... let's start troubleshooting by looking at the extended compiler messages and error:
+
+---------------------------------------------------
+
+..
+
+..
 
 Using library Arduino-HMC5883L-dev in folder: C:\Users\howar\OneDrive\Documents\Arduino\libraries\Arduino-HMC5883L-dev (legacy)
 
@@ -992,368 +1015,35 @@ exit status 1
 
 Compilation error: no matching function for call to 'HMC5883L::setOffset(int, int)'
 
+---------------------------------------------------
 
-Ok... let's search for this statement which we find in petitcat_arduino\src\MMC5883.cpp  
+Ok.... so this is essentially a "function not found" error message, i.e., the compiler was not able to find a function setOffset() that belongs to the HMC5883L class.
 
-(You won't find it in the Arduino IDE since the Arduino IDE does not support sub-directories. You need to look at your cloned Osoyoo folder.)
+Ok.... first thing is to make sure that the library HMC5833L is installed. Go to the Arduino IDE. Click Sketch, Include Library. At the bottom we see a list of installed libraries. Yes, HMC5833L library is installed.
 
-What does this file do first of all?
+![libstatus](libstatus.png)
 
-It appears the C++ code in MMC5883.cpp is for the magnetometer sensor library access, i.e., initializing the sensor, updating sensor readings and retrieving magnetic field values in the x,y,z dimenstions, as well as the angle relative to magnetic north. It can also set offsets, i.e., adjust raw magnetic field readings to remove systematic errors (e.g., just as the sailing ships a century ago did by housing their compasses in binnacles and using hard and soft iron balls nearby). The error message seems to be related setting such offsets for the magnetometer sensor. The error message imples ithat the function setOffset(int, int) is either being called incorrectly (e.g., function argument mismatch, etc) or it was not properly defined for the HMC5883L sensor.
+Does this library support a class HMC5883L with a function setOffset() -- given its same name as the class, let's assume it does, but we can always come back here and look into the library more.
 
-HMC5883L::setOffset(int, int) -- :: is a scope resolution operator which specifies here that the function setOffset() is a function defined within the HMC5883L class and that there are two integer parameters
+Take a text editor (I used Notepad++ but ordinary Windows Notepad will work) or another IDE that you use, and take a look at petitcat_arduino\src\MMC5883.cpp since it has a similar name.
 
-Ok... let's look again at the file:
+We find a similar statement:
 
+"void MMC5883MA::setOffset(int xo, int yo)"
 
-#include "MMC5883.h"
-#include <Arduino.h>
-#include <math.h>
-#include <Wire.h>
+But, the error message was about class HMC5833L not MMC5883MA.
 
 
-MMC5883MA::MMC5883MA(){
-  wire = &Wire;
-}
+Ok....let's search the whole repository for 'HMC5883L::setOffset(int, int)'.....
 
-void MMC5883MA::begin()
-{
-    // Olivier: Avoids freezing the main loop
-    wire->setWireTimeout( 25000, true);
+In file robot._define.h we find HMC5883L in the comments besides ROBOT_COMPASS_TYPE 1
 
-    wire->beginTransmission(MMC_ADDRESS);
-    // the address of the register is written first
-    // in this case CONTROL REGISTER 0
-    wire->write(COMPASS_CONFIG_REGISTER);
-    // then the data is written. I nthis case a 1 in the 4th position or hex 0x8
-    wire->write(COMPASS_CONFIG_REGISTER);
-    // end transmission sents a STOP to indicate the end of the WRITE
-    wire->endTransmission();
+In file lmu.cpp
 
-    // now as a verification read the device ID
+In file lmu.h
 
-    wire->beginTransmission(MMC_ADDRESS);
-    // write a 2f to the register to read
-    wire->write(Product_ID);
-    // send a STOP WRITE
-    wire->endTransmission();
-    // this tells the chip to send 1 byte from that register
-    // in i2c this is a START READ
-    wire->requestFrom(MMC_ADDRESS, 1);
-    // we then wait for 1 byte to be recieved
-    while (wire->available() < 1)
-        ;
-    // once the byte arrives we read it.
-    ID = wire->read();
-    //send another STOP READ
-    wire->endTransmission();
-    // print out the ID which is 0x0C
-    Serial.print("ID = ");
-    Serial.println(ID);
-}
 
-void MMC5883MA::calibrate()
-{
-    static int count = 0;
-    Serial.println("Please wait until calibration is done!");
-    while (count < 10000)
-    {
-        wire->beginTransmission(MMC_ADDRESS);
-        wire->write(COMPASS_CONFIG_REGISTER);
-        wire->write(1);
-        wire->endTransmission();
-        // we have to continually read the status register and look for bit zero to go TRUE
-        while ((reg & 1) == 0)
-        {
-            // write the register 0x7
-            wire->beginTransmission(MMC_ADDRESS);
-            wire->write(COMPASS_STATUS_REGISTER);
-            wire->endTransmission();
-            // read 1 byte
-            wire->requestFrom(MMC_ADDRESS, 1);
-            while (wire->available() < 1)
-                ;
-            reg = wire->read();
-            wire->endTransmission();
-            // let the WHILE evaluate the results once a TRUE condition is detected we continue on
-        }
-        // set the read register to 0
-        wire->beginTransmission(MMC_ADDRESS);
-        wire->write(COMPASS_DATA_REGISTER);
-        wire->endTransmission();
-        // request 6 values
-        wire->requestFrom(MMC_ADDRESS, 6);
-        // wait until 6 are recieved
-        while (wire->available() < 6)
-            ;
-        // read the six values
-        // I used shot int to prevent negative number
-        // they all need to be positive
-        xLSB = wire->read();
-        xMSB = wire->read();
-        yLSB = wire->read();
-        yMSB = wire->read();
-        zLSB = wire->read();
-        zMSB = wire->read();
 
-        wire->endTransmission();
-        // shifting a byte left 8 spaces multiplys it by 256 to move it to the
-        // upper byte position in a word. Adding the lsb gives the true number
-        // I used long here to prevent any negatives
-        sx = (long)(xMSB << 8) + xLSB;
-        sy = (long)(yMSB << 8) + yLSB;
-        sz = (long)(zMSB << 8) + zLSB;
-        // on the first pass I just capture the initial values
-        if (count == 0)
-        {
-            xMax = xMin = sx;
-            yMax = yMin = sy;
-            zMax = zMin = sz;
-        }
-        // then I determine if it is a max or a min or neither
-        if (xMax < sx)
-            xMax = sx;
-        if (xMin > sx)
-            xMin = sx;
-        if (yMax < sy)
-            yMax = sy;
-        if (yMin > sy)
-            yMin = sy;
-        if (zMax < sz)
-            zMax = sz;
-        if (zMin > sz)
-            zMin = sz;
-        /*Serial.print("X = ");
-    Serial.print(sx) ; 
-    Serial.print(" Y = ");
-    Serial.print(sy); 
-    Serial.print(" Z = ");
-    Serial.println(sz);*/
-        /*delay(100);*/
-        // just a little debug so I can see how long to go
-        // using the mod operator it limits the output to 10 lines 0 through 9000
-        if ((count % 1000) == 0)
-            Serial.print(".");
-        count++;
-    }
-    Serial.println(".");
-}
-
-void MMC5883MA::update()
-{
-    reg = 0;
-    wire->beginTransmission(MMC_ADDRESS);
-    wire->write(COMPASS_CONFIG_REGISTER);
-    wire->write(1);
-    wire->endTransmission();
-    while ((reg & 1) == 0)
-    {
-        wire->beginTransmission(MMC_ADDRESS);
-        wire->write(COMPASS_STATUS_REGISTER);
-        wire->endTransmission();
-        wire->requestFrom(MMC_ADDRESS, 1);
-        while (wire->available() < 1)
-            ;
-        reg = wire->read();
-        wire->endTransmission();
-    }
-    wire->beginTransmission(MMC_ADDRESS);
-    wire->write(COMPASS_DATA_REGISTER);
-    wire->endTransmission();
-    wire->requestFrom(MMC_ADDRESS, 6);
-    while (wire->available() < 6)
-        ;
-    xLSB = wire->read();
-    xMSB = wire->read();
-    yLSB = wire->read();
-    yMSB = wire->read();
-    zLSB = wire->read();
-    zMSB = wire->read();
-
-    wire->endTransmission();
-    sx = (long)(xMSB << 8) + xLSB;
-    sy = (long)(yMSB << 8) + yLSB;
-    sz = (long)(zMSB << 8) + zLSB;
-
-    //***************************************************************************
-    //  Evaluation time.
-    //***************************************************************************
-    // this read convert the data from garbage to a value from -1.0 to +1.0
-    // this says subrtact the min from the value to shift it to a number starting at zero
-    // subtract the min from the max to create a range
-    // devide the shifted number by that range to give a percent from xero to one
-    // multiply by 2 and subtract 1 giving a number -1.0 to +1.0
-    // the reason this works is simple...
-    // for the x axis when it is pointed north it is at its minimal value
-    // when it is pointed north it is at its max so north is zero south is -1.0
-    // from x only you can't tell east or west
-    // y is 1.0 pointing west and -1.0 pointing east
-    // z is one pointed at the center of the earth and -1 pointing away
-    // these three combined have converted the values to a UNIT SPhere or a sphere with
-    // radius of one.
-
-    x = 2.0 * (float)(sx - xMin) / (float)(xMax - xMin) - 1.0;
-    y = 2.0 * (float)(sy - yMin) / (float)(yMax - yMin) - 1.0;
-    z = 2.0 * (float)(sz - zMin) / (float)(zMax - zMin) - 1.0;
-}
-
-float MMC5883MA::getX()
-{
-    return x;
-}
-
-float MMC5883MA::getY()
-{
-    return y;
-}
-
-float MMC5883MA::getZ()
-{
-    return z;
-}
-
-float MMC5883MA::getAngel()
-{
-    // now that we have x any in units we need for trigonometry
-    // we can create a compass
-    // if you are wanting to make a compass with the chip parallel to the ground
-    // you only have to spin it in the x-y plane z doesnt matter.
-    // when you know the opposite Y and the adjacent X you use arctangent to ge the angle
-
-    // arc tangen is only good for one half the circle. It repeats itself in the other half.
-    // the function is mirrored on the diagonal (math talk)
-    // arctangent is not valid with x = 0.0
-
-    if (x != 0.0)
-    {
-        // if x is positive the we use ther returned angle and convert it to degrees
-        // it is faster just to mutiply with 100/PI already evaluated
-        if (x > 0.0)
-            angle = 57.2958 * atan(y / x);
-
-        // if x is less than 0.0 we have to determine which quardant by looking at Y
-        if (x < 0.0)
-        {
-            // y below zero subtract 180 from the answer
-            if (y < 0.0)
-                angle = 57.2958 * atan(y / x) - 180.0;
-            // y > 0.0 add 180
-            if (y > 0.0)
-                angle = 57.2958 * atan(y / x) + 180.0;
-        }
-    }
-    return angle;
-}
-
-String MMC5883MA::readData()
-{
-    update();
-    String value = "Mag X:";
-    value += x;
-    value += "\tY:";
-    value += y;
-    value += "  \tZ:";
-    value += z;
-    return value;
-}
-
-// Olivier Georgeon for compatibility with HMC5883
-void MMC5883MA::setOffset(int xo, int yo)
-{
-    xOffset = xo;
-    yOffset = yo;
-}
-
-// Olivier Georgeon for compatibility with HMC5883
-Vector MMC5883MA::readRaw(void)
-{
-    update();
-    v.XAxis = (float)sx/5.0 - xOffset;
-    v.YAxis = (float)sy/5.0 - yOffset;
-    v.ZAxis = (float)sy;
-    return v;
-}
-
-Let's look at the header file:
-
-// Adapted by Olivier from:
-// https://reefwing.medium.com/connecting-the-duinotech-3-axis-compass-to-an-arduino-b13c28d7d936
-// https://github.com/Reefwing-Software/MMC5883MA-Arduino-Library
-// 07 April 2023
-
-#include <Arduino.h>
-#include "Wire.h"
-
-#ifndef MMC5883_h
-#define MMC5883_h
-
-#define MMC_ADDRESS 0x30 // I2C address of MMC5883MC
-
-#define COMPASS_CONFIG_REGISTER 0x08
-#define COMPASS_THRESHOLD_REGISTER 0x0B
-#define COMPASS_STATUS_REGISTER 0x07
-#define COMPASS_DATA_REGISTER 0x00
-#define Product_ID 0x2F
-
-#ifndef VECTOR_STRUCT_H
-#define VECTOR_STRUCT_H
-struct Vector
-{
-    float XAxis;
-    float YAxis;
-    float ZAxis;
-};
-#endif
-
-class MMC5883MA
-{
-public:
-    MMC5883MA();
-
-    void begin();
-    void calibrate();
-    String readData();
-    void update();
-    float getX();
-    float getY();
-    float getZ();
-    float getAngel();
-
-    byte ID = 0;
-    int reg = 0;
-    long xMax = 0;
-    long xMin = 0;
-    long yMax = 0;
-    long yMin = 0;
-    long zMax = 0;
-    long zMin = 0;
-
-    unsigned short xLSB;
-    unsigned short xMSB;
-    unsigned short yLSB;
-    unsigned short yMSB;
-    unsigned short zLSB;
-    unsigned short zMSB;
-
-    float x;
-    float y;
-    float z;
-    float angle;
-
-    long sx;
-    long sy;
-    long sz;
-	// Olivier
-	Vector readRaw(void);
-	void setOffset(int xo, int yo);
-	int xOffset, yOffset;
-	Vector v;
-
-private:
-    TwoWire *wire;
-    uint8_t i2c_address;
-};
-#endif
 
 
 
