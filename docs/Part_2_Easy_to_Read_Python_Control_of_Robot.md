@@ -929,21 +929,10 @@ Using board 'uno' from platform in folder: C:\Users\howar\AppData\Local\Arduino1
 Using core 'arduino' from platform in folder: C:\Users\howar\AppData\Local\Arduino15\packages\arduino\hardware\avr\1.8.6
 
 Detecting libraries used...
-C:\Users\howar\AppData\Local\Arduino15\packages\arduino\tools\avr-gcc\7.3.0-atmel3.6.1-arduino7/bin/avr-g++ -c -g -Os -w -std=gnu++11 -fpermissive -fno-exceptions -ffunction-sections -fdata-sections -fno-threadsafe-statics -Wno-error=narrowing -flto -w -x c++ -E -CC -mmcu=atmega328p -DF_CPU=16000000L -DARDUINO=10607 -DARDUINO_AVR_UNO -DARDUINO_ARCH_AVR -IC:\Users\howar\AppData\Local\Arduino15\packages\arduino\hardware\avr\1.8.6\cores\arduino -IC:\Users\howar\AppData\Local\Arduino15\packages\arduino\hardware\avr\1.8.6\variants\standard C:\Users\howar\AppData\Local\Temp\arduino\sketches\F46E52024E025C3DF34C17E974EB4F88\sketch\petitcat_arduino.ino.cpp -o nul
-Alternatives for Arduino_JSON.h: [Arduino_JSON@0.2.0]
-ResolveLibrary(Arduino_JSON.h)
-  -> candidates: [Arduino_JSON@0.2.0]
-C:\Users\howar\AppData\Local\Arduino15\packages\arduino\tools\avr-gcc\7.3.0-atmel3.6.1-arduino7/bin/avr-g++ -c -g -Os -w -std=gnu++11 -fpermissive -fno-exceptions -ffunction-sections -fdata-sections -fno-threadsafe-statics -Wno-error=narrowing -flto -w -x c++ -E -CC -mmcu=atmega328p -DF_CPU=16000000L -DARDUINO=10607 -DARDUINO_AVR_UNO -DARDUINO_ARCH_AVR -IC:\Users\howar\AppData\Local\Arduino15\packages\arduino\hardware\avr\1.8.6\cores\arduino -IC:\Users\howar\AppData\Local\Arduino15\packages\arduino\hardware\avr\1.8.6\variants\standard -IC:\Users\howar\OneDrive\Documents\Arduino\libraries\Arduino_JSON\src C:\Users\howar\AppData\Local\Temp\arduino\sketches\F46E52024E025C3DF34C17E974EB4F88\sketch\petitcat_arduino.ino.cpp -o nul
-Alternatives for WiFiEsp.h: [WiFiEsp@2.2.2]
-ResolveLibrary(WiFiEsp.h)
-  -> candidates: [WiFiEsp@2.2.2]
-C:\Users\howar\AppData\Local\Arduino15\packages\arduino\tools\avr-gcc\7.3.0-atmel3.6.1-arduino7/bin/avr-g++ -c -g -Os -w -std=gnu++11 -fpermissive -fno-exceptions -ffunction-sections -fdata-sections -fno-threadsafe-statics -Wno-error=narrowing -flto -w -x c++ -E -CC -mmcu=atmega328p -DF_CPU=16000000L -DARDUINO=10607 -DARDUINO_AVR_UNO -DARDUINO_ARCH_AVR -IC:\Users\howar\AppData\Local\Arduino15\packages\arduino\hardware\avr\1.8.6\cores\arduino -IC:\Users\howar\AppData\Local\Arduino15\packages\arduino\hardware\avr\1.8.6\variants\standard -IC:\Users\howar\OneDrive\Documents\Arduino\libraries\Arduino_JSON\src -IC:\Users\howar\OneDrive\Documents\Arduino\libraries\WiFiEsp\src C:\Users\howar\AppData\Local\Temp\arduino\sketches\F46E52024E025C3DF34C17E974EB4F88\sketch\petitcat_arduino.ino.cpp -o nul
-Alternatives for Adafruit_TCS34725.h: [Adafruit TCS34725@1.4.4]
+C:\Users\howar\AppData\Local\Arduino15\packages\arduino\tools\avr-gcc\7.3.0-atmel3.6.1-arduino7/bin/avr-g++ -c -g -Os -w -std=gnu++11 -fpermissive -fno-exceptions -ffunction-sections -fdata-sections -fno-threadsafe-statics -Wno-error=narrowing -flto -w -x c++ -E -CC -mmcu=atmega328p -DF_CPU=16000000L -DARDUINO=10607 -DARDUINO_AVR_UNO -DARDUINO_ARCH_AVR -IC:\Users\howar\AppData\Local\Arduino15\packages\arduino\hardware\avr\1.8.6\cores\arduino -IC:\Users\howar\AppData\Local\Arduino15\packages\arduino\hardware\avr\1.8.6\variants\standard 
 ....
 ....
-ResolveLibrary(Adafruit_TCS34725.h)
-C:\Users\howar\AppData\Local\Arduino15\packages\arduino\tools\avr-gcc\7.3.0-atmel3.6.1-arduino7/bin/avr-g++ -c -g -Os -w -std=gnu++11 -fpermissive -fno-exceptions -ffunction-sections -fdata-sections -fno-threadsafe-statics -Wno-error=narrowing -flto -w -x c++ -E -CC -mmcu=atmega328p -DF_CPU=16000000L -DARDUINO=10607 -DARDUINO_AVR_UNO -DARDUINO_ARCH_AVR -IC:\Users\howar\AppData\Local\Arduino15\packages\arduino\hardware\avr\1.8.6\cores\arduino -IC:\Users\howar\AppData\Local\Arduino15\packages\arduino\hardware\avr\1.8.6\variants\standard -IC:\Users\howar\OneDrive\Documents\Arduino\libraries\Arduino_JSON\src -IC:\Users\howar\OneDrive\Documents\Arduino\libraries\WiFiEsp\src -IC:\Users\howar\OneDrive\Documents\Arduino\libraries\Adafruit_TCS34725 -IC:\Users\howar\OneDrive\Documents\Arduino\libraries\Adafruit_BusIO -IC:\Users\howar\AppData\Local\Arduino15\packages\arduino\hardware\avr\1.8.6\libraries\Wire\src -IC:\Users\howar\AppData\Local\Arduino15\libraries\Servo\src -IC:\Users\howar\OneDrive\Documents\Arduino\libraries\Arduino-HMC5883L-dev C:\Users\howar\AppData\Local\Temp\arduino\sketches\F46E52024E025C3DF34C17E974EB4F88\sketch\src\lib\MPU6050.cpp -o nul
-C:\Users\howar\AppData\Local\Arduino15\packages\arduino\tools\avr-gcc\7.3.0-atmel3.6.1-arduino7/bin/avr-g++ -c -g -Os -w -std=gnu++11 -fpermissive -fno-exceptions -ffunction-sections -fdata-sections -fno-threadsafe-statics -Wno-error=narrowing -flto -w -x c++ -E -CC -mmcu=atmega328p -DF_CPU=16000000L -DARDUINO=10607 -DARDUINO_AVR_UNO -DARDUINO_ARCH_AVR -IC:\Users\howar\AppData\Local\Arduino15\packages\arduino\hardware\avr\1.8.6\cores\arduino -IC:\Users\howar\AppData\Local\Arduino15\packages\arduino\hardware\avr\1.8.6\variants\standard -IC:\Users\howar\OneDrive\Documents\Arduino\libraries\Arduino_JSON\src -IC:\Users\howar\OneDrive\Documents\Arduino\libraries\WiFiEsp\src -IC:\Users\howar\OneDrive\Documents\Arduino\libraries\Adafruit_TCS34725 -IC:\Users\howar\OneDrive\Documents\Arduino\libraries\Adafruit_BusIO -IC:\Users\howar\AppData\Local\Arduino15\packages\arduino\hardware\avr\1.8.6\libraries\Wire\src -IC:\Users\howar\AppData\Local\Arduino15\libraries\Servo\src -IC:\Users\howar\OneDrive\Documents\Arduino\libraries\Arduino-HMC5883L-dev C:\Users\howar\AppData\Local\Temp\arduino\sketches\F46E52024E025C3DF34C17E974EB4F88\sketch\src\wifi\WifiCat.cpp -o nul
+IC:\Users\howar\AppData\Local\Arduino15\packages\arduino\hardware\avr\1.8.6\libraries\Wire\src -IC:\Users\howar\AppData\Local\Arduino15\libraries\Servo\src -IC:\Users\howar\OneDrive\Documents\Arduino\libraries\Arduino-HMC5883L-dev C:\Users\howar\AppData\Local\Temp\arduino\sketches\F46E52024E025C3DF34C17E974EB4F88\sketch\src\wifi\WifiCat.cpp -o nul
 Alternatives for arduino_secrets.h: []
 ResolveLibrary(arduino_secrets.h)
   -> candidates: []
@@ -954,6 +943,48 @@ compilation terminated.
 exit status 1
 
 Compilation error: arduino_secrets.h: No such file or directory
+
+
+--TROUBLESHOOTING  #1 COMPILATION ERRORS--
+
+The file arduino_secrets.h is standard way of storing confidential information such as login passwords (for example, for Wi-Fi networks) that your project will require but you want to keep apart from the other code. In Git systems we can add "arduino_secrets.h" to the .gitignore file and so it will not be uploaded to other repositories.
+
+Indeed, if we explore around the robot car project GitHub repository, we find a file arduino_secrets.h but not containing actual passwords:
+
+#define SECRET_WIFI_TYPE "STA" // Access point : "AP" pr Station (through router): "STA"
+#define SECRET_SSID "Your wifi SSID"
+#define SECRET_PASS "Your password"
+
+We will populate these fields once we seriously try out the code with the robot car Arduino board and Wi-Fi shield. For now, we trying to get the code to compile and will leave arduino_secrets.h in this form.
+
+We see from the compiler errors that C:\Users\howar\OneDrive\Documents\Arduino\osoyoo\petitcat_arduino\src\wifi\WifiCat.cpp:11:10: fatal error: arduino_secrets.h: No such file or directory -- we need to copy the file arduino_secrets.h to the src subfolder and then in turn to the wifi subfolder, all of the Sketchbook folder. In my computer the Sketchbook folder is c:\Users\howar\OneDrive\Documents\Arduino
+
+Also, the Arduino IDE does not normally support subdirectories in a Sketch -- all the .cpp and .h files should be in the root folder of the main Sketch (i.e., ino file). Thus, unlike in other programming environments, any subdirectories in the Arduino environment have to specially be handled.
+
+We can manually include any files in subdirectories via the include statement #include along with a relative path.
+
+Thus, in the main ino program "petitcat_arduino.ino we add the line #include "src/wifi/arduino_secrets.h" :
+
+![secret](secret.h)
+
+Let's compile again -- click
+
+This time we get this error:
+
+.....
+
+.....
+
+Using library Arduino-HMC5883L-dev in folder: C:\Users\howar\OneDrive\Documents\Arduino\libraries\Arduino-HMC5883L-dev (legacy)
+
+Using library SPI at version 1.0 in folder: C:\Users\howar\AppData\Local\Arduino15\packages\arduino\hardware\avr\1.8.6\libraries\SPI 
+
+exit status 1
+
+Compilation error: no matching function for call to 'HMC5883L::setOffset(int, int)'
+
+
+
 
 
 --SUCCESSFULLY COMPILING THE PROJECT REPO IN THE ARDUINO IDE--
