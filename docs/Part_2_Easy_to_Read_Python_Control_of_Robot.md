@@ -1006,7 +1006,9 @@ But.... we got another compilation error:
 --TROUBLESHOOTING  #2 COMPILATION ERRORS--
 -
 -
+We just got another compilation error:
 
+"Compilation error: no matching function for call to 'HMC5883L::setOffset(int, int)'"
 
 Ok.... let's start troubleshooting by looking at the extended compiler messages and error generated:
 
@@ -1034,22 +1036,28 @@ Ok.... first thing is to make sure that the library HMC5833L is installed. Go to
 
 Does this library support a class HMC5883L with a function setOffset() -- given its same name as the class, let's assume it does, but we can always come back here and look into the library more.
 
-Take a text editor (I used Notepad++ but ordinary Windows Notepad will work) or another IDE that you use, and take a look at petitcat_arduino\src\MMC5883.cpp since it has a similar name.
 
-We find a similar statement:
+Ok....let's search the whole repository for 'HMC5883L::setOffset(int, int)'.....  (You a text editor or other tool of your choice since Arduino IDE does not support subfolders.)
 
-"void MMC5883MA::setOffset(int xo, int yo)"
+In file robot._define.h we find HMC5883L in the comments besides ROBOT_COMPASS_TYPE 1, but otherwise not used.
 
-But, the error message was about class HMC5833L not MMC5883MA.
+In file lmu.cpp we find a "compass.setOffset(COMPASS_X_OFFSET, COMPASS_Y_OFFSET)" function where the compass object appears to be used in the functions of either the HMC5883L or MMC5883 compass module 
 
+Hmmmm..... this really suggests that the HMC5883L library, while installed, does not contain a 'setOffset(int, int)' method.
 
-Ok....let's search the whole repository for 'HMC5883L::setOffset(int, int)'.....
+Ok.... let's open the library's code and see if we can find a setOffset(int, int) method.
 
-In file robot._define.h we find HMC5883L in the comments besides ROBOT_COMPASS_TYPE 1
+We find this in HMC5883L_compass.ino:
+"  // Set calibration offset. See HMC5883L_calibration.ino
+  compass.setOffset(0, 0, 0);"
 
-In file lmu.cpp
+It appears that setOffset expects three arguments rather than two.
 
-In file lmu.h
+Hmmmm.....
+
+Sometimes, if you have access to the code developer, it is better to speak to him/her at this point, and then continue the journey.
+
+![confused](confused.png)
 
 
 
