@@ -1080,7 +1080,7 @@ Sometimes, if you have access to the code developer, it is better to speak to hi
 -
 -
 -
--
+-- ****ALREADY AT 1100 LINES -- CONSIDER SPLITTING INTO PART III HERE (AND UPDATE INTRO)***
 
 **Step #9 --Preliminary Testing of the PetitCat Code: Python <--> Arduino --**
 
@@ -1090,7 +1090,7 @@ Sometimes, if you have access to the code developer, it is better to speak to hi
 -
 -
 -
-- ****CONSIDER SPLITTING INTO PART III HERE (UPDATE INTRO)***
+-
 
 **Step #10 --Installing the Digital Compass and Intertial Measurement Unit --**
 
@@ -1132,9 +1132,9 @@ Sometimes, if you have access to the code developer, it is better to speak to hi
 -
 -
 -
-- ****CONSIDER SPLITTING INTO PART Iv HERE (UPDATED INTRO)***
+- ****CONSIDER SPLITTING INTO PART IV HERE (AND UPDATE INTRO)***
 
-**Step #14  --Using PetitCat for AI and Cognitive Science: Part III  --**
+**Step #14  --Using PetitCat for AI and Cognitive Science: Onward to Part III  --**
 .....
 
 .....
