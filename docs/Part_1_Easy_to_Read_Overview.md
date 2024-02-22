@@ -1162,6 +1162,15 @@ Initial draft Feb 9, 2024
 (This is a public document that can be modified by others who have access -- if anything doesn't make sense, please ignore.)
 (No use of high voltage or anything dangerous is specified in this document.)
 
+-
+-
+
+![altlogo](altlogo.png)
+
+-
+-
+
+
 end of document
 ****
 ##
