@@ -388,20 +388,11 @@ At the time of this writing the project is specified to use these libraries:
 ![libsused](libsused.png)
 
 
-
 -
 -
 -
 -
 
-
-![seizurewarn](seizurewarn.png)
-In Step 4, we describe experiments where there is a relatively fast flashing light. There is a risk in sensitive individuals of triggering seizures (as well as migraines). If this applies to you or you have any risk towards seizures, do NOT flash the light at high speed -- instructions are given below for flashing the LED at a much lower rate. (Triggering seizures in photosensitive individuals is increased by exposure to a frequency of 5 to 30 Hertz (it can still occur at 40 Hertz), bright lights, high contrast, and the duration of exposure. A frequency of 0.125 Hertz (one gentle turn on of the LED every 8 seconds) in a well-lit room is used in the alternative demonstration.)
-
-WARNING: This is written for an intended target audience of educated researchers in cognitive science and artificial intelligence, who might be interested in a theoretical aspect of approaching cognition as a means to help them learn new coding/system details. It is not written as a do-it-yourself therapeutic project and it is not written for those not educated in the field. 
-
-
--
 
 **Step #4 --Simple C/C++ Coding and (Possibly) Preventing Dementia**
 
@@ -485,6 +476,10 @@ Even if you have coded in C/C++ before, the Arduino board uses particular functi
 -Also, in C/C++ coding and in Arduino programs, lines of code typically end with a semicolon, i.e., ;  (although if a loop or if/then is being specified then after the 'if', 'for' or 'while' keyword, there will be braces, e.g.,  for (int i =0; i<5; i++) { ...... lines of code here }
 
 Now that you know what the structure of an Arduino program looks like and now that you know these very important functions (well, important for programming Arduino boards), try to write an Arduino program that blinks the LED on the robot car's Arduino board.
+
+****REWRITE -- AWKWARD WITH SEIZURE WARNING AND THEN THE DIFFERENT FREQUENCIES.... WRITE THIS 'STEP' WITH LOW FREQUENCY AND THEN AT THE END INTRODUCE 40 HZ GAMMA STIMULATION****
+
+![rewrite](rewrite.png)
 
 This is what my program looks like:
 
@@ -663,7 +658,7 @@ Let's put one of the leads of the (220 ohm) resistor into the GND (ground) pin w
 
 ![resistorground](resistorground.png)
 
-(This photo was taken after the code was written and uploaded to the Arduino -- the green LED was on while the photo was snapped. Note the black electronics jumper attaching to the negative lead of the LED with the other lead of the resistor.
+(This photo was taken after the code was written and uploaded to the Arduino -- the green LED was on while the photo was snapped. Note the black electronics jumper attaching to the negative lead of the LED with the other lead of the resistor.)
 
 You should buy these parts and build this circuit. This is considered very simple electronics and you should feel comfortable with this level of electronics hands-on experience.
 
@@ -902,7 +897,7 @@ In order to compile the project software, we must make sure that our Arduino IDE
 
 -The Arduino IDE should be open on your desktop/laptop computer.
 
--Go to File, Preferences and copy the location of your Sketchbook. On my computer it is:
+-Go to File, Preferences and note the location of your Sketchbook. On my computer it is:
 
 c:\Users\howar\OneDrive\Documents\Arduino  (<--note: this is for my PC; yours will be different!!)
 
@@ -992,6 +987,9 @@ Now to make the Arduino IDE access these files in subdirectories we need to manu
 
 ![secret](secret.png)
 
+****SPEAK WITH OLIVIER ABOUT DESIRED WAY TO HANDLE THIS ISSUE AND CAN RE-WRITE****
+
+![rewrite](rewrite.png)
 
 Let's compile again -- click the green checkmark (verify button) near the left-hand corner of the Arduino IDE main screen. 
 
@@ -1009,6 +1007,8 @@ But.... we got another compilation error:
 We just got another compilation error:
 
 "Compilation error: no matching function for call to 'HMC5883L::setOffset(int, int)'"
+
+![confused](confused.png)
 
 Ok.... let's start troubleshooting by looking at the extended compiler messages and error generated:
 
@@ -1057,7 +1057,11 @@ Hmmmm.....
 
 Sometimes, if you have access to the code developer, it is better to speak to him/her at this point, and then continue the journey.
 
-![confused](confused.png)
+****RE-WRITE AFTER SPEAK WITH OLIVIER.....REALLY BETTER WITH JUST 1 TROUBLESHOOTING, I.E., SECRETS AND LEAVE THIS OUT****
+
+![rewrite](rewrite.png)
+
+
 
 
 
@@ -1086,7 +1090,7 @@ Sometimes, if you have access to the code developer, it is better to speak to hi
 -
 -
 -
--
+- ****CONSIDER SPLITTING INTO PART III HERE (UPDATE INTRO)***
 
 **Step #10 --Installing the Digital Compass and Intertial Measurement Unit --**
 
@@ -1128,7 +1132,7 @@ Sometimes, if you have access to the code developer, it is better to speak to hi
 -
 -
 -
-
+- ****CONSIDER SPLITTING INTO PART Iv HERE (UPDATED INTRO)***
 
 **Step #14  --Using PetitCat for AI and Cognitive Science: Part III  --**
 .....
