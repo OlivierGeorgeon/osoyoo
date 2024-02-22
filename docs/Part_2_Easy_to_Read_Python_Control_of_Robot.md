@@ -1037,7 +1037,7 @@ Ok.... first thing is to make sure that the library HMC5833L is installed. Go to
 Does this library support a class HMC5883L with a function setOffset() -- given its same name as the class, let's assume it does, but we can always come back here and look into the library more.
 
 
-Ok....let's search the whole repository for 'HMC5883L::setOffset(int, int)'.....  (You a text editor or other tool of your choice since Arduino IDE does not support subfolders.)
+Ok....let's search the whole repository for 'HMC5883L::setOffset(int, int)'.....  (You can use a text editor or other tool of your choice since Arduino IDE does not support subfolders.)
 
 In file robot._define.h we find HMC5883L in the comments besides ROBOT_COMPASS_TYPE 1, but otherwise not used.
 
