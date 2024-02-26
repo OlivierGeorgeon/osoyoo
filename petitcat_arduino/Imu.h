@@ -12,7 +12,8 @@
 #include <Arduino_JSON.h>
 #include <Wire.h>
 #if ROBOT_COMPASS_TYPE == 1
-#include <HMC5883L.h>
+// #include <HMC5883L.h>
+#include "src/lib/HMC5883L.h"
 #endif
 #if ROBOT_COMPASS_TYPE == 2
 #include "src/lib/MMC5883.h"
