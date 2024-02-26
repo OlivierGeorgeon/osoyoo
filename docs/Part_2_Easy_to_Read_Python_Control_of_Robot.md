@@ -388,20 +388,11 @@ At the time of this writing the project is specified to use these libraries:
 ![libsused](libsused.png)
 
 
-
 -
 -
 -
 -
 
-
-![seizurewarn](seizurewarn.png)
-In Step 4, we describe experiments where there is a relatively fast flashing light. There is a risk in sensitive individuals of triggering seizures (as well as migraines). If this applies to you or you have any risk towards seizures, do NOT flash the light at high speed -- instructions are given below for flashing the LED at a much lower rate. (Triggering seizures in photosensitive individuals is increased by exposure to a frequency of 5 to 30 Hertz (it can still occur at 40 Hertz), bright lights, high contrast, and the duration of exposure. A frequency of 0.125 Hertz (one gentle turn on of the LED every 8 seconds) in a well-lit room is used in the alternative demonstration.)
-
-WARNING: This is written for an intended target audience of educated researchers in cognitive science and artificial intelligence, who might be interested in a theoretical aspect of approaching cognition as a means to help them learn new coding/system details. It is not written as a do-it-yourself therapeutic project and it is not written for those not educated in the field. 
-
-
--
 
 **Step #4 --Simple C/C++ Coding and (Possibly) Preventing Dementia**
 
@@ -485,6 +476,10 @@ Even if you have coded in C/C++ before, the Arduino board uses particular functi
 -Also, in C/C++ coding and in Arduino programs, lines of code typically end with a semicolon, i.e., ;  (although if a loop or if/then is being specified then after the 'if', 'for' or 'while' keyword, there will be braces, e.g.,  for (int i =0; i<5; i++) { ...... lines of code here }
 
 Now that you know what the structure of an Arduino program looks like and now that you know these very important functions (well, important for programming Arduino boards), try to write an Arduino program that blinks the LED on the robot car's Arduino board.
+
+****REWRITE -- AWKWARD WITH SEIZURE WARNING AND THEN THE DIFFERENT FREQUENCIES.... WRITE THIS 'STEP' WITH LOW FREQUENCY AND THEN AT THE END INTRODUCE 40 HZ GAMMA STIMULATION****
+
+![rewrite](rewrite.png)
 
 This is what my program looks like:
 
@@ -663,7 +658,7 @@ Let's put one of the leads of the (220 ohm) resistor into the GND (ground) pin w
 
 ![resistorground](resistorground.png)
 
-(This photo was taken after the code was written and uploaded to the Arduino -- the green LED was on while the photo was snapped. Note the black electronics jumper attaching to the negative lead of the LED with the other lead of the resistor.
+(This photo was taken after the code was written and uploaded to the Arduino -- the green LED was on while the photo was snapped. Note the black electronics jumper attaching to the negative lead of the LED with the other lead of the resistor.)
 
 You should buy these parts and build this circuit. This is considered very simple electronics and you should feel comfortable with this level of electronics hands-on experience.
 
@@ -722,7 +717,9 @@ Let's try to code an example where we don't need to give the program any inputs 
 
 Start with the numbers 0 and 1, and compute a Fibonacci series (i.e., add the last number with the previous one). When a three-digit number occurs, stop. Print out all intermediate results on the Serial Monitor.
 
-Here's the simple code I used to do this:
+You should try this on your own and then look at my code. I will write code quickly and leave some design issues in place and then we will gradually improve them. You can write nicely structured and understandable code in the Arduino environment just as you can on your laptop/desktop favorite programming environment.
+
+Here's the simple ("quick and dirty") code I used to do this:
 
 ![fibcode](fibcode.png)
 
@@ -739,7 +736,10 @@ Many languages, including C/C++, also support looping with a 'while' loop. If we
 
 Try to use these statements in your own code.
 
-Below the code above has been modified so that it prints out (i.e., on the Serial Monitor) "reset" five times each time the variables are reset (to keep variable 'a' less than 100).
+When we re-write or modify code ("refactor code"), even though the code may work (well.... work under the circumstances we test it under:)  we should always try to make a tiny improvement to make the code more readable (by far the most important thing -- code is written for other humans much more so than computers!!), less complex, less redundant (DRY -- "don't repeat yourself"), better structure, better performance and of course, if we note minor bugs (which may only show themselves under different testing environments) we should fix them. This tutorial/documentation on the Robot Car project is not a software design tutorial, and most readers have already seen this material a million times (English idiom, unless this document is being read by a generative AI app :), but it's good to mention here. I will write demo's in a sort of 'baby language' style (i.e., new system, just do things cautiously to see if things work) and then show how the code can be positively refactored as we introdue new features of the language and the project.
+
+Below the code above has been modified so that it prints out (i.e., on the Serial Monitor) "reset" five times each time the variables are reset (to keep variable 'a' less than 100). One improvement in refactoring -- it is silly to declare c= 0 when we reset it, since c=a later on, so let's remove that line. I'll leave it in the global declarations just to show the human reader we are starting off we these three variables at these values. (Again, my opinion on code refactoring is that other than removing bugs, the most important issue is that code is readable, i.e., goes into the brains, of the humans (not computers), reading it. Nonetheless, if there was nothing else to refactor, I might have removed that initial declaration.)
+
 
 ![forloop](forloop.png)
 
@@ -748,7 +748,318 @@ You can see that "reset" is printed out five times when the variables are reset:
 ![formsg](formsg.png)
 
 
+Let's rewrite the code to use the 'While' statement (although the 'For' statement is more appropriate given we know how many times we want 'Reset' printed out). Also, in refactoring let's get rid of 'magic numbers' (i.e., the '99') and label more appropriately. 
 
+![while](while.png)
+
+Use the Serial Monitor to take a look at the output of this code.
+
+
+
+When you code in another language, e.g. Python, you know that your best friend for debugging programs or seeing how something works, is not an advanced debugger (which are indeed great), but the humble "print" statement. Same thing in the Arduino IDE. If you are not sure if your code is working properly or you want to see how something is working in more detail, use the "Serial.println" statement and the Serial Monitor. For example, if you are not sure about the "While" statement in your code you could write something like this:
+
+![whiledebug](whiledebug.png)
+
+Most readers probably have already had thousands of hours of experience of debugging and refactoring code, so this tutorial may seem childish (although still useful to quickly learn some features of the way Arduino code operates), but if you don't have this background experience, use the "Serial.println" statement and experiment and debug code. The "Serial.println" statement will become your best friend :)
+
+![bestfriends](bestfriends.png)
+
+--CODE ABSTRACTION: FUNCTIONS--
+
+Most programming languages provide many mechanisms for abstracting code, especially including user defined functions. C/C++ and Arduino too, of course, allow user defined functions. (In a procedural language such as C we call a function a "function." In an object-oriented programming (OOP) language such as C++ we call a function that that is part of a class or an object the description of "method". However, in this documentation we will call both "functions.")
+
+We will continue to improve the previous code that computes Fibonacci series by incorporating a user defined function.
+
+.....
+
+.....
+
+
+--CODE STYLE--
+
+We haven't paid much attention to the style in which we write our Arduino programs, but like other languages, there are ways which are more standard and pleasant for other humans to read your code.
+
+..........
+
+..........
+
+
+--READING DIGITAL INPUTS IN ARDUINO--
+
+We've learned to use the Arduino board for digital outputs, e.g., the built-in function digitalWrite(output pin, LOW/HIGH). Now let's just very basically learn how to use the Arduino board to read a digital input.
+
+......
+
+......
+
+-
+-
+-
+-
+
+
+**Step #7 --Arduino Analog Inputs and Outputs and Measuring with a Multimeter --**
+
+Unlike the C/C++ code (or Python code) you normally write at your laptop/desktop, the Arduino code is very much concerned with input and outputs, both digital and analog ones. We have very briefly considered coding for digital inputs and outputs. In this step we will further consider digital inputs and outputs as well as coding for analog inputs and outputs. Also, we will practice using a multimeter.
+
+For many years a multimeter was known as a "VOM" -- volt-ohm-milliammeter, and they did what their name said -- measured voltage, resistance and current. Until the digital revolution in the last quarter of the 20th century, they had an analog meter, i.e., a needle moved on a scale with numbers and various units. Then volt-ohm-millaimmeters started using digital displays. And now, with advent of extremely complex and cheap integrated circuits, the volt-ohm-milliammeter has become an incredible multimeter capable of measuring not only voltages, resistance and current, but may include dozens if not hundreds of other features, from measuring frequencies, capacitances, temperatures, continuity issues, diode and transistor features to including oscilliscope screens in the device (depends on price). Perhaps the next generation of multimeters will also incorporate generative AI!! (None do at the time of this writing.)
+
+Multimeters are inexpensive and readily available at local hardware stores, auto parts stores, and electronics parts distributors, as well as online (e.g., at the time of this writing Amazon.com has a multimeter for sale for less than US$10 (including delivery of the meter for members) which measures DC and AC voltage, resistance, current, diode features, triode features, and records values measured so even if you disconnect from what you are measuring you have a record of the values measured). If you are coding for the Arduino board, you should have a very basic knowledge of how a multimeter works (it is a very small cost to buy one, or perhaps borrow one from a friend) and how to code for Arduino digital and analog inputs and outputs.
+
+If you are working on the Arduino board including working on the robot car project, you have left the nice, cozy (and very artificial) world of the ungrounded computer terminal attached to the ungrounded C++/Python code running on an ungrounded server somewhere, perhaps even creating amazing but ungrounded large language model code. It is time for you in your journey as a software engineer or AI researcher or cognitive scientist, to become grounded in the real world. Get your multimeter, and let's start coding for the real world!!
+
+![multimeter](multimeter.png)
+
+
+......
+
+......
+
+-
+-
+-
+-
+
+
+
+**Step #8 --Compiling the PetitCat Code --**
+
+Now that we have a working robot car (Part I) and that we have acquired further knowledge about coding for the Arduino board (this Part II of the documentation), we are ready to start implementing the actual code of the PetitCat robot car project.
+
+
+--OVERVIEW OF FILES IN PETITCAT ROBOT CAR PROJECT--
+
+
+Let's review the project very briefly, i.e., what it does and where the software is.
+
+The big picture (i.e., overview) of the project is: The Python module PetitCat.py (or test_remote_control_robot.py -- see below about redundant nomenclature) running as a Python module as part of your Python program on your desktop/laptop communicates via Wi-Fi to the robot car. The Arduino program PetitCat.ino compiled to Arduino code running on the Arduino board on the robot car communicates via Wi-Fi with PetitCat.py (or "PetitCatMain.py" depending on nomenclature used). 
+
+
+![bigpicture with new name for python code](bigpicture_newname.png)
+
+
+As this project evolves, names used to describe various parts of the project may change, although they will describe the same piece of code or the same folder of code, etc.
+
+Let's review the nomenclature of the project, i.e., the names referring to different parts of the project.
+
+-Overall project:
+
+The "PetitCat" project == the "Robot Car" project == the "Osoyoo Robot Car" project 
+
+-GibHub folder for project:   https://github.com/OlivierGeorgeon/osoyoo
+
+
+-Python main file:
+
+PetitCat.py == PetitCaMain.py == PetitCatTester.py == test_remote_control_robot.py
+
+-GitHub folder for Python files: /osoyoo/tests/
+
+https://github.com/OlivierGeorgeon/osoyoo/tree/master/tests
+
+If you go to this GitHub folder. If you click open PetitCat.py == PetitCaMain.py == PetitCatTester.py == test_remote_control_robot.py you see the standard library files PYthon will import automatically. 
+
+
+-Arduino board main file:
+
+PetitCat.ino == autocat_enacter.ino == petitcat_arduino.ino
+
+-GitHub folder for Arduino files:
+
+/osoyoo/petitcat_arduino/
+
+https://github.com/OlivierGeorgeon/osoyoo/blob/master/petitcat_arduino/petitcat_arduino.ino
+
+If you go to this GitHub folder. You will see that in addition to the main code PetitCat.ino == autocat_enacter.ino there are a good number of header .h and code .cpp files. All these will need to be cloned and copied into the IDE later. 
+
+
+--CLONING THE GITHUB PROJECT REPOSITORY--
+
+
+The use of 'Git' was discussed above. I usually like to see all files in a project, one by one, but when there are so many files, it often is just not practical. (In fact, the dangers of thousands of dependent files in computer projects is only starting to become appreciated. For example, in 2016 an open source coder not associated with any major corporation (thus coding from his house perhaps?), Azer Koculu, broke the Internet (yes, this really did happen) when he got upset with a lawyer saying the name of one of his open source programs should be changed, and so he removed his code from the public domain. His code was widely used (invoked more than a billion times per month) in Internet software and when it was gone, large portions of code related to the Internet dependent on his code, failed.) Anyway.... here we will use Git :)
+
+A "GitHub Repository" (sometimes just called a "repo") is where files are stored using Git, but in an online distributed manner, and GitHub in particular is a commercial company owned by Microsoft.
+
+Make sure 'Git' is installed on your computer. I am using a Windows computer and doing the operations from the command line.
+
+Enter at the command line "git clone  https://github.com/OlivierGeorgeon/osoyoo" and in a few seconds the PetitCat project  will be copied to your computer:
+
+![gitproject](gitproject.png)
+
+If you open this directory you will see it looks the same as what is on the GitHub site, but it's now on your local desktop/laptop:
+
+![osodir](osodir.png)
+
+
+--COPYING THE PROJECT REPO TO YOUR ARDUINO IDE--
+
+In order to compile the project software, we must make sure that our Arduino IDE has access to it.
+
+-The Arduino IDE should be open on your desktop/laptop computer.
+
+-Go to File, Preferences and note the location of your Sketchbook. On my computer it is:
+
+c:\Users\howar\OneDrive\Documents\Arduino  (<--note: this is for my PC; yours will be different!!)
+
+-In the cloned project repo we now have to look for Arduino sketch files (i.e., 'ino' file extension). We see this in the subfolder 'petitcat_arduino'. Thus we copy 'petitcat_arduino' to the Sketchbook location which in my case is c:\Users\howar\OneDrive\Documents\Arduino
+
+-In the Arduino IDE, now click File, Sketchbook -- you will see the choice of "osoyoo" which when you click will bring up "petitcat_arduino".
+
+![findino](findino.png)
+
+-Select "petitcat_arduino" and it will open the Sketch "petitcat_arduino" within Arduino IDE.
+
+![petitcatide](petitcatide.png)
+
+Before uploading it to the Robot Car Arduino board, click the compile button (green checkmark at the lefthand corner of the screen) (also called the "Verify" button) and see if it compiles successfully.
+
+In my case it did not -- "compilation error: arduino_secrets.h: no such file or directory"
+
+![secretsh](secretsh.png)
+
+-
+-
+
+--TROUBLESHOOTING  #1 COMPILATION ERRORS--
+-
+-
+
+
+Ok.... the program did not compile. Let's look at the extended compiler messages, and start troubleshooting:
+
+---------------------------------------------------
+
+FQBN: arduino:avr:uno
+
+Using board 'uno' from platform in folder: C:\Users\howar\AppData\Local\Arduino15\packages\arduino\hardware\avr\1.8.6
+
+Using core 'arduino' from platform in folder: C:\Users\howar\AppData\Local\Arduino15\packages\arduino\hardware\avr\1.8.6
+
+..
+
+..
+
+ResolveLibrary(arduino_secrets.h)
+
+  -> candidates: []
+  
+C:\Users\howar\OneDrive\Documents\Arduino\osoyoo\petitcat_arduino\src\wifi\WifiCat.cpp:11:10: fatal error: arduino_secrets.h: No such file or directory
+
+ #include "arduino_secrets.h"
+          ^~~~~~~~~~~~~~~~~~~
+	  
+compilation terminated.
+
+exit status 1
+
+Compilation error: arduino_secrets.h: No such file or directory
+
+---------------------------------------------------
+
+
+The file arduino_secrets.h is standard way of storing confidential information such as login passwords (for example, for Wi-Fi networks) that your project will require but you want to keep apart from the other code. In Git systems we can add "arduino_secrets.h" to the .gitignore file and so it will not be uploaded to other repositories.
+
+Indeed, if we explore around the robot car project GitHub repository, we find in another folder a file arduino_secrets.h but not containing actual passwords:
+
+---------------------------------------------------
+
+#define SECRET_WIFI_TYPE "STA" // Access point : "AP" pr Station (through router): "STA"
+
+#define SECRET_SSID "Your wifi SSID"
+
+#define SECRET_PASS "Your password"
+
+---------------------------------------------------
+
+We will populate these fields later once we seriously try out the code with the robot car Arduino board and Wi-Fi shield. For now, we are just trying to get the code to compile and will leave arduino_secrets.h in this form.
+
+We see from the compiler errors that " C:\Users\howar\OneDrive\Documents\Arduino\osoyoo\petitcat_arduino\src\wifi\WifiCat.cpp:11:10: fatal error: arduino_secrets.h: No such file or directory "
+
+Unlike other language development environments where this is taken for granted, the Arduino IDE does not normally support subdirectories in a Sketch -- all the .cpp and .h files should be in the root folder of the main Sketch (i.e., ino file). Thus, unlike in other programming environments, any subdirectories in the Arduino environment have to specially be handled.
+
+In my computer the Sketchbook folder is c:\Users\howar\OneDrive\Documents\Arduino. The root folder is petitcat_arduino -- thus we see the cpp and h files on the Arduino IDE Sketch screen. However, Sketchbook folder also contains a src subfolder which also contains a wifi subfolder.
+
+ --> Therefore, we need to copy the file arduino_secrets.h to the src subfolder and then in turn to the wifi subfolder. We do this.
+
+Now to make the Arduino IDE access these files in subdirectories we need to manually include any files in the root directory's subdirectories via the include statement #include along with a relative path.
+
+--> Therefore, in the main ino program "petitcat_arduino.ino we add the line #include "src/wifi/arduino_secrets.h" :
+
+![secret](secret.png)
+
+****SPEAK WITH OLIVIER ABOUT DESIRED WAY TO HANDLE THIS ISSUE AND CAN RE-WRITE****
+
+![rewrite](rewrite.png)
+
+Let's compile again -- click the green checkmark (verify button) near the left-hand corner of the Arduino IDE main screen. 
+
+The previous secret.h issue seems to be resolved (well.... the compiler did not generate an error message about it). 
+
+But.... we got another compilation error:
+
+"Compilation error: no matching function for call to 'HMC5883L::setOffset(int, int)'"
+
+-
+-
+--TROUBLESHOOTING  #2 COMPILATION ERRORS--
+-
+-
+We just got another compilation error:
+
+"Compilation error: no matching function for call to 'HMC5883L::setOffset(int, int)'"
+
+![confused](confused.png)
+
+Ok.... let's start troubleshooting by looking at the extended compiler messages and error generated:
+
+---------------------------------------------------
+
+..
+
+..
+
+Using library Arduino-HMC5883L-dev in folder: C:\Users\howar\OneDrive\Documents\Arduino\libraries\Arduino-HMC5883L-dev (legacy)
+
+Using library SPI at version 1.0 in folder: C:\Users\howar\AppData\Local\Arduino15\packages\arduino\hardware\avr\1.8.6\libraries\SPI 
+
+exit status 1
+
+Compilation error: no matching function for call to 'HMC5883L::setOffset(int, int)'
+
+---------------------------------------------------
+
+Ok.... so this is essentially a "function not found" error message, i.e., the compiler was not able to find a function setOffset() that belongs to the HMC5883L class.
+
+Ok.... first thing is to make sure that the library HMC5833L is installed. Go to the Arduino IDE. Click Sketch, Include Library. At the bottom we see a list of installed libraries. Yes, HMC5833L library is installed.
+
+![libstatus](libstatus.png)
+
+Does this library support a class HMC5883L with a function setOffset() -- given its same name as the class, let's assume it does, but we can always come back here and look into the library more.
+
+
+Ok....let's search the whole repository for 'HMC5883L::setOffset(int, int)'.....  (You can use a text editor or other tool of your choice since Arduino IDE does not support subfolders.)
+
+In file robot._define.h we find HMC5883L in the comments besides ROBOT_COMPASS_TYPE 1, but otherwise not used.
+
+In file lmu.cpp we find a "compass.setOffset(COMPASS_X_OFFSET, COMPASS_Y_OFFSET)" function where the compass object appears to be used in the functions of either the HMC5883L or MMC5883 compass module 
+
+Hmmmm..... this really suggests that the HMC5883L library, while installed, does not contain a 'setOffset(int, int)' method.
+
+Ok.... let's open the library's code and see if we can find a setOffset(int, int) method.
+
+We find this in HMC5883L_compass.ino:
+"  // Set calibration offset. See HMC5883L_calibration.ino
+  compass.setOffset(0, 0, 0);"
+
+It appears that setOffset expects three arguments rather than two.
+
+Hmmmm.....
+
+Sometimes, if you have access to the code developer, it is better to speak to him/her at this point, and then continue the journey.
+
+****RE-WRITE AFTER SPEAK WITH OLIVIER.....REALLY BETTER WITH JUST 1 TROUBLESHOOTING, I.E., SECRETS AND LEAVE THIS OUT****
+
+![rewrite](rewrite.png)
 
 
 
@@ -758,446 +1069,96 @@ You can see that "reset" is printed out five times when the variables are reset:
 
 
 # under construction#
-information below taken from Olivier's GitHub documentation, and will be incorporated into the documentation
 
 
+--SUCCESSFULLY COMPILING THE PROJECT REPO IN THE ARDUINO IDE--
 
+.....
 
+.....
 
+-
+-
+-
+-- ****ALREADY AT 1100 LINES -- CONSIDER SPLITTING INTO PART III HERE (AND UPDATE INTRO)***
 
+![altlogo](altlogo.png)
 
+-
+-
+-
+-
 
-# 1   install libraries into IDE #
+**Step #9 --Preliminary Testing of the PetitCat Code: Python <--> Arduino --**
 
-This project uses the following libraries:
+.....
 
-Library	Function	Where to find it
-Servo		Installed by default with the Arduino IDE
-HC-SR04	Ultrasonic telemeter	Regular Osoyoo robot
-WifiEsp-master	Wifi Shield	Regular Osoyoo robot (Lesson 5 : WiFiEsp-master.zip)
-Arduino_JSON	JSON	Arduino IDE Library manager
-MPU6050	Inertial Measurement Unit	Included in our project repository
-HLC5883L	Compass	jarzebski github
-MMC5883	Compass	Included in our project repository
+.....
+-
+-
+-
+-
 
+**Step #10 --Installing the Digital Compass and Intertial Measurement Unit --**
 
-nformation about these libraries
-MPU6050
-I adapted the MPU6050 library by Korneliusz Jarzebski and included it in this project. I had to add a timeout to avoid freezing the main loop if the MPU6050 is not responding. This seems to happen because of the noise caused by the motors. In file MPU6050.cpp, I added this line after Wire.begin() in line 38 (documentation here):
+.....
 
-Wire.setWireTimeout( 25000, true);
-Also, I had to edit the MPU6050.cpp to prevent it from aborting the initialization process when the address is not 0x68:
+.....
 
-Modif MU6050_library
+-
+-
+-
+-
 
-Figure 2: Comment the return false; in line 56
+**Step #11 --Installing the Color Sensor --**
 
-After looking at a few alternatives, I chose this library because it was also provided with my Arduino kit by Elegoo. It is provided in the arduino-kits-support-files. The file Mega_2560_The_Most_Complete_Starter_Kit contains the whole pedagogical material, including the electronic wiring diagram.
+......
 
-Arduino_JSON
-Install Arduino_JSON by Arduino from the library manager: Install_Arduino_json
+......
+-
+-
+-
+-
 
-Don't mistake it with the library ArduinoJSON by Benoit Blanchon.
 
-HMC5883L
-This library handles the compass chip HMC5883L implemented in some of the GY-86 imu cards, It is available at https://github.com/jarzebski/Arduino-HMC5883L.
+**Step #12  --Full Testing of the PetitCat Code: Python <--> Arduino --**
 
-HMC5883L Figure 3: The IMU card with the compass chip labeled L883/2131.
+......
 
-If your compass chip begins with L883, include the following lines in robot_define.h for your robot:
+......
+-
+-
+-
+-
 
-#define ROBOT_HAS_MPU6050  true
-#define ROBOT_COMPASS_TYPE 1
-MMC5883L
-This library handles the compass chip Duinotech MMC5883L implemented in some imu cards. I followed the article by David Such that lists the different compass chips. I adapted this library from his repo.
+**Step #13  --Using the PetitCat Code: Active Inference  --**
+.....
 
-IMU Figure 4: The IMU card with the compass chip labeled 5883/601X.
+.....
+-
+-
+-
+-
+- ****CONSIDER SPLITTING INTO PART IV HERE (AND UPDATE INTRO)***
+  
+  ![altlogo](altlogo.png)
 
-If your compass chip begins with 5883, include the following lines in robot_define.h for your robot:
+-
+-
+-
+-
 
-#define ROBOT_HAS_MPU6050  true
-#define ROBOT_COMPASS_TYPE 2
-Local parameters
-Wifi
-In the autocat_enacter\src\wifi folder, next to the WifiCat.cpp and WifiCat.h files, create the file arduino_secrets.h
+**Step #14  --Using PetitCat for AI and Cognitive Science: Onward to Part III  --**
+.....
 
-To let the robot connect to your own wifi as a station (STA), arduino_secrets.h must contain:
+.....
+-
+-
+-
+-
 
-#define SECRET_WIFI_TYPE "STA"
-#define SECRET_SSID "<your wifi SSID>"
-#define SECRET_PASS "<your password>"
-Alternatively, to let the robot provide its own wifi osoyoo_robot as an access point (AP), arduino_secrets.h must contain:
 
-#define SECRET_WIFI_TYPE "AP"
 
-
-
-# 2 load autocat_enacter.ino sketch and associated files #
-
-/*
- 
- Upload autocat_enacter.ino to the OSOYOO robot car
-
-  2023
-    Olivier Georgeon
-  Spring 2022
-   Titouan Knockart, Université Claude Bernard (UCBL), France
-  BSN2 2021-2022
-   Aleksei Apostolou, Daniel Duval, Célien Fiorelli, Geordi Gampio, Julina Matouassiloua
-  Teachers
-   Raphaël Cazorla, Florian Tholin, Olivier Georgeon
-  Bachelor Sciences du Numérique. ESQESE. UCLy. France
-
- Inspired form Arduino Mecanum Omni Direction Wheel Robot Car http://osoyoo.com/?p=30022
-*/
-
-#include <Arduino_JSON.h>
-#include "src/wifi/WifiCat.h"
-#include "Action_define.h"
-#include "Floor.h"
-#include "Head.h"
-#include "Imu.h"
-#include "Interaction.h"
-#include "Led.h"
-#include "Robot_define.h"
-#include "Sequencer.h"
-
-Floor FLO;
-Head HEA;
-Imu IMU;
-WifiCat WifiCat;
-Led LED;
-Sequencer SEQ(FLO, HEA, IMU, LED, WifiCat);
-
-int interaction_step = 0;
-int interaction_direction = 0;
-Interaction* INT  = nullptr;  // The interaction type will depend on the action received from the PC
-
-void setup()
-{
-  // Initialize serial for debugging
-
-  Serial.begin(9600);
-  Serial.println("Serial initialized");
-
-  // Initialize the LEDs
-
-  LED.setup();
-
-  // First attempt to initialize IMU
-
-  IMU.setup();
-  Serial.println("-- IMU initialized");
-
-  // Connect to the wifi board
-
-  WifiCat.begin();
-
-  // Second attempt to initialize IMU (try again because sometimes it fails the first time)
-  // Perhaps something to do with the order in which the imu registers are written.
-
-  IMU.setup();
-  Serial.println("-- IMU initialized");
-
-  // Initialize the automatic behaviors
-
-  FLO.setup();
-  Serial.println("-- Wheels initialized");
-
-  HEA.setup();
-  Serial.println("-- Head initialized");
-
-  Serial.println("--- Robot is ready ---");
-
-  pinMode(TOUCH_PIN, INPUT_PULLUP);
-}
-
-void loop()
-{
-  // Control the built-in led and the emotion led
-
-  LED.update();
-
-  // Behavior Floor Change Retreat
-
-  FLO.update(interaction_direction);
-
-  // Behavior Head Echo Alignment
-
-  HEA.update();
-
-  // Behavior IMU
-
-  IMU.update(interaction_step);
-
-  // Watch for message received from PC. If yes, starts the interaction
-
-  if (interaction_step == INTERACTION_DONE)
-    INT = SEQ.update(interaction_step, INT);
-
-  // Update the current interaction and return INTERACTION_DONE when done
-
-  if (INT != nullptr)
-  {
-    interaction_step = INT->update();
-    interaction_direction = INT->direction();
-  }
-  else
-    interaction_direction = DIRECTION_FRONT;
-}
-
-
-# 3 wifi #
-
-In the autocat_enacter\src\wifi folder, next to the WifiCat.cpp and WifiCat.h files, create the file arduino_secrets.h
-
-To let the robot connect to your own wifi as a station (STA), arduino_secrets.h must contain:
-
-#define SECRET_WIFI_TYPE "STA"
-#define SECRET_SSID "<your wifi SSID>"
-#define SECRET_PASS "<your password>"
-Alternatively, to let the robot provide its own wifi osoyoo_robot as an access point (AP), arduino_secrets.h must contain:
-
-#define SECRET_WIFI_TYPE "AP"
-The robot's IP address will show in the serial terminal:
-
-
-# 4 PetitCat #
-
-Test the PetitCat Robot
-This page explains how to test the PetitCat robot using the PetitCatTester.py file. Alternatively, you can use the PetitCatTester.ipynb notebook.
-
-
-![python](python.png)
-
-
-
-#!/usr/bin/env python
-#Olivier Georgeon, 2023.
-#This code is used to teach Developmental AI.
-#Requires:
-#- A PetiCat robot https://github.com/OlivierGeorgeon/osoyoo/wiki
-
-import socket
-import keyboard
-import sys
-import json
-
-UDP_IP = "192.168.4.1"
-UDP_TIMEOUT = 5  # Seconds
-
-
-class PetitCatTester:
-    def __init__(self, ip, time_out, port=8888):
-        self.IP = ip
-        self.port = port
-        self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.socket.settimeout(time_out)
-        self.clock = 0
-        self.focus_x = None
-        self.focus_y = None
-        self.color = None
-        self.duration = None
-        self.angle = None
-        self.span = None
-
-    def enact(self, _action_string):
-        """ Sending the action string, waiting for the outcome, and returning the outcome bytes """
-        _outcome = None  # Default if timeout
-        # print("sending " + action)
-        self.socket.sendto(bytes(_action_string, 'utf-8'), (self.IP, self.port))
-        try:
-            _outcome, address = self.socket.recvfrom(512)
-        except socket.error as error:  # Time out error when robot is not connected
-            print(error)
-        return _outcome
-
-    def send(self, _action):
-        """Format the action string for the notebook"""
-        command_dict = {'clock': self.clock, 'action': _action}
-        if self.focus_x is not None:
-            command_dict['focus_x'] = self.focus_x
-        if self.focus_y is not None:
-            command_dict['focus_y'] = self.focus_y
-        if self.color is not None:
-            command_dict['color'] = self.color
-        if self.duration is not None:
-            command_dict['duration'] = self.duration
-        if self.angle is not None:
-            command_dict['angle'] = self.angle
-        _action_string = json.dumps(command_dict)
-        print("Sending packet:", _action_string)
-        _outcome = self.enact(_action_string)
-        print("Received packet:", _outcome)
-        if _outcome is not None:
-            self.clock += 1
-        print("Next clock:", self.clock)
-        return _outcome
-
-
-#Test the wifi interface by controlling the robot from the console
-#Provide the Robot's IP address as a launch argument
-#py PetitCatTester.py 192.168.8.242
-if__name__ == '__main__':
-    robot_ip = UDP_IP
-    if len(sys.argv) > 1:
-        robot_ip = sys.argv[1]
-    else:
-        print("Please provide your robot's IP address")
-    print("Connecting to robot: " + robot_ip)
-    print("Action keys: 1: Turn left, 2: Backward, 3: Turn right, 4: Swipe left, 6: Swipe right, 8: Forward, -: Scan")
-    print("Ctrl+C and ENTER to abort")
-    osoyoo_wifi = PetitCatTester(robot_ip, UDP_TIMEOUT)
-    clock = 0
-    action = ""
-    while True:
-        print("Press action key:")
-        action = keyboard.read_key().upper()
-        action_string = '{"clock":' + str(clock) + ', "action":"' + action + '"}'
-        print("Sending packet:", action_string)
-        outcome = osoyoo_wifi.enact(action_string)
-        print("Received packet:", outcome)
-        if outcome is not None:
-            clock += 1
-
-
-
-
-Run the test
-Switch on the robot and read its IP address in the Arduino IDE terminal.
-
-Make sure your PC is connected to the same wifi as the robot.
-
-Clone this project or download the file PetitCatTester.py.
-
-Run PetitCatTester.py with the IP address of you robot as an argument. For example:
-
-py PetitCatTester.py 192.168.8.242
-Press the action keys. The robot executes your commands. Your python terminal displays the logs as in Figure 1.
-
-PetitCatTester Figure 1: The trace showing the enaction of three interactions
-
-When you press a key, the program sends the command packet to the robot via UDP. The field "clock" is an incremental number. The field "action" is your key. The robot executes your command and returns the outcome packet.
-
-If the wifi connection fails, the timeout is triggered and the outcome packet is None. The clock is not incremented.
-
-If the robot receives a command packet containing a clock equal to the clock previously received, it does not re-execute the command, and it immediately resends the latest outcome packet.
-
-Table 1 summarizes the recognized actions. The choice of keys was made for a standard keyboard numerical pad. These actions are interrupted if the robot detects a black line on the floor or an impact against an obstacle.
-
-Table 1: Main recognized commands
-
-Action key	Command
-1	Turn in the spot to the left by 45°
-2	Move backward during 1000ms
-3	Turn in the spot to the right by 45°
-4	Swipe left during 1000ms
-6	Swipe right during 1000ms
-8	Move forward during 1000ms
--	Scan the environment with the head
-Main command fields
-Table 2 summarizes the main fields of the command packet sent to the robot. To try the optional fields, you must modify PetitCatTester.py. Some optional fields only apply to some commands indicated in the Command column.
-
-Field	Command	Status	Description
-"clock"	all	Required	The incremental number of the interaction since startup.
-"action"	all	Required	The action code
-"focus_x"	all except -	Optional	The x coordinates of the focus point in mm
-"focus_y"	all except -	Optional	The y coordinates of the focus point in mm
-"color"	all	Optional	The color code of the emotion led: 0: off, 1: white, 2: green, 3: bleue, 4: red, 5: orange.
-"duration"	2, 4, 8	Optional	The duration of the translation in milliseconds
-"angle"	1	Optional	The angle of rotation in degrees. Negative angles turn right
-"span"	-	Optional	The span of the saccades during the scan in degrees
-During the interaction, the robot will keep its head towards the focus point defined by "focus_x" and "focus_y" coordinates.
-
-
-# 5 IMU Board (or possibly as an earlier step) mods  #
-
-HMC5883L
-This library handles the compass chip HMC5883L implemented in some of the GY-86 imu cards, It is available at https://github.com/jarzebski/Arduino-HMC5883L.
-
-HMC5883L Figure 3: The IMU card with the compass chip labeled L883/2131.
-
-If your compass chip begins with L883, include the following lines in robot_define.h for your robot:
-
-#define ROBOT_HAS_MPU6050  true
-#define ROBOT_COMPASS_TYPE 1
-MMC5883L
-This library handles the compass chip Duinotech MMC5883L implemented in some imu cards. I followed the article by David Such that lists the different compass chips. I adapted this library from his repo.
-
-IMU Figure 4: The IMU card with the compass chip labeled 5883/601X.
-
-If your compass chip begins with 5883, include the following lines in robot_define.h for your robot:
-
-#define ROBOT_HAS_MPU6050  true
-#define ROBOT_COMPASS_TYPE 2
-
-
-# 6 install IMU and Color Sensor #
-parts to install:
-
-HMC5583L compass chip in GY-86 IMU (inertial measurement) card (??) or MC5883L chip (?? to check)
-
-Connect the IMU card to the wifi Shield following Table 2 and Figure 1. Note that the calibration offset varies significantly depending on the position of the card on the robot.
-
-Table 2: IMU Wiring
-
-GY-86 Imu	MEGA2560 Wifi Shield
-Vcc	3v3
-GND	GND
-SCL	SCL
-SDA	SDA
-
-able 2: PIN connection
-
-TCS34725	MEGA2560	
-3v3	3v	On the Wifi Shield, yellow slots
-GND	GND	On the Wifi Shield, black
-SDA	SDA 20	
-SCL	SCL 21	
-LED	53	Digital output
-More information on the TCS34725 adafruit webpage.
-
-Color sensor (TCS34725 ?? to check)  
-Use the "long" two-hole version of the TCS34725. It has two LEDs, and the holes miraculously match holes on the robot platform (Figure 4). Wire it to the Arduino MEGA according to Table 2. Use PINs 20 and 21 for SDA and SCL because the other SDA and SCL PINs are used for the IMU. They are the same. For the power line, I used the 3v yellow PINs on the Wifi Shield. Alternatively, the VIN PIN can be connected to a 5V PIN (red).
-
-Table 2: PIN connection
-
-TCS34725	MEGA2560	
-3v3	3v	On the Wifi Shield, yellow slots
-GND	GND	On the Wifi Shield, black
-SDA	SDA 20	
-SCL	SCL 21	
-LED	53	Digital output
-More information on the TCS34725 adafruit webpage.
-
-
-![lastparts](lastparts.png)
-
-
-# 7 Emotion LED #
-
--did not buy yet the part but readily available locally
-
-
-Figure 5: RGB LED with flat side on the left. The cathode is the longest lead.
-![rgbled](rgbled.png)
-
-
-Table 3: RGB LED connections
-
-RGB LED		MEGA2560 / Wifi shield
-Blue		2
-Green		3
-GND	10kΩ resistor	GND
-Red		5
-
-
-
-
-
-
-Figure 6: The common cathode RGB LED on pins 2, 3, 5, and its cathode connected to the ground via a 10kΩ resistor. Flat side on the right.
-![emotionledinstall](emotionledinstall.jpg)
 
 
 
