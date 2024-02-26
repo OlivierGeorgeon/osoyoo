@@ -13,7 +13,8 @@
 #include "src/lib/MPU6050.h"
 #include "Action_define.h"
 #if ROBOT_COMPASS_TYPE == 1
-#include <HMC5883L.h>
+// #include <HMC5883L.h>
+#include "src/lib/HMC5883L.h"
 #endif
 #if ROBOT_COMPASS_TYPE == 2
 #include "src/lib/MMC5883.h"
@@ -89,7 +90,7 @@ void Imu::setup()
   compass.setSamples(HMC5883L_SAMPLES_4);  // HMC5883L_SAMPLES_4); // HMC5883L_SAMPLES_8
 
   // Set calibration offset. See HMC5883L_calibration.ino
-  compass.setOffset(COMPASS_X_OFFSET, COMPASS_Y_OFFSET);
+  compass.setOffset(COMPASS_X_OFFSET, COMPASS_Y_OFFSET, 0);
   #endif
 
   #if ROBOT_COMPASS_TYPE == 2

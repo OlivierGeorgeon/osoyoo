@@ -250,7 +250,7 @@ String MMC5883MA::readData()
 }
 
 // Olivier Georgeon for compatibility with HMC5883
-void MMC5883MA::setOffset(int xo, int yo)
+void MMC5883MA::setOffset(int xo, int yo, int zo)
 {
     xOffset = xo;
     yOffset = yo;
