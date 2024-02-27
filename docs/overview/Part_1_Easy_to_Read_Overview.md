@@ -1197,7 +1197,7 @@ You can try changing the values for the TURN_SPEED (turning speed) and the SHIFT
 
 The Arduino website provides thorough documentation of the Arduino board and the Arduino programming language and environment:  https://docs.arduino.cc/
 
-##
+## 
 ****
 Initial draft Feb 9, 2024
 
