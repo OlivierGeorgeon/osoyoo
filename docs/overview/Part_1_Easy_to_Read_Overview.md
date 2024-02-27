@@ -1142,7 +1142,7 @@ The Arduino IDE is somewhat weak compared to other professional IDEs for softwar
 
 The Sketch language that Arduino uses is largely standard C/C++ -- often the syntax, structures and semantics of C/C++ will work. However, the structure of the Sketch and the libraries provided are specifically designed to work with Arduino boards. (The AVR-GCC GNU compiler toolchain is used for Arduino boards. It compiles C/C++ albeit with some limitations related to the smaller amount of resources on the Arduino board.) 
 
-The basic structure of an Arduino Sketch consists of two main parts -- 'setup()' and 'loop()'
+The basic structure of an Arduino Sketch consists of two main parts -- 'setup()' and 'loop()' 
 
 The 'setup()' function runs at the start of the program (after includes, various function definitions, etc) and does initial setup housekeeping such as configuring pin modes on the Arduino board. If we look at the code of m2-lesson5a.ino then we see this function at lines 188 - 218. It is initialzing serial ports, it's checking for the presence of the Wi-Fi shield, it sends out a message useful for debugging that we'ere connected to the network, and so on.
 
