@@ -50,12 +50,14 @@ The PetitCat documentation is written so that anyone with a basic education can 
 -
 -
 
-# Part I: Modifying the Robot Car for Python Control
+# Part II: Modifying the Robot Car for Python Control
 
 -
 -
 
+Ok... in the previous Part I we built the robot car, installed software on it, and tried out its many features.
 
+Ok.... time to move forward now....
 
 Saddle up!! Let's get going on the most exciting part of our journey....
 
