@@ -959,8 +959,10 @@ I just asked GPT4 for a picture to illustrate my feelings to you the reader. Her
 -
 
 I just asked GPT4 to draw a logo for the PetitCat project in the style of Jackson Pollock to illustrate my feelings. Here is what it drew (first time, no regenerations):
-![logogpt4pollack](logogpt4pollack.jpg)
 
+<p align="center">
+ <img src="logogpt4pollack.jpg" width="900" height="950">
+</p>
 -
 -
 
