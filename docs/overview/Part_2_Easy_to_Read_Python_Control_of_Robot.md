@@ -414,14 +414,16 @@ At the time of this writing the project is specified to use these libraries:
 
 <h1 style="font-size: 24px;">Step #4 --Simple C/C++ Coding and (Possibly) Preventing Dementia</h1>
 
-No, this section title is not a typo. Keep reading, and see how with acquiring very simple C/C++ knowledge (which most readers probably already have) one could possibly prevent or delay Alzheimer's (and possibly other types of) dementia with the robot car. (CAUTION: We will only do this theoretically as part of learning some new coding. We will NOT build anything therapeutic or anything to be used seriously.)
+No, this section title is not a typo. Keep reading, and see how with acquiring very simple C/C++ knowledge (which most readers probably already have) one could possibly prevent or delay Alzheimer's (and possibly other types of) dementia with the robot car. 
+
+(CAUTION/DISCLAIMER: We will only do this theoretically as part of learning some new coding. We will NOT build anything therapeutic or anything to be used seriously.)
 
 
 --C/C++ IN THE ARDUINO ENVIRONMENT--
 
 As we discussed in Part I, the Arduino IDE uses a C++ compiler (the GNU GCC toolchain for the particular microcontroller being used) -- it compiles C and C++ code. Thus, Arduino programs are really C/C++ code.
 
-Learning to code in C and C++ is beyond the scope of this tutorial, and in any case most readers probably already have some experience in this area. However, this and the next Step (or two.... pending editing of how much material to include) is just to make sure that readers with limited experience in C/C++  feel a bit more comfortable with the code (as well as some idiosyncracies about Arduino program structure). 
+Learning to code in C and C++ is beyond the scope of this tutorial, and in any case most readers probably already have some experience in this area. However, this and the next Step (or two.... pending editing of how much material to include) is just to make sure that readers with limited experience in C/C++  feel a bit more comfortable with the code. As well, there are number of idiosyncracies and specialized functions in Arduino programs, so this may be of interest to even experienced coders. 
 
 C is the original procedural C programming language. C++ is a more modern object-oriented programming language with a richer set of features (particularly in memory management) and in its standard library. We will not be distinguishing between the two in this and the next Steps since the compiler will compile both sets of code. (C# is similar to C++. It was created by Microsoft in the late 1990s and originally developed for Windows platforms and Microsoft's .NET ecosystem, although it can now run on macOS and Linux. We will not be discussing it here.)
 
