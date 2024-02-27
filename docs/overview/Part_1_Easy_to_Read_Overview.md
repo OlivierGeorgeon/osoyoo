@@ -24,7 +24,7 @@ The "Easy-to-Read Overview" of the project is divided into five parts:
 
 **Part IV:** Integration of PetitCat with a Causal Cognitive Architecture
 
-**Part V:** Integration of PetitCat with GPT4
+**Part V:** Integration of PetitCat with Large Language Model
 
 
 The PetitCat documentation is written so that anyone with a basic education can read it and understand it. Have a deeper breadth of knowledge in software development, AI, or cognitive science, can, of course, allow greater appreciation for certain aspects of the project.
