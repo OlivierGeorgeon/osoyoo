@@ -37,7 +37,7 @@ If you are interested in starting this project, you should read this file first.
 Why? Because it is written from a first-person viewpoint that tries to answer the big questions of why do this project, how to start, how to implement, and so on. If you think back to learning a new subject in university -- wasn't it better to get tutorial help from a friend who just learned it rather than someone who already knew the subject for twenty years?  That's because the new learner has in his/her brain the steps that need to be overcome, while the experienced person has integrated these steps and may not teach them.
 I am that new learner -- trying to figure out how to even start this project. Let me guide you into what I believe you will find will be a very advantageous and satisfying project.
 
-<img src="robotcar.jpg" width="500" height="500">
+<img src="robotcar.jpg" width="500" height="500" align="center">
 
 
 
