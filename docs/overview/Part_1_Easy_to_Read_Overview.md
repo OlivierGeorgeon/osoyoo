@@ -38,7 +38,7 @@ Why? Because it is written from a first-person viewpoint that tries to answer th
 I am that new learner -- trying to figure out how to even start this project. Let me guide you into what I believe you will find will be a very advantageous and satisfying project.
 
 <img src="robotcar.jpg" width="500" height="500">
-![assembled robot car](robotcar.jpg)
+
 
 
 **Why Build a Robot Car?**
