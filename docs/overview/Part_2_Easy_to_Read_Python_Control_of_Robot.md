@@ -1,6 +1,7 @@
 
 
-# Part II: An Easy-to-Read Overview of the Robot Car ("PetitCat") Project: Modifying for Python Control
+# An Easy-to-Read Overview of the Robot Car ("PetitCat") Project
+# Part II
 
 ##
 
@@ -51,6 +52,7 @@ Saddle up!! Let's get going on the most exciting part of our journey....
 
 -
 -
+# Modifying for Python Control
 
 
 **Step #1 -- The Big Picture: The PetitCat Project**
