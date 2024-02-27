@@ -13,6 +13,7 @@ Howard Schneider -- Feb 15, 2024)
 
 
 # An Easy-to-Read Overview of the Robot Car ("PetitCat") Project
+# Part III
 
 ![petitcatgpt4logo](petitcatgpt4logo.jpg)
 -
@@ -54,6 +55,118 @@ The PetitCat documentation is written so that anyone with a basic education can 
 
 -
 -
+
+
+
+![rewrite](rewrite.png)
+
+# writing..... writing....#
+
+
+--SUCCESSFULLY COMPILING THE PROJECT REPO IN THE ARDUINO IDE--
+
+.....
+
+.....
+
+-
+-
+-
+-- ****ALREADY AT 1100 LINES -- CONSIDER SPLITTING INTO PART III HERE (AND UPDATE INTRO)***
+
+![altlogo](altlogo.png)
+
+-
+-
+-
+-
+
+**Step #9 --Preliminary Testing of the PetitCat Code: Python <--> Arduino --**
+
+.....
+
+.....
+-
+-
+-
+-
+
+**Step #10 --Installing the Digital Compass and Intertial Measurement Unit --**
+
+.....
+
+.....
+
+-
+-
+-
+-
+
+**Step #11 --Installing the Color Sensor --**
+
+......
+
+......
+-
+-
+-
+-
+
+
+**Step #12  --Full Testing of the PetitCat Code: Python <--> Arduino --**
+
+......
+
+......
+-
+-
+-
+-
+
+**Step #13  --Using the PetitCat Code: Active Inference  --**
+.....
+
+.....
+-
+-
+-
+-
+- ****CONSIDER SPLITTING INTO PART IV HERE (AND UPDATE INTRO)***
+  
+  ![altlogo](altlogo.png)
+
+-
+-
+-
+-
+
+**Step #14  --Using PetitCat for AI and Cognitive Science: Onward to Part III  --**
+.....
+
+.....
+-
+-
+-
+-
+
+##
+****
+
+(This is a public document that can be modified by others who have access -- if anything doesn't make sense, please ignore.)
+(No use of high voltage or anything dangerous is or should be specified in this document.)
+
+-
+-
+
+![altlogo](altlogo.png)
+
+-
+-
+
+
+end of document
+****
+##
 
 
 
