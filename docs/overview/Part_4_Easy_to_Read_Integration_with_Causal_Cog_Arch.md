@@ -13,7 +13,7 @@ Howard Schneider -- Feb 15, 2024)
 
 
 # An Easy-to-Read Overview of the Robot Car ("PetitCat") Project
-# Part III
+# Part IV
 
 ![petitcatgpt4logo](petitcatgpt4logo.jpg)
 -
@@ -51,7 +51,7 @@ The PetitCat documentation is written so that anyone with a basic education can 
 -
 -
 
-# Part III: Active Inference of the Robot Car
+# Part IV: Integration of PetitCat with a Causal Cognitive Architecture
 
 -
 -
@@ -74,46 +74,17 @@ The PetitCat documentation is written so that anyone with a basic education can 
 -
 -
 
-**Step # --Installing the Digital Compass and Intertial Measurement Unit --**
+**Step # --What is a Cognitive Architecture? --**
 
 .....
 
 .....
 
--
--
--
--
+![fig4.jpg](fig4.jpg)
 
-**Step # --Installing the Color Sensor --**
-
-......
-
-......
 -
 -
 -
--
-
-
-**Step #  --Full Testing of the PetitCat Code: Python <--> Arduino --**
-
-......
-
-......
--
--
--
--
-
-**Step --  --Using the PetitCat Code: Active Inference  --**
-.....
-
-.....
--
--
--
-
 
 
 ****
