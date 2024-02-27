@@ -703,7 +703,7 @@ You have mastered simple C/C++ coding for the Arduino and simple electronics for
 -
 -
 
-<h1 style="font-size: 24px;">Step #6 --Getting More Experience with the Arduino Coding</h1>
+<h1 style="font-size: 24px;">Step #6 --Getting More Experience with Arduino Coding</h1>
 
 Before moving on to consider the Arduino and Python code of the PetitCat project, getting a bit more experience with Arduino coding may be helpful. Again, while you are not expected to do C/C++ coding for the the PetitCat project (indeed, the purpose of PetitCat is to abstract away the C/C++/Arduino coding and let you interface your Python code to the robot car project), learning a bit more simple coding can help you better understand what the project code is doing.
 
