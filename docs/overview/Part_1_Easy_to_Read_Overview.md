@@ -951,11 +951,6 @@ For example, here is an inexpensive ($US10 from Amazon.com) more recent HC05 Blu
 -given that Bluetooth is not required for the next lesson, time to move on.....
 
 
-I just asked GPT4 for a picture to illustrate my feelings to you the reader. Here is what it drew (first time, no regenerations):
-
-<p align="center">
- <img src="horsetonextlesson.png" width="700" height="700">
-</p>
 -
 -
 
