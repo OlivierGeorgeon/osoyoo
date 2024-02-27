@@ -2,6 +2,28 @@
 
 
 # An Easy-to-Read Overview of the Robot Car ("PetitCat") Project
+
+Part I: The Basics: Assembly, Software and Using
+Part II: Modifying the Robot Car for Python Control
+Part III: Active Inference of the Robot Car
+Part IV: Integration of PetitCat with a Causal Cognitive Architecture
+Part V: Integration of PetitCat with GPT4
+
+The PetitCat documentation is written so that anyone with a basic education can read it and understand it. Have a deeper breadth of knowledge in software development, AI, or cognitive science, can, of course, allow greater appreciation for certain aspects of the project.
+
+-Part I does not require any specialized background knowledge. You should be familiar with moving files in either your Windows, Mac or Linux desktop/laptop computer. Other than that, no specialized knoweldge is needed. Part I is perfectly fine for high school students and hobbyists.
+
+-Part II may be fine for high school students, college students and hobbyists as well, given a willingness of some effort to learn things here and there. However, the documentation will guide you on this learning journey. The lower level software of the PetitCat project is written in C\C++ in the Arduino IDE. You don't need to know these languages in order to use Python with the project. However, we provide a very basic C\C++\Arduino tutorial which may be sufficient for most readers who do want to have a bit more control over the Arduino board coding, especially if you have coded in any other computer language at some point. We just touch upon the Python control of the project at the end of Part II, so you are not expected to have much Python knowledge in this part, unless you want to start modifying the Python files.
+
+-Part III really only requires some knowledge of Python. You do not have to be an expert developer. More important, is perhaps a background in AI in cognitive science. However, no background is required -- we provide gentle tutorials on a number of topics, and guide you through the concepts of active inference and implementing it in your PetitCat project.
+
+-Part IV has similar requirements. In this part we take a functioning system, i.e., the PetitCat robot car and software, and integrate with a cognitive architecture. The result is a true grounded system capable of autonomous operation. Again, in this part, only intermediate (or even novice) Python coding abilities are required. 
+
+-In Part V we will add the full capabilities  (hopefully.... depending on software releases and licensing) of GPT4 into the PetitCat cognitive architecture embedded system. Again, in this part, only intermediate (or even novice) Python coding abilities are required. However, we will gently guide you through the project, so that you end up with a super-human intelligent grounded autonomous robot system. 
+
+
+
+
 # Part I: The Basics
 
 ##
