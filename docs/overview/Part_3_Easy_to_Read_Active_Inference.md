@@ -63,7 +63,13 @@ The PetitCat documentation is written so that anyone with a basic education can 
 .....
 
 .....
--
+
+
+.....
+![rewrite](rewrite.png)
+
+
+# thinking..... writing..... thinking..... writing....#
 -
 -
 -
