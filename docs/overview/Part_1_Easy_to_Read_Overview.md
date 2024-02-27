@@ -953,15 +953,16 @@ For example, here is an inexpensive ($US10 from Amazon.com) more recent HC05 Blu
 
 I just asked GPT4 for a picture to illustrate my feelings to you the reader. Here is what it drew (first time, no regenerations):
 
-![horsetonextlesson](horsetonextlesson.png)
-
+<p align="center">
+ <img src="horsetonextlesson.png.jpg" width="700" height="700">
+</p>
 -
 -
 
 I just asked GPT4 to draw a logo for the PetitCat project in the style of Jackson Pollock to illustrate my feelings. Here is what it drew (first time, no regenerations):
 
 <p align="center">
- <img src="logogpt4pollack.jpg" width="900" height="950">
+ <img src="logogpt4pollack.jpg" width="700" height="700">
 </p>
 -
 -
