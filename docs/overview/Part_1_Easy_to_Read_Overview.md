@@ -52,7 +52,7 @@ For a good overview of the importance of grounding your AI/AGI please consider m
 Even if Tesla Bots, for sake of example, were available, you wouldn't want to use such a complex system for the prototype stages of your AI/AGI project or theoretical project. You want a capable but simple enough robotic system that you have direct access to via Python, which is what this robotic car project allows. You will now have an embodiment to use with your AI/AGI. Even if you work mainly theoretically, the robotic car project can be very useful in terms of demonstrations and proof of concept.
 
 <p align="center">
-![tesla bot gen 2](teslabot.jpg)
+  ![tesla bot gen 2](teslabot.jpg)
 </p>
 -
 -
