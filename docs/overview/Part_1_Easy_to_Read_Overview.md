@@ -1107,7 +1107,7 @@ They all work .... we can control the robot car via Wi-Fi.
 
 Success :)
 
-![gptrequest](gptrequest.png)
+
 ![successpic](successpic.png)
 
 Well, you probably notice you are at the end of the Osoyoo Manual now. Does this mean that we're at the end of the Basic Overview of the robot car?
