@@ -1078,11 +1078,17 @@ Ok.... now we need the Osoyoo mobile app to access the Wi-Fi hotspot on your rob
 
 -Then go to Settings and enter the IP address this app should access (since we want it to access the Wi-Fi board on the robot car)
 
-![appsettings](appsettings.png)
+<p align="center">
+ <img src="appsettings.png" width="600" height="600">
+</p>
+
 
 -Ok...now go to the main page of the app.
 
-![wifiapp](wifiapp.png)
+<p align="center">
+ <img src="wifiapp.png" width="600" height="600">
+</p>
+
 
 -Ok... turn on the robot car
 
