@@ -423,7 +423,7 @@ No, this section title is not a typo. Keep reading, and see how with acquiring v
 
 As we discussed in Part I, the Arduino IDE uses a C++ compiler (the GNU GCC toolchain for the particular microcontroller being used) -- it compiles C and C++ code. Thus, Arduino programs are really C/C++ code.
 
-Learning to code in C and C++ is beyond the scope of this tutorial, and in any case most readers probably already have some experience in this area. However, this and the next Step (or two.... pending editing of how much material to include) is just to make sure that readers with limited experience in C/C++  feel a bit more comfortable with the code. As well, there are number of idiosyncracies and specialized functions in Arduino programs, so this may be of interest to even experienced coders. 
+Learning to code in C and C++ is beyond the scope of this tutorial, and in any case most readers probably already have some experience in this area. However, this and the next Step (or two.... pending editing of how much material to include) is just to make sure that readers with limited experience in C/C++  feel a bit more comfortable with the code. As well, there are a number of idiosyncracies and specialized functions in Arduino programs, so this may be of interest to even experienced coders. 
 
 C is the original procedural C programming language. C++ is a more modern object-oriented programming language with a richer set of features (particularly in memory management) and in its standard library. We will not be distinguishing between the two in this and the next Steps since the compiler will compile both sets of code. (C# is similar to C++. It was created by Microsoft in the late 1990s and originally developed for Windows platforms and Microsoft's .NET ecosystem, although it can now run on macOS and Linux. We will not be discussing it here.)
 
@@ -435,26 +435,22 @@ On a technical note, the Arduino IDE looks at what type of board you are trying 
 - AVR-OBJCOPY then converts the ELF file into a HEX file which is a text representation of the binary data which will be loaded into the Arduino microcontroller's flash memory
 - Uploader tool AVRDUDE then transfers the HEX file to the microcontroller's flash memory by communicating with the bootloader on the Arduino AVR-microcontroller board
 
-In the Arduino IDE, when 'Upload' is clicked in the IDE then above sequence of compile and upload steps occur.
+In the Arduino IDE, when 'Upload' is clicked in the IDE then the above sequence of compile and upload steps occur.
 
 The Arduino CLI (available as a download from the Arduino website) allows compiling and uploading Arduino code at the command line, without the use of the IDE. Or, the usage of the above individual tools can be used at the commmand line, e.g., avr-gcc to compile and link files, avr-objcopy to convert to a HEX listing, and avrdude to upload the HEX file to the Arduino AVR-based microcontroller board. However, here we only consider the usage of the Arduino IDE to compile and upload code to the robot car's Arduino board.
 
 For readers with no background in C/C++ consider the many excellent and free (or some at small fees) courses and tutorials available online. However, the tutorial in this and the next Step(s) will give you some exposure to C/C++ in particular for the Arduino projects.
 
-You do not need to be able to code in C/C++. The purpose of the PetitCat project is to construct an interface that will allow your thousands of lines of Python code to communicate with the robot car, and then use this ability for various cognitive science/AI experiments and demonstrations. However, given that the robot car is powered by C/C++ code, understanding a tiny bit about C/C++ can be helpful in understanding how we make the robot car communicate with the Python programs.
+You do not need to be able to code in C/C++. The purpose of the PetitCat project is to construct an interface that will allow your thousands of lines of Python code to communicate with the robot car, and then use this ability for various cognitive science/AI experiments and demonstrations. However, given that the robot car is powered by compiled C/C++ code, understanding a tiny bit about C/C++ can be helpful in understanding how we make the robot car communicate with the Python programs.
 
 
 --FLASHING LIGHTS AND POSSIBLE IMPROVED COGNITION?? --
 
-Ok... above it was written "....Keep reading, and see how with acquiring very simple C/C++ knowledge you can possibly prevent or delay Alzheimer's (and possibly other types of) dementia with the robot car."  You may be thinking, 'Was this just clickbait to keep me reading your boring paragraphs?'  Well.... no :)  Ok.... so then you may think, 'Are you going to write now that by using my brain to learn something new (like the material in your boring paragraphs above and learning some C/C++ coding below) that will prevent or delay dementia and my brain will stay extra healthy?'  Well... maybe. Any intellectual stimulation is good for the brain and lots of studies indicate it may indeed keep the brain much healthier throughout the lifetime. But, no... it's not this. We will really build a more definitive prevention of Alzheimer's (possibly -- research is still lacking -- read the cautions below -- this is just for fun, not for real medical use!!) with our robot car project.
+Ok... above it was written "....Keep reading, and see how with acquiring very simple C/C++ knowledge you can possibly prevent or delay Alzheimer's (and possibly other types of) dementia with the robot car."  You may be thinking, 'Was this just clickbait to keep me reading your boring paragraphs?'  Well.... no :) 
 
-Synchronous acitivity of large groups of neurons generate oscillatory electrical signals which can be measured on the scalp of the head (EEG). It is believed that the synchronous activity of neurons allows different parts of the brain to communicate with each other. (Although.... if you want to consider a more nuanced look at the subject, consider reading- Schneider, H. (2022). Causal cognitive architecture 3: a solution to the binding problem. Cognitive Systems Research, 72, 88-115.) In dementias we see pertubation of the EEG rhythms believed to be needed for cognition. A number of studies have shown that stimulation in the 40-Hz "gamma" EEG range of oscillations can improve Alzheimer's Disease symptoms in mouse models of the disease (Chan, D., Suk, H. J., Jackson, B., Milman, N. P., Stark, D., Beach, S. D., & Tsai, L. H. (2021). Induction of specific brain oscillations may restore neural circuits and be used for the treatment of Alzheimer's disease. Journal of Internal Medicine, 290(5), 993-1009.) A study on humans also showed similar results (e.g., Chan, D., Suk, H. J., Jackson, B. L., Milman, N. P., Stark, D., Klerman, E. B., ... & Tsai, L. H. (2021). Gamma frequency sensory stimulation in probable mild Alzheimer’s dementia patients: results of a preliminary clinical trial.) (There is a warning in the next paragraph -- if this warning has been deleted please do not build this project without reading.)
+In fact, this is a very legitimate topic. 
 
-There is an LED on the Arduino board already wired up to digital output D13. If we flash this at 40Hz there will be a 40Hz visual stimuli which if we look at could (theoretically) prevent and improve dementias. (But.... again.... you should not do this because the research is still incomplete and there are actually dangers of staring at 40Hz signals such as risks of triggering seizures in sensitive individuals, triggering migraines in certain individuals, causing eye strain, and the potential for unknown effects. The reason medical research is done is because sometimes treatments end up causing more harm than good. We are building this project just for fun, not for medical usage!! We will just build a demonstration circuit, but not use it for any therapeutic purpose. As well, if there is any risk of seizures, please use the alternative much slower demonstration.)
-
-(Note: "GENUS" is not a typo for "Genius" but stands for Gamma-Entrainment-Using-Sensory stimuli at 40 Hz)
-
-![stimulate40Hz](stimulate40hz.jpg)
+However, given that there is very tiny risk of seizures induced by flashing lights for a very small percentage of the population, but still some people, this Step has been re-written so we discuss how we can code the Arduino board to possibly improve cognition and prevent dementia, but do so  only at the end of the Step and we don't program the actually circuit.
 
 
 --ARDUINO SKETCH TO FLASH THE ONBOARD LED--
@@ -507,12 +503,6 @@ This is what my program looks like:
 
 -
 -
-
-![seizurewarn](seizurewarn.png)
-Although the LED is low-power, this still represents a relatively fast flashing light. There is a risk in sensitive individuals of triggering seizures (as well as migraines). If this applies to you or you have any risk towards seizures, do NOT flash the light at high speed -- instructions are given below for flashing the LED at a much lower rate. (Triggering seizures in photosensitive individuals is increased by exposure to a frequency of 5 to 30 Hertz  (it can still occur at 40 Hertz), bright lights, high contrast, and the duration of exposure. A frequency of 0.125 Hertz (one gentle turn on of the LED every 8 seconds) in a well-lit room (to reduce contrast) is used in the alternative demonstration.)
-
-WARNING: This is written for an intended target audience of educated researchers in cognitive science and artificial intelligence, who might be interested in a theoretical aspect of approaching cognition as a means to help them learn new coding/system details. It is not written as a do-it-yourself therapeutic project and it is not written for those not educated in the field.
-
 ![slowflash](slowflash.png)
 
 Alternative code to consider if you are at photosensitive risk for seizures. Also use the demonstration in well-lit room to reduce contrast with the brightness of the LED. Also, do not stare at the LED and do not look at it for very long.
@@ -583,6 +573,34 @@ Now click the button to compile and upload the code. What happens?
 You will get a compilation error. When the code is linked together by the compiler toolchain, it expects to see a setup() function.
 
 Restore your code, i.e., uncomment the setup() function. Everything should work well now again, i.e., the code compiles and uploads to the Arduino board.
+
+
+
+
+![seizurewarn](seizurewarn.png)
+Although the LED is low-power, this still represents a relatively fast flashing light. There is a risk in sensitive individuals of triggering seizures (as well as migraines). If this applies to you or you have any risk towards seizures, do NOT flash the light at high speed -- instructions are given below for flashing the LED at a much lower rate. (Triggering seizures in photosensitive individuals is increased by exposure to a frequency of 5 to 30 Hertz  (it can still occur at 40 Hertz), bright lights, high contrast, and the duration of exposure. A frequency of 0.125 Hertz (one gentle turn on of the LED every 8 seconds) in a well-lit room (to reduce contrast) is used in the alternative demonstration.)
+
+WARNING: This is written for an intended target audience of educated researchers in cognitive science and artificial intelligence, who might be interested in a theoretical aspect of approaching cognition as a means to help them learn new coding/system details. It is not written as a do-it-yourself therapeutic project and it is not written for those not educated in the field.
+
+
+--FLASHING LIGHTS AND POSSIBLE IMPROVED COGNITION?? --
+
+Ok... above it was written "....Keep reading, and see how with acquiring very simple C/C++ knowledge you can possibly prevent or delay Alzheimer's (and possibly other types of) dementia with the robot car."  You may be thinking, 'Was this just clickbait to keep me reading your boring paragraphs?'  Well.... no :) 
+
+In fact, this is a very legitimate topic. 
+
+However, given that there is very tiny risk of seizures induced by flashing lights for a very small percentage of the population, but still some people, this Step has been re-written so we discuss how we can code the Arduino board to possibly improve cognition and prevent dementia, but do so  only at the end of the Step and we don't program the actually circuit.
+
+Ok.... so then you may think, 'Are you going to write now that by using my brain to learn something new (like the material in your boring paragraphs above and learning some C/C++ coding below) that will prevent or delay dementia and my brain will stay extra healthy?'  Well... maybe. Any intellectual stimulation is good for the brain and lots of studies indicate it may indeed keep the brain much healthier throughout the lifetime. But, no... it's not this. We will really build a more definitive prevention of Alzheimer's (possibly -- research is still lacking -- read the cautions below -- this is just for fun, not for real medical use!!) with our robot car project.
+
+Synchronous acitivity of large groups of neurons generate oscillatory electrical signals which can be measured on the scalp of the head (EEG). It is believed that the synchronous activity of neurons allows different parts of the brain to communicate with each other. (Although.... if you want to consider a more nuanced look at the subject, consider reading- Schneider, H. (2022). Causal cognitive architecture 3: a solution to the binding problem. Cognitive Systems Research, 72, 88-115.) In dementias we see pertubation of the EEG rhythms believed to be needed for cognition. A number of studies have shown that stimulation in the 40-Hz "gamma" EEG range of oscillations can improve Alzheimer's Disease symptoms in mouse models of the disease (Chan, D., Suk, H. J., Jackson, B., Milman, N. P., Stark, D., Beach, S. D., & Tsai, L. H. (2021). Induction of specific brain oscillations may restore neural circuits and be used for the treatment of Alzheimer's disease. Journal of Internal Medicine, 290(5), 993-1009.) A study on humans also showed similar results (e.g., Chan, D., Suk, H. J., Jackson, B. L., Milman, N. P., Stark, D., Klerman, E. B., ... & Tsai, L. H. (2021). Gamma frequency sensory stimulation in probable mild Alzheimer’s dementia patients: results of a preliminary clinical trial.) (There is a warning in the next paragraph -- if this warning has been deleted please do not build this project without reading.)
+
+There is an LED on the Arduino board already wired up to digital output D13. If we flash this at 40Hz there will be a 40Hz visual stimuli which if we look at could (theoretically) prevent and improve dementias. (But.... again.... you should not do this because the research is still incomplete and there are actually dangers of staring at 40Hz signals such as risks of triggering seizures in sensitive individuals, triggering migraines in certain individuals, causing eye strain, and the potential for unknown effects. The reason medical research is done is because sometimes treatments end up causing more harm than good. We are building this project just for fun, not for medical usage!! We will just build a demonstration circuit, but not use it for any therapeutic purpose. As well, if there is any risk of seizures, please use the alternative much slower demonstration.)
+
+(Note: "GENUS" is not a typo for "Genius" but stands for Gamma-Entrainment-Using-Sensory stimuli at 40 Hz)
+
+![stimulate40Hz](stimulate40hz.jpg)
+
 
 -
 -
