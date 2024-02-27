@@ -63,7 +63,7 @@ Saddle up!! Let's get going on the most exciting part of our journey....
 
 
 <p align="center">
- <img src="horsetonextlesson.png" width="900" height="900">
+ <img src="horsetonextlesson.png" width="770" height="770">
 </p>
 
 
