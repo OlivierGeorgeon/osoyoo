@@ -71,7 +71,7 @@ Saddle up!! Let's get going on the most exciting part of our journey....
 -
 
 
-**Step #1 -- The Big Picture: The PetitCat Project**
+<h1 style="font-size: 24px;">Step #1 -- The Big Picture: The PetitCat Project</h1>
 
 Ok.... you are in the saddle, riding high on your horse. Now it's time to survey the landscape before moving on....
 
@@ -134,7 +134,7 @@ https://github.com/OlivierGeorgeon/osoyoo/blob/master/petitcat_arduino/petitcat_
 
 
 
-**Step #2 -- Using your House/Workplace Wi-Fi to Communicate with the Robot Car**
+<h1 style="font-size: 24px;">Step #2 -- Using your House/Workplace Wi-Fi to Communicate with the Robot Car</h1>
 
 In Part I in one of the last Steps we created a Wi-Fi server ("hotspot") out of the Arduino board's Wi-Fi shield, and we logged our smartphone into this Wi-Fi server ("hotspot"). Then we used an app on our phone to control the robot car via a Wi-Fi linkage between the two.
 
@@ -306,7 +306,7 @@ For a moment, you can pretend you just created a great new robot to be used on t
 -
 
 
-**Step #3 --Getting More Experience with the Arduino IDE -- The Library Manager**
+<h1 style="font-size: 24px;">Step #3 --Getting More Experience with the Arduino IDE -- The Library Manager</h1>
 
 In this Step we will learn how to use the Arduino IDE library manager, and we will then install some of the Arduino libraries that our PetitCat project code will later need to use.
 
@@ -412,7 +412,7 @@ At the time of this writing the project is specified to use these libraries:
 -
 
 
-**Step #4 --Simple C/C++ Coding and (Possibly) Preventing Dementia**
+<h1 style="font-size: 24px;">Step #4 --Simple C/C++ Coding and (Possibly) Preventing Dementia</h1>
 
 No, this section title is not a typo. Keep reading, and see how with acquiring very simple C/C++ knowledge (which most readers probably already have) one could possibly prevent or delay Alzheimer's (and possibly other types of) dementia with the robot car. (CAUTION: We will only do this theoretically as part of learning some new coding. We will NOT build anything therapeutic or anything to be used seriously.)
 
@@ -587,8 +587,7 @@ Restore your code, i.e., uncomment the setup() function. Everything should work 
 -
 -
 
-
-**Step #5 --Simple Electronics Is All You Need (to do great things with the robot car project)**
+<h1 style="font-size: 24px;">Step #5 --Simple Electronics Is All You Need (to do great things with the robot car project)</h1>
 
 
 --THE INCREDIBLE COMPLEXITY OF THE ELECTRONICS BEHIND THE ARDUINO BOARD--
@@ -704,7 +703,7 @@ You have mastered simple C/C++ coding for the Arduino and simple electronics for
 -
 -
 
-**Step #6 --Getting More Experience with the Arduino Coding --**
+<h1 style="font-size: 24px;">Step #6 --Getting More Experience with the Arduino Coding</h1>
 
 Before moving on to consider the Arduino and Python code of the PetitCat project, getting a bit more experience with Arduino coding may be helpful. Again, while you are not expected to do C/C++ coding for the the PetitCat project (indeed, the purpose of PetitCat is to abstract away the C/C++/Arduino coding and let you interface your Python code to the robot car project), learning a bit more simple coding can help you better understand what the project code is doing.
 
@@ -815,8 +814,7 @@ We've learned to use the Arduino board for digital outputs, e.g., the built-in f
 -
 -
 
-
-**Step #7 --Arduino Analog Inputs and Outputs and Measuring with a Multimeter --**
+<h1 style="font-size: 24px;">Step #7 --Arduino Analog Inputs and Outputs and Measuring with a Multimeter</h1>
 
 Unlike the C/C++ code (or Python code) you normally write at your laptop/desktop, the Arduino code is very much concerned with input and outputs, both digital and analog ones. We have very briefly considered coding for digital inputs and outputs. In this step we will further consider digital inputs and outputs as well as coding for analog inputs and outputs. Also, we will practice using a multimeter.
 
@@ -839,8 +837,7 @@ If you are working on the Arduino board including working on the robot car proje
 -
 
 
-
-**Step #8 --Compiling the PetitCat Code --**
+<h1 style="font-size: 24px;">Step #8 --Compiling the PetitCat Code</h1>
 
 Now that we have a working robot car (Part I) and that we have acquired further knowledge about coding for the Arduino board (this Part II of the documentation), we are ready to start implementing the actual code of the PetitCat robot car project.
 
@@ -1099,19 +1096,9 @@ Sometimes, if you have access to the code developer, it is better to speak to hi
 -
 -
 
-**Step #9 --Preliminary Testing of the PetitCat Code: Python <--> Arduino --**
+<h1 style="font-size: 24px;">Step #9 --Preliminary Testing of the PetitCat Code: Python <--> Arduino</h1>
 
 
-**Step #10 --Installing the Digital Compass and Intertial Measurement Unit --**
-
-
-**Step #11 --Installing the Color Sensor --**
-
-
-**Step #12  --Full Testing of the PetitCat Code: Python <--> Arduino --**
-
-
-**Step #13  --Using the PetitCat Code: Active Inference  --**
 
 -
 -
