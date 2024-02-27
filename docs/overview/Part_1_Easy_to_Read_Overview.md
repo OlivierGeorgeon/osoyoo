@@ -1069,7 +1069,10 @@ Ok.... now we need the Osoyoo mobile app to access the Wi-Fi hotspot on your rob
 
 -Unfortunately when I do this search (Feb 9, 2024) the only app that appears in the Google Play store is "Osoyoo IoT UDP Robot APP" -- well, better than nothing, and maybe it will do the same thing.... so this app is installed on my Android cellphone
 
-![searchplay](searchplay.png)
+
+<p align="center">
+ <img src="searchplay.png" width="600" height="600">
+</p>
 
 -Ok we open the Osoyoo IoT UDP Robot APP
 
