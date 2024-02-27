@@ -55,33 +55,10 @@ The PetitCat documentation is written so that anyone with a basic education can 
 
 -
 -
-
-
-
-![rewrite](rewrite.png)
-
-# writing..... writing....#
-
-
---SUCCESSFULLY COMPILING THE PROJECT REPO IN THE ARDUINO IDE--
-
-.....
-
-.....
-
--
--
--
--- ****ALREADY AT 1100 LINES -- CONSIDER SPLITTING INTO PART III HERE (AND UPDATE INTRO)***
-
-![altlogo](altlogo.png)
-
--
--
 -
 -
 
-**Step #9 --Preliminary Testing of the PetitCat Code: Python <--> Arduino --**
+**Step # --Preliminary Testing of the PetitCat Code: Python <--> Arduino --**
 
 .....
 
@@ -91,7 +68,7 @@ The PetitCat documentation is written so that anyone with a basic education can 
 -
 -
 
-**Step #10 --Installing the Digital Compass and Intertial Measurement Unit --**
+**Step # --Installing the Digital Compass and Intertial Measurement Unit --**
 
 .....
 
@@ -102,7 +79,7 @@ The PetitCat documentation is written so that anyone with a basic education can 
 -
 -
 
-**Step #11 --Installing the Color Sensor --**
+**Step # --Installing the Color Sensor --**
 
 ......
 
@@ -113,7 +90,7 @@ The PetitCat documentation is written so that anyone with a basic education can 
 -
 
 
-**Step #12  --Full Testing of the PetitCat Code: Python <--> Arduino --**
+**Step #  --Full Testing of the PetitCat Code: Python <--> Arduino --**
 
 ......
 
@@ -123,33 +100,16 @@ The PetitCat documentation is written so that anyone with a basic education can 
 -
 -
 
-**Step #13  --Using the PetitCat Code: Active Inference  --**
+**Step --  --Using the PetitCat Code: Active Inference  --**
 .....
 
 .....
 -
 -
 -
--
-- ****CONSIDER SPLITTING INTO PART IV HERE (AND UPDATE INTRO)***
-  
-  ![altlogo](altlogo.png)
 
--
--
--
--
 
-**Step #14  --Using PetitCat for AI and Cognitive Science: Onward to Part III  --**
-.....
 
-.....
--
--
--
--
-
-##
 ****
 
 (This is a public document that can be modified by others who have access -- if anything doesn't make sense, please ignore.)
