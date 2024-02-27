@@ -17,7 +17,7 @@ Howard Schneider -- Feb 15, 2024)
 
 ![petitcatgpt4logo](petitcatgpt4logo.jpg)
 -
-
+ 
 -
 
 <h2 style="font-size: 24px;">The PetitCat Project </h2>
