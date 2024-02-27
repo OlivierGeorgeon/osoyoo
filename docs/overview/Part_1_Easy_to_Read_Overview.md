@@ -53,7 +53,7 @@ Even if Tesla Bots, for sake of example, were available, you wouldn't want to us
 -
 -
 -
-<h1 style="font-size: 24px;">**Step #1 -- Decide if you want to do the Project**</h1>
+<h1 style="font-size: 24px;">Step #1 -- Decide if you want to do the Project</h1>
 
 Your first step should be to decide to build this robotic car project. Are you working on an AI/AGI project that it could be useful for? (Actually, it is probably useful for most projects, including LLMs.) Do you have an interest in robotics and would like to see an interface to an AI project? 
 
@@ -68,7 +68,7 @@ In terms of your required software expertise, only a minimal amount is needed to
 -
 -
 
-**Step #2 -- Purchase the Robot Car kit**
+<h1 style="font-size: 24px;">Step #2 -- Purchase the Robot Car kit</h1>
 
 I assume you already have a Windows, Linux or Mac computer to use with this project. I used a Windows PC, and thus I will be describing my experience from a Windows point of view. However, running Arduino and Python code within Linux or Mac environments should be straightforward if that's what you are using.
 
@@ -98,7 +98,7 @@ Note: The Amazon website says this is a kit for teens while the Osoyoo website s
 -
 -
 
-**Step #3 -- Purchase the extra electronic parts**
+<h1 style="font-size: 24px;">Step #3 -- Purchase the Extra Electronic Parts</h1>
 
 You may not need these extra navigation parts immediately, but since they are purchased from AliExpress and generally delivered from China via slow delivery means (given that the sum total of the parts is about US$30), you may want to order these parts once you decide to go ahead with the project.
 
@@ -121,7 +121,7 @@ Troubleshooting note:  If you are able to allocate sufficient research funds, I 
 -
 -
 
-**Step #4 -- Receiving the Robot Car Kit -- Finding the Documentation**
+<h1 style="font-size: 24px;">Step #4 -- Receiving the Robot Car Kit -- Finding the Documentation</h1>
 
 A few days (or day -- Amazon.com is very efficient) have gone by and a package arrives at your lab, office (or home perhaps). It's the Osoyoo robotic car kit.
 
@@ -177,6 +177,7 @@ The online version of this manual has a useful parts list which links to the Oso
 
 
 **Step #5 -- Overview of the Parts and of the Documentation** 
+<h1 style="font-size: 24px;">Step #4 -- Receiving the Robot Car Kit -- Finding the Documentation</h1>
 
 Ok... at this point you've downloaded the correct PDF manual for your robot car kit.
 Again, as noted above --I am using the Model 2 manual in my overview of the robot car:  [model 2 PDF manual](https://osoyoo.com/manual/202000600-m2.pdf)
@@ -269,6 +270,7 @@ The Wi-Fi board will now actively interface to the Arduino board:
 -
 
 **Step #6 -- Assembly of Parts on the Underside of the Chassis** 
+<h1 style="font-size: 24px;">Step #4 -- Receiving the Robot Car Kit -- Finding the Documentation</h1>
 
 -Follow the instruction manual to bolt into place the motor holders. Then install the jackscrews and couplings on the motors, and install the motors as shown in the manual. There are nylon tie wraps to hold the extra wires. Note that these motors (one for each wheel) have Hall sensors (the white, yellow, orange, green lines) but they are apparently not being used and are just tucked away. Only the ground black and power red wires will go to the electronics through the center hole in the chassis.
 
@@ -285,6 +287,7 @@ Assembled chassis (Note that the straps are still loose until the assembly is co
 -
 
 **Step #7 -- Assembly of Electronic Parts on the Acrylic Board above the chassis** 
+<h1 style="font-size: 24px;">Step #4 -- Receiving the Robot Car Kit -- Finding the Documentation</h1>
 
 -Follow the instruction manual to prepare the acrylic board and then install the electronic modules as shown.
 
@@ -318,6 +321,7 @@ Assembled chassis (Note that the straps are still loose until the assembly is co
 -
 
 **Step #8 -- Installation of the Arduino IDE and Self-Test Program** 
+<h1 style="font-size: 24px;">Step #4 -- Receiving the Robot Car Kit -- Finding the Documentation</h1>
 
 -Even if you have no experience with Arduino, this step is quite easy.
 
@@ -397,7 +401,7 @@ https://www.youtube.com/watch?v=SWa4VOoAa1U
 -
 
 **Step #9 -- Troubleshooting** 
-
+<h1 style="font-size: 24px;">Step #4 -- Receiving the Robot Car Kit -- Finding the Documentation</h1>
 -
 -
 
@@ -607,6 +611,7 @@ BEFORE PROCEEDING FURTHER, MAKE SURE THE BASIC SELF-TEST PROGRAM OF YOUR OSOYOO 
 -
 
 **Step #10 -- Adding the Ultrasonic and Servomechanism Components**
+<h1 style="font-size: 24px;">Step #4 -- Receiving the Robot Car Kit -- Finding the Documentation</h1>
 
  -An "ultrasonic distance sensor" is effectively an ultrasonic transducer (generates ultrasonic waves) and an ultrasonic sensor (detects ultrasonic energy). (A "transceiver" is a device that both transmits and receives a signal.) An ultrasonic transceiver can measure distances by seeing how long it takes for an ultrasonic sound wave to hit a target and reflect back to the sensor. From the the time delay and the speed of sound the distance can be computed.
 
@@ -716,6 +721,7 @@ It happens quickly -- this is my screen less than a second after clicking the ar
 -
 
 **Step #11 -- Avoiding Obstacles with the IR Obstacle Avoidance Module**
+<h1 style="font-size: 24px;">Step #4 -- Receiving the Robot Car Kit -- Finding the Documentation</h1>
 
 One of the versions of the Osoyoo Robot Car kit comes with an additional lesson explaining using the Osoyoo IR Obstacle Avoidance module. My kit did not come with this lesson, and thus its use is not described here.
 
@@ -730,7 +736,7 @@ The Osoyoo IR Obstacle Avoidance module is exactly what is sounds like -- there 
 -
 
 **Step #12 -- Adding and Using the 5-Point Tracking Sensor**
- 
+<h1 style="font-size: 24px;">Step #4 -- Receiving the Robot Car Kit -- Finding the Documentation</h1> 
 
  -The Osoyoo 5-channel IR Tracker Sensor is an array of five infrared sensors that the Ardinuo can read as digital bits inputs. There is an on-board potentiometer to adjust the sensitivity of the sensors, i.e., at what point do they trigger. The advantage of an array of five sensors is that the car can detect the center of line and the edges outside the line at the same time -- very useful for following lines and borders. 
 
@@ -830,6 +836,7 @@ The car will now follow a black line (2 - 3 cm wide) on a white background.
 
 
 **Step #13 -- Adding Bluetooth Control of the Robotic Car**
+<h1 style="font-size: 24px;">Step #4 -- Receiving the Robot Car Kit -- Finding the Documentation</h1>
 
  As noted above, Bluetooth and Wi-Fi are both wireless mechanisms that allow computer devices to talk to each other and the Internet without using wires (i.e., that is why they are "wireless"). 
 
@@ -937,6 +944,7 @@ Hopefully you the reader will be able to Bluetooth pair your smartphone and have
 -
 
 **Step #14 -- Adding Wi-Fi Control of the Robotic Car**
+<h1 style="font-size: 24px;">Step #4 -- Receiving the Robot Car Kit -- Finding the Documentation</h1>
 
 Ok... let's hope we have better luck with Wi-Fi compared to Bluetooth in the Step above.
 
@@ -1082,6 +1090,7 @@ Let's take a look at some of the code we've been transferring to the Arduino boa
 
 
 **Step #15 -- Software Modifications -- Basic Parameter Changes**
+<h1 style="font-size: 24px;">Step #4 -- Receiving the Robot Car Kit -- Finding the Documentation</h1>
 
 For this Step #15, please open the Arduino IDE exactly as described above in earlier Steps (or "lessons").
 
