@@ -1086,7 +1086,7 @@ Sometimes, if you have access to the code developer, it is better to speak to hi
 
 
 
-# under construction#
+
 
 
 --SUCCESSFULLY COMPILING THE PROJECT REPO IN THE ARDUINO IDE--
@@ -1098,84 +1098,43 @@ Sometimes, if you have access to the code developer, it is better to speak to hi
 -
 -
 -
--- ****ALREADY AT 1100 LINES -- CONSIDER SPLITTING INTO PART III HERE (AND UPDATE INTRO)***
+
+**Step #9 --Preliminary Testing of the PetitCat Code: Python <--> Arduino --**
+
+
+**Step #10 --Installing the Digital Compass and Intertial Measurement Unit --**
+
+
+**Step #11 --Installing the Color Sensor --**
+
+
+**Step #12  --Full Testing of the PetitCat Code: Python <--> Arduino --**
+
+
+**Step #13  --Using the PetitCat Code: Active Inference  --**
+
+-
+-
+
+
+
+****
+
+(This is a public document that can be modified by others who have access -- if anything doesn't make sense, please ignore.)
+(No use of high voltage or anything dangerous is or should be specified in this document.)
+
+-
+-
 
 ![altlogo](altlogo.png)
 
 -
 -
--
--
-
-**Step #9 --Preliminary Testing of the PetitCat Code: Python <--> Arduino --**
-
-.....
-
-.....
--
--
--
--
-
-**Step #10 --Installing the Digital Compass and Intertial Measurement Unit --**
-
-.....
-
-.....
-
--
--
--
--
-
-**Step #11 --Installing the Color Sensor --**
-
-......
-
-......
--
--
--
--
 
 
-**Step #12  --Full Testing of the PetitCat Code: Python <--> Arduino --**
-
-......
-
-......
--
--
--
--
-
-**Step #13  --Using the PetitCat Code: Active Inference  --**
-.....
-
-.....
--
--
--
--
-- ****CONSIDER SPLITTING INTO PART IV HERE (AND UPDATE INTRO)***
-  
-  ![altlogo](altlogo.png)
-
--
--
--
--
-
-**Step #14  --Using PetitCat for AI and Cognitive Science: Onward to Part III  --**
-.....
-
-.....
--
--
--
--
-
-
+end of document
+****
+##
 
 
 
