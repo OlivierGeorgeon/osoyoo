@@ -1,7 +1,8 @@
 
 
 
-# Part I: An Easy-to-Read Overview of the Robot Car ("PetitCat") Project: The Basics
+# An Easy-to-Read Overview of the Robot Car ("PetitCat") Project
+# Part I: The Basics
 
 ##
 
