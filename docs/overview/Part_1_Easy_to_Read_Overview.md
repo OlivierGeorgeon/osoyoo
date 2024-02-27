@@ -12,7 +12,7 @@ Howard Schneider -- Feb 15, 2024)
 
 
 
-# An Easy-to-Read Overview of the Robot Car ("PetitCat") Project
+# An Easy-to-Read Overview of the Robot Car ("PetitCat") Project - Part I
 
 ![petitcatgpt4logo](petitcatgpt4logo.jpg)
 -
