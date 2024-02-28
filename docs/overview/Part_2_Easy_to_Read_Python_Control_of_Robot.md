@@ -1073,7 +1073,7 @@ The arduino_secrets.h file contains your home (or workplace) Wi-Fi identifying i
 
 #define SECRET_PASS "Your password"</b>
 
---> Above in Step #2 we set up the Osoyoo supplied program so that the robot car could act as an ordinary device on our home/workplace LAN. If you recall, before you started working on that Step, you needed to find out the following nformation about the Wi-Fi in your house/workplace:
+--> Above in Step #2 we set up the Osoyoo supplied program so that the robot car could act as an ordinary device on our home/workplace LAN. If you recall, before you started working on that Step, you needed to find out the following information about the Wi-Fi in your house/workplace:
 
 -SSID -- this is the name of your network, e.g., if the name of the network you log into is "Jones" then your SSID is "Jones".
 
