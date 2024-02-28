@@ -298,7 +298,10 @@ Celebrate.... because we will be moving onto more technical details in a few mom
 
 For a moment, you can pretend you just created a great new robot to be used on the Star Ship Enterprise (NCC-1701-D, of course). Picard is most pleased with your genius, and invites you for a cup of tea, Earl Grey, of course. 
 
-![logogpt4startrek](logogpt4startrek.jpg)
+<p align="center">
+ <img src="logogpt4startrek.jpg" width="700" height="950">
+</p>
+
 
 -
 -
