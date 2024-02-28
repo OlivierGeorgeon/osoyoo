@@ -524,7 +524,7 @@ The red LED on the Wi-Fi shield (reflecting the status of the D13 pin) will now 
 -
 
 
-</b>--FLASHING LIGHTS AND POSSIBLE IMPROVED COGNITION?? --</b>
+<b>--FLASHING LIGHTS AND POSSIBLE IMPROVED COGNITION?? --</b>
 
 Ok... above it was written "....Keep reading, and see how with acquiring very simple C/C++ knowledge you can possibly prevent or delay Alzheimer's (and possibly other types of) dementia with the robot car."  You may be thinking, 'Was this just to keep me reading ?'  As mentioned above -- no :) 
 
