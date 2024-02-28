@@ -954,7 +954,7 @@ In my case it did not -- "compilation error: arduino_secrets.h: no such file or 
 -
 -
 
---TROUBLESHOOTING  #1 COMPILATION ERRORS--
+--TROUBLESHOOTING COMPILATION ERRORS--
 -
 -
 
@@ -1007,105 +1007,24 @@ Indeed, if we explore around the robot car project GitHub repository, we find in
 
 We will populate these fields later once we seriously try out the code with the robot car Arduino board and Wi-Fi shield. For now, we are just trying to get the code to compile and will leave arduino_secrets.h in this form.
 
-We see from the compiler errors that " C:\Users\howar\OneDrive\Documents\Arduino\osoyoo\petitcat_arduino\src\wifi\WifiCat.cpp:11:10: fatal error: arduino_secrets.h: No such file or directory "
-
-Unlike other language development environments where this is taken for granted, the Arduino IDE does not normally support subdirectories in a Sketch -- all the .cpp and .h files should be in the root folder of the main Sketch (i.e., ino file). Thus, unlike in other programming environments, any subdirectories in the Arduino environment have to specially be handled.
-
 In my computer the Sketchbook folder is c:\Users\howar\OneDrive\Documents\Arduino. The root folder is petitcat_arduino -- thus we see the cpp and h files on the Arduino IDE Sketch screen. However, Sketchbook folder also contains a src subfolder which also contains a wifi subfolder.
 
  --> Therefore, we need to copy the file arduino_secrets.h to the src subfolder and then in turn to the wifi subfolder. We do this.
 
-Now to make the Arduino IDE access these files in subdirectories we need to manually include any files in the root directory's subdirectories via the include statement #include along with a relative path.
-
---> Therefore, in the main ino program "petitcat_arduino.ino we add the line #include "src/wifi/arduino_secrets.h" :
-
-![secret](secret.png)
-
-****SPEAK WITH OLIVIER ABOUT DESIRED WAY TO HANDLE THIS ISSUE AND CAN RE-WRITE****
-
-![rewrite](rewrite.png)
 
 Let's compile again -- click the green checkmark (verify button) near the left-hand corner of the Arduino IDE main screen. 
 
 The previous secret.h issue seems to be resolved (well.... the compiler did not generate an error message about it). 
 
-But.... we got another compilation error:
+Success !!
 
-"Compilation error: no matching function for call to 'HMC5883L::setOffset(int, int)'"
+-
+
+![compilesuccess](compilesuccess.png)
 
 -
 -
---TROUBLESHOOTING  #2 COMPILATION ERRORS--
--
--
-We just got another compilation error:
 
-"Compilation error: no matching function for call to 'HMC5883L::setOffset(int, int)'"
-
-![confused](confused.png)
-
-Ok.... let's start troubleshooting by looking at the extended compiler messages and error generated:
-
----------------------------------------------------
-
-..
-
-..
-
-Using library Arduino-HMC5883L-dev in folder: C:\Users\howar\OneDrive\Documents\Arduino\libraries\Arduino-HMC5883L-dev (legacy)
-
-Using library SPI at version 1.0 in folder: C:\Users\howar\AppData\Local\Arduino15\packages\arduino\hardware\avr\1.8.6\libraries\SPI 
-
-exit status 1
-
-Compilation error: no matching function for call to 'HMC5883L::setOffset(int, int)'
-
----------------------------------------------------
-
-Ok.... so this is essentially a "function not found" error message, i.e., the compiler was not able to find a function setOffset() that belongs to the HMC5883L class.
-
-Ok.... first thing is to make sure that the library HMC5833L is installed. Go to the Arduino IDE. Click Sketch, Include Library. At the bottom we see a list of installed libraries. Yes, HMC5833L library is installed.
-
-![libstatus](libstatus.png)
-
-Does this library support a class HMC5883L with a function setOffset() -- given its same name as the class, let's assume it does, but we can always come back here and look into the library more.
-
-
-Ok....let's search the whole repository for 'HMC5883L::setOffset(int, int)'.....  (You can use a text editor or other tool of your choice since Arduino IDE does not support subfolders.)
-
-In file robot._define.h we find HMC5883L in the comments besides ROBOT_COMPASS_TYPE 1, but otherwise not used.
-
-In file lmu.cpp we find a "compass.setOffset(COMPASS_X_OFFSET, COMPASS_Y_OFFSET)" function where the compass object appears to be used in the functions of either the HMC5883L or MMC5883 compass module 
-
-Hmmmm..... this really suggests that the HMC5883L library, while installed, does not contain a 'setOffset(int, int)' method.
-
-Ok.... let's open the library's code and see if we can find a setOffset(int, int) method.
-
-We find this in HMC5883L_compass.ino:
-"  // Set calibration offset. See HMC5883L_calibration.ino
-  compass.setOffset(0, 0, 0);"
-
-It appears that setOffset expects three arguments rather than two.
-
-Hmmmm.....
-
-Sometimes, if you have access to the code developer, it is better to speak to him/her at this point, and then continue the journey.
-
-****RE-WRITE AFTER SPEAK WITH OLIVIER.....REALLY BETTER WITH JUST 1 TROUBLESHOOTING, I.E., SECRETS AND LEAVE THIS OUT****
-
-![rewrite](rewrite.png)
-
-
-
-
-
-
-
-
-
-
-
---SUCCESSFULLY COMPILING THE PROJECT REPO IN THE ARDUINO IDE--
 
 .....
 
@@ -1116,8 +1035,6 @@ Sometimes, if you have access to the code developer, it is better to speak to hi
 -
 
 <h1 style="font-size: 24px;">Step #9 --Preliminary Testing of the PetitCat Code: Python <--> Arduino</h1>
-
-
 
 -
 -
