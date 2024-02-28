@@ -1055,7 +1055,7 @@ Success !!
 -
 -
 
-<b>--SETTING UP THE ARDUINO_SECRETS.H FILE--<\b>
+<b>--SETTING UP THE ARDUINO_SECRETS.H FILE--</b>
 
 Above in order to rectify a compiler error we had to move (or create) a header file "arduino_secrets.h" to the \src\wifi subfolder where the Arduino project was located.
 
@@ -1101,7 +1101,7 @@ However, the Arduino IDE contains a built-in external editor. The project "petit
 -
 -
 
-<b>--COMPILE, UPLOAD AND RUN PETITCAT ARDUINO PROJECT FILE--<\b>
+<b>--COMPILE, UPLOAD AND RUN PETITCAT ARDUINO PROJECT FILE--</b>
 
 Go to the Arduino IDE. Open the project "petitcat_arduino.ino"  Make sure the robot car is plugged into the USB port of your computer.
 
@@ -1128,7 +1128,7 @@ This is what the ReadMe/Wiki of of the project repository says we should see:
 -
 -
 
-<b>--INSTALLING PYTHON (IF NOT ALREADY DONE SO)--<\b>
+<b>--INSTALLING PYTHON (IF NOT ALREADY DONE SO)--</b>
 
 You need to have a working copy of Python on your laptop/desktop computer and some sort of programming environment to use it in. You may be using an advanced IDE such as Visual Studio IDE or PyCharm or a more streamlined development environment (e.g., such as Notepad++ operating in the terminal, which is what I am using). 
 
@@ -1144,7 +1144,7 @@ Tip: Do not download the latest version. It may not be fully stable, as well as 
 -
 -
 
-<b>--CLONING (COPYING) /osoyoo/tests --<\b>
+<b>--CLONING (COPYING) /osoyoo/tests --</b>
 
 Go to https://github.com/OlivierGeorgeon/osoyoo/tree/master/tests  and copy the file "test_remote_control_robot.py" into your Python environment.
 
@@ -1158,7 +1158,7 @@ Before running a Python program take a look at it quickly. What will it do? Anyt
 -
 -
 
-<b>--RUNNING THE PETITCAT PROJECT: PYTHON + ARDUINO CODE --<\b>
+<b>--RUNNING THE PETITCAT PROJECT: PYTHON + ARDUINO CODE --</b>
 
 -The Arduino code was successfully compiled and uploaded to the robot car.
 
@@ -1172,7 +1172,7 @@ Well.... the Python code runs.... but unfortunately the robot car does not appea
 
 
 
-<b>--TROUBLESHOOTING--<\b>
+<b>--TROUBLESHOOTING--</b>
 
 -
 
