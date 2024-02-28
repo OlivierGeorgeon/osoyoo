@@ -799,20 +799,21 @@ Most readers probably have already had thousands of hours of experience of debug
 
 Most programming languages provide many mechanisms for abstracting code, especially including user defined functions. C/C++ and Arduino too, of course, allow user defined functions. (In a procedural language such as C we call a function a "function." In an object-oriented programming (OOP) language such as C++ we call a function that that is part of a class or an object the description of "method". However, in this documentation we will call both "functions.")
 
-We will continue to improve the previous code that computes Fibonacci series by incorporating a user defined function.
+We will continue to improve the previous code that computes Fibonacci series by incorporating a user defined function. 
 
-.....
-
-.....
+Above we wanted to demonstrate the While loop, but the code seems somewhat awkward and takes the reader's attention away from the rest of function. We can keep our demonstration of the While loop, but let's put it in a user defined function. It will clean up the code in the Fibonnaci logic. As well, if we want to print out this message somewhere else in our program, we can call the same function again.
 
 
---CODE STYLE--
+![fcn](fcn.png)
 
-We haven't paid much attention to the style in which we write our Arduino programs, but like other languages, there are ways which are more standard and pleasant for other humans to read your code.
+-
+If you haven't coded in C/C++ before, we can quickly review the code above. (You should really code it yourself in the Arduino IDE (or any other IDE that you are using) and experiment with the code.)
 
-..........
+The function we defined "print_reset()" has a "void" before it since it doesn't return any value. If our function, for example, returned an integer value we would write "int print_reset()" The statement "counter --" just means to decrement the counter variable. The While loop was discussed above, and in fact, this somewhat bulky code was written to demonstrate this type of loop.
 
-..........
+If we wanted to pass a value to the function to tell it how many times to print its reset message, then we could define it as "void print_reset(int counter)". In the code below in line 20 we now write, "print_reset(5)" which cause "counter" to start with an initial value of 5. You should try out the code yourself.
+
+![fcnparm](fcnparm.png)
 
 
 -
