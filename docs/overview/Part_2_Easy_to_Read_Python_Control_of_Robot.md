@@ -1186,7 +1186,7 @@ Now click the green right arrow/circle in the Arduino IDE. The Lesson 5b code is
 
 The code compiles, uploads and on the Serial Monitor it seems to be interacting with the local area network:
 
-![lesson52bmasked](lesson52masked.png)
+![lesson52bmasked](lesson52bmasked.png)
 
 
 
