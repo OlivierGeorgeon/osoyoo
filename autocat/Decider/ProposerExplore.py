@@ -8,7 +8,7 @@ import numpy as np
 from pyrr import quaternion, Quaternion, Vector3
 from . Action import ACTION_TURN, ACTION_FORWARD, ACTION_SWIPE
 from . Interaction import OUTCOME_NO_FOCUS
-from . Decider import Decider
+from . Proposer import Proposer
 from ..Utils import short_angle
 from ..Robot.Enaction import Enaction
 from ..Robot.RobotDefine import TERRAIN_RADIUS
@@ -29,7 +29,7 @@ OUTCOME_FAR_RIGHT = "FR"
 OUTCOME_COLOR = "CL"
 
 
-class DeciderExplore(Decider):
+class ProposerExplore(Proposer):
     def __init__(self, workspace):
         super().__init__(workspace)
 

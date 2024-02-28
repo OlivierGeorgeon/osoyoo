@@ -9,7 +9,7 @@ from pyrr import vector
 from . Action import ACTION_TURN, ACTION_FORWARD, ACTION_BACKWARD, ACTION_SCAN
 from ..Robot.Enaction import Enaction
 from ..Robot.Command import DIRECTION_BACK
-from . Decider import Decider
+from . Proposer import Proposer
 from ..Integrator.OutcomeCode import FOCUS_TOO_FAR_DISTANCE
 from .. Enaction.CompositeEnaction import CompositeEnaction
 from ..Memory.Memory import EMOTION_ANGRY
@@ -19,7 +19,7 @@ STEP_INIT = 0
 STEP_PUSH = 1
 
 
-class DeciderPush(Decider):
+class ProposerPush(Proposer):
     def __init__(self, workspace):
         super().__init__(workspace)
         self.too_far = FOCUS_TOO_FAR_DISTANCE

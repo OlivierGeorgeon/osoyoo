@@ -102,15 +102,9 @@ def generate_prediction(command, memory):
     # Push objects
     push_objects(trajectory, memory)
 
-    # Predict the echo outcome from the nearest object phenomenon
+    # Predict the echo outcome from the first object phenomenon found in the sonar cone
     for p in [p for p in memory.phenomenon_memory.phenomena.values() if p.phenomenon_type == EXPERIENCE_ALIGNED_ECHO]:
         ego_center_point = memory.allocentric_to_egocentric(p.point)
-        # # If the phenomenon is in front of the robot then the robot pushes it
-        # if p.category is not None and ego_center_point[0] < ROBOT_FLOOR_SENSOR_X + p.category.short_radius and \
-        #         abs(ego_center_point[1]) < ROBOT_OUTSIDE_Y:
-        #     ego_center_point[0] = ROBOT_FLOOR_SENSOR_X + p.category.short_radius
-        #     p.point = memory.egocentric_to_allocentric(ego_center_point)
-        #     print("pushing object to ego position", ego_center_point)
         # if the phenomenon is recognized then subtract its radius to obtain the egocentric echo distance
         a, d = point_to_echo_direction_distance(ego_center_point)
         if p.category is not None:
@@ -119,8 +113,13 @@ def generate_prediction(command, memory):
                       or assert_almost_equal_angles(math.radians(a), memory.body_memory.head_direction_rad, 35)):
             outcome_dict["head_angle"] = round(a)
             outcome_dict["echo_distance"] = round(d)
+            outcome_dict["echo_point"] = ego_center_point.tolist()
+            break
 
     predicted_outcome = Outcome(outcome_dict)
+    # Override the echo_point to place the focus on the phenomenon
+    if "echo_point" in outcome_dict:
+        predicted_outcome.echo_point = np.array(outcome_dict["echo_point"])
 
     # Update focus based on echo
     trajectory.track_echo(predicted_outcome)

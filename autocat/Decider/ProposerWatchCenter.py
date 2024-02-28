@@ -9,11 +9,11 @@ from . Action import ACTION_WATCH, ACTION_TURN, ACTION_SWIPE, ACTION_FORWARD, AC
 from ..Robot.Enaction import Enaction
 from ..Memory.Memory import EMOTION_SAD, EMOTION_UPSET
 from ..Enaction.CompositeEnaction import CompositeEnaction
-from . Decider import Decider
+from . Proposer import Proposer
 from . PredefinedInteractions import create_or_retrieve_primitive, OUTCOME_FOCUS_FRONT
 
 
-class DeciderWatchCenter(Decider):
+class ProposerWatchCenter(Proposer):
     def __init__(self, workspace):
         super().__init__(workspace)
 

@@ -10,7 +10,7 @@ from . Action import ACTION_SWIPE, ACTION_TURN, ACTION_FORWARD, ACTION_BACKWARD,
 from ..Robot.Enaction import Enaction
 from ..Robot.Command import DIRECTION_LEFT, DIRECTION_RIGHT
 from ..Robot.RobotDefine import CHECK_OUTSIDE, ROBOT_FLOOR_SENSOR_X
-from . Decider import Decider
+from . Proposer import Proposer
 from ..Integrator.OutcomeCode import FOCUS_TOO_FAR_DISTANCE
 from ..Utils import line_intersection, echo_point
 from ..Enaction.CompositeEnaction import CompositeEnaction
@@ -30,7 +30,7 @@ STEP_ALIGN = 1
 STEP_WITHDRAW = 2
 
 
-class DeciderArrange(Decider):
+class ProposerArrange(Proposer):
     def __init__(self, workspace):
         super().__init__(workspace)
         self.too_far = FOCUS_TOO_FAR_DISTANCE

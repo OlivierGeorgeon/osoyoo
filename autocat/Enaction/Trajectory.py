@@ -31,8 +31,8 @@ class Trajectory:
         self.compass_quaternion = None  # Include the compass offset correction
         self.yaw_matrix = None  # Used by bodyView to rotate compass points
         self.displacement_matrix = None  # Used by EgocentricMemory to rotate experiences
-        self.focus_direction_prediction_error = 0
-        self.focus_distance_prediction_error = 0
+        # self.focus_direction_prediction_error = 0
+        # self.focus_distance_prediction_error = 0
         self.covered_area = np.empty((4, 3), dtype=int)
 
         # The prompt
@@ -143,8 +143,8 @@ class Trajectory:
                 new_focus_a, new_focus_d = point_to_echo_direction_distance(new_focus)
                 # prediction_focus_point = matrix44.apply_to_vector(self.displacement_matrix, self.focus_point)
                 prediction_focus_a, prediction_focus_d = point_to_echo_direction_distance(self.focus_point)
-                self.focus_direction_prediction_error = prediction_focus_a - new_focus_a
-                self.focus_distance_prediction_error = prediction_focus_d - new_focus_d
+                # self.focus_direction_prediction_error = prediction_focus_a - new_focus_a
+                # self.focus_distance_prediction_error = prediction_focus_d - new_focus_d
                 prediction_error_focus = self.focus_point - new_focus
                 # If the new focus is near the previous focus or the displacement has been continuous.
                 if np.linalg.norm(prediction_error_focus) < FOCUS_MAX_DELTA or outcome.status == "continuous":

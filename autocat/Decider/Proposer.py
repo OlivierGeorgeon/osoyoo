@@ -8,7 +8,7 @@ from ..Robot.Enaction import Enaction
 from ..Memory.Memory import EMOTION_HAPPY
 
 
-class Decider:
+class Proposer:
     """The parent class Decider generates the circle behavior"""
     def __init__(self, workspace):
         self.workspace = workspace

@@ -11,11 +11,11 @@ from . Action import ACTION_WATCH, ACTION_TURN, ACTION_SWIPE, ACTION_FORWARD, AC
 from ..Robot.Enaction import Enaction
 from ..Memory.Memory import EMOTION_SAD
 from ..Enaction.CompositeEnaction import CompositeEnaction
-from . Decider import Decider  # , FOCUS_TOO_TOO_FAR_DISTANCE, FOCUS_FAR_DISTANCE
+from . Proposer import Proposer  # , FOCUS_TOO_TOO_FAR_DISTANCE, FOCUS_FAR_DISTANCE
 from . PredefinedInteractions import create_or_retrieve_primitive, OUTCOME_FOCUS_SIDE, OUTCOME_FOCUS_FRONT, OUTCOME_FOCUS_TOO_FAR
 
 
-class DeciderWatch(Decider):
+class ProposerWatch(Proposer):
     def __init__(self, workspace):
         super().__init__(workspace)
 
