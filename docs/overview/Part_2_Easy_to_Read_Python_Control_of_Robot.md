@@ -797,7 +797,7 @@ Most readers probably have already had thousands of hours of experience of debug
 
 --CODE ABSTRACTION: FUNCTIONS--
 
-Most programming languages provide many mechanisms for abstracting code, especially including user defined functions. C/C++ and Arduino too, of course, allow user defined functions. (In a procedural language such as C we call a function a "function." In an object-oriented programming (OOP) language such as C++ we call a function that that is part of a class or an object the description of "method". However, in this documentation we will call both "functions.")
+Most programming languages provide many mechanisms for abstracting code, especially including user defined functions. C/C++ and Arduino too, of course, allow user defined functions. (In a procedural language such as C we call a function a "function." In an object-oriented programming (OOP) language such as C++ we call a function that is part of a class or an object the description of "method". However, in this documentation we will call both "functions.")
 
 We will continue to improve the previous code that computes Fibonacci series by incorporating a user defined function. 
 
@@ -1053,8 +1053,11 @@ Success !!
 -
 
 --Setting up Wi-Fi parameters
+
 --Cloning /osoyoo/tests
+
 --Intalling Python if not already done so
+
 --Trying out test_remote_control_robot.py
 
 
