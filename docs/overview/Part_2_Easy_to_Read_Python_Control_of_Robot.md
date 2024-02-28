@@ -1174,7 +1174,9 @@ Well.... the Python code runs.... but unfortunately the robot car does not appea
 
 <b>--TROUBLESHOOTING--<\b>
 
--Does the Wi-Fi board and associated hardware work properly?
+-
+
+Does the Wi-Fi board and associated hardware work properly?
 
 In the Arduino IDE load up Lesson 5b, i.e., the Osoyoo Lesson where the Arduino board uses the local area network as any access point. 
 
@@ -1194,16 +1196,17 @@ We click the IoT App -- Success!!  We can make the car go backwards, forewards, 
 
 Ok.... so the hardware works.
 
-- Above, after we compiled and uploaded the Arduino code "petitcat_arduino.ino" and clicked on the Serial Monitor, unfortunately we did not see any indication that the robot car was connected to the Wi-Fi of the local area network.
+-
+
+Above, after we compiled and uploaded the Arduino code "petitcat_arduino.ino" and clicked on the Serial Monitor, unfortunately we did not see any indication that the robot car was connected to the Wi-Fi of the local area network.
 
 
 ![readip](readip.png) 
 
+....
+....
+
 -
-
-
-
-
 
 
 
