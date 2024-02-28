@@ -299,7 +299,7 @@ Celebrate.... because we will be moving onto more technical details in a few mom
 For a moment, you can pretend you just created a great new robot to be used on the Star Ship Enterprise (NCC-1701-D, of course). Picard is most pleased with your genius, and invites you for a cup of tea, Earl Grey, of course. 
 
 <p align="center">
- <img src="logogpt4startrek.jpg" width="700" height="950">
+ <img src="logogpt4startrek.jpg" width="850" height="850">
 </p>
 
 
@@ -713,7 +713,7 @@ Success!! The new green LED flashes once each 8 seconds (on 2 seconds then off 6
 You have mastered simple C/C++ coding for the Arduino and simple electronics for the Arduino. You should feel great -- it's ok to throw yourself another celebration :)
 
 <p align="center">
- <img src="successpicfemale.png" width="700" height="950">
+ <img src="successpicfemale.png" width="850" height="850">
 </p>
 
 
