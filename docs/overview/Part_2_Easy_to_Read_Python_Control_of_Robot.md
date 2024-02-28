@@ -1204,8 +1204,7 @@ Ok.... so the hardware works.
 
 ![readip](readip.png) 
 
-....
-....
+-
 
 -
 
