@@ -1160,13 +1160,13 @@ Before running a Python program take a look at it quickly. What will it do? Anyt
 
 <b>--RUNNING THE PETITCAT PROJECT: PYTHON + ARDUINO CODE --</b>
 
--The Arduino code was successfully compiled and uploaded to the robot car.
+-The Arduino code was successfully compiled and uploaded to the robot car. (Well... it indeed successfully compiled and uploaded. However, on the Serial Monitor we did not see the Wi-Fi/IP information that we expected it to display.)
 
 -Ok.... now let's run the program test_remote_control_robot.py :
 
 ![packetfail](packetfail.png)
 
-Well.... the Python code runs.... but unfortunately the robot car does not appear to be receiving packets.
+Well.... the Python code runs.... but unfortunately the robot car does not appear to be receiving packets -- the robot car does not respond to any of the packets.
 
 -----> We need to troubleshoot.
 
@@ -1176,18 +1176,17 @@ Well.... the Python code runs.... but unfortunately the robot car does not appea
 
 -
 
-Does the Wi-Fi board and associated hardware work properly?
+<b>--></b>Does the Wi-Fi board and associated hardware work properly?
 
-In the Arduino IDE load up Lesson 5b, i.e., the Osoyoo Lesson where the Arduino board uses the local area network as any access point. 
+In the Arduino IDE load up Lesson 5b, i.e., the Osoyoo Lesson where the Arduino board uses the local area network as any access point. (Step 2 above.)
 
 Plug the USB cable from the robot to your computer.
 
 Now click the green right arrow/circle in the Arduino IDE. The Lesson 5b code is compiled and uploaded to the Arduino board in the robot car.
 
-The code compiles, uploads and on the Serial Monitor it seems to be interacting with the local area network:
+The code compiles and uploads to the robot car successfully. In the Arduino IDE when we look at the Serial Monitor the Arduino board Wi-Fi seems to be interacting with the local area network:
 
 ![lesson52bmasked](lesson52bmasked.png)
-
 
 
 As before in Step 2 (see above) we enter the IP Address (in this case 10.0.0.40) into the mobile phone Osoyoo IoT App. The mobile phone is on the same Wi-Fi LAN as the robot car.
@@ -1198,7 +1197,7 @@ Ok.... so the hardware works.
 
 -
 
-Above, after we compiled and uploaded the Arduino code "petitcat_arduino.ino" and clicked on the Serial Monitor, unfortunately we did not see any indication that the robot car was connected to the Wi-Fi of the local area network.
+<b>--></b>Above, after we compiled and uploaded the Arduino code "petitcat_arduino.ino" and clicked on the Serial Monitor, unfortunately we did not see any indication that the robot car was connected to the Wi-Fi of the local area network. Let's look at this in more detail.
 
 
 ![readip](readip.png) 
