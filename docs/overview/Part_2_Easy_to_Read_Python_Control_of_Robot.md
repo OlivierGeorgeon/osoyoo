@@ -432,7 +432,7 @@ No, this section title is not a typo. Keep reading, and see how with acquiring v
 (CAUTION/DISCLAIMER: We will only do this theoretically as part of learning some new coding. We will NOT build anything therapeutic or anything to be used seriously.)
 
 
---C/C++ IN THE ARDUINO ENVIRONMENT--
+<b>--C/C++ IN THE ARDUINO ENVIRONMENT--</b>
 
 As we discussed in Part I, the Arduino IDE uses a C++ compiler (the GNU GCC toolchain for the particular microcontroller being used) -- it compiles C and C++ code. Thus, Arduino programs are really C/C++ code.
 
@@ -457,7 +457,7 @@ For readers with no background in C/C++ consider the many excellent and free (or
 You do not need to be able to code in C/C++. The purpose of the PetitCat project is to construct an interface that will allow your thousands of lines of Python code to communicate with the robot car, and then use this ability for various cognitive science/AI experiments and demonstrations. However, given that the robot car is powered by compiled C/C++ code, understanding a tiny bit about C/C++ can be helpful in understanding how we make the robot car communicate with the Python programs.
 
 
---FLASHING LIGHTS AND POSSIBLE IMPROVED COGNITION?? --
+<b>--FLASHING LIGHTS AND POSSIBLE IMPROVED COGNITION?? --</b>
 
 Ok... above it was written "....Keep reading, and see how with acquiring very simple C/C++ knowledge you can possibly prevent or delay Alzheimer's (and possibly other types of) dementia with the robot car."  You may be thinking, 'Was this just clickbait to keep me reading your boring paragraphs?'  Well.... no :) 
 
@@ -466,7 +466,7 @@ In fact, this is a very legitimate topic.
 However, given that there is a risk of seizures induced by flashing lights for a svery small percentage of the population, but still some people, this Step has been re-written so we discuss how we can code the Arduino board to possibly improve cognition and prevent dementia, but do so  only at the end of the Step and we don't program the actual circuit.
 
 
---ARDUINO SKETCH TO FLASH THE ONBOARD LED--
+<b>--ARDUINO SKETCH TO FLASH THE ONBOARD LED--</b>
 
 In this Step we will learn how to code an Arduino program (i.e., "Sketch") in trying to flash an LED. 
 
@@ -516,21 +516,12 @@ The red LED on the Wi-Fi shield (reflecting the status of the D13 pin) will now 
 
 
 ![flashon](flashon.jpg)
+
 -
 -
 
 
-
-
-![seizurewarn](seizurewarn.png)
-
-
-Although the LED is low-power, it can be flashed relatively fast if programmed as such. There is a risk in sensitive individuals of triggering seizures (as well as migraines). If this applies to you or you have any risk towards seizures, do NOT flash the light at high speed.
-
-(Triggering seizures in photosensitive individuals is increased by exposure to a frequency of 5 to 30 Hertz  (it can still occur at 40 Hertz), bright lights, high contrast, and the duration of exposure. 
-
-
---FLASHING LIGHTS AND POSSIBLE IMPROVED COGNITION?? --
+</b>--FLASHING LIGHTS AND POSSIBLE IMPROVED COGNITION?? --</b>
 
 Ok... above it was written "....Keep reading, and see how with acquiring very simple C/C++ knowledge you can possibly prevent or delay Alzheimer's (and possibly other types of) dementia with the robot car."  You may be thinking, 'Was this just to keep me reading ?'  As mentioned above -- no :) 
 
@@ -547,10 +538,17 @@ In theory, if light is flashed at 40Hz there will be a 40Hz visual stimulation w
 ![stimulate40Hz](stimulate40hz.jpg)
 
 
+![seizurewarn](seizurewarn.png)
+
+
+Although the LED is low-power, it can be flashed relatively fast if programmed as such. There is a risk in sensitive individuals of triggering seizures (as well as migraines). If this applies to you or you have any risk towards seizures, do NOT flash the light at high speed.
+
+(Triggering seizures in photosensitive individuals is increased by exposure to a frequency of 5 to 30 Hertz  (it can still occur at 40 Hertz), bright lights, high contrast, and the duration of exposure. 
+
 -
 -
 
---EXPERIMENTING WITH THE ARDUINO COMPILER (WITHIN THE IDE)--
+<b>--EXPERIMENTING WITH THE ARDUINO COMPILER (WITHIN THE IDE)--</b>
 
 Ok.... let's experiment with the code syntax and the compiler a little bit. WARNING: Frequency should be at 0.125Hertz for all these experiments.
 
