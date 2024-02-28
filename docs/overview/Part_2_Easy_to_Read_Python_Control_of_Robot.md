@@ -1016,6 +1016,8 @@ The file arduino_secrets.h is standard way of storing confidential information s
 
 Indeed, if we explore around the robot car project GitHub repository, we find in another folder a file arduino_secrets.h but not containing actual passwords:
 
+(Note: If you can't find this file, you can just use your text editor (or most programming IDE's) to create a file "arduino_secrets.h" containing the lines below.)
+
 ---------------------------------------------------
 
 #define SECRET_WIFI_TYPE "STA" // Access point : "AP" pr Station (through router): "STA"
@@ -1049,16 +1051,131 @@ Success !!
 -
 
 <h1 style="font-size: 24px;">Step #9 --Preliminary Testing of the PetitCat Code: Python <--> Arduino</h1>
-	
+
+-
 -
 
---Setting up Wi-Fi parameters
+--SETTING UP THE ARDUINO_SECRETS.H FILE--
 
---Cloning /osoyoo/tests
+Above in order to rectify a compiler error we had to move (or create) a header file "arduino_secrets.h" to the \src\wifi subfolder where the Arduino project was located.
 
---Intalling Python if not already done so
+The arduino_secrets.h file contains your home (or workplace) Wi-Fi identifying information and login password, hence its name and why it is kept separate from the other files in the GitHub repository.
 
---Trying out test_remote_control_robot.py
+--> You have already copied "arduino_secrets.h" to \src\wifi of your Arduino PetitCat project. 
+
+(On my computer the Arduino Sketchbook is c:\Users\howar\OneDrive\Documents\Arduino. The full path to the wifi subfolder on my computer is : c:\Users\howar\OneDrive\Documents\Arduino\petitcat_arduino\src\wifi  -- your computer will have a different path, but it will also end with "\petitcat_arduino\src\wifi")
+
+--> If you don't have a file "arduino_secrets.h" in the \src\wifi subfolder of your Arduino PetitCat project, then take a look again at the Step above, or else just use any text or programmming editor to create a file "arduino_secrets.h" containing the following lines:
+
+<b>#define SECRET_WIFI_TYPE "STA" // Access point : "AP" pr Station (through router): "STA"
+
+#define SECRET_SSID "Your wifi SSID"
+
+#define SECRET_PASS "Your password"</b>
+
+--> Above in Step #2 we set up the Osoyoo supplied program so that the robot car could act as an ordinary device on our home/workplace LAN. If you recall, before you started working on that Step, you needed to find out the following nformation about the Wi-Fi in your house/workplace:
+
+-SSID -- this is the name of your network, e.g., if the name of the network you log into is "Jones" then your SSID is "Jones".
+
+-Pasword -- this is your password you use to log into your network, e.g., if the password to log into your Wi-Fi is "test1234" then your password is "test1234".
+
+You will need this same information again to enter in the "arduino_secrets.h" file.
+
+--> Take any text editor (including the one that comes with Windows or your operating system) or programming editor and open the file "arduino_secrets.h".
+
+(Unfortunately you cannot easily use the Arduino IDE to do this. In normal operation the Arduino IDE requires project files to be in the root directory of a project, which is why you won't see the files of the \src subfolders displayed in the project window. However, the Arduino IDE can still access these files if provided a path. However, if you click File and then Open and then (in Windows, but may be different if you are using a different operating system) double-click "osoyoo", double-click "peticat_arduino", double-click "src" and then double-click "wifi". You are now in the "wifi" subfolder, but you won't see or be able to edit "arduino_secrets.h" since it is not a Sketch file that the Arduino IDE is looking for. 
+
+However, the Arduino IDE contains a built-in external editor. The project "petitcat_arduino.ino" should be loaded in the Arduino IDE. You now should click Sketch and then Show Sketch Folder. You will now see the files and folders in the root directory for the project. Double-click (Windows computers) the folder "src" and then double-click the folder "wifi" and then double-click the file "arduino_secrets.h" -- it will open up in a different Arduino IDE editor. You can use this little editor to modify the file. After doing so, make sure to click File, Save. )
+
+--> Modify (and then save) the file "arduino_secrets.h" with the Wi-Fi information. For sake of example, below we are showing the same network info we used in the demo example in Step 2 above:
+
+<b>#define SECRET_WIFI_TYPE "STA" // Access point : "AP" pr Station (through router): "STA"
+
+#define SECRET_SSID "Jones"
+
+#define SECRET_PASS "test1234"</b>
+
+
+--> The PetitCat project file in the Arduino IDE (which will be uploaded to the robot car) now has your Wi-Fi network information required to attached to the same network your laptop/desktop computer is running (and from which you will communicate with the robot car via your Python programs).
+
+-
+-
+
+--COMPILE, UPLOAD AND RUN PETITCAT ARDUINO PROJECT FILE--
+
+Go to the Arduino IDE. Open the project "petitcat_arduino.ino"  Make sure the robot car is plugged into the USB port of your computer.
+
+The file arduino_secrets.h has now been populated with the necessary Wi-Fi information.
+
+Click the green circle with the right-pointing arrow (which actually is in the left-hand upper corner) -- the Arduino code will automatically compile and upload to the Arduino board of the robot car.
+
+Click Serial Monitor. This is what we see now:
+
+![readip](readip.png) 
+
+Hmmm.... the README file in the Osoyoo project repository says:
+
+"Read the robot's IP address in the arduino IDE terminal.
+
+Configure your arena and the IP address of your robots in autocat/Robot/RobotDefine.py"
+
+This is what the ReadMe/Wiki of of the project repository says we should see:
+
+![shouldsee](shouldsee.png)
+
+---->We can come back to this item. No IP address is shown unfortunately in the Serial Monitor when we run our code.
+
+-
+-
+
+--INSTALLING PYTHON (IF NOT ALREADY DONE SO)--
+
+You need to have a working copy of Python on your laptop/desktop computer and some sort of programming environment to use it in. You may be using an advanced IDE such as Visual Studio IDE or PyCharm or a more streamlined development environment (e.g., such as Notepad++ operating in the terminal, which is what I am using). 
+
+(Of interest, a survey of nearly 100,000 software developers (without distinction if they work in data science/AI or not) by Stack Overflow in 2023 found the following IDE's being used:  Visual Studio Code 74%, Visual Studio 28%, IntelliJ IDEA 27%, Notepad++ 25%, Vim 22%, Android Studio 17%, PyCharm 15%, Jupyter Notebook/Lab 13%, Sublime 13%)
+
+If you don't have some sort of programming environment where Python code can run then download one of the above advanced (there may be costs for some of these) or lightweight IDE's.
+
+If you don't have Python on your computer, then go to https://www.python.org/ and download a copy of Python. 
+
+Tip: Do not download the latest version. It may not be fully stable, as well as dependencies creep into your project, the latest version of Python often is not compatible with older dependencies whose developers have not updated them yet. Download a recent, stable version of Python. At the time of writing, I have Python 3.11.4 running on my computer although at python.org the latest release is at the time of writing version 3.12.2 (considered stable) or  version 3.13 (newest version available). 
+
+
+-
+-
+
+--CLONING (COPYING) /osoyoo/tests --
+
+Go to https://github.com/OlivierGeorgeon/osoyoo/tree/master/tests  and copy the file "test_remote_control_robot.py" into your Python environment.
+
+In my case I loaded this file into Notepad++ :
+
+![testremote](testremote.png)
+
+-
+Before running a Python program take a look at it quickly. What will it do? Anything strange to the system? What about imports? Are there any imports requring installation of libraries from PyPI or an external library? The import's of socket, keyboard, sys and json all come from the standard library, so nothing special for us to do.
+
+-
+-
+
+--RUNNING THE PETITCAT PROJECT: PYTHON + ARDUINO CODE --
+
+-The Arduino code was successfully compiled and uploaded to the robot car.
+
+-Ok.... now let's run the program test_remote_control_robot.py :
+
+![packetfail](packetfail.png)
+
+Well.... the Python code runs.... but unfortunately the robot car does not appear to be receiving packets.
+
+-----> Troubleshooting
+
+-
+-
+
+
+
+
 
 
 
