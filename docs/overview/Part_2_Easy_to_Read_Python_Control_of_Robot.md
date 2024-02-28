@@ -1096,6 +1096,31 @@ However, there the Arduino IDE contains a built-in external editor. The project 
 --> The PetitCat project file in the Arduino IDE (which will be uploaded to the robot car) now has your Wi-Fi network information required to attached to the same network your laptop/desktop computer is running (and from which you will communicate with the robot car via your Python programs).
 
 
+--COMPILE, UPLOAD AND RUN PETITCAT ARDUINO PROJECT FILE--
+
+Go to the Arduino IDE. Open the project "petitcat_arduino.ino"  Make sure the robot car is plugged into the USB port of your computer.
+
+The file arduino_secrets.h has now been populated with the necessary Wi-Fi information.
+
+Click the green circle with the right-pointing arrow (which actually is in the left-hand upper corner) -- the Arduino code will automatically compile and upload to the Arduino board of the robot car.
+
+Click Serial Monitor. This is what we see now:
+
+![readip](readip.png) 
+
+Hmmm.... the README file in the Osoyoo project repository says:
+
+"Read the robot's IP address in the arduino IDE terminal.
+
+Configure your arena and the IP address of your robots in autocat/Robot/RobotDefine.py"
+
+This is what the ReadMe/Wiki of of the project repository says we should see:
+
+![shouldsee](shouldsee.png)
+
+---->We can come back to this item. No IP address is shown unfortunately in the Serial Monitor when we run our code.
+
+
 --INSTALLING PYTHON (IF NOT ALREADY DONE SO)--
 
 You need to have a working copy of Python on your laptop/desktop computer and some sort of programming environment to use it in. You may be using an advanced IDE such as Visual Studio IDE or PyCharm or a more streamlined development environment (e.g., such as Notepad++ operating in the terminal, which is what I am using). 
@@ -1116,8 +1141,15 @@ In my case I loaded this file into Notepad++ :
 ![testremote](testremote.png)
 
 -
-Before running a Python program take a look at it quickly. What will it do? Anything strange to the system? What about imports? Are there any imports requring installation of libraries from PyPI or an external library? The import's of socket, keyboard, sys and json all come from the standar library, so nothing special for us to do.
+Before running a Python program take a look at it quickly. What will it do? Anything strange to the system? What about imports? Are there any imports requring installation of libraries from PyPI or an external library? The import's of socket, keyboard, sys and json all come from the standard library, so nothing special for us to do.
 
+Ok.... let's run the program test_remote_control_robot.py :
+
+![packetfail](packetfail.png)
+
+Well.... the code runs.... but unfortunately the robot car does not appear to be receiving packets.
+
+-----> Troubleshooting
 
 
 
