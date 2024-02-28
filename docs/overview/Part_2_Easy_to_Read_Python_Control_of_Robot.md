@@ -1055,7 +1055,7 @@ Success !!
 -
 -
 
---SETTING UP THE ARDUINO_SECRETS.H FILE--
+<b>--SETTING UP THE ARDUINO_SECRETS.H FILE--<\b>
 
 Above in order to rectify a compiler error we had to move (or create) a header file "arduino_secrets.h" to the \src\wifi subfolder where the Arduino project was located.
 
@@ -1101,7 +1101,7 @@ However, the Arduino IDE contains a built-in external editor. The project "petit
 -
 -
 
---COMPILE, UPLOAD AND RUN PETITCAT ARDUINO PROJECT FILE--
+<b>--COMPILE, UPLOAD AND RUN PETITCAT ARDUINO PROJECT FILE--<\b>
 
 Go to the Arduino IDE. Open the project "petitcat_arduino.ino"  Make sure the robot car is plugged into the USB port of your computer.
 
@@ -1128,7 +1128,7 @@ This is what the ReadMe/Wiki of of the project repository says we should see:
 -
 -
 
---INSTALLING PYTHON (IF NOT ALREADY DONE SO)--
+<b>--INSTALLING PYTHON (IF NOT ALREADY DONE SO)--<\b>
 
 You need to have a working copy of Python on your laptop/desktop computer and some sort of programming environment to use it in. You may be using an advanced IDE such as Visual Studio IDE or PyCharm or a more streamlined development environment (e.g., such as Notepad++ operating in the terminal, which is what I am using). 
 
@@ -1144,7 +1144,7 @@ Tip: Do not download the latest version. It may not be fully stable, as well as 
 -
 -
 
---CLONING (COPYING) /osoyoo/tests --
+<b>--CLONING (COPYING) /osoyoo/tests --<\b>
 
 Go to https://github.com/OlivierGeorgeon/osoyoo/tree/master/tests  and copy the file "test_remote_control_robot.py" into your Python environment.
 
@@ -1158,7 +1158,7 @@ Before running a Python program take a look at it quickly. What will it do? Anyt
 -
 -
 
---RUNNING THE PETITCAT PROJECT: PYTHON + ARDUINO CODE --
+<b>--RUNNING THE PETITCAT PROJECT: PYTHON + ARDUINO CODE --<\b>
 
 -The Arduino code was successfully compiled and uploaded to the robot car.
 
@@ -1168,9 +1168,37 @@ Before running a Python program take a look at it quickly. What will it do? Anyt
 
 Well.... the Python code runs.... but unfortunately the robot car does not appear to be receiving packets.
 
------> Troubleshooting
+-----> We need to troubleshoot.
 
--
+
+
+<b>--TROUBLESHOOTING--<\b>
+
+-Does the Wi-Fi board and associated hardware work properly?
+
+In the Arduino IDE load up Lesson 5b, i.e., the Osoyoo Lesson where the Arduino board uses the local area network as any access point. 
+
+Plug the USB cable from the robot to your computer.
+
+Now click the green right arrow/circle in the Arduino IDE. The Lesson 5b code is compiled and uploaded to the Arduino board in the robot car.
+
+The code compiles, uploads and on the Serial Monitor it seems to be interacting with the local area network:
+
+![lesson52bmasked](lesson52masked.png)
+
+
+
+As before in Step 2 (see above) we enter the IP Address (in this case 10.0.0.40) into the mobile phone Osoyoo IoT App. The mobile phone is on the same Wi-Fi LAN as the robot car.
+
+We click the IoT App -- Success!!  We can make the car go backwards, forewards, to the left or to the right.
+
+Ok.... so the hardware works.
+
+- Above, after we compiled and uploaded the Arduino code "petitcat_arduino.ino" and clicked on the Serial Monitor, unfortunately we did not see any indication that the robot car was connected to the Wi-Fi of the local area network.
+
+
+![readip](readip.png) 
+
 -
 
 
