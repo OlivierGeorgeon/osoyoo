@@ -508,7 +508,7 @@ Now that you know what the structure of an Arduino program looks like and now th
 
 
 -
-![slowflash](slowflash.png)
+![slowflash2](slowflash2.png)
 
 -
 -
@@ -557,39 +557,34 @@ Ok.... let's experiment with the code syntax and the compiler a little bit. WARN
 
 I left off the semi-colon at line 4. What will the compiler do? You should try this too.
 
-![line4](line4.png)
+![line42](line42.png)
 
-Note: Image is taken from older code. Please make the flash rate 0.125Hertz as above for these compiler experiments.
 -
-
-
+-
 
 Here's what happens when I click the green upload arrow on the Arduino IDE:
 
-![line4compile](line4compile.png)
+![line42compile](line42compile.png)
 
 Restore the code, i.e., put the semi-colon back at the end of line 4, and press the upload button. Now everything should compile and upload to the Arduino board successfully.
 
-Let's try something else. In line 13 write 'low' rather than 'LOW' in the delay() function. Click the upload button. What happens?
+Let's try something else. In line 14 write 'low' rather than 'LOW' in the delay() function. Click the upload button. What happens?
 
-![lownodeclare](lownodeclare.png)
+![low2nodeclare](low2nodeclare.png)
 
 The program is expecting to see something it knows the value of. It doesn't know what 'low' means in this function.
 
-Restore your code. Now move line 4 (i.e, pinMode) and insert it after line 10. Thus, instead of calling it once at the start of the program you will call it each loop. It is more efficient to just call it once at the start of the program, but this should work too. Give it a try. Upload the program.
+Restore your code. Now move line 4 (i.e, pinMode) and insert it after line 11. Thus, instead of calling it once at the start of the program you will call it each loop. It is more efficient to just call it once at the start of the program, but this should work too. Give it a try. Upload the program.
 
-![pinmodemoved](pinmodemoved.png)
+![pinmode2moved](pinmode2moved.png)
 
-Note: Image is taken from older code. Please make the flash rate 0.125Hertz as above for these compiler experiments.
--
 
 It should work ok.
 
 There is no code in the setup() function. Let's remove it. (Which you can do by commenting it out.) You should try this too:
 
-![commentoutsetup](commentoutsetup.png)
+![commentout2setup](commentout2setup.png)
 
-Note: Image is taken from older code. Please make the flash rate 0.125Hertz as above for these compiler experiments.
 -
 
 Now click the button to compile and upload the code. What happens?
