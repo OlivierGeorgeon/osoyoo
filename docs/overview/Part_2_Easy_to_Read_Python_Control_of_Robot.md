@@ -463,7 +463,7 @@ Ok... above it was written "....Keep reading, and see how with acquiring very si
 
 In fact, this is a very legitimate topic. 
 
-However, given that there is a risk of seizures induced by flashing lights for a svery small percentage of the population, but still some people, this Step has been re-written so we discuss how we can code the Arduino board to possibly improve cognition and prevent dementia, but do so  only at the end of the Step and we don't program the actual circuit.
+However, given that there is a risk of seizures induced by flashing lights for a very small percentage of the population, but still some people, this Step has been re-written so we discuss how we can code the Arduino board to possibly improve cognition and prevent dementia, but do so  only at the end of the Step and we don't program the actual circuit.
 
 
 <b>--ARDUINO SKETCH TO FLASH THE ONBOARD LED--</b>
@@ -480,7 +480,7 @@ If you look closely at the Wi-Fi shield there is an "LED13"  (actually it says "
 
 ![flashoff](flashoff.png)
 
-First of all, all Arduino programs need to have a setup() function and a loop() function. (In my Arduino IDE, when I click new sketch I actually get an Arduino code template with these two functions already in place, albeit empty with no lines of code inside.)
+Firstly, all Arduino programs need to have a setup() function and a loop() function. (In my Arduino IDE, when I click new sketch I actually get an Arduino code template with these two functions already in place, albeit empty with no lines of code inside.)
 
 The setup() function runs only once when the Arduino board is powered up (or reset). After the setup() function finishes its programmed tasks (i.e., whatever you tell it to do) it then automatically calls the loop() function.
 
@@ -525,7 +525,7 @@ The red LED on the Wi-Fi shield (reflecting the status of the D13 pin) will now 
 
 Ok... above it was written "....Keep reading, and see how with acquiring very simple C/C++ knowledge you can possibly prevent or delay Alzheimer's (and possibly other types of) dementia with the robot car."  You may be thinking, 'Was this just to keep me reading ?'  As mentioned above -- no :) 
 
-Ok.... so then you may think, 'Are you going to write now that by using my brain to learn something new that these activities will prevent or delay dementia and my brain will stay extra healthy?'  Well... maybe. Any intellectual stimulation is good for the brain and lots of studies indicate it may indeed keep the brain much healthier throughout the lifetime. But, no... it's not this. We really could in theory build a more definitive prevention of Alzheimer's with our robot car project. (But as noted above, this Step has been re-written and this material is only presented for general interest.)
+Ok.... so then you may think, 'Are you going to write now that by using my brain to learn something new that these activities will prevent or delay dementia and my brain will stay extra healthy?'  Well... maybe. Any intellectual stimulation is good for the brain and lots of studies indicate it may indeed keep the brain much healthier throughout the lifetime. But, no... it's not this. We really can in theory build a more definitive prevention of Alzheimer's with our robot car project. (But as noted above, this Step has been re-written and this material is only presented for general interest.)
 
 Synchronous acitivity of large groups of neurons generate oscillatory electrical signals which can be measured on the scalp of the head (EEG). It is believed that the synchronous activity of neurons allows different parts of the brain to communicate with each other. (Although.... if you want to consider a more nuanced look at the subject, consider reading- Schneider, H. (2022). Causal cognitive architecture 3: a solution to the binding problem. Cognitive Systems Research, 72, 88-115.) 
 
@@ -709,8 +709,10 @@ Success!! The new green LED flashes once each 8 seconds (on 2 seconds then off 6
 
 You have mastered simple C/C++ coding for the Arduino and simple electronics for the Arduino. You should feel great -- it's ok to throw yourself another celebration :)
 
+<p align="center">
+ <img src="successpicfemale.png" width="700" height="950">
+</p>
 
-![successpicfemale](successpicfemale.png)
 
 -
 -
