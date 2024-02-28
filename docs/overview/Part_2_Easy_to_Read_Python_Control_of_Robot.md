@@ -820,15 +820,6 @@ We haven't paid much attention to the style in which we write our Arduino progra
 ..........
 
 
---READING DIGITAL INPUTS IN ARDUINO--
-
-We've learned to use the Arduino board for digital outputs, e.g., the built-in function digitalWrite(output pin, LOW/HIGH). Now let's just very basically learn how to use the Arduino board to read a digital input.
-
-......
-
-......
-
--
 -
 -
 -
@@ -846,6 +837,17 @@ If you are working on the Arduino board including working on the robot car proje
 ![multimeter](multimeter.png)
 
 
+
+
+--READING DIGITAL INPUTS IN ARDUINO--
+
+We've learned to use the Arduino board for digital outputs, e.g., the built-in function digitalWrite(output pin, LOW/HIGH). Now let's just very basically learn how to use the Arduino board to read a digital input.
+
+......
+
+......
+
+-
 ......
 
 ......
