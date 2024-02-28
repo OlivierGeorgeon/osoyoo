@@ -344,7 +344,11 @@ NOTE:  Feb 27, 2024:  The HLC5883L code is now within the GitHub repository and 
 
 (Advantages of including code in the repository along with all the other code is that extra libraries do not have to be installed. However, the disadvantage is that libraries are often maintained by other people, and once code is put into a private program the code may no longer be maintained as effectively. )
 
-(If you go ahead and install the HLC5883L library anyway,this should not cause any problems -- the repository HLC5883L code will be used in any case.)
+(If you go ahead and install the HLC5883L library anyway,this should not cause any problems -- the repository HLC5883L code will be used in any case. You can see this if you inspect the code in Imu.cpp :
+
+// #include <HMC5883L.h>
+
+#include "src/lib/HMC5883L.h"   )
 
 --------------
 
