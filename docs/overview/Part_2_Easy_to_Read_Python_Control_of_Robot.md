@@ -339,7 +339,16 @@ Thus at this point when you search for Installed libraries you should see this o
 
 --MANUALLY INSTALLING THIRD-PARTY LIBRARIES--
 
-There is another library you must install -- the HLC5883L compass function library. (The HMC5883L is a three-axis (x,y,z) digital compass/magnetometer module that is installed and used later as part of the project. It is based on orthogonally situated magnetoresistive sensors. It provides raw data related to measured magnetic fields and does not adjust the outputs for variations in the Earth's magnetic field required for more accurate navigation. By the 1800's ships housed the ship's compass in a binnacle which contained soft iron spheres or sometimes actual magnets to help counteract the ship's magnetic fields -- something you can see if you ever look at old ships or visit museums. In modern ships there is GPS correction of the compass to deal with the deviations in the field in different locations on Earth.)
+-------------
+NOTE:  Feb 27, 2024:  The HLC5883L code is now within the GitHub repository and as such this library does not have to be installed manually any longer. (However, keep reading as the MPU-6050 library still needs to be installed manually.)
+
+(Advantages of including code in the repository along with all the other code is that extra libraries do not have to be installed. However, the disadvantage is that libraries are often maintained by other people, and once code is put into a private program the code may no longer be maintained as effectively. )
+
+(If you go ahead and install the HLC5883L library anyway,this should not cause any problems -- the repository HLC5883L code will be used in any case.)
+
+--------------
+
+The HLC5883L compass function library must be installed manually. (The HMC5883L is a three-axis (x,y,z) digital compass/magnetometer module that is installed and used later as part of the project. It is based on orthogonally situated magnetoresistive sensors. It provides raw data related to measured magnetic fields and does not adjust the outputs for variations in the Earth's magnetic field required for more accurate navigation. By the 1800's ships housed the ship's compass in a binnacle which contained soft iron spheres or sometimes actual magnets to help counteract the ship's magnetic fields -- something you can see if you ever look at old ships or visit museums. In modern ships there is GPS correction of the compass to deal with the deviations in the field in different locations on Earth.)
 
 Go to the GitHub repository Arduino-HMC5883L
 
@@ -349,7 +358,7 @@ Save the repository as a zip file.  (If you are not sure how to do this, see a f
 
 On the Arduino IDE click 'Sketch' and then 'Include Library' then 'ADD Zip Library'. Then select the zip file for the repository. This will get stored as a new library in your IDE.
 
-There is still another library you must install -- the MPU6050 inertial measurement unit (IMU) library. (We will later add an IMU hardware board to the project.) 
+----> There is still another library you must install -- the MPU6050 inertial measurement unit (IMU) library. (We will later add an IMU hardware board to the project.) 
 
 (The MPU-6050 uses MEMS (microelectromechanical system) integrated circuit fabrication technology to create a 3-axis (x,y,z) gyroscope and accelerometer in a single chip. The gyroscope measures the rotational velocity which allows navigation information with regard to spins and orientation. The accelerometer measures accelerations along the orthogonal axes. By mathematically integrating the accelerations they can be converted to velocity and by further integration they can be converted to change in position. Keep in mind the accelerometer will measure the acceleration due to gravity, and it is necessary to distinguish between accelerations measured due to gravity from accelerations due to movement of the robot car.)
 
