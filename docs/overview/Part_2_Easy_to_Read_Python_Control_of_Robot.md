@@ -822,7 +822,7 @@ If we wanted to pass a value to the function to tell it how many times to print 
 
 <h1 style="font-size: 24px;">Step #7 --Digital and Analog I/O and Measuring with a Multimeter</h1>
 
-Unlike the C/C++ code (or Python code) you normally write at your laptop/desktop, the Arduino code is very much concerned with input and outputs, both digital and analog ones. We have very briefly considered coding for digital inputs and outputs. In this step we will further consider digital inputs and outputs as well as coding for analog inputs and outputs. Also, we will practice using a multimeter.
+Unlike the C/C++ code (or Python code) you normally write at your laptop/desktop, the Arduino code is very much concerned with input and outputs, both digital and analog ones. We have very briefly considered coding for digital inputs and outputs. In this step we will consider coding for digital inputs and outputs as well as coding for analog inputs and outputs. Also, we will practice using a multimeter.
 
 For many years a multimeter was known as a "VOM" -- volt-ohm-milliammeter, and they did what their name said -- measured voltage, resistance and current. Until the digital revolution in the last quarter of the 20th century, they had an analog meter, i.e., a needle moved on a scale with numbers and various units. Then volt-ohm-millaimmeters started using digital displays. And now, with advent of extremely complex and cheap integrated circuits, the volt-ohm-milliammeter has become an incredible multimeter capable of measuring not only voltages, resistance and current, but may include dozens if not hundreds of other features, from measuring frequencies, capacitances, temperatures, continuity issues, diode and transistor features to including oscilliscope screens in the device (depends on price). Perhaps the next generation of multimeters will also incorporate generative AI!! (None do at the time of this writing.)
 
@@ -833,20 +833,43 @@ If you are working on the Arduino board including working on the robot car proje
 ![multimeter](multimeter.png)
 
 
+**UNDER CONSTRUCTION**
 
 
---READING DIGITAL INPUTS IN ARDUINO--
+--DIGITAL OUTPUTS--
 
-We've learned to use the Arduino board for digital outputs, e.g., the built-in function digitalWrite(output pin, LOW/HIGH). Now let's just very basically learn how to use the Arduino board to read a digital input.
+pinMode(outPin, OUTPUT)
 
-......
+digitalWrite(outPin, HIGH)
 
-......
+digitalWrite(outPin, LOW)
 
--
-......
 
-......
+--DIGITAL INPUTS--
+
+pinMode(inputPin, INPUT)
+
+pinMode(inputPin, INPUT_PULLUP)
+
+int x = digitalRead(inputPin)
+
+
+--ANALOG OUTPUTS--
+
+pinMode(outPin, OUTPUT)
+
+analogWrite(outPin, float value)
+
+
+--ANALOG INPUTS--
+
+pinMode -- not required (set automatically)
+
+int reading = analogRead(inputPin) 
+
+returns a value of 0 to 1023 over an input range 0 to 5 volts
+
+
 
 -
 -
@@ -1020,22 +1043,20 @@ Success !!
 
 ![compilesuccess](compilesuccess.png)
 
--
--
-
-
-.....
-
-.....
 
 -
 -
 -
 
 <h1 style="font-size: 24px;">Step #9 --Preliminary Testing of the PetitCat Code: Python <--> Arduino</h1>
+	
+-
 
--
--
+--Setting up Wi-Fi parameters
+--Cloning /osoyoo/tests
+--Intalling Python if not already done so
+--Trying out test_remote_control_robot.py
+
 
 
 
