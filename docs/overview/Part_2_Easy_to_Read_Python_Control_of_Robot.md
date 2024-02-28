@@ -503,11 +503,15 @@ The red LED on the Wi-Fi shield (reflecting the status of the D13 pin) will now 
 
 
 ![flashon](flashon.jpg)
+-
+-
 
 
 
 
 ![seizurewarn](seizurewarn.png)
+
+
 Although the LED is low-power, it can be flashed relatively fast if programmed as such. There is a risk in sensitive individuals of triggering seizures (as well as migraines). If this applies to you or you have any risk towards seizures, do NOT flash the light at high speed.
 
 (Triggering seizures in photosensitive individuals is increased by exposure to a frequency of 5 to 30 Hertz  (it can still occur at 40 Hertz), bright lights, high contrast, and the duration of exposure. 
@@ -517,7 +521,7 @@ Although the LED is low-power, it can be flashed relatively fast if programmed a
 
 Ok... above it was written "....Keep reading, and see how with acquiring very simple C/C++ knowledge you can possibly prevent or delay Alzheimer's (and possibly other types of) dementia with the robot car."  You may be thinking, 'Was this just clickbait to keep me reading your boring paragraphs?'  As mentioned above -- no :) 
 
-Ok.... so then you may think, 'Are you going to write now that by using my brain to learn something new (like the material in your boring paragraphs above and learning some C/C++ coding below) that these activities will prevent or delay dementia and my brain will stay extra healthy?'  Well... maybe. Any intellectual stimulation is good for the brain and lots of studies indicate it may indeed keep the brain much healthier throughout the lifetime. But, no... it's not this. We will really could in theory build a more definitive prevention of Alzheimer's with our robot car project. (But as noted above, this Step has been re-written and this material is only presented for general interest.)
+Ok.... so then you may think, 'Are you going to write now that by using my brain to learn something new that these activities will prevent or delay dementia and my brain will stay extra healthy?'  Well... maybe. Any intellectual stimulation is good for the brain and lots of studies indicate it may indeed keep the brain much healthier throughout the lifetime. But, no... it's not this. We will really could in theory build a more definitive prevention of Alzheimer's with our robot car project. (But as noted above, this Step has been re-written and this material is only presented for general interest.)
 
 Synchronous acitivity of large groups of neurons generate oscillatory electrical signals which can be measured on the scalp of the head (EEG). It is believed that the synchronous activity of neurons allows different parts of the brain to communicate with each other. (Although.... if you want to consider a more nuanced look at the subject, consider reading- Schneider, H. (2022). Causal cognitive architecture 3: a solution to the binding problem. Cognitive Systems Research, 72, 88-115.) In dementias we see pertubation of the EEG rhythms believed to be needed for cognition. A number of studies have shown that stimulation in the 40-Hz "gamma" EEG range of oscillations can improve Alzheimer's Disease symptoms in mouse models of the disease (Chan, D., Suk, H. J., Jackson, B., Milman, N. P., Stark, D., Beach, S. D., & Tsai, L. H. (2021). Induction of specific brain oscillations may restore neural circuits and be used for the treatment of Alzheimer's disease. Journal of Internal Medicine, 290(5), 993-1009.) A study on humans also showed similar results (e.g., Chan, D., Suk, H. J., Jackson, B. L., Milman, N. P., Stark, D., Klerman, E. B., ... & Tsai, L. H. (2021). Gamma frequency sensory stimulation in probable mild Alzheimer’s dementia patients: results of a preliminary clinical trial.) (There is a warning in the next paragraph -- if this warning has been deleted please do not build this project without reading.)
 
