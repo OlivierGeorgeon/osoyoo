@@ -824,7 +824,7 @@ We haven't paid much attention to the style in which we write our Arduino progra
 -
 -
 
-<h1 style="font-size: 24px;">Step #7 --Arduino Analog Inputs and Outputs and Measuring with a Multimeter</h1>
+<h1 style="font-size: 24px;">Step #7 --Digital and Analog I/O and Measuring with a Multimeter</h1>
 
 Unlike the C/C++ code (or Python code) you normally write at your laptop/desktop, the Arduino code is very much concerned with input and outputs, both digital and analog ones. We have very briefly considered coding for digital inputs and outputs. In this step we will further consider digital inputs and outputs as well as coding for analog inputs and outputs. Also, we will practice using a multimeter.
 
