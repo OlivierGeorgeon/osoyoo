@@ -450,18 +450,20 @@ Ok... above it was written "....Keep reading, and see how with acquiring very si
 
 In fact, this is a very legitimate topic. 
 
-However, given that there is very tiny risk of seizures induced by flashing lights for a very small percentage of the population, but still some people, this Step has been re-written so we discuss how we can code the Arduino board to possibly improve cognition and prevent dementia, but do so  only at the end of the Step and we don't program the actually circuit.
+However, given that there is a risk of seizures induced by flashing lights for a svery small percentage of the population, but still some people, this Step has been re-written so we discuss how we can code the Arduino board to possibly improve cognition and prevent dementia, but do so  only at the end of the Step and we don't program the actual circuit.
 
 
 --ARDUINO SKETCH TO FLASH THE ONBOARD LED--
 
-Ok.... let's start writing our program to flash an LED at 40Hz (and improve cognitive function maybe?) (CAUTION: We will only do this theoretically as part of learning some new coding. We will NOT build anything therapeutic or anything to be used seriously.)
+In this Step we will learn how to code an Arduino program (i.e., "Sketch") in trying to flash an LED. 
 
 Go to the Arduino IDE. Click File. Click New Sketch. A new window should pop up on your screen. (You can close the Arduino IDE screen in the background.)
 
-Ok.... the LED on the Arduino board on the robot car is wired up to digital pin output 13 already (i.e., it is already soldered directly on the board from the factory -- no discrete wires are necessary). Even if you have much experience coding in C/C++ how do you get the LED to start flashing?  Writing a C/C++ program for Arduino is similar but still different enough than writing C/C++ code that goes to a monitor or other computers.
+The LED on the Arduino board on the robot car is wired up to digital pin output 13 already (i.e., it is already soldered directly on the board from the factory -- no discrete wires are necessary).
 
-If you look closely at the Wi-Fi shield there is an "LED13"  (the printing is scraped off a bit in the photo below) on this shield which reflects the state of the D13 pin:
+Ok.... even if you have much experience coding in C/C++ how do you now get the LED to start flashing?  Writing a C/C++ program for Arduino is similar but still different enough than writing C/C++ code that goes to a monitor or other computers.
+
+If you look closely at the Wi-Fi shield there is an "LED13"  (actually it says "L.D13" in the photo below) on this shield which reflects the state of the D13 pin:
 
 ![flashoff](flashoff.png)
 
@@ -469,16 +471,11 @@ First of all, all Arduino programs need to have a setup() function and a loop() 
 
 The setup() function runs only once when the Arduino board is powered up (or reset). After the setup() function finishes its programmed tasks (i.e., whatever you tell it to do) it then automatically calls the loop() function.
 
-The loop() function runs over and over again (hence, its name of 'loop'). In our case, we want the Arduino board to flash an LED (for a fraction of second, but long enough to see hopefully) and then wait a certain delay. At that point the code gets to the end of the loop and starts again. We program the delay so that the loop runs 40 times each second, and thus the LED is flashing at 40Hz (which was our goal above.)
+The loop() function runs over and over again (hence, its name of 'loop'). In our case, we want the Arduino board to flash an LED long enough to see for a bit of time, and then wait a certain delay with the LED turned off. At that point the code gets to the end of the loop and starts again. 
 
-Before you start coding this project your Arduino IDE screen should look like this:
+You can name the Sketch (i.e., program) whatever you'd like -- just click on the right side to the tabs and rename the tab. As you can see I called my program (i.e., my Sketch) "flash_slow.ino". (You don't have to, and can use the default name the Arduino IDE choses for you.)
 
-
-![blanksketch](blanksketch.png)
-
-You can name the Sketch (i.e., program) whatever you'd like -- just click on the right side to the tabs and rename the tab. As you can see I called my program (i.e., my Sketch) "flash_40Hz". (You don't have to, and can use the default name the Arduino IDE choses for you.)
-
-Even if you have coded in C/C++ before, the Arduino board uses particular functions. Let's review some of them right now.
+Even if you have coded in C/C++ before, the Arduino IDE uses specialized functions. Let's review some of them right now.
 
 -pinMode(pin, mode) -- It tells Arduino IDE that a specific pin should be configured to behave as an input (mode=INPUT) or an output (mode=OUTPUT).
 
@@ -493,39 +490,46 @@ Even if you have coded in C/C++ before, the Arduino board uses particular functi
 
 Now that you know what the structure of an Arduino program looks like and now that you know these very important functions (well, important for programming Arduino boards), try to write an Arduino program that blinks the LED on the robot car's Arduino board.
 
-****REWRITE -- AWKWARD WITH SEIZURE WARNING AND THEN THE DIFFERENT FREQUENCIES.... WRITE THIS 'STEP' WITH LOW FREQUENCY AND THEN AT THE END INTRODUCE 40 HZ GAMMA STIMULATION****
 
-![rewrite](rewrite.png)
-
-This is what my program looks like:
-
-![flashsketch](flashsketch.png)
-
--
 -
 ![slowflash](slowflash.png)
-
-Alternative code to consider if you are at photosensitive risk for seizures. Also use the demonstration in well-lit room to reduce contrast with the brightness of the LED. Also, do not stare at the LED and do not look at it for very long.
 
 -
 -
 
 Click the green right facing arrow at the top of the screen (i.e., compile and upload code to the Arduino board).
 
-The red LED on the Wi-Fi shield (reflecting the status of the D13 pin) will now flash at 40Hz. (Or if you did the alternative demonstration, it will gently come on for 2 seconds and then go off for 6 seconds, and repeat.) DO NOT STARE AT THE LED. USE IN A WELL LIT-ROOM. READ THE WARNINGS ABOVE BEFORE BUILDING.
+The red LED on the Wi-Fi shield (reflecting the status of the D13 pin) will now gently come on for 2 seconds and then go off for 6 seconds, and repeat.
+
 
 ![flashon](flashon.jpg)
 
-Some people may perceive the  40Hz LED to be continuously on rather than flashing. (The threshold for most of the population to perceive a flashing light is from 15-60Hz.) It also depends on the environment in which the LED is viewed in. PLEASE DO NOT STARE AT THE LED. PLEASE DO NOT LOOK AT FOR LONG PERIODS OF TIME. PLEASE USE IN A WELL-LIT ROOM. PLEASE HEED ALL WARNINGS GIVEN ABOVE.
 
-In any case, in theory such an apparatus would stimulate the brain at 40Hz which might enhance  cognitive function. However, as mentioned above, this is just a fun project to make learning some new systems details more interesting. Maybe this technology can really help or prevent or delay Alzheimer's Disease and other cognitive impairments, or maybe medical research will prove it to be ineffective, despite positive trials at the time of writing. It was just considered theoretically here to help make learning some new coding interesting. (Please do not use in any serious manner.)
 
-For safety, we will now change the code to the safer alternative demonstration of flashing at 0.125Hertz, i.e., once per 8 seconds.
 
-![slowflash](slowflash.png)
+![seizurewarn](seizurewarn.png)
+Although the LED is low-power, it can be flashed relatively fast if programmed as such. There is a risk in sensitive individuals of triggering seizures (as well as migraines). If this applies to you or you have any risk towards seizures, do NOT flash the light at high speed.
 
-While some people may not be able to see flashing at 40 Hertz, at 0.125 Hertz you should be able to see the light come on and go off. If you can't see this now, then you need to troubleshoot the code and the Arduino board.
+(Triggering seizures in photosensitive individuals is increased by exposure to a frequency of 5 to 30 Hertz  (it can still occur at 40 Hertz), bright lights, high contrast, and the duration of exposure. 
 
+
+--FLASHING LIGHTS AND POSSIBLE IMPROVED COGNITION?? --
+
+Ok... above it was written "....Keep reading, and see how with acquiring very simple C/C++ knowledge you can possibly prevent or delay Alzheimer's (and possibly other types of) dementia with the robot car."  You may be thinking, 'Was this just clickbait to keep me reading your boring paragraphs?'  As mentioned above -- no :) 
+
+Ok.... so then you may think, 'Are you going to write now that by using my brain to learn something new (like the material in your boring paragraphs above and learning some C/C++ coding below) that these activities will prevent or delay dementia and my brain will stay extra healthy?'  Well... maybe. Any intellectual stimulation is good for the brain and lots of studies indicate it may indeed keep the brain much healthier throughout the lifetime. But, no... it's not this. We will really could in theory build a more definitive prevention of Alzheimer's with our robot car project. (But as noted above, this Step has been re-written and this material is only presented for general interest.)
+
+Synchronous acitivity of large groups of neurons generate oscillatory electrical signals which can be measured on the scalp of the head (EEG). It is believed that the synchronous activity of neurons allows different parts of the brain to communicate with each other. (Although.... if you want to consider a more nuanced look at the subject, consider reading- Schneider, H. (2022). Causal cognitive architecture 3: a solution to the binding problem. Cognitive Systems Research, 72, 88-115.) In dementias we see pertubation of the EEG rhythms believed to be needed for cognition. A number of studies have shown that stimulation in the 40-Hz "gamma" EEG range of oscillations can improve Alzheimer's Disease symptoms in mouse models of the disease (Chan, D., Suk, H. J., Jackson, B., Milman, N. P., Stark, D., Beach, S. D., & Tsai, L. H. (2021). Induction of specific brain oscillations may restore neural circuits and be used for the treatment of Alzheimer's disease. Journal of Internal Medicine, 290(5), 993-1009.) A study on humans also showed similar results (e.g., Chan, D., Suk, H. J., Jackson, B. L., Milman, N. P., Stark, D., Klerman, E. B., ... & Tsai, L. H. (2021). Gamma frequency sensory stimulation in probable mild Alzheimer’s dementia patients: results of a preliminary clinical trial.) (There is a warning in the next paragraph -- if this warning has been deleted please do not build this project without reading.)
+
+In theory, if light is flashed at 40Hz there will be a 40Hz visual stimulation which research indicates could (theoretically) prevent and improve dementias. (But.... again.... you should not do this because the research is still incomplete and there are actually dangers of staring at 40Hz signals such as risks of triggering seizures in sensitive individuals, triggering migraines in certain individuals, causing eye strain, and the potential for unknown effects.)
+
+(Note: "GENUS" is not a typo for "Genius" but stands for Gamma-Entrainment-Using-Sensory stimuli at 40 Hz)
+
+![stimulate40Hz](stimulate40hz.jpg)
+
+
+-
+-
 
 --EXPERIMENTING WITH THE ARDUINO COMPILER (WITHIN THE IDE)--
 
@@ -535,7 +539,7 @@ I left off the semi-colon at line 4. What will the compiler do? You should try t
 
 ![line4](line4.png)
 
-Note: Image is taken from older code. Please make the flash rate 0.125Hertz for these compiler experiments.
+Note: Image is taken from older code. Please make the flash rate 0.125Hertz as above for these compiler experiments.
 -
 
 
@@ -556,7 +560,7 @@ Restore your code. Now move line 4 (i.e, pinMode) and insert it after line 10. T
 
 ![pinmodemoved](pinmodemoved.png)
 
-Note: Image is taken from older code. Please make the flash rate 0.125Hertz for these compiler experiments.
+Note: Image is taken from older code. Please make the flash rate 0.125Hertz as above for these compiler experiments.
 -
 
 It should work ok.
@@ -565,7 +569,7 @@ There is no code in the setup() function. Let's remove it. (Which you can do by 
 
 ![commentoutsetup](commentoutsetup.png)
 
-Note: Image is taken from older code. Please make the flash rate 0.125Hertz for these compiler experiments.
+Note: Image is taken from older code. Please make the flash rate 0.125Hertz as above for these compiler experiments.
 -
 
 Now click the button to compile and upload the code. What happens?
@@ -576,33 +580,6 @@ Restore your code, i.e., uncomment the setup() function. Everything should work 
 
 
 
-
-![seizurewarn](seizurewarn.png)
-Although the LED is low-power, this still represents a relatively fast flashing light. There is a risk in sensitive individuals of triggering seizures (as well as migraines). If this applies to you or you have any risk towards seizures, do NOT flash the light at high speed -- instructions are given below for flashing the LED at a much lower rate. (Triggering seizures in photosensitive individuals is increased by exposure to a frequency of 5 to 30 Hertz  (it can still occur at 40 Hertz), bright lights, high contrast, and the duration of exposure. A frequency of 0.125 Hertz (one gentle turn on of the LED every 8 seconds) in a well-lit room (to reduce contrast) is used in the alternative demonstration.)
-
-WARNING: This is written for an intended target audience of educated researchers in cognitive science and artificial intelligence, who might be interested in a theoretical aspect of approaching cognition as a means to help them learn new coding/system details. It is not written as a do-it-yourself therapeutic project and it is not written for those not educated in the field.
-
-
---FLASHING LIGHTS AND POSSIBLE IMPROVED COGNITION?? --
-
-Ok... above it was written "....Keep reading, and see how with acquiring very simple C/C++ knowledge you can possibly prevent or delay Alzheimer's (and possibly other types of) dementia with the robot car."  You may be thinking, 'Was this just clickbait to keep me reading your boring paragraphs?'  Well.... no :) 
-
-In fact, this is a very legitimate topic. 
-
-However, given that there is very tiny risk of seizures induced by flashing lights for a very small percentage of the population, but still some people, this Step has been re-written so we discuss how we can code the Arduino board to possibly improve cognition and prevent dementia, but do so  only at the end of the Step and we don't program the actually circuit.
-
-Ok.... so then you may think, 'Are you going to write now that by using my brain to learn something new (like the material in your boring paragraphs above and learning some C/C++ coding below) that will prevent or delay dementia and my brain will stay extra healthy?'  Well... maybe. Any intellectual stimulation is good for the brain and lots of studies indicate it may indeed keep the brain much healthier throughout the lifetime. But, no... it's not this. We will really build a more definitive prevention of Alzheimer's (possibly -- research is still lacking -- read the cautions below -- this is just for fun, not for real medical use!!) with our robot car project.
-
-Synchronous acitivity of large groups of neurons generate oscillatory electrical signals which can be measured on the scalp of the head (EEG). It is believed that the synchronous activity of neurons allows different parts of the brain to communicate with each other. (Although.... if you want to consider a more nuanced look at the subject, consider reading- Schneider, H. (2022). Causal cognitive architecture 3: a solution to the binding problem. Cognitive Systems Research, 72, 88-115.) In dementias we see pertubation of the EEG rhythms believed to be needed for cognition. A number of studies have shown that stimulation in the 40-Hz "gamma" EEG range of oscillations can improve Alzheimer's Disease symptoms in mouse models of the disease (Chan, D., Suk, H. J., Jackson, B., Milman, N. P., Stark, D., Beach, S. D., & Tsai, L. H. (2021). Induction of specific brain oscillations may restore neural circuits and be used for the treatment of Alzheimer's disease. Journal of Internal Medicine, 290(5), 993-1009.) A study on humans also showed similar results (e.g., Chan, D., Suk, H. J., Jackson, B. L., Milman, N. P., Stark, D., Klerman, E. B., ... & Tsai, L. H. (2021). Gamma frequency sensory stimulation in probable mild Alzheimer’s dementia patients: results of a preliminary clinical trial.) (There is a warning in the next paragraph -- if this warning has been deleted please do not build this project without reading.)
-
-There is an LED on the Arduino board already wired up to digital output D13. If we flash this at 40Hz there will be a 40Hz visual stimuli which if we look at could (theoretically) prevent and improve dementias. (But.... again.... you should not do this because the research is still incomplete and there are actually dangers of staring at 40Hz signals such as risks of triggering seizures in sensitive individuals, triggering migraines in certain individuals, causing eye strain, and the potential for unknown effects. The reason medical research is done is because sometimes treatments end up causing more harm than good. We are building this project just for fun, not for medical usage!! We will just build a demonstration circuit, but not use it for any therapeutic purpose. As well, if there is any risk of seizures, please use the alternative much slower demonstration.)
-
-(Note: "GENUS" is not a typo for "Genius" but stands for Gamma-Entrainment-Using-Sensory stimuli at 40 Hz)
-
-![stimulate40Hz](stimulate40hz.jpg)
-
-
--
 -
 -
 -
