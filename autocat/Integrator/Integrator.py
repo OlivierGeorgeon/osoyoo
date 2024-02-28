@@ -35,7 +35,8 @@ def integrate(memory):
 
     # Adjust the robot's position in allocentric memory
     # print("Position correction due to phenomenon update", position_correction)
-    memory.allocentric_memory.move(Quaternion([0, 0, 0, 1]), position_correction, memory.clock)
+    # memory.allocentric_memory.move(Quaternion([0, 0, 0, 1]), position_correction, memory.clock)
+    memory.allocentric_memory.robot_point += position_correction
     # Create new hypothetical phenomena from remaining affordances
     memory.phenomenon_memory.create_phenomena(new_affordances)
 

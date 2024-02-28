@@ -22,27 +22,21 @@ class Message:
 
         self.destination = Vector3([0, 0, 0])
         if 'destination' in message_dict:
-            # self.destination = Vector3([message_dict["destination_x"], message_dict["destination_y"], 0])
             self.destination = Vector3(message_dict["destination"])
 
         self.ter_position = None
         if 'position' in message_dict:
-            # self.ter_position = Vector3([message_dict["pos_x"], message_dict["pos_y"], 0])
             self.ter_position = Vector3(message_dict["position"])
             self.ter_position += self.destination
 
         self.polar_ego_position = None
         if 'focus' in message_dict:
             # If focus then compute the polar_ego position
-            # self.focus_point = Vector3([message_dict["focus_x"], message_dict["focus_y"], 0])
             self.focus_point = Vector3(message_dict["focus"])
             self.polar_ego_position = -self.focus_point * (1 + ROBOT_FLOOR_SENSOR_X / self.focus_point.length)
-            # self.polar_ego_position += self.destination
 
         # Ego positions to be update by Workspace.receive_message
         self.position_matrix = None
-        # self.ego_quaternion = None
-        # self.ego_position = None
 
     def set_position_matrix(self, memory):
         """Return the position matrix of the other robot in this egocentric memory"""

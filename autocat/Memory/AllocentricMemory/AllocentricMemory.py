@@ -131,39 +131,40 @@ class AllocentricMemory:
 
         # print("Update allocentric time:", time.time() - start_time, "seconds")
 
-    def move(self, direction_quaternion, translation, clock):
+    def move(self, direction_quaternion, trajectory, clock):
         """Move the robot in allocentric memory. Mark the traversed cells Free. Returns the new position
         If body_quaternion is identity then the translation is allocentric"""
 
         # Move the robot along its body direction
-        destination_point = self.robot_point + quaternion.apply_to_vector(direction_quaternion, translation)
+        destination_point = self.robot_point + quaternion.apply_to_vector(direction_quaternion, trajectory.translation)
         # Mark the cells traversed by the robot
-        if translation[0] > 0:  # Move back
-            outline = np.array([
-                direction_quaternion * Vector3([ROBOT_CHASSIS_X, ROBOT_OUTSIDE_Y, 0]) + self.robot_point,
-                direction_quaternion * Vector3([-ROBOT_CHASSIS_X, ROBOT_OUTSIDE_Y, 0]) + destination_point,
-                direction_quaternion * Vector3([-ROBOT_CHASSIS_X, -ROBOT_OUTSIDE_Y, 0]) + destination_point,
-                direction_quaternion * Vector3([ROBOT_CHASSIS_X, -ROBOT_OUTSIDE_Y, 0]) + self.robot_point])
-        elif translation[1] > 0:  # Swipe left
-            outline = np.array([
-                direction_quaternion * Vector3([ROBOT_CHASSIS_X, ROBOT_OUTSIDE_Y, 0]) + destination_point,
-                direction_quaternion * Vector3([-ROBOT_CHASSIS_X, ROBOT_OUTSIDE_Y, 0]) + destination_point,
-                direction_quaternion * Vector3([-ROBOT_CHASSIS_X, -ROBOT_OUTSIDE_Y, 0]) + self.robot_point,
-                direction_quaternion * Vector3([ROBOT_CHASSIS_X, -ROBOT_OUTSIDE_Y, 0]) + self.robot_point])
-        elif translation[1] < 0:  # Swipe right
-            outline = np.array([
-                direction_quaternion * Vector3([ROBOT_CHASSIS_X, ROBOT_OUTSIDE_Y, 0]) + self.robot_point,
-                direction_quaternion * Vector3([-ROBOT_CHASSIS_X, ROBOT_OUTSIDE_Y, 0]) + self.robot_point,
-                direction_quaternion * Vector3([-ROBOT_CHASSIS_X, -ROBOT_OUTSIDE_Y, 0]) + destination_point,
-                direction_quaternion * Vector3([ROBOT_CHASSIS_X, -ROBOT_OUTSIDE_Y, 0]) + destination_point])
-        else:  # Move forward
-            outline = np.array([
-                direction_quaternion * Vector3([ROBOT_CHASSIS_X, ROBOT_OUTSIDE_Y, 0]) + destination_point,
-                direction_quaternion * Vector3([-ROBOT_CHASSIS_X, ROBOT_OUTSIDE_Y, 0]) + self.robot_point,
-                direction_quaternion * Vector3([-ROBOT_CHASSIS_X, -ROBOT_OUTSIDE_Y, 0]) + self.robot_point,
-                direction_quaternion * Vector3([ROBOT_CHASSIS_X, -ROBOT_OUTSIDE_Y, 0]) + destination_point])
-        # path = mpath.Path([p[0:2] for p in [p1, p2, p3, p4]])
-        path = mpath.Path(outline[:, 0:2])
+        # if translation[0] > 0:  # Move back
+        #     covered_area = np.array([
+        #         direction_quaternion * Vector3([ROBOT_CHASSIS_X, ROBOT_OUTSIDE_Y, 0]) + self.robot_point,
+        #         direction_quaternion * Vector3([-ROBOT_CHASSIS_X, ROBOT_OUTSIDE_Y, 0]) + destination_point,
+        #         direction_quaternion * Vector3([-ROBOT_CHASSIS_X, -ROBOT_OUTSIDE_Y, 0]) + destination_point,
+        #         direction_quaternion * Vector3([ROBOT_CHASSIS_X, -ROBOT_OUTSIDE_Y, 0]) + self.robot_point])
+        # elif translation[1] > 0:  # Swipe left
+        #     covered_area = np.array([
+        #         direction_quaternion * Vector3([ROBOT_CHASSIS_X, ROBOT_OUTSIDE_Y, 0]) + destination_point,
+        #         direction_quaternion * Vector3([-ROBOT_CHASSIS_X, ROBOT_OUTSIDE_Y, 0]) + destination_point,
+        #         direction_quaternion * Vector3([-ROBOT_CHASSIS_X, -ROBOT_OUTSIDE_Y, 0]) + self.robot_point,
+        #         direction_quaternion * Vector3([ROBOT_CHASSIS_X, -ROBOT_OUTSIDE_Y, 0]) + self.robot_point])
+        # elif translation[1] < 0:  # Swipe right
+        #     covered_area = np.array([
+        #         direction_quaternion * Vector3([ROBOT_CHASSIS_X, ROBOT_OUTSIDE_Y, 0]) + self.robot_point,
+        #         direction_quaternion * Vector3([-ROBOT_CHASSIS_X, ROBOT_OUTSIDE_Y, 0]) + self.robot_point,
+        #         direction_quaternion * Vector3([-ROBOT_CHASSIS_X, -ROBOT_OUTSIDE_Y, 0]) + destination_point,
+        #         direction_quaternion * Vector3([ROBOT_CHASSIS_X, -ROBOT_OUTSIDE_Y, 0]) + destination_point])
+        # else:  # Move forward
+        #     covered_area = np.array([
+        #         direction_quaternion * Vector3([ROBOT_CHASSIS_X, ROBOT_OUTSIDE_Y, 0]) + destination_point,
+        #         direction_quaternion * Vector3([-ROBOT_CHASSIS_X, ROBOT_OUTSIDE_Y, 0]) + self.robot_point,
+        #         direction_quaternion * Vector3([-ROBOT_CHASSIS_X, -ROBOT_OUTSIDE_Y, 0]) + self.robot_point,
+        #         direction_quaternion * Vector3([ROBOT_CHASSIS_X, -ROBOT_OUTSIDE_Y, 0]) + destination_point])
+        # path = mpath.Path(covered_area[:, 0:2])
+        alo_covered_area = trajectory.covered_area + self.robot_point
+        path = mpath.Path(alo_covered_area[:, 0:2])
         for c in [c for line in self.grid for c in line if c.is_inside(path)]:
             c.status[0] = EXPERIENCE_PLACE
             c.clock_place = clock
@@ -176,7 +177,6 @@ class AllocentricMemory:
         """Apply the PLACE status to the cells at the position of the robot"""
         # start_time = time.time()
         outline = body_memory.outline() + self.robot_point
-        # path = mpath.Path([p[0:2] for p in outline])
         path = mpath.Path(outline[:, 0:2])
         for c in [c for line in self.grid for c in line if c.is_inside(path)]:
             c.status[0] = EXPERIENCE_PLACE

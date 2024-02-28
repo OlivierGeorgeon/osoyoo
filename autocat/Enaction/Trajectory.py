@@ -6,7 +6,7 @@ from ..Integrator.OutcomeCode import CONFIDENCE_NO_FOCUS, CONFIDENCE_NEW_FOCUS, 
     CONFIDENCE_CAREFUL_SCAN, CONFIDENCE_CONFIRMED_FOCUS
 from ..Memory.BodyMemory import point_to_echo_direction_distance
 from ..Utils import short_angle, translation_quaternion_to_matrix, echo_point
-from ..Robot.RobotDefine import ROBOT_FLOOR_SENSOR_X, ROBOT_CHASSIS_Y, ROBOT_SETTINGS
+from ..Robot.RobotDefine import ROBOT_FLOOR_SENSOR_X, ROBOT_CHASSIS_Y, ROBOT_SETTINGS, ROBOT_CHASSIS_X, ROBOT_OUTSIDE_Y
 
 FOCUS_MAX_DELTA = 200  # 200 (mm) Maximum delta to keep focus
 
@@ -15,7 +15,6 @@ class Trajectory:
     """Used to compute the displacement, and to keep track of the prompt and the focus"""
     def __init__(self, memory, command):
         """Record the initial conditions of this trajectory"""
-        # self.intended_yaw = intended_yaw
         self.speed = command.speed
         self.span = command.span
 
@@ -34,6 +33,7 @@ class Trajectory:
         self.displacement_matrix = None  # Used by EgocentricMemory to rotate experiences
         self.focus_direction_prediction_error = 0
         self.focus_distance_prediction_error = 0
+        self.covered_area = np.empty((4, 3), dtype=int)
 
         # The prompt
         self.prompt_point = None
@@ -49,6 +49,13 @@ class Trajectory:
 
         # Translation integrated from the action's speed multiplied by the duration1
         self.translation = self.speed * outcome.duration1 / 1000
+
+        # The area covered during the translation in polar-egocentric coordinates
+        area = [[ROBOT_CHASSIS_X + max(0, self.translation[0]), ROBOT_OUTSIDE_Y + max(0, self.translation[1]), 0],
+                [-ROBOT_CHASSIS_X + min(0, self.translation[0]), ROBOT_OUTSIDE_Y + max(0, self.translation[1]), 0],
+                [-ROBOT_CHASSIS_X + min(0, self.translation[0]), -ROBOT_OUTSIDE_Y + min(0, self.translation[1]), 0],
+                [ROBOT_CHASSIS_X + max(0, self.translation[0]), -ROBOT_OUTSIDE_Y + min(0, self.translation[1]), 0]]
+        self.covered_area[:, :] = [(self.body_quaternion * Vector3(p)) for p in area]
 
         # The yaw quaternion
         if outcome.yaw is None:
@@ -182,4 +189,3 @@ class Trajectory:
                     self.focus_point = np.array([ROBOT_FLOOR_SENSOR_X + 10, 0, 0])
             self.focus_confidence = CONFIDENCE_TOUCHED_FOCUS
             # print("Catch focus impact", self.focus_point)
-

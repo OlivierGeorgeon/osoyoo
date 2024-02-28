@@ -10,6 +10,8 @@ from .PhenomenonMemory.PhenomenonTerrain import TERRAIN_INITIAL_CONFIDENCE, TERR
 from .AllocentricMemory.Hexagonal_geometry import CELL_RADIUS
 from ..Integrator.OutcomeCode import FOCUS_TOO_FAR_DISTANCE
 from ..Integrator.Integrator import integrate
+from ..Enaction.Predict import push_objects
+from .EgocentricMemory.Experience import EXPERIENCE_ALIGNED_ECHO
 
 GRID_WIDTH = 30  # 15   # 100 Number of cells wide
 GRID_HEIGHT = 100  # 70  # 45  # 200 Number of cells high
@@ -100,7 +102,7 @@ class Memory:
 
         # Translate the robot before applying the yaw
         # print("Robot relative translation", enaction.translation)
-        self.allocentric_memory.move(self.body_memory.body_quaternion, enaction.trajectory.translation, enaction.clock)
+        self.allocentric_memory.move(self.body_memory.body_quaternion, enaction.trajectory, enaction.clock)
         self.body_memory.update(enaction)
 
         # Compute the other robot's position relative to the current state of memory
@@ -109,6 +111,9 @@ class Memory:
 
         # Update egocentric memory
         self.egocentric_memory.update_and_add_experiences(enaction)
+
+        # Push objects
+        push_objects(enaction.trajectory, self)
 
         # The integrator may again update the robot's position
         # Call the integrator to create and update the phenomena
