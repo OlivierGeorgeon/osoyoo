@@ -839,6 +839,18 @@ If you are working on the Arduino board including working on the robot car proje
 
 **UNDER CONSTRUCTION**
 
+--USING THE SERIAL MONITOR FOR INPUTS--
+
+Serial.available()
+
+ch = Serial.read()
+
+--MEASUREMENTS WITH YOUR MULTIMETER--
+
+![multimeter](multimeter.png)
+
+![scope](scope.png)
+
 
 --DIGITAL OUTPUTS--
 
@@ -858,11 +870,75 @@ pinMode(inputPin, INPUT_PULLUP)
 int x = digitalRead(inputPin)
 
 
+--WHAT IS A PULL-UP RESISTOR?--
+
+![pullup](pullup.png)
+
+
+--WHAT IS DEBOUNCING?--
+
+![debounce](debounce.png)
+
+![debouncecircuit](debouncecircuit.png)
+
+
+// Constants
+const int buttonPin = 2;    // The pin that the pushbutton is attached to
+                            // <------- need to try out on the actual Mega Arduino board
+const int ledPin = 13;      // The pin that the LED is attached to
+const unsigned long debounceDelay = 50;  // the debounce time in milliseconds; increase if the output flickers
+                                          // <---- need to try out and experiment with
+
+// Variables
+int buttonState;            // the current reading from the input pin
+int lastButtonState = HIGH;   // the previous reading from the input pin
+unsigned long lastDebounceTime = 0;  // the last time the output pin was toggled
+
+void setup() {
+  pinMode(buttonPin, INPUT_PULLUP);
+  pinMode(ledPin, OUTPUT);
+  
+  // Set initial LED state
+  digitalWrite(ledPin, LOW);
+}
+
+void loop() {
+  // read the state of the switch into a local variable:
+  int reading = digitalRead(buttonPin);
+
+  // check if the button state has changed
+  if (reading != lastButtonState) {
+    // reset the debouncing timer
+    lastDebounceTime = millis();
+  }
+
+  if ((millis() - lastDebounceTime) > debounceDelay) {
+    // whatever the reading is at, it's been there for longer than the debounce
+    // delay, so take it as the actual current state:
+
+    // if the button state has changed:
+    if (reading != buttonState) {
+      buttonState = reading;
+
+      // only toggle the LED if the new button state is LOW
+      if (buttonState == LOW) {
+        digitalWrite(ledPin, !digitalRead(ledPin));
+      }
+    }
+  }
+
+  // save the reading. Next time through the loop, it'll be the lastButtonState:
+  lastButtonState = reading;
+}
+
+
 --ANALOG OUTPUTS--
 
 pinMode(outPin, OUTPUT)
 
 analogWrite(outPin, float value)
+
+![pwm](pwm.png)
 
 
 --ANALOG INPUTS--
