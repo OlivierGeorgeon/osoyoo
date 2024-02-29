@@ -832,7 +832,7 @@ If you are working on the Arduino board including working on the robot car proje
 
 
 <p align="center">
- <img src="multimeter.png" width="700" height="700">
+ <img src="engmultimeter.png" width="700" height="700">
 </p>
 
 -
