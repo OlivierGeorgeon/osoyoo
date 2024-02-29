@@ -830,7 +830,9 @@ Multimeters are inexpensive and readily available at local hardware stores, auto
 
 If you are working on the Arduino board including working on the robot car project, you have left the nice, cozy (and very artificial) world of the ungrounded computer terminal attached to the ungrounded C++/Python code running on an ungrounded server somewhere, perhaps even creating amazing but ungrounded large language model code. It is time for you in your journey as a software engineer or AI researcher or cognitive scientist, to become grounded in the real world. Get your multimeter, and let's start coding for the real world!!
 
-![multimeter](multimeter.png)
+<p align="center">
+ <img src="multimeter.png" width="700" height="700">
+</p>
 
 
 **UNDER CONSTRUCTION**
