@@ -58,12 +58,6 @@ class AllocentricMemory2:
                     cell_j = j
                 else:
                     cell_j = -self.height + j
-                for k in range(self.depth):
-                    if k <= self.depth // 2:
-                        cell_k = k
-                    else:
-                        cell_k = -self.depth + k
-                    self.grid[i][j][k] = (cell_i, cell_j, cell_k)
 
         self.user_cells = []  # List of immutable tuples to be easily copied
 

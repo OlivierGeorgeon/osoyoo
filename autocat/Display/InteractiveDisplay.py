@@ -5,6 +5,8 @@ import subprocess
 import pyglet
 from pyglet.gl import *
 
+
+
 ZOOM_IN_FACTOR = 1.2
 
 
@@ -32,7 +34,8 @@ class InteractiveDisplay(pyglet.window.Window):
         self.dragging = False
         self.start_drag_x = 0
         self.start_drag_y = 0
-
+        self.x = 0
+        self.y = 0
         # Karim:
         # self.window_x = 0
         # self.window_y = 0
@@ -47,21 +50,23 @@ class InteractiveDisplay(pyglet.window.Window):
         self.forefront = pyglet.graphics.OrderedGroup(5)
         self.screen_scale = screen_scale()
 
-    def on_resize(self, width, height):
-        """ Adjusting the viewport when resizing the window """
-        # Always display in the whole window. Scale for Mac.
-        glViewport(0, 0, width * self.screen_scale, height * self.screen_scale)
-        # glViewport(0, 0, width*2, height*2)  # For retina display on Mac
+
+
+    # def on_resize(self, width, height):
+    #     """ Adjusting the viewport when resizing the window """
+    #     # Always display in the whole window. Scale for Mac.
+    #     glViewport(0, 0, width * self.screen_scale, height * self.screen_scale)
+    #     # glViewport(0, 0, width*2, height*2)  # For retina display on Mac
 
         # Karim:
         # glViewport(0, 0, int(width * self.screen_scale * self.zoom_level),int(height * self.screen_scale * self.zoom_level))
 
-    def on_mouse_scroll(self, x, y, dx, dy):
-        """ Zooming the window """
-        # Inspired by https://www.py4u.net/discuss/148957
-        f = ZOOM_IN_FACTOR if dy < 0 else 1/ZOOM_IN_FACTOR if dy > 0 else 1
-        if .4 < self.zoom_level * f < 5:
-            self.zoom_level *= f
+    # def on_mouse_scroll(self, x, y, dx, dy):
+    #     """ Zooming the window """
+    #     # Inspired by https://www.py4u.net/discuss/148957
+    #     f = ZOOM_IN_FACTOR if dy < 0 else 1/ZOOM_IN_FACTOR if dy > 0 else 1
+    #     if .4 < self.zoom_level * f < 5:
+    #         self.zoom_level *= f
 
         # Karim:
         # Get the cursor position relative to the window
@@ -102,26 +107,39 @@ class InteractiveDisplay(pyglet.window.Window):
         # point_y = (y - self.window_y - self.height / 2) * self.zoom_level * 2
         # return Vector3([point_x, point_y, 0], dtype=int)
 
-    def on_mouse_press(self, x, y, button, modifiers):
-        if button == pyglet.window.mouse.LEFT:
-            self.dragging = True
-            self.start_drag_x = x
-            self.start_drag_y = y
+    # def on_mouse_press(self, x, y, button, modifiers):
+    #     if button == pyglet.window.mouse.LEFT:
+    #         print('mouse pressed')
+    #         self.dragging = True
+    #         self.start_drag_x = x
+    #         self.start_drag_y = y
+    #
+    #         #self.start_x = x
+    #         #self.start_y = y
+    #
+    # def on_mouse_drag(self, x, y, dx, dy, buttons, modifiers):
+    #     if self.dragging:
+    #         # Calculate the new window position
+    #         # new_x = self.x + dx
+    #         # new_y = self.y + dy
+    #
+    #         self.x += dx
+    #         self.y += dy
+    #         print('mouse dragging')
+    #         # Update the window position
+    #         #self.set_location(new_x, new_y)
+    #
+    #         #self.start_drag_x = x
+    #         #self.start_drag_y = y
+    #         self.on_draw()
+    #
+    #
+    # def on_mouse_release(self, x, y, button, modifiers):
+    #     if button == pyglet.window.mouse.LEFT:
+    #         self.dragging = False
+    #         self.start_drag_x = 0
+    #         self.start_drag_y = 0
+    #         print('mouse released')
+    #         #self.start_x = 0
+    #         #self.start_y = 0
 
-    def on_mouse_drag(self, x, y, dx, dy, buttons, modifiers):
-        if self.dragging:
-            # Calculate the new window position
-            new_x = self.x + dx
-            new_y = self.y + dy
-
-            # Update the window position
-            self.set_location(new_x, new_y)
-            #self.start_drag_x = x
-            #self.start_drag_y = y
-            self.on_draw()
-
-    def on_mouse_release(self, x, y, button, modifiers):
-        if button == pyglet.window.mouse.LEFT:
-            self.dragging = False
-            # self.start_drag_x = 0
-            # self.start_drag_y = 0
