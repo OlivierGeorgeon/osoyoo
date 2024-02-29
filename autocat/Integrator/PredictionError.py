@@ -83,19 +83,21 @@ class PredictionError:
               round(float(np.mean(list(self.compass.values()))), 2), "std:",
               round(float(np.std(list(self.compass.values()))), 2))
 
-        # If focus is confident then track its prediction error
+        # If focus is confident then track the echo prediction error
 
         if enaction.trajectory.focus_confidence >= CONFIDENCE_CONFIRMED_FOCUS:
-            self.focus_direction[actual_outcome.clock] = enaction.trajectory.focus_direction_prediction_error
+            pe = computed_outcome.head_angle - actual_outcome.head_angle
+            self.focus_direction[actual_outcome.clock] = pe
             self.focus_direction.pop(actual_outcome.clock - PREDICTION_ERROR_WINDOW, None)
-            print("Prediction Error Focus direction (integration - measure)=",
-                  enaction.trajectory.focus_direction_prediction_error,
+            print("Prediction Error Head Angle (prediction - measure)=", pe,
+                  # enaction.trajectory.focus_direction_prediction_error,
                   "Average:", round(float(np.mean(list(self.focus_direction.values())))),
                   "std:", round(float(np.std(list(self.focus_direction.values())))))
-            self.focus_distance[enaction.clock] = enaction.trajectory.focus_distance_prediction_error
+            pe = computed_outcome.echo_distance - actual_outcome.echo_distance
+            self.focus_distance[enaction.clock] = pe
             self.focus_distance.pop(enaction.clock - PREDICTION_ERROR_WINDOW, None)
-            print("Prediction Error Focus distance (integration - measure)=",
-                  enaction.trajectory.focus_distance_prediction_error,
+            print("Prediction Error Echo Distance (prediction - measure)=", pe,
+                  # enaction.trajectory.focus_distance_prediction_error,
                   "Average:", round(float(np.mean(list(self.focus_distance.values())))),
                   "std:", round(float(np.std(list(self.focus_distance.values())))))
 
@@ -122,8 +124,8 @@ class PredictionError:
         plot(self.forward_duration1, "Forward duration (ms)", "Forward_duration")
         plot(self.yaw, "Yaw (degrees)", "yaw")
         plot(self.compass, "Compass (degree)", "Compass")
-        plot(self.focus_direction, "Focus direction (degree)", "Focus_direction")
-        plot(self.focus_distance, "Focus distance (mm)", "Focus_distance")
+        plot(self.focus_direction, "Head direction (degree)", "Head_direction")
+        plot(self.focus_distance, "Echo distance (mm)", "Echo_distance")
         terrain = self.workspace.memory.phenomenon_memory.terrain()
         if terrain is not None:
             plot(terrain.origin_prediction_error, "Terrain origin (mm)", "Origin")

@@ -1,11 +1,11 @@
 import json
 import pyglet
-from .Decider.Decider import Decider
-from .Decider.DeciderExplore import DeciderExplore
-from .Decider.DeciderWatch import DeciderWatch
-from .Decider.DeciderPush import DeciderPush
-from .Decider.DeciderWatchCenter import DeciderWatchCenter
-from .Decider.DeciderArrange import DeciderArrange
+from .Decider.Proposer import Proposer
+from .Decider.ProposerExplore import ProposerExplore
+from .Decider.ProposerWatch import ProposerWatch
+from .Decider.ProposerPush import ProposerPush
+from .Decider.ProposerWatchCenter import ProposerWatchCenter
+from .Decider.ProposerArrange import ProposerArrange
 from .Decider.Action import create_actions, ACTION_FORWARD, ACTIONS, ACTION_TURN, ACTION_BACKWARD
 from .Memory.Memory import Memory
 from .Memory.PhenomenonMemory.PhenomenonTerrain import TERRAIN_INITIAL_CONFIDENCE
@@ -37,8 +37,8 @@ class Workspace:
         self.actions = create_actions(robot_id)
         self.memory = Memory(arena_id, robot_id)
         # if self.robot_id == '1':
-        self.deciders = {'Explore': DeciderExplore(self), 'Circle ': Decider(self),
-                         'Watch C': DeciderWatchCenter(self), 'Arrange': DeciderArrange(self)}
+        self.proposers = {'Explore': ProposerExplore(self), 'Circle ': Proposer(self),
+                         'Watch C': ProposerWatchCenter(self), 'Arrange': ProposerArrange(self)}
         # self.deciders = {'Explore': DeciderExplore(self), 'Circle': DeciderCircle(self), 'Watch': DeciderWatch(self)}
         # self.deciders = {'Circle': DeciderCircle(self), 'Explore': DeciderExplore(self)}
         # self.deciders = {'Push': DeciderPush(self), 'Watch': DeciderWatch(self)}
@@ -107,9 +107,9 @@ class Workspace:
                     # self.deciders[self.decider_id].stack_enaction()
                     # All deciders propose an enaction with an activation value
                     proposed_enactions = []
-                    for name, decider in self.deciders.items():
-                        activation = decider.activation_level()  # Must compute before proposing
-                        enaction = decider.propose_enaction()
+                    for name, proposer in self.proposers.items():
+                        activation = proposer.activation_level()  # Must compute before proposing
+                        enaction = proposer.propose_enaction()
                         if enaction is not None:
                             proposed_enactions.append([name, enaction, activation])
                     # The enaction that has the highest activation is selected

@@ -7,7 +7,7 @@
 |  |  |     |  |  |   |  |   |  | \     ||  |  |  |  |
 |__|  |_____|  |__|  |____|  |__|  \____||__|__|  |__|
 
- Upload autocat_enacter.ino to the OSOYOO robot car
+ Upload this file to the PetitCat robot car
 
   2023
     Olivier Georgeon

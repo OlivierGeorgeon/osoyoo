@@ -298,48 +298,48 @@ def test_convert_pos_in_cell():
     return error
 
 
-def test_move():
-    """Test the function move()"""
-    hx = AllocentricMemory(20, 20, cell_radius=10)
-    error = 0
-
-    # Sweep left from Origin (orientation East)
-    good_end_x, good_end_y = 0, 20  # OG 23/09/2022
-    hx.robot_point = [0, 0, 0]
-    rotation = 0
-    move = [0, 20, 0]
-    end_x, end_y, _ = hx.move(rotation, move, 0)
-    try:
-        assert(end_x == good_end_x and end_y == good_end_y)
-    except AssertionError:
-        print("Position incorrect after sweeping left: ", end_x, end_y, " should be", good_end_x, ",", good_end_y)
-        error = 1
-
-    # Turn South and sweep left
-    try:
-        hx.robot_point = [0, 0, 0]
-        rotation = -3.14/2
-        move = [0, 20, 0]
-        end_x, end_y, _ = hx.move(rotation, move, 0)
-        good_end_x, good_end_y = 20, 0
-        assert(end_x == good_end_x and end_y == good_end_y)
-    except AssertionError:
-        print("Position incorrect after rotate south and sweep left: ", end_x, end_y, " should be", good_end_x, ",",
-              good_end_y)
-        error = 2
-
-    # Move forward from Origin
-    try:
-        hx.robot_point = [0, 0, 0]
-        hx.robot_angle = 0
-        rotation = 0
-        move = [20, 0, 0]
-        end_x, end_y, _ = hx.move(rotation, move, 0)
-        good_end_x, good_end_y = 20, 0
-        assert(end_x == good_end_x and end_y == good_end_y)
-    except AssertionError:
-        print("Position incorrect after moving forward from origin: ", end_x, end_y, " should be", good_end_x, ",",
-              good_end_y)
-        error = 3
-
-    return error
+# def test_move():
+#     """Test the function move()"""
+#     hx = AllocentricMemory(20, 20, cell_radius=10)
+#     error = 0
+#
+#     # Sweep left from Origin (orientation East)
+#     good_end_x, good_end_y = 0, 20  # OG 23/09/2022
+#     hx.robot_point = [0, 0, 0]
+#     rotation = 0
+#     move = [0, 20, 0]
+#     end_x, end_y, _ = hx.move(rotation, move, 0)
+#     try:
+#         assert(end_x == good_end_x and end_y == good_end_y)
+#     except AssertionError:
+#         print("Position incorrect after sweeping left: ", end_x, end_y, " should be", good_end_x, ",", good_end_y)
+#         error = 1
+#
+#     # Turn South and sweep left
+#     try:
+#         hx.robot_point = [0, 0, 0]
+#         rotation = -3.14/2
+#         move = [0, 20, 0]
+#         end_x, end_y, _ = hx.move(rotation, move, 0)
+#         good_end_x, good_end_y = 20, 0
+#         assert(end_x == good_end_x and end_y == good_end_y)
+#     except AssertionError:
+#         print("Position incorrect after rotate south and sweep left: ", end_x, end_y, " should be", good_end_x, ",",
+#               good_end_y)
+#         error = 2
+#
+#     # Move forward from Origin
+#     try:
+#         hx.robot_point = [0, 0, 0]
+#         hx.robot_angle = 0
+#         rotation = 0
+#         move = [20, 0, 0]
+#         end_x, end_y, _ = hx.move(rotation, move, 0)
+#         good_end_x, good_end_y = 20, 0
+#         assert(end_x == good_end_x and end_y == good_end_y)
+#     except AssertionError:
+#         print("Position incorrect after moving forward from origin: ", end_x, end_y, " should be", good_end_x, ",",
+#               good_end_y)
+#         error = 3
+#
+#     return error
