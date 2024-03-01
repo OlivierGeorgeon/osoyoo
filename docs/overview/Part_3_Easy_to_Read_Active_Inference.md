@@ -123,7 +123,11 @@ The PetitCat documentation is written so that anyone with a basic education can 
 -
 -
 
-![altlogo](altlogo.png)
+
+<p align="center">
+ <img src="altlogo.png" width="470" height="470">
+</p>
+
 
 -
 -
