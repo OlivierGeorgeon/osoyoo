@@ -105,7 +105,7 @@ Do not worry. Regardless of your skill level, this manual will gently guide you 
 
 Are you ready?
 
-Don't be hesitant. Climb up on that horse and start your journey. Saddle up!!
+Don't be hesitant. Climb up on that horse and start your journey. Saddle up!! 
 
 
 
