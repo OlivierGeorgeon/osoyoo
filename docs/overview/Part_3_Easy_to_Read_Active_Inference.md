@@ -54,24 +54,40 @@ The PetitCat documentation is written so that anyone with a basic education can 
 
 -
 -
+
+<h1 style="font-size: 24px;">Step #1 -- Time to Get Serious</h1>
+
+Regardless of your skill level, you have made it this far -- you have built a robot car with your hands, you have learned how to move software around (Part I) and then you learned how to write some software in C/C++, build electronic circuits and make the software control the electronics (Part II). 
+
+Now here you are. In this Part III we will start doing a bit more serious work. But, regardless of your skill level or experience, do not worry -- this manual will gently guide you through the steps.
+
+In this Part III we will explore a bit more the software we just finished compiling and installing in Part II and see how well it controls the robot car. Then we will go on to further modify our robot car with a digital compass, inertial measurement unit and a color sensor. Then we will consider the Python code controlling all this. Then we will move on to consider Active Inference and how the robot car demonstrates this important principle. 
+
+You made it this far, and you will succeed again this part.  Get on that horse. Saddle up!!  
+
+
+
+<p align="center">
+ <img src="horsetonextlesson.png" width="770" height="770">
+</p>
+
+
+
+-
+-
 -
 -
 
-**Step # --Preliminary Testing of the PetitCat Code: Python <--> Arduino --**
 
 .....
 
-.....
-
-
-.....
-![rewrite](rewrite.png)
-
+<img src="rewrite.png" width="370" height="370">
 
 # thinking..... writing..... thinking..... writing....
--
--
--
+
+
+
+
 
 **Step # --Installing the Digital Compass and Intertial Measurement Unit --**
 
