@@ -58,7 +58,7 @@ class ProposerArrange(Proposer):
             # Slight Withdraw
             enaction_memory = self.workspace.memory.save()
             enaction_memory.egocentric_memory.prompt_point = None
-            enaction_memory.egocentric_memory.focus_point = np.array([100, 0, 0])  # Look ahead
+            # enaction_memory.egocentric_memory.focus_point = np.array([100, 0, 0])  # Look ahead but cause prediction error
             composite_enaction = Enaction(self.workspace.actions[ACTION_BACKWARD], enaction_memory)
             self.step = STEP_INIT
 

@@ -37,6 +37,7 @@ def plot(data_dict, caption, file_name):
     # plt.show()
     # plt.pause(1)
     plt.savefig("log/" + file_name + ".pdf")
+    plt.close()
 
 
 class PredictionError:

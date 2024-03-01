@@ -42,7 +42,6 @@ class Trajectory:
         self.focus_point = None
         if memory.egocentric_memory.focus_point is not None:
             self.focus_point = memory.egocentric_memory.focus_point.copy()
-        # print("Trajectory initial focus", self.focus_point)
 
     def track_displacement(self, intended_yaw, outcome):
         """Compute the displacement from the duration1, yaw, floor, impact"""

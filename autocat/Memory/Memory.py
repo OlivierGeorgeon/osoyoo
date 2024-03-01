@@ -98,7 +98,10 @@ class Memory:
         """
         self.egocentric_memory.focus_point = enaction.trajectory.focus_point
         self.egocentric_memory.prompt_point = enaction.trajectory.prompt_point
-        print("Trajectory prompt", enaction.trajectory.prompt_point)
+        # print("Trajectory prompt", enaction.trajectory.prompt_point)
+
+        # Push objects before moving the robot
+        push_objects(enaction.trajectory, self)
 
         # Translate the robot before applying the yaw
         # print("Robot relative translation", enaction.translation)
@@ -113,7 +116,7 @@ class Memory:
         self.egocentric_memory.update_and_add_experiences(enaction)
 
         # Push objects
-        push_objects(enaction.trajectory, self)
+        # push_objects(enaction.trajectory, self)
 
         # The integrator may again update the robot's position
         # Call the integrator to create and update the phenomena
@@ -218,7 +221,7 @@ class Memory:
         # If there is a terrain origin, check if the focus is around the terrain center
         else:
             terrain_point = self.egocentric_to_terrain_centric(ego_point)
-            print("Focus in terrain-centric coordinates", terrain_point)
+            print("Focus in terrain-centric coordinates", np.round(terrain_point))
             return np.linalg.norm(terrain_point) < ARRANGE_MAX_RADIUS
 
     def is_outside_terrain(self, ego_point):

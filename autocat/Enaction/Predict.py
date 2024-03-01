@@ -90,6 +90,9 @@ def generate_prediction(command, memory):
     trajectory = Trajectory(memory, command)
     trajectory.track_displacement(command.yaw, Outcome(outcome_dict))
 
+    # Push objects before moving the robot
+    push_objects(trajectory, memory)
+
     # Apply the displacement to memory
 
     memory.allocentric_memory.move(memory.body_memory.body_quaternion, trajectory, command.clock)
@@ -99,7 +102,7 @@ def generate_prediction(command, memory):
     memory.egocentric_memory.prompt_point = trajectory.prompt_point
 
     # Push objects
-    push_objects(trajectory, memory)
+    # push_objects(trajectory, memory)
 
     # Predict the echo outcome from the first object phenomenon found in the sonar cone
     for p in [p for p in memory.phenomenon_memory.phenomena.values() if p.phenomenon_type == EXPERIENCE_ALIGNED_ECHO]:
@@ -140,13 +143,12 @@ def cell_color(ego_point, memory):
 
 
 def push_objects(trajectory, memory):
-    """Update the position of the phenomena that are on the robot's trajectory"""
+    """Update the position of the phenomena that are on the robot's trajectory. Must be called before moving robot."""
     alo_covered_area = trajectory.covered_area + memory.allocentric_memory.robot_point
     path = mpath.Path(alo_covered_area[:, 0:2])
     for p in [p for p in memory.phenomenon_memory.phenomena.values() if p.category is not None and
               p.phenomenon_type == EXPERIENCE_ALIGNED_ECHO and path.contains_point(p.point[0:2])]:
         ego_point = memory.allocentric_to_egocentric(p.point)
-        if ego_point[0] < ROBOT_FLOOR_SENSOR_X + p.category.short_radius and abs(ego_point[1]) < ROBOT_OUTSIDE_Y:
-            ego_point[0] = ROBOT_FLOOR_SENSOR_X + p.category.short_radius
-            p.point = memory.egocentric_to_allocentric(ego_point)
-            # print("pushing object to ego position", ego_point)
+        # if ego_point[0] < ROBOT_FLOOR_SENSOR_X + p.category.short_radius and abs(ego_point[1]) < ROBOT_OUTSIDE_Y:
+        ego_point[0] = trajectory.translation[0] + ROBOT_FLOOR_SENSOR_X + p.category.short_radius
+        p.point = memory.egocentric_to_allocentric(ego_point)
