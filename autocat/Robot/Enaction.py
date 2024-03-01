@@ -26,9 +26,6 @@ class Enaction:
         self.predicted_memory.clock += 1
         self.predicted_outcome, self.predicted_outcome_code = generate_prediction(self.command, self.predicted_memory)
 
-        # The predicted outcome code
-        # self.predicted_outcome_code = outcome_code(self.predicted_memory, self.trajectory, self.predicted_outcome)
-
         # The key used for hash
         self.key = (self.action.action_code, self.predicted_outcome_code)
 
@@ -65,7 +62,7 @@ class Enaction:
         """Computes the actual trajectory: body_quaternion, translation, displacement_matrix, focus, and prompt."""
         self.outcome = outcome
         self.trajectory.track_displacement(self.predicted_outcome.yaw, self.outcome)
-        self.trajectory.track_echo(self.outcome)
+        self.trajectory.track_focus(self.outcome)
 
     def succeed(self):
         """Return True if the enaction succeeded: no floor or impact outcome"""

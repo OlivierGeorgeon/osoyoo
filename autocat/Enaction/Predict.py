@@ -8,8 +8,7 @@ from ..Memory.AllocentricMemory.Hexagonal_geometry import point_to_cell
 from ..Memory.EgocentricMemory.Experience import EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_FLOOR
 from ..Robot.RobotDefine import ROBOT_FLOOR_SENSOR_X, ROBOT_SETTINGS, ROBOT_OUTSIDE_Y
 from ..Robot.Outcome import Outcome
-from ..Memory.BodyMemory import point_to_echo_direction_distance
-from ..Utils import assert_almost_equal_angles
+from ..Utils import assert_almost_equal_angles, point_to_echo_direction_distance
 from .Trajectory import Trajectory
 from ..Integrator.OutcomeCode import outcome_code
 
@@ -113,16 +112,16 @@ def generate_prediction(command, memory):
                       or assert_almost_equal_angles(math.radians(a), memory.body_memory.head_direction_rad, 35)):
             outcome_dict["head_angle"] = round(a)
             outcome_dict["echo_distance"] = round(d)
-            outcome_dict["echo_point"] = ego_center_point.tolist()
+            # outcome_dict["echo_point"] = ego_center_point.astype(int).tolist()
             break
 
     predicted_outcome = Outcome(outcome_dict)
     # Override the echo_point to place the focus on the phenomenon
-    if "echo_point" in outcome_dict:
-        predicted_outcome.echo_point = np.array(outcome_dict["echo_point"])
+    # if "echo_point" in outcome_dict:
+    #     predicted_outcome.echo_point = np.array(outcome_dict["echo_point"])
 
     # Update focus based on echo
-    trajectory.track_echo(predicted_outcome)
+    trajectory.track_focus(predicted_outcome)
 
     code = outcome_code(memory, trajectory, predicted_outcome)
 

@@ -12,10 +12,9 @@ from ..Robot.Command import DIRECTION_LEFT, DIRECTION_RIGHT
 from ..Robot.RobotDefine import CHECK_OUTSIDE, ROBOT_FLOOR_SENSOR_X
 from . Proposer import Proposer
 from ..Integrator.OutcomeCode import FOCUS_TOO_FAR_DISTANCE
-from ..Utils import line_intersection, echo_point
+from ..Utils import line_intersection, head_direction_distance_to_point, point_to_echo_direction_distance
 from ..Enaction.CompositeEnaction import CompositeEnaction
 from ..Memory.Memory import EMOTION_ANGRY
-from ..Memory.BodyMemory import point_to_echo_direction_distance
 from . Interaction import OUTCOME_FLOOR, OUTCOME_LOST_FOCUS, OUTCOME_TOUCH, OUTCOME_NO_FOCUS
 from ..Memory.PhenomenonMemory.PhenomenonTerrain import TERRAIN_INITIAL_CONFIDENCE
 from ..Memory.PhenomenonMemory import ARRANGE_OBJECT_RADIUS
@@ -82,9 +81,10 @@ class ProposerArrange(Proposer):
 
         # If there is an object to arrange
         elif self.is_to_arrange():
-            # The point center of the object
-            direction, distance = point_to_echo_direction_distance(self.workspace.memory.egocentric_memory.focus_point)
-            object_center = echo_point(direction, distance + ARRANGE_OBJECT_RADIUS)  # Presuppose the object's radius
+            # The point center of the object is the focus
+            # direction, distance = point_to_echo_direction_distance(self.workspace.memory.egocentric_memory.focus_point)
+            # object_center = echo_point(direction, distance + ARRANGE_OBJECT_RADIUS)  # Presuppose the object's radius
+            object_center = self.workspace.memory.egocentric_memory.focus_point
             l1 = line.create_from_points(object_center, ego_target)
             ego_intersection = line_intersection(l1, line.create_from_points([0, 0, 0], [0, 1, 0]))
             ego_projection = point_closest_point_on_line(np.array([0, 0, 0]), l1)

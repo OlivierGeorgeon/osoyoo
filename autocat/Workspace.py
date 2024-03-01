@@ -109,6 +109,7 @@ class Workspace:
                     proposed_enactions = []
                     for name, proposer in self.proposers.items():
                         activation = proposer.activation_level()  # Must compute before proposing
+                        # print("Computing proposition of", name, "with focus", self.memory.egocentric_memory.focus_point)
                         enaction = proposer.propose_enaction()
                         if enaction is not None:
                             proposed_enactions.append([name, enaction, activation])
