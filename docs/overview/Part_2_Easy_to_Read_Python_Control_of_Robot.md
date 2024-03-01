@@ -1298,7 +1298,11 @@ Ok.... so the hardware works.
 -
 -
 
-![altlogo](altlogo.png)
+
+<p align="center">
+ <img src="altlogo.png" width="470" height="470">
+</p>
+
 
 -
 -
