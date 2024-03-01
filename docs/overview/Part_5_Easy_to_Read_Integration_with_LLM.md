@@ -110,7 +110,7 @@ Do not be hesitant -- get on that horse. Saddle up!!  The Universe and question 
 
 .....
 
-<img src="rewrite.png" width="370" height="370">
+<img src="madeleine.png" width="370" height="370">
 
 # thinking..... writing..... thinking..... writing....
 
