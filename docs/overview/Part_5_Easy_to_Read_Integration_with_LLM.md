@@ -65,7 +65,7 @@ In the last Part IV we thought about what are the biggest questions in the unive
 
 3. How can we create an AGI that works even better than our brain, better than any large language model, i.e., something human but extraordinarily functioning?
 
-As we mentioned in the last part, question #1 is not for us to answer, and despite the work of Einstein et al., it obviously still remains unanswered.  In the last part, we considered a model of the mammalian and human brain that explains quite well how our brain works and how it amazingly (less amazing when the mechanisms are considered) how it evolved.
+As we mentioned in the last part, question #1 is not for us to answer, and despite the work of Einstein et al., it obviously still remains unanswered.  In the last part, we considered a model of the mammalian and human brain that explains quite well how our brain works and how it amazingly (less amazing when the mechanisms are considered) it evolved.
 
 It this Part V we will go on to answer question #3 -- the PetitCat project will take on a form such that it becomes an AGI that is human in its core.
 
