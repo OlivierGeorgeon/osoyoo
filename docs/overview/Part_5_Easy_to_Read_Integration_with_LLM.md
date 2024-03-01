@@ -93,7 +93,9 @@ Do not be hesitant -- get on that horse. Saddle up!!  The Universe and question 
 
 # pensant.... écrivant.... pensant.... écrivant...
 
+(Yes..... borrowed from Proust's A la recherche du temps perdu -- something we all can relate to. Humans are not LLM's. Our ways of thinking and communicating (i.e., writing) are deeply human in method, and create our representation of the world around us with regard to space, time and memories of time.)
 
+(Let us hope that future is human AGI and not alien AGI --  https://link.springer.com/chapter/10.1007/978-3-031-33469-6_24 )
 
 
 
