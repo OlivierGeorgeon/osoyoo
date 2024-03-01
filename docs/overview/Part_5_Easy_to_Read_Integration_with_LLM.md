@@ -71,7 +71,7 @@ It this Part V we will go on to answer question #3 -- the PetitCat project will 
 
 You are probably wondering if you can really build this. Do not be hesitant. Regardless of your skill level, you have made it this far -- you have built a robot car with your hands, you have learned how to move software around (Part I) and then you learned how to write some software in C/C++, build electronic circuits and make the software control the electronics (Part II). Then you learned how to code in Python and demonstrated active inference (Part III).  Then in the last Part IV you, despite or in spite of, your knowledge of neurophysiology/AI/cognitive science/computer science/robotics you built a device that explains the human brain. Now here you are, ready to complete the journey, wondering if you are really capable of building this.
 
-Do not be hesitant -- get on that horse. Saddle up!!  The Universe and question #3 awaits you!!
+Do not be hesitant -- get on that horse. Saddle up!!  The Universe and question #3 await you!!
 
 
 
