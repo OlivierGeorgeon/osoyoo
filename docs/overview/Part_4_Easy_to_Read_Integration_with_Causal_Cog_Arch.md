@@ -122,7 +122,11 @@ Saddle up -- the Universe and its big questions await you!!
 -
 -
 
-![altlogo](altlogo.png)
+
+<p align="center">
+ <img src="altlogo.png" width="470" height="470">
+</p>
+
 
 -
 -
