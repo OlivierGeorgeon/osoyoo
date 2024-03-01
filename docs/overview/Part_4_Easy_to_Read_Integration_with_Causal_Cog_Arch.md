@@ -57,9 +57,32 @@ The PetitCat documentation is written so that anyone with a basic education can 
 -
 -
 
-**Step # --Preliminary Testing of the PetitCat Code: Python <--> Arduino --**
+**Step 1 --The Biggest Questions in the Universe --**
 
-.....
+In this step we think about what are the biggest questions in the universe and then we saddle up, and go on to start answering these questions. 
+
+Do not be hesitant. Regardless of your skill level, you have made it this far -- you have built a robot car with your hands, you have learned how to move software around (Part I) and then you learned how to write some software in C/C++, build electronic circuits and make the software control the electronics (Part II). Then you learned how to code in Python and demonstrated active inference (Part III). Now here you are.
+
+The biggest questions in the universe may differ to each person. However, the three biggest questions, this manual will take, are:
+
+1. What is space and time and where did all this come from?
+
+2. How does our brain work?
+
+3. How can we create an AGI that works even better than our brain, better than any large language model, i.e., something human but extraordinarily functioning?
+
+Question #1 is not for us to answer, and despite the work of Einstein et al., it obviously still remains unanswered.  However, in this Part IV we will answer question #2 -- the PetitCat project will take on a form similar to a model of the human brain that explains how it works and how it evolved -- question #2 answered.  And then in Part V we will build from the work we have done in these four parts, an AGI that is human in its core (question #3).
+
+Saddle up -- the Universe and its big questions await you!!
+
+
+![horsetonextlesson](horsetonextlesson.png)
+
+-
+-
+-
+-
+
 
 .....
 ![rewrite](rewrite.png)
