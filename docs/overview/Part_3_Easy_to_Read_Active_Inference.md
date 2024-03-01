@@ -63,7 +63,7 @@ Now here you are. In this Part III we will start doing a bit more serious work. 
 
 In this Part III we will explore a bit more the software we just finished compiling and installing in Part II and see how well it controls the robot car. Then we will go on to further modify our robot car with a digital compass, inertial measurement unit and a color sensor. Then we will consider the Python code controlling all this. Then we will move on to consider Active Inference and how the robot car demonstrates this important principle. 
 
-You made it this far, and you will succeed again this part.  Get on that horse. Saddle up!!  
+You made it this far, and you will succeed again in this part.  Get on that horse. Saddle up!!  
 
 
 
