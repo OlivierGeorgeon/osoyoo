@@ -57,13 +57,13 @@ The PetitCat documentation is written so that anyone with a basic education can 
 -
 -
 
-**Step 1 --The Biggest Questions in the Universe --**
+<h1 style="font-size: 24px;">Step #1 -- The Biggest Questions in the Universe</h1>
 
 In this step we think about what are the biggest questions in the universe and then we saddle up, and go on to start answering these questions. 
 
 Do not be hesitant. Regardless of your skill level, you have made it this far -- you have built a robot car with your hands, you have learned how to move software around (Part I) and then you learned how to write some software in C/C++, build electronic circuits and make the software control the electronics (Part II). Then you learned how to code in Python and demonstrated active inference (Part III). Now here you are.
 
-The biggest questions in the universe may differ to each person. However, the three biggest questions, this manual will take, are:
+The biggest questions in the Universe may differ to each person. However, here this documentation takes the the three biggest questions in the Universe to be:
 
 1. What is space and time and where did all this come from?
 
