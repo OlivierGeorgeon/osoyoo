@@ -101,6 +101,15 @@ In terms of your required electronics expertise, very little is needed if everyt
 
 In terms of your required software expertise, only a minimal amount is needed to make the robot work. For example, you need to be comfortable moving around files and running Python code. The Arduino IDE and code you can install and copy without great expertise (I will show you how below). Of course, if you have the time, you can spend more hours getting more expertise in the Arduino ecosystem. As well, you will need more expertise in Python if you want to use the robot car for your own research project.
 
+Do not worry. Regardless of your skill level, this manual will gently guide you through the five parts. You will accomplish amazing things. Have confidence in yourself. Have confidence in this manual. Have confidence in this project.
+
+Are you ready?
+
+Don't be hesitant. Climb up on that horse and start your journey. Saddle up!!
+
+
+
+
 -
 -
 -
