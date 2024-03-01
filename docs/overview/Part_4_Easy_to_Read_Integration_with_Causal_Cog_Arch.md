@@ -90,9 +90,9 @@ Saddle up -- the Universe and its big questions await you!!
 
 
 .....
-<p align="center">
- <img src="rewrite.png" width="370" height="370">
-</p>
+
+<img src="rewrite.png" width="370" height="370">
+
 # thinking..... writing..... thinking..... writing....
 
 
