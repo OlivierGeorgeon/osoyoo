@@ -76,7 +76,12 @@ Question #1 is not for us to answer, and despite the work of Einstein et al., it
 Saddle up -- the Universe and its big questions await you!!
 
 
-![horsetonextlesson](horsetonextlesson.png)
+
+<p align="center">
+ <img src="horsetonextlesson.png" width="770" height="770">
+</p>
+
+
 
 -
 -
@@ -85,9 +90,9 @@ Saddle up -- the Universe and its big questions await you!!
 
 
 .....
-![rewrite](rewrite.png)
-
-
+<p align="center">
+ <img src="rewrite.png" width="370" height="370">
+</p>
 # thinking..... writing..... thinking..... writing....
 
 
