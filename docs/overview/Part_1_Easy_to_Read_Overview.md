@@ -1207,7 +1207,10 @@ Initial draft Feb 9, 2024
 -
 -
 
-![altlogo](altlogo.png)
+
+<p align="center">
+ <img src="altlogo.png" width="470" height="470">
+</p>
 
 -
 -
