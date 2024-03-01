@@ -137,7 +137,10 @@ Do not be hesitant -- get on that horse. Saddle up!!  The Universe and question 
 -
 -
 
-![altlogo](altlogo.png)
+<p align="center">
+ <img src="altlogo.png" width="470" height="470">
+</p>
+
 
 -
 -
