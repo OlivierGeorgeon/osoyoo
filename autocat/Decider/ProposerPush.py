@@ -1,11 +1,11 @@
 ########################################################################################
-# This decider makes the robot push an object when it has the focus
+# This proposer makes the robot push an object when it has the focus
 # Activation 2: when the robot is angry
 ########################################################################################
 
-# from playsound import playsound
+import math
 import numpy as np
-from pyrr import vector
+from pyrr import vector, Vector3
 from . Action import ACTION_TURN, ACTION_FORWARD, ACTION_BACKWARD, ACTION_SCAN
 from ..Robot.Enaction import Enaction
 from ..Robot.Command import DIRECTION_BACK
@@ -29,43 +29,49 @@ class ProposerPush(Proposer):
     def activation_level(self):
         """The level of activation of this decider: -1: default, 5 if focus inside terrain"""
         activation_level = 0
-        if self.workspace.memory.emotion_code == EMOTION_ANGRY:
+        # If focus is not None and is inside terrain
+        if self.workspace.memory.egocentric_memory.focus_point is not None and self.workspace.memory.phenomenon_memory.is_inside_terrain(self.workspace.memory.egocentric_to_terrain_centric(self.workspace.memory.egocentric_memory.focus_point)):
             activation_level = 4
+        # if self.workspace.memory.emotion_code == EMOTION_ANGRY:
+        #     activation_level = 4
         # Activate during the withdraw step
         if self.step == STEP_PUSH:
             activation_level = 3  # May return to deciderExplore to return directly to origin
         return activation_level
 
-    def select_enaction(self, outcome):
+    def select_enaction(self, enaction):
         """Add the next enaction to the stack based on sequence learning and spatial modifiers"""
-
+        composite_enaction = None
+        e_memory = self.workspace.memory.save()
+        e_memory.emotion_code = EMOTION_ANGRY
         # If there is an object to push
-        if self.step == STEP_INIT:
+        if self.workspace.memory.egocentric_memory.focus_point is not None and self.workspace.memory.phenomenon_memory.is_inside_terrain(self.workspace.memory.egocentric_to_terrain_centric(self.workspace.memory.egocentric_memory.focus_point)):
+        # if self.step == STEP_INIT:
             # Start pushing
-            if self.workspace.memory.egocentric_memory.focus_point is not None and outcome != OUTCOME_FLOOR:
-                # playsound('autocat/Assets/tiny_cute.wav', False)
-                self.workspace.push_sound.play()
-                # Compute the prompt
-                target_prompt = vector.set_length(self.workspace.memory.egocentric_memory.focus_point, 700)
-                self.workspace.memory.egocentric_memory.prompt_point = target_prompt
-                # First enaction: turn to the prompt
-                e0 = Enaction(self.workspace.actions[ACTION_TURN], self.workspace.memory)
-                # Second enaction: move forward to the prompt
-                e1 = Enaction(self.workspace.actions[ACTION_FORWARD], e0.predicted_memory)
-                composite_enaction = CompositeEnaction([e0, e1])
-                self.step = STEP_PUSH
+            if e_memory.egocentric_memory.focus_point is not None and enaction.outcome_code != OUTCOME_FLOOR:
+                ego_destination = vector.set_length(e_memory.egocentric_memory.focus_point, 1200)
+                e_memory.egocentric_memory.prompt_point = ego_destination
+                # If object in front modulo 10° then push
+                if abs(math.atan2(ego_destination[1], math.fabs(ego_destination[0]))) < 0.175:
+                    composite_enaction = Enaction(self.workspace.actions[ACTION_FORWARD], e_memory)
+                    self.step = STEP_PUSH
+                # If object not in front then turn toward object
+                else:
+                    composite_enaction = Enaction(self.workspace.actions[ACTION_TURN], e_memory)
             else:
                 # If there is no object then watch (probably never happens)
                 print("DeciderPush is watching")
-                composite_enaction = Enaction(self.workspace.actions[ACTION_SCAN], self.workspace.memory, span=10)
-        else:
+                composite_enaction = Enaction(self.workspace.actions[ACTION_SCAN], e_memory, span=10)
+        elif self.step == STEP_PUSH:
             # Start withdrawing
             # The first enaction: turn the back to the prompt
-            origin = self.workspace.memory.phenomenon_memory.watch_point()  # Birth place or arena center
-            self.workspace.memory.egocentric_memory.prompt_point = self.workspace.memory.allocentric_to_egocentric(origin)
-            e0 = Enaction(self.workspace.actions[ACTION_TURN], self.workspace.memory, direction=DIRECTION_BACK)
+            # origin = self.workspace.memory.phenomenon_memory.watch_point()  # Birth place or arena center
+            # e_memory.egocentric_memory.prompt_point = e_memory.allocentric_to_egocentric(origin)
+            ego_watch_point = self.workspace.memory.terrain_centric_to_egocentric(np.array([0, 0, 0]))
+            e_memory.egocentric_memory.prompt_point = ego_watch_point
+            e0 = Enaction(self.workspace.actions[ACTION_TURN], e_memory, direction=DIRECTION_BACK)
             # Second enaction: move forward to the prompt
-            e1 = Enaction(self.workspace.actions[ACTION_BACKWARD], e0.predicted_memory)
+            e1 = Enaction(self.workspace.actions[ACTION_BACKWARD], e0.predicted_memory.save())
             composite_enaction = CompositeEnaction([e0, e1])
             self.step = STEP_INIT
 

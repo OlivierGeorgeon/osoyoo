@@ -94,34 +94,37 @@ def generate_prediction(command, memory):
     push_objects(trajectory, memory)
 
     # Apply the displacement to memory
-
     memory.allocentric_memory.move(memory.body_memory.body_quaternion, trajectory, command.clock)
     memory.body_memory.body_quaternion = memory.body_memory.body_quaternion.cross(trajectory.yaw_quaternion)
-    memory.body_memory.head_direction_rad = trajectory.head_direction_rad
+    memory.body_memory.set_head_direction_degree(trajectory.head_direction_degree)
     memory.egocentric_memory.focus_point = trajectory.focus_point
     memory.egocentric_memory.prompt_point = trajectory.prompt_point
 
-    # Push objects
-    # push_objects(trajectory, memory)
-
     # Predict the echo outcome from the first object phenomenon found in the sonar cone
-    for p in [p for p in memory.phenomenon_memory.phenomena.values() if p.phenomenon_type == EXPERIENCE_ALIGNED_ECHO]:
-        ego_center_point = memory.allocentric_to_egocentric(p.point)
-        # if the phenomenon is recognized then subtract its radius to obtain the egocentric echo distance
-        a, d = point_to_echo_direction_distance(ego_center_point)
-        if p.category is not None:
-            d -= p.category.short_radius
-        if d > 0 and (command.action.action_code == ACTION_SCAN and assert_almost_equal_angles(math.radians(a), 0, 90)
-                      or assert_almost_equal_angles(math.radians(a), memory.body_memory.head_direction_rad, 35)):
-            outcome_dict["head_angle"] = round(a)
-            outcome_dict["echo_distance"] = round(d)
-            # outcome_dict["echo_point"] = ego_center_point.astype(int).tolist()
-            break
+    # for p in [p for p in memory.phenomenon_memory.phenomena.values() if p.phenomenon_type == EXPERIENCE_ALIGNED_ECHO]:
+    #     ego_center_point = memory.allocentric_to_egocentric(p.point)
+    #     # if the phenomenon is recognized then subtract its radius to obtain the egocentric echo distance
+    #     a, d = point_to_echo_direction_distance(ego_center_point)
+    #     if p.category is not None:
+    #         d -= p.category.short_radius
+    #     if d > 0 and (command.action.action_code == ACTION_SCAN and assert_almost_equal_angles(math.radians(a), 0, 90)
+    #                   or assert_almost_equal_angles(math.radians(a), memory.body_memory.head_direction_rad, 35)):
+    #         outcome_dict["head_angle"] = round(a)
+    #         outcome_dict["echo_distance"] = round(d)
+    #         break
+
+    ad = [point_to_echo_direction_distance(memory.allocentric_to_egocentric(p.point))
+          for p in memory.phenomenon_memory.phenomena.values() if p.phenomenon_type == EXPERIENCE_ALIGNED_ECHO]
+    scan_ad = np.array([p for p in ad if p[1] > 0 and (command.action.action_code == ACTION_SCAN and
+                        assert_almost_equal_angles(math.radians(p[0]), 0, 125)
+                        or assert_almost_equal_angles(math.radians(p[0]),
+                                                      memory.body_memory.head_direction_rad, 35))], dtype=int)
+    if scan_ad.ndim > 1:
+        outcome_dict['head_angle'], outcome_dict['echo_distance'] = scan_ad[np.argmin(scan_ad[:, 1])].tolist()
+    elif trajectory.focus_point is not None:  # Focus not on an object
+        outcome_dict['head_angle'], _ = point_to_echo_direction_distance(trajectory.focus_point)
 
     predicted_outcome = Outcome(outcome_dict)
-    # Override the echo_point to place the focus on the phenomenon
-    # if "echo_point" in outcome_dict:
-    #     predicted_outcome.echo_point = np.array(outcome_dict["echo_point"])
 
     # Update focus based on echo
     trajectory.track_focus(predicted_outcome)

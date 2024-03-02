@@ -12,12 +12,13 @@ from . Proposer import Proposer
 from ..Utils import short_angle
 from ..Robot.Enaction import Enaction
 from ..Robot.RobotDefine import TERRAIN_RADIUS
-from ..Memory.BodyMemory import ENERGY_TIRED
+from ..Memory.BodyMemory import ENERGY_TIRED, EXCITATION_LOW
 from ..Memory.PhenomenonMemory.PhenomenonMemory import TER
 from ..Memory.PhenomenonMemory.PhenomenonTerrain import TERRAIN_ORIGIN_CONFIDENCE
 from ..Memory.PhenomenonMemory import PHENOMENON_RECOGNIZED_CONFIDENCE
 from ..Memory.Memory import EMOTION_RELAXED
 from ..Enaction.CompositeEnaction import CompositeEnaction
+from ..Integrator.OutcomeCode import FOCUS_TOO_FAR_DISTANCE
 
 
 CLOCK_TO_GO_HOME = 8  # Number of interactions before going home
@@ -50,8 +51,20 @@ class ProposerExplore(Proposer):
     def activation_level(self):
         """The level of activation is 2 if the terrain has confidence and the robot is excited or low energy"""
         activation_level = 0
-        if self.workspace.memory.emotion_code == EMOTION_RELAXED:
-            activation_level = 3
+        # High energy then must circle, explore, watch or arrange
+        if self.workspace.memory.body_memory.energy >= ENERGY_TIRED:
+            # High excitation then must circle or explore
+            if self.workspace.memory.body_memory.excitation > EXCITATION_LOW:
+                # Focus inside terrain or not too far: HAPPY DeciderCircle
+                if self.workspace.memory.egocentric_memory.focus_point is None or \
+                        np.linalg.norm(self.workspace.memory.egocentric_memory.focus_point) > FOCUS_TOO_FAR_DISTANCE or \
+                        self.workspace.memory.is_outside_terrain(self.workspace.memory.egocentric_memory.focus_point):
+                    return 3
+        # Tired: Robot RELAXED, must go home
+        else:
+            return 3
+        # if self.workspace.memory.emotion_code == EMOTION_RELAXED:
+        #     activation_level = 3
         return activation_level
 
     def outcome(self, enaction):

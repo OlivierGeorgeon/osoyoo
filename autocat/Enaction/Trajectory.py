@@ -24,7 +24,7 @@ class Trajectory:
 
         # Track the displacement
         self.body_quaternion = memory.body_memory.body_quaternion.copy()
-        self.head_direction_rad = memory.body_memory.head_direction_rad
+        self.head_direction_degree = memory.body_memory.head_direction_degree()
         self.body_direction_delta = 0  # Displayed in BodyView
         self.focus_confidence = CONFIDENCE_NO_FOCUS  # Used by deciders to possibly trigger scan
         self.translation = None  # Used by allocentric memory to move the robot
@@ -121,7 +121,9 @@ class Trajectory:
         if self.focus_point is not None:
             self.focus_point = matrix44.apply_to_vector(self.displacement_matrix, self.focus_point).astype(int)
             # Keep head towards focus
-            self.head_direction_rad = min(max(-math.pi/2, math.atan2(self.focus_point[1], self.focus_point[0])), math.pi/2)
+            self.head_direction_degree, _ = point_to_echo_direction_distance(self.focus_point)
+            # self.head_direction_rad = math.radians(max(-90, min(head_direction_degree, 90)))
+            # self.head_direction_rad = min(max(-math.pi/2, math.atan2(self.focus_point[1], self.focus_point[0])), math.pi/2)
 
         # Move the prompt
         if self.prompt_point is not None:
@@ -172,7 +174,7 @@ class Trajectory:
 
         self.focus_point = new_focus
         if new_focus is not None:
-            self.head_direction_rad = min(max(-math.pi/2, math.atan2(new_focus[1], new_focus[0])), math.pi/2)
+            self.head_direction_degree = math.degrees(math.atan2(new_focus[1], new_focus[0]))
 
         # Careful scan has extra confidence
         if self.focus_confidence == CONFIDENCE_NEW_FOCUS and self.span == 10:

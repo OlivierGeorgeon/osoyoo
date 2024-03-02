@@ -38,7 +38,8 @@ class Workspace:
         self.memory = Memory(arena_id, robot_id)
         # if self.robot_id == '1':
         self.proposers = {'Explore': ProposerExplore(self), 'Circle ': Proposer(self),
-                         'Watch C': ProposerWatchCenter(self), 'Arrange': ProposerArrange(self)}
+                          # 'Watch C': ProposerWatchCenter(self),  'Arrange': ProposerArrange(self),
+                          'Watch': ProposerWatch(self), 'Push': ProposerPush(self)}
         # self.deciders = {'Explore': DeciderExplore(self), 'Circle': DeciderCircle(self), 'Watch': DeciderWatch(self)}
         # self.deciders = {'Circle': DeciderCircle(self), 'Explore': DeciderExplore(self)}
         # self.deciders = {'Push': DeciderPush(self), 'Watch': DeciderWatch(self)}
@@ -101,7 +102,7 @@ class Workspace:
             if self.composite_enaction is None:
                 if self.control_mode == KEY_CONTROL_DECIDER:
                     # The most activated decider processes the previous enaction and chooses the next enaction
-                    self.memory.appraise_emotion()
+                    # self.memory.appraise_emotion()
                     # self.decider_id = max(self.deciders, key=lambda k: self.deciders[k].activation_level())
                     # print("Decider:", self.decider_id)
                     # self.deciders[self.decider_id].stack_enaction()
@@ -109,12 +110,12 @@ class Workspace:
                     proposed_enactions = []
                     for name, proposer in self.proposers.items():
                         activation = proposer.activation_level()  # Must compute before proposing
-                        # print("Computing proposition of", name, "with focus", self.memory.egocentric_memory.focus_point)
+                        # print("Computing proposition", name, "with focus", self.memory.egocentric_memory.focus_point)
                         enaction = proposer.propose_enaction()
                         if enaction is not None:
                             proposed_enactions.append([name, enaction, activation])
                     # The enaction that has the highest activation is selected
-                    print("Proposed enactions:")  # , ' '.join(e.__str__() for line in proposed_enactions for e in line))
+                    print("Proposed enactions:")
                     for p in proposed_enactions:
                         print(" ", p[0], ":", p[1], p[2])
                     most_activated = proposed_enactions.index(max(proposed_enactions, key=lambda p: p[2]))
@@ -135,7 +136,7 @@ class Workspace:
         elif user_key.upper() in ACTIONS:
             # Only process actions when the robot is IDLE
             if self.enacter.interaction_step == ENACTION_STEP_IDLE:
-                self.memory.appraise_emotion()
+                # self.memory.appraise_emotion()
                 self.composite_enaction = Enaction(self.actions[user_key.upper()], self.memory.save(), span=10)
         elif user_key.upper() == "/":
             # If key ALIGN then turn and move forward to the prompt

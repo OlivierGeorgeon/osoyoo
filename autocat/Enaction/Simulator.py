@@ -78,10 +78,10 @@ class Simulator:
         # Simulate the movement of the head to the focus
         if memory.egocentric_memory.focus_point is not None:
             head_direction_degree, _ = point_to_echo_direction_distance(memory.egocentric_memory.focus_point)
-            head_direction_degree = max(-90, min(head_direction_degree, 90))
+            # head_direction_degree = max(-90, min(head_direction_degree, 90))
             memory.body_memory.set_head_direction_degree(head_direction_degree)
-        else:
-            head_direction_degree = memory.body_memory.head_direction_degree()
+        # else:
+        #     head_direction_degree = memory.body_memory.head_direction_degree()
 
         # Simulate the movement of the head when SCAN
         if enaction.action.action_code == ACTION_SCAN:
@@ -137,8 +137,8 @@ class Simulator:
                 p = cell.point()
                 a, d = point_to_echo_direction_distance(memory.allocentric_to_egocentric(p))
                 if enaction.action.action_code == ACTION_SCAN and \
-                        assert_almost_equal_angles(math.radians(a), 0, 90) or \
-                        assert_almost_equal_angles(math.radians(a), math.radians(head_direction_degree), 35):
+                        assert_almost_equal_angles(math.radians(a), 0, 125) or \
+                        assert_almost_equal_angles(math.radians(a), memory.body_memory.head_direction_rad, 35):
                     echoes.append([a, d])
         # The closest echo
         np_echoes = np.array(echoes, dtype=int)

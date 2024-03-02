@@ -1,5 +1,5 @@
 ########################################################################################
-# This decider makes the robot arrange an object to a specific place
+# This proposer makes the robot arrange an object to a specific place
 # Activation 4: when the robot is angry
 ########################################################################################
 import math
