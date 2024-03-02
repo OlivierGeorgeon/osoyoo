@@ -12,7 +12,7 @@ from ..Robot.Command import DIRECTION_LEFT, DIRECTION_RIGHT
 from ..Robot.RobotDefine import CHECK_OUTSIDE, ROBOT_FLOOR_SENSOR_X
 from . Proposer import Proposer
 from ..Integrator.OutcomeCode import FOCUS_TOO_FAR_DISTANCE
-from ..Utils import line_intersection, head_direction_distance_to_point, point_to_echo_direction_distance
+from ..Utils import line_intersection, head_direction_distance_to_point, point_to_head_direction_distance
 from ..Enaction.CompositeEnaction import CompositeEnaction
 from ..Memory.Memory import EMOTION_ANGRY
 from . Interaction import OUTCOME_FLOOR, OUTCOME_LOST_FOCUS, OUTCOME_TOUCH, OUTCOME_NO_FOCUS

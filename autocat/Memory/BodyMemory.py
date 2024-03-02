@@ -38,11 +38,6 @@ class BodyMemory:
 
     def set_head_direction_degree(self, head_direction_degree: int):
         """Set the head direction from degree measured relative to the robot within [-90,90]"""
-        # assert(-90 <= head_direction_degree <= 90)
-        # if head_direction_degree < -90:
-        #     head_direction_degree = -90
-        # if head_direction_degree > 90:
-        #     head_direction_degree = 90
         self.head_direction_rad = math.radians(max(-90, min(head_direction_degree, 90)))
 
     def head_direction_degree(self):

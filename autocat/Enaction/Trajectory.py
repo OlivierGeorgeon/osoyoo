@@ -5,7 +5,7 @@ from ..Decider.Action import ACTION_FORWARD
 from ..Integrator.OutcomeCode import CONFIDENCE_NO_FOCUS, CONFIDENCE_NEW_FOCUS, CONFIDENCE_TOUCHED_FOCUS, \
     CONFIDENCE_CAREFUL_SCAN, CONFIDENCE_CONFIRMED_FOCUS
 from ..Utils import short_angle, translation_quaternion_to_matrix, head_direction_distance_to_point, \
-    point_to_echo_direction_distance
+    point_to_head_direction_distance
 from ..Robot.RobotDefine import ROBOT_FLOOR_SENSOR_X, ROBOT_CHASSIS_Y, ROBOT_SETTINGS, ROBOT_CHASSIS_X, ROBOT_OUTSIDE_Y
 from ..Memory.PhenomenonMemory import ARRANGE_OBJECT_RADIUS
 
@@ -121,9 +121,7 @@ class Trajectory:
         if self.focus_point is not None:
             self.focus_point = matrix44.apply_to_vector(self.displacement_matrix, self.focus_point).astype(int)
             # Keep head towards focus
-            self.head_direction_degree, _ = point_to_echo_direction_distance(self.focus_point)
-            # self.head_direction_rad = math.radians(max(-90, min(head_direction_degree, 90)))
-            # self.head_direction_rad = min(max(-math.pi/2, math.atan2(self.focus_point[1], self.focus_point[0])), math.pi/2)
+            self.head_direction_degree, _ = point_to_head_direction_distance(self.focus_point)
 
         # Move the prompt
         if self.prompt_point is not None:
@@ -141,7 +139,7 @@ class Trajectory:
         if new_echo is None:
             new_focus = None
         else:
-            a, d = point_to_echo_direction_distance(new_echo)
+            a, d = point_to_head_direction_distance(new_echo)
             new_focus = head_direction_distance_to_point(a, d + ARRANGE_OBJECT_RADIUS)
 
         # If the robot was focussed then adjust the focus and the displacement

@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import os
 from pyrr import Quaternion
 from ..Decider.Action import ACTION_FORWARD
-from ..Utils import short_angle, point_to_echo_direction_distance
+from ..Utils import short_angle, point_to_head_direction_distance
 from ..Integrator.OutcomeCode import CONFIDENCE_CONFIRMED_FOCUS
 
 PREDICTION_ERROR_WINDOW = 100
@@ -88,14 +88,16 @@ class PredictionError:
 
         # The echo prediction error when focus is confident
 
-        if enaction.trajectory.focus_confidence >= CONFIDENCE_CONFIRMED_FOCUS:
-            pe = computed_outcome.head_angle - actual_outcome.head_angle
-            self.echo_direction[actual_outcome.clock] = pe
-            self.echo_direction.pop(actual_outcome.clock - PREDICTION_ERROR_WINDOW, None)
-            print("Prediction Error Head Direction (prediction - measure)=", pe,
-                  # enaction.trajectory.focus_direction_prediction_error,
-                  "Average:", round(float(np.mean(list(self.echo_direction.values())))),
-                  "std:", round(float(np.std(list(self.echo_direction.values())))))
+        # if enaction.trajectory.focus_confidence >= CONFIDENCE_CONFIRMED_FOCUS:
+        pe = computed_outcome.head_angle - actual_outcome.head_angle
+        self.echo_direction[actual_outcome.clock] = pe
+        self.echo_direction.pop(actual_outcome.clock - PREDICTION_ERROR_WINDOW, None)
+        print("Prediction Error Head Direction (prediction - measure)=", pe,
+              # enaction.trajectory.focus_direction_prediction_error,
+              "Average:", round(float(np.mean(list(self.echo_direction.values())))),
+              "std:", round(float(np.std(list(self.echo_direction.values())))))
+
+        if computed_outcome.echo_distance < 10000 and actual_outcome.echo_distance < 10000:
             pe = computed_outcome.echo_distance - actual_outcome.echo_distance
             self.echo_distance[enaction.clock] = pe
             self.echo_distance.pop(enaction.clock - PREDICTION_ERROR_WINDOW, None)
@@ -107,8 +109,8 @@ class PredictionError:
         # The focus prediction error
 
         if enaction.predicted_memory.egocentric_memory.focus_point is not None and enaction.trajectory.focus_point is not None:
-            pa, pd = point_to_echo_direction_distance(enaction.predicted_memory.egocentric_memory.focus_point)
-            ma, md = point_to_echo_direction_distance(enaction.trajectory.focus_point)
+            pa, pd = point_to_head_direction_distance(enaction.predicted_memory.egocentric_memory.focus_point)
+            ma, md = point_to_head_direction_distance(enaction.trajectory.focus_point)
             self.focus_direction[actual_outcome.clock] = round(pa - ma)
             self.focus_direction.pop(actual_outcome.clock - PREDICTION_ERROR_WINDOW, None)
             print("Prediction Error Focus Direction (prediction - measure)=", round(pa - ma),

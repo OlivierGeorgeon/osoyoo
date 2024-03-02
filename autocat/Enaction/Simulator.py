@@ -7,7 +7,7 @@ from ..Decider.Action import ACTION_SWIPE, ACTION_FORWARD, ACTION_SCAN
 from ..Robot.Outcome import Outcome
 from ..Memory.AllocentricMemory.Hexagonal_geometry import point_to_cell
 from ..Memory.EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO
-from ..Utils import assert_almost_equal_angles, translation_quaternion_to_matrix, point_to_echo_direction_distance
+from ..Utils import assert_almost_equal_angles, translation_quaternion_to_matrix, point_to_head_direction_distance
 from .Predict import RETREAT_YAW
 
 SIMULATION_SPEED = 1  # 0.5
@@ -77,7 +77,7 @@ class Simulator:
 
         # Simulate the movement of the head to the focus
         if memory.egocentric_memory.focus_point is not None:
-            head_direction_degree, _ = point_to_echo_direction_distance(memory.egocentric_memory.focus_point)
+            head_direction_degree, _ = point_to_head_direction_distance(memory.egocentric_memory.focus_point)
             # head_direction_degree = max(-90, min(head_direction_degree, 90))
             memory.body_memory.set_head_direction_degree(head_direction_degree)
         # else:
@@ -120,10 +120,6 @@ class Simulator:
 
         # If the terrain is recognized, use the predicted outcome
         else:
-            # self.simulated_outcome_dict['floor'] = enaction.predicted_outcome.floor
-            # self.simulated_outcome_dict['yaw'] = enaction.predicted_outcome.yaw
-            # self.simulated_outcome_dict['duration1'] = enaction.predicted_outcome.duration1
-            # self.simulated_outcome_dict['color_index'] = enaction.predicted_outcome.color_index
             # Stop the simulation after the predicted duration1
             if self.simulation_time * 1000 > enaction.predicted_outcome.duration1:
                 self.is_simulating = False
@@ -135,7 +131,7 @@ class Simulator:
             cell = memory.allocentric_memory.grid[ij[0]][ij[1]]
             if cell.status[1] == EXPERIENCE_ALIGNED_ECHO:
                 p = cell.point()
-                a, d = point_to_echo_direction_distance(memory.allocentric_to_egocentric(p))
+                a, d = point_to_head_direction_distance(memory.allocentric_to_egocentric(p))
                 if enaction.action.action_code == ACTION_SCAN and \
                         assert_almost_equal_angles(math.radians(a), 0, 125) or \
                         assert_almost_equal_angles(math.radians(a), memory.body_memory.head_direction_rad, 35):

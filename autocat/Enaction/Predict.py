@@ -8,9 +8,10 @@ from ..Memory.AllocentricMemory.Hexagonal_geometry import point_to_cell
 from ..Memory.EgocentricMemory.Experience import EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_FLOOR
 from ..Robot.RobotDefine import ROBOT_FLOOR_SENSOR_X, ROBOT_SETTINGS, ROBOT_OUTSIDE_Y
 from ..Robot.Outcome import Outcome
-from ..Utils import assert_almost_equal_angles, point_to_echo_direction_distance
+from ..Utils import assert_almost_equal_angles, point_to_head_direction_distance
 from .Trajectory import Trajectory
 from ..Integrator.OutcomeCode import outcome_code
+from ..Memory.PhenomenonMemory import ARRANGE_OBJECT_RADIUS
 
 RETREAT_YAW = 45
 
@@ -101,28 +102,18 @@ def generate_prediction(command, memory):
     memory.egocentric_memory.prompt_point = trajectory.prompt_point
 
     # Predict the echo outcome from the first object phenomenon found in the sonar cone
-    # for p in [p for p in memory.phenomenon_memory.phenomena.values() if p.phenomenon_type == EXPERIENCE_ALIGNED_ECHO]:
-    #     ego_center_point = memory.allocentric_to_egocentric(p.point)
-    #     # if the phenomenon is recognized then subtract its radius to obtain the egocentric echo distance
-    #     a, d = point_to_echo_direction_distance(ego_center_point)
-    #     if p.category is not None:
-    #         d -= p.category.short_radius
-    #     if d > 0 and (command.action.action_code == ACTION_SCAN and assert_almost_equal_angles(math.radians(a), 0, 90)
-    #                   or assert_almost_equal_angles(math.radians(a), memory.body_memory.head_direction_rad, 35)):
-    #         outcome_dict["head_angle"] = round(a)
-    #         outcome_dict["echo_distance"] = round(d)
-    #         break
-
-    ad = [point_to_echo_direction_distance(memory.allocentric_to_egocentric(p.point))
+    ad = [point_to_head_direction_distance(memory.allocentric_to_egocentric(p.point))
           for p in memory.phenomenon_memory.phenomena.values() if p.phenomenon_type == EXPERIENCE_ALIGNED_ECHO]
     scan_ad = np.array([p for p in ad if p[1] > 0 and (command.action.action_code == ACTION_SCAN and
                         assert_almost_equal_angles(math.radians(p[0]), 0, 125)
                         or assert_almost_equal_angles(math.radians(p[0]),
                                                       memory.body_memory.head_direction_rad, 35))], dtype=int)
     if scan_ad.ndim > 1:
-        outcome_dict['head_angle'], outcome_dict['echo_distance'] = scan_ad[np.argmin(scan_ad[:, 1])].tolist()
+        # outcome_dict['head_angle'], outcome_dict['echo_distance'] = scan_ad[np.argmin(scan_ad[:, 1])].tolist()
+        a, d = scan_ad[np.argmin(scan_ad[:, 1])].tolist()
+        outcome_dict['head_angle'], outcome_dict['echo_distance'] = a, d - ARRANGE_OBJECT_RADIUS
     elif trajectory.focus_point is not None:  # Focus not on an object
-        outcome_dict['head_angle'], _ = point_to_echo_direction_distance(trajectory.focus_point)
+        outcome_dict['head_angle'], _ = point_to_head_direction_distance(trajectory.focus_point)
 
     predicted_outcome = Outcome(outcome_dict)
 
@@ -152,6 +143,5 @@ def push_objects(trajectory, memory):
     for p in [p for p in memory.phenomenon_memory.phenomena.values() if p.category is not None and
               p.phenomenon_type == EXPERIENCE_ALIGNED_ECHO and path.contains_point(p.point[0:2])]:
         ego_point = memory.allocentric_to_egocentric(p.point)
-        # if ego_point[0] < ROBOT_FLOOR_SENSOR_X + p.category.short_radius and abs(ego_point[1]) < ROBOT_OUTSIDE_Y:
         ego_point[0] = trajectory.translation[0] + ROBOT_FLOOR_SENSOR_X + p.category.short_radius
         p.point = memory.egocentric_to_allocentric(ego_point)

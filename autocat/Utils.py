@@ -94,7 +94,7 @@ def head_direction_distance_to_point(head_direction, echo_distance):
     return matrix44.apply_to_vector(echo_matrix(head_direction, echo_distance), np.array([0, 0, 0])).astype(int)
 
 
-def point_to_echo_direction_distance(point):
+def point_to_head_direction_distance(point):
     """Return the head direction in degrees and distance of the echo"""
     # Warning: may return a backward head direction
     point_from_head = point - np.array([ROBOT_HEAD_X, 0, 0])
