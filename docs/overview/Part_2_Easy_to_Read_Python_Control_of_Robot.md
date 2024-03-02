@@ -1288,6 +1288,14 @@ Ok.... so the hardware works.
 -
 
 
+![wifiesp.png](wifiesp.png)
+
+-
+
+![connected](connected.png)
+
+-
+
 
 
 ****
