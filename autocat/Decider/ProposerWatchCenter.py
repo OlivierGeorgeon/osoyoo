@@ -1,33 +1,45 @@
 ########################################################################################
-# This decider makes the robot stay in the watch point and watch for object in the center of the terrrain
-# Activation 2 if emotion is SAD
+# This decider makes the robot stay at the watch point and watch for object in the center of the terrrain
+# This behavior is associated with EMOTION_SAD
 ########################################################################################
 
 import math
 import numpy as np
-from . Action import ACTION_WATCH, ACTION_TURN, ACTION_SWIPE, ACTION_FORWARD, ACTION_SCAN
+from . Action import ACTION_WATCH, ACTION_TURN, ACTION_FORWARD, ACTION_SCAN
 from ..Robot.Enaction import Enaction
-from ..Memory.Memory import EMOTION_SAD, EMOTION_UPSET
+from ..Memory import EMOTION_SAD, EMOTION_UPSET
 from ..Enaction.CompositeEnaction import CompositeEnaction
 from . Proposer import Proposer
-from . PredefinedInteractions import create_or_retrieve_primitive, OUTCOME_FOCUS_FRONT
+from ..Memory.BodyMemory import ENERGY_TIRED, EXCITATION_LOW
+from ..Memory.PhenomenonMemory.PhenomenonTerrain import TERRAIN_ORIGIN_CONFIDENCE
+from ..Memory.PhenomenonMemory import ARRANGE_OBJECT_RADIUS
 
 
 class ProposerWatchCenter(Proposer):
-    def __init__(self, workspace):
-        super().__init__(workspace)
-
-        # Give higher valence to Watch than to Swipe
-        # create_or_retrieve_primitive(self.primitive_interactions, workspace.actions[ACTION_SWIPE], OUTCOME_FOCUS_FRONT, 1)
-        # create_or_retrieve_primitive(self.primitive_interactions, workspace.actions[ACTION_FORWARD], OUTCOME_FOCUS_FRONT, 1)
-        # create_or_retrieve_primitive(self.primitive_interactions, workspace.actions[ACTION_WATCH], OUTCOME_FOCUS_FRONT, 2)
+    # def __init__(self, workspace):
+    #     super().__init__(workspace)
 
     def activation_level(self):
-        """The level of activation is 2 if the robot is SAD or UPSET"""
-        if self.workspace.memory.emotion_code in [EMOTION_SAD, EMOTION_UPSET]:
+        """The level of activation is 2 if the terrain is confident, energy is high, excitation is low"""
+        if self.workspace.memory.phenomenon_memory.terrain_confidence() >= TERRAIN_ORIGIN_CONFIDENCE and \
+                self.workspace.memory.body_memory.energy >= ENERGY_TIRED and \
+                self.workspace.memory.body_memory.excitation <= EXCITATION_LOW:
             return 2
-        else:
-            return 0
+            # if self.workspace.memory.egocentric_memory.focus_point is None:
+            #     return 2
+            # else:
+            #     ego_target = self.workspace.memory.terrain_centric_to_egocentric(self.workspace.memory.phenomenon_memory.arrange_point())
+            #     is_to_arrange = self.workspace.memory.is_to_arrange(self.workspace.memory.egocentric_memory.focus_point)
+            #     is_closer = self.workspace.memory.egocentric_memory.focus_point[0] < ego_target[0] - ARRANGE_OBJECT_RADIUS
+            #     print("Focus near terrain center:", is_to_arrange, ". Before terrain center:", is_closer,
+            #           ". Other robot angry:", self.workspace.memory.phenomenon_memory.other_robot_is_angry())
+            #     if not is_to_arrange:
+            #         return 2
+        return 0
+        # if self.workspace.memory.emotion_code in [EMOTION_SAD, EMOTION_UPSET]:
+        #     return 2
+        # else:
+        #     return 0
 
     def select_enaction(self, enaction):
         """Return the next intended interaction"""
@@ -55,7 +67,10 @@ class ProposerWatchCenter(Proposer):
         # If facing arrange point then WATCH arrange point
         elif abs(math.atan2(ego_arrange_point[1], ego_arrange_point[0])) < 0.349:
             e_memory.egocentric_memory.prompt_point = None
-            e_memory.egocentric_memory.focus_point = ego_arrange_point
+            # Upset if there is an object to watch
+            if e_memory.egocentric_memory.focus_point is not None:
+                e_memory.emotion_code = EMOTION_UPSET
+            # e_memory.egocentric_memory.focus_point = ego_arrange_point
             composite_enaction = Enaction(self.workspace.actions[ACTION_WATCH], e_memory)
 
         # If not facing arrange point then turn to arrange point

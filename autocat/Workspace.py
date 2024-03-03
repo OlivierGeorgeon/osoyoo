@@ -39,7 +39,8 @@ class Workspace:
         # if self.robot_id == '1':
         self.proposers = {'Explore': ProposerExplore(self), 'Circle ': Proposer(self),
                           # 'Watch C': ProposerWatchCenter(self),  'Arrange': ProposerArrange(self),
-                          'Watch': ProposerWatch(self), 'Push': ProposerPush(self)}
+                          'Watch': ProposerWatch(self), 'Push': ProposerPush(self)
+                          }
         # self.deciders = {'Explore': DeciderExplore(self), 'Circle': DeciderCircle(self), 'Watch': DeciderWatch(self)}
         # self.deciders = {'Circle': DeciderCircle(self), 'Explore': DeciderExplore(self)}
         # self.deciders = {'Push': DeciderPush(self), 'Watch': DeciderWatch(self)}

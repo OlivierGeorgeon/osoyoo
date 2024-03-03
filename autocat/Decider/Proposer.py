@@ -1,3 +1,9 @@
+########################################################################################
+# This proposer proposes the default behavior which makes the robot circle around objects
+# This behavior is associated with EMOTION_HAPPY
+# Activation 2: when the robot is happy
+########################################################################################
+
 import numpy as np
 from . Action import ACTION_SCAN
 from . PredefinedInteractions import create_or_retrieve_primitive, create_primitive_interactions, \
@@ -5,7 +11,7 @@ from . PredefinedInteractions import create_or_retrieve_primitive, create_primit
 from . Interaction import OUTCOME_FOCUS_TOO_FAR
 from . Action import ACTION_TURN
 from ..Robot.Enaction import Enaction
-from ..Memory.Memory import EMOTION_HAPPY
+from ..Memory import EMOTION_HAPPY
 from ..Memory.PhenomenonMemory.PhenomenonTerrain import TERRAIN_ORIGIN_CONFIDENCE
 from ..Memory.BodyMemory import ENERGY_TIRED, EXCITATION_LOW
 from ..Integrator.OutcomeCode import FOCUS_TOO_FAR_DISTANCE
@@ -23,23 +29,17 @@ class Proposer:
         self.composite_interactions = create_composite_interactions(self.workspace.actions, self.primitive_interactions)
 
     def activation_level(self):
-        """Return the activation level of this decider/ 1: default; 3 if focus not too far and excited"""
-        activation_level = 1  # Is the proposer by default
-        # if self.workspace.memory.emotion_code == EMOTION_HAPPY:
-        if self.workspace.memory.phenomenon_memory.terrain_confidence() < TERRAIN_ORIGIN_CONFIDENCE:
-            activation_level = 2
-        else:
-            # High energy then must circle, explore, watch or arrange
-            if self.workspace.memory.body_memory.energy >= ENERGY_TIRED:
-                # High excitation then must circle or explore
-                if self.workspace.memory.body_memory.excitation > EXCITATION_LOW:
-                    # Focus inside terrain or not too far: HAPPY DeciderCircle
-                    if self.workspace.memory.egocentric_memory.focus_point is not None and \
-                            np.linalg.norm(self.workspace.memory.egocentric_memory.focus_point) < FOCUS_TOO_FAR_DISTANCE and \
-                            not self.workspace.memory.is_outside_terrain(self.workspace.memory.egocentric_memory.focus_point):
-                        activation_level = 2
-                    # No interesting focus: RELAXED, DeciderExplore
-        return activation_level
+        """Return the activation level of this decider:
+         1: default; 2: terrain unconfident or high energy and exitation and object to circle round"""
+
+        if self.workspace.memory.phenomenon_memory.terrain_confidence() < TERRAIN_ORIGIN_CONFIDENCE or \
+                (self.workspace.memory.body_memory.energy >= ENERGY_TIRED and
+                 self.workspace.memory.body_memory.excitation > EXCITATION_LOW and
+                 self.workspace.memory.egocentric_memory.focus_point is not None and
+                 np.linalg.norm(self.workspace.memory.egocentric_memory.focus_point) < FOCUS_TOO_FAR_DISTANCE and
+                 not self.workspace.memory.is_outside_terrain(self.workspace.memory.egocentric_memory.focus_point)):
+            return 2
+        return 1
 
     def propose_enaction(self):
         """Return a proposed interaction"""
