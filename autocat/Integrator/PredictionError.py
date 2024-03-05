@@ -44,6 +44,7 @@ class PredictionError:
     def __init__(self, workspace):
         """Initialize the prediction error arrays"""
         self.workspace = workspace
+        self.outcome_code = {}
         self.forward_duration1 = {}  # (s)
         self.yaw = {}  # (degree)
         self.compass = {}  # (degree)
@@ -57,6 +58,15 @@ class PredictionError:
         computed_outcome = enaction.predicted_outcome
         actual_outcome = enaction.outcome
 
+        # Outcome code
+        pe = int(enaction.predicted_outcome_code != enaction.outcome_code)
+        self.outcome_code[enaction.clock] = pe
+        self.outcome_code.pop(actual_outcome.clock - PREDICTION_ERROR_WINDOW, None)
+        print("Prediction Error Outcome Code", pe,
+              "(predicted:", enaction.predicted_outcome_code, ", actual:", enaction.outcome_code, ")",
+              "Average:", round(float(np.mean(list(self.outcome_code.values())))),
+              "std:", round(float(np.std(list(self.outcome_code.values())))))
+
         # Translation FORWARD duration1
 
         if enaction.action.action_code in [ACTION_FORWARD] and actual_outcome.duration1 != 0:
@@ -64,8 +74,8 @@ class PredictionError:
             self.forward_duration1[enaction.clock] = pe
             self.forward_duration1.pop(actual_outcome.clock - PREDICTION_ERROR_WINDOW, None)
             print("Prediction Error Translate duration1 (simulation - measured)=", round(pe),
-                  "Average:", round(float(np.mean(list(self.forward_duration1.values())))),
-                  "std:", round(float(np.std(list(self.forward_duration1.values())))))
+                  "Average:", round(float(np.mean(list(self.forward_duration1.values()))), 2),
+                  "std:", round(float(np.std(list(self.forward_duration1.values())))), 2)
         # yaw
 
         # pe = math.degrees(-short_angle(enaction.command.intended_yaw_quaternion, enaction.yaw_quaternion))
@@ -142,6 +152,7 @@ class PredictionError:
         if not os.path.exists("log"):
             os.makedirs("log")
         # Generate the plots
+        plot(self.outcome_code, "Outcome code (0/1)", "Outcome_code")
         plot(self.forward_duration1, "Forward duration (s)", "Forward_duration")
         plot(self.yaw, "Yaw (degrees)", "yaw")
         plot(self.compass, "Compass (degree)", "Compass")

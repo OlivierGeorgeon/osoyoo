@@ -12,12 +12,9 @@ from ..Enaction.CompositeEnaction import CompositeEnaction
 from . Proposer import Proposer
 from ..Memory.BodyMemory import ENERGY_TIRED, EXCITATION_LOW
 from ..Memory.PhenomenonMemory.PhenomenonTerrain import TERRAIN_ORIGIN_CONFIDENCE
-from ..Memory.PhenomenonMemory import ARRANGE_OBJECT_RADIUS
 
 
 class ProposerWatchCenter(Proposer):
-    # def __init__(self, workspace):
-    #     super().__init__(workspace)
 
     def activation_level(self):
         """The level of activation is 2 if the terrain is confident, energy is high, excitation is low"""
@@ -25,21 +22,7 @@ class ProposerWatchCenter(Proposer):
                 self.workspace.memory.body_memory.energy >= ENERGY_TIRED and \
                 self.workspace.memory.body_memory.excitation <= EXCITATION_LOW:
             return 2
-            # if self.workspace.memory.egocentric_memory.focus_point is None:
-            #     return 2
-            # else:
-            #     ego_target = self.workspace.memory.terrain_centric_to_egocentric(self.workspace.memory.phenomenon_memory.arrange_point())
-            #     is_to_arrange = self.workspace.memory.is_to_arrange(self.workspace.memory.egocentric_memory.focus_point)
-            #     is_closer = self.workspace.memory.egocentric_memory.focus_point[0] < ego_target[0] - ARRANGE_OBJECT_RADIUS
-            #     print("Focus near terrain center:", is_to_arrange, ". Before terrain center:", is_closer,
-            #           ". Other robot angry:", self.workspace.memory.phenomenon_memory.other_robot_is_angry())
-            #     if not is_to_arrange:
-            #         return 2
         return 0
-        # if self.workspace.memory.emotion_code in [EMOTION_SAD, EMOTION_UPSET]:
-        #     return 2
-        # else:
-        #     return 0
 
     def select_enaction(self, enaction):
         """Return the next intended interaction"""

@@ -10,10 +10,10 @@ from . Action import ACTION_TURN, ACTION_FORWARD, ACTION_BACKWARD, ACTION_SCAN
 from ..Robot.Enaction import Enaction
 from ..Robot.Command import DIRECTION_BACK
 from . Proposer import Proposer
-from ..Integrator.OutcomeCode import FOCUS_TOO_FAR_DISTANCE
 from .. Enaction.CompositeEnaction import CompositeEnaction
 from ..Memory import EMOTION_ANGRY
 from . Interaction import OUTCOME_FLOOR
+from ..Utils import assert_almost_equal_angles
 
 STEP_INIT = 0
 STEP_WITHDRAW = 1
@@ -22,14 +22,10 @@ STEP_WITHDRAW = 1
 class ProposerPush(Proposer):
     def __init__(self, workspace):
         super().__init__(workspace)
-        # self.too_far = FOCUS_TOO_FAR_DISTANCE
-        # self.action = self.workspace.actions[ACTION_SCAN]
         self.step = STEP_INIT
 
     def activation_level(self):
         """The level of activation of this decider: 0: default, 4 if focus inside terrain, 3 for withdrawal"""
-        # activation_level = 0
-        # If focus is not None and is inside terrain
         if self.is_to_push():
             return 4
         elif self.step == STEP_WITHDRAW:
@@ -43,23 +39,17 @@ class ProposerPush(Proposer):
 
         # If there is an object to push
         if self.is_to_push() and enaction.outcome_code != OUTCOME_FLOOR:
-                # e_memory.phenomenon_memory.is_inside_terrain(e_memory.egocentric_to_terrain_centric(
-                #     self.workspace.memory.egocentric_memory.focus_point)):
             # Start pushing
-            # if e_memory.egocentric_memory.focus_point is not None and enaction.outcome_code != OUTCOME_FLOOR:
             ego_destination = vector.set_length(e_memory.egocentric_memory.focus_point, 1200)
             e_memory.egocentric_memory.prompt_point = ego_destination
             # If object in front modulo 10° then push
-            if abs(math.atan2(ego_destination[1], math.fabs(ego_destination[0]))) < 0.175:
+            # if abs(math.atan2(ego_destination[1], math.fabs(ego_destination[0]))) < 0.175:
+            if assert_almost_equal_angles(math.atan2(ego_destination[1], ego_destination[0]), 0, 10):
                 composite_enaction = Enaction(self.workspace.actions[ACTION_FORWARD], e_memory)
                 self.step = STEP_WITHDRAW
             # If object not in front then turn toward object
             else:
                 composite_enaction = Enaction(self.workspace.actions[ACTION_TURN], e_memory)
-            # else:
-            #     # If there is no object then scan (probably never happens)
-            #     print("DeciderPush is scanning")
-            #     composite_enaction = Enaction(self.workspace.actions[ACTION_SCAN], e_memory, span=10)
 
         # Withdraw step
         elif self.step == STEP_WITHDRAW:

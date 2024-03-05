@@ -6,6 +6,7 @@ from .Decider.ProposerWatch import ProposerWatch
 from .Decider.ProposerPush import ProposerPush
 from .Decider.ProposerWatchCenter import ProposerWatchCenter
 from .Decider.ProposerArrange import ProposerArrange
+from .Decider.ProposerPlayForward import ProposerPlayForward
 from .Decider.Action import create_actions, ACTION_FORWARD, ACTIONS, ACTION_TURN, ACTION_BACKWARD
 from .Memory.Memory import Memory
 from .Memory.PhenomenonMemory.PhenomenonTerrain import TERRAIN_INITIAL_CONFIDENCE
@@ -37,9 +38,11 @@ class Workspace:
         self.actions = create_actions(robot_id)
         self.memory = Memory(arena_id, robot_id)
         # if self.robot_id == '1':
-        self.proposers = {'Explore': ProposerExplore(self), 'Circle ': Proposer(self),
+        self.proposers = {'Circle ': Proposer(self),
+                          # 'Explore': ProposerExplore(self),
                           # 'Watch C': ProposerWatchCenter(self),  'Arrange': ProposerArrange(self),
-                          'Watch': ProposerWatch(self), 'Push': ProposerPush(self)
+                          # 'Watch': ProposerWatch(self), 'Push': ProposerPush(self)
+                          'Play': ProposerPlayForward(self)
                           }
         # self.deciders = {'Explore': DeciderExplore(self), 'Circle': DeciderCircle(self), 'Watch': DeciderWatch(self)}
         # self.deciders = {'Circle': DeciderCircle(self), 'Explore': DeciderExplore(self)}
