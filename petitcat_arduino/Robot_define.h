@@ -1,4 +1,4 @@
-#define ROBOT_ID 4 // 0: regular Osoyoo robot, 1: robot BSN, 2: robot UCBL, 3: SHS chez Olivier, 11 to 14: DOLL robots
+#define ROBOT_ID 3 // 0: regular Osoyoo robot, 1: robot BSN, 2: robot UCBL, 3: SHS chez Olivier, 11 to 14: DOLL robots
 
 #define AP_SSID "osoyoo_robot"          // The wifi SSID of this robot in Access Point
 #define ROBOT_HEAD_X 80                 // (mm) X position of the head
@@ -86,7 +86,7 @@
 #define ACCELERATION_Y_OFFSET 0  // -3        //
 #define ACCELERATION_X_IMPACT_THRESHOLD 210  // 200 Longitudinal impact if acceleration exceeds this threshold
 #define ACCELERATION_Y_IMPACT_THRESHOLD 200  // lateral impact if acceleration exceeds this threshold
-#define ACCELERATION_X_BLOCK_THRESHOLD 140 // 30 // Robot is blocked if longitudinal acceleration below this threshold
+#define ACCELERATION_X_BLOCK_THRESHOLD 110  // 140 // 30 // Robot is blocked if longitudinal acceleration below this threshold
 #define ACCELERATION_Y_BLOCK_THRESHOLD 80 // 100 // Robot is blocked if lateral acceleration below this threshold
 #define GYRO_COEF 1.
 #define ROBOT_SERVO_PIN 6

@@ -8,38 +8,46 @@ from ..Decider.Action import ACTION_FORWARD, ACTION_BACKWARD
 from ..Decider.Interaction import OUTCOME_LOST_FOCUS
 from ..Utils import short_angle, point_to_head_direction_distance, assert_almost_equal_angles
 from ..Integrator.OutcomeCode import CONFIDENCE_CONFIRMED_FOCUS
+from .PlotSequence import plot
 
 PREDICTION_ERROR_WINDOW = 100
 RUNNING_AVERAGE_COEF = 0.25
 
 
-def plot(data_dict, caption, file_name):
-    """Plot the values in this dictionary"""
-    point_x = list(data_dict.keys())
-    point_y = list(data_dict.values())
-
-    # Create the figure
-    plt.figure(figsize=(6, 3))
-    # Set plot properties
-    plt.title(caption)
-    plt.xlabel('Clock')
-    plt.ylabel('Prediction error')
-    plt.axhline(0, color='black', linewidth=0.5)
-    # plt.axvline(0, color='black', linewidth=0.5)
-    plt.grid(color='gray', linestyle='--', linewidth=0.5)
-    # plt.legend()
-    # plt.axis('equal')  # Ensure equal scaling of axes
-
-    # The points
-    plt.plot(point_x, point_y, marker='o', linestyle='-', color='b', label=None)
-
-    # Show the plot
-    # plt.ion()
-    # plt.draw()
-    # plt.show()
-    # plt.pause(1)
-    plt.savefig("log/" + file_name + ".pdf")
-    plt.close()
+# def plot(data_dict, caption, file_name, y_label, parameters=None):
+#     """Plot the values in this dictionary"""
+#     if parameters is not None and 'bottom' in parameters and 'top' in parameters:
+#         # plt.ylim(bottom=bottom, top=top)
+#         plt.axis(ymin=parameters['bottom'], ymax=parameters['top'])
+#         point_x = [key for key, value in data_dict.items() if parameters['bottom'] < value < parameters['top']]
+#         point_y = [value for value in data_dict.values() if parameters['bottom'] < value < parameters['top']]
+#     else:
+#         point_x = list(data_dict.keys())
+#         point_y = list(data_dict.values())
+#
+#     # Create the figure
+#     plt.figure(figsize=(6, 3))
+#     # Set plot properties
+#     plt.title(caption)
+#     plt.xlabel('Clock')
+#     plt.ylabel(y_label)
+#     plt.axhline(0, color='black', linewidth=0.5)
+#     # plt.axvline(0, color='black', linewidth=0.5)
+#     plt.grid(color='gray', linestyle='--', linewidth=0.5)
+#     # plt.legend()
+#     # plt.axis('equal')  # Ensure equal scaling of axes
+#
+#
+#     # The points
+#     plt.plot(point_x, point_y, marker='o', linestyle='-', color='b', label=None)
+#
+#     # Show the plot
+#     # plt.ion()
+#     # plt.draw()
+#     # plt.show()
+#     # plt.pause(1)
+#     plt.savefig("log/" + file_name + ".pdf")
+#     plt.close()
 
 
 class PredictionError:
@@ -54,12 +62,22 @@ class PredictionError:
         self.pe_echo_distance = {}  # (mm)
         self.pe_focus_direction = {}  # (degree)
         self.pe_focus_distance = {}  # (mm)
+
         self.pe_speed_forward = {}  # (mm/s)
         self.value_speed_forward = {}  # (mm/s)
         self.pe_speed_backward = {}  # (mm/s)
         self.value_speed_backward = {}  # (mm/s)
+        self.pe_x_speed = {}  # (mm/s)
+        self.x_speed = {}  # (mm/s)
 
         self.previous_echo_distance = 0
+
+        # The agg backend avoids interfering with pyglet windows
+        # https://matplotlib.org/stable/users/explain/figure/backends.html
+        matplotlib.use('agg')
+        # Create the log directory if it does not exist because it is not included in git
+        if not os.path.exists("log"):
+            os.makedirs("log")
 
     def log(self, enaction):
         """Compute the prediction errors: computed - actual"""
@@ -88,6 +106,7 @@ class PredictionError:
             # Forward speed
 
             self.value_speed_forward[enaction.clock] = self.workspace.actions[ACTION_FORWARD].translation_speed[0]
+            self.x_speed[enaction.clock] = self.workspace.actions[ACTION_FORWARD].translation_speed[0]
             if assert_almost_equal_angles(math.radians(actual_outcome.head_angle), 0, 11) and enaction.outcome_code != OUTCOME_LOST_FOCUS:
                 action_speed = self.workspace.actions[ACTION_FORWARD].translation_speed[0]
                 speed = (self.previous_echo_distance - actual_outcome.echo_distance) * 1000 / actual_outcome.duration1
@@ -100,12 +119,22 @@ class PredictionError:
                 # Update the speed of the action
                 self.workspace.actions[ACTION_FORWARD].translation_speed[0] = action_speed * (1. - RUNNING_AVERAGE_COEF) + speed * RUNNING_AVERAGE_COEF
 
+                # Use the same speed forward and backward
+                self.pe_x_speed[enaction.clock] = pe
+                self.pe_x_speed.pop(actual_outcome.clock - PREDICTION_ERROR_WINDOW, None)
+                print("Prediction Error X Speed (simulation", round(action_speed), " - measured", round(speed), ")=", pe,
+                      "Average:", round(float(np.mean(list(self.pe_x_speed.values()))), 1),
+                      "std:", round(float(np.std(list(self.pe_x_speed.values())))), 1)
+                self.workspace.actions[ACTION_BACKWARD].translation_speed[0] = - action_speed * (1. - RUNNING_AVERAGE_COEF) - speed * RUNNING_AVERAGE_COEF
+
+
         # self.previous_echo_distance = actual_outcome.echo_distance
 
         # Translation Backward
 
         if enaction.action.action_code in [ACTION_BACKWARD] and actual_outcome.duration1 != 0 and enaction.outcome_code != OUTCOME_LOST_FOCUS:
             self.value_speed_backward[enaction.clock] = self.workspace.actions[ACTION_BACKWARD].translation_speed[0]
+            self.x_speed[enaction.clock] = -self.workspace.actions[ACTION_BACKWARD].translation_speed[0]
             if assert_almost_equal_angles(math.radians(actual_outcome.head_angle), 0, 11):
                 action_speed = self.workspace.actions[ACTION_BACKWARD].translation_speed[0]
                 speed = (self.previous_echo_distance - actual_outcome.echo_distance) * 1000 / actual_outcome.duration1
@@ -117,6 +146,13 @@ class PredictionError:
                       "std:", round(float(np.std(list(self.pe_speed_backward.values())))), 1)
                 # Update the speed of the action
                 self.workspace.actions[ACTION_BACKWARD].translation_speed[0] = action_speed * (1. - RUNNING_AVERAGE_COEF) + speed * RUNNING_AVERAGE_COEF
+                # Use the same speed forward and backward
+                self.pe_x_speed[enaction.clock] = - pe  # Opposite
+                self.pe_x_speed.pop(actual_outcome.clock - PREDICTION_ERROR_WINDOW, None)
+                print("Prediction Error X Speed (simulation", round(action_speed), " - measured", round(speed), ")=", pe,
+                      "Average:", round(float(np.mean(list(self.pe_x_speed.values()))), 1),
+                      "std:", round(float(np.std(list(self.pe_x_speed.values())))), 1)
+                self.workspace.actions[ACTION_FORWARD].translation_speed[0] = - action_speed * (1. - RUNNING_AVERAGE_COEF) - speed * RUNNING_AVERAGE_COEF
 
         self.previous_echo_distance = actual_outcome.echo_distance
 
@@ -189,32 +225,34 @@ class PredictionError:
 
     def plot(self):
         """Show the prediction error plots"""
-        # The agg backend avoids interfering with pyglet windows
-        # https://matplotlib.org/stable/users/explain/figure/backends.html
-        matplotlib.use('agg')
-        # Create the log directory if it does not exist because it is not included in git
-        if not os.path.exists("log"):
-            os.makedirs("log")
-        # Generate the plots
-        plot(self.pe_outcome_code, "Outcome code (0/1)", "Outcome_code")
-        plot(self.pe_forward_duration1, "Forward duration (s)", "Forward_duration")
-        plot(self.pe_speed_forward, "Forward speed (mm/s)", "Forward_speed_pe")
-        plot(self.value_speed_forward, "Forward speed value (mm/s)", "Forward_speed_value")
-        plot(self.pe_speed_backward, "Backward speed (mm/s)", "Backward_speed_pe")
-        plot(self.value_speed_backward, "Backward speed value (mm/s)", "Backward_speed_value")
-        plot(self.pe_yaw, "Yaw (degrees)", "yaw")
-        plot(self.pe_compass, "Compass (degree)", "Compass")
-        plot(self.pe_echo_direction, "Head direction (degree)", "Head_direction")
-        plot(self.pe_echo_distance, "Echo distance (mm)", "Echo_distance")
-        plot(self.pe_focus_direction, "Focus direction (degree)", "Focus_direction")
-        plot(self.pe_focus_distance, "Focus distance (mm)", "Focus_distance")
+        # The outcome code prediction error
+        parameters = {'bottom': -1, 'top': 2, 'color': 'c'}
+        plot(self.pe_outcome_code, "Outcome code prediction error", "01_Outcome_code", "(0/1)", parameters)
+
+        # The yaw and compass
+        parameters = {'bottom': -20, 'top': 20, 'color': 'c'}
+        plot(self.pe_yaw, "Yaw prediction error", "02_yaw", "(degrees)", parameters)
+        plot(self.pe_compass, "Compass prediction error", "03_Compass", "(degree)", parameters)
+
+        # The speed as blue circles
+        plot(self.x_speed, "X speed", "04_x_speed", "(mm/s)")
+        # plot(self.value_speed_forward, "Forward speed value", "Forward_speed_value", "(mm/s)")
+        # plot(self.value_speed_backward, "Backward speed value", "Backward_speed_value", "(mm/s)")
+
+        # The prediction errors as red squares
+        parameters = {'bottom': -100, 'top': 100, 'color': 'r'}
+        plot(self.pe_x_speed, "X speed prediction error", "05_x_speed_pe", "(mm/s)", parameters)
+        plot(self.pe_forward_duration1, "Forward duration prediction error", "06_Forward_duration", "(s)", parameters)
+        # plot(self.pe_speed_forward, "Forward speed prediction error", "Forward_speed_pe", "(mm/s)", parameters)
+        # plot(self.pe_speed_backward, "Backward speed prediction error", "Backward_speed_pe", "(mm/s)", parameters)
+        plot(self.pe_echo_direction, "Head direction prediction error", "07_Head_direction", "(degree)", parameters)
+        plot(self.pe_echo_distance, "Echo distance prediction error", "08_Echo_distance", "(mm)", parameters)
+
+        # The focus as magenta squares
+        parameters = {'bottom': -100, 'top': 100, 'color': 'm'}
+        plot(self.pe_focus_direction, "Focus direction prediction error", "09_Focus_direction", "(degree)", parameters)
+        plot(self.pe_focus_distance, "Focus distance prediction error", "10_Focus_distance", "(mm)", parameters)
+
         terrain = self.workspace.memory.phenomenon_memory.terrain()
         if terrain is not None:
-            plot(terrain.origin_prediction_error, "Terrain origin (mm)", "Origin")
-
-
-# Test plot
-if __name__ == "__main__":
-    test_dict = {0: 1, 1: 2, 2: 2, 3: 1, 4: 0}
-    matplotlib.use('agg')
-    plot(test_dict, "Test", "test")
+            plot(terrain.origin_prediction_error, "Terrain origin", "11_Origin", "(mm)")

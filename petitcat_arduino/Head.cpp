@@ -58,10 +58,10 @@ void Head::update()
         }
       Serial.println("Step: " + String(_echo_alignment_step) + ", Angle: " +String(_head_angle) + ", measure: " + String(_current_ultrasonic_measure));
 
+      // If the echo is closer or no current echo and no previous and no penultimate
       if ((_previous_ultrasonic_measure > _current_ultrasonic_measure ) ||
           (_previous_ultrasonic_measure == NO_ECHO_DISTANCE)  && (_current_ultrasonic_measure == NO_ECHO_DISTANCE)
           && (_penultimate_ultrasonic_measure == NO_ECHO_DISTANCE))
-      // The echo is closer or no current echo and no previous and no penultimate
       {
         if ((_head_angle <= -90) || (_head_angle >= 90))
         // The head reached the limit angle
