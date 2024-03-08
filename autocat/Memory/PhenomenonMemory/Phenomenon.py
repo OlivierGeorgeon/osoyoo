@@ -21,7 +21,7 @@ class Phenomenon:
         # Initial shape is unknown
         self.origin_direction_quaternion = Quaternion([0., 0., 0., 1.])
         self.relative_origin_point = np.array([0, 0, 0])
-        self.shape = np.empty([3, 3])  # Used to display the shape
+        self.shape = np.empty([3, 3])  # Shape in terrain-centric coordinate used to display the phenomenon
 
         # Record the first affordance of the phenomenon
         # The phenomenon is placed in allocentric memory at the position of the initial affordance
@@ -36,7 +36,7 @@ class Phenomenon:
         self.tour_started = False
         # The hull is used to display the phenomenon's contour
         self.hull_points = None
-        self.path = None  # Used to test is_inside
+        self.path = None  # Used to test is_inside in terrain-centric coordinates
         self.interpolation_types = None
         # self.interpolation_points = None
 
@@ -136,18 +136,15 @@ class Phenomenon:
     def set_path(self):
         """Set the path representing the terrain outline used to test is_inside"""
         # Must not be recomputed on each call to is_inside()
-        # Need a closed loop two dimensional array [[x0, y0],...,[x100, y100],[x0, y0]]
-        # self.path = mpath.Path(np.append(self.shape[:, 0:2], self.shape[0:1, 0:2], axis=0))
-        # self.path = mpath.Path(np.array([p[0:2] for p in self.shape]) + self.shape[0][0:2])
-        # self.path = mpath.Path(np.append(self.shape, self.shape[0:1, :], axis=0)[:, 0:2])
+        # Need a two dimensional array [[x0, y0],...,[x100, y100]]
         self.path = mpath.Path(self.shape[:, 0:2])
 
-    def is_inside(self, p):
-        """True if p is inside the phenomenon"""
-        if p is None or self.path is None:
+    def is_inside(self, terrain_centric_point):
+        """True if the point in terrain-centric coordinates is inside the phenomenon"""
+        if terrain_centric_point is None or self.path is None:
             return False
         else:
-            return self.path.contains_point(p[0:2])
+            return self.path.contains_point(terrain_centric_point[0:2])
 
     def phenomenon_label(self):
         """Return the text to display in phenomenon view"""

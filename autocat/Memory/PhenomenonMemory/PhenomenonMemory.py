@@ -80,6 +80,21 @@ class PhenomenonMemory:
             is_outside_terrain = not self.phenomena[TER].is_inside(allo_point)
         return is_outside_terrain
 
+    def is_inside_terrain(self, allo_point):
+        """Return True if allo_point is not None and there is a confident terrain and allo_point is inside"""
+        # If no point then False
+        if allo_point is None:
+            print("allo point is none")
+            return False
+        # If terrain not confident then False
+        elif self.terrain_confidence() < TERRAIN_ORIGIN_CONFIDENCE:
+            print("terrain is not confident")
+            return False
+        # If the point is outside the confident terrain then True
+        else:
+            print("is inside terrain", self.phenomena[TER].is_inside(allo_point))
+            return self.phenomena[TER].is_inside(allo_point)
+
     def create_phenomenon(self, affordance):
         """Create a new phenomenon depending of the type of the affordance"""
         # Must always create a phenomenon

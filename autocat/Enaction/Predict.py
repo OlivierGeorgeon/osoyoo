@@ -8,10 +8,10 @@ from ..Memory.AllocentricMemory.Hexagonal_geometry import point_to_cell
 from ..Memory.EgocentricMemory.Experience import EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_FLOOR
 from ..Robot.RobotDefine import ROBOT_FLOOR_SENSOR_X, ROBOT_SETTINGS, ROBOT_OUTSIDE_Y
 from ..Robot.Outcome import Outcome
-from ..Memory.BodyMemory import point_to_echo_direction_distance
-from ..Utils import assert_almost_equal_angles
+from ..Utils import assert_almost_equal_angles, point_to_head_direction_distance
 from .Trajectory import Trajectory
 from ..Integrator.OutcomeCode import outcome_code
+from ..Memory.PhenomenonMemory import ARRANGE_OBJECT_RADIUS
 
 RETREAT_YAW = 45
 
@@ -91,38 +91,34 @@ def generate_prediction(command, memory):
     trajectory = Trajectory(memory, command)
     trajectory.track_displacement(command.yaw, Outcome(outcome_dict))
 
-    # Apply the displacement to memory
+    # Push objects before moving the robot
+    push_objects(trajectory, memory)
 
+    # Apply the displacement to memory
     memory.allocentric_memory.move(memory.body_memory.body_quaternion, trajectory, command.clock)
     memory.body_memory.body_quaternion = memory.body_memory.body_quaternion.cross(trajectory.yaw_quaternion)
-    memory.body_memory.head_direction_rad = trajectory.head_direction_rad
+    memory.body_memory.set_head_direction_degree(trajectory.head_direction_degree)
     memory.egocentric_memory.focus_point = trajectory.focus_point
     memory.egocentric_memory.prompt_point = trajectory.prompt_point
 
-    # Push objects
-    push_objects(trajectory, memory)
-
     # Predict the echo outcome from the first object phenomenon found in the sonar cone
-    for p in [p for p in memory.phenomenon_memory.phenomena.values() if p.phenomenon_type == EXPERIENCE_ALIGNED_ECHO]:
-        ego_center_point = memory.allocentric_to_egocentric(p.point)
-        # if the phenomenon is recognized then subtract its radius to obtain the egocentric echo distance
-        a, d = point_to_echo_direction_distance(ego_center_point)
-        if p.category is not None:
-            d -= p.category.short_radius
-        if d > 0 and (command.action.action_code == ACTION_SCAN and assert_almost_equal_angles(math.radians(a), 0, 90)
-                      or assert_almost_equal_angles(math.radians(a), memory.body_memory.head_direction_rad, 35)):
-            outcome_dict["head_angle"] = round(a)
-            outcome_dict["echo_distance"] = round(d)
-            outcome_dict["echo_point"] = ego_center_point.tolist()
-            break
+    ad = [point_to_head_direction_distance(memory.allocentric_to_egocentric(p.point))
+          for p in memory.phenomenon_memory.phenomena.values() if p.phenomenon_type == EXPERIENCE_ALIGNED_ECHO]
+    scan_ad = np.array([p for p in ad if p[1] > 0 and (command.action.action_code == ACTION_SCAN and
+                        assert_almost_equal_angles(math.radians(p[0]), 0, 125)
+                        or assert_almost_equal_angles(math.radians(p[0]),
+                                                      memory.body_memory.head_direction_rad, 35))], dtype=int)
+    if scan_ad.ndim > 1:
+        # outcome_dict['head_angle'], outcome_dict['echo_distance'] = scan_ad[np.argmin(scan_ad[:, 1])].tolist()
+        a, d = scan_ad[np.argmin(scan_ad[:, 1])].tolist()
+        outcome_dict['head_angle'], outcome_dict['echo_distance'] = a, d - ARRANGE_OBJECT_RADIUS
+    elif trajectory.focus_point is not None:  # Focus not on an object
+        outcome_dict['head_angle'], _ = point_to_head_direction_distance(trajectory.focus_point)
 
     predicted_outcome = Outcome(outcome_dict)
-    # Override the echo_point to place the focus on the phenomenon
-    if "echo_point" in outcome_dict:
-        predicted_outcome.echo_point = np.array(outcome_dict["echo_point"])
 
     # Update focus based on echo
-    trajectory.track_echo(predicted_outcome)
+    trajectory.track_focus(predicted_outcome)
 
     code = outcome_code(memory, trajectory, predicted_outcome)
 
@@ -141,13 +137,11 @@ def cell_color(ego_point, memory):
 
 
 def push_objects(trajectory, memory):
-    """Update the position of the phenomena that are on the robot's trajectory"""
+    """Update the position of the phenomena that are on the robot's trajectory. Must be called before moving robot."""
     alo_covered_area = trajectory.covered_area + memory.allocentric_memory.robot_point
     path = mpath.Path(alo_covered_area[:, 0:2])
     for p in [p for p in memory.phenomenon_memory.phenomena.values() if p.category is not None and
               p.phenomenon_type == EXPERIENCE_ALIGNED_ECHO and path.contains_point(p.point[0:2])]:
         ego_point = memory.allocentric_to_egocentric(p.point)
-        if ego_point[0] < ROBOT_FLOOR_SENSOR_X + p.category.short_radius and abs(ego_point[1]) < ROBOT_OUTSIDE_Y:
-            ego_point[0] = ROBOT_FLOOR_SENSOR_X + p.category.short_radius
-            p.point = memory.egocentric_to_allocentric(ego_point)
-            # print("pushing object to ego position", ego_point)
+        ego_point[0] = trajectory.translation[0] + ROBOT_FLOOR_SENSOR_X + p.category.short_radius
+        p.point = memory.egocentric_to_allocentric(ego_point)

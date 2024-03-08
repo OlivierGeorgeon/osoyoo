@@ -173,10 +173,11 @@ void Imu::update(int interaction_step)
       if (_ZAngle < _min_negative_yaw_right)
         _min_negative_yaw_right = _ZAngle;
 
-      // Check for forward impact or blocked (x positive)
+      // If impact or blocked when going forward (x positive)
       if ((x_acceleration < -ACCELERATION_X_IMPACT_THRESHOLD) ||
          (_cycle_count >= IMU_ACCELERATION_CYCLES) && (_max_positive_x_acc < ACCELERATION_X_BLOCK_THRESHOLD))
       {
+        // Specify the direction
         if (_min_negative_yaw_right < -GYRO_IMPACT_THRESHOLD)
           _impact_forward = B01;
         else if (_max_positive_yaw_left > GYRO_IMPACT_THRESHOLD)
@@ -185,10 +186,11 @@ void Imu::update(int interaction_step)
           _impact_forward = B11;
       }
 
-      // Check for backward impact or blocked (x negative)
+      // If impact or blocked when going backward (x negative)
       if ((x_acceleration > ACCELERATION_X_IMPACT_THRESHOLD) ||
          (_cycle_count >= IMU_ACCELERATION_CYCLES) && (_min_negative_x_acc > -ACCELERATION_X_BLOCK_THRESHOLD))
       {
+        // Specify the direction
         if (_min_negative_yaw_right < -GYRO_IMPACT_THRESHOLD)
           _impact_backward = B10;
         else if (_max_positive_yaw_left > GYRO_IMPACT_THRESHOLD)
@@ -260,8 +262,11 @@ void Imu::outcome_forward(JSONVar & outcome_object)
   outcome_object["max_x_acc"] = _max_positive_x_acc;
   outcome_object["min_x_acc"] = _min_negative_x_acc;
 
-  outcome_object["max_yaw"] = round(_max_positive_yaw_left * 100.0);
-  outcome_object["min_yaw"] = round(_min_negative_yaw_right * 100.0); // Does not show negative sign of floats!
+  char buffer[6];
+  dtostrf(_max_positive_yaw_left, 4, 2, buffer);
+  outcome_object["max_yaw"] = buffer;
+  dtostrf(_min_negative_yaw_right, 4, 2, buffer);
+  outcome_object["min_yaw"] = buffer;
 
   // outcome_object["max_speed"] = (int) _max_speed;
   // outcome_object["min_speed"] = (int) _min_speed;
@@ -275,8 +280,11 @@ void Imu::outcome_backward(JSONVar & outcome_object)
   outcome_object["impact"] = _impact_backward;
   outcome_object["max_x_acc"] = _max_positive_x_acc;
   outcome_object["min_x_acc"] = _min_negative_x_acc;
-  outcome_object["max_yaw"] = round(_max_positive_yaw_left * 100.0);
-  outcome_object["min_yaw"] = round(_min_negative_yaw_right * 100.0); // Does not show negative sign of floats!
+  char buffer[6];
+  dtostrf(_max_positive_yaw_left, 4, 2, buffer);
+  outcome_object["max_yaw"] = buffer;
+  dtostrf(_min_negative_yaw_right, 4, 2, buffer);
+  outcome_object["min_yaw"] = buffer;
   #endif
 }
 

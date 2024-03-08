@@ -12,12 +12,13 @@ from . Proposer import Proposer
 from ..Utils import short_angle
 from ..Robot.Enaction import Enaction
 from ..Robot.RobotDefine import TERRAIN_RADIUS
-from ..Memory.BodyMemory import ENERGY_TIRED
+from ..Memory.BodyMemory import ENERGY_TIRED, EXCITATION_LOW
 from ..Memory.PhenomenonMemory.PhenomenonMemory import TER
 from ..Memory.PhenomenonMemory.PhenomenonTerrain import TERRAIN_ORIGIN_CONFIDENCE
 from ..Memory.PhenomenonMemory import PHENOMENON_RECOGNIZED_CONFIDENCE
-from ..Memory.Memory import EMOTION_RELAXED
+from ..Memory import EMOTION_RELAXED
 from ..Enaction.CompositeEnaction import CompositeEnaction
+from ..Integrator.OutcomeCode import FOCUS_TOO_FAR_DISTANCE
 
 
 CLOCK_TO_GO_HOME = 8  # Number of interactions before going home
@@ -45,14 +46,22 @@ class ProposerExplore(Proposer):
         self.prompt_index = 0
         self.ter_prompt = None
         self.explore_angle_quaternion = Quaternion.from_z_rotation(math.pi / 3)  # 2
-        # self.action = "-"
 
     def activation_level(self):
         """The level of activation is 2 if the terrain has confidence and the robot is excited or low energy"""
-        activation_level = 0
-        if self.workspace.memory.emotion_code == EMOTION_RELAXED:
-            activation_level = 3
-        return activation_level
+        # High energy then must circle, explore, watch or arrange
+        if self.workspace.memory.body_memory.energy >= ENERGY_TIRED:
+            # High excitation then must circle or explore
+            if self.workspace.memory.body_memory.excitation > EXCITATION_LOW:
+                # Focus inside terrain or not too far: HAPPY DeciderCircle
+                if self.workspace.memory.egocentric_memory.focus_point is None or \
+                        np.linalg.norm(self.workspace.memory.egocentric_memory.focus_point) > FOCUS_TOO_FAR_DISTANCE or \
+                        self.workspace.memory.is_outside_terrain(self.workspace.memory.egocentric_memory.focus_point):
+                    return 3
+        # Tired: must go home
+        else:
+            return 3
+        return 0
 
     def outcome(self, enaction):
         """ Convert the enacted interaction into an outcome adapted to the explore behavior """
@@ -95,14 +104,14 @@ class ProposerExplore(Proposer):
 
         outcome_code = self.outcome(enaction)
 
+        e_memory = self.workspace.memory.save()
+        e_memory.emotion_code = EMOTION_RELAXED
         e1, e2 = None, None
 
         # If time to go home
         if self.workspace.memory.body_memory.energy < ENERGY_TIRED:
             # If right or left then swipe to home
             if outcome_code in [OUTCOME_LEFT, OUTCOME_RIGHT]:
-                e_memory = self.workspace.memory.save()
-                e_memory.emotion_code = EMOTION_RELAXED
                 if outcome_code == OUTCOME_RIGHT:
                     e_memory.egocentric_memory.prompt_point = np.array([0, 280, 0], dtype=int)  # Swipe to the right
                     e_memory.egocentric_memory.focus_point = np.array([280, 280, 0], dtype=int)
@@ -111,18 +120,16 @@ class ProposerExplore(Proposer):
                     e_memory.egocentric_memory.focus_point = np.array([280, -280, 0], dtype=int)
                 # print("Swiping to confirmation by:", ego_confirmation)
                 e1 = Enaction(self.workspace.actions[ACTION_SWIPE], e_memory)
-                self.workspace.startup_sound.play()
+                # self.workspace.startup_sound.play()
             # If not left or right we need to manoeuvre
             else:
                 # If near home then go to confirmation prompt
-                e_memory = self.workspace.memory.save()
-                e_memory.emotion_code = EMOTION_RELAXED
                 if self.workspace.memory.is_near_terrain_origin() or outcome_code == OUTCOME_COLOR:
                     polar_confirmation = self.workspace.memory.phenomenon_memory.phenomena[TER].confirmation_prompt()
                     # print("Enacting confirmation sequence to", polar_confirmation)
                     ego_confirmation = self.workspace.memory.polar_egocentric_to_egocentric(polar_confirmation)
                     e_memory.egocentric_memory.prompt_point = ego_confirmation
-                    self.workspace.near_home_sound.play()
+                    # self.workspace.near_home_sound.play()
                 else:
                     # If not near home then go to origin prompt
                     allo_origin = self.workspace.memory.phenomenon_memory.phenomena[TER].relative_origin_point + \
@@ -130,12 +137,13 @@ class ProposerExplore(Proposer):
                     # print("Going from", self.workspace.memory.allocentric_memory.robot_point, "to origin sensor point", allo_origin)
                     ego_origin = self.workspace.memory.allocentric_to_egocentric(allo_origin)
                     e_memory.egocentric_memory.prompt_point = ego_origin
-                    self.workspace.clear_sound.play()
+                    # self.workspace.clear_sound.play()
                 e_memory.egocentric_memory.focus_point = None  # Prevent unnatural head movement
                 e1 = Enaction(self.workspace.actions[ACTION_TURN], e_memory)
                 e2 = Enaction(self.workspace.actions[ACTION_FORWARD], e1.predicted_memory.save())
+
+        # If not time to go home, go to the most interesting pool point
         else:
-            # Go to the most interesting pool point
             # mip = self.workspace.memory.allocentric_memory.most_interesting_pool(self.workspace.clock)
             # self.workspace.memory.egocentric_memory.prompt_point = self.workspace.memory.allocentric_to_egocentric(mip)
 
@@ -151,8 +159,6 @@ class ProposerExplore(Proposer):
                              * Vector3([-TERRAIN_RADIUS[self.workspace.arena_id]["radius"], 0, 0]))
             else:
                 ego_prompt = self.workspace.memory.terrain_centric_to_egocentric(self.ter_prompt)
-            e_memory = self.workspace.memory.save()
-            e_memory.emotion_code = EMOTION_RELAXED
             e_memory.egocentric_memory.prompt_point = ego_prompt
             e_memory.egocentric_memory.focus_point = None  # Prevent unnatural head movement
             self.prompt_index += 1
