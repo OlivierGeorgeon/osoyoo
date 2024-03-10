@@ -1,7 +1,7 @@
 import math
 import numpy as np
 from pyrr import matrix44, Vector3, Quaternion
-from ..Decider.Action import ACTION_FORWARD
+from ..Proposer.Action import ACTION_FORWARD
 from ..Integrator.OutcomeCode import CONFIDENCE_NO_FOCUS, CONFIDENCE_NEW_FOCUS, CONFIDENCE_TOUCHED_FOCUS, \
     CONFIDENCE_CAREFUL_SCAN, CONFIDENCE_CONFIRMED_FOCUS
 from ..Utils import short_angle, translation_quaternion_to_matrix, head_direction_distance_to_point, \

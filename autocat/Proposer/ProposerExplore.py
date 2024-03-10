@@ -19,6 +19,7 @@ from ..Memory.PhenomenonMemory import PHENOMENON_RECOGNIZED_CONFIDENCE
 from ..Memory import EMOTION_RELAXED
 from ..Enaction.CompositeEnaction import CompositeEnaction
 from ..Integrator.OutcomeCode import FOCUS_TOO_FAR_DISTANCE
+from . GoalGenerator import GoalGenerator
 
 
 CLOCK_TO_GO_HOME = 8  # Number of interactions before going home
@@ -34,6 +35,8 @@ class ProposerExplore(Proposer):
     def __init__(self, workspace):
         super().__init__(workspace)
 
+        self.goal_generator = GoalGenerator(workspace)
+
         # point = np.array([-2000, 2000, 0])  # Begin with North West
         # point = np.array([-920, 770, 0])  # Begin with North West
         # self.prompt_points = [point]
@@ -43,9 +46,10 @@ class ProposerExplore(Proposer):
         # for i in range(1, self.nb_points):
         #     point = matrix44.apply_to_vector(rotation_matrix, point)
         #     self.prompt_points.append(point)
-        self.prompt_index = 0
-        self.ter_prompt = None
-        self.explore_angle_quaternion = Quaternion.from_z_rotation(math.pi / 3)  # 2
+
+        # self.prompt_index = 0
+        # self.ter_prompt = None
+        # self.explore_angle_quaternion = Quaternion.from_z_rotation(math.pi / 3)  # 2
 
     def activation_level(self):
         """The level of activation is 2 if the terrain has confidence and the robot is excited or low energy"""
@@ -148,20 +152,23 @@ class ProposerExplore(Proposer):
             # self.workspace.memory.egocentric_memory.prompt_point = self.workspace.memory.allocentric_to_egocentric(mip)
 
             # Go successively to the predefined prompt points relative to the terrain center
-            if self.prompt_index == 0:
-                self.ter_prompt = self.workspace.memory.phenomenon_memory.phenomena[TER].origin_direction_quaternion \
-                                  * Vector3([TERRAIN_RADIUS[self.workspace.arena_id]["radius"] * 1.1, 0, 0])
-            self.ter_prompt = quaternion.apply_to_vector(self.explore_angle_quaternion, self.ter_prompt)
-            # When the terrain has not been recognized, add the terrain radius
-            if self.workspace.memory.phenomenon_memory.terrain_confidence() < PHENOMENON_RECOGNIZED_CONFIDENCE:
-                ego_prompt = self.workspace.memory.terrain_centric_to_egocentric(self.ter_prompt +
-                             self.workspace.memory.phenomenon_memory.phenomena[TER].origin_direction_quaternion
-                             * Vector3([-TERRAIN_RADIUS[self.workspace.arena_id]["radius"], 0, 0]))
-            else:
-                ego_prompt = self.workspace.memory.terrain_centric_to_egocentric(self.ter_prompt)
+            # if self.prompt_index == 0:
+            #     self.ter_prompt = self.workspace.memory.phenomenon_memory.phenomena[TER].origin_direction_quaternion \
+            #                       * Vector3([TERRAIN_RADIUS[self.workspace.arena_id]["radius"] * 1.1, 0, 0])
+            # self.ter_prompt = quaternion.apply_to_vector(self.explore_angle_quaternion, self.ter_prompt)
+            # # When the terrain has not been recognized, add the terrain radius
+            # if self.workspace.memory.phenomenon_memory.terrain_confidence() < PHENOMENON_RECOGNIZED_CONFIDENCE:
+            #     ego_prompt = self.workspace.memory.terrain_centric_to_egocentric(self.ter_prompt +
+            #                  self.workspace.memory.phenomenon_memory.phenomena[TER].origin_direction_quaternion
+            #                  * Vector3([-TERRAIN_RADIUS[self.workspace.arena_id]["radius"], 0, 0]))
+            # else:
+            #     ego_prompt = self.workspace.memory.terrain_centric_to_egocentric(self.ter_prompt)
+
+            ego_prompt = self.workspace.memory.terrain_centric_to_egocentric(self.goal_generator.terrain_goal_point())
+
             e_memory.egocentric_memory.prompt_point = ego_prompt
             e_memory.egocentric_memory.focus_point = None  # Prevent unnatural head movement
-            self.prompt_index += 1
+            # self.prompt_index += 1
             # if self.prompt_index >= self.nb_points:
             #     self.prompt_index = 0
             e1 = Enaction(self.workspace.actions[ACTION_TURN], e_memory)

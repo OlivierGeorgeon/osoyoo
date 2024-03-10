@@ -2,7 +2,7 @@ import math
 import numpy as np
 import time
 import matplotlib.path as mpath
-from ..Decider.Action import ACTION_FORWARD, ACTION_SWIPE, ACTION_RIGHTWARD, ACTION_SCAN
+from ..Proposer.Action import ACTION_FORWARD, ACTION_SWIPE, ACTION_RIGHTWARD, ACTION_SCAN
 from ..Memory.PhenomenonMemory import PHENOMENON_RECOGNIZED_CONFIDENCE
 from ..Memory.AllocentricMemory.Hexagonal_geometry import point_to_cell
 from ..Memory.EgocentricMemory.Experience import EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_FLOOR

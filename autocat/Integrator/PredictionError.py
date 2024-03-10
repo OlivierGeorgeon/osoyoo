@@ -1,53 +1,15 @@
 import math
 import numpy as np
 import matplotlib
-import matplotlib.pyplot as plt
 import os
 from pyrr import Quaternion
-from ..Decider.Action import ACTION_FORWARD, ACTION_BACKWARD
-from ..Decider.Interaction import OUTCOME_LOST_FOCUS
+from ..Proposer.Action import ACTION_FORWARD, ACTION_BACKWARD
+from ..Proposer.Interaction import OUTCOME_LOST_FOCUS, OUTCOME_NO_FOCUS, OUTCOME_FLOOR
 from ..Utils import short_angle, point_to_head_direction_distance, assert_almost_equal_angles
-from ..Integrator.OutcomeCode import CONFIDENCE_CONFIRMED_FOCUS
 from .PlotSequence import plot
 
 PREDICTION_ERROR_WINDOW = 100
 RUNNING_AVERAGE_COEF = 0.25
-
-
-# def plot(data_dict, caption, file_name, y_label, parameters=None):
-#     """Plot the values in this dictionary"""
-#     if parameters is not None and 'bottom' in parameters and 'top' in parameters:
-#         # plt.ylim(bottom=bottom, top=top)
-#         plt.axis(ymin=parameters['bottom'], ymax=parameters['top'])
-#         point_x = [key for key, value in data_dict.items() if parameters['bottom'] < value < parameters['top']]
-#         point_y = [value for value in data_dict.values() if parameters['bottom'] < value < parameters['top']]
-#     else:
-#         point_x = list(data_dict.keys())
-#         point_y = list(data_dict.values())
-#
-#     # Create the figure
-#     plt.figure(figsize=(6, 3))
-#     # Set plot properties
-#     plt.title(caption)
-#     plt.xlabel('Clock')
-#     plt.ylabel(y_label)
-#     plt.axhline(0, color='black', linewidth=0.5)
-#     # plt.axvline(0, color='black', linewidth=0.5)
-#     plt.grid(color='gray', linestyle='--', linewidth=0.5)
-#     # plt.legend()
-#     # plt.axis('equal')  # Ensure equal scaling of axes
-#
-#
-#     # The points
-#     plt.plot(point_x, point_y, marker='o', linestyle='-', color='b', label=None)
-#
-#     # Show the plot
-#     # plt.ion()
-#     # plt.draw()
-#     # plt.show()
-#     # plt.pause(1)
-#     plt.savefig("log/" + file_name + ".pdf")
-#     plt.close()
 
 
 class PredictionError:
@@ -107,7 +69,8 @@ class PredictionError:
 
             self.value_speed_forward[enaction.clock] = self.workspace.actions[ACTION_FORWARD].translation_speed[0]
             self.x_speed[enaction.clock] = self.workspace.actions[ACTION_FORWARD].translation_speed[0]
-            if assert_almost_equal_angles(math.radians(actual_outcome.head_angle), 0, 11) and enaction.outcome_code != OUTCOME_LOST_FOCUS:
+            if assert_almost_equal_angles(math.radians(actual_outcome.head_angle), 0, 11) and \
+                    enaction.outcome_code not in [OUTCOME_LOST_FOCUS, OUTCOME_NO_FOCUS, OUTCOME_FLOOR]:
                 action_speed = self.workspace.actions[ACTION_FORWARD].translation_speed[0]
                 speed = (self.previous_echo_distance - actual_outcome.echo_distance) * 1000 / actual_outcome.duration1
                 pe = round(action_speed - speed)
@@ -127,12 +90,10 @@ class PredictionError:
                       "std:", round(float(np.std(list(self.pe_x_speed.values())))), 1)
                 self.workspace.actions[ACTION_BACKWARD].translation_speed[0] = - action_speed * (1. - RUNNING_AVERAGE_COEF) - speed * RUNNING_AVERAGE_COEF
 
-
-        # self.previous_echo_distance = actual_outcome.echo_distance
-
         # Translation Backward
 
-        if enaction.action.action_code in [ACTION_BACKWARD] and actual_outcome.duration1 != 0 and enaction.outcome_code != OUTCOME_LOST_FOCUS:
+        if enaction.action.action_code in [ACTION_BACKWARD] and actual_outcome.duration1 != 0 and \
+                enaction.outcome_code not in [OUTCOME_LOST_FOCUS, OUTCOME_NO_FOCUS, OUTCOME_FLOOR]:
             self.value_speed_backward[enaction.clock] = self.workspace.actions[ACTION_BACKWARD].translation_speed[0]
             self.x_speed[enaction.clock] = -self.workspace.actions[ACTION_BACKWARD].translation_speed[0]
             if assert_almost_equal_angles(math.radians(actual_outcome.head_angle), 0, 11):
@@ -158,7 +119,6 @@ class PredictionError:
 
         # yaw
 
-        # pe = math.degrees(-short_angle(enaction.command.intended_yaw_quaternion, enaction.yaw_quaternion))
         pe = math.degrees(-short_angle(Quaternion.from_z_rotation(math.radians(computed_outcome.yaw)),
                                        enaction.trajectory.yaw_quaternion))
         self.pe_yaw[enaction.clock] = pe
@@ -226,13 +186,13 @@ class PredictionError:
     def plot(self):
         """Show the prediction error plots"""
         # The outcome code prediction error
-        parameters = {'bottom': -1, 'top': 2, 'color': 'c'}
-        plot(self.pe_outcome_code, "Outcome code prediction error", "01_Outcome_code", "(0/1)", parameters)
+        kwargs = {'bottom': -1, 'top': 2, 'fmt': 'sc'}
+        plot(self.pe_outcome_code, "Outcome code prediction error", "01_Outcome_code", "(0/1)", **kwargs)
 
         # The yaw and compass
-        parameters = {'bottom': -20, 'top': 20, 'color': 'c'}
-        plot(self.pe_yaw, "Yaw prediction error", "02_yaw", "(degrees)", parameters)
-        plot(self.pe_compass, "Compass prediction error", "03_Compass", "(degree)", parameters)
+        kwargs = {'bottom': -20, 'top': 20, 'fmt': 'sc'}
+        plot(self.pe_yaw, "Yaw prediction error", "02_yaw", "(degrees)", **kwargs)
+        plot(self.pe_compass, "Compass prediction error", "03_Compass", "(degree)", **kwargs)
 
         # The speed as blue circles
         plot(self.x_speed, "X speed", "04_x_speed", "(mm/s)")
@@ -240,18 +200,18 @@ class PredictionError:
         # plot(self.value_speed_backward, "Backward speed value", "Backward_speed_value", "(mm/s)")
 
         # The prediction errors as red squares
-        parameters = {'bottom': -100, 'top': 100, 'color': 'r'}
-        plot(self.pe_x_speed, "X speed prediction error", "05_x_speed_pe", "(mm/s)", parameters)
-        plot(self.pe_forward_duration1, "Forward duration prediction error", "06_Forward_duration", "(s)", parameters)
+        kwargs = {'bottom': -100, 'top': 100, 'fmt': 'sr'}
+        plot(self.pe_x_speed, "X speed prediction error", "05_x_speed_pe", "(mm/s)", **kwargs)
+        plot(self.pe_forward_duration1, "Forward duration prediction error", "06_Forward_duration", "(s)", **kwargs)
         # plot(self.pe_speed_forward, "Forward speed prediction error", "Forward_speed_pe", "(mm/s)", parameters)
         # plot(self.pe_speed_backward, "Backward speed prediction error", "Backward_speed_pe", "(mm/s)", parameters)
-        plot(self.pe_echo_direction, "Head direction prediction error", "07_Head_direction", "(degree)", parameters)
-        plot(self.pe_echo_distance, "Echo distance prediction error", "08_Echo_distance", "(mm)", parameters)
+        plot(self.pe_echo_direction, "Head direction prediction error", "07_Head_direction", "(degree)", **kwargs)
+        plot(self.pe_echo_distance, "Echo distance prediction error", "08_Echo_distance", "(mm)", **kwargs)
 
         # The focus as magenta squares
-        parameters = {'bottom': -100, 'top': 100, 'color': 'm'}
-        plot(self.pe_focus_direction, "Focus direction prediction error", "09_Focus_direction", "(degree)", parameters)
-        plot(self.pe_focus_distance, "Focus distance prediction error", "10_Focus_distance", "(mm)", parameters)
+        kwargs = {'bottom': -100, 'top': 100, 'fmt': 'sm'}
+        plot(self.pe_focus_direction, "Focus direction prediction error", "09_Focus_direction", "(degree)", **kwargs)
+        plot(self.pe_focus_distance, "Focus distance prediction error", "10_Focus_distance", "(mm)", **kwargs)
 
         terrain = self.workspace.memory.phenomenon_memory.terrain()
         if terrain is not None:

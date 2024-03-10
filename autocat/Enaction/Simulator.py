@@ -3,7 +3,7 @@ import numpy as np
 from pyrr import Quaternion, Vector3, matrix44
 from ..Robot.RobotDefine import ROBOT_FLOOR_SENSOR_X
 from ..Memory.PhenomenonMemory import PHENOMENON_RECOGNIZED_CONFIDENCE
-from ..Decider.Action import ACTION_SWIPE, ACTION_FORWARD, ACTION_SCAN
+from ..Proposer.Action import ACTION_SWIPE, ACTION_FORWARD, ACTION_SCAN
 from ..Robot.Outcome import Outcome
 from ..Memory.AllocentricMemory.Hexagonal_geometry import point_to_cell
 from ..Memory.EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO

@@ -1,13 +1,13 @@
 import json
 import pyglet
-from .Decider.Proposer import Proposer
-from .Decider.ProposerExplore import ProposerExplore
-from .Decider.ProposerWatch import ProposerWatch
-from .Decider.ProposerPush import ProposerPush
-from .Decider.ProposerWatchCenter import ProposerWatchCenter
-from .Decider.ProposerArrange import ProposerArrange
-from .Decider.ProposerPlayForward import ProposerPlayForward
-from .Decider.Action import create_actions, ACTION_FORWARD, ACTIONS, ACTION_TURN, ACTION_BACKWARD
+from .Proposer.Proposer import Proposer
+from .Proposer.ProposerExplore import ProposerExplore
+from .Proposer.ProposerWatch import ProposerWatch
+from .Proposer.ProposerPush import ProposerPush
+from .Proposer.ProposerWatchCenter import ProposerWatchCenter
+from .Proposer.ProposerArrange import ProposerArrange
+from .Proposer.ProposerPlayForward import ProposerPlayForward
+from .Proposer.Action import create_actions, ACTION_FORWARD, ACTIONS, ACTION_TURN, ACTION_BACKWARD
 from .Memory.Memory import Memory
 from .Memory.PhenomenonMemory.PhenomenonTerrain import TERRAIN_INITIAL_CONFIDENCE
 from .Robot.Enaction import Enaction
@@ -39,10 +39,10 @@ class Workspace:
         self.memory = Memory(arena_id, robot_id)
         # if self.robot_id == '1':
         self.proposers = {'Circle ': Proposer(self),
-                          # 'Explore': ProposerExplore(self),
+                          'Explore': ProposerExplore(self),
                           # 'Watch C': ProposerWatchCenter(self),  'Arrange': ProposerArrange(self),
-                          # 'Watch': ProposerWatch(self), 'Push': ProposerPush(self)
-                          'Play': ProposerPlayForward(self)
+                          'Watch': ProposerWatch(self), 'Push': ProposerPush(self)
+                          # 'Play': ProposerPlayForward(self)
                           }
         # self.deciders = {'Explore': DeciderExplore(self), 'Circle': DeciderCircle(self), 'Watch': DeciderWatch(self)}
         # self.deciders = {'Circle': DeciderCircle(self), 'Explore': DeciderExplore(self)}
