@@ -16,7 +16,7 @@ class GoalGenerator:
         self.goal_point = None
 
     def terrain_goal_point(self):
-        """Return a new goal point in terrain centric coordinates"""
+        """Return a new goal point in terrain centric coordinates for touring the terrain"""
         if self.step == STEP_INIT:
             self.goal_point = self.workspace.memory.phenomenon_memory.phenomena[TER].origin_direction_quaternion * \
                               Vector3([TERRAIN_RADIUS[self.workspace.arena_id]["radius"] * 1.1, 0, 0])
@@ -31,3 +31,7 @@ class GoalGenerator:
                 origin_direction_quaternion * Vector3([-TERRAIN_RADIUS[self.workspace.arena_id]["radius"], 0, 0])
         else:
             return self.goal_point
+
+    def most_interesting_pool(self):
+        """Return point of the pool in allocentric memory that have the highest interest value"""
+        return self.workspace.memory.allocentric_memory.most_interesting_pool(self.workspace.clock)

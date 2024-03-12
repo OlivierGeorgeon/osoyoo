@@ -37,19 +37,13 @@ class Workspace:
         self.robot_id = robot_id
         self.actions = create_actions(robot_id)
         self.memory = Memory(arena_id, robot_id)
-        # if self.robot_id == '1':
         self.proposers = {'Circle ': Proposer(self),
                           'Explore': ProposerExplore(self),
+                          'Watch': ProposerWatch(self),
                           # 'Watch C': ProposerWatchCenter(self),  'Arrange': ProposerArrange(self),
-                          'Watch': ProposerWatch(self), 'Push': ProposerPush(self)
-                          # 'Play': ProposerPlayForward(self)
+                          # 'Push': ProposerPush(self)
+                          'Play': ProposerPlayForward(self)
                           }
-        # self.deciders = {'Explore': DeciderExplore(self), 'Circle': DeciderCircle(self), 'Watch': DeciderWatch(self)}
-        # self.deciders = {'Circle': DeciderCircle(self), 'Explore': DeciderExplore(self)}
-        # self.deciders = {'Push': DeciderPush(self), 'Watch': DeciderWatch(self)}
-        # else:
-        #     self.deciders = {'Explore': DeciderExplore(self), 'Circle': DeciderCircle(self)}
-        #     # self.deciders = {'Circle': DeciderCircle(self)}
         self.enacter = Enacter(self)
         self.simulator = Simulator(self)
         self.prediction_error = PredictionError(self)

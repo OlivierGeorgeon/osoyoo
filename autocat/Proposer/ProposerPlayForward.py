@@ -12,6 +12,7 @@ from ..Robot.Command import DIRECTION_BACK
 from . Proposer import Proposer
 from .. Enaction.CompositeEnaction import CompositeEnaction
 from ..Memory import EMOTION_HAPPY
+from ..Memory.BodyMemory import EXCITATION_LOW
 from . Interaction import OUTCOME_FLOOR, OUTCOME_FOCUS_TOO_FAR
 from ..Utils import assert_almost_equal_angles
 from ..Integrator.OutcomeCode import FOCUS_TOO_FAR_DISTANCE
@@ -29,11 +30,16 @@ class ProposerPlayForward(Proposer):
         self.step = STEP_INIT
 
     def activation_level(self):
-        """The level of activation of this decider: 0: default, 4 if focus inside terrain, 3 for withdrawal"""
-        if self.is_to_play():
+        """The level of activation of this decider: 0: default, 5 if excited and object to play with """
+        if self.workspace.memory.body_memory.excitation > EXCITATION_LOW and \
+                (self.is_to_play() or self.step == STEP_WITHDRAW):
             return 5
-        elif self.step == STEP_WITHDRAW:
-            return 5
+
+        # if self.is_to_play() and self.workspace.memory.body_memory.excitation > EXCITATION_LOW:
+        #     return 5
+        # elif self.step == STEP_WITHDRAW:
+        #     return 5
+
         return 0
 
     def select_enaction(self, enaction):

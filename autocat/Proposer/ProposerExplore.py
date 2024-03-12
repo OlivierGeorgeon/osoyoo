@@ -34,37 +34,30 @@ OUTCOME_COLOR = "CL"
 class ProposerExplore(Proposer):
     def __init__(self, workspace):
         super().__init__(workspace)
-
+        # The goal generator proposes successive goal points to explore the terrain
         self.goal_generator = GoalGenerator(workspace)
 
-        # point = np.array([-2000, 2000, 0])  # Begin with North West
-        # point = np.array([-920, 770, 0])  # Begin with North West
-        # self.prompt_points = [point]
-        # # Visit 6 points from North West to south East every pi/6
-        # self.nb_points = 6
-        # rotation_matrix = matrix44.create_from_z_rotation(-math.pi/6)
-        # for i in range(1, self.nb_points):
-        #     point = matrix44.apply_to_vector(rotation_matrix, point)
-        #     self.prompt_points.append(point)
-
-        # self.prompt_index = 0
-        # self.ter_prompt = None
-        # self.explore_angle_quaternion = Quaternion.from_z_rotation(math.pi / 3)  # 2
-
     def activation_level(self):
-        """The level of activation is 2 if the terrain has confidence and the robot is excited or low energy"""
-        # High energy then must circle, explore, watch or arrange
-        if self.workspace.memory.body_memory.energy >= ENERGY_TIRED:
-            # High excitation then must circle or explore
-            if self.workspace.memory.body_memory.excitation > EXCITATION_LOW:
-                # Focus inside terrain or not too far: HAPPY DeciderCircle
-                if self.workspace.memory.egocentric_memory.focus_point is None or \
-                        np.linalg.norm(self.workspace.memory.egocentric_memory.focus_point) > FOCUS_TOO_FAR_DISTANCE or \
-                        self.workspace.memory.is_outside_terrain(self.workspace.memory.egocentric_memory.focus_point):
-                    return 3
-        # Tired: must go home
-        else:
+        """The level of activation is 3 if the terrain has confidence and the robot is excited or low energy"""
+
+        if self.workspace.memory.phenomenon_memory.terrain_confidence() >= TERRAIN_ORIGIN_CONFIDENCE and  \
+            (self.workspace.memory.body_memory.energy < ENERGY_TIRED or
+             self.workspace.memory.body_memory.excitation > EXCITATION_LOW):
             return 3
+
+        # # High energy then must circle, explore, watch or arrange
+        # if self.workspace.memory.body_memory.energy >= ENERGY_TIRED:
+        #     # High excitation then must circle or explore
+        #     if self.workspace.memory.body_memory.excitation > EXCITATION_LOW:
+        #         # Focus inside terrain or not too far: HAPPY DeciderCircle
+        #         if self.workspace.memory.egocentric_memory.focus_point is None or \
+        #                 np.linalg.norm(self.workspace.memory.egocentric_memory.focus_point) > FOCUS_TOO_FAR_DISTANCE or \
+        #                 self.workspace.memory.is_outside_terrain(self.workspace.memory.egocentric_memory.focus_point):
+        #             return 3
+        # # Tired: must go home
+        # else:
+        #     return 3
+
         return 0
 
     def outcome(self, enaction):
@@ -168,9 +161,6 @@ class ProposerExplore(Proposer):
 
             e_memory.egocentric_memory.prompt_point = ego_prompt
             e_memory.egocentric_memory.focus_point = None  # Prevent unnatural head movement
-            # self.prompt_index += 1
-            # if self.prompt_index >= self.nb_points:
-            #     self.prompt_index = 0
             e1 = Enaction(self.workspace.actions[ACTION_TURN], e_memory)
             e2 = Enaction(self.workspace.actions[ACTION_FORWARD], e1.predicted_memory.save())
 

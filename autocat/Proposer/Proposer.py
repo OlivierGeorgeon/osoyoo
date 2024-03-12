@@ -30,7 +30,7 @@ class Proposer:
 
     def activation_level(self):
         """Return the activation level of this decider:
-         1: default; 2: terrain unconfident or high energy and exitation and object to circle round"""
+         1: default; 2: terrain unconfident or high energy and excitation and object to circle round"""
 
         if self.workspace.memory.phenomenon_memory.terrain_confidence() < TERRAIN_ORIGIN_CONFIDENCE or \
                 (self.workspace.memory.body_memory.energy >= ENERGY_TIRED and
