@@ -7,6 +7,7 @@ from .Proposer.ProposerPush import ProposerPush
 from .Proposer.ProposerWatchCenter import ProposerWatchCenter
 from .Proposer.ProposerArrange import ProposerArrange
 from .Proposer.ProposerPlayForward import ProposerPlayForward
+from .Proposer.ProposerPlaySwipe import ProposerPlaySwipe
 from .Proposer.Action import create_actions, ACTION_FORWARD, ACTIONS, ACTION_TURN, ACTION_BACKWARD
 from .Memory.Memory import Memory
 from .Memory.PhenomenonMemory.PhenomenonTerrain import TERRAIN_INITIAL_CONFIDENCE
@@ -42,7 +43,7 @@ class Workspace:
                           'Watch': ProposerWatch(self),
                           # 'Watch C': ProposerWatchCenter(self),  'Arrange': ProposerArrange(self),
                           # 'Push': ProposerPush(self)
-                          'Play': ProposerPlayForward(self)
+                          'Play': ProposerPlaySwipe(self)
                           }
         self.enacter = Enacter(self)
         self.simulator = Simulator(self)

@@ -4,10 +4,11 @@ import matplotlib.pyplot as plt
 
 def plot(data_dict, caption, file_name, y_label, **kwargs):
     """Plot the values in this dictionary"""
-    # See plot parameters
+    # See plot parameters at
     # https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.plot.html
-    # Default blue circles with lines
+    # Default blue circles size 12 with lines
     fmt = kwargs.get('fmt', 'o-b')
+    marker_size = kwargs.get('marker_size', 12)
 
     # Filter out the points out of range y
     if 'bottom' in kwargs and 'top' in kwargs:
@@ -31,7 +32,7 @@ def plot(data_dict, caption, file_name, y_label, **kwargs):
     # plt.axis('equal')  # Ensure equal scaling of axes
 
     # The points
-    plt.plot(point_x, point_y, fmt)  # marker=marker, linestyle=line_style, color=color, label=None)
+    plt.plot(point_x, point_y, fmt, markersize=marker_size)  # marker=marker, linestyle=line_style, color=color, label=None)
 
     # Plot invisible points to scale the y axis
     if 'bottom' in kwargs and 'top' in kwargs:
@@ -52,5 +53,5 @@ if __name__ == "__main__":
     test_dict = {0: 10, 1: 20, 2: 20, 3: 200, 4: 0, 5: -10, 6: -20, 7: 0, 8: -50, 9: -50, 10: -40}
     matplotlib.use('agg')
     plot(test_dict, "Title", "00_test_file", "(unit)")
-    parameters = {'bottom': -100, 'top': 100, 'fmt': 'sr'}
+    parameters = {'bottom': -100, 'top': 100, 'fmt': 'sr', 'marker_size': 5}
     plot(test_dict, "Title", "01_test_file", "(unit)", **parameters)

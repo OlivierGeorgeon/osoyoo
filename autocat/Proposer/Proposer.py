@@ -5,11 +5,10 @@
 ########################################################################################
 
 import numpy as np
-from . Action import ACTION_SCAN
+from . Action import ACTION_SCAN, ACTION_TURN, ACTION_SWIPE
 from . PredefinedInteractions import create_or_retrieve_primitive, create_primitive_interactions, \
     create_composite_interactions, create_or_reinforce_composite
-from . Interaction import OUTCOME_FOCUS_TOO_FAR
-from . Action import ACTION_TURN
+from . Interaction import OUTCOME_FOCUS_TOO_FAR, OUTCOME_LOST_FOCUS
 from ..Robot.Enaction import Enaction
 from ..Memory import EMOTION_HAPPY
 from ..Memory.PhenomenonMemory.PhenomenonTerrain import TERRAIN_ORIGIN_CONFIDENCE
@@ -27,6 +26,9 @@ class Proposer:
         # Load the predefined behavior
         self.primitive_interactions = create_primitive_interactions(self.workspace.actions)
         self.composite_interactions = create_composite_interactions(self.workspace.actions, self.primitive_interactions)
+
+        # The direction of translation
+        self.direction = 1
 
     def activation_level(self):
         """Return the activation level of this decider:
@@ -54,6 +56,7 @@ class Proposer:
         action = self.select_action(enaction)
         e_memory = self.workspace.memory.save()
         e_memory.emotion_code = EMOTION_HAPPY
+        span = 40
 
         # Set the spatial modifiers
         if action.action_code in [ACTION_TURN]:
@@ -63,11 +66,17 @@ class Proposer:
                 e_memory.egocentric_memory.prompt_point = np.array([-100, 0, 0], dtype=int)
             else:
                 e_memory.egocentric_memory.prompt_point = self.workspace.memory.egocentric_memory.focus_point.copy()
+        elif action.action_code in [ACTION_SWIPE]:
+            # Swipe in the predefined direction
+            e_memory.egocentric_memory.prompt_point = self.direction * action.translation_speed
+        # If lost focus then scan carefully
+        elif action.action_code in [ACTION_SCAN] and enaction.outcome_code == OUTCOME_LOST_FOCUS:
+            span = 10
         else:
             e_memory.egocentric_memory.prompt_point = None
 
         # Add the enaction to the stack
-        return Enaction(action, e_memory)
+        return Enaction(action, e_memory, span=span)
 
     def select_action(self, enaction):
         """The sequence learning mechanism that proposes the next action"""

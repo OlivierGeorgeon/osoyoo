@@ -8,14 +8,11 @@ import numpy as np
 from pyrr import vector, Vector3
 from . Action import ACTION_TURN, ACTION_FORWARD, ACTION_BACKWARD, ACTION_SWIPE, ACTION_SCAN
 from ..Robot.Enaction import Enaction
-from ..Robot.Command import DIRECTION_BACK
 from . Proposer import Proposer
-from .. Enaction.CompositeEnaction import CompositeEnaction
 from ..Memory import EMOTION_HAPPY
 from ..Memory.BodyMemory import EXCITATION_LOW
 from . Interaction import OUTCOME_FLOOR, OUTCOME_FOCUS_TOO_FAR
 from ..Utils import assert_almost_equal_angles
-from ..Integrator.OutcomeCode import FOCUS_TOO_FAR_DISTANCE
 
 STEP_INIT = 0
 STEP_WITHDRAW = 1
@@ -34,11 +31,6 @@ class ProposerPlayForward(Proposer):
         if self.workspace.memory.body_memory.excitation > EXCITATION_LOW and \
                 (self.is_to_play() or self.step == STEP_WITHDRAW):
             return 5
-
-        # if self.is_to_play() and self.workspace.memory.body_memory.excitation > EXCITATION_LOW:
-        #     return 5
-        # elif self.step == STEP_WITHDRAW:
-        #     return 5
 
         return 0
 

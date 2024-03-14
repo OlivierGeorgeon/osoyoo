@@ -1,6 +1,6 @@
 ########################################################################################
 # This decider makes the robot explore the parts of the terrain that are not yet known
-# Activation 0: default. 2: the terrain has an absolute reference
+# Activation 0: default. 3: the terrain has an absolute reference
 ########################################################################################
 
 import math
@@ -141,22 +141,6 @@ class ProposerExplore(Proposer):
 
         # If not time to go home, go to the most interesting pool point
         else:
-            # mip = self.workspace.memory.allocentric_memory.most_interesting_pool(self.workspace.clock)
-            # self.workspace.memory.egocentric_memory.prompt_point = self.workspace.memory.allocentric_to_egocentric(mip)
-
-            # Go successively to the predefined prompt points relative to the terrain center
-            # if self.prompt_index == 0:
-            #     self.ter_prompt = self.workspace.memory.phenomenon_memory.phenomena[TER].origin_direction_quaternion \
-            #                       * Vector3([TERRAIN_RADIUS[self.workspace.arena_id]["radius"] * 1.1, 0, 0])
-            # self.ter_prompt = quaternion.apply_to_vector(self.explore_angle_quaternion, self.ter_prompt)
-            # # When the terrain has not been recognized, add the terrain radius
-            # if self.workspace.memory.phenomenon_memory.terrain_confidence() < PHENOMENON_RECOGNIZED_CONFIDENCE:
-            #     ego_prompt = self.workspace.memory.terrain_centric_to_egocentric(self.ter_prompt +
-            #                  self.workspace.memory.phenomenon_memory.phenomena[TER].origin_direction_quaternion
-            #                  * Vector3([-TERRAIN_RADIUS[self.workspace.arena_id]["radius"], 0, 0]))
-            # else:
-            #     ego_prompt = self.workspace.memory.terrain_centric_to_egocentric(self.ter_prompt)
-
             ego_prompt = self.workspace.memory.terrain_centric_to_egocentric(self.goal_generator.terrain_goal_point())
 
             e_memory.egocentric_memory.prompt_point = ego_prompt

@@ -32,6 +32,18 @@ class GoalGenerator:
         else:
             return self.goal_point
 
+    def object_goal_point(self):
+        """Return a new goal in polar object centric coordinates"""
+        if self.step == STEP_INIT:
+            # Initial goal: North of object
+            self.goal_point = Vector3([0, 300, 0])
+            self.step = STEP_EXPLORE
+        else:
+            # The next goal point is rotated
+            self.goal_point = quaternion.apply_to_vector(self.explore_angle_quaternion, self.goal_point)
+
+        return self.goal_point
+
     def most_interesting_pool(self):
         """Return point of the pool in allocentric memory that have the highest interest value"""
         return self.workspace.memory.allocentric_memory.most_interesting_pool(self.workspace.clock)
