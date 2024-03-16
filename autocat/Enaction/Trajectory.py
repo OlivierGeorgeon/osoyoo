@@ -69,6 +69,9 @@ class Trajectory:
         # If the robot returns no compass then the body_quaternion is estimated from yaw
         if outcome.compass_point is None:
             self.body_quaternion = body_quaternion_integrated
+            # Create the compass point to generate the experience and display in BodyView
+            outcome.compass_point = self.body_quaternion.inverse * Vector3([0, -330, 0])
+            self.compass_quaternion = self.body_quaternion.copy()
         else:
             # If the robot returns compass
             # Compute the compass_quaternion. Subtract the offset from robot_define.py

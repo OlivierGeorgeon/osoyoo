@@ -7,6 +7,7 @@ from .Proposer.ProposerPush import ProposerPush
 from .Proposer.ProposerWatchCenter import ProposerWatchCenter
 from .Proposer.ProposerArrange import ProposerArrange
 from .Proposer.ProposerPlayForward import ProposerPlayForward
+from .Proposer.ProposerPlayTurn import ProposerPlayTurn
 from .Proposer.ProposerPlaySwipe import ProposerPlaySwipe
 from .Proposer.Action import create_actions, ACTION_FORWARD, ACTIONS, ACTION_TURN, ACTION_BACKWARD
 from .Memory.Memory import Memory
@@ -43,7 +44,8 @@ class Workspace:
                           'Watch': ProposerWatch(self),
                           # 'Watch C': ProposerWatchCenter(self),  'Arrange': ProposerArrange(self),
                           # 'Push': ProposerPush(self)
-                          'Play': ProposerPlaySwipe(self)
+                          # 'Play': ProposerPlaySwipe(self)
+                          'Play': ProposerPlayTurn(self)
                           }
         self.enacter = Enacter(self)
         self.simulator = Simulator(self)

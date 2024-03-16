@@ -1,5 +1,5 @@
 ########################################################################################
-# This proposer makes the robot play by going to an object and back
+# This proposer makes the robot play by swiping to an object and back
 # Activation 5: Makes the robot HAPPY
 ########################################################################################
 

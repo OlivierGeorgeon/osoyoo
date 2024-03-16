@@ -5,7 +5,7 @@ import os
 from pyrr import Quaternion
 from ..Proposer.Action import ACTION_FORWARD, ACTION_BACKWARD, ACTION_SWIPE
 from ..Proposer.Interaction import OUTCOME_LOST_FOCUS, OUTCOME_NO_FOCUS, OUTCOME_FLOOR
-from ..Utils import short_angle, point_to_head_direction_distance, assert_almost_equal_angles
+from ..Utils import short_angle, point_to_head_direction_distance
 from .PlotSequence import plot
 
 PREDICTION_ERROR_WINDOW = 100
@@ -73,7 +73,6 @@ class PredictionError:
 
             self.value_speed_forward[enaction.clock] = self.workspace.actions[ACTION_FORWARD].translation_speed[0]
             self.x_speed[enaction.clock] = self.workspace.actions[ACTION_FORWARD].translation_speed[0]
-            # if assert_almost_equal_angles(math.radians(actual_outcome.head_angle), 0, 11) and \
             if abs(actual_outcome.head_angle) < 11 and \
                     enaction.outcome_code not in [OUTCOME_LOST_FOCUS, OUTCOME_NO_FOCUS, OUTCOME_FLOOR]:
                 action_speed = self.workspace.actions[ACTION_FORWARD].translation_speed[0]
@@ -154,7 +153,7 @@ class PredictionError:
         else:
             self.previous_echo_point = None
 
-            # yaw
+        # yaw
 
         pe = math.degrees(-short_angle(Quaternion.from_z_rotation(math.radians(computed_outcome.yaw)),
                                        enaction.trajectory.yaw_quaternion))

@@ -32,8 +32,8 @@ def quaternion_to_direction_rad(quaternion):
     # The Z component of the rotation axis gives the sign of the angle if is not NaN
     angle = quaternion.angle
     if np.isnan(angle):
-        print("Angle is NaN for quaternion", repr(quaternion))
-        # It printed Quaternion([0., 0., 0., 1.]) but I can't reproduce how its ".angle" is NaN
+        # print("Angle is NaN for", repr(quaternion))
+        # It prints "Quaternion([0., 0., 0., 1.])" but I can't reproduce how its ".angle" is NaN
         angle = 0
     else:
         if angle > math.pi:  # The short angle
