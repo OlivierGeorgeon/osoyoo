@@ -7,7 +7,7 @@ from ...Robot.CtrlRobot import ENACTION_STEP_REFRESHING
 # import circle_fit as cf
 from ...Workspace import KEY_DECREASE, KEY_INCREASE
 from ...Utils import quaternion_to_azimuth, quaternion_translation_to_matrix, translation_quaternion_to_matrix
-from ...Integrator.Calibrate import compass_calibration
+from ...Integrator.Calibrator import compass_calibration
 from ...Memory.EgocentricMemory.Experience import EXPERIENCE_COMPASS, EXPERIENCE_AZIMUTH
 
 KEY_OFFSET = 'O'

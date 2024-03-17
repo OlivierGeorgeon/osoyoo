@@ -130,9 +130,9 @@ class PredictionError:
             pe = (computed_outcome.duration1 - actual_outcome.duration1) / 1000  # / actual_outcome.duration1
             self.pe_lateral_duration1[enaction.clock] = pe
             self.pe_lateral_duration1.pop(actual_outcome.clock - PREDICTION_ERROR_WINDOW, None)
-            print("Prediction Error Lateral duration1 (simulation - measured)=", round(pe),
+            print("Prediction Error Swipe duration1 (simulation - measured)=", round(pe, 3),
                   "Average:", round(float(np.mean(list(self.pe_lateral_duration1.values()))), 2),
-                  "std:", round(float(np.std(list(self.pe_lateral_duration1.values())))), 2)
+                  "std:", round(float(np.std(list(self.pe_lateral_duration1.values()))), 2))
 
             # If focus and head toward object  TODO test that
             if enaction.outcome_code not in [OUTCOME_LOST_FOCUS, OUTCOME_NO_FOCUS, OUTCOME_FLOOR] and \
@@ -225,10 +225,13 @@ class PredictionError:
         kwargs = {'bottom': -1, 'top': 2, 'fmt': 'sc', 'marker_size': 5}
         plot(self.pe_outcome_code, "Outcome code prediction error", "01_Outcome_code", "(0/1)", **kwargs)
 
-        # The yaw and compass
-        kwargs = {'bottom': -20, 'top': 20, 'fmt': 'sc', 'marker_size': 5}
+        # The yaw prediction error
+        kwargs = {'bottom': -40, 'top': 40, 'fmt': 'sc', 'marker_size': 5}
         plot(self.pe_yaw, "Yaw prediction error", "02_yaw", "(degrees)", **kwargs)
-        plot(self.pe_compass, "Compass prediction error", "03_Compass", "(degree)", **kwargs)
+
+        # The compass residual error
+        kwargs = {'bottom': -20, 'top': 20, 'fmt': 'sy', 'marker_size': 5}
+        plot(self.pe_compass, "Compass residual error", "03_Compass", "(degree)", **kwargs)
 
         # The speed as blue circles
         plot(self.x_speed, "X speed", "04_x_speed", "(mm/s)")
@@ -236,12 +239,15 @@ class PredictionError:
         # plot(self.value_speed_forward, "Forward speed value", "Forward_speed_value", "(mm/s)")
         # plot(self.value_speed_backward, "Backward speed value", "Backward_speed_value", "(mm/s)")
 
+        # The translation duration prediction errors in seconds as red squares
+        kwargs = {'bottom': -2, 'top': 2, 'fmt': 'sr', 'marker_size': 5}
+        plot(self.pe_forward_duration1, "Forward duration prediction error", "06_Forward_duration", "(s)", **kwargs)
+        plot(self.pe_lateral_duration1, "Swipe duration prediction error", "14_Swipe_duration", "(s)", **kwargs)
+
         # The prediction errors as red squares
         kwargs = {'bottom': -100, 'top': 100, 'fmt': 'sr', 'marker_size': 5}
         plot(self.pe_x_speed, "X speed prediction error", "05_x_speed_pe", "(mm/s)", **kwargs)
         plot(self.pe_y_speed, "Y speed prediction error", "13_y_speed_pe", "(mm/s)", **kwargs)
-        plot(self.pe_forward_duration1, "Forward duration prediction error", "06_Forward_duration", "(s)", **kwargs)
-        plot(self.pe_lateral_duration1, "Swipe duration prediction error", "14_Swipe_duration", "(s)", **kwargs)
         # plot(self.pe_speed_forward, "Forward speed prediction error", "Forward_speed_pe", "(mm/s)", parameters)
         # plot(self.pe_speed_backward, "Backward speed prediction error", "Backward_speed_pe", "(mm/s)", parameters)
         plot(self.pe_echo_direction, "Head direction prediction error", "07_Head_direction", "(degree)", **kwargs)

@@ -14,7 +14,7 @@ from ..Memory import EMOTION_HAPPY
 from ..Memory.BodyMemory import EXCITATION_LOW
 from ..Memory.EgocentricMemory.Experience import EXPERIENCE_AZIMUTH, EXPERIENCE_COMPASS
 from . Interaction import OUTCOME_FLOOR, OUTCOME_FOCUS_TOO_FAR
-from ..Integrator.Calibrate import compass_calibration
+from ..Integrator.Calibrator import compass_calibration
 
 STEP_INIT = 0
 STEP_CALIBRATE = 1

@@ -11,7 +11,7 @@ from .Proposer.ProposerPlayTurn import ProposerPlayTurn
 from .Proposer.ProposerPlaySwipe import ProposerPlaySwipe
 from .Proposer.Action import create_actions, ACTION_FORWARD, ACTIONS, ACTION_TURN, ACTION_BACKWARD
 from .Memory.Memory import Memory
-from .Memory.PhenomenonMemory.PhenomenonTerrain import TERRAIN_INITIAL_CONFIDENCE
+from .Memory.PhenomenonMemory import TERRAIN_INITIAL_CONFIDENCE
 from .Robot.Enaction import Enaction
 from .Robot.Command import DIRECTION_BACK
 from .Robot.Message import Message
@@ -20,6 +20,7 @@ from .Enaction.Simulator import Simulator
 from .Robot.CtrlRobot import ENACTION_STEP_IDLE, ENACTION_STEP_REFRESHING
 from .Enaction.CompositeEnaction import CompositeEnaction
 from .Integrator.PredictionError import PredictionError
+from .Integrator.Calibrator import Calibrator
 
 KEY_CONTROL_DECIDER = "A"  # Automatic mode: controlled by the deciders
 KEY_CONTROL_USER = "M"  # Manual mode : controlled by the user
@@ -39,17 +40,18 @@ class Workspace:
         self.robot_id = robot_id
         self.actions = create_actions(robot_id)
         self.memory = Memory(arena_id, robot_id)
-        self.proposers = {'Circle ': Proposer(self),
-                          'Explore': ProposerExplore(self),
-                          'Watch': ProposerWatch(self),
-                          # 'Watch C': ProposerWatchCenter(self),  'Arrange': ProposerArrange(self),
-                          # 'Push': ProposerPush(self)
-                          # 'Play': ProposerPlaySwipe(self)
-                          'Play': ProposerPlayTurn(self)
+        self.proposers = {'Circle ': Proposer(self)
+                          # , 'Explore': ProposerExplore(self)
+                          # , 'Watch': ProposerWatch(self)
+                          # , 'Watch C': ProposerWatchCenter(self),  'Arrange': ProposerArrange(self)
+                          # , 'Push': ProposerPush(self)
+                          # , 'Play': ProposerPlaySwipe(self)
+                          # , 'Play': ProposerPlayTurn(self)
                           }
         self.enacter = Enacter(self)
         self.simulator = Simulator(self)
         self.prediction_error = PredictionError(self)
+        self.calibrator = Calibrator(self)
 
         self.composite_enaction = None  # The composite enaction to enact
         self.enaction = None  # The primitive enaction to enact

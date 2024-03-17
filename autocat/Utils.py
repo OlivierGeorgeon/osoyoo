@@ -1,6 +1,6 @@
 import math
 import numpy as np
-from pyrr import Quaternion, line, Matrix44, Vector3, matrix44
+from pyrr import Quaternion, line, Matrix44, Vector3, matrix44, matrix33
 
 from autocat.Robot.RobotDefine import ROBOT_HEAD_X
 
@@ -82,7 +82,7 @@ def assert_almost_equal_angles(angle1, angle2, difference_degrees):
     return abs(short_angle(quaternion1, quaternion2)) < math.radians(difference_degrees)
 
 
-def echo_matrix(head_direction, echo_distance):
+def head_direction_distance_to_matrix(head_direction, echo_distance):
     """Return the matrix representing the pose of the echo from direction in degrees and distance"""
     head_quaternion = Quaternion.from_z_rotation(math.radians(head_direction))
     echo_from_head_matrix = translation_quaternion_to_matrix([echo_distance, 0, 0], head_quaternion)
@@ -91,7 +91,14 @@ def echo_matrix(head_direction, echo_distance):
 
 def head_direction_distance_to_point(head_direction, echo_distance):
     """Return the egocentric echo point from the head direction and echo distance"""
-    return matrix44.apply_to_vector(echo_matrix(head_direction, echo_distance), np.array([0, 0, 0])).astype(int)
+    return matrix44.apply_to_vector(head_direction_distance_to_matrix(head_direction, echo_distance),
+                                    np.array([0, 0, 0])).astype(int)
+
+
+def matrix_to_rotation_matrix(matrix):
+    """Return a Matrix44 that contains only the rotation of the argument matrix"""
+    # Convert to matrix33 and then back to matrix44 to remove the translation part
+    return matrix44.create_from_matrix33(matrix33.create_from_matrix44(matrix))
 
 
 def point_to_head_direction_distance(point):

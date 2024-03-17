@@ -15,8 +15,7 @@ from ..Utils import line_intersection
 from ..Enaction.CompositeEnaction import CompositeEnaction
 from ..Memory import EMOTION_ANGRY
 from . Interaction import OUTCOME_FLOOR, OUTCOME_LOST_FOCUS, OUTCOME_TOUCH, OUTCOME_NO_FOCUS
-from ..Memory.PhenomenonMemory.PhenomenonTerrain import TERRAIN_INITIAL_CONFIDENCE
-from ..Memory.PhenomenonMemory import ARRANGE_OBJECT_RADIUS
+from ..Memory.PhenomenonMemory import ARRANGE_OBJECT_RADIUS, TERRAIN_INITIAL_CONFIDENCE
 
 ARRANGE_MIN_RADIUS = 100
 ARRANGE_MAX_RADIUS = 400

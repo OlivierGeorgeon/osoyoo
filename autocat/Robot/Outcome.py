@@ -3,7 +3,7 @@ import numpy as np
 import colorsys
 from pyrr import matrix44
 from ..Memory.EgocentricMemory.Experience import FLOOR_COLORS
-from ..Utils import echo_matrix
+from ..Utils import head_direction_distance_to_matrix
 
 
 def category_color(color_sensor):
@@ -146,7 +146,8 @@ class Outcome:
         self.echo_point = None
         self.echo_matrix = None
         if self.echo_distance < 10000:
-            self.echo_matrix = echo_matrix(outcome_dict['head_angle'], outcome_dict['echo_distance'])
+            self.echo_matrix = head_direction_distance_to_matrix(outcome_dict['head_angle'],
+                                                                 outcome_dict['echo_distance'])
             self.echo_point = matrix44.apply_to_vector(self.echo_matrix, [0, 0, 0])
 
         # Outcome echo array for SCAN interactions

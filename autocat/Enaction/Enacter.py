@@ -1,6 +1,6 @@
 from ..Robot.CtrlRobot import ENACTION_STEP_IDLE, ENACTION_STEP_COMMANDING, ENACTION_STEP_ENACTING, \
     ENACTION_STEP_INTEGRATING, ENACTION_STEP_REFRESHING
-from ..Memory.PhenomenonMemory.PhenomenonMemory import TERRAIN_ORIGIN_CONFIDENCE
+from ..Memory.PhenomenonMemory import TERRAIN_ORIGIN_CONFIDENCE
 from ..Integrator.OutcomeCode import outcome_code
 
 
@@ -66,6 +66,8 @@ class Enacter:
                                                    self.workspace.enaction.trajectory, self.workspace.enaction.outcome)
             # Track the prediction errors
             self.workspace.prediction_error.log(self.workspace.enaction)
+            # Calibrate what can be improved
+            self.workspace.calibrator.calibrate()
             # Increment the clock if the enacted interaction was properly received
             if self.workspace.enaction.clock >= self.workspace.memory.clock:  # don't increment if the robot is behind
                 self.workspace.memory.clock += 1

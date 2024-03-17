@@ -1,7 +1,7 @@
 import numpy as np
 from pyrr import Vector3
-from . import PHENOMENON_RECOGNIZE_CONFIDENCE
-from .Phenomenon import Phenomenon, PHENOMENON_DELTA, PHENOMENON_CONFIDENCE_PRUNE
+from . import PHENOMENON_RECOGNIZE_CONFIDENCE, PHENOMENON_CONFIDENCE_PRUNE
+from .Phenomenon import Phenomenon, PHENOMENON_DELTA
 from autocat.Memory.EgocentricMemory.Experience import EXPERIENCE_CENTRAL_ECHO, EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_BLOCK, \
     EXPERIENCE_IMPACT, EXPERIENCE_FLOOR
 

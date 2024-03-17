@@ -10,8 +10,7 @@ from ..EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_PLACE, EX
 from ..AllocentricMemory.GridCell import CELL_NO_ECHO
 from ...Robot.RobotDefine import ROBOT_CHASSIS_X, ROBOT_OUTSIDE_Y, CHECK_OUTSIDE
 from ...Memory.PhenomenonMemory.PhenomenonMemory import TER, ROBOT1
-from ...Memory.PhenomenonMemory.PhenomenonTerrain import TERRAIN_ORIGIN_CONFIDENCE
-from ..PhenomenonMemory import PHENOMENON_RECOGNIZE_CONFIDENCE
+from ..PhenomenonMemory import PHENOMENON_RECOGNIZE_CONFIDENCE, TERRAIN_ORIGIN_CONFIDENCE
 
 
 class AllocentricMemory:

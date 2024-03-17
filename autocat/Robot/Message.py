@@ -2,7 +2,7 @@ import json
 import math
 from pyrr import Vector3, Quaternion
 from .. Robot.RobotDefine import ROBOT_FLOOR_SENSOR_X
-from ..Memory.PhenomenonMemory.PhenomenonTerrain import TERRAIN_INITIAL_CONFIDENCE
+from ..Memory.PhenomenonMemory import TERRAIN_INITIAL_CONFIDENCE
 from ..Utils import azimuth_to_quaternion
 from ..Utils import quaternion_translation_to_matrix
 

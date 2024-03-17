@@ -5,7 +5,7 @@ from .EgocentricMemory.EgocentricMemory import EgocentricMemory
 from .AllocentricMemory.AllocentricMemory import AllocentricMemory
 from .BodyMemory import BodyMemory
 from .PhenomenonMemory.PhenomenonMemory import PhenomenonMemory
-from .PhenomenonMemory.PhenomenonTerrain import TERRAIN_ORIGIN_CONFIDENCE
+from .PhenomenonMemory import TERRAIN_ORIGIN_CONFIDENCE
 from .AllocentricMemory.Hexagonal_geometry import CELL_RADIUS
 from ..Integrator.Integrator import integrate
 from ..Enaction.Predict import push_objects

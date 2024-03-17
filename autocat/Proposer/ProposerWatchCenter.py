@@ -11,7 +11,7 @@ from ..Memory import EMOTION_SAD, EMOTION_UPSET
 from ..Enaction.CompositeEnaction import CompositeEnaction
 from . Proposer import Proposer
 from ..Memory.BodyMemory import ENERGY_TIRED, EXCITATION_LOW
-from ..Memory.PhenomenonMemory.PhenomenonTerrain import TERRAIN_ORIGIN_CONFIDENCE
+from ..Memory.PhenomenonMemory import TERRAIN_ORIGIN_CONFIDENCE
 
 
 class ProposerWatchCenter(Proposer):

@@ -14,8 +14,7 @@ from ..Robot.Enaction import Enaction
 from ..Robot.RobotDefine import TERRAIN_RADIUS
 from ..Memory.BodyMemory import ENERGY_TIRED, EXCITATION_LOW
 from ..Memory.PhenomenonMemory.PhenomenonMemory import TER
-from ..Memory.PhenomenonMemory.PhenomenonTerrain import TERRAIN_ORIGIN_CONFIDENCE
-from ..Memory.PhenomenonMemory import PHENOMENON_RECOGNIZED_CONFIDENCE
+from ..Memory.PhenomenonMemory import PHENOMENON_RECOGNIZED_CONFIDENCE, TERRAIN_ORIGIN_CONFIDENCE
 from ..Memory import EMOTION_RELAXED
 from ..Enaction.CompositeEnaction import CompositeEnaction
 from ..Integrator.OutcomeCode import FOCUS_TOO_FAR_DISTANCE

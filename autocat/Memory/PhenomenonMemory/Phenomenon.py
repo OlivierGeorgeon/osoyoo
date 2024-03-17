@@ -4,11 +4,10 @@ import numpy as np
 from pyrr import Quaternion
 from scipy.spatial import ConvexHull, QhullError
 from scipy.interpolate import splprep, splev
-from . import PHENOMENON_RECOGNIZE_CONFIDENCE, PHENOMENON_RECOGNIZED_CONFIDENCE
+from . import PHENOMENON_INITIAL_CONFIDENCE, PHENOMENON_CLOSED_CONFIDENCE, PHENOMENON_RECOGNIZE_CONFIDENCE, \
+    PHENOMENON_RECOGNIZED_CONFIDENCE
 
 PHENOMENON_DELTA = 300  # (mm) Distance between affordances to be considered the same phenomenon
-PHENOMENON_INITIAL_CONFIDENCE = 0  # 0.2 Initial confidence in the phenomenon
-PHENOMENON_CONFIDENCE_PRUNE = 30  # Confidence threshold above which prune
 
 
 class Phenomenon:
@@ -58,6 +57,21 @@ class Phenomenon:
         else:
             return None
 
+    def try_to_close(self):
+        """If the area is large enough, increase confidence and interpolate the closed shape"""
+        if self.confidence < PHENOMENON_CLOSED_CONFIDENCE:
+            vertices = [a.point[0:2] for a in self.affordances.values() if a.type in self.interpolation_types]
+            if len(vertices) > 2:
+                vertices.append(vertices[0])
+                vertices = np.array(vertices)
+                # Compute the area with the Shoelace formula. TODO : sort the vertices or find a better criteria
+                area = 0.5 * np.abs(np.dot(vertices[:-1, 0], np.roll(vertices[:-1, 1], 1)) -
+                                    np.dot(vertices[:-1, 1], np.roll(vertices[:-1, 0], 1)))
+                print("area", area)
+                if area > 700000:
+                    self.confidence = PHENOMENON_CLOSED_CONFIDENCE
+                    self.interpolate()
+
     def recognize(self, category):
         """Update the category, confidence, shape, and path of this phenomenon"""
         # if self.category is None:
@@ -104,8 +118,8 @@ class Phenomenon:
                 # angles = np.arctan2(points[:, 1], points[:, 0])
                 sorted_points = points[np.argsort(angles)]
 
-                # Close the loop
-                sorted_points = np.append(sorted_points, [sorted_points[0]], axis=0)
+                # Close the loop (not necessary)
+                # sorted_points = np.append(sorted_points, [sorted_points[0]], axis=0)
                 # print(repr(sorted_points))
                 # Generate the B-spline representation
                 tck_u = splprep(sorted_points.T, s=s, per=1)  # s=5000, per=True)  # s=0.2
@@ -130,14 +144,16 @@ class Phenomenon:
     def outline(self):
         """Return the terrain outline 2D points as list of integers"""
         # Convert into flat list of 2D points [x0, y0, x1, y1, ...,x100, y100]
+        if self.confidence < PHENOMENON_CLOSED_CONFIDENCE:
+            return np.array([a.point[0:2] for a in self.affordances.values() if a.type in
+                             self.interpolation_types]).flatten().astype("int").tolist()
         return self.shape[:, 0:2].flatten().astype("int").tolist()
-        # return np.array([p[0:2] for p in self.shape]).flatten().astype("int").tolist()
 
     def set_path(self):
         """Set the path representing the terrain outline used to test is_inside"""
         # Must not be recomputed on each call to is_inside()
-        # Need a two dimensional array [[x0, y0],...,[x100, y100]]
-        self.path = mpath.Path(self.shape[:, 0:2])
+        # Need a closed two dimensional array [[x0, y0],...,[x100, y100], [x0, y0]]
+        self.path = mpath.Path(self.shape[:, 0:2] + self.shape[0, 0:2])
 
     def is_inside(self, terrain_centric_point):
         """True if the point in terrain-centric coordinates is inside the phenomenon"""
@@ -146,12 +162,12 @@ class Phenomenon:
         else:
             return self.path.contains_point(terrain_centric_point[0:2])
 
-    def phenomenon_label(self):
-        """Return the text to display in phenomenon view"""
-        label = "Origin direction: " + \
-            str(round(math.degrees(self.affordances[0].experience.absolute_direction_rad))) + \
-            "°. Nb tours:" + str(self.nb_tour)
-        return label
+    # def phenomenon_label(self):
+    #     """Return the text to display in phenomenon view"""
+    #     label = "Origin direction: " + \
+    #         str(round(math.degrees(self.affordances[0].experience.absolute_direction_rad))) + \
+    #         "°. Nb tours:" + str(self.nb_tour)
+    #     return label
 
     def vector_toward_origin(self, affordance):
         """Return the vector computed from the affordance point minus the phenomenon point."""

@@ -1,12 +1,12 @@
 import math
-from pyrr import Matrix44, Quaternion, Vector3, matrix33, matrix44
+from pyrr import Matrix44, Quaternion, Vector3
 from ...Memory.EgocentricMemory.Experience import Experience, EXPERIENCE_LOCAL_ECHO, EXPERIENCE_CENTRAL_ECHO, \
     EXPERIENCE_PLACE, EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_IMPACT, EXPERIENCE_ROBOT, \
     EXPERIENCE_TOUCH, EXPERIENCE_COMPASS, EXPERIENCE_AZIMUTH
 from ...Robot.RobotDefine import ROBOT_COLOR_SENSOR_X, ROBOT_FLOOR_SENSOR_X, ROBOT_CHASSIS_Y, ROBOT_OUTSIDE_Y, \
     ROBOT_SETTINGS
 from ...Proposer.Action import ACTION_FORWARD, ACTION_BACKWARD, ACTION_SWIPE, ACTION_RIGHTWARD, ACTION_CIRCUMVENT
-from ...Utils import quaternion_translation_to_matrix, echo_matrix
+from ...Utils import quaternion_translation_to_matrix, head_direction_distance_to_matrix, matrix_to_rotation_matrix
 
 EXPERIENCE_PERSISTENCE = 10
 
@@ -30,8 +30,9 @@ class EgocentricMemory:
         for experience in self.experiences.values():
             if experience.type == EXPERIENCE_COMPASS:
                 # Get the rotation part of the displacement matrix
-                m33 = matrix33.create_from_matrix44(enaction.trajectory.displacement_matrix)
-                experience.displace(matrix44.create_from_matrix33(m33))
+                # m33 = matrix33.create_from_matrix44(enaction.trajectory.displacement_matrix)
+                # experience.displace(matrix44.create_from_matrix33(m33))
+                experience.displace(matrix_to_rotation_matrix(enaction.trajectory.displacement_matrix))
             elif experience.type != EXPERIENCE_AZIMUTH:  # Do not move the azimuth experiences for calibration
                 experience.displace(enaction.trajectory.displacement_matrix)
 
@@ -107,7 +108,7 @@ class EgocentricMemory:
         for e in enaction.outcome.echos.items():
             # angle = math.radians(int(e[0]))
             # point = np.array([ROBOT_HEAD_X + math.cos(angle) * e[1], math.sin(angle) * e[1], 0])
-            pose_matrix = echo_matrix(int(e[0]), e[1])
+            pose_matrix = head_direction_distance_to_matrix(int(e[0]), e[1])
             local_exp = Experience(pose_matrix, EXPERIENCE_LOCAL_ECHO, enaction.clock, experience_id=self.experience_id,
                                    durability=EXPERIENCE_PERSISTENCE, color_index=enaction.outcome.color_index)
             self.experiences[local_exp.id] = local_exp
@@ -118,7 +119,7 @@ class EgocentricMemory:
         for e in enaction.outcome.central_echos:
             # angle = math.radians(int(e[0]))
             # point = np.array([ROBOT_HEAD_X + math.cos(angle) * e[1], math.sin(angle) * e[1], 0])
-            pose_matrix = echo_matrix(int(e[0]), e[1])
+            pose_matrix = head_direction_distance_to_matrix(int(e[0]), e[1])
             central_exp = Experience(pose_matrix, EXPERIENCE_CENTRAL_ECHO, enaction.clock,
                                      experience_id=self.experience_id, durability=EXPERIENCE_PERSISTENCE,
                                      color_index=enaction.outcome.color_index)

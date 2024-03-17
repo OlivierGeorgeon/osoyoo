@@ -13,7 +13,7 @@ from ..Enaction.CompositeEnaction import CompositeEnaction
 from . Proposer import Proposer
 from . PredefinedInteractions import OUTCOME_FOCUS_SIDE
 from ..Memory.BodyMemory import ENERGY_TIRED, EXCITATION_LOW
-from ..Memory.PhenomenonMemory.PhenomenonTerrain import TERRAIN_ORIGIN_CONFIDENCE
+from ..Memory.PhenomenonMemory import TERRAIN_ORIGIN_CONFIDENCE
 
 STEP_INIT = 0
 STEP_TURN = 1
