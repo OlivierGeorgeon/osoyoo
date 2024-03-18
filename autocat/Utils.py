@@ -1,6 +1,6 @@
 import math
 import numpy as np
-from pyrr import Quaternion, line, Matrix44, Vector3, matrix44
+from pyrr import Quaternion, line, Matrix44, Vector3, matrix44, matrix33
 
 from autocat.Robot.RobotDefine import ROBOT_HEAD_X
 
@@ -32,8 +32,8 @@ def quaternion_to_direction_rad(quaternion):
     # The Z component of the rotation axis gives the sign of the angle if is not NaN
     angle = quaternion.angle
     if np.isnan(angle):
-        print("Angle is NaN for quaternion", repr(quaternion))
-        # It printed Quaternion([0., 0., 0., 1.]) but I can't reproduce how its ".angle" is NaN
+        # print("Angle is NaN for", repr(quaternion))
+        # It prints "Quaternion([0., 0., 0., 1.])" but I can't reproduce how its ".angle" is NaN
         angle = 0
     else:
         if angle > math.pi:  # The short angle
@@ -82,16 +82,33 @@ def assert_almost_equal_angles(angle1, angle2, difference_degrees):
     return abs(short_angle(quaternion1, quaternion2)) < math.radians(difference_degrees)
 
 
-def echo_matrix(head_direction, echo_distance):
+def head_direction_distance_to_matrix(head_direction, echo_distance):
     """Return the matrix representing the pose of the echo from direction in degrees and distance"""
     head_quaternion = Quaternion.from_z_rotation(math.radians(head_direction))
     echo_from_head_matrix = translation_quaternion_to_matrix([echo_distance, 0, 0], head_quaternion)
     return Matrix44.from_translation([ROBOT_HEAD_X, 0, 0]) * echo_from_head_matrix
 
 
-def echo_point(head_direction, echo_distance):
+def head_direction_distance_to_point(head_direction, echo_distance):
     """Return the egocentric echo point from the head direction and echo distance"""
-    return matrix44.apply_to_vector(echo_matrix(head_direction, echo_distance), np.array([0, 0, 0])).astype(int)
+    return matrix44.apply_to_vector(head_direction_distance_to_matrix(head_direction, echo_distance),
+                                    np.array([0, 0, 0])).astype(int)
+
+
+def matrix_to_rotation_matrix(matrix):
+    """Return a Matrix44 that contains only the rotation of the argument matrix"""
+    # Convert to matrix33 and then back to matrix44 to remove the translation part
+    return matrix44.create_from_matrix33(matrix33.create_from_matrix44(matrix))
+
+
+def point_to_head_direction_distance(point):
+    """Return the head direction in degrees and distance of the echo"""
+    # Warning: may return a backward head direction
+    point_from_head = point - np.array([ROBOT_HEAD_X, 0, 0])
+    # Do not round to reduce prediction error
+    direction = math.degrees(math.atan2(point_from_head[1], point_from_head[0]))
+    distance = np.linalg.norm(point_from_head)
+    return direction, distance
 
 
 # Testing the utils

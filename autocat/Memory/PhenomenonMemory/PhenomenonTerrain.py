@@ -1,7 +1,8 @@
 import math
 import numpy as np
 from pyrr import Vector3, Quaternion
-from . import PHENOMENON_RECOGNIZE_CONFIDENCE, PHENOMENON_RECOGNIZED_CONFIDENCE
+from . import PHENOMENON_RECOGNIZE_CONFIDENCE, PHENOMENON_RECOGNIZED_CONFIDENCE, TERRAIN_ORIGIN_CONFIDENCE, \
+    TERRAIN_INITIAL_CONFIDENCE
 from .Phenomenon import Phenomenon
 from .Affordance import Affordance, MIDDLE_COLOR_INDEX, COLOR_DISTANCE
 from ...Memory.EgocentricMemory.Experience import EXPERIENCE_PLACE, EXPERIENCE_FLOOR
@@ -9,8 +10,6 @@ from ...Utils import short_angle
 
 
 TERRAIN_EXPERIENCE_TYPES = [EXPERIENCE_PLACE, EXPERIENCE_FLOOR]
-TERRAIN_INITIAL_CONFIDENCE = 10  # Must not be null to allow position correction
-TERRAIN_ORIGIN_CONFIDENCE = 20  # The terrain has an absolute origin
 
 
 class PhenomenonTerrain(Phenomenon):

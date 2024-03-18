@@ -1,9 +1,9 @@
 import numpy as np
 from pyrr import Vector3
-from . import ARRANGE_OBJECT_RADIUS
+from . import ARRANGE_OBJECT_RADIUS, TERRAIN_ORIGIN_CONFIDENCE
 from .PhenomenonCategory import PhenomenonCategory
 from .PhenomenonObject import PhenomenonObject
-from .PhenomenonTerrain import PhenomenonTerrain, TERRAIN_EXPERIENCE_TYPES, TERRAIN_ORIGIN_CONFIDENCE
+from .PhenomenonTerrain import PhenomenonTerrain, TERRAIN_EXPERIENCE_TYPES
 from .PhenomenonRobot import PhenomenonRobot
 from .. import EMOTION_ANGRY
 from ..EgocentricMemory.Experience import EXPERIENCE_ROBOT, EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO
@@ -80,6 +80,21 @@ class PhenomenonMemory:
             is_outside_terrain = not self.phenomena[TER].is_inside(allo_point)
         return is_outside_terrain
 
+    def is_inside_terrain(self, allo_point):
+        """Return True if allo_point is not None and there is a confident terrain and allo_point is inside"""
+        # If no point then False
+        if allo_point is None:
+            print("allo point is none")
+            return False
+        # If terrain not confident then False
+        elif self.terrain_confidence() < TERRAIN_ORIGIN_CONFIDENCE:
+            print("terrain is not confident")
+            return False
+        # If the point is outside the confident terrain then True
+        else:
+            print("is inside terrain", self.phenomena[TER].is_inside(allo_point))
+            return self.phenomena[TER].is_inside(allo_point)
+
     def create_phenomenon(self, affordance):
         """Create a new phenomenon depending of the type of the affordance"""
         # Must always create a phenomenon
@@ -129,6 +144,7 @@ class PhenomenonMemory:
                 if delta is not None:
                     # Check if this phenomenon can be recognized
                     self.recognize_category(phenomenon)
+                    phenomenon.try_to_close()
                     remaining_affordances.remove(affordance)
                     # Null correction do not count (to be improved)
                     if round(np.linalg.norm(delta)) > 0:

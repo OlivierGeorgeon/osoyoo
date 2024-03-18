@@ -91,5 +91,5 @@ class CtrlPhenomenonView:
         if self.workspace.enacter.interaction_step == ENACTION_STEP_REFRESHING:
             if self.phenomenon is not None:
                 self.update_affordance_displays(self.phenomenon)
-                self.view.label3.text = self.phenomenon.phenomenon_label()
+                # self.view.label3.text = self.phenomenon.phenomenon_label()
             self.update_body_robot()

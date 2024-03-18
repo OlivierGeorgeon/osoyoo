@@ -1,6 +1,6 @@
 ########################################################################################
 # This decider makes the robot explore the parts of the terrain that are not yet known
-# Activation 0: default. 2: the terrain has an absolute reference
+# Activation 0: default. 3: the terrain has an absolute reference
 ########################################################################################
 
 import math
@@ -12,12 +12,13 @@ from . Proposer import Proposer
 from ..Utils import short_angle
 from ..Robot.Enaction import Enaction
 from ..Robot.RobotDefine import TERRAIN_RADIUS
-from ..Memory.BodyMemory import ENERGY_TIRED
+from ..Memory.BodyMemory import ENERGY_TIRED, EXCITATION_LOW
 from ..Memory.PhenomenonMemory.PhenomenonMemory import TER
-from ..Memory.PhenomenonMemory.PhenomenonTerrain import TERRAIN_ORIGIN_CONFIDENCE
-from ..Memory.PhenomenonMemory import PHENOMENON_RECOGNIZED_CONFIDENCE
-from ..Memory.Memory import EMOTION_RELAXED
+from ..Memory.PhenomenonMemory import PHENOMENON_RECOGNIZED_CONFIDENCE, TERRAIN_ORIGIN_CONFIDENCE
+from ..Memory import EMOTION_RELAXED
 from ..Enaction.CompositeEnaction import CompositeEnaction
+from ..Integrator.OutcomeCode import FOCUS_TOO_FAR_DISTANCE
+from . GoalGenerator import GoalGenerator
 
 
 CLOCK_TO_GO_HOME = 8  # Number of interactions before going home
@@ -32,27 +33,31 @@ OUTCOME_COLOR = "CL"
 class ProposerExplore(Proposer):
     def __init__(self, workspace):
         super().__init__(workspace)
-
-        # point = np.array([-2000, 2000, 0])  # Begin with North West
-        # point = np.array([-920, 770, 0])  # Begin with North West
-        # self.prompt_points = [point]
-        # # Visit 6 points from North West to south East every pi/6
-        # self.nb_points = 6
-        # rotation_matrix = matrix44.create_from_z_rotation(-math.pi/6)
-        # for i in range(1, self.nb_points):
-        #     point = matrix44.apply_to_vector(rotation_matrix, point)
-        #     self.prompt_points.append(point)
-        self.prompt_index = 0
-        self.ter_prompt = None
-        self.explore_angle_quaternion = Quaternion.from_z_rotation(math.pi / 3)  # 2
-        # self.action = "-"
+        # The goal generator proposes successive goal points to explore the terrain
+        self.goal_generator = GoalGenerator(workspace)
 
     def activation_level(self):
-        """The level of activation is 2 if the terrain has confidence and the robot is excited or low energy"""
-        activation_level = 0
-        if self.workspace.memory.emotion_code == EMOTION_RELAXED:
-            activation_level = 3
-        return activation_level
+        """The level of activation is 3 if the terrain has confidence and the robot is excited or low energy"""
+
+        if self.workspace.memory.phenomenon_memory.terrain_confidence() >= TERRAIN_ORIGIN_CONFIDENCE and  \
+            (self.workspace.memory.body_memory.energy < ENERGY_TIRED or
+             self.workspace.memory.body_memory.excitation > EXCITATION_LOW):
+            return 3
+
+        # # High energy then must circle, explore, watch or arrange
+        # if self.workspace.memory.body_memory.energy >= ENERGY_TIRED:
+        #     # High excitation then must circle or explore
+        #     if self.workspace.memory.body_memory.excitation > EXCITATION_LOW:
+        #         # Focus inside terrain or not too far: HAPPY DeciderCircle
+        #         if self.workspace.memory.egocentric_memory.focus_point is None or \
+        #                 np.linalg.norm(self.workspace.memory.egocentric_memory.focus_point) > FOCUS_TOO_FAR_DISTANCE or \
+        #                 self.workspace.memory.is_outside_terrain(self.workspace.memory.egocentric_memory.focus_point):
+        #             return 3
+        # # Tired: must go home
+        # else:
+        #     return 3
+
+        return 0
 
     def outcome(self, enaction):
         """ Convert the enacted interaction into an outcome adapted to the explore behavior """
@@ -95,14 +100,14 @@ class ProposerExplore(Proposer):
 
         outcome_code = self.outcome(enaction)
 
+        e_memory = self.workspace.memory.save()
+        e_memory.emotion_code = EMOTION_RELAXED
         e1, e2 = None, None
 
         # If time to go home
         if self.workspace.memory.body_memory.energy < ENERGY_TIRED:
             # If right or left then swipe to home
             if outcome_code in [OUTCOME_LEFT, OUTCOME_RIGHT]:
-                e_memory = self.workspace.memory.save()
-                e_memory.emotion_code = EMOTION_RELAXED
                 if outcome_code == OUTCOME_RIGHT:
                     e_memory.egocentric_memory.prompt_point = np.array([0, 280, 0], dtype=int)  # Swipe to the right
                     e_memory.egocentric_memory.focus_point = np.array([280, 280, 0], dtype=int)
@@ -111,18 +116,16 @@ class ProposerExplore(Proposer):
                     e_memory.egocentric_memory.focus_point = np.array([280, -280, 0], dtype=int)
                 # print("Swiping to confirmation by:", ego_confirmation)
                 e1 = Enaction(self.workspace.actions[ACTION_SWIPE], e_memory)
-                self.workspace.startup_sound.play()
+                # self.workspace.startup_sound.play()
             # If not left or right we need to manoeuvre
             else:
                 # If near home then go to confirmation prompt
-                e_memory = self.workspace.memory.save()
-                e_memory.emotion_code = EMOTION_RELAXED
                 if self.workspace.memory.is_near_terrain_origin() or outcome_code == OUTCOME_COLOR:
                     polar_confirmation = self.workspace.memory.phenomenon_memory.phenomena[TER].confirmation_prompt()
                     # print("Enacting confirmation sequence to", polar_confirmation)
                     ego_confirmation = self.workspace.memory.polar_egocentric_to_egocentric(polar_confirmation)
                     e_memory.egocentric_memory.prompt_point = ego_confirmation
-                    self.workspace.near_home_sound.play()
+                    # self.workspace.near_home_sound.play()
                 else:
                     # If not near home then go to origin prompt
                     allo_origin = self.workspace.memory.phenomenon_memory.phenomena[TER].relative_origin_point + \
@@ -130,34 +133,17 @@ class ProposerExplore(Proposer):
                     # print("Going from", self.workspace.memory.allocentric_memory.robot_point, "to origin sensor point", allo_origin)
                     ego_origin = self.workspace.memory.allocentric_to_egocentric(allo_origin)
                     e_memory.egocentric_memory.prompt_point = ego_origin
-                    self.workspace.clear_sound.play()
+                    # self.workspace.clear_sound.play()
                 e_memory.egocentric_memory.focus_point = None  # Prevent unnatural head movement
                 e1 = Enaction(self.workspace.actions[ACTION_TURN], e_memory)
                 e2 = Enaction(self.workspace.actions[ACTION_FORWARD], e1.predicted_memory.save())
-        else:
-            # Go to the most interesting pool point
-            # mip = self.workspace.memory.allocentric_memory.most_interesting_pool(self.workspace.clock)
-            # self.workspace.memory.egocentric_memory.prompt_point = self.workspace.memory.allocentric_to_egocentric(mip)
 
-            # Go successively to the predefined prompt points relative to the terrain center
-            if self.prompt_index == 0:
-                self.ter_prompt = self.workspace.memory.phenomenon_memory.phenomena[TER].origin_direction_quaternion \
-                                  * Vector3([TERRAIN_RADIUS[self.workspace.arena_id]["radius"] * 1.1, 0, 0])
-            self.ter_prompt = quaternion.apply_to_vector(self.explore_angle_quaternion, self.ter_prompt)
-            # When the terrain has not been recognized, add the terrain radius
-            if self.workspace.memory.phenomenon_memory.terrain_confidence() < PHENOMENON_RECOGNIZED_CONFIDENCE:
-                ego_prompt = self.workspace.memory.terrain_centric_to_egocentric(self.ter_prompt +
-                             self.workspace.memory.phenomenon_memory.phenomena[TER].origin_direction_quaternion
-                             * Vector3([-TERRAIN_RADIUS[self.workspace.arena_id]["radius"], 0, 0]))
-            else:
-                ego_prompt = self.workspace.memory.terrain_centric_to_egocentric(self.ter_prompt)
-            e_memory = self.workspace.memory.save()
-            e_memory.emotion_code = EMOTION_RELAXED
+        # If not time to go home, go to the most interesting pool point
+        else:
+            ego_prompt = self.workspace.memory.terrain_centric_to_egocentric(self.goal_generator.terrain_goal_point())
+
             e_memory.egocentric_memory.prompt_point = ego_prompt
             e_memory.egocentric_memory.focus_point = None  # Prevent unnatural head movement
-            self.prompt_index += 1
-            # if self.prompt_index >= self.nb_points:
-            #     self.prompt_index = 0
             e1 = Enaction(self.workspace.actions[ACTION_TURN], e_memory)
             e2 = Enaction(self.workspace.actions[ACTION_FORWARD], e1.predicted_memory.save())
 

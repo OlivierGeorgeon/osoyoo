@@ -1,11 +1,19 @@
+########################################################################################
+# This proposer proposes the default behavior which makes the robot circle around objects
+# This behavior is associated with EMOTION_HAPPY
+# Activation 2: when the robot is happy
+########################################################################################
+
 import numpy as np
-from . Action import ACTION_SCAN
+from . Action import ACTION_SCAN, ACTION_TURN, ACTION_SWIPE
 from . PredefinedInteractions import create_or_retrieve_primitive, create_primitive_interactions, \
     create_composite_interactions, create_or_reinforce_composite
-from . Interaction import OUTCOME_FOCUS_TOO_FAR
-from . Action import ACTION_TURN
+from . Interaction import OUTCOME_FOCUS_TOO_FAR, OUTCOME_LOST_FOCUS
 from ..Robot.Enaction import Enaction
-from ..Memory.Memory import EMOTION_HAPPY
+from ..Memory import EMOTION_HAPPY
+from ..Memory.PhenomenonMemory import TERRAIN_ORIGIN_CONFIDENCE
+from ..Memory.BodyMemory import ENERGY_TIRED, EXCITATION_LOW
+from ..Integrator.OutcomeCode import FOCUS_TOO_FAR_DISTANCE
 
 
 class Proposer:
@@ -19,12 +27,21 @@ class Proposer:
         self.primitive_interactions = create_primitive_interactions(self.workspace.actions)
         self.composite_interactions = create_composite_interactions(self.workspace.actions, self.primitive_interactions)
 
+        # The direction of translation
+        self.direction = 1
+
     def activation_level(self):
-        """Return the activation level of this decider/ 1: default; 3 if focus not too far and excited"""
-        activation_level = 1  # Is the decider by default
-        if self.workspace.memory.emotion_code == EMOTION_HAPPY:
-            activation_level = 2
-        return activation_level
+        """Return the activation level of this decider:
+         1: default; 2: terrain unconfident or high energy and excitation and object to circle round"""
+
+        if self.workspace.memory.phenomenon_memory.terrain_confidence() < TERRAIN_ORIGIN_CONFIDENCE or \
+                (self.workspace.memory.body_memory.energy >= ENERGY_TIRED and
+                 self.workspace.memory.body_memory.excitation > EXCITATION_LOW and
+                 self.workspace.memory.egocentric_memory.focus_point is not None and
+                 np.linalg.norm(self.workspace.memory.egocentric_memory.focus_point) < FOCUS_TOO_FAR_DISTANCE and
+                 not self.workspace.memory.is_outside_terrain(self.workspace.memory.egocentric_memory.focus_point)):
+            return 2
+        return 1
 
     def propose_enaction(self):
         """Return a proposed interaction"""
@@ -39,6 +56,7 @@ class Proposer:
         action = self.select_action(enaction)
         e_memory = self.workspace.memory.save()
         e_memory.emotion_code = EMOTION_HAPPY
+        span = 40
 
         # Set the spatial modifiers
         if action.action_code in [ACTION_TURN]:
@@ -48,11 +66,17 @@ class Proposer:
                 e_memory.egocentric_memory.prompt_point = np.array([-100, 0, 0], dtype=int)
             else:
                 e_memory.egocentric_memory.prompt_point = self.workspace.memory.egocentric_memory.focus_point.copy()
+        elif action.action_code in [ACTION_SWIPE]:
+            # Swipe in the predefined direction
+            e_memory.egocentric_memory.prompt_point = self.direction * action.translation_speed
+        # If lost focus then scan carefully
+        elif action.action_code in [ACTION_SCAN] and enaction.outcome_code == OUTCOME_LOST_FOCUS:
+            span = 10
         else:
             e_memory.egocentric_memory.prompt_point = None
 
         # Add the enaction to the stack
-        return Enaction(action, e_memory)
+        return Enaction(action, e_memory, span=span)
 
     def select_action(self, enaction):
         """The sequence learning mechanism that proposes the next action"""

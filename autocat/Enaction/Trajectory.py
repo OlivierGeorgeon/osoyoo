@@ -1,12 +1,13 @@
 import math
 import numpy as np
 from pyrr import matrix44, Vector3, Quaternion
-from ..Decider.Action import ACTION_FORWARD, ACTION_TURN, ACTION_SCAN, ACTION_WATCH
+from ..Proposer.Action import ACTION_FORWARD
 from ..Integrator.OutcomeCode import CONFIDENCE_NO_FOCUS, CONFIDENCE_NEW_FOCUS, CONFIDENCE_TOUCHED_FOCUS, \
     CONFIDENCE_CAREFUL_SCAN, CONFIDENCE_CONFIRMED_FOCUS
-from ..Memory.BodyMemory import point_to_echo_direction_distance
-from ..Utils import short_angle, translation_quaternion_to_matrix, echo_point
+from ..Utils import short_angle, translation_quaternion_to_matrix, head_direction_distance_to_point, \
+    point_to_head_direction_distance
 from ..Robot.RobotDefine import ROBOT_FLOOR_SENSOR_X, ROBOT_CHASSIS_Y, ROBOT_SETTINGS, ROBOT_CHASSIS_X, ROBOT_OUTSIDE_Y
+from ..Memory.PhenomenonMemory import ARRANGE_OBJECT_RADIUS
 
 FOCUS_MAX_DELTA = 200  # 200 (mm) Maximum delta to keep focus
 
@@ -23,7 +24,7 @@ class Trajectory:
 
         # Track the displacement
         self.body_quaternion = memory.body_memory.body_quaternion.copy()
-        self.head_direction_rad = memory.body_memory.head_direction_rad
+        self.head_direction_degree = memory.body_memory.head_direction_degree()
         self.body_direction_delta = 0  # Displayed in BodyView
         self.focus_confidence = CONFIDENCE_NO_FOCUS  # Used by deciders to possibly trigger scan
         self.translation = None  # Used by allocentric memory to move the robot
@@ -31,8 +32,6 @@ class Trajectory:
         self.compass_quaternion = None  # Include the compass offset correction
         self.yaw_matrix = None  # Used by bodyView to rotate compass points
         self.displacement_matrix = None  # Used by EgocentricMemory to rotate experiences
-        # self.focus_direction_prediction_error = 0
-        # self.focus_distance_prediction_error = 0
         self.covered_area = np.empty((4, 3), dtype=int)
 
         # The prompt
@@ -70,6 +69,9 @@ class Trajectory:
         # If the robot returns no compass then the body_quaternion is estimated from yaw
         if outcome.compass_point is None:
             self.body_quaternion = body_quaternion_integrated
+            # Create the compass point to generate the experience and display in BodyView
+            outcome.compass_point = self.body_quaternion.inverse * Vector3([0, -330, 0])
+            self.compass_quaternion = self.body_quaternion.copy()
         else:
             # If the robot returns compass
             # Compute the compass_quaternion. Subtract the offset from robot_define.py
@@ -122,38 +124,40 @@ class Trajectory:
         if self.focus_point is not None:
             self.focus_point = matrix44.apply_to_vector(self.displacement_matrix, self.focus_point).astype(int)
             # Keep head towards focus
-            self.head_direction_rad = min(max(-math.pi/2, math.atan2(self.focus_point[1], self.focus_point[0])), math.pi/2)
+            self.head_direction_degree, _ = point_to_head_direction_distance(self.focus_point)
 
         # Move the prompt
         if self.prompt_point is not None:
             self.prompt_point = matrix44.apply_to_vector(self.displacement_matrix, self.prompt_point).astype(int)
 
-    def track_echo(self, outcome):
-        """Keep the focus to the echo_point, and compute the focus_confidence"""
+    def track_focus(self, outcome):
+        """Compute the focus_confidence and adjust it to new echo"""
 
-        new_focus = outcome.echo_point
+        new_echo = outcome.echo_point
         # If careful watch and there are central echoes then the focus is the first (closest)
         if self.span == 10 and len(outcome.central_echos) > 0:
-            new_focus = echo_point(*outcome.central_echos[0])
+            new_echo = head_direction_distance_to_point(*outcome.central_echos[0])
+
+        # The new focus is at the center of the object  TODO must recognize the object
+        if new_echo is None:
+            new_focus = None
+        else:
+            a, d = point_to_head_direction_distance(new_echo)
+            new_focus = head_direction_distance_to_point(a, d + ARRANGE_OBJECT_RADIUS)
 
         # If the robot was focussed then adjust the focus and the displacement
         if self.focus_point is not None:
             if new_focus is not None:
                 # The error between the expected and the actual position of the echo
-                new_focus_a, new_focus_d = point_to_echo_direction_distance(new_focus)
-                # prediction_focus_point = matrix44.apply_to_vector(self.displacement_matrix, self.focus_point)
-                prediction_focus_a, prediction_focus_d = point_to_echo_direction_distance(self.focus_point)
-                # self.focus_direction_prediction_error = prediction_focus_a - new_focus_a
-                # self.focus_distance_prediction_error = prediction_focus_d - new_focus_d
                 prediction_error_focus = self.focus_point - new_focus
                 # If the new focus is near the previous focus or the displacement has been continuous.
                 if np.linalg.norm(prediction_error_focus) < FOCUS_MAX_DELTA or outcome.status == "continuous":
                     # The focus has been kept
-                    print("Focus kept with prediction error", prediction_error_focus, "moved to ", new_focus)
+                    # print("Focus kept with prediction error", prediction_error_focus, "moved to ", new_focus)
                     self.focus_confidence = CONFIDENCE_CONFIRMED_FOCUS
                 else:
                     # The focus was lost
-                    print("Focus delta:", prediction_error_focus, "New focus:", new_focus)
+                    # print("Focus delta:", prediction_error_focus, "New focus:", new_focus)
                     self.focus_confidence = CONFIDENCE_NEW_FOCUS
             else:
                 # The focus was lost
@@ -171,7 +175,7 @@ class Trajectory:
 
         self.focus_point = new_focus
         if new_focus is not None:
-            self.head_direction_rad = min(max(-math.pi/2, math.atan2(new_focus[1], new_focus[0])), math.pi/2)
+            self.head_direction_degree = math.degrees(math.atan2(new_focus[1], new_focus[0]))
 
         # Careful scan has extra confidence
         if self.focus_confidence == CONFIDENCE_NEW_FOCUS and self.span == 10:

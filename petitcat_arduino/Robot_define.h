@@ -86,7 +86,7 @@
 #define ACCELERATION_Y_OFFSET 0  // -3        //
 #define ACCELERATION_X_IMPACT_THRESHOLD 210  // 200 Longitudinal impact if acceleration exceeds this threshold
 #define ACCELERATION_Y_IMPACT_THRESHOLD 200  // lateral impact if acceleration exceeds this threshold
-#define ACCELERATION_X_BLOCK_THRESHOLD 140 // 30 // Robot is blocked if longitudinal acceleration below this threshold
+#define ACCELERATION_X_BLOCK_THRESHOLD 110  // 140 // 30 // Robot is blocked if longitudinal acceleration below this threshold
 #define ACCELERATION_Y_BLOCK_THRESHOLD 80 // 100 // Robot is blocked if lateral acceleration below this threshold
 #define GYRO_COEF 1.
 #define ROBOT_SERVO_PIN 6
@@ -228,9 +228,9 @@
 #define ROBOT_REAR_LEFT_WHEEL_COEF 1
 #define ROBOT_FRONT_RIGHT_WHEEL_COEF 1
 #define ROBOT_FRONT_LEFT_WHEEL_COEF 1
-#define TURN_SPOT_MAX_DURATION 1300
-#define TURN_SPOT_ENDING_DELAY 200
-#define TURN_SPOT_ENDING_ANGLE 3
+#define TURN_SPOT_MAX_DURATION 2400
+#define TURN_SPOT_ENDING_DELAY 180
+#define TURN_SPOT_ENDING_ANGLE 9
 #define ROBOT_SERVO_PIN 13
 
 #endif

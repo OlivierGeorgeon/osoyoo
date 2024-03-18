@@ -4,14 +4,14 @@ from pyglet import shapes, gl
 from webcolors import name_to_rgb
 from ..Memory.EgocentricMemory.Experience import EXPERIENCE_LOCAL_ECHO, EXPERIENCE_CENTRAL_ECHO,  EXPERIENCE_PLACE, \
     EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_IMPACT, EXPERIENCE_BLOCK, FLOOR_COLORS, EXPERIENCE_FOCUS, \
-    EXPERIENCE_ROBOT, EXPERIENCE_TOUCH
+    EXPERIENCE_ROBOT, EXPERIENCE_TOUCH, EXPERIENCE_AZIMUTH, EXPERIENCE_COMPASS
 from .EgocentricDisplay.OsoyooCar import EMOTION_COLORS
 
 
 # Points of interest that only exist in Body Display
 # (points of interest attached to an interaction have the same type as their interactions)
-POINT_COMPASS = 'Compass'
-POINT_AZIMUTH = 'Azimuth'
+# POINT_COMPASS = 'Compass'
+# POINT_AZIMUTH = 'Azimuth'
 POINT_PROMPT = 'Prompt'
 POINT_CONE = 'Cone'
 POINT_ROBOT = 'PRobot'  # To draw the body of the other robot
@@ -77,12 +77,12 @@ class PointOfInterest:
             self.points = [40, 0, 20, 34, -20, 34, -40, 0, -20, -34, 20, -34]
             self.shape = self.batch.add_indexed(6, gl.GL_TRIANGLES, group, [0, 1, 2, 0, 2, 3, 0, 3, 4, 0, 4, 5],
                                                 ('v2i', self.points), ('c4B', 6 * (*self.color, self.opacity)))
-        if self.type == POINT_COMPASS:
+        if self.type == EXPERIENCE_COMPASS:
             self.color = name_to_rgb("RoyalBlue")
             self.points = [10, 0, 0, -15, 0, 15, -10, 0]
             self.shape = self.batch.add_indexed(4, gl.GL_TRIANGLES, self.group, [0, 1, 2, 1, 2, 3],
                                                 ('v2i', self.points), ('c4B', 4 * (*self.color, self.opacity)))
-        if self.type == POINT_AZIMUTH:
+        if self.type == EXPERIENCE_AZIMUTH:
             self.color = name_to_rgb("SteelBlue")
             self.points = [20, 0, 0, -30, 0, 30, -20, 0]
             self.shape = self.batch.add_indexed(4, gl.GL_TRIANGLES, self.group, [0, 1, 2, 1, 2, 3],

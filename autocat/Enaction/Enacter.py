@@ -1,6 +1,6 @@
 from ..Robot.CtrlRobot import ENACTION_STEP_IDLE, ENACTION_STEP_COMMANDING, ENACTION_STEP_ENACTING, \
     ENACTION_STEP_INTEGRATING, ENACTION_STEP_REFRESHING
-from ..Memory.PhenomenonMemory.PhenomenonMemory import TERRAIN_ORIGIN_CONFIDENCE
+from ..Memory.PhenomenonMemory import TERRAIN_ORIGIN_CONFIDENCE
 from ..Integrator.OutcomeCode import outcome_code
 
 
@@ -18,7 +18,12 @@ class Enacter:
                 # Take the current enaction from the composite interaction
                 self.workspace.enaction = self.workspace.composite_enaction.current_enaction()
                 # Take a memory snapshot to restore at the end of the enaction
+                self.workspace.memory.emotion_code = self.workspace.enaction.predicted_memory.emotion_code
                 self.memory_snapshot = self.workspace.memory.save()
+                # Show the prompt in memory
+                if self.workspace.enaction.trajectory.prompt_point is not None:
+                    self.workspace.memory.egocentric_memory.prompt_point = self.workspace.enaction.trajectory.prompt_point.copy()
+                    self.workspace.memory.allocentric_memory.update_prompt(self.workspace.memory.egocentric_to_allocentric(self.workspace.memory.egocentric_memory.prompt_point), self.workspace.memory.clock)
                 # Begin the enaction
                 self.workspace.enaction.begin(self.workspace.memory.body_memory.body_quaternion)
                 # Begin the simulation
@@ -61,6 +66,8 @@ class Enacter:
                                                    self.workspace.enaction.trajectory, self.workspace.enaction.outcome)
             # Track the prediction errors
             self.workspace.prediction_error.log(self.workspace.enaction)
+            # Calibrate what can be improved
+            self.workspace.calibrator.calibrate()
             # Increment the clock if the enacted interaction was properly received
             if self.workspace.enaction.clock >= self.workspace.memory.clock:  # don't increment if the robot is behind
                 self.workspace.memory.clock += 1
