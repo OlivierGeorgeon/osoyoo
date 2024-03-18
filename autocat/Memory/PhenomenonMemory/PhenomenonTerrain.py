@@ -1,8 +1,8 @@
 import math
 import numpy as np
 from pyrr import Vector3, Quaternion
-from . import PHENOMENON_RECOGNIZE_CONFIDENCE, PHENOMENON_RECOGNIZED_CONFIDENCE, TERRAIN_ORIGIN_CONFIDENCE, \
-    TERRAIN_INITIAL_CONFIDENCE
+from . import PHENOMENON_INITIAL_CONFIDENCE, PHENOMENON_RECOGNIZE_CONFIDENCE, PHENOMENON_RECOGNIZED_CONFIDENCE, TERRAIN_ORIGIN_CONFIDENCE, \
+    PHENOMENON_CLOSED_CONFIDENCE
 from .Phenomenon import Phenomenon
 from .Affordance import Affordance, MIDDLE_COLOR_INDEX, COLOR_DISTANCE
 from ...Memory.EgocentricMemory.Experience import EXPERIENCE_PLACE, EXPERIENCE_FLOOR
@@ -17,7 +17,7 @@ class PhenomenonTerrain(Phenomenon):
     def __init__(self, affordance):
         super().__init__(affordance)
         self.phenomenon_type = EXPERIENCE_FLOOR
-        self.confidence = TERRAIN_INITIAL_CONFIDENCE
+        self.confidence = PHENOMENON_INITIAL_CONFIDENCE  # TERRAIN_INITIAL_CONFIDENCE
         self.interpolation_types = [EXPERIENCE_FLOOR]
 
         # If the affordance is color floor then use it as absolute origin
@@ -77,7 +77,7 @@ class PhenomenonTerrain(Phenomenon):
                         self.last_origin_clock = affordance.clock
                 # Black line: Compute the position correction based on the nearest point in the terrain shape
                 # TODO use the point on the trajectory rather than the closest point
-                elif self.confidence >= PHENOMENON_RECOGNIZED_CONFIDENCE:
+                elif self.confidence >= PHENOMENON_CLOSED_CONFIDENCE:  # PHENOMENON_RECOGNIZED_CONFIDENCE
                     distances = np.linalg.norm(self.shape - affordance.point, axis=1)
                     closest_point = self.shape[np.argmin(distances)]
                     position_correction = np.array(affordance.point - closest_point, dtype=int)
@@ -85,12 +85,28 @@ class PhenomenonTerrain(Phenomenon):
                     affordance.point -= position_correction
 
             # if the phenomenon is not recognized, recompute the shape
-            if self.category is None:
+            # if self.category is None:
+            if self.confidence == PHENOMENON_CLOSED_CONFIDENCE:
                 self.interpolate()
 
             return - position_correction  # TODO remove the minus sign
         # Affordances that do not belong to this phenomenon must return None
         return None
+
+    def try_to_bridge(self):
+        """If the area is big enough, increase confidence and interpolate the closed shape"""
+        if self.confidence < PHENOMENON_CLOSED_CONFIDENCE:
+            vertices = [a.point[0:2] for a in self.affordances.values() if a.type in self.interpolation_types]
+            if len(vertices) > 2:
+                vertices.append(vertices[0])
+                vertices = np.array(vertices)
+                # Compute the area with the Shoelace formula. TODO : sort the vertices or find a better criterion
+                area = 0.5 * np.abs(np.dot(vertices[:-1, 0], np.roll(vertices[:-1, 1], 1)) -
+                                    np.dot(vertices[:-1, 1], np.roll(vertices[:-1, 0], 1)))
+                print("area", area)
+                if area > 500000:
+                    self.confidence = PHENOMENON_CLOSED_CONFIDENCE
+                    self.interpolate()
 
     def recognize(self, category):
         """Set the terrain's category, shape, path, confidence. Adjust its position to the latest affordance"""

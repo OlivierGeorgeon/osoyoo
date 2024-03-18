@@ -144,7 +144,7 @@ class PhenomenonMemory:
                 if delta is not None:
                     # Check if this phenomenon can be recognized
                     self.recognize_category(phenomenon)
-                    phenomenon.try_to_close()
+                    phenomenon.try_to_bridge()
                     remaining_affordances.remove(affordance)
                     # Null correction do not count (to be improved)
                     if round(np.linalg.norm(delta)) > 0:

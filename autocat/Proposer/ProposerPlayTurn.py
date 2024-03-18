@@ -29,8 +29,11 @@ class ProposerPlayTurn(Proposer):
 
     def activation_level(self):
         """The level of activation of this decider: 0: default, 5 if excited and object to play with """
-        if self.workspace.memory.body_memory.excitation > EXCITATION_LOW and self.is_to_play():
-            return 5
+        if self.workspace.memory.clock < 4:
+            #  Turn around to calibrate the compass
+            return 6
+        # if self.workspace.memory.body_memory.excitation > EXCITATION_LOW and self.is_to_play():
+        #     return 5
         return 0
 
     def select_enaction(self, enaction):
@@ -38,21 +41,22 @@ class ProposerPlayTurn(Proposer):
         # Calibrate the compass
         if self.step == STEP_CALIBRATE:
             self.step = STEP_INIT
-            points = np.array([e.point()[0: 2] for e in self.workspace.memory.egocentric_memory.experiences.values()
-                               if e.clock >= enaction.clock - NB_TURN and e.type == EXPERIENCE_AZIMUTH])
-            offset_2d = compass_calibration(points)
-            print("Calibrate", offset_2d)
-            if offset_2d is not None:
-                offset_point = np.array([offset_2d[0], offset_2d[1], 0], dtype=int)
-                self.workspace.memory.body_memory.compass_offset += offset_point
-                offset_matrix = Matrix44.from_translation(-offset_point).astype('float64')
-                for e in self.workspace.memory.egocentric_memory.experiences.values():
-                    if e.type in [EXPERIENCE_COMPASS, EXPERIENCE_AZIMUTH]:
-                        e.displace(offset_matrix)
+            self.workspace.calibrator.calibrate_compass()
+            # points = np.array([e.point()[0: 2] for e in self.workspace.memory.egocentric_memory.experiences.values()
+            #                    if e.clock >= enaction.clock - NB_TURN and e.type == EXPERIENCE_AZIMUTH])
+            # offset_2d = compass_calibration(points)
+            # print("Calibrate", offset_2d)
+            # if offset_2d is not None:
+            #     offset_point = np.array([offset_2d[0], offset_2d[1], 0], dtype=int)
+            #     self.workspace.memory.body_memory.compass_offset += offset_point
+            #     offset_matrix = Matrix44.from_translation(-offset_point).astype('float64')
+            #     for e in self.workspace.memory.egocentric_memory.experiences.values():
+            #         if e.type in [EXPERIENCE_COMPASS, EXPERIENCE_AZIMUTH]:
+            #             e.displace(offset_matrix)
 
         # If there is an object to play with
         if self.is_to_play() and enaction.outcome_code not in [OUTCOME_FLOOR, OUTCOME_FOCUS_TOO_FAR]:
-            self.step = STEP_CALIBRATE
+            # self.step = STEP_CALIBRATE  Needed if automatic calibration is off
             e_memory = self.workspace.memory.save()
             e_memory.emotion_code = EMOTION_HAPPY
             e_memory.egocentric_memory.prompt_point = np.array([100, 0, 0])

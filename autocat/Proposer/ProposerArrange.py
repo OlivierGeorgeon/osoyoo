@@ -15,7 +15,7 @@ from ..Utils import line_intersection
 from ..Enaction.CompositeEnaction import CompositeEnaction
 from ..Memory import EMOTION_ANGRY
 from . Interaction import OUTCOME_FLOOR, OUTCOME_LOST_FOCUS, OUTCOME_TOUCH, OUTCOME_NO_FOCUS
-from ..Memory.PhenomenonMemory import ARRANGE_OBJECT_RADIUS, TERRAIN_INITIAL_CONFIDENCE
+from ..Memory.PhenomenonMemory import ARRANGE_OBJECT_RADIUS, TERRAIN_ORIGIN_CONFIDENCE
 
 ARRANGE_MIN_RADIUS = 100
 ARRANGE_MAX_RADIUS = 400
@@ -161,7 +161,7 @@ class ProposerArrange(Proposer):
             return False
 
         # If no confident terrain then don't arrange object
-        if self.workspace.memory.phenomenon_memory.terrain_confidence() <= TERRAIN_INITIAL_CONFIDENCE:
+        if self.workspace.memory.phenomenon_memory.terrain_confidence() <= TERRAIN_ORIGIN_CONFIDENCE:  # TERRAIN_INITIAL_CONFIDENCE:
             print("No confident terrain")
             return False
 

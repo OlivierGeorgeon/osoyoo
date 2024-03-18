@@ -2,7 +2,7 @@ import json
 import math
 from pyrr import Vector3, Quaternion
 from .. Robot.RobotDefine import ROBOT_FLOOR_SENSOR_X
-from ..Memory.PhenomenonMemory import TERRAIN_INITIAL_CONFIDENCE
+from ..Memory.PhenomenonMemory import TERRAIN_ORIGIN_CONFIDENCE
 from ..Utils import azimuth_to_quaternion
 from ..Utils import quaternion_translation_to_matrix
 
@@ -43,7 +43,7 @@ class Message:
         # The relative position if available
         if self.ter_position is not None:
             # If position in terrain and this robot knows the position of the terrain
-            if memory.phenomenon_memory.terrain_confidence() > TERRAIN_INITIAL_CONFIDENCE:
+            if memory.phenomenon_memory.terrain_confidence() > TERRAIN_ORIGIN_CONFIDENCE:  # TERRAIN_INITIAL_CONFIDENCE:
                 ego_position = memory.terrain_centric_to_egocentric(self.ter_position)
             else:
                 # If cannot place the robot then no position matrix
