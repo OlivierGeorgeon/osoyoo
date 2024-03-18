@@ -99,6 +99,28 @@ class AllocentricView(InteractiveDisplay):
         self.bottom -= dy * self.zoom_level
         self.top -= dy * self.zoom_level
 
+        # Update robot position to keep it centered
+        # self.robot_body_x += dx * self.zoom_level
+        # self.robot_body_y += dy * self.zoom_level
+        #
+        # # Update the positions of the robot's body parts
+        # self.robot.robotBody.x = self.robot_body_x
+        # self.robot.robotBody.y = self.robot_body_y
+        # self.robot.FLWheel.x = self.robot_body_x + 50
+        # self.robot.FLWheel.y = self.robot_body_y + 100
+        # self.robot.FRWheel.x = self.robot_body_x + 50
+        # self.robot.FRWheel.y = self.robot_body_y - 100
+        # self.robot.RLWheel.x = self.robot_body_x - 50
+        # self.robot.RLWheel.y = self.robot_body_y + 100
+        # self.robot.RRWheel.x = self.robot_body_x - 50
+        # self.robot.RRWheel.y = self.robot_body_y - 100
+        # self.robot.robot_emotion.x = self.robot_body_x - 30
+        # self.robot.robot_emotion.y = self.robot_body_y
+        # self.robot.head_x += dx * self.zoom_level
+        # self.robot.head_y += dy * self.zoom_level
+        # self.robot.robotHead.x = self.robot.head_x
+        # self.robot.robotHead.y = self.robot.head_y
+
     def on_mouse_scroll(self, x, y, dx, dy):
         # Get scale factor
         f = ZOOM_IN_FACTOR if dy > 0 else ZOOM_OUT_FACTOR if dy < 0 else 1
