@@ -98,10 +98,59 @@ class InteractiveDisplay(pyglet.window.Window):
 
     def mouse_coordinates_to_point(self, x, y):
         """ Return the point in world scale from mouse x and y """
-        point_x = (x - self.width / 2) * self.zoom_level * 2
-        point_y = (y - self.height / 2) * self.zoom_level * 2
+        adjusted_x = x - self.total_dx
+        adjusted_y = y - self.total_dy
+
+        point_x = (adjusted_x - self.width / 2) * self.zoom_level * 2
+        point_y = (adjusted_y - self.height / 2) * self.zoom_level * 2
+
         return Vector3([point_x, point_y, 0], dtype=int)
 
+        # point_x = (x - self.width / 2) * self.zoom_level * 2
+        # point_y = (y - self.height / 2) * self.zoom_level * 2
+        # return Vector3([point_x, point_y, 0], dtype=int)
+
+        # normalized_x = (x / self.width) * (self.right - self.left) + self.left
+        # normalized_y = (1 - y / self.height) * (self.top - self.bottom) + self.bottom
+        #
+        # # Convertir les coordonnées normalisées en coordonnées mondiales
+        # point_x = normalized_x * self.zoom_level
+        # point_y = normalized_y * self.zoom_level
+        #
+        # return Vector3([point_x, point_y, 0], dtype=int)
+        #creation offset
+        #combien la fenetre est dragged par rapport a 0
+        # drag_offset_x = self.left - self.width / 2
+        # drag_offset_y = self.bottom - self.height / 2
+        # adjusted_x = x + drag_offset_x
+        # adjusted_y = y + drag_offset_y
+        #
+        # point_x = (adjusted_x - self.width / 2) * self.zoom_level * 2
+        # point_y = (adjusted_y - self.height / 2) * self.zoom_level * 2
+        # return Vector3([point_x, point_y, 0], dtype=int)
+
+        # Original lines :
+
+
+        # point_x = (x - self.width / 2) * self.zoom_level * 2
+        # point_y = (y - self.height / 2) * self.zoom_level * 2
+        # return Vector3([point_x, point_y, 0], dtype=int)
+
+        # point_x = self.x + (x - self.width / 2) * self.zoom_level * 2
+        # point_y = self.y + (y - self.height / 2) * self.zoom_level * 2
+        #
+        # return Vector3([point_x, point_y, 0], dtype=int)
+
+        # center_x = self.x + self.width / 2
+        # center_y = self.y + self.height / 2
+        #
+        # # Calculate the offset of the mouse from the center of the window
+        # offset_x = (x - self.width / 2) * self.zoom_level
+        # offset_y = (y - self.height / 2) * self.zoom_level
+        #
+        # # Calculate the point in world coordinates
+        # point_x = center_x - offset_x
+        # point_y = center_y - offset_y
         # Karim:
         # point_x = (x - self.window_x - self.width / 2) * self.zoom_level * 2
         # point_y = (y - self.window_y - self.height / 2) * self.zoom_level * 2

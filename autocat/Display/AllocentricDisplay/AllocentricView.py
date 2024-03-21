@@ -69,6 +69,9 @@ class AllocentricView(InteractiveDisplay):
         self.zoomed_width = width
         self.zoomed_height = height
 
+        self.total_dx = 0
+        self.total_dy = 0
+
     def init_gl(self, width, height):
         # Set clear color
         #glClearColor(0 / 255, 0 / 255, 0 / 255, 0 / 255)
@@ -87,39 +90,102 @@ class AllocentricView(InteractiveDisplay):
 
     def on_resize(self, width, height):
         # Set window values
+        # self.width = width
+        # self.height = height
+        # # Initialize OpenGL context
+        # self.init_gl(width, height)
+
+
+        #premier essai:
+        # self.width = width
+        # self.height = height
+        #
+        # # Adjust window position based on accumulated drag
+        # adjusted_width = width + self.total_dx
+        # adjusted_height = height + self.total_dy
+        #
+        # # Initialize OpenGL context
+        # self.init_gl(adjusted_width, adjusted_height)
+
+        #deuxieme essai:
         self.width = width
         self.height = height
+
+             # prise en compte du drag dx/dy
+        adjusted_width = width + self.total_dx
+        adjusted_height = height + self.total_dy
+
+            # nouveau calcul coins de fenetre
+        self.left = (-adjusted_width / 2 - self.total_dx) * self.zoom_level
+        self.right = (adjusted_width / 2 - self.total_dx) * self.zoom_level
+        self.bottom = (-adjusted_height / 2 - self.total_dy) * self.zoom_level
+        self.top = (adjusted_height / 2 - self.total_dy) * self.zoom_level
+
         # Initialize OpenGL context
-        self.init_gl(width, height)
+        self.init_gl(adjusted_width, adjusted_height)
+
+
+        #variable pour le centre de l'ecran, 0.5 pour chaque moitié d'axe
+        mouse_x = 0.5
+        mouse_y = 0.5
+
+        #calcul des coordonnées
+        mouse_x_in_world = self.left + mouse_x * self.zoomed_width
+        mouse_y_in_world = self.bottom + mouse_y * self.zoomed_height
+
+        #nouvelles dimensions de la fenetre en fonction du zoom
+        self.zoomed_width = width * self.zoom_level
+        self.zoomed_height = height * self.zoom_level
+
+        #recalcul de LRBT
+        self.left = mouse_x_in_world - mouse_x * self.zoomed_width
+        self.right = mouse_x_in_world + (1 - mouse_x) * self.zoomed_width
+        self.bottom = mouse_y_in_world - mouse_y * self.zoomed_height
+        self.top = mouse_y_in_world + (1 - mouse_y) * self.zoomed_height
 
     def on_mouse_drag(self, x, y, dx, dy, buttons, modifiers):
+        self.total_dx += dx
+        self.total_dy += dy
+
+        self.left = (-self.width / 2 - self.total_dx) * self.zoom_level
+        self.right = (self.width / 2 - self.total_dx) * self.zoom_level
+        self.bottom = (-self.height / 2 - self.total_dy) * self.zoom_level
+        self.top = (self.height / 2 - self.total_dy) * self.zoom_level
         # Move camera
-        self.left -= dx * self.zoom_level
-        self.right -= dx * self.zoom_level
-        self.bottom -= dy * self.zoom_level
-        self.top -= dy * self.zoom_level
+        #Original code:
+        # self.left -= dx * self.zoom_level
+        # self.right -= dx * self.zoom_level
+        # self.bottom -= dy * self.zoom_level
+        # self.top -= dy * self.zoom_level
+
+        #sECOND ANSWER
+        #store total of dx/dy to calculate mouse pos
+
+
+
+        #Third answer:
+
+        # Update the zoomed width and height
+        # self.zoomed_width -= dx * self.zoom_level
+        # self.zoomed_height -= dy * self.zoom_level
+        #
+        # mouse_x = x / self.width
+        # mouse_y = y / self.height
+        # mouse_x_in_world = self.left + mouse_x * self.zoomed_width
+        # mouse_y_in_world = self.bottom + mouse_y * self.zoomed_height
+        #
+        # self.left = mouse_x_in_world - mouse_x * self.zoomed_width
+        # self.right = mouse_x_in_world + (1 - mouse_x) * self.zoomed_width
+        # self.bottom = mouse_y_in_world - mouse_y * self.zoomed_height
+        # self.top = mouse_y_in_world + (1 - mouse_y) * self.zoomed_height
+
+        # glTranslatef(*self.workspace.memory.allocentric_memory.robot_point)
+        # glRotatef(90 - self.workspace.memory.body_memory.body_azimuth(), 0.0, 0.0, 1.0)
 
         # Update robot position to keep it centered
         # self.robot_body_x += dx * self.zoom_level
         # self.robot_body_y += dy * self.zoom_level
-        #
-        # # Update the positions of the robot's body parts
-        # self.robot.robotBody.x = self.robot_body_x
-        # self.robot.robotBody.y = self.robot_body_y
-        # self.robot.FLWheel.x = self.robot_body_x + 50
-        # self.robot.FLWheel.y = self.robot_body_y + 100
-        # self.robot.FRWheel.x = self.robot_body_x + 50
-        # self.robot.FRWheel.y = self.robot_body_y - 100
-        # self.robot.RLWheel.x = self.robot_body_x - 50
-        # self.robot.RLWheel.y = self.robot_body_y + 100
-        # self.robot.RRWheel.x = self.robot_body_x - 50
-        # self.robot.RRWheel.y = self.robot_body_y - 100
-        # self.robot.robot_emotion.x = self.robot_body_x - 30
-        # self.robot.robot_emotion.y = self.robot_body_y
-        # self.robot.head_x += dx * self.zoom_level
-        # self.robot.head_y += dy * self.zoom_level
-        # self.robot.robotHead.x = self.robot.head_x
-        # self.robot.robotHead.y = self.robot.head_y
+
 
     def on_mouse_scroll(self, x, y, dx, dy):
         # Get scale factor
