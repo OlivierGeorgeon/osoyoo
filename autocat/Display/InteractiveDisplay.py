@@ -8,6 +8,8 @@ from pyglet.gl import *
 
 
 ZOOM_IN_FACTOR = 1.2
+ZOOM_OUT_FACTOR = 1/ZOOM_IN_FACTOR
+
 
 
 def screen_scale():
@@ -36,11 +38,15 @@ class InteractiveDisplay(pyglet.window.Window):
         self.start_drag_y = 0
         self.x = 0
         self.y = 0
-        # Karim:
-        # self.window_x = 0
-        # self.window_y = 0
-        # self.window_width = width
-        # self.window_height = height
+        self.left = 0
+        self.right = width
+        self.bottom = 0
+        self.top = height
+        self.zoomed_width = width
+        self.zoomed_height = height
+
+        self.total_dx = 0
+        self.total_dy = 0
 
         # Initialize OpenGL parameters
         # https://www.w3schools.com/cssref/css_colors.asp
@@ -50,51 +56,22 @@ class InteractiveDisplay(pyglet.window.Window):
         self.forefront = pyglet.graphics.OrderedGroup(5)
         self.screen_scale = screen_scale()
 
+    def init_gl(self, width, height):
+        # Set clear color
+        # glClearColor(0 / 255, 0 / 255, 0 / 255, 0 / 255)
 
+        # Set antialiasing
+        glEnable(GL_LINE_SMOOTH)
+        glEnable(GL_POLYGON_SMOOTH)
+        glHint(GL_LINE_SMOOTH_HINT, GL_NICEST)
 
-    # def on_resize(self, width, height):
-    #     """ Adjusting the viewport when resizing the window """
-    #     # Always display in the whole window. Scale for Mac.
-    #     glViewport(0, 0, width * self.screen_scale, height * self.screen_scale)
-    #     # glViewport(0, 0, width*2, height*2)  # For retina display on Mac
+        # Set alpha blending
+        glEnable(GL_BLEND)
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 
-        # Karim:
-        # glViewport(0, 0, int(width * self.screen_scale * self.zoom_level),int(height * self.screen_scale * self.zoom_level))
+        # Set viewport
+        glViewport(0, 0, width, height)
 
-    # def on_mouse_scroll(self, x, y, dx, dy):
-    #     """ Zooming the window """
-    #     # Inspired by https://www.py4u.net/discuss/148957
-    #     f = ZOOM_IN_FACTOR if dy < 0 else 1/ZOOM_IN_FACTOR if dy > 0 else 1
-    #     if .4 < self.zoom_level * f < 5:
-    #         self.zoom_level *= f
-
-        # Karim:
-        # Get the cursor position relative to the window
-        # cursor_x = (x - self.window_x) / (self.window_width * self.zoom_level)
-        # cursor_y = (y - self.window_y) / (self.window_height * self.zoom_level)
-        #
-        # # Calculate the new zoom level based on the mouse wheel direction
-        # zoom_factor = ZOOM_IN_FACTOR if dy < 0 else 1 / ZOOM_IN_FACTOR if dy > 0 else 1
-        # new_zoom_level = self.zoom_level * zoom_factor
-        #
-        # # Ensure the zoom level is within the specified range
-        # if .4 < new_zoom_level < 5:
-        #     # Calculate the shift in the zoomed position based on the cursor position
-        #     shift_x = cursor_x * (self.zoom_level - new_zoom_level)
-        #     shift_y = cursor_y * (self.zoom_level - new_zoom_level)
-        #
-        #     # Update the zoom level
-        #     self.zoom_level = new_zoom_level
-        #
-        #     # Update the position of the window based on the cursor position
-        #     self.window_x += shift_x * self.window_width
-        #     self.window_y += shift_y * self.window_height
-        #
-        #     # Update the size of the window based on the zoom level
-        #     self.window_width *= self.zoom_level
-        #     self.window_height *= self.zoom_level
-        #
-        # self.on_draw()
 
     def mouse_coordinates_to_point(self, x, y):
         """ Return the point in world scale from mouse x and y """
@@ -110,85 +87,75 @@ class InteractiveDisplay(pyglet.window.Window):
         # point_y = (y - self.height / 2) * self.zoom_level * 2
         # return Vector3([point_x, point_y, 0], dtype=int)
 
-        # normalized_x = (x / self.width) * (self.right - self.left) + self.left
-        # normalized_y = (1 - y / self.height) * (self.top - self.bottom) + self.bottom
-        #
-        # # Convertir les coordonnées normalisées en coordonnées mondiales
-        # point_x = normalized_x * self.zoom_level
-        # point_y = normalized_y * self.zoom_level
-        #
-        # return Vector3([point_x, point_y, 0], dtype=int)
-        #creation offset
-        #combien la fenetre est dragged par rapport a 0
-        # drag_offset_x = self.left - self.width / 2
-        # drag_offset_y = self.bottom - self.height / 2
-        # adjusted_x = x + drag_offset_x
-        # adjusted_y = y + drag_offset_y
-        #
-        # point_x = (adjusted_x - self.width / 2) * self.zoom_level * 2
-        # point_y = (adjusted_y - self.height / 2) * self.zoom_level * 2
-        # return Vector3([point_x, point_y, 0], dtype=int)
+    def on_resize(self, width, height):
+        # Set window values
+        # self.width = width
+        # self.height = height
+        # # Initialize OpenGL context
+        # self.init_gl(width, height)
 
-        # Original lines :
+        #deuxieme essai:
+        self.width = width
+        self.height = height
+
+             # prise en compte du drag dx/dy
+        adjusted_width = width + self.total_dx
+        adjusted_height = height + self.total_dy
+
+            # nouveau calcul coins de fenetre
+        self.left = (-adjusted_width / 2 - self.total_dx) * self.zoom_level
+        self.right = (adjusted_width / 2 - self.total_dx) * self.zoom_level
+        self.bottom = (-adjusted_height / 2 - self.total_dy) * self.zoom_level
+        self.top = (adjusted_height / 2 - self.total_dy) * self.zoom_level
+
+        # Initialize OpenGL context
+        self.init_gl(adjusted_width, adjusted_height)
 
 
-        # point_x = (x - self.width / 2) * self.zoom_level * 2
-        # point_y = (y - self.height / 2) * self.zoom_level * 2
-        # return Vector3([point_x, point_y, 0], dtype=int)
+        #variable pour le centre de l'ecran, 0.5 pour chaque moitié d'axe
+        mouse_x = 0.5
+        mouse_y = 0.5
 
-        # point_x = self.x + (x - self.width / 2) * self.zoom_level * 2
-        # point_y = self.y + (y - self.height / 2) * self.zoom_level * 2
-        #
-        # return Vector3([point_x, point_y, 0], dtype=int)
+        #calcul des coordonnées
+        mouse_x_in_world = self.left + mouse_x * self.zoomed_width
+        mouse_y_in_world = self.bottom + mouse_y * self.zoomed_height
 
-        # center_x = self.x + self.width / 2
-        # center_y = self.y + self.height / 2
-        #
-        # # Calculate the offset of the mouse from the center of the window
-        # offset_x = (x - self.width / 2) * self.zoom_level
-        # offset_y = (y - self.height / 2) * self.zoom_level
-        #
-        # # Calculate the point in world coordinates
-        # point_x = center_x - offset_x
-        # point_y = center_y - offset_y
-        # Karim:
-        # point_x = (x - self.window_x - self.width / 2) * self.zoom_level * 2
-        # point_y = (y - self.window_y - self.height / 2) * self.zoom_level * 2
-        # return Vector3([point_x, point_y, 0], dtype=int)
+        #nouvelles dimensions de la fenetre en fonction du zoom
+        self.zoomed_width = width * self.zoom_level
+        self.zoomed_height = height * self.zoom_level
 
-    # def on_mouse_press(self, x, y, button, modifiers):
-    #     if button == pyglet.window.mouse.LEFT:
-    #         print('mouse pressed')
-    #         self.dragging = True
-    #         self.start_drag_x = x
-    #         self.start_drag_y = y
-    #
-    #         #self.start_x = x
-    #         #self.start_y = y
-    #
-    # def on_mouse_drag(self, x, y, dx, dy, buttons, modifiers):
-    #     if self.dragging:
-    #         # Calculate the new window position
-    #         # new_x = self.x + dx
-    #         # new_y = self.y + dy
-    #
-    #         self.x += dx
-    #         self.y += dy
-    #         print('mouse dragging')
-    #         # Update the window position
-    #         #self.set_location(new_x, new_y)
-    #
-    #         #self.start_drag_x = x
-    #         #self.start_drag_y = y
-    #         self.on_draw()
-    #
-    #
-    # def on_mouse_release(self, x, y, button, modifiers):
-    #     if button == pyglet.window.mouse.LEFT:
-    #         self.dragging = False
-    #         self.start_drag_x = 0
-    #         self.start_drag_y = 0
-    #         print('mouse released')
-    #         #self.start_x = 0
-    #         #self.start_y = 0
+        #recalcul de LRBT
+        self.left = mouse_x_in_world - mouse_x * self.zoomed_width
+        self.right = mouse_x_in_world + (1 - mouse_x) * self.zoomed_width
+        self.bottom = mouse_y_in_world - mouse_y * self.zoomed_height
+        self.top = mouse_y_in_world + (1 - mouse_y) * self.zoomed_height
 
+    def on_mouse_drag(self, x, y, dx, dy, buttons, modifiers):
+        self.total_dx += dx
+        self.total_dy += dy
+
+        self.left = (-self.width / 2 - self.total_dx) * self.zoom_level
+        self.right = (self.width / 2 - self.total_dx) * self.zoom_level
+        self.bottom = (-self.height / 2 - self.total_dy) * self.zoom_level
+        self.top = (self.height / 2 - self.total_dy) * self.zoom_level
+
+    def on_mouse_scroll(self, x, y, dx, dy):
+        # Get scale factor
+        f = ZOOM_IN_FACTOR if dy > 0 else ZOOM_OUT_FACTOR if dy < 0 else 1
+        # If zoom_level is in the proper range
+        if .2 < self.zoom_level * f < 5:
+            self.zoom_level *= f
+
+            mouse_x = x / self.width
+            mouse_y = y / self.height
+
+            mouse_x_in_world = self.left + mouse_x * self.zoomed_width
+            mouse_y_in_world = self.bottom + mouse_y * self.zoomed_height
+
+            self.zoomed_width *= f
+            self.zoomed_height *= f
+
+            self.left = mouse_x_in_world - mouse_x * self.zoomed_width
+            self.right = mouse_x_in_world + (1 - mouse_x) * self.zoomed_width
+            self.bottom = mouse_y_in_world - mouse_y * self.zoomed_height
+            self.top = mouse_y_in_world + (1 - mouse_y) * self.zoomed_height

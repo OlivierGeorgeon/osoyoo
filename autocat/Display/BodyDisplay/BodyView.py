@@ -42,8 +42,10 @@ class BodyView(InteractiveDisplay):
         # The transformations are stacked, and applied in reversed order to the vertices
 
         # Stack the projection matrix. Centered on (0,0). Fit the window size and zoom factor
-        glOrtho(-self.width * self.zoom_level, self.width * self.zoom_level, -self.height * self.zoom_level,
-                self.height * self.zoom_level, 1, -1)
+        # glOrtho(-self.width * self.zoom_level, self.width * self.zoom_level, -self.height * self.zoom_level,
+        #         self.height * self.zoom_level, 1, -1)
+        glOrtho(self.left, self.right, self.bottom, self.top, 1, -1)
+
 
         # Stack the rotation of the robot body
         glRotatef(90 - self.workspace.memory.body_memory.body_azimuth(), 0.0, 0.0, 1.0)
