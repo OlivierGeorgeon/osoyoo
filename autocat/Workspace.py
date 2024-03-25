@@ -11,7 +11,7 @@ from .Proposer.ProposerPlayTurn import ProposerPlayTurn
 from .Proposer.ProposerPlaySwipe import ProposerPlaySwipe
 from .Proposer.Action import create_actions, ACTION_FORWARD, ACTIONS, ACTION_TURN, ACTION_BACKWARD
 from .Memory.Memory import Memory
-from .Memory.PhenomenonMemory import TERRAIN_INITIAL_CONFIDENCE
+from .Memory.PhenomenonMemory import TERRAIN_ORIGIN_CONFIDENCE
 from .Robot.Enaction import Enaction
 from .Robot.Command import DIRECTION_BACK
 from .Robot.Message import Message
@@ -41,12 +41,12 @@ class Workspace:
         self.actions = create_actions(robot_id)
         self.memory = Memory(arena_id, robot_id)
         self.proposers = {'Circle ': Proposer(self)
+                          , 'PlayC': ProposerPlayTurn(self)
                           # , 'Explore': ProposerExplore(self)
                           # , 'Watch': ProposerWatch(self)
                           # , 'Watch C': ProposerWatchCenter(self),  'Arrange': ProposerArrange(self)
                           # , 'Push': ProposerPush(self)
                           # , 'Play': ProposerPlaySwipe(self)
-                          # , 'Play': ProposerPlayTurn(self)
                           }
         self.enacter = Enacter(self)
         self.simulator = Simulator(self)
@@ -186,7 +186,7 @@ class Workspace:
                    "azimuth": self.memory.body_memory.body_azimuth(), "emotion": self.memory.emotion_code}
 
         # If the terrain has been found then send the position relative to the terrain origin
-        if self.memory.phenomenon_memory.terrain_confidence() > TERRAIN_INITIAL_CONFIDENCE:
+        if self.memory.phenomenon_memory.terrain_confidence() > TERRAIN_ORIGIN_CONFIDENCE:  # TERRAIN_INITIAL_CONFIDENCE:
             robot_point = self.memory.terrain_centric_robot_point()
             message['position'] = robot_point.astype(int).tolist()
 

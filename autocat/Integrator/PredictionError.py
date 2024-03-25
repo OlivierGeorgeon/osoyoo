@@ -227,7 +227,7 @@ class PredictionError:
 
         # The yaw prediction error
         kwargs = {'bottom': -40, 'top': 40, 'fmt': 'sc', 'marker_size': 5}
-        plot(self.pe_yaw, "Yaw prediction error", "02_yaw", "(degrees)", **kwargs)
+        plot(self.pe_yaw, "Yaw prediction error", "02_yaw", "(degree)", **kwargs)
 
         # The compass residual error
         kwargs = {'bottom': -20, 'top': 20, 'fmt': 'sy', 'marker_size': 5}

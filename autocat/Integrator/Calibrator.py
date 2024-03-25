@@ -14,14 +14,21 @@ def compass_calibration(points):
     # print(repr(points))
     if points.shape[0] > 2:
         # Find the center of the circle made by the compass points
-        xc, yc, r, sigma = cf.taubinSVD(points)
-        # If the circle is in bounds and not too far off
-        if MIN_OFFSET_RADIUS < r < MAX_OFFSET_RADIUS and np.linalg.norm([xc, yc]) < MAX_OFFSET_DISTANCE:
-            print("Fit circle offset=(" + str(round(xc)) + ", " + str(round(yc)) + ") radius=" + str(round(r))
-                  + " sigma=" + str(round(sigma, 2)))
-            return round(xc), round(yc)
-        else:
-            print("Compass calibration failed. Radius out of bound: " + str(round(r)))
+        try:
+            xc, yc, r, sigma = cf.taubinSVD(points)
+            # If the circle is in bounds and not too far off
+            if MIN_OFFSET_RADIUS < r < MAX_OFFSET_RADIUS and np.linalg.norm([xc, yc]) < MAX_OFFSET_DISTANCE:
+                print("Fit circle offset=(" + str(round(xc)) + ", " + str(round(yc)) + ") radius=" + str(round(r))
+                      + " sigma=" + str(round(sigma, 2)))
+                return round(xc), round(yc)
+            else:
+                print("Compass calibration failed. Radius out of bound: " + str(round(r)))
+        except ValueError as e:
+            # All the points are at the same position
+            print("Unable to compute circle:", e)
+        except OverflowError as e:
+            # All the points are aligned
+            print("Unable to compute circle:", e)
     else:
         print("Compass calibration failed. Not enough points: " + str(points.shape[0]))
     return None

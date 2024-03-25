@@ -18,18 +18,11 @@ DEFAULT_ACTION_DURATION = 1000    # (ms) The default duration of actions (value 
 # RETREAT_DISTANCE_Y = 20  # 75     # (mm) Y displacement when line is detected on the side
 
 TERRAIN_RADIUS = {"A328": {"radius": 1100, "azimuth": 25, "short_radius": 800},  #  25 990 x 600  45},
-                  # "PetiteIA": {"radius": 600, "azimuth": 50},  # Petit tapis
+                  "Circle": {"radius": 650, "short_radius": 650, "azimuth": 90},  # Petit tapis
                   "PetiteIA": {"radius": 1100, "azimuth": 55, "short_radius": 650},  # {990, 60},  # Grand tapis
                   "A301": {"radius": 1200, "azimuth": 50},
                   "DOLL": {"radius": 1200, "azimuth": 0, "short_radius": 1000}      # To be defined
 }
-
-# You must set the compass offset to the center of the circle drawn by the (compass_x, compass_y) points.
-# Display the compass points of interest in Egocentric view.
-# See screenshot docs/first_steps/compass_calibration.png
-# See https://www.best-microcontroller-projects.com/hmc5883l.html
-# compass_x must be near 0 when the robot is East or West
-# compass_y must be near 0 when the robot is North or South.
 
 ROBOT_SETTINGS_0 = {
     "IP": {},
@@ -66,7 +59,7 @@ ROBOT_SETTINGS_3["compass_offset"] = [0, 0, 0]  # [-50, 0, 0] [50, -50, 0]  # [3
 
 # Robot 4 chez Olivier
 ROBOT_SETTINGS_4 = ROBOT_SETTINGS_0.copy()
-ROBOT_SETTINGS_4["IP"] = {"PetiteIA": "192.168.8.242"}  # 108
+ROBOT_SETTINGS_4["IP"] = {"PetiteIA": "192.168.8.242", "Circle": "192.168.8.242"}  # 108
 ROBOT_SETTINGS_4["forward_speed"] = 320
 ROBOT_SETTINGS_4["lateral_speed"] = 200  # 50
 ROBOT_SETTINGS_4["retreat_distance"] = 40  # 150 Increase it if the line keeps being pushed farther

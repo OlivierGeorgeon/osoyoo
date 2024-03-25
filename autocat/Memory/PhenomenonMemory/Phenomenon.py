@@ -37,7 +37,6 @@ class Phenomenon:
         self.hull_points = None
         self.path = None  # Used to test is_inside in terrain-centric coordinates
         self.interpolation_types = None
-        # self.interpolation_points = None
 
         # Last time the origin affordance was enacted. Used to compute the return to origin.
         self.last_origin_clock = affordance.clock
@@ -57,20 +56,16 @@ class Phenomenon:
         else:
             return None
 
-    def try_to_close(self):
-        """If the area is large enough, increase confidence and interpolate the closed shape"""
-        if self.confidence < PHENOMENON_CLOSED_CONFIDENCE:
-            vertices = [a.point[0:2] for a in self.affordances.values() if a.type in self.interpolation_types]
-            if len(vertices) > 2:
-                vertices.append(vertices[0])
-                vertices = np.array(vertices)
-                # Compute the area with the Shoelace formula. TODO : sort the vertices or find a better criteria
-                area = 0.5 * np.abs(np.dot(vertices[:-1, 0], np.roll(vertices[:-1, 1], 1)) -
-                                    np.dot(vertices[:-1, 1], np.roll(vertices[:-1, 0], 1)))
-                print("area", area)
-                if area > 700000:
-                    self.confidence = PHENOMENON_CLOSED_CONFIDENCE
-                    self.interpolate()
+    def try_to_bridge(self):
+        """Try to bridge the circumference of the phenomenon"""
+        # Only implemented for PhenomenonTerrain yet
+        return
+
+    def move_origin(self, offset):
+        """Move the phenomenon's origin by the offset. Move the affordance by the opposite"""
+        self.point += offset
+        for a in self.affordances.values():
+            a.point -= offset
 
     def recognize(self, category):
         """Update the category, confidence, shape, and path of this phenomenon"""
@@ -152,7 +147,7 @@ class Phenomenon:
     def set_path(self):
         """Set the path representing the terrain outline used to test is_inside"""
         # Must not be recomputed on each call to is_inside()
-        # Need a closed two dimensional array [[x0, y0],...,[x100, y100], [x0, y0]]
+        # Need a closed two-dimensional array [[x0, y0],...,[x100, y100], [x0, y0]]
         self.path = mpath.Path(self.shape[:, 0:2] + self.shape[0, 0:2])
 
     def is_inside(self, terrain_centric_point):
@@ -161,13 +156,6 @@ class Phenomenon:
             return False
         else:
             return self.path.contains_point(terrain_centric_point[0:2])
-
-    # def phenomenon_label(self):
-    #     """Return the text to display in phenomenon view"""
-    #     label = "Origin direction: " + \
-    #         str(round(math.degrees(self.affordances[0].experience.absolute_direction_rad))) + \
-    #         "°. Nb tours:" + str(self.nb_tour)
-    #     return label
 
     def vector_toward_origin(self, affordance):
         """Return the vector computed from the affordance point minus the phenomenon point."""

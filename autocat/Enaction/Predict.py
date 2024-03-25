@@ -3,7 +3,7 @@ import numpy as np
 import time
 import matplotlib.path as mpath
 from ..Proposer.Action import ACTION_FORWARD, ACTION_SWIPE, ACTION_RIGHTWARD, ACTION_SCAN
-from ..Memory.PhenomenonMemory import PHENOMENON_RECOGNIZED_CONFIDENCE
+from ..Memory.PhenomenonMemory import PHENOMENON_RECOGNIZED_CONFIDENCE, PHENOMENON_CLOSED_CONFIDENCE
 from ..Memory.AllocentricMemory.Hexagonal_geometry import point_to_cell
 from ..Memory.EgocentricMemory.Experience import EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_FLOOR
 from ..Robot.RobotDefine import ROBOT_FLOOR_SENSOR_X, ROBOT_SETTINGS, ROBOT_OUTSIDE_Y
@@ -24,8 +24,8 @@ def generate_prediction(command, memory):
                     "head_angle": memory.body_memory.head_direction_degree(), "echo_distance": 10000,
                     "yaw": command.yaw, "floor": 0}
 
-    # If terrain is recognized, adjust the floor, duration1, and yaw outcome
-    if memory.phenomenon_memory.terrain_confidence() >= PHENOMENON_RECOGNIZED_CONFIDENCE:
+    # If terrain is closed, adjust the floor, duration1, and yaw outcome
+    if memory.phenomenon_memory.terrain_confidence() >= PHENOMENON_CLOSED_CONFIDENCE:  # PHENOMENON_RECOGNIZED_CONFIDENCE:
         # The shape of the terrain in egocentric coordinates
         # start_time = time.time()
         ego_shape = np.apply_along_axis(memory.terrain_centric_to_egocentric, 1,
@@ -33,59 +33,100 @@ def generate_prediction(command, memory):
         # print("compute ego shape:", (time.time() - start_time) * 1000, "milliseconds")
         if command.action.action_code == ACTION_FORWARD:
             # Loop over the points where the y coordinate changes sign
+            intersections = []
             for i in np.where(np.diff(np.sign(ego_shape[:, 1])))[0]:
-                # find the x coordinate of the line intersection. Tentatively set floor and yaw
-                if abs(ego_shape[i + 1][0] - ego_shape[i][0]) < 5:
-                    outcome_dict["floor"] = 3
-                    outcome_dict["yaw"] = 0
-                    x = ego_shape[i][0]
-                else:
-                    slope = (ego_shape[i + 1][1] - ego_shape[i][1]) / (ego_shape[i + 1][0] - ego_shape[i][0])
-                    x = ego_shape[i][0] - ego_shape[i][1] / slope
-                    if ego_shape[i][0] > ego_shape[i + 1][0]:
-                        outcome_dict["floor"] = 1
+                intersection = x_intersection([ego_shape[i], ego_shape[i + 1]])
+                if intersection is not None:
+                    intersections.append(intersection)
+            if len(intersections) > 0:
+                closest_intersection = intersections[np.argmin(np.array(intersections)[:, 0])]
+                duration1 = (closest_intersection[0] - ROBOT_FLOOR_SENSOR_X) * 1000 / ROBOT_SETTINGS[memory.robot_id]["forward_speed"]
+                if duration1 < command.duration:
+                    outcome_dict["duration1"] = round(duration1)
+                    outcome_dict["floor"] = closest_intersection[1]
+                    outcome_dict["color_index"] = cell_color(np.array([closest_intersection[0], 0, 0]), memory)
+                    if closest_intersection[1] == 1:
                         outcome_dict["yaw"] = -RETREAT_YAW
-                    else:
-                        outcome_dict["floor"] = 2
+                    elif closest_intersection[1] == 2:
                         outcome_dict["yaw"] = RETREAT_YAW
-                # If the line intersection is before the robot
-                if x > 0:
-                    duration1 = (x - ROBOT_FLOOR_SENSOR_X) * 1000 / ROBOT_SETTINGS[memory.robot_id]["forward_speed"]
-                    if duration1 < command.duration:
-                        outcome_dict["duration1"] = round(duration1)
-                        outcome_dict["color_index"] = cell_color(np.array([x, 0, 0]), memory)
-                    else:
-                        # Must reset the floor and yaw set above
-                        outcome_dict["floor"] = 0
-                        outcome_dict["yaw"] = 0
-                    # Stop searching (assume the robot is inside the terrain)
-                    break
+
+            # # find the x coordinate of the line intersection. Tentatively set floor and yaw
+                # if abs(ego_shape[i + 1][0] - ego_shape[i][0]) < 5:
+                #     outcome_dict["floor"] = 3
+                #     outcome_dict["yaw"] = 0
+                #     x = ego_shape[i][0]
+                # else:
+                #     slope = (ego_shape[i + 1][1] - ego_shape[i][1]) / (ego_shape[i + 1][0] - ego_shape[i][0])
+                #     x = ego_shape[i][0] - ego_shape[i][1] / slope
+                #     if ego_shape[i][0] > ego_shape[i + 1][0]:
+                #         outcome_dict["floor"] = 1
+                #         outcome_dict["yaw"] = -RETREAT_YAW
+                #     else:
+                #         outcome_dict["floor"] = 2
+                #         outcome_dict["yaw"] = RETREAT_YAW
+                # # If the line intersection is before the robot
+                # if x > 0:
+                #     duration1 = (x - ROBOT_FLOOR_SENSOR_X) * 1000 / ROBOT_SETTINGS[memory.robot_id]["forward_speed"]
+                #     if duration1 < command.duration:
+                #         outcome_dict["duration1"] = round(duration1)
+                #         outcome_dict["color_index"] = cell_color(np.array([x, 0, 0]), memory)
+                #     else:
+                #         # Must reset the floor and yaw set above
+                #         outcome_dict["floor"] = 0
+                #         outcome_dict["yaw"] = 0
+                #     # Stop searching (assume the robot is inside the terrain)
+                #     break
         elif command.action.action_code in [ACTION_SWIPE, ACTION_RIGHTWARD]:
             # Translate the shape by the position of the floor sensor so we can check the sign of the x coordinate
             ego_shape -= np.array([ROBOT_FLOOR_SENSOR_X, 0, 0])  #
             # Loop over the points where the x coordinate pass the floor sensor
+            intersections_left = []
+            intersections_right = []
             for i in np.where(np.diff(np.sign(ego_shape[:, 0])))[0]:
-                if abs(ego_shape[i + 1][1] - ego_shape[i][1]) == 0:
-                    y = ego_shape[i][1]
-                else:
-                    slope = (ego_shape[i + 1][0] - ego_shape[i][0]) / (ego_shape[i + 1][1] - ego_shape[i][1])
-                    y = ego_shape[i][1] - ego_shape[i][0] / slope
-                if command.speed[1] > 0 and y > 0:  # Swipe left
-                    duration1 = y * 1000 / ROBOT_SETTINGS[memory.robot_id]["lateral_speed"]
-                    if duration1 < command.duration:
-                        outcome_dict["duration1"] = round(duration1)
-                        outcome_dict["floor"] = 2
-                        outcome_dict["yaw"] = RETREAT_YAW
-                        outcome_dict["color_index"] = cell_color(np.array([ROBOT_FLOOR_SENSOR_X, y, 0]), memory)
-                    break
-                elif command.speed[1] < 0 and y < 0:  # Swipe right
-                    duration1 = -y * 1000 / ROBOT_SETTINGS[memory.robot_id]["lateral_speed"]
-                    if duration1 < command.duration:
-                        outcome_dict["duration1"] = round(duration1)
-                        outcome_dict["floor"] = 1
-                        outcome_dict["yaw"] = -RETREAT_YAW
-                        outcome_dict["color_index"] = cell_color(np.array([ROBOT_FLOOR_SENSOR_X, y, 0]), memory)
-                    break
+                intersection = y_intersection([ego_shape[i], ego_shape[i + 1]])
+                if intersection is not None:
+                    if intersection > 0:
+                        intersections_left.append(intersection)
+                    else:
+                        intersections_right.append(intersection)
+            if command.speed[1] > 0 and len(intersections_left) > 0:  # Swipe left
+                closest_intersection = intersections_left[np.argmin(np.array(intersections_left))]
+                duration1 = closest_intersection * 1000 / ROBOT_SETTINGS[memory.robot_id]["lateral_speed"]
+                if duration1 < command.duration:
+                    outcome_dict["duration1"] = round(duration1)
+                    outcome_dict["floor"] = 2
+                    outcome_dict["yaw"] = RETREAT_YAW
+                    outcome_dict["color_index"] = cell_color(np.array([ROBOT_FLOOR_SENSOR_X, closest_intersection, 0]), memory)
+            elif command.speed[1] < 0 < len(intersections_right):  # Swipe right
+                closest_intersection = intersections_right[np.argmax(np.array(intersections_right))]
+                duration1 = -closest_intersection * 1000 / ROBOT_SETTINGS[memory.robot_id]["lateral_speed"]
+                if duration1 < command.duration:
+                    outcome_dict["duration1"] = round(duration1)
+                    outcome_dict["floor"] = 1
+                    outcome_dict["yaw"] = -RETREAT_YAW
+                    outcome_dict["color_index"] = cell_color(np.array([ROBOT_FLOOR_SENSOR_X, closest_intersection, 0]), memory)
+
+                # if abs(ego_shape[i + 1][1] - ego_shape[i][1]) == 0:
+                #     y = ego_shape[i][1]
+                # else:
+                #     slope = (ego_shape[i + 1][0] - ego_shape[i][0]) / (ego_shape[i + 1][1] - ego_shape[i][1])
+                #     y = ego_shape[i][1] - ego_shape[i][0] / slope
+                # if command.speed[1] > 0 and y > 0:  # Swipe left
+                #     duration1 = y * 1000 / ROBOT_SETTINGS[memory.robot_id]["lateral_speed"]
+                #     if duration1 < command.duration:
+                #         outcome_dict["duration1"] = round(duration1)
+                #         outcome_dict["floor"] = 2
+                #         outcome_dict["yaw"] = RETREAT_YAW
+                #         outcome_dict["color_index"] = cell_color(np.array([ROBOT_FLOOR_SENSOR_X, y, 0]), memory)
+                #     break
+                # elif command.speed[1] < 0 and y < 0:  # Swipe right
+                #     duration1 = -y * 1000 / ROBOT_SETTINGS[memory.robot_id]["lateral_speed"]
+                #     if duration1 < command.duration:
+                #         outcome_dict["duration1"] = round(duration1)
+                #         outcome_dict["floor"] = 1
+                #         outcome_dict["yaw"] = -RETREAT_YAW
+                #         outcome_dict["color_index"] = cell_color(np.array([ROBOT_FLOOR_SENSOR_X, y, 0]), memory)
+                #     break
 
     # Compute the displacement in memory
     trajectory = Trajectory(memory, command)
@@ -146,3 +187,56 @@ def push_objects(trajectory, memory):
         ego_point = memory.allocentric_to_egocentric(p.point)
         ego_point[0] = trajectory.translation[0] + ROBOT_FLOOR_SENSOR_X + p.category.short_radius
         p.point = memory.egocentric_to_allocentric(ego_point)
+
+
+def x_intersection(line):
+    """Return the x value where the segment intersects the x axis, and the floor code"""
+    # line1 = x1, y1, x2, y2
+    x1, y1, x2, y2 = line[0][0], line[0][1], line[1][0], line[1][1]
+    dx = (x2 - x1)
+    if dx == 0:
+        x = x1
+    else:
+        slope = (y2 - y1) / dx
+        x = x1 - y1 / slope
+
+    if x < 0 or y1 * y2 > 0:
+        # The line segment does not intersect before the robot
+        return None
+    if dx == 0 or abs(slope) > 10:
+        # Line segment in front
+        return [x, 3]
+    elif (x1 < x2 and y1 < y2) or (x1 > x2 and y1 > y2):
+        # Line segment to the right
+        return [x, 1]
+    else:
+        # Line segment to the left
+        return [x, 2]
+
+
+def y_intersection(line):
+    """Return the y value where the segment intersects the y axis or None"""
+    # line1 = x1, y1, x2, y2
+    x1, y1, x2, y2 = line[0][0], line[0][1], line[1][0], line[1][1]
+    dy = (y2 - y1)
+    if dy == 0:
+        y = y1
+    else:
+        slope = (x2 - x1) / dy
+        y = y1 - x1 / slope
+
+    if x1 * x2 > 0:
+        # The line segment does not intersect with the y axis
+        return None
+    else:
+        return y
+    # if dy == 0 or abs(slope) > 10:
+    #     # Line segment in front
+    #     return [x, 3]
+    # elif (x1 < x2 and y1 < y2) or (x1 > x2 and y1 > y2):
+    #     # Line segment to the right
+    #     return [x, 1]
+    # else:
+    #     # Line segment to the left
+    #     return [x, 2]
+
