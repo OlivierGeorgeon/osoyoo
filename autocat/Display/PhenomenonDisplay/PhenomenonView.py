@@ -47,8 +47,10 @@ class PhenomenonView(InteractiveDisplay):
         # The transformations are stacked, and applied backward to the vertices
 
         # Stack the projection matrix. Centered on (0,0). Fit the window size and zoom factor
-        glOrtho(-self.width * self.zoom_level, self.width * self.zoom_level, -self.height * self.zoom_level,
-                self.height * self.zoom_level, 1, -1)
+        # glOrtho(-self.width * self.zoom_level, self.width * self.zoom_level, -self.height * self.zoom_level,
+        #         self.height * self.zoom_level, 1, -1)
+        glOrtho(self.left, self.right, self.bottom, self.top, 1, -1)
+
 
         # Draw the phenomenon
         self.batch.draw()
