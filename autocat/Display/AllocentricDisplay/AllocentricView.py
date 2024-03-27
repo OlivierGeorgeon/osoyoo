@@ -38,10 +38,6 @@ class AllocentricView(InteractiveDisplay):
         self.robot_batch = pyglet.graphics.Batch()
         self.robot = OsoyooCar(self.robot_batch, self.forefront)  # Rectangles seem not to respect ordered groups
 
-        self.zoom_level = 1
-        #self.mouse_press_angle = 0
-        # self.window = None
-
         self.workspace = workspace
         self.nb_cell_x = workspace.memory.allocentric_memory.width
         self.nb_cell_y = workspace.memory.allocentric_memory.height
@@ -51,8 +47,7 @@ class AllocentricView(InteractiveDisplay):
         self.robot_poi = None  # The other robot point of interest
         self.body_poi = None
 
-        #self.mouse_press_x = 0
-        #self.mouse_press_y = 0
+
 
         # The text at the bottom left
         self.label_batch = pyglet.graphics.Batch()
@@ -71,96 +66,6 @@ class AllocentricView(InteractiveDisplay):
 
         self.total_dx = 0
         self.total_dy = 0
-
-    # def init_gl(self, width, height):
-    #     # Set clear color
-    #     #glClearColor(0 / 255, 0 / 255, 0 / 255, 0 / 255)
-    #
-    #     # Set antialiasing
-    #     glEnable(GL_LINE_SMOOTH)
-    #     glEnable(GL_POLYGON_SMOOTH)
-    #     glHint(GL_LINE_SMOOTH_HINT, GL_NICEST)
-    #
-    #     # Set alpha blending
-    #     glEnable(GL_BLEND)
-    #     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-    #
-    #     # Set viewport
-    #     glViewport(0, 0, width, height)
-
-    # def on_resize(self, width, height):
-    #     # Set window values
-    #     # self.width = width
-    #     # self.height = height
-    #     # # Initialize OpenGL context
-    #     # self.init_gl(width, height)
-    #
-    #     #deuxieme essai:
-    #     self.width = width
-    #     self.height = height
-    #
-    #          # prise en compte du drag dx/dy
-    #     adjusted_width = width + self.total_dx
-    #     adjusted_height = height + self.total_dy
-    #
-    #         # nouveau calcul coins de fenetre
-    #     self.left = (-adjusted_width / 2 - self.total_dx) * self.zoom_level
-    #     self.right = (adjusted_width / 2 - self.total_dx) * self.zoom_level
-    #     self.bottom = (-adjusted_height / 2 - self.total_dy) * self.zoom_level
-    #     self.top = (adjusted_height / 2 - self.total_dy) * self.zoom_level
-    #
-    #     # Initialize OpenGL context
-    #     self.init_gl(adjusted_width, adjusted_height)
-    #
-    #
-    #     #variable pour le centre de l'ecran, 0.5 pour chaque moitié d'axe
-    #     mouse_x = 0.5
-    #     mouse_y = 0.5
-    #
-    #     #calcul des coordonnées
-    #     mouse_x_in_world = self.left + mouse_x * self.zoomed_width
-    #     mouse_y_in_world = self.bottom + mouse_y * self.zoomed_height
-    #
-    #     #nouvelles dimensions de la fenetre en fonction du zoom
-    #     self.zoomed_width = width * self.zoom_level
-    #     self.zoomed_height = height * self.zoom_level
-    #
-    #     #recalcul de LRBT
-    #     self.left = mouse_x_in_world - mouse_x * self.zoomed_width
-    #     self.right = mouse_x_in_world + (1 - mouse_x) * self.zoomed_width
-    #     self.bottom = mouse_y_in_world - mouse_y * self.zoomed_height
-    #     self.top = mouse_y_in_world + (1 - mouse_y) * self.zoomed_height
-    #
-    # def on_mouse_drag(self, x, y, dx, dy, buttons, modifiers):
-    #     self.total_dx += dx
-    #     self.total_dy += dy
-    #
-    #     self.left = (-self.width / 2 - self.total_dx) * self.zoom_level
-    #     self.right = (self.width / 2 - self.total_dx) * self.zoom_level
-    #     self.bottom = (-self.height / 2 - self.total_dy) * self.zoom_level
-    #     self.top = (self.height / 2 - self.total_dy) * self.zoom_level
-    #
-    #
-    # def on_mouse_scroll(self, x, y, dx, dy):
-    #     # Get scale factor
-    #     f = ZOOM_IN_FACTOR if dy > 0 else ZOOM_OUT_FACTOR if dy < 0 else 1
-    #     # If zoom_level is in the proper range
-    #     if .2 < self.zoom_level * f < 5:
-    #         self.zoom_level *= f
-    #
-    #         mouse_x = x / self.width
-    #         mouse_y = y / self.height
-    #
-    #         mouse_x_in_world = self.left + mouse_x * self.zoomed_width
-    #         mouse_y_in_world = self.bottom + mouse_y * self.zoomed_height
-    #
-    #         self.zoomed_width *= f
-    #         self.zoomed_height *= f
-    #
-    #         self.left = mouse_x_in_world - mouse_x * self.zoomed_width
-    #         self.right = mouse_x_in_world + (1 - mouse_x) * self.zoomed_width
-    #         self.bottom = mouse_y_in_world - mouse_y * self.zoomed_height
-    #         self.top = mouse_y_in_world + (1 - mouse_y) * self.zoomed_height
 
     def update_hexagon(self, cell):
         """Create or update or delete an hexagon in allocentric view."""
@@ -195,14 +100,6 @@ class AllocentricView(InteractiveDisplay):
 
         # Set orthographic projection matrix
         glOrtho(self.left, self.right, self.bottom, self.top, 1, -1)
-        # glClear(GL_COLOR_BUFFER_BIT)
-        #
-        # # The transformations are stacked, and applied backward to the vertices
-        # glLoadIdentity()
-
-        # Stack the projection matrix. Centered on (0,0). Fit the window size and zoom factor
-        # glOrtho(-self.width * self.zoom_level, self.width * self.zoom_level, -self.height * self.zoom_level,
-        #         self.height * self.zoom_level, 1, -1)
 
         # Draw the hexagonal grid
         self.batch.draw()

@@ -32,19 +32,12 @@ class InteractiveDisplay(pyglet.window.Window):
     def __init__(self, width=400, height=400, *args, **kwargs):
         super().__init__(width, height, *args, **kwargs)
         self.zoom_level = 1.0
-        #Karim:
-        self.dragging = False
-        self.start_drag_x = 0
-        self.start_drag_y = 0
-        self.x = 0
-        self.y = 0
         self.left = 0
         self.right = width
         self.bottom = 0
         self.top = height
         self.zoomed_width = width
         self.zoomed_height = height
-
         self.total_dx = 0
         self.total_dy = 0
 
@@ -57,9 +50,6 @@ class InteractiveDisplay(pyglet.window.Window):
         self.screen_scale = screen_scale()
 
     def init_gl(self, width, height):
-        # Set clear color
-        # glClearColor(0 / 255, 0 / 255, 0 / 255, 0 / 255)
-
         # Set antialiasing
         glEnable(GL_LINE_SMOOTH)
         glEnable(GL_POLYGON_SMOOTH)
@@ -83,18 +73,7 @@ class InteractiveDisplay(pyglet.window.Window):
 
         return Vector3([point_x, point_y, 0], dtype=int)
 
-        # point_x = (x - self.width / 2) * self.zoom_level * 2
-        # point_y = (y - self.height / 2) * self.zoom_level * 2
-        # return Vector3([point_x, point_y, 0], dtype=int)
-
     def on_resize(self, width, height):
-        # Set window values
-        # self.width = width
-        # self.height = height
-        # # Initialize OpenGL context
-        # self.init_gl(width, height)
-
-        #deuxieme essai:
         self.width = width
         self.height = height
 
@@ -141,7 +120,7 @@ class InteractiveDisplay(pyglet.window.Window):
 
     def on_mouse_scroll(self, x, y, dx, dy):
         # Get scale factor
-        f = ZOOM_IN_FACTOR if dy > 0 else ZOOM_OUT_FACTOR if dy < 0 else 1
+        f = ZOOM_OUT_FACTOR if dy > 0 else ZOOM_IN_FACTOR if dy < 0 else 1
         # If zoom_level is in the proper range
         if .2 < self.zoom_level * f < 5:
             self.zoom_level *= f
