@@ -37,7 +37,7 @@ Table 2: IMU Wiring
 |SCL|SCL|
 |SDA|SDA|
 
-![HMC5883L_wiring](https://github.com/OlivierGeorgeon/osoyoo/assets/11695651/ad768966-af8f-4bb0-853d-4555f6dd5da5)
+![image](C:\Users\assi.karim\Desktop\imageswiki/gy86wiring.jpg)
 Figure 1: wiring of GY-86 imu
 
 # Connect the color sensor
@@ -48,10 +48,10 @@ Use PINs 20 and 21 for SDA and SCL because the other SDA and SCL PINs are used f
 For the power line, I used the 3v yellow PINs on the Wifi Shield. 
 Alternatively, the VIN PIN can be connected to a 5V PIN (red).
 
-![IMG_8115](https://user-images.githubusercontent.com/11695651/229270982-c6d02f3a-db68-4b3a-a110-0910c88de84a.JPG)
+![image](C:\Users\assi.karim\Desktop\imageswiki/TCS34725.jpg)
 Figure 4: TCS34725 color sensor mounted on two 40 mm pillars between the front wheel motors
 
-![IMG_8111](https://user-images.githubusercontent.com/11695651/229271282-8f59b321-83d1-41a0-b1b4-20df9120ef7a.JPG)
+![image](C:\Users\assi.karim\Desktop\imageswiki/TCS34725(2).jpg)
 Figure 5: TCS34725 color sensor to Arduino MEGA wiring
 
 Table 2: PIN connection
@@ -69,7 +69,7 @@ More information on the [TCS34725 adafruit webpage](https://learn.adafruit.com/a
 
 Install a common cathode RGB LED as shown below. 
 
-![rgb](https://github.com/OlivierGeorgeon/osoyoo/assets/11695651/c9c52a55-6352-4033-ab9d-d28f2acd3f0a)
+![image](C:\Users\assi.karim\Desktop\imageswiki/rgbled.png)
 
 Figure 5: RGB LED with flat side on the left. The cathode is the longest lead.
 
@@ -81,5 +81,5 @@ Table 3: RGB LED connections
 |GND|10kΩ resistor| GND |
 |Red|| 5 |
 
-![IMG_8684](https://github.com/OlivierGeorgeon/osoyoo/assets/11695651/e21755d3-1f04-483c-b324-0aba3f3e01e3)
+![image](C:\Users\assi.karim\Desktop\imageswiki/rgbled(2).jpg)
 Figure 6: The common cathode RGB LED on pins 2, 3, 5, and its cathode connected to the ground via a 10kΩ resistor. Flat side on the right.

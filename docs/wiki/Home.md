@@ -56,7 +56,7 @@ Wire.setWireTimeout( 25000, true);
 
 Also, I had to edit the `MPU6050.cpp` to prevent it from aborting the initialization process when the address is not 0x68:
 
-![Modif MU6050_library](https://user-images.githubusercontent.com/11695651/139214270-3739bf2b-64f3-4326-9bd4-39f3e330e921.PNG)
+![image](C:\Users\assi.karim\Desktop\imageswiki/MPU6050.png)
 
 Figure 2: Comment the return false; in line 56
 
@@ -68,8 +68,7 @@ It is provided in the [arduino-kits-support-files](https://www.elegoo.com/pages/
 ### Arduino_JSON
 
 Install Arduino_JSON by Arduino from the library manager:
-![Install_Arduino_json](https://user-images.githubusercontent.com/11695651/125329184-7891c600-e345-11eb-857b-185678f818ce.PNG)
-
+![image](C:\Users\assi.karim\Desktop\imageswiki/arduinojson.png)
 Don't mistake it with the library `ArduinoJSON` by Benoit Blanchon.
 
 ### HMC5883L
@@ -77,7 +76,7 @@ Don't mistake it with the library `ArduinoJSON` by Benoit Blanchon.
 This library handles the compass chip HMC5883L implemented in some of the GY-86 imu cards,
 It is available at https://github.com/jarzebski/Arduino-HMC5883L.
 
-![HMC5883L](https://github.com/OlivierGeorgeon/osoyoo/assets/11695651/24b12222-5fbb-4bd5-b937-51daeec2cbbb)
+![image](C:\Users\assi.karim\Desktop\imageswiki/HMC5883L.jpg)
 Figure 3: The IMU card with the compass chip labeled `L883/2131`.
 
 If your compass chip begins with `L883`, include the following lines in `robot_define.h` for your robot:
@@ -93,7 +92,7 @@ This library handles the compass chip Duinotech MMC5883L implemented in some imu
 I followed the [article by David Such](https://reefwing.medium.com/connecting-the-duinotech-3-axis-compass-to-an-arduino-b13c28d7d936) that lists the different compass chips. 
 I adapted this library from [his repo](https://github.com/Reefwing-Software/MMC5883MA-Arduino-Library). 
 
-![IMU](https://github.com/OlivierGeorgeon/osoyoo/assets/11695651/0c10efe5-a1a0-416b-8148-61d245ccc14f)
+![image](C:\Users\assi.karim\Desktop\imageswiki/MMC5883L.jpg)
 Figure 4: The IMU card with the compass chip labeled `5883/601X`.
 
 If your compass chip begins with `5883`, include the following lines in `robot_define.h` for your robot:
@@ -126,4 +125,4 @@ Alternatively, to let the robot provide its own wifi `osoyoo_robot` as an access
 ```
 The robot's IP address will show in the serial terminal: 
 
-![serial](https://user-images.githubusercontent.com/11695651/125335179-8bf45f80-e34c-11eb-84e1-4c4423807d77.PNG)
+![image](C:\Users\assi.karim\Desktop\imageswiki/serialterminal.png)
