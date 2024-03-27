@@ -56,7 +56,8 @@ Wire.setWireTimeout( 25000, true);
 
 Also, I had to edit the `MPU6050.cpp` to prevent it from aborting the initialization process when the address is not 0x68:
 
-![image](C:\Users\assi.karim\Desktop\imageswiki/MPU6050.png)
+![image](assets/MPU6050.png)
+
 
 Figure 2: Comment the return false; in line 56
 
