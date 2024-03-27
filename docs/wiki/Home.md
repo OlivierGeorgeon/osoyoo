@@ -69,7 +69,7 @@ It is provided in the [arduino-kits-support-files](https://www.elegoo.com/pages/
 ### Arduino_JSON
 
 Install Arduino_JSON by Arduino from the library manager:
-![image](C:\Users\assi.karim\Desktop\imageswiki/arduinojson.png)
+![image](assets/arduinojson.png)
 Don't mistake it with the library `ArduinoJSON` by Benoit Blanchon.
 
 ### HMC5883L
@@ -77,7 +77,7 @@ Don't mistake it with the library `ArduinoJSON` by Benoit Blanchon.
 This library handles the compass chip HMC5883L implemented in some of the GY-86 imu cards,
 It is available at https://github.com/jarzebski/Arduino-HMC5883L.
 
-![image](C:\Users\assi.karim\Desktop\imageswiki/HMC5883L.jpg)
+![image](assets/HMC5883L.jpg)
 Figure 3: The IMU card with the compass chip labeled `L883/2131`.
 
 If your compass chip begins with `L883`, include the following lines in `robot_define.h` for your robot:
@@ -93,7 +93,7 @@ This library handles the compass chip Duinotech MMC5883L implemented in some imu
 I followed the [article by David Such](https://reefwing.medium.com/connecting-the-duinotech-3-axis-compass-to-an-arduino-b13c28d7d936) that lists the different compass chips. 
 I adapted this library from [his repo](https://github.com/Reefwing-Software/MMC5883MA-Arduino-Library). 
 
-![image](C:\Users\assi.karim\Desktop\imageswiki/MMC5883L.jpg)
+![image](assets/MMC5883L.jpg)
 Figure 4: The IMU card with the compass chip labeled `5883/601X`.
 
 If your compass chip begins with `5883`, include the following lines in `robot_define.h` for your robot:
@@ -126,4 +126,4 @@ Alternatively, to let the robot provide its own wifi `osoyoo_robot` as an access
 ```
 The robot's IP address will show in the serial terminal: 
 
-![image](C:\Users\assi.karim\Desktop\imageswiki/serialterminal.png)
+![image](assets/serialterminal.png)
