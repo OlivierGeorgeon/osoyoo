@@ -67,7 +67,7 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         robot_ip = sys.argv[1]
     else:
-        input_ip = input(f"Please provide your robot's IP address or ENTER for default {UDP_IP} : ")
+        input_ip = input(f"Please provide your robot's IP address or press ENTER for default {UDP_IP} : ")
         if input_ip == "":
             robot_ip = UDP_IP
 

@@ -48,7 +48,7 @@ class Memory:
         # print("Trajectory prompt", enaction.trajectory.prompt_point)
 
         # Push objects before moving the robot
-        push_objects(enaction.trajectory, self)
+        push_objects(enaction.trajectory, self, enaction.outcome.floor)
 
         # Translate the robot before applying the yaw
         # print("Robot relative translation", enaction.translation)

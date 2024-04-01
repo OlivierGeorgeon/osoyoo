@@ -148,7 +148,7 @@ class Phenomenon:
         """Set the path representing the terrain outline used to test is_inside"""
         # Must not be recomputed on each call to is_inside()
         # Need a closed two-dimensional array [[x0, y0],...,[x100, y100], [x0, y0]]
-        self.path = mpath.Path(self.shape[:, 0:2] + self.shape[0, 0:2])
+        self.path = mpath.Path(np.concatenate((self.shape[:, 0:2], self.shape[0:1, 0:2])))
 
     def is_inside(self, terrain_centric_point):
         """True if the point in terrain-centric coordinates is inside the phenomenon"""
