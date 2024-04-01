@@ -29,9 +29,10 @@ void WifiCat::begin()
   Serial1.begin(9600);    // initialize serial for ESP module
   WiFi.init(&Serial1);    // initialize ESP module
   // check for the presence of the shield
-  if (WiFi.status() == WL_NO_SHIELD) {
+  if (WiFi.status() == WL_NO_SHIELD)
+  {
     Serial.println("WiFi shield not present");
-    // don't continue
+    // Block the robot
     while (true);
   }
 
@@ -52,7 +53,8 @@ void WifiCat::begin()
     // Connecting to wifi as a Station (STA)
     char ssid[] = SECRET_SSID;
     char pass[] = SECRET_PASS;
-    while (status != WL_CONNECTED) {
+    while (status != WL_CONNECTED)
+    {
       Serial.print("Attempting to connect to WPA SSID: ");
       Serial.println(ssid);
       status = WiFi.begin(ssid, pass);

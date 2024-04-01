@@ -3,9 +3,9 @@
 # This code is used to to test the PetitCat robot.
 
 import socket
-import keyboard
 import sys
 import json
+# import keyboard  # Uncomment to use instead of input()
 
 UDP_IP = "192.168.4.1"
 UDP_TIMEOUT = 5  # Seconds
@@ -67,7 +67,10 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         robot_ip = sys.argv[1]
     else:
-        print("Please provide your robot's IP address")
+        input_ip = input(f"Please provide your robot's IP address or ENTER for default {UDP_IP} : ")
+        if input_ip == "":
+            robot_ip = UDP_IP
+
     print("Connecting to robot: " + robot_ip)
     print("Action keys: 1: Turn left, 2: Backward, 3: Turn right, 4: Swipe left, 6: Swipe right, 8: Forward, -: Scan")
     print("Ctrl+C and ENTER to abort")
@@ -75,8 +78,9 @@ if __name__ == '__main__':
     clock = 0
     action = ""
     while True:
-        print("Press action key:")
-        action = keyboard.read_key().upper()
+        # print("Press action key:")
+        # action = keyboard.read_key().upper()
+        action = input("Enter action key:")
         action_string = '{"clock":' + str(clock) + ', "action":"' + action + '"}'
         print("Sending packet:", action_string)
         outcome = petitcat_tester.enact(action_string)
