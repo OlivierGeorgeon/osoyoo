@@ -66,6 +66,7 @@ class Phenomenon:
         self.point += offset
         for a in self.affordances.values():
             a.point -= offset
+        self.shape -= offset
 
     def recognize(self, category):
         """Update the category, confidence, shape, and path of this phenomenon"""

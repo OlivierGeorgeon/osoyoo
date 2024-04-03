@@ -1,6 +1,7 @@
 ########################################################################################
 # This proposer makes the robot play by turning in place
-# Activation 5: Makes the robot HAPPY
+# Activation: 5
+# EMOTION_CONTENT (Serotonin)
 ########################################################################################
 
 import math
@@ -10,7 +11,7 @@ from . Action import ACTION_TURN
 from ..Robot.Enaction import Enaction
 from ..Enaction.CompositeEnaction import CompositeEnaction
 from . Proposer import Proposer
-from ..Memory import EMOTION_HAPPY
+from ..Memory import EMOTION_CONTENT
 from ..Memory.BodyMemory import EXCITATION_LOW
 from ..Memory.EgocentricMemory.Experience import EXPERIENCE_AZIMUTH, EXPERIENCE_COMPASS
 from . Interaction import OUTCOME_FLOOR, OUTCOME_FOCUS_TOO_FAR
@@ -58,7 +59,7 @@ class ProposerPlayTurn(Proposer):
         if self.is_to_play() and enaction.outcome_code not in [OUTCOME_FLOOR, OUTCOME_FOCUS_TOO_FAR]:
             # self.step = STEP_CALIBRATE  Needed if automatic calibration is off
             e_memory = self.workspace.memory.save()
-            e_memory.emotion_code = EMOTION_HAPPY
+            e_memory.emotion_code = EMOTION_CONTENT
             e_memory.egocentric_memory.prompt_point = np.array([100, 0, 0])
             enactions = []
             # create the sequence of turn

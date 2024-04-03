@@ -1,16 +1,17 @@
 ########################################################################################
 # This proposer makes the robot play by swiping to an object and back
-# Activation 5: Makes the robot HAPPY
+# Activation: 5
+# EMOTION_CONTENT (Serotonin)
 ########################################################################################
 
 import math
 import numpy as np
 from pyrr import vector, Vector3
-from . Action import ACTION_TURN, ACTION_FORWARD, ACTION_BACKWARD, ACTION_SWIPE, ACTION_SCAN
+from . Action import ACTION_TURN, ACTION_SWIPE
 from ..Robot.Enaction import Enaction
 from ..Robot.RobotDefine import ROBOT_HEAD_X
 from . Proposer import Proposer
-from ..Memory import EMOTION_HAPPY
+from ..Memory import EMOTION_CONTENT
 from ..Memory.BodyMemory import EXCITATION_LOW
 from . Interaction import OUTCOME_FLOOR, OUTCOME_FOCUS_TOO_FAR
 from ..Robot.Command import DIRECTION_LEFT, DIRECTION_RIGHT
@@ -38,7 +39,7 @@ class ProposerPlaySwipe(Proposer):
     def select_enaction(self, enaction):
         """Add the next enaction to the stack based on sequence learning and spatial modifiers"""
         e_memory = self.workspace.memory.save()
-        e_memory.emotion_code = EMOTION_HAPPY
+        e_memory.emotion_code = EMOTION_CONTENT
 
         # Withdraw step
         if self.step == STEP_WITHDRAW_TO_RIGHT:

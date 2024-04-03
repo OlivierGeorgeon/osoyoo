@@ -15,7 +15,7 @@ from ..Robot.RobotDefine import TERRAIN_RADIUS
 from ..Memory.BodyMemory import ENERGY_TIRED, EXCITATION_LOW
 from ..Memory.PhenomenonMemory.PhenomenonMemory import TER
 from ..Memory.PhenomenonMemory import PHENOMENON_RECOGNIZED_CONFIDENCE, TERRAIN_ORIGIN_CONFIDENCE
-from ..Memory import EMOTION_RELAXED
+from ..Memory import EMOTION_CONTENT
 from ..Enaction.CompositeEnaction import CompositeEnaction
 from ..Integrator.OutcomeCode import FOCUS_TOO_FAR_DISTANCE
 from . GoalGenerator import GoalGenerator
@@ -101,7 +101,7 @@ class ProposerExplore(Proposer):
         outcome_code = self.outcome(enaction)
 
         e_memory = self.workspace.memory.save()
-        e_memory.emotion_code = EMOTION_RELAXED
+        e_memory.emotion_code = EMOTION_CONTENT
         e1, e2 = None, None
 
         # If time to go home

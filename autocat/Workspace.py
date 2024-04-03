@@ -104,26 +104,22 @@ class Workspace:
             # Next automatic decision
             if self.composite_enaction is None:
                 if self.control_mode == KEY_CONTROL_DECIDER:
-                    # The most activated decider processes the previous enaction and chooses the next enaction
-                    # self.memory.appraise_emotion()
-                    # self.decider_id = max(self.deciders, key=lambda k: self.deciders[k].activation_level())
-                    # print("Decider:", self.decider_id)
-                    # self.deciders[self.decider_id].stack_enaction()
                     # All deciders propose an enaction with an activation value
-                    proposed_enactions = []
-                    for name, proposer in self.proposers.items():
-                        activation = proposer.activation_level()  # Must compute before proposing
-                        # print("Computing proposition", name, "with focus", self.memory.egocentric_memory.focus_point)
-                        enaction = proposer.propose_enaction()
-                        if enaction is not None:
-                            proposed_enactions.append([name, enaction, activation])
-                    # The enaction that has the highest activation is selected
-                    print("Proposed enactions:")
-                    for p in proposed_enactions:
-                        print(" ", p[0], ":", p[1], p[2])
-                    most_activated = proposed_enactions.index(max(proposed_enactions, key=lambda p: p[2]))
-                    print("Decider:", proposed_enactions[most_activated][0])
-                    self.composite_enaction = proposed_enactions[most_activated][1]
+                    self.composite_enaction = self.enacter.decide()
+                    # proposed_enactions = []
+                    # for name, proposer in self.proposers.items():
+                    #     activation = proposer.activation_level()  # Must compute before proposing
+                    #     # print("Computing proposition", name, "with focus", self.memory.egocentric_memory.focus_point)
+                    #     enaction = proposer.propose_enaction()
+                    #     if enaction is not None:
+                    #         proposed_enactions.append([name, enaction, activation])
+                    # # The enaction that has the highest activation is selected
+                    # print("Proposed enactions:")
+                    # for p in proposed_enactions:
+                    #     print(" ", p[0], ":", p[1], p[2])
+                    # most_activated = proposed_enactions.index(max(proposed_enactions, key=lambda p: p[2]))
+                    # print("Decider:", proposed_enactions[most_activated][0])
+                    # self.composite_enaction = proposed_enactions[most_activated][1]
                 else:
                     self.decider_id = "Manual"
                 # Case DECIDER_KEY_USER is handled by self.process_user_key()

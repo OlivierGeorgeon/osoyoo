@@ -77,7 +77,7 @@ class PhenomenonTerrain(Phenomenon):
                         self.last_origin_clock = affordance.clock
                 # Black line: Compute the position correction based on the nearest point in the terrain shape
                 # TODO use the point on the trajectory rather than the closest point
-                elif self.confidence >= PHENOMENON_CLOSED_CONFIDENCE:  # PHENOMENON_RECOGNIZED_CONFIDENCE
+                elif self.confidence >= PHENOMENON_RECOGNIZED_CONFIDENCE:  # PHENOMENON_CLOSED_CONFIDENCE
                     distances = np.linalg.norm(self.shape - affordance.point, axis=1)
                     closest_point = self.shape[np.argmin(distances)]
                     position_correction = np.array(affordance.point - closest_point, dtype=int)
@@ -107,6 +107,9 @@ class PhenomenonTerrain(Phenomenon):
                 if area > 500000:
                     self.confidence = PHENOMENON_CLOSED_CONFIDENCE
                     self.interpolate()
+                    # Place the origin of the terrain at the center
+                    centroid = self.shape.mean(axis=0).astype(int)
+                    self.move_origin(centroid)
 
     def recognize(self, category):
         """Set the terrain's category, shape, path, confidence. Adjust its position to the latest affordance"""

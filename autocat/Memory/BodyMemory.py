@@ -18,6 +18,9 @@ class BodyMemory:
         self.compass_offset = np.array(ROBOT_SETTINGS[robot_id]["compass_offset"], dtype=int)
         self.energy = 100  # [0,100] The level of energy of the robot
         self.excitation = 100  # [0, 100] The level of excitation
+        self.serotonin = 50  # 5-HT
+        self.dopamine = 50  # DA
+        self.noradrenaline = 50  # NA
 
     def update(self, enaction):
         """Update the body state variables: energy and excitation, head, body direction"""
