@@ -9,6 +9,7 @@ from .Proposer.ProposerArrange import ProposerArrange
 from .Proposer.ProposerPlayForward import ProposerPlayForward
 from .Proposer.ProposerPlayTurn import ProposerPlayTurn
 from .Proposer.ProposerPlaySwipe import ProposerPlaySwipe
+from .Proposer.ProposerPlayTerrain import ProposerPlayTerrain
 from .Proposer.Action import create_actions, ACTION_FORWARD, ACTIONS, ACTION_TURN, ACTION_BACKWARD
 from .Memory.Memory import Memory
 from .Memory.PhenomenonMemory import TERRAIN_ORIGIN_CONFIDENCE
@@ -41,12 +42,13 @@ class Workspace:
         self.actions = create_actions(robot_id)
         self.memory = Memory(arena_id, robot_id)
         self.proposers = {'Circle ': Proposer(self)
-                          , 'Play Turn': ProposerPlayTurn(self)
+                          # , 'Play Turn': ProposerPlayTurn(self)
                           # , 'Explore': ProposerExplore(self)
                           , 'Watch': ProposerWatch(self)
                           # , 'Watch C': ProposerWatchCenter(self),  'Arrange': ProposerArrange(self)
                           , 'Push': ProposerPush(self)
-                          # , 'Play': ProposerPlaySwipe(self)
+                          , 'Play': ProposerPlayForward(self)
+                          , "Play terrain": ProposerPlayTerrain(self)
                           }
         self.enacter = Enacter(self)
         self.simulator = Simulator(self)

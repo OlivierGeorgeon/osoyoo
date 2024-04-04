@@ -7,7 +7,7 @@
 import math
 import numpy as np
 from pyrr import vector, Vector3
-from . Action import ACTION_TURN, ACTION_FORWARD, ACTION_BACKWARD, ACTION_SCAN
+from . Action import ACTION_TURN, ACTION_FORWARD, ACTION_BACKWARD
 from ..Robot.Enaction import Enaction
 from ..Robot.Command import DIRECTION_BACK
 from . Proposer import Proposer
@@ -27,6 +27,9 @@ class ProposerPush(Proposer):
 
     def activation_level(self):
         """The level of activation of this decider: 0: default, 4 if focus inside terrain, 3 for withdrawal"""
+
+        return self.workspace.memory.body_memory.noradrenaline
+
         if self.is_to_push():
             return 4
         elif self.step == STEP_WITHDRAW:

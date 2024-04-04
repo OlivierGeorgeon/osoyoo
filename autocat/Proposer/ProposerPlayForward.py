@@ -7,7 +7,7 @@
 import math
 import numpy as np
 from pyrr import vector, Vector3
-from . Action import ACTION_TURN, ACTION_FORWARD, ACTION_BACKWARD, ACTION_SWIPE, ACTION_SCAN
+from . Action import ACTION_TURN, ACTION_FORWARD, ACTION_BACKWARD, ACTION_SWIPE
 from ..Robot.Enaction import Enaction
 from . Proposer import Proposer
 from ..Memory import EMOTION_CONTENT
@@ -29,6 +29,9 @@ class ProposerPlayForward(Proposer):
 
     def activation_level(self):
         """The level of activation of this decider: 0: default, 5 if excited and object to play with """
+
+        return self.workspace.memory.body_memory.serotonin
+
         if self.workspace.memory.body_memory.excitation > EXCITATION_LOW and \
                 (self.is_to_play() or self.step == STEP_WITHDRAW):
             return 5

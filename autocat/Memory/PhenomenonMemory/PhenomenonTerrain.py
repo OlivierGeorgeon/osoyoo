@@ -83,6 +83,10 @@ class PhenomenonTerrain(Phenomenon):
                     position_correction = np.array(affordance.point - closest_point, dtype=int)
                     print("Nearest shape point", closest_point, "Position correction", position_correction)
                     affordance.point -= position_correction
+                elif self.confidence >= PHENOMENON_CLOSED_CONFIDENCE:
+                    # Recenter the terrain
+                    self.move_origin(self.shape.mean(axis=0).astype(int))
+                    # self.prune(affordance)
 
             # if the phenomenon is not recognized, recompute the shape
             # if self.category is None:
@@ -108,8 +112,7 @@ class PhenomenonTerrain(Phenomenon):
                     self.confidence = PHENOMENON_CLOSED_CONFIDENCE
                     self.interpolate()
                     # Place the origin of the terrain at the center
-                    centroid = self.shape.mean(axis=0).astype(int)
-                    self.move_origin(centroid)
+                    self.move_origin(self.shape.mean(axis=0).astype(int))
 
     def recognize(self, category):
         """Set the terrain's category, shape, path, confidence. Adjust its position to the latest affordance"""
@@ -167,6 +170,19 @@ class PhenomenonTerrain(Phenomenon):
             # v = affordance.point + affordance.polar_green_point() + self.relative_origin_point
         # print("Place prediction error", v)
         return np.array(v, dtype=int)
+
+    def prune(self, affordance):
+        """Remove previous affordances that has the closest angle"""
+        q_affordance = Quaternion.from_z_rotation(math.atan2(affordance.point[1], affordance.point[0]))
+        similar_affordances = []
+        for k, a in self.affordances.items():
+            q_from_center = Quaternion.from_z_rotation(math.atan2(a.point[1], a.point[0]))
+            if abs(short_angle(q_from_center, q_affordance)) < math.pi / 8 and 0 < k < self.affordance_id - 2:
+                similar_affordances.append(k)
+
+        for k in similar_affordances:
+            print("Prune affordance", k)
+            self.affordances.pop(k)
 
     def save(self, saved_phenomenon=None):
         """Return a clone of the phenomenon for memory snapshot"""

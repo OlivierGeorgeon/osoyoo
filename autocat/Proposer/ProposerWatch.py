@@ -2,7 +2,7 @@
 # Propose to stay at the surveillance point and watch over the surrounding
 # And also listen for messages from possible other robot
 # Activation: 3
-# EMOTION_SAD
+# EMOTION_SAD (Low neurotransmitters)
 ########################################################################################
 
 import math
@@ -27,6 +27,9 @@ class ProposerWatch(Proposer):
 
     def activation_level(self):
         """The level of activation is 3 if the excitation is low"""
+
+        return 40
+
         # if self.workspace.memory.phenomenon_memory.terrain_confidence() >= PHENOMENON_CLOSED_CONFIDENCE and \
         #   self.workspace.memory.body_memory.energy >= ENERGY_TIRED and \
         if self.workspace.memory.body_memory.excitation <= EXCITATION_LOW:
@@ -52,7 +55,7 @@ class ProposerWatch(Proposer):
     def select_enaction(self, enaction):
         """Return the next intended interaction"""
 
-        # if the terrain is not CLOSED then don't propose watch over behavior
+        # if the terrain is not CLOSED then don't propose watch-over behavior
         if self.workspace.memory.phenomenon_memory.terrain_confidence() < PHENOMENON_CLOSED_CONFIDENCE:
             return None
 
