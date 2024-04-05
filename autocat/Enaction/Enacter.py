@@ -98,5 +98,6 @@ class Enacter:
         for p in proposed_enactions:
             print(" ", p[0], ":", p[1], p[2])
         most_activated = proposed_enactions.index(max(proposed_enactions, key=lambda p: p[2]))
-        print("Decider:", proposed_enactions[most_activated][0])
+        self.workspace.decider_id = proposed_enactions[most_activated][0]
+        print("Decider:", self.workspace.decider_id)
         return proposed_enactions[most_activated][1]

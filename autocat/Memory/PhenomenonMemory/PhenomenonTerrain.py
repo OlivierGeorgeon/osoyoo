@@ -86,7 +86,7 @@ class PhenomenonTerrain(Phenomenon):
                 elif self.confidence >= PHENOMENON_CLOSED_CONFIDENCE:
                     # Recenter the terrain
                     self.move_origin(self.shape.mean(axis=0).astype(int))
-                    # self.prune(affordance)
+                    self.prune(affordance)
 
             # if the phenomenon is not recognized, recompute the shape
             # if self.category is None:
