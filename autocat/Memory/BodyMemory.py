@@ -38,7 +38,7 @@ class BodyMemory:
             self.energy = max(0, self.energy - 1)
         # Decrease excitation level
         self.excitation = max(0, self.excitation - 1)
-        self.dopamine = max(0, self.dopamine - 1)
+        self.dopamine = max(30, self.dopamine - 1)
 
     def set_head_direction_degree(self, head_direction_degree: int):
         """Set the head direction from degree measured relative to the robot within [-90,90]"""

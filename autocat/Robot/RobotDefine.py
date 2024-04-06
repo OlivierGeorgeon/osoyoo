@@ -60,6 +60,7 @@ ROBOT_SETTINGS_3["compass_offset"] = [0, 0, 0]  # [-50, 0, 0] [50, -50, 0]  # [3
 # Robot 4 chez Olivier
 ROBOT_SETTINGS_4 = ROBOT_SETTINGS_0.copy()
 ROBOT_SETTINGS_4["IP"] = {"PetiteIA": "192.168.8.242", "Circle": "192.168.8.242"}  # 108
+# ROBOT_SETTINGS_4["IP"] = {"PetiteIA": "192.168.8.242", "Circle": "192.168.4.1"}  # 108
 ROBOT_SETTINGS_4["forward_speed"] = 320
 ROBOT_SETTINGS_4["lateral_speed"] = 200  # 50
 ROBOT_SETTINGS_4["retreat_distance"] = 40  # 150 Increase it if the line keeps being pushed farther

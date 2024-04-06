@@ -36,6 +36,7 @@ Specify the parameters of your robot in the files:
 English: 
 * [The project's wiki](https://github.com/OlivierGeorgeon/osoyoo/wiki)
 * [Howard Schneider's unboxing report](https://github.com/OlivierGeorgeon/osoyoo/blob/master/docs/overview/Part_1_Easy_to_Read_Overview.md)
+* [The video playlist](https://youtube.com/playlist?list=PLlSPp5EpW5vFb-ZMCr8m0dIOoKEQe9CIE&si=HachYRwgJR8I-BbH)
 
 French:
 * [La documentation écrite par les étudiants](https://github.com/UCLy/INIT2/blob/master/docs/first_step/premier_pas.md)
