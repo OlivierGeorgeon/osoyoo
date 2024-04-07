@@ -1,7 +1,7 @@
 # PetitCat
 
-The PetitCat project aims at controlling a mobile robot to generate life-like behaviors.
-It is currently used with the PetitCat Robot, an extension of the [osoyoo robot car](https://osoyoo.myshopify.com/collections/robot-car/products/osoyoo-omni-directinal-mecanum-wheels-robot-car-kit-for-arduino-mega2560-metal-chassis-dc-speed-encoder-motor-robotic-diy-stem-remote-controlled-educational-mechanical-diy-coding-for-teens-adult?variant=31634199183471). 
+The PetitCat project aims at generate life-like behaviors in robots.
+It currently uses the PetitCat Robot, an extension of the [osoyoo robot car](https://osoyoo.myshopify.com/collections/robot-car/products/osoyoo-omni-directinal-mecanum-wheels-robot-car-kit-for-arduino-mega2560-metal-chassis-dc-speed-encoder-motor-robotic-diy-stem-remote-controlled-educational-mechanical-diy-coding-for-teens-adult?variant=31634199183471). 
 
 
 ## Repository architecture
@@ -34,10 +34,13 @@ It is currently used with the PetitCat Robot, an extension of the [osoyoo robot 
 Test documentation 
 * [test_remote_control_robot.md](docs/tests/test_remote_control_robot.md) Helps you test the communication with the robot.
 
-Full documentation of the project: 
-* [The project's wiki](https://github.com/OlivierGeorgeon/osoyoo/wiki) Helps you assembly and calibrate your robot.
+Full project documentation in English: 
+* [The project's wiki](https://github.com/OlivierGeorgeon/osoyoo/wiki) Helps you assembly your robot, calibrate it, and run the project.
 * [Howard Schneider's full tutorial](docs/overview/Part_1_Easy_to_Read_Overview.md) Step by step explanations for beginners. 
 * [Video playlist](https://youtube.com/playlist?list=PLlSPp5EpW5vFb-ZMCr8m0dIOoKEQe9CIE&si=HachYRwgJR8I-BbH) Demonstrations of behaviors. 
 
 French additional information:
-* [La documentation écrite par les étudiants](https://github.com/UCLy/INIT2/blob/master/docs/first_step/premier_pas.md)
+* [La documentation écrite par les étudiants](docs/first_step/premier_pas.md)
+
+## Related projects
+* [Simon Gay's project](https://gaysimon.github.io/robot/robot_navigation_en.html) Simon added a Raspbery Pi and a binocular camera to study navigation.
