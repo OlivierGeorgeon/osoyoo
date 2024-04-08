@@ -1,3 +1,4 @@
+import numpy as np
 import pyglet
 from pyglet.gl import *
 import math
@@ -24,6 +25,17 @@ class BodyView(InteractiveDisplay):
 
         # Define the text area at the bottom of the view
         self.label_batch = pyglet.graphics.Batch()
+
+        self.label_5HT = pyglet.text.Label('5-HT: ', font_name='Verdana', font_size=10, x=10, y=70)
+        self.label_5HT.color = (0, 0, 0, 255)
+        self.label_5HT.batch = self.label_batch
+        self.label_DA = pyglet.text.Label('DA: ', font_name='Verdana', font_size=10, x=100, y=70)
+        self.label_DA.color = (0, 0, 0, 255)
+        self.label_DA.batch = self.label_batch
+        self.label_NA = pyglet.text.Label('NA: ', font_name='Verdana', font_size=10, x=190, y=70)
+        self.label_NA.color = (0, 0, 0, 255)
+        self.label_NA.batch = self.label_batch
+
         self.label_clock = pyglet.text.Label('Clock: ', font_name='Verdana', font_size=10, x=10, y=50)
         self.label_clock.color = (0, 0, 0, 255)
         self.label_clock.batch = self.label_batch
@@ -66,14 +78,24 @@ class BodyView(InteractiveDisplay):
         # Rotate the click point by the inverse rotation of the robot
         v = self.workspace.memory.body_memory.body_quaternion.inverse * self.mouse_coordinates_to_point(x, y)
         t = round(math.degrees(math.atan2(v[1], v[0])))
-        self.label.text = "Click: x:" + str(round(v[0])) + ", y:" + str(round(v[1])) + ", angle:" + str(t) + "°"
+        self.label_enaction.text = f"Click: x: {round(v[0])},  y: {round(v[1])}, angle: {t}°"
 
-
-# Testing the EgocentricView by displaying the robot in a pretty position, and the mouse click coordinates
-# py -m autocat.Display.BodyDisplay.BodyView
-# if __name__ == "__main__":
-#     view = BodyView()
-#     view.robot.rotate_head(-45)  # Turn head 45° to the right
-#     view.azimuth = 350           # Turn robot 10° to the left
-#
-#     pyglet.app.run()
+    def on_mouse_scroll(self, x, y, dx, dy):
+        """ Zooming the window """
+        if y > 90:
+            # Zoom the view
+            super().on_mouse_scroll(x, y, dx, dy)
+        elif y > 60:
+            # The neurotransmitter levels
+            if x < 100:
+                self.workspace.memory.body_memory.serotonin += int(np.sign(dy))
+            elif x < 190:
+                self.workspace.memory.body_memory.dopamine += int(np.sign(dy))
+            else:
+                self.workspace.memory.body_memory.noradrenaline += int(np.sign(dy))
+        else:
+            # The energy levels
+            if x < 150:
+                self.workspace.memory.body_memory.energy += int(np.sign(dy))
+            else:
+                self.workspace.memory.body_memory.excitation += int(np.sign(dy))

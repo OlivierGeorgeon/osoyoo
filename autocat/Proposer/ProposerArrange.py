@@ -13,7 +13,7 @@ from ..Robot.RobotDefine import CHECK_OUTSIDE, ROBOT_FLOOR_SENSOR_X
 from . Proposer import Proposer
 from ..Utils import line_intersection
 from ..Enaction.CompositeEnaction import CompositeEnaction
-from ..Memory import EMOTION_ANGRY
+from ..Memory import EMOTION_VIGILANCE
 from . Interaction import OUTCOME_FLOOR, OUTCOME_LOST_FOCUS, OUTCOME_TOUCH, OUTCOME_NO_FOCUS
 from ..Memory.PhenomenonMemory import ARRANGE_OBJECT_RADIUS, TERRAIN_ORIGIN_CONFIDENCE
 
@@ -39,7 +39,7 @@ class ProposerArrange(Proposer):
         ego_target = self.workspace.memory.terrain_centric_to_egocentric(
             self.workspace.memory.phenomenon_memory.arrange_point())
         e_memory = self.workspace.memory.save()
-        e_memory.emotion_code = EMOTION_ANGRY
+        e_memory.emotion_code = EMOTION_VIGILANCE
 
         # If robot too close to target point then withdraw
         if self.is_to_withdraw():

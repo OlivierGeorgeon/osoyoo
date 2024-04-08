@@ -1,11 +1,11 @@
 import numpy as np
 from pyrr import quaternion
-from . import EMOTION_HAPPY
+from . import EMOTION_PLEASURE
 from .EgocentricMemory.EgocentricMemory import EgocentricMemory
 from .AllocentricMemory.AllocentricMemory import AllocentricMemory
 from .BodyMemory import BodyMemory
 from .PhenomenonMemory.PhenomenonMemory import PhenomenonMemory
-from .PhenomenonMemory import TERRAIN_ORIGIN_CONFIDENCE
+from .PhenomenonMemory import PHENOMENON_CLOSED_CONFIDENCE
 from .AllocentricMemory.Hexagonal_geometry import CELL_RADIUS
 from ..Integrator.Integrator import integrate
 from ..Enaction.Predict import push_objects
@@ -30,7 +30,7 @@ class Memory:
         self.egocentric_memory = EgocentricMemory(robot_id)
         self.allocentric_memory = AllocentricMemory(GRID_WIDTH, GRID_HEIGHT, cell_radius=CELL_RADIUS)
         self.phenomenon_memory = PhenomenonMemory(arena_id)
-        self.emotion_code = EMOTION_HAPPY
+        self.emotion_code = EMOTION_PLEASURE
 
     def __str__(self):
         return "Memory Robot position (" + str(round(self.allocentric_memory.robot_point[0])) + "," +\
@@ -48,7 +48,7 @@ class Memory:
         # print("Trajectory prompt", enaction.trajectory.prompt_point)
 
         # Push objects before moving the robot
-        push_objects(enaction.trajectory, self)
+        push_objects(enaction.trajectory, self, enaction.outcome.floor)
 
         # Translate the robot before applying the yaw
         # print("Robot relative translation", enaction.translation)
@@ -111,7 +111,7 @@ class Memory:
         """Return the point in egocentric coordinates from the point in terrain-centric coordinates"""
         if point is None:
             return None
-        if self.phenomenon_memory.terrain_confidence() >= TERRAIN_ORIGIN_CONFIDENCE:
+        if self.phenomenon_memory.terrain_confidence() >= PHENOMENON_CLOSED_CONFIDENCE:
             return self.allocentric_to_egocentric(point + self.phenomenon_memory.terrain().point)
         return self.allocentric_to_egocentric(point)
 
@@ -119,7 +119,7 @@ class Memory:
         """Return the point in terrain egocentric coordinates from the point in egocentric coordinates"""
         if point is None:
             return None
-        if self.phenomenon_memory.terrain_confidence() >= TERRAIN_ORIGIN_CONFIDENCE:
+        if self.phenomenon_memory.terrain_confidence() >= PHENOMENON_CLOSED_CONFIDENCE:
             return self.egocentric_to_allocentric(point) - self.phenomenon_memory.terrain().point
         return self.egocentric_to_allocentric(point)
 
@@ -127,14 +127,14 @@ class Memory:
         """Return the point in allocentric coordinates from the point in terrain_centric"""
         if point is None:
             return None
-        elif self.phenomenon_memory.terrain_confidence() >= TERRAIN_ORIGIN_CONFIDENCE:
+        elif self.phenomenon_memory.terrain_confidence() >= PHENOMENON_CLOSED_CONFIDENCE:
             return point + self.phenomenon_memory.terrain().point
         else:
             return point
 
     def terrain_centric_robot_point(self):
         """Return the position of the robot relative to the terrain point"""
-        if self.phenomenon_memory.terrain_confidence() >= TERRAIN_ORIGIN_CONFIDENCE:
+        if self.phenomenon_memory.terrain_confidence() >= PHENOMENON_CLOSED_CONFIDENCE:
             return self.allocentric_memory.robot_point - self.phenomenon_memory.terrain().point
         else:
             return self.allocentric_memory.robot_point

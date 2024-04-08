@@ -60,7 +60,13 @@ class CtrlRobot:
                             print("Received outcome does not match current enaction")
             else:
                 # Timeout: reinitialize the cycle. This will resend the enaction
+                serotonin = self.workspace.memory.body_memory.serotonin  # Handel user change  TODO improve
+                dopamine = self.workspace.memory.body_memory.dopamine  # Handel user change
+                noradrenaline = self.workspace.memory.body_memory.noradrenaline  # Handel user change
                 self.workspace.memory = self.workspace.enacter.memory_snapshot
+                self.workspace.memory.body_memory.serotonin = serotonin
+                self.workspace.memory.body_memory.dopamine = dopamine
+                self.workspace.memory.body_memory.noradrenaline = noradrenaline
                 self.workspace.enacter.interaction_step = ENACTION_STEP_REFRESHING
                 print("Timeout")
 

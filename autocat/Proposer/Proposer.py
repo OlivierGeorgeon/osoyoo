@@ -1,16 +1,16 @@
 ########################################################################################
 # This proposer proposes the default behavior which makes the robot circle around objects
-# This behavior is associated with EMOTION_HAPPY
-# Activation 2: when the robot is happy
+# Activation 2:
+# EMOTION_PLEASURE: Dopamine
 ########################################################################################
 
 import numpy as np
-from . Action import ACTION_SCAN, ACTION_TURN, ACTION_SWIPE
+from . Action import ACTION_SCAN, ACTION_TURN, ACTION_SWIPE, ACTION_FORWARD
 from . PredefinedInteractions import create_or_retrieve_primitive, create_primitive_interactions, \
     create_composite_interactions, create_or_reinforce_composite
 from . Interaction import OUTCOME_FOCUS_TOO_FAR, OUTCOME_LOST_FOCUS
 from ..Robot.Enaction import Enaction
-from ..Memory import EMOTION_HAPPY
+from ..Memory import EMOTION_PLEASURE
 from ..Memory.PhenomenonMemory import TERRAIN_ORIGIN_CONFIDENCE
 from ..Memory.BodyMemory import ENERGY_TIRED, EXCITATION_LOW
 from ..Integrator.OutcomeCode import FOCUS_TOO_FAR_DISTANCE
@@ -34,6 +34,8 @@ class Proposer:
         """Return the activation level of this decider:
          1: default; 2: terrain unconfident or high energy and excitation and object to circle round"""
 
+        return self.workspace.memory.body_memory.dopamine
+
         if self.workspace.memory.phenomenon_memory.terrain_confidence() < TERRAIN_ORIGIN_CONFIDENCE or \
                 (self.workspace.memory.body_memory.energy >= ENERGY_TIRED and
                  self.workspace.memory.body_memory.excitation > EXCITATION_LOW and
@@ -55,7 +57,7 @@ class Proposer:
         # Call the sequence learning mechanism to select the next action
         action = self.select_action(enaction)
         e_memory = self.workspace.memory.save()
-        e_memory.emotion_code = EMOTION_HAPPY
+        e_memory.emotion_code = EMOTION_PLEASURE
         span = 40
 
         # Set the spatial modifiers
@@ -98,7 +100,8 @@ class Proposer:
 
         # Selecting the next action to enact
         # Initialize with the first action to select by default
-        proclivity_dict = {self.workspace.actions[ACTION_SCAN]: 0}
+        # proclivity_dict = {self.workspace.actions[ACTION_FORWARD]: 0}  # Favors exploration
+        proclivity_dict = {self.workspace.actions[ACTION_SCAN]: 0}  # Favors staying in place
         if self.composite_interactions:
             activated_interactions = [ci for ci in self.composite_interactions if
                                       ci.pre_interaction == self.last_interaction]

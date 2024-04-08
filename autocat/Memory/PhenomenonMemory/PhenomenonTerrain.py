@@ -77,12 +77,16 @@ class PhenomenonTerrain(Phenomenon):
                         self.last_origin_clock = affordance.clock
                 # Black line: Compute the position correction based on the nearest point in the terrain shape
                 # TODO use the point on the trajectory rather than the closest point
-                elif self.confidence >= PHENOMENON_CLOSED_CONFIDENCE:  # PHENOMENON_RECOGNIZED_CONFIDENCE
+                elif self.confidence >= PHENOMENON_RECOGNIZED_CONFIDENCE:  # PHENOMENON_CLOSED_CONFIDENCE
                     distances = np.linalg.norm(self.shape - affordance.point, axis=1)
                     closest_point = self.shape[np.argmin(distances)]
                     position_correction = np.array(affordance.point - closest_point, dtype=int)
                     print("Nearest shape point", closest_point, "Position correction", position_correction)
                     affordance.point -= position_correction
+                elif self.confidence >= PHENOMENON_CLOSED_CONFIDENCE:
+                    # Recenter the terrain
+                    self.move_origin(self.shape.mean(axis=0).astype(int))
+                    self.prune(affordance)
 
             # if the phenomenon is not recognized, recompute the shape
             # if self.category is None:
@@ -107,6 +111,8 @@ class PhenomenonTerrain(Phenomenon):
                 if area > 500000:
                     self.confidence = PHENOMENON_CLOSED_CONFIDENCE
                     self.interpolate()
+                    # Place the origin of the terrain at the center
+                    self.move_origin(self.shape.mean(axis=0).astype(int))
 
     def recognize(self, category):
         """Set the terrain's category, shape, path, confidence. Adjust its position to the latest affordance"""
@@ -164,6 +170,19 @@ class PhenomenonTerrain(Phenomenon):
             # v = affordance.point + affordance.polar_green_point() + self.relative_origin_point
         # print("Place prediction error", v)
         return np.array(v, dtype=int)
+
+    def prune(self, affordance):
+        """Remove previous affordances that has the closest angle"""
+        q_affordance = Quaternion.from_z_rotation(math.atan2(affordance.point[1], affordance.point[0]))
+        similar_affordances = []
+        for k, a in self.affordances.items():
+            q_from_center = Quaternion.from_z_rotation(math.atan2(a.point[1], a.point[0]))
+            if abs(short_angle(q_from_center, q_affordance)) < math.pi / 8 and 0 < k < self.affordance_id - 2:
+                similar_affordances.append(k)
+
+        for k in similar_affordances:
+            print("Prune affordance", k)
+            self.affordances.pop(k)
 
     def save(self, saved_phenomenon=None):
         """Return a clone of the phenomenon for memory snapshot"""
