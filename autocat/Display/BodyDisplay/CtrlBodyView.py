@@ -10,6 +10,7 @@ from ...Integrator.Calibrator import compass_calibration
 from ...Memory.EgocentricMemory.Experience import EXPERIENCE_COMPASS, EXPERIENCE_AZIMUTH
 
 KEY_OFFSET = 'O'
+ENGAGEMENT_MODES = {'R': "Real", 'I': "Imaginary"}
 
 
 class CtrlBodyView:
@@ -88,11 +89,12 @@ class CtrlBodyView:
         self.view.label_DA.text = f"DA: {self.workspace.memory.body_memory.dopamine:d}"
         self.view.label_NA.text = f"NA: {self.workspace.memory.body_memory.noradrenaline:d}"
 
-        self.view.label_clock.text = "Clock: {:d}".format(self.workspace.memory.clock) \
-                                     + ", En:{:d}%".format(self.workspace.memory.body_memory.energy) \
-                                     + ", Ex:{:d}%".format(self.workspace.memory.body_memory.excitation) \
-                                     + ", " + self.workspace.decider_id \
-                                     + ", " + self.workspace.engagement_mode
+        self.view.label_clock.text = "Clock: {:d}".format(self.workspace.memory.clock)  \
+                                     + " | " + ENGAGEMENT_MODES[self.workspace.engagement_mode]  \
+                                     + " | " + self.workspace.decider_id
+        # + ", En:{:d}%".format(self.workspace.memory.body_memory.energy) \
+        # + ", Ex:{:d}%".format(self.workspace.memory.body_memory.excitation) \
+
         # During the interaction:update the head direction
         self.view.robot.rotate_head(self.workspace.memory.body_memory.head_direction_degree())
         # At the end of interaction
@@ -103,7 +105,7 @@ class CtrlBodyView:
 
     def body_label(self, action):
         """Return the label to display in the body view"""
-        rotation_speed = "{:.2f}°/s".format(math.degrees(action.rotation_speed_rad))
+        rotation_speed = "{:.1f}°/s".format(math.degrees(action.rotation_speed_rad))
         label = "Speed x: " + str(int(action.translation_speed[0])) + "mm/s, y: " \
             + str(int(action.translation_speed[1])) + "mm/s, rotation:" + rotation_speed
         return label
@@ -111,5 +113,6 @@ class CtrlBodyView:
     def body_label_azimuth(self, enaction):
         """Return the label to display in the body view"""
         return "Azimuth: " + str(quaternion_to_azimuth(enaction.trajectory.body_quaternion)) + \
-               ", compass: " + str(quaternion_to_azimuth(enaction.trajectory.compass_quaternion)) + ", delta: " + \
-               "{:.2f}".format(math.degrees(enaction.trajectory.body_direction_delta))
+               ", offset: ({:d}, {:d})".format(self.workspace.memory.body_memory.compass_offset[0], self.workspace.memory.body_memory.compass_offset[1]) + \
+               ", residual: {:.1f}".format(math.degrees(enaction.trajectory.body_direction_delta))
+        # ", compass: " + str(quaternion_to_azimuth(enaction.trajectory.compass_quaternion)) + \
