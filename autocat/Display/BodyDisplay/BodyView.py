@@ -17,7 +17,7 @@ class BodyView(InteractiveDisplay):
 
         # Initialize OpenGL parameters
         glClearColor(1.0, 235.0/256., 205.0/256., 1.0)
-        self.zoom_level = 1.3
+        self.zoom_level = 2.6
 
         # Define the robot
         self.robot_batch = pyglet.graphics.Batch()

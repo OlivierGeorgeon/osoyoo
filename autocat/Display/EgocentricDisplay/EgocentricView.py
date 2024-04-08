@@ -20,7 +20,7 @@ class EgocentricView(InteractiveDisplay):
         # self.batch = pyglet.graphics.Batch()
         # self.background = pyglet.graphics.OrderedGroup(0)
         # self.foreground = pyglet.graphics.OrderedGroup(1)
-        # self.zoom_level = 1
+        self.zoom_level = 2
 
         # Define the robot
         self.robot = OsoyooCar(self.batch, self.background)

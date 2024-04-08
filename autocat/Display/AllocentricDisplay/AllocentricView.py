@@ -19,11 +19,11 @@ ZOOM_OUT_FACTOR = 1/ZOOM_IN_FACTOR
 class AllocentricView(InteractiveDisplay):
     """Create the allocentric view"""
     def __init__(self, workspace, width=400, height=400, *args, **kwargs):
-        conf = Config(sample_buffers=1,
-                      samples=4,
-                      depth_size=16,
-                      double_buffer=True)
-        super().__init__(width, height, resizable=True, config=conf, *args, **kwargs)
+        # conf = Config(sample_buffers=1,
+        #               samples=4,
+        #               depth_size=16,
+        #               double_buffer=True)
+        super().__init__(width, height, resizable=True, *args, **kwargs)
         self.set_caption("Allocentric Memory")
         self.set_minimum_size(150, 150)
 
@@ -38,6 +38,12 @@ class AllocentricView(InteractiveDisplay):
         self.robot_batch = pyglet.graphics.Batch()
         self.robot = OsoyooCar(self.robot_batch, self.forefront)  # Rectangles seem not to respect ordered groups
 
+        self.zoom_level = 3
+        # self.left *= self.zoom_level
+        # self.right *= self.zoom_level
+        # self.bottom *= self.zoom_level
+        # self.top *= self.zoom_level
+
         self.workspace = workspace
         self.nb_cell_x = workspace.memory.allocentric_memory.width
         self.nb_cell_y = workspace.memory.allocentric_memory.height
@@ -47,8 +53,6 @@ class AllocentricView(InteractiveDisplay):
         self.robot_poi = None  # The other robot point of interest
         self.body_poi = None
 
-
-
         # The text at the bottom left
         self.label_batch = pyglet.graphics.Batch()
         self.label = pyglet.text.Label('', font_name='Verdana', font_size=10, x=10, y=10)
@@ -57,15 +61,15 @@ class AllocentricView(InteractiveDisplay):
         self.label_click = pyglet.text.Label('', font_name='Verdana', font_size=10, x=10, y=30)
         self.label_click.color = (255, 255, 255, 255)
         self.label_click.batch = self.label_batch
-        self.left = 0
-        self.right = width
-        self.bottom = 0
-        self.top = height
-        self.zoomed_width = width
-        self.zoomed_height = height
-
-        self.total_dx = 0
-        self.total_dy = 0
+        # self.left = 0
+        # self.right = width
+        # self.bottom = 0
+        # self.top = height
+        # self.zoomed_width = width
+        # self.zoomed_height = height
+        #
+        # self.total_dx = 0
+        # self.total_dy = 0
 
     def update_hexagon(self, cell):
         """Create or update or delete an hexagon in allocentric view."""

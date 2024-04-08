@@ -16,7 +16,7 @@ class PhenomenonView(InteractiveDisplay):
         # # Initialize OpenGL parameters
         # # https://www.w3schools.com/cssref/css_colors.asp
         glClearColor(1.0, 1.0, 1.0, 1.0)
-        self.zoom_level = 3
+        self.zoom_level = 6
 
         # Define the robot
         self.robot_batch = pyglet.graphics.Batch()
