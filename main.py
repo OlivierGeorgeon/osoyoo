@@ -28,7 +28,6 @@ if len(sys.argv) < 3:  # Argument 0 is "main.py" when launched in -m mode
 
 flock = Flock(sys.argv)
 
-# playsound('autocat/Assets/R5.wav', False)
 # R5 = pyglet.media.load('autocat/Assets/R5.wav', streaming=False)
 # R5.play()
 pyglet.clock.schedule_interval(flock.main, 0.1)
