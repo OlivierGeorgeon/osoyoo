@@ -167,6 +167,15 @@ class Phenomenon:
         """Return the latest affordance added to this phenomenon"""
         return self.affordances[self.affordance_id]
 
+    def reshape(self, origin_position_error, clock):
+        """Propagate the origin position error to all the affordances since the last origin affordance"""
+        for a in [a for a in self.affordances.values() if a.clock > self.last_origin_clock]:
+            # The older the affordance, the smallest the position correction
+            correction_coefficient = (a.clock - self.last_origin_clock) / (clock - self.last_origin_clock)
+            a.point -= np.array(origin_position_error * correction_coefficient, dtype=int)
+            # print("Affordance clock:", a.experience.clock, "corrected by:", ac, "coef:", coef)
+        self.last_origin_clock = clock
+
     def save(self, saved_phenomenon):
         """Return a clone of the phenomenon for memory snapshot"""
         saved_phenomenon.point = self.point.copy()

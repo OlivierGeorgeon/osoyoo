@@ -51,14 +51,14 @@ class InteractiveDisplay(pyglet.window.Window):
         self.screen_scale = screen_scale()
 
     def mouse_coordinates_to_point(self, x, y):
-        """ Return the point in world scale from mouse x and y """
+        """ Return the point in world reference frame from mouse x and y """
         point_x = (x - self.drag_x - self.width / 2) * self.zoom_level
         point_y = (y - self.drag_y - self.height / 2) * self.zoom_level
         return Vector3([point_x, point_y, 0], dtype=int)
 
     def on_resize(self, width, height):
         """ Adjusting the viewport when resizing the window """
-        # Recompute the corners of the camera
+        # Recompute the corners of the world window
         self.left = (-width / 2 - self.drag_x) * self.zoom_level
         self.right = (width / 2 - self.drag_x) * self.zoom_level
         self.bottom = (-height / 2 - self.drag_y) * self.zoom_level
@@ -71,7 +71,7 @@ class InteractiveDisplay(pyglet.window.Window):
         # The total amount of drag
         self.drag_x += dx
         self.drag_y += dy
-        # Recompute the corners of the camera
+        # Recompute the corners of the world window
         self.left = (-self.width / 2 - self.drag_x) * self.zoom_level
         self.right = (self.width / 2 - self.drag_x) * self.zoom_level
         self.bottom = (-self.height / 2 - self.drag_y) * self.zoom_level
@@ -80,7 +80,7 @@ class InteractiveDisplay(pyglet.window.Window):
     def on_mouse_scroll(self, x, y, dx, dy):
         """ Zoom the window from the center of the world"""
         f = ZOOM_OUT_FACTOR if dy > 0 else ZOOM_IN_FACTOR if dy < 0 else 1
-        if .2 < self.zoom_level * f < 10:
+        if .6 < self.zoom_level * f < 8:
             self.zoom_level *= f
             self.left *= f
             self.right *= f

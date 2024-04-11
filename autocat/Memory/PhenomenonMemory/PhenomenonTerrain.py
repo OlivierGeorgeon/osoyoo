@@ -60,21 +60,20 @@ class PhenomenonTerrain(Phenomenon):
                     elif abs(short_angle(affordance.quaternion, self.origin_direction_quaternion)) < math.pi / 2 \
                             or self.confidence >= PHENOMENON_RECOGNIZE_CONFIDENCE:
                         # If this affordance is in the direction of the origin or terrain is recognized
-                        # else:
                         position_correction = self.vector_toward_origin(affordance)
                         # Prediction error is opposite of the position_correction projected along the color direction
                         self.origin_prediction_error[affordance.clock] = np.dot(-position_correction,
                                                                          affordance.quaternion * Vector3([0., 1., 0.]))
                         # Correct the position of the affordances since last time the robot visited the absolute origin
-                        for a in [a for a in self.affordances.values() if a.clock > self.last_origin_clock]:
-                            coef = (a.clock - self.last_origin_clock)/(affordance.clock - self.last_origin_clock)
-                            ac = np.array(position_correction * coef, dtype=int)
-                            a.point -= ac
-                            # print("Affordance clock:", a.experience.clock, "corrected by:", ac, "coef:", coef)
+                        self.reshape(self, position_correction, affordance.clock)
+                        # for a in [a for a in self.affordances.values() if a.clock > self.last_origin_clock]:
+                        #     coef = (a.clock - self.last_origin_clock)/(affordance.clock - self.last_origin_clock)
+                        #     ac = np.array(position_correction * coef, dtype=int)
+                        #     a.point -= ac
+                        # self.last_origin_clock = affordance.clock
                         # Increase confidence if not consecutive origin affordances
                         # if affordance.clock - self.last_origin_clock > 5:
                         self.confidence = max(PHENOMENON_RECOGNIZE_CONFIDENCE, self.confidence)
-                        self.last_origin_clock = affordance.clock
                 # Black line: Compute the position correction based on the nearest point in the terrain shape
                 # TODO use the point on the trajectory rather than the closest point
                 elif self.confidence >= PHENOMENON_RECOGNIZED_CONFIDENCE:  # PHENOMENON_CLOSED_CONFIDENCE
