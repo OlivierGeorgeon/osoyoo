@@ -5,7 +5,7 @@ from .EgocentricMemory.EgocentricMemory import EgocentricMemory
 from .AllocentricMemory.AllocentricMemory import AllocentricMemory
 from .BodyMemory import BodyMemory
 from .PhenomenonMemory.PhenomenonMemory import PhenomenonMemory
-from .PhenomenonMemory import PHENOMENON_CLOSED_CONFIDENCE
+from .PhenomenonMemory import PHENOMENON_ENCLOSED_CONFIDENCE
 from .AllocentricMemory.Hexagonal_geometry import CELL_RADIUS
 from ..Integrator.Integrator import integrate
 from ..Enaction.Predict import push_objects
@@ -111,7 +111,7 @@ class Memory:
         """Return the point in egocentric coordinates from the point in terrain-centric coordinates"""
         if point is None:
             return None
-        if self.phenomenon_memory.terrain_confidence() >= PHENOMENON_CLOSED_CONFIDENCE:
+        if self.phenomenon_memory.terrain_confidence() >= PHENOMENON_ENCLOSED_CONFIDENCE:
             return self.allocentric_to_egocentric(point + self.phenomenon_memory.terrain().point)
         return self.allocentric_to_egocentric(point)
 
@@ -119,7 +119,7 @@ class Memory:
         """Return the point in terrain egocentric coordinates from the point in egocentric coordinates"""
         if point is None:
             return None
-        if self.phenomenon_memory.terrain_confidence() >= PHENOMENON_CLOSED_CONFIDENCE:
+        if self.phenomenon_memory.terrain_confidence() >= PHENOMENON_ENCLOSED_CONFIDENCE:
             return self.egocentric_to_allocentric(point) - self.phenomenon_memory.terrain().point
         return self.egocentric_to_allocentric(point)
 
@@ -127,14 +127,14 @@ class Memory:
         """Return the point in allocentric coordinates from the point in terrain_centric"""
         if point is None:
             return None
-        elif self.phenomenon_memory.terrain_confidence() >= PHENOMENON_CLOSED_CONFIDENCE:
+        elif self.phenomenon_memory.terrain_confidence() >= PHENOMENON_ENCLOSED_CONFIDENCE:
             return point + self.phenomenon_memory.terrain().point
         else:
             return point
 
     def terrain_centric_robot_point(self):
         """Return the position of the robot relative to the terrain point"""
-        if self.phenomenon_memory.terrain_confidence() >= PHENOMENON_CLOSED_CONFIDENCE:
+        if self.phenomenon_memory.terrain_confidence() >= PHENOMENON_ENCLOSED_CONFIDENCE:
             return self.allocentric_memory.robot_point - self.phenomenon_memory.terrain().point
         else:
             return self.allocentric_memory.robot_point

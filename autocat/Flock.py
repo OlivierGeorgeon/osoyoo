@@ -39,7 +39,7 @@ class Flock:
         for robot_id in self.workspaces.keys():
             self.ctrl_robots[robot_id].main(dt)  # Check if outcome received from the robot
             self.workspaces[robot_id].main(dt)
-            self.ctrl_robots[robot_id].main(dt)  # Check if command to send to the robot
+            # self.ctrl_robots[robot_id].main(dt)  # Check if command to send to the robot
             self.ctrl_egocentric_views[robot_id].main(dt)
             self.ctrl_allocentric_views[robot_id].main(dt)
             self.ctrl_body_views[robot_id].main(dt)

@@ -30,5 +30,5 @@ flock = Flock(sys.argv)
 
 # R5 = pyglet.media.load('autocat/Assets/R5.wav', streaming=False)
 # R5.play()
-pyglet.clock.schedule_interval(flock.main, 0.1)
+pyglet.clock.schedule_interval(flock.main, 0.2)  # The computation takes approximately 0.13s
 pyglet.app.run()

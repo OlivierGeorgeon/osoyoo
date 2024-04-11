@@ -2,14 +2,14 @@ import math
 import numpy as np
 from pyrr import Vector3, Quaternion
 from . import PHENOMENON_INITIAL_CONFIDENCE, PHENOMENON_RECOGNIZE_CONFIDENCE, PHENOMENON_RECOGNIZED_CONFIDENCE, TERRAIN_ORIGIN_CONFIDENCE, \
-    PHENOMENON_CLOSED_CONFIDENCE
+    PHENOMENON_ENCLOSED_CONFIDENCE
 from .Phenomenon import Phenomenon
 from .Affordance import Affordance, MIDDLE_COLOR_INDEX, COLOR_DISTANCE
 from ...Memory.EgocentricMemory.Experience import EXPERIENCE_PLACE, EXPERIENCE_FLOOR
 from ...Utils import short_angle
 
 
-TERRAIN_EXPERIENCE_TYPES = [EXPERIENCE_PLACE, EXPERIENCE_FLOOR]
+TERRAIN_EXPERIENCE_TYPES = [EXPERIENCE_FLOOR]  # EXPERIENCE_PLACE
 
 
 class PhenomenonTerrain(Phenomenon):
@@ -17,7 +17,7 @@ class PhenomenonTerrain(Phenomenon):
     def __init__(self, affordance):
         super().__init__(affordance)
         self.phenomenon_type = EXPERIENCE_FLOOR
-        self.confidence = PHENOMENON_INITIAL_CONFIDENCE  # TERRAIN_INITIAL_CONFIDENCE
+        # self.confidence = PHENOMENON_INITIAL_CONFIDENCE  # TERRAIN_INITIAL_CONFIDENCE
         self.interpolation_types = [EXPERIENCE_FLOOR]
 
         # If the affordance is color floor then use it as absolute origin
@@ -65,7 +65,7 @@ class PhenomenonTerrain(Phenomenon):
                         self.origin_prediction_error[affordance.clock] = np.dot(-position_correction,
                                                                          affordance.quaternion * Vector3([0., 1., 0.]))
                         # Correct the position of the affordances since last time the robot visited the absolute origin
-                        self.reshape(self, position_correction, affordance.clock)
+                        self.enclose(position_correction, affordance.clock)
                         # for a in [a for a in self.affordances.values() if a.clock > self.last_origin_clock]:
                         #     coef = (a.clock - self.last_origin_clock)/(affordance.clock - self.last_origin_clock)
                         #     ac = np.array(position_correction * coef, dtype=int)
@@ -82,23 +82,23 @@ class PhenomenonTerrain(Phenomenon):
                     position_correction = np.array(affordance.point - closest_point, dtype=int)
                     print("Nearest shape point", closest_point, "Position correction", position_correction)
                     affordance.point -= position_correction
-                elif self.confidence >= PHENOMENON_CLOSED_CONFIDENCE:
+                elif self.confidence >= PHENOMENON_ENCLOSED_CONFIDENCE:
                     # Recenter the terrain
                     self.move_origin(self.shape.mean(axis=0).astype(int))
                     self.prune(affordance)
 
             # if the phenomenon is not recognized, recompute the shape
             # if self.category is None:
-            if self.confidence == PHENOMENON_CLOSED_CONFIDENCE:
+            if self.confidence == PHENOMENON_ENCLOSED_CONFIDENCE:
                 self.interpolate()
 
             return - position_correction  # TODO remove the minus sign
         # Affordances that do not belong to this phenomenon must return None
         return None
 
-    def try_to_bridge(self):
+    def try_to_enclose(self):  # TODO improve and use it for automatic enclosure
         """If the area is big enough, increase confidence and interpolate the closed shape"""
-        if self.confidence < PHENOMENON_CLOSED_CONFIDENCE:
+        if self.confidence < PHENOMENON_ENCLOSED_CONFIDENCE:
             vertices = [a.point[0:2] for a in self.affordances.values() if a.type in self.interpolation_types]
             if len(vertices) > 2:
                 vertices.append(vertices[0])
@@ -108,7 +108,7 @@ class PhenomenonTerrain(Phenomenon):
                                     np.dot(vertices[:-1, 1], np.roll(vertices[:-1, 0], 1)))
                 print("area", area)
                 if area > 500000:
-                    self.confidence = PHENOMENON_CLOSED_CONFIDENCE
+                    self.confidence = PHENOMENON_ENCLOSED_CONFIDENCE
                     self.interpolate()
                     # Place the origin of the terrain at the center
                     self.move_origin(self.shape.mean(axis=0).astype(int))

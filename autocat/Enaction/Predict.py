@@ -3,7 +3,7 @@ import numpy as np
 import time
 import matplotlib.path as mpath
 from ..Proposer.Action import ACTION_FORWARD, ACTION_SWIPE, ACTION_RIGHTWARD, ACTION_SCAN
-from ..Memory.PhenomenonMemory import PHENOMENON_RECOGNIZED_CONFIDENCE, PHENOMENON_CLOSED_CONFIDENCE
+from ..Memory.PhenomenonMemory import PHENOMENON_RECOGNIZED_CONFIDENCE, PHENOMENON_ENCLOSED_CONFIDENCE
 from ..Memory.AllocentricMemory.Hexagonal_geometry import point_to_cell
 from ..Memory.EgocentricMemory.Experience import EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_FLOOR
 from ..Robot.RobotDefine import ROBOT_FLOOR_SENSOR_X, ROBOT_SETTINGS, ROBOT_OUTSIDE_Y
@@ -25,7 +25,7 @@ def generate_prediction(command, memory):
                     "yaw": command.yaw, "floor": 0}
 
     # If terrain is closed, adjust the floor, duration1, and yaw outcome
-    if memory.phenomenon_memory.terrain_confidence() >= PHENOMENON_CLOSED_CONFIDENCE:  # PHENOMENON_RECOGNIZED_CONFIDENCE:
+    if memory.phenomenon_memory.terrain_confidence() >= PHENOMENON_ENCLOSED_CONFIDENCE:  # PHENOMENON_RECOGNIZED_CONFIDENCE:
         # The shape of the terrain in egocentric coordinates
         # start_time = time.time()
         ego_shape = np.apply_along_axis(memory.terrain_centric_to_egocentric, 1,

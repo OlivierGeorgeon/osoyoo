@@ -1,7 +1,7 @@
 import math
 from pyrr import quaternion, Quaternion, Vector3
 from ..Robot.RobotDefine import TERRAIN_RADIUS
-from ..Memory.PhenomenonMemory import PHENOMENON_CLOSED_CONFIDENCE
+from ..Memory.PhenomenonMemory import PHENOMENON_ENCLOSED_CONFIDENCE
 from ..Memory.PhenomenonMemory.PhenomenonMemory import TER
 
 STEP_INIT = 0
@@ -26,7 +26,7 @@ class GoalGenerator:
         self.goal_point = quaternion.apply_to_vector(self.explore_angle_quaternion, self.goal_point)
 
         # When the terrain is not closed, add the terrain radius
-        if self.workspace.memory.phenomenon_memory.terrain_confidence() < PHENOMENON_CLOSED_CONFIDENCE:
+        if self.workspace.memory.phenomenon_memory.terrain_confidence() < PHENOMENON_ENCLOSED_CONFIDENCE:
             return self.goal_point + self.workspace.memory.phenomenon_memory.phenomena[TER].\
                 origin_direction_quaternion * Vector3([-TERRAIN_RADIUS[self.workspace.arena_id]["radius"], 0, 0])
         else:

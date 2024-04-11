@@ -14,7 +14,7 @@ from ..Enaction.CompositeEnaction import CompositeEnaction
 from . Proposer import Proposer
 from . PredefinedInteractions import OUTCOME_FOCUS_SIDE
 from ..Memory.BodyMemory import ENERGY_TIRED, EXCITATION_LOW
-from ..Memory.PhenomenonMemory import PHENOMENON_CLOSED_CONFIDENCE
+from ..Memory.PhenomenonMemory import PHENOMENON_ENCLOSED_CONFIDENCE
 
 STEP_INIT = 0
 STEP_TURN = 1
@@ -56,7 +56,7 @@ class ProposerWatch(Proposer):
         """Return the next intended interaction"""
 
         # if the terrain is not CLOSED then don't propose watch-over behavior
-        if self.workspace.memory.phenomenon_memory.terrain_confidence() < PHENOMENON_CLOSED_CONFIDENCE:
+        if self.workspace.memory.phenomenon_memory.terrain_confidence() < PHENOMENON_ENCLOSED_CONFIDENCE:
             return None
 
         e_memory = self.workspace.memory.save()

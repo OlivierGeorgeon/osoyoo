@@ -81,7 +81,8 @@ int WifiCat::read(char* packetBuffer)
     packetBuffer[len] = 0;
     Serial.print("Income string: ");
     Serial.println(packetBuffer);
-    Udp.flush(); // Discard any remaining input data. Test for debug
+    // Don't flush because sometimes it receives two commands together: the previous resent and the current
+    // Udp.flush();
 
     //Serial.print("From ");
     //Serial.print(Udp.remoteIP());

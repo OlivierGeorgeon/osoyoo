@@ -1,6 +1,6 @@
 import numpy as np
 from pyrr import Vector3
-from . import ARRANGE_OBJECT_RADIUS, TERRAIN_ORIGIN_CONFIDENCE, PHENOMENON_CLOSED_CONFIDENCE
+from . import ARRANGE_OBJECT_RADIUS, TERRAIN_ORIGIN_CONFIDENCE, PHENOMENON_ENCLOSED_CONFIDENCE
 from .PhenomenonCategory import PhenomenonCategory
 from .PhenomenonObject import PhenomenonObject
 from .PhenomenonTerrain import PhenomenonTerrain, TERRAIN_EXPERIENCE_TYPES
@@ -73,7 +73,7 @@ class PhenomenonMemory:
         if allo_point is None:
             is_outside_terrain = False
         # If terrain not confident then False
-        elif self.terrain_confidence() < PHENOMENON_CLOSED_CONFIDENCE:
+        elif self.terrain_confidence() < PHENOMENON_ENCLOSED_CONFIDENCE:
             is_outside_terrain = False
         # If the point is outside the confident terrain then True
         else:
@@ -87,7 +87,7 @@ class PhenomenonMemory:
             print("allo point is none")
             return False
         # If terrain not confident then False
-        elif self.terrain_confidence() < PHENOMENON_CLOSED_CONFIDENCE:
+        elif self.terrain_confidence() < PHENOMENON_ENCLOSED_CONFIDENCE:
             print("terrain is not closed")
             return False
         # If the point is outside the confident terrain then True
@@ -144,7 +144,7 @@ class PhenomenonMemory:
                 if delta is not None:
                     # Check if this phenomenon can be recognized
                     self.recognize_category(phenomenon)
-                    phenomenon.try_to_bridge()
+                    # phenomenon.try_to_enclose()
                     remaining_affordances.remove(affordance)
                     # Null correction do not count (to be improved)
                     if round(np.linalg.norm(delta)) > 0:

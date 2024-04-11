@@ -31,6 +31,7 @@ KEY_DECREASE = "D"
 KEY_INCREASE = "P"
 KEY_CLEAR = "C"  # Clear the stack of interactions to enact next
 KEY_PREDICTION_ERROR = "E"
+KEY_ENCLOSE = "N"
 
 
 class Workspace:

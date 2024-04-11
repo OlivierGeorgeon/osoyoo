@@ -11,7 +11,7 @@ from . Action import ACTION_TURN, ACTION_FORWARD, ACTION_BACKWARD
 from . Proposer import Proposer
 from ..Robot.Command import DIRECTION_BACK
 from ..Robot.Enaction import Enaction
-from ..Memory.PhenomenonMemory import PHENOMENON_CLOSED_CONFIDENCE
+from ..Memory.PhenomenonMemory import PHENOMENON_ENCLOSED_CONFIDENCE
 from ..Memory import EMOTION_CONTENT
 from ..Enaction.CompositeEnaction import CompositeEnaction
 from . GoalGenerator import GoalGenerator
@@ -36,7 +36,7 @@ class ProposerPlayTerrain(Proposer):
         """Propose the next enaction"""
 
         # If the terrain is not closed, don't play with it
-        if self.workspace.memory.phenomenon_memory.terrain_confidence() < PHENOMENON_CLOSED_CONFIDENCE:
+        if self.workspace.memory.phenomenon_memory.terrain_confidence() < PHENOMENON_ENCLOSED_CONFIDENCE:
             return None
 
         e_memory = self.workspace.memory.save()
