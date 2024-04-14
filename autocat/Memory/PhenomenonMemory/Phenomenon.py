@@ -77,12 +77,12 @@ class Phenomenon:
         self.set_path()
         self.confidence = PHENOMENON_RECOGNIZED_CONFIDENCE
         print("Phenomenon recognized:", category.experience_type)
-
-    def compute_center(self):
-        """Recompute the center of the phenomenon as the mean of the affordance position"""
-        points = np.array([a.point for a in self.affordances.values()])
-        centroid = points.mean(axis=0)
-        return centroid
+    #
+    # def compute_center(self):
+    #     """Recompute the center of the phenomenon as the mean of the affordance position"""
+    #     points = np.array([a.point for a in self.affordances.values()])
+    #     centroid = points.mean(axis=0)
+    #     return centroid
 
     def convex_hull(self):
         """Return the points of the convex hull containing the phenomenon as a flat list"""

@@ -1,7 +1,7 @@
 # PetitCat
 
 The PetitCat project aims at generating life-like behaviors in robots.
-It currently uses the PetitCat Robot, an extension of the [osoyoo robot car](https://osoyoo.myshopify.com/collections/robot-car/products/osoyoo-omni-directinal-mecanum-wheels-robot-car-kit-for-arduino-mega2560-metal-chassis-dc-speed-encoder-motor-robotic-diy-stem-remote-controlled-educational-mechanical-diy-coding-for-teens-adult?variant=31634199183471). 
+It uses the PetitCat Robot, an extension of the [osoyoo robot car](https://osoyoo.myshopify.com/collections/robot-car/products/osoyoo-omni-directinal-mecanum-wheels-robot-car-kit-for-arduino-mega2560-metal-chassis-dc-speed-encoder-motor-robotic-diy-stem-remote-controlled-educational-mechanical-diy-coding-for-teens-adult?variant=31634199183471). 
 
 
 ## Repository architecture
@@ -30,7 +30,7 @@ It currently uses the PetitCat Robot, an extension of the [osoyoo robot car](htt
 
 
 
-## The documentation 
+## Documentation 
 
 Test documentation 
 * [test_remote_control_robot.md](docs/tests/test_remote_control_robot.md) Helps you test the communication between your PC and your robot.
@@ -46,3 +46,11 @@ French additional information:
 ## Related projects
 
 * [Simon Gay's project](https://gaysimon.github.io/robot/robot_navigation_en.html) Simon added a Banana Pi and a binocular camera to study navigation.
+
+## References
+
+Georgeon, O. L., Lurie, D.,  Robertson, P. (2024). Artificial enactive inference in three-dimensional world. Cognitive Systems Research, 101234. [doi:10.1016/j.cogsys.2024.101234](https://authors.elsevier.com/a/1ivtO4xrDwYOWV)
+
+<!---
+(https://doi.org/10.1016/j.cogsys.2024.101234).
+--->

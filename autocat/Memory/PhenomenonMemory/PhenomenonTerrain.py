@@ -176,7 +176,8 @@ class PhenomenonTerrain(Phenomenon):
         similar_affordances = []
         for k, a in self.affordances.items():
             q_from_center = Quaternion.from_z_rotation(math.atan2(a.point[1], a.point[0]))
-            if abs(short_angle(q_from_center, q_affordance)) < math.pi / 8 and 0 < k < self.affordance_id - 2:
+            # TODO check that it's ok to remove affordance 0
+            if abs(short_angle(q_from_center, q_affordance)) < math.pi / 8 and k < self.affordance_id - 2:
                 similar_affordances.append(k)
 
         for k in similar_affordances:
@@ -185,6 +186,7 @@ class PhenomenonTerrain(Phenomenon):
 
     def save(self, saved_phenomenon=None):
         """Return a clone of the phenomenon for memory snapshot"""
-        saved_phenomenon = PhenomenonTerrain(self.affordances[0].save())
+        # Instantiate the clone using the first affordance of the phenomenon
+        saved_phenomenon = PhenomenonTerrain(self.affordances[min(self.affordances)].save())
         super().save(saved_phenomenon)
         return saved_phenomenon
