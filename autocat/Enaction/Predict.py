@@ -104,6 +104,7 @@ def generate_prediction(command, memory):
         # outcome_dict['head_angle'], outcome_dict['echo_distance'] = scan_ad[np.argmin(scan_ad[:, 1])].tolist()
         a, d = scan_ad[np.argmin(scan_ad[:, 1])].tolist()
         outcome_dict['head_angle'], outcome_dict['echo_distance'] = max(-90, min(a, 90)), d - ARRANGE_OBJECT_RADIUS
+        print("echo distance", outcome_dict['echo_distance'])
     elif trajectory.focus_point is not None:  # Focus not on an object
         outcome_dict['head_angle'], _ = point_to_head_direction_distance(trajectory.focus_point)
     outcome_dict['head_angle'] = max(-90, min(outcome_dict['head_angle'], 90))

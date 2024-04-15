@@ -22,7 +22,7 @@ class PhenomenonTerrain(Phenomenon):
         # If the affordance is color floor then use it as absolute origin
         if affordance.type == EXPERIENCE_FLOOR and affordance.color_index > 0:
             self.absolute_affordance_key = 0
-            self.last_origin_clock = affordance.experience.clock
+            self.last_origin_clock = affordance.clock
             self.origin_direction_quaternion = affordance.quaternion.copy()
             self.confidence = TERRAIN_ORIGIN_CONFIDENCE
 
