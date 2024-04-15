@@ -36,7 +36,7 @@ Test documentation
 * [test_remote_control_robot.md](docs/tests/test_remote_control_robot.md) Helps you test the communication between your PC and your robot.
 
 Full project documentation in English: 
-* [The project's wiki](https://github.com/OlivierGeorgeon/osoyoo/wiki) Helps you assembly your robot, calibrate it, and run the project.
+* [The project's wiki](docs/wiki/home.md) Helps you assembly your robot, calibrate it, and run the project.
 * [Howard Schneider's full tutorial](docs/overview/Part_1_Easy_to_Read_Overview.md) Step by step explanations for beginners. 
 * [Youtube playlist](https://youtube.com/playlist?list=PLlSPp5EpW5vFb-ZMCr8m0dIOoKEQe9CIE&si=HachYRwgJR8I-BbH) Demonstrations of behaviors. 
 

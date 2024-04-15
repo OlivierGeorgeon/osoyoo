@@ -1,7 +1,7 @@
 import math
 import numpy as np
 from pyrr import Vector3, Quaternion
-from . import PHENOMENON_INITIAL_CONFIDENCE, PHENOMENON_RECOGNIZE_CONFIDENCE, PHENOMENON_RECOGNIZED_CONFIDENCE, TERRAIN_ORIGIN_CONFIDENCE, \
+from . import PHENOMENON_RECOGNIZE_CONFIDENCE, PHENOMENON_RECOGNIZED_CONFIDENCE, TERRAIN_ORIGIN_CONFIDENCE, \
     PHENOMENON_ENCLOSED_CONFIDENCE
 from .Phenomenon import Phenomenon
 from .Affordance import Affordance, MIDDLE_COLOR_INDEX, COLOR_DISTANCE
@@ -17,7 +17,6 @@ class PhenomenonTerrain(Phenomenon):
     def __init__(self, affordance):
         super().__init__(affordance)
         self.phenomenon_type = EXPERIENCE_FLOOR
-        # self.confidence = PHENOMENON_INITIAL_CONFIDENCE  # TERRAIN_INITIAL_CONFIDENCE
         self.interpolation_types = [EXPERIENCE_FLOOR]
 
         # If the affordance is color floor then use it as absolute origin
