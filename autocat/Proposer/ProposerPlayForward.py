@@ -1,15 +1,16 @@
 ########################################################################################
 # This proposer makes the robot play by going to an object and back
-# Activation 5: Makes the robot HAPPY
+# Activation: 5
+# EMOTION_CONTENT (Serotonin)
 ########################################################################################
 
 import math
 import numpy as np
 from pyrr import vector, Vector3
-from . Action import ACTION_TURN, ACTION_FORWARD, ACTION_BACKWARD, ACTION_SWIPE, ACTION_SCAN
+from . Action import ACTION_TURN, ACTION_FORWARD, ACTION_BACKWARD, ACTION_SWIPE
 from ..Robot.Enaction import Enaction
 from . Proposer import Proposer
-from ..Memory import EMOTION_HAPPY
+from ..Memory import EMOTION_CONTENT
 from ..Memory.BodyMemory import EXCITATION_LOW
 from . Interaction import OUTCOME_FLOOR, OUTCOME_FOCUS_TOO_FAR
 from ..Utils import assert_almost_equal_angles
@@ -28,6 +29,9 @@ class ProposerPlayForward(Proposer):
 
     def activation_level(self):
         """The level of activation of this decider: 0: default, 5 if excited and object to play with """
+
+        return self.workspace.memory.body_memory.serotonin
+
         if self.workspace.memory.body_memory.excitation > EXCITATION_LOW and \
                 (self.is_to_play() or self.step == STEP_WITHDRAW):
             return 5
@@ -37,7 +41,7 @@ class ProposerPlayForward(Proposer):
     def select_enaction(self, enaction):
         """Add the next enaction to the stack based on sequence learning and spatial modifiers"""
         e_memory = self.workspace.memory.save()
-        e_memory.emotion_code = EMOTION_HAPPY
+        e_memory.emotion_code = EMOTION_CONTENT
 
         # Withdraw step
         if self.step == STEP_WITHDRAW:

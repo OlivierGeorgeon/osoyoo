@@ -4,7 +4,7 @@ import numpy as np
 from pyrr import Quaternion
 from scipy.spatial import ConvexHull, QhullError
 from scipy.interpolate import splprep, splev
-from . import PHENOMENON_INITIAL_CONFIDENCE, PHENOMENON_CLOSED_CONFIDENCE, PHENOMENON_RECOGNIZE_CONFIDENCE, \
+from . import PHENOMENON_INITIAL_CONFIDENCE, PHENOMENON_ENCLOSED_CONFIDENCE, PHENOMENON_RECOGNIZE_CONFIDENCE, \
     PHENOMENON_RECOGNIZED_CONFIDENCE
 
 PHENOMENON_DELTA = 300  # (mm) Distance between affordances to be considered the same phenomenon
@@ -56,7 +56,7 @@ class Phenomenon:
         else:
             return None
 
-    def try_to_bridge(self):
+    def try_to_enclose(self):
         """Try to bridge the circumference of the phenomenon"""
         # Only implemented for PhenomenonTerrain yet
         return
@@ -66,6 +66,7 @@ class Phenomenon:
         self.point += offset
         for a in self.affordances.values():
             a.point -= offset
+        self.shape -= offset
 
     def recognize(self, category):
         """Update the category, confidence, shape, and path of this phenomenon"""
@@ -76,12 +77,12 @@ class Phenomenon:
         self.set_path()
         self.confidence = PHENOMENON_RECOGNIZED_CONFIDENCE
         print("Phenomenon recognized:", category.experience_type)
-
-    def compute_center(self):
-        """Recompute the center of the phenomenon as the mean of the affordance position"""
-        points = np.array([a.point for a in self.affordances.values()])
-        centroid = points.mean(axis=0)
-        return centroid
+    #
+    # def compute_center(self):
+    #     """Recompute the center of the phenomenon as the mean of the affordance position"""
+    #     points = np.array([a.point for a in self.affordances.values()])
+    #     centroid = points.mean(axis=0)
+    #     return centroid
 
     def convex_hull(self):
         """Return the points of the convex hull containing the phenomenon as a flat list"""
@@ -139,7 +140,7 @@ class Phenomenon:
     def outline(self):
         """Return the terrain outline 2D points as list of integers"""
         # Convert into flat list of 2D points [x0, y0, x1, y1, ...,x100, y100]
-        if self.confidence < PHENOMENON_CLOSED_CONFIDENCE:
+        if self.confidence < PHENOMENON_ENCLOSED_CONFIDENCE:
             return np.array([a.point[0:2] for a in self.affordances.values() if a.type in
                              self.interpolation_types]).flatten().astype("int").tolist()
         return self.shape[:, 0:2].flatten().astype("int").tolist()
@@ -148,7 +149,7 @@ class Phenomenon:
         """Set the path representing the terrain outline used to test is_inside"""
         # Must not be recomputed on each call to is_inside()
         # Need a closed two-dimensional array [[x0, y0],...,[x100, y100], [x0, y0]]
-        self.path = mpath.Path(self.shape[:, 0:2] + self.shape[0, 0:2])
+        self.path = mpath.Path(np.concatenate((self.shape[:, 0:2], self.shape[0:1, 0:2])))
 
     def is_inside(self, terrain_centric_point):
         """True if the point in terrain-centric coordinates is inside the phenomenon"""
@@ -165,6 +166,22 @@ class Phenomenon:
     def latest_added_affordance(self):
         """Return the latest affordance added to this phenomenon"""
         return self.affordances[self.affordance_id]
+
+    def enclose(self, origin_position_error, clock):
+        """Adjust the position of affordances, interpolate the shape, move position to center"""
+        # Propagate the origin position error to all the affordances since the last origin affordance
+        for a in [a for a in self.affordances.values() if a.clock > self.last_origin_clock]:
+            # The older the affordance, the smaller the position correction
+            correction_coefficient = (a.clock - self.last_origin_clock) / (clock - self.last_origin_clock)
+            ac = np.array(origin_position_error * correction_coefficient, dtype=int)
+            a.point += ac
+            # print("Affordance clock:", a.clock, "corrected by:", ac, "coef:", correction_coefficient)
+        self.last_origin_clock = clock
+        # Interpolate the affordance positions
+        self.interpolate()
+        # Place the origin of the terrain at the center
+        self.move_origin(self.shape.mean(axis=0).astype(int))
+        self.confidence = max(PHENOMENON_ENCLOSED_CONFIDENCE, self.confidence)
 
     def save(self, saved_phenomenon):
         """Return a clone of the phenomenon for memory snapshot"""

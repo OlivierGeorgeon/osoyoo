@@ -22,7 +22,9 @@ class CtrlRobot:
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.socket.connect((self.robot_ip, self.port))  # Not necessary for UDP
         self.socket.settimeout(0)
-        self.expected_outcome_time = 0.
+        self.send_time = 0.
+        self.time_out = 0.
+        # self.expected_outcome_time = 0.
 
     def main(self, dt):
         """The main handler of the communication to and from the robot."""
@@ -33,18 +35,19 @@ class CtrlRobot:
 
         # While the robot is enacting the interaction, check for the outcome
         if self.workspace.enacter.interaction_step == ENACTION_STEP_ENACTING and not self.workspace.is_imagining:
-            if time.time() < self.expected_outcome_time:
+            if time.time() < self.send_time + self.time_out:
                 outcome_string = None
                 try:
                     outcome_string, _ = self.socket.recvfrom(512)
                 except socket.timeout:   # Time out error if outcome not yet received
-                    print(".", end='')
+                    print("t", end='')
                 except OSError as e:
                     if e.args[0] == 10035:
                         print(".", end='')
                     else:
                         print(e)
-                if outcome_string is not None:  # Sometimes it receives a None outcome. I don't know why
+                # If the outcome was received
+                if outcome_string is not None:
                     print()
                     print("Outcome:", outcome_string)
                     # Short outcome are for debug
@@ -54,15 +57,22 @@ class CtrlRobot:
                             # Terminate the enaction
                             self.workspace.enaction.terminate(Outcome(outcome_dict))
                             self.workspace.enacter.interaction_step = ENACTION_STEP_INTEGRATING
-                            # self.terminate_enaction(outcome_dict)
                         else:
-                            # Sometimes the previous outcome was received after the time out and we find it here
-                            print("Received outcome does not match current enaction")
+                            # Previous outcome received again: Perhaps the command was resent during first reception
+                            print(f"Outcome {outcome_dict['clock']} was received again")
+                            # Reset the time out. This will resend the next command right away
+                            # self.expected_outcome_time = time.time()
             else:
                 # Timeout: reinitialize the cycle. This will resend the enaction
+                serotonin = self.workspace.memory.body_memory.serotonin  # Handel user change  TODO improve
+                dopamine = self.workspace.memory.body_memory.dopamine  # Handel user change
+                noradrenaline = self.workspace.memory.body_memory.noradrenaline  # Handel user change
                 self.workspace.memory = self.workspace.enacter.memory_snapshot
+                self.workspace.memory.body_memory.serotonin = serotonin
+                self.workspace.memory.body_memory.dopamine = dopamine
+                self.workspace.memory.body_memory.noradrenaline = noradrenaline
                 self.workspace.enacter.interaction_step = ENACTION_STEP_REFRESHING
-                print("Timeout")
+                print(f".Timeout {self.time_out:.3f}")
 
     def send_command_to_robot(self):
         """Send the enaction string to the robot and set the timeout"""
@@ -73,17 +83,6 @@ class CtrlRobot:
         self.socket.sendto(bytes(enaction_string, 'utf-8'), (self.robot_ip, self.port))
 
         # Initialize the timeout
-        self.expected_outcome_time = time.time() + self.workspace.enaction.command.timeout()
-
-    # def terminate_enaction(self, outcome_dict):
-    #     """ Terminate the enaction using the outcome received from the robot."""
-    #
-    #     # Process the outcome
-    #     outcome = Outcome(outcome_dict)
-    #
-    #     # Terminate the enaction
-    #     self.workspace.enaction.terminate(outcome)
-    #     # If the composite enaction is over or aborted due to floor or impact
-    #     if not self.workspace.composite_enaction.increment(outcome) or outcome.floor > 0 or outcome.impact > 0:
-    #         self.workspace.composite_enaction = None
-    #     self.workspace.enacter.interaction_step = ENACTION_STEP_INTEGRATING
+        self.send_time = time.time()
+        self.time_out = self.workspace.enaction.command.timeout()
+        # self.expected_outcome_time = time.time() + self.workspace.enaction.command.timeout()

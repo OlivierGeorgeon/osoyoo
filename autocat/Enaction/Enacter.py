@@ -50,7 +50,13 @@ class Enacter:
         # INTEGRATING: the new enacted interaction
         if self.interaction_step == ENACTION_STEP_INTEGRATING:
             # Restore the memory from the snapshot
+            serotonin = self.workspace.memory.body_memory.serotonin  # Handel user change  TODO improve
+            dopamine = self.workspace.memory.body_memory.dopamine  # Handel user change
+            noradrenaline = self.workspace.memory.body_memory.noradrenaline  # Handel user change
             self.workspace.memory = self.memory_snapshot
+            self.workspace.memory.body_memory.serotonin = serotonin
+            self.workspace.memory.body_memory.dopamine = dopamine
+            self.workspace.memory.body_memory.noradrenaline = noradrenaline
             # Retrieve possible message from other robot
             if self.workspace.memory.phenomenon_memory.terrain_confidence() >= TERRAIN_ORIGIN_CONFIDENCE and \
                     self.workspace.message is not None:
@@ -77,3 +83,21 @@ class Enacter:
                 self.workspace.composite_enaction = None
 
         # REFRESHING: Will be reset to IDLE in the next cycle
+
+    def decide(self):
+        """Return the selected composite enaction"""
+        proposed_enactions = []
+        for name, proposer in self.workspace.proposers.items():
+            activation = proposer.activation_level()  # Must compute before proposing
+            # print("Computing proposition", name, "with focus", self.memory.egocentric_memory.focus_point)
+            enaction = proposer.propose_enaction()
+            if enaction is not None:
+                proposed_enactions.append([name, enaction, activation])
+        # The enaction that has the highest activation is selected
+        print("Proposed enactions:")
+        for p in proposed_enactions:
+            print(" ", p[0], ":", p[1], p[2])
+        most_activated = proposed_enactions.index(max(proposed_enactions, key=lambda p: p[2]))
+        self.workspace.decider_id = proposed_enactions[most_activated][0]
+        print("Decider:", self.workspace.decider_id)
+        return proposed_enactions[most_activated][1]

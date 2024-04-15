@@ -3,7 +3,7 @@ import numpy as np
 import time
 import matplotlib.path as mpath
 from ..Proposer.Action import ACTION_FORWARD, ACTION_SWIPE, ACTION_RIGHTWARD, ACTION_SCAN
-from ..Memory.PhenomenonMemory import PHENOMENON_RECOGNIZED_CONFIDENCE, PHENOMENON_CLOSED_CONFIDENCE
+from ..Memory.PhenomenonMemory import PHENOMENON_RECOGNIZED_CONFIDENCE, PHENOMENON_ENCLOSED_CONFIDENCE
 from ..Memory.AllocentricMemory.Hexagonal_geometry import point_to_cell
 from ..Memory.EgocentricMemory.Experience import EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_FLOOR
 from ..Robot.RobotDefine import ROBOT_FLOOR_SENSOR_X, ROBOT_SETTINGS, ROBOT_OUTSIDE_Y
@@ -25,7 +25,7 @@ def generate_prediction(command, memory):
                     "yaw": command.yaw, "floor": 0}
 
     # If terrain is closed, adjust the floor, duration1, and yaw outcome
-    if memory.phenomenon_memory.terrain_confidence() >= PHENOMENON_CLOSED_CONFIDENCE:  # PHENOMENON_RECOGNIZED_CONFIDENCE:
+    if memory.phenomenon_memory.terrain_confidence() >= PHENOMENON_ENCLOSED_CONFIDENCE:  # PHENOMENON_RECOGNIZED_CONFIDENCE:
         # The shape of the terrain in egocentric coordinates
         # start_time = time.time()
         ego_shape = np.apply_along_axis(memory.terrain_centric_to_egocentric, 1,
@@ -49,33 +49,6 @@ def generate_prediction(command, memory):
                         outcome_dict["yaw"] = -RETREAT_YAW
                     elif closest_intersection[1] == 2:
                         outcome_dict["yaw"] = RETREAT_YAW
-
-            # # find the x coordinate of the line intersection. Tentatively set floor and yaw
-                # if abs(ego_shape[i + 1][0] - ego_shape[i][0]) < 5:
-                #     outcome_dict["floor"] = 3
-                #     outcome_dict["yaw"] = 0
-                #     x = ego_shape[i][0]
-                # else:
-                #     slope = (ego_shape[i + 1][1] - ego_shape[i][1]) / (ego_shape[i + 1][0] - ego_shape[i][0])
-                #     x = ego_shape[i][0] - ego_shape[i][1] / slope
-                #     if ego_shape[i][0] > ego_shape[i + 1][0]:
-                #         outcome_dict["floor"] = 1
-                #         outcome_dict["yaw"] = -RETREAT_YAW
-                #     else:
-                #         outcome_dict["floor"] = 2
-                #         outcome_dict["yaw"] = RETREAT_YAW
-                # # If the line intersection is before the robot
-                # if x > 0:
-                #     duration1 = (x - ROBOT_FLOOR_SENSOR_X) * 1000 / ROBOT_SETTINGS[memory.robot_id]["forward_speed"]
-                #     if duration1 < command.duration:
-                #         outcome_dict["duration1"] = round(duration1)
-                #         outcome_dict["color_index"] = cell_color(np.array([x, 0, 0]), memory)
-                #     else:
-                #         # Must reset the floor and yaw set above
-                #         outcome_dict["floor"] = 0
-                #         outcome_dict["yaw"] = 0
-                #     # Stop searching (assume the robot is inside the terrain)
-                #     break
         elif command.action.action_code in [ACTION_SWIPE, ACTION_RIGHTWARD]:
             # Translate the shape by the position of the floor sensor so we can check the sign of the x coordinate
             ego_shape -= np.array([ROBOT_FLOOR_SENSOR_X, 0, 0])  #
@@ -106,34 +79,12 @@ def generate_prediction(command, memory):
                     outcome_dict["yaw"] = -RETREAT_YAW
                     outcome_dict["color_index"] = cell_color(np.array([ROBOT_FLOOR_SENSOR_X, closest_intersection, 0]), memory)
 
-                # if abs(ego_shape[i + 1][1] - ego_shape[i][1]) == 0:
-                #     y = ego_shape[i][1]
-                # else:
-                #     slope = (ego_shape[i + 1][0] - ego_shape[i][0]) / (ego_shape[i + 1][1] - ego_shape[i][1])
-                #     y = ego_shape[i][1] - ego_shape[i][0] / slope
-                # if command.speed[1] > 0 and y > 0:  # Swipe left
-                #     duration1 = y * 1000 / ROBOT_SETTINGS[memory.robot_id]["lateral_speed"]
-                #     if duration1 < command.duration:
-                #         outcome_dict["duration1"] = round(duration1)
-                #         outcome_dict["floor"] = 2
-                #         outcome_dict["yaw"] = RETREAT_YAW
-                #         outcome_dict["color_index"] = cell_color(np.array([ROBOT_FLOOR_SENSOR_X, y, 0]), memory)
-                #     break
-                # elif command.speed[1] < 0 and y < 0:  # Swipe right
-                #     duration1 = -y * 1000 / ROBOT_SETTINGS[memory.robot_id]["lateral_speed"]
-                #     if duration1 < command.duration:
-                #         outcome_dict["duration1"] = round(duration1)
-                #         outcome_dict["floor"] = 1
-                #         outcome_dict["yaw"] = -RETREAT_YAW
-                #         outcome_dict["color_index"] = cell_color(np.array([ROBOT_FLOOR_SENSOR_X, y, 0]), memory)
-                #     break
-
     # Compute the displacement in memory
     trajectory = Trajectory(memory, command)
     trajectory.track_displacement(command.yaw, Outcome(outcome_dict))
 
     # Push objects before moving the robot
-    push_objects(trajectory, memory)
+    push_objects(trajectory, memory, outcome_dict["floor"])
 
     # Apply the displacement to memory
     memory.allocentric_memory.move(memory.body_memory.body_quaternion, trajectory, command.clock)
@@ -178,7 +129,7 @@ def cell_color(ego_point, memory):
         return 0
 
 
-def push_objects(trajectory, memory):
+def push_objects(trajectory, memory, floor):
     """Update the position of the phenomena that are on the robot's trajectory. Must be called before moving robot."""
     alo_covered_area = trajectory.covered_area + memory.allocentric_memory.robot_point
     path = mpath.Path(alo_covered_area[:, 0:2])
@@ -186,6 +137,9 @@ def push_objects(trajectory, memory):
               p.phenomenon_type == EXPERIENCE_ALIGNED_ECHO and path.contains_point(p.point[0:2])]:
         ego_point = memory.allocentric_to_egocentric(p.point)
         ego_point[0] = trajectory.translation[0] + ROBOT_FLOOR_SENSOR_X + p.category.short_radius
+        # If floor then push beyond the retreat distance
+        if floor:
+            ego_point[0] += ROBOT_SETTINGS[memory.robot_id]["retreat_distance"]
         p.point = memory.egocentric_to_allocentric(ego_point)
 
 

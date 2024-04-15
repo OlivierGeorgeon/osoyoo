@@ -1,17 +1,18 @@
 ########################################################################################
 # This proposer makes the robot push an object when it has the focus
-# Activation 2: when the robot is angry
+# Activation: 2.
+# EMOTION_VIGILANT behavior (Noradrenaline)
 ########################################################################################
 
 import math
 import numpy as np
 from pyrr import vector, Vector3
-from . Action import ACTION_TURN, ACTION_FORWARD, ACTION_BACKWARD, ACTION_SCAN
+from . Action import ACTION_TURN, ACTION_FORWARD, ACTION_BACKWARD
 from ..Robot.Enaction import Enaction
 from ..Robot.Command import DIRECTION_BACK
 from . Proposer import Proposer
 from .. Enaction.CompositeEnaction import CompositeEnaction
-from ..Memory import EMOTION_ANGRY
+from ..Memory import EMOTION_VIGILANCE
 from . Interaction import OUTCOME_FLOOR
 from ..Utils import assert_almost_equal_angles
 
@@ -26,6 +27,9 @@ class ProposerPush(Proposer):
 
     def activation_level(self):
         """The level of activation of this decider: 0: default, 4 if focus inside terrain, 3 for withdrawal"""
+
+        return self.workspace.memory.body_memory.noradrenaline
+
         if self.is_to_push():
             return 4
         elif self.step == STEP_WITHDRAW:
@@ -35,7 +39,7 @@ class ProposerPush(Proposer):
     def select_enaction(self, enaction):
         """Add the next enaction to the stack based on sequence learning and spatial modifiers"""
         e_memory = self.workspace.memory.save()
-        e_memory.emotion_code = EMOTION_ANGRY
+        e_memory.emotion_code = EMOTION_VIGILANCE
 
         # If there is an object to push
         if self.is_to_push() and enaction.outcome_code != OUTCOME_FLOOR:

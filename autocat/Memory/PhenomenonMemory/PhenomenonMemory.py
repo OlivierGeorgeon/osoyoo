@@ -1,11 +1,11 @@
 import numpy as np
 from pyrr import Vector3
-from . import ARRANGE_OBJECT_RADIUS, TERRAIN_ORIGIN_CONFIDENCE
+from . import ARRANGE_OBJECT_RADIUS, TERRAIN_ORIGIN_CONFIDENCE, PHENOMENON_ENCLOSED_CONFIDENCE
 from .PhenomenonCategory import PhenomenonCategory
 from .PhenomenonObject import PhenomenonObject
 from .PhenomenonTerrain import PhenomenonTerrain, TERRAIN_EXPERIENCE_TYPES
 from .PhenomenonRobot import PhenomenonRobot
-from .. import EMOTION_ANGRY
+from .. import EMOTION_VIGILANCE
 from ..EgocentricMemory.Experience import EXPERIENCE_ROBOT, EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO
 from ...Robot.RobotDefine import TERRAIN_RADIUS, ROBOT_FLOOR_SENSOR_X, ROBOT_OUTSIDE_Y
 
@@ -44,7 +44,7 @@ class PhenomenonMemory:
 
     def watch_point(self):
         """The point where the robot returns for watching in allocentric coordinates"""
-        # If the terrain has has an origin
+        # If the terrain has an origin
         if self.terrain_confidence() >= TERRAIN_ORIGIN_CONFIDENCE:
             # Set the watch point half way between the center and the color patch
             point = self.phenomena[TER].origin_direction_quaternion * \
@@ -73,7 +73,7 @@ class PhenomenonMemory:
         if allo_point is None:
             is_outside_terrain = False
         # If terrain not confident then False
-        elif self.terrain_confidence() < TERRAIN_ORIGIN_CONFIDENCE:
+        elif self.terrain_confidence() < PHENOMENON_ENCLOSED_CONFIDENCE:
             is_outside_terrain = False
         # If the point is outside the confident terrain then True
         else:
@@ -87,8 +87,8 @@ class PhenomenonMemory:
             print("allo point is none")
             return False
         # If terrain not confident then False
-        elif self.terrain_confidence() < TERRAIN_ORIGIN_CONFIDENCE:
-            print("terrain is not confident")
+        elif self.terrain_confidence() < PHENOMENON_ENCLOSED_CONFIDENCE:
+            print("terrain is not closed")
             return False
         # If the point is outside the confident terrain then True
         else:
@@ -144,7 +144,7 @@ class PhenomenonMemory:
                 if delta is not None:
                     # Check if this phenomenon can be recognized
                     self.recognize_category(phenomenon)
-                    phenomenon.try_to_bridge()
+                    # phenomenon.try_to_enclose()
                     remaining_affordances.remove(affordance)
                     # Null correction do not count (to be improved)
                     if round(np.linalg.norm(delta)) > 0:
@@ -170,7 +170,7 @@ class PhenomenonMemory:
 
     def other_robot_is_angry(self):
         """Return True if there is another robot and it is angry"""
-        if ROBOT1 in self.phenomena and self.phenomena[ROBOT1].latest_added_affordance().color_index == EMOTION_ANGRY:
+        if ROBOT1 in self.phenomena and self.phenomena[ROBOT1].latest_added_affordance().color_index == EMOTION_VIGILANCE:
             return True
         else:
             return False

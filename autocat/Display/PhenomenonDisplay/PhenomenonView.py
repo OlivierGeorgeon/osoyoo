@@ -16,15 +16,14 @@ class PhenomenonView(InteractiveDisplay):
         # # Initialize OpenGL parameters
         # # https://www.w3schools.com/cssref/css_colors.asp
         glClearColor(1.0, 1.0, 1.0, 1.0)
-        self.zoom_level = 3
+        self.zoom_level = 6
 
         # Define the robot
         self.robot_batch = pyglet.graphics.Batch()
         self.robot = OsoyooCar(self.robot_batch, self.background)
         self.robot_translate = np.array([0, 0, 0], dtype=float)
         self.robot_rotate = 0
-        self.phenomenon_point = np.array([0, 0, 0], dtype=float)
-
+        # self.phenomenon_point = np.array([0, 0, 0], dtype=float)
         self.hull_line = None
 
         # Define the text area at the bottom of the view
@@ -50,7 +49,6 @@ class PhenomenonView(InteractiveDisplay):
         # glOrtho(-self.width * self.zoom_level, self.width * self.zoom_level, -self.height * self.zoom_level,
         #         self.height * self.zoom_level, 1, -1)
         glOrtho(self.left, self.right, self.bottom, self.top, 1, -1)
-
 
         # Draw the phenomenon
         self.batch.draw()

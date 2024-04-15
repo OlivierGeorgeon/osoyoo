@@ -33,7 +33,7 @@ Sequencer::Sequencer(Floor& FLO, Head& HEA, Imu& IMU, Led& LED, WifiCat& WifiCat
 // Watch the wifi and returns the new interaction to enact if any
 Interaction* Sequencer::update(int& interaction_step, Interaction* INT)
 {
-  digitalWrite(LED_BUILTIN, HIGH); // Dim the led while waiting for an action
+  digitalWrite(LED_BUILTIN, HIGH); // Dim the led while waiting for a command
   int len = _WifiCat.read(_packetBuffer);
   digitalWrite(LED_BUILTIN, LOW);
 
@@ -52,8 +52,8 @@ Interaction* Sequencer::update(int& interaction_step, Interaction* INT)
     if (json_action.hasOwnProperty("clock"))
       clock = (int)json_action["clock"];
 
-    // If received a string with the same clock then resend the outcome
-    // (The previous outcome was sent but the PC did not receive it)
+    // If the new clock equals the previous clock then do not enact the interaction but resend the previous outcome
+    // (The interaction was already enacted but the PC did not receive the previous outcome)
 
     if (clock == _previous_clock)
     {
@@ -61,11 +61,12 @@ Interaction* Sequencer::update(int& interaction_step, Interaction* INT)
         INT->send();
     }
 
-    // If it is a new clock then process the action
+    // If the new clock differs from the previous clock then enact the interaction
+    // (Lower clock means it was received from another PC application)
 
     else
     {
-      // Delete the previous interaction (Not sure if it is needed)
+      // Delete the previous interaction (Not sure whether it is needed)
       if (INT != nullptr)
       {
         delete INT;

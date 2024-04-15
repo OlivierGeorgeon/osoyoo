@@ -1,10 +1,10 @@
 import json
 import math
 from ..Proposer.Action import ACTION_FORWARD, ACTION_BACKWARD, ACTION_SWIPE, ACTION_RIGHTWARD, ACTION_TURN, \
-    ACTION_TURN_HEAD
+    ACTION_TURN_HEAD, ACTION_SCAN
 from .RobotDefine import DEFAULT_ACTION_DURATION
 
-ENACTION_MIN_TIMEOUT = 2.  # Seconds
+ENACTION_MIN_TIMEOUT = 3.  # Seconds
 DIRECTION_FRONT = 0  # Direction code to go to turn to the prompt
 DIRECTION_BACK = 1
 DIRECTION_LEFT = 2
@@ -60,7 +60,7 @@ class Command:
         """Return the json string to send to the robot"""
         command_dict = {'clock': self.clock,  'action': self.action.action_code}
         # Don't send the optional values when not needed
-        if self.duration != DEFAULT_ACTION_DURATION and self.action.action_code != ACTION_TURN:
+        if self.duration != DEFAULT_ACTION_DURATION and self.action.action_code not in [ACTION_TURN, ACTION_SCAN]:
             command_dict['duration'] = self.duration
         if self.yaw != round(math.degrees(self.action.rotation_speed_rad * self.action.target_duration)):
             command_dict['angle'] = self.yaw
@@ -81,7 +81,7 @@ class Command:
         return json.dumps(command_dict)
 
     def timeout(self):
-        """Return the timeout expected from this command"""
+        """Return the timeout expected from this command in seconds"""
         timeout = self.duration / 1000. + ENACTION_MIN_TIMEOUT
         # print("Time out", timeout)
         return timeout

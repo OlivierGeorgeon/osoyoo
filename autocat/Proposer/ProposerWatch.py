@@ -1,7 +1,8 @@
 ########################################################################################
-# This decider makes the robot stay at the watch point and watch for objects in its surrounding
-# And also listen for messages from the other robot
-# This behavior is associated with EMOTION_SAD
+# Propose to stay at the surveillance point and watch over the surrounding
+# And also listen for messages from possible other robot
+# Activation: 3
+# EMOTION_SAD (Low neurotransmitters)
 ########################################################################################
 
 import math
@@ -13,7 +14,7 @@ from ..Enaction.CompositeEnaction import CompositeEnaction
 from . Proposer import Proposer
 from . PredefinedInteractions import OUTCOME_FOCUS_SIDE
 from ..Memory.BodyMemory import ENERGY_TIRED, EXCITATION_LOW
-from ..Memory.PhenomenonMemory import TERRAIN_ORIGIN_CONFIDENCE
+from ..Memory.PhenomenonMemory import PHENOMENON_ENCLOSED_CONFIDENCE
 
 STEP_INIT = 0
 STEP_TURN = 1
@@ -25,11 +26,14 @@ class ProposerWatch(Proposer):
         self.step = STEP_INIT
 
     def activation_level(self):
-        """The level of activation is 2 if terrain is confident and no object to arrange"""
-        if self.workspace.memory.phenomenon_memory.terrain_confidence() >= TERRAIN_ORIGIN_CONFIDENCE and \
-                self.workspace.memory.body_memory.energy >= ENERGY_TIRED and \
-                self.workspace.memory.body_memory.excitation <= EXCITATION_LOW:
-            return 2
+        """The level of activation is 3 if the excitation is low"""
+
+        return 40
+
+        # if self.workspace.memory.phenomenon_memory.terrain_confidence() >= PHENOMENON_CLOSED_CONFIDENCE and \
+        #   self.workspace.memory.body_memory.energy >= ENERGY_TIRED and \
+        if self.workspace.memory.body_memory.excitation <= EXCITATION_LOW:
+            return 3
         return 0
 
     # def outcome(self, enaction):
@@ -50,6 +54,10 @@ class ProposerWatch(Proposer):
 
     def select_enaction(self, enaction):
         """Return the next intended interaction"""
+
+        # if the terrain is not CLOSED then don't propose watch-over behavior
+        if self.workspace.memory.phenomenon_memory.terrain_confidence() < PHENOMENON_ENCLOSED_CONFIDENCE:
+            return None
 
         e_memory = self.workspace.memory.save()
         e_memory.emotion_code = EMOTION_SAD
