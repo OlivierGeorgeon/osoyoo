@@ -70,7 +70,6 @@ class Phenomenon:
 
     def recognize(self, category):
         """Update the category, confidence, shape, and path of this phenomenon"""
-        # if self.category is None:
         self.category = category
         # The phenomenon's shape is copied from the category's shape
         self.shape = category.shape.copy()

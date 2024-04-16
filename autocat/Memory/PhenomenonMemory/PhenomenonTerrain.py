@@ -9,7 +9,7 @@ from ...Memory.EgocentricMemory.Experience import EXPERIENCE_PLACE, EXPERIENCE_F
 from ...Utils import short_angle
 
 
-TERRAIN_EXPERIENCE_TYPES = [EXPERIENCE_FLOOR]  # EXPERIENCE_PLACE
+# TERRAIN_EXPERIENCE_TYPES = [EXPERIENCE_FLOOR]  # EXPERIENCE_PLACE
 
 
 class PhenomenonTerrain(Phenomenon):
@@ -25,12 +25,13 @@ class PhenomenonTerrain(Phenomenon):
             self.last_origin_clock = affordance.clock
             self.origin_direction_quaternion = affordance.quaternion.copy()
             self.confidence = TERRAIN_ORIGIN_CONFIDENCE
+            # create_phenomenon() will call recognize()
 
     def update(self, affordance: Affordance):
         """Test if the affordance is within the acceptable delta from the position of the phenomenon,
         if yes, add the affordance to the phenomenon, and return the robot's position correction."""
         # Check if the affordance is acceptable for this phenomenon type
-        if affordance.type in TERRAIN_EXPERIENCE_TYPES:
+        if affordance.type == EXPERIENCE_FLOOR:
             # Add the affordance
             affordance.point = affordance.point.astype(int) - self.point.astype(int)
             self.affordance_id += 1
@@ -116,7 +117,7 @@ class PhenomenonTerrain(Phenomenon):
         """Set the terrain's category, shape, path, confidence. Adjust its position to the latest affordance"""
         super().recognize(category)
 
-        # The TERRAIN origin depends on the orientation of the absolute affordance
+        # The TERRAIN direction depends on the orientation of the absolute affordance
         if np.dot(self.absolute_affordance().polar_sensor_point, category.quaternion * Vector3([1., 0., 0.])) < 0:
             # Origin is North-East
             self.origin_direction_quaternion = category.quaternion.copy()
@@ -125,16 +126,18 @@ class PhenomenonTerrain(Phenomenon):
             self.origin_direction_quaternion = category.quaternion * Quaternion.from_z_rotation(math.pi)
 
         # The new relative origin is the position of green patch from the phenomenon center
-        new_relative_origin = np.array(self.origin_direction_quaternion * Vector3([category.long_radius -
-            np.linalg.norm(self.absolute_affordance().polar_sensor_point), 0, 0]), dtype=int)
+        # new_relative_origin = np.array(self.origin_direction_quaternion * Vector3([category.long_radius -
+        #     np.linalg.norm(self.absolute_affordance().polar_sensor_point), 0, 0]), dtype=int)
+        y = (MIDDLE_COLOR_INDEX - self.absolute_affordance().color_index) * COLOR_DISTANCE
+        new_origin = np.array(self.origin_direction_quaternion * Vector3([category.long_radius, y, 0]), dtype=int)
 
         # The position of the phenomenon is adjusted by the difference in relative origin
-        terrain_offset = new_relative_origin - self.relative_origin_point
+        terrain_offset = new_origin - self.relative_origin_point
         # print("Terrain offset", terrain_offset)
         self.point -= terrain_offset
         for a in self.affordances.values():
             a.point += terrain_offset
-        self.relative_origin_point = new_relative_origin
+        self.relative_origin_point = new_origin
 
     def confirmation_prompt(self):
         """Return the point in polar egocentric coordinates to aim for confirmation of this phenomenon"""
@@ -157,13 +160,15 @@ class PhenomenonTerrain(Phenomenon):
         if abs(short_angle(affordance.quaternion, self.origin_direction_quaternion)) < math.pi / 2:
             # Vector to origin
             # Trust the terrain direction
-            v = affordance.point + affordance.polar_sensor_point - self.origin_direction_quaternion * color_y - self.relative_origin_point
+            # v = affordance.point + affordance.polar_sensor_point - self.origin_direction_quaternion * color_y - self.relative_origin_point
+            v = affordance.point - self.origin_direction_quaternion * color_y - self.relative_origin_point
             # Trust the affordance direction
             # v = affordance.point + affordance.polar_green_point() - self.relative_origin_point
         else:
             # Vector to opposite of the origin
             # Trust the terrain direction
-            v = affordance.point + affordance.polar_sensor_point + self.origin_direction_quaternion * color_y + self.relative_origin_point
+            # v = affordance.point + affordance.polar_sensor_point + self.origin_direction_quaternion * color_y + self.relative_origin_point
+            v = affordance.point + self.origin_direction_quaternion * color_y + self.relative_origin_point
             # Trust the affordance direction
             # v = affordance.point + affordance.polar_green_point() + self.relative_origin_point
         # print("Place prediction error", v)

@@ -9,10 +9,12 @@
 # Run main.py with the robot's IP address:
 # py -m main.py <Arena_ID> <Robot ID>
 #
+#  Spring 2024
+#   Karim Assi (UCLy, ESQESE, BSN)
 #  Spring 2022
 #   Titoua Knockart, Université Claude Bernard (UCBL), France
-#  BSN2 2021-2022
-#   Aleksei Apostolou, Daniel Duval, Célien Fiorelli, Geordi Gampio, Julina Matouassiloua
+#  2021-2022
+#   Aleksei Apostolou, Daniel Duval, Célien Fiorelli, Geordi Gampio, Julina Matouassiloua (UCLy, ESQESE, BSN)
 #  Teachers
 #   Raphaël Cazorla, Florian Tholin, Olivier Georgeon
 #  Bachelor Sciences du Numérique. ESQESE. UCLy. France

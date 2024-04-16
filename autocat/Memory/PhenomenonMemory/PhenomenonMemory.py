@@ -3,7 +3,7 @@ from pyrr import Vector3
 from . import ARRANGE_OBJECT_RADIUS, TERRAIN_ORIGIN_CONFIDENCE, PHENOMENON_ENCLOSED_CONFIDENCE
 from .PhenomenonCategory import PhenomenonCategory
 from .PhenomenonObject import PhenomenonObject
-from .PhenomenonTerrain import PhenomenonTerrain, TERRAIN_EXPERIENCE_TYPES
+from .PhenomenonTerrain import PhenomenonTerrain
 from .PhenomenonRobot import PhenomenonRobot
 from .. import EMOTION_VIGILANCE
 from ..EgocentricMemory.Experience import EXPERIENCE_ROBOT, EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO
@@ -98,8 +98,11 @@ class PhenomenonMemory:
     def create_phenomenon(self, affordance):
         """Create a new phenomenon depending of the type of the affordance"""
         # Must always create a phenomenon
-        if affordance.type in TERRAIN_EXPERIENCE_TYPES:
+        if affordance.type == EXPERIENCE_FLOOR:
             self.phenomena[TER] = PhenomenonTerrain(affordance)
+            # If color affordance then recognize the terrain
+            if affordance.color_index > 0:
+                self.phenomena[TER].recognize(self.phenomenon_categories[TER])
             return TER
         if affordance.type == EXPERIENCE_ROBOT:
             robot1 = PhenomenonRobot(affordance)

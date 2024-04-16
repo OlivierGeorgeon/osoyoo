@@ -100,8 +100,8 @@ class Proposer:
 
         # Selecting the next action to enact
         # Initialize with the first action to select by default
-        # proclivity_dict = {self.workspace.actions[ACTION_FORWARD]: 0}  # Favors exploration
-        proclivity_dict = {self.workspace.actions[ACTION_SCAN]: 0}  # Favors staying in place
+        proclivity_dict = {self.workspace.actions[ACTION_FORWARD]: 0}  # Favors exploration
+        # proclivity_dict = {self.workspace.actions[ACTION_SCAN]: 0}  # Favors staying in place
         if self.composite_interactions:
             activated_interactions = [ci for ci in self.composite_interactions if
                                       ci.pre_interaction == self.last_interaction]
