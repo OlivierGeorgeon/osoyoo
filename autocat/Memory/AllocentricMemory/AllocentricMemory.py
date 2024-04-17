@@ -53,21 +53,9 @@ class AllocentricMemory:
 
         # Fill the grid with cells
         # self.grid = list()
-        self.grid = np.zeros((height, width), dtype=int)
+        self.grid = np.zeros((height, width, 10), dtype=int)
 
         # Use negative grid index for negative positions
-        for i in range(self.width):
-            self.grid.append(list())
-            if i <= self.width // 2:
-                cell_i = i
-            else:
-                cell_i = -self.width + i
-            for j in range(self.height):
-                if j <= self.height // 2:
-                    cell_j = j
-                else:
-                    cell_j = -self.height + j
-                self.grid[i].append(GridCell(cell_i, cell_j))
 
         self.user_cells = []  # List of immutable tuples to be easily copied
 
