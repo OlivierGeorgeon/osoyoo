@@ -12,6 +12,16 @@ from ...Robot.RobotDefine import ROBOT_CHASSIS_X, ROBOT_OUTSIDE_Y, CHECK_OUTSIDE
 from ...Memory.PhenomenonMemory.PhenomenonMemory import TER, ROBOT1
 from ..PhenomenonMemory import PHENOMENON_RECOGNIZE_CONFIDENCE, TERRAIN_ORIGIN_CONFIDENCE
 
+STATUS_0 = 0
+STATUS_1 = 1
+STATUS_3 = 6
+STATUS_4 = 8
+CLOCK_PLACE = 2
+COLOR_INDEX = 3
+CLOCK_FOCUS = 7
+CLOCK_PROMPT = 9
+CLOCK_INTERACTION = 4
+PHENOMENON_ID = 5
 
 class AllocentricMemory:
     """The agent's allocentric memory made with an hexagonal grid."""
@@ -42,7 +52,9 @@ class AllocentricMemory:
         self.affordances = []
 
         # Fill the grid with cells
-        self.grid = list()
+        # self.grid = list()
+        self.grid = np.zeros((height, width), dtype=int)
+
         # Use negative grid index for negative positions
         for i in range(self.width):
             self.grid.append(list())
@@ -92,7 +104,8 @@ class AllocentricMemory:
                     self.apply_status_to_cell(cell_x, cell_y, EXPERIENCE_FLOOR, p.last_origin_clock, 0)
                     # Attribute this phenomenon to this cell
                     if (self.min_i <= cell_x <= self.max_i) and (self.min_j <= cell_y <= self.max_j):
-                        self.grid[cell_x][cell_y].phenomenon_id = p_id
+                        #self.grid[cell_x][cell_y].phenomenon_id = p_id
+                        self.grid[cell_x][cell_y][PHENOMENON_ID] = p_id
                 # Draw the color floor affordances
                 for a in p.affordances.values():
                     if a.color_index != 0:
@@ -101,7 +114,10 @@ class AllocentricMemory:
                         self.apply_status_to_cell(cell_x, cell_y, a.type, a.clock, a.color_index)
                         # Attribute this phenomenon to this cell
                         if (self.min_i <= cell_x <= self.max_i) and (self.min_j <= cell_y <= self.max_j):
-                            self.grid[cell_x][cell_y].phenomenon_id = p_id
+                            #self.grid[cell_x][cell_y].phenomenon_id = p_id
+                            self.grid[cell_x][cell_y][PHENOMENON_ID] = p_id
+
+
             else:
                 if p_id == ROBOT1:
                     # Draw the other robot from its shape
@@ -111,7 +127,9 @@ class AllocentricMemory:
                         self.apply_status_to_cell(cell_x, cell_y, EXPERIENCE_IMPACT, p.last_origin_clock, 0)
                         # Attribute this phenomenon to this cell
                         if (self.min_i <= cell_x <= self.max_i) and (self.min_j <= cell_y <= self.max_j):
-                            self.grid[cell_x][cell_y].phenomenon_id = p_id
+                            #self.grid[cell_x][cell_y].phenomenon_id = p_id
+                            self.grid[cell_x][cell_y][PHENOMENON_ID] = p_id
+
                 # Mark the affordances of this phenomenon
                 for a in p.affordances.values():
                     if (p_id != TER or p.confidence < PHENOMENON_RECOGNIZE_CONFIDENCE or a.color_index != 0
@@ -121,7 +139,8 @@ class AllocentricMemory:
                         self.apply_status_to_cell(cell_x, cell_y, a.type, a.clock, a.color_index)
                         # Attribute this phenomenon to this cell
                         if (self.min_i <= cell_x <= self.max_i) and (self.min_j <= cell_y <= self.max_j):
-                            self.grid[cell_x][cell_y].phenomenon_id = p_id
+                            #self.grid[cell_x][cell_y].phenomenon_id = p_id
+                            self.grid[cell_x][cell_y][PHENOMENON_ID] = p_id
 
         # Place the affordances that are not attached to phenomena
         for a in self.affordances:
@@ -171,12 +190,17 @@ class AllocentricMemory:
         """Change the cell status. Keep the max clock"""
         if (self.min_i <= i <= self.max_i) and (self.min_j <= j <= self.max_j):
             if status in [EXPERIENCE_FLOOR, EXPERIENCE_PLACE]:
-                self.grid[i][j].status[0] = status
-                self.grid[i][j].clock_place = max(clock, self.grid[i][j].clock_place)
+                #self.grid[i][j].status[0] = status
+                self.grid[i][j][STATUS_0] = status
+                #self.grid[i][j].clock_place = max(clock, self.grid[i][j].clock_place)
+                self.grid[i][j][CLOCK_PLACE] = max(clock, self.grid[i][j][CLOCK_PLACE])
                 self.grid[i][j].color_index = color_index
+                #self.grid[i][j][COLOR_INDEX] = color_index
             else:
-                self.grid[i][j].status[1] = status
-                self.grid[i][j].clock_interaction = max(clock, self.grid[i][j].clock_interaction)
+                #self.grid[i][j].status[1] = status
+                self.grid[i][j][STATUS_1] = status
+                #self.grid[i][j].clock_interaction = max(clock, self.grid[i][j].clock_interaction)
+                self.grid[i][j][CLOCK_INTERACTION] = max(clock, self.grid[i][j][CLOCK_INTERACTION])
         else:
             pass
             # print("Error: cell out of grid, i:", i, "j:", j, "Status:", status)
@@ -184,10 +208,14 @@ class AllocentricMemory:
     def clear_cell(self, i, j, clock):
         """Reset status0 and color of that cell"""
         if (self.min_i <= i <= self.max_i) and (self.min_j <= j <= self.max_j):
-            self.grid[i][j].status[0] = CELL_UNKNOWN
-            self.grid[i][j].clock_place = clock
-            self.grid[i][j].color_index = 0
-            self.grid[i][j].phenomenon_id = None
+            #self.grid[i][j].status[0] = CELL_UNKNOWN
+            self.grid[i][j][STATUS_0] = CELL_UNKNOWN
+            #self.grid[i][j].clock_place = clock
+            self.grid[i][j][CLOCK_PLACE] = clock
+            #self.grid[i][j].color_index = 0
+            self.grid[i][j][COLOR_INDEX] = 0
+            #self.grid[i][j].phenomenon_id = None
+            self.grid[i][j][PHENOMENON_ID] = -1
 
     def mark_echo_area(self, affordance):
         """Mark the area covered by the echolocalization sensor in allocentric memory"""
@@ -205,26 +233,34 @@ class AllocentricMemory:
         # Clear the previous focus cell
         if self.focus_i is not None:
             if (self.min_i <= self.focus_i <= self.max_i) and (self.min_j <= self.focus_j <= self.max_j):
-                self.grid[self.focus_i][self.focus_j].status[3] = CELL_UNKNOWN
+                #self.grid[self.focus_i][self.focus_j].status[3] = CELL_UNKNOWN
+                self.grid[self.focus_i][self.focus_j][STATUS_3] = CELL_UNKNOWN
         # Add the new focus cell
         if allo_focus is not None:
             self.focus_i, self.focus_j = point_to_cell(allo_focus, self.cell_radius)
             if (self.min_i <= self.focus_i <= self.max_i) and (self.min_j <= self.focus_j <= self.max_j):
-                self.grid[self.focus_i][self.focus_j].status[3] = EXPERIENCE_FOCUS
-                self.grid[self.focus_i][self.focus_j].clock_focus = clock
+                #self.grid[self.focus_i][self.focus_j].status[3] = EXPERIENCE_FOCUS
+                self.grid[self.focus_i][self.focus_j][STATUS_3] = EXPERIENCE_FOCUS
+                #self.grid[self.focus_i][self.focus_j].clock_focus = clock
+                self.grid[self.focus_i][self.focus_j][CLOCK_FOCUS] = clock
+
 
     def update_prompt(self, allo_prompt, clock):
         """Update the prompt in allocentric memory"""
         # Clear the previous prompt cell
         if self.prompt_i is not None:
             if (self.min_i <= self.prompt_i <= self.max_i) and (self.min_j <= self.prompt_j <= self.max_j):
-                self.grid[self.prompt_i][self.prompt_j].status[4] = CELL_UNKNOWN
+                #self.grid[self.prompt_i][self.prompt_j].status[4] = CELL_UNKNOWN
+                self.grid[self.prompt_i][self.prompt_j][STATUS_4] = CELL_UNKNOWN
         # Add the new prompt cell
         if allo_prompt is not None:
             self.prompt_i, self.prompt_j = point_to_cell(allo_prompt, self.cell_radius)
             if (self.min_i <= self.prompt_i <= self.max_i) and (self.min_j <= self.prompt_j <= self.max_j):
-                self.grid[self.prompt_i][self.prompt_j].status[4] = EXPERIENCE_PROMPT
-                self.grid[self.prompt_i][self.prompt_j].clock_prompt = clock
+                #self.grid[self.prompt_i][self.prompt_j].status[4] = EXPERIENCE_PROMPT
+                self.grid[self.prompt_i][self.prompt_j][STATUS_4] = EXPERIENCE_PROMPT
+                #self.grid[self.prompt_i][self.prompt_j].clock_prompt = clock
+                self.grid[self.prompt_i][self.prompt_j][CLOCK_PROMPT] = clock
+
                 # print("Prompt in cell", self.prompt_i, ", ", self.prompt_j)
 
     def save(self):
@@ -266,10 +302,14 @@ class AllocentricMemory:
         coord = coords[interests.index(max_interest)]
         # Update the prompt
         if self.prompt_i is not None:
-            self.grid[self.prompt_i][self.prompt_j].status[3] = CELL_UNKNOWN
+            #self.grid[self.prompt_i][self.prompt_j].status[3] = CELL_UNKNOWN
+            self.grid[self.prompt_i][self.prompt_j][STATUS_3] = CELL_UNKNOWN
         self.prompt_i, self.prompt_j = coord[0], coord[1]
-        self.grid[self.prompt_i][self.prompt_j].status[3] = EXPERIENCE_PROMPT
-        self.grid[self.prompt_i][self.prompt_j].clock_prompt = clock
+        #self.grid[self.prompt_i][self.prompt_j].status[3] = EXPERIENCE_PROMPT
+        self.grid[self.prompt_i][self.prompt_j][STATUS_3] = EXPERIENCE_PROMPT
+
+        #self.grid[self.prompt_i][self.prompt_j].clock_prompt = clock
+        self.grid[self.prompt_i][self.prompt_j][CLOCK_PROMPT] = clock
         print("Most interesting pool:", coord, "with interest", max_interest)
         return self.grid[self.prompt_i][self.prompt_j].point()
 
