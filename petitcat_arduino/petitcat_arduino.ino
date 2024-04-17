@@ -9,6 +9,8 @@
 
  Upload this file to the PetitCat robot car
 
+  2024
+    Karim Assi (UCly, ESQESE, BSN)
   2023
     Olivier Georgeon
   Spring 2022

@@ -55,7 +55,8 @@ class CtrlRobot:
                         outcome_dict = json.loads(outcome_string)
                         if outcome_dict['clock'] == self.workspace.enaction.clock:
                             # Terminate the enaction
-                            self.workspace.enaction.terminate(Outcome(outcome_dict))
+                            # self.workspace.enaction.terminate(Outcome(outcome_dict))
+                            self.workspace.enaction.outcome = Outcome(outcome_dict)
                             self.workspace.enacter.interaction_step = ENACTION_STEP_INTEGRATING
                         else:
                             # Previous outcome received again: Perhaps the command was resent during first reception

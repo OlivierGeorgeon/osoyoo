@@ -1,6 +1,6 @@
 from pyrr import Quaternion
 from ..Memory.EgocentricMemory.Experience import EXPERIENCE_LOCAL_ECHO, EXPERIENCE_CENTRAL_ECHO, \
-    EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_AZIMUTH, EXPERIENCE_COMPASS
+    EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_AZIMUTH, EXPERIENCE_COMPASS, EXPERIENCE_PLACE
 from autocat.Memory.PhenomenonMemory.Affordance import Affordance
 from ..Display.AllocentricDisplay import DISPLAY_CONE
 
@@ -16,7 +16,7 @@ def integrate(memory):
     # The new affordances
     new_affordances = []
     for e in new_experiences:
-        if e.type not in [EXPERIENCE_LOCAL_ECHO, EXPERIENCE_AZIMUTH, EXPERIENCE_COMPASS]:
+        if e.type not in [EXPERIENCE_LOCAL_ECHO, EXPERIENCE_AZIMUTH, EXPERIENCE_COMPASS, EXPERIENCE_PLACE]:
             # The position of the affordance in allocentric memory
             affordance_point = memory.egocentric_to_allocentric(e.point())
             new_affordances.append(Affordance(affordance_point, e.type, e.clock, e.color_index,

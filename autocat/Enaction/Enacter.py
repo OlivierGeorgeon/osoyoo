@@ -42,13 +42,19 @@ class Enacter:
             self.workspace.simulator.simulate(dt)
             # If imagining then use the simulated outcome when the simulation is finished
             if self.workspace.is_imagining and not self.workspace.simulator.is_simulating:
-                simulated_outcome = self.workspace.simulator.end()
-                self.workspace.enaction.terminate(simulated_outcome)
+                # simulated_outcome = self.workspace.simulator.end()
+                # self.workspace.enaction.terminate(simulated_outcome)
                 self.interaction_step = ENACTION_STEP_INTEGRATING
             # If not imagining then CtrlRobot will terminate the enaction and proceed to INTEGRATING
 
         # INTEGRATING: the new enacted interaction
         if self.interaction_step == ENACTION_STEP_INTEGRATING:
+            # End the simulation
+            simulated_outcome = self.workspace.simulator.end()
+            print("Simulated outcome", simulated_outcome)
+            if self.workspace.is_imagining:
+                self.workspace.enaction.outcome = simulated_outcome
+            self.workspace.enaction.terminate()
             # Restore the memory from the snapshot
             serotonin = self.workspace.memory.body_memory.serotonin  # Handel user change  TODO improve
             dopamine = self.workspace.memory.body_memory.dopamine  # Handel user change
@@ -63,8 +69,8 @@ class Enacter:
                 self.workspace.enaction.message = self.workspace.message
                 print("Message", self.workspace.message.message_string)
             # Force terminate the simulation
-            simulated_outcome = self.workspace.simulator.end()
-            print("Simulated outcome", simulated_outcome)
+            # simulated_outcome = self.workspace.simulator.end()
+            # print("Simulated outcome", simulated_outcome)
             # Update memory
             self.workspace.memory.update(self.workspace.enaction)
             # Compute the outcome code

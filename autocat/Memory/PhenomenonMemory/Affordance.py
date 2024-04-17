@@ -91,11 +91,11 @@ class Affordance:
             points = [p1, p2, p3] + self.point
         return points
 
-    def polar_green_point(self):
-        """Return the point of the expected green patch, polar-centric relative to this affordance"""
-        # The color point along the y axis: red positive, purple negative.
-        color_y = Vector3([0, (MIDDLE_COLOR_INDEX - self.color_index) * COLOR_DISTANCE, 0])
-        return np.array(self.polar_sensor_point - self.quaternion * color_y, dtype=int)
+    # def polar_green_point(self):
+    #     """Return the point of the expected green patch, polar-centric relative to this affordance"""
+    #     # The color point along the y axis: red positive, purple negative.
+    #     color_y = Vector3([0, (MIDDLE_COLOR_INDEX - self.color_index) * COLOR_DISTANCE, 0])
+    #     return np.array(self.polar_sensor_point - self.quaternion * color_y, dtype=int)
 
     def save(self):
         """Return a cloned affordance for memory snapshot"""

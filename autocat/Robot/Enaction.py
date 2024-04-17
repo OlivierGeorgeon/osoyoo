@@ -58,9 +58,9 @@ class Enaction:
         print("Predicted outcome", self.predicted_outcome)
         self.trajectory.body_quaternion = body_quaternion.copy()
 
-    def terminate(self, outcome):
+    def terminate(self):
         """Computes the actual trajectory: body_quaternion, translation, displacement_matrix, focus, and prompt."""
-        self.outcome = outcome
+        # self.outcome = outcome
         self.trajectory.track_displacement(self.predicted_outcome.yaw, self.outcome)
         self.trajectory.track_focus(self.outcome)
 
