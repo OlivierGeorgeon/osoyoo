@@ -45,5 +45,5 @@ class GoalGenerator:
         return self.goal_point
 
     def most_interesting_pool(self):
-        """Return point of the pool in allocentric memory that have the highest interest value"""
+        """Return point of the pool in allocentric memory that has the highest interest value"""
         return self.workspace.memory.allocentric_memory.most_interesting_pool(self.workspace.clock)

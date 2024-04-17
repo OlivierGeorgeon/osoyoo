@@ -49,7 +49,7 @@ class Workspace:
                           # , 'Watch C': ProposerWatchCenter(self),  'Arrange': ProposerArrange(self)
                           , 'Push': ProposerPush(self)
                           , 'Play': ProposerPlayForward(self)
-                          # , "Play terrain": ProposerPlayTerrain(self)
+                          , "Play terrain": ProposerPlayTerrain(self)
                           }
         self.enacter = Enacter(self)
         self.simulator = Simulator(self)

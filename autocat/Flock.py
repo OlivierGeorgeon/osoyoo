@@ -1,3 +1,4 @@
+import time
 from . Workspace import Workspace
 from .Robot.CtrlRobot import CtrlRobot
 from .Display.EgocentricDisplay.CtrlEgocentricView import CtrlEgocentricView
@@ -36,6 +37,7 @@ class Flock:
 
     def main(self, dt):
         """Update the robots"""
+        start_time = time.time()
         for robot_id in self.workspaces.keys():
             self.ctrl_robots[robot_id].main(dt)  # Check if outcome received from the robot
             self.workspaces[robot_id].main(dt)
@@ -50,6 +52,9 @@ class Flock:
             for key_receiver in self.workspaces.keys():
                 if key_sender != key_receiver:
                     self.workspaces[key_receiver].receive_message(self.workspaces[key_sender].emit_message())
+        main_loop_duration = time.time() - start_time
+        if main_loop_duration > 0.1:
+            print(f"Main loop duration: {main_loop_duration:.3f} seconds")
 
         # # Pass the message from robot '2' to robot '1'
         # if all(key in self.workspaces for key in ['1', '2']):

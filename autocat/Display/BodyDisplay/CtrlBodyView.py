@@ -86,9 +86,20 @@ class CtrlBodyView:
     def main(self, dt):
         """Called every frame. Update the body view"""
         self.view.label_5HT.text = f"5-HT: {self.workspace.memory.body_memory.serotonin:d}"
+        if self.workspace.memory.body_memory.serotonin >= 50:
+            self.view.label_5HT.color = (0, 0, 0, 255)
+        else:
+            self.view.label_5HT.color = (255, 0, 0, 255)
         self.view.label_DA.text = f"DA: {self.workspace.memory.body_memory.dopamine:d}"
+        if self.workspace.memory.body_memory.dopamine >= 50:
+            self.view.label_DA.color = (0, 0, 0, 255)
+        else:
+            self.view.label_DA.color = (255, 0, 0, 255)
         self.view.label_NA.text = f"NA: {self.workspace.memory.body_memory.noradrenaline:d}"
-
+        if self.workspace.memory.body_memory.noradrenaline >= 50:
+            self.view.label_NA.color = (0, 0, 0, 255)
+        else:
+            self.view.label_NA.color = (255, 0, 0, 255)
         self.view.label_clock.text = "Clock: {:d}".format(self.workspace.memory.clock)  \
                                      + " | " + ENGAGEMENT_MODES[self.workspace.engagement_mode]  \
                                      + " | " + self.workspace.decider_id
