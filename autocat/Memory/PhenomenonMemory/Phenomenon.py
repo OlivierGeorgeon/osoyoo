@@ -4,7 +4,7 @@ import numpy as np
 from pyrr import Quaternion
 from scipy.spatial import ConvexHull, QhullError
 from scipy.interpolate import splprep, splev
-from . import PHENOMENON_INITIAL_CONFIDENCE, PHENOMENON_ENCLOSED_CONFIDENCE, PHENOMENON_RECOGNIZE_CONFIDENCE, \
+from . import PHENOMENON_INITIAL_CONFIDENCE, PHENOMENON_ENCLOSED_CONFIDENCE, PHENOMENON_RECOGNIZABLE_CONFIDENCE, \
     PHENOMENON_RECOGNIZED_CONFIDENCE
 
 PHENOMENON_DELTA = 300  # (mm) Distance between affordances to be considered the same phenomenon
@@ -45,13 +45,16 @@ class Phenomenon:
 
     def absolute_affordance(self):
         """Return a reference to the absolute origin affordance or None"""
-        if self.absolute_affordance_key is None:
+        # if self.absolute_affordance_key is None:
+        #     return None
+        if self.absolute_affordance_key in self.affordances:
+            return self.affordances[self.absolute_affordance_key]
+        else:
             return None
-        return self.affordances[self.absolute_affordance_key]
 
     def category_clue(self):
         """If RECOGNITION confidence then return the experience type else return None"""
-        if self.confidence >= PHENOMENON_RECOGNIZE_CONFIDENCE:
+        if self.confidence >= PHENOMENON_RECOGNIZABLE_CONFIDENCE:
             return self.phenomenon_type
         else:
             return None

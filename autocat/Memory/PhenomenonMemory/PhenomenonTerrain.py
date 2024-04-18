@@ -1,7 +1,7 @@
 import math
 import numpy as np
 from pyrr import Vector3, Quaternion
-from . import PHENOMENON_RECOGNIZE_CONFIDENCE, PHENOMENON_RECOGNIZED_CONFIDENCE, TERRAIN_ORIGIN_CONFIDENCE, \
+from . import PHENOMENON_RECOGNIZABLE_CONFIDENCE, PHENOMENON_RECOGNIZED_CONFIDENCE, TERRAIN_ORIGIN_CONFIDENCE, \
     PHENOMENON_ENCLOSED_CONFIDENCE
 from .Phenomenon import Phenomenon
 from .Affordance import Affordance, MIDDLE_COLOR_INDEX, COLOR_DISTANCE
@@ -56,7 +56,7 @@ class PhenomenonTerrain(Phenomenon):
                     for a in self.affordances.values():
                         a.point -= terrain_offset
                 elif abs(short_angle(affordance.quaternion, self.origin_direction_quaternion)) < math.pi / 2 \
-                        or self.confidence >= PHENOMENON_RECOGNIZE_CONFIDENCE:
+                        or self.confidence >= PHENOMENON_RECOGNIZABLE_CONFIDENCE:
                     # If this affordance is in the direction of the origin or terrain is recognized
                     position_correction = self.vector_toward_origin(affordance)
                     # Prediction error is opposite of the position_correction projected along the color direction
@@ -64,14 +64,9 @@ class PhenomenonTerrain(Phenomenon):
                                                                      affordance.quaternion * Vector3([0., 1., 0.]))
                     # Correct the position of the affordances since last time the robot visited the absolute origin
                     self.enclose(position_correction, affordance.clock)
-                    # for a in [a for a in self.affordances.values() if a.clock > self.last_origin_clock]:
-                    #     coef = (a.clock - self.last_origin_clock)/(affordance.clock - self.last_origin_clock)
-                    #     ac = np.array(position_correction * coef, dtype=int)
-                    #     a.point -= ac
-                    # self.last_origin_clock = affordance.clock
                     # Increase confidence if not consecutive origin affordances
                     # if affordance.clock - self.last_origin_clock > 5:
-                    self.confidence = max(PHENOMENON_RECOGNIZE_CONFIDENCE, self.confidence)
+                    self.confidence = max(PHENOMENON_RECOGNIZABLE_CONFIDENCE, self.confidence)
             # Black line: Compute the position correction based on the nearest point in the terrain shape
             # TODO use the point on the trajectory rather than the closest point
             elif self.confidence >= PHENOMENON_RECOGNIZED_CONFIDENCE:  # PHENOMENON_CLOSED_CONFIDENCE
@@ -116,6 +111,11 @@ class PhenomenonTerrain(Phenomenon):
         """Set the terrain's category, shape, path, confidence. Adjust its position to the latest affordance"""
         super().recognize(category)
 
+        # TODO Manage the delete absolute affordance
+        if self.absolute_affordance() is None:
+            return
+
+        # TODO The phenomenon position is different if the phenomenon is recognized from a black line
         # The TERRAIN direction depends on the orientation of the absolute affordance
         if np.dot(self.absolute_affordance().polar_sensor_point, category.quaternion * Vector3([1., 0., 0.])) < 0:
             # Origin is North-East
@@ -125,8 +125,6 @@ class PhenomenonTerrain(Phenomenon):
             self.origin_direction_quaternion = category.quaternion * Quaternion.from_z_rotation(math.pi)
 
         # The new relative origin is the position of green patch from the phenomenon center
-        # new_relative_origin = np.array(self.origin_direction_quaternion * Vector3([category.long_radius -
-        #     np.linalg.norm(self.absolute_affordance().polar_sensor_point), 0, 0]), dtype=int)
         y = (MIDDLE_COLOR_INDEX - self.absolute_affordance().color_index) * COLOR_DISTANCE
         new_origin = np.array(self.origin_direction_quaternion * Vector3([category.long_radius, y, 0]), dtype=int)
 

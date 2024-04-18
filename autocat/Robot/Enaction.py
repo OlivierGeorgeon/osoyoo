@@ -61,7 +61,13 @@ class Enaction:
     def terminate(self):
         """Computes the actual trajectory: body_quaternion, translation, displacement_matrix, focus, and prompt."""
         # self.outcome = outcome
-        self.trajectory.track_displacement(self.predicted_outcome.yaw, self.outcome)
+        # Mitigated the outcome.duration1 from prediction and actual
+        if self.predicted_outcome.floor and self.outcome.floor and \
+                self.predicted_outcome.duration1 != self.outcome.duration1:
+            self.outcome.duration1 = round((self.predicted_outcome.duration1 * self.predicted_outcome.confidence +
+                                            self.outcome.duration1 * (100 - self.predicted_outcome.confidence)) / 100)
+            print("Outcome adjusted Duration1:", self.outcome.duration1)
+        self.trajectory.track_displacement(self.outcome)
         self.trajectory.track_focus(self.outcome)
 
     def succeed(self):

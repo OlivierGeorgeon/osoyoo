@@ -56,7 +56,14 @@ class CtrlPhenomenonView:
             #     self.view.label3.text = "Clock: " + str(p.clock)
             #     self.selected_clock = p.clock
 
-        self.view.push_handlers(on_text, on_mouse_press)
+        def on_mouse_scroll(x, y, dx, dy):
+            """ Modify the phenomenon's confidence """
+            if y < 50:
+                # Modify the confidence
+                self.phenomenon.confidence += int(np.sign(dy))
+                self.phenomenon.confidence = min(max(self.phenomenon.confidence, 0), 100)
+
+        self.view.push_handlers(on_text, on_mouse_press, on_mouse_scroll)
 
     def update_body_robot(self):
         """Updates the robot's body to display by the phenomenon view"""

@@ -4,7 +4,7 @@ from pyrr import matrix44, Vector3, Quaternion
 from ..Proposer.Action import ACTION_FORWARD
 from ..Integrator.OutcomeCode import CONFIDENCE_NO_FOCUS, CONFIDENCE_NEW_FOCUS, CONFIDENCE_TOUCHED_FOCUS, \
     CONFIDENCE_CAREFUL_SCAN, CONFIDENCE_CONFIRMED_FOCUS
-from ..Utils import short_angle, translation_quaternion_to_matrix, head_direction_distance_to_point, \
+from ..Utils import short_angle, translation_quaternion_to_matrix, head_angle_distance_to_point, \
     point_to_head_direction_distance
 from ..Robot.RobotDefine import ROBOT_FLOOR_SENSOR_X, ROBOT_CHASSIS_Y, ROBOT_SETTINGS, ROBOT_CHASSIS_X, ROBOT_OUTSIDE_Y
 from ..Memory.PhenomenonMemory import ARRANGE_OBJECT_RADIUS
@@ -43,8 +43,16 @@ class Trajectory:
         if memory.egocentric_memory.focus_point is not None:
             self.focus_point = memory.egocentric_memory.focus_point.copy()
 
-    def track_displacement(self, intended_yaw, outcome):
+    def track_displacement(self, outcome):
         """Compute the displacement from the duration1, yaw, floor, impact"""
+
+        # # The trajectory is based on an adjusted duration1 in the case of a predicted FLOOR event
+        # if predicted_outcome.floor and outcome.floor:
+        #     duration1 = (predicted_outcome.duration1 * predicted_outcome.confidence +
+        #                  outcome.duration1 * (100 - predicted_outcome.confidence)) / 100
+        #     print("Trajectory based on adjusted Duration1:", duration1)
+        # else:
+        #     duration1 = outcome.duration1
 
         # Translation integrated from the action's speed multiplied by the duration1
         self.translation = self.speed * outcome.duration1 / 1000
@@ -56,12 +64,12 @@ class Trajectory:
                 [ROBOT_CHASSIS_X + max(0, self.translation[0]), -ROBOT_OUTSIDE_Y + min(0, self.translation[1]), 0]]
         self.covered_area[:, :] = [(self.body_quaternion * Vector3(p)) for p in area]
 
-        # The yaw quaternion
-        if outcome.yaw is None:
-            # If the yaw is not measured then use predicted yaw
-            self.yaw_quaternion = Quaternion.from_z_rotation(math.radians(intended_yaw))
-        else:
-            self.yaw_quaternion = Quaternion.from_z_rotation(math.radians(outcome.yaw))
+        # # The yaw quaternion
+        # if outcome.yaw is None:
+        #     # If the yaw is not measured then use predicted yaw
+        #     self.yaw_quaternion = Quaternion.from_z_rotation(math.radians(predicted_outcome.yaw))
+        # else:
+        self.yaw_quaternion = Quaternion.from_z_rotation(math.radians(outcome.yaw))
 
         # The new body quaternion computed by integrating the yaw (do not override body_quaternion yet)
         body_quaternion_integrated = self.body_quaternion.cross(self.yaw_quaternion)
@@ -136,14 +144,14 @@ class Trajectory:
         new_echo = outcome.echo_point
         # If careful watch and there are central echoes then the focus is the first (closest)
         if self.span == 10 and len(outcome.central_echos) > 0:
-            new_echo = head_direction_distance_to_point(*outcome.central_echos[0])
+            new_echo = head_angle_distance_to_point(*outcome.central_echos[0])
 
         # The new focus is at the center of the object  TODO must recognize the object
         if new_echo is None:
             new_focus = None
         else:
             a, d = point_to_head_direction_distance(new_echo)
-            new_focus = head_direction_distance_to_point(a, d + ARRANGE_OBJECT_RADIUS)
+            new_focus = head_angle_distance_to_point(a, d + ARRANGE_OBJECT_RADIUS)
 
         # If the robot was focussed then adjust the focus and the displacement
         if self.focus_point is not None:

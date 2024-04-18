@@ -45,6 +45,7 @@ def generate_prediction(command, memory):
                     outcome_dict["duration1"] = round(duration1)
                     outcome_dict["floor"] = closest_intersection[1]
                     outcome_dict["color_index"] = cell_color(np.array([closest_intersection[0], 0, 0]), memory)
+                    outcome_dict["confidence"] = memory.phenomenon_memory.terrain_confidence()
                     if closest_intersection[1] == 1:
                         outcome_dict["yaw"] = -RETREAT_YAW
                     elif closest_intersection[1] == 2:
@@ -70,6 +71,7 @@ def generate_prediction(command, memory):
                     outcome_dict["floor"] = 2
                     outcome_dict["yaw"] = RETREAT_YAW
                     outcome_dict["color_index"] = cell_color(np.array([ROBOT_FLOOR_SENSOR_X, closest_intersection, 0]), memory)
+                    outcome_dict["confidence"] = memory.phenomenon_memory.terrain_confidence()
             elif command.speed[1] < 0 < len(intersections_right):  # Swipe right
                 closest_intersection = intersections_right[np.argmax(np.array(intersections_right))]
                 duration1 = -closest_intersection * 1000 / ROBOT_SETTINGS[memory.robot_id]["lateral_speed"]
@@ -78,10 +80,11 @@ def generate_prediction(command, memory):
                     outcome_dict["floor"] = 1
                     outcome_dict["yaw"] = -RETREAT_YAW
                     outcome_dict["color_index"] = cell_color(np.array([ROBOT_FLOOR_SENSOR_X, closest_intersection, 0]), memory)
+                    outcome_dict["confidence"] = memory.phenomenon_memory.terrain_confidence()
 
     # Compute the displacement in memory
     trajectory = Trajectory(memory, command)
-    trajectory.track_displacement(command.yaw, Outcome(outcome_dict))
+    trajectory.track_displacement(Outcome(outcome_dict))
 
     # Push objects before moving the robot
     push_objects(trajectory, memory, outcome_dict["floor"])

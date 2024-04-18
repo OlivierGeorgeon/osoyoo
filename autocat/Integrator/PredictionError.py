@@ -241,8 +241,8 @@ class PredictionError:
 
         # The translation duration prediction errors in seconds as red squares
         kwargs = {'bottom': -2, 'top': 2, 'fmt': 'sr', 'marker_size': 5}
-        plot(self.pe_forward_duration1, "Forward duration prediction error", "06_Forward_duration", "(s)", **kwargs)
-        plot(self.pe_lateral_duration1, "Swipe duration prediction error", "14_Swipe_duration", "(s)", **kwargs)
+        plot(self.pe_forward_duration1, "Forward duration prediction error", "06_Forward_duration_pe", "(s)", **kwargs)
+        plot(self.pe_lateral_duration1, "Swipe duration prediction error", "14_Swipe_duration_pe", "(s)", **kwargs)
 
         # The prediction errors as red squares
         kwargs = {'bottom': -100, 'top': 100, 'fmt': 'sr', 'marker_size': 5}

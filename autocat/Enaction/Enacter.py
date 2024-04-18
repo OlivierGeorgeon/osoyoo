@@ -59,10 +59,13 @@ class Enacter:
             serotonin = self.workspace.memory.body_memory.serotonin  # Handel user change  TODO improve
             dopamine = self.workspace.memory.body_memory.dopamine  # Handel user change
             noradrenaline = self.workspace.memory.body_memory.noradrenaline  # Handel user change
+            confidence = self.workspace.memory.phenomenon_memory.terrain_confidence()
             self.workspace.memory = self.memory_snapshot
             self.workspace.memory.body_memory.serotonin = serotonin
             self.workspace.memory.body_memory.dopamine = dopamine
             self.workspace.memory.body_memory.noradrenaline = noradrenaline
+            if self.workspace.memory.phenomenon_memory.terrain() is not None:
+                self.workspace.memory.phenomenon_memory.terrain().confidence = confidence
             # Retrieve possible message from other robot
             if self.workspace.memory.phenomenon_memory.terrain_confidence() >= TERRAIN_ORIGIN_CONFIDENCE and \
                     self.workspace.message is not None:

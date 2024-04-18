@@ -28,7 +28,7 @@ class CtrlRobot:
 
     def main(self, dt):
         """The main handler of the communication to and from the robot."""
-        # If INTENDING then send the interaction to the robot
+        # If COMMANDING then send the interaction to the robot
         if self.workspace.enacter.interaction_step == ENACTION_STEP_COMMANDING:
             self.workspace.enacter.interaction_step = ENACTION_STEP_ENACTING
             self.send_command_to_robot()
@@ -46,34 +46,38 @@ class CtrlRobot:
                         print(".", end='')
                     else:
                         print(e)
-                # If the outcome was received
-                if outcome_string is not None:
-                    print()
-                    print("Outcome:", outcome_string)
-                    # Short outcome are for debug
-                    if len(outcome_string) > 100:
-                        outcome_dict = json.loads(outcome_string)
-                        if outcome_dict['clock'] == self.workspace.enaction.clock:
-                            # Terminate the enaction
-                            # self.workspace.enaction.terminate(Outcome(outcome_dict))
-                            self.workspace.enaction.outcome = Outcome(outcome_dict)
-                            self.workspace.enacter.interaction_step = ENACTION_STEP_INTEGRATING
-                        else:
-                            # Previous outcome received again: Perhaps the command was resent during first reception
-                            print(f"Outcome {outcome_dict['clock']} was received again")
-                            # Reset the time out. This will resend the next command right away
-                            # self.expected_outcome_time = time.time()
+                # If the outcome was received and packet longer than debug packet
+                if outcome_string is not None and len(outcome_string) > 100:
+                    outcome_dict = json.loads(outcome_string)
+                    if outcome_dict['clock'] == self.workspace.enaction.clock:
+                        print()  # New line after the waiting dots
+                        print("Outcome:", outcome_string)
+                        # If the robot does not return the yaw (no IMU) then use the command yaw
+                        if 'yaw' not in outcome_dict:
+                            outcome_dict['yaw'] = self.workspace.enaction.command.yaw
+                        # Terminate the enaction
+                        self.workspace.enaction.outcome = Outcome(outcome_dict)
+                        self.workspace.enacter.interaction_step = ENACTION_STEP_INTEGRATING
+                        # else:
+                        # Previous outcome received again: Perhaps the command was resent during first reception
+                        # print(f"Outcome {outcome_dict['clock']} was received again")
+                        # Reset the time out. This will resend the next command right away
+                        # self.expected_outcome_time = time.time()
             else:
                 # Timeout: reinitialize the cycle. This will resend the enaction
-                serotonin = self.workspace.memory.body_memory.serotonin  # Handel user change  TODO improve
-                dopamine = self.workspace.memory.body_memory.dopamine  # Handel user change
-                noradrenaline = self.workspace.memory.body_memory.noradrenaline  # Handel user change
-                self.workspace.memory = self.workspace.enacter.memory_snapshot
-                self.workspace.memory.body_memory.serotonin = serotonin
-                self.workspace.memory.body_memory.dopamine = dopamine
-                self.workspace.memory.body_memory.noradrenaline = noradrenaline
-                self.workspace.enacter.interaction_step = ENACTION_STEP_REFRESHING
-                print(f".Timeout {self.time_out:.3f}")
+                # serotonin = self.workspace.memory.body_memory.serotonin  # Handel user change  TODO improve
+                # dopamine = self.workspace.memory.body_memory.dopamine  # Handel user change
+                # noradrenaline = self.workspace.memory.body_memory.noradrenaline  # Handel user change
+                # confidence = self.workspace.memory.phenomenon_memory.terrain_confidence()
+                # self.workspace.memory = self.workspace.enacter.memory_snapshot
+                # self.workspace.memory.body_memory.serotonin = serotonin
+                # self.workspace.memory.body_memory.dopamine = dopamine
+                # self.workspace.memory.body_memory.noradrenaline = noradrenaline
+                # if self.workspace.memory.phenomenon_memory.terrain() is not None:
+                #     self.workspace.memory.phenomenon_memory.terrain().confidence = confidence
+                # self.workspace.enacter.interaction_step = ENACTION_STEP_REFRESHING
+                self.workspace.enacter.interaction_step = ENACTION_STEP_COMMANDING
+                print(f". Timeout {self.time_out:.3f} .", end='')
 
     def send_command_to_robot(self):
         """Send the enaction string to the robot and set the timeout"""
