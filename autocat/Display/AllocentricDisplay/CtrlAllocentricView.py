@@ -7,6 +7,18 @@ from ...Memory.EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_A
 from ...Memory.AllocentricMemory.GridCell import CELL_UNKNOWN
 
 
+STATUS_0 = 0
+STATUS_1 = 1
+STATUS_3 = 6
+STATUS_4 = 8
+CLOCK_PLACE = 2
+COLOR_INDEX = 3
+CLOCK_FOCUS = 7
+CLOCK_PROMPT = 9
+CLOCK_INTERACTION = 4
+PHENOMENON_ID = 5
+
+
 class CtrlAllocentricView:
     def __init__(self, workspace):
         """Control the allocentric view"""
@@ -38,9 +50,12 @@ class CtrlAllocentricView:
                         self.workspace.memory.allocentric_memory.user_cells.remove((cell_x, cell_y))
                 # CTRL ALT: toggle COLOR FLOOR
                 elif modifiers & key.MOD_CTRL and modifiers & key.MOD_ALT:
-                    if cell.status[0] == EXPERIENCE_FLOOR and cell.color_index > 0:
-                        cell.status[0] = CELL_UNKNOWN
-                        cell.color_index = 0
+                    #if cell.status[0] == EXPERIENCE_FLOOR and cell.color_index > 0:
+                    if self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][STATUS_0] == EXPERIENCE_FLOOR and self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][COLOR_INDEX] > 0:
+                        #cell.status[0] = CELL_UNKNOWN
+                        self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][STATUS_0] = CELL_UNKNOWN
+                        self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][COLOR_INDEX] = 0
+                        #cell.color_index = 0
                         if (cell_x, cell_y) in self.workspace.memory.allocentric_memory.user_cells:
                             self.workspace.memory.allocentric_memory.user_cells.remove((cell_x, cell_y))
                     else:
@@ -50,8 +65,11 @@ class CtrlAllocentricView:
                         self.workspace.memory.allocentric_memory.user_cells.append((cell_x, cell_y))
                 # CTRL: Toggle FLOOR
                 elif modifiers & key.MOD_CTRL:
-                    if cell.status[0] == EXPERIENCE_FLOOR and cell.color_index == 0:
-                        cell.status[0] = CELL_UNKNOWN
+                    #if cell.status[0] == EXPERIENCE_FLOOR and cell.color_index == 0:
+                    if self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][STATUS_0] == EXPERIENCE_FLOOR and self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][COLOR_INDEX] == 0:
+                        self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][STATUS_0] = CELL_UNKNOWN
+
+                        #cell.status[0] = CELL_UNKNOWN
                         if (cell_x, cell_y) in self.workspace.memory.allocentric_memory.user_cells:
                             self.workspace.memory.allocentric_memory.user_cells.remove((cell_x, cell_y))
                     else:
@@ -61,9 +79,16 @@ class CtrlAllocentricView:
                         self.workspace.memory.allocentric_memory.user_cells.append((cell_x, cell_y))
                 # ALT: Toggle ECHO
                 elif modifiers & key.MOD_ALT:
-                    if cell.status[1] == EXPERIENCE_ALIGNED_ECHO:
-                        cell.status[1] = CELL_UNKNOWN
-                        cell.color_index = 0
+                    # if cell.status[1] == EXPERIENCE_ALIGNED_ECHO:
+                    #     cell.status[1] = CELL_UNKNOWN
+                    #     cell.color_index = 0
+
+                    if self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][STATUS_1] == EXPERIENCE_ALIGNED_ECHO:
+                        self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][STATUS_1] = CELL_UNKNOWN
+                        self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][COLOR_INDEX] = 0
+
+
+
                         if (cell_x, cell_y) in self.workspace.memory.allocentric_memory.user_cells:
                             self.workspace.memory.allocentric_memory.user_cells.remove((cell_x, cell_y))
                     else:
@@ -88,7 +113,7 @@ class CtrlAllocentricView:
                 # ctrl_phenomenon_view = CtrlPhenomenonView(workspace)
                 # ctrl_phenomenon_view.update_body_robot()
                 # ctrl_phenomenon_view.update_points_of_interest(phenomenon)
-            self.view.label_click.text = cell.label()
+            #self.view.label_click.text = cell.label()
 
         self.view.on_mouse_press = on_mouse_press
 
