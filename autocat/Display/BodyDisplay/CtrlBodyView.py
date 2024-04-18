@@ -86,10 +86,8 @@ class CtrlBodyView:
     def main(self, dt):
         """Called every frame. Update the body view"""
         self.view.label_5HT.text = f"5-HT: {self.workspace.memory.body_memory.serotonin:d}"
-        if self.workspace.memory.body_memory.serotonin >= 50:
-            self.view.label_5HT.color = (0, 0, 0, 255)
-        else:
-            self.view.label_5HT.color = (255, 0, 0, 255)
+        self.view.label_5HT.color = (0, 0, 0, 255) if self.workspace.memory.body_memory.serotonin >= 50 \
+            else (255, 0, 0, 255)
         self.view.label_DA.text = f"DA: {self.workspace.memory.body_memory.dopamine:d}"
         if self.workspace.memory.body_memory.dopamine >= 50:
             self.view.label_DA.color = (0, 0, 0, 255)

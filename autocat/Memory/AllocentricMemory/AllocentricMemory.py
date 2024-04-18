@@ -10,7 +10,7 @@ from ..EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_PLACE, EX
 from ..AllocentricMemory.GridCell import CELL_NO_ECHO
 from ...Robot.RobotDefine import ROBOT_CHASSIS_X, ROBOT_OUTSIDE_Y, CHECK_OUTSIDE
 from ...Memory.PhenomenonMemory.PhenomenonMemory import TER, ROBOT1
-from ..PhenomenonMemory import PHENOMENON_RECOGNIZE_CONFIDENCE, TERRAIN_ORIGIN_CONFIDENCE
+from ..PhenomenonMemory import PHENOMENON_RECOGNIZE_CONFIDENCE, PHENOMENON_ENCLOSED_CONFIDENCE
 
 
 class AllocentricMemory:
@@ -84,8 +84,8 @@ class AllocentricMemory:
                         c.status[0] = EXPERIENCE_FLOOR
                         c.phenomenon_id = TER
                         c.clock_place = clock
-            # If terrain category has been recognised
-            if p_id == TER and p.confidence >= PHENOMENON_RECOGNIZE_CONFIDENCE:  # TERRAIN_ORIGIN_CONFIDENCE:
+            # If terrain is enclosed
+            if p_id == TER and p.confidence >= PHENOMENON_ENCLOSED_CONFIDENCE:  # PHENOMENON_RECOGNIZE_CONFIDENCE:  # TERRAIN_ORIGIN_CONFIDENCE:
                 # Draw the terrain from its shape
                 for point in p.shape:
                     cell_x, cell_y = point_to_cell(point + p.point)

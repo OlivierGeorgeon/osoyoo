@@ -148,6 +148,7 @@ class Phenomenon:
         """Set the path representing the terrain outline used to test is_inside"""
         # Must not be recomputed on each call to is_inside()
         # Need a closed two-dimensional array [[x0, y0],...,[x100, y100], [x0, y0]]
+        # TODO the shape should be already enclosed when we call set_path
         self.path = mpath.Path(np.concatenate((self.shape[:, 0:2], self.shape[0:1, 0:2])))
 
     def is_inside(self, terrain_centric_point):
@@ -176,11 +177,29 @@ class Phenomenon:
             a.point += ac
             # print("Affordance clock:", a.clock, "corrected by:", ac, "coef:", correction_coefficient)
         self.last_origin_clock = clock
+        # Compute the shape
+        self.reshape()
+        # points = np.array([a.point for a in self.affordances.values()], dtype=int)
+        # center = points.mean(axis=0)
+        # angles = np.arctan2(points[:, 1] - center[1], points[:, 0] - center[0])
+        # sorted_points = points[np.argsort(angles)]
+        # self.shape = np.concatenate((sorted_points, sorted_points[0:1]))
+        # self.set_path()
         # Interpolate the affordance positions
-        self.interpolate()
+        # self.interpolate()
         # Place the origin of the terrain at the center
-        self.move_origin(self.shape.mean(axis=0).astype(int))
+        # self.move_origin(self.shape.mean(axis=0).astype(int))
         self.confidence = max(PHENOMENON_ENCLOSED_CONFIDENCE, self.confidence)
+
+    def reshape(self):
+        """Recompute the shape of the phenomenon and its center"""
+        points = np.array([a.point for a in self.affordances.values()], dtype=int)
+        center = points.mean(axis=0, dtype=int)
+        angles = np.arctan2(points[:, 1] - center[1], points[:, 0] - center[0])
+        sorted_points = points[np.argsort(angles)]
+        self.shape = np.concatenate((sorted_points, sorted_points[0:1]))
+        self.set_path()
+        self.move_origin(center)
 
     def save(self, saved_phenomenon):
         """Return a clone of the phenomenon for memory snapshot"""

@@ -40,7 +40,7 @@ class Enacter:
         # ENACTING: Simulate the enaction in memory
         if self.interaction_step == ENACTION_STEP_ENACTING:
             self.workspace.simulator.simulate(dt)
-            # If imagining then use the simulated outcome when the simulation is finished
+            # If imagining then check for the end of the simulation
             if self.workspace.is_imagining and not self.workspace.simulator.is_simulating:
                 # simulated_outcome = self.workspace.simulator.end()
                 # self.workspace.enaction.terminate(simulated_outcome)
@@ -49,7 +49,7 @@ class Enacter:
 
         # INTEGRATING: the new enacted interaction
         if self.interaction_step == ENACTION_STEP_INTEGRATING:
-            # End the simulation
+            # Terminate the simulation
             simulated_outcome = self.workspace.simulator.end()
             print("Simulated outcome", simulated_outcome)
             if self.workspace.is_imagining:

@@ -38,59 +38,58 @@ class PhenomenonTerrain(Phenomenon):
             self.affordances[self.affordance_id] = affordance
             position_correction = np.array([0, 0, 0], dtype=int)
 
-            # If find black line
-            if affordance.type == EXPERIENCE_FLOOR:
-                # If color
-                if affordance.color_index > 0:
-                    # If the phenomenon does not have an absolute origin yet then this affordance becomes the absolute
-                    if self.confidence < TERRAIN_ORIGIN_CONFIDENCE:
-                        # This experience becomes the phenomenon's absolute origin
-                        self.absolute_affordance_key = self.affordance_id
-                        # The phenomenon's direction is the absolute direction of this affordance
-                        self.origin_direction_quaternion = affordance.quaternion.copy()
-                        self.last_origin_clock = affordance.clock
-                        self.confidence = TERRAIN_ORIGIN_CONFIDENCE
-                        # The terrain position is moved to the green sensor position relative to this FLOOR affordance
-                        # (Assume the pattern of the color patch)
-                        # The terrain origin remains at the terrain position
-                        terrain_offset = self.vector_toward_origin(affordance)
-                        self.point += terrain_offset
-                        for a in self.affordances.values():
-                            a.point -= terrain_offset
-                    elif abs(short_angle(affordance.quaternion, self.origin_direction_quaternion)) < math.pi / 2 \
-                            or self.confidence >= PHENOMENON_RECOGNIZE_CONFIDENCE:
-                        # If this affordance is in the direction of the origin or terrain is recognized
-                        position_correction = self.vector_toward_origin(affordance)
-                        # Prediction error is opposite of the position_correction projected along the color direction
-                        self.origin_prediction_error[affordance.clock] = np.dot(-position_correction,
-                                                                         affordance.quaternion * Vector3([0., 1., 0.]))
-                        # Correct the position of the affordances since last time the robot visited the absolute origin
-                        self.enclose(position_correction, affordance.clock)
-                        # for a in [a for a in self.affordances.values() if a.clock > self.last_origin_clock]:
-                        #     coef = (a.clock - self.last_origin_clock)/(affordance.clock - self.last_origin_clock)
-                        #     ac = np.array(position_correction * coef, dtype=int)
-                        #     a.point -= ac
-                        # self.last_origin_clock = affordance.clock
-                        # Increase confidence if not consecutive origin affordances
-                        # if affordance.clock - self.last_origin_clock > 5:
-                        self.confidence = max(PHENOMENON_RECOGNIZE_CONFIDENCE, self.confidence)
-                # Black line: Compute the position correction based on the nearest point in the terrain shape
-                # TODO use the point on the trajectory rather than the closest point
-                elif self.confidence >= PHENOMENON_RECOGNIZED_CONFIDENCE:  # PHENOMENON_CLOSED_CONFIDENCE
-                    distances = np.linalg.norm(self.shape - affordance.point, axis=1)
-                    closest_point = self.shape[np.argmin(distances)]
-                    position_correction = np.array(affordance.point - closest_point, dtype=int)
-                    print("Nearest shape point", closest_point, "Position correction", position_correction)
-                    affordance.point -= position_correction
-                elif self.confidence >= PHENOMENON_ENCLOSED_CONFIDENCE:
-                    # Recenter the terrain
-                    self.move_origin(self.shape.mean(axis=0).astype(int))
-                    self.prune(affordance)
+            # If color
+            if affordance.color_index > 0:
+                # If the phenomenon does not have an absolute origin yet then this affordance becomes the absolute
+                if self.confidence < TERRAIN_ORIGIN_CONFIDENCE:
+                    # This experience becomes the phenomenon's absolute origin
+                    self.absolute_affordance_key = self.affordance_id
+                    # The phenomenon's direction is the absolute direction of this affordance
+                    self.origin_direction_quaternion = affordance.quaternion.copy()
+                    self.last_origin_clock = affordance.clock
+                    self.confidence = TERRAIN_ORIGIN_CONFIDENCE
+                    # The terrain position is moved to the green sensor position relative to this FLOOR affordance
+                    # (Assume the pattern of the color patch)
+                    # The terrain origin remains at the terrain position
+                    terrain_offset = self.vector_toward_origin(affordance)
+                    self.point += terrain_offset
+                    for a in self.affordances.values():
+                        a.point -= terrain_offset
+                elif abs(short_angle(affordance.quaternion, self.origin_direction_quaternion)) < math.pi / 2 \
+                        or self.confidence >= PHENOMENON_RECOGNIZE_CONFIDENCE:
+                    # If this affordance is in the direction of the origin or terrain is recognized
+                    position_correction = self.vector_toward_origin(affordance)
+                    # Prediction error is opposite of the position_correction projected along the color direction
+                    self.origin_prediction_error[affordance.clock] = np.dot(-position_correction,
+                                                                     affordance.quaternion * Vector3([0., 1., 0.]))
+                    # Correct the position of the affordances since last time the robot visited the absolute origin
+                    self.enclose(position_correction, affordance.clock)
+                    # for a in [a for a in self.affordances.values() if a.clock > self.last_origin_clock]:
+                    #     coef = (a.clock - self.last_origin_clock)/(affordance.clock - self.last_origin_clock)
+                    #     ac = np.array(position_correction * coef, dtype=int)
+                    #     a.point -= ac
+                    # self.last_origin_clock = affordance.clock
+                    # Increase confidence if not consecutive origin affordances
+                    # if affordance.clock - self.last_origin_clock > 5:
+                    self.confidence = max(PHENOMENON_RECOGNIZE_CONFIDENCE, self.confidence)
+            # Black line: Compute the position correction based on the nearest point in the terrain shape
+            # TODO use the point on the trajectory rather than the closest point
+            elif self.confidence >= PHENOMENON_RECOGNIZED_CONFIDENCE:  # PHENOMENON_CLOSED_CONFIDENCE
+                distances = np.linalg.norm(self.shape - affordance.point, axis=1)
+                closest_point = self.shape[np.argmin(distances)]
+                position_correction = np.array(affordance.point - closest_point, dtype=int)
+                print("Nearest shape point", closest_point, "Position correction", position_correction)
+                affordance.point -= position_correction
+            elif self.confidence >= PHENOMENON_ENCLOSED_CONFIDENCE:
+                # Recenter the terrain
+                # self.move_origin(self.shape.mean(axis=0).astype(int))
+                self.prune(affordance)
+                self.reshape()
 
             # if the phenomenon is not recognized, recompute the shape
-            # if self.category is None:
-            if self.confidence == PHENOMENON_ENCLOSED_CONFIDENCE:
-                self.interpolate()
+            # if self.confidence == PHENOMENON_ENCLOSED_CONFIDENCE:
+            #     # self.interpolate()
+            #     self.reshape()
 
             return - position_correction  # TODO remove the minus sign
         # Affordances that do not belong to this phenomenon must return None
