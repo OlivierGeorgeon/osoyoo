@@ -3,7 +3,7 @@ import math
 import numpy as np
 from .BodyView import BodyView
 from autocat.Display.PointOfInterest import PointOfInterest
-from ...Robot.CtrlRobot import ENACTION_STEP_REFRESHING
+from ...Robot.CtrlRobot import ENACTION_STEP_RENDERING
 from ...Workspace import KEY_DECREASE, KEY_INCREASE
 from ...Utils import quaternion_to_azimuth
 from ...Integrator.Calibrator import compass_calibration
@@ -107,7 +107,7 @@ class CtrlBodyView:
         # During the interaction:update the head direction
         self.view.robot.rotate_head(self.workspace.memory.body_memory.head_direction_degree())
         # At the end of interaction
-        if self.workspace.enacter.interaction_step == ENACTION_STEP_REFRESHING and self.workspace.enaction.outcome is not None:
+        if self.workspace.enacter.interaction_step == ENACTION_STEP_RENDERING and self.workspace.enaction.outcome is not None:
             self.view.label.text = self.body_label_azimuth(self.workspace.enaction)
             self.view.label_enaction.text = self.body_label(self.workspace.enaction.action)
             self.update_body_view()

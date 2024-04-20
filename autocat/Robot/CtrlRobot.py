@@ -8,7 +8,7 @@ ENACTION_STEP_IDLE = 0
 ENACTION_STEP_COMMANDING = 1
 ENACTION_STEP_ENACTING = 2
 ENACTION_STEP_INTEGRATING = 3
-ENACTION_STEP_REFRESHING = 4
+ENACTION_STEP_RENDERING = 4
 
 
 class CtrlRobot:
@@ -34,7 +34,7 @@ class CtrlRobot:
             self.send_command_to_robot()
 
         # While the robot is enacting the interaction, check for the outcome
-        if self.workspace.enacter.interaction_step == ENACTION_STEP_ENACTING and not self.workspace.is_imagining:
+        if self.workspace.enacter.interaction_step == ENACTION_STEP_ENACTING and not self.workspace.enacter.is_imagining:
             if time.time() < self.send_time + self.time_out:
                 outcome_string = None
                 try:

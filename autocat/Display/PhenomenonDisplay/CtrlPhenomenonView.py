@@ -3,9 +3,10 @@ import numpy as np
 from .PhenomenonView import PhenomenonView
 from ..PointOfInterest import PointOfInterest, POINT_CONE
 from ...Workspace import KEY_DECREASE, KEY_INCREASE, KEY_ENCLOSE
-from ...Robot.CtrlRobot import ENACTION_STEP_REFRESHING
+from ...Robot.CtrlRobot import ENACTION_STEP_RENDERING
 from ...Utils import quaternion_translation_to_matrix
 from ...Memory.EgocentricMemory.Experience import EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_CENTRAL_ECHO
+from ...Memory.PhenomenonMemory.PhenomenonMemory import TER, DOT
 
 
 class CtrlPhenomenonView:
@@ -14,29 +15,31 @@ class CtrlPhenomenonView:
     def __init__(self, workspace):
         self.view = PhenomenonView()
         self.workspace = workspace
-        self.egocentric_memory = workspace.memory.egocentric_memory
+        # self.egocentric_memory = workspace.memory.egocentric_memory
         self.affordance_displays = []
-        self.phenomenon = None
+        self.phenomenon_id = None
         self.selected_clock = 0
 
         def on_text(text):
             """Handle user keypress"""
-            if text.upper() == KEY_DECREASE:
-                self.phenomenon.confidence = max(0, self.phenomenon.confidence - 0.1)
-            elif text.upper() == KEY_INCREASE:
-                self.phenomenon.confidence = min(self.phenomenon.confidence + 0.1, 1.)
-            elif text.upper() == KEY_ENCLOSE:
+            if self.phenomenon_id is not None and text.upper() == KEY_ENCLOSE:
+                phenomenon = self.workspace.memory.phenomenon_memory.phenomena[self.phenomenon_id]
+                # if text.upper() == KEY_DECREASE:
+                #     self.phenomenon.confidence = max(0, self.phenomenon.confidence - 0.1)
+                # elif text.upper() == KEY_INCREASE:
+                #     self.phenomenon.confidence = min(self.phenomenon.confidence + 0.1, 1.)
+                # if text.upper() == KEY_ENCLOSE:
                 # Enclose the phenomenon: by moving the selected affordance to the origin affordance
                 if self.selected_clock > 0:
                     clock = self.selected_clock
                 else:
                     clock = self.workspace.memory.clock
-                affordances = [a for a in self.phenomenon.affordances.values() if a.clock == clock
-                               and a.type == self.phenomenon.phenomenon_type]
+                affordances = [a for a in phenomenon.affordances.values() if a.clock == clock
+                               and a.type == phenomenon.phenomenon_type]
                 if len(affordances) > 0:
                     position_error = -affordances[0].point
-                    self.phenomenon.enclose(position_error, clock)
-                    self.workspace.memory.allocentric_memory.robot_point += position_error
+                    phenomenon.enclose(position_error, clock)
+                    workspace.memory.allocentric_memory.robot_point += position_error
                 self.update_affordance_displays()
             else:
                 # Other keypress are handled by the workspace
@@ -58,10 +61,11 @@ class CtrlPhenomenonView:
 
         def on_mouse_scroll(x, y, dx, dy):
             """ Modify the phenomenon's confidence """
-            if y < 50:
+            if y < 50 and self.phenomenon_id is not None:
                 # Modify the confidence
-                self.phenomenon.confidence += int(np.sign(dy))
-                self.phenomenon.confidence = min(max(self.phenomenon.confidence, 0), 100)
+                phenomenon = self.workspace.memory.phenomenon_memory.phenomena[self.phenomenon_id]
+                phenomenon.confidence += int(np.sign(dy))
+                phenomenon.confidence = min(max(phenomenon.confidence, 0), 100)
 
         self.view.push_handlers(on_text, on_mouse_press, on_mouse_scroll)
 
@@ -74,18 +78,21 @@ class CtrlPhenomenonView:
 
     def update_affordance_displays(self):
         """Retrieve the new affordances in a phenomenon and create the corresponding points of interest"""
-        # Delete the points of interest
-        for poi in self.affordance_displays:
-            poi.delete()
-        self.affordance_displays = []
+        if self.phenomenon_id is not None:
+            phenomenon = self.workspace.memory.phenomenon_memory.phenomena[self.phenomenon_id]
 
-        # Recreate all affordance displays
-        for a in self.phenomenon.affordances.values():
-            ad = self.create_affordance_displays(a)
-            self.affordance_displays.extend(ad)
+            # Delete the points of interest
+            for poi in self.affordance_displays:
+                poi.delete()
+            self.affordance_displays = []
 
-        # Draw the phenomenon outline
-        self.view.add_lines(self.phenomenon.outline(), "black")
+            # Recreate all affordance displays
+            for a in phenomenon.affordances.values():
+                ad = self.create_affordance_displays(a)
+                self.affordance_displays.extend(ad)
+
+            # Draw the phenomenon outline if any
+            self.view.add_lines(phenomenon.outline(), "black")
 
     def create_affordance_displays(self, affordance):
         """Return the affordance display for this affordance"""
@@ -105,14 +112,15 @@ class CtrlPhenomenonView:
         """Called every frame. Update the phenomenon view"""
         # The position of the robot in the view
         self.view.robot_rotate = 90 - self.workspace.memory.body_memory.body_azimuth()
-        # Always display Phenomenon 0 (terrain)
-        if 0 in self.workspace.memory.phenomenon_memory.phenomena:
-            self.phenomenon = self.workspace.memory.phenomenon_memory.phenomena[0]
+        # Display Phenomenon 0 (terrain) by default if it exists
+        if self.phenomenon_id is None and TER in self.workspace.memory.phenomenon_memory.phenomena:
+            self.phenomenon_id = TER
 
-        if self.phenomenon is not None:
-            self.view.robot_translate = self.workspace.memory.allocentric_memory.robot_point - self.phenomenon.point
-            self.view.label2.text = "Confidence: {:d}%".format(int(self.phenomenon.confidence))
+        if self.phenomenon_id is not None:
+            phenomenon = self.workspace.memory.phenomenon_memory.phenomena[self.phenomenon_id]
+            self.view.robot_translate = self.workspace.memory.allocentric_memory.robot_point - phenomenon.point
+            self.view.label2.text = f"Confidence: {phenomenon.confidence}"
             self.view.robot.rotate_head(self.workspace.memory.body_memory.head_direction_degree())
             self.update_body_robot()
-            if self.workspace.enacter.interaction_step == ENACTION_STEP_REFRESHING:
+            if self.workspace.enacter.interaction_step == ENACTION_STEP_RENDERING:
                 self.update_affordance_displays()

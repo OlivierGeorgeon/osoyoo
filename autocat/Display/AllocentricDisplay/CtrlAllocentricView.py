@@ -2,7 +2,7 @@ import time
 from pyglet.window import key, mouse
 from .AllocentricView import AllocentricView
 from ...Memory.AllocentricMemory.Hexagonal_geometry import point_to_cell
-from ...Robot.CtrlRobot import ENACTION_STEP_REFRESHING, ENACTION_STEP_ENACTING
+from ...Robot.CtrlRobot import ENACTION_STEP_RENDERING, ENACTION_STEP_ENACTING
 from ...Memory.EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO
 from ...Memory.AllocentricMemory.GridCell import CELL_UNKNOWN
 
@@ -81,13 +81,13 @@ class CtrlAllocentricView:
                     self.workspace.memory.egocentric_memory.prompt_point = ego_point
 
                 self.update_view()
-            # if cell.phenomenon_id is not None:
-                # print("Displaying Phenomenon", cell.phenomenon_id)
-                # self.workspace.ctrl_phenomenon_view.phenomenon = \
-                #     self.workspace.memory.phenomenon_memory.phenomena[cell.phenomenon_id]
-                # ctrl_phenomenon_view = CtrlPhenomenonView(workspace)
-                # ctrl_phenomenon_view.update_body_robot()
-                # ctrl_phenomenon_view.update_points_of_interest(phenomenon)
+            # Display this phenomenon in phenomenon window
+            if cell.phenomenon_id is not None:
+                self.workspace.ctrl_phenomenon_view.view.set_caption(f"Phenomenon {cell.phenomenon_id}")
+                self.workspace.ctrl_phenomenon_view.phenomenon_id = cell.phenomenon_id
+                self.workspace.ctrl_phenomenon_view.update_body_robot()
+                self.workspace.ctrl_phenomenon_view.update_affordance_displays()
+
             self.view.label_click.text = cell.label()
 
         self.view.on_mouse_press = on_mouse_press
@@ -117,5 +117,5 @@ class CtrlAllocentricView:
     def main(self, dt):
         """Refresh allocentric view"""
         # Refresh during the enaction and at the end of the interaction cycle
-        if self.workspace.enacter.interaction_step in [ENACTION_STEP_ENACTING, ENACTION_STEP_REFRESHING]:
+        if self.workspace.enacter.interaction_step in [ENACTION_STEP_ENACTING, ENACTION_STEP_RENDERING]:
             self.update_view()

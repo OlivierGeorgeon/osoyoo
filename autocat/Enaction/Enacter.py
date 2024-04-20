@@ -1,7 +1,8 @@
 from ..Robot.CtrlRobot import ENACTION_STEP_IDLE, ENACTION_STEP_COMMANDING, ENACTION_STEP_ENACTING, \
-    ENACTION_STEP_INTEGRATING, ENACTION_STEP_REFRESHING
+    ENACTION_STEP_INTEGRATING, ENACTION_STEP_RENDERING
 from ..Memory.PhenomenonMemory import TERRAIN_ORIGIN_CONFIDENCE
 from ..Integrator.OutcomeCode import outcome_code
+from . import KEY_ENGAGEMENT_ROBOT, KEY_CONTROL_DECIDER, KEY_ENGAGEMENT_IMAGINARY
 
 
 class Enacter:
@@ -9,10 +10,39 @@ class Enacter:
         self.workspace = workspace
         self.interaction_step = ENACTION_STEP_IDLE
         self.memory_snapshot = None
+        self.is_imagining = False
+        self.memory_before_imaginary = None
 
     def main(self, dt):
         """Controls the enaction."""
+        # RENDERING: last only one cycle
+        if self.interaction_step == ENACTION_STEP_RENDERING:
+            self.interaction_step = ENACTION_STEP_IDLE
+
+        # IDLE: Ready to choose the next intended interaction
         if self.interaction_step == ENACTION_STEP_IDLE:
+            # Manage the memory snapshot
+            if self.is_imagining:
+                # If stop imagining then restore memory from the snapshot
+                if self.workspace.engagement_mode == KEY_ENGAGEMENT_ROBOT:
+                    self.workspace.memory = self.memory_before_imaginary
+                    self.is_imagining = False
+                    self.interaction_step = ENACTION_STEP_RENDERING
+            else:
+                # If start imagining then take a new memory snapshot
+                if self.workspace.engagement_mode == KEY_ENGAGEMENT_IMAGINARY:
+                    self.memory_before_imaginary = self.workspace.memory.save()
+                    self.is_imagining = True
+            # Next automatic decision
+            if self.workspace.composite_enaction is None:
+                if self.workspace.control_mode == KEY_CONTROL_DECIDER:
+                    # All deciders propose an enaction with an activation value
+                    self.workspace.composite_enaction = self.decide()
+                else:
+                    self.workspace.decider_id = "Manual"
+                # Case DECIDER_KEY_USER is handled by self.process_user_key()
+
+        # if self.interaction_step == ENACTION_STEP_IDLE:  TODO make sure we can comment this line
             # When the next enaction is in the stack, prepare the enaction
             if self.workspace.composite_enaction is not None:
                 # Take the current enaction from the composite interaction
@@ -28,7 +58,7 @@ class Enacter:
                 self.workspace.enaction.begin(self.workspace.memory.body_memory.body_quaternion)
                 # Begin the simulation
                 self.workspace.simulator.begin()
-                if self.workspace.is_imagining:
+                if self.is_imagining:
                     # If imagining then proceed to simulating the enaction
                     self.interaction_step = ENACTION_STEP_ENACTING
                 else:
@@ -41,7 +71,7 @@ class Enacter:
         if self.interaction_step == ENACTION_STEP_ENACTING:
             self.workspace.simulator.simulate(dt)
             # If imagining then check for the end of the simulation
-            if self.workspace.is_imagining and not self.workspace.simulator.is_simulating:
+            if self.is_imagining and not self.workspace.simulator.is_simulating:
                 # simulated_outcome = self.workspace.simulator.end()
                 # self.workspace.enaction.terminate(simulated_outcome)
                 self.interaction_step = ENACTION_STEP_INTEGRATING
@@ -52,7 +82,7 @@ class Enacter:
             # Terminate the simulation
             simulated_outcome = self.workspace.simulator.end()
             print("Simulated outcome", simulated_outcome)
-            if self.workspace.is_imagining:
+            if self.is_imagining:
                 self.workspace.enaction.outcome = simulated_outcome
             self.workspace.enaction.terminate()
             # Restore the memory from the snapshot
@@ -86,12 +116,14 @@ class Enacter:
             # Increment the clock if the enacted interaction was properly received
             if self.workspace.enaction.clock >= self.workspace.memory.clock:  # don't increment if the robot is behind
                 self.workspace.memory.clock += 1
-            self.interaction_step = ENACTION_STEP_REFRESHING
+            self.interaction_step = ENACTION_STEP_RENDERING
             # If the composite enaction is over or aborted due to floor or impact
             if not self.workspace.composite_enaction.increment():  # or outcome.floor > 0 or outcome.impact > 0:
                 self.workspace.composite_enaction = None
 
-        # REFRESHING: Will be reset to IDLE in the next cycle
+        # RENDERING: Will be reset to IDLE in the next cycle
+        # if self.interaction_step == ENACTION_STEP_RENDERING:
+        #     print("Render the views")
 
     def decide(self):
         """Return the selected composite enaction"""

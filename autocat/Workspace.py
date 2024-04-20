@@ -18,15 +18,16 @@ from .Robot.Command import DIRECTION_BACK
 from .Robot.Message import Message
 from .Enaction.Enacter import Enacter
 from .Enaction.Simulator import Simulator
-from .Robot.CtrlRobot import ENACTION_STEP_IDLE, ENACTION_STEP_REFRESHING
+from .Robot.CtrlRobot import ENACTION_STEP_IDLE, ENACTION_STEP_RENDERING
 from .Enaction.CompositeEnaction import CompositeEnaction
 from .Integrator.PredictionError import PredictionError
 from .Integrator.Calibrator import Calibrator
+from .Enaction import KEY_ENGAGEMENT_ROBOT, KEY_CONTROL_DECIDER, KEY_ENGAGEMENT_IMAGINARY
 
-KEY_CONTROL_DECIDER = "A"  # Automatic mode: controlled by the deciders
+# KEY_CONTROL_DECIDER = "A"  # Automatic mode: controlled by the deciders
 KEY_CONTROL_USER = "M"  # Manual mode : controlled by the user
-KEY_ENGAGEMENT_ROBOT = "R"  # The robot actually enacts the interaction
-KEY_ENGAGEMENT_IMAGINARY = "I"  # The application imagines the interaction but the robot does not enact them
+# KEY_ENGAGEMENT_ROBOT = "R"  # The robot actually enacts the interaction
+# KEY_ENGAGEMENT_IMAGINARY = "I"  # The application imagines the interaction but the robot does not enact them
 KEY_DECREASE = "D"
 KEY_INCREASE = "P"
 KEY_CLEAR = "C"  # Clear the stack of interactions to enact next
@@ -37,6 +38,7 @@ KEY_ENCLOSE = "N"
 class Workspace:
     """The Workspace supervises the interaction cycle. It produces the intended_interaction
     and processes the enacted interaction """
+
     def __init__(self, arena_id, robot_id):
         self.arena_id = arena_id
         self.robot_id = robot_id
@@ -67,8 +69,8 @@ class Workspace:
         self.ctrl_phenomenon_view = None
 
         # Control the enaction
-        self.is_imagining = False
-        self.memory_before_imaginary = None
+        # self.is_imagining = False
+        # self.memory_before_imaginary = None
 
         # Message from other robot
         self.message = None
@@ -86,33 +88,6 @@ class Workspace:
     def main(self, dt):
         """The main handler of the interaction cycle:
         organize the generation of the intended_interaction and the processing of the enacted_interaction."""
-        # REFRESHING: last only one cycle
-        if self.enacter.interaction_step == ENACTION_STEP_REFRESHING:
-            self.enacter.interaction_step = ENACTION_STEP_IDLE
-
-        # IDLE: Ready to choose the next intended interaction
-        if self.enacter.interaction_step == ENACTION_STEP_IDLE:
-            # Manage the memory snapshot
-            if self.is_imagining:
-                # If stop imagining then restore memory from the snapshot
-                if self.engagement_mode == KEY_ENGAGEMENT_ROBOT:
-                    self.memory = self.memory_before_imaginary
-                    self.is_imagining = False
-                    self.enacter.interaction_step = ENACTION_STEP_REFRESHING
-            else:
-                # If start imagining then take a new memory snapshot
-                if self.engagement_mode == KEY_ENGAGEMENT_IMAGINARY:
-                    self.memory_before_imaginary = self.memory.save()
-                    self.is_imagining = True
-            # Next automatic decision
-            if self.composite_enaction is None:
-                if self.control_mode == KEY_CONTROL_DECIDER:
-                    # All deciders propose an enaction with an activation value
-                    self.composite_enaction = self.enacter.decide()
-                else:
-                    self.decider_id = "Manual"
-                # Case DECIDER_KEY_USER is handled by self.process_user_key()
-
         self.enacter.main(dt)
 
     def process_user_key(self, user_key):
@@ -171,7 +146,7 @@ class Workspace:
             self.memory.body_memory.noradrenaline = noradrenaline
             if self.memory.phenomenon_memory.terrain() is not None:
                 self.memory.phenomenon_memory.terrain().confidence = confidence
-            self.enacter.interaction_step = ENACTION_STEP_REFRESHING
+            self.enacter.interaction_step = ENACTION_STEP_RENDERING
             # TODO: prevent a crash when the enaction has been cleared and then an outcome is received after
         elif user_key.upper() == KEY_PREDICTION_ERROR:
             self.prediction_error.plot()

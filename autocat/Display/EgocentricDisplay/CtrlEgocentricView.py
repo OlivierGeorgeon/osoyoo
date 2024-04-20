@@ -3,7 +3,7 @@ from pyglet.window import key, mouse
 from .EgocentricView import EgocentricView
 from ..PointOfInterest import PointOfInterest, POINT_PROMPT, POINT_ROBOT
 from ...Memory.EgocentricMemory.Experience import EXPERIENCE_FOCUS, EXPERIENCE_ROBOT
-from ...Robot.CtrlRobot import ENACTION_STEP_ENACTING, ENACTION_STEP_REFRESHING
+from ...Robot.CtrlRobot import ENACTION_STEP_ENACTING, ENACTION_STEP_RENDERING
 
 
 class CtrlEgocentricView:
@@ -104,5 +104,5 @@ class CtrlEgocentricView:
         self.update_body_robot()
 
         # Update the display of egocentric memory
-        if self.workspace.enacter.interaction_step in [ENACTION_STEP_ENACTING, ENACTION_STEP_REFRESHING]:
+        if self.workspace.enacter.interaction_step in [ENACTION_STEP_ENACTING, ENACTION_STEP_RENDERING]:
             self.update_points_of_interest()

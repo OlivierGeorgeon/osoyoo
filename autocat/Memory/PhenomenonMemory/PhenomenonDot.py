@@ -14,7 +14,6 @@ class PhenomenonDot:
         self.category = None  # Required because tested for push
         self.affordance_id = 0
         self.point = affordance.point.copy()
-        # Initialize the list of affordances
         affordance.point[:] = 0  # Reset in place
         self.affordances = {0: affordance}
 
@@ -47,6 +46,9 @@ class PhenomenonDot:
             return self.phenomenon_type
         else:
             return None
+
+    def outline(self):
+        return None
 
     def save(self):
         """Return a clone of the phenomenon for memory snapshot"""
