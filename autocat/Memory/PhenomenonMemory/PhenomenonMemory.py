@@ -5,6 +5,7 @@ from .PhenomenonCategory import PhenomenonCategory
 from .PhenomenonObject import PhenomenonObject
 from .PhenomenonTerrain import PhenomenonTerrain
 from .PhenomenonRobot import PhenomenonRobot
+from .PhenomenonDot import PhenomenonDot
 from .. import EMOTION_VIGILANCE
 from ..EgocentricMemory.Experience import EXPERIENCE_ROBOT, EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO
 from ...Robot.RobotDefine import TERRAIN_RADIUS, ROBOT_FLOOR_SENSOR_X, ROBOT_OUTSIDE_Y
@@ -12,6 +13,7 @@ from ...Robot.RobotDefine import TERRAIN_RADIUS, ROBOT_FLOOR_SENSOR_X, ROBOT_OUT
 TER = 0
 ROBOT1 = -1  # The last other robot from which this robot receives a message TODO Handle more robots
 BOX = 1
+DOT = 2
 
 
 class PhenomenonMemory:
@@ -99,12 +101,14 @@ class PhenomenonMemory:
         """Create a new phenomenon depending of the type of the affordance"""
         # Must always create a phenomenon
         if affordance.type == EXPERIENCE_FLOOR:
-            self.phenomena[TER] = PhenomenonTerrain(affordance)
+            # self.phenomena[TER] = PhenomenonTerrain(affordance)
+            self.phenomenon_id += 1
+            self.phenomena[self.phenomenon_id] = PhenomenonDot(affordance)
             # If color affordance then recognize the terrain
             if affordance.color_index > 0:
                 self.phenomena[TER].recognize(self.phenomenon_categories[TER])
             return TER
-        if affordance.type == EXPERIENCE_ROBOT:
+        elif affordance.type == EXPERIENCE_ROBOT:
             robot1 = PhenomenonRobot(affordance)
             self.phenomena[ROBOT1] = robot1
             # Immediately recognized as a robot phenomenon

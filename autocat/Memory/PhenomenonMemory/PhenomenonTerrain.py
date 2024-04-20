@@ -105,7 +105,7 @@ class PhenomenonTerrain(Phenomenon):
                     self.confidence = PHENOMENON_ENCLOSED_CONFIDENCE
                     self.interpolate()
                     # Place the origin of the terrain at the center
-                    self.move_origin(self.shape.mean(axis=0).astype(int))
+                    self.shift(self.shape.mean(axis=0).astype(int))
 
     def recognize(self, category):
         """Set the terrain's category, shape, path, confidence. Adjust its position to the latest affordance"""
@@ -184,6 +184,14 @@ class PhenomenonTerrain(Phenomenon):
         for k in similar_affordances:
             print("Prune affordance", k)
             self.affordances.pop(k)
+
+    # def prune(self, theta_rad):
+    #     """Keep only affordances whose directions are spread from the last by more than theta_rad"""
+    #     last_q = Quaternion.from_z_rotation(math.atan2(self.affordances[self.affordance_id].point[1],
+    #                                                    self.affordances[self.affordance_id].point[0]))
+    #     self.affordances = {k: a for k, a in self.affordances if
+    #                         abs(short_angle(Quaternion.from_z_rotation(math.atan2(a.point[1], a.point[0])), last_q)) <
+    #                         theta_rad and k < self.affordance_id}
 
     def save(self, saved_phenomenon=None):
         """Return a clone of the phenomenon for memory snapshot"""

@@ -160,6 +160,18 @@ class Workspace:
             # Clear the stack of enactions
             self.clear_sound.play()
             self.composite_enaction = None
+            # Restore memory
+            serotonin = self.memory.body_memory.serotonin  # Handel user change  TODO improve
+            dopamine = self.memory.body_memory.dopamine  # Handel user change
+            noradrenaline = self.memory.body_memory.noradrenaline  # Handel user change
+            confidence = self.memory.phenomenon_memory.terrain_confidence()
+            self.memory = self.enacter.memory_snapshot
+            self.memory.body_memory.serotonin = serotonin
+            self.memory.body_memory.dopamine = dopamine
+            self.memory.body_memory.noradrenaline = noradrenaline
+            if self.memory.phenomenon_memory.terrain() is not None:
+                self.memory.phenomenon_memory.terrain().confidence = confidence
+            self.enacter.interaction_step = ENACTION_STEP_REFRESHING
             # TODO: prevent a crash when the enaction has been cleared and then an outcome is received after
         elif user_key.upper() == KEY_PREDICTION_ERROR:
             self.prediction_error.plot()
