@@ -17,6 +17,7 @@ CLOCK_FOCUS = 7
 CLOCK_PROMPT = 9
 CLOCK_INTERACTION = 4
 PHENOMENON_ID = 5
+CLOCK_NO_ECHO = 10
 
 
 class CtrlAllocentricView:
@@ -113,9 +114,23 @@ class CtrlAllocentricView:
                 # ctrl_phenomenon_view = CtrlPhenomenonView(workspace)
                 # ctrl_phenomenon_view.update_body_robot()
                 # ctrl_phenomenon_view.update_points_of_interest(phenomenon)
-            #self.view.label_click.text = cell.label()
 
-        self.view.on_mouse_press = on_mouse_press
+                """Label of the cell for display on click in allocentricView"""
+                label = str(self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][STATUS_0]) + " Clocks: ["
+                label += str(self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][STATUS_1])
+                label += str(self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][STATUS_3])
+                label += str(self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][STATUS_4])
+                label += str(self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][CLOCK_PLACE]) + ", "
+                label += str(self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][CLOCK_INTERACTION]) + ", "
+                label += str(self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][CLOCK_NO_ECHO]) + ", "
+                label += str(self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][CLOCK_FOCUS]) + ", "
+                label += str(self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][CLOCK_FOCUS]) + "]"
+                if self.phenomenon_id is not None:
+                    label += " Phenomenon:" + str(self.phenomenon_id)
+
+                self.view.label_click.text = label
+            self.view.on_mouse_press = on_mouse_press
+
 
         def on_key_press(symbol, modifiers):
             """ Deleting the prompt"""

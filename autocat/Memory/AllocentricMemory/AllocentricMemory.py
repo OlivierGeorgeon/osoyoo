@@ -16,11 +16,14 @@ STATUS_0 = 0
 STATUS_1 = 1
 STATUS_3 = 6
 STATUS_4 = 8
+STATUS_2 = 11
 CLOCK_PLACE = 2
 COLOR_INDEX = 3
 CLOCK_FOCUS = 7
 CLOCK_PROMPT = 9
+CLOCK_NO_ECHO = 12
 CLOCK_INTERACTION = 4
+CLOCK_PHENOMENON = 10
 PHENOMENON_ID = 5
 
 class AllocentricMemory:
@@ -146,9 +149,15 @@ class AllocentricMemory:
         # Mark the cells traversed by the robot
         alo_covered_area = trajectory.covered_area + self.robot_point
         path = mpath.Path(alo_covered_area[:, 0:2])
-        for c in [c for line in self.grid for c in line if c.is_inside(path)]:
-            c.status[0] = EXPERIENCE_PLACE
-            c.clock_place = clock
+        # for c in [c for line in self.grid for c in line if c.is_inside(path)]:
+        #     c.status[0] = EXPERIENCE_PLACE
+        #     c.clock_place = clock
+        for line in self.grid:
+            for c in line:
+                if c.is_inside(path):
+                    for z in range(len(c)):
+                        c[z][STATUS_0] = EXPERIENCE_PLACE
+                        c[z][CLOCK_PLACE] = clock
 
         # The new position of the robot
         # self.robot_point = destination_point
@@ -157,22 +166,41 @@ class AllocentricMemory:
 
     def place_robot(self, body_memory, clock):
         """Apply the PLACE status to the cells at the position of the robot"""
-        # start_time = time.time()
+        start_time = time.time()
         outline = body_memory.outline() + self.robot_point
         path = mpath.Path(outline[:, 0:2])
-        for c in [c for line in self.grid for c in line if c.is_inside(path)]:
-            c.status[0] = EXPERIENCE_PLACE
-            c.clock_place = clock
+        # for c in [c for line in self.grid for c in line if c.is_inside(path)]:
+        #     c.status[0] = EXPERIENCE_PLACE
+        #     c.clock_place = clock
         # print("Place robot time:", time.time() - start_time, "seconds")
+
+        for line in self.grid:
+            for c in line:
+                if c.is_inside(path):
+                    for z in range(len(c)):
+                        c[z][STATUS_0] = EXPERIENCE_PLACE
+                        c[z][CLOCK_PLACE] = clock
 
     def clear_grid_status(self):
         """Reset the status of all cells except PLACE status"""
-        for c in [c for line in self.grid for c in line if c.phenomenon_id is not None]:
-            if c.status[0] != EXPERIENCE_PLACE:  # The place experiences are not moved with phenomena
-                c.status[0] = CELL_UNKNOWN
-            c.status[1] = CELL_UNKNOWN
-            c.clock_phenomenon = 0
-            c.phenomenon_id = None
+        # for c in [c for line in self.grid for c in line if c.phenomenon_id is not None]:
+        #     if c.status[0] != EXPERIENCE_PLACE:  # The place experiences are not moved with phenomena
+        #         c.status[0] = CELL_UNKNOWN
+        #     c.status[1] = CELL_UNKNOWN
+        #     c.clock_phenomenon = 0
+        #     c.phenomenon_id = None
+
+        for line in self.grid:
+            for c in line:
+                for z in range(len(c)):
+                    if c[z][PHENOMENON_ID] is not None:
+                        if c[z][STATUS_0] != EXPERIENCE_PLACE:  # Les expériences de lieu ne sont pas déplacées avec les phénomènes
+                            c[z][STATUS_0] = CELL_UNKNOWN
+                        c[z][STATUS_1] = CELL_UNKNOWN
+                        c[z][CLOCK_PHENOMENON] = 0
+                        c[z][PHENOMENON_ID] = None
+
+        #boucle for parcoure
 
     def apply_status_to_cell(self, i, j, status, clock, color_index):
         """Change the cell status. Keep the max clock"""
@@ -182,8 +210,8 @@ class AllocentricMemory:
                 self.grid[i][j][STATUS_0] = status
                 #self.grid[i][j].clock_place = max(clock, self.grid[i][j].clock_place)
                 self.grid[i][j][CLOCK_PLACE] = max(clock, self.grid[i][j][CLOCK_PLACE])
-                self.grid[i][j].color_index = color_index
-                #self.grid[i][j][COLOR_INDEX] = color_index
+                #self.grid[i][j].color_index = color_index
+                self.grid[i][j][COLOR_INDEX] = color_index
             else:
                 #self.grid[i][j].status[1] = status
                 self.grid[i][j][STATUS_1] = status
@@ -211,10 +239,17 @@ class AllocentricMemory:
         points = affordance.sensor_triangle()
         triangle = [p[0:2] for p in points]
         path = mpath.Path(triangle)
-        for c in [c for line in self.grid for c in line if c.is_inside(path)]:
-            c.status[2] = CELL_NO_ECHO
-            c.clock_no_echo = affordance.clock
+        # for c in [c for line in self.grid for c in line if c.is_inside(path)]:
+        #     c.status[2] = CELL_NO_ECHO
+        #     c.clock_no_echo = affordance.clock
         # print("Place echo time:", time.time() - start_time, "seconds")
+
+        for line in self.grid:
+            for c in line:
+                if c.is_inside(path):
+                    for z in range(len(c)):
+                        c[z][STATUS_2] = CELL_NO_ECHO
+                        c[z][CLOCK_NO_ECHO] = affordance.clock
 
     def update_focus(self, allo_focus, clock):
         """Update the focus in allocentric memory"""
