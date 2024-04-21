@@ -1,6 +1,6 @@
 import math
 import numpy as np
-from pyrr import matrix44, Vector3, Quaternion
+from pyrr import matrix44, Vector3, Quaternion, Matrix44
 from ..Proposer.Action import ACTION_FORWARD
 from ..Integrator.OutcomeCode import CONFIDENCE_NO_FOCUS, CONFIDENCE_NEW_FOCUS, CONFIDENCE_TOUCHED_FOCUS, \
     CONFIDENCE_CAREFUL_SCAN, CONFIDENCE_CONFIRMED_FOCUS
@@ -46,14 +46,6 @@ class Trajectory:
     def track_displacement(self, outcome):
         """Compute the displacement from the duration1, yaw, floor, impact"""
 
-        # # The trajectory is based on an adjusted duration1 in the case of a predicted FLOOR event
-        # if predicted_outcome.floor and outcome.floor:
-        #     duration1 = (predicted_outcome.duration1 * predicted_outcome.confidence +
-        #                  outcome.duration1 * (100 - predicted_outcome.confidence)) / 100
-        #     print("Trajectory based on adjusted Duration1:", duration1)
-        # else:
-        #     duration1 = outcome.duration1
-
         # Translation integrated from the action's speed multiplied by the duration1
         self.translation = self.speed * outcome.duration1 / 1000
 
@@ -64,11 +56,7 @@ class Trajectory:
                 [ROBOT_CHASSIS_X + max(0, self.translation[0]), -ROBOT_OUTSIDE_Y + min(0, self.translation[1]), 0]]
         self.covered_area[:, :] = [(self.body_quaternion * Vector3(p)) for p in area]
 
-        # # The yaw quaternion
-        # if outcome.yaw is None:
-        #     # If the yaw is not measured then use predicted yaw
-        #     self.yaw_quaternion = Quaternion.from_z_rotation(math.radians(predicted_outcome.yaw))
-        # else:
+        # # The yaw quaternion (if the robot does not return the yaw then it is provided by the enaction)
         self.yaw_quaternion = Quaternion.from_z_rotation(math.radians(outcome.yaw))
 
         # The new body quaternion computed by integrating the yaw (do not override body_quaternion yet)
@@ -115,10 +103,17 @@ class Trajectory:
                 self.body_quaternion = body_quaternion_corrected
 
         # The retreat distance
-        if outcome.floor > 0:
-            front_point = Vector3([ROBOT_FLOOR_SENSOR_X, 0, 0])
-            line_point = front_point + Vector3([ROBOT_SETTINGS[self.robot_id]["retreat_distance"], 0, 0])
-            self.translation += front_point - self.yaw_quaternion * line_point
+        # if outcome.floor > 0:
+            # front_point = Vector3([ROBOT_FLOOR_SENSOR_X, 0, 0])
+            # line_point = front_point + Vector3([ROBOT_SETTINGS[self.robot_id]["retreat_distance"], 0, 0])
+            # self.ego_retreat[:] = front_point - self.yaw_quaternion * line_point
+            # self.translation += self.ego_retreat
+        if outcome.floor == 0b01:
+            self.translation -= np.array(ROBOT_SETTINGS[self.robot_id]["retreat_distance"]) * np.array([1, -1, 0])
+        elif outcome.floor == 0b11:
+            self.translation -= np.array(ROBOT_SETTINGS[self.robot_id]["retreat_distance"]) * np.array([1, 0, 0])
+        elif outcome.floor == 0b10:
+            self.translation -= np.array(ROBOT_SETTINGS[self.robot_id]["retreat_distance"])
 
         if outcome.blocked:
             self.translation = np.array([0, 0, 0], dtype=int)

@@ -49,12 +49,11 @@ class CtrlPhenomenonView:
             """ Computing the position of the mouse click relative to the robot in mm and degrees """
             point = self.view.mouse_coordinates_to_point(x, y)
             angle = math.atan2(point[1], point[0])
-            self.view.label1.text = "Click: x:" + str(round(point[0])) + ", y:" + str(round(point[1])) \
-                                    + ", angle:" + str(round(math.degrees(angle))) + "°."
+            self.view.label2.text = f"Click: ({point[0]},{point[1]}), direction: {math.degrees(angle):.0f}°"
             selected_clocks = [p.clock for p in self.affordance_displays if p.select_if_near(point)]
             if len(selected_clocks) > 0:
                 self.selected_clock = selected_clocks[0]
-                self.view.label3.text = f"Clock: {self.selected_clock}"
+                self.view.label1.text = f"Clock: {self.selected_clock}"
             # for p in [p for p in self.affordance_displays if p.select_if_near(point)]:
             #     self.view.label3.text = "Clock: " + str(p.clock)
             #     self.selected_clock = p.clock
@@ -100,7 +99,7 @@ class CtrlPhenomenonView:
         pose_matrix = quaternion_translation_to_matrix(affordance.quaternion, affordance.point)
         if affordance.type in [EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_CENTRAL_ECHO]:
             cone_display = PointOfInterest(pose_matrix, self.view.batch, self.view.background, POINT_CONE,
-                                           affordance.type, affordance.clock, affordance.color_index,
+                                           affordance.clock, affordance.color_index,
                                            np.linalg.norm(affordance.polar_sensor_point))
             affordance_displays.append(cone_display)
         poi = PointOfInterest(pose_matrix, self.view.batch, self.view.forefront,
@@ -119,7 +118,7 @@ class CtrlPhenomenonView:
         if self.phenomenon_id is not None:
             phenomenon = self.workspace.memory.phenomenon_memory.phenomena[self.phenomenon_id]
             self.view.robot_translate = self.workspace.memory.allocentric_memory.robot_point - phenomenon.point
-            self.view.label2.text = f"Confidence: {phenomenon.confidence}"
+            self.view.label3.text = f"Type: {phenomenon.phenomenon_type}, Confidence: {phenomenon.confidence}"
             self.view.robot.rotate_head(self.workspace.memory.body_memory.head_direction_degree())
             self.update_body_robot()
             if self.workspace.enacter.interaction_step == ENACTION_STEP_RENDERING:

@@ -19,11 +19,23 @@ class PhenomenonDot:
 
     def update(self, affordance):
         """Add a new affordance to this phenomenon and move the phenomenon to the position of this affordance"""
-        self.point[:] = affordance.point  # Copy in place
-        affordance.point[:] = 0
-        self.affordance_id += 1
-        self.affordances[self.affordance_id] = affordance
-        return 0
+        if affordance.type == self.phenomenon_type:
+            # self.point[:] = affordance.point  # Copy in place
+            offset = affordance.point - self.point
+            self.shift(offset)
+            affordance.point[:] = 0
+            self.affordance_id += 1
+            self.affordances[self.affordance_id] = affordance
+            return 0
+        else:
+            return None
+
+    def shift(self, offset):
+        """Shift the phenomenon's point by the offset. Shift the affordances by the opposite"""
+        self.point += offset
+        print("Phenomenon offset", offset)
+        for a in self.affordances.values():
+            a.point -= offset
 
     def check(self):
         """If an affordances in every pi/2 then increase confidence to PHENOMENON_ENCLOSED_CONFIDENCE"""
@@ -48,7 +60,9 @@ class PhenomenonDot:
             return None
 
     def outline(self):
-        return None
+        """Return the terrain outline 2D points as list of integers"""
+        # The affordance points must be integers
+        return np.array([a.point[0:2] for a in self.affordances.values()]).flatten().tolist()
 
     def save(self):
         """Return a clone of the phenomenon for memory snapshot"""

@@ -1,4 +1,5 @@
 import math
+import numpy as np
 from pyrr import Matrix44, Quaternion, Vector3
 from ...Memory.EgocentricMemory.Experience import Experience, EXPERIENCE_LOCAL_ECHO, EXPERIENCE_CENTRAL_ECHO, \
     EXPERIENCE_PLACE, EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_IMPACT, EXPERIENCE_ROBOT, \
@@ -6,7 +7,7 @@ from ...Memory.EgocentricMemory.Experience import Experience, EXPERIENCE_LOCAL_E
 from ...Robot.RobotDefine import ROBOT_COLOR_SENSOR_X, ROBOT_FLOOR_SENSOR_X, ROBOT_CHASSIS_Y, ROBOT_OUTSIDE_Y, \
     ROBOT_SETTINGS
 from ...Proposer.Action import ACTION_FORWARD, ACTION_BACKWARD, ACTION_SWIPE, ACTION_RIGHTWARD, ACTION_CIRCUMVENT
-from ...Utils import quaternion_translation_to_matrix, head_angle_distance_to_matrix, matrix_to_rotation_matrix
+from ...Utils import quaternion_translation_to_matrix, head_angle_distance_to_matrix, matrix_to_rotation_matrix, translation_quaternion_to_matrix
 
 EXPERIENCE_PERSISTENCE = 10
 
@@ -46,16 +47,19 @@ class EgocentricMemory:
         # The FLOOR experience
         if enaction.outcome.floor > 0:
             # playsound('autocat/Assets/cyberpunk3.wav', False)
-            line_point = Vector3([ROBOT_FLOOR_SENSOR_X + ROBOT_SETTINGS[self.robot_id]["retreat_distance"], 0, 0])
-            if enaction.outcome.floor == 0b01:
-                # Black line on the right
-                pose_matrix = quaternion_translation_to_matrix(Quaternion.from_z_rotation(0.), line_point)
-            elif enaction.outcome.floor == 0b10:
-                # Black line on the left
-                pose_matrix = quaternion_translation_to_matrix(Quaternion.from_z_rotation(0.), line_point)
-            else:
-                # Black line on the front
-                pose_matrix = quaternion_translation_to_matrix(Quaternion.from_z_rotation(0.), line_point)
+            # line_point = Vector3([ROBOT_FLOOR_SENSOR_X + ROBOT_SETTINGS[self.robot_id]["retreat_distance"], 0, 0])
+            # if enaction.outcome.floor == 0b01:
+            #     # Black line on the right
+            #     pose_matrix = quaternion_translation_to_matrix(Quaternion.from_z_rotation(0.), line_point)
+            #     pose_matrix = translation_quaternion_to_matrix(line_point, Quaternion.from_z_rotation(math.pi/6))
+            # elif enaction.outcome.floor == 0b10:
+            #     # Black line on the left
+            #     pose_matrix = translation_quaternion_to_matrix(line_point, Quaternion.from_z_rotation(-math.pi/6))
+            # else:
+            #     # Black line on the front
+            #     pose_matrix = quaternion_translation_to_matrix(Quaternion.from_z_rotation(0.), line_point)
+            pose_matrix = translation_quaternion_to_matrix([ROBOT_FLOOR_SENSOR_X, 0, 0], enaction.trajectory.yaw_quaternion.inverse)
+            pose_matrix = Matrix44.from_translation([np.linalg.norm(ROBOT_SETTINGS[self.robot_id]["retreat_distance"]), 0, 0]) * pose_matrix
             floor_exp = Experience(pose_matrix, EXPERIENCE_FLOOR, enaction.clock, experience_id=self.experience_id,
                                    durability=EXPERIENCE_PERSISTENCE, color_index=enaction.outcome.color_index)
             self.experiences[floor_exp.id] = floor_exp
@@ -68,6 +72,7 @@ class EgocentricMemory:
                                   experience_id=self.experience_id, durability=EXPERIENCE_PERSISTENCE,
                                   color_index=enaction.outcome.color_index)
             self.experiences[echo_exp.id] = echo_exp
+            # print(echo_exp)
             self.experience_id += 1
 
         # The IMPACT experience

@@ -103,7 +103,7 @@ void loop()
 
   IMU.update(interaction_step);
 
-  // Watch for message received from PC. If yes, starts the interaction
+  // Watch out for message received from PC. If message received, get the interaction
 
   if (interaction_step == INTERACTION_DONE)
     INT = SEQ.update(interaction_step, INT);

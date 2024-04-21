@@ -100,13 +100,14 @@ class PhenomenonMemory:
     def create_phenomenon(self, affordance):
         """Create a new phenomenon depending of the type of the affordance"""
         # Must always create a phenomenon
-        if affordance.type == EXPERIENCE_FLOOR:
-            # self.phenomena[TER] = PhenomenonTerrain(affordance)
+        if affordance.type == EXPERIENCE_FLOOR and affordance.color_index == 0:
             self.phenomenon_id += 1
             self.phenomena[self.phenomenon_id] = PhenomenonDot(affordance)
-            # If color affordance then recognize the terrain
-            if affordance.color_index > 0:
-                self.phenomena[TER].recognize(self.phenomenon_categories[TER])
+            return self.phenomenon_id
+        # If color affordance then recognize the terrain (for imaginary tests)
+        elif affordance.type == EXPERIENCE_FLOOR and affordance.color_index > 0:
+            self.phenomena[TER] = PhenomenonTerrain(affordance)
+            self.phenomena[TER].recognize(self.phenomenon_categories[TER])
             return TER
         elif affordance.type == EXPERIENCE_ROBOT:
             robot1 = PhenomenonRobot(affordance)
@@ -129,7 +130,7 @@ class PhenomenonMemory:
                 clustered = False
                 # Look if the new affordance can be attached to an existing new phenomenon
                 for new_phenomenon_id in new_phenomena_id:
-                    print("Update new phenomenon")
+                    print("Update new phenomenon", new_phenomenon_id)
                     if self.phenomena[new_phenomenon_id].update(affordance) is not None:
                         clustered = True
                         break
