@@ -87,10 +87,19 @@ class AllocentricMemory:
             # Mark the cells outside the terrain (for BICA 2023 paper)
             if CHECK_OUTSIDE == 1:
                 if p_id == TER and p.confidence >= PHENOMENON_RECOGNIZABLE_CONFIDENCE and p.path is not None:
-                    for c in [c for line in self.grid for c in line if not p.is_inside(c.point())]:
-                        c.status[0] = EXPERIENCE_FLOOR
-                        c.phenomenon_id = TER
-                        c.clock_place = clock
+                    # for c in [c for line in self.grid for c in line if not p.is_inside(c.point())]:
+                    #     c.status[0] = EXPERIENCE_FLOOR
+                    #     c.phenomenon_id = TER
+                    #     c.clock_place = clock
+                    for i in range(self.min_i, self.max_i):
+                        for j in range(self.min_j, self.max_j):
+                            point = cell_to_point(i, j)
+                            if path.contains_point(point[0:2]):
+                                self.grid[i][j][STATUS_0] = EXPERIENCE_FLOOR
+                                self.grid[i][j][PHENOMENON_ID] = TER
+                                self.grid[i][j][CLOCK_PLACE] = clock
+
+                #path??
 
             # If terrain is enclosed
             if p_id == TER and p.confidence >= PHENOMENON_ENCLOSED_CONFIDENCE:  # PHENOMENON_RECOGNIZE_CONFIDENCE:  # TERRAIN_ORIGIN_CONFIDENCE:
@@ -180,13 +189,15 @@ class AllocentricMemory:
         #     c.status[0] = EXPERIENCE_PLACE
         #     c.clock_place = clock
         # print("Place robot time:", time.time() - start_time, "seconds")
+        for i in range(self.min_i, self.max_i):
+            for j in range(self.min_j, self.max_j):
+                point = cell_to_point(i, j)
+                if path.contains_point(point[0:2]):
+                    self.grid[i][j][STATUS_0] = EXPERIENCE_PLACE
+                    self.grid[i][j][CLOCK_PLACE] = clock
 
-        for line in self.grid:
-            for c in line:
-                if c.is_inside(path):
-                    for z in range(len(c)):
-                        c[z][STATUS_0] = EXPERIENCE_PLACE
-                        c[z][CLOCK_PLACE] = clock
+
+
 
     def clear_grid_status(self):
         """Reset the status of all cells except PLACE status"""
@@ -197,17 +208,14 @@ class AllocentricMemory:
         #     c.clock_phenomenon = 0
         #     c.phenomenon_id = None
 
-        for line in self.grid:
-            for c in line:
-                for z in range(len(c)):
-                    if c[z][PHENOMENON_ID] is not None:
-                        if c[z][STATUS_0] != EXPERIENCE_PLACE:  # Les expériences de lieu ne sont pas déplacées avec les phénomènes
-                            c[z][STATUS_0] = CELL_UNKNOWN
-                        c[z][STATUS_1] = CELL_UNKNOWN
-                        c[z][CLOCK_PHENOMENON] = 0
-                        c[z][PHENOMENON_ID] = None
-
-        #boucle for parcoure
+        for i in range(self.min_i, self.min_j):
+            for j in range(self.max_i, self.max_j):
+                if self.grid[i][j][PHENOMENON_ID] is not None:
+                    if self.grid[i][j][STATUS_0] != EXPERIENCE_PLACE:
+                        self.grid[i][j][STATUS_0] = CELL_UNKNOWN
+                    self.grid[i][j][STATUS_1] = CELL_UNKNOWN
+                    self.grid[i][j][CLOCK_PHENOMENON] = 0
+                    self.grid[i][j][PHENOMENON_ID] = -1
 
     def apply_status_to_cell(self, i, j, status, clock, color_index):
         """Change the cell status. Keep the max clock"""
@@ -250,13 +258,12 @@ class AllocentricMemory:
         #     c.status[2] = CELL_NO_ECHO
         #     c.clock_no_echo = affordance.clock
         # print("Place echo time:", time.time() - start_time, "seconds")
-
-        for line in self.grid:
-            for c in line:
-                if c.is_inside(path):
-                    for z in range(len(c)):
-                        c[z][STATUS_2] = CELL_NO_ECHO
-                        c[z][CLOCK_NO_ECHO] = affordance.clock
+        for i in range(self.min_i, self.max_i):
+            for j in range(self.min_j, self.max_j):
+                point = cell_to_point(i, j)
+                if path.contains_point(point[0:2]):
+                    self.grid[i][j][STATUS_2] = CELL_NO_ECHO
+                    self.grid[i][j][CLOCK_NO_ECHO] = affordance.clock
 
     def update_focus(self, allo_focus, clock):
         """Update the focus in allocentric memory"""
