@@ -11,6 +11,8 @@ from ..AllocentricMemory.GridCell import CELL_NO_ECHO
 from ...Robot.RobotDefine import ROBOT_CHASSIS_X, ROBOT_OUTSIDE_Y, CHECK_OUTSIDE
 from ...Memory.PhenomenonMemory.PhenomenonMemory import TER, ROBOT1
 from ..PhenomenonMemory import PHENOMENON_RECOGNIZE_CONFIDENCE, TERRAIN_ORIGIN_CONFIDENCE
+from .Hexagonal_geometry import cell_to_point
+
 
 STATUS_0 = 0
 STATUS_1 = 1
@@ -158,15 +160,17 @@ class AllocentricMemory:
         # Mark the cells traversed by the robot
         alo_covered_area = trajectory.covered_area + self.robot_point
         path = mpath.Path(alo_covered_area[:, 0:2])
+
         # for c in [c for line in self.grid for c in line if c.is_inside(path)]:
         #     c.status[0] = EXPERIENCE_PLACE
         #     c.clock_place = clock
-        for line in self.grid:
-            for c in line:
-                if c.is_inside(path):
-                    for z in range(len(c)):
-                        c[z][STATUS_0] = EXPERIENCE_PLACE
-                        c[z][CLOCK_PLACE] = clock
+
+        for i in range(self.min_i, self.max_i):
+            for j in range(self.min_j, self.max_j):
+                point = cell_to_point(i, j)
+                if path.contains_point(point[0:2]):
+                    self.grid[i][j][STATUS_0] = EXPERIENCE_PLACE
+                    self.grid[i][j][CLOCK_PLACE] = clock
 
         # The new position of the robot
         # self.robot_point = destination_point
@@ -304,7 +308,7 @@ class AllocentricMemory:
         saved_allocentric_memory.prompt_i = self.prompt_i
         saved_allocentric_memory.prompt_j = self.prompt_j
         saved_allocentric_memory.affordances = [a.save() for a in self.affordances]
-        saved_allocentric_memory.grid = [[c.save() for c in line] for line in self.grid]
+        saved_allocentric_memory.grid = self.grid.copy()
         saved_allocentric_memory.user_cells = [e for e in self.user_cells]
 
         return saved_allocentric_memory

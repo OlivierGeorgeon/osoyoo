@@ -11,7 +11,19 @@ from ..Utils import assert_almost_equal_angles, translation_quaternion_to_matrix
 from .Predict import RETREAT_YAW
 
 SIMULATION_SPEED = 1  # 0.5
-
+STATUS_0 = 0
+STATUS_1 = 1
+STATUS_3 = 6
+STATUS_4 = 8
+STATUS_2 = 11
+CLOCK_PLACE = 2
+COLOR_INDEX = 3
+CLOCK_FOCUS = 7
+CLOCK_PROMPT = 9
+CLOCK_NO_ECHO = 12
+CLOCK_INTERACTION = 4
+CLOCK_PHENOMENON = 10
+PHENOMENON_ID = 5
 
 class Simulator:
     def __init__(self, workspace):
@@ -100,7 +112,7 @@ class Simulator:
                 # Must check before marking the place, and terminate to prevent overriding duration1
                 if (memory.allocentric_memory.min_i <= i <= memory.allocentric_memory.max_i) and \
                         (memory.allocentric_memory.min_j <= j <= memory.allocentric_memory.max_j) and \
-                        memory.allocentric_memory.grid[i][j].status[0] == EXPERIENCE_FLOOR:
+                        memory.allocentric_memory.grid[i][j][STATUS_0] == EXPERIENCE_FLOOR:
                     self.is_simulating = False
                     self.simulated_outcome_dict['duration1'] = round(self.simulation_time * 1000)
                     if enaction.action.action_code == ACTION_FORWARD:
