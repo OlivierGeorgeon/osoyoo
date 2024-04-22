@@ -3,7 +3,7 @@ import math
 import numpy as np
 from .BodyView import BodyView
 from autocat.Display.PointOfInterest import PointOfInterest
-from ...Robot.CtrlRobot import ENACTION_STEP_REFRESHING
+from ...Robot.CtrlRobot import ENACTION_STEP_RENDERING
 from ...Workspace import KEY_DECREASE, KEY_INCREASE
 from ...Utils import quaternion_to_azimuth
 from ...Integrator.Calibrator import compass_calibration
@@ -86,9 +86,18 @@ class CtrlBodyView:
     def main(self, dt):
         """Called every frame. Update the body view"""
         self.view.label_5HT.text = f"5-HT: {self.workspace.memory.body_memory.serotonin:d}"
+        self.view.label_5HT.color = (0, 0, 0, 255) if self.workspace.memory.body_memory.serotonin >= 50 \
+            else (255, 0, 0, 255)
         self.view.label_DA.text = f"DA: {self.workspace.memory.body_memory.dopamine:d}"
+        if self.workspace.memory.body_memory.dopamine >= 50:
+            self.view.label_DA.color = (0, 0, 0, 255)
+        else:
+            self.view.label_DA.color = (255, 0, 0, 255)
         self.view.label_NA.text = f"NA: {self.workspace.memory.body_memory.noradrenaline:d}"
-
+        if self.workspace.memory.body_memory.noradrenaline >= 50:
+            self.view.label_NA.color = (0, 0, 0, 255)
+        else:
+            self.view.label_NA.color = (255, 0, 0, 255)
         self.view.label_clock.text = "Clock: {:d}".format(self.workspace.memory.clock)  \
                                      + " | " + ENGAGEMENT_MODES[self.workspace.engagement_mode]  \
                                      + " | " + self.workspace.decider_id
@@ -98,7 +107,7 @@ class CtrlBodyView:
         # During the interaction:update the head direction
         self.view.robot.rotate_head(self.workspace.memory.body_memory.head_direction_degree())
         # At the end of interaction
-        if self.workspace.enacter.interaction_step == ENACTION_STEP_REFRESHING and self.workspace.enaction.outcome is not None:
+        if self.workspace.enacter.interaction_step == ENACTION_STEP_RENDERING and self.workspace.enaction.outcome is not None:
             self.view.label.text = self.body_label_azimuth(self.workspace.enaction)
             self.view.label_enaction.text = self.body_label(self.workspace.enaction.action)
             self.update_body_view()

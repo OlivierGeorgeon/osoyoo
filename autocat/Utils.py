@@ -82,16 +82,16 @@ def assert_almost_equal_angles(angle1, angle2, difference_degrees):
     return abs(short_angle(quaternion1, quaternion2)) < math.radians(difference_degrees)
 
 
-def head_direction_distance_to_matrix(head_direction, echo_distance):
+def head_angle_distance_to_matrix(head_direction, echo_distance):
     """Return the matrix representing the pose of the echo from direction in degrees and distance"""
     head_quaternion = Quaternion.from_z_rotation(math.radians(head_direction))
     echo_from_head_matrix = translation_quaternion_to_matrix([echo_distance, 0, 0], head_quaternion)
     return Matrix44.from_translation([ROBOT_HEAD_X, 0, 0]) * echo_from_head_matrix
 
 
-def head_direction_distance_to_point(head_direction, echo_distance):
+def head_angle_distance_to_point(head_direction, echo_distance):
     """Return the egocentric echo point from the head direction and echo distance"""
-    return matrix44.apply_to_vector(head_direction_distance_to_matrix(head_direction, echo_distance),
+    return matrix44.apply_to_vector(head_angle_distance_to_matrix(head_direction, echo_distance),
                                     np.array([0, 0, 0])).astype(int)
 
 

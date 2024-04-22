@@ -3,7 +3,7 @@ import numpy as np
 import colorsys
 from pyrr import matrix44
 from ..Memory.EgocentricMemory.Experience import FLOOR_COLORS
-from ..Utils import head_direction_distance_to_matrix
+from ..Utils import head_angle_distance_to_matrix
 
 
 def category_color(color_sensor):
@@ -124,6 +124,7 @@ class Outcome:
         self.floor = outcome_dict.get('floor', 0)
         self.blocked = outcome_dict.get('blocked', 0)
         self.touch = outcome_dict.get('touch', 0)
+        self.confidence = outcome_dict.get('confidence', 100)  # The confidence of the predicted outcome
 
         # The processed fields
 
@@ -146,8 +147,7 @@ class Outcome:
         self.echo_point = None
         self.echo_matrix = None
         if self.echo_distance < 10000:
-            self.echo_matrix = head_direction_distance_to_matrix(outcome_dict['head_angle'],
-                                                                 outcome_dict['echo_distance'])
+            self.echo_matrix = head_angle_distance_to_matrix(outcome_dict['head_angle'], outcome_dict['echo_distance'])
             self.echo_point = matrix44.apply_to_vector(self.echo_matrix, [0, 0, 0])
 
         # Outcome echo array for SCAN interactions

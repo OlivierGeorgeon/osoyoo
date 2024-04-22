@@ -262,11 +262,18 @@ void Imu::outcome_forward(JSONVar & outcome_object)
   outcome_object["max_x_acc"] = _max_positive_x_acc;
   outcome_object["min_x_acc"] = _min_negative_x_acc;
 
-  char buffer[6];
-  dtostrf(_max_positive_yaw_left, 4, 2, buffer);
-  outcome_object["max_yaw"] = buffer;
-  dtostrf(_min_negative_yaw_right, 4, 2, buffer);
-  outcome_object["min_yaw"] = buffer;
+  if (_max_positive_yaw_left > -10.0)  // Not measured if duration < 20ms
+  {
+    char buffer[8];  // 6 may cause buffer overflow and crash
+    dtostrf(_max_positive_yaw_left, 4, 2, buffer);
+    outcome_object["max_yaw"] = buffer;
+  }
+  if (_min_negative_yaw_right < 10.0)
+  {
+    char buffer[8];
+    dtostrf(_min_negative_yaw_right, 4, 2, buffer);
+    outcome_object["min_yaw"] = buffer;
+  }
 
   // outcome_object["max_speed"] = (int) _max_speed;
   // outcome_object["min_speed"] = (int) _min_speed;
@@ -280,11 +287,19 @@ void Imu::outcome_backward(JSONVar & outcome_object)
   outcome_object["impact"] = _impact_backward;
   outcome_object["max_x_acc"] = _max_positive_x_acc;
   outcome_object["min_x_acc"] = _min_negative_x_acc;
-  char buffer[6];
-  dtostrf(_max_positive_yaw_left, 4, 2, buffer);
-  outcome_object["max_yaw"] = buffer;
-  dtostrf(_min_negative_yaw_right, 4, 2, buffer);
-  outcome_object["min_yaw"] = buffer;
+
+  if (_max_positive_yaw_left > -10.0)  // Not measured if duration < 20ms
+  {
+    char buffer[8];
+    dtostrf(_max_positive_yaw_left, 4, 2, buffer);
+    outcome_object["max_yaw"] = buffer;
+  }
+  if (_min_negative_yaw_right < 10.0)  // Not measured if duration < 20ms
+  {
+    char buffer[8];
+    dtostrf(_min_negative_yaw_right, 4, 2, buffer);
+    outcome_object["min_yaw"] = buffer;
+  }
   #endif
 }
 

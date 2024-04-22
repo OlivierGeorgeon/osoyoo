@@ -23,6 +23,10 @@ class Affordance:
         self.quaternion = quaternion  # The absolute direction of this affordance
         self.polar_sensor_point = polar_sensor_point  # The position of the sensor relative to the affordance
 
+    def __str__(self):
+        return f"(Point:({self.point[0]},{self.point[1]}) ,clock:{self.clock}, type:{self.type}, " \
+               f"color_index:{self.color_index})"
+
     def absolute_direction_rad(self):
         """Return the absolute direction of this affordance"""
         return quaternion_to_direction_rad(self.quaternion)

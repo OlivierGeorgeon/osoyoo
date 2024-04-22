@@ -1,6 +1,6 @@
 import numpy as np
 from pyrr import Vector3
-from . import PHENOMENON_RECOGNIZE_CONFIDENCE, PHENOMENON_CONFIDENCE_PRUNE
+from . import PHENOMENON_RECOGNIZABLE_CONFIDENCE, PHENOMENON_CONFIDENCE_PRUNE
 from .Phenomenon import Phenomenon, PHENOMENON_DELTA
 from autocat.Memory.EgocentricMemory.Experience import EXPERIENCE_CENTRAL_ECHO, EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_BLOCK, \
     EXPERIENCE_IMPACT, EXPERIENCE_FLOOR
@@ -12,7 +12,7 @@ class PhenomenonObject(Phenomenon):
     """A hypothetical phenomenon related to echo localization"""
     def __init__(self, affordance):
         super().__init__(affordance)
-        self.confidence = PHENOMENON_RECOGNIZE_CONFIDENCE
+        self.confidence = PHENOMENON_RECOGNIZABLE_CONFIDENCE
         self.absolute_affordance_key = 0  # The initial affordance is the origin
         self.phenomenon_type = EXPERIENCE_ALIGNED_ECHO
         self.interpolation_types = [EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_FLOOR]

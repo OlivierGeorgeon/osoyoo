@@ -28,7 +28,7 @@ class ProposerWatch(Proposer):
     def activation_level(self):
         """The level of activation is 3 if the excitation is low"""
 
-        return 40
+        return 50
 
         # if self.workspace.memory.phenomenon_memory.terrain_confidence() >= PHENOMENON_CLOSED_CONFIDENCE and \
         #   self.workspace.memory.body_memory.energy >= ENERGY_TIRED and \

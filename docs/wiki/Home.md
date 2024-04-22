@@ -9,9 +9,8 @@ To associate C/C++ syntax highlighting with `.ino` files, follow [Sawyer McLane'
 
 ## Clone the project 
 
-You can clone the project directly from within Pycharm as explained in [Pycharm documentation](https://www.jetbrains.com/help/pycharm/manage-projects-hosted-on-github.html#clone-from-GitHub). 
-
-Github address: https://github.com/OlivierGeorgeon/osoyoo.git
+Clone the project from the github repository. 
+To do it from within Pycharm, see [Pycharm documentation](https://www.jetbrains.com/help/pycharm/manage-projects-hosted-on-github.html#clone-from-GitHub). 
 
 ## Install the required packages
 
@@ -37,7 +36,7 @@ This project uses the following libraries:
 |WifiEsp-master| Wifi Shield | Regular Osoyoo robot ([Lesson 5](https://osoyoo.com/2019/11/08/omni-direction-mecanum-wheel-robot-car-kit-v1-lesson-5-wifi-control-robot-car/)  : [WiFiEsp-master.zip](https://osoyoo.com/driver/mecanum_metal_chassis/for_mega2560/WiFiEsp-master.zip))|
 |Arduino_JSON | JSON  | Arduino IDE Library manager|
 |MPU6050 | Inertial Measurement Unit | Included in our project repository |
-|HLC5883L | Compass | [jarzebski github](https://github.com/jarzebski/Arduino-HMC5883L) |
+|HLC5883L | Compass | Included in our project repository |
 |MMC5883 | Compass |  Included in our project repository |
 |Adafruit_TCS34725| Color sensor | Arduino IDE Library manager |
 
@@ -75,7 +74,7 @@ Don't mistake it with the library `ArduinoJSON` by Benoit Blanchon.
 ### HMC5883L
 
 This library handles the compass chip HMC5883L implemented in some of the GY-86 imu cards,
-It is available at https://github.com/jarzebski/Arduino-HMC5883L.
+This project includes a version adapted from [Jarzebski's library](https://github.com/jarzebski/Arduino-HMC5883L).
 
 ![image](assets/HMC5883L.jpg)
 Figure 3: The IMU card with the compass chip labeled `L883/2131`.
@@ -119,7 +118,7 @@ To let the robot connect to your own wifi as a station (STA), `arduino_secrets.h
 #define SECRET_PASS "<your password>"
 ```
 
-Alternatively, to let the robot provide its own wifi `osoyoo_robot` as an access point (AP),  `arduino_secrets.h` must contain:
+Alternatively, to let the robot provide its own wifi `petitcat` as an access point (AP),  `arduino_secrets.h` must contain:
 
 ```
 #define SECRET_WIFI_TYPE "AP"

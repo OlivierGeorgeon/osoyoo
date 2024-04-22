@@ -2,7 +2,7 @@ import math
 import numpy as np
 from pyrr import Quaternion, Vector3, matrix44
 from ..Robot.RobotDefine import ROBOT_FLOOR_SENSOR_X
-from ..Memory.PhenomenonMemory import PHENOMENON_RECOGNIZED_CONFIDENCE
+from ..Memory.PhenomenonMemory import PHENOMENON_ENCLOSED_CONFIDENCE
 from ..Proposer.Action import ACTION_SWIPE, ACTION_FORWARD, ACTION_SCAN
 from ..Robot.Outcome import Outcome
 from ..Memory.AllocentricMemory.Hexagonal_geometry import point_to_cell
@@ -103,8 +103,8 @@ class Simulator:
         # Simulate the displacement in allocentric memory
         memory.allocentric_memory.robot_point += memory.body_memory.body_quaternion * Vector3(translation)
 
-        # If no terrain recognized then check for floor cells
-        if memory.phenomenon_memory.terrain_confidence() < PHENOMENON_RECOGNIZED_CONFIDENCE:
+        # If terrain is not enclosed then check for floor cells
+        if memory.phenomenon_memory.terrain_confidence() < PHENOMENON_ENCLOSED_CONFIDENCE:
             if enaction.action.action_code in [ACTION_FORWARD, ACTION_SWIPE]:
                 i, j = point_to_cell(memory.allocentric_memory.robot_point +
                                      memory.body_memory.body_quaternion * Vector3([ROBOT_FLOOR_SENSOR_X, 0, 0]))
@@ -130,7 +130,7 @@ class Simulator:
                 else:
                     self.simulated_outcome_dict['floor'] = 0
 
-        # If the terrain is recognized, use the predicted outcome
+        # If the terrain is enclosed, use the predicted outcome
         else:
             # Stop the simulation after the predicted duration1
             if self.simulation_time * 1000 > enaction.predicted_outcome.duration1:

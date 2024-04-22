@@ -30,7 +30,7 @@ Sequencer::Sequencer(Floor& FLO, Head& HEA, Imu& IMU, Led& LED, WifiCat& WifiCat
 {
 }
 
-// Watch the wifi and returns the new interaction to enact if any
+// Watch out the wifi and returns the new interaction to enact if any
 Interaction* Sequencer::update(int& interaction_step, Interaction* INT)
 {
   digitalWrite(LED_BUILTIN, HIGH); // Dim the led while waiting for a command

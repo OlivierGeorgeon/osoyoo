@@ -51,7 +51,7 @@ class Experience:
         self.color_index = color_index
 
     def __str__(self):
-        return "(id:" + str(self.id) + ",clock:" + str(self.clock) + ", type:" + self.type + ")"
+        return f"(id:{self.id}, clock:{self.clock}, type:{self.type}, color_index:{self.color_index})"
 
     def displace(self, displacement_matrix):
         """Displace the experience by the displacement_matrix"""

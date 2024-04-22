@@ -10,7 +10,7 @@ class PhenomenonView(InteractiveDisplay):
     """Display a phenomenon"""
     def __init__(self, width=350, height=350, *args, **kwargs):
         super().__init__(width, height, resizable=True, *args, **kwargs)
-        self.set_caption("Terrain Phenomenon View")
+        # self.set_caption("Terrain Phenomenon View")
         self.set_minimum_size(150, 150)
 
         # # Initialize OpenGL parameters
@@ -31,10 +31,10 @@ class PhenomenonView(InteractiveDisplay):
         self.label1 = pyglet.text.Label('', font_name='Verdana', font_size=10, x=10, y=50)
         self.label1.color = (0, 0, 0, 255)
         self.label1.batch = self.label_batch
-        self.label2 = pyglet.text.Label('Confidence: None', font_name='Verdana', font_size=10, x=10, y=30)
+        self.label2 = pyglet.text.Label('', font_name='Verdana', font_size=10, x=10, y=30)
         self.label2.color = (0, 0, 0, 255)
         self.label2.batch = self.label_batch
-        self.label3 = pyglet.text.Label('Origin direction: None', font_name='Verdana', font_size=10, x=10, y=10)
+        self.label3 = pyglet.text.Label('Type: None', font_name='Verdana', font_size=10, x=10, y=10)
         self.label3.color = (0, 0, 0, 255)
         self.label3.batch = self.label_batch
 
@@ -82,3 +82,8 @@ class PhenomenonView(InteractiveDisplay):
                 # v_index += [nb_points]  # Close the loop
                 self.hull_line = self.batch.add_indexed(nb_points, gl.GL_LINES, self.forefront, index, ('v2i', points),
                                                         ('c4B', nb_points * (*name_to_rgb(color_string), 255)))
+
+    def on_mouse_scroll(self, x, y, dx, dy):
+        """ Zooming the window if the mouse is above the text"""
+        if y >= 50:
+            super().on_mouse_scroll(x, y, dx, dy)
