@@ -87,6 +87,15 @@ class AllocentricMemory:
                         c.status[0] = EXPERIENCE_FLOOR
                         c.phenomenon_id = TER
                         c.clock_place = clock
+
+                # for line in self.grid:
+                #     for c in line:
+                #         if not p.is_inside(c.point()):
+                #             for z in range(len(c.status)):  # Itérer sur la troisième dimension
+                #                 c.status[z] = EXPERIENCE_FLOOR
+                #             c.phenomenon_id = TER
+                #             c.clock_place = clock
+
             # If terrain category has been recognised
             if p_id == TER and p.confidence >= PHENOMENON_RECOGNIZE_CONFIDENCE:  # TERRAIN_ORIGIN_CONFIDENCE:
                 # Draw the terrain from its shape
