@@ -134,7 +134,7 @@ class Trajectory:
             self.prompt_point = matrix44.apply_to_vector(self.displacement_matrix, self.prompt_point).astype(int)
 
     def track_focus(self, outcome):
-        """Compute the focus_confidence and adjust it to new echo"""
+        """Track object: adjust the focus to the new echo and update the focus confidence"""
 
         new_echo = outcome.echo_point
         # If careful watch and there are central echoes then the focus is the first (closest)
@@ -170,11 +170,7 @@ class Trajectory:
 
         # If the robot was not focussed then check for catch focus
         elif new_focus is not None:
-            # if outcome.action_code in [ACTION_SCAN, ACTION_FORWARD, ACTION_TURN, ACTION_WATCH] \
-            #         and outcome.echo_point is not None:
-            # Catch focus
             self.focus_confidence = CONFIDENCE_NEW_FOCUS
-            # print("New focus ", new_focus)
 
         self.focus_point = new_focus
         if new_focus is not None:
@@ -184,15 +180,15 @@ class Trajectory:
         if self.focus_confidence == CONFIDENCE_NEW_FOCUS and self.span == 10:
             self.focus_confidence = CONFIDENCE_CAREFUL_SCAN
 
-        # Impact or block catch focus
-        if outcome.impact > 0 and outcome.action_code == ACTION_FORWARD:
-            if new_focus is None or np.linalg.norm(new_focus) > 200:
-                # Focus on the object "felt"
-                if outcome.impact == 0b01:
-                    self.focus_point = np.array([ROBOT_FLOOR_SENSOR_X + 10, -ROBOT_CHASSIS_Y, 0])
-                elif outcome.impact == 0b10:
-                    self.focus_point = np.array([ROBOT_FLOOR_SENSOR_X + 10, ROBOT_CHASSIS_Y, 0])
-                else:
-                    self.focus_point = np.array([ROBOT_FLOOR_SENSOR_X + 10, 0, 0])
+        # Impact or block catch focus TODO Move to Enacter select_focus()
+        if outcome.impact > 0 and outcome.action_code == ACTION_FORWARD and \
+                (new_focus is None or np.linalg.norm(new_focus) > 200):
+            # Focus on the object "felt"
+            if outcome.impact == 0b01:
+                self.focus_point = np.array([ROBOT_FLOOR_SENSOR_X + 10, -ROBOT_CHASSIS_Y, 0])
+            elif outcome.impact == 0b10:
+                self.focus_point = np.array([ROBOT_FLOOR_SENSOR_X + 10, ROBOT_CHASSIS_Y, 0])
+            else:
+                self.focus_point = np.array([ROBOT_FLOOR_SENSOR_X + 10, 0, 0])
             self.focus_confidence = CONFIDENCE_TOUCHED_FOCUS
             # print("Catch focus impact", self.focus_point)

@@ -30,11 +30,8 @@ class Simulator:
         # Initialize all the required fields of the outcome because sometimes simulate() is not called
         self.simulated_outcome_dict = {"clock": self.workspace.enaction.clock,
                                        "action": self.workspace.enaction.action.action_code,
-                                       # "duration1": self.workspace.enaction.command.duration,
                                        "head_angle": self.workspace.enaction.predicted_outcome.head_angle,
                                        "echo_distance": self.workspace.enaction.predicted_outcome.echo_distance,
-                                       # "yaw": self.workspace.enaction.command.yaw,
-                                       # "floor": 0, "color_index": 0,"status": "S"
                                        'floor': self.workspace.enaction.predicted_outcome.floor,
                                        'yaw': self.workspace.enaction.predicted_outcome.yaw,
                                        'duration1': self.workspace.enaction.predicted_outcome.duration1,

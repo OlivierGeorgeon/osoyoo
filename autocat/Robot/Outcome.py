@@ -114,7 +114,6 @@ class Outcome:
         self.clock = outcome_dict['clock']
         self.duration1 = outcome_dict['duration1']
         self.head_angle = outcome_dict['head_angle']
-        self.impact = outcome_dict.get('impact', 0)
 
         # The optional fields with default values
 
@@ -122,6 +121,7 @@ class Outcome:
         self.yaw = outcome_dict.get('yaw', None)
         self.azimuth = outcome_dict.get('azimuth', None)
         self.floor = outcome_dict.get('floor', 0)
+        self.impact = outcome_dict.get('impact', 0)
         self.blocked = outcome_dict.get('blocked', 0)
         self.touch = outcome_dict.get('touch', 0)
         self.confidence = outcome_dict.get('confidence', 100)  # The confidence of the predicted outcome
@@ -144,8 +144,8 @@ class Outcome:
 
         # Outcome echo
         self.echo_distance = outcome_dict.get('echo_distance', 10000)
-        self.echo_point = None
         self.echo_matrix = None
+        self.echo_point = None
         if self.echo_distance < 10000:
             self.echo_matrix = head_angle_distance_to_matrix(outcome_dict['head_angle'], outcome_dict['echo_distance'])
             self.echo_point = matrix44.apply_to_vector(self.echo_matrix, [0, 0, 0])

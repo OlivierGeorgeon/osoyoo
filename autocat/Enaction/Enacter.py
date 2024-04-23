@@ -1,8 +1,13 @@
+import numpy as np
 from ..Robot.CtrlRobot import ENACTION_STEP_IDLE, ENACTION_STEP_COMMANDING, ENACTION_STEP_ENACTING, \
     ENACTION_STEP_INTEGRATING, ENACTION_STEP_RENDERING
 from ..Memory.PhenomenonMemory import TERRAIN_ORIGIN_CONFIDENCE
 from ..Integrator.OutcomeCode import outcome_code
 from . import KEY_ENGAGEMENT_ROBOT, KEY_CONTROL_DECIDER, KEY_ENGAGEMENT_IMAGINARY
+from ..Proposer.Action import ACTION_FORWARD
+from ..Robot.RobotDefine import ROBOT_FLOOR_SENSOR_X, ROBOT_CHASSIS_Y, ROBOT_SETTINGS, ROBOT_CHASSIS_X, ROBOT_OUTSIDE_Y
+from ..Integrator.OutcomeCode import CONFIDENCE_TOUCHED_FOCUS
+from ..Memory.EgocentricMemory.Experience import EXPERIENCE_FLOOR
 
 
 class Enacter:
@@ -84,7 +89,10 @@ class Enacter:
             print("Simulated outcome", simulated_outcome)
             if self.is_imagining:
                 self.workspace.enaction.outcome = simulated_outcome
+
+            # Terminate the enaction using the outcome that come from the robot or from the simulation
             self.workspace.enaction.terminate()
+
             # Restore the memory from the snapshot
             serotonin = self.workspace.memory.body_memory.serotonin  # Handel user change  TODO improve
             dopamine = self.workspace.memory.body_memory.dopamine  # Handel user change
@@ -96,30 +104,39 @@ class Enacter:
             self.workspace.memory.body_memory.noradrenaline = noradrenaline
             if self.workspace.memory.phenomenon_memory.terrain() is not None:
                 self.workspace.memory.phenomenon_memory.terrain().confidence = confidence
+
             # Retrieve possible message from other robot
             if self.workspace.memory.phenomenon_memory.terrain_confidence() >= TERRAIN_ORIGIN_CONFIDENCE and \
                     self.workspace.message is not None:
                 self.workspace.enaction.message = self.workspace.message
                 print("Message", self.workspace.message.message_string)
-            # Force terminate the simulation
-            # simulated_outcome = self.workspace.simulator.end()
-            # print("Simulated outcome", simulated_outcome)
-            # Update memory
+
+            # Update memory, possibly create new phenomena
             self.workspace.memory.update(self.workspace.enaction)
-            # Compute the outcome code
+
+            # Select the focus
+            self.select_focus(self.workspace.memory)
+
+            # Compute the outcome code which depends on the updated memory
             self.workspace.enaction.outcome_code = outcome_code(self.workspace.memory,
                                                    self.workspace.enaction.trajectory, self.workspace.enaction.outcome)
+
             # Track the prediction errors
             self.workspace.prediction_error.log(self.workspace.enaction)
-            # Calibrate what can be improved
+            # Update the calibration values
             self.workspace.calibrator.calibrate()
-            # Increment the clock if the enacted interaction was properly received
+
+            # Increment the clock
             if self.workspace.enaction.clock >= self.workspace.memory.clock:  # don't increment if the robot is behind
                 self.workspace.memory.clock += 1
-            self.interaction_step = ENACTION_STEP_RENDERING
+            else:
+                print("Clock not incremented")  # TODO If never happens then remove the test
+
             # If the composite enaction is over or aborted due to floor or impact
-            if not self.workspace.composite_enaction.increment():  # or outcome.floor > 0 or outcome.impact > 0:
+            if not self.workspace.composite_enaction.increment():
                 self.workspace.composite_enaction = None
+
+            self.interaction_step = ENACTION_STEP_RENDERING
 
         # RENDERING: Will be reset to IDLE in the next cycle
         # if self.interaction_step == ENACTION_STEP_RENDERING:
@@ -142,3 +159,17 @@ class Enacter:
         self.workspace.decider_id = proposed_enactions[most_activated][0]
         print("Decider:", self.workspace.decider_id)
         return proposed_enactions[most_activated][1]
+
+    def select_focus(self, memory):
+        """Select a focus based on the phenomena in memory"""
+
+        # If no focus then look for phenomena that could attract focus
+        if memory.egocentric_memory.focus_point is None:
+            # The dict of distances of the dot phenomena beyond the floor sensor
+            k_d = {k: p.point[0] for k, p in memory.phenomenon_memory.phenomena.items() if p.phenomenon_type in
+                   [EXPERIENCE_FLOOR] and p.point[0] > ROBOT_FLOOR_SENSOR_X}
+            if len(k_d) > 0:
+                # The focus is at the position of the closest phenomenon
+                closest_dot_phenomenon = memory.phenomenon_memory.phenomena[min(k_d, key=k_d.get)]
+                memory.allocentric_memory.update_focus(closest_dot_phenomenon.point, memory.clock)
+                memory.egocentric_memory.focus_point = memory.allocentric_to_egocentric(closest_dot_phenomenon.point)
