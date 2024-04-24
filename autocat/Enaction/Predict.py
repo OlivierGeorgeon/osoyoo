@@ -2,7 +2,7 @@ import math
 import numpy as np
 import time
 import matplotlib.path as mpath
-from ..Proposer.Action import ACTION_FORWARD, ACTION_SWIPE, ACTION_RIGHTWARD, ACTION_SCAN
+from ..Proposer.Action import ACTION_FORWARD, ACTION_SWIPE, ACTION_RIGHTWARD, ACTION_SCAN, ACTION_BACKWARD
 from ..Memory.PhenomenonMemory import PHENOMENON_ENCLOSED_CONFIDENCE
 from ..Memory.AllocentricMemory.Hexagonal_geometry import point_to_cell
 from ..Memory.EgocentricMemory.Experience import EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_FLOOR
@@ -84,22 +84,24 @@ def generate_prediction(command, memory):
 
     # Predict crossing a dot phenomenon
 
+    dots = [memory.allocentric_to_egocentric(p.point) for p in memory.phenomenon_memory.phenomena.values()
+            if p.phenomenon_type == EXPERIENCE_FLOOR]
+    # Test crossing dot phenomenon while moving forward
     if command.action.action_code == ACTION_FORWARD:
-        dots = [p.point for p in memory.phenomenon_memory.phenomena.values() if p.phenomenon_type == EXPERIENCE_FLOOR
-            and p.point[0] > ROBOT_FLOOR_SENSOR_X and abs(p.point[1]) < 20]
+        dots = [p for p in dots if p[0] > ROBOT_FLOOR_SENSOR_X and abs(p[1]) < 20]
         if len(dots) > 0:
             closest_dot = dots[np.argmin(np.array(dots)[:, 0])]
             duration1 = (closest_dot[0] - ROBOT_FLOOR_SENSOR_X) * 1000 / ROBOT_SETTINGS[memory.robot_id]["forward_speed"]
             if duration1 < command.duration:
-                outcome_dict["duration1"] = round(duration1)
-                if closest_dot[1] > 10:
-                    outcome_dict["floor"] = 0b10
-                    outcome_dict["yaw"] = RETREAT_YAW
-                elif closest_dot[1] > -10:
-                    outcome_dict["floor"] = 0b11
-                else:
-                    outcome_dict["floor"] = 0b01
-                    outcome_dict["yaw"] = -RETREAT_YAW
+                record_dot_retreat(outcome_dict, duration1, closest_dot[1])
+    # Test crossing dot phenomenon while moving backward
+    elif command.action.action_code == ACTION_BACKWARD:
+        dots = [p for p in dots if p[0] < ROBOT_FLOOR_SENSOR_X and abs(p[1]) < 20]
+        if len(dots) > 0:
+            closest_dot = dots[np.argmax(np.array(dots)[:, 0])]
+            duration1 = (ROBOT_FLOOR_SENSOR_X - closest_dot[0]) * 1000 / ROBOT_SETTINGS[memory.robot_id]["forward_speed"]
+            if duration1 < command.duration:
+                record_dot_retreat(outcome_dict, duration1, closest_dot[1])
 
     # Compute the displacement in memory
 
@@ -210,3 +212,16 @@ def y_intersection(line):
         return None
     else:
         return y
+
+
+def record_dot_retreat(outcome_dict, duration1, closest_dot_y):
+    """Record the retreat when crossed a DOT phenomenon"""
+    outcome_dict["duration1"] = round(duration1)
+    if closest_dot_y > 10:
+        outcome_dict["floor"] = 0b10
+        outcome_dict["yaw"] = RETREAT_YAW
+    elif closest_dot_y > -10:
+        outcome_dict["floor"] = 0b11
+    else:
+        outcome_dict["floor"] = 0b01
+        outcome_dict["yaw"] = -RETREAT_YAW

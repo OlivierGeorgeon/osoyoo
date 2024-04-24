@@ -4,10 +4,19 @@ from ..Robot.CtrlRobot import ENACTION_STEP_IDLE, ENACTION_STEP_COMMANDING, ENAC
 from ..Memory.PhenomenonMemory import TERRAIN_ORIGIN_CONFIDENCE
 from ..Integrator.OutcomeCode import outcome_code
 from . import KEY_ENGAGEMENT_ROBOT, KEY_CONTROL_DECIDER, KEY_ENGAGEMENT_IMAGINARY
-from ..Proposer.Action import ACTION_FORWARD
-from ..Robot.RobotDefine import ROBOT_FLOOR_SENSOR_X, ROBOT_CHASSIS_Y, ROBOT_SETTINGS, ROBOT_CHASSIS_X, ROBOT_OUTSIDE_Y
-from ..Integrator.OutcomeCode import CONFIDENCE_TOUCHED_FOCUS
+from ..Robot.RobotDefine import ROBOT_FLOOR_SENSOR_X
 from ..Memory.EgocentricMemory.Experience import EXPERIENCE_FLOOR
+from ..Proposer.Proposer import Proposer
+from ..Proposer.ProposerExplore import ProposerExplore
+from ..Proposer.ProposerWatch import ProposerWatch
+from ..Proposer.ProposerPush import ProposerPush
+from ..Proposer.ProposerWatchCenter import ProposerWatchCenter
+from ..Proposer.ProposerArrange import ProposerArrange
+from ..Proposer.ProposerPlayForward import ProposerPlayForward
+from ..Proposer.ProposerPlayTurn import ProposerPlayTurn
+from ..Proposer.ProposerPlaySwipe import ProposerPlaySwipe
+from ..Proposer.ProposerPlayTerrain import ProposerPlayTerrain
+from ..Proposer.ProposerPlayDot import ProposerPlayDot
 
 
 class Enacter:
@@ -17,6 +26,16 @@ class Enacter:
         self.memory_snapshot = None
         self.is_imagining = False
         self.memory_before_imaginary = None
+        self.proposers = {'Circle ': Proposer(self.workspace)
+                          # , 'Play Turn': ProposerPlayTurn(self)
+                          # , 'Explore': ProposerExplore(self)
+                          , 'Watch': ProposerWatch(self.workspace)
+                          # , 'Watch C': ProposerWatchCenter(self),  'Arrange': ProposerArrange(self)
+                          , 'Push': ProposerPush(self.workspace)
+                          # , 'Play': ProposerPlayForward(self)
+                          # , "Play terrain": ProposerPlayTerrain(self)
+                          , "Play DOT": ProposerPlayDot(self.workspace)
+                          }
 
     def main(self, dt):
         """Controls the enaction."""
@@ -144,21 +163,23 @@ class Enacter:
 
     def decide(self):
         """Return the selected composite enaction"""
-        proposed_enactions = []
-        for name, proposer in self.workspace.proposers.items():
+        # Each proposer adds a proposition to the list
+        propositions = []
+        for name, proposer in self.proposers.items():
             activation = proposer.activation_level()  # Must compute before proposing
             # print("Computing proposition", name, "with focus", self.memory.egocentric_memory.focus_point)
             enaction = proposer.propose_enaction()
             if enaction is not None:
-                proposed_enactions.append([name, enaction, activation])
-        # The enaction that has the highest activation is selected
+                propositions.append([name, enaction, activation])
         print("Proposed enactions:")
-        for p in proposed_enactions:
+        for p in propositions:
             print(" ", p[0], ":", p[1], p[2])
-        most_activated = proposed_enactions.index(max(proposed_enactions, key=lambda p: p[2]))
-        self.workspace.decider_id = proposed_enactions[most_activated][0]
+
+        # Select the enaction that has the highest activation value
+        most_activated_index = propositions.index(max(propositions, key=lambda p: p[2]))
+        self.workspace.decider_id = propositions[most_activated_index][0]
         print("Decider:", self.workspace.decider_id)
-        return proposed_enactions[most_activated][1]
+        return propositions[most_activated_index][1]
 
     def select_focus(self, memory):
         """Select a focus based on the phenomena in memory"""
@@ -169,7 +190,9 @@ class Enacter:
             k_d = {k: p.point[0] for k, p in memory.phenomenon_memory.phenomena.items() if p.phenomenon_type in
                    [EXPERIENCE_FLOOR] and p.point[0] > ROBOT_FLOOR_SENSOR_X}
             if len(k_d) > 0:
-                # The focus is at the position of the closest phenomenon
-                closest_dot_phenomenon = memory.phenomenon_memory.phenomena[min(k_d, key=k_d.get)]
+                # Focus at the closest phenomenon
+                closest_key = min(k_d, key=k_d.get)
+                memory.phenomenon_memory.focus_phenomenon_id = closest_key
+                closest_dot_phenomenon = memory.phenomenon_memory.phenomena[closest_key]
                 memory.allocentric_memory.update_focus(closest_dot_phenomenon.point, memory.clock)
                 memory.egocentric_memory.focus_point = memory.allocentric_to_egocentric(closest_dot_phenomenon.point)
