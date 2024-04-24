@@ -134,7 +134,7 @@ def generate_prediction(command, memory):
         print("echo distance", outcome_dict['echo_distance'])
     elif trajectory.focus_point is not None:  # Focus not on an object
         outcome_dict['head_angle'], _ = point_to_head_direction_distance(trajectory.focus_point)
-    outcome_dict['head_angle'] = max(-90, min(outcome_dict['head_angle'], 90))
+    outcome_dict['head_angle'] = round(max(-90, min(outcome_dict['head_angle'], 90)))
 
     predicted_outcome = Outcome(outcome_dict)
 
