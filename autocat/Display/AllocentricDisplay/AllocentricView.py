@@ -1,3 +1,4 @@
+import numpy as np
 import pyglet
 from pyglet.gl import *
 from ...Utils import quaternion_translation_to_matrix
@@ -7,8 +8,8 @@ from ...Memory.AllocentricMemory.Hexagonal_geometry import point_to_cell
 from ...Memory.EgocentricMemory.Experience import EXPERIENCE_ROBOT
 from ..InteractiveDisplay import InteractiveDisplay
 from ..PointOfInterest import PointOfInterest, POINT_ROBOT
-
-
+from ...Memory.AllocentricMemory.AllocentricMemory import STATUS_0, STATUS_4
+from ...Memory.AllocentricMemory.GridCell import CELL_UNKNOWN
 NB_CELL_WIDTH = 30
 NB_CELL_HEIGHT = 100
 CELL_RADIUS = 50
@@ -71,20 +72,23 @@ class AllocentricView(InteractiveDisplay):
         # self.total_dx = 0
         # self.total_dy = 0
 
-    def update_hexagon(self, cell):
+    def update_hexagon(self, i, j, cell):
         """Create or update or delete an hexagon in allocentric view."""
-        if self.hexagons[cell.i][cell.j] is None:
-            if cell.is_known():
+
+        if self.hexagons[i][j] is None:
+            #if cell[STATUS_0:STATUS_4].is_known():
+            if not np.array_equal(cell[STATUS_0:STATUS_4], np.array([CELL_UNKNOWN,CELL_UNKNOWN,CELL_UNKNOWN,CELL_UNKNOWN,CELL_UNKNOWN])):
                 # Create the hexagon
-                self.hexagons[cell.i][cell.j] = CellDisplay(cell, self.batch, self.groups, self.workspace.memory.clock)
+                self.hexagons[i][j] = CellDisplay(cell, self.batch, self.groups, self.workspace.memory.clock)
         else:
-            if cell.is_known():
+            #if cell.is_known():
+            if not np.array_equal(cell[STATUS_0:STATUS_4], np.array([CELL_UNKNOWN,CELL_UNKNOWN,CELL_UNKNOWN,CELL_UNKNOWN,CELL_UNKNOWN])):
                 # Update the hexagon
-                self.hexagons[cell.i][cell.j].update_color(cell, self.workspace.memory.clock)
+                self.hexagons[i][j].update_color(cell, self.workspace.memory.clock)
             else:
                 # Delete the hexagon
-                self.hexagons[cell.i][cell.j].delete()
-                self.hexagons[cell.i][cell.j] = None
+                self.hexagons[i][j].delete()
+                self.hexagons[i][j] = None
 
     def on_draw(self):
         """ Drawing the window """

@@ -29,6 +29,8 @@ CLOCK_NO_ECHO = 12
 CLOCK_INTERACTION = 4
 CLOCK_PHENOMENON = 10
 PHENOMENON_ID = 5
+POINT_X = 13
+POINT_Y = 14
 
 class AllocentricMemory:
     """The agent's allocentric memory made with an hexagonal grid."""
@@ -60,7 +62,7 @@ class AllocentricMemory:
 
         # Fill the grid with cells
         # self.grid = list()
-        self.grid = np.zeros((height, width, 10), dtype=int)
+        self.grid = np.zeros((width, height, 15), dtype=int)
 
         # Use negative grid index for negative positions
 
@@ -94,7 +96,7 @@ class AllocentricMemory:
                     for i in range(self.min_i, self.max_i):
                         for j in range(self.min_j, self.max_j):
                             point = cell_to_point(i, j)
-                            if path.contains_point(point[0:2]):
+                            if p.is_inside(point):
                                 self.grid[i][j][STATUS_0] = EXPERIENCE_FLOOR
                                 self.grid[i][j][PHENOMENON_ID] = TER
                                 self.grid[i][j][CLOCK_PLACE] = clock

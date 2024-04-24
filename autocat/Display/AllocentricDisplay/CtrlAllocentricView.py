@@ -149,8 +149,11 @@ class CtrlAllocentricView:
 
     def update_view(self):
         """Update the allocentric view from the status in the allocentric grid cells"""
-        for c in [c for line in self.workspace.memory.allocentric_memory.grid for c in line]:
-            self.view.update_hexagon(c)
+        # for c in [c for line in self.workspace.memory.allocentric_memory.grid for c in line]:
+        #     self.view.update_hexagon(c)
+        for i in range(self.workspace.memory.allocentric_memory.min_i, self.workspace.memory.allocentric_memory.max_i):
+            for j in range(self.workspace.memory.allocentric_memory.min_j, self.workspace.memory.allocentric_memory.max_j):
+                self.view.update_hexagon(i, j, self.workspace.memory.allocentric_memory.grid[i][j][:])
         # Update the other robot
         # if ROBOT1 in self.workspace.memory.phenomenon_memory.phenomena:
         #     self.view.update_robot_poi(self.workspace.memory.phenomenon_memory.phenomena[ROBOT1])
