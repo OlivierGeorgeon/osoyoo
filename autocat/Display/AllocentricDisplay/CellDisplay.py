@@ -9,7 +9,7 @@ from ...Memory.EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_A
     EXPERIENCE_ROBOT, FLOOR_COLORS
 from ...Memory.AllocentricMemory.GridCell import CELL_UNKNOWN, CELL_NO_ECHO
 from ...Memory.AllocentricMemory.Hexagonal_geometry import CELL_RADIUS
-from ...Memory.AllocentricMemory.AllocentricMemory import STATUS_0, STATUS_2, STATUS_3, STATUS_1, STATUS_4, POINT_X, POINT_Y
+from ...Memory.AllocentricMemory.AllocentricMemory import STATUS_0, STATUS_2, STATUS_3, STATUS_1, STATUS_4, POINT_X, POINT_Y, CLOCK_INTERACTION, CLOCK_PLACE
 SCALE_LEVEL_0 = 2.5  # 3
 SCALE_LEVEL_1 = 0.8  # 0.9
 SCALE_LEVEL_2 = 0.6  # 0.65
@@ -52,13 +52,12 @@ class CellDisplay:
         for i in range(0, 5):
             point = matrix44.apply_to_vector(rotation_matrix, point)
             points.append(point)
-        points += cell_point
-        #points.extend(cell_point)
+        points += np.array(cell_point)
 
         points = np.array([p[0:2] for p in points]).flatten().astype(int).tolist()
-        color = (*name_to_rgb('white'), 0)
+
         return self.batch.add_indexed(6, gl.GL_TRIANGLES, group, [0, 1, 2, 0, 2, 3, 0, 3, 4, 0, 4, 5],
-                                      ('v2i', points), ('c4B', color * 6))
+                                      ('v2i', points), ('c4B', (*name_to_rgb('white'), 0) * 6))
 
     def update_color(self, cell, clock):
         """Update the color and opacity of the shapes based on the cell status"""
@@ -78,7 +77,7 @@ class CellDisplay:
             opacity1 = 0
         if cell[STATUS_0] == EXPERIENCE_PLACE:
             color1 = name_to_rgb('Lavender')  # name_to_rgb('LightGreen')  # name_to_rgb(FLOOR_COLORS[0])
-            opacity1 = int(max(255 * (30 - clock + cell.clock_place) / 30, 0))
+            opacity1 = int(max(255 * (30 - clock + cell[CLOCK_PLACE]) / 30, 0))
         if cell[STATUS_0] == EXPERIENCE_FLOOR:
             if cell.color_index == 0:
                 color1 = name_to_rgb('black')
@@ -99,19 +98,19 @@ class CellDisplay:
         #     color2 = name_to_rgb('LightGreen')  # LightGreen
         if cell[STATUS_1] == EXPERIENCE_BLOCK:
             color2 = name_to_rgb('salmon')
-            opacity2 = int(max(255 * (10 - clock + cell.clock_interaction) / 10, 0))
+            opacity2 = int(max(255 * (10 - clock + cell[CLOCK_INTERACTION]) / 10, 0))
         if cell[STATUS_1] == EXPERIENCE_IMPACT:
             color2 = name_to_rgb('salmon')
-            opacity2 = int(max(255 * (10 - clock + cell.clock_interaction) / 10, 0))
+            opacity2 = int(max(255 * (10 - clock + cell[CLOCK_INTERACTION]) / 10, 0))
         if cell[STATUS_1] == EXPERIENCE_ROBOT:
             color2 = name_to_rgb('lightSteelBlue')
-            opacity2 = int(max(255 * (10 - clock + cell.clock_interaction) / 10, 0))
+            opacity2 = int(max(255 * (10 - clock + cell[CLOCK_INTERACTION]) / 10, 0))
         if cell[STATUS_1] == EXPERIENCE_ALIGNED_ECHO:
             color2 = name_to_rgb('orange')
-            opacity2 = int(max(255 * (10 - clock + cell.clock_interaction) / 10, 0))
+            opacity2 = int(max(255 * (10 - clock + cell[CLOCK_INTERACTION]) / 10, 0))
         if cell[STATUS_1] == EXPERIENCE_CENTRAL_ECHO:
             color2 = name_to_rgb('sienna')
-            opacity2 = int(max(255 * (10 - clock + cell.clock_interaction) / 10, 0))
+            opacity2 = int(max(255 * (10 - clock + cell[CLOCK_INTERACTION]) / 10, 0))
         # if cell.status[1] == CELL_PHENOMENON:
         #     color2 = name_to_rgb('yellow')
         # Reset the color of the shape1
