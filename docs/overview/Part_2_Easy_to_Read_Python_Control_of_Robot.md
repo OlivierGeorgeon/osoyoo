@@ -1291,10 +1291,44 @@ Ok.... so the hardware works.
 ![wifiesp.png](wifiesp.png)
 
 -
+<b>--></b>Look at the Serial Monitor in the Arduino IDE -- there has been success now in connecting to the Wi-Fi.
+
+>>>>  Look for the IP Address  <<<<
+
+You need to provide this IP Address to the Python code so it knows how to address the PetitCat robot car.
+
+In the example above we see that the IP Address is 10.0.0.40
+
+>>>> You need to pass this IP Address to the Python program <<<<
+
+Thus at the command line write:
+
+"python test_remote_control_robot.py 10.0.0.40"
+
+(Note1:  In the future if the name of the PetitCat Python program changes then use whatever name it has, e.g., if it changed to "petcat" then in this case you would write "python petcat 10.0.0.40")
+
+(Note2:  On my system the IP Address is 10.0.0.40 -- on your system it might be some other address. For example, if it is 10.0.0.41 then at the command line you would write:
+
+"python test_remote_control_robot.py 10.0.0.41" )
+
+(Note3: Of course, you don't add quotes "" to your command line -- they are shown here in documentation to indicate that you are copying this text. For example in Windows terminal you would be writing after the prompt (e.g., > prompt) :
+
+>python test_remote_control_robot.py 10.0.0.4
+
+And on Mac and Linux systems, of course, you will have a slightly different prompt, often a $)
+
+
+Ok, let's try it out -- we will pass the IP Address 10.0.0.40 to the Python code:
+
+-
 
 ![connected](connected.png)
 
 -
+
+Success!!  Everything seems to run ok.
+
+Now let's try it out. Unplug the robot car from the USB and put it down on the floor. Enter an '8' into the keyboard attached to the computer running the Python code. The car goes forward. Then enter a '2' -- the car goes backwards. Success!!
 
 
 
