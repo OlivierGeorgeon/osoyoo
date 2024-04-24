@@ -1,4 +1,4 @@
-# Setup the environment
+# Software setup
 
 ## Install Pycharm
 
