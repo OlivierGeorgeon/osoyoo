@@ -1330,6 +1330,13 @@ Success!!  Everything seems to run ok.
 
 Now let's try it out. Unplug the robot car from the USB and put it down on the floor. Enter an '8' into the keyboard attached to the computer running the Python code. The car goes forward. Then enter a '2' -- the car goes backwards. Success!!
 
+-
+
+![successpic](successpic.png)
+
+Well, you probably notice you are at the end of Part 2. 
+
+In the next part of the Overview series, Part 3, we will review in more depth the Arduino *.ino code and the Python *.py code that form the PetitCat system. We will also start considering how to use the PetitCat system to model active inference. 
 
 
 ****
