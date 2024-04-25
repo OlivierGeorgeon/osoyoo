@@ -54,10 +54,10 @@ class PredictionError:
         pe = int(enaction.predicted_outcome_code != enaction.outcome_code)
         self.pe_outcome_code[enaction.clock] = pe
         self.pe_outcome_code.pop(actual_outcome.clock - PREDICTION_ERROR_WINDOW, None)
-        print("Prediction Error Outcome Code", pe,
-              "(predicted:", enaction.predicted_outcome_code, ", actual:", enaction.outcome_code, ")",
-              "Average:", round(float(np.mean(list(self.pe_outcome_code.values())))),
-              "std:", round(float(np.std(list(self.pe_outcome_code.values())))))
+        print("Prediction Error Outcome Code",
+              f"(predicted:{enaction.predicted_outcome_code}, actual:{enaction.outcome_code})= {pe}",
+              f"Average: {np.mean(list(self.pe_outcome_code.values())):.1f}",
+              f"std: {np.std(list(self.pe_outcome_code.values())):.1f}")
 
         # Translation FORWARD duration1
 
@@ -65,9 +65,9 @@ class PredictionError:
             pe = (computed_outcome.duration1 - actual_outcome.duration1) / 1000  # / actual_outcome.duration1
             self.pe_forward_duration1[enaction.clock] = pe
             self.pe_forward_duration1.pop(actual_outcome.clock - PREDICTION_ERROR_WINDOW, None)
-            print("Prediction Error Translate duration1 (simulation - measured)=", round(pe),
-                  "Average:", round(float(np.mean(list(self.pe_forward_duration1.values()))), 2),
-                  "std:", round(float(np.std(list(self.pe_forward_duration1.values())))), 2)
+            print(f"Prediction Error Translate duration1 (simulation - measured)= {pe:.3f}",
+                  f"Average: {np.mean(list(self.pe_forward_duration1.values())):.3f}",
+                  f"std: {np.std(list(self.pe_forward_duration1.values())):.3f}")
 
             # Forward speed
 

@@ -3,7 +3,7 @@ import numpy as np
 from pyrr import Quaternion, Vector3, matrix44
 from ..Robot.RobotDefine import ROBOT_FLOOR_SENSOR_X
 from ..Memory.PhenomenonMemory import PHENOMENON_ENCLOSED_CONFIDENCE
-from ..Proposer.Action import ACTION_SWIPE, ACTION_FORWARD, ACTION_SCAN
+from ..Proposer.Action import ACTION_SWIPE, ACTION_FORWARD, ACTION_SCAN, ACTION_BACKWARD
 from ..Robot.Outcome import Outcome
 from ..Memory.AllocentricMemory.Hexagonal_geometry import point_to_cell
 from ..Memory.EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO
@@ -42,11 +42,8 @@ class Simulator:
         # Initialize all the required fields of the outcome because sometimes simulate() is not called
         self.simulated_outcome_dict = {"clock": self.workspace.enaction.clock,
                                        "action": self.workspace.enaction.action.action_code,
-                                       # "duration1": self.workspace.enaction.command.duration,
                                        "head_angle": self.workspace.enaction.predicted_outcome.head_angle,
                                        "echo_distance": self.workspace.enaction.predicted_outcome.echo_distance,
-                                       # "yaw": self.workspace.enaction.command.yaw,
-                                       # "floor": 0, "color_index": 0,"status": "S"
                                        'floor': self.workspace.enaction.predicted_outcome.floor,
                                        'yaw': self.workspace.enaction.predicted_outcome.yaw,
                                        'duration1': self.workspace.enaction.predicted_outcome.duration1,
@@ -90,10 +87,7 @@ class Simulator:
         # Simulate the movement of the head to the focus
         if memory.egocentric_memory.focus_point is not None:
             head_direction_degree, _ = point_to_head_direction_distance(memory.egocentric_memory.focus_point)
-            # head_direction_degree = max(-90, min(head_direction_degree, 90))
             memory.body_memory.set_head_direction_degree(head_direction_degree)
-        # else:
-        #     head_direction_degree = memory.body_memory.head_direction_degree()
 
         # Simulate the movement of the head when SCAN
         if enaction.action.action_code == ACTION_SCAN:
@@ -105,7 +99,7 @@ class Simulator:
 
         # If terrain is not enclosed then check for floor cells
         if memory.phenomenon_memory.terrain_confidence() < PHENOMENON_ENCLOSED_CONFIDENCE:
-            if enaction.action.action_code in [ACTION_FORWARD, ACTION_SWIPE]:
+            if enaction.action.action_code in [ACTION_FORWARD, ACTION_SWIPE, ACTION_BACKWARD]:
                 i, j = point_to_cell(memory.allocentric_memory.robot_point +
                                      memory.body_memory.body_quaternion * Vector3([ROBOT_FLOOR_SENSOR_X, 0, 0]))
                 # If crossed the line then stop the simulation

@@ -114,9 +114,9 @@ class CtrlBodyView:
 
     def body_label(self, action):
         """Return the label to display in the body view"""
-        rotation_speed = "{:.1f}°/s".format(math.degrees(action.rotation_speed_rad))
-        label = "Speed x: " + str(int(action.translation_speed[0])) + "mm/s, y: " \
-            + str(int(action.translation_speed[1])) + "mm/s, rotation:" + rotation_speed
+        # rotation_speed = "{:.1f}°/s".format(math.degrees(action.rotation_speed_rad))
+        label = f"Translation: ({action.translation_speed[0]:.0f}, {action.translation_speed[1]:.0f}) mm/s, " \
+                f"rotation: {math.degrees(action.rotation_speed_rad):.1f}°/s"
         return label
 
     def body_label_azimuth(self, enaction):

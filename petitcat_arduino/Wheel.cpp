@@ -145,10 +145,11 @@ void Wheel::stopMotion()    //Stop
 
 void Wheel::setMotion(int speed_fl, int speed_rl, int speed_rr, int speed_fr)
 {
-  frontLeftWheel(speed_fl);
-  rearLeftWheel(speed_rl);
-  rearRightWheel(speed_rr);
-  frontRightWheel(speed_fr);
+  // Apply the corrective coefficient of each wheel
+  frontLeftWheel(speed_fl * FRONT_LEFT_WHEEL_COEF);
+  rearLeftWheel(speed_rl * REAR_LEFT_WHEEL_COEF);
+  rearRightWheel(speed_rr * FRONT_RIGHT_WHEEL_COEF);
+  frontRightWheel(speed_fr * REAR_RIGHT_WHEEL_COEF);
 }
 
 /*motor control*/
@@ -160,14 +161,14 @@ void Wheel::frontRightWheel(int speed)
     // Forward
     digitalWrite(RightMotorDirPin1,LOW);
     digitalWrite(RightMotorDirPin2,HIGH);
-    analogWrite(speedPinR,speed * ROBOT_FRONT_RIGHT_WHEEL_COEF);
+    analogWrite(speedPinR,speed);
   }
   else
   {
     // Backward
     digitalWrite(RightMotorDirPin1,HIGH);
     digitalWrite(RightMotorDirPin2,LOW);
-    analogWrite(speedPinR,-speed * ROBOT_FRONT_RIGHT_WHEEL_COEF);
+    analogWrite(speedPinR,-speed);
   }
 }
 
@@ -178,14 +179,14 @@ void Wheel::frontLeftWheel(int speed)
     // Forward
     digitalWrite(LeftMotorDirPin1,LOW);
     digitalWrite(LeftMotorDirPin2,HIGH);
-    analogWrite(speedPinL,speed * ROBOT_FRONT_LEFT_WHEEL_COEF);
+    analogWrite(speedPinL,speed);
   }
   else
   {
     // Backward
     digitalWrite(LeftMotorDirPin1,HIGH);
     digitalWrite(LeftMotorDirPin2,LOW);
-    analogWrite(speedPinL,-speed * ROBOT_FRONT_LEFT_WHEEL_COEF);
+    analogWrite(speedPinL,-speed);
   }
 }
 
@@ -196,14 +197,14 @@ void Wheel::rearRightWheel(int speed)
     // Forward
     digitalWrite(RightMotorDirPin1B, LOW);
     digitalWrite(RightMotorDirPin2B,HIGH);
-    analogWrite(speedPinRB,speed * ROBOT_REAR_RIGHT_WHEEL_COEF); // corrective coefficient depends on robot
+    analogWrite(speedPinRB,speed);
   }
   else
   {
     // Backward
     digitalWrite(RightMotorDirPin1B, HIGH);
     digitalWrite(RightMotorDirPin2B,LOW);
-    analogWrite(speedPinRB,-speed * ROBOT_REAR_RIGHT_WHEEL_COEF); // corrective coefficient depends on robot
+    analogWrite(speedPinRB,-speed);
   }
 }
 
@@ -214,13 +215,13 @@ void Wheel::rearLeftWheel(int speed)
     // Forward
     digitalWrite(LeftMotorDirPin1B,LOW);
     digitalWrite(LeftMotorDirPin2B,HIGH);
-    analogWrite(speedPinLB,speed * ROBOT_REAR_LEFT_WHEEL_COEF); // corrective coefficient depends on robot
+    analogWrite(speedPinLB,speed);
   }
   else
   {
     // Backward
     digitalWrite(LeftMotorDirPin1B,HIGH);
     digitalWrite(LeftMotorDirPin2B,LOW);
-    analogWrite(speedPinLB,-speed * ROBOT_REAR_LEFT_WHEEL_COEF); // corrective coefficient depends on robot
+    analogWrite(speedPinLB,-speed);
   }
 }

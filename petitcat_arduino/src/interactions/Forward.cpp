@@ -81,7 +81,7 @@ void Forward::ongoing()
   // If no floor change nor impact, check whether duration has elapsed
   else if (_action_end_time < millis())
   {
-    if (!_HEA._is_enacting_head_alignment)
+    if (_align > 0 && !_HEA._is_enacting_head_alignment)
       _HEA.beginEchoAlignment();  // Force HEA
     _duration1 = millis()- _action_start_time;
     _FLO._OWM.stopMotion();

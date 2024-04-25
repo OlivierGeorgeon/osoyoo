@@ -8,6 +8,7 @@ from ..Utils import short_angle, translation_quaternion_to_matrix, head_angle_di
     point_to_head_direction_distance
 from ..Robot.RobotDefine import ROBOT_FLOOR_SENSOR_X, ROBOT_CHASSIS_Y, ROBOT_SETTINGS, ROBOT_CHASSIS_X, ROBOT_OUTSIDE_Y
 from ..Memory.PhenomenonMemory import ARRANGE_OBJECT_RADIUS
+from ..Memory.EgocentricMemory.EgocentricMemory import EXPERIENCE_ALIGNED_ECHO
 
 FOCUS_MAX_DELTA = 200  # 200 (mm) Maximum delta to keep focus
 
@@ -40,8 +41,11 @@ class Trajectory:
             self.prompt_point = memory.egocentric_memory.prompt_point.copy()
         # The focus
         self.focus_point = None
+        self.focus_phenomenon = None
         if memory.egocentric_memory.focus_point is not None:
             self.focus_point = memory.egocentric_memory.focus_point.copy()
+            if memory.phenomenon_memory.focus_phenomenon_id is not None:
+                self.focus_phenomenon = memory.phenomenon_memory.phenomena[memory.phenomenon_memory.focus_phenomenon_id]
 
     def track_displacement(self, outcome):
         """Compute the displacement from the duration1, yaw, floor, impact"""
@@ -134,65 +138,76 @@ class Trajectory:
             self.prompt_point = matrix44.apply_to_vector(self.displacement_matrix, self.prompt_point).astype(int)
 
     def track_focus(self, outcome):
-        """Compute the focus_confidence and adjust it to new echo"""
+        """Track object: adjust the focus to the new echo and update the focus confidence"""
 
-        new_echo = outcome.echo_point
-        # If careful watch and there are central echoes then the focus is the first (closest)
-        if self.span == 10 and len(outcome.central_echos) > 0:
-            new_echo = head_angle_distance_to_point(*outcome.central_echos[0])
-
-        # The new focus is at the center of the object  TODO must recognize the object
-        if new_echo is None:
-            new_focus = None
-        else:
-            a, d = point_to_head_direction_distance(new_echo)
-            new_focus = head_angle_distance_to_point(a, d + ARRANGE_OBJECT_RADIUS)
-
-        # If the robot was focussed then adjust the focus and the displacement
-        if self.focus_point is not None:
-            if new_focus is not None:
-                # The error between the expected and the actual position of the echo
-                prediction_error_focus = self.focus_point - new_focus
-                # If the new focus is near the previous focus or the displacement has been continuous.
-                if np.linalg.norm(prediction_error_focus) < FOCUS_MAX_DELTA or outcome.status == "continuous":
-                    # The focus has been kept
-                    # print("Focus kept with prediction error", prediction_error_focus, "moved to ", new_focus)
-                    self.focus_confidence = CONFIDENCE_CONFIRMED_FOCUS
-                else:
-                    # The focus was lost
-                    # print("Focus delta:", prediction_error_focus, "New focus:", new_focus)
-                    self.focus_confidence = CONFIDENCE_NEW_FOCUS
+        # If was focusing at an object phenomenon
+        if self.focus_point is not None and self.focus_phenomenon is not None and \
+                self.focus_phenomenon.phenomenon_type == EXPERIENCE_ALIGNED_ECHO:
+            # If the focus was kept close enough
+            if outcome.echo_point is not None and (np.linalg.norm(self.focus_point - outcome.echo_point)
+                                                   < FOCUS_MAX_DELTA or outcome.status == "continuous"):
+                # The focus is confirmed and adjusted
+                self.focus_confidence = CONFIDENCE_CONFIRMED_FOCUS
+                self.focus_point = outcome.echo_point
             else:
                 # The focus was lost
-                # print("Lost focus due to no echo ", new_focus)
                 self.focus_confidence = CONFIDENCE_NO_FOCUS
-                # self.head_direction_rad = math.atan2(self.focus_point[1], self.focus_point[0])  # look at old focus
+                self.focus_point = None
+                self.focus_phenomenon = None
 
-        # If the robot was not focussed then check for catch focus
-        elif new_focus is not None:
-            # if outcome.action_code in [ACTION_SCAN, ACTION_FORWARD, ACTION_TURN, ACTION_WATCH] \
-            #         and outcome.echo_point is not None:
-            # Catch focus
-            self.focus_confidence = CONFIDENCE_NEW_FOCUS
-            # print("New focus ", new_focus)
-
-        self.focus_point = new_focus
-        if new_focus is not None:
-            self.head_direction_degree = math.degrees(math.atan2(new_focus[1], new_focus[0]))
-
-        # Careful scan has extra confidence
-        if self.focus_confidence == CONFIDENCE_NEW_FOCUS and self.span == 10:
-            self.focus_confidence = CONFIDENCE_CAREFUL_SCAN
-
-        # Impact or block catch focus
-        if outcome.impact > 0 and outcome.action_code == ACTION_FORWARD:
-            if new_focus is None or np.linalg.norm(new_focus) > 200:
-                # Focus on the object "felt"
-                if outcome.impact == 0b01:
-                    self.focus_point = np.array([ROBOT_FLOOR_SENSOR_X + 10, -ROBOT_CHASSIS_Y, 0])
-                elif outcome.impact == 0b10:
-                    self.focus_point = np.array([ROBOT_FLOOR_SENSOR_X + 10, ROBOT_CHASSIS_Y, 0])
-                else:
-                    self.focus_point = np.array([ROBOT_FLOOR_SENSOR_X + 10, 0, 0])
-            self.focus_confidence = CONFIDENCE_TOUCHED_FOCUS
-            # print("Catch focus impact", self.focus_point)
+        # new_echo = outcome.echo_point
+        # # If careful watch and there are central echoes then the focus is the first (closest)
+        # if self.span == 10 and len(outcome.central_echos) > 0:
+        #     new_echo = head_angle_distance_to_point(*outcome.central_echos[0])
+        #
+        # # The new focus is at the center of the object  TODO must recognize the object
+        # if new_echo is None:
+        #     new_focus = None
+        # else:
+        #     a, d = point_to_head_direction_distance(new_echo)
+        #     new_focus = head_angle_distance_to_point(a, d + ARRANGE_OBJECT_RADIUS)
+        #
+        # # If the robot was focussed then adjust the focus and the displacement
+        # if self.focus_point is not None:
+        #     if new_focus is not None:
+        #         # The error between the expected and the actual position of the echo
+        #         prediction_error_focus = self.focus_point - new_focus
+        #         # If the new focus is near the previous focus or the displacement has been continuous.
+        #         if np.linalg.norm(prediction_error_focus) < FOCUS_MAX_DELTA or outcome.status == "continuous":
+        #             # The focus has been kept
+        #             # print("Focus kept with prediction error", prediction_error_focus, "moved to ", new_focus)
+        #             self.focus_confidence = CONFIDENCE_CONFIRMED_FOCUS
+        #         else:
+        #             # The focus was lost
+        #             # print("Focus delta:", prediction_error_focus, "New focus:", new_focus)
+        #             self.focus_confidence = CONFIDENCE_NEW_FOCUS
+        #     else:
+        #         # The focus was lost
+        #         # print("Lost focus due to no echo ", new_focus)
+        #         self.focus_confidence = CONFIDENCE_NO_FOCUS
+        #         # self.head_direction_rad = math.atan2(self.focus_point[1], self.focus_point[0])  # look at old focus
+        #
+        # # If the robot was not focussed then check for catch focus
+        # elif new_focus is not None:
+        #     self.focus_confidence = CONFIDENCE_NEW_FOCUS
+        #
+        # self.focus_point = new_focus
+        # if new_focus is not None:
+        #     self.head_direction_degree = math.degrees(math.atan2(new_focus[1], new_focus[0]))
+        #
+        # # Careful scan has extra confidence
+        # if self.focus_confidence == CONFIDENCE_NEW_FOCUS and self.span == 10:
+        #     self.focus_confidence = CONFIDENCE_CAREFUL_SCAN
+        #
+        # # Impact or block catch focus TODO Move to Enacter select_focus()
+        # if outcome.impact > 0 and outcome.action_code == ACTION_FORWARD and \
+        #         (new_focus is None or np.linalg.norm(new_focus) > 200):
+        #     # Focus on the object "felt"
+        #     if outcome.impact == 0b01:
+        #         self.focus_point = np.array([ROBOT_FLOOR_SENSOR_X + 10, -ROBOT_CHASSIS_Y, 0])
+        #     elif outcome.impact == 0b10:
+        #         self.focus_point = np.array([ROBOT_FLOOR_SENSOR_X + 10, ROBOT_CHASSIS_Y, 0])
+        #     else:
+        #         self.focus_point = np.array([ROBOT_FLOOR_SENSOR_X + 10, 0, 0])
+        #     self.focus_confidence = CONFIDENCE_TOUCHED_FOCUS
+        #     # print("Catch focus impact", self.focus_point)

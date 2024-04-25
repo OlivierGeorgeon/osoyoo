@@ -14,13 +14,15 @@ class PhenomenonDot:
         self.category = None  # Required because tested for push
         self.affordance_id = 0
         self.point = affordance.point.copy()
-        affordance.point[:] = 0  # Reset in place
+        affordance.point[:] = 0  # Array-wise reset in place
         self.affordances = {0: affordance}
+
+    def __str__(self):
+        return f"(Phenomenon type:{self.phenomenon_type})"
 
     def update(self, affordance):
         """Add a new affordance to this phenomenon and move the phenomenon to the position of this affordance"""
         if affordance.type == self.phenomenon_type:
-            # self.point[:] = affordance.point  # Copy in place
             offset = affordance.point - self.point
             self.shift(offset)
             affordance.point[:] = 0

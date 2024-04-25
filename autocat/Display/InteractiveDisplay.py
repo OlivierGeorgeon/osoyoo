@@ -63,7 +63,7 @@ class InteractiveDisplay(pyglet.window.Window):
         self.right = (width / 2 - self.drag_x) * self.zoom_level
         self.bottom = (-height / 2 - self.drag_y) * self.zoom_level
         self.top = (height / 2 - self.drag_y) * self.zoom_level
-        # Always display in the whole window. Scale for Mac.
+        # The viewport has the dimension of the whole window for PC and twice the whole window for Mac retina display
         glViewport(0, 0, width * self.screen_scale, height * self.screen_scale)
 
     def on_mouse_drag(self, x, y, dx, dy, buttons, modifiers):
