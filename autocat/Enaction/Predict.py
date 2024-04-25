@@ -167,7 +167,7 @@ def push_objects(trajectory, memory, floor):
         ego_point[0] = trajectory.translation[0] + ROBOT_FLOOR_SENSOR_X + p.category.short_radius
         # If floor then push beyond the retreat distance
         if floor:
-            ego_point[0] += ROBOT_SETTINGS[memory.robot_id]["retreat_distance"]
+            ego_point[0] += ROBOT_SETTINGS[memory.robot_id]["retreat_distance"][0]
         p.point = memory.egocentric_to_allocentric(ego_point)
 
 

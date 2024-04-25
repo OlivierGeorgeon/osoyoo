@@ -184,17 +184,27 @@ class Enacter:
     def select_focus(self, memory):
         """Select a focus based on the phenomena in memory"""
 
-        # If no focus then look for phenomena that could attract focus
-        if memory.egocentric_memory.focus_point is None:
-            # The dict of distances of the dot phenomena beyond the floor sensor
-            k_d = {k: memory.allocentric_to_egocentric(p.point)[0] for k, p in memory.phenomenon_memory.phenomena.items()
-                   if p.phenomenon_type == EXPERIENCE_FLOOR and memory.allocentric_to_egocentric(p.point)[0] > ROBOT_FLOOR_SENSOR_X}
-            # k_d = {k: p.point[0] for k, p in memory.phenomenon_memory.phenomena.items() if p.phenomenon_type in
-            #        [EXPERIENCE_FLOOR] and p.point[0] > ROBOT_FLOOR_SENSOR_X}
-            if len(k_d) > 0:
-                # Focus at the closest phenomenon
-                closest_key = min(k_d, key=k_d.get)
-                memory.phenomenon_memory.focus_phenomenon_id = closest_key
-                closest_dot_phenomenon = memory.phenomenon_memory.phenomena[closest_key]
-                memory.allocentric_memory.update_focus(closest_dot_phenomenon.point, memory.clock)
-                memory.egocentric_memory.focus_point = memory.allocentric_to_egocentric(closest_dot_phenomenon.point)
+        # Look for DOT phenomena
+        k_d = {k: memory.allocentric_to_egocentric(p.point)[0] for k, p in memory.phenomenon_memory.phenomena.items()
+               if p.phenomenon_type == EXPERIENCE_FLOOR and memory.allocentric_to_egocentric(p.point)[0] >
+               ROBOT_FLOOR_SENSOR_X}
+        if len(k_d) > 0:
+            # Focus at the closest DOT phenomenon
+            closest_key = min(k_d, key=k_d.get)
+            memory.phenomenon_memory.focus_phenomenon_id = closest_key
+            closest_dot_phenomenon = memory.phenomenon_memory.phenomena[closest_key]
+            memory.allocentric_memory.update_focus(closest_dot_phenomenon.point, memory.clock)
+            memory.egocentric_memory.focus_point = memory.allocentric_to_egocentric(closest_dot_phenomenon.point)
+
+        # # If no focus then look for phenomena that could attract focus
+        # if memory.egocentric_memory.focus_point is None:
+        #     # The dict of distances of the dot phenomena beyond the floor sensor
+        #     k_d = {k: memory.allocentric_to_egocentric(p.point)[0] for k, p in memory.phenomenon_memory.phenomena.items()
+        #            if p.phenomenon_type == EXPERIENCE_FLOOR and memory.allocentric_to_egocentric(p.point)[0] > ROBOT_FLOOR_SENSOR_X}
+        #     if len(k_d) > 0:
+        #         # Focus at the closest phenomenon
+        #         closest_key = min(k_d, key=k_d.get)
+        #         memory.phenomenon_memory.focus_phenomenon_id = closest_key
+        #         closest_dot_phenomenon = memory.phenomenon_memory.phenomena[closest_key]
+        #         memory.allocentric_memory.update_focus(closest_dot_phenomenon.point, memory.clock)
+        #         memory.egocentric_memory.focus_point = memory.allocentric_to_egocentric(closest_dot_phenomenon.point)
