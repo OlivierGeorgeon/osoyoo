@@ -29,7 +29,6 @@ class ProposerPlayDot(Proposer):
         p_id = self.workspace.memory.phenomenon_memory.focus_phenomenon_id
         # If no focus then no proposition
         if p_id is None:
-            print("no DOT phenomenon")
             return None
 
         # If focus at a dot phenomenon

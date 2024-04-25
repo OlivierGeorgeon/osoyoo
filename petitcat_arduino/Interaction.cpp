@@ -61,10 +61,14 @@ Interaction::Interaction(Floor& FLO, Head& HEA, Imu& IMU, WifiCat& WifiCat, JSON
   if (json_action.hasOwnProperty("span"))
     _span = (int)json_action["span"];
 
+  // The instruction to align head after the enaction
+  if (json_action.hasOwnProperty("align"))
+    _align = (int)json_action["align"];
+
   _action_start_time = millis();
   _action_end_time = _action_start_time + _target_duration;
-  _status = "0";
-  _step = INTERACTION_BEGIN;
+//  _status = "0"; in interaction.h
+//  _step = INTERACTION_BEGIN;  in interaction.h
 }
 
 void Interaction::begin()

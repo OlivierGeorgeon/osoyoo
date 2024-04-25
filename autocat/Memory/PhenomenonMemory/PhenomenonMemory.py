@@ -193,4 +193,5 @@ class PhenomenonMemory:
         saved_phenomenon_memory.phenomenon_categories = {k: c for k, c in self.phenomenon_categories.items()}
         saved_phenomenon_memory.phenomena = {k: p.save() for k, p in self.phenomena.items()}
         saved_phenomenon_memory.phenomenon_id = self.phenomenon_id
+        saved_phenomenon_memory.focus_phenomenon_id = self.focus_phenomenon_id
         return saved_phenomenon_memory
