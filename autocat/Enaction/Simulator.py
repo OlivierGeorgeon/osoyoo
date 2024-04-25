@@ -6,24 +6,13 @@ from ..Memory.PhenomenonMemory import PHENOMENON_ENCLOSED_CONFIDENCE
 from ..Proposer.Action import ACTION_SWIPE, ACTION_FORWARD, ACTION_SCAN, ACTION_BACKWARD
 from ..Robot.Outcome import Outcome
 from ..Memory.AllocentricMemory.Hexagonal_geometry import point_to_cell
+from ..Memory.AllocentricMemory.AllocentricMemory import COLOR_INDEX, STATUS_0, STATUS_1, POINT_X, POINT_Y
 from ..Memory.EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO
 from ..Utils import assert_almost_equal_angles, translation_quaternion_to_matrix, point_to_head_direction_distance
 from .Predict import RETREAT_YAW
 
 SIMULATION_SPEED = 1  # 0.5
-STATUS_0 = 0
-STATUS_1 = 1
-STATUS_3 = 6
-STATUS_4 = 8
-STATUS_2 = 11
-CLOCK_PLACE = 2
-COLOR_INDEX = 3
-CLOCK_FOCUS = 7
-CLOCK_PROMPT = 9
-CLOCK_NO_ECHO = 12
-CLOCK_INTERACTION = 4
-CLOCK_PHENOMENON = 10
-PHENOMENON_ID = 5
+
 
 class Simulator:
     def __init__(self, workspace):
@@ -120,7 +109,7 @@ class Simulator:
                             # Swipe right
                             self.simulated_outcome_dict['floor'] = 1
                             self.simulated_outcome_dict['yaw'] = -RETREAT_YAW
-                    self.simulated_outcome_dict['color_index'] = memory.allocentric_memory.grid[i][j].color_index
+                    self.simulated_outcome_dict['color_index'] = int(memory.allocentric_memory.grid[i][j][COLOR_INDEX])
                 else:
                     self.simulated_outcome_dict['floor'] = 0
 
@@ -135,8 +124,8 @@ class Simulator:
         # The echoes added by the user
         for ij in memory.allocentric_memory.user_cells:
             cell = memory.allocentric_memory.grid[ij[0]][ij[1]]
-            if cell.status[1] == EXPERIENCE_ALIGNED_ECHO:
-                p = cell.point()
+            if cell[STATUS_1] == EXPERIENCE_ALIGNED_ECHO:
+                p = [cell[POINT_X], cell[POINT_Y], 0]
                 a, d = point_to_head_direction_distance(memory.allocentric_to_egocentric(p))
                 if enaction.action.action_code == ACTION_SCAN and \
                         assert_almost_equal_angles(math.radians(a), 0, 125) or \

@@ -4,33 +4,35 @@ import time
 import numpy as np
 from pyrr import quaternion, Vector3
 from . Hexagonal_geometry import point_to_cell, get_neighbors
-from . GridCell import GridCell, CELL_UNKNOWN
+# from . GridCell import GridCell, CELL_UNKNOWN
 from ..EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_PLACE, EXPERIENCE_FOCUS, EXPERIENCE_PROMPT, \
     EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_IMPACT
-from ..AllocentricMemory.GridCell import CELL_NO_ECHO
+# from ..AllocentricMemory.GridCell import CELL_NO_ECHO
 from ...Robot.RobotDefine import ROBOT_CHASSIS_X, ROBOT_OUTSIDE_Y, CHECK_OUTSIDE
 from ...Memory.PhenomenonMemory.PhenomenonMemory import TER, ROBOT1
 
 from .Hexagonal_geometry import cell_to_point
 from ..PhenomenonMemory import PHENOMENON_RECOGNIZABLE_CONFIDENCE, PHENOMENON_ENCLOSED_CONFIDENCE
 
-
-
 STATUS_0 = 0
 STATUS_1 = 1
-STATUS_3 = 6
-STATUS_4 = 8
-STATUS_2 = 11
-CLOCK_PLACE = 2
-COLOR_INDEX = 3
+STATUS_2 = 2
+STATUS_3 = 3
+STATUS_4 = 4
+CLOCK_PLACE = 11
+COLOR_INDEX = 6
 CLOCK_FOCUS = 7
 CLOCK_PROMPT = 9
 CLOCK_NO_ECHO = 12
-CLOCK_INTERACTION = 4
+CLOCK_INTERACTION = 8
 CLOCK_PHENOMENON = 10
 PHENOMENON_ID = 5
 POINT_X = 13
 POINT_Y = 14
+
+CELL_UNKNOWN = 0
+CELL_NO_ECHO = -4
+
 
 class AllocentricMemory:
     """The agent's allocentric memory made with an hexagonal grid."""
@@ -44,9 +46,9 @@ class AllocentricMemory:
         self.width = width  # Nb cells width
         self.height = height  # Nb cells height
         self.min_i = -width // 2 + 1
-        self.max_i = width // 2
+        self.max_i = width // 2 + 1
         self.min_j = -height // 2 + 1
-        self.max_j = height // 2
+        self.max_j = height // 2 + 1
         self.cell_radius = cell_radius
 
         # Allocentric memory is initialized with the robot at its center
@@ -63,6 +65,12 @@ class AllocentricMemory:
         # Fill the grid with cells
         # self.grid = list()
         self.grid = np.zeros((width, height, 15), dtype=int)
+        for i in range(self.min_i, self.max_i):
+            for j in range(self.min_j, self.max_j):
+                point = cell_to_point(i, j, cell_radius)
+                self.grid[i][j][POINT_X] = point[0]
+                self.grid[i][j][POINT_Y] = point[1]
+                self.grid[i][j][PHENOMENON_ID] = -1
 
         # Use negative grid index for negative positions
 
@@ -74,7 +82,7 @@ class AllocentricMemory:
             if j % 2 == 1:
                 output += "-----"
             for i in range(self.min_i, self.max_i + 1):
-                output += str(self.grid[i][j]) + "-----"
+                output += f"({self.grid[i][j][POINT_X]:4d}, {self.grid[i][j][POINT_Y]:4d})-----"
                 # output += "-----"
             output += "\n"
         return output
@@ -95,8 +103,7 @@ class AllocentricMemory:
                     #     c.clock_place = clock
                     for i in range(self.min_i, self.max_i):
                         for j in range(self.min_j, self.max_j):
-                            point = cell_to_point(i, j)
-                            if p.is_inside(point):
+                            if p.is_inside(self.grid[i][j][POINT_X:POINT_Y+1]):
                                 self.grid[i][j][STATUS_0] = EXPERIENCE_FLOOR
                                 self.grid[i][j][PHENOMENON_ID] = TER
                                 self.grid[i][j][CLOCK_PLACE] = clock
@@ -172,8 +179,7 @@ class AllocentricMemory:
 
         for i in range(self.min_i, self.max_i):
             for j in range(self.min_j, self.max_j):
-                point = cell_to_point(i, j)
-                if path.contains_point(point[0:2]):
+                if path.contains_point(self.grid[i][j][POINT_X:POINT_Y+1]):
                     self.grid[i][j][STATUS_0] = EXPERIENCE_PLACE
                     self.grid[i][j][CLOCK_PLACE] = clock
 
@@ -193,8 +199,9 @@ class AllocentricMemory:
         # print("Place robot time:", time.time() - start_time, "seconds")
         for i in range(self.min_i, self.max_i):
             for j in range(self.min_j, self.max_j):
-                point = cell_to_point(i, j)
-                if path.contains_point(point[0:2]):
+                # point = cell_to_point(i, j)
+                if path.contains_point(self.grid[i][j][POINT_X:POINT_Y+1]):
+                    # if path.contains_point(point[0:2]):
                     self.grid[i][j][STATUS_0] = EXPERIENCE_PLACE
                     self.grid[i][j][CLOCK_PLACE] = clock
 
@@ -212,7 +219,7 @@ class AllocentricMemory:
 
         for i in range(self.min_i, self.min_j):
             for j in range(self.max_i, self.max_j):
-                if self.grid[i][j][PHENOMENON_ID] is not None:
+                if self.grid[i][j][PHENOMENON_ID] != -1:
                     if self.grid[i][j][STATUS_0] != EXPERIENCE_PLACE:
                         self.grid[i][j][STATUS_0] = CELL_UNKNOWN
                     self.grid[i][j][STATUS_1] = CELL_UNKNOWN
@@ -262,8 +269,8 @@ class AllocentricMemory:
         # print("Place echo time:", time.time() - start_time, "seconds")
         for i in range(self.min_i, self.max_i):
             for j in range(self.min_j, self.max_j):
-                point = cell_to_point(i, j)
-                if path.contains_point(point[0:2]):
+                # point = cell_to_point(i, j)
+                if path.contains_point(self.grid[i][j][POINT_X:POINT_Y+1]):
                     self.grid[i][j][STATUS_2] = CELL_NO_ECHO
                     self.grid[i][j][CLOCK_NO_ECHO] = affordance.clock
 
@@ -283,7 +290,6 @@ class AllocentricMemory:
                 #self.grid[self.focus_i][self.focus_j].clock_focus = clock
                 self.grid[self.focus_i][self.focus_j][CLOCK_FOCUS] = clock
 
-
     def update_prompt(self, allo_prompt, clock):
         """Update the prompt in allocentric memory"""
         # Clear the previous prompt cell
@@ -299,8 +305,7 @@ class AllocentricMemory:
                 self.grid[self.prompt_i][self.prompt_j][STATUS_4] = EXPERIENCE_PROMPT
                 #self.grid[self.prompt_i][self.prompt_j].clock_prompt = clock
                 self.grid[self.prompt_i][self.prompt_j][CLOCK_PROMPT] = clock
-
-                # print("Prompt in cell", self.prompt_i, ", ", self.prompt_j)
+                print("Prompt in cell", self.prompt_i, ", ", self.prompt_j)
 
     def save(self):
         """Retun a clone of allocentric memory for memory snapshot"""
@@ -311,7 +316,7 @@ class AllocentricMemory:
         saved_allocentric_memory.prompt_i = self.prompt_i
         saved_allocentric_memory.prompt_j = self.prompt_j
         saved_allocentric_memory.affordances = [a.save() for a in self.affordances]
-        saved_allocentric_memory.grid = self.grid.copy()
+        saved_allocentric_memory.grid[:, :, :] = self.grid
         saved_allocentric_memory.user_cells = [e for e in self.user_cells]
 
         return saved_allocentric_memory

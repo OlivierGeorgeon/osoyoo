@@ -8,8 +8,8 @@ from ...Memory.AllocentricMemory.Hexagonal_geometry import point_to_cell
 from ...Memory.EgocentricMemory.Experience import EXPERIENCE_ROBOT
 from ..InteractiveDisplay import InteractiveDisplay
 from ..PointOfInterest import PointOfInterest, POINT_ROBOT
-from ...Memory.AllocentricMemory.AllocentricMemory import STATUS_0, STATUS_4
-from ...Memory.AllocentricMemory.GridCell import CELL_UNKNOWN
+from ...Memory.AllocentricMemory.AllocentricMemory import STATUS_0, STATUS_4, CELL_UNKNOWN
+
 NB_CELL_WIDTH = 30
 NB_CELL_HEIGHT = 100
 CELL_RADIUS = 50
@@ -77,12 +77,12 @@ class AllocentricView(InteractiveDisplay):
 
         if self.hexagons[i][j] is None:
             #if cell[STATUS_0:STATUS_4].is_known():
-            if not np.array_equal(cell[STATUS_0:STATUS_4], np.array([CELL_UNKNOWN,CELL_UNKNOWN,CELL_UNKNOWN,CELL_UNKNOWN,CELL_UNKNOWN])):
+            if not np.array_equal(cell[STATUS_0:STATUS_4+1], np.array([CELL_UNKNOWN,CELL_UNKNOWN,CELL_UNKNOWN,CELL_UNKNOWN,CELL_UNKNOWN])):
                 # Create the hexagon
                 self.hexagons[i][j] = CellDisplay(cell, self.batch, self.groups, self.workspace.memory.clock)
         else:
             #if cell.is_known():
-            if not np.array_equal(cell[STATUS_0:STATUS_4], np.array([CELL_UNKNOWN,CELL_UNKNOWN,CELL_UNKNOWN,CELL_UNKNOWN,CELL_UNKNOWN])):
+            if not np.array_equal(cell[STATUS_0:STATUS_4+1], np.array([CELL_UNKNOWN,CELL_UNKNOWN,CELL_UNKNOWN,CELL_UNKNOWN,CELL_UNKNOWN])):
                 # Update the hexagon
                 self.hexagons[i][j].update_color(cell, self.workspace.memory.clock)
             else:

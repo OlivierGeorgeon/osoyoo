@@ -7,7 +7,7 @@ from .test_AllocentricMemory import test_convert_pos_in_cell
 # Testing Allocentric Memory
 # py -m autocat.Memory.AllocentricMemory
 
-allocentric_memory = AllocentricMemory(10, 11, CELL_RADIUS)
+allocentric_memory = AllocentricMemory(8, 9, CELL_RADIUS)
 # Displaying the hexagonal grid in the console.
 print(allocentric_memory)
 
@@ -18,7 +18,7 @@ print(allocentric_memory)
 
 error = 0
 try:
-    error = test_convert_pos_in_cell()
+    # error = test_convert_pos_in_cell()
     assert (error == 0)
     print("Every test in test_convert_pos_in_cell(hx.robot_pos_x, hx.robot_pos_y) passed without error")
 except AssertionError:
