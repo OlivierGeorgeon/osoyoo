@@ -618,7 +618,7 @@ The Intel 8008 quasi-8-bit microprocessor was released in 1972. It used 10,000nm
 
 A few months after the release of the Altair 8800, the IMSAI 8080 kit (both of these PC's were based on the 8080 chip) released in Dec 1975. About 25,000 hobbyists built the IMSAI 8080. The kit came with 1KB of RAM. There was no long term storage although hobbyists rapidly adopted using cassette tape recorders and simple modulation/demodulation hardware to store and retrieve code. The bus into which different boards plugged in was called the S-100 bus (i.e., all the data, address, etc lines). The kit came with an Intel 8080 manual of machine instructions and indeed most hobbyists just keyed machine instructions into the system via the front panel toggle switches, although some hobbyists attached the computer to a video terminal and eventually ran CP/M operating system.
 
-![imsai8080inside](imsai8080inside.png)
+![imsai8080inside](imsai8080inside.jpg)
 
 If you never had the chance to experience an early microcomputer at the machine level (or were not born yet) the High Nibble company of Australia has produced a working replica of the IMSAI 8080. Face on it looks identical but it is just a facade with toggle switches and an ESP32 microcontroller to simulate the IMSAI 8080 behavior, plus also provides Wi-Fi connectivity.
 
