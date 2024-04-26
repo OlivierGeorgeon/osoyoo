@@ -67,21 +67,18 @@ class EgocentricView(InteractiveDisplay):
 
     def get_prompt_point(self, x, y, button, modifiers):
         """ Computing the position of the mouse click relative to the robot in mm and degrees """
-        prompt_point = self.mouse_coordinates_to_point(x, y)
+        click_point = self.mouse_coordinates_to_point(x, y)
         if self.is_north_up:
             # TODO test this
             rotation_matrix = matrix44.create_from_z_rotation(-math.radians(self.azimuth - 90))
         else:
             rotation_matrix = matrix44.create_from_z_rotation(math.pi/2)
-        prompt_point = matrix44.apply_to_vector(rotation_matrix, prompt_point).astype(int)
-
-        # Cartesian coordinates from the robot axis
-        prompt_polar_angle = int(math.degrees(math.atan2(prompt_point[1], prompt_point[0])))
+        click_point = matrix44.apply_to_vector(rotation_matrix, click_point).astype(int)
+        click_angle = math.degrees(math.atan2(click_point[1], click_point[0]))
         # Display the mouse click coordinates at the bottom of the view
-        self.label1.text = "Click: x:" + str(prompt_point[0]) + ", y:" + str(prompt_point[1]) \
-                           + ", angle:" + str(prompt_polar_angle) + "°"
+        self.label1.text = f"Click: ({click_point[0]:.0f}, {click_point[1]:.0f}), angle: {click_angle:.0f}°"
         # Return the click position to the controller
-        return prompt_point
+        return click_point
 
 
 # Testing the EgocentricView by displaying the robot in a pretty position, and the mouse click coordinates

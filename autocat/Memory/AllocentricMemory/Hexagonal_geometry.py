@@ -37,14 +37,22 @@ def get_neighbor_in_direction(i, j, direction):
 
 def cell_to_point(i, j, radius=CELL_RADIUS):
     """Convert the cell coordinates into allocentric coordinates"""
-    cell_height = math.sqrt((2 * radius) ** 2 - radius ** 2)
-    if j % 2 == 0:
-        x = i * 3 * radius
-        y = cell_height * (j / 2)
-    else:
-        x = (1.5 * radius) + i * 3 * radius
-        y = (cell_height / 2) + (j - 1) / 2 * cell_height
-    return np.array([x, y, 0], dtype=int)
+    cell_height = np.sqrt((2 * radius) ** 2 - radius ** 2)
+    x = np.where(j % 2 == 0, i * 3 * radius, (1.5 * radius) + i * 3 * radius)
+    y = np.where(j % 2 == 0, cell_height * (j / 2), (cell_height / 2) + (j - 1) / 2 * cell_height)
+    return np.transpose(np.array([x, y]), axes=(1, 2, 0))
+
+
+# def cell_to_point(i, j, radius=CELL_RADIUS):
+#     """Convert the cell coordinates into allocentric coordinates"""
+#     cell_height = math.sqrt((2 * radius) ** 2 - radius ** 2)
+#     if j % 2 == 0:
+#         x = i * 3 * radius
+#         y = cell_height * (j / 2)
+#     else:
+#         x = (1.5 * radius) + i * 3 * radius
+#         y = (cell_height / 2) + (j - 1) / 2 * cell_height
+#     return np.array([x, y, 0], dtype=int)
 
 
 def point_to_cell(point, radius=CELL_RADIUS):

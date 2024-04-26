@@ -62,15 +62,26 @@ class AllocentricMemory:
         # The affordances
         self.affordances = []
 
+        start_time = time.time()
         # Fill the grid with cells
         # self.grid = list()
         self.grid = np.zeros((width, height, 15), dtype=int)
-        for i in range(self.min_i, self.max_i):
-            for j in range(self.min_j, self.max_j):
-                point = cell_to_point(i, j, cell_radius)
-                self.grid[i][j][POINT_X] = point[0]
-                self.grid[i][j][POINT_Y] = point[1]
-                self.grid[i][j][PHENOMENON_ID] = -1
+
+        # Initialize the grid
+        i_range = np.concatenate((np.arange(0, self.max_i), np.arange(self.min_i, 0)))
+        j_range = np.concatenate((np.arange(0, self.max_j), np.arange(self.min_j, 0)))
+        mesh_i, mesh_j = np.meshgrid(i_range, j_range, indexing='ij')
+        self.grid[:, :, POINT_X: POINT_Y+1] = cell_to_point(mesh_i, mesh_j, cell_radius)
+        self.grid[:, :, PHENOMENON_ID] = -1
+
+        # for i in range(self.min_i, self.max_i):
+        #     for j in range(self.min_j, self.max_j):
+        #         # self.grid[i][j][POINT_X: POINT_Y+1] = cell_to_point(i, j, cell_radius)[0, 0:2]
+        #         point = cell_to_point(i, j, cell_radius)[0]
+        #         self.grid[i][j][POINT_X] = point[0]
+        #         self.grid[i][j][POINT_Y] = point[1]
+        #         self.grid[i][j][PHENOMENON_ID] = -1
+        # print(f"Init Grid time: {time.time() - start_time:.4f} seconds")
 
         # Use negative grid index for negative positions
 
@@ -305,12 +316,12 @@ class AllocentricMemory:
                 self.grid[self.prompt_i][self.prompt_j][STATUS_4] = EXPERIENCE_PROMPT
                 #self.grid[self.prompt_i][self.prompt_j].clock_prompt = clock
                 self.grid[self.prompt_i][self.prompt_j][CLOCK_PROMPT] = clock
-                print("Prompt in cell", self.prompt_i, ", ", self.prompt_j)
+                # print("Prompt in cell", self.prompt_i, ", ", self.prompt_j)
 
     def save(self):
-        """Retun a clone of allocentric memory for memory snapshot"""
+        """Return a clone of allocentric memory for memory snapshot"""
         saved_allocentric_memory = AllocentricMemory(self.width, self.height, self.cell_radius)
-        saved_allocentric_memory.robot_point = self.robot_point.copy()
+        saved_allocentric_memory.robot_point[:] = self.robot_point
         saved_allocentric_memory.focus_i = self.focus_i
         saved_allocentric_memory.focus_j = self.focus_j
         saved_allocentric_memory.prompt_i = self.prompt_i

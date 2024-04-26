@@ -116,7 +116,7 @@ class CtrlAllocentricView:
                 self.workspace.ctrl_phenomenon_view.update_body_robot()
                 self.workspace.ctrl_phenomenon_view.update_affordance_displays()
 
-            self.view.label_click.text = repr(self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][:])
+            self.view.label_click.text = self.workspace.memory.allocentric_memory.grid[cell_x][cell_y].__str__()
 
             # """Label of the cell for display on click in allocentricView"""
             # label = str(self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][STATUS_0]) + " Clocks: ["
