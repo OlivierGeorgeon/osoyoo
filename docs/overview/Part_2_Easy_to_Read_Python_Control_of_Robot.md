@@ -624,6 +624,8 @@ If you never had the chance to experience an early microcomputer at the machine 
 
 ![imsai8080](imsai8080.png)
 
+-
+
 The chip in the Arduino Mega board on the robot car project is an ATmega2560 chip. It is an 8-bit chip but reflects the exponential improvements in chipmaking that have occurred since the release of older 8-bit chips such as the Intel 8008 and Intel 8080. As noted above, the Intel 8008 was fabricated with element sizes (i.e., elements of the silicon photolithographed, where the size refers to the smallest half-pitch of a feature, typically the gate length of a transistor) of 10 microns or 10,000 nanometers. In contrast, current, for example, Apple A16 chips use 4nm element size (actually equivalent element size, this is a FinFET process in more than one dimension). 
 
 The ATmega2560 chip is made by MicroChip Technology which does not reveal the manufacturing technology details but the chip is a modern chip believed to be fabricated at the 90nm or 65nm node (i.e. equivalent) feature size (very economical node sizes at the time of this writing versus the very expensive 4nm node size discussed above used by Apple for the A16), in contrast to the 10,000nm element size used by the first Intel 8008 (quasi) 8-bit chips. As well the ATmega2560 has a host of modern features such as including  within the one chip all the components needed for flash memory, SRAM, digital input and output, analog input and output, etc. 
@@ -845,6 +847,13 @@ If you are working on the Arduino board including working on the robot car proje
 -
 
 **UNDER CONSTRUCTION**
+
+-
+This section still needs to be properly finished. You may think this section does not apply to you since you work in AI and don't need to know the low-level electronics, but really you should know the superficial level of low-level of electronics this section discussed.
+-
+At present working on the code and documentation of the code portions particularly in the next Part III, but I will come back and finish this section. "I'll be back."  (If you don't know where this line is from, then perhaps even more important than upgrading your electronics knowledge, is to upgrade your popular sci-fi knowledge -- go watch the 1984 movie Terminator and then watch the entire series of Terminator (except for Terminator Genisys which was not scientifically accurate). Yes, Arnold Schwarzenegger says this famous line.)
+
+![beback](beback.jpg)
 
 --USING THE SERIAL MONITOR FOR INPUTS--
 
@@ -1343,6 +1352,8 @@ Now let's try it out. Unplug the robot car from the USB and put it down on the f
 ![successpic](successpic.png)
 
 Well, you probably notice you are at the end of Part 2. 
+
+In Part 1 you become familiar with the hardware and software systems we are using. In this Part 2 you developed more experience with the software and you transitioned from the Osoyoo pre-canned demonstration programs to a more serious use of the robot car. At this point your robot car should be controllable from Python code running on your desktop/laptop. If not, then please go back to the sections above and make sure it is working, before moving onto to Part 3.
 
 In the next part of the Overview series, Part 3, we will review in more depth the Arduino *.ino code and the Python *.py code that form the PetitCat system. We will also start considering how to use the PetitCat system to model active inference. 
 
