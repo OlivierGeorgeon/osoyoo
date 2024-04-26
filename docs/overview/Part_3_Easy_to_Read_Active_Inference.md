@@ -59,7 +59,7 @@ The PetitCat documentation is written so that anyone with a basic education can 
 
 Regardless of your skill level, you have made it this far -- you have built a robot car with your hands, you have learned how to move software around (Part I) and then you learned how to write some software in C/C++, build electronic circuits and make the software control the electronics (Part II). 
 
-In Part I you become familiar with the hardware and software systems we are using. In this Part II you developed more experience with the software and you transitioned from the Osoyoo pre-canned demonstration programs to a more serious use of the robot car. At this point your robot car should be controllable from Python code running on your desktop/laptop. If not, then please go back to the previous Part II and make sure it is working, before continuing in this Part III.
+In Part I you became familiar with the hardware and software systems we are using. In this Part II you developed more experience with the software and you transitioned from the Osoyoo pre-canned demonstration programs to a more serious use of the robot car. At this point your robot car should be controllable from Python code running on your desktop/laptop. If not, then please go back to the previous Part II and make sure it is working, before continuing in this Part III.
 
 Ok... you successfully completed Part II and have a robot car you can control from your Python code. Now here you are. In this Part III we will start doing a bit more serious work. But, regardless of your skill level or experience, do not worry -- this manual will gently guide you through the steps.
 
