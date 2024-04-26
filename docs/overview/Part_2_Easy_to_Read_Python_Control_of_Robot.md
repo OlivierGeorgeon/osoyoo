@@ -616,6 +616,14 @@ The Intel 8008 quasi-8-bit microprocessor was released in 1972. It used 10,000nm
 
 ![popelectronics](popelectronics.jpg)
 
+A few months after the release of the Altair 8800, the IMSAI 8080 kit (both of these PC's were based on the 8080 chip) released in Dec 1975. About 25,000 hobbyists built the IMSAI 8080. The kit came with 1KB of RAM. There was no long term storage although hobbyists rapidly adopted using cassette tape recorders and simple modulation/demodulation hardware to store and retrieve code. The bus into which different boards plugged in was called the S-100 bus (i.e., all the data, address, etc lines). The kit came with an Intel 8080 manual of machine instructions and indeed most hobbyists just keyed machine instructions into the system via the front panel toggle switches, although some hobbyists attached the computer to a video terminal and eventually ran CP/M operating system.
+
+![imsai8080inside](imsai8080inside.png)
+
+If you never had the chance to experience an early microcomputer at the machine level (or were not born yet) the High Nibble company of Australia has produced a working replica of the IMSAI 8080. Face on it looks identical but it is just a facade with toggle switches and an ESP32 microcontroller to simulate the IMSAI 8080 behavior, plus also provides Wi-Fi connectivity.
+
+![imsai8080](imsai8080.png)
+
 The chip in the Arduino Mega board on the robot car project is an ATmega2560 chip. It is an 8-bit chip but reflects the exponential improvements in chipmaking that have occurred since the release of older 8-bit chips such as the Intel 8008 and Intel 8080. As noted above, the Intel 8008 was fabricated with element sizes (i.e., elements of the silicon photolithographed, where the size refers to the smallest half-pitch of a feature, typically the gate length of a transistor) of 10 microns or 10,000 nanometers. In contrast, current, for example, Apple A16 chips use 4nm element size (actually equivalent element size, this is a FinFET process in more than one dimension). 
 
 The ATmega2560 chip is made by MicroChip Technology which does not reveal the manufacturing technology details but the chip is a modern chip believed to be fabricated at the 90nm or 65nm node (i.e. equivalent) feature size (very economical node sizes at the time of this writing versus the very expensive 4nm node size discussed above used by Apple for the A16), in contrast to the 10,000nm element size used by the first Intel 8008 (quasi) 8-bit chips. As well the ATmega2560 has a host of modern features such as including  within the one chip all the components needed for flash memory, SRAM, digital input and output, analog input and output, etc. 
