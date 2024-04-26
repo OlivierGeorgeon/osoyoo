@@ -7,9 +7,9 @@ from . import DISPLAY_POOL
 from ...Memory.EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_BLOCK, \
     EXPERIENCE_FOCUS, EXPERIENCE_IMPACT, EXPERIENCE_PLACE, EXPERIENCE_CENTRAL_ECHO, EXPERIENCE_PROMPT, \
     EXPERIENCE_ROBOT, FLOOR_COLORS
-from ...Memory.AllocentricMemory.GridCell import CELL_UNKNOWN, CELL_NO_ECHO
+from ...Memory.AllocentricMemory.AllocentricMemory import CELL_UNKNOWN, CELL_NO_ECHO
 from ...Memory.AllocentricMemory.Hexagonal_geometry import CELL_RADIUS
-from ...Memory.AllocentricMemory.AllocentricMemory import STATUS_0, STATUS_2, STATUS_3, STATUS_1, STATUS_4, POINT_X, POINT_Y, CLOCK_INTERACTION, CLOCK_PLACE
+from ...Memory.AllocentricMemory.AllocentricMemory import STATUS_0, STATUS_2, STATUS_3, STATUS_1, STATUS_4, POINT_X, POINT_Y, CLOCK_INTERACTION, CLOCK_PLACE, COLOR_INDEX, CLOCK_NO_ECHO
 SCALE_LEVEL_0 = 2.5  # 3
 SCALE_LEVEL_1 = 0.8  # 0.9
 SCALE_LEVEL_2 = 0.6  # 0.65
@@ -79,13 +79,13 @@ class CellDisplay:
             color1 = name_to_rgb('Lavender')  # name_to_rgb('LightGreen')  # name_to_rgb(FLOOR_COLORS[0])
             opacity1 = int(max(255 * (30 - clock + cell[CLOCK_PLACE]) / 30, 0))
         if cell[STATUS_0] == EXPERIENCE_FLOOR:
-            if cell.color_index == 0:
+            if cell[COLOR_INDEX] == 0:
                 color1 = name_to_rgb('black')
             else:
-                color1 = name_to_rgb(FLOOR_COLORS[cell.color_index])
+                color1 = name_to_rgb(FLOOR_COLORS[cell[COLOR_INDEX]])
         # Reset the color of the shape0
-        #self.shape1.colors[0:24] = 6 * (*color1, opacity1)
-        self.shape2.colors[:] = 6 * (*color1, opacity1)
+        self.shape1.colors[0:24] = 6 * (*color1, opacity1)
+        # self.shape1.colors[:] = 6 * (*color1, opacity1)
 
 
         # Level 2
@@ -127,7 +127,7 @@ class CellDisplay:
         else:
             if cell[STATUS_2] == CELL_NO_ECHO:
                 color3 = name_to_rgb('CadetBlue')  # CadetBlue LightGreen
-                opacity3 = int(max(255 * (10 - clock + cell.clock_no_echo) / 10, 0))
+                opacity3 = int(max(255 * (10 - clock + cell[CLOCK_NO_ECHO]) / 10, 0))
             else:
                 color3 = name_to_rgb('grey')
                 opacity3 = 0

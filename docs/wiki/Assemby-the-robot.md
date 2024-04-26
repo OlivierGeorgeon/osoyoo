@@ -14,6 +14,7 @@ The servo `LACC200610` provided by Osoyoo was jittering when the wheels were mov
 We have modified some wiring from the original osoyoo robot as listed in Table 1.
 
 Table 1: Wiring modification
+
 |Original |Modified ||
 |---|---|---|
 |5|23| Rear  Right Motor direction pin 1|
@@ -22,7 +23,7 @@ Table 1: Wiring modification
 
 Pins 5 and 6 were moved to 23 and 25 because they don't need the PWM functionality. These pins are declared in the file `Wheel.h`.
 
-Pin 13 was moved to pin 6 to avoid the head jittering when downloading the sketch. This pin is declared in the file `Robot_define.h`.
+Pin 13 was moved to pin 6 because we are using the arduino onboard LED that is also connected to Pin 13. The head servo pin is declared in the file `Robot_define.h`.
 
 # Connect the IMU card
 
@@ -30,6 +31,7 @@ Connect the IMU card to the wifi Shield following Table 2 and Figure 1.
 Note that the calibration offset varies significantly depending on the position of the card on the robot. 
 
 Table 2: IMU Wiring
+
 |GY-86 Imu|MEGA2560 Wifi Shield|
 |---|---|
 |Vcc|3v3|
@@ -43,7 +45,7 @@ Figure 1: wiring of GY-86 imu
 # Connect the color sensor
 
 Use the "long" two-hole version of the TCS34725. It has two LEDs, and the holes miraculously match holes on the robot platform (Figure 4).
-Wire it to the Arduino MEGA according to Table 2. 
+Wire it to the Arduino MEGA according to Table 3. 
 Use PINs 20 and 21 for SDA and SCL because the other SDA and SCL PINs are used for the IMU. They are the same. 
 For the power line, I used the 3v yellow PINs on the Wifi Shield. 
 Alternatively, the VIN PIN can be connected to a 5V PIN (red).
@@ -54,7 +56,8 @@ Figure 4: TCS34725 color sensor mounted on two 40 mm pillars between the front w
 ![image](assets/TCS34725(2).jpg)
 Figure 5: TCS34725 color sensor to Arduino MEGA wiring
 
-Table 2: PIN connection
+Table 3: TCS34725 PIN connection
+
 |TCS34725 |MEGA2560 ||
 |---|---|---|
 |3v3|3v| On the Wifi Shield, yellow slots|
@@ -73,7 +76,8 @@ Install a common cathode RGB LED as shown below.
 
 Figure 5: RGB LED with flat side on the left. The cathode is the longest lead.
 
-Table 3: RGB LED connections
+Table 4: RGB LED connections
+
 |RGB LED | |MEGA2560 / Wifi shield|
 |---|---|---|
 |Blue|| 2 |

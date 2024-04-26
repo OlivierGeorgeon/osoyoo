@@ -30,6 +30,8 @@ class PhenomenonMemory:
         category_box = PhenomenonCategory(EXPERIENCE_ALIGNED_ECHO, ARRANGE_OBJECT_RADIUS, ARRANGE_OBJECT_RADIUS, 0)
         self.phenomenon_categories = {TER: category_terrain, ROBOT1: category_robot, BOX: category_box}
 
+        self.focus_phenomenon_id = None  # The ID of the phenomenon that has focus
+
     def terrain(self):
         """Return the terrain phenomenon or None"""
         if TER in self.phenomena:
@@ -191,4 +193,5 @@ class PhenomenonMemory:
         saved_phenomenon_memory.phenomenon_categories = {k: c for k, c in self.phenomenon_categories.items()}
         saved_phenomenon_memory.phenomena = {k: p.save() for k, p in self.phenomena.items()}
         saved_phenomenon_memory.phenomenon_id = self.phenomenon_id
+        saved_phenomenon_memory.focus_phenomenon_id = self.focus_phenomenon_id
         return saved_phenomenon_memory

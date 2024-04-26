@@ -64,6 +64,7 @@ void Turn::ongoing()
   {
     // _HEA._next_saccade_time = millis() - SACCADE_DURATION;  // Terminate HEA inhibition
     //if (!_HEA._is_enacting_head_alignment)
+    if (_align > 0)
         _HEA.beginEchoAlignment();  // Force HEA. It was inhibited during the interaction
     _duration1 = millis() - _action_start_time;
     _FLO._OWM.stopMotion();

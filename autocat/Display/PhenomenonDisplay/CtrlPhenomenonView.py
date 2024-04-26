@@ -17,7 +17,7 @@ class CtrlPhenomenonView:
         self.workspace = workspace
         # self.egocentric_memory = workspace.memory.egocentric_memory
         self.affordance_displays = []
-        self.phenomenon_id = None
+        self.phenomenon_id = -1
         self.selected_clock = 0
 
         def on_text(text):
@@ -77,7 +77,7 @@ class CtrlPhenomenonView:
 
     def update_affordance_displays(self):
         """Retrieve the new affordances in a phenomenon and create the corresponding points of interest"""
-        if self.phenomenon_id is not None:
+        if self.phenomenon_id in self.workspace.memory.phenomenon_memory.phenomena:
             phenomenon = self.workspace.memory.phenomenon_memory.phenomena[self.phenomenon_id]
 
             # Delete the points of interest
@@ -115,7 +115,7 @@ class CtrlPhenomenonView:
         if self.phenomenon_id is None and TER in self.workspace.memory.phenomenon_memory.phenomena:
             self.phenomenon_id = TER
 
-        if self.phenomenon_id is not None:
+        if self.phenomenon_id in self.workspace.memory.phenomenon_memory.phenomena:  # is not None:
             phenomenon = self.workspace.memory.phenomenon_memory.phenomena[self.phenomenon_id]
             self.view.robot_translate = self.workspace.memory.allocentric_memory.robot_point - phenomenon.point
             self.view.label3.text = f"Type: {phenomenon.phenomenon_type}, Confidence: {phenomenon.confidence}"

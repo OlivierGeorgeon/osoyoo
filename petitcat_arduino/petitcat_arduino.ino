@@ -42,7 +42,7 @@ WifiCat WifiCat;
 Led LED;
 Sequencer SEQ(FLO, HEA, IMU, LED, WifiCat);
 
-int interaction_step = 0;
+int interaction_step = INTERACTION_DONE;
 int interaction_direction = 0;
 Interaction* INT  = nullptr;  // The interaction type will depend on the action received from the PC
 

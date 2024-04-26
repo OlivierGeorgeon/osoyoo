@@ -4,7 +4,7 @@ from .AllocentricView import AllocentricView
 from ...Memory.AllocentricMemory.Hexagonal_geometry import point_to_cell
 from ...Robot.CtrlRobot import ENACTION_STEP_RENDERING, ENACTION_STEP_ENACTING
 from ...Memory.EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO
-from ...Memory.AllocentricMemory.GridCell import CELL_UNKNOWN
+from ...Memory.AllocentricMemory.AllocentricMemory import CELL_UNKNOWN
 
 
 STATUS_0 = 0
@@ -109,29 +109,31 @@ class CtrlAllocentricView:
                 self.update_view()
 
             # Display this phenomenon in phenomenon window
-            if cell.phenomenon_id is not None:
-                self.workspace.ctrl_phenomenon_view.view.set_caption(f"Phenomenon {cell.phenomenon_id}")
-                self.workspace.ctrl_phenomenon_view.phenomenon_id = cell.phenomenon_id
+            if self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][PHENOMENON_ID] != -1:
+            # if cell.phenomenon_id is not None:
+                self.workspace.ctrl_phenomenon_view.view.set_caption(f"Phenomenon {self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][PHENOMENON_ID]}")
+                self.workspace.ctrl_phenomenon_view.phenomenon_id = self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][PHENOMENON_ID]
                 self.workspace.ctrl_phenomenon_view.update_body_robot()
                 self.workspace.ctrl_phenomenon_view.update_affordance_displays()
 
-            self.view.label_click.text = cell.label()
+            self.view.label_click.text = self.workspace.memory.allocentric_memory.grid[cell_x][cell_y].__str__()
 
-            """Label of the cell for display on click in allocentricView"""
-            label = str(self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][STATUS_0]) + " Clocks: ["
-            label += str(self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][STATUS_1])
-            label += str(self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][STATUS_3])
-            label += str(self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][STATUS_4])
-            label += str(self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][CLOCK_PLACE]) + ", "
-            label += str(self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][CLOCK_INTERACTION]) + ", "
-            label += str(self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][CLOCK_NO_ECHO]) + ", "
-            label += str(self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][CLOCK_FOCUS]) + ", "
-            label += str(self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][CLOCK_FOCUS]) + "]"
-            if self.phenomenon_id is not None:
-                label += " Phenomenon:" + str(self.phenomenon_id)
+            # """Label of the cell for display on click in allocentricView"""
+            # label = str(self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][STATUS_0]) + " Clocks: ["
+            # label += str(self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][STATUS_1])
+            # label += str(self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][STATUS_3])
+            # label += str(self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][STATUS_4])
+            # label += str(self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][CLOCK_PLACE]) + ", "
+            # label += str(self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][CLOCK_INTERACTION]) + ", "
+            # label += str(self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][CLOCK_NO_ECHO]) + ", "
+            # label += str(self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][CLOCK_FOCUS]) + ", "
+            # label += str(self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][CLOCK_FOCUS]) + "]"
+            # # if self.phenomenon_id is not None:
+            #     label += " Phenomenon:" + str(self.phenomenon_id)
+            #
+            #     self.view.label_click.text = label
 
-                self.view.label_click.text = label
-            self.view.on_mouse_press = on_mouse_press
+        self.view.on_mouse_press = on_mouse_press
 
         def on_key_press(symbol, modifiers):
             """ Deleting the prompt"""

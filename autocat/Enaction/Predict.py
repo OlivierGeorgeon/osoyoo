@@ -2,11 +2,11 @@ import math
 import numpy as np
 import time
 import matplotlib.path as mpath
-from ..Proposer.Action import ACTION_FORWARD, ACTION_SWIPE, ACTION_RIGHTWARD, ACTION_SCAN
-from ..Memory.PhenomenonMemory import PHENOMENON_RECOGNIZED_CONFIDENCE, PHENOMENON_ENCLOSED_CONFIDENCE
+from ..Proposer.Action import ACTION_FORWARD, ACTION_SWIPE, ACTION_RIGHTWARD, ACTION_SCAN, ACTION_BACKWARD
+from ..Memory.PhenomenonMemory import PHENOMENON_ENCLOSED_CONFIDENCE
 from ..Memory.AllocentricMemory.Hexagonal_geometry import point_to_cell
 from ..Memory.EgocentricMemory.Experience import EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_FLOOR
-from ..Robot.RobotDefine import ROBOT_FLOOR_SENSOR_X, ROBOT_SETTINGS, ROBOT_OUTSIDE_Y
+from ..Robot.RobotDefine import ROBOT_FLOOR_SENSOR_X, ROBOT_SETTINGS
 from ..Robot.Outcome import Outcome
 from ..Utils import assert_almost_equal_angles, point_to_head_direction_distance
 from .Trajectory import Trajectory
@@ -21,16 +21,16 @@ def generate_prediction(command, memory):
 
     # By default, predict the intended duration1, yaw, and floor: 0.
     outcome_dict = {"clock": command.clock, "action": command.action.action_code, "duration1": command.duration,
-                    "head_angle": memory.body_memory.head_direction_degree(), "echo_distance": 10000,
-                    "yaw": command.yaw, "floor": 0}
+                    "head_angle": memory.body_memory.head_direction_degree()
+                    # , "echo_distance": 10000  # not necessary
+                    , "yaw": command.yaw, "floor": 0}
 
-    # If terrain is closed, adjust the floor, duration1, and yaw outcome
-    if memory.phenomenon_memory.terrain_confidence() >= PHENOMENON_ENCLOSED_CONFIDENCE:  # PHENOMENON_RECOGNIZED_CONFIDENCE:
+    # Predict crossing enclosed terrain
+
+    if memory.phenomenon_memory.terrain_confidence() >= PHENOMENON_ENCLOSED_CONFIDENCE:
         # The shape of the terrain in egocentric coordinates
-        # start_time = time.time()
         ego_shape = np.apply_along_axis(memory.terrain_centric_to_egocentric, 1,
                                         memory.phenomenon_memory.terrain().shape)
-        # print("compute ego shape:", (time.time() - start_time) * 1000, "milliseconds")
         if command.action.action_code == ACTION_FORWARD:
             # Loop over the points where the y coordinate changes sign
             intersections = []
@@ -82,14 +82,38 @@ def generate_prediction(command, memory):
                     outcome_dict["color_index"] = cell_color(np.array([ROBOT_FLOOR_SENSOR_X, closest_intersection, 0]), memory)
                     outcome_dict["confidence"] = memory.phenomenon_memory.terrain_confidence()
 
+    # Predict crossing a dot phenomenon
+
+    dots = [memory.allocentric_to_egocentric(p.point) for p in memory.phenomenon_memory.phenomena.values()
+            if p.phenomenon_type == EXPERIENCE_FLOOR]
+    # Test crossing dot phenomenon while moving forward
+    if command.action.action_code == ACTION_FORWARD:
+        dots = [p for p in dots if p[0] > ROBOT_FLOOR_SENSOR_X and abs(p[1]) < 20]
+        if len(dots) > 0:
+            closest_dot = dots[np.argmin(np.array(dots)[:, 0])]
+            duration1 = (closest_dot[0] - ROBOT_FLOOR_SENSOR_X) * 1000 / ROBOT_SETTINGS[memory.robot_id]["forward_speed"]
+            if duration1 < command.duration:
+                record_dot_retreat(outcome_dict, duration1, closest_dot[1])
+    # Test crossing dot phenomenon while moving backward
+    elif command.action.action_code == ACTION_BACKWARD:
+        dots = [p for p in dots if p[0] < ROBOT_FLOOR_SENSOR_X and abs(p[1]) < 20]
+        if len(dots) > 0:
+            closest_dot = dots[np.argmax(np.array(dots)[:, 0])]
+            duration1 = (ROBOT_FLOOR_SENSOR_X - closest_dot[0]) * 1000 / ROBOT_SETTINGS[memory.robot_id]["forward_speed"]
+            if duration1 < command.duration:
+                record_dot_retreat(outcome_dict, duration1, closest_dot[1])
+
     # Compute the displacement in memory
+
     trajectory = Trajectory(memory, command)
     trajectory.track_displacement(Outcome(outcome_dict))
 
     # Push objects before moving the robot
+
     push_objects(trajectory, memory, outcome_dict["floor"])
 
     # Apply the displacement to memory
+
     memory.allocentric_memory.move(memory.body_memory.body_quaternion, trajectory, command.clock)
     memory.body_memory.body_quaternion = memory.body_memory.body_quaternion.cross(trajectory.yaw_quaternion)
     memory.body_memory.set_head_direction_degree(trajectory.head_direction_degree)
@@ -97,6 +121,7 @@ def generate_prediction(command, memory):
     memory.egocentric_memory.prompt_point = trajectory.prompt_point
 
     # Predict the echo outcome from the first object phenomenon found in the sonar cone
+
     ad = [point_to_head_direction_distance(memory.allocentric_to_egocentric(p.point))
           for p in memory.phenomenon_memory.phenomena.values() if p.phenomenon_type == EXPERIENCE_ALIGNED_ECHO]
     scan_ad = np.array([p for p in ad if p[1] > 0 and (command.action.action_code == ACTION_SCAN and
@@ -104,19 +129,18 @@ def generate_prediction(command, memory):
                         or assert_almost_equal_angles(math.radians(p[0]),
                                                       memory.body_memory.head_direction_rad, 35))], dtype=int)
     if scan_ad.ndim > 1:
-        # outcome_dict['head_angle'], outcome_dict['echo_distance'] = scan_ad[np.argmin(scan_ad[:, 1])].tolist()
         a, d = scan_ad[np.argmin(scan_ad[:, 1])].tolist()
         outcome_dict['head_angle'], outcome_dict['echo_distance'] = max(-90, min(a, 90)), d - ARRANGE_OBJECT_RADIUS
         print("echo distance", outcome_dict['echo_distance'])
     elif trajectory.focus_point is not None:  # Focus not on an object
         outcome_dict['head_angle'], _ = point_to_head_direction_distance(trajectory.focus_point)
-    outcome_dict['head_angle'] = max(-90, min(outcome_dict['head_angle'], 90))
+    outcome_dict['head_angle'] = round(max(-90, min(outcome_dict['head_angle'], 90)))
 
     predicted_outcome = Outcome(outcome_dict)
 
     # Update focus based on echo
-    trajectory.track_focus(predicted_outcome)
 
+    trajectory.track_focus(predicted_outcome)
     code = outcome_code(memory, trajectory, predicted_outcome)
 
     return predicted_outcome, code
@@ -143,7 +167,7 @@ def push_objects(trajectory, memory, floor):
         ego_point[0] = trajectory.translation[0] + ROBOT_FLOOR_SENSOR_X + p.category.short_radius
         # If floor then push beyond the retreat distance
         if floor:
-            ego_point[0] += ROBOT_SETTINGS[memory.robot_id]["retreat_distance"]
+            ego_point[0] += ROBOT_SETTINGS[memory.robot_id]["retreat_distance"][0]
         p.point = memory.egocentric_to_allocentric(ego_point)
 
 
@@ -154,6 +178,7 @@ def x_intersection(line):
     dx = (x2 - x1)
     if dx == 0:
         x = x1
+        slope = np.inf
     else:
         slope = (y2 - y1) / dx
         x = x1 - y1 / slope
@@ -182,19 +207,21 @@ def y_intersection(line):
     else:
         slope = (x2 - x1) / dy
         y = y1 - x1 / slope
-
     if x1 * x2 > 0:
         # The line segment does not intersect with the y axis
         return None
     else:
         return y
-    # if dy == 0 or abs(slope) > 10:
-    #     # Line segment in front
-    #     return [x, 3]
-    # elif (x1 < x2 and y1 < y2) or (x1 > x2 and y1 > y2):
-    #     # Line segment to the right
-    #     return [x, 1]
-    # else:
-    #     # Line segment to the left
-    #     return [x, 2]
 
+
+def record_dot_retreat(outcome_dict, duration1, closest_dot_y):
+    """Record the retreat when crossed a DOT phenomenon"""
+    outcome_dict["duration1"] = round(duration1)
+    if closest_dot_y > 10:
+        outcome_dict["floor"] = 0b10
+        outcome_dict["yaw"] = RETREAT_YAW
+    elif closest_dot_y > -10:
+        outcome_dict["floor"] = 0b11
+    else:
+        outcome_dict["floor"] = 0b01
+        outcome_dict["yaw"] = -RETREAT_YAW
