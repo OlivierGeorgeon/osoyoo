@@ -77,11 +77,9 @@ You made it this far, and you will succeed again in this part.  Get on that hors
 
 -
 
+<h1 style="font-size: 24px;">Step #2 -- Rewiring the ServoMechanism</h1>
 
 
-**Step #1 --Rewiring the ServoMechanism --**
-
-.....
 
 ## The head servo is overheating
 
