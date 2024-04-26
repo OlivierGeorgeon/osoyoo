@@ -83,6 +83,14 @@ You made it this far, and you will succeed again in this part.  Get on that hors
 
 ## The head servo is overheating
 
+
+<img src="rewrite.png" width="370" height="370">
+
+# thinking..... writing..... thinking..... writing....
+
+
+
+
 This may be because you left the servo head connected to Pin 13.
 Please make sure you moved it to Pin 6 as explained in [Modify some wiring](Assemby-the-robot.md#modify-some-wiring).
 
