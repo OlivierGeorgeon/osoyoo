@@ -60,6 +60,7 @@ class Workspace:
         self.message_sound = pyglet.media.load('autocat/Assets/chirp.wav', streaming=False)
         self.floor_sound = pyglet.media.load('autocat/Assets/cyberpunk3.wav', streaming=False)
         self.impact_sound = pyglet.media.load('autocat/Assets/cute_beep1.wav', streaming=False)
+        self.surprise_sound = pyglet.media.load('autocat/Assets/chirp3.mp3', streaming=False)
         self.startup_sound.play()
 
     def main(self, dt):

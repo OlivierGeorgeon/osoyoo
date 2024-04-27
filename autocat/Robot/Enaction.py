@@ -71,8 +71,13 @@ class Enaction:
         self.trajectory.track_focus(self.outcome)
 
     def succeed(self):
-        """Return True if the enaction succeeded: no floor or impact outcome"""
-        return self.outcome.floor == 0 and self.outcome.impact == 0
+        """Return True if floor and impact were correctly predicted"""
+        if (self.outcome.floor > 0) != (self.predicted_outcome.floor > 0):
+            return False
+        if (self.outcome.impact > 0) != (self.predicted_outcome.impact > 0):
+            return False
+        return True
+        # return self.outcome.floor == self.predicted_outcome.floor and self.outcome.impact == 0
 
     def current_enaction(self):
         """Used if the enaction is taken as a composite enaction"""

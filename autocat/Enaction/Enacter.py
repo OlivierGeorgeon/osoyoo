@@ -151,6 +151,10 @@ class Enacter:
             else:
                 print("Clock not incremented")  # TODO If never happens then remove the test
 
+            # Express surprise if the enaction failed
+            if not self.workspace.enaction.succeed():
+                self.workspace.surprise_sound.play()
+
             # If the composite enaction is over or aborted due to floor or impact
             if not self.workspace.composite_enaction.increment():
                 self.workspace.composite_enaction = None

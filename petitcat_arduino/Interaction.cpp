@@ -98,15 +98,17 @@ void Interaction::terminate()
   if (_FLO._is_retreating)
     _action_end_time = millis() + 200;
 
-  // Serial.println("Interaction.step2()");
-  // if (_action_end_time < millis() &&  !_FLO._is_retreating && !_HEA._is_enacting_head_alignment)
-  if (_action_end_time < millis() && !_HEA._is_enacting_head_alignment)
-  {
-    // Read the floor color and return true when done
-    if (_FLO._CLR.end_read())
-      // When color has been read, proceed to step 3
-      _step = INTERACTION_SEND;
-  }
+  // When time is over then read the floor color and proceed to step SEND
+  if (_action_end_time < millis() && (_align == 0 || !_HEA._is_enacting_head_alignment) && _FLO._CLR.end_read())
+    _step = INTERACTION_SEND;
+
+//  if (_action_end_time < millis() && !_HEA._is_enacting_head_alignment)
+//  {
+//    // Read the floor color and return true when done
+//    if (_FLO._CLR.end_read())
+//      // When color has been read, proceed to step 3
+//      _step = INTERACTION_SEND;
+//  }
 }
 
 // Send the outcome and go back to Step 0

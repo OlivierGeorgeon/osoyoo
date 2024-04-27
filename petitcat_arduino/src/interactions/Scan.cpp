@@ -71,6 +71,7 @@ void Scan::ongoing()
       // Terminate the ongoing step
       _HEA.beginEchoAlignment();  // Trigger echo alignment
       _duration1 = millis() - _action_start_time;
+      _duration2 = millis();
       _action_end_time = 0;
       _step = INTERACTION_TERMINATE;
     }

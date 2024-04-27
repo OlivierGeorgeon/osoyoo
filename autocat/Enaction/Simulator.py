@@ -9,7 +9,7 @@ from ..Memory.AllocentricMemory.Hexagonal_geometry import point_to_cell
 from ..Memory.AllocentricMemory.AllocentricMemory import COLOR_INDEX, STATUS_0, STATUS_1, POINT_X, POINT_Y
 from ..Memory.EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO
 from ..Utils import assert_almost_equal_angles, translation_quaternion_to_matrix, point_to_head_direction_distance
-from .Predict import RETREAT_YAW
+# from .Predict import RETREAT_YAW
 
 SIMULATION_SPEED = 1  # 0.5
 
@@ -104,11 +104,11 @@ class Simulator:
                         if enaction.command.speed[1] > 0:
                             # Swipe left
                             self.simulated_outcome_dict['floor'] = 2
-                            self.simulated_outcome_dict['yaw'] = RETREAT_YAW
+                            self.simulated_outcome_dict['yaw'] = memory.body_memory.retreat_yaw
                         else:
                             # Swipe right
                             self.simulated_outcome_dict['floor'] = 1
-                            self.simulated_outcome_dict['yaw'] = -RETREAT_YAW
+                            self.simulated_outcome_dict['yaw'] = -memory.body_memory.retreat_yaw
                     self.simulated_outcome_dict['color_index'] = int(memory.allocentric_memory.grid[i][j][COLOR_INDEX])
                 else:
                     self.simulated_outcome_dict['floor'] = 0
