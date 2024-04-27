@@ -3,7 +3,7 @@ import matplotlib.path as mpath
 import time
 import numpy as np
 from pyrr import quaternion, Vector3
-from . Hexagonal_geometry import point_to_cell, get_neighbors
+from . Hexagonal_geometry import point_to_cell, get_neighbors, is_pool
 # from . GridCell import GridCell, CELL_UNKNOWN
 from ..EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_PLACE, EXPERIENCE_FOCUS, EXPERIENCE_PROMPT, \
     EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_IMPACT
@@ -29,6 +29,7 @@ CLOCK_PHENOMENON = 10
 PHENOMENON_ID = 5
 POINT_X = 13
 POINT_Y = 14
+IS_POOL = 15
 
 CELL_UNKNOWN = 0
 CELL_NO_ECHO = -4
@@ -62,28 +63,17 @@ class AllocentricMemory:
         # The affordances
         self.affordances = []
 
+        # The hexagonal grid
         start_time = time.time()
-        # Fill the grid with cells
-        # self.grid = list()
-        self.grid = np.zeros((width, height, 15), dtype=int)
-
-        # Initialize the grid
+        self.grid = np.zeros((width, height, 16), dtype=int)
+        # Indexes after max_i and max_j are used for negative positions
         i_range = np.concatenate((np.arange(0, self.max_i), np.arange(self.min_i, 0)))
         j_range = np.concatenate((np.arange(0, self.max_j), np.arange(self.min_j, 0)))
         mesh_i, mesh_j = np.meshgrid(i_range, j_range, indexing='ij')
         self.grid[:, :, POINT_X: POINT_Y+1] = cell_to_point(mesh_i, mesh_j, cell_radius)
         self.grid[:, :, PHENOMENON_ID] = -1
-
-        # for i in range(self.min_i, self.max_i):
-        #     for j in range(self.min_j, self.max_j):
-        #         # self.grid[i][j][POINT_X: POINT_Y+1] = cell_to_point(i, j, cell_radius)[0, 0:2]
-        #         point = cell_to_point(i, j, cell_radius)[0]
-        #         self.grid[i][j][POINT_X] = point[0]
-        #         self.grid[i][j][POINT_Y] = point[1]
-        #         self.grid[i][j][PHENOMENON_ID] = -1
+        self.grid[:, :, IS_POOL] = is_pool(mesh_i, mesh_j)
         # print(f"Init Grid time: {time.time() - start_time:.4f} seconds")
-
-        # Use negative grid index for negative positions
 
         self.user_cells = []  # List of immutable tuples to be easily copied
 
@@ -119,8 +109,6 @@ class AllocentricMemory:
                                 self.grid[i][j][PHENOMENON_ID] = TER
                                 self.grid[i][j][CLOCK_PLACE] = clock
 
-                #path??
-
             # If terrain is enclosed
             if p_id == TER and p.confidence >= PHENOMENON_ENCLOSED_CONFIDENCE:  # PHENOMENON_RECOGNIZE_CONFIDENCE:  # TERRAIN_ORIGIN_CONFIDENCE:
                 # Draw the terrain from its shape
@@ -141,7 +129,6 @@ class AllocentricMemory:
                         if (self.min_i <= cell_x <= self.max_i) and (self.min_j <= cell_y <= self.max_j):
                             #self.grid[cell_x][cell_y].phenomenon_id = p_id
                             self.grid[cell_x][cell_y][PHENOMENON_ID] = p_id
-
 
             else:
                 if p_id == ROBOT1:
@@ -177,8 +164,6 @@ class AllocentricMemory:
     def move(self, direction_quaternion, trajectory, clock):
         """Move the robot in allocentric memory. Mark the traversed cells Free. Returns the new position
         If body_quaternion is identity then the translation is allocentric"""
-        # Move the robot along its body direction
-        # destination_point = self.robot_point + quaternion.apply_to_vector(direction_quaternion, trajectory.translation)
 
         # Mark the cells traversed by the robot
         alo_covered_area = trajectory.covered_area + self.robot_point
@@ -216,9 +201,6 @@ class AllocentricMemory:
                     self.grid[i][j][STATUS_0] = EXPERIENCE_PLACE
                     self.grid[i][j][CLOCK_PLACE] = clock
 
-
-
-
     def clear_grid_status(self):
         """Reset the status of all cells except PLACE status"""
         # for c in [c for line in self.grid for c in line if c.phenomenon_id is not None]:
@@ -227,7 +209,6 @@ class AllocentricMemory:
         #     c.status[1] = CELL_UNKNOWN
         #     c.clock_phenomenon = 0
         #     c.phenomenon_id = None
-
         for i in range(self.min_i, self.min_j):
             for j in range(self.max_i, self.max_j):
                 if self.grid[i][j][PHENOMENON_ID] != -1:

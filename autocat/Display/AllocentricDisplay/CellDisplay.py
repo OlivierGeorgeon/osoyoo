@@ -9,7 +9,8 @@ from ...Memory.EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_A
     EXPERIENCE_ROBOT, FLOOR_COLORS
 from ...Memory.AllocentricMemory.AllocentricMemory import CELL_UNKNOWN, CELL_NO_ECHO
 from ...Memory.AllocentricMemory.Hexagonal_geometry import CELL_RADIUS
-from ...Memory.AllocentricMemory.AllocentricMemory import STATUS_0, STATUS_2, STATUS_3, STATUS_1, STATUS_4, POINT_X, POINT_Y, CLOCK_INTERACTION, CLOCK_PLACE, COLOR_INDEX, CLOCK_NO_ECHO
+from ...Memory.AllocentricMemory.AllocentricMemory import STATUS_0, STATUS_2, STATUS_3, STATUS_1, STATUS_4, POINT_X, \
+    POINT_Y, CLOCK_INTERACTION, CLOCK_PLACE, COLOR_INDEX, CLOCK_NO_ECHO, IS_POOL
 SCALE_LEVEL_0 = 2.5  # 3
 SCALE_LEVEL_1 = 0.8  # 0.9
 SCALE_LEVEL_2 = 0.6  # 0.65
@@ -24,12 +25,12 @@ class CellDisplay:
 
         # The level 0 hexagon: Pool cell
         self.shape0 = None
-        # if DISPLAY_POOL:
-        #     if cell.is_pool():
-        #         point_pool = np.array([CELL_RADIUS * SCALE_LEVEL_0, 0, 0])
-        #         rotation_matrix = matrix44.create_from_z_rotation(-math.atan2(math.sqrt(3), -2))
-        #         point_pool = matrix44.apply_to_vector(rotation_matrix, point_pool)
-        #         self.shape0 = self.create_shape(cell.point(), point_pool, groups[0])
+        if DISPLAY_POOL:
+            if cell[IS_POOL]:
+                point_pool = np.array([CELL_RADIUS * SCALE_LEVEL_0, 0, 0])
+                rotation_matrix = matrix44.create_from_z_rotation(-math.atan2(math.sqrt(3), -2))
+                point_pool = matrix44.apply_to_vector(rotation_matrix, point_pool)
+                self.shape0 = self.create_shape([cell[POINT_X], cell[POINT_Y], 0], point_pool, groups[0])
 
         # The level 1 hexagon
         point0 = np.array([CELL_RADIUS * SCALE_LEVEL_1, 0, 0])
@@ -85,8 +86,6 @@ class CellDisplay:
                 color1 = name_to_rgb(FLOOR_COLORS[cell[COLOR_INDEX]])
         # Reset the color of the shape0
         self.shape1.colors[0:24] = 6 * (*color1, opacity1)
-        # self.shape1.colors[:] = 6 * (*color1, opacity1)
-
 
         # Level 2
         color2 = name_to_rgb('white')
@@ -94,8 +93,6 @@ class CellDisplay:
         if cell[STATUS_1] == CELL_UNKNOWN:
             color2 = name_to_rgb('grey')
             opacity2 = 0
-        # if cell.status[1] == EXPERIENCE_PLACE:  # Not used
-        #     color2 = name_to_rgb('LightGreen')  # LightGreen
         if cell[STATUS_1] == EXPERIENCE_BLOCK:
             color2 = name_to_rgb('salmon')
             opacity2 = int(max(255 * (10 - clock + cell[CLOCK_INTERACTION]) / 10, 0))
@@ -114,9 +111,7 @@ class CellDisplay:
         # if cell.status[1] == CELL_PHENOMENON:
         #     color2 = name_to_rgb('yellow')
         # Reset the color of the shape1
-        #self.shape2.colors[0:24] = 6 * (*color2, opacity2)
-        self.shape2.colors[:] = 6 * (*color2, opacity2)
-
+        self.shape2.colors[0:24] = 6 * (*color2, opacity2)
 
         # Level 3: Focus or Prompt or No Echo
         opacity3 = 255
@@ -132,8 +127,7 @@ class CellDisplay:
                 color3 = name_to_rgb('grey')
                 opacity3 = 0
         # Reset the color of the shape2
-        #self.shape3.colors[0:24] = 6 * (*color3, opacity3)
-        self.shape3.colors[:] = 6 * (*color3, opacity3)
+        self.shape3.colors[0:24] = 6 * (*color3, opacity3)
 
     def delete(self):
         """Delete the hexagon from the view"""
