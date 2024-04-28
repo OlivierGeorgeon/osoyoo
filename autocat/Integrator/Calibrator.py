@@ -3,7 +3,7 @@ import circle_fit as cf
 from pyrr import Matrix44
 from ..Memory.EgocentricMemory.Experience import EXPERIENCE_AZIMUTH, EXPERIENCE_COMPASS
 
-RUNNING_WINDOW_AZIMUTH = 20
+RUNNING_WINDOW_AZIMUTH = 100
 MAX_OFFSET_DISTANCE = 100
 MIN_OFFSET_RADIUS = 130
 MAX_OFFSET_RADIUS = 550  # 400
@@ -69,4 +69,4 @@ class Calibrator:
                 dif = self.workspace.enaction.outcome.yaw - self.workspace.memory.body_memory.retreat_yaw
                 av = (self.workspace.enaction.outcome.yaw + self.workspace.memory.body_memory.retreat_yaw)/2
             self.workspace.memory.body_memory.retreat_yaw = round(av)
-            print(f"Calibrate retreat yaw to: {av:.0f}, difference {dif:.1f}")
+            print(f"Calibrate withdraw yaw to: {av:.0f}, difference {dif:.1f}")

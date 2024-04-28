@@ -24,11 +24,14 @@ class PhenomenonDot:
         """Add a new affordance to this phenomenon and move the phenomenon to the position of this affordance"""
         if affordance.type == self.phenomenon_type:
             offset = affordance.point - self.point
-            self.shift(offset)
+            # Shift the phenomenon to the point of the new affordance
+            self.shift(offset)  # Comment to assume that the dot is fixed
+            # Add the new affordance
             affordance.point[:] = 0
             self.affordance_id += 1
             self.affordances[self.affordance_id] = affordance
-            return 0
+            # Return the robot's position correction
+            return 0  # -offset  Correct the robot's bosition based on the fixed dot
         else:
             return None
 

@@ -8,11 +8,13 @@ import numpy as np
 from . Action import ACTION_TURN, ACTION_FORWARD, ACTION_SWIPE, ACTION_BACKWARD
 from ..Robot.Enaction import Enaction
 from . Proposer import Proposer
-from ..Memory import EMOTION_CONTENT
+from ..Memory import EMOTION_CONTENT, EMOTION_VIGILANCE
 from ..Memory.EgocentricMemory.Experience import EXPERIENCE_FLOOR
+from ..Memory.AllocentricMemory.AllocentricMemory import CLOCK_PLACE
 from ..Enaction.CompositeEnaction import CompositeEnaction
 from ..Robot.RobotDefine import ROBOT_FLOOR_SENSOR_X
 from ..Memory.AllocentricMemory.Hexagonal_geometry import pool_neighbors, point_to_cell
+from ..Proposer.Interaction import OUTCOME_LOST_FOCUS
 
 STEP_INIT = 0
 STEP_WITHDRAW = 1
@@ -30,8 +32,32 @@ class ProposerPlayDot(Proposer):
     def select_enaction(self, enaction):
         """Add the next enaction to the stack based on sequence learning and spatial modifiers"""
 
-        p_id = self.workspace.memory.phenomenon_memory.focus_phenomenon_id
+        # If lost focus then search
+        if enaction.outcome_code == OUTCOME_LOST_FOCUS:
+            left_of_focus = self.workspace.memory.egocentric_memory.focus_point + np.array([0, 150, 0])
+            i, j = point_to_cell(self.workspace.memory.egocentric_to_allocentric(left_of_focus))
+            last_visited_left = self.workspace.memory.allocentric_memory.grid[i, j, CLOCK_PLACE]
+            right_of_focus = self.workspace.memory.egocentric_memory.focus_point + np.array([0, -150, 0])
+            i, j = point_to_cell(self.workspace.memory.egocentric_to_allocentric(right_of_focus))
+            last_visited_right = self.workspace.memory.allocentric_memory.grid[i, j, CLOCK_PLACE]
+            print(f"Searching left {last_visited_left}, right {last_visited_right}")
+            e_memory = self.workspace.memory.save()
+            e_memory.emotion_code = EMOTION_VIGILANCE
+            e_memory.egocentric_memory.prompt_point = np.array([200, 0, 0])
+            e0 = Enaction(self.workspace.actions[ACTION_FORWARD], e_memory)
+            e0.predicted_memory.egocentric_memory.prompt_point = np.array([-100, 0, 0])
+            e1 = Enaction(self.workspace.actions[ACTION_TURN], e0.predicted_memory)
+            if last_visited_left < last_visited_right:
+                e1.predicted_memory.egocentric_memory.prompt_point = np.array([0, -100, 0])
+            else:
+                e1.predicted_memory.egocentric_memory.prompt_point = np.array([0, 100, 0])
+            e2 = Enaction(self.workspace.actions[ACTION_SWIPE], e1.predicted_memory)
+            e2.predicted_memory.egocentric_memory.prompt_point = np.array([400, 0, 0])
+            e3 = Enaction(self.workspace.actions[ACTION_FORWARD], e2.predicted_memory)
+            return CompositeEnaction([e0, e1, e2, e3])
+
         # If no focus then no proposition
+        p_id = self.workspace.memory.phenomenon_memory.focus_phenomenon_id
         if p_id is None:
             return None
 

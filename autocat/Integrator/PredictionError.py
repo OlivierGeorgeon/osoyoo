@@ -2,14 +2,14 @@ import math
 import numpy as np
 import matplotlib
 import os
+import csv
 from pyrr import Quaternion
 from ..Proposer.Action import ACTION_FORWARD, ACTION_BACKWARD, ACTION_SWIPE
 from ..Proposer.Interaction import OUTCOME_LOST_FOCUS, OUTCOME_NO_FOCUS, OUTCOME_FLOOR
 from ..Utils import short_angle, point_to_head_direction_distance
 from .PlotSequence import plot
-#from ..Enaction.Simulator import RETREAT_YAW
 
-PREDICTION_ERROR_WINDOW = 100
+PREDICTION_ERROR_WINDOW = 200
 RUNNING_AVERAGE_COEF = 0.25
 
 
@@ -176,7 +176,7 @@ class PredictionError:
             re = math.degrees(-short_angle(q_computed, enaction.trajectory.yaw_quaternion))
             self.re_yaw[enaction.clock] = re
             self.re_yaw.pop(enaction.clock - PREDICTION_ERROR_WINDOW, None)
-            print(f"Residual Error Retreat Yaw (computed - measured)= {re:.1f}",
+            print(f"Residual Error Withdraw Yaw (computed - measured)= {re:.1f}",
                   f"Average: {np.mean(list(self.re_yaw.values())):.1f}",
                   f"std: {np.std(list(self.re_yaw.values())):.1f}")
 
@@ -248,9 +248,16 @@ class PredictionError:
 
         # Residual errors Yaw and Compass
         kwargs = {'bottom': -20, 'top': 20, 'fmt': 'sy', 'marker_size': 5}
-        plot(self.re_yaw, "Retreat yaw residual error", "03_yaw_re", "(degree)", **kwargs)
+        plot(self.re_yaw, "Withdraw yaw residual error", "03_yaw_re", "(degree)", **kwargs)
         plot(self.re_compass, "Compass residual error", "04_Compass", "(degree)", **kwargs)
-
+        with open("log/03_yaw_re.csv", 'w', newline='') as file:
+            writer = csv.writer(file)
+            for key, value in self.re_yaw.items():
+                writer.writerow([round(key), value])
+        with open("log/04_Compass.csv", 'w', newline='') as file:
+            writer = csv.writer(file)
+            for key, value in self.re_compass.items():
+                writer.writerow([round(key), value])
         # The speed as blue circles
         plot(self.x_speed, "X speed", "05_x_speed", "(mm/s)")
         plot(self.y_speed, "Y speed", "06_y_speed", "(mm/s)")

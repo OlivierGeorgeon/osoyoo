@@ -86,7 +86,7 @@ class PhenomenonTerrain(Phenomenon):
             #     # self.interpolate()
             #     self.reshape()
 
-            return - position_correction  # TODO remove the minus sign
+            return 0  # - position_correction  # TODO remove the minus sign
         # Affordances that do not belong to this phenomenon must return None
         return None
 
