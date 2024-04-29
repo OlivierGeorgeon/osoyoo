@@ -267,14 +267,14 @@ class PredictionError:
         kwargs = {'bottom': -20, 'top': 20, 'fmt': 'sy', 'marker_size': 5}
         plot(self.re_yaw, "Withdraw yaw residual error", "03_yaw_re", "(degree)", **kwargs)
         plot(self.re_compass, "Compass residual error", "04_Compass", "(degree)", **kwargs)
-        with open("log/03_yaw_re.csv", 'w', newline='') as file:
-            writer = csv.writer(file)
-            for key, value in self.re_yaw.items():
-                writer.writerow([round(key), value])
-        with open("log/04_Compass.csv", 'w', newline='') as file:
-            writer = csv.writer(file)
-            for key, value in self.re_compass.items():
-                writer.writerow([round(key), value])
+        # with open("log/03_yaw_re.csv", 'w', newline='') as file:
+        #     writer = csv.writer(file)
+        #     for key, value in self.re_yaw.items():
+        #         writer.writerow([round(key), value])
+        # with open("log/04_Compass.csv", 'w', newline='') as file:
+        #     writer = csv.writer(file)
+        #     for key, value in self.re_compass.items():
+        #         writer.writerow([round(key), value])
         # The speed as blue circles
         plot(self.x_speed, "X speed", "05_x_speed", "(mm/s)")
         plot(self.y_speed, "Y speed", "06_y_speed", "(mm/s)")
