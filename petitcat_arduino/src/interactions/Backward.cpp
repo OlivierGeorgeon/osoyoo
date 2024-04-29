@@ -45,7 +45,7 @@ void Backward::ongoing()
     if (!_HEA._is_enacting_head_alignment)
       _HEA.beginEchoAlignment();
     _duration1 = millis() - _action_start_time;
-    _duration2 = millis();
+//    _duration2 = millis();
     _action_end_time = 0;
     _FLO._OWM.stopMotion();
     _step = INTERACTION_TERMINATE;
@@ -58,7 +58,7 @@ void Backward::ongoing()
     _status ="1";
     // Proceed to step 2 for enacting Floor Change Retreat
     _duration1 = millis()- _action_start_time;
-    _duration2 = millis();
+//    _duration2 = millis();
     _action_end_time = 0;
     _step = INTERACTION_TERMINATE;
   }
@@ -67,7 +67,7 @@ void Backward::ongoing()
     if (_align > 0 && !_HEA._is_enacting_head_alignment)
       _HEA.beginEchoAlignment();  // Force HEA
     _duration1 = millis()- _action_start_time;
-    _duration2 = millis();
+//    _duration2 = millis();
     _FLO._OWM.stopMotion();
     _step = INTERACTION_TERMINATE;
   }

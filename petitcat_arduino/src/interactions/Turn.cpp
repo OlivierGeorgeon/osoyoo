@@ -52,7 +52,7 @@ void Turn::ongoing()
     _status ="1";
     // Proceed to step 2 for enacting Floor Change Retreat
     _duration1 = millis()- _action_start_time;
-    _duration2 = millis();
+//    _duration2 = millis();
     _action_end_time = _FLO._retreat_end_time + TURN_SPOT_ENDING_DELAY;
     _step = INTERACTION_TERMINATE;
   }
@@ -68,7 +68,7 @@ void Turn::ongoing()
     if (_align > 0)
         _HEA.beginEchoAlignment();  // Force HEA. It was inhibited during the interaction
     _duration1 = millis() - _action_start_time;
-    _duration2 = millis();
+//    _duration2 = millis();
     _FLO._OWM.stopMotion();
     _action_end_time = millis() + TURN_SPOT_ENDING_DELAY;// give it time to immobilize before terminating interaction
     _step = INTERACTION_TERMINATE;

@@ -44,7 +44,6 @@ protected:
   int _clock = 0;
   int head_destination_angle = 0;
   unsigned long _duration1;
-  unsigned long _duration2;
   unsigned long _action_start_time;
   int _step = INTERACTION_BEGIN;
   int _caution = 0;
