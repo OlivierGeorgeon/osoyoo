@@ -116,7 +116,7 @@ class AllocentricView(InteractiveDisplay):
         """ Computes the cell coordinates from the screen coordinates """
         mouse_point = self.mouse_coordinates_to_point(x, y)
         cell_x, cell_y = point_to_cell(mouse_point)
-        cell_axial_x, cell_axial_y = point_to_cell_axial(mouse_point, 1)
+        cell_axial_x, cell_axial_y = point_to_cell_axial(mouse_point, CELL_RADIUS)
         self.label.text = "Mouse pos.: " + str(mouse_point[0]) + ", " + str(mouse_point[1])
         self.label.text += ", Cell: " + str(cell_x) + ", " + str(cell_y)
         self.label.text += ", Cell_axial: " + str(cell_axial_x) + ", " + str(cell_axial_y)

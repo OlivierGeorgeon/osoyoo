@@ -72,6 +72,8 @@ def point_to_cell_axial(point, size):
     r = (2 * point[1]) / (3 * size)
     return round(q), round(r)
 
+#axial round
+
 
 
 def is_pool(i, j):
