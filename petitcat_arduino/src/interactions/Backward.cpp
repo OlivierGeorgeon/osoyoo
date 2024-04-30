@@ -37,7 +37,7 @@ void Backward::ongoing()
   if (_is_focussed)  // Keep the head towards the focus (HEA is inhibited during the action) (speed is negative)
     _HEA.turnHead(_HEA.head_direction(_focus_x - _speed * (millis()- _action_start_time)/1000, _focus_y));
 
-  // If impact then proceed to phase 2
+  // If impact then proceed to step 2
   int impact = _IMU.get_impact_backward();
   if (impact > 0) // && !_FLO._is_enacting)
   {
@@ -45,6 +45,7 @@ void Backward::ongoing()
     if (!_HEA._is_enacting_head_alignment)
       _HEA.beginEchoAlignment();
     _duration1 = millis() - _action_start_time;
+    _duration2 = millis();
     _action_end_time = 0;
     _FLO._OWM.stopMotion();
     _step = INTERACTION_TERMINATE;
@@ -57,6 +58,7 @@ void Backward::ongoing()
     _status ="1";
     // Proceed to step 2 for enacting Floor Change Retreat
     _duration1 = millis()- _action_start_time;
+    _duration2 = millis();
     _action_end_time = 0;
     _step = INTERACTION_TERMINATE;
   }
@@ -65,6 +67,7 @@ void Backward::ongoing()
     if (_align > 0 && !_HEA._is_enacting_head_alignment)
       _HEA.beginEchoAlignment();  // Force HEA
     _duration1 = millis()- _action_start_time;
+    _duration2 = millis();
     _FLO._OWM.stopMotion();
     _step = INTERACTION_TERMINATE;
   }

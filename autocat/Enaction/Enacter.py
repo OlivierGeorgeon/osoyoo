@@ -6,6 +6,7 @@ from ..Integrator.OutcomeCode import outcome_code
 from . import KEY_ENGAGEMENT_ROBOT, KEY_CONTROL_DECIDER, KEY_ENGAGEMENT_IMAGINARY
 from ..Robot.RobotDefine import ROBOT_FLOOR_SENSOR_X
 from ..Memory.EgocentricMemory.Experience import EXPERIENCE_FLOOR
+from ..Proposer.Interaction import OUTCOME_LOST_FOCUS
 from ..Proposer.Proposer import Proposer
 from ..Proposer.ProposerExplore import ProposerExplore
 from ..Proposer.ProposerWatch import ProposerWatch
@@ -140,9 +141,19 @@ class Enacter:
             self.workspace.enaction.outcome_code = outcome_code(self.workspace.memory,
                                                    self.workspace.enaction.trajectory, self.workspace.enaction.outcome)
 
+            # Express surprise if the enaction failed
+            if not self.workspace.enaction.succeed():
+                self.workspace.surprise_sound.play()
+                # if failed due to no floor and no impact
+                if self.workspace.enaction.outcome.floor == 0 and \
+                        self.workspace.memory.phenomenon_memory.focus_phenomenon_id is not None \
+                        and self.workspace.enaction.outcome.impact == 0:
+                    # Lost focus to DOT phenomenon  TODO improve
+                    self.workspace.enaction.outcome_code = OUTCOME_LOST_FOCUS
+
             # Track the prediction errors
             self.workspace.prediction_error.log(self.workspace.enaction)
-            # Update the calibration values
+            # Calibrate
             self.workspace.calibrator.calibrate()
 
             # Increment the clock

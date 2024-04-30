@@ -1,12 +1,10 @@
 import math
 import numpy as np
 from pyrr import matrix44, Vector3, Quaternion, Matrix44
-from ..Proposer.Action import ACTION_FORWARD
-from ..Integrator.OutcomeCode import CONFIDENCE_NO_FOCUS, CONFIDENCE_NEW_FOCUS, CONFIDENCE_TOUCHED_FOCUS, \
-    CONFIDENCE_CAREFUL_SCAN, CONFIDENCE_CONFIRMED_FOCUS
-from ..Utils import short_angle, translation_quaternion_to_matrix, head_angle_distance_to_point, \
-    point_to_head_direction_distance
-from ..Robot.RobotDefine import ROBOT_FLOOR_SENSOR_X, ROBOT_CHASSIS_Y, ROBOT_SETTINGS, ROBOT_CHASSIS_X, ROBOT_OUTSIDE_Y
+from ..Proposer.Action import ACTION_FORWARD, ACTION_BACKWARD, ACTION_SWIPE, ACTION_RIGHTWARD
+from ..Integrator.OutcomeCode import CONFIDENCE_NO_FOCUS, CONFIDENCE_CONFIRMED_FOCUS
+from ..Utils import short_angle, translation_quaternion_to_matrix, point_to_head_direction_distance
+from ..Robot.RobotDefine import ROBOT_SETTINGS, ROBOT_CHASSIS_X, ROBOT_OUTSIDE_Y, ROBOT_FLOOR_SENSOR_X
 from ..Memory.PhenomenonMemory import ARRANGE_OBJECT_RADIUS
 from ..Memory.EgocentricMemory.EgocentricMemory import EXPERIENCE_ALIGNED_ECHO
 
@@ -106,18 +104,22 @@ class Trajectory:
                 # Update the body_quaternion
                 self.body_quaternion = body_quaternion_corrected
 
-        # The retreat distance
-        # if outcome.floor > 0:
-            # front_point = Vector3([ROBOT_FLOOR_SENSOR_X, 0, 0])
-            # line_point = front_point + Vector3([ROBOT_SETTINGS[self.robot_id]["retreat_distance"], 0, 0])
-            # self.ego_retreat[:] = front_point - self.yaw_quaternion * line_point
-            # self.translation += self.ego_retreat
-        if outcome.floor == 0b01:
-            self.translation -= np.array(ROBOT_SETTINGS[self.robot_id]["retreat_distance"]) * np.array([1, -1, 0])
-        elif outcome.floor == 0b11:
-            self.translation -= np.array(ROBOT_SETTINGS[self.robot_id]["retreat_distance"]) * np.array([1, 0, 0])
-        elif outcome.floor == 0b10:
-            self.translation -= np.array(ROBOT_SETTINGS[self.robot_id]["retreat_distance"])
+        # The withdraw distance
+        if outcome.action_code in [ACTION_FORWARD, ACTION_SWIPE, ACTION_RIGHTWARD]:
+            if outcome.floor == 0b01:
+                self.translation -= np.array(ROBOT_SETTINGS[self.robot_id]["retreat_distance"]) * np.array([1, -1, 0])
+            elif outcome.floor == 0b11:
+                self.translation -= np.array(ROBOT_SETTINGS[self.robot_id]["retreat_distance"]) * np.array([1, 0, 0])
+            elif outcome.floor == 0b10:
+                self.translation -= np.array(ROBOT_SETTINGS[self.robot_id]["retreat_distance"])
+        # elif outcome.action_code in [ACTION_SWIPE, ACTION_RIGHTWARD]:
+        #     if outcome.floor == 0b01:
+        #         self.translation += np.array([0, ROBOT_SETTINGS[self.robot_id]["retreat_distance"][0], 0])
+        #     elif outcome.floor == 0b10:
+        #         self.translation -= np.array([0, ROBOT_SETTINGS[self.robot_id]["retreat_distance"][0], 0])
+        elif outcome.action_code == ACTION_BACKWARD and outcome.floor:
+            # Withdraw forward
+            self.translation += np.array(ROBOT_SETTINGS[self.robot_id]["retreat_distance"]) * np.array([1, 0, 0])
 
         if outcome.blocked:
             self.translation = np.array([0, 0, 0], dtype=int)

@@ -16,6 +16,7 @@ class BodyMemory:
         self.head_direction_rad = .0  # [-pi/2, pi/2] Radian relative to the robot's x axis
         self.body_quaternion = Quaternion([0., 0., 0., 1.])  # The direction of the body initialized to x axis
         self.compass_offset = np.array(ROBOT_SETTINGS[robot_id]["compass_offset"], dtype=int)
+        self.retreat_yaw = ROBOT_SETTINGS[robot_id]["retreat_yaw"]
         self.energy = 100  # [0,100] The level of energy of the robot
         self.excitation = 100  # [0, 100] The level of excitation
         self.serotonin = 50  # 5-HT

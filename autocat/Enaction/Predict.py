@@ -5,6 +5,7 @@ import matplotlib.path as mpath
 from ..Proposer.Action import ACTION_FORWARD, ACTION_SWIPE, ACTION_RIGHTWARD, ACTION_SCAN, ACTION_BACKWARD
 from ..Memory.PhenomenonMemory import PHENOMENON_ENCLOSED_CONFIDENCE
 from ..Memory.AllocentricMemory.Hexagonal_geometry import point_to_cell
+from ..Memory.AllocentricMemory.AllocentricMemory import STATUS_0, COLOR_INDEX
 from ..Memory.EgocentricMemory.Experience import EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_FLOOR
 from ..Robot.RobotDefine import ROBOT_FLOOR_SENSOR_X, ROBOT_SETTINGS
 from ..Robot.Outcome import Outcome
@@ -13,7 +14,7 @@ from .Trajectory import Trajectory
 from ..Integrator.OutcomeCode import outcome_code
 from ..Memory.PhenomenonMemory import ARRANGE_OBJECT_RADIUS
 
-RETREAT_YAW = 45
+# RETREAT_YAW = 35
 
 
 def generate_prediction(command, memory):
@@ -32,7 +33,7 @@ def generate_prediction(command, memory):
         ego_shape = np.apply_along_axis(memory.terrain_centric_to_egocentric, 1,
                                         memory.phenomenon_memory.terrain().shape)
         if command.action.action_code == ACTION_FORWARD:
-            # Loop over the points where the y coordinate changes sign
+            # Find the nearest intersection with the terrain on x axis
             intersections = []
             for i in np.where(np.diff(np.sign(ego_shape[:, 1])))[0]:
                 intersection = x_intersection([ego_shape[i], ego_shape[i + 1]])
@@ -47,9 +48,9 @@ def generate_prediction(command, memory):
                     outcome_dict["color_index"] = cell_color(np.array([closest_intersection[0], 0, 0]), memory)
                     outcome_dict["confidence"] = memory.phenomenon_memory.terrain_confidence()
                     if closest_intersection[1] == 1:
-                        outcome_dict["yaw"] = -RETREAT_YAW
+                        outcome_dict["yaw"] = -memory.body_memory.retreat_yaw
                     elif closest_intersection[1] == 2:
-                        outcome_dict["yaw"] = RETREAT_YAW
+                        outcome_dict["yaw"] = memory.body_memory.retreat_yaw
         elif command.action.action_code in [ACTION_SWIPE, ACTION_RIGHTWARD]:
             # Translate the shape by the position of the floor sensor so we can check the sign of the x coordinate
             ego_shape -= np.array([ROBOT_FLOOR_SENSOR_X, 0, 0])  #
@@ -68,8 +69,8 @@ def generate_prediction(command, memory):
                 duration1 = closest_intersection * 1000 / ROBOT_SETTINGS[memory.robot_id]["lateral_speed"]
                 if duration1 < command.duration:
                     outcome_dict["duration1"] = round(duration1)
-                    outcome_dict["floor"] = 2
-                    outcome_dict["yaw"] = RETREAT_YAW
+                    outcome_dict["floor"] = 0b10
+                    outcome_dict["yaw"] = memory.body_memory.retreat_yaw
                     outcome_dict["color_index"] = cell_color(np.array([ROBOT_FLOOR_SENSOR_X, closest_intersection, 0]), memory)
                     outcome_dict["confidence"] = memory.phenomenon_memory.terrain_confidence()
             elif command.speed[1] < 0 < len(intersections_right):  # Swipe right
@@ -77,8 +78,8 @@ def generate_prediction(command, memory):
                 duration1 = -closest_intersection * 1000 / ROBOT_SETTINGS[memory.robot_id]["lateral_speed"]
                 if duration1 < command.duration:
                     outcome_dict["duration1"] = round(duration1)
-                    outcome_dict["floor"] = 1
-                    outcome_dict["yaw"] = -RETREAT_YAW
+                    outcome_dict["floor"] = 0b01
+                    outcome_dict["yaw"] = -memory.body_memory.retreat_yaw
                     outcome_dict["color_index"] = cell_color(np.array([ROBOT_FLOOR_SENSOR_X, closest_intersection, 0]), memory)
                     outcome_dict["confidence"] = memory.phenomenon_memory.terrain_confidence()
 
@@ -93,7 +94,7 @@ def generate_prediction(command, memory):
             closest_dot = dots[np.argmin(np.array(dots)[:, 0])]
             duration1 = (closest_dot[0] - ROBOT_FLOOR_SENSOR_X) * 1000 / ROBOT_SETTINGS[memory.robot_id]["forward_speed"]
             if duration1 < command.duration:
-                record_dot_retreat(outcome_dict, duration1, closest_dot[1])
+                record_dot_retreat(outcome_dict, duration1, closest_dot[1], memory.body_memory.retreat_yaw)
     # Test crossing dot phenomenon while moving backward
     elif command.action.action_code == ACTION_BACKWARD:
         dots = [p for p in dots if p[0] < ROBOT_FLOOR_SENSOR_X and abs(p[1]) < 20]
@@ -101,7 +102,7 @@ def generate_prediction(command, memory):
             closest_dot = dots[np.argmax(np.array(dots)[:, 0])]
             duration1 = (ROBOT_FLOOR_SENSOR_X - closest_dot[0]) * 1000 / ROBOT_SETTINGS[memory.robot_id]["forward_speed"]
             if duration1 < command.duration:
-                record_dot_retreat(outcome_dict, duration1, closest_dot[1])
+                record_dot_retreat(outcome_dict, duration1, closest_dot[1], memory.body_memory.retreat_yaw)
 
     # Compute the displacement in memory
 
@@ -151,8 +152,8 @@ def cell_color(ego_point, memory):
     floor_i, floor_j = point_to_cell(memory.egocentric_to_allocentric(ego_point))
     if (memory.allocentric_memory.min_i <= floor_i <= memory.allocentric_memory.max_i) and \
             (memory.allocentric_memory.min_j <= floor_j <= memory.allocentric_memory.max_j) and \
-            memory.allocentric_memory.grid[floor_i][floor_j].status[0] == EXPERIENCE_FLOOR:
-        return memory.allocentric_memory.grid[floor_i][floor_j].color_index
+            memory.allocentric_memory.grid[floor_i][floor_j][STATUS_0] == EXPERIENCE_FLOOR:
+        return int(memory.allocentric_memory.grid[floor_i][floor_j][COLOR_INDEX])
     else:
         return 0
 
@@ -214,14 +215,14 @@ def y_intersection(line):
         return y
 
 
-def record_dot_retreat(outcome_dict, duration1, closest_dot_y):
+def record_dot_retreat(outcome_dict, duration1, closest_dot_y, retreat_yaw):
     """Record the retreat when crossed a DOT phenomenon"""
     outcome_dict["duration1"] = round(duration1)
     if closest_dot_y > 10:
         outcome_dict["floor"] = 0b10
-        outcome_dict["yaw"] = RETREAT_YAW
+        outcome_dict["yaw"] = retreat_yaw
     elif closest_dot_y > -10:
         outcome_dict["floor"] = 0b11
     else:
         outcome_dict["floor"] = 0b01
-        outcome_dict["yaw"] = -RETREAT_YAW
+        outcome_dict["yaw"] = -retreat_yaw

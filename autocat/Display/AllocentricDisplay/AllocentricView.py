@@ -13,7 +13,7 @@ from ...Memory.AllocentricMemory.AllocentricMemory import STATUS_0, STATUS_4, CE
 
 NB_CELL_WIDTH = 30
 NB_CELL_HEIGHT = 100
-CELL_RADIUS = 50
+# CELL_RADIUS = 50
 ZOOM_IN_FACTOR = 1.2
 ZOOM_OUT_FACTOR = 1/ZOOM_IN_FACTOR
 
@@ -21,10 +21,6 @@ ZOOM_OUT_FACTOR = 1/ZOOM_IN_FACTOR
 class AllocentricView(InteractiveDisplay):
     """Create the allocentric view"""
     def __init__(self, workspace, width=400, height=400, *args, **kwargs):
-        # conf = Config(sample_buffers=1,
-        #               samples=4,
-        #               depth_size=16,
-        #               double_buffer=True)
         super().__init__(width, height, resizable=True, *args, **kwargs)
         self.set_caption("Allocentric Memory")
         self.set_minimum_size(150, 150)
@@ -41,17 +37,13 @@ class AllocentricView(InteractiveDisplay):
         self.robot = OsoyooCar(self.robot_batch, self.forefront)  # Rectangles seem not to respect ordered groups
 
         self.zoom_level = 3
-        # self.left *= self.zoom_level
-        # self.right *= self.zoom_level
-        # self.bottom *= self.zoom_level
-        # self.top *= self.zoom_level
 
         self.workspace = workspace
-        self.nb_cell_x = workspace.memory.allocentric_memory.width
-        self.nb_cell_y = workspace.memory.allocentric_memory.height
-        self.cell_radius = workspace.memory.allocentric_memory.cell_radius
-
-        self.hexagons = [[None for _ in range(self.nb_cell_y)] for _ in range(self.nb_cell_x)]
+        # self.nb_cell_x = workspace.memory.allocentric_memory.width
+        # self.nb_cell_y = workspace.memory.allocentric_memory.height
+        # self.cell_radius = workspace.memory.allocentric_memory.cell_radius
+        self.hexagons = [[None for _ in range(workspace.memory.allocentric_memory.height)]
+                         for _ in range(workspace.memory.allocentric_memory.width)]
         self.robot_poi = None  # The other robot point of interest
         self.body_poi = None
 
@@ -63,31 +55,19 @@ class AllocentricView(InteractiveDisplay):
         self.label_click = pyglet.text.Label('', font_name='Verdana', font_size=10, x=10, y=30)
         self.label_click.color = (255, 255, 255, 255)
         self.label_click.batch = self.label_batch
-        # self.left = 0
-        # self.right = width
-        # self.bottom = 0
-        # self.top = height
-        # self.zoomed_width = width
-        # self.zoomed_height = height
-        #
-        # self.total_dx = 0
-        # self.total_dy = 0
 
     def update_hexagon(self, i, j, cell):
         """Create or update or delete an hexagon in allocentric view."""
-
         if self.hexagons[i][j] is None:
-            #if cell[STATUS_0:STATUS_4].is_known():
-            if not np.array_equal(cell[STATUS_0:STATUS_4+1], np.array([CELL_UNKNOWN,CELL_UNKNOWN,CELL_UNKNOWN,CELL_UNKNOWN,CELL_UNKNOWN])):
-                # Create the hexagon
+            if not np.all(cell[STATUS_0:STATUS_4+1] == CELL_UNKNOWN):
+                # The hexagon does not exist but the cell is known then create the hexagon
                 self.hexagons[i][j] = CellDisplay(cell, self.batch, self.groups, self.workspace.memory.clock)
         else:
-            #if cell.is_known():
-            if not np.array_equal(cell[STATUS_0:STATUS_4+1], np.array([CELL_UNKNOWN,CELL_UNKNOWN,CELL_UNKNOWN,CELL_UNKNOWN,CELL_UNKNOWN])):
-                # Update the hexagon
+            if not np.all(cell[STATUS_0:STATUS_4+1] == CELL_UNKNOWN):
+                # The hexagon exists and the cell is known then update the hexagon
                 self.hexagons[i][j].update_color(cell, self.workspace.memory.clock)
             else:
-                # Delete the hexagon
+                # The hexagon exists and the cell is unknown then delete the hexagon
                 self.hexagons[i][j].delete()
                 self.hexagons[i][j] = None
 

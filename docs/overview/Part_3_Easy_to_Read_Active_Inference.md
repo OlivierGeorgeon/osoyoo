@@ -59,9 +59,11 @@ The PetitCat documentation is written so that anyone with a basic education can 
 
 Regardless of your skill level, you have made it this far -- you have built a robot car with your hands, you have learned how to move software around (Part I) and then you learned how to write some software in C/C++, build electronic circuits and make the software control the electronics (Part II). 
 
-Now here you are. In this Part III we will start doing a bit more serious work. But, regardless of your skill level or experience, do not worry -- this manual will gently guide you through the steps.
+In Part I you became familiar with the hardware and software systems we are using. In this Part II you developed more experience with the software and you transitioned from the Osoyoo pre-canned demonstration programs to a more serious use of the robot car. At this point your robot car should be controllable from Python code running on your desktop/laptop. If not, then please go back to the previous Part II and make sure it is working, before continuing in this Part III.
 
-In this Part III we will explore a bit more the software we just finished compiling and installing in Part II and see how well it controls the robot car. Then we will go on to further modify our robot car with a digital compass, inertial measurement unit and a color sensor. Then we will consider the Python code controlling all this. Then we will move on to consider Active Inference and how the robot car demonstrates this important principle. 
+Ok... you successfully completed Part II and have a robot car you can control from your Python code. Now here you are. In this Part III we will start doing a bit more serious work. But, regardless of your skill level or experience, do not worry -- this manual will gently guide you through the steps.
+
+In this Part III we will explore a bit more the software we just finished compiling and installing in Part II. We will also further modify the robot car, starting with changing the wiring of the servomechanism shortly below. Then we will go on to further modify our robot car with a digital compass, inertial measurement unit and a color sensor. Then we will consider the Python code controlling all this. If you don't know how to code in Python there are many excellent free courses available and you can still do this project. (However, I am assuming anyone doing this project and wanting to interface real-world hardware with their Python code, knows how to code the latter.) Then we will move on to consider Active Inference and how the robot car demonstrates this important principle. 
 
 You made it this far, and you will succeed again in this part.  Get on that horse. Saddle up!!  
 
@@ -74,6 +76,60 @@ You made it this far, and you will succeed again in this part.  Get on that hors
 
 
 -
+
+<h1 style="font-size: 24px;">Step #2 -- Rewiring the ServoMechanism</h1>
+
+
+
+## The head servo is overheating
+
+
+<img src="rewrite.png" width="370" height="370">
+
+# thinking..... writing..... thinking..... writing....
+
+
+
+
+This may be because you left the servo head connected to Pin 13.
+Please make sure you moved it to Pin 6 as explained in [Modify some wiring](Assemby-the-robot.md#modify-some-wiring).
+
+Pin 13 is used to control the built-in LED of the Arduino board. 
+The petitcat arduino code sends a fast on/off signal to Pin 13 to make the LED blink quickly to indicate that the robot is waiting for a wifi command. 
+If Pin 13 is connected to the head servo, the servo won't move but will overheat. 
+
+## The robot moves backward
+
+In some versions of the Osoyoo robot, the wheel wiring is backward. 
+You may invert the wheel wiring or set negative coefficients to wheels in `robot_define.h` like this:
+
+```
+#define REAR_RIGHT_WHEEL_COEF -1
+#define REAR_LEFT_WHEEL_COEF -1
+#define FRONT_RIGHT_WHEEL_COEF -1
+#define FRONT_LEFT_WHEEL_COEF -1
+```
+
+## Optionally change the servo
+
+The servo `LACC200610` provided by Osoyoo was jittering when the wheels were moving. I replaced it with the `SG90` servo from my Elegoo kit, which solved the problem.
+
+
+# Modify some wiring
+
+We have modified some wiring from the original osoyoo robot as listed in Table 1.
+
+Table 1: Wiring modification
+
+|Original |Modified ||
+|---|---|---|
+|5|23| Rear  Right Motor direction pin 1|
+|6|25| Rear  Right Motor direction pin 2|
+|13|6|Head servo pin|
+
+Pins 5 and 6 were moved to 23 and 25 because they don't need the PWM functionality. These pins are declared in the file `Wheel.h`.
+
+Pin 13 was moved to pin 6 because we are using the arduino onboard LED that is also connected to Pin 13. The head servo pin is declared in the file `Robot_define.h`.
 -
 -
 -

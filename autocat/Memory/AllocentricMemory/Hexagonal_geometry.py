@@ -35,6 +35,19 @@ def get_neighbor_in_direction(i, j, direction):
     return i + di, j + dj
 
 
+def pool_neighbors(i, j):
+    """Return the pool cells neighboring this cell"""
+    if j % 2 == 0:
+        # Even lines
+        neighbors = np.array([[1, -1], [1, 4], [-1, 5], [-2, 1], [-1, -4], [0, -5]])
+    else:
+        # Odd lines
+        # relative_neighbors = np.array([[3, -2], [2, 3], [1, 4], [0, 0], [0, -5], [2, -6]])
+        neighbors = np.array([[2, -1], [1, 4], [0, 5], [-1, 1], [-1, -4], [1, -5]])
+    neighbors += np.array([i, j])
+    return neighbors
+
+
 def cell_to_point(i, j, radius=CELL_RADIUS):
     """Convert the cell coordinates into allocentric coordinates"""
     cell_height = np.sqrt((2 * radius) ** 2 - radius ** 2)
@@ -59,6 +72,16 @@ def point_to_cell_axial(point, size):
     r = (2 * point[1]) / (3 * size)
     return round(q), round(r)
 
+
+
+def is_pool(i, j):
+    """True if this cell is used for pooling with aperture 7"""
+    # https://ieeexplore.ieee.org/document/8853238
+    # even: i = 3n + m, j = -2n + 4m
+    # odd: i = 3n + m -2, j = -2n + 4m + 1
+    pool_even = (-4 * i + j) % 14 == 0
+    pool_odd = (-4 * i + j - 9) % 14 == 0
+    return np.logical_or(pool_even, pool_odd)
 
 
 def point_to_cell(point, radius=CELL_RADIUS):

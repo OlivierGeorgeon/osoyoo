@@ -6,7 +6,8 @@ from ...Memory.EgocentricMemory.Experience import Experience, EXPERIENCE_LOCAL_E
     EXPERIENCE_TOUCH, EXPERIENCE_COMPASS, EXPERIENCE_AZIMUTH
 from ...Robot.RobotDefine import ROBOT_COLOR_SENSOR_X, ROBOT_FLOOR_SENSOR_X, ROBOT_CHASSIS_Y, ROBOT_OUTSIDE_Y, \
     ROBOT_SETTINGS
-from ...Proposer.Action import ACTION_FORWARD, ACTION_BACKWARD, ACTION_SWIPE, ACTION_RIGHTWARD, ACTION_CIRCUMVENT
+from ...Proposer.Action import ACTION_FORWARD, ACTION_BACKWARD, ACTION_SWIPE, ACTION_RIGHTWARD, ACTION_CIRCUMVENT, \
+    ACTION_TURN
 from ...Utils import quaternion_translation_to_matrix, head_angle_distance_to_matrix, matrix_to_rotation_matrix, translation_quaternion_to_matrix
 
 EXPERIENCE_PERSISTENCE = 10
@@ -46,20 +47,23 @@ class EgocentricMemory:
 
         # The FLOOR experience
         if enaction.outcome.floor > 0:
-            # playsound('autocat/Assets/cyberpunk3.wav', False)
-            # line_point = Vector3([ROBOT_FLOOR_SENSOR_X + ROBOT_SETTINGS[self.robot_id]["retreat_distance"], 0, 0])
-            # if enaction.outcome.floor == 0b01:
-            #     # Black line on the right
-            #     pose_matrix = quaternion_translation_to_matrix(Quaternion.from_z_rotation(0.), line_point)
-            #     pose_matrix = translation_quaternion_to_matrix(line_point, Quaternion.from_z_rotation(math.pi/6))
-            # elif enaction.outcome.floor == 0b10:
-            #     # Black line on the left
-            #     pose_matrix = translation_quaternion_to_matrix(line_point, Quaternion.from_z_rotation(-math.pi/6))
-            # else:
-            #     # Black line on the front
-            #     pose_matrix = quaternion_translation_to_matrix(Quaternion.from_z_rotation(0.), line_point)
-            pose_matrix = translation_quaternion_to_matrix([ROBOT_FLOOR_SENSOR_X, 0, 0], enaction.trajectory.yaw_quaternion.inverse)
-            pose_matrix = Matrix44.from_translation([np.linalg.norm(ROBOT_SETTINGS[self.robot_id]["retreat_distance"]), 0, 0]) * pose_matrix
+            if enaction.action.action_code in [ACTION_FORWARD, ACTION_TURN, ACTION_SWIPE, ACTION_RIGHTWARD]:
+                pose_matrix = translation_quaternion_to_matrix([ROBOT_FLOOR_SENSOR_X, 0, 0],
+                                                               enaction.trajectory.yaw_quaternion.inverse)
+                pose_matrix = Matrix44.from_translation([np.linalg.norm(ROBOT_SETTINGS[self.robot_id]
+                                                                        ["retreat_distance"]), 0, 0]) * pose_matrix
+            elif enaction.action.action_code == ACTION_BACKWARD:
+                pose_matrix = Matrix44.from_translation([ROBOT_FLOOR_SENSOR_X - ROBOT_SETTINGS[self.robot_id]
+                                                        ["retreat_distance"][0], 0, 0]) * pose_matrix
+            # else:  # SWIPE
+            #     if enaction.command.speed[1] > 0:
+            #         # pose_matrix = Matrix44.from_translation([ROBOT_FLOOR_SENSOR_X, ROBOT_SETTINGS[self.robot_id]["retreat_distance"][0], 0]).astype('float64')
+            #         pose_matrix = quaternion_translation_to_matrix(Quaternion.from_z_rotation(math.pi/2), [ROBOT_FLOOR_SENSOR_X, ROBOT_SETTINGS[self.robot_id]["retreat_distance"][0], 0])
+            #     else:
+            #         # pose_matrix = Matrix44.from_translation([ROBOT_FLOOR_SENSOR_X, -ROBOT_SETTINGS[self.robot_id]["retreat_distance"][0], 0]).astype('float64')
+            #         pose_matrix = quaternion_translation_to_matrix(Quaternion.from_z_rotation(math.pi / 2),
+            #                                                [ROBOT_FLOOR_SENSOR_X,
+            #                                                 -ROBOT_SETTINGS[self.robot_id]["retreat_distance"][0], 0])
             floor_exp = Experience(pose_matrix, EXPERIENCE_FLOOR, enaction.clock, experience_id=self.experience_id,
                                    durability=EXPERIENCE_PERSISTENCE, color_index=enaction.outcome.color_index)
             self.experiences[floor_exp.id] = floor_exp

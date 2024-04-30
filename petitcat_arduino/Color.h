@@ -7,7 +7,7 @@
 #define Color_h
 
 #define Led_PIN 53         // Pin number
-#define LED_ON_DURATION 50  // (ms) led on before reading the color
+#define LED_ON_DURATION 200  // Give time to immobilize 50  // (ms) led on before reading the color
 #include <Arduino_JSON.h>
 #include <Adafruit_TCS34725.h>
 

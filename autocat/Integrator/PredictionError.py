@@ -2,13 +2,14 @@ import math
 import numpy as np
 import matplotlib
 import os
+import csv
 from pyrr import Quaternion
 from ..Proposer.Action import ACTION_FORWARD, ACTION_BACKWARD, ACTION_SWIPE
 from ..Proposer.Interaction import OUTCOME_LOST_FOCUS, OUTCOME_NO_FOCUS, OUTCOME_FLOOR
 from ..Utils import short_angle, point_to_head_direction_distance
 from .PlotSequence import plot
 
-PREDICTION_ERROR_WINDOW = 100
+PREDICTION_ERROR_WINDOW = 200
 RUNNING_AVERAGE_COEF = 0.25
 
 
@@ -20,7 +21,8 @@ class PredictionError:
         self.pe_forward_duration1 = {}  # (s)
         self.pe_lateral_duration1 = {}  # (s)
         self.pe_yaw = {}  # (degree)
-        self.pe_compass = {}  # (degree)
+        self.re_yaw = {}  # (degree)
+        self.re_compass = {}  # (degree)
         self.pe_echo_direction = {}  # (degree)
         self.pe_echo_distance = {}  # (mm)
         self.pe_focus_direction = {}  # (degree)
@@ -80,7 +82,7 @@ class PredictionError:
                 pe = round(action_speed - speed)
                 self.pe_speed_forward[enaction.clock] = pe
                 self.pe_speed_forward.pop(actual_outcome.clock - PREDICTION_ERROR_WINDOW, None)
-                print("Prediction Error Speed (simulation", round(action_speed), " - measured", round(speed), ")=", pe,
+                print(f"Prediction Error Speed (simulation {action_speed:.0f}, - measured {speed:.0f})= {pe}",
                       "Average:", round(float(np.mean(list(self.pe_speed_forward.values()))), 1),
                       "std:", round(float(np.std(list(self.pe_speed_forward.values())))), 1)
                 # Update the speed of the action
@@ -89,7 +91,7 @@ class PredictionError:
                 # Use the same speed forward and backward
                 self.pe_x_speed[enaction.clock] = pe
                 self.pe_x_speed.pop(actual_outcome.clock - PREDICTION_ERROR_WINDOW, None)
-                print("Prediction Error X Speed (simulation", round(action_speed), " - measured", round(speed), ")=", pe,
+                print(f"Prediction Error X Speed (simulation {action_speed:.0f}, - measured {speed:.0f})= {pe}",
                       "Average:", round(float(np.mean(list(self.pe_x_speed.values()))), 1),
                       "std:", round(float(np.std(list(self.pe_x_speed.values())))), 1)
                 self.workspace.actions[ACTION_BACKWARD].translation_speed[0] = - action_speed * (1. - RUNNING_AVERAGE_COEF) - speed * RUNNING_AVERAGE_COEF
@@ -107,7 +109,7 @@ class PredictionError:
                 pe = round(action_speed - speed)
                 self.pe_speed_backward[enaction.clock] = pe
                 self.pe_speed_backward.pop(actual_outcome.clock - PREDICTION_ERROR_WINDOW, None)
-                print("Prediction Error Speed Back (simulation", round(action_speed), " - measured", round(speed), ")=", pe,
+                print(f"Prediction Error Speed Back (simulation {action_speed:.0f}, - measured {speed:.0f})= {pe}",
                       "Average:", round(float(np.mean(list(self.pe_speed_backward.values()))), 1),
                       "std:", round(float(np.std(list(self.pe_speed_backward.values())))), 1)
                 # Update the speed of the action
@@ -115,7 +117,7 @@ class PredictionError:
                 # Use the same speed forward and backward
                 self.pe_x_speed[enaction.clock] = - pe  # Opposite
                 self.pe_x_speed.pop(actual_outcome.clock - PREDICTION_ERROR_WINDOW, None)
-                print("Prediction Error X Speed (simulation", round(action_speed), " - measured", round(speed), ")=", pe,
+                print(f"Prediction Error X Speed (simulation {action_speed:.0f}, - measured {speed:.0f})= {pe}",
                       "Average:", round(float(np.mean(list(self.pe_x_speed.values()))), 1),
                       "std:", round(float(np.std(list(self.pe_x_speed.values())))), 1)
                 # Update the action speed
@@ -142,7 +144,7 @@ class PredictionError:
                 pe = round(action_speed - speed)
                 self.pe_y_speed[enaction.clock] = pe
                 self.pe_y_speed.pop(actual_outcome.clock - PREDICTION_ERROR_WINDOW, None)
-                print("Prediction Error Y Speed (simulation", round(action_speed), " - measured", round(speed), ")=", pe,
+                print(f"Prediction Error Y Speed (simulation {action_speed:.0f}, - measured {speed:.0f})= {pe}",
                       "Average:", round(float(np.mean(list(self.pe_y_speed.values()))), 1),
                       "std:", round(float(np.std(list(self.pe_y_speed.values())))), 1)
                 # Update the action speed
@@ -153,24 +155,39 @@ class PredictionError:
         else:
             self.previous_echo_point = None
 
-        # yaw
+        # Yaw raw prediction error
 
-        pe = math.degrees(-short_angle(Quaternion.from_z_rotation(math.radians(computed_outcome.yaw)),
-                                       enaction.trajectory.yaw_quaternion))
-        self.pe_yaw[enaction.clock] = pe
-        self.pe_yaw.pop(enaction.clock - PREDICTION_ERROR_WINDOW, None)
-        print("Prediction Error Yaw (command - measure)=", round(pe, 1),
-              "Average:", round(float(np.mean(list(self.pe_yaw.values()))), 1),
-              "std:", round(float(np.std(list(self.pe_yaw.values()))), 1))
+        if enaction.outcome.floor == 0 and enaction.predicted_outcome.floor == 0:
+            pe = math.degrees(-short_angle(Quaternion.from_z_rotation(math.radians(computed_outcome.yaw)),
+                                           enaction.trajectory.yaw_quaternion))
+            self.pe_yaw[enaction.clock] = pe
+            self.pe_yaw.pop(enaction.clock - PREDICTION_ERROR_WINDOW, None)
+            print(f"Prediction Error Yaw (command - measure)= {pe:.1f}",
+                  f"Average: {np.mean(list(self.pe_yaw.values())):.1f}",
+                  f"std: {np.std(list(self.pe_yaw.values())):.1f}")
 
-        # Compass prediction error
+        # Yaw residual error
 
-        self.pe_compass[enaction.clock] = math.degrees(enaction.trajectory.body_direction_delta)
-        self.pe_compass.pop(actual_outcome.clock - PREDICTION_ERROR_WINDOW, None)
-        print("Prediction Error Compass (integrated direction - compass measure)=",
-              round(self.pe_compass[enaction.clock], 2), "Average:",
-              round(float(np.mean(list(self.pe_compass.values()))), 2), "std:",
-              round(float(np.std(list(self.pe_compass.values()))), 2))
+        if enaction.outcome.floor in [1, 2]:
+            if enaction.outcome.floor == 1:
+                q_computed = Quaternion.from_z_rotation(math.radians(-self.workspace.memory.body_memory.retreat_yaw))
+            else:
+                q_computed = Quaternion.from_z_rotation(math.radians(self.workspace.memory.body_memory.retreat_yaw))
+            re = math.degrees(-short_angle(q_computed, enaction.trajectory.yaw_quaternion))
+            self.re_yaw[enaction.clock] = re
+            self.re_yaw.pop(enaction.clock - PREDICTION_ERROR_WINDOW, None)
+            print(f"Residual Error Withdraw Yaw (computed - measured)= {re:.1f}",
+                  f"Average: {np.mean(list(self.re_yaw.values())):.1f}",
+                  f"std: {np.std(list(self.re_yaw.values())):.1f}")
+
+        # Compass residual error
+
+        self.re_compass[enaction.clock] = math.degrees(enaction.trajectory.body_direction_delta)
+        self.re_compass.pop(actual_outcome.clock - PREDICTION_ERROR_WINDOW, None)
+        print("Residual Error Compass (integrated direction - compass measure)=",
+              round(self.re_compass[enaction.clock], 2), "Average:",
+              round(float(np.mean(list(self.re_compass.values()))), 2), "std:",
+              round(float(np.std(list(self.re_compass.values()))), 2))
 
         # The echo prediction error when focus is confident
 
@@ -227,27 +244,35 @@ class PredictionError:
 
         # The yaw prediction error
         kwargs = {'bottom': -40, 'top': 40, 'fmt': 'sc', 'marker_size': 5}
-        plot(self.pe_yaw, "Yaw prediction error", "02_yaw", "(degree)", **kwargs)
+        plot(self.pe_yaw, "Yaw prediction error", "02_yaw_pe", "(degree)", **kwargs)
 
-        # The compass residual error
+        # Residual errors Yaw and Compass
         kwargs = {'bottom': -20, 'top': 20, 'fmt': 'sy', 'marker_size': 5}
-        plot(self.pe_compass, "Compass residual error", "03_Compass", "(degree)", **kwargs)
-
+        plot(self.re_yaw, "Withdraw yaw residual error", "03_yaw_re", "(degree)", **kwargs)
+        plot(self.re_compass, "Compass residual error", "04_Compass", "(degree)", **kwargs)
+        with open("log/03_yaw_re.csv", 'w', newline='') as file:
+            writer = csv.writer(file)
+            for key, value in self.re_yaw.items():
+                writer.writerow([round(key), value])
+        with open("log/04_Compass.csv", 'w', newline='') as file:
+            writer = csv.writer(file)
+            for key, value in self.re_compass.items():
+                writer.writerow([round(key), value])
         # The speed as blue circles
-        plot(self.x_speed, "X speed", "04_x_speed", "(mm/s)")
-        plot(self.y_speed, "Y speed", "12_y_speed", "(mm/s)")
+        plot(self.x_speed, "X speed", "05_x_speed", "(mm/s)")
+        plot(self.y_speed, "Y speed", "06_y_speed", "(mm/s)")
         # plot(self.value_speed_forward, "Forward speed value", "Forward_speed_value", "(mm/s)")
         # plot(self.value_speed_backward, "Backward speed value", "Backward_speed_value", "(mm/s)")
 
         # The translation duration prediction errors in seconds as red squares
         kwargs = {'bottom': -2, 'top': 2, 'fmt': 'sr', 'marker_size': 5}
-        plot(self.pe_forward_duration1, "Forward duration prediction error", "06_Forward_duration_pe", "(s)", **kwargs)
-        plot(self.pe_lateral_duration1, "Swipe duration prediction error", "14_Swipe_duration_pe", "(s)", **kwargs)
+        plot(self.pe_forward_duration1, "Forward duration prediction error", "07_Forward_duration_pe", "(s)", **kwargs)
+        plot(self.pe_lateral_duration1, "Swipe duration prediction error", "08_Swipe_duration_pe", "(s)", **kwargs)
 
         # The prediction errors as red squares
         kwargs = {'bottom': -100, 'top': 100, 'fmt': 'sr', 'marker_size': 5}
-        plot(self.pe_x_speed, "X speed prediction error", "05_x_speed_pe", "(mm/s)", **kwargs)
-        plot(self.pe_y_speed, "Y speed prediction error", "13_y_speed_pe", "(mm/s)", **kwargs)
+        plot(self.pe_x_speed, "X speed prediction error", "09_x_speed_pe", "(mm/s)", **kwargs)
+        plot(self.pe_y_speed, "Y speed prediction error", "10_y_speed_pe", "(mm/s)", **kwargs)
         # plot(self.pe_speed_forward, "Forward speed prediction error", "Forward_speed_pe", "(mm/s)", parameters)
         # plot(self.pe_speed_backward, "Backward speed prediction error", "Backward_speed_pe", "(mm/s)", parameters)
         plot(self.pe_echo_direction, "Head direction prediction error", "07_Head_direction", "(degree)", **kwargs)
@@ -255,9 +280,9 @@ class PredictionError:
 
         # The focus as magenta squares
         kwargs = {'bottom': -100, 'top': 100, 'fmt': 'sm', 'marker_size': 5}
-        plot(self.pe_focus_direction, "Focus direction prediction error", "09_Focus_direction", "(degree)", **kwargs)
-        plot(self.pe_focus_distance, "Focus distance prediction error", "10_Focus_distance", "(mm)", **kwargs)
+        plot(self.pe_focus_direction, "Focus direction prediction error", "11_Focus_direction", "(degree)", **kwargs)
+        plot(self.pe_focus_distance, "Focus distance prediction error", "12_Focus_distance", "(mm)", **kwargs)
 
         terrain = self.workspace.memory.phenomenon_memory.terrain()
         if terrain is not None:
-            plot(terrain.origin_prediction_error, "Terrain origin", "11_Origin", "(mm)")
+            plot(terrain.origin_prediction_error, "Terrain origin", "13_Origin", "(mm)")
