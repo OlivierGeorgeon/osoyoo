@@ -85,7 +85,7 @@ void Scan::outcome(JSONVar & outcome_object)
 {
   JSONVar echos;
   bool has_echo = false;
-  for (int i = 0; i < _sign_array.size; i++)
+  for (int i = 0; i < MAX_SACCADES; i++)
   {
     if (_sign_array.distances[i] > 0 and _sign_array.distances[i]< 10000)
     {

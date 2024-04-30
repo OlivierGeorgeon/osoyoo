@@ -34,6 +34,7 @@
 #include "Led.h"
 #include "Robot_define.h"
 #include "Sequencer.h"
+//#include <MemoryUsage.h>
 
 Floor FLO;
 Head HEA;
@@ -61,6 +62,15 @@ void setup()
 
   IMU.setup();
   Serial.println("-- IMU initialized");
+
+  // Print memory usage
+//  MEMORY_PRINT_START
+//  MEMORY_PRINT_HEAPSTART
+//  MEMORY_PRINT_HEAPEND
+//  MEMORY_PRINT_STACKSTART
+//  MEMORY_PRINT_END
+//  MEMORY_PRINT_HEAPSIZE
+//  FREERAM_PRINT
 
   // Connect to the wifi board
 

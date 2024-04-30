@@ -6,16 +6,18 @@
 #ifndef Scan_h
 #define Scan_h
 
+#define MAX_SACCADES 18
+
 #include "../../Interaction.h"
 
 struct significant_array
 {
     // Struct to store the angles and the corresponding measures,
     // and booleans to indicate if the measure are significant
-    int distances[18]{0}; // 180/SCAN_SACCADE_SPAN
-    int angles[18]{0};
-    bool sign[18]{false};
-    int size = 18;
+    int distances[MAX_SACCADES]{0}; // 180/SCAN_SACCADE_SPAN
+    int8_t angles[MAX_SACCADES]{0};
+    bool sign[MAX_SACCADES]{false};
+//    int size = 18;
 };
 
 
@@ -35,6 +37,6 @@ private:
   unsigned long _next_saccade_time;
   significant_array _sign_array;
   int _current_index;
-};
+  };
 
 #endif

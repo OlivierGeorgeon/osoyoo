@@ -182,16 +182,23 @@ class AllocentricMemory:
         # print("Place robot time:", time.time() - start_time, "seconds")
 
     def clear_grid_status(self):
-        """Reset the status of all cells except PLACE status"""
-        for i in range(self.min_i, self.min_j):
-            for j in range(self.max_i, self.max_j):
-                if self.grid[i][j][PHENOMENON_ID] != -1:
-                    # The place experiences are not moved with phenomena
-                    if self.grid[i][j][STATUS_0] != EXPERIENCE_PLACE:
-                        self.grid[i][j][STATUS_0] = CELL_UNKNOWN
-                    self.grid[i][j][STATUS_1] = CELL_UNKNOWN
-                    self.grid[i][j][CLOCK_PHENOMENON] = 0
-                    self.grid[i][j][PHENOMENON_ID] = -1
+        """Reset the status of cells where there is a phenomenon, except PLACE status"""
+        phenomena_ij = np.where(self.grid[:, :, PHENOMENON_ID] != -1)
+        self.grid[:, :, STATUS_1][phenomena_ij] = CELL_UNKNOWN
+        self.grid[:, :, CLOCK_PHENOMENON][phenomena_ij] = 0
+        self.grid[:, :, PHENOMENON_ID][phenomena_ij] = -1
+        self.grid[:, :, STATUS_0][phenomena_ij] = np.where(self.grid[:, :, STATUS_0][phenomena_ij] != EXPERIENCE_PLACE,
+                                                           CELL_UNKNOWN, self.grid[:, :, STATUS_0][phenomena_ij])
+
+        # for i in range(self.min_i, self.min_j):
+        #     for j in range(self.max_i, self.max_j):
+        #         if self.grid[i][j][PHENOMENON_ID] != -1:
+        #             # The place experiences are not moved with phenomena
+        #             if self.grid[i][j][STATUS_0] != EXPERIENCE_PLACE:
+        #                 self.grid[i][j][STATUS_0] = CELL_UNKNOWN
+        #             self.grid[i][j][STATUS_1] = CELL_UNKNOWN
+        #             self.grid[i][j][CLOCK_PHENOMENON] = 0
+        #             self.grid[i][j][PHENOMENON_ID] = -1
 
     def apply_status_to_cell(self, i, j, status, clock, color_index):
         """Change the cell status. Keep the max clock"""
