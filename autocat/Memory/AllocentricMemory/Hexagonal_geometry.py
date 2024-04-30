@@ -54,6 +54,12 @@ def cell_to_point(i, j, radius=CELL_RADIUS):
 #         y = (cell_height / 2) + (j - 1) / 2 * cell_height
 #     return np.array([x, y, 0], dtype=int)
 
+def point_to_cell_axial(point, size):
+    q = (math.sqrt(3) * point[0] - point[1]) / (3 * size)
+    r = (2 * point[1]) / (3 * size)
+    return round(q), round(r)
+
+
 
 def point_to_cell(point, radius=CELL_RADIUS):
     """Convert an allocentric position to cell coordinates."""
@@ -67,6 +73,7 @@ def point_to_cell(point, radius=CELL_RADIUS):
     tmp_cell_y_center = 0
     # Do the regular part of translation :
     # to go to the next cell on the right/left you move by 3*radius on the x axis.
+
     x_sign = 1
     if pos_x < 0:
         x_sign = -1
