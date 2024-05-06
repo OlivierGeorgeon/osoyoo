@@ -238,20 +238,24 @@ class PredictionError:
 
         # Trace the enaction
         position_pe = ""
-        if self.workspace.memory.phenomenon_memory.focus_phenomenon_id is not None:
-            position_pe = self.workspace.memory.phenomenon_memory.phenomena[self.workspace.memory.phenomenon_memory.focus_phenomenon_id].position_pe.get(enaction.clock, "")
+        if self.workspace.memory.phenomenon_memory.focus_phenomenon_id is not None and enaction.clock in self.workspace.memory.phenomenon_memory.phenomena[self.workspace.memory.phenomenon_memory.focus_phenomenon_id].position_pe:
+            position_pe = round(self.workspace.memory.phenomenon_memory.phenomena[self.workspace.memory.phenomenon_memory.focus_phenomenon_id].position_pe[enaction.clock])
+            # Reduce serotonin if prediction error is low
+            if position_pe < 50:
+                self.workspace.memory.body_memory.serotonin = max(40, self.workspace.memory.body_memory.serotonin - 1)
 
         if enaction.clock == 0:
             # Initialize the file with headers
             with open("log/00_Trace.csv", 'w', newline='') as file:
                 csv.writer(file).writerow(["clock", "action", "predicted_outcome", "outcome_code", "pe_code", "floor",
-                                           "re_yaw", "re_compass", "position_pe"])
+                                           "re_yaw", "re_compass", "position_pe", "serotonin"])
         # Append the enaction line
         with open("log/00_Trace.csv", 'a', newline='') as file:
             writer = csv.writer(file)
             writer.writerow([enaction.clock, enaction.command.action.action_code, enaction.predicted_outcome_code,
                              enaction.outcome_code, self.pe_outcome_code[enaction.clock], enaction.outcome.floor,
-                             self.re_yaw.get(enaction.clock, ""), self.re_compass.get(enaction.clock, ""), position_pe])
+                             self.re_yaw.get(enaction.clock, ""), self.re_compass.get(enaction.clock, ""), position_pe,
+                             self.workspace.memory.body_memory.serotonin])
 
     def plot(self):
         """Show the prediction error plots"""

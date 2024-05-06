@@ -30,14 +30,10 @@ class ProposerPush(Proposer):
 
         return self.workspace.memory.body_memory.noradrenaline
 
-        if self.is_to_push():
-            return 4
-        elif self.step == STEP_WITHDRAW:
-            return 3  # May compete with ProposerExplore to return directly to origin
-        return 0
-
-    def select_enaction(self, enaction):
+    def propose_enaction(self):
         """Add the next enaction to the stack based on sequence learning and spatial modifiers"""
+        enaction = self.workspace.enaction
+
         e_memory = self.workspace.memory.save()
         e_memory.emotion_code = EMOTION_VIGILANCE
 

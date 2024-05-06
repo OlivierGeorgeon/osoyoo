@@ -36,19 +36,10 @@ class Proposer:
 
         return self.workspace.memory.body_memory.dopamine
 
-        if self.workspace.memory.phenomenon_memory.terrain_confidence() < TERRAIN_ORIGIN_CONFIDENCE or \
-                (self.workspace.memory.body_memory.energy >= ENERGY_TIRED and
-                 self.workspace.memory.body_memory.excitation > EXCITATION_LOW and
-                 self.workspace.memory.egocentric_memory.focus_point is not None and
-                 np.linalg.norm(self.workspace.memory.egocentric_memory.focus_point) < FOCUS_TOO_FAR_DISTANCE and
-                 not self.workspace.memory.is_outside_terrain(self.workspace.memory.egocentric_memory.focus_point)):
-            return 2
-        return 1
-
     def propose_enaction(self):
         """Return a proposed interaction"""
         if self.workspace.enaction is None:
-            return Enaction(self.workspace.actions[ACTION_SCAN], self.workspace.memory.save())
+            return Enaction(self.workspace.actions[ACTION_FORWARD], self.workspace.memory.save())
         return self.select_enaction(self.workspace.enaction)
 
     def select_enaction(self, enaction):

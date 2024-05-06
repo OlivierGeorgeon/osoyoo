@@ -123,7 +123,7 @@ class PhenomenonMemory:
             return self.phenomenon_id
 
     def create_phenomena(self, affordances):
-        """Create new phenomena from the list of affordances"""
+        """Create new phenomena from the list of affordances. Return the list of new phenomena IDs"""
         new_phenomena_id = []
         for affordance in affordances:
             if len(new_phenomena_id) == 0:
@@ -138,7 +138,7 @@ class PhenomenonMemory:
                         break
                 if not clustered:
                     new_phenomena_id.append(self.create_phenomenon(affordance))
-        # self.object_phenomena.extend(new_phenomena_id)
+        return new_phenomena_id
 
     def update_phenomena(self, affordances):
         """Try to attach a list of affordances to phenomena in the list.

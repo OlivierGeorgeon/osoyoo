@@ -10,7 +10,7 @@ from ...Robot.RobotDefine import ROBOT_CHASSIS_X, ROBOT_OUTSIDE_Y, CHECK_OUTSIDE
 from ...Memory.PhenomenonMemory.PhenomenonMemory import TER, ROBOT1
 from .Hexagonal_geometry import cell_to_point
 from ..PhenomenonMemory import PHENOMENON_RECOGNIZABLE_CONFIDENCE, PHENOMENON_ENCLOSED_CONFIDENCE
-from .utils import is_inside_polygon, is_inside_polygon2
+from .AllocentricGeometry import is_inside_rectangle, is_inside_polygon
 
 STATUS_0 = 0
 STATUS_1 = 1
@@ -157,7 +157,7 @@ class AllocentricMemory:
 
         # Mark the cells traversed by the robot
         alo_covered_area = trajectory.covered_area + self.robot_point
-        inside_ij = np.where(is_inside_polygon(self.grid[:, :, POINT_X], self.grid[:, :, POINT_Y], alo_covered_area))
+        inside_ij = np.where(is_inside_rectangle(self.grid[:, :, POINT_X], self.grid[:, :, POINT_Y], alo_covered_area))
         self.grid[:, :, STATUS_0][inside_ij] = EXPERIENCE_PLACE
         self.grid[:, :, CLOCK_PLACE][inside_ij] = clock
 
@@ -177,7 +177,7 @@ class AllocentricMemory:
         """Apply the PLACE status to the cells at the position of the robot"""
         start_time = time.time()
         outline = body_memory.outline() + self.robot_point
-        inside_ij = np.where(is_inside_polygon(self.grid[:, :, POINT_X], self.grid[:, :, POINT_Y], outline))
+        inside_ij = np.where(is_inside_rectangle(self.grid[:, :, POINT_X], self.grid[:, :, POINT_Y], outline))
         self.grid[:, :, STATUS_0][inside_ij] = EXPERIENCE_PLACE
         self.grid[:, :, CLOCK_PLACE][inside_ij] = clock
         # path = mpath.Path(outline[:, 0:2])

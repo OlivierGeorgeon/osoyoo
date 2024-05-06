@@ -37,7 +37,10 @@ def integrate(memory):
     # print("Position correction due to phenomenon update", position_correction)
     memory.allocentric_memory.robot_point += position_correction
     # Create new hypothetical phenomena from remaining affordances
-    memory.phenomenon_memory.create_phenomena(new_affordances)
+    new_phenomena_ids = memory.phenomenon_memory.create_phenomena(new_affordances)
+    # If new phenomena were created then play with them
+    if len(new_phenomena_ids) > 0:
+        memory.body_memory.serotonin = max(60, memory.body_memory.serotonin)
 
     # Store the remaining new affordances in allocentric memory
     # self.allocentric_memory.affordances.extend(new_affordances) Not sure why
