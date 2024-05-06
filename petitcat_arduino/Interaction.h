@@ -31,7 +31,7 @@ protected:
   Imu& _IMU;
   WifiCat& _WifiCat;
   unsigned long _action_end_time;
-  String _status = "0";
+  String _status; //  = "0";
   char _action = 0;
   int _target_angle = 0;
   int _target_duration = 1000;

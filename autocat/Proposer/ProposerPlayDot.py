@@ -64,6 +64,24 @@ class ProposerPlayDot(Proposer):
         if p.phenomenon_type == EXPERIENCE_FLOOR:
             e_memory = self.workspace.memory.save()
             e_memory.emotion_code = EMOTION_CONTENT
+
+            # If very playful and the dot is forward
+            if self.workspace.memory.body_memory.serotonin > 60 and \
+                    e_memory.egocentric_memory.focus_point[0] > ROBOT_FLOOR_SENSOR_X:
+                if abs(e_memory.egocentric_memory.focus_point[1]) < 10:
+                    # If in front then go to the dot
+                    e_memory.egocentric_memory.prompt_point = e_memory.egocentric_memory.focus_point.copy()
+                    return Enaction(self.workspace.actions[ACTION_FORWARD], e_memory)
+                elif math.degrees(math.atan2(e_memory.egocentric_memory.focus_point[1], e_memory.egocentric_memory.focus_point[0])) < 15:
+                    # If slightly in front then swipe
+                    e_memory.egocentric_memory.prompt_point = e_memory.egocentric_memory.focus_point.copy()
+                    return Enaction(self.workspace.actions[ACTION_SWIPE], e_memory)
+                else:
+                    # If not in front then turn
+                    e_memory.egocentric_memory.prompt_point = e_memory.egocentric_memory.focus_point.copy()
+                    return Enaction(self.workspace.actions[ACTION_TURN], e_memory)
+
+            # If mildly playful then turn around the dot
             # First enaction SWIPE in the direction of the focus
             if e_memory.egocentric_memory.focus_point[1] > 0:
                 e_memory.egocentric_memory.prompt_point = None

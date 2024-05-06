@@ -141,7 +141,7 @@ void Head::outcome(JSONVar & outcome_object)
 void Head::turnHead(int head_angle)
 {
   _head_angle = constrain(head_angle, -90, 90);
-  Serial.println("Turning head to: " + String(head_angle));
+  Serial.print("Turning head to: "); Serial.println(_head_angle));
   _head.write(_head_angle + 90);
 }
 

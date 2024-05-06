@@ -19,8 +19,8 @@ class BodyMemory:
         self.retreat_yaw = ROBOT_SETTINGS[robot_id]["retreat_yaw"]
         self.energy = 100  # [0,100] The level of energy of the robot
         self.excitation = 100  # [0, 100] The level of excitation
-        self.serotonin = 50  # 5-HT
-        self.dopamine = 100  # DA
+        self.serotonin = 61  # 5-HT
+        self.dopamine = 50  # DA
         self.noradrenaline = 50  # NA
 
     def update(self, enaction):
@@ -82,3 +82,4 @@ class BodyMemory:
         saved_body_memory.dopamine = self.dopamine
         saved_body_memory.noradrenaline = self.noradrenaline
         return saved_body_memory
+

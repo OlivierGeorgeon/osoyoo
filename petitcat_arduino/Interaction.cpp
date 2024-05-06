@@ -67,7 +67,8 @@ Interaction::Interaction(Floor& FLO, Head& HEA, Imu& IMU, WifiCat& WifiCat, JSON
 
   _action_start_time = millis();
   _action_end_time = _action_start_time + _target_duration;
-//  _status = "0"; in interaction.h
+  _status.reserve(10);
+  _status = "0"; // in interaction.h
 //  _step = INTERACTION_BEGIN;  in interaction.h
 }
 

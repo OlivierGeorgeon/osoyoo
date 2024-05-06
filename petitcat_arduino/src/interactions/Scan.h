@@ -37,6 +37,6 @@ private:
   unsigned long _next_saccade_time;
   significant_array _sign_array;
   int _current_index;
-  };
+};
 
 #endif
