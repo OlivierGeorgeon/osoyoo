@@ -71,8 +71,37 @@ def point_to_cell_axial(point, size):
     q = (math.sqrt(3) * point[0] - point[1]) / (3 * size)
     r = (2 * point[1]) / (3 * size)
     return round(q), round(r)
+    #return axial_round(q,r)
+
+function pixel_to_pointy_hex(point):
+    var q = (sqrt(3)/3 * point.x  -  1./3 * point.y) / size
+    var r = (                        2./3 * point.y) / size
+    return axial_round(Hex(q, r))
+
+def cell_to_point_axial(cell, size):
+    q = (3/2 * cell[0]) * size
+    r = (math.sqrt(3)/2 * cell[0] + math.sqrt(3) * cell[1]) * size
+    return q, r
 
 #axial round
+
+def axial_round(q, r):
+    x = round(q)
+    z = round(r)
+    y = round(-x - z)
+
+    x_diff = abs(x - q)
+    y_diff = abs(y - (-x - z))
+    z_diff = abs(z - r)
+
+    if x_diff > y_diff and x_diff > z_diff:
+        x = -y - z
+    elif y_diff > z_diff:
+        y = -x - z
+    else:
+        z = -x - y
+
+    return x, z
 
 
 

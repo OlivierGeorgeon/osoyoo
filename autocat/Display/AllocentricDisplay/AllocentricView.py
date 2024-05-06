@@ -13,7 +13,7 @@ from ...Memory.AllocentricMemory.AllocentricMemory import STATUS_0, STATUS_4, CE
 
 NB_CELL_WIDTH = 30
 NB_CELL_HEIGHT = 100
-# CELL_RADIUS = 50
+CELL_RADIUS = 50
 ZOOM_IN_FACTOR = 1.2
 ZOOM_OUT_FACTOR = 1/ZOOM_IN_FACTOR
 
