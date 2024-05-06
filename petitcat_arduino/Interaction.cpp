@@ -67,8 +67,8 @@ Interaction::Interaction(Floor& FLO, Head& HEA, Imu& IMU, WifiCat& WifiCat, JSON
 
   _action_start_time = millis();
   _action_end_time = _action_start_time + _target_duration;
-  _status.reserve(10);
-  _status = "0"; // in interaction.h
+//  _status.reserve(10);
+//  _status = "0"; // in interaction.h
 //  _step = INTERACTION_BEGIN;  in interaction.h
 }
 
@@ -120,7 +120,9 @@ void Interaction::send()
   // Compute the outcome message
   JSONVar outcome_object;
   outcome_object["clock"] = _clock;
-  outcome_object["action"] = String(_action);
+  char s[2]; s[0] = _action; s[1] = 0;
+//  snprintf(s, 2, "%c", _action);
+  outcome_object["action"] = s;  // String(_action); Avoid String to improve memory management
   outcome_object["duration1"] = _duration1;
   _HEA.outcome(outcome_object);
   _FLO.outcome(outcome_object);

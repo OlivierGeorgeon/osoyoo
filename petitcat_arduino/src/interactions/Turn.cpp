@@ -49,7 +49,8 @@ void Turn::ongoing()
   // Check if Floor Change Retreat
   if (_FLO._is_retreating)
   {
-    _status ="1";
+//    _status ="1";
+    strcpy(_status, "1");
     // Proceed to step 2 for enacting Floor Change Retreat
     _duration1 = millis()- _action_start_time;
 //    _duration2 = millis();

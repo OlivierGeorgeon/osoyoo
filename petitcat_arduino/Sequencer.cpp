@@ -127,7 +127,10 @@ Interaction* Sequencer::update(int& interaction_step, Interaction* INT)
       {
         // Unrecognized action (for debug)
         interaction_step = INTERACTION_DONE;  // remain in step 0
-        _WifiCat.send("{\"status\":\"Unknown\", \"action\":\"" + String(action) + "\"}");
+        char s[40];
+        snprintf(s, 40, "{\"status\":\"Unknown\", \"action\":\" %c \"}", action);
+        _WifiCat.send(s);
+//        _WifiCat.send("{\"status\":\"Unknown\", \"action\":\"" + String(action) + "\"}");
       }
 
       // Print the address of the pointer to control that the heap is not going to overflow

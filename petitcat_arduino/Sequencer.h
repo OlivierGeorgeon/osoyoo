@@ -26,7 +26,6 @@ private:
   Imu& _IMU;
   Led& _LED;
   WifiCat& _WifiCat;
-
   int _previous_clock = -1;
   char _packetBuffer[UDP_BUFFER_SIZE];
 };

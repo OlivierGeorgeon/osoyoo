@@ -34,7 +34,8 @@ void Watch::ongoing()
   // Check if Head alignment has been triggered
   if (_HEA._is_enacting_head_alignment)
   {
-    _status ="move";
+//    _status ="move";
+    strcpy(_status, "move");
     _duration1 = millis() - _action_start_time;
     _action_end_time = 0;
     _step = INTERACTION_TERMINATE;
@@ -57,6 +58,7 @@ void Watch::ongoing()
 void Watch::outcome(JSONVar & outcome_object)
 {
   if (!_HEA._discontinuous)
-    _status ="continuous";
+//    _status ="continuous";
+    strcpy(_status, "continuous");
   _HEA._discontinuous = false;
 }

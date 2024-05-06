@@ -39,7 +39,8 @@ void Forward::ongoing()
   {
     if (!_HEA._is_enacting_head_alignment)
       _HEA.beginEchoAlignment();  // Force to look at the obstacle
-    _status ="echo";
+//    _status ="echo";
+    strcpy(_status, "echo");
     _duration1 = millis()- _action_start_time;
 //    _duration2 = millis();
     _action_end_time = 0;
@@ -59,7 +60,8 @@ void Forward::ongoing()
     else
       _HEA.turnHead(0);
     _FLO.extraDuration(RETREAT_EXTRA_DURATION); // Increase retreat duration because need to reverse speed
-    _status ="1";
+//    _status ="1";
+    strcpy(_status, "1");
     // Proceed to step 2 for enacting Floor Change Retreat
     _duration1 = millis() - _action_start_time;
 //    _duration2 = millis();
