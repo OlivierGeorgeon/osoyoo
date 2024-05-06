@@ -68,15 +68,18 @@ def cell_to_point(i, j, radius=CELL_RADIUS):
 #     return np.array([x, y, 0], dtype=int)
 
 def point_to_cell_axial(point, size):
-    q = (math.sqrt(3) * point[0] - point[1]) / (3 * size)
-    r = (2 * point[1]) / (3 * size)
-    return round(q), round(r)
-    #return axial_round(q,r)
+    q = (2 * point[0]) / (3 * size)
+    r = (-point[0] + math.sqrt(3) * point[1]) / (3 * size)
 
-function pixel_to_pointy_hex(point):
-    var q = (sqrt(3)/3 * point.x  -  1./3 * point.y) / size
-    var r = (                        2./3 * point.y) / size
-    return axial_round(Hex(q, r))
+#    q = (math.sqrt(3) * point[0] - point[1]) / (3 * size)
+#    r = (2 * point[1]) / (3 * size)
+    #return round(q), round(r)
+    return axial_round(q, r)
+
+#function pixel_to_pointy_hex(point):
+#    var q = (sqrt(3)/3 * point.x  -  1./3 * point.y) / size
+#    var r = (                        2./3 * point.y) / size
+#    return axial_round(Hex(q, r))
 
 def cell_to_point_axial(cell, size):
     q = (3/2 * cell[0]) * size
