@@ -5,7 +5,7 @@ from pyglet.gl import *
 from ...Utils import quaternion_translation_to_matrix
 from ..EgocentricDisplay.OsoyooCar import OsoyooCar
 from .CellDisplay import CellDisplay
-from ...Memory.AllocentricMemory.Hexagonal_geometry import point_to_cell, point_to_cell_axial
+from ...Memory.AllocentricMemory.Hexagonal_geometry import point_to_cell, point_to_cell_axial, cell_to_point_axial
 from ...Memory.EgocentricMemory.Experience import EXPERIENCE_ROBOT
 from ..InteractiveDisplay import InteractiveDisplay
 from ..PointOfInterest import PointOfInterest, POINT_ROBOT
@@ -120,6 +120,7 @@ class AllocentricView(InteractiveDisplay):
         self.label.text = "Mouse pos.: " + str(mouse_point[0]) + ", " + str(mouse_point[1])
         self.label.text += ", Cell: " + str(cell_x) + ", " + str(cell_y)
         self.label.text += ", Cell_axial: " + str(cell_axial_q) + ", " + str(cell_axial_r)
+        self.label.text += cell_to_point_axial(cell_axial_q, cell_axial_r, CELL_RADIUS).__str__()
         return cell_x, cell_y
 
         # def mouse_coordinate_to_cell(self, x, y):

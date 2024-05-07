@@ -86,12 +86,11 @@ def point_to_cell_axial(point, size):
 #     r = (math.sqrt(3)/2 * cell[0] + math.sqrt(3) * cell[1]) * size
 #     return q, r
 
-def cell_to_point_axial(cell, size):
-    q = (3/2 * cell[0]) * size
-    r = (math.sqrt(3)/2 * cell[0] + math.sqrt(3) * cell[1]) * size
-    return np.array([q, r])
+def cell_to_point_axial(q, r, size):
+    x = (3/2 * q) * size
+    y = (math.sqrt(3)/2 * q + math.sqrt(3) * r) * size
+    return np.array([x, y])
 
-#axial round
 
 def axial_round(q, r):
     x = round(q)
