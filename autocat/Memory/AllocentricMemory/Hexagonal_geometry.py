@@ -81,10 +81,15 @@ def point_to_cell_axial(point, size):
 #    var r = (                        2./3 * point.y) / size
 #    return axial_round(Hex(q, r))
 
+# def cell_to_point_axial(cell, size):
+#     q = (3/2 * cell[0]) * size
+#     r = (math.sqrt(3)/2 * cell[0] + math.sqrt(3) * cell[1]) * size
+#     return q, r
+
 def cell_to_point_axial(cell, size):
     q = (3/2 * cell[0]) * size
     r = (math.sqrt(3)/2 * cell[0] + math.sqrt(3) * cell[1]) * size
-    return q, r
+    return np.array([q, r])
 
 #axial round
 
