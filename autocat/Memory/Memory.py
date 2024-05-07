@@ -10,8 +10,8 @@ from .AllocentricMemory.Hexagonal_geometry import CELL_RADIUS
 from ..Integrator.Integrator import integrate
 from ..Enaction.Predict import push_objects
 
-GRID_WIDTH = 30  # 15   # 100 Number of cells wide
-GRID_HEIGHT = 100  # 70  # 45  # 200 Number of cells high
+GRID_WIDTH = 50  # 15   # 100 Number of cells wide
+GRID_HEIGHT = 50  # 70  # 45  # 200 Number of cells high
 NEAR_HOME = 300    # (mm) Max distance to consider near home
 # ARRANGE_MIN_RADIUS = 100
 # ARRANGE_MAX_RADIUS = 400

@@ -48,7 +48,7 @@ def pool_neighbors(i, j):
     return neighbors
 
 
-def cell_to_point(i, j, radius=CELL_RADIUS):
+def cell_to_point_offset(i, j, radius=CELL_RADIUS):
     """Convert the cell coordinates into allocentric coordinates"""
     cell_height = np.sqrt((2 * radius) ** 2 - radius ** 2)
     x = np.where(j % 2 == 0, i * 3 * radius, (1.5 * radius) + i * 3 * radius)
@@ -67,7 +67,7 @@ def cell_to_point(i, j, radius=CELL_RADIUS):
 #         y = (cell_height / 2) + (j - 1) / 2 * cell_height
 #     return np.array([x, y, 0], dtype=int)
 
-def point_to_cell_axial(point, size):
+def point_to_cell(point, size=CELL_RADIUS):
     q = (2 * point[0]) / (3 * size)
     r = (-point[0] + math.sqrt(3) * point[1]) / (3 * size)
 
@@ -86,10 +86,11 @@ def point_to_cell_axial(point, size):
 #     r = (math.sqrt(3)/2 * cell[0] + math.sqrt(3) * cell[1]) * size
 #     return q, r
 
-def cell_to_point_axial(q, r, size):
+def cell_to_point(q, r, size=CELL_RADIUS):
     x = (3/2 * q) * size
     y = (math.sqrt(3)/2 * q + math.sqrt(3) * r) * size
-    return np.array([x, y])
+    #return np.array([x, y])
+    return np.transpose(np.array([x, y]), axes=(1, 2, 0))
 
 
 def axial_round(q, r):
@@ -122,7 +123,7 @@ def is_pool(i, j):
     return np.logical_or(pool_even, pool_odd)
 
 
-def point_to_cell(point, radius=CELL_RADIUS):
+def point_to_cell_offset(point, radius=CELL_RADIUS):
     """Convert an allocentric position to cell coordinates."""
     # print(point)
     pos_x, pos_y = point[0], point[1]

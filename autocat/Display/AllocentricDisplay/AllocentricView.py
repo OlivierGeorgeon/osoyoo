@@ -5,14 +5,15 @@ from pyglet.gl import *
 from ...Utils import quaternion_translation_to_matrix
 from ..EgocentricDisplay.OsoyooCar import OsoyooCar
 from .CellDisplay import CellDisplay
-from ...Memory.AllocentricMemory.Hexagonal_geometry import point_to_cell, point_to_cell_axial, cell_to_point_axial
+#from ...Memory.AllocentricMemory.Hexagonal_geometry import point_to_cell, point_to_cell_axial, cell_to_point_axial
+from ...Memory.AllocentricMemory.Hexagonal_geometry import point_to_cell, cell_to_point
 from ...Memory.EgocentricMemory.Experience import EXPERIENCE_ROBOT
 from ..InteractiveDisplay import InteractiveDisplay
 from ..PointOfInterest import PointOfInterest, POINT_ROBOT
 from ...Memory.AllocentricMemory.AllocentricMemory import STATUS_0, STATUS_4, CELL_UNKNOWN
 
-NB_CELL_WIDTH = 30
-NB_CELL_HEIGHT = 100
+#NB_CELL_WIDTH = 50
+#NB_CELL_HEIGHT = 50
 CELL_RADIUS = 50
 ZOOM_IN_FACTOR = 1.2
 ZOOM_OUT_FACTOR = 1/ZOOM_IN_FACTOR
@@ -116,11 +117,11 @@ class AllocentricView(InteractiveDisplay):
         """ Computes the cell coordinates from the screen coordinates """
         mouse_point = self.mouse_coordinates_to_point(x, y)
         cell_x, cell_y = point_to_cell(mouse_point)
-        cell_axial_q, cell_axial_r = point_to_cell_axial(mouse_point, CELL_RADIUS)
+        cell_axial_q, cell_axial_r = point_to_cell(mouse_point, CELL_RADIUS)
         self.label.text = "Mouse pos.: " + str(mouse_point[0]) + ", " + str(mouse_point[1])
         self.label.text += ", Cell: " + str(cell_x) + ", " + str(cell_y)
         self.label.text += ", Cell_axial: " + str(cell_axial_q) + ", " + str(cell_axial_r)
-        self.label.text += cell_to_point_axial(cell_axial_q, cell_axial_r, CELL_RADIUS).__str__()
+        #self.label.text += cell_to_point(cell_axial_q, cell_axial_r, CELL_RADIUS).__str__()
         return cell_x, cell_y
 
         # def mouse_coordinate_to_cell(self, x, y):
