@@ -58,20 +58,25 @@ void Scan::ongoing()
     }
     _sign_array.distances[_current_index] = _current_ultrasonic_measure;
     _sign_array.angles[_current_index] = _head_angle;
-    Serial.println("Index: " + (String)_current_index + ", angle: " + (String)_head_angle + ", distance: "+ (String)_current_ultrasonic_measure);
+    // The string conversion seems to modify _head_angle in some circumstances
+//     Serial.println("Index: " + String(_current_index) + ", angle: " + String(_head_angle) + ", distance: "+ String(_current_ultrasonic_measure));
+    Serial.print("Index: "); Serial.print(_current_index);
+    Serial.print(", angle: "); Serial.print(_head_angle);
+    Serial.print(", distance: "); Serial.println(_current_ultrasonic_measure);
     _current_index++;
     _head_angle += _head_angle_span;
     if (abs(_head_angle) > 90)
     { // The scan is over, move to the angle of the min measure
       _head_angle  = _angle_min_ultrasonic_measure;
       _head_angle_span = ALIGN_SACCADE_SPAN;  // reset saccade span for alignment
-      Serial.println("Scan aligned at angle: " + String(_head_angle) + ", measure: " + String(_min_ultrasonic_measure));
+      Serial.print("Scan aligned at angle: "); Serial.print(_head_angle);
+      Serial.print(", measure: "); Serial.println(_min_ultrasonic_measure);
       _HEA._next_saccade_time = millis() + ECHO_MONITOR_PERIOD; // Wait before monitoring again
 
       // Terminate the ongoing step
       _HEA.beginEchoAlignment();  // Trigger echo alignment
       _duration1 = millis() - _action_start_time;
-      _duration2 = millis();
+//      _duration2 = millis();
       _action_end_time = 0;
       _step = INTERACTION_TERMINATE;
     }
@@ -85,10 +90,14 @@ void Scan::outcome(JSONVar & outcome_object)
 {
   JSONVar echos;
   bool has_echo = false;
-  for (int i = 0; i < _sign_array.size; i++)
+  for (int i = 0; i < MAX_SACCADES; i++)
   {
     if (_sign_array.distances[i] > 0 and _sign_array.distances[i]< 10000)
     {
+      //  https://cpp4arduino.com/2018/11/21/eight-tips-to-use-the-string-class-efficiently.html
+      //  char angle_string[10]; // sprintf(angle_string, 4, "%i", _sign_array.angles[i]);
+      //  itoa(_sign_array.angles[i], angle_string, 10);
+      //  echos[angle_string] = _sign_array.distances[i];
       echos[String(_sign_array.angles[i])] = _sign_array.distances[i];
       has_echo = true;
     }

@@ -20,7 +20,7 @@ class BodyMemory:
         self.energy = 100  # [0,100] The level of energy of the robot
         self.excitation = 100  # [0, 100] The level of excitation
         self.serotonin = 50  # 5-HT
-        self.dopamine = 100  # DA
+        self.dopamine = 50  # DA
         self.noradrenaline = 50  # NA
 
     def update(self, enaction):
@@ -39,7 +39,7 @@ class BodyMemory:
             self.energy = max(0, self.energy - 1)
         # Decrease excitation level
         self.excitation = max(0, self.excitation - 1)
-        self.dopamine = max(30, self.dopamine - 1)
+        # self.dopamine = max(30, self.dopamine - 1)
 
     def set_head_direction_degree(self, head_direction_degree: int):
         """Set the head direction from degree measured relative to the robot within [-90,90]"""
@@ -82,3 +82,4 @@ class BodyMemory:
         saved_body_memory.dopamine = self.dopamine
         saved_body_memory.noradrenaline = self.noradrenaline
         return saved_body_memory
+

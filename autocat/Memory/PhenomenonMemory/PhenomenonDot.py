@@ -17,6 +17,8 @@ class PhenomenonDot:
         affordance.point[:] = 0  # Array-wise reset in place
         self.affordances = {0: affordance}
 
+        self.position_pe = {}  # (mm) The distance between predicted position and measured position
+
     def __str__(self):
         return f"(Phenomenon type:{self.phenomenon_type})"
 
@@ -25,13 +27,14 @@ class PhenomenonDot:
         if affordance.type == self.phenomenon_type:
             offset = affordance.point - self.point
             # Shift the phenomenon to the point of the new affordance
-            self.shift(offset)  # Comment to assume that the dot is fixed
+            # self.shift(offset)  # Comment to assume that the dot is fixed
             # Add the new affordance
             affordance.point[:] = 0
             self.affordance_id += 1
             self.affordances[self.affordance_id] = affordance
             # Return the robot's position correction
-            return 0  # -offset  Correct the robot's bosition based on the fixed dot
+            self.position_pe[affordance.clock] = np.linalg.norm(offset)
+            return -offset  # Correct the robot's position based on the fixed dot
         else:
             return None
 

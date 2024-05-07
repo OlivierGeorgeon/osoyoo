@@ -52,9 +52,10 @@ class ProposerWatch(Proposer):
     #             outcome = OUTCOME_FOCUS_SIDE
     #     return outcome
 
-    def select_enaction(self, enaction):
+    def propose_enaction(self):
         """Return the next intended interaction"""
 
+        enaction = self.workspace.enaction
         # if the terrain is not CLOSED then don't propose watch-over behavior
         if self.workspace.memory.phenomenon_memory.terrain_confidence() < PHENOMENON_ENCLOSED_CONFIDENCE:
             return None

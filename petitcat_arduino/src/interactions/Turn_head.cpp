@@ -37,7 +37,7 @@ void Turn_head::ongoing()
   if (!_HEA._is_enacting_head_alignment && !_HEA._is_enacting_echo_scan)
   {
     _duration1 = millis()- _action_start_time;
-    _duration2 = millis();
+//    _duration2 = millis();
     _action_end_time = 0;
     _step = INTERACTION_TERMINATE;
   }

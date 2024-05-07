@@ -236,6 +236,27 @@ class PredictionError:
                       "Average:", round(float(np.mean(list(terrain.origin_prediction_error.values())))),
                       "std:", round(float(np.std(list(terrain.origin_prediction_error.values())))))
 
+        # Trace the enaction
+        position_pe = ""
+        if self.workspace.memory.phenomenon_memory.focus_phenomenon_id is not None and enaction.clock in self.workspace.memory.phenomenon_memory.phenomena[self.workspace.memory.phenomenon_memory.focus_phenomenon_id].position_pe:
+            position_pe = round(self.workspace.memory.phenomenon_memory.phenomena[self.workspace.memory.phenomenon_memory.focus_phenomenon_id].position_pe[enaction.clock])
+            # Reduce serotonin if prediction error is low
+            if position_pe < 50:
+                self.workspace.memory.body_memory.serotonin = max(40, self.workspace.memory.body_memory.serotonin - 1)
+
+        if enaction.clock == 0:
+            # Initialize the file with headers
+            with open("log/00_Trace.csv", 'w', newline='') as file:
+                csv.writer(file).writerow(["clock", "action", "predicted_outcome", "outcome_code", "pe_code", "floor",
+                                           "re_yaw", "re_compass", "position_pe", "serotonin"])
+        # Append the enaction line
+        with open("log/00_Trace.csv", 'a', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow([enaction.clock, enaction.command.action.action_code, enaction.predicted_outcome_code,
+                             enaction.outcome_code, self.pe_outcome_code[enaction.clock], enaction.outcome.floor,
+                             self.re_yaw.get(enaction.clock, ""), self.re_compass.get(enaction.clock, ""), position_pe,
+                             self.workspace.memory.body_memory.serotonin])
+
     def plot(self):
         """Show the prediction error plots"""
         # The outcome code prediction error
@@ -250,14 +271,14 @@ class PredictionError:
         kwargs = {'bottom': -20, 'top': 20, 'fmt': 'sy', 'marker_size': 5}
         plot(self.re_yaw, "Withdraw yaw residual error", "03_yaw_re", "(degree)", **kwargs)
         plot(self.re_compass, "Compass residual error", "04_Compass", "(degree)", **kwargs)
-        with open("log/03_yaw_re.csv", 'w', newline='') as file:
-            writer = csv.writer(file)
-            for key, value in self.re_yaw.items():
-                writer.writerow([round(key), value])
-        with open("log/04_Compass.csv", 'w', newline='') as file:
-            writer = csv.writer(file)
-            for key, value in self.re_compass.items():
-                writer.writerow([round(key), value])
+        # with open("log/03_yaw_re.csv", 'w', newline='') as file:
+        #     writer = csv.writer(file)
+        #     for key, value in self.re_yaw.items():
+        #         writer.writerow([round(key), value])
+        # with open("log/04_Compass.csv", 'w', newline='') as file:
+        #     writer = csv.writer(file)
+        #     for key, value in self.re_compass.items():
+        #         writer.writerow([round(key), value])
         # The speed as blue circles
         plot(self.x_speed, "X speed", "05_x_speed", "(mm/s)")
         plot(self.y_speed, "Y speed", "06_y_speed", "(mm/s)")

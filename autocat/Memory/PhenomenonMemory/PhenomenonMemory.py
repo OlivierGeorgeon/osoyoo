@@ -123,11 +123,13 @@ class PhenomenonMemory:
             return self.phenomenon_id
 
     def create_phenomena(self, affordances):
-        """Create new phenomena from the list of affordances"""
-        new_phenomena_id = []
+        """Create new phenomena from the list of affordances. Return the list of new phenomena IDs"""
+        new_phenomena_id = {}
         for affordance in affordances:
             if len(new_phenomena_id) == 0:
-                new_phenomena_id.append(self.create_phenomenon(affordance))
+                # new_phenomena_id.append(self.create_phenomenon(affordance))
+                phenomenon_id = self.create_phenomenon(affordance)
+                new_phenomena_id[phenomenon_id] = self.phenomena[phenomenon_id].phenomenon_type
             else:
                 clustered = False
                 # Look if the new affordance can be attached to an existing new phenomenon
@@ -137,8 +139,10 @@ class PhenomenonMemory:
                         clustered = True
                         break
                 if not clustered:
-                    new_phenomena_id.append(self.create_phenomenon(affordance))
-        # self.object_phenomena.extend(new_phenomena_id)
+                    phenomenon_id = self.create_phenomenon(affordance)
+                    new_phenomena_id[phenomenon_id] = self.phenomena[phenomenon_id].phenomenon_type
+                    # new_phenomena_id.append(self.create_phenomenon(affordance))
+        return new_phenomena_id
 
     def update_phenomena(self, affordances):
         """Try to attach a list of affordances to phenomena in the list.

@@ -54,9 +54,12 @@ void Head::update()
           // abs(_current_ultrasonic_measure - _previous_ultrasonic_measure) < 9000 )
         {
           _discontinuous = true;
-          Serial.println("Discontinuous: " + String(_current_ultrasonic_measure) + " " + String(_previous_ultrasonic_measure));
+          Serial.print("Discontinuous: "); Serial.print(_current_ultrasonic_measure);
+          Serial.print(" "); Serial.println(_previous_ultrasonic_measure);
         }
-      Serial.println("Step: " + String(_echo_alignment_step) + ", Angle: " +String(_head_angle) + ", measure: " + String(_current_ultrasonic_measure));
+      Serial.print("Step: "); Serial.print(_echo_alignment_step);
+      Serial.print(", Angle: "); Serial.print(_head_angle);
+      Serial.print(", measure: "); Serial.println(_current_ultrasonic_measure);
 
       // If the echo is closer or no current echo and no previous and no penultimate
       if ((_previous_ultrasonic_measure > _current_ultrasonic_measure ) ||
@@ -70,7 +73,8 @@ void Head::update()
           // The echo is closer after several steps then the min distance is on the limit angle
           {
             _min_ultrasonic_measure = _current_ultrasonic_measure;
-            Serial.println("Aligned at limit angle: " + String(_head_angle) + ", measure " + String(_min_ultrasonic_measure));
+            Serial.print("Aligned at limit angle: "); Serial.print(_head_angle);
+            Serial.print(", measure "); Serial.println(_min_ultrasonic_measure);
             _is_enacting_head_alignment = false;
             _next_saccade_time = millis() + ECHO_MONITOR_PERIOD; // Wait before monitoring again
           }
@@ -102,7 +106,8 @@ void Head::update()
             (_previous_ultrasonic_measure < NO_ECHO_DISTANCE))
         {
           _min_ultrasonic_measure = _previous_ultrasonic_measure;
-          Serial.println("Aligned at angle: " + String(_head_angle) + ", measure " + String(_min_ultrasonic_measure));
+          Serial.print("Aligned at angle: "); Serial.print(_head_angle);
+          Serial.print(", measure "); Serial.println(_min_ultrasonic_measure);
           _is_enacting_head_alignment = false;
           _next_saccade_time = millis() + ECHO_MONITOR_PERIOD; // Switch to monitoring period
         }
@@ -116,8 +121,9 @@ void Head::update()
       if (abs(_current_ultrasonic_measure  - _min_ultrasonic_measure) > ECHO_MONITOR_VARIATION &&
           abs(_previous_ultrasonic_measure - _min_ultrasonic_measure) > ECHO_MONITOR_VARIATION)
       {
-        Serial.print("Trigger alignment from Angle: " +String(_head_angle) + ", measure: " + String(_current_ultrasonic_measure));
-        Serial.println(", variation: " + String(_current_ultrasonic_measure - _min_ultrasonic_measure));
+        Serial.print("Trigger alignment from Angle: "); Serial.print(_head_angle);
+        Serial.print(", measure: "); Serial.print(_current_ultrasonic_measure);
+        Serial.print(", variation: "); Serial.println(_current_ultrasonic_measure - _min_ultrasonic_measure);
         beginEchoAlignment();
       }
     }
@@ -141,7 +147,7 @@ void Head::outcome(JSONVar & outcome_object)
 void Head::turnHead(int head_angle)
 {
   _head_angle = constrain(head_angle, -90, 90);
-  Serial.println("Turning head to: " + String(head_angle));
+  Serial.print("Turning head to: "); Serial.println(_head_angle);
   _head.write(_head_angle + 90);
 }
 

@@ -45,10 +45,11 @@ void Swipe::ongoing()
     else
       _HEA.turnHead(-50);
     _FLO.extraDuration(RETREAT_EXTRA_DURATION); // Increase retreat duration because need to reverse speed
-    _status ="1";
+//    _status ="1";
+    strcpy(_status, "1");
     // Proceed to step 2 for enacting Floor Change Retreat
     _duration1 = millis()- _action_start_time;
-    _duration2 = millis();
+//    _duration2 = millis();
     _action_end_time = _FLO._retreat_end_time + TURN_SPOT_ENDING_DELAY;
     _step = INTERACTION_TERMINATE;
   }
@@ -61,7 +62,7 @@ void Swipe::ongoing()
     else
       _HEA.turnHead(-90);
     _duration1 = millis() - _action_start_time;
-    _duration2 = millis();
+//    _duration2 = millis();
     _FLO._OWM.stopMotion();
     _step = INTERACTION_TERMINATE;
     _action_end_time = 0;
@@ -72,7 +73,7 @@ void Swipe::ongoing()
     if (_align > 0 && !_HEA._is_enacting_head_alignment)
       _HEA.beginEchoAlignment();  // Force HEA
     _duration1 = millis() - _action_start_time;
-    _duration2 = millis();
+//    _duration2 = millis();
     _FLO._OWM.stopMotion();
     _step = INTERACTION_TERMINATE;
     _action_end_time = 0;

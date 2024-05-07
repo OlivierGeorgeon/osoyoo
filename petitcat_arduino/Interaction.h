@@ -31,7 +31,8 @@ protected:
   Imu& _IMU;
   WifiCat& _WifiCat;
   unsigned long _action_end_time;
-  String _status = "0";
+//  String _status; //  = "0";
+  char _status[15] = "0"; //  = "0";
   char _action = 0;
   int _target_angle = 0;
   int _target_duration = 1000;
@@ -44,12 +45,12 @@ protected:
   int _clock = 0;
   int head_destination_angle = 0;
   unsigned long _duration1;
-  unsigned long _duration2;
   unsigned long _action_start_time;
   int _step = INTERACTION_BEGIN;
   int _caution = 0;
   int _span = 40;
   int _align = 0;
+  unsigned long _duration2 =0;  // Seems to create memory overflow
 };
 
 #endif

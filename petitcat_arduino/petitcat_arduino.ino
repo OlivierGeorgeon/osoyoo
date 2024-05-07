@@ -24,7 +24,6 @@
  Inspired form Arduino Mecanum Omni Direction Wheel Robot Car http://osoyoo.com/?p=30022
 */
 
-#include <Arduino_JSON.h>
 #include "src/wifi/WifiCat.h"
 #include "Action_define.h"
 #include "Floor.h"
@@ -34,6 +33,7 @@
 #include "Led.h"
 #include "Robot_define.h"
 #include "Sequencer.h"
+//#include <MemoryUsage.h>
 
 Floor FLO;
 Head HEA;
@@ -43,7 +43,7 @@ Led LED;
 Sequencer SEQ(FLO, HEA, IMU, LED, WifiCat);
 
 int interaction_step = INTERACTION_DONE;
-int interaction_direction = 0;
+int interaction_direction = DIRECTION_FRONT;
 Interaction* INT  = nullptr;  // The interaction type will depend on the action received from the PC
 
 void setup()
@@ -51,7 +51,7 @@ void setup()
   // Initialize serial for debugging
 
   Serial.begin(9600);
-  Serial.println("Serial initialized");
+  Serial.println("-- Serial initialized");
 
   // Initialize the LEDs
 
@@ -59,14 +59,24 @@ void setup()
 
   // First attempt to initialize IMU
 
-  IMU.setup();
-  Serial.println("-- IMU initialized");
+//  IMU.setup();
+//  Serial.println("-- IMU initialized");
+
+  // Print memory usage
+//  MEMORY_PRINT_START
+//  MEMORY_PRINT_HEAPSTART
+//  MEMORY_PRINT_HEAPEND
+//  MEMORY_PRINT_STACKSTART
+//  MEMORY_PRINT_END
+//  MEMORY_PRINT_HEAPSIZE
+//  FREERAM_PRINT
 
   // Connect to the wifi board
 
   WifiCat.begin();
 
   // Second attempt to initialize IMU (try again because sometimes it fails the first time)
+  // Perhaps needs time after switch on
   // Perhaps something to do with the order in which the imu registers are written.
 
   IMU.setup();
@@ -80,9 +90,9 @@ void setup()
   HEA.setup();
   Serial.println("-- Head initialized");
 
-  Serial.println("--- Robot is ready ---");
-
   pinMode(TOUCH_PIN, INPUT_PULLUP);
+
+  Serial.println("--- Robot is ready ---");
 }
 
 void loop()

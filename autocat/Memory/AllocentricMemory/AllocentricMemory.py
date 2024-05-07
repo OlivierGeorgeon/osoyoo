@@ -8,9 +8,9 @@ from ..EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_PLACE, EX
     EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_IMPACT
 from ...Robot.RobotDefine import ROBOT_CHASSIS_X, ROBOT_OUTSIDE_Y, CHECK_OUTSIDE
 from ...Memory.PhenomenonMemory.PhenomenonMemory import TER, ROBOT1
-
 from .Hexagonal_geometry import cell_to_point
 from ..PhenomenonMemory import PHENOMENON_RECOGNIZABLE_CONFIDENCE, PHENOMENON_ENCLOSED_CONFIDENCE
+from .AllocentricGeometry import is_inside_rectangle, is_inside_polygon
 
 STATUS_0 = 0
 STATUS_1 = 1
@@ -157,13 +157,18 @@ class AllocentricMemory:
 
         # Mark the cells traversed by the robot
         alo_covered_area = trajectory.covered_area + self.robot_point
-        path = mpath.Path(alo_covered_area[:, 0:2])
+        inside_ij = np.where(is_inside_rectangle(self.grid[:, :, POINT_X], self.grid[:, :, POINT_Y], alo_covered_area))
+        self.grid[:, :, STATUS_0][inside_ij] = EXPERIENCE_PLACE
+        self.grid[:, :, CLOCK_PLACE][inside_ij] = clock
 
-        for i in range(self.min_i, self.max_i):
-            for j in range(self.min_j, self.max_j):
-                if path.contains_point(self.grid[i][j][POINT_X:POINT_Y+1]):
-                    self.grid[i][j][STATUS_0] = EXPERIENCE_PLACE
-                    self.grid[i][j][CLOCK_PLACE] = clock
+        # path = mpath.Path(alo_covered_area[:, 0:2])
+        #
+        # for i in range(self.min_i, self.max_i):
+        #     for j in range(self.min_j, self.max_j):
+        #         if is_inside_polygon(self.grid[i][j][POINT_X:POINT_Y+1], alo_covered_area):
+        #         # if path.contains_point(self.grid[i][j][POINT_X:POINT_Y+1]):
+        #             self.grid[i][j][STATUS_0] = EXPERIENCE_PLACE
+        #             self.grid[i][j][CLOCK_PLACE] = clock
 
         # The new position of the robot
         self.robot_point += quaternion.apply_to_vector(direction_quaternion, trajectory.translation)
@@ -172,26 +177,36 @@ class AllocentricMemory:
         """Apply the PLACE status to the cells at the position of the robot"""
         start_time = time.time()
         outline = body_memory.outline() + self.robot_point
-        path = mpath.Path(outline[:, 0:2])
-        for i in range(self.min_i, self.max_i):
-            for j in range(self.min_j, self.max_j):
-                # point = cell_to_point(i, j)
-                if path.contains_point(self.grid[i][j][POINT_X:POINT_Y+1]):
-                    self.grid[i][j][STATUS_0] = EXPERIENCE_PLACE
-                    self.grid[i][j][CLOCK_PLACE] = clock
+        inside_ij = np.where(is_inside_rectangle(self.grid[:, :, POINT_X], self.grid[:, :, POINT_Y], outline))
+        self.grid[:, :, STATUS_0][inside_ij] = EXPERIENCE_PLACE
+        self.grid[:, :, CLOCK_PLACE][inside_ij] = clock
+        # path = mpath.Path(outline[:, 0:2])
+        # for i in range(self.min_i, self.max_i):
+        #     for j in range(self.min_j, self.max_j):
+        #         if path.contains_point(self.grid[i][j][POINT_X:POINT_Y+1]):
+        #             self.grid[i][j][STATUS_0] = EXPERIENCE_PLACE
+        #             self.grid[i][j][CLOCK_PLACE] = clock
+
         # print("Place robot time:", time.time() - start_time, "seconds")
 
     def clear_grid_status(self):
-        """Reset the status of all cells except PLACE status"""
-        for i in range(self.min_i, self.min_j):
-            for j in range(self.max_i, self.max_j):
-                if self.grid[i][j][PHENOMENON_ID] != -1:
-                    # The place experiences are not moved with phenomena
-                    if self.grid[i][j][STATUS_0] != EXPERIENCE_PLACE:
-                        self.grid[i][j][STATUS_0] = CELL_UNKNOWN
-                    self.grid[i][j][STATUS_1] = CELL_UNKNOWN
-                    self.grid[i][j][CLOCK_PHENOMENON] = 0
-                    self.grid[i][j][PHENOMENON_ID] = -1
+        """Reset the status of cells where there is a phenomenon, except PLACE status"""
+        phenomena_ij = np.where(self.grid[:, :, PHENOMENON_ID] != -1)
+        self.grid[:, :, STATUS_1][phenomena_ij] = CELL_UNKNOWN
+        self.grid[:, :, CLOCK_PHENOMENON][phenomena_ij] = 0
+        self.grid[:, :, PHENOMENON_ID][phenomena_ij] = -1
+        self.grid[:, :, STATUS_0][phenomena_ij] = np.where(self.grid[:, :, STATUS_0][phenomena_ij] != EXPERIENCE_PLACE,
+                                                           CELL_UNKNOWN, self.grid[:, :, STATUS_0][phenomena_ij])
+
+        # for i in range(self.min_i, self.min_j):
+        #     for j in range(self.max_i, self.max_j):
+        #         if self.grid[i][j][PHENOMENON_ID] != -1:
+        #             # The place experiences are not moved with phenomena
+        #             if self.grid[i][j][STATUS_0] != EXPERIENCE_PLACE:
+        #                 self.grid[i][j][STATUS_0] = CELL_UNKNOWN
+        #             self.grid[i][j][STATUS_1] = CELL_UNKNOWN
+        #             self.grid[i][j][CLOCK_PHENOMENON] = 0
+        #             self.grid[i][j][PHENOMENON_ID] = -1
 
     def apply_status_to_cell(self, i, j, status, clock, color_index):
         """Change the cell status. Keep the max clock"""
