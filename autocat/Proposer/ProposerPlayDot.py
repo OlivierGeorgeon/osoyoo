@@ -76,7 +76,8 @@ class ProposerPlayDot(Proposer):
                     # If in front then go to the dot
                     e_memory.egocentric_memory.prompt_point = e_memory.egocentric_memory.focus_point.copy()
                     return Enaction(self.workspace.actions[ACTION_FORWARD], e_memory)
-                elif math.degrees(math.atan2(e_memory.egocentric_memory.focus_point[1], e_memory.egocentric_memory.focus_point[0])) < 15:
+                elif abs(math.degrees(math.atan2(e_memory.egocentric_memory.focus_point[1],
+                                                 e_memory.egocentric_memory.focus_point[0]))) < 15:
                     # If slightly in front then swipe
                     e_memory.egocentric_memory.prompt_point = e_memory.egocentric_memory.focus_point.copy()
                     return Enaction(self.workspace.actions[ACTION_SWIPE], e_memory)

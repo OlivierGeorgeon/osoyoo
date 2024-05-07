@@ -39,7 +39,8 @@ def integrate(memory):
     # Create new hypothetical phenomena from remaining affordances
     new_phenomena_ids = memory.phenomenon_memory.create_phenomena(new_affordances)
     # If new phenomena were created then play with them
-    if len(new_phenomena_ids) > 0:
+    # if len(new_phenomena_ids) > 0:
+    if EXPERIENCE_FLOOR in new_phenomena_ids.values():
         memory.body_memory.serotonin = max(60, memory.body_memory.serotonin)
 
     # Store the remaining new affordances in allocentric memory

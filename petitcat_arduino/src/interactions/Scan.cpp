@@ -94,9 +94,10 @@ void Scan::outcome(JSONVar & outcome_object)
   {
     if (_sign_array.distances[i] > 0 and _sign_array.distances[i]< 10000)
     {
-//      char angle_string[10]; // sprintf(angle_string, 4, "%i", _sign_array.angles[i]);
-//      itoa(_sign_array.angles[i], angle_string, 10);
-//      echos[angle_string] = _sign_array.distances[i];
+      //  https://cpp4arduino.com/2018/11/21/eight-tips-to-use-the-string-class-efficiently.html
+      //  char angle_string[10]; // sprintf(angle_string, 4, "%i", _sign_array.angles[i]);
+      //  itoa(_sign_array.angles[i], angle_string, 10);
+      //  echos[angle_string] = _sign_array.distances[i];
       echos[String(_sign_array.angles[i])] = _sign_array.distances[i];
       has_echo = true;
     }
