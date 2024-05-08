@@ -39,6 +39,7 @@ class PredictionError:
 
         self.previous_echo_distance = 0
         self.previous_echo_point = None
+        self.previous_yaw_re = 100  # To check that reduction error decreases
 
         # The agg backend avoids interfering with pyglet windows
         # https://matplotlib.org/stable/users/explain/figure/backends.html
@@ -132,9 +133,9 @@ class PredictionError:
             pe = (computed_outcome.duration1 - actual_outcome.duration1) / 1000  # / actual_outcome.duration1
             self.pe_lateral_duration1[enaction.clock] = pe
             self.pe_lateral_duration1.pop(actual_outcome.clock - PREDICTION_ERROR_WINDOW, None)
-            print("Prediction Error Swipe duration1 (simulation - measured)=", round(pe, 3),
-                  "Average:", round(float(np.mean(list(self.pe_lateral_duration1.values()))), 2),
-                  "std:", round(float(np.std(list(self.pe_lateral_duration1.values()))), 2))
+            print(f"Prediction Error Swipe duration1 (simulation - measured)= {pe:.3f}",
+                  f"Average: {np.mean(list(self.pe_lateral_duration1.values())):.2f}",
+                  f"std: {np.std(list(self.pe_lateral_duration1.values())):.2f}")
 
             # If focus and head toward object  TODO test that
             if enaction.outcome_code not in [OUTCOME_LOST_FOCUS, OUTCOME_NO_FOCUS, OUTCOME_FLOOR] and \
@@ -145,8 +146,8 @@ class PredictionError:
                 self.pe_y_speed[enaction.clock] = pe
                 self.pe_y_speed.pop(actual_outcome.clock - PREDICTION_ERROR_WINDOW, None)
                 print(f"Prediction Error Y Speed (simulation {action_speed:.0f}, - measured {speed:.0f})= {pe}",
-                      "Average:", round(float(np.mean(list(self.pe_y_speed.values()))), 1),
-                      "std:", round(float(np.std(list(self.pe_y_speed.values())))), 1)
+                      f"Average: {np.mean(list(self.pe_y_speed.values())):.1f}",
+                      f"std: {np.std(list(self.pe_y_speed.values())):.1f}")
                 # Update the action speed
                 self.workspace.actions[ACTION_SWIPE].translation_speed[1] = action_speed * (1. - RUNNING_AVERAGE_COEF) + speed * RUNNING_AVERAGE_COEF
 
@@ -157,14 +158,13 @@ class PredictionError:
 
         # Yaw raw prediction error
 
-        if enaction.outcome.floor == 0 and enaction.predicted_outcome.floor == 0:
-            pe = math.degrees(-short_angle(Quaternion.from_z_rotation(math.radians(computed_outcome.yaw)),
-                                           enaction.trajectory.yaw_quaternion))
-            self.pe_yaw[enaction.clock] = pe
-            self.pe_yaw.pop(enaction.clock - PREDICTION_ERROR_WINDOW, None)
-            print(f"Prediction Error Yaw (command - measure)= {pe:.1f}",
-                  f"Average: {np.mean(list(self.pe_yaw.values())):.1f}",
-                  f"std: {np.std(list(self.pe_yaw.values())):.1f}")
+        # if enaction.outcome.floor == 0 and enaction.predicted_outcome.floor == 0:
+        pe = math.degrees(-short_angle(Quaternion.from_z_rotation(math.radians(computed_outcome.yaw)),
+                                       enaction.trajectory.yaw_quaternion))
+        self.pe_yaw[enaction.clock] = pe
+        self.pe_yaw.pop(enaction.clock - PREDICTION_ERROR_WINDOW, None)
+        print(f"Prediction Error Yaw (command - measure)= {pe:.1f} Average: {np.mean(list(self.pe_yaw.values())):.1f}",
+              f"std: {np.std(list(self.pe_yaw.values())):.1f}")
 
         # Yaw residual error
 
@@ -179,6 +179,12 @@ class PredictionError:
             print(f"Residual Error Withdraw Yaw (computed - measured)= {re:.1f}",
                   f"Average: {np.mean(list(self.re_yaw.values())):.1f}",
                   f"std: {np.std(list(self.re_yaw.values())):.1f}")
+            # If residual error increased then decrease serotonine (not fun!)
+            if abs(self.previous_yaw_re) <= abs(re):
+                self.workspace.memory.body_memory.serotonin = max(40, self.workspace.memory.body_memory.serotonin - 1)
+            self.previous_yaw_re = re
+        elif enaction.outcome.floor == 3:  # not fun either
+            self.workspace.memory.body_memory.serotonin = max(40, self.workspace.memory.body_memory.serotonin - 1)
 
         # Compass residual error
 
@@ -241,20 +247,22 @@ class PredictionError:
         if self.workspace.memory.phenomenon_memory.focus_phenomenon_id is not None and enaction.clock in self.workspace.memory.phenomenon_memory.phenomena[self.workspace.memory.phenomenon_memory.focus_phenomenon_id].position_pe:
             position_pe = round(self.workspace.memory.phenomenon_memory.phenomena[self.workspace.memory.phenomenon_memory.focus_phenomenon_id].position_pe[enaction.clock])
             # Reduce serotonin if prediction error is low
-            if position_pe < 50:
-                self.workspace.memory.body_memory.serotonin = max(40, self.workspace.memory.body_memory.serotonin - 1)
+            # if position_pe < 50:
+            #     self.workspace.memory.body_memory.serotonin = max(40, self.workspace.memory.body_memory.serotonin - 1)
 
         if enaction.clock == 0:
             # Initialize the file with headers
             with open("log/00_Trace.csv", 'w', newline='') as file:
                 csv.writer(file).writerow(["clock", "action", "predicted_outcome", "outcome_code", "pe_code", "floor",
-                                           "re_yaw", "re_compass", "position_pe", "serotonin"])
+                                           "pe_yaw", "re_yaw", "re_compass", "forward_pe", "position_pe", "serotonin"])
         # Append the enaction line
         with open("log/00_Trace.csv", 'a', newline='') as file:
             writer = csv.writer(file)
             writer.writerow([enaction.clock, enaction.command.action.action_code, enaction.predicted_outcome_code,
                              enaction.outcome_code, self.pe_outcome_code[enaction.clock], enaction.outcome.floor,
-                             self.re_yaw.get(enaction.clock, ""), self.re_compass.get(enaction.clock, ""), position_pe,
+                             self.pe_yaw.get(enaction.clock, ""),
+                             self.re_yaw.get(enaction.clock, ""), self.re_compass.get(enaction.clock, ""),
+                             self.pe_speed_forward.get(enaction.clock, ""), position_pe,
                              self.workspace.memory.body_memory.serotonin])
 
     def plot(self):
@@ -263,22 +271,15 @@ class PredictionError:
         kwargs = {'bottom': -1, 'top': 2, 'fmt': 'sc', 'marker_size': 5}
         plot(self.pe_outcome_code, "Outcome code prediction error", "01_Outcome_code", "(0/1)", **kwargs)
 
-        # The yaw prediction error
+        # The yaw prediction error cyan squares
         kwargs = {'bottom': -40, 'top': 40, 'fmt': 'sc', 'marker_size': 5}
         plot(self.pe_yaw, "Yaw prediction error", "02_yaw_pe", "(degree)", **kwargs)
 
-        # Residual errors Yaw and Compass
-        kwargs = {'bottom': -20, 'top': 20, 'fmt': 'sy', 'marker_size': 5}
+        # Residual errors Yaw and Compass magenta squares
+        kwargs = {'bottom': -20, 'top': 20, 'fmt': 'sm', 'marker_size': 5}
         plot(self.re_yaw, "Withdraw yaw residual error", "03_yaw_re", "(degree)", **kwargs)
         plot(self.re_compass, "Compass residual error", "04_Compass", "(degree)", **kwargs)
-        # with open("log/03_yaw_re.csv", 'w', newline='') as file:
-        #     writer = csv.writer(file)
-        #     for key, value in self.re_yaw.items():
-        #         writer.writerow([round(key), value])
-        # with open("log/04_Compass.csv", 'w', newline='') as file:
-        #     writer = csv.writer(file)
-        #     for key, value in self.re_compass.items():
-        #         writer.writerow([round(key), value])
+
         # The speed as blue circles
         plot(self.x_speed, "X speed", "05_x_speed", "(mm/s)")
         plot(self.y_speed, "Y speed", "06_y_speed", "(mm/s)")
@@ -286,7 +287,7 @@ class PredictionError:
         # plot(self.value_speed_backward, "Backward speed value", "Backward_speed_value", "(mm/s)")
 
         # The translation duration prediction errors in seconds as red squares
-        kwargs = {'bottom': -2, 'top': 2, 'fmt': 'sr', 'marker_size': 5}
+        kwargs = {'bottom': -1, 'top': 1, 'fmt': 'sr', 'marker_size': 5}
         plot(self.pe_forward_duration1, "Forward duration prediction error", "07_Forward_duration_pe", "(s)", **kwargs)
         plot(self.pe_lateral_duration1, "Swipe duration prediction error", "08_Swipe_duration_pe", "(s)", **kwargs)
 
@@ -299,8 +300,8 @@ class PredictionError:
         plot(self.pe_echo_direction, "Head direction prediction error", "07_Head_direction", "(degree)", **kwargs)
         plot(self.pe_echo_distance, "Echo distance prediction error", "08_Echo_distance", "(mm)", **kwargs)
 
-        # The focus as magenta squares
-        kwargs = {'bottom': -100, 'top': 100, 'fmt': 'sm', 'marker_size': 5}
+        # The focus as red squares
+        kwargs = {'bottom': -100, 'top': 100, 'fmt': 'sr', 'marker_size': 5}
         plot(self.pe_focus_direction, "Focus direction prediction error", "11_Focus_direction", "(degree)", **kwargs)
         plot(self.pe_focus_distance, "Focus distance prediction error", "12_Focus_distance", "(mm)", **kwargs)
 

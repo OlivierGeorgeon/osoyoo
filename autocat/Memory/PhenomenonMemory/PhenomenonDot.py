@@ -3,6 +3,7 @@ import numpy as np
 from pyrr import Quaternion
 from . import PHENOMENON_INITIAL_CONFIDENCE, PHENOMENON_ENCLOSED_CONFIDENCE, PHENOMENON_RECOGNIZABLE_CONFIDENCE
 from ...Utils import short_angle
+from .Phenomenon import PHENOMENON_DELTA
 
 
 class PhenomenonDot:
@@ -24,7 +25,7 @@ class PhenomenonDot:
 
     def update(self, affordance):
         """Add a new affordance to this phenomenon and move the phenomenon to the position of this affordance"""
-        if affordance.type == self.phenomenon_type:
+        if affordance.type == self.phenomenon_type and np.linalg.norm(self.point - affordance.point) < PHENOMENON_DELTA:
             offset = affordance.point - self.point
             # Shift the phenomenon to the point of the new affordance
             # self.shift(offset)  # Comment to assume that the dot is fixed

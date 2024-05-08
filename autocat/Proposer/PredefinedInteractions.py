@@ -108,7 +108,7 @@ def create_composite_interactions(actions, primitive_interactions):
 
     # Valence of trespassing interactions
     i80 = create_or_retrieve_primitive(primitive_interactions, actions[ACTION_FORWARD], OUTCOME_NO_FOCUS, 4)
-    i811 = create_or_retrieve_primitive(primitive_interactions, actions[ACTION_FORWARD], OUTCOME_FLOOR, -1)  # 1
+    i811 = create_or_retrieve_primitive(primitive_interactions, actions[ACTION_FORWARD], OUTCOME_FLOOR, 1)  # Changed from -1 to 1 for IWAI paper
 
     i40 = create_or_retrieve_primitive(primitive_interactions, actions[ACTION_SWIPE], OUTCOME_NO_FOCUS, 1)
     i411 = create_or_retrieve_primitive(primitive_interactions, actions[ACTION_SWIPE], OUTCOME_FLOOR, -1)  # 1 -1

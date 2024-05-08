@@ -59,7 +59,7 @@ void setup()
 
   // First attempt to initialize IMU
 
-//  IMU.setup();
+  IMU.setup();
 //  Serial.println("-- IMU initialized");
 
   // Print memory usage

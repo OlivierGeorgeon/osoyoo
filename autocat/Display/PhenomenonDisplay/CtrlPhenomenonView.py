@@ -60,7 +60,7 @@ class CtrlPhenomenonView:
 
         def on_mouse_scroll(x, y, dx, dy):
             """ Modify the phenomenon's confidence """
-            if y < 50 and self.phenomenon_id is not None:
+            if y < 50 and self.phenomenon_id in self.workspace.memory.phenomenon_memory.phenomena:
                 # Modify the confidence
                 phenomenon = self.workspace.memory.phenomenon_memory.phenomena[self.phenomenon_id]
                 phenomenon.confidence += int(np.sign(dy))

@@ -68,7 +68,6 @@ class BodyMemory:
             self.body_quaternion * Vector3([-ROBOT_CHASSIS_X, ROBOT_OUTSIDE_Y, 0]),
             self.body_quaternion * Vector3([-ROBOT_CHASSIS_X, -ROBOT_OUTSIDE_Y, 0]),
             self.body_quaternion * Vector3([ROBOT_CHASSIS_X, -ROBOT_OUTSIDE_Y, 0])])
-        # return np.array([p1, p2, p3, p4])
 
     def save(self):
         """Return a clone of bodymemory to save a snapshot of memory"""
@@ -76,6 +75,7 @@ class BodyMemory:
         saved_body_memory.head_direction_rad = self.head_direction_rad
         saved_body_memory.body_quaternion = self.body_quaternion.copy()
         saved_body_memory.compass_offset = self.compass_offset.copy()
+        saved_body_memory.retreat_yaw = self.retreat_yaw
         saved_body_memory.energy = self.energy
         saved_body_memory.excitation = self.excitation
         saved_body_memory.serotonin = self.serotonin

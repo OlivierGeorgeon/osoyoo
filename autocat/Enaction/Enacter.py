@@ -27,7 +27,7 @@ class Enacter:
         self.memory_snapshot = None
         self.is_imagining = False
         self.memory_before_imaginary = None
-        self.proposers = {'Circle ': Proposer(self.workspace)
+        self.proposers = {'Default ': Proposer(self.workspace)
                           # , 'Play Turn': ProposerPlayTurn(self)
                           # , 'Explore': ProposerExplore(self)
                           , 'Watch': ProposerWatch(self.workspace)

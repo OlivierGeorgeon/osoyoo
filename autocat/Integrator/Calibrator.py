@@ -63,10 +63,10 @@ class Calibrator:
             # Right floor, negative retreat yaw
             if self.workspace.enaction.outcome.floor == 0b01:
                 dif = self.workspace.enaction.outcome.yaw + self.workspace.memory.body_memory.retreat_yaw
-                av = (-self.workspace.enaction.outcome.yaw + self.workspace.memory.body_memory.retreat_yaw)/2
+                av = (- 0.3 * self.workspace.enaction.outcome.yaw + 0.7 * self.workspace.memory.body_memory.retreat_yaw)  #/2
             # Left floor, positive retreat yaw
             else:
                 dif = self.workspace.enaction.outcome.yaw - self.workspace.memory.body_memory.retreat_yaw
-                av = (self.workspace.enaction.outcome.yaw + self.workspace.memory.body_memory.retreat_yaw)/2
+                av = (0.3 * self.workspace.enaction.outcome.yaw + 0.7 * self.workspace.memory.body_memory.retreat_yaw)  # /2
             self.workspace.memory.body_memory.retreat_yaw = round(av)
             print(f"Calibrate withdraw yaw to: {av:.0f}, difference {dif:.1f}")

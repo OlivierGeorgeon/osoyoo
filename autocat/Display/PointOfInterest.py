@@ -90,7 +90,8 @@ class PointOfInterest:
                                                 ('v2i', self.points), ('c4B', 4 * (*self.color, self.opacity)))
         if self.type == POINT_PROMPT:
             self.color = name_to_rgb("MediumOrchid")
-            self.points = [40, 0, 20, 34, -20, 34, -40, 0, -20, -34, 20, -34]
+            # self.points = [40, 0, 20, 34, -20, 34, -40, 0, -20, -34, 20, -34]
+            self.points = [20, 0, 10, 17, -10, 17, -20, 0, -10, -17, 10, -17]
             self.shape = self.batch.add_indexed(6, gl.GL_TRIANGLES, group, [0, 1, 2, 0, 2, 3, 0, 3, 4, 0, 4, 5],
                                                 ('v2i', self.points), ('c4B', 6 * (*self.color, self.opacity)))
         if self.type == POINT_ROBOT:  # The body of the other robot
