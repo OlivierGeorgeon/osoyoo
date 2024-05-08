@@ -14,7 +14,7 @@ from ..Memory.EgocentricMemory.Experience import EXPERIENCE_FLOOR
 from ..Memory.AllocentricMemory.AllocentricMemory import CLOCK_PLACE
 from ..Enaction.CompositeEnaction import CompositeEnaction
 from ..Robot.RobotDefine import ROBOT_FLOOR_SENSOR_X
-from ..Memory.AllocentricMemory.Hexagonal_geometry import pool_neighbors, point_to_cell
+from ..Memory.AllocentricMemory.Hexagonal_geometry import point_to_cell  #, pool_neighbors
 from ..Proposer.Interaction import OUTCOME_LOST_FOCUS
 
 PLAY_DISTANCE_CLOSE = 200  # Between robot center and object center

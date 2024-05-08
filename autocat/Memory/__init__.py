@@ -1,3 +1,6 @@
+GRID_WIDTH = 50  # 15   # 100 Number of cells wide
+GRID_HEIGHT = 50  # 70  # 45  # 200 Number of cells high
+
 EMOTION_CONTENT = 1  # White. Serotonin: relaxation, contentment, well-being.
 EMOTION_PLEASURE = 2  # Green. Dopamine: reward, motivation.
 EMOTION_SAD = 3  # Bleu. Low neurotransmitters: anxiety, obsessive,

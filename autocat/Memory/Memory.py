@@ -1,6 +1,6 @@
 import numpy as np
 from pyrr import quaternion
-from . import EMOTION_PLEASURE
+from . import EMOTION_PLEASURE, GRID_WIDTH, GRID_HEIGHT
 from .EgocentricMemory.EgocentricMemory import EgocentricMemory
 from .AllocentricMemory.AllocentricMemory import AllocentricMemory
 from .BodyMemory import BodyMemory
@@ -10,8 +10,6 @@ from .AllocentricMemory.Hexagonal_geometry import CELL_RADIUS
 from ..Integrator.Integrator import integrate
 from ..Enaction.Predict import push_objects
 
-GRID_WIDTH = 50  # 15   # 100 Number of cells wide
-GRID_HEIGHT = 50  # 70  # 45  # 200 Number of cells high
 NEAR_HOME = 300    # (mm) Max distance to consider near home
 # ARRANGE_MIN_RADIUS = 100
 # ARRANGE_MAX_RADIUS = 400

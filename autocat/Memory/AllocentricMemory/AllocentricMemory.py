@@ -3,14 +3,14 @@ import matplotlib.path as mpath
 import time
 import numpy as np
 from pyrr import quaternion, Vector3
-from . Hexagonal_geometry import point_to_cell, get_neighbors, is_pool
+from . Hexagonal_geometry import point_to_cell, is_pool  #, get_neighbors
 from ..EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_PLACE, EXPERIENCE_FOCUS, EXPERIENCE_PROMPT, \
     EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_IMPACT
 from ...Robot.RobotDefine import ROBOT_CHASSIS_X, ROBOT_OUTSIDE_Y, CHECK_OUTSIDE
 from ...Memory.PhenomenonMemory.PhenomenonMemory import TER, ROBOT1
 from .Hexagonal_geometry import cell_to_point
 from ..PhenomenonMemory import PHENOMENON_RECOGNIZABLE_CONFIDENCE, PHENOMENON_ENCLOSED_CONFIDENCE
-from .AllocentricGeometry import is_inside_rectangle, is_inside_polygon
+from .Geometry import is_inside_rectangle, is_inside_polygon
 
 STATUS_0 = 0
 STATUS_1 = 1
@@ -284,57 +284,57 @@ class AllocentricMemory:
 
         return saved_allocentric_memory
 
-    def most_interesting_pool(self, clock):
-        """Return the coordinates of the cell that has the most interesting pool value"""
-        interests = []
-        coords = []
-
-        # for n in range(-2, 2):
-        #     for m in range(-2, 2):
-        # 3 tours counterclockwise:
-        visit = [(2, 0), (-1, 4), (-2, -4), (2, -2), (0, 4), (-2, -2), (2, -4), (1, 4), (-2, 0), (1, -4), (2, 4), (-2, 2),
-                 (0, -4), (2, 2), (-2, 4), (-1, -4)]
-        visit = [(2, 0), (-1, 4), (-2, -4), (2, -2), (0, 4), (-2, -2), (2, -4), (1, 4), (-2, 0), (1, -4), (2, 4), (-2, 2),
-                 (0, -4), (2, 2), (-2, 4), (-1, -4)]
-        for i in visit:
-            i_even = 3 * i[0] + i[1]
-            j_even = -2 * i[0] + 4 * i[1]
-            coords.append([i_even, j_even])
-            interests.append(self.pool_interest(i_even, j_even, clock))
-            # i_odd = i_even - 2
-            # j_odd = j_even + 1
-            # cells.append([i_odd, j_odd])
-            # interests.append(self.pool_interest(i_odd, j_odd, clock))
-        max_interest = max(interests)
-        coord = coords[interests.index(max_interest)]
-        # Update the prompt
-        if self.prompt_i is not None:
-            self.grid[self.prompt_i][self.prompt_j][STATUS_3] = CELL_UNKNOWN
-        self.prompt_i, self.prompt_j = coord[0], coord[1]
-        self.grid[self.prompt_i][self.prompt_j][STATUS_3] = EXPERIENCE_PROMPT
-        self.grid[self.prompt_i][self.prompt_j][CLOCK_PROMPT] = clock
-        print("Most interesting pool:", coord, "with interest", max_interest)
-        return self.prompt_i, self.prompt_j  # TODO use that
-        # return self.grid[self.prompt_i][self.prompt_j].point()
-
-    def pool_interest(self, i, j, clock):
-        """Return the sum of interest of neighbors plus this cell"""
-        if (self.min_i + 1 <= i <= self.max_i - 1) and (self.min_j + 1 <= j <= self.max_j - 1):
-            interest = self.grid[i][j].interest_value(clock)
-            for n in get_neighbors(i, j).values():
-                interest_value = 0
-                # Interesting if not visited
-                if self.grid[i][j][STATUS_0] == CELL_UNKNOWN:
-                    interest_value = 1
-                # Not interesting if already prompted
-                if self.grid[i][j][CLOCK_PROMPT] > 0:
-                    interest_value = -10
-                # Very interesting if colored
-                # Not working because stop on the cell and don't change the clock_place
-                # if self.color_index is not None and self.color_index > 0 and clock - self.clock_place > 5:
-                #     interest_value = 10
-                interest += interest_value
-            return interest
-        else:
-            # If not in the grid
-            return -20
+    # def most_interesting_pool(self, clock):
+    #     """Return the coordinates of the cell that has the most interesting pool value"""
+    #     interests = []
+    #     coords = []
+    #
+    #     # for n in range(-2, 2):
+    #     #     for m in range(-2, 2):
+    #     # 3 tours counterclockwise:
+    #     visit = [(2, 0), (-1, 4), (-2, -4), (2, -2), (0, 4), (-2, -2), (2, -4), (1, 4), (-2, 0), (1, -4), (2, 4), (-2, 2),
+    #              (0, -4), (2, 2), (-2, 4), (-1, -4)]
+    #     visit = [(2, 0), (-1, 4), (-2, -4), (2, -2), (0, 4), (-2, -2), (2, -4), (1, 4), (-2, 0), (1, -4), (2, 4), (-2, 2),
+    #              (0, -4), (2, 2), (-2, 4), (-1, -4)]
+    #     for i in visit:
+    #         i_even = 3 * i[0] + i[1]
+    #         j_even = -2 * i[0] + 4 * i[1]
+    #         coords.append([i_even, j_even])
+    #         interests.append(self.pool_interest(i_even, j_even, clock))
+    #         # i_odd = i_even - 2
+    #         # j_odd = j_even + 1
+    #         # cells.append([i_odd, j_odd])
+    #         # interests.append(self.pool_interest(i_odd, j_odd, clock))
+    #     max_interest = max(interests)
+    #     coord = coords[interests.index(max_interest)]
+    #     # Update the prompt
+    #     if self.prompt_i is not None:
+    #         self.grid[self.prompt_i][self.prompt_j][STATUS_3] = CELL_UNKNOWN
+    #     self.prompt_i, self.prompt_j = coord[0], coord[1]
+    #     self.grid[self.prompt_i][self.prompt_j][STATUS_3] = EXPERIENCE_PROMPT
+    #     self.grid[self.prompt_i][self.prompt_j][CLOCK_PROMPT] = clock
+    #     print("Most interesting pool:", coord, "with interest", max_interest)
+    #     return self.prompt_i, self.prompt_j  # TODO use that
+    #     # return self.grid[self.prompt_i][self.prompt_j].point()
+    #
+    # def pool_interest(self, i, j, clock):
+    #     """Return the sum of interest of neighbors plus this cell"""
+    #     if (self.min_i + 1 <= i <= self.max_i - 1) and (self.min_j + 1 <= j <= self.max_j - 1):
+    #         interest = self.grid[i][j].interest_value(clock)
+    #         for n in get_neighbors(i, j).values():
+    #             interest_value = 0
+    #             # Interesting if not visited
+    #             if self.grid[i][j][STATUS_0] == CELL_UNKNOWN:
+    #                 interest_value = 1
+    #             # Not interesting if already prompted
+    #             if self.grid[i][j][CLOCK_PROMPT] > 0:
+    #                 interest_value = -10
+    #             # Very interesting if colored
+    #             # Not working because stop on the cell and don't change the clock_place
+    #             # if self.color_index is not None and self.color_index > 0 and clock - self.clock_place > 5:
+    #             #     interest_value = 10
+    #             interest += interest_value
+    #         return interest
+    #     else:
+    #         # If not in the grid
+    #         return -20
