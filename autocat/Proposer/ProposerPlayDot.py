@@ -25,6 +25,7 @@ class ProposerPlayDot(Proposer):
     def __init__(self, workspace):
         super().__init__(workspace)
         self.last_seen_focus = None
+        self.emotion = EMOTION_CONTENT
 
     def activation_level(self):
         """The level of activation of this decider: Serotonin level + 1  """
@@ -44,47 +45,34 @@ class ProposerPlayDot(Proposer):
 
         e_memory = self.workspace.memory.save()
         # If lost the phenomenon then move the focus to the side
-        if enaction.outcome_code == OUTCOME_LOST_FOCUS:
+        if enaction.outcome_code == OUTCOME_FLOOR:
+            self.emotion = EMOTION_CONTENT
+            self.last_seen_focus = None
+        elif enaction.outcome_code == OUTCOME_LOST_FOCUS or self.emotion == EMOTION_VIGILANCE:
             if self.last_seen_focus is None:
                 # Memorise the allocentric last seen focus for the next try
                 self.last_seen_focus = self.workspace.memory.egocentric_to_allocentric(self.workspace.memory.egocentric_memory.focus_point)
             else:
                 # Reuse the last seen focus
                 self.workspace.memory.egocentric_memory.focus_point = self.workspace.memory.allocentric_to_egocentric(self.last_seen_focus)
-            left_of_focus = self.workspace.memory.egocentric_memory.focus_point + np.array([0, 150, 0])
+            left_of_focus = self.workspace.memory.egocentric_memory.focus_point + np.array([0, 80, 0])
             i, j = point_to_cell(self.workspace.memory.egocentric_to_allocentric(left_of_focus))
             last_visited_left = self.workspace.memory.allocentric_memory.grid[i, j, CLOCK_PLACE]
-            right_of_focus = self.workspace.memory.egocentric_memory.focus_point + np.array([0, -150, 0])
+            right_of_focus = self.workspace.memory.egocentric_memory.focus_point + np.array([0, -80, 0])
             i, j = point_to_cell(self.workspace.memory.egocentric_to_allocentric(right_of_focus))
             last_visited_right = self.workspace.memory.allocentric_memory.grid[i, j, CLOCK_PLACE]
             print(f"Searching left {last_visited_left}, right {last_visited_right}")
-            # e_memory = self.workspace.memory.save()
-            # e_memory.emotion_code = EMOTION_VIGILANCE
-            # e_memory.egocentric_memory.prompt_point = np.array([200, 0, 0])
-            # e0 = Enaction(self.workspace.actions[ACTION_FORWARD], e_memory)
-            # e0.predicted_memory.egocentric_memory.prompt_point = np.array([-100, 0, 0])
-            # e1 = Enaction(self.workspace.actions[ACTION_TURN], e0.predicted_memory)
             if last_visited_left < last_visited_right:
-                focus = self.workspace.memory.egocentric_memory.focus_point + np.array([0, 150, 0])
-                # self.workspace.memory.egocentric_memory.focus_point = self.workspace.memory.allocentric_to_egocentric()
-                # e1.predicted_memory.egocentric_memory.prompt_point = np.array([0, -100, 0])
+                # focus = self.workspace.memory.egocentric_memory.focus_point + np.array([0, 80, 0])
+                e_memory.egocentric_memory.focus_point = left_of_focus
             else:
-                focus = self.workspace.memory.egocentric_memory.focus_point + np.array([0, -150, 0])
-                # self.workspace.memory.egocentric_memory.focus_point = self.workspace.memory.allocentric_to_egocentric(self.workspace.memory.egocentric_memory.focus_point + np.array([0, -300, 0]))
-                # e1.predicted_memory.egocentric_memory.prompt_point = np.array([0, 100, 0])
-            e_memory.egocentric_memory.focus_point = focus
-            # e2 = Enaction(self.workspace.actions[ACTION_SWIPE], e1.predicted_memory)
-            # e2.predicted_memory.egocentric_memory.prompt_point = np.array([400, 0, 0])
-            # e3 = Enaction(self.workspace.actions[ACTION_FORWARD], e2.predicted_memory)
-            # return CompositeEnaction([e0, e1, e2, e3])
-            # e_memory.egocentric_memory.prompt_point = np.array([-400, 0, 0])
-            # return Enaction(self.workspace.actions[ACTION_BACKWARD], e_memory)
-            e_memory.emotion_code = EMOTION_VIGILANCE
-        elif enaction.outcome_code == OUTCOME_FLOOR:
-            e_memory.emotion_code = EMOTION_CONTENT
-            self.last_seen_focus = None
+                e_memory.egocentric_memory.focus_point = right_of_focus
+                # focus = self.workspace.memory.egocentric_memory.focus_point + np.array([0, -80, 0])
+            # e_memory.egocentric_memory.focus_point = focus
+            self.emotion = EMOTION_VIGILANCE
 
-            # If focus at a dot phenomenon
+        # If focus at a dot phenomenon
+        e_memory.emotion_code = self.emotion
         p = self.workspace.memory.phenomenon_memory.phenomena[p_id]
         if p.phenomenon_type == EXPERIENCE_FLOOR:
             # If very playful and the dot is forward
@@ -127,19 +115,3 @@ class ProposerPlayDot(Proposer):
                 e0.predicted_memory.egocentric_memory.prompt_point = None  # Don't stop at the dot
                 e1 = Enaction(self.workspace.actions[ACTION_FORWARD], e0.predicted_memory)
                 return CompositeEnaction([e0, e1])
-
-            # # If lost then go to the pool cell surrounding the focus that has the oldest clock
-            # allo_focus = self.workspace.memory.egocentric_to_allocentric(self.workspace.memory.egocentric_memory.focus_point)
-            # allo_cell = point_to_cell(allo_focus)
-            # neighbors = pool_neighbors(*allo_cell)
-            # clocks = {}
-            # for p in range(0, 6):
-            #     clocks[p] = self.workspace.memory.allocentric_memory.grid[neighbors[p, 0], neighbors[p, 1], CLOCK_PLACE]
-            # i, j = neighbors[min(clocks, key=clocks.get)]
-            # allo_prompt = np.array([self.workspace.memory.allocentric_memory.grid[i, j, POINT_X], self.workspace.memory.allocentric_memory.grid[i, j, POINT_Y], 0])
-            # e_memory.egocentric_memory.prompt_point = self.workspace.memory.allocentric_to_egocentric(allo_prompt)
-            # # TURN
-            # e0 = Enaction(self.workspace.actions[ACTION_TURN], e_memory)
-            # # FORWARD
-            # e1 = Enaction(self.workspace.actions[ACTION_FORWARD], e0.predicted_memory)
-            # return CompositeEnaction([e0, e1])
