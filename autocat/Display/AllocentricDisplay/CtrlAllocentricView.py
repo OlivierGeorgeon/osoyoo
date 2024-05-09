@@ -1,7 +1,7 @@
 import time
 from pyglet.window import key, mouse
 from .AllocentricView import AllocentricView
-from ...Memory.AllocentricMemory.Hexagonal_geometry import point_to_cell
+from ...Memory.AllocentricMemory.Geometry import point_to_cell
 from ...Robot.CtrlRobot import ENACTION_STEP_RENDERING, ENACTION_STEP_ENACTING
 from ...Memory.EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO
 from ...Memory.AllocentricMemory.AllocentricMemory import CELL_UNKNOWN

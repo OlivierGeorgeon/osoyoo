@@ -5,7 +5,7 @@ from pyglet.gl import *
 from ...Utils import quaternion_translation_to_matrix
 from ..EgocentricDisplay.OsoyooCar import OsoyooCar
 from .CellDisplay import CellDisplay
-from ...Memory.AllocentricMemory.Hexagonal_geometry import point_to_cell
+from ...Memory.AllocentricMemory.Geometry import point_to_cell
 from ...Memory.EgocentricMemory.Experience import EXPERIENCE_ROBOT
 from ..InteractiveDisplay import InteractiveDisplay
 from ..PointOfInterest import PointOfInterest, POINT_ROBOT

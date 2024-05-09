@@ -1,6 +1,6 @@
 from pyrr import Vector3
 import numpy as np
-from ..AllocentricMemory.Hexagonal_geometry import CELL_RADIUS
+from .. import CELL_RADIUS
 from ..EgocentricMemory.Experience import EXPERIENCE_FLOOR
 from ...Utils import azimuth_to_quaternion
 from .Affordance import MIDDLE_COLOR_INDEX, COLOR_DISTANCE

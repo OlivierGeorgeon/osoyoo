@@ -5,7 +5,7 @@ from ..Robot.RobotDefine import ROBOT_FLOOR_SENSOR_X
 from ..Memory.PhenomenonMemory import PHENOMENON_ENCLOSED_CONFIDENCE
 from ..Proposer.Action import ACTION_SWIPE, ACTION_FORWARD, ACTION_SCAN, ACTION_BACKWARD
 from ..Robot.Outcome import Outcome
-from ..Memory.AllocentricMemory.Hexagonal_geometry import point_to_cell
+from ..Memory.AllocentricMemory.Geometry import point_to_cell
 from ..Memory.AllocentricMemory.AllocentricMemory import COLOR_INDEX, STATUS_0, STATUS_1, POINT_X, POINT_Y
 from ..Memory.EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO
 from ..Utils import assert_almost_equal_angles, translation_quaternion_to_matrix, point_to_head_direction_distance

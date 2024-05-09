@@ -8,7 +8,7 @@ from ...Memory.EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_A
     EXPERIENCE_FOCUS, EXPERIENCE_IMPACT, EXPERIENCE_PLACE, EXPERIENCE_CENTRAL_ECHO, EXPERIENCE_PROMPT, \
     EXPERIENCE_ROBOT, FLOOR_COLORS
 from ...Memory.AllocentricMemory.AllocentricMemory import CELL_UNKNOWN, CELL_NO_ECHO
-from ...Memory.AllocentricMemory.Hexagonal_geometry import CELL_RADIUS
+from ...Memory import CELL_RADIUS
 from ...Memory.AllocentricMemory.AllocentricMemory import STATUS_0, STATUS_2, STATUS_3, STATUS_1, STATUS_4, POINT_X, \
     POINT_Y, CLOCK_INTERACTION, CLOCK_PLACE, COLOR_INDEX, CLOCK_NO_ECHO, IS_POOL
 SCALE_LEVEL_0 = 2.5  # 3

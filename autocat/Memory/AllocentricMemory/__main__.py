@@ -1,6 +1,8 @@
 import numpy as np
 from .AllocentricMemory import AllocentricMemory
-from .Hexagonal_geometry import CELL_RADIUS, cell_to_point, cell_to_x, cell_to_y
+from .Hexagonal_geometry import cell_to_x, cell_to_y
+from .Geometry import cell_to_point
+from .. import CELL_RADIUS
 # from .test_AllocentricMemory import test_move, test_convert_pos_in_cell
 from .test_AllocentricMemory import test_convert_pos_in_cell
 

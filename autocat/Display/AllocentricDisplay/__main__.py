@@ -4,11 +4,12 @@ from pyrr import Quaternion, Matrix44
 import pyglet
 from ...Workspace import Workspace
 from .CtrlAllocentricView import CtrlAllocentricView
-from ...Memory.AllocentricMemory.Hexagonal_geometry import point_to_cell, pool_neighbors
+# from ...Memory.AllocentricMemory.Hexagonal_geometry import pool_neighbors
+from ...Memory.AllocentricMemory.Geometry import point_to_cell
 from ...Memory.EgocentricMemory.Experience import Experience, EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_PLACE, \
     EXPERIENCE_FOCUS, EXPERIENCE_FLOOR, EXPERIENCE_ROBOT
 from ...Memory.AllocentricMemory.AllocentricMemory import CELL_NO_ECHO
-from ...Memory.AllocentricMemory.Hexagonal_geometry import CELL_RADIUS
+from ...Memory import CELL_RADIUS
 from ...Memory.PhenomenonMemory.Affordance import Affordance
 from ...Utils import quaternion_translation_to_matrix
 from ...Memory.AllocentricMemory.AllocentricMemory import STATUS_0, STATUS_2, STATUS_3, STATUS_1, STATUS_4, POINT_X, \
@@ -65,9 +66,9 @@ workspace.memory.phenomenon_memory.create_phenomenon(affordanceR)
 workspace.memory.allocentric_memory.update_affordances(workspace.memory.phenomenon_memory, 0)
 
 # Display neighboring pools
-neighbors = pool_neighbors(-7, 0)
-for p in range(0, 6):
-    workspace.memory.allocentric_memory.grid[neighbors[p, 0], neighbors[p, 1], STATUS_1] = EXPERIENCE_ALIGNED_ECHO
+# neighbors = pool_neighbors(-7, 0)
+# for p in range(0, 6):
+#     workspace.memory.allocentric_memory.grid[neighbors[p, 0], neighbors[p, 1], STATUS_1] = EXPERIENCE_ALIGNED_ECHO
 
 # Create the view
 ctrl_allocentric_view = CtrlAllocentricView(workspace)

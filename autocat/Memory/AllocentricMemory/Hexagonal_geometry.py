@@ -7,53 +7,6 @@
 # https://ieeexplore.ieee.org/document/8853238
 ########################################################################################
 
-import math
-import numpy as np
-from .. import GRID_WIDTH, GRID_HEIGHT
-
-CELL_RADIUS = 50  # (mm) Diameter of the outer circle
-
-
-def cell_to_point(q, r, radius=CELL_RADIUS):
-    """Convert cell axial coordinates to allocentric position"""
-    x = (3/2 * q) * radius
-    y = (np.sqrt(3)/2 * q + np.sqrt(3) * r) * radius
-    return np.transpose(np.array([x, y]), axes=(1, 2, 0))
-
-
-def point_to_cell(point, radius=CELL_RADIUS):
-    """Convert allocentric position to cell axial coordinates."""
-    # Rhombus wrap
-    # point %= np.array([GRID_WIDTH, GRID_HEIGHT, 1])
-    q = (2 * point[0]) / (3 * radius)
-    r = (-point[0] + np.sqrt(3) * point[1]) / (3 * radius)
-    return axial_round(q, r)
-
-
-def axial_round(q, r):
-    """Round the axial coordinates"""
-    x = round(q)
-    z = round(r)
-    y = round(-x - z)
-
-    x_diff = abs(x - q)
-    y_diff = abs(y - (-x - z))
-    z_diff = abs(z - r)
-
-    if x_diff > y_diff and x_diff > z_diff:
-        x = -y - z
-    elif y_diff > z_diff:
-        y = -x - z
-    else:
-        z = -x - y
-    return x, z
-
-
-def is_pool(i, j):
-    """Return 1 if this cell is a pool center with aperture 7"""
-    # https://ieeexplore.ieee.org/document/8853238
-    return np.where((i - 2 * j) % 7 == 0, 1, 0)
-
 
 # def get_neighbors(i, j):
 #     """Return a dictionary of the coordinates of the six neighboring cells"""

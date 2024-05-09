@@ -1,12 +1,11 @@
 import numpy as np
 from pyrr import quaternion
-from . import EMOTION_PLEASURE, GRID_WIDTH, GRID_HEIGHT
+from . import EMOTION_PLEASURE, GRID_WIDTH, GRID_HEIGHT, CELL_RADIUS
 from .EgocentricMemory.EgocentricMemory import EgocentricMemory
 from .AllocentricMemory.AllocentricMemory import AllocentricMemory
 from .BodyMemory import BodyMemory
 from .PhenomenonMemory.PhenomenonMemory import PhenomenonMemory
 from .PhenomenonMemory import PHENOMENON_ENCLOSED_CONFIDENCE
-from .AllocentricMemory.Hexagonal_geometry import CELL_RADIUS
 from ..Integrator.Integrator import integrate
 from ..Enaction.Predict import push_objects
 

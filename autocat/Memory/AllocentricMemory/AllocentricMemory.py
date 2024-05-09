@@ -3,14 +3,12 @@ import matplotlib.path as mpath
 import time
 import numpy as np
 from pyrr import quaternion, Vector3
-from . Hexagonal_geometry import point_to_cell, is_pool  #, get_neighbors
 from ..EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_PLACE, EXPERIENCE_FOCUS, EXPERIENCE_PROMPT, \
     EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_IMPACT
 from ...Robot.RobotDefine import ROBOT_CHASSIS_X, ROBOT_OUTSIDE_Y, CHECK_OUTSIDE
 from ...Memory.PhenomenonMemory.PhenomenonMemory import TER, ROBOT1
-from .Hexagonal_geometry import cell_to_point
 from ..PhenomenonMemory import PHENOMENON_RECOGNIZABLE_CONFIDENCE, PHENOMENON_ENCLOSED_CONFIDENCE
-from .Geometry import is_inside_rectangle, is_inside_polygon
+from .Geometry import is_inside_rectangle, cell_to_point, point_to_cell, is_pool
 
 STATUS_0 = 0
 STATUS_1 = 1

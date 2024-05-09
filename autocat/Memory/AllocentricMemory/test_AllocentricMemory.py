@@ -1,5 +1,5 @@
 from .AllocentricMemory import AllocentricMemory
-from .Hexagonal_geometry import point_to_cell
+from .Geometry import point_to_cell
 
 
 def test_convert_pos_in_cell():

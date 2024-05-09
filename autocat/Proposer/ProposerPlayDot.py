@@ -14,8 +14,8 @@ from ..Memory.EgocentricMemory.Experience import EXPERIENCE_FLOOR
 from ..Memory.AllocentricMemory.AllocentricMemory import CLOCK_PLACE
 from ..Enaction.CompositeEnaction import CompositeEnaction
 from ..Robot.RobotDefine import ROBOT_FLOOR_SENSOR_X
-from ..Memory.AllocentricMemory.Hexagonal_geometry import point_to_cell  #, pool_neighbors
-from ..Proposer.Interaction import OUTCOME_LOST_FOCUS
+from ..Memory.AllocentricMemory.Geometry import point_to_cell
+from ..Proposer.Interaction import OUTCOME_LOST_FOCUS, OUTCOME_FLOOR
 
 PLAY_DISTANCE_CLOSE = 200  # Between robot center and object center
 PLAY_DISTANCE_WITHDRAW = 250  # From where the robot has stopped
@@ -65,11 +65,14 @@ class ProposerPlayDot(Proposer):
             # e0.predicted_memory.egocentric_memory.prompt_point = np.array([-100, 0, 0])
             # e1 = Enaction(self.workspace.actions[ACTION_TURN], e0.predicted_memory)
             if last_visited_left < last_visited_right:
-                self.workspace.memory.egocentric_memory.focus_point = self.workspace.memory.allocentric_to_egocentric(self.workspace.memory.egocentric_memory.focus_point + np.array([0, 80, 0]))
+                focus = self.workspace.memory.egocentric_memory.focus_point + np.array([0, 150, 0])
+                # self.workspace.memory.egocentric_memory.focus_point = self.workspace.memory.allocentric_to_egocentric()
                 # e1.predicted_memory.egocentric_memory.prompt_point = np.array([0, -100, 0])
             else:
-                self.workspace.memory.egocentric_memory.focus_point = self.workspace.memory.allocentric_to_egocentric(self.workspace.memory.egocentric_memory.focus_point + np.array([0, -80, 0]))
+                focus = self.workspace.memory.egocentric_memory.focus_point + np.array([0, -150, 0])
+                # self.workspace.memory.egocentric_memory.focus_point = self.workspace.memory.allocentric_to_egocentric(self.workspace.memory.egocentric_memory.focus_point + np.array([0, -300, 0]))
                 # e1.predicted_memory.egocentric_memory.prompt_point = np.array([0, 100, 0])
+            e_memory.egocentric_memory.focus_point = focus
             # e2 = Enaction(self.workspace.actions[ACTION_SWIPE], e1.predicted_memory)
             # e2.predicted_memory.egocentric_memory.prompt_point = np.array([400, 0, 0])
             # e3 = Enaction(self.workspace.actions[ACTION_FORWARD], e2.predicted_memory)
@@ -77,10 +80,11 @@ class ProposerPlayDot(Proposer):
             # e_memory.egocentric_memory.prompt_point = np.array([-400, 0, 0])
             # return Enaction(self.workspace.actions[ACTION_BACKWARD], e_memory)
             e_memory.emotion_code = EMOTION_VIGILANCE
-        else:
+        elif enaction.outcome_code == OUTCOME_FLOOR:
             e_memory.emotion_code = EMOTION_CONTENT
+            self.last_seen_focus = None
 
-        # If focus at a dot phenomenon
+            # If focus at a dot phenomenon
         p = self.workspace.memory.phenomenon_memory.phenomena[p_id]
         if p.phenomenon_type == EXPERIENCE_FLOOR:
             # If very playful and the dot is forward
