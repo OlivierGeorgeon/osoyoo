@@ -98,6 +98,9 @@ For a good overview of the importance of grounding your AI/AGI please consider m
 For a good overview of the field of Artifical Cognition please consider this recent paper:
 [https://www.frontiersin.org/articles/10.3389/fncom.2024.1349408/full](https://www.frontiersin.org/articles/10.3389/fncom.2024.1349408/full)
 
+-
+
+**Why Not Use a More Professional Experimental Robot?**
 Even if Tesla Bots, for sake of example, were available, you wouldn't want to use such a complex system for the prototype stages of your AI/AGI project or theoretical project. You want a capable but simple enough robotic system that you have direct access to via Python, which is what this robotic car project allows. You will now have an embodiment to use with your AI/AGI. Even if you work mainly theoretically, the robotic car project can be very useful in terms of demonstrations and proof of concept.
 
 <p align="center">
@@ -118,7 +121,7 @@ There is also the issue of cost. For example, a cognitive robot used in many lab
  <img src="atlas.jpg" width="150" height="150">
 </p>
 
-Hanson Robotics has sophisticated very humanoid-like robots that some R&D institutions use. The Sophia and Einstein models are quite famous. Again, such models are orders of magnitude more expensive than the total $100- $200 cost of the PetitCat project.
+Hanson Robotics has sophisticated very humanoid-like robots that some R&D institutions use. The Sophia and Einstein models are quite famous. 
 
 <p align="center">
  <img src="hansoneinstein.jpg" width="150" height="150">
@@ -130,7 +133,7 @@ A very promising Android robot is the Phoenix model from Sanctuary AI.
  <img src="phoenix.jpg" width="150" height="150">
 </p>
 
-The list of android-like robots being developed at this time has become extensive and too long to include here. However, two android-like robots recently seen in the press are the Figure01 from Figure AI and the NVIDIA Groot.
+The list of android-like robots being developed at this time has become extensive and too long to include here. However, two android-like robots recently seen in the press are the Figure01 from Figure AI and the NVIDIA Groot. Again, such models are orders of magnitude more expensive than the total $100- $200 cost of the PetitCat project.
 
 <p align="center">
  <img src="figure01.jpg" width="150" height="150">
@@ -164,7 +167,10 @@ Don't be hesitant. Climb up on that horse and start your journey. Saddle up!!
 </p>
 
 
+-
 
+**Why Not Use ROS2?**
+Even if  
 
 
 -
