@@ -458,16 +458,24 @@ Rear-left AK3
 Thus when we reverse the wiring we get:
 
 Front-right  BK1 --> AK3
+
 Front-left BK3 --> AK1
+
 Rear-right AK1 --> BK3
+
 Rear-left AK3 -->  BK1
+
 
 And we reverse again the wiring we get:
 
 Front-right  BK1 --> AK3 --> BK1
+
 Front-left BK3 --> AK1 --> BK3
+
 Rear-right AK1 --> BK3 --> AK1
+
 Rear-left AK3 -->  BK1 --> AK3
+
 
 These reversals can be done in software. However, this would require modifying the Osoyoo packaged software. Thus, for the moment we are not modifying the software so that you can download the software which Osoyoo provides without modifications. However, later on, we will reverse the wheel wiring virtually rather than unplug and replug cables.
 
