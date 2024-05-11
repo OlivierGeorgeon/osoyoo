@@ -148,8 +148,11 @@ The list of android-like robots being developed at this time has become extensiv
 
 **Why Not Use ROS2?** 
 
-Even if  
+ The Robot Operating System (ROS) is a collection of software frameworks to take care of the low-level management of a robotic system. For example, it can abstract away aspects of the hardware being used, it can control the low-level operations of the robot and coordinate communication between different operations. ROS was released in 2007 and ROS2 was released in 2017. ROS2 is open source.
 
+ However, ROS2, despite its name, is not an operating system, but must be run on top of another operating system, usually Linux. Thus, there is a need for a full computer system board in the PetitCat project if ROS2 is used. As well, ROS2 is many times more complex than the Arduino-based software used in the PetitCat project. 
+
+ Thus, to keep the costs of the PetitCat project down (i.e., total costs of under US$200, including the extras) and to keep the complexity of the project down (the goal is to have an easy-to-implement robotic system that you can use with your AGI project), it was decided not to use ROS2. Instead an Arnduino microcontroller board is used involving lower costs and less complexity in interfacing your AGI project to a robotic embodiment. Note that most of your AGI project code will run on a desktop/laptop/server PC running in Python, not on the Arduino microcontroller board.
 
 
 
