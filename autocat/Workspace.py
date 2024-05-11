@@ -46,8 +46,8 @@ class Workspace:
         self.control_mode = KEY_CONTROL_USER
         self.engagement_mode = KEY_ENGAGEMENT_ROBOT
 
-        # Controls which phenomenon to display
-        self.ctrl_phenomenon_view = None
+        # Controls which phenomenon view to display
+        # self.ctrl_phenomenon_view = None
 
         # Message from other robot
         self.message = None
@@ -65,6 +65,7 @@ class Workspace:
             self.startup_sound.play()
         except pyglet.media.codecs.wave.WAVEDecodeException as e:
             print("Error loading sound files", e)
+            # TODO: Handle the case when sounds are not loaded
 
     def main(self, dt):
         """The main handler of the interaction cycle:

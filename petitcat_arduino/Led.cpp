@@ -31,12 +31,14 @@ void Led::update()
     // Serial.print("Cycle count:"); Serial.println(cycle_count);cycle_count = 0;  // For debug
     if (blink_on)
     {
-      digitalWrite(LED_BUILTIN, HIGH);
+//      digitalWrite(LED_BUILTIN, HIGH);
+      builtin_on();
       blink_on = false;
     }
     else
     {
-      digitalWrite(LED_BUILTIN, LOW);
+//      digitalWrite(LED_BUILTIN, LOW);
+      builtin_off();
       blink_on = true;
     }
   }
@@ -94,4 +96,20 @@ void Led::color(int c)
     emotion_green = 1.;
     emotion_blue = 0.;
   }
+}
+
+// Set the builtin LED if not used for the servo PIN
+void Led::builtin_on()
+{
+  #if LED_BUILTIN != ROBOT_SERVO_PIN
+    digitalWrite(LED_BUILTIN, HIGH);
+  #endif
+}
+
+// Reset the builtin LED if not used for the servo PIN
+void Led::builtin_off()
+{
+  #if LED_BUILTIN != ROBOT_SERVO_PIN
+    digitalWrite(LED_BUILTIN, LOW);
+  #endif
 }

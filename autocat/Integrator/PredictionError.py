@@ -244,7 +244,9 @@ class PredictionError:
 
         # Trace the enaction
         position_pe = ""
-        if self.workspace.memory.phenomenon_memory.focus_phenomenon_id is not None and enaction.clock in self.workspace.memory.phenomenon_memory.phenomena[self.workspace.memory.phenomenon_memory.focus_phenomenon_id].position_pe:
+        if self.workspace.memory.phenomenon_memory.focus_phenomenon_id is not None and \
+                hasattr(self.workspace.memory.phenomenon_memory.phenomena[self.workspace.memory.phenomenon_memory.focus_phenomenon_id], 'position_pe') and \
+                enaction.clock in self.workspace.memory.phenomenon_memory.phenomena[self.workspace.memory.phenomenon_memory.focus_phenomenon_id].position_pe:
             position_pe = round(self.workspace.memory.phenomenon_memory.phenomena[self.workspace.memory.phenomenon_memory.focus_phenomenon_id].position_pe[enaction.clock])
             # Reduce serotonin if prediction error is low
             # if position_pe < 50:
@@ -268,11 +270,11 @@ class PredictionError:
     def plot(self):
         """Show the prediction error plots"""
         # The outcome code prediction error
-        kwargs = {'bottom': -1, 'top': 2, 'fmt': 'sc', 'marker_size': 5}
+        kwargs = {'bottom': -1, 'top': 2, 'fmt': 'sr', 'marker_size': 5}
         plot(self.pe_outcome_code, "Outcome code prediction error", "01_Outcome_code", "(0/1)", **kwargs)
 
-        # The yaw prediction error cyan squares
-        kwargs = {'bottom': -40, 'top': 40, 'fmt': 'sc', 'marker_size': 5}
+        # The yaw prediction error red squares
+        kwargs = {'bottom': -40, 'top': 40, 'fmt': 'sr', 'marker_size': 5}
         plot(self.pe_yaw, "Yaw prediction error", "02_yaw_pe", "(degree)", **kwargs)
 
         # Residual errors Yaw and Compass magenta squares

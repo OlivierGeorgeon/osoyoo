@@ -15,8 +15,8 @@
 #define speedPinL 10           // LEFT  WHEEL PWM pin D7 connect front MODEL-X ENB
 
 #define speedPinRB 11          // RIGHT WHEEL PWM pin connect Back MODEL-X ENA
-#define RightMotorDirPin1B 23 // 5  // Rear  Right Motor direction pin 1 to Back MODEL-X IN1 (K1)
-#define RightMotorDirPin2B 25 // 6   // Rear  Right Motor direction pin 2 to Back MODEL-X IN2 (K1)
+//#define RightMotorDirPin1B 5 // Was moved to Robot_define.h
+//#define RightMotorDirPin2B 6 // Was moved to Robot_define.h
 #define LeftMotorDirPin1B 7    // Rear  left Motor direction pin 1 to Back MODEL-X IN3  (K3)
 #define LeftMotorDirPin2B 8    // Rear  left Motor direction pin 2 to Back MODEL-X IN4  (k3)
 #define speedPinLB 12          // LEFT  WHEEL PWM pin D8 connect Rear MODEL-X ENB

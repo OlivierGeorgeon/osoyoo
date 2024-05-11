@@ -140,9 +140,14 @@ void Interaction::send()
 
   // Send the outcome to the PC
   String outcome_json_string = JSON.stringify(outcome_object);
-  digitalWrite(LED_BUILTIN, HIGH); // light the led during transfer
+  // light the led during transfer
+  #if LED_BUILTIN != ROBOT_SERVO_PIN
+    digitalWrite(LED_BUILTIN, HIGH);
+  #endif
   _WifiCat.send(outcome_json_string);
-  digitalWrite(LED_BUILTIN, LOW);
+  #if LED_BUILTIN != ROBOT_SERVO_PIN
+    digitalWrite(LED_BUILTIN, LOW);
+  #endif
 
   // Ready to delete this interaction
   _step = INTERACTION_DONE;

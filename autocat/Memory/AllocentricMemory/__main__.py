@@ -1,10 +1,7 @@
 import numpy as np
 from .AllocentricMemory import AllocentricMemory
-from .Hexagonal_geometry import cell_to_x, cell_to_y
 from .Geometry import cell_to_point
 from .. import CELL_RADIUS
-# from .test_AllocentricMemory import test_move, test_convert_pos_in_cell
-from .test_AllocentricMemory import test_convert_pos_in_cell
 
 # Testing Allocentric Memory
 # py -m autocat.Memory.AllocentricMemory
@@ -13,8 +10,8 @@ allocentric_memory = AllocentricMemory(8, 9, CELL_RADIUS)
 # Displaying the hexagonal grid in the console.
 print(allocentric_memory)
 
-print("Cell_to_point(1,1)", cell_to_point(1, 1))
-print("Cell_to_point([1, 1], [1, 2])", cell_to_point(np.array([1, 1]), np.array([1, 2])))
+# print("Cell_to_point(1,1)", cell_to_point(1, 1))
+# print("Cell_to_point([1, 1], [1, 2])", cell_to_point(np.array([1, 1]), np.array([1, 2])))
 i_range = np.arange(1, 4)
 j_range = np.arange(1, 3)
 I, J = np.meshgrid(i_range, j_range, indexing='ij')

@@ -20,6 +20,8 @@ public:
   void setup();
   void update();
   void color(int c);
+  void builtin_on();
+  void builtin_off();
 private:
   unsigned long blink_time = 0;
   unsigned long cycle_count = 0;
