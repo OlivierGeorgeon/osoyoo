@@ -447,9 +447,13 @@ And thus, when you then move onto Lesson 3, reverse the wires back to the origin
 Osoyoo wiring instructions for wheel motors to pin locations on the Motor Control Board Y:
 
 Front-right  BK1
+
 Front-left BK3
+
 Rear-right AK1
+
 Rear-left AK3
+
 
 Thus when we reverse the wiring we get:
 
