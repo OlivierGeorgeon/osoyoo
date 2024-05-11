@@ -76,11 +76,25 @@ I am that new learner -- trying to figure out how to even start this project. Le
 
 
 
-**Why Build a Robot Car?**
+**Artificial Cognition, i.e., Why Build a Robot Car?**
 
-Embodiment is crucial to the emergence of real AGI, as well as understanding the operation of the mammalian brain.
+Artificial Cognition is an interdisciplinary field that designs and understands computational models and devices that are based on cognitive processes such as perception, reasoning, learning, problem-solving and decision-making. It obviously is inspired by human cognitive skills and the human brain. 
+
+Key areas of Artificial Cognition include cognitive architectures (a computational framework based on the human mind and brain), knowledge representation (how to model information about the world), learning (systems should learn from experiences and through such adaptations improve performance in the future), logical reasoning, and perception (how to interpret stimuli from the external world). 
+
+Grounding is a key part of Artificial Cognition. In perceiving the world, grounding connects the internal symbols the system has with actual sensory inputs from the environment. In performing actions on the world, internal symbols can similarly be understood. There also can be other types of grounding such as social grounding where internal symbols are given meaning with relation to social effects of the group. 
+
+Embodiment is often crucial to Artificial Cognitive as well as the emergence of real AGI, as well as understanding the operation of the mammalian brain.
+
+Embodiment technically means to give an AI program some way to sense the environment and some way to act on the environment. However, in a practical sense, it means to give your AI program a physical body. While embodiment does not guarantee grounding, again in a practical sense, it almost always allows it. For example, an embodiment such as a robot car allows your AI program to have sensors and thus perceive the environment. It allows your AI program to have actuators and thus act on the world. Thus the internal symbolic representations (even if in neural networks) of your AI program can be linked to real-world external objects and actions. 
+
+Embodiment also goes beyond this. For example, by have a robot body, your AI program learn in context, i.e., it can associate the stimuli that the environment provides and the actions the robot performs, with the outcome that results. As well, the robot, i.e., the embodiment for your AI program, can get immediate feedback on an action it performs, and thus it can continually improve the links between symbols and their effect on the environment.
+
 For a good overview of the importance of grounding your AI/AGI please consider my paper:
 [cca5 inductive analogical soln to grounding problem](https://www.sciencedirect.com/science/article/abs/pii/S1389041722000493?via%3Dihub) [archive preprint](https://github.com/howard8888/insomnia/blob/master/analogical%20inductive%20preprint.pdf)
+
+For a good overview of the field of Artifical Cognition please consider this recent paper:
+[https://www.frontiersin.org/articles/10.3389/fncom.2024.1349408/full] (https://www.frontiersin.org/articles/10.3389/fncom.2024.1349408/full)
 
 Even if Tesla Bots, for sake of example, were available, you wouldn't want to use such a complex system for the prototype stages of your AI/AGI project or theoretical project. You want a capable but simple enough robotic system that you have direct access to via Python, which is what this robotic car project allows. You will now have an embodiment to use with your AI/AGI. Even if you work mainly theoretically, the robotic car project can be very useful in terms of demonstrations and proof of concept.
 
