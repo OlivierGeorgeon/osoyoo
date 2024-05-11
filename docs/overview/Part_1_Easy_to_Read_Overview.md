@@ -104,7 +104,7 @@ Even if Tesla Bots, for sake of example, were available, you wouldn't want to us
  <img src="teslabot.jpg" width="150" height="150">
 </p>
 
-There is also the issue of cost. For example, a cognitive robot used in many laboratories (and seen in the paper above on Artificial Cognition) is the iCub robot. It is a reasonable small size and can be interfaced to AI programs. However, the cost a single iCub robot is approximately  €250,000 (source Wikipedia at the time of writing). Or, another robot that can be interfaced to your AI projects is Boston Dynamics robot dog Spot. However, its cost is approximately US$75,000 (source Wikipedia at the time of writing). In contrast, the cost of the PetitCat project is about $100-$200 with all the optional accessories. 
+There is also the issue of cost. For example, a cognitive robot used in many laboratories (and seen in the paper above on Artificial Cognition) is the iCub robot. It is a reasonable small size and can be interfaced to AI programs. However, the cost a single iCub robot is approximately  €250,000 (source Wikipedia at the time of writing). Or, another robot that can be interfaced to your AI projects is Boston Dynamics robot dog Spot. However, its cost is approximately US$75,000 (source Wikipedia at the time of writing). (The Boston Dynamics humanoid Atlas is currrently not available for sale, but it would similarly be quite costly.)  In contrast, the cost of the PetitCat project is about $100-$200 with all the optional accessories. 
 
 <p align="center">
  <img src="icub.jpg" width="150" height="150">
@@ -114,8 +114,33 @@ There is also the issue of cost. For example, a cognitive robot used in many lab
  <img src="spot.jpg" width="150" height="150">
 </p>
 
--
--
+<p align="center">
+ <img src="atlas.jpg" width="150" height="150">
+</p>
+
+Hanson Robotics has sophisticated very humanoid-like robots that some R&D institutions use. The Sophia and Einstein models are quite famous. Again, such models are orders of magnitude more expensive than the total $100- $200 cost of the PetitCat project.
+
+<p align="center">
+ <img src="hansoneinstein.jpg" width="150" height="150">
+</p>
+
+A very promising Android robot is the Phoenix model from Sanctuary AI.
+
+<p align="center">
+ <img src="phoenix.jpg" width="150" height="150">
+</p>
+
+The list of android-like robots being developed at this time has become extensive and too long to include here. However, two android-like robots recently seen in the press are the Figure01 from Figure AI and the NVIDIA Groot.
+
+<p align="center">
+ <img src="figure01.jpg" width="150" height="150">
+</p>
+
+<p align="center">
+ <img src="groot.jpg" width="150" height="150">
+</p>
+
+
 <h1 style="font-size: 24px;">Step #1 -- Decide if you want to do the Project</h1>
 
 Your first step should be to decide to build this robotic car project. Are you working on an AI/AGI project that it could be useful for? (Actually, it is probably useful for most projects, including LLMs.) Do you have an interest in robotics and would like to see an interface to an AI project? 
