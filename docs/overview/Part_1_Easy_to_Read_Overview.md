@@ -101,6 +101,7 @@ For a good overview of the field of Artifical Cognition please consider this rec
 -
 
 **Why Not Use a More Professional Experimental Robot?**
+
 Even if Tesla Bots, for sake of example, were available, you wouldn't want to use such a complex system for the prototype stages of your AI/AGI project or theoretical project. You want a capable but simple enough robotic system that you have direct access to via Python, which is what this robotic car project allows. You will now have an embodiment to use with your AI/AGI. Even if you work mainly theoretically, the robotic car project can be very useful in terms of demonstrations and proof of concept.
 
 <p align="center">
@@ -170,6 +171,7 @@ Don't be hesitant. Climb up on that horse and start your journey. Saddle up!!
 -
 
 **Why Not Use ROS2?**
+
 Even if  
 
 
