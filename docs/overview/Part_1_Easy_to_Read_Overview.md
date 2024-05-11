@@ -430,7 +430,52 @@ Assembled chassis (Note that the straps are still loose until the assembly is co
 -Now connect the motor controller board to the Arduino board and the Wi-Fi shield pass through connectors as shown in the diagram in the manual:
 ![connect arduino to motor controller](arduinoconnect.png)
 
+-
+-
+------------
+
+NOte:
+The wiring shown in the Osoyoo Manual causes the robot car to run in reverse when the software of Lesson 2 (ultrasound object avoidance) and Lesson 5b (cellphone Wi-Fi app to make the car go in different directions) is run. (However, if the software from Lesson 3 (photocell line tracking) is run, the direction is correct.)
+
+Thus, for Lesson 2 and for Lesson 5b reverse the following wires:
+
+AK1 <--> BK3
+BK1 <--> AK3
+
+And thus, when you then move onto Lesson 3, reverse the wires back to the original position. And then when moving onto Lesson 5b reverse again as shown above.
+
+Osoyoo wiring instructions for wheel motors to pin locations on the Motor Control Board Y:
+
+Front-right  BK1
+Front-left BK3
+Rear-right AK1
+Rear-left AK3
+
+Thus when we reverse the wiring we get:
+
+Front-right  BK1 --> AK3
+Front-left BK3 --> AK1
+Rear-right AK1 --> BK3
+Rear-left AK3 -->  BK1
+
+And we reverse again the wiring we get:
+
+Front-right  BK1 --> AK3 --> BK1
+Front-left BK3 --> AK1 --> BK3
+Rear-right AK1 --> BK3 --> AK1
+Rear-left AK3 -->  BK1 --> AK3
+
+These reversals can be done in software. However, this would require modifying the Osoyoo packaged software. Thus, for the moment we are not modifying the software so that you can download the software which Osoyoo provides without modifications. However, later on, we will reverse the wheel wiring virtually rather than unplug and replug cables.
+
+------------
+-
+-
+
+
+
 -I then connected the voltage meter and the battery box, although in the manual they also show connection of the servo motor and the 5-point tracking module, which can be done now or later.
+
+
 ![connect other modules](otherconnect.png)
 -
 -
