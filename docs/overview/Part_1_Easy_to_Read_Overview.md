@@ -24,6 +24,7 @@ Howard Schneider -- Feb 15, 2024)
 
 
 The "Easy-to-Read Overview" of the project is divided into five parts:
+(Note: At the time of writing. The number of parts may increase in the future.)
 
 **Part I:** The Basics: Assembly, Software and Using
 
@@ -40,7 +41,7 @@ The PetitCat documentation is written so that anyone with a basic education can 
 
 -Part I does not require any specialized background knowledge. You should be familiar with moving files around in either your Windows, Mac or Linux desktop/laptop computer. Other than that, no specialized knoweldge is needed. Part I is perfectly fine for high school students and hobbyists.
 
--Part II may be fine for high school students, college students and hobbyists as well, given a willingness of some effort to learn things here and there. However, the documentation will guide you on this learning journey. The lower level software of the PetitCat project is written in C\C++ in the Arduino IDE. You don't need to know these languages or environment in order to use Python with the project. However, we provide a very basic C\C++\Arduino tutorial which may be sufficient for most readers who do want to have a bit more control over the Arduino board coding. We just touch upon the Python control of the project at the end of Part II, so you are not expected to have much Python knowledge in this part, unless you want to start modifying the Python files.
+-Part II may be fine for high school students, college students and hobbyists as well, given a willingness of some effort to learn things here and there. However, the documentation will guide you on this learning journey. The lower level software of the PetitCat project is written in C/C++ in the Arduino IDE. You don't need to know these languages or environment in order to use Python with the project. However, we provide a very basic C/C++/Arduino tutorial which may be sufficient for most readers who do want to have a bit more control over the Arduino board coding. We just touch upon the Python control of the project at the end of Part II, so you are not expected to have much Python knowledge in this part, unless you want to start modifying the Python files.
 
 -Part III really only requires some knowledge of Python. You do not have to be an expert developer. More important, is perhaps a background in AI or cognitive science. However, there is no real background prerequisite here. Regardless of the reader's background, we provide gentle tutorials on a number of topics, and guide the learner through the concepts of active inference and implementing it in the PetitCat project.
 
@@ -161,15 +162,15 @@ The list of android-like robots being developed at this time has become extensiv
 
 <h1 style="font-size: 24px;">Step #1 -- Decide if you want to do the Project</h1>
 
-Your first step should be to decide to build this robotic car project. Are you working on an AI/AGI project that it could be useful for? (Actually, it is probably useful for most projects, including LLMs.) Do you have an interest in robotics and would like to see an interface to an AI project? 
+Your first step should be to decide to build this robotic car project. Are you working on an AI/AGI project that it could be useful for? (Actually, it is probably useful for most projects, including LLMs. Please read above about grounding and about artificial cognition.) Do you have an interest in robotics and would like to see an interface to an AI project? 
 
-In terms of monetary cost expect to spend about US$200 on the project (I know the Amazon.com prices are not this high, but shipping to other countries, extra parts from AliExpress, etc will push up the price). 
+In terms of monetary cost expect to spend about US$150-$200 on the project (I know the Amazon.com prices are not this high, but shipping to other countries, extra parts from AliExpress, etc will push up the price). (If you purchase duplicate parts, which can be useful for troubleshooting, then double the costs.)
 
 In terms of your required electronics expertise, very little is needed if everything gets assembled correctly and all parts are working. If you want to modify the design, if there is more advanced troubleshooting, then of course more is better.
 
-In terms of your required software expertise, only a minimal amount is needed to make the robot work. For example, you need to be comfortable moving around files and running Python code. The Arduino IDE and code you can install and copy without great expertise (I will show you how below). Of course, if you have the time, you can spend more hours getting more expertise in the Arduino ecosystem. As well, you will need more expertise in Python if you want to use the robot car for your own research project.
+In terms of your required software expertise, only a minimal amount is needed to make the robot work. For example, you need to be comfortable moving around files and running Python code. The Arduino IDE and code you can install and copy without great expertise (I will show you how below). Of course, if you have the time, you can spend more hours getting more expertise in the Arduino ecosystem (which involves C/C++ code). As well, you will need more expertise in Python if you want to use the robot car for your own research project.
 
-Do not worry. Regardless of your skill level, this manual will gently guide you through the five parts. You will accomplish amazing things. Have confidence in yourself. Have confidence in this manual. Have confidence in this project.
+Do not worry. Regardless of your skill level, this manual will gently guide you through the various parts of the project. You will accomplish amazing things. Have confidence in yourself. Have confidence in this manual. Have confidence in this project.
 
 Are you ready?
 
