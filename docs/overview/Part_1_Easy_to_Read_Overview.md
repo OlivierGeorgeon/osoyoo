@@ -105,43 +105,43 @@ For a good overview of the field of Artifical Cognition please consider this rec
 Even if Tesla Bots, for sake of example, were available, you wouldn't want to use such a complex system for the prototype stages of your AI/AGI project or theoretical project. You want a capable but simple enough robotic system that you have direct access to via Python, which is what this robotic car project allows. You will now have an embodiment to use with your AI/AGI. Even if you work mainly theoretically, the robotic car project can be very useful in terms of demonstrations and proof of concept.
 
 <p align="center">
- <img src="teslabot.jpg" width="150" height="150">
+ <img src="teslabot.jpg" width="250" height="250">
 </p>
 
 There is also the issue of cost. For example, a cognitive robot used in many laboratories (and seen in the paper above on Artificial Cognition) is the iCub robot. It is a reasonable small size and can be interfaced to AI programs. However, the cost a single iCub robot is approximately  €250,000 (source Wikipedia at the time of writing). Or, another robot that can be interfaced to your AI projects is Boston Dynamics robot dog Spot. However, its cost is approximately US$75,000 (source Wikipedia at the time of writing). (The Boston Dynamics humanoid Atlas is currrently not available for sale, but it would similarly be quite costly.)  In contrast, the cost of the PetitCat project is about $100-$200 with all the optional accessories. 
 
 <p align="center">
- <img src="icub.jpg" width="150" height="150">
+ <img src="icub.jpg" width="250" height="250">
 </p>
 
 <p align="center">
- <img src="spot.jpg" width="150" height="150">
+ <img src="spot.jpg" width="250" height="250">
 </p>
 
 <p align="center">
- <img src="atlas.jpg" width="150" height="150">
+ <img src="atlas.jpg" width="250" height="250">
 </p>
 
 Hanson Robotics has sophisticated very humanoid-like robots that some R&D institutions use. The Sophia and Einstein models are quite famous. 
 
 <p align="center">
- <img src="hansoneinstein.jpg" width="150" height="150">
+ <img src="hansoneinstein.jpg" width="250" height="250">
 </p>
 
 A very promising Android robot is the Phoenix model from Sanctuary AI.
 
 <p align="center">
- <img src="phoenix.jpg" width="150" height="150">
+ <img src="phoenix.jpg" width="250" height="250">
 </p>
 
 The list of android-like robots being developed at this time has become extensive and too long to include here. However, two android-like robots recently seen in the press are the Figure01 from Figure AI and the NVIDIA Groot. Again, such models are orders of magnitude more expensive than the total $100- $200 cost of the PetitCat project.
 
 <p align="center">
- <img src="figure01.jpg" width="150" height="150">
+ <img src="figure01.jpg" width=2150" height="250">
 </p>
 
 <p align="center">
- <img src="groot.jpg" width="150" height="150">
+ <img src="groot.jpg" width=2150" height="250">
 </p>
 
 -
@@ -152,7 +152,10 @@ The list of android-like robots being developed at this time has become extensiv
 
  However, ROS2, despite its name, is not an operating system, but must be run on top of another operating system, usually Linux. Thus, there is a need for a full computer system board in the PetitCat project if ROS2 is used. As well, ROS2 is many times more complex than the Arduino-based software used in the PetitCat project. 
 
- Thus, to keep the costs of the PetitCat project down (i.e., total costs of under US$200, including the extras) and to keep the complexity of the project down (the goal is to have an easy-to-implement robotic system that you can use with your AGI project), it was decided not to use ROS2. Instead an Arnduino microcontroller board is used involving lower costs and less complexity in interfacing your AGI project to a robotic embodiment. Note that most of your AGI project code will run on a desktop/laptop/server PC running in Python, not on the Arduino microcontroller board.
+ Thus, to keep the costs of the PetitCat project down (i.e., total costs of under US$200, including the extras) and to keep the complexity of the project down (the goal is to have an easy-to-implement robotic system that you can use with your AGI project), it was decided not to use ROS2. Instead an Arnduino microcontroller board along with the Arduino IDE (which compiles and pushes machine code onto the board) is used resulting in lower costs and less complexity in interfacing your AGI project to a robotic embodiment. Note that most of your AGI project code will run on a desktop/laptop/server PC running in Python, not in the machine code in the Arduino microcontroller board. However, the PetitCat project allows communication between the Arduino board and the Python software running on your desktop/laptop/server.
+
+-
+-
 
 
 
