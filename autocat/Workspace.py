@@ -52,16 +52,19 @@ class Workspace:
         # Message from other robot
         self.message = None
 
-        # Load sounds
-        self.startup_sound = pyglet.media.load('autocat/Assets/R5.wav', streaming=False)
-        self.clear_sound = pyglet.media.load('autocat/Assets/R3.wav', streaming=False)
-        self.near_home_sound = pyglet.media.load('autocat/Assets/R4.wav', streaming=False)
-        self.push_sound = pyglet.media.load('autocat/Assets/tiny_cute.wav', streaming=False)
-        self.message_sound = pyglet.media.load('autocat/Assets/chirp.wav', streaming=False)
-        self.floor_sound = pyglet.media.load('autocat/Assets/cyberpunk3.wav', streaming=False)
-        self.impact_sound = pyglet.media.load('autocat/Assets/cute_beep1.wav', streaming=False)
-        self.surprise_sound = pyglet.media.load('autocat/Assets/chirp3.mp3', streaming=False)
-        self.startup_sound.play()
+        # Try to load sounds (it may not work on all platforms)
+        try:
+            self.startup_sound = pyglet.media.load('autocat/Assets/R5.wav', streaming=False)
+            self.clear_sound = pyglet.media.load('autocat/Assets/R3.wav', streaming=False)
+            self.near_home_sound = pyglet.media.load('autocat/Assets/R4.wav', streaming=False)
+            self.push_sound = pyglet.media.load('autocat/Assets/tiny_cute.wav', streaming=False)
+            self.message_sound = pyglet.media.load('autocat/Assets/chirp.wav', streaming=False)
+            self.floor_sound = pyglet.media.load('autocat/Assets/cyberpunk3.wav', streaming=False)
+            self.impact_sound = pyglet.media.load('autocat/Assets/cute_beep1.wav', streaming=False)
+            self.surprise_sound = pyglet.media.load('autocat/Assets/chirp3.mp3', streaming=False)
+            self.startup_sound.play()
+        except pyglet.media.codecs.wave.WAVEDecodeException as e:
+            print("Error loading sound files", e)
 
     def main(self, dt):
         """The main handler of the interaction cycle:

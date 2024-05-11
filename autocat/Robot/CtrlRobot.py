@@ -20,7 +20,7 @@ class CtrlRobot:
         self.workspace = workspace
         self.port = 8888
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.socket.connect((self.robot_ip, self.port))  # Not necessary for UDP
+        # self.socket.connect((self.robot_ip, self.port))  # Not necessary for UDP. Generates an error on my mac
         self.socket.settimeout(0)
         self.send_time = 0.
         self.time_out = 0.
@@ -42,7 +42,7 @@ class CtrlRobot:
                 except socket.timeout:   # Time out error if outcome not yet received
                     print("t", end='')
                 except OSError as e:
-                    if e.args[0] == 10035:
+                    if e.args[0] in [35, 10035]:
                         print(".", end='')
                     else:
                         print(e)

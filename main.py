@@ -24,6 +24,10 @@ import pyglet
 from autocat import Flock
 # from playsound import playsound
 
+# Try to fix some mouse press issue on mac but it does not solve the problem
+# https://github.com/pyglet/pyglet/issues/171
+pyglet.options['osx_alt_loop'] = True
+
 if len(sys.argv) < 3:  # Argument 0 is "main.py" when launched in -m mode
     print("Please provide the arena ID and the robot ID as arguments")
     exit()
