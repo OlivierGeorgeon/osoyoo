@@ -144,6 +144,14 @@ The list of android-like robots being developed at this time has become extensiv
  <img src="groot.jpg" width="150" height="150">
 </p>
 
+-
+
+**Why Not Use ROS2?** 
+
+Even if  
+
+
+
 
 <h1 style="font-size: 24px;">Step #1 -- Decide if you want to do the Project</h1>
 
@@ -167,12 +175,6 @@ Don't be hesitant. Climb up on that horse and start your journey. Saddle up!!
  <img src="horsetonextlesson.png" width="770" height="770">
 </p>
 
-
--
-
-**Why Not Use ROS2?** 
-
-Even if  
 
 
 -
