@@ -440,6 +440,7 @@ The wiring shown in the Osoyoo Manual causes the robot car to run in reverse whe
 Thus, for Lesson 2 and for Lesson 5b reverse the following wires:
 
 AK1 <--> BK3
+
 BK1 <--> AK3
 
 And thus, when you then move onto Lesson 3, reverse the wires back to the original position. And then when moving onto Lesson 5b reverse again as shown above.
