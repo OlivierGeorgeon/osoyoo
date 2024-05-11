@@ -905,7 +905,7 @@ If you are working on the Arduino board including working on the robot car proje
 -
 This section still needs to be properly finished. You may think this section does not apply to you since you work in AI/AGI and don't need to know the low-level electronics, but really you should know the basic low-level of electronics this section discusses.
 -
-At present I am working on the code and documentation of the code portions particularly in the next Part III, but I will come back and finish this section. "I'll be back."  (If you don't know where this line is from, then perhaps even more important than upgrading your electronics knowledge, is to upgrade your popular sci-fi knowledge -- go watch the 1984 movie Terminator and then watch the entire series of Terminator (except for Terminator Genisys which was not scientifically accurate). Yes, Arnold Schwarzenegger says this famous line. If you work in AI/AGI then it behooves you to consider what the effect of successful achievement of AGI by mankind will actually be. Terminator may be more thought provoking than more academic exercises on the subject. A popular/quasi-academic reference is Bostrom's Superintelligence book for those interested -- ISBN 978-0199678112. But again, if you have not seen the Terminator movies, then complete this important part of your AI/AGI education :)  )
+At present I am working on the code and documentation of the code portions particularly in the next Part III, but I will come back and finish this section. "I'll be back."  
 
 ![beback](beback.jpg)
 
