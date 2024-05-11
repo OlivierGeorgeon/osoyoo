@@ -434,7 +434,7 @@ Assembled chassis (Note that the straps are still loose until the assembly is co
 -
 ------------
 
-NOte:
+Note:
 The wiring shown in the Osoyoo Manual causes the robot car to run in reverse when the software of Lesson 2 (ultrasound object avoidance) and Lesson 5b (cellphone Wi-Fi app to make the car go in different directions) is run. (However, if the software from Lesson 3 (photocell line tracking) is run, the direction is correct.)
 
 Thus, for Lesson 2 and for Lesson 5b reverse the following wires:
