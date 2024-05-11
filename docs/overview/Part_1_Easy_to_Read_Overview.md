@@ -137,11 +137,11 @@ A very promising Android robot is the Phoenix model from Sanctuary AI.
 The list of android-like robots being developed at this time has become extensive and too long to include here. However, two android-like robots recently seen in the press are the Figure01 from Figure AI and the NVIDIA Groot. Again, such models are orders of magnitude more expensive than the total $100- $200 cost of the PetitCat project.
 
 <p align="center">
- <img src="figure01.jpg" width=2150" height="250">
+ <img src="figure01.jpg" width=250" height="250">
 </p>
 
 <p align="center">
- <img src="groot.jpg" width=2150" height="250">
+ <img src="groot.jpg" width=250" height="250">
 </p>
 
 -
