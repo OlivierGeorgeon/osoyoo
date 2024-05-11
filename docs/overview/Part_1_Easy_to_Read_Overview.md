@@ -104,6 +104,7 @@ Even if Tesla Bots, for sake of example, were available, you wouldn't want to us
  <img src="teslabot.jpg" width="150" height="150">
 </p>
 -
+There is also the issue of cost. For example, a cognitive robot used in many laboratories (and seen in the paper above on Artificial Cognition) is the iCub robot. It is a reasonable small size and can be interfaced to AI programs. However, the cost a single iCub robot is approximately  € 250,000 (source Wikipedia at the time of writing). Or, another robot that can be interfaced to your AI projects is Boston Dynamics robot dog Spot. However, its cost is approximately US$ 75,000 (source Wikipedia at the time of writing). In contrast, the cost of the PetitCat project is about $100-$200 with all the optional accessories. 
 -
 -
 -
