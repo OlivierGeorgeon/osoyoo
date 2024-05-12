@@ -138,7 +138,7 @@ Hanson Robotics has sophisticated very humanoid-like robots that some R&D instit
  <img src="hansoneinstein.jpg" width="250" height="250">
 </p>
 
-A very promising Android robot is the Phoenix model from Sanctuary AI.
+A very promising android-like robot is the Phoenix model from Sanctuary AI.
 
 <p align="center">
  <img src="phoenix.jpg" width="250" height="250">
