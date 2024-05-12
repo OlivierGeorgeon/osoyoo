@@ -356,22 +356,24 @@ For a moment, you can pretend you just created a great new robot to be used on t
  <img src="logogpt4startrek.jpg" width="550" height="550">
 </p>
 
-
+-
 -------------------------
 
-At this point the basic Osoyoo hardware and pre-packaged software have been installed.
+At this point the basic Osoyoo hardware and pre-packaged software have been installed for your robot car.
 
 In the future, if you want to make sure all the systems of the robot car are working you can use this pre-packaged software as a simple diagnostic tool.
 
 Run the Lesson 2 Osoyoo sketch -- if the ultrasound detector and servomotors are functioning, then the robot car will avoid objects with the ultrasound sensors.
 
-Run the Lesson 3 Osoyoo sketch -- the line tracking/avoiding photocells will become activated.
+Run the Lesson 3 Osoyoo sketch -- the line tracking/avoiding photocells will become activated. (To avoid having to reverse the wheel motor cables here, what I do is simply lift the car in the air and put a black paper and then a white paper under the photocells and observe changes in the wheel directions.)
 
 Run the Lesson 5b Osoyoo sketch -- the Wi-Fi will become activated. You should be able to control the forward and turning motion of the robot car via the cellphone app described.
 
--------------------------
+I hope in the future to write our own diagnostic routines so that you do not need to load and run the pre-packaged sketeches, and as well, be able to provide more meaningful diagnostic information, including allowing virtual direction control of the wheels. 
 
+-------------------------
 -
+
 -
 
 
@@ -1034,9 +1036,26 @@ returns a value of 0 to 1023 over an input range 0 to 5 volts
 
 
 
+
 -
+
+
 -
--
+-------------------------
+
+At this point the basic Osoyoo hardware and pre-packaged software have been installed for your robot car.
+
+In the future, if you want to make sure all the systems of the robot car are working you can use this pre-packaged software as a simple diagnostic tool.
+
+Run the Lesson 2 Osoyoo sketch -- if the ultrasound detector and servomotors are functioning, then the robot car will avoid objects with the ultrasound sensors.
+
+Run the Lesson 3 Osoyoo sketch -- the line tracking/avoiding photocells will become activated. (To avoid having to reverse the wheel motor cables here, what I do is simply lift the car in the air and put a black paper and then a white paper under the photocells and observe changes in the wheel directions.)
+
+Run the Lesson 5b Osoyoo sketch -- the Wi-Fi will become activated. You should be able to control the forward and turning motion of the robot car via the cellphone app described.
+
+I hope in the future to write our own diagnostic routines so that you do not need to load and run the pre-packaged sketeches, and as well, be able to provide more meaningful diagnostic information, including allowing virtual direction control of the wheels. 
+
+-------------------------
 -
 
 
