@@ -92,12 +92,19 @@ Embodiment technically means to give an AI program some way to sense the environ
 Embodiment also goes beyond this. For example, by having a robot body, your AI program can learn in context, i.e., it can associate the stimuli that the environment provides and the actions the robot performs, with the outcome that results. As well, the robot, i.e., the embodiment for your AI program, can get immediate feedback on an action it performs, and thus it can continually improve the links between symbols and their effect on the environment.
 
 For a good overview of the importance of grounding your AI/AGI please consider my paper:
+
 [cca5 inductive analogical soln to grounding problem](https://www.sciencedirect.com/science/article/abs/pii/S1389041722000493?via%3Dihub) 
 
 [archive preprint](https://github.com/howard8888/insomnia/blob/master/analogical%20inductive%20preprint.pdf)
 
 For a good overview of the field of Artifical Cognition please consider this recent paper:
+
 [https://www.frontiersin.org/articles/10.3389/fncom.2024.1349408/full](https://www.frontiersin.org/articles/10.3389/fncom.2024.1349408/full)
+
+For a paper on using the PetitCat project for Active Inference by Dr Georgeon, please consider this recent paper:
+
+[https://www.sciencedirect.com/science/article/pii/S1389041724000287?dgcid=author](https://www.sciencedirect.com/science/article/pii/S1389041724000287?dgcid=author)
+
 
 -
 
