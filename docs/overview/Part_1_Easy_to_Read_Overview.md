@@ -1017,6 +1017,21 @@ Your robotic car still has the code from Lesson 2 on it. However, when you turn 
 
 OK.... now we have to install new code to make use of the IR Sensor array.
 
+------------------------------
+NOTE ABOUT WHEEL DIRECTION: The original Osoyoo wiring of the motors will give the correct forward and backward direction of the wheels. Thus, if you reversed the motor wiring for Lesson 2 above, you should re-reverse it back to the original wiring, i.e.,
+
+Front-right  BK1 --> AK3 --> BK1
+
+Front-left BK3 --> AK1 --> BK3
+
+Rear-right AK1 --> BK3 --> AK1
+
+Rear-left AK3 -->  BK1 --> AK3
+
+As noted above, these reversals can be done in software. However, this would require modifying the Osoyoo packaged software. Thus, for the moment we are not modifying the software so that you can download the software which Osoyoo provides without modifications. However, later on, we will reverse the wheel wiring virtually rather than unplug and replug cables.
+
+------------------------------
+
 -Open the Arduino IDE exactly as described above. As well, the manual shows several screens of the Arduino IDE. Make sure your Arduino IDE is configured exactly like before (i.e., correct Arduino board is specified).
 
 -Click 'Open' and load in m2-lesson3.ino
