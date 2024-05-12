@@ -371,6 +371,16 @@ Run the Lesson 5b Osoyoo sketch -- the Wi-Fi will become activated. You should b
 
 I hope in the future to write our own diagnostic routines so that you do not need to load and run the pre-packaged sketches, and as well, be able to provide more meaningful diagnostic information, including allowing virtual direction control of the wheels. 
 
+Note: In the PetitCat project software, you can modify wheel direction (i.e., without swapping cables) as follows:
+
+#define REAR_RIGHT_WHEEL_COEF -1
+
+#define REAR_LEFT_WHEEL_COEF -1
+
+#define FRONT_RIGHT_WHEEL_COEF -1
+
+#define FRONT_LEFT_WHEEL_COEF -1
+
 -------------------------
 -
 
@@ -1054,6 +1064,16 @@ Run the Lesson 3 Osoyoo sketch -- the line tracking/avoiding photocells will bec
 Run the Lesson 5b Osoyoo sketch -- the Wi-Fi will become activated. You should be able to control the forward and turning motion of the robot car via the cellphone app described.
 
 I hope in the future to write our own diagnostic routines so that you do not need to load and run the pre-packaged sketeches, and as well, be able to provide more meaningful diagnostic information, including allowing virtual direction control of the wheels. 
+
+Note: In the PetitCat project software, you can modify wheel direction (i.e., without swapping cables) as follows:
+
+#define REAR_RIGHT_WHEEL_COEF -1
+
+#define REAR_LEFT_WHEEL_COEF -1
+
+#define FRONT_RIGHT_WHEEL_COEF -1
+
+#define FRONT_LEFT_WHEEL_COEF -1
 
 -------------------------
 -
