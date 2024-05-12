@@ -351,6 +351,21 @@ Celebrate.... because we will be moving onto more technical details in a few mom
 
 For a moment, you can pretend you just created a great new robot to be used on the Star Ship Enterprise (NCC-1701-D, of course). Picard is most pleased with your genius, and invites you for a cup of tea, Earl Grey, of course. 
 
+
+-------------------------
+
+At this point the basic Osoyoo hardware and pre-packaged software have been installed.
+
+In the future, if you want to make sure all the systems of the robot car are working you can use this pre-packaged software as a simple diagnostic tool.
+
+Run the Lesson 2 Osoyoo sketch -- if the ultrasound detector and servomotors are functioning, then the robot car will avoid objects with the ultrasound sensors.
+
+Run the Lesson 3 Osoyoo sketch -- the line tracking/avoiding photocells will become activated.
+
+Run the Lesson 5b Osoyoo sketch -- the Wi-Fi will become activated. You should be able to control the forward and turning motion of the robot car via the cellphone app described.
+
+-------------------------
+
 <p align="center">
  <img src="logogpt4startrek.jpg" width="850" height="850">
 </p>
