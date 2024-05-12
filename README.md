@@ -11,6 +11,9 @@ At present the PetitCat project uses as the default "PetitCat Robot" an Arduino-
 
 -
 
+![petitcatgpt4logo](petitcatgpt4logo.jpg)
+
+-
 
 ## Repository architecture
 
