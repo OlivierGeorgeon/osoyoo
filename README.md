@@ -1,7 +1,14 @@
 # PetitCat
 
-The PetitCat project aims at generating life-like behaviors in robots.
-It uses the PetitCat Robot, an extension of the [osoyoo robot car](https://osoyoo.myshopify.com/collections/robot-car/products/osoyoo-omni-directinal-mecanum-wheels-robot-car-kit-for-arduino-mega2560-metal-chassis-dc-speed-encoder-motor-robotic-diy-stem-remote-controlled-educational-mechanical-diy-coding-for-teens-adult?variant=31634199183471). 
+The PetitCat project allows any AI researcher to have access to low-cost and readily available robotic parts to allow easy grounding and embodiment of their work as well as generating life-like behaviors in robots.
+
+The PetitCat project allows an AI researcher's tens of thousands of lines of Python code running on a laptop/desktop/server to bidirectionally access a mobile robot via ordinary Wi-Fi.
+
+At present the PetitCat project uses the free Arduino IDE to support a myriad of microcontroller boards which can control a variety of mobile robotic platforms.
+
+At present the PetitCat project uses as the default "PetitCat Robot" an Arduino-driven robot car produced by Osoyoo. The cost of all parts including the Arduino board is approximately US$120 at the time of writing, i.e., orders of magnitude less costly (and less complex) than typical robotic embodiments purchased by research laboratories. For details about the Osoyoo robot car as well as ordering parts, please see:
+[Howard Schneider's full tutorial](docs/overview/Part_1_Easy_to_Read_Overview.md) 
+
 
 
 ## Repository architecture
