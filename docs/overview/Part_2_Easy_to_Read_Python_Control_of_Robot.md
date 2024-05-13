@@ -22,6 +22,7 @@ Howard Schneider -- Feb 15, 2024)
 
 
 The "Easy-to-Read Overview" of the project is divided into five parts:
+(The number of parts may change in the future.)
 
 **Part I:** The Basics: Assembly, Software and Using
 
@@ -126,8 +127,6 @@ https://github.com/OlivierGeorgeon/osoyoo/blob/master/petitcat_arduino/petitcat_
 
 ---> Go to this GitHub folder. You will see that in addition to the main code PetitCat.ino == autocat_enacter.ino there are a good number of header .h and code .cpp files. All these will need to be cloned and copied into the IDE later. 
 
--
--
 -
 -
 
@@ -297,14 +296,39 @@ Celebrate.... because we will be moving onto more technical details in a few mom
 
 For a moment, you can pretend you just created a great new robot to be used on the Star Ship Enterprise (NCC-1701-D, of course). Picard is most pleased with your genius, and invites you for a cup of tea, Earl Grey, of course. 
 
+
 <p align="center">
- <img src="logogpt4startrek.jpg" width="850" height="850">
+ <img src="logogpt4startrek.jpg" width="550" height="550">
 </p>
 
+-
+-------------------------
 
+At this point the basic Osoyoo hardware and pre-packaged software have been installed for your robot car.
+
+In the future, if you want to make sure all the systems of the robot car are working you can use this pre-packaged software as a simple diagnostic tool.
+
+Run the Lesson 2 Osoyoo sketch -- if the ultrasound detector and servomotors are functioning, then the robot car will avoid objects with the ultrasound sensors.
+
+Run the Lesson 3 Osoyoo sketch -- the line tracking/avoiding photocells will become activated. (To avoid having to reverse the wheel motor cables here, what I do is simply lift the car in the air and put a black paper and then a white paper under the photocells and observe changes in the wheel directions.)
+
+Run the Lesson 5b Osoyoo sketch -- the Wi-Fi will become activated. You should be able to control the forward and turning motion of the robot car via the cellphone app described.
+
+I hope in the future to write our own diagnostic routines so that you do not need to load and run the pre-packaged sketches, and as well, be able to provide more meaningful diagnostic information, including allowing virtual direction control of the wheels. 
+
+Note: In the PetitCat project software, you can modify wheel direction (i.e., without swapping cables) as follows:
+
+#define REAR_RIGHT_WHEEL_COEF -1
+
+#define REAR_LEFT_WHEEL_COEF -1
+
+#define FRONT_RIGHT_WHEEL_COEF -1
+
+#define FRONT_LEFT_WHEEL_COEF -1
+
+-------------------------
 -
--
--
+
 -
 
 
@@ -851,7 +875,7 @@ If you are working on the Arduino board including working on the robot car proje
 -
 This section still needs to be properly finished. You may think this section does not apply to you since you work in AI/AGI and don't need to know the low-level electronics, but really you should know the basic low-level of electronics this section discusses.
 -
-At present I am working on the code and documentation of the code portions particularly in the next Part III, but I will come back and finish this section. "I'll be back."  (If you don't know where this line is from, then perhaps even more important than upgrading your electronics knowledge, is to upgrade your popular sci-fi knowledge -- go watch the 1984 movie Terminator and then watch the entire series of Terminator (except for Terminator Genisys which was not scientifically accurate). Yes, Arnold Schwarzenegger says this famous line. If you work in AI/AGI then it behooves you to consider what the effect of successful achievement of AGI by mankind will actually be. Terminator may be more thought provoking than more academic exercises on the subject. A popular/quasi-academic reference is Bostrom's Superintelligence book for those interested -- ISBN 978-0199678112. But again, if you have not seen the Terminator movies, then complete this important part of your AI/AGI education :)  )
+At present I am working on the code and documentation of the code portions particularly in the next Part III, but I will come back and finish this section. "I'll be back."  
 
 ![beback](beback.jpg)
 
@@ -967,9 +991,36 @@ returns a value of 0 to 1023 over an input range 0 to 5 volts
 
 
 
+
 -
+
+
 -
--
+-------------------------
+
+At this point the basic Osoyoo hardware and pre-packaged software have been installed for your robot car.
+
+In the future, if you want to make sure all the systems of the robot car are working you can use this pre-packaged software as a simple diagnostic tool.
+
+Run the Lesson 2 Osoyoo sketch -- if the ultrasound detector and servomotors are functioning, then the robot car will avoid objects with the ultrasound sensors.
+
+Run the Lesson 3 Osoyoo sketch -- the line tracking/avoiding photocells will become activated. (To avoid having to reverse the wheel motor cables here, what I do is simply lift the car in the air and put a black paper and then a white paper under the photocells and observe changes in the wheel directions.)
+
+Run the Lesson 5b Osoyoo sketch -- the Wi-Fi will become activated. You should be able to control the forward and turning motion of the robot car via the cellphone app described.
+
+I hope in the future to write our own diagnostic routines so that you do not need to load and run the pre-packaged sketeches, and as well, be able to provide more meaningful diagnostic information, including allowing virtual direction control of the wheels. 
+
+Note: In the PetitCat project software, you can modify wheel direction (i.e., without swapping cables) as follows:
+
+#define REAR_RIGHT_WHEEL_COEF -1
+
+#define REAR_LEFT_WHEEL_COEF -1
+
+#define FRONT_RIGHT_WHEEL_COEF -1
+
+#define FRONT_LEFT_WHEEL_COEF -1
+
+-------------------------
 -
 
 

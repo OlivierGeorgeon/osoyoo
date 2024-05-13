@@ -24,6 +24,7 @@ Howard Schneider -- Feb 15, 2024)
 
 
 The "Easy-to-Read Overview" of the project is divided into five parts:
+(Note: At the time of writing. The number of parts may increase in the future.)
 
 **Part I:** The Basics: Assembly, Software and Using
 
@@ -40,7 +41,7 @@ The PetitCat documentation is written so that anyone with a basic education can 
 
 -Part I does not require any specialized background knowledge. You should be familiar with moving files around in either your Windows, Mac or Linux desktop/laptop computer. Other than that, no specialized knoweldge is needed. Part I is perfectly fine for high school students and hobbyists.
 
--Part II may be fine for high school students, college students and hobbyists as well, given a willingness of some effort to learn things here and there. However, the documentation will guide you on this learning journey. The lower level software of the PetitCat project is written in C\C++ in the Arduino IDE. You don't need to know these languages or environment in order to use Python with the project. However, we provide a very basic C\C++\Arduino tutorial which may be sufficient for most readers who do want to have a bit more control over the Arduino board coding. We just touch upon the Python control of the project at the end of Part II, so you are not expected to have much Python knowledge in this part, unless you want to start modifying the Python files.
+-Part II may be fine for high school students, college students and hobbyists as well, given a willingness of some effort to learn things here and there. However, the documentation will guide you on this learning journey. The lower level software of the PetitCat project is written in C/C++ in the Arduino IDE. You don't need to know these languages or environment in order to use Python with the project. However, we provide a very basic C/C++/Arduino tutorial which may be sufficient for most readers who do want to have a bit more control over the Arduino board coding. We just touch upon the Python control of the project at the end of Part II, so you are not expected to have much Python knowledge in this part, unless you want to start modifying the Python files.
 
 -Part III really only requires some knowledge of Python. You do not have to be an expert developer. More important, is perhaps a background in AI or cognitive science. However, there is no real background prerequisite here. Regardless of the reader's background, we provide gentle tutorials on a number of topics, and guide the learner through the concepts of active inference and implementing it in the PetitCat project.
 
@@ -76,32 +77,109 @@ I am that new learner -- trying to figure out how to even start this project. Le
 
 
 
-**Why Build a Robot Car?**
+**Artificial Cognition, i.e., Why Build a Robot Car?**
 
-Embodiment is crucial to the emergence of real AGI, as well as understanding the operation of the mammalian brain.
+Artificial Cognition is an interdisciplinary field that designs and understands computational models and devices that are based on cognitive processes such as perception, reasoning, learning, problem-solving and decision-making. It obviously is inspired by human cognitive skills and the human brain. 
+
+Key areas of Artificial Cognition include cognitive architectures (a computational framework based on the human mind and brain), knowledge representation (how to model information about the world), learning (systems should learn from experiences and through such adaptations improve performance in the future), logical reasoning, and perception (how to interpret stimuli from the external world). 
+
+Grounding is a key part of Artificial Cognition. In perceiving the world, grounding connects the internal symbols the system has with actual sensory inputs from the environment. In performing actions on the world, internal symbols can similarly be understood. There also can be other types of grounding such as social grounding where internal symbols are given meaning with relation to social effects of the group. 
+
+Embodiment is often crucial to Artificial Cognitive as well as the emergence of real AGI, as well as understanding the operation of the mammalian brain.
+
+Embodiment technically means to give an AI program some way to sense the environment and some way to act on the environment. However, in a practical sense, it means to give your AI program a physical body. While embodiment does not guarantee grounding, again in a practical sense, it almost always allows it. For example, an embodiment such as a robot car allows your AI program to have sensors and thus perceive the environment. It allows your AI program to have actuators and thus act on the world. Thus the internal symbolic representations (even if abstractly in neural networks) of your AI program can be linked to real-world external objects and actions. 
+
+Embodiment also goes beyond this. For example, by having a robot body, your AI program can learn in context, i.e., it can associate the stimuli that the environment provides and the actions the robot performs, with the outcome that results. As well, the robot, i.e., the embodiment for your AI program, can get immediate feedback on an action it performs, and thus it can continually improve the links between symbols and their effect on the environment.
+
 For a good overview of the importance of grounding your AI/AGI please consider my paper:
-[cca5 inductive analogical soln to grounding problem](https://www.sciencedirect.com/science/article/abs/pii/S1389041722000493?via%3Dihub) [archive preprint](https://github.com/howard8888/insomnia/blob/master/analogical%20inductive%20preprint.pdf)
+
+[cca5 inductive analogical soln to grounding problem](https://www.sciencedirect.com/science/article/abs/pii/S1389041722000493?via%3Dihub) 
+
+[archive preprint](https://github.com/howard8888/insomnia/blob/master/analogical%20inductive%20preprint.pdf)
+
+For a good overview of the field of Artifical Cognition please consider this recent paper:
+
+[https://www.frontiersin.org/articles/10.3389/fncom.2024.1349408/full](https://www.frontiersin.org/articles/10.3389/fncom.2024.1349408/full)
+
+For a paper on using the PetitCat project for Enactive Inference by Dr Georgeon and colleagues, please consider this recent paper:
+
+[https://www.sciencedirect.com/science/article/pii/S1389041724000287?dgcid=author](https://www.sciencedirect.com/science/article/pii/S1389041724000287?dgcid=author)
+
+(We will discuss the concept of active inference in a later Part of the documentation. The main idea behind active inference, as developed by psychiatrist and neuroimaging expert Karl Friston, is that organisms keep a stable state by minimizing "free energy" which is related to prediction errors in their models of the world. (If you recall your high school chemistry classes, Gibbs Free Energy is whether a chemical reacton will occur spontaneously, i.e., a system's potential to perform work. When a system is in equilibrium, the free energy is minimized. If you studied thermodynamics in university, then you have a more detailed understanding of free energy, e.g., Helmholtz, Boltzmann, etc.  Friston's use of free energy is similar, where there is minimal mismatch between an organism's prediction of the world and what they perceive of the real world, and thus the organism stays in a stable, equilibrium state as such in its environment. If there is a mismatch detected, then the organism will adapt its behavior to minimize this prediction error.) Thus, the organism is constantly updating its internal modle of the world in order to minimize prediction errors with regard to the actual sensory signals coming in from the real world. Enactivism is related to a philosophy that emphasizes the active role an organism has in shaping its perception and cognition, i.e., it does not simply process information in the act of perception, but is deeply grounded in its environment, and by interacting with its environment, it shapes it perceptions and model of the world. Thus, in enactive inference, cognition must be embodied and grounded such the organism creates its own reality by interactions with the environment. Enactive inference generally is considered to focus more on the embodied interaction than the internal models of active inference. We will discuss these concepts in later Parts of the documentation, but the interest reader should consult Georgeon and colleagues' paper above.)
+
+
+-
+
+**Why Not Use a More Professional Experimental Robot?**
 
 Even if Tesla Bots, for sake of example, were available, you wouldn't want to use such a complex system for the prototype stages of your AI/AGI project or theoretical project. You want a capable but simple enough robotic system that you have direct access to via Python, which is what this robotic car project allows. You will now have an embodiment to use with your AI/AGI. Even if you work mainly theoretically, the robotic car project can be very useful in terms of demonstrations and proof of concept.
 
 <p align="center">
- <img src="teslabot.jpg" width="150" height="150">
+ <img src="teslabot.jpg" width="250" height="250">
 </p>
+
+There is also the issue of cost. For example, a cognitive robot used in many laboratories (and seen in the paper above on Artificial Cognition) is the iCub robot. It is a reasonable small size and can be interfaced to AI programs. However, the cost a single iCub robot is approximately  €250,000 (source Wikipedia at the time of writing). Or, another robot that can be interfaced to your AI projects is Boston Dynamics robot dog Spot. However, its cost is approximately US$75,000 (source Wikipedia at the time of writing). (The Boston Dynamics humanoid Atlas is currrently not available for sale, but it would similarly be quite costly.)  In contrast, the cost of the PetitCat project is about $100-$200 with all the optional accessories. 
+
+<p align="center">
+ <img src="icub.jpg" width="250" height="250">
+</p>
+
+<p align="center">
+ <img src="spot.jpg" width="250" height="250">
+</p>
+
+<p align="center">
+ <img src="atlas.jpg" width="250" height="250">
+</p>
+
+Hanson Robotics has sophisticated very humanoid-like robots that some R&D institutions use. The Sophia and Einstein models are quite famous. 
+
+<p align="center">
+ <img src="hansoneinstein.jpg" width="250" height="250">
+</p>
+
+A very promising android-like robot is the Phoenix model from Sanctuary AI.
+
+<p align="center">
+ <img src="phoenix.jpg" width="250" height="250">
+</p>
+
+The list of android-like robots being developed at this time has become extensive and too long to include here. However, two android-like robots recently seen in the press are the Figure01 from Figure AI and the NVIDIA Groot. Again, such models are orders of magnitude more expensive than the total $100- $200 cost of the PetitCat project.
+
+<p align="center">
+ <img src="figure01.jpg" width=250" height="250">
+</p>
+
+<p align="center">
+ <img src="groot.jpg" width=250" height="250">
+</p>
+
+-
+
+**Why Not Use ROS2?** 
+
+ The Robot Operating System (ROS) is a collection of software frameworks to take care of the low-level management of a robotic system. For example, it can abstract away aspects of the hardware being used, it can control the low-level operations of the robot and coordinate communication between different operations. ROS was released in 2007 and ROS2 was released in 2017. ROS2 is open source.
+
+ However, ROS2, despite its name, is not an operating system, but must be run on top of another operating system, usually Linux. Thus, there is a need for a full computer system board in the PetitCat project if ROS2 is used. As well, ROS2 is many times more complex than the Arduino-based software used in the PetitCat project. 
+
+ Thus, to keep the costs of the PetitCat project down (i.e., total costs of under US$200, including the extras) and to keep the complexity of the project down (the goal is to have an easy-to-implement robotic system that you can use with your AGI project), it was decided not to use ROS2. Instead an Arnduino microcontroller board along with the Arduino IDE (which compiles and pushes machine code onto the board) is used resulting in lower costs and less complexity in interfacing your AGI project to a robotic embodiment. Note that most of your AGI project code will run on a desktop/laptop/server PC running in Python, not in the machine code in the Arduino microcontroller board. However, the PetitCat project allows communication between the Arduino board and the Python software running on your desktop/laptop/server.
+
 -
 -
--
--
+
+
+
 <h1 style="font-size: 24px;">Step #1 -- Decide if you want to do the Project</h1>
 
-Your first step should be to decide to build this robotic car project. Are you working on an AI/AGI project that it could be useful for? (Actually, it is probably useful for most projects, including LLMs.) Do you have an interest in robotics and would like to see an interface to an AI project? 
+Your first step should be to decide to build this robotic car project. Are you working on an AI/AGI project that it could be useful for? (Actually, it is probably useful for most projects, including LLMs. Please read above about grounding and about artificial cognition.) Do you have an interest in robotics and would like to see an interface to an AI project? 
 
-In terms of monetary cost expect to spend about US$200 on the project (I know the Amazon.com prices are not this high, but shipping to other countries, extra parts from AliExpress, etc will push up the price). 
+In terms of monetary cost expect to spend about US$150-$200 on the project (I know the Amazon.com prices are not this high, but shipping to other countries, extra parts from AliExpress, etc will push up the price). (If you purchase duplicate parts, which can be useful for troubleshooting, then double the costs.)
 
 In terms of your required electronics expertise, very little is needed if everything gets assembled correctly and all parts are working. If you want to modify the design, if there is more advanced troubleshooting, then of course more is better.
 
-In terms of your required software expertise, only a minimal amount is needed to make the robot work. For example, you need to be comfortable moving around files and running Python code. The Arduino IDE and code you can install and copy without great expertise (I will show you how below). Of course, if you have the time, you can spend more hours getting more expertise in the Arduino ecosystem. As well, you will need more expertise in Python if you want to use the robot car for your own research project.
+In terms of your required software expertise, only a minimal amount is needed to make the robot work. For example, you need to be comfortable moving around files and running Python code. The Arduino IDE and code you can install and copy without great expertise (I will show you how below). Of course, if you have the time, you can spend more hours getting more expertise in the Arduino ecosystem (which involves C/C++ code). As well, you will need more expertise in Python if you want to use the robot car for your own research project.
 
-Do not worry. Regardless of your skill level, this manual will gently guide you through the five parts. You will accomplish amazing things. Have confidence in yourself. Have confidence in this manual. Have confidence in this project.
+Do not worry. Regardless of your skill level, this manual will gently guide you through the various parts of the project. You will accomplish amazing things. Have confidence in yourself. Have confidence in this manual. Have confidence in this project.
 
 Are you ready?
 
@@ -112,8 +190,6 @@ Don't be hesitant. Climb up on that horse and start your journey. Saddle up!!
 <p align="center">
  <img src="horsetonextlesson.png" width="770" height="770">
 </p>
-
-
 
 
 
@@ -349,7 +425,15 @@ Assembled chassis (Note that the straps are still loose until the assembly is co
 -Tip: Careful about not wasting wire in threading through the center hole and to the motor control board -- there will not be much excess wire on one side.
 (Also, note that only the red power and black ground wire from the motors are controlled by the motor board. The other colored wires are from the motor's Hall sensor and are not used at this point in the project. Hall sensors can measure the magnitude and orientation of a magnetic field, so, usually a pair or equivalent of magnets rotate without any physical contact and the Hall sensor detects their location, i.e., effectively the location of the rotor of the motor, which can be very useful in precision robotic applications.)
 
-(The Osoyoo "Model Y 2.0 Motor Driver Board for Arduino Robotic Car Kit" is a 4-channel H-bridge motor driver. H-bridge circuits allow voltage to be applied across a load in either direction, which is very useful for controlling the rotation direction of a DC motor such as used in the robotic car. A simple, silicon transistor H-bridge circuit is shown below -- as can be seen it looks like an 'H' thus the name. The Osoyoo board uses the PT5126 chip as a DC motor driver, which can supply up to 2.8Amps at a voltage of 2 - 24 volts, useful for bidirectional control of electric motors. It is a single-channel chip, so I am not sure how Osoyoo gets the 4-channels -- perhaps in the future reverse engineer the board and see how it works exactly. They specify using two such chips in their product specifications, although just by looking at the layout of the PCB it looks like there are 4 such chips, although the lettering on the chip packages are faded so I cannot read the parts numbers, which would make more sense.)
+(The Osoyoo "Model Y 2.0 Motor Driver Board for Arduino Robotic Car Kit" is a 4-channel H-bridge motor driver. H-bridge circuits allow voltage to be applied across a load in either direction, which is very useful for controlling the rotation direction of a DC motor such as used in the robotic car. A simple, silicon transistor H-bridge circuit is shown below -- as can be seen it looks like an 'H' thus the name. The Osoyoo board uses the PT5126 chip as a DC motor driver, which can supply up to 2.8Amps at a voltage of 2 - 24 volts, useful for bidirectional control of electric motors. It is a single-channel chip.  They specify using two such chips in their product specifications, although just by looking at the layout of the PCB it looks like there are 4 such chips which makes more sense given it is a single channel. The lettering on the chip packages are faded so I cannot read the parts numbers. However, the chip part number comes up on the Alibaba website at the time of writing at 13 cents per chip and shows a picture resembling the 8-lead slim packages soldered to the PCB. From another site I was able to find the specs for this chip:  controls 2V- 24V at 2.8 amps, as noted above; accepts logic signals of 1.6V to VCC; VCC can be 2.7V to 5.5V (which means can work with other Arduino boards that operate at 3.3 volts); good PWM specs with up to 200KHz signals allowed; and very importantly seems to have protection for back-EMF from the motor although terms used don't say this exactly; also thermal shut-down protection; draws less than 50 nanoamps (not milliamps or microamps but nanoamps, i.e., .05 microamps) when bridge is turned off -- seems like an impressive integrated circuit for 13 cents !! )
+
+(The INI inputs on the Model Y 2.0 Motor Driver Board control the H-bridge motor driver circuits. For example, if M_A IN1 input from Arduino is high and M_A IN2 input from Arduino is low, then the Motor A (which wheel depends on if these inputs control AK1, AK3, BK1, BK3 -- I will trace out in the future or perhaps take the lazy approach write some diagnostic software to see the effect) by convention turns clockwise (again I need to actually experiment and measure), while if M_A IN1 is low and M_A IN2 is high, then the wheel A will turn counter-clockwise. If both M_A IN1 and IN2 are both high or both low, then the H-bridge is turned off and no activation of the motor. Note that the inputs from the Arduino board can be PWM inputs, although I am unsure how much the pre-packaged Osoyoo software takes advantage of this. By varying the duty cycle of the pulses, the speed of each motor can finely be controlled. Also, each of the motors on the robot kit have feedback sensors which are actually not connected in this robot kit, as noted above, but are there for possible future used.) (Previous tracings indicated that Osoyoo EMB IN4, IN3  correspond to inputs M_A IN1, M_A IN2 on the Driver Board which get PWM inputs from Ardinuo pins 5, 6, and which typically should control the rear-right motor, although note that which motor depends on where cables are plugged and I did not record which output (i.e, AK1, AK3, BK1 or BK3) nor which logic signals corresponded to clockwise versus counterclockwise -- to do in future documentation.)
+
+(Note that the Osoyoo "Model Y 2.0 Motor Driver Board for Arduino Robotic Car Kit" also provides the motor output to two servomechanisms. In the robot car kit described here, only the outputs from "Servo1" are used. The Motor Driver Board does not actually control the servo motor. It supplies power to the servo motor, i.e., the pins 5V and ground. There are pins (for servo #1 being used in the robot car) of S1 and S1. One of the pins S1 receives a PWM signal from pin 13 of the Arduino board. The other pin S1 simply passes this signal to the servo motor, i.e., the servo motors are actually being driven and controlled directly by the Arduino board, not the Model Y 2.0 Motor Driver Board.)
+
+(At this time note that pin 13 of the Arduino board is driving the servo motor. This might be changed in the future since pin 13 of the Arduino board also goes the LED on the Arduino board. Thus, if you write a program in the future that blinks this LED, you will also be pulsing the servo motor moving the ultrasound sensors of your robot car, and possibly burn out the servo motor. Pin 13 is the default wiring that Osoyoo used in its manual and in the pre-packaged Arduino software that comes with the robot car kit.)
+
+
 
 ![siliconHbridge](siliconHbridge.png)
 
@@ -363,7 +447,46 @@ Assembled chassis (Note that the straps are still loose until the assembly is co
 -Now connect the motor controller board to the Arduino board and the Wi-Fi shield pass through connectors as shown in the diagram in the manual:
 ![connect arduino to motor controller](arduinoconnect.png)
 
+-
+-
+------------
+
+Note:
+The wiring shown in the Osoyoo Manual causes the robot car to run in reverse when the software of Lesson 2 (ultrasound object avoidance) and Lesson 5b (cellphone Wi-Fi app to make the car go in different directions) is run. (However, if the software from Lesson 3 (photocell line tracking) is run, the direction is correct.)
+
+The original Osoyoo wiring instructions for wheel motors to pin locations on the Motor Control Board Y:
+
+Front-right  BK1
+
+Front-left BK3
+
+Rear-right AK1
+
+Rear-left AK3
+
+
+For the Osoyoo software that comes with Lesson 5b you need the wiring reversed from original wiring:
+
+Front-right  BK1 --> AK3
+
+Front-left BK3 --> AK1
+
+Rear-right AK1 --> BK3
+
+Rear-left AK3 -->  BK1
+
+
+These reversals can be done in software. However, this would require modifying the Osoyoo packaged software. Thus, for the moment we are not modifying the software so that you can download the software which Osoyoo provides without modifications. However, later on, we will reverse the wheel wiring virtually rather than unplug and replug cables.
+
+------------
+-
+-
+
+
+
 -I then connected the voltage meter and the battery box, although in the manual they also show connection of the servo motor and the 5-point tracking module, which can be done now or later.
+
+
 ![connect other modules](otherconnect.png)
 -
 -
@@ -626,7 +749,61 @@ PLEASE CONTRIBUTE TO THIS SECTION AS YOU ENCOUNTER AND TROUBLESHOOT PROBLEMS
   
    - if the above does not work, and you have second Arduino kit, you can try swapping boards to see if you can isolate the problem to one board
   
- - 
+   wiring of wheel motors direction issue:
+
+   
+-
+------------
+
+Note:
+The wiring shown in the Osoyoo Manual causes the robot car to run in reverse when the software of Lesson 2 (ultrasound object avoidance) and Lesson 5b (cellphone Wi-Fi app to make the car go in different directions) is run. (However, if the software from Lesson 3 (photocell line tracking) is run, the direction is correct.)
+
+Thus, for Lesson 2 and for Lesson 5b reverse the following wires:
+
+AK1 <--> BK3
+
+BK1 <--> AK3
+
+And thus, when you then move onto Lesson 3, reverse the wires back to the original position. And then when moving onto Lesson 5b reverse again as shown above.
+
+Osoyoo wiring instructions for wheel motors to pin locations on the Motor Control Board Y:
+
+Front-right  BK1
+
+Front-left BK3
+
+Rear-right AK1
+
+Rear-left AK3
+
+
+Thus when we reverse the wiring we get:
+
+Front-right  BK1 --> AK3
+
+Front-left BK3 --> AK1
+
+Rear-right AK1 --> BK3
+
+Rear-left AK3 -->  BK1
+
+
+And we reverse again the wiring we get:
+
+Front-right  BK1 --> AK3 --> BK1
+
+Front-left BK3 --> AK1 --> BK3
+
+Rear-right AK1 --> BK3 --> AK1
+
+Rear-left AK3 -->  BK1 --> AK3
+
+
+These reversals can be done in software. However, this would require modifying the Osoyoo packaged software. Thus, for the moment we are not modifying the software so that you can download the software which Osoyoo provides without modifications. However, later on, we will reverse the wheel wiring virtually rather than unplug and replug cables.
+
+------------
+-
+-
 
  **Arduino/Computer Issues**
  This section is for troubleshooting Arduino/computer issues and can be added to with experience, i.e., "under construction" at present.
@@ -838,6 +1015,21 @@ Your robotic car still has the code from Lesson 2 on it. However, when you turn 
 
 OK.... now we have to install new code to make use of the IR Sensor array.
 
+------------------------------
+NOTE ABOUT WHEEL DIRECTION: The original Osoyoo wiring of the motors will give the correct forward and backward direction of the wheels. Thus, if you reversed the motor wiring for Lesson 2 above, you should re-reverse it back to the original wiring, i.e.,
+
+Front-right  BK1 --> AK3 --> BK1
+
+Front-left BK3 --> AK1 --> BK3
+
+Rear-right AK1 --> BK3 --> AK1
+
+Rear-left AK3 -->  BK1 --> AK3
+
+As noted above, these reversals can be done in software. However, this would require modifying the Osoyoo packaged software. Thus, for the moment we are not modifying the software so that you can download the software which Osoyoo provides without modifications. However, later on, we will reverse the wheel wiring virtually rather than unplug and replug cables.
+
+------------------------------
+
 -Open the Arduino IDE exactly as described above. As well, the manual shows several screens of the Arduino IDE. Make sure your Arduino IDE is configured exactly like before (i.e., correct Arduino board is specified).
 
 -Click 'Open' and load in m2-lesson3.ino
@@ -1012,6 +1204,40 @@ New wiring changes to make:
 
 
 ![wificlose](wificlose.png)
+
+
+
+-
+------------
+
+Note:
+The wiring shown in the Osoyoo Manual causes the robot car to run in reverse when the software of Lesson 2 (ultrasound object avoidance) and Lesson 5b (cellphone Wi-Fi app to make the car go in different directions) is run. (However, if the software from Lesson 3 (photocell line tracking) is run, the direction is correct.)
+
+The original Osoyoo wiring instructions for wheel motors to pin locations on the Motor Control Board Y:
+
+Front-right  BK1
+
+Front-left BK3
+
+Rear-right AK1
+
+Rear-left AK3
+
+
+For the Osoyoo software that comes with Lesson 5b you need the wiring reversed from original wiring:
+
+Front-right  BK1 --> AK3
+
+Front-left BK3 --> AK1
+
+Rear-right AK1 --> BK3
+
+Rear-left AK3 -->  BK1
+
+
+These reversals can be done in software. However, this would require modifying the Osoyoo packaged software. Thus, for the moment we are not modifying the software so that you can download the software which Osoyoo provides without modifications. However, later on, we will reverse the wheel wiring virtually rather than unplug and replug cables.
+
+------------
 
 --Software Installation--
 
