@@ -98,7 +98,7 @@ void Led::color(int c)
   }
 }
 
-// Set the builtin LED if not used for the servo PIN
+// Set the builtin LED if not used for the servo PIN (as in the default Osoyoo Robot)
 void Led::builtin_on()
 {
   #if LED_BUILTIN != ROBOT_SERVO_PIN
@@ -106,7 +106,7 @@ void Led::builtin_on()
   #endif
 }
 
-// Reset the builtin LED if not used for the servo PIN
+// Reset the builtin LED if not used for the servo PIN (as in the default Osoyoo Robot)
 void Led::builtin_off()
 {
   #if LED_BUILTIN != ROBOT_SERVO_PIN

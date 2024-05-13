@@ -248,7 +248,7 @@
 #define TURN_SPOT_ENDING_DELAY 180
 #define TURN_SPOT_ENDING_ANGLE 9
 #define ROBOT_SERVO_PIN 13
-#define RightMotorDirPin1B 5  // Rear  Right Motor direction pin 1 to Back MODEL-X IN1 (K1)
-#define RightMotorDirPin2B 6   // Rear  Right Motor direction pin 2 to Back MODEL-X IN2 (K1)
+#define RightMotorDirPin1B 5  // Rear Right Motor direction pin 1 to Back MODEL-X IN1 (K1)
+#define RightMotorDirPin2B 6   // Rear Right Motor direction pin 2 to Back MODEL-X IN2 (K1)
 
 #endif
