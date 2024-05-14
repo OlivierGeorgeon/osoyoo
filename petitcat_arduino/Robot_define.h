@@ -1,4 +1,4 @@
-//debug trail to ensure latest software is being pulled by Git  may 14, 2024
+//debug trail to ensure latest software is being pulled by Git  may 14, 2024 
 #define ROBOT_ID 0 // 0: Default Osoyoo robot, 1: robot BSN, 2: robot UCBL, 3: SHS chez Olivier, 11 to 14: DOLL robots
 
 #define AP_SSID "Petitcat"              // The wifi SSID of this robot in Access Point
