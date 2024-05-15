@@ -48,10 +48,10 @@ Interaction* INT  = nullptr;  // The interaction type will depend on the action 
 
 void setup()
 {
-  // Initialize serial for debugging
+  // Initialize
 
   Serial.begin(9600);
-  Serial.println("-- Serial initialized");
+  Serial.print("Petitcat Arduino 0.1.1 for Robot "); Serial.println(ROBOT_ID);
 
   // Initialize the LEDs
 

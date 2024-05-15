@@ -44,7 +44,7 @@ class Wheel
     void retreatRightward();
     void stopMotion();
     void circumvent(int speed);
-  private:
+  // private:
     void setMotion(int speed_fl, int speed_rl, int speed_rr, int speed_fr);
     void frontLeftWheel(int speed_fl);
     void rearLeftWheel(int speed_rl);

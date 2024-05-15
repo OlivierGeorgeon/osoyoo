@@ -25,7 +25,7 @@ class Floor
     void outcome(JSONVar & outcome_object);
     bool _is_retreating = false;
     unsigned long _retreat_end_time = 0;
-    Wheel _OWM;
+    Wheel _OWM;  // Omni-Wheel Motion
     Color _CLR;
     int _floor_outcome = 0;  // Create a begin() and move this to private?
   private:

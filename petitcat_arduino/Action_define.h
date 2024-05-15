@@ -11,6 +11,7 @@
 #define ACTION_ECHO_SCAN '-'
 #define ACTION_SCAN_DIRECTION '+'
 #define ACTION_WATCH 'W'
+#define ACTION_TEST 'T'
 
 #define INTERACTION_BEGIN 1
 #define INTERACTION_ONGOING 2

@@ -24,6 +24,8 @@
 #include "src/interactions/Turn.h"
 #include "src/interactions/Turn_head.h"
 #include "src/interactions/Watch.h"
+#include "src/interactions/Test.h"
+
 // #include <MemoryUsage.h>
 
 Sequencer::Sequencer(Floor& FLO, Head& HEA, Imu& IMU, Led& LED, WifiCat& WifiCat) :
@@ -119,6 +121,9 @@ Interaction* Sequencer::update(int& interaction_step, Interaction* INT)
 
       else if (action == ACTION_ECHO_SCAN)
         INT = new Scan(_FLO, _HEA, _IMU, _WifiCat, json_action);
+
+      else if (action == ACTION_TEST)
+        INT = new Test(_FLO, _HEA, _IMU, _WifiCat, json_action);
 
 //      else if (action == ACTION_ALIGN_ROBOT)
 //        INT = new Turn_angle(_FLO, _HEA, _IMU, _WifiCat, json_action);
