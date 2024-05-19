@@ -9,11 +9,8 @@ At present the PetitCat project uses the free Arduino IDE to support a myriad of
 At present the PetitCat project uses as the default "PetitCat Robot" an Arduino-driven robot car produced by Osoyoo. The cost of all parts including the Arduino board is approximately US$120 at the time of writing, i.e., orders of magnitude less costly (and less complex) than typical robotic embodiments purchased by research laboratories. For details about the Osoyoo robot car as well as ordering parts, please see:
 [Howard Schneider's full tutorial](docs/overview/Part_1_Easy_to_Read_Overview.md) 
 
--
 
-![petitcatgpt4logo](petitcatgpt4logo.jpg)
-
--
+![petitcat logo](docs/petitcat_logo.png)
 
 ## Repository architecture
 
