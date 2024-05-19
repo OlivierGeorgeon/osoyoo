@@ -97,6 +97,7 @@ class Simulator:
                         (memory.allocentric_memory.min_j <= j <= memory.allocentric_memory.max_j) and \
                         memory.allocentric_memory.grid[i][j][STATUS_0] == EXPERIENCE_FLOOR:
                     self.is_simulating = False
+                    # The simulated distance is shorter than the phenomenon location due to cell radius
                     self.simulated_outcome_dict['duration1'] = round(self.simulation_time * 1000)
                     if enaction.action.action_code == ACTION_FORWARD:
                         self.simulated_outcome_dict['floor'] = 3

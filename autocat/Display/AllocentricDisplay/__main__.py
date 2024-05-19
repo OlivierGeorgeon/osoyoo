@@ -4,7 +4,6 @@ from pyrr import Quaternion, Matrix44
 import pyglet
 from ...Workspace import Workspace
 from .CtrlAllocentricView import CtrlAllocentricView
-# from ...Memory.AllocentricMemory.Hexagonal_geometry import pool_neighbors
 from ...Memory.AllocentricMemory.Geometry import point_to_cell
 from ...Memory.EgocentricMemory.Experience import Experience, EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_PLACE, \
     EXPERIENCE_FOCUS, EXPERIENCE_FLOOR, EXPERIENCE_ROBOT
@@ -64,6 +63,8 @@ affordanceR = Affordance(np.array([500, 500, 0]), EXPERIENCE_ROBOT, -3, 2,
 workspace.memory.phenomenon_memory.create_phenomenon(affordanceR)
 
 workspace.memory.allocentric_memory.update_affordances(workspace.memory.phenomenon_memory, 0)
+
+workspace.memory.allocentric_memory.roll(np.array([50, 0, 0]))
 
 # Display neighboring pools
 # neighbors = pool_neighbors(-7, 0)

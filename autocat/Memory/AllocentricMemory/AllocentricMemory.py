@@ -161,6 +161,14 @@ class AllocentricMemory:
         # The new position of the robot
         self.robot_point += quaternion.apply_to_vector(direction_quaternion, trajectory.translation)
 
+    def roll(self, point):
+        """Roll allocentric memory to place the point at the center"""
+        i, j = point_to_cell(point)
+        xy = self.grid[i, j, POINT_X:POINT_Y+1]
+        self.grid = np.roll(self.grid, (-i, -j), axis=(0, 1))
+        self.grid[:, :, POINT_X:POINT_Y+1] -= xy
+        self.robot_point[0:2] -= xy
+
     def place_robot(self, body_memory, clock):
         """Apply the PLACE status to the cells at the position of the robot"""
         start_time = time.time()

@@ -1,6 +1,6 @@
 GRID_WIDTH = 50  # 15   # 100 Number of cells wide
 GRID_HEIGHT = 50  # 70  # 45  # 200 Number of cells high
-CELL_RADIUS = 50  # (mm) Diameter of the outer circle
+CELL_RADIUS = 50  # (mm) Radius of the outer circle
 
 EMOTION_CONTENT = 1  # White. Serotonin: relaxation, contentment, well-being.
 EMOTION_PLEASURE = 2  # Green. Dopamine: reward, motivation.

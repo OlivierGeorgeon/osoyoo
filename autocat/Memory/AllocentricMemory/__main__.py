@@ -22,17 +22,3 @@ R = cell_to_point(I, J)
 print(R)
 print(R[1, 1])
 error = 0
-try:
-    # error = test_convert_pos_in_cell()
-    assert (error == 0)
-    print("Every test in test_convert_pos_in_cell(hx.robot_pos_x, hx.robot_pos_y) passed without error")
-except AssertionError:
-    print("test_convert_robot_pos_in_robot_cell failed with error : ", error)
-
-try:
-#     error = test_move()
-    assert (error == 0)
-    print("Every test in test_move passed without error")
-except AssertionError:
-    print("test_move failed with error : ", error)
-
