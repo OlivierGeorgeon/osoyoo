@@ -161,7 +161,6 @@ At the time of writing Unitree has been getting much press about its G1 humanoid
 </p>
 
 
-Future robotic embodiments are interesting to consider but the reality is that the PetitCat project will allow the AI/AGI researcher to interface his/her project to an embodiment for under $200 in parts and for a very reasonable complexity cost in the present.
 -
 
 **Why Not Use ROS2?** 
@@ -171,6 +170,11 @@ Future robotic embodiments are interesting to consider but the reality is that t
  However, ROS2, despite its name, is not an operating system, but must be run on top of another operating system, usually Linux. Thus, there is a need for a full computer system board in the PetitCat project if ROS2 is used. As well, ROS2 is many times more complex than the Arduino-based software used in the PetitCat project. 
 
  Thus, to keep the costs of the PetitCat project down (i.e., total costs of under US$200, including the extras) and to keep the complexity of the project down (the goal is to have an easy-to-implement robotic system that you can use with your AGI project), it was decided not to use ROS2. Instead an Arnduino microcontroller board along with the Arduino IDE (which compiles and pushes machine code onto the board) is used resulting in lower costs and less complexity in interfacing your AGI project to a robotic embodiment. Note that most of your AGI project code will run on a desktop/laptop/server PC running in Python, not in the machine code in the Arduino microcontroller board. However, the PetitCat project allows communication between the Arduino board and the Python software running on your desktop/laptop/server.
+
+
+
+
+Future robotic embodiments are interesting to consider but the reality is that the PetitCat project will allow the AI/AGI researcher to interface his/her project to an embodiment for under $200 in parts and for a very reasonable complexity cost in the present.
 
 -
 -
