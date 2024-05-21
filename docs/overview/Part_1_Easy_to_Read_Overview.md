@@ -154,10 +154,10 @@ The list of android-like robots being developed at this time has become extensiv
  <img src="groot.jpg" width=250" height="250">
 </p>
 
-At the time of writing Unitree has been getting much press about its G1 humanoid robot which is to sell for US$16,000 (albeit, not available at the time of writing and unknown when it will be available) and has the following specifications:  super-flexibility to do any human work and to fold up for easy transport, weight 35-47kg, can run at about 7km/h, 43 degrees of freedom, 2 hours of activity per charge, and includes 3D LIDAR as well as depth camera. Again, availability is unknown but if price point can drop for this and similar robots, then perhaps in the future the PetitCat project can be applied to more interesting embodiments for your AI and AGI research.
+At the time of writing Unitree has been getting much press about its G1 humanoid robot which is to sell for US$16,000 (albeit, not available at the time of writing and unknown when it will be available) and has the following specifications:  super-flexibility to do any human work, weight 35-47kg,  and can run at about 7km/h. Again, availability is unknown but when the price point drops for this and similar robots, then perhaps in the future the PetitCat project can be applied to more interesting embodiments for your AI and AGI research.
 
 <p align="center">
- <img src="g1.png" width=250" height="250">
+ <img src="g2.png" width=250" height="250">
 </p>
 
 -
