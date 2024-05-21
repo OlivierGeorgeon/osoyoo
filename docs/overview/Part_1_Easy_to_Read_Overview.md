@@ -154,6 +154,12 @@ The list of android-like robots being developed at this time has become extensiv
  <img src="groot.jpg" width=250" height="250">
 </p>
 
+At the time of writing Unitree has been getting much press about its G1 humanoid robot which is to sell for US$16,000 (albeit, not available at the time of writing and unknown when it will be available) and has the following specifications:  super-flexibility to do any human work, super-flexibility to fold up for easy transport, weight 35-47kg, can run at about 7km/h, 43 degrees of freedom, 2 hours of activity per charge, and includes 3D LIDAR as well as depth camera.
+
+<p align="center">
+ <img src="g1.png" width=250" height="250">
+</p>
+
 -
 
 **Why Not Use ROS2?** 
