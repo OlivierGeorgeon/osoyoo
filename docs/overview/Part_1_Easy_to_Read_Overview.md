@@ -161,7 +161,7 @@ At the time of writing Unitree has been getting much press about its G1 humanoid
 </p>
 
 
---> Future robotic embodiments are interesting to consider but the reality is that the PetitCat project will allow the AI/AGI researcher to interface his/her project to an embodiment for under $200 in parts and for a very reasonable complexity cost in the present.
+Future robotic embodiments are interesting to consider but the reality is that the PetitCat project will allow the AI/AGI researcher to interface his/her project to an embodiment for under $200 in parts and for a very reasonable complexity cost in the present.
 -
 
 **Why Not Use ROS2?** 
