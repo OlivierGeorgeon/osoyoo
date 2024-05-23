@@ -6,7 +6,7 @@
 
 import math
 import numpy as np
-from . Action import ACTION_TURN, ACTION_FORWARD, ACTION_SWIPE, ACTION_BACKWARD
+from . Action import ACTION_TURN, ACTION_FORWARD, ACTION_SWIPE
 from ..Robot.Enaction import Enaction
 from . Proposer import Proposer
 from ..Memory import EMOTION_CONTENT, EMOTION_VIGILANCE

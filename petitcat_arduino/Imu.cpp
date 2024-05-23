@@ -54,8 +54,11 @@ void Imu::setup()
   // If you don't want use threshold, comment this line or set 0.
   _mpu.setThreshold(3); // Tried without but gives absurd results
 
+  Serial.println("-- IMU initialized");
+
   #else
     #warning "No MPU6050"
+    Serial.println("-- No IMU configured");
   #endif
 
   #if ROBOT_COMPASS_TYPE > 0
@@ -64,7 +67,7 @@ void Imu::setup()
   _mpu.setI2CMasterModeEnabled(false);
   _mpu.setI2CBypassEnabled(true) ;
   _mpu.setSleepEnabled(false);
-  Serial.println("Initialize compass");
+//  Serial.println("Initialize compass");
 
   #endif
 
@@ -72,7 +75,7 @@ void Imu::setup()
 
   while (!compass.begin())
   {
-    Serial.println("Could not find a valid HMC5883L sensor, check wiring!");
+    Serial.println("Could not find a valid HMC5883L sensor, check wiring or configuration in Robot_define.h!");
     delay(500);
   }
 
@@ -91,12 +94,18 @@ void Imu::setup()
 
   // Set calibration offset. See HMC5883L_calibration.ino
   compass.setOffset(COMPASS_X_OFFSET, COMPASS_Y_OFFSET, 0);
-  #endif
+  Serial.println("-- Compass HMC5883L initialized");
 
-  #if ROBOT_COMPASS_TYPE == 2
-  Serial.println("Initializing MMC5883");
+  #elif ROBOT_COMPASS_TYPE == 2
+
   compass.begin();
   compass.setOffset(COMPASS_X_OFFSET, COMPASS_Y_OFFSET);
+  Serial.println("-- Compass MMC5883 initialized");
+
+  #else
+
+  Serial.println("-- No Compass configured");
+
   #endif
 }
 

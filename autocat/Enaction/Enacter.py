@@ -18,6 +18,7 @@ from ..Proposer.ProposerPlayTurn import ProposerPlayTurn
 from ..Proposer.ProposerPlaySwipe import ProposerPlaySwipe
 from ..Proposer.ProposerPlayTerrain import ProposerPlayTerrain
 from ..Proposer.ProposerPlayDot import ProposerPlayDot
+from ..SoundPlayer import SoundPlayer, SOUND_SURPRISE
 
 
 class Enacter:
@@ -143,7 +144,8 @@ class Enacter:
 
             # Express surprise if the enaction failed
             if not self.workspace.enaction.succeed():
-                self.workspace.surprise_sound.play()
+                # self.workspace.surprise_sound.play()
+                SoundPlayer.play(SOUND_SURPRISE)
                 # if failed due to no floor and no impact
                 if self.workspace.enaction.outcome.floor == 0 and \
                         self.workspace.memory.phenomenon_memory.focus_phenomenon_id is not None \

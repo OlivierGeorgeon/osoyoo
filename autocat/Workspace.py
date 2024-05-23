@@ -13,6 +13,7 @@ from .Enaction.CompositeEnaction import CompositeEnaction
 from .Integrator.PredictionError import PredictionError
 from .Integrator.Calibrator import Calibrator
 from .Enaction import KEY_ENGAGEMENT_ROBOT, KEY_CONTROL_DECIDER, KEY_ENGAGEMENT_IMAGINARY
+from .SoundPlayer import SoundPlayer, SOUND_STARTUP, SOUND_CLEAR
 
 # KEY_CONTROL_DECIDER = "A"  # Automatic mode: controlled by the deciders
 KEY_CONTROL_USER = "M"  # Manual mode : controlled by the user
@@ -53,19 +54,20 @@ class Workspace:
         self.message = None
 
         # Try to load sounds (it may not work on all platforms)
-        try:
-            self.startup_sound = pyglet.media.load('autocat/Assets/R5.wav', streaming=False)
-            self.clear_sound = pyglet.media.load('autocat/Assets/R3.wav', streaming=False)
-            self.near_home_sound = pyglet.media.load('autocat/Assets/R4.wav', streaming=False)
-            self.push_sound = pyglet.media.load('autocat/Assets/tiny_cute.wav', streaming=False)
-            self.message_sound = pyglet.media.load('autocat/Assets/chirp.wav', streaming=False)
-            self.floor_sound = pyglet.media.load('autocat/Assets/cyberpunk3.wav', streaming=False)
-            self.impact_sound = pyglet.media.load('autocat/Assets/cute_beep1.wav', streaming=False)
-            self.surprise_sound = pyglet.media.load('autocat/Assets/chirp3.mp3', streaming=False)
-            self.startup_sound.play()
-        except pyglet.media.codecs.wave.WAVEDecodeException as e:
-            print("Error loading sound files", e)
-            # TODO: Handle the case when sounds are not loaded
+        SoundPlayer.play(SOUND_STARTUP)
+        # try:
+        #     self.startup_sound = pyglet.media.load('autocat/Assets/R5.wav', streaming=False)
+        #     self.clear_sound = pyglet.media.load('autocat/Assets/R3.wav', streaming=False)
+        #     self.near_home_sound = pyglet.media.load('autocat/Assets/R4.wav', streaming=False)
+        #     self.push_sound = pyglet.media.load('autocat/Assets/tiny_cute.wav', streaming=False)
+        #     self.message_sound = pyglet.media.load('autocat/Assets/chirp.wav', streaming=False)
+        #     self.floor_sound = pyglet.media.load('autocat/Assets/cyberpunk3.wav', streaming=False)
+        #     self.impact_sound = pyglet.media.load('autocat/Assets/cute_beep1.wav', streaming=False)
+        #     self.surprise_sound = pyglet.media.load('autocat/Assets/chirp3.mp3', streaming=False)
+        #     self.startup_sound.play()
+        # except pyglet.media.codecs.wave.WAVEDecodeException as e:
+        #     print("Error loading sound files", e)
+        #     # TODO: Handle the case when sounds are not loaded
 
     def main(self, dt):
         """The main handler of the interaction cycle:
@@ -115,7 +117,8 @@ class Workspace:
                 self.composite_enaction = CompositeEnaction([e0, e1, e2, e3])
         elif user_key.upper() == KEY_CLEAR:
             # Clear the stack of enactions
-            self.clear_sound.play()
+            # self.clear_sound.play()
+            SoundPlayer.play(SOUND_CLEAR)
             self.composite_enaction = None
             # Restore memory
             serotonin = self.memory.body_memory.serotonin  # Handel user change  TODO improve

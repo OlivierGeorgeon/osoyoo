@@ -80,7 +80,7 @@ void setup()
   // Perhaps something to do with the order in which the imu registers are written.
 
   IMU.setup();
-  Serial.println("-- IMU initialized");
+//  Serial.println("-- IMU initialized");
 
   // Initialize the automatic behaviors
 

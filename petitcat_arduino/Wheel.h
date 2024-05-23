@@ -46,10 +46,10 @@ class Wheel
     void circumvent(int speed);
   // private:
     void setMotion(int speed_fl, int speed_rl, int speed_rr, int speed_fr);
-    void frontLeftWheel(int speed_fl);
-    void rearLeftWheel(int speed_rl);
-    void frontRightWheel(int speed_fr);
-    void rearRightWheel(int speed_rr);
+    void frontLeftWheel(int speed);
+    void rearLeftWheel(int speed);
+    void frontRightWheel(int speed);
+    void rearRightWheel(int speed);
 };
 
 #endif
