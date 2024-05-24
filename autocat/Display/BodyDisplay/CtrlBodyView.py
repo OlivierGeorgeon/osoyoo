@@ -8,6 +8,7 @@ from ...Workspace import KEY_DECREASE, KEY_INCREASE
 from ...Utils import quaternion_to_azimuth
 from ...Integrator.Calibrator import compass_calibration
 from ...Memory.EgocentricMemory.Experience import EXPERIENCE_COMPASS, EXPERIENCE_AZIMUTH
+from ...Memory.BodyMemory import DOPAMINE, SEROTONIN, NORADRENALINE
 
 KEY_OFFSET = 'O'
 ENGAGEMENT_MODES = {'R': "Real", 'I': "Imaginary"}
@@ -85,16 +86,16 @@ class CtrlBodyView:
 
     def main(self, dt):
         """Called every frame. Update the body view"""
-        self.view.label_5HT.text = f"5-HT: {self.workspace.memory.body_memory.serotonin:d}"
-        self.view.label_5HT.color = (0, 0, 0, 255) if self.workspace.memory.body_memory.serotonin >= 50 \
+        self.view.label_5HT.text = f"5-HT: {self.workspace.memory.body_memory.neurotransmitters[SEROTONIN]:d}"
+        self.view.label_5HT.color = (0, 0, 0, 255) if self.workspace.memory.body_memory.neurotransmitters[SEROTONIN] >= 50 \
             else (255, 0, 0, 255)
-        self.view.label_DA.text = f"DA: {self.workspace.memory.body_memory.dopamine:d}"
-        if self.workspace.memory.body_memory.dopamine >= 50:
+        self.view.label_DA.text = f"DA: {self.workspace.memory.body_memory.neurotransmitters[DOPAMINE]:d}"
+        if self.workspace.memory.body_memory.neurotransmitters[DOPAMINE] >= 50:
             self.view.label_DA.color = (0, 0, 0, 255)
         else:
             self.view.label_DA.color = (255, 0, 0, 255)
-        self.view.label_NA.text = f"NA: {self.workspace.memory.body_memory.noradrenaline:d}"
-        if self.workspace.memory.body_memory.noradrenaline >= 50:
+        self.view.label_NA.text = f"NA: {self.workspace.memory.body_memory.neurotransmitters[NORADRENALINE]:d}"
+        if self.workspace.memory.body_memory.neurotransmitters[NORADRENALINE] >= 50:
             self.view.label_NA.color = (0, 0, 0, 255)
         else:
             self.view.label_NA.color = (255, 0, 0, 255)

@@ -6,6 +6,9 @@ from ..Utils import quaternion_to_azimuth, quaternion_to_direction_rad
 
 ENERGY_TIRED = 80  # 88  # 90  # 92  # Level of energy below which the agent wants to go to color patch
 EXCITATION_LOW = 90  # 95  # 60  # 75  # Level of excitation below witch Robot just wants to watch if it is not tired
+DOPAMINE = 0
+SEROTONIN = 1
+NORADRENALINE = 2
 
 
 class BodyMemory:
@@ -17,11 +20,13 @@ class BodyMemory:
         self.body_quaternion = Quaternion([0., 0., 0., 1.])  # The direction of the body initialized to x axis
         self.compass_offset = np.array(ROBOT_SETTINGS[robot_id]["compass_offset"], dtype=int)
         self.retreat_yaw = ROBOT_SETTINGS[robot_id]["retreat_yaw"]
+        # TODO Return to color patch based on neurotransmitters
+        self.neurotransmitters = np.array([50, 50, 50], dtype=int)  # DA, 5-HT, NA
         self.energy = 100  # [0,100] The level of energy of the robot
         self.excitation = 100  # [0, 100] The level of excitation
-        self.serotonin = 50  # 5-HT
-        self.dopamine = 50  # DA
-        self.noradrenaline = 50  # NA
+        # self.serotonin = 50  # 5-HT
+        # self.dopamine = 50  # DA
+        # self.noradrenaline = 50  # NA
 
     def update(self, enaction):
         """Update the body state variables: energy and excitation, head, body direction"""
@@ -39,7 +44,6 @@ class BodyMemory:
             self.energy = max(0, self.energy - 1)
         # Decrease excitation level
         self.excitation = max(0, self.excitation - 1)
-        # self.dopamine = max(30, self.dopamine - 1)
 
     def set_head_direction_degree(self, head_direction_degree: int):
         """Set the head direction from degree measured relative to the robot within [-90,90]"""
@@ -78,8 +82,9 @@ class BodyMemory:
         saved_body_memory.retreat_yaw = self.retreat_yaw
         saved_body_memory.energy = self.energy
         saved_body_memory.excitation = self.excitation
-        saved_body_memory.serotonin = self.serotonin
-        saved_body_memory.dopamine = self.dopamine
-        saved_body_memory.noradrenaline = self.noradrenaline
+        saved_body_memory.neurotransmitters[:] = self.neurotransmitters
+        # saved_body_memory.serotonin = self.serotonin
+        # saved_body_memory.dopamine = self.dopamine
+        # saved_body_memory.noradrenaline = self.noradrenaline
         return saved_body_memory
 

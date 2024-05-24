@@ -11,6 +11,7 @@ from . PredefinedInteractions import create_or_retrieve_primitive, create_primit
 from . Interaction import OUTCOME_FOCUS_TOO_FAR, OUTCOME_LOST_FOCUS
 from ..Robot.Enaction import Enaction
 from ..Memory import EMOTION_PLEASURE
+from ..Memory.BodyMemory import DOPAMINE
 from ..Memory.PhenomenonMemory import TERRAIN_ORIGIN_CONFIDENCE
 from ..Memory.BodyMemory import ENERGY_TIRED, EXCITATION_LOW
 from ..Integrator.OutcomeCode import FOCUS_TOO_FAR_DISTANCE
@@ -34,7 +35,7 @@ class Proposer:
         """Return the activation level of this decider:
          1: default; 2: terrain unconfident or high energy and excitation and object to circle round"""
 
-        return self.workspace.memory.body_memory.dopamine
+        return self.workspace.memory.body_memory.neurotransmitters[DOPAMINE]
 
     def propose_enaction(self):
         """Return a proposed interaction"""

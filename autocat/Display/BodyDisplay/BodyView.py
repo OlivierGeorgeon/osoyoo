@@ -4,6 +4,7 @@ from pyglet.gl import *
 import math
 from ..EgocentricDisplay.OsoyooCar import OsoyooCar
 from ..InteractiveDisplay import InteractiveDisplay
+from ...Memory.BodyMemory import DOPAMINE, SEROTONIN, NORADRENALINE
 
 
 class BodyView(InteractiveDisplay):
@@ -26,12 +27,12 @@ class BodyView(InteractiveDisplay):
         # Define the text area at the bottom of the view
         self.label_batch = pyglet.graphics.Batch()
 
-        self.label_5HT = pyglet.text.Label('5-HT: ', font_name='Verdana', font_size=10, x=10, y=70)
-        self.label_5HT.color = (0, 0, 0, 255)
-        self.label_5HT.batch = self.label_batch
-        self.label_DA = pyglet.text.Label('DA: ', font_name='Verdana', font_size=10, x=100, y=70)
+        self.label_DA = pyglet.text.Label('DA: ', font_name='Verdana', font_size=10, x=10, y=70)
         self.label_DA.color = (0, 0, 0, 255)
         self.label_DA.batch = self.label_batch
+        self.label_5HT = pyglet.text.Label('5-HT: ', font_name='Verdana', font_size=10, x=100, y=70)
+        self.label_5HT.color = (0, 0, 0, 255)
+        self.label_5HT.batch = self.label_batch
         self.label_NA = pyglet.text.Label('NA: ', font_name='Verdana', font_size=10, x=190, y=70)
         self.label_NA.color = (0, 0, 0, 255)
         self.label_NA.batch = self.label_batch
@@ -88,11 +89,11 @@ class BodyView(InteractiveDisplay):
         elif y > 60:
             # The neurotransmitter levels
             if x < 100:
-                self.workspace.memory.body_memory.serotonin += int(np.sign(dy))
+                self.workspace.memory.body_memory.neurotransmitters[DOPAMINE] += int(np.sign(dy))
             elif x < 190:
-                self.workspace.memory.body_memory.dopamine += int(np.sign(dy))
+                self.workspace.memory.body_memory.neurotransmitters[SEROTONIN] += int(np.sign(dy))
             else:
-                self.workspace.memory.body_memory.noradrenaline += int(np.sign(dy))
+                self.workspace.memory.body_memory.neurotransmitters[NORADRENALINE] += int(np.sign(dy))
         else:
             # The energy levels
             if x < 150:

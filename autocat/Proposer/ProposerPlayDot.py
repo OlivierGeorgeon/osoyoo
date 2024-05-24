@@ -16,6 +16,7 @@ from ..Enaction.CompositeEnaction import CompositeEnaction
 from ..Robot.RobotDefine import ROBOT_FLOOR_SENSOR_X
 from ..Memory.AllocentricMemory.Geometry import point_to_cell
 from ..Proposer.Interaction import OUTCOME_LOST_FOCUS, OUTCOME_FLOOR
+from ..Memory.BodyMemory import SEROTONIN
 
 PLAY_DISTANCE_CLOSE = 200  # Between robot center and object center
 PLAY_DISTANCE_WITHDRAW = 250  # From where the robot has stopped
@@ -29,7 +30,7 @@ class ProposerPlayDot(Proposer):
 
     def activation_level(self):
         """The level of activation of this decider: Serotonin level + 1  """
-        return self.workspace.memory.body_memory.serotonin # + 51
+        return self.workspace.memory.body_memory.neurotransmitters[SEROTONIN]
 
     def propose_enaction(self):
         """Add the next enaction to the stack based on sequence learning and spatial modifiers"""
@@ -76,7 +77,7 @@ class ProposerPlayDot(Proposer):
         p = self.workspace.memory.phenomenon_memory.phenomena[p_id]
         if p.phenomenon_type == EXPERIENCE_FLOOR:
             # If very playful and the dot is forward
-            if self.workspace.memory.body_memory.serotonin > 55 and \
+            if self.workspace.memory.body_memory.neurotransmitters[SEROTONIN] > 55 and \
                     e_memory.egocentric_memory.focus_point[0] > ROBOT_FLOOR_SENSOR_X:
                 if abs(e_memory.egocentric_memory.focus_point[1]) < 20:
                     # If in front then go to the dot

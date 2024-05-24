@@ -121,14 +121,16 @@ class Workspace:
             SoundPlayer.play(SOUND_CLEAR)
             self.composite_enaction = None
             # Restore memory
-            serotonin = self.memory.body_memory.serotonin  # Handel user change  TODO improve
-            dopamine = self.memory.body_memory.dopamine  # Handel user change
-            noradrenaline = self.memory.body_memory.noradrenaline  # Handel user change
+            neurotransmitter_point = self.memory.body_memory.neurotransmitters.copy()
+            # serotonin = self.memory.body_memory.serotonin  # Handel user change  TODO improve
+            # dopamine = self.memory.body_memory.dopamine  # Handel user change
+            # noradrenaline = self.memory.body_memory.noradrenaline  # Handel user change
             confidence = self.memory.phenomenon_memory.terrain_confidence()
             self.memory = self.enacter.memory_snapshot
-            self.memory.body_memory.serotonin = serotonin
-            self.memory.body_memory.dopamine = dopamine
-            self.memory.body_memory.noradrenaline = noradrenaline
+            self.memory.body_memory.neurotransmitters[:] = neurotransmitter_point
+            # self.memory.body_memory.serotonin = serotonin
+            # self.memory.body_memory.dopamine = dopamine
+            # self.memory.body_memory.noradrenaline = noradrenaline
             if self.memory.phenomenon_memory.terrain() is not None:
                 self.memory.phenomenon_memory.terrain().confidence = confidence
             self.enacter.interaction_step = ENACTION_STEP_RENDERING

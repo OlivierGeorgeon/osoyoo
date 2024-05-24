@@ -43,9 +43,9 @@
 #define BLUE_LED_PIN 2
 #define GREEN_LED_PIN 3
 #define RED_LED_PIN 5
-#define SERVO_PIN 6  // 13 Changed because 13 is used for internal led
-#define RightMotorDirPin1B 23
-#define RightMotorDirPin2B 25
+#define SERVO_PIN 6  // 13 Changed because 13 is used for built-in led
+#define RightMotorDirPin1B 23  // 5 Changed because we use 5 for Emotion LED
+#define RightMotorDirPin2B 25  // 5 Changed because we use 6 for Emotion LED
 
 #elif ROBOT_ID == 2
 

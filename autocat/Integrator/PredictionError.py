@@ -8,6 +8,7 @@ from ..Proposer.Action import ACTION_FORWARD, ACTION_BACKWARD, ACTION_SWIPE
 from ..Proposer.Interaction import OUTCOME_LOST_FOCUS, OUTCOME_NO_FOCUS, OUTCOME_FLOOR
 from ..Utils import short_angle, point_to_head_direction_distance
 from .PlotSequence import plot
+from ..Memory.BodyMemory import SEROTONIN
 
 PREDICTION_ERROR_WINDOW = 200
 RUNNING_AVERAGE_COEF = 0.25
@@ -181,10 +182,10 @@ class PredictionError:
                   f"std: {np.std(list(self.re_yaw.values())):.1f}")
             # If residual error increased then decrease serotonine (not fun!)
             if abs(self.previous_yaw_re) <= abs(re):
-                self.workspace.memory.body_memory.serotonin = max(40, self.workspace.memory.body_memory.serotonin - 1)
+                self.workspace.memory.body_memory.neurotransmitters[SEROTONIN] = max(40, self.workspace.memory.body_memory.neurotransmitters[SEROTONIN] - 1)
             self.previous_yaw_re = re
         elif enaction.outcome.floor == 3:  # not fun either
-            self.workspace.memory.body_memory.serotonin = max(40, self.workspace.memory.body_memory.serotonin - 1)
+            self.workspace.memory.body_memory.neurotransmitters[SEROTONIN] = max(40, self.workspace.memory.body_memory.neurotransmitters[SEROTONIN] - 1)
 
         # Compass residual error
 
@@ -265,7 +266,7 @@ class PredictionError:
                              self.pe_yaw.get(enaction.clock, ""),
                              self.re_yaw.get(enaction.clock, ""), self.re_compass.get(enaction.clock, ""),
                              self.pe_speed_forward.get(enaction.clock, ""), position_pe,
-                             self.workspace.memory.body_memory.serotonin])
+                             self.workspace.memory.body_memory.neurotransmitters[SEROTONIN]])
 
     def plot(self):
         """Show the prediction error plots"""

@@ -44,19 +44,6 @@ class ProposerExplore(Proposer):
              self.workspace.memory.body_memory.excitation > EXCITATION_LOW):
             return 3
 
-        # # High energy then must circle, explore, watch or arrange
-        # if self.workspace.memory.body_memory.energy >= ENERGY_TIRED:
-        #     # High excitation then must circle or explore
-        #     if self.workspace.memory.body_memory.excitation > EXCITATION_LOW:
-        #         # Focus inside terrain or not too far: HAPPY DeciderCircle
-        #         if self.workspace.memory.egocentric_memory.focus_point is None or \
-        #                 np.linalg.norm(self.workspace.memory.egocentric_memory.focus_point) > FOCUS_TOO_FAR_DISTANCE or \
-        #                 self.workspace.memory.is_outside_terrain(self.workspace.memory.egocentric_memory.focus_point):
-        #             return 3
-        # # Tired: must go home
-        # else:
-        #     return 3
-
         return 0
 
     def outcome(self, enaction):

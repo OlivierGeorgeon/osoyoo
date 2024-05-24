@@ -13,6 +13,7 @@ from ..Robot.Command import DIRECTION_BACK
 from . Proposer import Proposer
 from .. Enaction.CompositeEnaction import CompositeEnaction
 from ..Memory import EMOTION_VIGILANCE
+from ..Memory.BodyMemory import NORADRENALINE
 from . Interaction import OUTCOME_FLOOR
 from ..Utils import assert_almost_equal_angles
 
@@ -28,7 +29,7 @@ class ProposerPush(Proposer):
     def activation_level(self):
         """The level of activation of this decider: 0: default, 4 if focus inside terrain, 3 for withdrawal"""
 
-        return self.workspace.memory.body_memory.noradrenaline
+        return self.workspace.memory.body_memory.neurotransmitters[NORADRENALINE]
 
     def propose_enaction(self):
         """Add the next enaction to the stack based on sequence learning and spatial modifiers"""
