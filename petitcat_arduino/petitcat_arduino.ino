@@ -51,7 +51,7 @@ void setup()
   // Initialize
 
   Serial.begin(9600);
-  Serial.print("Petitcat Arduino 0.1.1 for Robot "); Serial.println(ROBOT_ID);
+  Serial.print("Petitcat Arduino 0.1.2 for Robot "); Serial.println(ROBOT_ID);
 
   // Initialize the LEDs
 

@@ -19,7 +19,7 @@ void Head::setup()
   pinMode(Echo_PIN,INPUT);
   digitalWrite(Trig_PIN,LOW);
   // init servo
-  _head.attach(ROBOT_SERVO_PIN);
+  _head.attach(SERVO_PIN);
   turnHead(0); // Head straight ahead
   _head_angle_span = ALIGN_SACCADE_SPAN;
 }

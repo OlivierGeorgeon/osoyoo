@@ -1,5 +1,5 @@
 //debug trail to ensure latest software is being pulled by Git  may 14, 2024 
-#define ROBOT_ID 0 // 0: Default Osoyoo robot, 1: robot BSN, 2: robot UCBL, 3: SHS chez Olivier, 11 to 14: DOLL robots
+#define ROBOT_ID 4 // 0: Default Osoyoo robot, 1: robot BSN, 2: robot UCBL, 3: SHS chez Olivier, 11 to 14: DOLL robots
 
 #define AP_SSID "Petitcat"              // The wifi SSID of this robot in Access Point
 #define ROBOT_HEAD_X 80                 // (mm) X position of the head
@@ -36,11 +36,14 @@
 #define ACCELERATION_X_BLOCK_THRESHOLD 60  // TODO depends whether the interaction starts when the robot is immobile
 #define ACCELERATION_Y_BLOCK_THRESHOLD 80 // 100 // Robot is blocked if lateral acceleration below this threshold
 #define GYRO_COEF 0.97  // 1.2  //  1 // IMU is upright. If turns too much, increase this value
-#define ROBOT_SERVO_PIN 6  // 13 Changed because 13 is used for internal led
 #define GYRO_IMPACT_THRESHOLD 0.25      // (degree) above this threshold: strong z rotation = lateral impact
 #define WHITE_RED 67.
 #define WHITE_GREEN 103.
 #define WHITE_BLUE 91.
+#define BLUE_LED_PIN 2
+#define GREEN_LED_PIN 3
+#define RED_LED_PIN 5
+#define SERVO_PIN 6  // 13 Changed because 13 is used for internal led
 #define RightMotorDirPin1B 23
 #define RightMotorDirPin2B 25
 
@@ -65,11 +68,14 @@
 #define ACCELERATION_X_BLOCK_THRESHOLD 60 // Below the threshold, the robot is blocked
 #define ACCELERATION_Y_BLOCK_THRESHOLD 80 // Robot is blocked if lateral acceleration below this threshold
 #define GYRO_COEF 0.99  // 1.0
-#define ROBOT_SERVO_PIN 6
 #define GYRO_IMPACT_THRESHOLD 0.25      // (degree) above this threshold: strong z rotation = lateral impact
 #define WHITE_RED 70.
 #define WHITE_GREEN 91.
 #define WHITE_BLUE 77.
+#define BLUE_LED_PIN 2
+#define GREEN_LED_PIN 3
+#define RED_LED_PIN 5
+#define SERVO_PIN 6
 #define RightMotorDirPin1B 23
 #define RightMotorDirPin2B 25
 
@@ -94,11 +100,14 @@
 #define ACCELERATION_X_BLOCK_THRESHOLD 110  // 140 // 30 // Robot is blocked if longitudinal acceleration below this threshold
 #define ACCELERATION_Y_BLOCK_THRESHOLD 80 // 100 // Robot is blocked if lateral acceleration below this threshold
 #define GYRO_COEF 1.
-#define ROBOT_SERVO_PIN 6
 #define GYRO_IMPACT_THRESHOLD 0.5 // 0.25      // (degree/s) above this threshold: strong z rotation = lateral impact
 #define WHITE_RED 69.
 #define WHITE_GREEN 107.
 #define WHITE_BLUE 94.
+#define BLUE_LED_PIN 2
+#define GREEN_LED_PIN 3
+#define RED_LED_PIN 5
+#define SERVO_PIN 6
 #define RightMotorDirPin1B 23
 #define RightMotorDirPin2B 25
 
@@ -123,11 +132,14 @@
 #define ACCELERATION_X_BLOCK_THRESHOLD 140
 #define ACCELERATION_Y_BLOCK_THRESHOLD 80
 #define GYRO_COEF 0.98  // If average(integrated_yaw - compass)>0 when turning trigonometric (left "1") then decrease this value
-#define ROBOT_SERVO_PIN 6
 #define GYRO_IMPACT_THRESHOLD 0.5
 #define WHITE_RED 89.
 #define WHITE_GREEN 93.
 #define WHITE_BLUE 89.
+#define BLUE_LED_PIN 2
+#define GREEN_LED_PIN 3
+#define RED_LED_PIN 5
+#define SERVO_PIN 6
 #define RightMotorDirPin1B 23
 #define RightMotorDirPin2B 25
 
@@ -153,8 +165,11 @@
 #define ACCELERATION_X_BLOCK_THRESHOLD 140 // 50 // Robot is blocked if longitudinal acceleration below this threshold
 #define ACCELERATION_Y_BLOCK_THRESHOLD 80 // Robot is blocked if lateral acceleration below this threshold
 #define GYRO_COEF 1.  // 1.5
-#define ROBOT_SERVO_PIN 4
 #define GYRO_IMPACT_THRESHOLD 0.25      // (degree) above this threshold: strong z rotation = lateral impact
+#define BLUE_LED_PIN 2
+#define GREEN_LED_PIN 3
+#define RED_LED_PIN 3  // Not used yet
+#define SERVO_PIN 4
 #define RightMotorDirPin1B 5
 #define RightMotorDirPin2B 6
 
@@ -179,8 +194,11 @@
 #define ACCELERATION_X_BLOCK_THRESHOLD 140 // 50 // Robot is blocked if longitudinal acceleration below this threshold
 #define ACCELERATION_Y_BLOCK_THRESHOLD 80 // Robot is blocked if lateral acceleration below this threshold
 #define GYRO_COEF 1.  // 1.5
-#define ROBOT_SERVO_PIN 4
 #define GYRO_IMPACT_THRESHOLD 0.25      // (degree) above this threshold: strong z rotation = lateral impact
+#define BLUE_LED_PIN 2
+#define GREEN_LED_PIN 3
+#define RED_LED_PIN 3  // Not used yet
+#define SERVO_PIN 4
 #define RightMotorDirPin1B 5
 #define RightMotorDirPin2B 6
 
@@ -205,8 +223,11 @@
 #define ACCELERATION_X_BLOCK_THRESHOLD 140 // 50 // Robot is blocked if longitudinal acceleration below this threshold
 #define ACCELERATION_Y_BLOCK_THRESHOLD 80 // Robot is blocked if lateral acceleration below this threshold
 #define GYRO_COEF 1.  // 1.4
-#define ROBOT_SERVO_PIN 4
 #define GYRO_IMPACT_THRESHOLD 0.25      // (degree) above this threshold: strong z rotation = lateral impact
+#define BLUE_LED_PIN 2
+#define GREEN_LED_PIN 3
+#define RED_LED_PIN 3  // Not used yet
+#define SERVO_PIN 4
 #define RightMotorDirPin1B 5
 #define RightMotorDirPin2B 6
 
@@ -231,8 +252,11 @@
 #define ACCELERATION_X_BLOCK_THRESHOLD 140 // 50 // Robot is blocked if longitudinal acceleration below this threshold
 #define ACCELERATION_Y_BLOCK_THRESHOLD 80 // Robot is blocked if lateral acceleration below this threshold
 #define GYRO_COEF 1.  // 1.5
-#define ROBOT_SERVO_PIN 4
 #define GYRO_IMPACT_THRESHOLD 0.25      // (degree) above this threshold: strong z rotation = lateral impact
+#define BLUE_LED_PIN 2
+#define GREEN_LED_PIN 3
+#define RED_LED_PIN 3  // Not used yet
+#define SERVO_PIN 4
 #define RightMotorDirPin1B 5
 #define RightMotorDirPin2B 6
 
@@ -248,8 +272,11 @@
 #define TURN_SPOT_MAX_DURATION 2400
 #define TURN_SPOT_ENDING_DELAY 180
 #define TURN_SPOT_ENDING_ANGLE 9
-#define ROBOT_SERVO_PIN 13
+#define BLUE_LED_PIN 2
+#define GREEN_LED_PIN 3
+#define RED_LED_PIN 3  // Not used yet
 #define RightMotorDirPin1B 5  // Rear Right Motor direction pin 1 to Back MODEL-X IN1 (K1)
 #define RightMotorDirPin2B 6   // Rear Right Motor direction pin 2 to Back MODEL-X IN2 (K1)
+#define SERVO_PIN 13
 
 #endif

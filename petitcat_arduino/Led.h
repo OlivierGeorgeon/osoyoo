@@ -8,9 +8,9 @@
 #define Led_h
 
 #define BLINK_PERIOD 100  // (ms) The period of blinking 10Hz
-#define RED_LED_PIN 5
-#define GREEN_LED_PIN 3
-#define BLUE_LED_PIN 2
+// #define RED_LED_PIN 5
+// #define GREEN_LED_PIN 3
+// #define BLUE_LED_PIN 2
 
 
 class Led

@@ -141,11 +141,11 @@ void Interaction::send()
   // Send the outcome to the PC
   String outcome_json_string = JSON.stringify(outcome_object);
   // light the led during transfer
-  #if LED_BUILTIN != ROBOT_SERVO_PIN
+  #if LED_BUILTIN != SERVO_PIN
     digitalWrite(LED_BUILTIN, HIGH);
   #endif
   _WifiCat.send(outcome_json_string);
-  #if LED_BUILTIN != ROBOT_SERVO_PIN
+  #if LED_BUILTIN != SERVO_PIN
     digitalWrite(LED_BUILTIN, LOW);
   #endif
 
