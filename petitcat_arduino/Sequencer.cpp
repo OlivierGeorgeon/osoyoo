@@ -37,10 +37,8 @@ Sequencer::Sequencer(Floor& FLO, Head& HEA, Imu& IMU, Led& LED, WifiCat& WifiCat
 Interaction* Sequencer::update(int& interaction_step, Interaction* INT)
 {
   // Dim the led while waiting for a command
-  //  digitalWrite(LED_BUILTIN, HIGH);
   _LED.builtin_on();
   int len = _WifiCat.read(_packetBuffer);
-  //  digitalWrite(LED_BUILTIN, LOW);
   _LED.builtin_off();
 
   // If received a new action
@@ -51,7 +49,6 @@ Interaction* Sequencer::update(int& interaction_step, Interaction* INT)
     int clock = 0;
 
     JSONVar json_action = JSON.parse(_packetBuffer);
-    // Serial.println(myObject);
     if (json_action.hasOwnProperty("action"))
       action = ((const char*) json_action["action"])[0];
 
@@ -105,7 +102,12 @@ Interaction* Sequencer::update(int& interaction_step, Interaction* INT)
         INT = new Swipe(_FLO, _HEA, _IMU, _WifiCat, json_action);
 
       else if (action == ACTION_STOP)
-        _FLO._OWM.stopMotion();
+      {
+        // Do nothing. Can be used for debug
+        interaction_step = INTERACTION_DONE;  // remain in step 0
+        char s[40]; snprintf(s, 40, "{\"clock\":%d, \"action\":\"%c\"}", clock, action);
+        _WifiCat.send(s);
+      }
 
       else if (action == ACTION_SHIFT_RIGHT)  // Negative speed makes swipe to the right
         INT = new Swipe(_FLO, _HEA, _IMU, _WifiCat, json_action);
@@ -135,18 +137,15 @@ Interaction* Sequencer::update(int& interaction_step, Interaction* INT)
       {
         // Unrecognized action (for debug)
         interaction_step = INTERACTION_DONE;  // remain in step 0
-        char s[40];
-        snprintf(s, 40, "{\"status\":\"Unknown\", \"action\":\" %c \"}", action);
+        char s[50];
+        snprintf(s, 50, "{\"clock\":%d, \"action\":\"%c\", \"status\":\"Unknown\"}", clock, action);
+//        snprintf(s, 40, "{\"status\":\"Unknown\", \"action\":\"%c\"}", action);
         _WifiCat.send(s);
-//        _WifiCat.send("{\"status\":\"Unknown\", \"action\":\"" + String(action) + "\"}");
       }
 
       // Print the address of the pointer to control that the heap is not going to overflow
       Serial.print("Interaction's address in SRAM: ");
       Serial.println((unsigned int)INT);
-//      MEMORY_PRINT_HEAPEND
-//      MEMORY_PRINT_HEAPSIZE
-//      FREERAM_PRINT
     }
   }
   return INT;

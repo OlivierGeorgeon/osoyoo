@@ -33,7 +33,6 @@
 #include "Led.h"
 #include "Robot_define.h"
 #include "Sequencer.h"
-//#include <MemoryUsage.h>
 
 Floor FLO;
 Head HEA;
@@ -51,7 +50,7 @@ void setup()
   // Initialize
 
   Serial.begin(9600);
-  Serial.print("Petitcat Arduino 0.1.2 for Robot "); Serial.println(ROBOT_ID);
+  Serial.print("Petitcat Arduino 0.1.3 for Robot "); Serial.println(ROBOT_ID);
 
   // Initialize the LEDs
 
@@ -60,16 +59,6 @@ void setup()
   // First attempt to initialize IMU
 
   IMU.setup();
-//  Serial.println("-- IMU initialized");
-
-  // Print memory usage
-//  MEMORY_PRINT_START
-//  MEMORY_PRINT_HEAPSTART
-//  MEMORY_PRINT_HEAPEND
-//  MEMORY_PRINT_STACKSTART
-//  MEMORY_PRINT_END
-//  MEMORY_PRINT_HEAPSIZE
-//  FREERAM_PRINT
 
   // Connect to the wifi board
 
@@ -80,7 +69,6 @@ void setup()
   // Perhaps something to do with the order in which the imu registers are written.
 
   IMU.setup();
-//  Serial.println("-- IMU initialized");
 
   // Initialize the automatic behaviors
 
