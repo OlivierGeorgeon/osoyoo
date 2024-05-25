@@ -79,10 +79,10 @@ class Enaction:
         return True
         # return self.outcome.floor == self.predicted_outcome.floor and self.outcome.impact == 0
 
-    def current_enaction(self):
-        """Used if the enaction is taken as a composite enaction"""
-        return self
+    # def current_enaction(self):
+    #     """Used if the enaction is taken as a composite enaction"""
+    #     return self
 
-    def increment(self):
-        """Used if the enaction is taken as a composite enaction"""
-        return False
+    # def increment(self):
+    #     """Used if the enaction is taken as a composite enaction"""
+    #     return False

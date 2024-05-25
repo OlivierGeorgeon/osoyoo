@@ -26,10 +26,10 @@ class ProposerPush(Proposer):
         super().__init__(workspace)
         self.step = STEP_INIT
 
-    def activation_level(self):
-        """The level of activation of this decider: 0: default, 4 if focus inside terrain, 3 for withdrawal"""
-
-        return self.workspace.memory.body_memory.neurotransmitters[NORADRENALINE]
+    # def activation_level(self):
+    #     """The level of activation of this decider: 0: default, 4 if focus inside terrain, 3 for withdrawal"""
+    #
+    #     return self.workspace.memory.body_memory.neurotransmitters[NORADRENALINE]
 
     def propose_enaction(self):
         """Add the next enaction to the stack based on sequence learning and spatial modifiers"""
@@ -46,11 +46,13 @@ class ProposerPush(Proposer):
             # If object in front modulo 10° then push
             # if abs(math.atan2(ego_destination[1], math.fabs(ego_destination[0]))) < 0.175:
             if assert_almost_equal_angles(math.atan2(ego_destination[1], ego_destination[0]), 0, 10):
-                composite_enaction = Enaction(self.workspace.actions[ACTION_FORWARD], e_memory)
+                e = Enaction(self.workspace.actions[ACTION_FORWARD], e_memory)
+                composite_enaction = CompositeEnaction([e], 'Push', np.array([0, 0, 1]))
                 self.step = STEP_WITHDRAW
             # If object not in front then turn toward object
             else:
-                composite_enaction = Enaction(self.workspace.actions[ACTION_TURN], e_memory)
+                e= Enaction(self.workspace.actions[ACTION_TURN], e_memory)
+                composite_enaction = CompositeEnaction([e], 'Push', np.array([0, 0, 1]))
 
         # Withdraw step
         elif self.step == STEP_WITHDRAW:
@@ -60,7 +62,7 @@ class ProposerPush(Proposer):
             e0 = Enaction(self.workspace.actions[ACTION_TURN], e_memory, direction=DIRECTION_BACK)
             # Second enaction: move back to the prompt
             e1 = Enaction(self.workspace.actions[ACTION_BACKWARD], e0.predicted_memory.save())
-            composite_enaction = CompositeEnaction([e0, e1])
+            composite_enaction = CompositeEnaction([e0, e1], 'Push', np.array([0, 0, 1]))
             self.step = STEP_INIT
 
         # Otherwise don't propose an enaction (OUTCOME_FLOOR)

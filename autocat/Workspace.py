@@ -1,5 +1,6 @@
 import json
 import pyglet
+import numpy as np
 from .Proposer.Action import create_actions, ACTION_FORWARD, ACTIONS, ACTION_TURN, ACTION_BACKWARD
 from .Memory.Memory import Memory
 from .Memory.PhenomenonMemory import TERRAIN_ORIGIN_CONFIDENCE
@@ -55,19 +56,6 @@ class Workspace:
 
         # Try to load sounds (it may not work on all platforms)
         SoundPlayer.play(SOUND_STARTUP)
-        # try:
-        #     self.startup_sound = pyglet.media.load('autocat/Assets/R5.wav', streaming=False)
-        #     self.clear_sound = pyglet.media.load('autocat/Assets/R3.wav', streaming=False)
-        #     self.near_home_sound = pyglet.media.load('autocat/Assets/R4.wav', streaming=False)
-        #     self.push_sound = pyglet.media.load('autocat/Assets/tiny_cute.wav', streaming=False)
-        #     self.message_sound = pyglet.media.load('autocat/Assets/chirp.wav', streaming=False)
-        #     self.floor_sound = pyglet.media.load('autocat/Assets/cyberpunk3.wav', streaming=False)
-        #     self.impact_sound = pyglet.media.load('autocat/Assets/cute_beep1.wav', streaming=False)
-        #     self.surprise_sound = pyglet.media.load('autocat/Assets/chirp3.mp3', streaming=False)
-        #     self.startup_sound.play()
-        # except pyglet.media.codecs.wave.WAVEDecodeException as e:
-        #     print("Error loading sound files", e)
-        #     # TODO: Handle the case when sounds are not loaded
 
     def main(self, dt):
         """The main handler of the interaction cycle:
@@ -83,8 +71,8 @@ class Workspace:
         elif user_key.upper() in ACTIONS:
             # Only process actions when the robot is IDLE
             if self.enacter.interaction_step == ENACTION_STEP_IDLE:
-                # self.memory.appraise_emotion()
-                self.composite_enaction = Enaction(self.actions[user_key.upper()], self.memory.save(), span=10)
+                e = Enaction(self.actions[user_key.upper()], self.memory.save(), span=10)
+                self.composite_enaction = CompositeEnaction([e], 'Manual', np.array([1, 1, 1]))
         elif user_key.upper() == "/":
             # If key ALIGN then turn and move forward to the prompt
             if self.enacter.interaction_step == ENACTION_STEP_IDLE:
@@ -92,7 +80,7 @@ class Workspace:
                 e0 = Enaction(self.actions[ACTION_TURN], self.memory.save())
                 # Second enaction: move forward to the prompt
                 e1 = Enaction(self.actions[ACTION_FORWARD], e0.predicted_memory.save())
-                self.composite_enaction = CompositeEnaction([e0, e1])
+                self.composite_enaction = CompositeEnaction([e0, e1], 'Manual', np.array([1, 1, 1]))
         elif user_key.upper() == ":" and self.memory.egocentric_memory.focus_point is not None:
             # If key ALIGN BACK then turn back and move backward to the prompt
             if self.enacter.interaction_step == ENACTION_STEP_IDLE:
@@ -100,7 +88,7 @@ class Workspace:
                 e0 = Enaction(self.actions[ACTION_TURN], self.memory.save(), direction=DIRECTION_BACK)
                 # Second enaction: move forward to the prompt
                 e1 = Enaction(self.actions[ACTION_BACKWARD], e0.predicted_memory.save())
-                self.composite_enaction = CompositeEnaction([e0, e1])
+                self.composite_enaction = CompositeEnaction([e0, e1], 'Manual', np.array([1, 1, 1]))
         elif user_key.upper() == "P" and self.memory.egocentric_memory.focus_point is not None:
             # If key PUSH and has focus then create the push sequence
             if self.enacter.interaction_step == ENACTION_STEP_IDLE:
@@ -114,7 +102,7 @@ class Workspace:
                 e2 = Enaction(self.actions[ACTION_TURN], e2_memory)
                 # Fourth enaction: move forward to the new prompt
                 e3 = Enaction(self.actions[ACTION_FORWARD], e2.predicted_memory.save())
-                self.composite_enaction = CompositeEnaction([e0, e1, e2, e3])
+                self.composite_enaction = CompositeEnaction([e0, e1, e2, e3], 'Manual', np.array([1, 1, 1]))
         elif user_key.upper() == KEY_CLEAR:
             # Clear the stack of enactions
             # self.clear_sound.play()
@@ -122,15 +110,9 @@ class Workspace:
             self.composite_enaction = None
             # Restore memory
             neurotransmitter_point = self.memory.body_memory.neurotransmitters.copy()
-            # serotonin = self.memory.body_memory.serotonin  # Handel user change  TODO improve
-            # dopamine = self.memory.body_memory.dopamine  # Handel user change
-            # noradrenaline = self.memory.body_memory.noradrenaline  # Handel user change
             confidence = self.memory.phenomenon_memory.terrain_confidence()
             self.memory = self.enacter.memory_snapshot
             self.memory.body_memory.neurotransmitters[:] = neurotransmitter_point
-            # self.memory.body_memory.serotonin = serotonin
-            # self.memory.body_memory.dopamine = dopamine
-            # self.memory.body_memory.noradrenaline = noradrenaline
             if self.memory.phenomenon_memory.terrain() is not None:
                 self.memory.phenomenon_memory.terrain().confidence = confidence
             self.enacter.interaction_step = ENACTION_STEP_RENDERING

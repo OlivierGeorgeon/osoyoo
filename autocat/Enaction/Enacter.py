@@ -28,10 +28,10 @@ class Enacter:
         self.memory_snapshot = None
         self.is_imagining = False
         self.memory_before_imaginary = None
-        self.proposers = {'Default ': Proposer(self.workspace)
+        self.proposers = {'Default': Proposer(self.workspace)
                           # , 'Play Turn': ProposerPlayTurn(self)
                           # , 'Explore': ProposerExplore(self)
-                          , 'Watch': ProposerWatch(self.workspace)
+                          # , 'Watch': ProposerWatch(self.workspace)
                           # , 'Watch C': ProposerWatchCenter(self),  'Arrange': ProposerArrange(self)
                           , 'Push': ProposerPush(self.workspace)
                           # , 'Play': ProposerPlayForward(self)
@@ -116,15 +116,9 @@ class Enacter:
 
             # Restore the memory from the snapshot
             neurotransmitters = self.workspace.memory.body_memory.neurotransmitters.copy()
-            # serotonin = self.workspace.memory.body_memory.serotonin  # Handel user change  TODO improve
-            # dopamine = self.workspace.memory.body_memory.dopamine  # Handel user change
-            # noradrenaline = self.workspace.memory.body_memory.noradrenaline  # Handel user change
             confidence = self.workspace.memory.phenomenon_memory.terrain_confidence()
             self.workspace.memory = self.memory_snapshot
             self.workspace.memory.body_memory.neurotransmitters[:] = neurotransmitters
-            # self.workspace.memory.body_memory.serotonin = serotonin
-            # self.workspace.memory.body_memory.dopamine = dopamine
-            # self.workspace.memory.body_memory.noradrenaline = noradrenaline
             if self.workspace.memory.phenomenon_memory.terrain() is not None:
                 self.workspace.memory.phenomenon_memory.terrain().confidence = confidence
 
@@ -180,21 +174,23 @@ class Enacter:
         """Return the selected composite enaction"""
         # Each proposer adds a proposition to the list
         propositions = []
-        for name, proposer in self.proposers.items():
-            activation = proposer.activation_level()  # Must compute before proposing
+        for proposer in self.proposers.values():
+            # activation = proposer.activation_level()  # Must compute before proposing
             # print("Computing proposition", name, "with focus", self.memory.egocentric_memory.focus_point)
             enaction = proposer.propose_enaction()
             if enaction is not None:
-                propositions.append([name, enaction, activation])
+                activation = enaction.emotion_mask * self.workspace.memory.body_memory.neurotransmitters
+                propositions.append([enaction, activation.sum()])
         print("Proposed enactions:")
         for p in propositions:
-            print(" ", p[0], ":", p[1], p[2])
+            print(" ", p[0].decider_id, ":", p[0], p[1])
+            # print(" ", p[0], ":", p[1], p[2])
 
         # Select the enaction that has the highest activation value
-        most_activated_index = propositions.index(max(propositions, key=lambda p: p[2]))
-        self.workspace.decider_id = propositions[most_activated_index][0]
+        most_activated_index = propositions.index(max(propositions, key=lambda p: p[1]))
+        self.workspace.decider_id = propositions[most_activated_index][0].decider_id
         print("Decider:", self.workspace.decider_id)
-        return propositions[most_activated_index][1]
+        return propositions[most_activated_index][0]
 
     def select_focus(self, memory):
         """Select a focus based on the phenomena in memory"""

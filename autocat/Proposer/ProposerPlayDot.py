@@ -28,9 +28,9 @@ class ProposerPlayDot(Proposer):
         self.last_seen_focus = None
         self.emotion = EMOTION_CONTENT
 
-    def activation_level(self):
-        """The level of activation of this decider: Serotonin level + 1  """
-        return self.workspace.memory.body_memory.neurotransmitters[SEROTONIN]
+    # def activation_level(self):
+    #     """The level of activation of this decider: Serotonin level + 1  """
+    #     return self.workspace.memory.body_memory.neurotransmitters[SEROTONIN]
 
     def propose_enaction(self):
         """Add the next enaction to the stack based on sequence learning and spatial modifiers"""
@@ -82,16 +82,19 @@ class ProposerPlayDot(Proposer):
                 if abs(e_memory.egocentric_memory.focus_point[1]) < 20:
                     # If in front then go to the dot
                     e_memory.egocentric_memory.prompt_point = None  # e_memory.egocentric_memory.focus_point.copy()   # Don't stop at the dot
-                    return Enaction(self.workspace.actions[ACTION_FORWARD], e_memory)
+                    e = Enaction(self.workspace.actions[ACTION_FORWARD], e_memory)
+                    return CompositeEnaction([e], "Play DOT", np.array([0, 1, 0], dtype=int))
                 elif abs(math.degrees(math.atan2(e_memory.egocentric_memory.focus_point[1],
                                                  e_memory.egocentric_memory.focus_point[0]))) < 15:
                     # If slightly in front then swipe
                     e_memory.egocentric_memory.prompt_point = e_memory.egocentric_memory.focus_point.copy()
-                    return Enaction(self.workspace.actions[ACTION_SWIPE], e_memory)
+                    e = Enaction(self.workspace.actions[ACTION_SWIPE], e_memory)
+                    return CompositeEnaction([e], "Play DOT", np.array([0, 1, 0], dtype=int))
                 else:
                     # If not in front then turn
                     e_memory.egocentric_memory.prompt_point = e_memory.egocentric_memory.focus_point.copy()
-                    return Enaction(self.workspace.actions[ACTION_TURN], e_memory)
+                    e = Enaction(self.workspace.actions[ACTION_TURN], e_memory)
+                    return CompositeEnaction([e], "Play DOT", np.array([0, 1, 0], dtype=int))
 
             # If mildly playful then turn around the dot
             if e_memory.egocentric_memory.focus_point[0] > ROBOT_FLOOR_SENSOR_X:
@@ -107,7 +110,7 @@ class ProposerPlayDot(Proposer):
                 # Third enaction move FORWARD to focus
                 e1.predicted_memory.egocentric_memory.prompt_point = None  # Don't stop at the dot
                 e2 = Enaction(self.workspace.actions[ACTION_FORWARD], e1.predicted_memory)
-                return CompositeEnaction([e0, e1, e2])
+                return CompositeEnaction([e0, e1, e2], "Play DOT", np.array([0, 1, 0], dtype=int))
             else:
                 # First enaction TURN to focus
                 e_memory.egocentric_memory.prompt_point = e_memory.egocentric_memory.focus_point.copy()
@@ -115,4 +118,4 @@ class ProposerPlayDot(Proposer):
                 # Second enaction move FORWARD to focus
                 e0.predicted_memory.egocentric_memory.prompt_point = None  # Don't stop at the dot
                 e1 = Enaction(self.workspace.actions[ACTION_FORWARD], e0.predicted_memory)
-                return CompositeEnaction([e0, e1])
+                return CompositeEnaction([e0, e1], "Play DOT", np.array([0, 1, 0], dtype=int))

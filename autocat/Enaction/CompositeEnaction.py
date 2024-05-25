@@ -1,11 +1,13 @@
 
 
 class CompositeEnaction:
-    """A composite enaction is a series of promitive interactions"""
-    def __init__(self, enactions):
+    """A composite enaction is a series of primitive interactions"""
+    def __init__(self, enactions, decider_id, emotion_mask):
         self.enactions = enactions
         self.index = 0
         self.key = tuple([e.key for e in self.enactions])
+        self.decider_id = decider_id
+        self.emotion_mask = emotion_mask
 
     def __hash__(self):
         """The hash is the action code """
