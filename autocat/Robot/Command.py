@@ -13,9 +13,14 @@ DIRECTION_RIGHT = 3
 
 class Command:
     """A command to send to the robot"""
-    def __init__(self, action, clock, prompt_point, focus_point, direction, span, color, caution):
+    # def __init__(self, action, clock, prompt_point, focus_point, direction, span, color, caution):
+    def __init__(self, action, memory, direction, span, caution):
+        clock = memory.clock
+        prompt_point = memory.egocentric_memory.prompt_point
+        focus_point = memory.egocentric_memory.focus_point
+        color = memory.body_memory.emotion_code()
 
-        # The required fields
+        # The fields that are not None
         self.action = action
         self.clock = clock
         self.duration = action.target_duration * 1000  # Default duration

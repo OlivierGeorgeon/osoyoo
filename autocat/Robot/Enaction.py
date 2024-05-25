@@ -16,8 +16,9 @@ class Enaction:
         self.clock = memory.clock
 
         # Generate the command to the robot
-        self.command = Command(self.action, self.clock, memory.egocentric_memory.prompt_point,
-                               memory.egocentric_memory.focus_point, direction, span, memory.emotion_code, caution)
+        # self.command = Command(self.action, self.clock, memory.egocentric_memory.prompt_point,
+        #                        memory.egocentric_memory.focus_point, direction, span, memory.emotion_code, caution)
+        self.command = Command(self.action, memory, direction, span, caution)
 
         # Initialize the actual trajectory (clone again the necessary elements of memory)
         self.trajectory = Trajectory(memory, self.command)

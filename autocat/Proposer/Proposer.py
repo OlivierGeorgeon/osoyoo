@@ -37,7 +37,8 @@ class Proposer:
     def propose_enaction(self):
         """Return a proposed interaction"""
         if self.workspace.enaction is None:
-            return Enaction(self.workspace.actions[ACTION_FORWARD], self.workspace.memory.save())
+            e = Enaction(self.workspace.actions[ACTION_FORWARD], self.workspace.memory.save())
+            return CompositeEnaction([e], 'Default', np.array([1, 0, 0]))
         return self.select_enaction(self.workspace.enaction)
 
     def select_enaction(self, enaction):
@@ -68,7 +69,7 @@ class Proposer:
 
         # Add the enaction to the stack
         e = Enaction(action, e_memory, span=span)
-        return CompositeEnaction([e], 'Default', np.array([1, 0, 0], dtype=int))
+        return CompositeEnaction([e], 'Default', np.array([1, 0, 0]))
 
     def select_action(self, enaction):
         """The sequence learning mechanism that proposes the next action"""

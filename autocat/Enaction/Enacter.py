@@ -19,11 +19,13 @@ from ..Proposer.ProposerPlaySwipe import ProposerPlaySwipe
 from ..Proposer.ProposerPlayTerrain import ProposerPlayTerrain
 from ..Proposer.ProposerPlayDot import ProposerPlayDot
 from ..SoundPlayer import SoundPlayer, SOUND_SURPRISE
+from ..Proposer.AttentionMechanism import AttentionMechanism
 
 
 class Enacter:
     def __init__(self, workspace):
         self.workspace = workspace
+        self.attention_mechanism = AttentionMechanism(workspace)
         self.interaction_step = ENACTION_STEP_IDLE
         self.memory_snapshot = None
         self.is_imagining = False
@@ -33,7 +35,7 @@ class Enacter:
                           # , 'Explore': ProposerExplore(self)
                           # , 'Watch': ProposerWatch(self.workspace)
                           # , 'Watch C': ProposerWatchCenter(self),  'Arrange': ProposerArrange(self)
-                          , 'Push': ProposerPush(self.workspace)
+                          # , 'Push': ProposerPush(self.workspace)
                           # , 'Play': ProposerPlayForward(self)
                           # , "Play terrain": ProposerPlayTerrain(self)
                           , "Play DOT": ProposerPlayDot(self.workspace)
@@ -172,12 +174,15 @@ class Enacter:
 
     def decide(self):
         """Return the selected composite enaction"""
+        # Update the focus is the dot was lost
+        self.attention_mechanism.update_focus()
+
         # Each proposer adds a proposition to the list
         propositions = []
         for proposer in self.proposers.values():
             # activation = proposer.activation_level()  # Must compute before proposing
-            # print("Computing proposition", name, "with focus", self.memory.egocentric_memory.focus_point)
             enaction = proposer.propose_enaction()
+            print("Proposition", enaction,  "with focus", self.workspace.memory.egocentric_memory.focus_point)
             if enaction is not None:
                 activation = enaction.emotion_mask * self.workspace.memory.body_memory.neurotransmitters
                 propositions.append([enaction, activation.sum()])

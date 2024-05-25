@@ -3,6 +3,7 @@ import numpy as np
 from pyrr import Quaternion, Vector3
 from ..Robot.RobotDefine import ROBOT_SETTINGS, ROBOT_CHASSIS_X, ROBOT_OUTSIDE_Y
 from ..Utils import quaternion_to_azimuth, quaternion_to_direction_rad
+from . import EMOTION_PLEASURE, EMOTION_VIGILANCE, EMOTION_CONTENT
 
 ENERGY_TIRED = 80  # 88  # 90  # 92  # Level of energy below which the agent wants to go to color patch
 EXCITATION_LOW = 90  # 95  # 60  # 75  # Level of excitation below witch Robot just wants to watch if it is not tired
@@ -72,6 +73,10 @@ class BodyMemory:
             self.body_quaternion * Vector3([-ROBOT_CHASSIS_X, ROBOT_OUTSIDE_Y, 0]),
             self.body_quaternion * Vector3([-ROBOT_CHASSIS_X, -ROBOT_OUTSIDE_Y, 0]),
             self.body_quaternion * Vector3([ROBOT_CHASSIS_X, -ROBOT_OUTSIDE_Y, 0])])
+
+    def emotion_code(self):
+        """Return the code to display the emotion"""
+        return [EMOTION_PLEASURE, EMOTION_CONTENT, EMOTION_VIGILANCE][np.argmax(self.neurotransmitters)]
 
     def save(self):
         """Return a clone of bodymemory to save a snapshot of memory"""
