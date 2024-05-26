@@ -67,9 +67,6 @@ Interaction::Interaction(Floor& FLO, Head& HEA, Imu& IMU, WifiCat& WifiCat, JSON
 
   _action_start_time = millis();
   _action_end_time = _action_start_time + _target_duration;
-//  _status.reserve(10);
-//  _status = "0"; // in interaction.h
-//  _step = INTERACTION_BEGIN;  in interaction.h
 }
 
 void Interaction::begin()
@@ -102,14 +99,6 @@ void Interaction::terminate()
   // When time is over then read the floor color and proceed to step SEND
   if (_action_end_time < millis() && (_align == 0 || !_HEA._is_enacting_head_alignment) && _FLO._CLR.end_read())
     _step = INTERACTION_SEND;
-
-//  if (_action_end_time < millis() && !_HEA._is_enacting_head_alignment)
-//  {
-//    // Read the floor color and return true when done
-//    if (_FLO._CLR.end_read())
-//      // When color has been read, proceed to step 3
-//      _step = INTERACTION_SEND;
-//  }
 }
 
 // Send the outcome and go back to Step 0
@@ -121,7 +110,7 @@ void Interaction::send()
   JSONVar outcome_object;
   outcome_object["clock"] = _clock;
   char s[2]; s[0] = _action; s[1] = 0;
-//  snprintf(s, 2, "%c", _action);
+  //  snprintf(s, 2, "%c", _action);
   outcome_object["action"] = s;  // String(_action); Avoid String to improve memory management
   outcome_object["duration1"] = _duration1;
   _HEA.outcome(outcome_object);
@@ -178,5 +167,5 @@ int Interaction::update()
 
 int Interaction::direction()
 {
- return DIRECTION_FRONT;
+  return DIRECTION_FRONT;
 }

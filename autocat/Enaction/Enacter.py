@@ -70,13 +70,12 @@ class Enacter:
                     self.workspace.decider_id = "Manual"
                 # Case DECIDER_KEY_USER is handled by self.process_user_key()
 
-        # if self.interaction_step == ENACTION_STEP_IDLE:  TODO make sure we can comment this line
             # When the next enaction is in the stack, prepare the enaction
             if self.workspace.composite_enaction is not None:
                 # Take the current enaction from the composite interaction
                 self.workspace.enaction = self.workspace.composite_enaction.current_enaction()
                 # Take a memory snapshot to restore at the end of the enaction
-                self.workspace.memory.emotion_code = self.workspace.enaction.predicted_memory.emotion_code
+                # self.workspace.memory.emotion_code = self.workspace.enaction.predicted_memory.emotion_code
                 self.memory_snapshot = self.workspace.memory.save()
                 # Show the prompt in memory
                 if self.workspace.enaction.trajectory.prompt_point is not None:
@@ -142,7 +141,6 @@ class Enacter:
 
             # Express surprise if the enaction failed
             if not self.workspace.enaction.succeed():
-                # self.workspace.surprise_sound.play()
                 SoundPlayer.play(SOUND_SURPRISE)
                 # if failed due to no floor and no impact
                 if self.workspace.enaction.outcome.floor == 0 and \

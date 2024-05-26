@@ -88,7 +88,7 @@ class ProposerExplore(Proposer):
         outcome_code = self.outcome(enaction)
 
         e_memory = self.workspace.memory.save()
-        e_memory.emotion_code = EMOTION_CONTENT
+        # e_memory.emotion_code = EMOTION_CONTENT
         e1, e2 = None, None
 
         # If time to go home

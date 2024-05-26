@@ -29,7 +29,7 @@
 #include "Floor.h"
 #include "Head.h"
 #include "Imu.h"
-#include "Interaction.h"
+//#include "Interaction.h"
 #include "Led.h"
 #include "Robot_define.h"
 #include "Sequencer.h"
@@ -37,20 +37,21 @@
 Floor FLO;
 Head HEA;
 Imu IMU;
-WifiCat WifiCat;
+WifiCat WIF;
 Led LED;
-Sequencer SEQ(FLO, HEA, IMU, LED, WifiCat);
+Sequencer SEQ(FLO, HEA, IMU, LED, WIF);
 
 int interaction_step = INTERACTION_DONE;
 int interaction_direction = DIRECTION_FRONT;
-Interaction* INT  = nullptr;  // The interaction type will depend on the action received from the PC
+//Interaction* INT  = nullptr;  // The interaction type will depend on the action received from the PC
 
 void setup()
 {
   // Initialize
 
   Serial.begin(9600);
-  Serial.print("Petitcat Arduino 0.1.3 for Robot "); Serial.println(ROBOT_ID);
+  Serial.print("Petitcat Arduino 0.1.3 for Robot ");
+  Serial.println(ROBOT_ID);
 
   // Initialize the LEDs
 
@@ -62,7 +63,7 @@ void setup()
 
   // Connect to the wifi board
 
-  WifiCat.begin();
+  WIF.begin();
 
   // Second attempt to initialize IMU (try again because sometimes it fails the first time)
   // Perhaps needs time after switch on
@@ -103,16 +104,17 @@ void loop()
 
   // Watch out for message received from PC. If message received, get the interaction
 
-  if (interaction_step == INTERACTION_DONE)
-    INT = SEQ.update(interaction_step, INT);
+  //if (interaction_step == INTERACTION_DONE)
+//  INT = SEQ.update(interaction_step, interaction_direction, INT);
+  SEQ.update(interaction_step, interaction_direction);
 
   // Update the current interaction and return INTERACTION_DONE when done
 
-  if (INT != nullptr)
-  {
-    interaction_step = INT->update();
-    interaction_direction = INT->direction();
-  }
-  else
-    interaction_direction = DIRECTION_FRONT;
+//  if (INT != nullptr)
+//  {
+//    interaction_step = INT->update();
+    // interaction_direction = INT->direction();
+//  }
+  // else
+    // interaction_direction = DIRECTION_FRONT;
 }

@@ -98,7 +98,7 @@ class AllocentricView(InteractiveDisplay):
         glRotatef(90 - self.workspace.memory.body_memory.body_azimuth(), 0.0, 0.0, 1.0)
         # Draw the robot
         self.robot.rotate_head(self.workspace.memory.body_memory.head_direction_degree())
-        self.robot.emotion_color(self.workspace.memory.emotion_code)
+        self.robot.emotion_color(self.workspace.memory.body_memory.emotion_code())
         self.robot_batch.draw()
 
         # Draw the text at the bottom left corner

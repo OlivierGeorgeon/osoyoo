@@ -29,11 +29,6 @@ class Proposer:
         # The direction of translation
         self.direction = 1
 
-    # def activation_level(self):
-    #     """Return the activation level of this decider:
-    #      1: default; 2: terrain unconfident or high energy and excitation and object to circle round"""
-    #     return self.workspace.memory.body_memory.neurotransmitters[DOPAMINE]
-
     def propose_enaction(self):
         """Return a proposed interaction"""
         if self.workspace.enaction is None:
@@ -47,7 +42,7 @@ class Proposer:
         # Call the sequence learning mechanism to select the next action
         action = self.select_action(enaction)
         e_memory = self.workspace.memory.save()
-        e_memory.emotion_code = EMOTION_PLEASURE
+        # e_memory.emotion_code = EMOTION_PLEASURE
         span = 40
 
         # Set the spatial modifiers

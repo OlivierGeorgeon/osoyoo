@@ -64,7 +64,7 @@ class CtrlBodyView:
 
         # Update the position of the robot
         self.view.robot.rotate_head(self.workspace.memory.body_memory.head_direction_degree())
-        self.view.robot.emotion_color(self.workspace.memory.emotion_code)
+        self.view.robot.emotion_color(self.workspace.memory.body_memory.emotion_code())
         # self.view.body_rotation_matrix = self.workspace.memory.body_memory.body_direction_matrix()
 
         # Delete the points of interest

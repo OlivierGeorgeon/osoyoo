@@ -36,7 +36,7 @@ class ProposerPush(Proposer):
         enaction = self.workspace.enaction
 
         e_memory = self.workspace.memory.save()
-        e_memory.emotion_code = EMOTION_VIGILANCE
+        # e_memory.emotion_code = EMOTION_VIGILANCE
 
         # If there is an object to push
         if self.is_to_push() and enaction.outcome_code != OUTCOME_FLOOR:

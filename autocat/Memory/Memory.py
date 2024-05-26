@@ -27,7 +27,7 @@ class Memory:
         self.egocentric_memory = EgocentricMemory(robot_id)
         self.allocentric_memory = AllocentricMemory(GRID_WIDTH, GRID_HEIGHT, cell_radius=CELL_RADIUS)
         self.phenomenon_memory = PhenomenonMemory(arena_id)
-        self.emotion_code = EMOTION_PLEASURE
+        # self.emotion_code = EMOTION_PLEASURE
 
     def __str__(self):
         return "Memory Robot position (" + str(round(self.allocentric_memory.robot_point[0])) + "," +\
@@ -141,7 +141,7 @@ class Memory:
         # start_time = time.time()
         saved_memory = Memory(self.phenomenon_memory.arena_id, self.robot_id)
         saved_memory.clock = self.clock
-        saved_memory.emotion_code = self.emotion_code
+        # saved_memory.emotion_code = self.emotion_code
         # Clone body memory
         saved_memory.body_memory = self.body_memory.save()
         # Clone egocentric memory

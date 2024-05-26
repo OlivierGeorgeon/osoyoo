@@ -39,7 +39,7 @@ class ProposerArrange(Proposer):
         ego_target = self.workspace.memory.terrain_centric_to_egocentric(
             self.workspace.memory.phenomenon_memory.arrange_point())
         e_memory = self.workspace.memory.save()
-        e_memory.emotion_code = EMOTION_VIGILANCE
+        # e_memory.emotion_code = EMOTION_VIGILANCE
 
         # If robot too close to target point then withdraw
         if self.is_to_withdraw():

@@ -40,7 +40,7 @@ class ProposerPlayTerrain(Proposer):
             return None
 
         e_memory = self.workspace.memory.save()
-        e_memory.emotion_code = EMOTION_CONTENT
+        # e_memory.emotion_code = EMOTION_CONTENT
 
         # If the robot is at the center of the terrain
         if np.linalg.norm(self.workspace.memory.terrain_centric_robot_point()) < 200:

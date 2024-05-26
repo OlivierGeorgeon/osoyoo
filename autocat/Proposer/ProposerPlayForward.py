@@ -41,7 +41,7 @@ class ProposerPlayForward(Proposer):
     def select_enaction(self, enaction):
         """Add the next enaction to the stack based on sequence learning and spatial modifiers"""
         e_memory = self.workspace.memory.save()
-        e_memory.emotion_code = EMOTION_CONTENT
+        # e_memory.emotion_code = EMOTION_CONTENT
 
         # Withdraw step
         if self.step == STEP_WITHDRAW:

@@ -28,14 +28,17 @@
 
 // #include <MemoryUsage.h>
 
-Sequencer::Sequencer(Floor& FLO, Head& HEA, Imu& IMU, Led& LED, WifiCat& WifiCat) :
-  _FLO(FLO), _HEA(HEA), _IMU(IMU), _LED(LED), _WifiCat(WifiCat)
+Sequencer::Sequencer(Floor& FLO, Head& HEA, Imu& IMU, Led& LED, WifiCat& WIF) :
+  _FLO(FLO), _HEA(HEA), _IMU(IMU), _LED(LED), _WifiCat(WIF)
 {
 }
 
 // Watch out the wifi and returns the new interaction to enact if any
-Interaction* Sequencer::update(int& interaction_step, Interaction* INT)
+//Interaction* Sequencer::update(int& interaction_step, int& interaction_direction, Interaction* INT)
+void Sequencer::update(int& interaction_step, int& interaction_direction)
 {
+  if (interaction_step == INTERACTION_DONE)
+  {
   // Dim the led while waiting for a command
   _LED.builtin_on();
   int len = _WifiCat.read(_packetBuffer);
@@ -69,7 +72,7 @@ Interaction* Sequencer::update(int& interaction_step, Interaction* INT)
 
     else
     {
-      // Delete the previous interaction (Not sure whether it is needed)
+      // Delete the previous interaction to release memory
       if (INT != nullptr)
       {
         delete INT;
@@ -139,14 +142,25 @@ Interaction* Sequencer::update(int& interaction_step, Interaction* INT)
         interaction_step = INTERACTION_DONE;  // remain in step 0
         char s[50];
         snprintf(s, 50, "{\"clock\":%d, \"action\":\"%c\", \"status\":\"Unknown\"}", clock, action);
-//        snprintf(s, 40, "{\"status\":\"Unknown\", \"action\":\"%c\"}", action);
         _WifiCat.send(s);
       }
 
       // Print the address of the pointer to control that the heap is not going to overflow
       Serial.print("Interaction's address in SRAM: ");
       Serial.println((unsigned int)INT);
+      if (INT != nullptr)
+        interaction_direction = INT->direction();
+      else
+        interaction_direction = DIRECTION_FRONT;
     }
   }
-  return INT;
+  // return INT;
+  }
+
+  // If not DONE then update the current interaction
+  else
+  {
+    if (INT != nullptr)
+      interaction_step = INT->update();
+  }
 }

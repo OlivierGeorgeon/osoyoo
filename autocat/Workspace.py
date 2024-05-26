@@ -124,7 +124,7 @@ class Workspace:
         """Return the message to answer to another robot"""
 
         message = {"robot": self.robot_id, "clock": self.memory.clock,
-                   "azimuth": self.memory.body_memory.body_azimuth(), "emotion": self.memory.emotion_code}
+                   "azimuth": self.memory.body_memory.body_azimuth(), "emotion": self.memory.body_memory.emotion_code()}
 
         # If the terrain has been found then send the position relative to the terrain origin
         if self.memory.phenomenon_memory.terrain_confidence() > TERRAIN_ORIGIN_CONFIDENCE:  # TERRAIN_INITIAL_CONFIDENCE:

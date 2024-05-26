@@ -2,7 +2,7 @@ from pyrr import Quaternion
 from ..Memory.EgocentricMemory.Experience import EXPERIENCE_CENTRAL_ECHO, EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_FLOOR
 from autocat.Memory.PhenomenonMemory.Affordance import Affordance
 from ..Display.AllocentricDisplay import DISPLAY_CONE
-from ..Memory.BodyMemory import SEROTONIN
+from ..Memory.BodyMemory import SEROTONIN, NORADRENALINE
 
 
 def integrate(memory):
@@ -44,6 +44,8 @@ def integrate(memory):
             # Move the allocentric memory to the point
             memory.allocentric_memory.roll(p.point)
             p.point[:] = 0
+    if memory.body_memory.neurotransmitters[NORADRENALINE] > 50:
+        memory.body_memory.neurotransmitters[NORADRENALINE] -= 1
 
     # if EXPERIENCE_FLOOR in new_phenomena_ids.values():
     #     memory.body_memory.serotonin = max(60, memory.body_memory.serotonin)

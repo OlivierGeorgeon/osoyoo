@@ -61,7 +61,7 @@ class ProposerWatch(Proposer):
             return None
 
         e_memory = self.workspace.memory.save()
-        e_memory.emotion_code = EMOTION_SAD
+        # e_memory.emotion_code = EMOTION_SAD
         ego_watch_point = self.workspace.memory.terrain_centric_to_egocentric(np.array([0, 0, 0]))
 
         # If far from watch point then go to watch point

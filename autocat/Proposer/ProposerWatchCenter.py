@@ -33,7 +33,7 @@ class ProposerWatchCenter(Proposer):
             self.workspace.memory.phenomenon_memory.arrange_point())
 
         e_memory = self.workspace.memory.save()
-        e_memory.emotion_code = EMOTION_SAD
+        # e_memory.emotion_code = EMOTION_SAD
 
         # If far from watch point then go to watch point
         if np.linalg.norm(ego_watch_point) > 200:
@@ -51,8 +51,8 @@ class ProposerWatchCenter(Proposer):
         elif abs(math.atan2(ego_arrange_point[1], ego_arrange_point[0])) < 0.349:
             e_memory.egocentric_memory.prompt_point = None
             # Upset if there is an object to watch
-            if e_memory.egocentric_memory.focus_point is not None:
-                e_memory.emotion_code = EMOTION_UPSET
+            # if e_memory.egocentric_memory.focus_point is not None:
+                # e_memory.emotion_code = EMOTION_UPSET
             # e_memory.egocentric_memory.focus_point = ego_arrange_point
             composite_enaction = Enaction(self.workspace.actions[ACTION_WATCH], e_memory)
 

@@ -59,7 +59,7 @@ class ProposerPlayTurn(Proposer):
         if self.is_to_play() and enaction.outcome_code not in [OUTCOME_FLOOR, OUTCOME_FOCUS_TOO_FAR]:
             # self.step = STEP_CALIBRATE  Needed if automatic calibration is off
             e_memory = self.workspace.memory.save()
-            e_memory.emotion_code = EMOTION_CONTENT
+            # e_memory.emotion_code = EMOTION_CONTENT
             e_memory.egocentric_memory.prompt_point = np.array([100, 0, 0])
             enactions = []
             # create the sequence of turn

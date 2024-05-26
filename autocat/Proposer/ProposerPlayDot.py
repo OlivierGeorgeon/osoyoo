@@ -23,14 +23,10 @@ PLAY_DISTANCE_WITHDRAW = 250  # From where the robot has stopped
 
 
 class ProposerPlayDot(Proposer):
-    def __init__(self, workspace):
-        super().__init__(workspace)
-        self.last_seen_focus = None
-        self.emotion = EMOTION_CONTENT
-
-    # def activation_level(self):
-    #     """The level of activation of this decider: Serotonin level + 1  """
-    #     return self.workspace.memory.body_memory.neurotransmitters[SEROTONIN]
+    # def __init__(self, workspace):
+    #     super().__init__(workspace)
+    #     self.last_seen_focus = None
+    #     self.emotion = EMOTION_CONTENT
 
     def propose_enaction(self):
         """Add the next enaction to the stack based on sequence learning and spatial modifiers"""
@@ -45,35 +41,8 @@ class ProposerPlayDot(Proposer):
             return None
 
         e_memory = self.workspace.memory.save()
-        # # If lost the phenomenon then move the focus to the side
-        # if enaction.outcome_code == OUTCOME_FLOOR:
-        #     self.emotion = EMOTION_CONTENT
-        #     self.last_seen_focus = None
-        # elif enaction.outcome_code == OUTCOME_LOST_FOCUS or self.emotion == EMOTION_VIGILANCE:
-        #     if self.last_seen_focus is None:
-        #         # Memorise the allocentric last seen focus for the next try
-        #         self.last_seen_focus = self.workspace.memory.egocentric_to_allocentric(self.workspace.memory.egocentric_memory.focus_point)
-        #     else:
-        #         # Reuse the last seen focus
-        #         self.workspace.memory.egocentric_memory.focus_point = self.workspace.memory.allocentric_to_egocentric(self.last_seen_focus)
-        #     left_of_focus = self.workspace.memory.egocentric_memory.focus_point + np.array([0, 80, 0])
-        #     i, j = point_to_cell(self.workspace.memory.egocentric_to_allocentric(left_of_focus))
-        #     last_visited_left = self.workspace.memory.allocentric_memory.grid[i, j, CLOCK_PLACE]
-        #     right_of_focus = self.workspace.memory.egocentric_memory.focus_point + np.array([0, -80, 0])
-        #     i, j = point_to_cell(self.workspace.memory.egocentric_to_allocentric(right_of_focus))
-        #     last_visited_right = self.workspace.memory.allocentric_memory.grid[i, j, CLOCK_PLACE]
-        #     print(f"Searching left {last_visited_left}, right {last_visited_right}")
-        #     if last_visited_left < last_visited_right:
-        #         # focus = self.workspace.memory.egocentric_memory.focus_point + np.array([0, 80, 0])
-        #         e_memory.egocentric_memory.focus_point = left_of_focus
-        #     else:
-        #         e_memory.egocentric_memory.focus_point = right_of_focus
-        #         # focus = self.workspace.memory.egocentric_memory.focus_point + np.array([0, -80, 0])
-        #     # e_memory.egocentric_memory.focus_point = focus
-        #     self.emotion = EMOTION_VIGILANCE
-
         # If focus at a dot phenomenon
-        e_memory.emotion_code = self.emotion
+        # e_memory.emotion_code = self.emotion
         p = self.workspace.memory.phenomenon_memory.phenomena[p_id]
         if p.phenomenon_type == EXPERIENCE_FLOOR:
             # If very playful and the dot is forward

@@ -13,12 +13,7 @@
 #include "../../Action_define.h"
 #include "Backward.h"
 
-Backward::Backward(
-  Floor& FCR,
-  Head& HEA,
-  Imu& IMU,
-  WifiCat& WifiCat,
-  JSONVar json_action) :
+Backward::Backward(Floor& FCR, Head& HEA, Imu& IMU, WifiCat& WifiCat, JSONVar json_action) :
   Interaction(FCR, HEA, IMU, WifiCat, json_action)
 {
 }
@@ -81,5 +76,5 @@ void Backward::outcome(JSONVar & outcome_object)
 
 int Backward::direction()
 {
- return DIRECTION_BACK;
+  return DIRECTION_BACK;
 }
