@@ -1,5 +1,6 @@
 import time
-from . Workspace import Workspace
+from .Workspace import Workspace
+from .SoundPlayer import SoundPlayer, SOUND_STARTUP
 from .Robot.CtrlRobot import CtrlRobot
 from .Display.EgocentricDisplay.CtrlEgocentricView import CtrlEgocentricView
 from .Display.AllocentricDisplay.CtrlAllocentricView import CtrlAllocentricView
@@ -11,6 +12,9 @@ class Flock:
     """The Flock handles communication between robots"""
     def __init__(self, arguments):
         """Create the flock of robots"""
+        # Try to load sounds (it may not work on all platforms)
+        SoundPlayer.play(SOUND_STARTUP)
+
         self.workspaces = {}
         self.ctrl_robots = {}
         self.ctrl_egocentric_views = {}
@@ -39,9 +43,8 @@ class Flock:
         """Update the robots"""
         start_time = time.time()
         for robot_id in self.workspaces.keys():
-            self.ctrl_robots[robot_id].main(dt)  # Check if outcome received from the robot
+            self.ctrl_robots[robot_id].main(dt)
             self.workspaces[robot_id].main(dt)
-            # self.ctrl_robots[robot_id].main(dt)  # Check if command to send to the robot
             self.ctrl_egocentric_views[robot_id].main(dt)
             self.ctrl_allocentric_views[robot_id].main(dt)
             self.ctrl_body_views[robot_id].main(dt)

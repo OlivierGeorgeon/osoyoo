@@ -132,8 +132,8 @@ class Enacter:
             # Update memory, possibly create new phenomena
             self.workspace.memory.update(self.workspace.enaction)
 
-            # Select the focus
-            self.select_focus(self.workspace.memory)
+            # Select the focus - May be included in the attention mechanism
+            # self.select_focus(self.workspace.memory)
 
             # Compute the outcome code which depends on the updated memory
             self.workspace.enaction.outcome_code = outcome_code(self.workspace.memory,
@@ -148,6 +148,10 @@ class Enacter:
                         and self.workspace.enaction.outcome.impact == 0:
                     # Lost focus to DOT phenomenon  TODO improve
                     self.workspace.enaction.outcome_code = OUTCOME_LOST_FOCUS
+
+            # Manage attention
+            # Focus at the nearest dot phenomenon, or near it if it was lost
+            self.attention_mechanism.update_focus()
 
             # Track the prediction errors
             self.workspace.prediction_error.log(self.workspace.enaction)
@@ -173,7 +177,7 @@ class Enacter:
     def decide(self):
         """Return the selected composite enaction"""
         # Update the focus is the dot was lost
-        self.attention_mechanism.update_focus()
+        # self.attention_mechanism.update_focus()
 
         # Each proposer adds a proposition to the list
         propositions = []

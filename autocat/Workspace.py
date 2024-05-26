@@ -14,7 +14,7 @@ from .Enaction.CompositeEnaction import CompositeEnaction
 from .Integrator.PredictionError import PredictionError
 from .Integrator.Calibrator import Calibrator
 from .Enaction import KEY_ENGAGEMENT_ROBOT, KEY_CONTROL_DECIDER, KEY_ENGAGEMENT_IMAGINARY
-from .SoundPlayer import SoundPlayer, SOUND_STARTUP, SOUND_CLEAR
+from .SoundPlayer import SoundPlayer, SOUND_CLEAR
 
 # KEY_CONTROL_DECIDER = "A"  # Automatic mode: controlled by the deciders
 KEY_CONTROL_USER = "M"  # Manual mode : controlled by the user
@@ -53,9 +53,6 @@ class Workspace:
 
         # Message from other robot
         self.message = None
-
-        # Try to load sounds (it may not work on all platforms)
-        SoundPlayer.play(SOUND_STARTUP)
 
     def main(self, dt):
         """The main handler of the interaction cycle:

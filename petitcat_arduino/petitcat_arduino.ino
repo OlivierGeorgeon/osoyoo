@@ -1,11 +1,11 @@
 /*   >> Howard debug version trace <<
- ____    ___  ______  ____  ______    __   ____  ______
-|    \  /  _]|      ||    ||      |  /  ] /    ||      |
-|  o  )/  [_ |      | |  | |      | /  / |  o  ||      |
+ ____    ___  ______  ____  ______    __  /\_/\  ______
+|    \  /  _]|      ||    ||      |  /  ]/  o o||      |
+|  o  )/  [_ |      | |  | |      | /  / |  >;<||      |
 |   _/|    _]|_|  |_| |  | |_|  |_|/  /  |     ||_|  |_|
 |  |  |   [_   |  |   |  |   |  | /   \_ |  _  |  |  |
 |  |  |     |  |  |   |  |   |  | \     ||  |  |  |  |
-|__|  |_____|  |__|  |____|  |__|  \____||__|__|  |__|
+|__|  |_____|  |__|  |____|  |__|  \____||_m|_m|  |__|
 
  Upload this file to the PetitCat robot car
 
@@ -29,7 +29,6 @@
 #include "Floor.h"
 #include "Head.h"
 #include "Imu.h"
-//#include "Interaction.h"
 #include "Led.h"
 #include "Robot_define.h"
 #include "Sequencer.h"
@@ -37,17 +36,15 @@
 Floor FLO;
 Head HEA;
 Imu IMU;
-WifiCat WIF;
 Led LED;
-Sequencer SEQ(FLO, HEA, IMU, LED, WIF);
+Sequencer ACT(FLO, HEA, IMU, LED);
 
 int interaction_step = INTERACTION_DONE;
 int interaction_direction = DIRECTION_FRONT;
-//Interaction* INT  = nullptr;  // The interaction type will depend on the action received from the PC
 
 void setup()
 {
-  // Initialize
+  // Initialize the serial com
 
   Serial.begin(9600);
   Serial.print("Petitcat Arduino 0.1.3 for Robot ");
@@ -61,12 +58,12 @@ void setup()
 
   IMU.setup();
 
-  // Connect to the wifi board
+  // Connect to the wifi
 
-  WIF.begin();
+  ACT.setup();
 
   // Second attempt to initialize IMU (try again because sometimes it fails the first time)
-  // Perhaps needs time after switch on
+  // Not sure why. Perhaps needs time after switched on
   // Perhaps something to do with the order in which the imu registers are written.
 
   IMU.setup();
@@ -74,19 +71,19 @@ void setup()
   // Initialize the automatic behaviors
 
   FLO.setup();
-  Serial.println("-- Wheels initialized");
+  Serial.println("-- Floor monitoring initialized");
 
   HEA.setup();
-  Serial.println("-- Head initialized");
+  Serial.println("-- Head monitoring initialized");
 
   pinMode(TOUCH_PIN, INPUT_PULLUP);
 
-  Serial.println("--- Robot is ready ---");
+  Serial.println("--- Petitcat is ready ---");
 }
 
 void loop()
 {
-  // Control the built-in led and the emotion led
+  // Control the built-in LED and the emotion LED
 
   LED.update();
 
@@ -102,19 +99,8 @@ void loop()
 
   IMU.update(interaction_step);
 
-  // Watch out for message received from PC. If message received, get the interaction
+  // Monitor the wifi and enact the interaction received from the PC
+  //  (Update interaction_step and interaction_direction)
 
-  //if (interaction_step == INTERACTION_DONE)
-//  INT = SEQ.update(interaction_step, interaction_direction, INT);
-  SEQ.update(interaction_step, interaction_direction);
-
-  // Update the current interaction and return INTERACTION_DONE when done
-
-//  if (INT != nullptr)
-//  {
-//    interaction_step = INT->update();
-    // interaction_direction = INT->direction();
-//  }
-  // else
-    // interaction_direction = DIRECTION_FRONT;
+  ACT.update(interaction_step, interaction_direction);
 }

@@ -69,7 +69,7 @@ void WifiCat::begin()
   Serial.println(PORT);
 }
 
-// Read up tp 512 characters from the current packet and place them to the buffer
+// Read up to 512 characters from the current packet and place them to the buffer
 // Returns the number of bytes read, or 0 if none are available
 
 int WifiCat::read(char* packetBuffer)

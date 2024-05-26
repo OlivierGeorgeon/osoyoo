@@ -28,139 +28,137 @@
 
 // #include <MemoryUsage.h>
 
-Sequencer::Sequencer(Floor& FLO, Head& HEA, Imu& IMU, Led& LED, WifiCat& WIF) :
-  _FLO(FLO), _HEA(HEA), _IMU(IMU), _LED(LED), _WifiCat(WIF)
+Sequencer::Sequencer(Floor& FLO, Head& HEA, Imu& IMU, Led& LED) :
+  _FLO(FLO), _HEA(HEA), _IMU(IMU), _LED(LED)
 {
 }
 
-// Watch out the wifi and returns the new interaction to enact if any
-//Interaction* Sequencer::update(int& interaction_step, int& interaction_direction, Interaction* INT)
+// Initialize the connexion with the PC
+void Sequencer::setup()
+{
+  _WifiCat.begin();
+}
+
+// Monitor the interaction recieved from the PC
 void Sequencer::update(int& interaction_step, int& interaction_direction)
 {
+  // If no ongoing interaction then monitor the Wi-Fi
   if (interaction_step == INTERACTION_DONE)
   {
-  // Dim the led while waiting for a command
-  _LED.builtin_on();
-  int len = _WifiCat.read(_packetBuffer);
-  _LED.builtin_off();
+    // High-frequency blink the led while waiting for a packet from the PC
+    _LED.builtin_on();
+    int len = _WifiCat.read(_packetBuffer);
+    _LED.builtin_off();
 
-  // If received a new action
+    // If received a new packet
 
-  if (len > 0)
-  {
-    char action = 0;
-    int clock = 0;
-
-    JSONVar json_action = JSON.parse(_packetBuffer);
-    if (json_action.hasOwnProperty("action"))
-      action = ((const char*) json_action["action"])[0];
-
-    if (json_action.hasOwnProperty("clock"))
-      clock = (int)json_action["clock"];
-
-    // If the new clock equals the previous clock then do not enact the interaction but resend the previous outcome
-    // (The interaction was already enacted but the PC did not receive the previous outcome)
-
-    if (clock == _previous_clock)
+    if (len > 0)
     {
-      if (INT != nullptr)
-        INT->send();
+      char action = 0;
+      int clock = 0;
+
+      JSONVar json_action = JSON.parse(_packetBuffer);
+      if (json_action.hasOwnProperty("action"))
+        action = ((const char*) json_action["action"])[0];
+
+      if (json_action.hasOwnProperty("clock"))
+        clock = (int)json_action["clock"];
+
+      // If the new clock equals the previous clock then do not enact the interaction but resend the previous outcome
+      // (The interaction was already enacted but the PC did not receive the previous outcome)
+
+      if ((clock == _previous_clock) && (INT != nullptr))
+          INT->send();
+
+      // If the new clock differs from the previous clock then enact the interaction
+      // (Lower clock means it was received from another PC application)
+
+      else
+      {
+        // Delete the previous interaction to release memory
+        if (INT != nullptr)
+        {
+          delete INT;
+          INT = nullptr;
+        }
+
+        interaction_step = INTERACTION_BEGIN;
+        _previous_clock = clock;
+        _IMU.begin();
+        _FLO._floor_outcome = 0; // Reset possible floor change when the robot was placed on the floor
+
+        // Set the emotion led
+        if (json_action.hasOwnProperty("color"))
+          _LED.color((int)json_action["color"]);
+        else
+          _LED.color(0);
+
+        // Instantiate the interaction
+
+        if (action == ACTION_TURN_IN_SPOT_LEFT)
+          INT = new Turn(_FLO, _HEA, _IMU, _WifiCat, json_action);
+
+        else if (action == ACTION_GO_BACK)
+          INT = new Backward(_FLO, _HEA, _IMU, _WifiCat, json_action);
+
+        else if (action == ACTION_TURN_IN_SPOT_RIGHT)
+          INT = new Turn(_FLO, _HEA, _IMU, _WifiCat, json_action);
+
+        else if (action == ACTION_SHIFT_LEFT)
+          INT = new Swipe(_FLO, _HEA, _IMU, _WifiCat, json_action);
+
+        else if (action == ACTION_STOP)
+        {
+          // Do nothing. Can be used for debug
+          interaction_step = INTERACTION_DONE;  // remain in step 0
+          char s[40]; snprintf(s, 40, "{\"clock\":%d, \"action\":\"%c\"}", clock, action);
+          _WifiCat.send(s);
+        }
+
+        else if (action == ACTION_SHIFT_RIGHT)  // Negative speed makes swipe to the right
+          INT = new Swipe(_FLO, _HEA, _IMU, _WifiCat, json_action);
+
+        else if (action == ACTION_GO_ADVANCE)
+          INT = new Forward(_FLO, _HEA, _IMU, _WifiCat, json_action);
+
+        else if (action == ACTION_TURN_RIGHT)
+          INT = new Circumvent(_FLO, _HEA, _IMU, _WifiCat, json_action);
+
+        else if (action == ACTION_SCAN_DIRECTION)
+          INT = new Turn_head(_FLO, _HEA, _IMU, _WifiCat, json_action);
+
+        else if (action == ACTION_ECHO_SCAN)
+          INT = new Scan(_FLO, _HEA, _IMU, _WifiCat, json_action);
+
+        else if (action == ACTION_TEST)
+          INT = new Test(_FLO, _HEA, _IMU, _WifiCat, json_action);
+
+        else if (action == ACTION_WATCH)
+          INT = new Watch(_FLO, _HEA, _IMU, _WifiCat, json_action);
+
+        else
+        {
+          // Unrecognized action (for debug)
+          interaction_step = INTERACTION_DONE;  // remain in step 0
+          char s[50];
+          snprintf(s, 50, "{\"clock\":%d, \"action\":\"%c\", \"status\":\"Unknown\"}", clock, action);
+          _WifiCat.send(s);
+        }
+
+        // Print the address of the pointer to control that the heap is not going to overflow
+        Serial.print("Interaction's address in SRAM: ");
+        Serial.println((unsigned int)INT);
+
+        // Update the direction used by the Floor behavior
+        if (INT != nullptr)
+          interaction_direction = INT->direction();
+        else
+          interaction_direction = DIRECTION_FRONT;
+      }
     }
-
-    // If the new clock differs from the previous clock then enact the interaction
-    // (Lower clock means it was received from another PC application)
-
-    else
-    {
-      // Delete the previous interaction to release memory
-      if (INT != nullptr)
-      {
-        delete INT;
-        INT = nullptr;
-      }
-
-      interaction_step = INTERACTION_BEGIN;
-      _previous_clock = clock;
-      _IMU.begin();
-      _FLO._floor_outcome = 0; // Reset possible floor change when the robot was placed on the floor
-
-      // Set the emotion led
-      if (json_action.hasOwnProperty("color"))
-        _LED.color((int)json_action["color"]);
-      else
-        _LED.color(0);
-
-      // Instantiate the interaction
-
-      if (action == ACTION_TURN_IN_SPOT_LEFT)
-        INT = new Turn(_FLO, _HEA, _IMU, _WifiCat, json_action);
-
-      else if (action == ACTION_GO_BACK)
-        INT = new Backward(_FLO, _HEA, _IMU, _WifiCat, json_action);
-
-      else if (action == ACTION_TURN_IN_SPOT_RIGHT)
-        INT = new Turn(_FLO, _HEA, _IMU, _WifiCat, json_action);
-
-      else if (action == ACTION_SHIFT_LEFT)
-        INT = new Swipe(_FLO, _HEA, _IMU, _WifiCat, json_action);
-
-      else if (action == ACTION_STOP)
-      {
-        // Do nothing. Can be used for debug
-        interaction_step = INTERACTION_DONE;  // remain in step 0
-        char s[40]; snprintf(s, 40, "{\"clock\":%d, \"action\":\"%c\"}", clock, action);
-        _WifiCat.send(s);
-      }
-
-      else if (action == ACTION_SHIFT_RIGHT)  // Negative speed makes swipe to the right
-        INT = new Swipe(_FLO, _HEA, _IMU, _WifiCat, json_action);
-
-      else if (action == ACTION_GO_ADVANCE)
-        INT = new Forward(_FLO, _HEA, _IMU, _WifiCat, json_action);
-
-      else if (action == ACTION_TURN_RIGHT)
-        INT = new Circumvent(_FLO, _HEA, _IMU, _WifiCat, json_action);
-
-      else if (action == ACTION_SCAN_DIRECTION)
-        INT = new Turn_head(_FLO, _HEA, _IMU, _WifiCat, json_action);
-
-      else if (action == ACTION_ECHO_SCAN)
-        INT = new Scan(_FLO, _HEA, _IMU, _WifiCat, json_action);
-
-      else if (action == ACTION_TEST)
-        INT = new Test(_FLO, _HEA, _IMU, _WifiCat, json_action);
-
-//      else if (action == ACTION_ALIGN_ROBOT)
-//        INT = new Turn_angle(_FLO, _HEA, _IMU, _WifiCat, json_action);
-//
-      else if (action == ACTION_WATCH)
-        INT = new Watch(_FLO, _HEA, _IMU, _WifiCat, json_action);
-
-      else
-      {
-        // Unrecognized action (for debug)
-        interaction_step = INTERACTION_DONE;  // remain in step 0
-        char s[50];
-        snprintf(s, 50, "{\"clock\":%d, \"action\":\"%c\", \"status\":\"Unknown\"}", clock, action);
-        _WifiCat.send(s);
-      }
-
-      // Print the address of the pointer to control that the heap is not going to overflow
-      Serial.print("Interaction's address in SRAM: ");
-      Serial.println((unsigned int)INT);
-      if (INT != nullptr)
-        interaction_direction = INT->direction();
-      else
-        interaction_direction = DIRECTION_FRONT;
-    }
-  }
-  // return INT;
   }
 
   // If not DONE then update the current interaction
-  else
-  {
-    if (INT != nullptr)
-      interaction_step = INT->update();
-  }
+  else if (INT != nullptr)
+    interaction_step = INT->update();
 }

@@ -1,13 +1,13 @@
-#  ____    ___  ______  ____  ______    __   ____  ______
-# |    \  /  _]|      ||    ||      |  /  ] /    ||      |
-# |  o  )/  [_ |      | |  | |      | /  / |  o  ||      |
+#  ____    ___  ______  ____  ______    __  /\_/\  ______
+# |    \  /  _]|      ||    ||      |  /  ]/  o o||      |
+# |  o  )/  [_ |      | |  | |      | /  / |  >;<||      |
 # |   _/|    _]|_|  |_| |  | |_|  |_|/  /  |     ||_|  |_|
 # |  |  |   [_   |  |   |  |   |  | /   \_ |  _  |  |  |
 # |  |  |     |  |  |   |  |   |  | \     ||  |  |  |  |
-# |__|  |_____|  |__|  |____|  |__|  \____||__|__|  |__|
+# |__|  |_____|  |__|  |____|  |__|  \____||_m|_m|  |__|
 #
-# Run main.py with the robot's IP address:
-# py -m main.py <Arena_ID> <Robot ID>
+# Run main.py with the arena and robot IDs:
+# py -m main.py <Arena_ID> <Robot ID1> <Robot ID2> ...
 #
 #  Spring 2024
 #   Karim Assi (UCLy, ESQESE, BSN)
@@ -22,19 +22,21 @@
 import sys
 import pyglet
 from autocat import Flock
-# from playsound import playsound
 
-# Try to fix some mouse press issue on mac but it does not solve the problem
+# Try to fix some mouse-press issue on Mac but it does not solve the problem
 # https://github.com/pyglet/pyglet/issues/171
 pyglet.options['osx_alt_loop'] = True
 
+# Check for the presence of the launch arguments
 if len(sys.argv) < 3:  # Argument 0 is "main.py" when launched in -m mode
     print("Please provide the arena ID and the robot ID as arguments")
     exit()
 
+# Initialize the flock of robots
 flock = Flock(sys.argv)
 
-# R5 = pyglet.media.load('autocat/Assets/R5.wav', streaming=False)
-# R5.play()
+# Schedule the GUI update every 100ms
 pyglet.clock.schedule_interval(flock.main, 0.1)
+
+# Launch the GUI
 pyglet.app.run()

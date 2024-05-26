@@ -18,18 +18,18 @@
 class Sequencer
 {
 public:
-  Sequencer(Floor& FLO, Head& HEA, Imu& IMU, Led& LED, WifiCat& WIF);
-//  Interaction* update(int& interaction_step, int& interaction_direction, Interaction* INT);
+  Sequencer(Floor& FLO, Head& HEA, Imu& IMU, Led& LED);
+  void setup();
   void update(int& interaction_step, int& interaction_direction);
 private:
   Floor& _FLO;
   Head& _HEA;
   Imu& _IMU;
   Led& _LED;
-  WifiCat& _WifiCat;
+  WifiCat _WifiCat;
+  Interaction* INT  = nullptr;  // The interaction type will depend on the action received from the PC
   int _previous_clock = -1;
   char _packetBuffer[UDP_BUFFER_SIZE];
-  Interaction* INT  = nullptr;  // The interaction type will depend on the action received from the PC
 };
 
 #endif
