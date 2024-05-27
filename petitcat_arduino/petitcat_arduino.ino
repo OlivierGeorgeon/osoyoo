@@ -100,7 +100,7 @@ void loop()
   IMU.update(interaction_step);
 
   // Monitor the wifi and enact the interaction received from the PC
-  //  (Update interaction_step and interaction_direction)
+  //  Modifies interaction_step and interaction_direction
 
   ACT.update(interaction_step, interaction_direction);
 }

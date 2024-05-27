@@ -58,3 +58,4 @@ French additional information:
 ## References
 
 Georgeon, O. L., Lurie, D.,  Robertson, P. (2024). Artificial enactive inference in three-dimensional world. Cognitive Systems Research, 101234. [doi:10.1016/j.cogsys.2024.101234](https://doi.org/10.1016/j.cogsys.2024.101234).
+See [preprint](https://hal.science/hal-04587508).

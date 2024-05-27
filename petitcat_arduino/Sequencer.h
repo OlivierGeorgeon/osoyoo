@@ -26,7 +26,7 @@ private:
   Head& _HEA;
   Imu& _IMU;
   Led& _LED;
-  WifiCat _WifiCat;
+  WifiCat _WIFI;
   Interaction* INT  = nullptr;  // The interaction type will depend on the action received from the PC
   int _previous_clock = -1;
   char _packetBuffer[UDP_BUFFER_SIZE];

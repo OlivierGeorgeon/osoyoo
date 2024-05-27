@@ -49,7 +49,7 @@ protected:
   int _caution = 0;
   int _span = 40;
   int _align = 0;
-  unsigned long _duration2 =0;  // Seems to create memory overflow
+  unsigned long _duration2 = 0;
 };
 
 #endif

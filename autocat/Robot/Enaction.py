@@ -1,23 +1,20 @@
 from .Command import Command, DIRECTION_FRONT
 from ..Enaction.Predict import generate_prediction
 from ..Enaction.Trajectory import Trajectory
-from ..Integrator.OutcomeCode import outcome_code
 
 
 class Enaction:
     """An enaction is defined by its action and its predicted outcome code.
     It contains a command, predicted memory, predicted outcome, actual trajectory, and actual outcome."""
 
-    def __init__(self, action, memory, direction=DIRECTION_FRONT, span=40, caution=0):
+    def __init__(self, interaction, memory, direction=DIRECTION_FRONT, span=40, caution=0):
         """Generate the command, predicted memory, and predicted outcome."""
         # The initial arguments
-        self.action = action
+        self.action = interaction.action
         self.predicted_memory = memory  # must be a clone of the current memory
         self.clock = memory.clock
 
         # Generate the command to the robot
-        # self.command = Command(self.action, self.clock, memory.egocentric_memory.prompt_point,
-        #                        memory.egocentric_memory.focus_point, direction, span, memory.emotion_code, caution)
         self.command = Command(self.action, memory, direction, span, caution)
 
         # Initialize the actual trajectory (clone again the necessary elements of memory)

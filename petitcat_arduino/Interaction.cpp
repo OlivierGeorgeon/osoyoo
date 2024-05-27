@@ -158,13 +158,14 @@ int Interaction::update()
   if (_step == INTERACTION_TERMINATE)
     terminate();
 
-  // STEP 3: Ending the interaction:
+  // STEP 3: Sending the outcome to the PC
   if (_step == INTERACTION_SEND)
     send();
 
   return _step;
 }
 
+// The direction of this interaction, overridden by child interactions.
 int Interaction::direction()
 {
   return DIRECTION_FRONT;

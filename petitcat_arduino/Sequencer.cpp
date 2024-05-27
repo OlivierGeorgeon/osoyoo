@@ -36,7 +36,7 @@ Sequencer::Sequencer(Floor& FLO, Head& HEA, Imu& IMU, Led& LED) :
 // Initialize the connexion with the PC
 void Sequencer::setup()
 {
-  _WifiCat.begin();
+  _WIFI.begin();
 }
 
 // Monitor the interaction recieved from the PC
@@ -47,7 +47,7 @@ void Sequencer::update(int& interaction_step, int& interaction_direction)
   {
     // High-frequency blink the led while waiting for a packet from the PC
     _LED.builtin_on();
-    int len = _WifiCat.read(_packetBuffer);
+    int len = _WIFI.read(_packetBuffer);
     _LED.builtin_off();
 
     // If received a new packet
@@ -96,53 +96,53 @@ void Sequencer::update(int& interaction_step, int& interaction_direction)
         // Instantiate the interaction
 
         if (action == ACTION_TURN_IN_SPOT_LEFT)
-          INT = new Turn(_FLO, _HEA, _IMU, _WifiCat, json_action);
+          INT = new Turn(_FLO, _HEA, _IMU, _WIFI, json_action);
 
         else if (action == ACTION_GO_BACK)
-          INT = new Backward(_FLO, _HEA, _IMU, _WifiCat, json_action);
+          INT = new Backward(_FLO, _HEA, _IMU, _WIFI, json_action);
 
         else if (action == ACTION_TURN_IN_SPOT_RIGHT)
-          INT = new Turn(_FLO, _HEA, _IMU, _WifiCat, json_action);
+          INT = new Turn(_FLO, _HEA, _IMU, _WIFI, json_action);
 
         else if (action == ACTION_SHIFT_LEFT)
-          INT = new Swipe(_FLO, _HEA, _IMU, _WifiCat, json_action);
+          INT = new Swipe(_FLO, _HEA, _IMU, _WIFI, json_action);
 
         else if (action == ACTION_STOP)
         {
           // Do nothing. Can be used for debug
           interaction_step = INTERACTION_DONE;  // remain in step 0
           char s[40]; snprintf(s, 40, "{\"clock\":%d, \"action\":\"%c\"}", clock, action);
-          _WifiCat.send(s);
+          _WIFI.send(s);
         }
 
         else if (action == ACTION_SHIFT_RIGHT)  // Negative speed makes swipe to the right
-          INT = new Swipe(_FLO, _HEA, _IMU, _WifiCat, json_action);
+          INT = new Swipe(_FLO, _HEA, _IMU, _WIFI, json_action);
 
         else if (action == ACTION_GO_ADVANCE)
-          INT = new Forward(_FLO, _HEA, _IMU, _WifiCat, json_action);
+          INT = new Forward(_FLO, _HEA, _IMU, _WIFI, json_action);
 
         else if (action == ACTION_TURN_RIGHT)
-          INT = new Circumvent(_FLO, _HEA, _IMU, _WifiCat, json_action);
+          INT = new Circumvent(_FLO, _HEA, _IMU, _WIFI, json_action);
 
         else if (action == ACTION_SCAN_DIRECTION)
-          INT = new Turn_head(_FLO, _HEA, _IMU, _WifiCat, json_action);
+          INT = new Turn_head(_FLO, _HEA, _IMU, _WIFI, json_action);
 
         else if (action == ACTION_ECHO_SCAN)
-          INT = new Scan(_FLO, _HEA, _IMU, _WifiCat, json_action);
+          INT = new Scan(_FLO, _HEA, _IMU, _WIFI, json_action);
 
         else if (action == ACTION_TEST)
-          INT = new Test(_FLO, _HEA, _IMU, _WifiCat, json_action);
+          INT = new Test(_FLO, _HEA, _IMU, _WIFI, json_action);
 
         else if (action == ACTION_WATCH)
-          INT = new Watch(_FLO, _HEA, _IMU, _WifiCat, json_action);
+          INT = new Watch(_FLO, _HEA, _IMU, _WIFI, json_action);
 
         else
         {
-          // Unrecognized action (for debug)
+          // Unrecognized action. Do nothing.
           interaction_step = INTERACTION_DONE;  // remain in step 0
           char s[50];
           snprintf(s, 50, "{\"clock\":%d, \"action\":\"%c\", \"status\":\"Unknown\"}", clock, action);
-          _WifiCat.send(s);
+          _WIFI.send(s);
         }
 
         // Print the address of the pointer to control that the heap is not going to overflow

@@ -8,7 +8,7 @@
 ########################################################################################
 
 import numpy as np
-from autocat.Memory import CELL_RADIUS
+from autocat.Memory import CELL_RADIUS, GRID_WIDTH, GRID_HEIGHT
 
 
 def cell_to_point(q, r, radius=CELL_RADIUS):
@@ -20,11 +20,13 @@ def cell_to_point(q, r, radius=CELL_RADIUS):
 
 def point_to_cell(point, radius=CELL_RADIUS):
     """Convert allocentric position to cell axial coordinates."""
-    # Rhombus wrap
-    # point %= np.array([GRID_WIDTH, GRID_HEIGHT, 1])
     q = (2 * point[0]) / (3 * radius)
     r = (-point[0] + np.sqrt(3) * point[1]) / (3 * radius)
-    return axial_round(q, r)
+    q, r = axial_round(q, r)
+    # Rhombus wrap
+    q = (q + int((GRID_WIDTH - 0.5) // 2)) % GRID_WIDTH - int((GRID_WIDTH - 0.5) // 2)
+    r = (r + int((GRID_HEIGHT - 0.5) // 2)) % GRID_HEIGHT - int((GRID_HEIGHT - 0.5) // 2)
+    return q, r
 
 
 def axial_round(q, r):

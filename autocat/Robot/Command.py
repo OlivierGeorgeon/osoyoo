@@ -13,29 +13,28 @@ DIRECTION_RIGHT = 3
 
 class Command:
     """A command to send to the robot"""
-    # def __init__(self, action, clock, prompt_point, focus_point, direction, span, color, caution):
     def __init__(self, action, memory, direction, span, caution):
-        clock = memory.clock
+        # clock = memory.clock
         prompt_point = memory.egocentric_memory.prompt_point
-        focus_point = memory.egocentric_memory.focus_point
-        color = memory.body_memory.emotion_code()
+        # focus_point = memory.egocentric_memory.focus_point
+        # color = memory.body_memory.emotion_code()
 
         # The fields that are not None
         self.action = action
-        self.clock = clock
+        self.clock = memory.clock
         self.duration = action.target_duration * 1000  # Default duration
         self.yaw = round(math.degrees(action.rotation_speed_rad * action.target_duration))
         self.speed = self.action.translation_speed.copy()
         self.rotation_speed = 0
-        self.color = color
+        self.color = memory.body_memory.emotion_code()
         self.caution = caution
         self.span = span
 
         # The focus is optional
-        if focus_point is None:
+        if memory.egocentric_memory.focus_point is None:
             self.focus = None
         else:
-            self.focus = focus_point.copy()
+            self.focus = memory.egocentric_memory.focus_point.copy()
 
         # Override the default duration and yaw on the basis of the prompt
         if prompt_point is not None:
