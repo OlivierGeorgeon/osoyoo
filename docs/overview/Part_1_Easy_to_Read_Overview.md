@@ -454,7 +454,7 @@ Assembled chassis (Note that the straps are still loose until the assembly is co
 
 ![black acrylic board](wiring.jpg)
 
-![inserting motor wires](motorwires.png)
+![oliviermotorwiring](oliviermotorwiring.jpg)
 
 -Now connect the motor controller board to the Arduino board and the Wi-Fi shield pass through connectors as shown in the diagram in the manual:
 ![connect arduino to motor controller](arduinoconnect.png)
