@@ -42,8 +42,8 @@ def integrate(memory):
         if p.phenomenon_type == EXPERIENCE_FLOOR:
             memory.body_memory.neurotransmitters[SEROTONIN] = max(60, memory.body_memory.neurotransmitters[SEROTONIN])
             # Move the allocentric memory to the point
-            memory.allocentric_memory.roll(p.point)
-            p.point[:] = 0
+            # memory.allocentric_memory.roll(p.point)
+            # p.point[:] = 0
     if memory.body_memory.neurotransmitters[NORADRENALINE] > 50:
         memory.body_memory.neurotransmitters[NORADRENALINE] -= 1
 

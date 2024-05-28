@@ -1,13 +1,24 @@
+from ..Robot.Enaction import Enaction
 
 
 class CompositeEnaction:
     """A composite enaction is a series of primitive interactions"""
-    def __init__(self, enactions, decider_id, emotion_mask):
+    def __init__(self, enactions, decider_id, emotion_mask, interactions=None, memory=None):
         self.enactions = enactions
         self.index = 0
-        self.key = tuple([e.key for e in self.enactions])
         self.decider_id = decider_id
         self.emotion_mask = emotion_mask
+
+        # Construct the list of enactions from the list of interactions if any
+        if interactions is not None:
+            self.enactions = []
+            e_memory = memory
+            for interaction in interactions:
+                e = Enaction(interaction, e_memory)
+                e_memory = e.predicted_memory.save()
+                self.enactions.append(e)
+
+        self.key = tuple([e.key for e in self.enactions])
 
     def __hash__(self):
         """The hash is the action code """

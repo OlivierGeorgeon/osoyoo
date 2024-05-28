@@ -13,7 +13,7 @@ from ..Robot.Enaction import Enaction
 from ..Memory import EMOTION_PLEASURE
 from ..Memory.BodyMemory import DOPAMINE
 from ..Enaction.CompositeEnaction import CompositeEnaction
-from ..Proposer.Interaction import OUTCOME_ANY
+from ..Proposer.Interaction import OUTCOME_PROMPT
 from ..Proposer.PredefinedInteractions import create_or_retrieve_primitive, create_primitive_interactions
 
 
@@ -34,7 +34,7 @@ class Proposer:
     def propose_enaction(self):
         """Return a proposed interaction"""
         if self.workspace.enaction is None:
-            i0 = create_or_retrieve_primitive(self.workspace.primitive_interactions, self.workspace.actions[ACTION_FORWARD], OUTCOME_ANY)
+            i0 = create_or_retrieve_primitive(self.workspace.primitive_interactions, self.workspace.actions[ACTION_FORWARD], OUTCOME_PROMPT)
             e = Enaction(i0, self.workspace.memory.save())
             return CompositeEnaction([e], 'Default', np.array([1, 0, 0]))
         return self.select_enaction(self.workspace.enaction)
@@ -66,7 +66,7 @@ class Proposer:
             e_memory.egocentric_memory.prompt_point = None
 
         # Add the enaction to the stack
-        i0 = create_or_retrieve_primitive(self.workspace.primitive_interactions, action, OUTCOME_ANY)
+        i0 = create_or_retrieve_primitive(self.workspace.primitive_interactions, action, OUTCOME_PROMPT)
         e = Enaction(i0, e_memory, span=span)
         return CompositeEnaction([e], 'Default', np.array([1, 0, 0]))
 
