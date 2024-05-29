@@ -48,6 +48,7 @@ The PetitCat documentation is written so that anyone with a basic education can 
 -In Part V we will add the full capabilities (depending on software releases and licensing) of a large language model (GPT4 at the time of this writing) into the PetitCat cognitive architecture robot car system. Again, in this part, only intermediate (or even novice) Python coding abilities are required. However, we will gently guide you through the project, so that you end up with a super-human intelligent grounded autonomous robot system.
 
 -
+![oliviermotorwiring](oliviermotorwiring.jpg)
 -
 
 # Part III: Active Inference of the Robot Car
