@@ -8,7 +8,7 @@ OUTCOME_FOCUS_TOO_FAR = 'too_far'  # U-Turn
 OUTCOME_FLOOR = 'floor'
 OUTCOME_TOUCH = 'touch'
 OUTCOME_PROMPT = 'prompt'  # Reach the prompt point
-OUTCOME_LIST = [OUTCOME_LOST_FOCUS, OUTCOME_FOCUS_FAR, OUTCOME_FOCUS_TOO_CLOSE, OUTCOME_FOCUS_FRONT,
+OUTCOME_LIST = [OUTCOME_NO_FOCUS, OUTCOME_LOST_FOCUS, OUTCOME_FOCUS_FAR, OUTCOME_FOCUS_TOO_CLOSE, OUTCOME_FOCUS_FRONT,
                 OUTCOME_FOCUS_SIDE, OUTCOME_FOCUS_TOO_FAR, OUTCOME_FLOOR, OUTCOME_PROMPT]
 
 
@@ -40,12 +40,11 @@ class Interaction:
         #     return False
 
 
-# Testing Interaction
-# py -m autocat.Decider.Interaction
-if __name__ == '__main__':
-    """ demonstrate the usage of Interaction.create_or_retrieve() """
-    interaction00 = Interaction.create_or_retrieve(0, OUTCOME_NO_FOCUS)  # Create
-    interaction01 = Interaction.create_or_retrieve(0, 1)  # Create
-    interaction10 = Interaction.create_or_retrieve(1, OUTCOME_NO_FOCUS)  # Create
-    interaction11 = Interaction.create_or_retrieve(1, 1)  # Create
-    interaction00b = Interaction.create_or_retrieve(0, OUTCOME_NO_FOCUS)  # Retrieve
+def create_interactions(actions):
+    """Return the dictionary of all interactions with valence zero."""
+    primitive_interactions = {}
+    for a in actions.values():
+        for o in OUTCOME_LIST:
+            interaction = Interaction(a, o, 0)
+            primitive_interactions[interaction.key] = interaction
+    return primitive_interactions

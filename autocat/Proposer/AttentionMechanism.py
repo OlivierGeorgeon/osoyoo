@@ -66,4 +66,4 @@ class AttentionMechanism:
             else:
                 self.workspace.memory.egocentric_memory.focus_point = right_of_focus
                 # focus = self.workspace.memory.egocentric_memory.focus_point + np.array([0, -80, 0])
-            self.workspace.memory.body_memory.neurotransmitters[NORADRENALINE] = 60
+            self.workspace.memory.body_memory.neurotransmitters[NORADRENALINE] = 61  # Must be > max Serotonin

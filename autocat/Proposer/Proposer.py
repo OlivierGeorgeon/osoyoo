@@ -6,15 +6,11 @@
 
 import numpy as np
 from . Action import ACTION_SCAN, ACTION_TURN, ACTION_SWIPE, ACTION_FORWARD
-from . PredefinedInteractions import create_or_retrieve_primitive, create_primitive_interactions, \
-    create_composite_interactions, create_or_reinforce_composite
+from . PredefinedInteractions import create_composite_interactions, create_or_reinforce_composite
 from . Interaction import OUTCOME_FOCUS_TOO_FAR, OUTCOME_LOST_FOCUS
 from ..Robot.Enaction import Enaction
-from ..Memory import EMOTION_PLEASURE
-from ..Memory.BodyMemory import DOPAMINE
 from ..Enaction.CompositeEnaction import CompositeEnaction
 from ..Proposer.Interaction import OUTCOME_PROMPT
-from ..Proposer.PredefinedInteractions import create_or_retrieve_primitive, create_primitive_interactions
 
 
 class Proposer:
@@ -25,8 +21,8 @@ class Proposer:
         self.last_interaction = None
 
         # Load the predefined behavior
-        self.primitive_interactions = create_primitive_interactions(self.workspace.actions)
-        self.composite_interactions = create_composite_interactions(self.workspace.actions, self.primitive_interactions)
+        # self.primitive_interactions = create_primitive_interactions(self.workspace.actions)
+        self.composite_interactions = create_composite_interactions(self.workspace.primitive_interactions)
 
         # The direction of translation
         self.direction = 1
@@ -34,7 +30,7 @@ class Proposer:
     def propose_enaction(self):
         """Return a proposed interaction"""
         if self.workspace.enaction is None:
-            i0 = create_or_retrieve_primitive(self.workspace.primitive_interactions, self.workspace.actions[ACTION_FORWARD], OUTCOME_PROMPT)
+            i0 = self.workspace.primitive_interactions[(ACTION_FORWARD, OUTCOME_PROMPT)]
             e = Enaction(i0, self.workspace.memory.save())
             return CompositeEnaction([e], 'Default', np.array([1, 0, 0]))
         return self.select_enaction(self.workspace.enaction)
@@ -66,7 +62,7 @@ class Proposer:
             e_memory.egocentric_memory.prompt_point = None
 
         # Add the enaction to the stack
-        i0 = create_or_retrieve_primitive(self.workspace.primitive_interactions, action, OUTCOME_PROMPT)
+        i0 = self.workspace.primitive_interactions[(action.action_code, OUTCOME_PROMPT)]
         e = Enaction(i0, e_memory, span=span)
         return CompositeEnaction([e], 'Default', np.array([1, 0, 0]))
 
@@ -74,8 +70,7 @@ class Proposer:
         """The sequence learning mechanism that proposes the next action"""
         # Recording previous interaction (call this decider every cycle to record every interaction
         self.previous_interaction = self.last_interaction
-        self.last_interaction = create_or_retrieve_primitive(self.primitive_interactions, enaction.action,
-                                                             enaction.outcome_code)
+        self.last_interaction = self.workspace.primitive_interactions[(enaction.action.action_code, enaction.outcome_code)]
 
         # Tracing the last interaction
         print("Action: " + str(enaction.action) +

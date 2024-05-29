@@ -63,7 +63,7 @@ class Action:
 
 
 def create_actions(robot_id):
-    """Create all actions"""
+    """Return the dictionary of all the actions"""
     x_speed = ROBOT_SETTINGS[robot_id]["forward_speed"]
     y_speed = ROBOT_SETTINGS[robot_id]["lateral_speed"]
     action_dictionary = {}

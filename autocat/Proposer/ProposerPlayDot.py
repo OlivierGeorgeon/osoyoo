@@ -14,17 +14,13 @@ from ..Enaction.CompositeEnaction import CompositeEnaction
 from ..Robot.RobotDefine import ROBOT_FLOOR_SENSOR_X
 from ..Proposer.Interaction import OUTCOME_PROMPT, OUTCOME_FLOOR, OUTCOME_FOCUS_FRONT
 from ..Memory.BodyMemory import SEROTONIN
-from ..Proposer.PredefinedInteractions import create_or_retrieve_primitive, create_primitive_interactions
+# from ..Proposer.PredefinedInteractions import create_or_retrieve_primitive, create_primitive_interactions
 
 PLAY_DISTANCE_CLOSE = 200  # Between robot center and object center
 PLAY_DISTANCE_WITHDRAW = 250  # From where the robot has stopped
 
 
 class ProposerPlayDot(Proposer):
-    # def __init__(self, workspace):
-    #     super().__init__(workspace)
-    #     self.last_seen_focus = None
-    #     self.emotion = EMOTION_CONTENT
 
     def propose_enaction(self):
         """Add the next enaction to the stack based on sequence learning and spatial modifiers"""
@@ -47,58 +43,45 @@ class ProposerPlayDot(Proposer):
                     e_memory.egocentric_memory.focus_point[0] > ROBOT_FLOOR_SENSOR_X:
                 if abs(e_memory.egocentric_memory.focus_point[1]) < 20:
                     # If in front then go to the dot
-                    i0 = create_or_retrieve_primitive(self.workspace.primitive_interactions, self.workspace.actions[ACTION_FORWARD], OUTCOME_FLOOR)
-                    e_memory.egocentric_memory.prompt_point = None  # e_memory.egocentric_memory.focus_point.copy()   # Don't stop at the dot
-                    e0 = Enaction(i0, e_memory)
-                    return CompositeEnaction([e0], "Play DOT", np.array([0, 1, 0]))
+                    i0 = self.workspace.primitive_interactions[(ACTION_FORWARD, OUTCOME_FLOOR)]
+                    # e_memory.egocentric_memory.prompt_point = None
+                    # e0 = Enaction(i0, e_memory)
+                    return CompositeEnaction(None, "Play DOT", np.array([0, 1, 0]), [i0], e_memory)
+                    # return CompositeEnaction([e0], "Play DOT", np.array([0, 1, 0]))
                 elif abs(math.degrees(math.atan2(e_memory.egocentric_memory.focus_point[1],
                                                  e_memory.egocentric_memory.focus_point[0]))) < 15:
                     # If slightly in front then swipe
-                    i0 = create_or_retrieve_primitive(self.workspace.primitive_interactions, self.workspace.actions[ACTION_SWIPE], OUTCOME_FOCUS_FRONT)
-                    e_memory.egocentric_memory.prompt_point = e_memory.egocentric_memory.focus_point.copy()
-                    e0 = Enaction(i0, e_memory)
-                    return CompositeEnaction([e0], "Play DOT", np.array([0, 1, 0]))
+                    i0 = self.workspace.primitive_interactions[(ACTION_SWIPE, OUTCOME_FOCUS_FRONT)]
+                    # e_memory.egocentric_memory.prompt_point = e_memory.egocentric_memory.focus_point.copy()
+                    # e0 = Enaction(i0, e_memory)
+                    # return CompositeEnaction([e0], "Play DOT", np.array([0, 1, 0]))
+                    return CompositeEnaction(None, "Play DOT", np.array([0, 1, 0]), [i0], e_memory)
                 else:
                     # If not in front then turn
-                    i0 = create_or_retrieve_primitive(self.workspace.primitive_interactions, self.workspace.actions[ACTION_TURN], OUTCOME_FOCUS_FRONT)
-                    e_memory.egocentric_memory.prompt_point = e_memory.egocentric_memory.focus_point.copy()
-                    e = Enaction(i0, e_memory)
-                    return CompositeEnaction([e], "Play DOT", np.array([0, 1, 0]))
+                    i0 = self.workspace.primitive_interactions[(ACTION_TURN, OUTCOME_FOCUS_FRONT)]
+                    # e_memory.egocentric_memory.prompt_point = e_memory.egocentric_memory.focus_point.copy()
+                    # e = Enaction(i0, e_memory)
+                    # return CompositeEnaction([e], "Play DOT", np.array([0, 1, 0]))
+                    return CompositeEnaction(None, "Play DOT", np.array([0, 1, 0]), [i0], e_memory)
 
             # If mildly playful then turn around the dot
             if e_memory.egocentric_memory.focus_point[0] > ROBOT_FLOOR_SENSOR_X:
                 # First enaction SWIPE in the direction of the focus
-                i0 = create_or_retrieve_primitive(self.workspace.primitive_interactions, self.workspace.actions[ACTION_SWIPE], OUTCOME_PROMPT)
-                i1 = create_or_retrieve_primitive(self.workspace.primitive_interactions, self.workspace.actions[ACTION_TURN], OUTCOME_FOCUS_FRONT)
-                i2 = create_or_retrieve_primitive(self.workspace.primitive_interactions, self.workspace.actions[ACTION_FORWARD], OUTCOME_FLOOR)
                 if e_memory.egocentric_memory.focus_point[1] > 0:
                     e_memory.egocentric_memory.prompt_point = None
                 else:
                     e_memory.egocentric_memory.prompt_point = np.array([0, -200, 0])
-                # e0 = Enaction(i0, e_memory)
-                # Second enaction TURN to focus
-                # e0.predicted_memory.egocentric_memory.prompt_point = e0.predicted_memory.egocentric_memory.focus_point.copy()
-                # e1 = Enaction(i1, e0.predicted_memory.save())
-                # Third enaction move FORWARD to focus
-                # e1.predicted_memory.egocentric_memory.prompt_point = None  # Don't stop at the dot
-                # e2 = Enaction(i2, e1.predicted_memory.save())
-                # interactions = [i0, i1, i2]
-                enactions = []
-                # for interaction in interactions:
-                #     e = Enaction(interaction, e_memory)
-                #     e_memory = e.predicted_memory.save()
-                #     enactions.append(e)
-                # return CompositeEnaction([e0, e1, e2], "Play DOT", np.array([0, 1, 0]))
-                # return CompositeEnaction(enactions, "Play DOT", np.array([0, 1, 0]))
-                return CompositeEnaction(None, "Play DOT", np.array([0, 1, 0]), [i0, i1, i2], e_memory)
+                # i0 = self.workspace.primitive_interactions[(ACTION_SWIPE, OUTCOME_PROMPT)]
+                # i1 = self.workspace.primitive_interactions[(ACTION_TURN, OUTCOME_FOCUS_FRONT)]
+                # i2 = self.workspace.primitive_interactions[(ACTION_FORWARD, OUTCOME_FLOOR)]
+                # return CompositeEnaction(None, "Play DOT", np.array([0, 1, 0]), [i0, i1, i2], e_memory)
+                return CompositeEnaction(None, "Play DOT", np.array([0, 1, 0]),
+                                         self.workspace.sequence_interactions["STF"], e_memory)
             else:
-                # First enaction TURN to focus
-                i0 = create_or_retrieve_primitive(self.workspace.primitive_interactions, self.workspace.actions[ACTION_TURN], OUTCOME_FOCUS_FRONT)
-                # e_memory.egocentric_memory.prompt_point = e_memory.egocentric_memory.focus_point.copy()
-                # e0 = Enaction(i0, e_memory)
-                # Second enaction move FORWARD to focus
-                i1 = create_or_retrieve_primitive(self.workspace.primitive_interactions, self.workspace.actions[ACTION_FORWARD], OUTCOME_FLOOR)
-                # e0.predicted_memory.egocentric_memory.prompt_point = None  # Don't stop at the dot
-                # e1 = Enaction(i1, e0.predicted_memory)
-                return CompositeEnaction(None, "Play DOT", np.array([0, 1, 0]), [i0, i1], e_memory)
-                # return CompositeEnaction([e0, e1], "Play DOT", np.array([0, 1, 0]))
+                # # First enaction TURN to focus
+                # i0 = self.workspace.primitive_interactions[(ACTION_TURN, OUTCOME_FOCUS_FRONT)]
+                # # Second enaction move FORWARD to focus
+                # i1 = self.workspace.primitive_interactions[(ACTION_FORWARD, OUTCOME_FLOOR)]
+                # return CompositeEnaction(None, "Play DOT", np.array([0, 1, 0]), [i0, i1], e_memory)
+                return CompositeEnaction(None, "Play DOT", np.array([0, 1, 0]),
+                                         self.workspace.sequence_interactions["TF"], e_memory)
