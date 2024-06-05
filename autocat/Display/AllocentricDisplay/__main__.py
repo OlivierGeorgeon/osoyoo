@@ -11,8 +11,8 @@ from ...Memory.AllocentricMemory.AllocentricMemory import CELL_NO_ECHO
 from ...Memory import CELL_RADIUS
 from ...Memory.PhenomenonMemory.Affordance import Affordance
 from ...Utils import quaternion_translation_to_matrix
-from ...Memory.AllocentricMemory.AllocentricMemory import STATUS_0, STATUS_2, STATUS_3, STATUS_1, STATUS_4, POINT_X, \
-    POINT_Y, CLOCK_INTERACTION, CLOCK_PLACE, COLOR_INDEX, CLOCK_NO_ECHO, IS_POOL
+from ...Memory.AllocentricMemory import STATUS_0, STATUS_1, STATUS_2, STATUS_3, STATUS_4, COLOR_INDEX, \
+    CLOCK_INTERACTION, CLOCK_NO_ECHO, CLOCK_PLACE, POINT_X, POINT_Y, IS_POOL
 
 # Testing CtrlAllocentricView by displaying Allocentric Hexagonal Memory
 # Hover the grid to display the mouse position

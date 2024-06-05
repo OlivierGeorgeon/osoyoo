@@ -9,8 +9,9 @@ from ...Memory.EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_A
     EXPERIENCE_ROBOT, FLOOR_COLORS
 from ...Memory.AllocentricMemory.AllocentricMemory import CELL_UNKNOWN, CELL_NO_ECHO
 from ...Memory import CELL_RADIUS
-from ...Memory.AllocentricMemory.AllocentricMemory import STATUS_0, STATUS_2, STATUS_3, STATUS_1, STATUS_4, POINT_X, \
-    POINT_Y, CLOCK_INTERACTION, CLOCK_PLACE, COLOR_INDEX, CLOCK_NO_ECHO, IS_POOL
+from ...Memory.AllocentricMemory import STATUS_0, STATUS_1, STATUS_2, STATUS_3, STATUS_4, COLOR_INDEX, \
+    CLOCK_INTERACTION, CLOCK_NO_ECHO, CLOCK_PLACE, POINT_X, POINT_Y, IS_POOL
+
 SCALE_LEVEL_0 = 2.5  # 3
 SCALE_LEVEL_1 = 0.8  # 0.9
 SCALE_LEVEL_2 = 0.6  # 0.65

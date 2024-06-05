@@ -5,7 +5,7 @@ import matplotlib.path as mpath
 from ..Proposer.Action import ACTION_FORWARD, ACTION_SWIPE, ACTION_RIGHTWARD, ACTION_SCAN, ACTION_BACKWARD
 from ..Memory.PhenomenonMemory import PHENOMENON_ENCLOSED_CONFIDENCE
 from ..Memory.AllocentricMemory.Geometry import point_to_cell
-from ..Memory.AllocentricMemory.AllocentricMemory import STATUS_0, COLOR_INDEX
+from ..Memory.AllocentricMemory import STATUS_0, COLOR_INDEX
 from ..Memory.EgocentricMemory.Experience import EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_FLOOR
 from ..Robot.RobotDefine import ROBOT_FLOOR_SENSOR_X, ROBOT_SETTINGS
 from ..Robot.Outcome import Outcome

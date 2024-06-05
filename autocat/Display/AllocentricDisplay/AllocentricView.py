@@ -9,7 +9,8 @@ from ...Memory.AllocentricMemory.Geometry import point_to_cell
 from ...Memory.EgocentricMemory.Experience import EXPERIENCE_ROBOT
 from ..InteractiveDisplay import InteractiveDisplay
 from ..PointOfInterest import PointOfInterest, POINT_ROBOT
-from ...Memory.AllocentricMemory.AllocentricMemory import STATUS_0, STATUS_4, CELL_UNKNOWN
+from ...Memory.AllocentricMemory.AllocentricMemory import CELL_UNKNOWN
+from ...Memory.AllocentricMemory import STATUS_0, STATUS_4
 
 #NB_CELL_WIDTH = 50
 #NB_CELL_HEIGHT = 50

@@ -3,7 +3,7 @@
 ########################################################################################
 
 import numpy as np
-from ..Memory.AllocentricMemory.AllocentricMemory import CLOCK_PLACE
+from ..Memory.AllocentricMemory import CLOCK_PLACE
 from ..Memory.AllocentricMemory.Geometry import point_to_cell
 from ..Proposer.Interaction import OUTCOME_LOST_FOCUS, OUTCOME_FLOOR
 from ..Memory.BodyMemory import NORADRENALINE

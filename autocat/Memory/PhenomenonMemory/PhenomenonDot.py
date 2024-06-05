@@ -4,6 +4,10 @@ from pyrr import Quaternion
 from . import PHENOMENON_INITIAL_CONFIDENCE, PHENOMENON_ENCLOSED_CONFIDENCE, PHENOMENON_RECOGNIZABLE_CONFIDENCE
 from ...Utils import short_angle
 from .Phenomenon import PHENOMENON_DELTA
+from ...Memory.BodyMemory import SEROTONIN
+from ...Robot.RobotDefine import ROBOT_FLOOR_SENSOR_X
+from ...Proposer.Action import ACTION_TURN, ACTION_FORWARD, ACTION_SWIPE
+from ...Proposer.Interaction import OUTCOME_FLOOR, OUTCOME_FOCUS_FRONT
 
 
 class PhenomenonDot:
@@ -72,6 +76,33 @@ class PhenomenonDot:
         """Return the terrain outline 2D points as list of integers"""
         # The affordance points must be integers
         return np.array([a.point[0:2] for a in self.affordances.values()]).flatten().tolist()
+
+    def propose_interaction_code(self, memory):
+        """Return the interaction code and updates the memory"""
+        # If very playful and the dot is forward
+        if memory.body_memory.neurotransmitters[SEROTONIN] > 55 and memory.egocentric_memory.focus_point[0] > \
+                ROBOT_FLOOR_SENSOR_X:
+            if abs(memory.egocentric_memory.focus_point[1]) < 20:
+                # If in front then go to the dot
+                return ACTION_FORWARD, OUTCOME_FLOOR
+            elif abs(math.degrees(math.atan2(memory.egocentric_memory.focus_point[1],
+                                             memory.egocentric_memory.focus_point[0]))) < 15:
+                # If slightly in front then swipe
+                return ACTION_SWIPE, OUTCOME_FOCUS_FRONT
+            else:
+                # If not in front then turn
+                return ACTION_TURN, OUTCOME_FOCUS_FRONT
+
+        # If mildly playful then turn around the dot
+        if memory.egocentric_memory.focus_point[0] > ROBOT_FLOOR_SENSOR_X:
+            # First enaction SWIPE in the direction of the focus
+            if memory.egocentric_memory.focus_point[1] > 0:
+                memory.egocentric_memory.prompt_point = None
+            else:
+                memory.egocentric_memory.prompt_point = np.array([0, -200, 0])
+            return "STF"
+        else:
+            return "TF"
 
     def save(self):
         """Return a clone of the phenomenon for memory snapshot"""

@@ -1,31 +1,16 @@
-import math
 import matplotlib.path as mpath
 import time
 import numpy as np
-from pyrr import quaternion, Vector3
+from pyrr import quaternion
+
+from . import STATUS_0, STATUS_1, STATUS_2, STATUS_3, STATUS_4, PHENOMENON_ID, COLOR_INDEX, CLOCK_FOCUS, \
+    CLOCK_INTERACTION, CLOCK_PROMPT, CLOCK_PHENOMENON, CLOCK_NO_ECHO, CLOCK_PLACE, POINT_X, POINT_Y, IS_POOL
 from ..EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_PLACE, EXPERIENCE_FOCUS, EXPERIENCE_PROMPT, \
     EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_IMPACT
-from ...Robot.RobotDefine import ROBOT_CHASSIS_X, ROBOT_OUTSIDE_Y, CHECK_OUTSIDE
+from ...Robot.RobotDefine import CHECK_OUTSIDE
 from ...Memory.PhenomenonMemory.PhenomenonMemory import TER, ROBOT1
 from ..PhenomenonMemory import PHENOMENON_RECOGNIZABLE_CONFIDENCE, PHENOMENON_ENCLOSED_CONFIDENCE
 from .Geometry import is_inside_rectangle, cell_to_point, point_to_cell, is_pool
-
-STATUS_0 = 0
-STATUS_1 = 1
-STATUS_2 = 2
-STATUS_3 = 3
-STATUS_4 = 4
-PHENOMENON_ID = 5
-COLOR_INDEX = 6
-CLOCK_FOCUS = 7
-CLOCK_INTERACTION = 8
-CLOCK_PROMPT = 9
-CLOCK_PHENOMENON = 10
-CLOCK_NO_ECHO = 12
-CLOCK_PLACE = 11
-POINT_X = 13
-POINT_Y = 14
-IS_POOL = 15
 
 CELL_UNKNOWN = 0
 CELL_NO_ECHO = -4
@@ -66,7 +51,7 @@ class AllocentricMemory:
         i_range = np.concatenate((np.arange(0, self.max_i), np.arange(self.min_i, 0)))
         j_range = np.concatenate((np.arange(0, self.max_j), np.arange(self.min_j, 0)))
         mesh_i, mesh_j = np.meshgrid(i_range, j_range, indexing='ij')
-        self.grid[:, :, POINT_X: POINT_Y+1] = cell_to_point(mesh_i, mesh_j, cell_radius)
+        self.grid[:, :, POINT_X: POINT_Y + 1] = cell_to_point(mesh_i, mesh_j, cell_radius)
         self.grid[:, :, PHENOMENON_ID] = -1
         self.grid[:, :, IS_POOL] = is_pool(mesh_i, mesh_j)
         # print(f"Init Grid time: {time.time() - start_time:.4f} seconds")
@@ -96,7 +81,7 @@ class AllocentricMemory:
                 if p_id == TER and p.confidence >= PHENOMENON_RECOGNIZABLE_CONFIDENCE and p.path is not None:
                     for i in range(self.min_i, self.max_i):
                         for j in range(self.min_j, self.max_j):
-                            if p.is_inside(self.grid[i][j][POINT_X:POINT_Y+1]):
+                            if p.is_inside(self.grid[i][j][POINT_X:POINT_Y + 1]):
                                 self.grid[i][j][STATUS_0] = EXPERIENCE_FLOOR
                                 self.grid[i][j][PHENOMENON_ID] = TER
                                 self.grid[i][j][CLOCK_PLACE] = clock
@@ -164,9 +149,9 @@ class AllocentricMemory:
     def roll(self, point):
         """Roll allocentric memory to place the point at the center"""
         i, j = point_to_cell(point)
-        xy = self.grid[i, j, POINT_X:POINT_Y+1]
+        xy = self.grid[i, j, POINT_X:POINT_Y + 1]
         self.grid = np.roll(self.grid, (-i, -j), axis=(0, 1))
-        self.grid[:, :, POINT_X:POINT_Y+1] -= xy
+        self.grid[:, :, POINT_X:POINT_Y + 1] -= xy
         self.robot_point[0:2] -= xy
 
     def place_robot(self, body_memory, clock):
@@ -217,7 +202,7 @@ class AllocentricMemory:
         path = mpath.Path(triangle)
         for i in range(self.min_i, self.max_i):
             for j in range(self.min_j, self.max_j):
-                if path.contains_point(self.grid[i][j][POINT_X:POINT_Y+1]):
+                if path.contains_point(self.grid[i][j][POINT_X:POINT_Y + 1]):
                     self.grid[i][j][STATUS_2] = CELL_NO_ECHO
                     self.grid[i][j][CLOCK_NO_ECHO] = affordance.clock
         # print("Place echo time:", time.time() - start_time, "seconds")

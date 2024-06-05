@@ -8,6 +8,7 @@ from ..Robot.RobotDefine import ROBOT_FLOOR_SENSOR_X
 from ..Memory.EgocentricMemory.Experience import EXPERIENCE_FLOOR
 from ..Proposer.Interaction import OUTCOME_LOST_FOCUS
 from ..Proposer.Proposer import Proposer
+from ..Proposer.ProposerFocusPhenomenon import ProposerFocusPhenomenon
 from ..Proposer.ProposerExplore import ProposerExplore
 from ..Proposer.ProposerWatch import ProposerWatch
 from ..Proposer.ProposerPush import ProposerPush
@@ -17,7 +18,6 @@ from ..Proposer.ProposerPlayForward import ProposerPlayForward
 from ..Proposer.ProposerPlayTurn import ProposerPlayTurn
 from ..Proposer.ProposerPlaySwipe import ProposerPlaySwipe
 from ..Proposer.ProposerPlayTerrain import ProposerPlayTerrain
-from ..Proposer.ProposerPlayDot import ProposerPlayDot
 from ..SoundPlayer import SoundPlayer, SOUND_SURPRISE
 from ..Proposer.AttentionMechanism import AttentionMechanism
 
@@ -38,7 +38,7 @@ class Enacter:
                           # , 'Push': ProposerPush(self.workspace)
                           # , 'Play': ProposerPlayForward(self)
                           # , "Play terrain": ProposerPlayTerrain(self)
-                          , "Play DOT": ProposerPlayDot(self.workspace)
+                          , "Point": ProposerFocusPhenomenon(self.workspace)
                           }
 
     def main(self, dt):
