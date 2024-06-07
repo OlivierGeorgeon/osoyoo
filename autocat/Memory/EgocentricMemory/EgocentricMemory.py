@@ -40,8 +40,9 @@ class EgocentricMemory:
 
         # Add the PLACE experience with the sensed color
         pose_matrix = Matrix44.from_translation([ROBOT_COLOR_SENSOR_X, 0, 0], dtype=float)
-        place_exp = Experience(pose_matrix, EXPERIENCE_PLACE, enaction.clock, self.experience_id,
-                               durability=EXPERIENCE_PERSISTENCE, color_index=enaction.outcome.color_index)
+        place_exp = Experience(self.experience_id, pose_matrix, EXPERIENCE_PLACE, enaction.clock,
+                               enaction.trajectory.body_quaternion, durability=EXPERIENCE_PERSISTENCE,
+                               color_index=enaction.outcome.color_index)
         self.experiences[place_exp.id] = place_exp
         self.experience_id += 1
 
@@ -64,7 +65,9 @@ class EgocentricMemory:
             #         pose_matrix = quaternion_translation_to_matrix(Quaternion.from_z_rotation(math.pi / 2),
             #                                                [ROBOT_FLOOR_SENSOR_X,
             #                                                 -ROBOT_SETTINGS[self.robot_id]["retreat_distance"][0], 0])
-            floor_exp = Experience(pose_matrix, EXPERIENCE_FLOOR, enaction.clock, experience_id=self.experience_id,
+            floor_exp = Experience(experience_id=self.experience_id, pose_matrix=pose_matrix,
+                                   experience_type=EXPERIENCE_FLOOR, clock=enaction.clock,
+                                   body_quaternion=enaction.trajectory.body_quaternion,
                                    durability=EXPERIENCE_PERSISTENCE, color_index=enaction.outcome.color_index)
             self.experiences[floor_exp.id] = floor_exp
             self.experience_id += 1
@@ -72,9 +75,10 @@ class EgocentricMemory:
         # The ECHO experience
 
         if enaction.outcome.echo_point is not None:
-            echo_exp = Experience(enaction.outcome.echo_matrix, EXPERIENCE_ALIGNED_ECHO, enaction.clock,
-                                  experience_id=self.experience_id, durability=EXPERIENCE_PERSISTENCE,
-                                  color_index=enaction.outcome.color_index)
+            echo_exp = Experience(experience_id=self.experience_id, pose_matrix=enaction.outcome.echo_matrix,
+                                  experience_type=EXPERIENCE_ALIGNED_ECHO, clock=enaction.clock,
+                                  body_quaternion=enaction.trajectory.body_quaternion,
+                                  durability=EXPERIENCE_PERSISTENCE, color_index=enaction.outcome.color_index)
             self.experiences[echo_exp.id] = echo_exp
             # print(echo_exp)
             self.experience_id += 1
@@ -107,7 +111,9 @@ class EgocentricMemory:
                 else:  # Impact on the left
                     pose_matrix = Matrix44.from_translation([-ROBOT_FLOOR_SENSOR_X, ROBOT_CHASSIS_Y, 0], dtype=float)
                     # point = np.array([-ROBOT_FRONT_X, ROBOT_FRONT_Y, 0])
-            impact_exp = Experience(pose_matrix, EXPERIENCE_IMPACT, enaction.clock, experience_id=self.experience_id,
+            impact_exp = Experience(experience_id=self.experience_id, pose_matrix=pose_matrix,
+                                    experience_type=EXPERIENCE_IMPACT, clock=enaction.clock,
+                                    body_quaternion=enaction.trajectory.body_quaternion,
                                     durability=EXPERIENCE_PERSISTENCE, color_index=enaction.outcome.color_index)
             self.experiences[impact_exp.id] = impact_exp
             self.experience_id += 1
@@ -118,7 +124,9 @@ class EgocentricMemory:
             # angle = math.radians(int(e[0]))
             # point = np.array([ROBOT_HEAD_X + math.cos(angle) * e[1], math.sin(angle) * e[1], 0])
             pose_matrix = head_angle_distance_to_matrix(int(e[0]), e[1])
-            local_exp = Experience(pose_matrix, EXPERIENCE_LOCAL_ECHO, enaction.clock, experience_id=self.experience_id,
+            local_exp = Experience(experience_id=self.experience_id, pose_matrix=pose_matrix,
+                                   experience_type=EXPERIENCE_LOCAL_ECHO, clock=enaction.clock,
+                                   body_quaternion=enaction.trajectory.body_quaternion,
                                    durability=EXPERIENCE_PERSISTENCE, color_index=enaction.outcome.color_index)
             self.experiences[local_exp.id] = local_exp
             self.experience_id += 1
@@ -129,9 +137,10 @@ class EgocentricMemory:
             # angle = math.radians(int(e[0]))
             # point = np.array([ROBOT_HEAD_X + math.cos(angle) * e[1], math.sin(angle) * e[1], 0])
             pose_matrix = head_angle_distance_to_matrix(int(e[0]), e[1])
-            central_exp = Experience(pose_matrix, EXPERIENCE_CENTRAL_ECHO, enaction.clock,
-                                     experience_id=self.experience_id, durability=EXPERIENCE_PERSISTENCE,
-                                     color_index=enaction.outcome.color_index)
+            central_exp = Experience(experience_id=self.experience_id, pose_matrix=pose_matrix,
+                                     experience_type=EXPERIENCE_CENTRAL_ECHO, clock=enaction.clock,
+                                     body_quaternion=enaction.trajectory.body_quaternion,
+                                     durability=EXPERIENCE_PERSISTENCE, color_index=enaction.outcome.color_index)
             self.experiences[central_exp.id] = central_exp
             self.experience_id += 1
             local_echos.append((math.radians(int(e[0])), e[1], central_exp))
@@ -142,16 +151,19 @@ class EgocentricMemory:
         # Add the other robot experience
         if enaction.message is not None and enaction.message.position_matrix is not None:
             # pose_m = quaternion_translation_to_matrix(enaction.message.ego_quaternion, enaction.message.ego_position)
-            robot_exp = Experience(enaction.message.position_matrix, EXPERIENCE_ROBOT, enaction.clock,
-                                   experience_id=self.experience_id, durability=EXPERIENCE_PERSISTENCE // 3,
-                                   color_index=enaction.message.emotion_code)
+            robot_exp = Experience(experience_id=self.experience_id, pose_matrix=enaction.message.position_matrix,
+                                   experience_type=EXPERIENCE_ROBOT, clock=enaction.clock,
+                                   body_quaternion=enaction.trajectory.body_quaternion,
+                                   durability=EXPERIENCE_PERSISTENCE // 3, color_index=enaction.message.emotion_code)
             self.experiences[robot_exp.id] = robot_exp
             self.experience_id += 1
 
         # Add the touch experience
         if enaction.outcome.touch:
             pose_m = Matrix44.from_translation([ROBOT_FLOOR_SENSOR_X, 0, 0], dtype=float)
-            touch_exp = Experience(pose_m, EXPERIENCE_TOUCH, enaction.clock, experience_id=self.experience_id,
+            touch_exp = Experience(experience_id=self.experience_id, pose_matrix=pose_m,
+                                   experience_type=EXPERIENCE_TOUCH, clock=enaction.clock,
+                                   body_quaternion=enaction.trajectory.body_quaternion,
                                    durability=EXPERIENCE_PERSISTENCE, color_index=0)
             self.experiences[touch_exp.id] = touch_exp
             self.experience_id += 1
@@ -159,13 +171,15 @@ class EgocentricMemory:
         # Add the compass experience with durability 0
         pose_m = quaternion_translation_to_matrix(enaction.trajectory.body_quaternion.inverse,
                                                   enaction.outcome.compass_point)
-        compass_exp = Experience(pose_m, EXPERIENCE_COMPASS, enaction.clock, experience_id=self.experience_id,
-                                 durability=0, color_index=0)
+        compass_exp = Experience(experience_id=self.experience_id, pose_matrix=pose_m,
+                                 experience_type=EXPERIENCE_COMPASS, clock=enaction.clock,
+                                 body_quaternion=enaction.trajectory.body_quaternion, durability=0, color_index=0)
         self.experiences[compass_exp.id] = compass_exp
         self.experience_id += 1
         # Add the azimuth experience with durability 0
-        azimuth_exp = Experience(pose_m, EXPERIENCE_AZIMUTH, enaction.clock, experience_id=self.experience_id,
-                                 durability=0, color_index=0)
+        azimuth_exp = Experience(experience_id=self.experience_id, pose_matrix=pose_m,
+                                 experience_type=EXPERIENCE_AZIMUTH, clock=enaction.clock,
+                                 body_quaternion=enaction.trajectory.body_quaternion, durability=0, color_index=0)
         self.experiences[azimuth_exp.id] = azimuth_exp
         self.experience_id += 1
 

@@ -22,10 +22,11 @@ controller.view.robot_rotate = 90 - workspace.memory.body_memory.body_azimuth()
 
 # Floor affordance
 pose_matrix = quaternion_translation_to_matrix(Quaternion.from_z_rotation(0), [50, 0, 0])
-experience0 = Experience(pose_matrix, EXPERIENCE_FLOOR, 0, experience_id=0)
+experience0 = Experience(experience_id=0, pose_matrix=pose_matrix, experience_type=EXPERIENCE_FLOOR, clock=0,
+                         body_quaternion=workspace.memory.body_memory.body_quaternion)
 affordance0 = Affordance(np.array([0, 0, 0]), EXPERIENCE_FLOOR, 0, 0,
-                         experience0.absolute_quaternion(Quaternion.from_z_rotation(math.pi/4)).copy(),
-                         experience0.polar_sensor_point(Quaternion.from_z_rotation(math.pi/4)).copy())
+                         experience0.absolute_quaternion().copy(),
+                         experience0.polar_sensor_point().copy())
 phenomenon = PhenomenonObject(affordance0)
 
 # Create a phenomenon
@@ -37,25 +38,28 @@ phenomenon = PhenomenonObject(affordance0)
 
 # Add a second affordance
 pose_matrix = quaternion_translation_to_matrix(Quaternion.from_z_rotation(0), [200, 0, 0])
-experience2 = Experience(pose_matrix, EXPERIENCE_ALIGNED_ECHO, 0, experience_id=2)
+experience2 = Experience(experience_id=2, pose_matrix=pose_matrix, experience_type=EXPERIENCE_ALIGNED_ECHO, clock=0,
+                         body_quaternion=workspace.memory.body_memory.body_quaternion)
 affordance2 = Affordance(np.array([10, 50, 0]), EXPERIENCE_ALIGNED_ECHO, 0, 0,
-                         experience2.absolute_quaternion(Quaternion.from_z_rotation(-math.pi / 2)).copy(),
-                         experience2.polar_sensor_point(Quaternion.from_z_rotation(-math.pi / 2)).copy())
+                         experience2.absolute_quaternion().copy(),
+                         experience2.polar_sensor_point().copy())
 phenomenon.update(affordance2)
 
 # The position of the experience and its direction must match
 pose_matrix = quaternion_translation_to_matrix(Quaternion.from_z_rotation(-0.4), [200, -50, 0])
-experience3 = Experience(pose_matrix, EXPERIENCE_ALIGNED_ECHO, 0, experience_id=3)
+experience3 = Experience(experience_id=3, pose_matrix=pose_matrix, experience_type=EXPERIENCE_ALIGNED_ECHO, clock=0,
+                         body_quaternion=workspace.memory.body_memory.body_quaternion)
 affordance3 = Affordance(np.array([100, 50, 0]), EXPERIENCE_ALIGNED_ECHO, 0, 0,
-                         experience3.absolute_quaternion(Quaternion.from_z_rotation(-math.pi / 2)).copy(),
-                         experience3.polar_sensor_point(Quaternion.from_z_rotation(-math.pi / 2)).copy())
+                         experience3.absolute_quaternion().copy(),
+                         experience3.polar_sensor_point().copy())
 phenomenon.update(affordance3)
 
 pose_matrix = Matrix44.from_translation([300, 0, 0], dtype=float)
-experience4 = Experience(pose_matrix, EXPERIENCE_ALIGNED_ECHO, 0, experience_id=4)
+experience4 = Experience(experience_id=4, pose_matrix=pose_matrix, experience_type=EXPERIENCE_ALIGNED_ECHO, clock=0,
+                         body_quaternion=workspace.memory.body_memory.body_quaternion)
 affordance4 = Affordance(np.array([100, 0, 0]), EXPERIENCE_ALIGNED_ECHO, 0, 0,
-                         experience4.absolute_quaternion(Quaternion.from_z_rotation(3 * math.pi / 4)).copy(),
-                         experience4.polar_sensor_point(Quaternion.from_z_rotation(3 * math.pi / 4)).copy())
+                         experience4.absolute_quaternion().copy(),
+                         experience4.polar_sensor_point().copy())
 phenomenon.update(affordance4)
 
 # experience5 = Experience([300, 0, 0], EXPERIENCE_ALIGNED_ECHO, 3 * math.pi / 4, 0, experience_id=5)

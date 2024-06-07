@@ -17,9 +17,8 @@ def integrate(memory):
         # if e.type not in [EXPERIENCE_LOCAL_ECHO, EXPERIENCE_AZIMUTH, EXPERIENCE_COMPASS, EXPERIENCE_PLACE]:
         # The position of the affordance in allocentric memory
         affordance_point = memory.egocentric_to_allocentric(e.point()).astype("int")
-        new_affordances.append(Affordance(affordance_point, e.type, e.clock, e.color_index,
-                               e.absolute_quaternion(memory.body_memory.body_quaternion),
-                               e.polar_sensor_point(memory.body_memory.body_quaternion)))
+        new_affordances.append(Affordance(affordance_point, e.type, e.clock, e.color_index, e.absolute_quaternion(),
+                                          e.polar_sensor_point()))
     # for a in new_affordances:
     #     print(a)
 

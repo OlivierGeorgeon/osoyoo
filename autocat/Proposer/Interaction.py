@@ -27,7 +27,6 @@ class Interaction:
     def __hash__(self):
         """ The hash is necessary to use interactions as keys in a dictionary """
         return hash(self.key)
-        # return self.action.__hash__() * 10 + self.outcome.__hash__()
 
     def __eq__(self, other):
         """ Interactions are equal if they have the same action and the same outcome """

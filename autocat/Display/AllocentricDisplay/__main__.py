@@ -56,10 +56,11 @@ workspace.memory.allocentric_memory.grid[3][-7][STATUS_1] = EXPERIENCE_ALIGNED_E
 
 # Other robot
 pose_matrix = quaternion_translation_to_matrix(Quaternion.from_z_rotation(math.radians(170)), [0, 0, 0])
-experienceR = Experience(pose_matrix, EXPERIENCE_ROBOT, -3, experience_id=2, color_index=2)
+experienceR = Experience(experience_id=2, pose_matrix=pose_matrix, experience_type=EXPERIENCE_ROBOT, clock=-3,
+                         body_quaternion=workspace.memory.body_memory.body_quaternion, color_index=2)
 affordanceR = Affordance(np.array([500, 500, 0]), EXPERIENCE_ROBOT, -3, 2,
-                         experienceR.absolute_quaternion(workspace.memory.body_memory.body_quaternion).copy(),
-                         experienceR.polar_sensor_point(workspace.memory.body_memory.body_quaternion).copy())
+                         experienceR.absolute_quaternion().copy(),
+                         experienceR.polar_sensor_point().copy())
 workspace.memory.phenomenon_memory.create_phenomenon(affordanceR)
 
 workspace.memory.allocentric_memory.update_affordances(workspace.memory.phenomenon_memory, 0)

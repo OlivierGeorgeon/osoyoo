@@ -115,7 +115,3 @@ class PhenomenonCategory:
         # Only recognize phenomena that have origin confidence
         return phenomenon.confidence >= PHENOMENON_RECOGNIZABLE_CONFIDENCE and \
                self.experience_type == phenomenon.phenomenon_type
-
-    # def save(self):
-    #     """Return a cloned phenomenon category for memory snapshot"""
-    #     return PhenomenonCategory(self.experience_type, self.short_radius, self.long_radius, self.azimuth)

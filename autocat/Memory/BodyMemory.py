@@ -34,7 +34,7 @@ class BodyMemory:
         # Update the head
         self.set_head_direction_degree(enaction.outcome.head_angle)
         # Body direction
-        self.body_quaternion = enaction.trajectory.body_quaternion
+        self.body_quaternion[:] = enaction.trajectory.body_quaternion
 
         # Update energy level
         if enaction.outcome.color_index > 0 and enaction.outcome.floor > 0:

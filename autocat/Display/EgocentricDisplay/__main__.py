@@ -20,16 +20,18 @@ ctrl_egocentric_view = CtrlEgocentricView(workspace)
 
 # Add experiences
 pose_matrix = quaternion_translation_to_matrix(Quaternion.from_z_rotation(0.5), [150, 0, 0])
-experience0 = Experience(pose_matrix, EXPERIENCE_FLOOR, 0,
-                         experience_id=0)  # , direction_quaternion=Quaternion.from_z_rotation(0.5))
+experience0 = Experience(experience_id=0, pose_matrix=pose_matrix, experience_type=EXPERIENCE_FLOOR, clock=0,
+                         body_quaternion=Quaternion([0., 0., 0., 1.]))  # , direction_quaternion=Quaternion.from_z_rotation(0.5))
 workspace.memory.egocentric_memory.experiences[0] = experience0
 
 pose_matrix = quaternion_translation_to_matrix(Quaternion.from_z_rotation(0.), [300, -300, 0])
-experience1 = Experience(pose_matrix, EXPERIENCE_ALIGNED_ECHO, 0, experience_id=1)
+experience1 = Experience(experience_id=1, pose_matrix=pose_matrix, experience_type=EXPERIENCE_ALIGNED_ECHO, clock=0,
+                         body_quaternion=Quaternion([0., 0., 0., 1.]))
 workspace.memory.egocentric_memory.experiences[1] = experience1
 
 pose_matrix = quaternion_translation_to_matrix(Quaternion.from_z_rotation(math.radians(-130)), [200, 200, 0])
-experience2 = Experience(pose_matrix, EXPERIENCE_ROBOT, -3, experience_id=2, color_index=2)
+experience2 = Experience(experience_id=2, pose_matrix=pose_matrix, experience_type=EXPERIENCE_ROBOT, clock=-3,
+                         body_quaternion=Quaternion([0., 0., 0., 1.]), color_index=2)
 workspace.memory.egocentric_memory.experiences[2] = experience2
 # poi1 = controller.add_point_of_interest(150, 0, EXPERIENCE_FLOOR)
 # controller.points_of_interest.append(poi1)
