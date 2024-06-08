@@ -1,7 +1,7 @@
 # A cue is an experience related to a place cell
 # It can be used to recognize the place cell
 
-from pyrr import matrix44, Quaternion, Vector3
+from pyrr import matrix44
 
 
 class Cue:
@@ -9,7 +9,7 @@ class Cue:
     def __init__(self, experience_id, pose_matrix, experience_type, clock, color_index, polar_sensor_point):
         """Position should be integer to facilitate search"""
         self.id = experience_id
-        self.pose_matrix = pose_matrix  # The position of this affordance relative to a place
+        self.pose_matrix = pose_matrix  # The pose of this cue relative to the place center
         self.type = experience_type
         self.clock = clock
         self.color_index = color_index
@@ -24,6 +24,6 @@ class Cue:
         return matrix44.apply_to_vector(self.pose_matrix, [0., 0., 0.])
 
     def save(self):
-        """Return a cloned affordance for memory snapshot"""
+        """Return a cloned cue for memory snapshot"""
         return Cue(self.id, self.pose_matrix.copy(), self.type, self.clock, self.color_index,
                    self.polar_sensor_point.copy())

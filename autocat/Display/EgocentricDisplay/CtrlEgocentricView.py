@@ -58,11 +58,11 @@ class CtrlEgocentricView:
                 p.delete()
                 self.points_of_interest.remove(p)
 
-    def update_body_robot(self):
-        """Updates the robot's body to display by the egocentric view"""
-        self.view.robot.rotate_head(self.workspace.memory.body_memory.head_direction_degree())
-        self.view.robot.emotion_color(self.workspace.memory.body_memory.emotion_code())
-        self.view.azimuth = self.workspace.memory.body_memory.body_azimuth()
+    # def update_body_robot(self):
+    #     """Updates the robot's body to display by the egocentric view"""
+    #     self.view.robot.rotate_head(self.workspace.memory.body_memory.head_direction_degree())
+    #     self.view.robot.emotion_color(self.workspace.memory.body_memory.emotion_code())
+    #     self.view.azimuth = self.workspace.memory.body_memory.body_azimuth()
 
     def update_points_of_interest(self):
         """Retrieve all new experiences from memory, create and update the corresponding points of interest"""
@@ -101,7 +101,8 @@ class CtrlEgocentricView:
         """Update the egocentric view"""
 
         # Update every frame to simulate the robot's displacement
-        self.update_body_robot()
+        # self.update_body_robot()
+        self.view.update_body_display(self.workspace.memory.body_memory)
 
         # Update the display of egocentric memory
         if self.workspace.enacter.interaction_step in [ENACTION_STEP_ENACTING, ENACTION_STEP_RENDERING]:

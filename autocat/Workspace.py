@@ -55,7 +55,8 @@ class Workspace:
         self.engagement_mode = KEY_ENGAGEMENT_ROBOT
 
         # Controls which phenomenon view to display
-        # self.ctrl_phenomenon_view = None
+        self.ctrl_phenomenon_view = None
+        self.ctrl_place_cell_view = None
 
         # Message from other robot
         self.message = None

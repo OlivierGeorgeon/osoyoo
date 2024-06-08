@@ -4,7 +4,7 @@ from .AllocentricView import AllocentricView
 from ...Memory.AllocentricMemory.Geometry import point_to_cell
 from ...Robot.CtrlRobot import ENACTION_STEP_RENDERING, ENACTION_STEP_ENACTING
 from ...Memory.EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO
-from ...Memory.AllocentricMemory.AllocentricMemory import CELL_UNKNOWN
+from ...Memory.AllocentricMemory.AllocentricMemory import CELL_UNKNOWN, PLACE_CELL_ID
 
 
 STATUS_0 = 0
@@ -80,16 +80,9 @@ class CtrlAllocentricView:
                         self.workspace.memory.allocentric_memory.user_cells.append((cell_x, cell_y))
                 # ALT: Toggle ECHO
                 elif modifiers & key.MOD_ALT:
-                    # if cell.status[1] == EXPERIENCE_ALIGNED_ECHO:
-                    #     cell.status[1] = CELL_UNKNOWN
-                    #     cell.color_index = 0
-
                     if self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][STATUS_1] == EXPERIENCE_ALIGNED_ECHO:
                         self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][STATUS_1] = CELL_UNKNOWN
                         self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][COLOR_INDEX] = 0
-
-
-
                         if (cell_x, cell_y) in self.workspace.memory.allocentric_memory.user_cells:
                             self.workspace.memory.allocentric_memory.user_cells.remove((cell_x, cell_y))
                     else:
@@ -110,11 +103,16 @@ class CtrlAllocentricView:
 
             # Display this phenomenon in phenomenon window
             if self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][PHENOMENON_ID] != -1:
-            # if cell.phenomenon_id is not None:
                 self.workspace.ctrl_phenomenon_view.view.set_caption(f"Phenomenon {self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][PHENOMENON_ID]}")
                 self.workspace.ctrl_phenomenon_view.phenomenon_id = self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][PHENOMENON_ID]
-                self.workspace.ctrl_phenomenon_view.update_body_robot()
+                # self.workspace.ctrl_phenomenon_view.update_body_robot()
                 self.workspace.ctrl_phenomenon_view.update_affordance_displays()
+
+            # Display the place cell in place cell window
+            if self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][PLACE_CELL_ID] > 0:
+                self.workspace.ctrl_place_cell_view.view.set_caption(f"Phenomenon {self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][PLACE_CELL_ID]}")
+                self.workspace.ctrl_place_cell_view.place_cell_id = self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][PLACE_CELL_ID]
+                self.workspace.ctrl_place_cell_view.update_cue_displays()
 
             self.view.label_click.text = self.workspace.memory.allocentric_memory.grid[cell_x][cell_y].__str__()
 
@@ -153,6 +151,7 @@ class CtrlAllocentricView:
         """Update the allocentric view from the status in the allocentric grid cells"""
         # for c in [c for line in self.workspace.memory.allocentric_memory.grid for c in line]:
         #     self.view.update_hexagon(c)
+        self.view.update_body_display(self.workspace.memory.body_memory)
         for i in range(self.workspace.memory.allocentric_memory.min_i, self.workspace.memory.allocentric_memory.max_i):
             for j in range(self.workspace.memory.allocentric_memory.min_j, self.workspace.memory.allocentric_memory.max_j):
                 self.view.update_hexagon(i, j, self.workspace.memory.allocentric_memory.grid[i][j][:])

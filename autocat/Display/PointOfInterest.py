@@ -5,7 +5,7 @@ from webcolors import name_to_rgb
 from ..Memory.EgocentricMemory.Experience import EXPERIENCE_LOCAL_ECHO, EXPERIENCE_CENTRAL_ECHO,  EXPERIENCE_PLACE, \
     EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_IMPACT, EXPERIENCE_BLOCK, FLOOR_COLORS, EXPERIENCE_FOCUS, \
     EXPERIENCE_ROBOT, EXPERIENCE_TOUCH, EXPERIENCE_AZIMUTH, EXPERIENCE_COMPASS
-from .EgocentricDisplay.OsoyooCar import EMOTION_COLORS
+from autocat.Display.RobotDisplay import EMOTION_COLORS
 
 
 # Points of interest that only exist in Body Display

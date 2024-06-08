@@ -8,6 +8,7 @@ from .PhenomenonMemory.PhenomenonMemory import PhenomenonMemory
 from .PhenomenonMemory import PHENOMENON_ENCLOSED_CONFIDENCE
 from ..Integrator.Integrator import integrate
 from ..Enaction.Predict import push_objects
+from .PlaceMemory.PlaceMemory import PlaceMemory
 
 NEAR_HOME = 300    # (mm) Max distance to consider near home
 # ARRANGE_MIN_RADIUS = 100
@@ -27,7 +28,7 @@ class Memory:
         self.egocentric_memory = EgocentricMemory(robot_id)
         self.allocentric_memory = AllocentricMemory(GRID_WIDTH, GRID_HEIGHT, cell_radius=CELL_RADIUS)
         self.phenomenon_memory = PhenomenonMemory(arena_id)
-        # self.emotion_code = EMOTION_PLEASURE
+        self.place_memory = PlaceMemory()
 
     def __str__(self):
         return "Memory Robot position (" + str(round(self.allocentric_memory.robot_point[0])) + "," +\
@@ -63,12 +64,14 @@ class Memory:
         # Call the integrator to create and update the phenomena
         integrate(self)
 
+        self.place_memory.add_or_update_place_cell(self)
+
         """Update allocentric memory on the basis of body, phenomenon, and egocentric memory"""
         # Mark the cells where is the robot
         self.allocentric_memory.place_robot(self.body_memory, self.clock)
 
-        # Mark the affordances
-        self.allocentric_memory.update_affordances(self.phenomenon_memory, self.clock)
+        # Update the grid with affordances and place cells
+        self.allocentric_memory.update_grid(self)
 
         # Update the focus in allocentric memory
         allo_focus = self.egocentric_to_allocentric(self.egocentric_memory.focus_point)
@@ -150,6 +153,8 @@ class Memory:
         saved_memory.allocentric_memory = self.allocentric_memory.save()
         # Clone phenomenon memory
         saved_memory.phenomenon_memory = self.phenomenon_memory.save()
+        # Clone place memory
+        saved_memory.place_memory = self.place_memory.save()
         # print("Save memory duration:", time.time() - start_time, "seconds")
 
         return saved_memory

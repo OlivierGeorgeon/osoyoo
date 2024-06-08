@@ -8,7 +8,7 @@ ROBOT_WHEEL_COLOR = name_to_rgb("darkBlue")
 EMOTION_COLORS = ["black", "LavenderBlush", "LimeGreen", "DodgerBlue", "red", "DarkOrange"]
 
 
-class OsoyooCar:
+class RobotDisplay:
     def __init__(self, batch, group):
         self.batch = batch
         self.group = group

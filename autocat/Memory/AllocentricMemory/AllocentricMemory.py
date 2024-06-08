@@ -4,7 +4,8 @@ import numpy as np
 from pyrr import quaternion
 
 from . import STATUS_0, STATUS_1, STATUS_2, STATUS_3, STATUS_4, PHENOMENON_ID, COLOR_INDEX, CLOCK_FOCUS, \
-    CLOCK_INTERACTION, CLOCK_PROMPT, CLOCK_PHENOMENON, CLOCK_NO_ECHO, CLOCK_PLACE, POINT_X, POINT_Y, IS_POOL
+    CLOCK_INTERACTION, CLOCK_PROMPT, CLOCK_PHENOMENON, CLOCK_NO_ECHO, CLOCK_PLACE, POINT_X, POINT_Y, IS_POOL, \
+    PLACE_CELL_ID
 from ..EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_PLACE, EXPERIENCE_FOCUS, EXPERIENCE_PROMPT, \
     EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_IMPACT
 from ...Robot.RobotDefine import CHECK_OUTSIDE
@@ -46,7 +47,7 @@ class AllocentricMemory:
 
         # The hexagonal grid
         start_time = time.time()
-        self.grid = np.zeros((width, height, 16), dtype=int)
+        self.grid = np.zeros((width, height, 17), dtype=int)
         # Indexes after max_i and max_j are used for negative positions
         i_range = np.concatenate((np.arange(0, self.max_i), np.arange(self.min_i, 0)))
         j_range = np.concatenate((np.arange(0, self.max_j), np.arange(self.min_j, 0)))
@@ -69,13 +70,13 @@ class AllocentricMemory:
             output += "\n"
         return output
 
-    def update_affordances(self, phenomenon_memory, clock):
+    def update_grid(self, memory):
         """Allocate the phenomena to the cells of allocentric memory"""
         # start_time = time.time()
         # Clear the previous phenomena
         self.clear_grid_status()
         # Place the phenomena again
-        for p_id, p in phenomenon_memory.phenomena.items():
+        for p_id, p in memory.phenomenon_memory.phenomena.items():
             # Mark the cells outside the terrain (for BICA 2023 paper)
             if CHECK_OUTSIDE == 1:
                 if p_id == TER and p.confidence >= PHENOMENON_RECOGNIZABLE_CONFIDENCE and p.path is not None:
@@ -84,7 +85,7 @@ class AllocentricMemory:
                             if p.is_inside(self.grid[i][j][POINT_X:POINT_Y + 1]):
                                 self.grid[i][j][STATUS_0] = EXPERIENCE_FLOOR
                                 self.grid[i][j][PHENOMENON_ID] = TER
-                                self.grid[i][j][CLOCK_PLACE] = clock
+                                self.grid[i][j][CLOCK_PLACE] = memory.clock
 
             # If terrain is enclosed
             if p_id == TER and p.confidence >= PHENOMENON_ENCLOSED_CONFIDENCE:  # PHENOMENON_RECOGNIZE_CONFIDENCE:  # TERRAIN_ORIGIN_CONFIDENCE:
@@ -130,7 +131,14 @@ class AllocentricMemory:
         # Place the affordances that are not attached to phenomena
         for a in self.affordances:
             cell_x, cell_y = point_to_cell(a.point)
-            self.apply_status_to_cell(cell_x, cell_y, a.type, clock, a.color_index)
+            self.apply_status_to_cell(cell_x, cell_y, a.type, memory.clock, a.color_index)
+
+        # Place the place cells again
+        for place_cell_id, place_cell in memory.place_memory.place_cells.items():
+            cell_x, cell_y = point_to_cell(place_cell.point)
+            print(f"Place cell {place_cell}")
+            if (self.min_i <= cell_x <= self.max_i) and (self.min_j <= cell_y <= self.max_j):
+                self.grid[cell_x][cell_y][PLACE_CELL_ID] = place_cell_id
 
         # print("Update allocentric time:", time.time() - start_time, "seconds")
 
@@ -171,6 +179,7 @@ class AllocentricMemory:
         self.grid[:, :, PHENOMENON_ID][phenomena_ij] = -1
         self.grid[:, :, STATUS_0][phenomena_ij] = np.where(self.grid[:, :, STATUS_0][phenomena_ij] != EXPERIENCE_PLACE,
                                                            CELL_UNKNOWN, self.grid[:, :, STATUS_0][phenomena_ij])
+        self.grid[:, :, PLACE_CELL_ID] = 0
 
     def apply_status_to_cell(self, i, j, status, clock, color_index):
         """Change the cell status. Keep the max clock"""

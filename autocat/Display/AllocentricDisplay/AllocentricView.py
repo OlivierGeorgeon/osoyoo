@@ -1,9 +1,8 @@
 import numpy as np
 import pyglet
-import math
 from pyglet.gl import *
 from ...Utils import quaternion_translation_to_matrix
-from ..EgocentricDisplay.OsoyooCar import OsoyooCar
+from autocat.Display.RobotDisplay import RobotDisplay
 from .CellDisplay import CellDisplay
 from ...Memory.AllocentricMemory.Geometry import point_to_cell
 from ...Memory.EgocentricMemory.Experience import EXPERIENCE_ROBOT
@@ -22,7 +21,7 @@ ZOOM_OUT_FACTOR = 1/ZOOM_IN_FACTOR
 class AllocentricView(InteractiveDisplay):
     """Create the allocentric view"""
     def __init__(self, workspace, width=400, height=400, *args, **kwargs):
-        super().__init__(width, height, resizable=True, *args, **kwargs)
+        super().__init__(width, height, *args, **kwargs)
         self.set_caption("Allocentric Memory")
         self.set_minimum_size(150, 150)
 
@@ -34,8 +33,8 @@ class AllocentricView(InteractiveDisplay):
                        pyglet.graphics.OrderedGroup(2),
                        pyglet.graphics.OrderedGroup(3),
                        pyglet.graphics.OrderedGroup(4)]
-        self.robot_batch = pyglet.graphics.Batch()
-        self.robot = OsoyooCar(self.robot_batch, self.forefront)  # Rectangles seem not to respect ordered groups
+        # self.robot_batch = pyglet.graphics.Batch()
+        # self.robot = RobotDisplay(self.robot_batch, self.forefront)  # Rectangles seem not to respect ordered groups
 
         self.zoom_level = 3
 
@@ -98,8 +97,8 @@ class AllocentricView(InteractiveDisplay):
         glTranslatef(*self.workspace.memory.allocentric_memory.robot_point)
         glRotatef(90 - self.workspace.memory.body_memory.body_azimuth(), 0.0, 0.0, 1.0)
         # Draw the robot
-        self.robot.rotate_head(self.workspace.memory.body_memory.head_direction_degree())
-        self.robot.emotion_color(self.workspace.memory.body_memory.emotion_code())
+        # self.robot.rotate_head(self.workspace.memory.body_memory.head_direction_degree())
+        # self.robot.emotion_color(self.workspace.memory.body_memory.emotion_code())
         self.robot_batch.draw()
 
         # Draw the text at the bottom left corner

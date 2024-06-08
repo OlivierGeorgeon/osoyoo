@@ -39,14 +39,14 @@ class CtrlBodyView:
                 points = np.array([p.point()[0: 2] for p in self.points_of_interest if (p.type == EXPERIENCE_AZIMUTH)])
                 compass_xy = compass_calibration(points)
                 if compass_xy is None:
-                    self.view.label.text = "Compass calibration failed"
+                    self.view.label2.text = "Compass calibration failed"
                 else:
                     delta_offset = np.array([compass_xy[0], compass_xy[1], 0], dtype=int)
                     self.workspace.memory.body_memory.compass_offset += delta_offset
                     position_matrix = Matrix44.from_translation(-delta_offset).astype('float64')
                     for p in self.points_of_interest:
                         p.displace(position_matrix)
-                    self.view.label.text = "Compass adjusted by " + str(compass_xy)
+                    self.view.label2.text = "Compass adjusted by " + str(compass_xy)
             else:
                 self.workspace.process_user_key(text)
 
@@ -62,9 +62,10 @@ class CtrlBodyView:
     def update_body_view(self):
         """Add and update points of interest from the latest enacted interaction """
 
-        # Update the position of the robot
-        self.view.robot.rotate_head(self.workspace.memory.body_memory.head_direction_degree())
-        self.view.robot.emotion_color(self.workspace.memory.body_memory.emotion_code())
+        # Update the robot display
+        self.view.update_body_display(self.workspace.memory.body_memory)
+        # self.view.robot.rotate_head(self.workspace.memory.body_memory.head_direction_degree())
+        # self.view.robot.emotion_color(self.workspace.memory.body_memory.emotion_code())
         # self.view.body_rotation_matrix = self.workspace.memory.body_memory.body_direction_matrix()
 
         # Delete the points of interest
@@ -99,9 +100,9 @@ class CtrlBodyView:
             self.view.label_NA.color = (0, 0, 0, 255)
         else:
             self.view.label_NA.color = (255, 0, 0, 255)
-        self.view.label_clock.text = "Clock: {:d}".format(self.workspace.memory.clock)  \
-                                     + " | " + ENGAGEMENT_MODES[self.workspace.engagement_mode]  \
-                                     + " | " + self.workspace.decider_id
+        self.view.label1.text = "Clock: {:d}".format(self.workspace.memory.clock) \
+                                + " | " + ENGAGEMENT_MODES[self.workspace.engagement_mode] \
+                                + " | " + self.workspace.decider_id
         # + ", En:{:d}%".format(self.workspace.memory.body_memory.energy) \
         # + ", Ex:{:d}%".format(self.workspace.memory.body_memory.excitation) \
 
@@ -109,8 +110,8 @@ class CtrlBodyView:
         self.view.robot.rotate_head(self.workspace.memory.body_memory.head_direction_degree())
         # At the end of interaction
         if self.workspace.enacter.interaction_step == ENACTION_STEP_RENDERING and self.workspace.enaction.outcome is not None:
-            self.view.label.text = self.body_label_azimuth(self.workspace.enaction)
-            self.view.label_enaction.text = self.body_label(self.workspace.enaction.action)
+            self.view.label2.text = self.body_label_azimuth(self.workspace.enaction)
+            self.view.label3.text = self.body_label(self.workspace.enaction.action)
             self.update_body_view()
 
     def body_label(self, action):

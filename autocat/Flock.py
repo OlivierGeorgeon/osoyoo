@@ -6,6 +6,7 @@ from .Display.EgocentricDisplay.CtrlEgocentricView import CtrlEgocentricView
 from .Display.AllocentricDisplay.CtrlAllocentricView import CtrlAllocentricView
 from .Display.BodyDisplay.CtrlBodyView import CtrlBodyView
 from .Display.PhenomenonDisplay.CtrlPhenomenonView import CtrlPhenomenonView
+from .Display.PlaceCellDisplay.CtrlPlaceCellView import CtrlPlaceCellView
 
 
 class Flock:
@@ -21,6 +22,7 @@ class Flock:
         self.ctrl_allocentric_views = {}
         self.ctrl_body_views = {}
         self.ctrl_phenomenon_views = {}
+        self.ctrl_place_cell_views = {}
         for i in range(2, len(arguments)):
             workspace = Workspace(arguments[1], arguments[i])
             self.workspaces[arguments[i]] = workspace
@@ -34,6 +36,9 @@ class Flock:
             self.ctrl_phenomenon_views[arguments[i]] = CtrlPhenomenonView(self.workspaces[arguments[i]])
             self.ctrl_phenomenon_views[arguments[i]].view.set_caption("Terrain " + arguments[i])
             self.workspaces[arguments[i]].ctrl_phenomenon_view = self.ctrl_phenomenon_views[arguments[i]]
+            self.ctrl_place_cell_views[arguments[i]] = CtrlPlaceCellView(self.workspaces[arguments[i]])
+            self.ctrl_place_cell_views[arguments[i]].view.set_caption("Place Cell " + arguments[i])
+            self.workspaces[arguments[i]].ctrl_place_cell_view = self.ctrl_place_cell_views[arguments[i]]
 
         # Create the views for the first robot
         # self.ctrl_phenomenon_view = CtrlPhenomenonView(self.workspaces[arguments[2]])
@@ -49,6 +54,7 @@ class Flock:
             self.ctrl_allocentric_views[robot_id].main(dt)
             self.ctrl_body_views[robot_id].main(dt)
             self.ctrl_phenomenon_views[robot_id].main(dt)
+            self.ctrl_place_cell_views[robot_id].main(dt)
 
         # Transmit messages between robots
         for key_sender in self.workspaces.keys():

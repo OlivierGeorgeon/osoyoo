@@ -63,7 +63,7 @@ affordanceR = Affordance(np.array([500, 500, 0]), EXPERIENCE_ROBOT, -3, 2,
                          experienceR.polar_sensor_point().copy())
 workspace.memory.phenomenon_memory.create_phenomenon(affordanceR)
 
-workspace.memory.allocentric_memory.update_affordances(workspace.memory.phenomenon_memory, 0)
+workspace.memory.allocentric_memory.update_grid(workspace.memory)
 
 workspace.memory.allocentric_memory.roll(np.array([50, 0, 0]))
 

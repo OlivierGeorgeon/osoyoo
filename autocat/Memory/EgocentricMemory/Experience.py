@@ -49,14 +49,13 @@ class Experience:
         self.pose_matrix = matrix44.multiply(self.pose_matrix, displacement_matrix)
 
     def point(self):
-        """Return the point of this experience."""
+        """Return the point of this experience in egocentric coordinates."""
         # Translate the origin point by the pose
         return matrix44.apply_to_vector(self.pose_matrix, [0., 0., 0.])
 
     def polar_pose_matrix(self):
-        """Return the pose matrix in polar centric coordinates (rotated by the body_quaternion"""
-        # return self.pose_matrix * self.body_quaternion  # TODO Check that
-        return Matrix44(Matrix33(self.body_quaternion)) * self.pose_matrix
+        """Return the pose matrix in polar centric coordinates (rotated by the body_quaternion)"""
+        return Matrix44(self.body_quaternion.inverse) * self.pose_matrix
 
     def absolute_quaternion(self):
         """Return a quaternion representing the absolute direction of this experience"""

@@ -1,8 +1,10 @@
+import numpy as np
 from pyrr import Vector3
 import platform
 import subprocess
 import pyglet
 from pyglet.gl import *
+from .RobotDisplay import RobotDisplay
 
 ZOOM_IN_FACTOR = 1.2
 ZOOM_OUT_FACTOR = 1/ZOOM_IN_FACTOR
@@ -27,7 +29,8 @@ class InteractiveDisplay(pyglet.window.Window):
     """The parent class of interactive views"""
     def __init__(self, width=400, height=400, *args, **kwargs):
         conf = Config(sample_buffers=1, samples=4, depth_size=0, double_buffer=True)
-        super().__init__(width, height, config=conf, *args, **kwargs)
+        super().__init__(width, height, resizable=True, config=conf, *args, **kwargs)
+        self.set_minimum_size(150, 150)
         self.zoom_level = 1.0
         self.left = -width / 2
         self.right = width / 2
@@ -44,11 +47,63 @@ class InteractiveDisplay(pyglet.window.Window):
         # Set alpha blending
         glEnable(GL_BLEND)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+        glClearColor(1.0, 1.0, 1.0, 1.0)
+        self.zoom_level = 6
 
+        # The batch that displays the points of interest
         self.batch = pyglet.graphics.Batch()
         self.background = pyglet.graphics.OrderedGroup(0)
         self.forefront = pyglet.graphics.OrderedGroup(5)
         self.screen_scale = screen_scale()
+
+        # The batch that displays the robot
+        self.robot_batch = pyglet.graphics.Batch()
+        self.robot = RobotDisplay(self.robot_batch, self.background)
+        self.robot_translate = np.array([0, 0, 0], dtype=float)
+        self.robot_rotate = 0
+
+        # The batch that displays the labels at the bottom of the view
+        self.label_batch = pyglet.graphics.Batch()
+        self.label1 = pyglet.text.Label('', font_name='Verdana', font_size=10, x=10, y=50)
+        self.label1.color = (0, 0, 0, 255)
+        self.label1.batch = self.label_batch
+        self.label2 = pyglet.text.Label('', font_name='Verdana', font_size=10, x=10, y=30)
+        self.label2.color = (0, 0, 0, 255)
+        self.label2.batch = self.label_batch
+        self.label3 = pyglet.text.Label('', font_name='Verdana', font_size=10, x=10, y=10)
+        self.label3.color = (0, 0, 0, 255)
+        self.label3.batch = self.label_batch
+
+    def on_draw(self):
+        """ Drawing the view """
+        glClear(GL_COLOR_BUFFER_BIT)
+        glLoadIdentity()
+
+        # The transformations are stacked, and applied backward to the vertices
+
+        # Stack the projection matrix. Centered on (0,0). Fit the window size and zoom factor
+        glOrtho(self.left, self.right, self.bottom, self.top, 1, -1)
+
+        # Draw the phenomenon
+        self.batch.draw()
+
+        # Stack the rotation and translation of the robot body
+        glTranslatef(*self.robot_translate)
+        glRotatef(self.robot_rotate, 0.0, 0.0, 1.0)
+        # Draw the robot
+        self.robot_batch.draw()
+
+        # Reset the projection to Identity to cancel the projection of the text
+        glLoadIdentity()
+        # Stack the projection of the text
+        glOrtho(0, self.width, 0, self.height, -1, 1)
+        # Draw the text in the bottom left corner
+        self.label_batch.draw()
+
+    def update_body_display(self, body_memory):
+        """Updates the robot's body to display"""
+        self.robot.rotate_head(body_memory.head_direction_degree())
+        self.robot.emotion_color(body_memory.emotion_code())
 
     def mouse_coordinates_to_point(self, x, y):
         """ Return the point in world reference frame from mouse x and y """
