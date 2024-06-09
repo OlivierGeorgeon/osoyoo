@@ -11,7 +11,7 @@ class PlaceMemory:
     def __init__(self):
         """Initialize the list of place cells"""
         self.place_cells = {}
-        self.place_cell_id = 0
+        self.place_cell_id = 0  # First place cell created will be number 1
 
     def add_or_update_place_cell(self, memory):
         """Create e new place cell or update the existing one"""
@@ -33,10 +33,15 @@ class PlaceMemory:
             self.place_cells[self.place_cell_id] = PlaceCell(memory.allocentric_memory.robot_point, cues)
             return None
         else:
+            # Add new cues to the existing place cell
             # Offset the cues to the closes place cell
-            offset_matrix = Matrix44.from_translation(memory.allocentric_memory.robot_point - self.place_cells[existing_id].point)
+            # print(f"Update Place cell {existing_id}")
+            offset_vector = memory.allocentric_memory.robot_point - self.place_cells[existing_id].point
+            # print("Offset vector", offset_vector)
+            offset_matrix = Matrix44.from_translation(offset_vector)
             for cue in cues.values():
-                cue.pose_matrix *= offset_matrix
+                # https://pyglet.readthedocs.io/en/latest/programming_guide/math.html#matrix-multiplication
+                cue.pose_matrix @= offset_matrix  # offset_matrix * cue.pose_matrix  # *= does not work: wrong order
             # Add the cues to the existing place cell
             return self.place_cells[existing_id].add_cues(cues)
 

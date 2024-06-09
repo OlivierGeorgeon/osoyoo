@@ -136,7 +136,7 @@ class AllocentricMemory:
         # Place the place cells again
         for place_cell_id, place_cell in memory.place_memory.place_cells.items():
             cell_x, cell_y = point_to_cell(place_cell.point)
-            print(f"Place cell {place_cell}")
+            # print(f"Update grid Place cell {place_cell}")
             if (self.min_i <= cell_x <= self.max_i) and (self.min_j <= cell_y <= self.max_j):
                 self.grid[cell_x][cell_y][PLACE_CELL_ID] = place_cell_id
 
