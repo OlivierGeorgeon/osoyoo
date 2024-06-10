@@ -10,7 +10,7 @@ from ...Memory.EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_A
 from ...Memory.AllocentricMemory.AllocentricMemory import CELL_UNKNOWN, CELL_NO_ECHO
 from ...Memory import CELL_RADIUS
 from ...Memory.AllocentricMemory import STATUS_0, STATUS_1, STATUS_2, STATUS_3, STATUS_4, COLOR_INDEX, \
-    CLOCK_INTERACTION, CLOCK_NO_ECHO, CLOCK_PLACE, POINT_X, POINT_Y, IS_POOL
+    CLOCK_INTERACTION, CLOCK_NO_ECHO, CLOCK_PLACE, POINT_X, POINT_Y, IS_POOL, PLACE_CELL_ID
 
 SCALE_LEVEL_0 = 2.5  # 3
 SCALE_LEVEL_1 = 0.8  # 0.9
@@ -66,9 +66,6 @@ class CellDisplay:
         # Level 0 Pool
         if self.shape0 is not None:
             color0 = name_to_rgb('royalBlue')
-            # if cell.clock_prompt > 0:
-            #     color0 = name_to_rgb('MediumOrchid')
-            #self.shape0.colors[0:24] = 6 * (*color0, 255)
             self.shape0.colors[:] = 6 * (*color0, 255)
 
         # Level 1
@@ -109,8 +106,9 @@ class CellDisplay:
         if cell[STATUS_1] == EXPERIENCE_CENTRAL_ECHO:
             color2 = name_to_rgb('sienna')
             opacity2 = int(max(255 * (10 - clock + cell[CLOCK_INTERACTION]) / 10, 0))
-        # if cell.status[1] == CELL_PHENOMENON:
-        #     color2 = name_to_rgb('yellow')
+        if cell[PLACE_CELL_ID] > 0:
+            color2 = name_to_rgb('yellow')
+            opacity2 = 255
         # Reset the color of the shape1
         self.shape2.colors[0:24] = 6 * (*color2, opacity2)
 

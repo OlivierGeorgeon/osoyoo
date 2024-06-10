@@ -60,11 +60,13 @@ class Memory:
         # Update egocentric memory
         self.egocentric_memory.update_and_add_experiences(enaction)
 
-        # The integrator may again update the robot's position
         # Call the integrator to create and update the phenomena
         integrate(self)
 
-        self.place_memory.add_or_update_place_cell(self)
+        # Create or update place cell
+        position_correction = self.place_memory.add_or_update_place_cell(self)
+        print("Adjust the robot's position to place cell", position_correction)
+        self.allocentric_memory.robot_point += position_correction
 
         """Update allocentric memory on the basis of body, phenomenon, and egocentric memory"""
         # Mark the cells where is the robot

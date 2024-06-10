@@ -16,19 +16,28 @@ class PlaceCell:
     def __str__(self):
         return self.key.__str__()
 
-    def add_cues(self, cues):
-        """Compute a position correction, add the cues, and return the position correction"""
-        position_correction = np.array([0, 0, 0])
+    def recognize_vector(self, cues):
+        """Return the vector of the position defined by previous cues minus the position by the new cues"""
+        vector = np.array([0, 0, 0])
         # Assume FLOOR experiences come from a single point
         for new_cue in [cue for cue in cues.values() if cue.type == EXPERIENCE_FLOOR]:
-            for old_cue in [cue for cue in self.cues.values() if cue.type == EXPERIENCE_FLOOR]:
-                position_correction = -new_cue.point() + old_cue.point()
-        position_correction_matrix = Matrix44.from_translation(position_correction)
-        # shift the new cues
-        for cue in cues.values():
-            cue.pose_matrix *= position_correction_matrix
-        self.cues.update(cues)
-        return position_correction
+            for previous_cue in [cue for cue in self.cues.values() if cue.type == EXPERIENCE_FLOOR]:
+                vector = previous_cue.point() - new_cue.point()
+        return vector
+
+    # def add_cues(self, cues):
+    #     """Compute a position correction, add the cues, and return the position correction"""
+    #     position_correction = np.array([0, 0, 0])
+    #     # Assume FLOOR experiences come from a single point
+    #     for new_cue in [cue for cue in cues.values() if cue.type == EXPERIENCE_FLOOR]:
+    #         for old_cue in [cue for cue in self.cues.values() if cue.type == EXPERIENCE_FLOOR]:
+    #             position_correction = old_cue.point() - new_cue.point()
+    #     position_correction_matrix = Matrix44.from_translation(position_correction)
+    #     # shift the new cues
+    #     for cue in cues.values():
+    #         cue.pose_matrix @= position_correction_matrix
+    #     self.cues.update(cues)
+    #     return position_correction
 
     def save(self):
         """Return a cloned place cell for memory snapshot"""
