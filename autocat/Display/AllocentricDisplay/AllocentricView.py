@@ -2,7 +2,6 @@ import numpy as np
 import pyglet
 from pyglet.gl import *
 from ...Utils import quaternion_translation_to_matrix
-from autocat.Display.RobotDisplay import RobotDisplay
 from .CellDisplay import CellDisplay
 from ...Memory.AllocentricMemory.Geometry import point_to_cell
 from ...Memory.EgocentricMemory.Experience import EXPERIENCE_ROBOT
@@ -11,8 +10,6 @@ from ..PointOfInterest import PointOfInterest, POINT_ROBOT
 from ...Memory.AllocentricMemory.AllocentricMemory import CELL_UNKNOWN
 from ...Memory.AllocentricMemory import STATUS_0, STATUS_4
 
-#NB_CELL_WIDTH = 50
-#NB_CELL_HEIGHT = 50
 CELL_RADIUS = 50
 ZOOM_IN_FACTOR = 1.2
 ZOOM_OUT_FACTOR = 1/ZOOM_IN_FACTOR
@@ -20,8 +17,8 @@ ZOOM_OUT_FACTOR = 1/ZOOM_IN_FACTOR
 
 class AllocentricView(InteractiveDisplay):
     """Create the allocentric view"""
-    def __init__(self, workspace, width=400, height=400, *args, **kwargs):
-        super().__init__(width, height, *args, **kwargs)
+    def __init__(self, workspace, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.set_caption("Allocentric Memory")
         self.set_minimum_size(150, 150)
 
@@ -33,28 +30,23 @@ class AllocentricView(InteractiveDisplay):
                        pyglet.graphics.OrderedGroup(2),
                        pyglet.graphics.OrderedGroup(3),
                        pyglet.graphics.OrderedGroup(4)]
-        # self.robot_batch = pyglet.graphics.Batch()
-        # self.robot = RobotDisplay(self.robot_batch, self.forefront)  # Rectangles seem not to respect ordered groups
 
         self.zoom_level = 3
 
         self.workspace = workspace
-        # self.nb_cell_x = workspace.memory.allocentric_memory.width
-        # self.nb_cell_y = workspace.memory.allocentric_memory.height
-        # self.cell_radius = workspace.memory.allocentric_memory.cell_radius
         self.hexagons = [[None for _ in range(workspace.memory.allocentric_memory.height)]
                          for _ in range(workspace.memory.allocentric_memory.width)]
         self.robot_poi = None  # The other robot point of interest
         self.body_poi = None
 
         # The text at the bottom left
-        self.label_batch = pyglet.graphics.Batch()
-        self.label = pyglet.text.Label('', font_name='Verdana', font_size=10, x=10, y=10)
-        self.label.color = (255, 255, 255, 255)
-        self.label.batch = self.label_batch
-        self.label_click = pyglet.text.Label('', font_name='Verdana', font_size=10, x=10, y=30)
-        self.label_click.color = (255, 255, 255, 255)
-        self.label_click.batch = self.label_batch
+        # self.label_batch = pyglet.graphics.Batch()
+        # self.label = pyglet.text.Label('', font_name='Verdana', font_size=10, x=10, y=10)
+        # self.label.color = (255, 255, 255, 255)
+        # self.label.batch = self.label_batch
+        # self.label_click = pyglet.text.Label('', font_name='Verdana', font_size=10, x=10, y=30)
+        # self.label_click.color = (255, 255, 255, 255)
+        # self.label_click.batch = self.label_batch
 
     def update_hexagon(self, i, j, cell):
         """Create or update or delete an hexagon in allocentric view."""
@@ -94,12 +86,12 @@ class AllocentricView(InteractiveDisplay):
         self.batch.draw()
 
         # Stack the transformation to position the robot
-        glTranslatef(*self.workspace.memory.allocentric_memory.robot_point)
-        glRotatef(90 - self.workspace.memory.body_memory.body_azimuth(), 0.0, 0.0, 1.0)
+        # glTranslatef(*self.workspace.memory.allocentric_memory.robot_point)
+        # glRotatef(90 - self.workspace.memory.body_memory.body_azimuth(), 0.0, 0.0, 1.0)
+        glTranslatef(*self.robot_translate)
+        glRotatef(self.robot_rotate, 0.0, 0.0, 1.0)
         # Draw the robot
-        # self.robot.rotate_head(self.workspace.memory.body_memory.head_direction_degree())
-        # self.robot.emotion_color(self.workspace.memory.body_memory.emotion_code())
-        self.robot_batch.draw()
+        self.egocentric_batch.draw()
 
         # Draw the text at the bottom left corner
         glLoadIdentity()
@@ -116,10 +108,8 @@ class AllocentricView(InteractiveDisplay):
         """ Computes the cell coordinates from the screen coordinates """
         mouse_point = self.mouse_coordinates_to_point(x, y)
         cell_x, cell_y = point_to_cell(mouse_point)
-        # cell_axial_q, cell_axial_r = point_to_cell(mouse_point, CELL_RADIUS)
-        self.label.text = "Mouse pos.: " + str(mouse_point[0]) + ", " + str(mouse_point[1])
-        self.label.text += ", Cell: " + str(cell_x) + ", " + str(cell_y)
-        # self.label.text += ", Cell_axial: " + str(cell_axial_q) + ", " + str(cell_axial_r)
+        self.label3.text = "Mouse pos.: " + str(mouse_point[0]) + ", " + str(mouse_point[1])
+        self.label3.text += ", Cell: " + str(cell_x) + ", " + str(cell_y)
         return cell_x, cell_y
 
     def update_robot_poi(self, phenomenon):

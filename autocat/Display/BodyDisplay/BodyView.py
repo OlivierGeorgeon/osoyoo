@@ -2,15 +2,14 @@ import numpy as np
 import pyglet
 from pyglet.gl import *
 import math
-from autocat.Display.RobotDisplay import RobotDisplay
 from ..InteractiveDisplay import InteractiveDisplay
 from ...Memory.BodyMemory import DOPAMINE, SEROTONIN, NORADRENALINE
 
 
 class BodyView(InteractiveDisplay):
     """Display the information in body memory"""
-    def __init__(self, workspace, width=350, height=350, *args, **kwargs):
-        super().__init__(width, height, *args, **kwargs)
+    def __init__(self, workspace, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.set_caption("Body Memory")
         self.set_minimum_size(150, 150)
 
@@ -20,13 +19,7 @@ class BodyView(InteractiveDisplay):
         glClearColor(1.0, 235.0/256., 205.0/256., 1.0)
         self.zoom_level = 2.6
 
-        # Define the robot
-        # self.robot_batch = pyglet.graphics.Batch()
-        # self.robot = RobotDisplay(self.robot_batch, self.background)
-
         # Define the text area at the bottom of the view
-        # self.label_batch = pyglet.graphics.Batch()
-
         self.label_DA = pyglet.text.Label('DA: ', font_name='Verdana', font_size=10, x=10, y=70)
         self.label_DA.color = (0, 0, 0, 255)
         self.label_DA.batch = self.label_batch
@@ -39,15 +32,6 @@ class BodyView(InteractiveDisplay):
 
         self.label2.text = 'Azimuth: 90'
         self.label3.text = 'Speed: (0, 0)'
-        # self.label1 = pyglet.text.Label('Clock: ', font_name='Verdana', font_size=10, x=10, y=50)
-        # self.label1.color = (0, 0, 0, 255)
-        # self.label1.batch = self.label_batch
-        # self.label2 = pyglet.text.Label('', font_name='Verdana', font_size=10, x=10, y=30)
-        # self.label2.color = (0, 0, 0, 255)
-        # self.label2.batch = self.label_batch
-        # self.label3 = pyglet.text.Label('Speed: ', font_name='Verdana', font_size=10, x=10, y=10)
-        # self.label3.color = (0, 0, 0, 255)
-        # self.label3.batch = self.label_batch
 
     def on_draw(self):
         """ Drawing the view """
@@ -59,15 +43,17 @@ class BodyView(InteractiveDisplay):
         # Stack the projection matrix. Centered on (0,0). Fit the window size and zoom factor
         # glOrtho(-self.width * self.zoom_level, self.width * self.zoom_level, -self.height * self.zoom_level,
         #         self.height * self.zoom_level, 1, -1)
+        glTranslatef(*self.robot_translate)
         glOrtho(self.left, self.right, self.bottom, self.top, 1, -1)
 
-
         # Stack the rotation of the robot body
-        glRotatef(90 - self.workspace.memory.body_memory.body_azimuth(), 0.0, 0.0, 1.0)
+        # glRotatef(90 - self.workspace.memory.body_memory.body_azimuth(), 0.0, 0.0, 1.0)
+        glTranslatef(*self.robot_translate)
+        glRotatef(self.robot_rotate, 0.0, 0.0, 1.0)
         # Draw compass points
         self.batch.draw()
         # Draw the robot
-        self.robot_batch.draw()
+        self.egocentric_batch.draw()
 
         # Reset the projection to Identity to cancel the projection of the text
         glLoadIdentity()

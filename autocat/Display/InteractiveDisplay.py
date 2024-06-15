@@ -50,15 +50,15 @@ class InteractiveDisplay(pyglet.window.Window):
         glClearColor(1.0, 1.0, 1.0, 1.0)
         self.zoom_level = 6
 
-        # The batch that displays the points of interest
+        # The batch that displays the content of the window
         self.batch = pyglet.graphics.Batch()
         self.background = pyglet.graphics.OrderedGroup(0)
         self.forefront = pyglet.graphics.OrderedGroup(5)
         self.screen_scale = screen_scale()
 
         # The batch that displays the robot
-        self.robot_batch = pyglet.graphics.Batch()
-        self.robot = RobotDisplay(self.robot_batch, self.background)
+        self.egocentric_batch = pyglet.graphics.Batch()
+        self.robot = RobotDisplay(self.egocentric_batch, self.background)
         self.robot_translate = np.array([0, 0, 0], dtype=float)
         self.robot_rotate = 0
 
@@ -76,27 +76,28 @@ class InteractiveDisplay(pyglet.window.Window):
 
     def on_draw(self):
         """ Drawing the view """
+        # The transformations are stacked, and applied backward to the vertices
         glClear(GL_COLOR_BUFFER_BIT)
         glLoadIdentity()
-
-        # The transformations are stacked, and applied backward to the vertices
 
         # Stack the projection matrix. Centered on (0,0). Fit the window size and zoom factor
         glOrtho(self.left, self.right, self.bottom, self.top, 1, -1)
 
-        # Draw the phenomenon
+        # Draw the layer in polar coordinates
         self.batch.draw()
 
-        # Stack the rotation and translation of the robot body
+        # Stack the rotation and translation of the robot's body
         glTranslatef(*self.robot_translate)
         glRotatef(self.robot_rotate, 0.0, 0.0, 1.0)
-        # Draw the robot
-        self.robot_batch.draw()
+
+        # Draw the layer in egocentric coordinates
+        self.egocentric_batch.draw()
 
         # Reset the projection to Identity to cancel the projection of the text
         glLoadIdentity()
         # Stack the projection of the text
         glOrtho(0, self.width, 0, self.height, -1, 1)
+
         # Draw the text in the bottom left corner
         self.label_batch.draw()
 
@@ -114,10 +115,11 @@ class InteractiveDisplay(pyglet.window.Window):
     def on_resize(self, width, height):
         """ Adjusting the viewport when resizing the window """
         # Recompute the corners of the world window
-        self.left = (-width / 2 - self.drag_x) * self.zoom_level
-        self.right = (width / 2 - self.drag_x) * self.zoom_level
-        self.bottom = (-height / 2 - self.drag_y) * self.zoom_level
-        self.top = (height / 2 - self.drag_y) * self.zoom_level
+        # self.left = (-width / 2 - self.drag_x) * self.zoom_level
+        # self.right = (width / 2 - self.drag_x) * self.zoom_level
+        # self.bottom = (-height / 2 - self.drag_y) * self.zoom_level
+        # self.top = (height / 2 - self.drag_y) * self.zoom_level
+        self.recompute_corners()
         # The viewport has the dimension of the whole window for PC and twice the whole window for Mac retina display
         glViewport(0, 0, width * self.screen_scale, height * self.screen_scale)
 
@@ -126,7 +128,15 @@ class InteractiveDisplay(pyglet.window.Window):
         # The total amount of drag
         self.drag_x += dx
         self.drag_y += dy
-        # Recompute the corners of the world window
+        self.recompute_corners()
+        # # Recompute the corners of the world window
+        # self.left = (-self.width / 2 - self.drag_x) * self.zoom_level
+        # self.right = (self.width / 2 - self.drag_x) * self.zoom_level
+        # self.bottom = (-self.height / 2 - self.drag_y) * self.zoom_level
+        # self.top = (self.height / 2 - self.drag_y) * self.zoom_level
+
+    def recompute_corners(self):
+        """Recompute the corners of the world window"""
         self.left = (-self.width / 2 - self.drag_x) * self.zoom_level
         self.right = (self.width / 2 - self.drag_x) * self.zoom_level
         self.bottom = (-self.height / 2 - self.drag_y) * self.zoom_level

@@ -7,36 +7,11 @@ from ..InteractiveDisplay import InteractiveDisplay
 
 
 class EgocentricView(InteractiveDisplay):
-    def __init__(self, width=400, height=400, *args, **kwargs):
-        super().__init__(width, height, *args, **kwargs)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         # self.is_north_up = False  # Reset to display the robot on the X axis
         self.set_caption("Egocentric Memory")
-        # self.set_minimum_size(150, 150)
-
-        # Initialize OpenGL parameters
-        # glClearColor(1.0, 1.0, 1.0, 1.0)
-        # pyglet.gl.glEnable(pyglet.gl.GL_BLEND)
-        # self.batch = pyglet.graphics.Batch()
-        # self.background = pyglet.graphics.OrderedGroup(0)
-        # self.foreground = pyglet.graphics.OrderedGroup(1)
         self.zoom_level = 2
-
-        # Define the robot
-        # self.robot = OsoyooCar(self.batch, self.background)
-        # self.azimuth = 0  # Degree from north [0, 360]
-        # self.robot_rotate = 90
-
-        # Define the text area at the bottom of the view
-        # self.label_batch = pyglet.graphics.Batch()
-        # self.label1 = pyglet.text.Label('', font_name='Verdana', font_size=10, x=10, y=10)
-        # self.label1.color = (0, 0, 0, 255)
-        # self.label1.batch = self.label_batch
-        # self.label2 = pyglet.text.Label('', font_name='Verdana', font_size=10, x=10, y=30)
-        # self.label2.color = (0, 0, 0, 255)
-        # self.label2.batch = self.label_batch
-        # self.label_left_speed = pyglet.text.Label('Leftward speed: ', font_name='Verdana', font_size=10, x=10, y=10)
-        # self.label_left_speed.color = (0, 0, 0, 255)
-        # self.label_left_speed.batch = self.label_batch
 
     def on_draw(self):
         """ Drawing the view """
@@ -48,7 +23,6 @@ class EgocentricView(InteractiveDisplay):
         # Stack the projection matrix. Centered on (0,0). Fit the window size and zoom factor
         glOrtho(self.left, self.right, self.bottom, self.top, 1, -1)
 
-
         # Stack the rotation of the world so the robot's front is up
         # if self.is_north_up:
         #     glRotatef(90 - self.azimuth, 0.0, 0.0, 1.0)
@@ -58,7 +32,7 @@ class EgocentricView(InteractiveDisplay):
         # Draw the points of interest
         self.batch.draw()
         # Draw the robot
-        self.robot_batch.draw()
+        self.egocentric_batch.draw()
 
         # Draw the text at the bottom left corner
         glLoadIdentity()
@@ -79,17 +53,3 @@ class EgocentricView(InteractiveDisplay):
         self.label3.text = f"Click: ({click_point[0]:.0f}, {click_point[1]:.0f}), angle: {click_angle:.0f}°"
         # Return the click position to the controller
         return click_point
-
-
-# Testing the EgocentricView by displaying the robot in a pretty position, and the mouse click coordinates
-# py -m autocat.Display.EgocentricDisplay.EgocentricView
-# if __name__ == "__main__":
-#     view = EgocentricView()
-#     view.robot.rotate_head(-45)  # Turn head 45° to the right
-#     view.azimuth = 350           # Turn robot 10° to the left
-#
-#     @view.event
-#     def on_mouse_press(x, y, button, modifiers):
-#         view.get_prompt_point(x, y, button, modifiers)  # Display mouse click coordinates
-#
-#     pyglet.app.run()

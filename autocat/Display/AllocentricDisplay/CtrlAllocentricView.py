@@ -114,7 +114,7 @@ class CtrlAllocentricView:
                 self.workspace.ctrl_place_cell_view.place_cell_id = self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][PLACE_CELL_ID]
                 self.workspace.ctrl_place_cell_view.update_cue_displays()
 
-            self.view.label_click.text = self.workspace.memory.allocentric_memory.grid[cell_x][cell_y].__str__()
+            self.view.label2.text = self.workspace.memory.allocentric_memory.grid[cell_x][cell_y].__str__()
 
             # """Label of the cell for display on click in allocentricView"""
             # label = str(self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][STATUS_0]) + " Clocks: ["
@@ -161,6 +161,9 @@ class CtrlAllocentricView:
 
     def main(self, dt):
         """Refresh allocentric view"""
+        # The position of the robot in the view
+        self.view.robot_rotate = 90 - self.workspace.memory.body_memory.body_azimuth()
+        self.view.robot_translate = self.workspace.memory.allocentric_memory.robot_point
         # Refresh during the enaction and at the end of the interaction cycle
         if self.workspace.enacter.interaction_step in [ENACTION_STEP_ENACTING, ENACTION_STEP_RENDERING]:
             self.update_view()

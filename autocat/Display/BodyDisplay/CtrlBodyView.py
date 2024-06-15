@@ -87,6 +87,9 @@ class CtrlBodyView:
 
     def main(self, dt):
         """Called every frame. Update the body view"""
+        # The position of the robot in the view
+        self.view.robot_rotate = 90 - self.workspace.memory.body_memory.body_azimuth()
+
         self.view.label_5HT.text = f"5-HT: {self.workspace.memory.body_memory.neurotransmitters[SEROTONIN]:d}"
         self.view.label_5HT.color = (0, 0, 0, 255) if self.workspace.memory.body_memory.neurotransmitters[SEROTONIN] >= 50 \
             else (255, 0, 0, 255)

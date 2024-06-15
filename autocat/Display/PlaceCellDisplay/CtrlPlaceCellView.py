@@ -8,7 +8,7 @@ class CtrlPlaceCellView:
     """Handle the logic of the phenomenon view, retrieve data from the phenomenon and convert it
     to points of interest that can be displayed in a pyglet window"""
     def __init__(self, workspace):
-        self.view = InteractiveDisplay(width=350, height=350)
+        self.view = InteractiveDisplay()
         self.workspace = workspace
         self.cue_displays = []
         self.place_cell_id = -1
