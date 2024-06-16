@@ -19,7 +19,7 @@ class AllocentricView(InteractiveDisplay):
     """Create the allocentric view"""
     def __init__(self, workspace, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.set_caption("Allocentric Memory")
+        # self.set_caption("Allocentric Memory")
         self.set_minimum_size(150, 150)
 
         # glClearColor(0.2, 0.2, 0.7, 1.0)  # Make it look like hippocampus imaging
@@ -39,15 +39,6 @@ class AllocentricView(InteractiveDisplay):
         self.robot_poi = None  # The other robot point of interest
         self.body_poi = None
 
-        # The text at the bottom left
-        # self.label_batch = pyglet.graphics.Batch()
-        # self.label = pyglet.text.Label('', font_name='Verdana', font_size=10, x=10, y=10)
-        # self.label.color = (255, 255, 255, 255)
-        # self.label.batch = self.label_batch
-        # self.label_click = pyglet.text.Label('', font_name='Verdana', font_size=10, x=10, y=30)
-        # self.label_click.color = (255, 255, 255, 255)
-        # self.label_click.batch = self.label_batch
-
     def update_hexagon(self, i, j, cell):
         """Create or update or delete an hexagon in allocentric view."""
         if self.hexagons[i][j] is None:
@@ -63,42 +54,42 @@ class AllocentricView(InteractiveDisplay):
                 self.hexagons[i][j].delete()
                 self.hexagons[i][j] = None
 
-    def on_draw(self):
-        """ Drawing the window """
-
-        # Initialize Projection matrix
-        glMatrixMode(GL_PROJECTION)
-        glLoadIdentity()
-
-        # Initialize Modelview matrix
-        glMatrixMode(GL_MODELVIEW)
-        glLoadIdentity()
-        # Save the default modelview matrix
-        glPushMatrix()
-
-        # Clear window with ClearColor
-        glClear(GL_COLOR_BUFFER_BIT)
-
-        # Set orthographic projection matrix
-        glOrtho(self.left, self.right, self.bottom, self.top, 1, -1)
-
-        # Draw the hexagonal grid
-        self.batch.draw()
-
-        # Stack the transformation to position the robot
-        # glTranslatef(*self.workspace.memory.allocentric_memory.robot_point)
-        # glRotatef(90 - self.workspace.memory.body_memory.body_azimuth(), 0.0, 0.0, 1.0)
-        glTranslatef(*self.robot_translate)
-        glRotatef(self.robot_rotate, 0.0, 0.0, 1.0)
-        # Draw the robot
-        self.egocentric_batch.draw()
-
-        # Draw the text at the bottom left corner
-        glLoadIdentity()
-        glOrtho(0, self.width, 0, self.height, -1, 1)
-        self.label_batch.draw()
-
-        glPopMatrix()
+    # def on_draw(self):
+    #     """ Drawing the window """
+    #
+    #     # Initialize Projection matrix
+    #     glMatrixMode(GL_PROJECTION)
+    #     glLoadIdentity()
+    #
+    #     # Initialize Modelview matrix
+    #     glMatrixMode(GL_MODELVIEW)
+    #     glLoadIdentity()
+    #     # Save the default modelview matrix
+    #     glPushMatrix()
+    #
+    #     # Clear window with ClearColor
+    #     glClear(GL_COLOR_BUFFER_BIT)
+    #
+    #     # Set orthographic projection matrix
+    #     glOrtho(self.left, self.right, self.bottom, self.top, 1, -1)
+    #
+    #     # Draw the hexagonal grid
+    #     self.batch.draw()
+    #
+    #     # Stack the transformation to position the robot
+    #     # glTranslatef(*self.workspace.memory.allocentric_memory.robot_point)
+    #     # glRotatef(90 - self.workspace.memory.body_memory.body_azimuth(), 0.0, 0.0, 1.0)
+    #     glTranslatef(*self.robot_translate)
+    #     glRotatef(self.robot_rotate, 0.0, 0.0, 1.0)
+    #     # Draw the robot
+    #     self.egocentric_batch.draw()
+    #
+    #     # Draw the text at the bottom left corner
+    #     glLoadIdentity()
+    #     glOrtho(0, self.width, 0, self.height, -1, 1)
+    #     self.label_batch.draw()
+    #
+    #     glPopMatrix()
 
     def on_mouse_motion(self, x, y, dx, dy):
         """Display the position in allocentric memory and the cell in the grid"""

@@ -48,6 +48,9 @@ Full project documentation in English:
 * [Howard Schneider's full tutorial](docs/overview/Part_1_Easy_to_Read_Overview.md) Step by step explanations for beginners and experienced makers alike. The documentation is intended to give any user a pleasant experience with the project regardless of how seriously they intend to make use of the project.
 * [Youtube playlist](https://youtube.com/playlist?list=PLlSPp5EpW5vFb-ZMCr8m0dIOoKEQe9CIE&si=HachYRwgJR8I-BbH) Demonstrations of behaviors. 
 
+Publications
+* [Publications](docs/wiki/publications.md)
+
 French additional information:
 * [La documentation écrite par les étudiants](docs/first_step/premier_pas.md)
 

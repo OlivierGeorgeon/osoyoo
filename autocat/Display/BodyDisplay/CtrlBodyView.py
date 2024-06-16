@@ -26,6 +26,10 @@ class CtrlBodyView:
         self.mouse_press_angle = 0
         self.last_used_id = -1
 
+        def on_mouse_press(x, y, button, modifiers):
+            """ Selecting or unselecting points of interest """
+            self.view.mouse_to_ego_point(x, y, button, modifiers)
+
         def on_text(text):
             """Process the user key or forward it to the Workspace to handle"""
             if text.upper() == KEY_DECREASE:
@@ -50,7 +54,7 @@ class CtrlBodyView:
             else:
                 self.workspace.process_user_key(text)
 
-        self.view.push_handlers(on_text)
+        self.view.push_handlers(on_mouse_press, on_text)
 
     def add_point_of_interest(self, pose_matrix, point_type, group=None):
         """ Adding a point of interest to the view """
@@ -73,17 +77,18 @@ class CtrlBodyView:
 
         # Recreate the points of interest from experiences
         for e in [e for e in self.workspace.memory.egocentric_memory.experiences.values() if
-                  e.clock + 10 >= self.workspace.memory.clock]:
+                  e.clock + 10 >= self.workspace.memory.clock and e.type in [EXPERIENCE_COMPASS, EXPERIENCE_AZIMUTH]]:
             if e.type == EXPERIENCE_COMPASS:
-                poi = PointOfInterest(e.pose_matrix, self.view.batch, self.view.forefront, e.type, e.clock,
+                poi = PointOfInterest(e.pose_matrix, self.view.egocentric_batch, self.view.forefront, e.type, e.clock,
                                       color_index=e.color_index)
-                poi.fade(self.workspace.memory.clock)
-                self.points_of_interest.append(poi)
-            if e.type == EXPERIENCE_AZIMUTH:
-                poi = PointOfInterest(e.pose_matrix, self.view.batch, self.view.background, e.type, e.clock,
+                # poi.fade(self.workspace.memory.clock)
+                # self.points_of_interest.append(poi)
+            else:
+            # if e.type == EXPERIENCE_AZIMUTH:
+                poi = PointOfInterest(e.pose_matrix, self.view.egocentric_batch, self.view.background, e.type, e.clock,
                                       color_index=e.color_index)
-                poi.fade(self.workspace.memory.clock)
-                self.points_of_interest.append(poi)
+            poi.fade(self.workspace.memory.clock)
+            self.points_of_interest.append(poi)
 
     def main(self, dt):
         """Called every frame. Update the body view"""

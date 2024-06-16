@@ -1,5 +1,6 @@
+import math
 import numpy as np
-from pyrr import Vector3
+from pyrr import Vector3, matrix44
 import platform
 import subprocess
 import pyglet
@@ -112,6 +113,17 @@ class InteractiveDisplay(pyglet.window.Window):
         point_y = (y - self.drag_y - self.height / 2) * self.zoom_level
         return Vector3([point_x, point_y, 0], dtype=int)
 
+    def mouse_to_ego_point(self, x, y, button, modifiers):
+        """ Computing the position of the mouse click relative to the robot in mm and degrees """
+        ego_point = self.mouse_coordinates_to_point(x, y)
+        rotation_matrix = matrix44.create_from_z_rotation(math.radians(self.robot_rotate))
+        ego_point = matrix44.apply_to_vector(rotation_matrix, ego_point).astype(int)
+        ego_angle = math.degrees(math.atan2(ego_point[1], ego_point[0]))
+        # Display the mouse click coordinates at the bottom of the view
+        self.label3.text = f"Click: ({ego_point[0]:.0f}, {ego_point[1]:.0f}), angle: {ego_angle:.0f}°"
+        # Return the click position to the controller
+        return ego_point
+
     def on_resize(self, width, height):
         """ Adjusting the viewport when resizing the window """
         # Recompute the corners of the world window
@@ -119,7 +131,7 @@ class InteractiveDisplay(pyglet.window.Window):
         # self.right = (width / 2 - self.drag_x) * self.zoom_level
         # self.bottom = (-height / 2 - self.drag_y) * self.zoom_level
         # self.top = (height / 2 - self.drag_y) * self.zoom_level
-        self.recompute_corners()
+        self.compute_corners()
         # The viewport has the dimension of the whole window for PC and twice the whole window for Mac retina display
         glViewport(0, 0, width * self.screen_scale, height * self.screen_scale)
 
@@ -128,14 +140,14 @@ class InteractiveDisplay(pyglet.window.Window):
         # The total amount of drag
         self.drag_x += dx
         self.drag_y += dy
-        self.recompute_corners()
+        self.compute_corners()
         # # Recompute the corners of the world window
         # self.left = (-self.width / 2 - self.drag_x) * self.zoom_level
         # self.right = (self.width / 2 - self.drag_x) * self.zoom_level
         # self.bottom = (-self.height / 2 - self.drag_y) * self.zoom_level
         # self.top = (self.height / 2 - self.drag_y) * self.zoom_level
 
-    def recompute_corners(self):
+    def compute_corners(self):
         """Recompute the corners of the world window"""
         self.left = (-self.width / 2 - self.drag_x) * self.zoom_level
         self.right = (self.width / 2 - self.drag_x) * self.zoom_level

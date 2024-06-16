@@ -7,3 +7,5 @@
 [Calibrate the robot](Calibrate-the-robot.md)
 
 [Troubleshooting](troubleshooting.md)
+
+[Publications](publications.md)
