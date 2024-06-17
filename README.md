@@ -10,7 +10,7 @@ At present the PetitCat project uses as the default "PetitCat Robot" an Arduino-
 [Howard Schneider's full tutorial](docs/overview/Part_1_Easy_to_Read_Overview.md) 
 
 
-![petitcat logo](docs/petitcat_logo.png)
+![petitcat logo](docs/petitcat_padding.png)
 
 ## Repository architecture
 
@@ -60,5 +60,6 @@ French additional information:
 
 ## References
 
-Georgeon, O. L., Lurie, D.,  Robertson, P. (2024). Artificial enactive inference in three-dimensional world. Cognitive Systems Research, 101234. [doi:10.1016/j.cogsys.2024.101234](https://doi.org/10.1016/j.cogsys.2024.101234).
-See [preprint](https://hal.science/hal-04587508).
+Georgeon, O. L., Lurie, D.,  Robertson, P. (2024). 
+Artificial enactive inference in three-dimensional world. Cognitive Systems Research, 101234. [doi:10.1016/j.cogsys.2024.101234](https://doi.org/10.1016/j.cogsys.2024.101234).
+([PDF](https://hal.science/hal-04587508)).

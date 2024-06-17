@@ -1,3 +1,5 @@
+# Publications referencing PetitCat
+
 Georgeon O. L., Vidal J., Knockaert,  T., Robertson P. (2022).
 Simultaneous Localization and Active Phenomenon Inference (SLAPI). 
 Third International Workshop on Self-Supervised Learning. 

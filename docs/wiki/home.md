@@ -8,4 +8,6 @@
 
 [Troubleshooting](troubleshooting.md)
 
+[Piloting the robot](piloting.md)
+
 [Publications](publications.md)

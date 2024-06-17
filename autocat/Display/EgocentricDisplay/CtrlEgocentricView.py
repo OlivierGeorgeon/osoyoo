@@ -1,6 +1,6 @@
 from pyrr import Matrix44
 from pyglet.window import key, mouse
-from .EgocentricView import EgocentricView
+# from .EgocentricView import EgocentricView
 from ..InteractiveDisplay import InteractiveDisplay
 from ..PointOfInterest import PointOfInterest, POINT_PROMPT, POINT_ROBOT
 from ...Memory.EgocentricMemory.Experience import EXPERIENCE_FOCUS, EXPERIENCE_ROBOT
