@@ -33,9 +33,9 @@ class Flock:
             self.ctrl_allocentric_views[arguments[i]].view.set_caption("Allocentric " + arguments[i])
             self.ctrl_body_views[arguments[i]] = CtrlBodyView(self.workspaces[arguments[i]])
             self.ctrl_body_views[arguments[i]].view.set_caption("Robot " + arguments[i])
-            self.ctrl_phenomenon_views[arguments[i]] = CtrlPhenomenonView(self.workspaces[arguments[i]])
-            self.ctrl_phenomenon_views[arguments[i]].view.set_caption("Terrain " + arguments[i])
-            self.workspaces[arguments[i]].ctrl_phenomenon_view = self.ctrl_phenomenon_views[arguments[i]]
+            # self.ctrl_phenomenon_views[arguments[i]] = CtrlPhenomenonView(self.workspaces[arguments[i]])
+            # self.ctrl_phenomenon_views[arguments[i]].view.set_caption("Terrain " + arguments[i])
+            # self.workspaces[arguments[i]].ctrl_phenomenon_view = self.ctrl_phenomenon_views[arguments[i]]
             self.ctrl_place_cell_views[arguments[i]] = CtrlPlaceCellView(self.workspaces[arguments[i]])
             self.ctrl_place_cell_views[arguments[i]].view.set_caption("Place Cell Robot " + arguments[i])
             self.workspaces[arguments[i]].ctrl_place_cell_view = self.ctrl_place_cell_views[arguments[i]]
@@ -53,7 +53,7 @@ class Flock:
             self.ctrl_egocentric_views[robot_id].main(dt)
             self.ctrl_allocentric_views[robot_id].main(dt)
             self.ctrl_body_views[robot_id].main(dt)
-            self.ctrl_phenomenon_views[robot_id].main(dt)
+            # self.ctrl_phenomenon_views[robot_id].main(dt)
             self.ctrl_place_cell_views[robot_id].main(dt)
 
         # Transmit messages between robots

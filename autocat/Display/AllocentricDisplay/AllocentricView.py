@@ -1,6 +1,6 @@
 import numpy as np
-import pyglet
-from pyglet.gl import *
+from pyglet.graphics import OrderedGroup
+from pyglet.gl import glClearColor
 from ...Utils import quaternion_translation_to_matrix
 from .CellDisplay import CellDisplay
 from ...Memory.AllocentricMemory.Geometry import point_to_cell
@@ -26,10 +26,7 @@ class AllocentricView(InteractiveDisplay):
         glClearColor(0.2, 0.2, 1.0, 1.0)  # For demonstration in Fête de la Science
         # glClearColor(1.0, 1.0, 1.0, 1.0)
 
-        self.groups = [pyglet.graphics.OrderedGroup(1),
-                       pyglet.graphics.OrderedGroup(2),
-                       pyglet.graphics.OrderedGroup(3),
-                       pyglet.graphics.OrderedGroup(4)]
+        self.groups = [OrderedGroup(1), OrderedGroup(2), OrderedGroup(3), OrderedGroup(4)]
 
         self.zoom_level = 3
 
@@ -53,43 +50,6 @@ class AllocentricView(InteractiveDisplay):
                 # The hexagon exists and the cell is unknown then delete the hexagon
                 self.hexagons[i][j].delete()
                 self.hexagons[i][j] = None
-
-    # def on_draw(self):
-    #     """ Drawing the window """
-    #
-    #     # Initialize Projection matrix
-    #     glMatrixMode(GL_PROJECTION)
-    #     glLoadIdentity()
-    #
-    #     # Initialize Modelview matrix
-    #     glMatrixMode(GL_MODELVIEW)
-    #     glLoadIdentity()
-    #     # Save the default modelview matrix
-    #     glPushMatrix()
-    #
-    #     # Clear window with ClearColor
-    #     glClear(GL_COLOR_BUFFER_BIT)
-    #
-    #     # Set orthographic projection matrix
-    #     glOrtho(self.left, self.right, self.bottom, self.top, 1, -1)
-    #
-    #     # Draw the hexagonal grid
-    #     self.batch.draw()
-    #
-    #     # Stack the transformation to position the robot
-    #     # glTranslatef(*self.workspace.memory.allocentric_memory.robot_point)
-    #     # glRotatef(90 - self.workspace.memory.body_memory.body_azimuth(), 0.0, 0.0, 1.0)
-    #     glTranslatef(*self.robot_translate)
-    #     glRotatef(self.robot_rotate, 0.0, 0.0, 1.0)
-    #     # Draw the robot
-    #     self.egocentric_batch.draw()
-    #
-    #     # Draw the text at the bottom left corner
-    #     glLoadIdentity()
-    #     glOrtho(0, self.width, 0, self.height, -1, 1)
-    #     self.label_batch.draw()
-    #
-    #     glPopMatrix()
 
     def on_mouse_motion(self, x, y, dx, dy):
         """Display the position in allocentric memory and the cell in the grid"""

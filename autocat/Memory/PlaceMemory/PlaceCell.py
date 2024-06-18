@@ -1,5 +1,4 @@
-# A place cell is defined by a point and contains the affordances experienced from this place
-# A place cell can be recognized from its cues
+# A place cell is defined by a point and contains the cues to recognize it
 
 import numpy as np
 from pyrr import Matrix44
@@ -8,13 +7,18 @@ from ..EgocentricMemory.EgocentricMemory import EXPERIENCE_FLOOR
 
 class PlaceCell:
     def __init__(self, point, cues):
-        """initialize the place cell from the point and a list of cues"""
+        """initialize the place cell from its point and its dictionary of cues"""
         self.point = point.copy()
         self.key = round(self.point[0]), round(self.point[1])
         self.cues = cues  # Dictionary of cues
 
     def __str__(self):
+        """Return the string of the tuple of the place cell coordinates"""
         return self.key.__str__()
+
+    def __hash__(self):
+        """Return the hash to use place cells as nodes in networkx"""
+        return hash(self.key)
 
     def recognize_vector(self, cues):
         """Return the vector of the position defined by previous cues minus the position by the new cues"""

@@ -28,7 +28,7 @@ def screen_scale():
 
 class InteractiveDisplay(pyglet.window.Window):
     """The parent class of interactive views"""
-    def __init__(self, width=400, height=400, *args, **kwargs):
+    def __init__(self, width=350, height=350, *args, **kwargs):
         conf = Config(sample_buffers=1, samples=4, depth_size=0, double_buffer=True)
         super().__init__(width, height, resizable=True, config=conf, *args, **kwargs)
         self.set_minimum_size(150, 150)
@@ -126,11 +126,6 @@ class InteractiveDisplay(pyglet.window.Window):
 
     def on_resize(self, width, height):
         """ Adjusting the viewport when resizing the window """
-        # Recompute the corners of the world window
-        # self.left = (-width / 2 - self.drag_x) * self.zoom_level
-        # self.right = (width / 2 - self.drag_x) * self.zoom_level
-        # self.bottom = (-height / 2 - self.drag_y) * self.zoom_level
-        # self.top = (height / 2 - self.drag_y) * self.zoom_level
         self.compute_corners()
         # The viewport has the dimension of the whole window for PC and twice the whole window for Mac retina display
         glViewport(0, 0, width * self.screen_scale, height * self.screen_scale)
@@ -141,11 +136,6 @@ class InteractiveDisplay(pyglet.window.Window):
         self.drag_x += dx
         self.drag_y += dy
         self.compute_corners()
-        # # Recompute the corners of the world window
-        # self.left = (-self.width / 2 - self.drag_x) * self.zoom_level
-        # self.right = (self.width / 2 - self.drag_x) * self.zoom_level
-        # self.bottom = (-self.height / 2 - self.drag_y) * self.zoom_level
-        # self.top = (self.height / 2 - self.drag_y) * self.zoom_level
 
     def compute_corners(self):
         """Recompute the corners of the world window"""

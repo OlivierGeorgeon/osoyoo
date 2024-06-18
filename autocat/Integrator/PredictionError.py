@@ -7,7 +7,7 @@ from pyrr import Quaternion
 from ..Proposer.Action import ACTION_FORWARD, ACTION_BACKWARD, ACTION_SWIPE
 from ..Proposer.Interaction import OUTCOME_LOST_FOCUS, OUTCOME_NO_FOCUS, OUTCOME_FLOOR
 from ..Utils import short_angle, point_to_head_direction_distance
-from .PlotSequence import plot
+from .PlotSequence import plot, plot_places
 from ..Memory.BodyMemory import SEROTONIN
 
 PREDICTION_ERROR_WINDOW = 200
@@ -311,3 +311,8 @@ class PredictionError:
         terrain = self.workspace.memory.phenomenon_memory.terrain()
         if terrain is not None:
             plot(terrain.origin_prediction_error, "Terrain origin", "13_Origin", "(mm)")
+
+        # The graph of place cells
+        graph = self.workspace.memory.place_memory.place_cell_graph
+        pos = {k: tuple(p.point[0:2]) for k, p in self.workspace.memory.place_memory.place_cells.items()}
+        plot_places(graph, pos)

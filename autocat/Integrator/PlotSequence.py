@@ -1,5 +1,6 @@
 import matplotlib
 import matplotlib.pyplot as plt
+import networkx as nx
 
 
 def plot(data_dict, caption, file_name, y_label, **kwargs):
@@ -48,10 +49,39 @@ def plot(data_dict, caption, file_name, y_label, **kwargs):
     plt.close()
 
 
+def plot_places(G, pos):
+    """Plot the graph at the given positions"""
+    nx.draw(G, pos, with_labels=True, node_color='lightblue', node_size=500, font_size=16, font_color='black',
+            edge_color='gray')
+    # plt.show()
+    plt.xlim(-1000, 1000)  # Adjust the range according to node positions
+    plt.ylim(-1000, 1000)  # Adjust the range according to node positions
+    plt.savefig("log/13_place_cells.pdf", bbox_inches='tight')
+    plt.close()
+
+
 # Test plot
 if __name__ == "__main__":
-    test_dict = {0: 10, 1: 20, 2: 20, 3: 200, 4: 0, 5: -10, 6: -20, 7: 0, 8: -50, 9: -50, 10: -40}
-    matplotlib.use('agg')
-    plot(test_dict, "Title", "00_test_file", "(unit)")
-    parameters = {'bottom': -100, 'top': 100, 'fmt': 'sr', 'marker_size': 5}
-    plot(test_dict, "Title", "01_test_file", "(unit)", **parameters)
+    # test_dict = {0: 10, 1: 20, 2: 20, 3: 200, 4: 0, 5: -10, 6: -20, 7: 0, 8: -50, 9: -50, 10: -40}
+    # matplotlib.use('agg')
+    # plot(test_dict, "Title", "00_test_file", "(unit)")
+    # parameters = {'bottom': -100, 'top': 100, 'fmt': 'sr', 'marker_size': 5}
+    # plot(test_dict, "Title", "01_test_file", "(unit)", **parameters)
+
+    # Plot graph
+    G = nx.Graph()
+    # Adding nodes
+    G.add_node(1)
+    G.add_node(2)
+    G.add_node(3)
+    # Adding edges
+    G.add_edge(1, 2)
+    G.add_edge(2, 3)
+    G.add_edge(3, 1)
+    # Step 3: Specify the positions of the nodes
+    pos = {
+        1: (0, 0),  # Position of node 1
+        2: (100, 100),  # Position of node 2
+        3: (200, 0)  # Position of node 3
+    }
+    plot_places(G, pos)

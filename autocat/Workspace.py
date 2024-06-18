@@ -81,11 +81,6 @@ class Workspace:
         elif user_key.upper() == "/":
             # If key ALIGN then turn and move forward to the prompt
             if self.enacter.interaction_step == ENACTION_STEP_IDLE:
-                # # The first interaction: turn to the prompt
-                # i0 = self.primitive_interactions[(ACTION_TURN, OUTCOME_PROMPT)]
-                # # Second interaction: move forward to the prompt
-                # i1 = self.primitive_interactions[(ACTION_FORWARD, OUTCOME_PROMPT)]
-                # self.composite_enaction = CompositeEnaction(None, 'Manual', np.array([1, 1, 1]), [i0, i1], self.memory.save())
                 self.composite_enaction = CompositeEnaction(None, 'Manual', np.array([1, 1, 1]),
                                                             self.sequence_interactions["TF-P"], self.memory.save())
         elif user_key.upper() == ":" and self.memory.egocentric_memory.focus_point is not None:
