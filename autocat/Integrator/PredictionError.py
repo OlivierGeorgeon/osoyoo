@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib
 import os
 import csv
+import networkx as nx
 from pyrr import Quaternion
 from ..Proposer.Action import ACTION_FORWARD, ACTION_BACKWARD, ACTION_SWIPE
 from ..Proposer.Interaction import OUTCOME_LOST_FOCUS, OUTCOME_NO_FOCUS, OUTCOME_FLOOR
@@ -314,5 +315,10 @@ class PredictionError:
 
         # The graph of place cells
         graph = self.workspace.memory.place_memory.place_cell_graph
-        pos = {k: tuple(p.point[0:2]) for k, p in self.workspace.memory.place_memory.place_cells.items()}
+        dis = self.workspace.memory.place_memory.place_cell_distances
+        print("Distances", dis)
+        pos0 = {k: tuple(p.point[0:2]) for k, p in self.workspace.memory.place_memory.place_cells.items()}
+        print("Positions0", pos0)
+        pos = nx.kamada_kawai_layout(graph, dist=dis, pos=pos0, scale=1000)
+        print("Pos", pos)
         plot_places(graph, pos)

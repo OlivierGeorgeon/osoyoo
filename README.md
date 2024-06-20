@@ -1,12 +1,13 @@
 # PetitCat
 
-The PetitCat project allows any AI researcher to have access to low-cost and readily available robotic parts to allow easy grounding and embodiment of their work as well as generating life-like behaviors in robots.
+The PetitCat project allows any hobbyist, student, or AI researcher to have access to low-cost and readily available robotic parts to experiment generating life-like behaviors in robots.
 
-The PetitCat project allows an AI researcher's tens of thousands of lines of Python code running on a laptop/desktop/server to bidirectionally access a mobile robot via ordinary Wi-Fi.
+AI researcher's use it for their tens of thousands of lines of Python code running on a laptop/desktop/server to bidirectionally access a mobile robot via ordinary Wi-Fi.
 
-At present the PetitCat project uses the free Arduino IDE to support a myriad of microcontroller boards which can control a variety of mobile robotic platforms.
+The PetitCat project uses the free Arduino IDE to support a myriad of microcontroller boards which can control a variety of mobile robotic platforms.
+Demonstrations are based on the [Osoyoo](https://osoyoo.com/2022/07/05/v2-metal-mecanum-wheel-robotic-lesson1-robot-car-assembly-model-2021006600/) platform but apply to similar platforms such as [4tronics](https://4tronix.co.uk/blog/?p=169), [Adafruit](https://www.adafruit.com/product/1639), [XiaoR](https://www.xiaorgeek.net/products/xiaor-geek-arduino-uno-r3-wifi-smart-programmable-robot-car), etc.
 
-At present the PetitCat project uses as the default "PetitCat Robot" an Arduino-driven robot car produced by Osoyoo. The cost of all parts including the Arduino board is approximately US$120 at the time of writing, i.e., orders of magnitude less costly (and less complex) than typical robotic embodiments purchased by research laboratories. For details about the Osoyoo robot car as well as ordering parts, please see:
+The cost of all parts including the Arduino board is approximately US$120 at the time of writing, i.e., orders of magnitude less costly (and less complex) than typical robotic embodiments purchased by research laboratories. For details about the Osoyoo robot car as well as ordering parts, please see:
 [Howard Schneider's full tutorial](docs/overview/Part_1_Easy_to_Read_Overview.md) 
 
 

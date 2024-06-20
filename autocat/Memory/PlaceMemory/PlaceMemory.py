@@ -1,6 +1,7 @@
 import numpy as np
 import networkx as nx
 from pyrr import Matrix44
+import copy
 from ...Memory.PlaceMemory.PlaceCell import PlaceCell
 from ...Memory.PlaceMemory.Cue import Cue
 from ...Memory.EgocentricMemory.Experience import EXPERIENCE_COMPASS, EXPERIENCE_AZIMUTH
@@ -15,6 +16,7 @@ class PlaceMemory:
         self.place_cells = {}
         self.place_cell_id = 0  # Incremental cell id (first cell is 1)
         self.place_cell_graph = nx.Graph()
+        self.place_cell_distances = dict(dict())
         self.current_robot_cell_id = 0  # The place cell where the robot currently is
 
     def add_or_update_place_cell(self, memory):
@@ -43,6 +45,7 @@ class PlaceMemory:
             self.place_cells[self.place_cell_id] = PlaceCell(memory.allocentric_memory.robot_point, cues)
             if self.place_cell_id > 1:  # Don't create Node 0
                 self.place_cell_graph.add_edge(self.current_robot_cell_id, self.place_cell_id)
+                self.place_cell_distances[self.current_robot_cell_id] = {self.place_cell_id:  np.linalg.norm(self.place_cells[self.current_robot_cell_id].point - self.place_cells[self.place_cell_id].point)}
             self.current_robot_cell_id = self.place_cell_id
             return np.array([0, 0, 0])
         else:
@@ -66,6 +69,8 @@ class PlaceMemory:
             # Add the edge in the graph if different
             if self.current_robot_cell_id != existing_id:
                 self.place_cell_graph.add_edge(self.current_robot_cell_id, existing_id)
+                # TODO check if this edge already existed
+                self.place_cell_distances[self.current_robot_cell_id] = {existing_id: np.linalg.norm(self.place_cells[self.current_robot_cell_id].point - self.place_cells[existing_id].point)}
             self.current_robot_cell_id = existing_id
             # Return robot position correction
             return position_correction
@@ -77,4 +82,5 @@ class PlaceMemory:
         saved_place_memory.place_cell_id = self.place_cell_id
         saved_place_memory.place_cell_graph = self.place_cell_graph.copy()
         saved_place_memory.current_robot_cell_id = self.current_robot_cell_id
+        saved_place_memory.place_cell_distances = copy.deepcopy(self.place_cell_distances)
         return saved_place_memory
