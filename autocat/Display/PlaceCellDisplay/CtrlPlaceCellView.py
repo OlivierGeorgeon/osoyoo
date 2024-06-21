@@ -1,7 +1,11 @@
 import math
+import numpy as np
+from webcolors import name_to_rgb
+from pyglet.gl import GL_LINES
 from ..InteractiveDisplay import InteractiveDisplay
 from ..PointOfInterest import PointOfInterest
 from ...Robot.CtrlRobot import ENACTION_STEP_RENDERING
+from ...Memory.EgocentricMemory.Experience import FLOOR_COLORS
 
 
 class CtrlPlaceCellView:
@@ -13,6 +17,7 @@ class CtrlPlaceCellView:
         self.cue_displays = []
         self.place_cell_id = -1
         self.selected_clock = 0
+        self.graph_display = None
 
         def on_text(text):
             """Handle user keypress"""
@@ -46,8 +51,20 @@ class CtrlPlaceCellView:
                                               cue.clock, cue.color_index)
                 self.cue_displays.append(cue_display)
 
-            # Draw the cue outline if any
-            # self.view.add_lines(phenomenon.outline(), "black")
+            # Draw the graph
+            if self.graph_display is not None:
+                self.graph_display.delete()
+                self.graph_display = None
+            points = []
+            for u, v in self.workspace.memory.place_memory.place_cell_graph.edges:
+                points.append(self.workspace.memory.place_memory.place_cells[u].point)
+                points.append(self.workspace.memory.place_memory.place_cells[v].point)
+            nb = len(points)
+            index = list(range(nb))
+            points = np.array(points) - place_cell.point
+            li = points[:, 0:2].flatten().astype("int").tolist()
+            self.graph_display = self.view.batch.add_indexed(nb, GL_LINES, self.view.forefront, index, ('v2i', li),
+                                                             ('c4B', nb * (*name_to_rgb(FLOOR_COLORS[0]), 255)))
 
     def main(self, dt):
         """Called every frame. Update the place cell view"""

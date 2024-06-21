@@ -21,7 +21,7 @@ class PhenomenonView(InteractiveDisplay):
             # points += points[0:2]  # Loop back to the last point
             nb_points = int(len(points) / 2)
             if nb_points >= 2:
-                index = []  # The initial point
+                index = []
                 for i in range(0, nb_points - 1):
                     index.extend([i, i + 1])
                 # v_index += [nb_points]  # Close the loop

@@ -1,4 +1,4 @@
-# Piloting PetitCat
+# Piloting or simulating PetitCat
 
 Run `main.py` on a PC to open the windows shown in Figure 1. For example:
 

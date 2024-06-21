@@ -58,13 +58,6 @@ class CtrlPhenomenonView:
 
         self.view.push_handlers(on_text, on_mouse_press, on_mouse_scroll)
 
-    # def update_body_robot(self):
-    #     """Updates the robot's body to display by the phenomenon view"""
-    #     self.view.robot.rotate_head(self.workspace.memory.body_memory.head_direction_degree())
-    #     self.view.robot.emotion_color(self.workspace.memory.body_memory.emotion_code())
-        # if self.phenomenon is not None:
-        #     self.view.phenomenon_point = self.phenomenon.point
-
     def update_affordance_displays(self):
         """Retrieve the new affordances in a phenomenon and create the corresponding points of interest"""
         if self.phenomenon_id in self.workspace.memory.phenomenon_memory.phenomena:
@@ -111,7 +104,5 @@ class CtrlPhenomenonView:
             phenomenon = self.workspace.memory.phenomenon_memory.phenomena[self.phenomenon_id]
             self.view.robot_translate = self.workspace.memory.allocentric_memory.robot_point - phenomenon.point
             self.view.label3.text = f"Type: {phenomenon.phenomenon_type}, Confidence: {phenomenon.confidence}"
-            # self.view.robot.rotate_head(self.workspace.memory.body_memory.head_direction_degree())
-            # update_body_robot()
             if self.workspace.enacter.interaction_step == ENACTION_STEP_RENDERING:
                 self.update_affordance_displays()
