@@ -131,6 +131,7 @@ class Enacter:
 
             # Update memory, possibly create new phenomena
             self.workspace.memory.update(self.workspace.enaction)
+            self.workspace.show_place_cell(self.workspace.memory.place_memory.current_robot_cell_id)
 
             # Select the focus - May be included in the attention mechanism
             # self.select_focus(self.workspace.memory)

@@ -1,5 +1,4 @@
 import json
-import pyglet
 import numpy as np
 from .Proposer.Action import create_actions, ACTION_FORWARD, ACTIONS, ACTION_TURN, ACTION_BACKWARD
 from .Memory.Memory import Memory
@@ -15,13 +14,10 @@ from .Integrator.PredictionError import PredictionError
 from .Integrator.Calibrator import Calibrator
 from .Enaction import KEY_ENGAGEMENT_ROBOT, KEY_CONTROL_DECIDER, KEY_ENGAGEMENT_IMAGINARY
 from .SoundPlayer import SoundPlayer, SOUND_CLEAR
-from .Proposer.Interaction import Interaction, OUTCOME_FOCUS_FRONT, OUTCOME_PROMPT, create_interactions, OUTCOME_NO_FOCUS
+from .Proposer.Interaction import OUTCOME_PROMPT, create_interactions
 from .Proposer.PredefinedInteractions import create_sequence_interactions
 
-# KEY_CONTROL_DECIDER = "A"  # Automatic mode: controlled by the deciders
 KEY_CONTROL_USER = "M"  # Manual mode : controlled by the user
-# KEY_ENGAGEMENT_ROBOT = "R"  # The robot actually enacts the interaction
-# KEY_ENGAGEMENT_IMAGINARY = "I"  # The application imagines the interaction but the robot does not enact them
 KEY_DECREASE = "D"
 KEY_INCREASE = "P"
 KEY_CLEAR = "C"  # Clear the stack of interactions to enact next
@@ -162,3 +158,8 @@ class Workspace:
         if message_string is not None:
             self.message = Message(message_string)
 
+    def show_place_cell(self, place_cell_id):
+        """Display this place cell if not zero"""
+        if place_cell_id > 0:
+            self.ctrl_place_cell_view.place_cell_id = place_cell_id
+            self.ctrl_place_cell_view.update_cue_displays()

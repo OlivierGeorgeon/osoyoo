@@ -126,10 +126,8 @@ def polar_to_cartesian(polar_points):
     # Convert to Cartesian coordinates
     x = r * np.cos(theta)
     y = r * np.sin(theta)
-    z = np.zeros_like(x)
-    # Stack the x, y, and z coordinates into a single array
-    cartesian_points = np.column_stack((x, y, z))
-    return cartesian_points
+    # Stack the x and y coordinates into a single array
+    return np.column_stack((x, y, np.zeros_like(x)))
 
 
 # Testing the utils

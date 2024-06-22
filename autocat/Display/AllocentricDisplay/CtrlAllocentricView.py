@@ -4,20 +4,9 @@ from .AllocentricView import AllocentricView
 from ...Memory.AllocentricMemory.Geometry import point_to_cell
 from ...Robot.CtrlRobot import ENACTION_STEP_RENDERING, ENACTION_STEP_ENACTING
 from ...Memory.EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO
-from ...Memory.AllocentricMemory.AllocentricMemory import CELL_UNKNOWN, PLACE_CELL_ID
-
-
-STATUS_0 = 0
-STATUS_1 = 1
-STATUS_3 = 6
-STATUS_4 = 8
-CLOCK_PLACE = 2
-COLOR_INDEX = 3
-CLOCK_FOCUS = 7
-CLOCK_PROMPT = 9
-CLOCK_INTERACTION = 4
-PHENOMENON_ID = 5
-CLOCK_NO_ECHO = 10
+from ...Memory.AllocentricMemory.AllocentricMemory import CELL_UNKNOWN
+from ...Memory.AllocentricMemory import STATUS_0, STATUS_1, STATUS_4, COLOR_INDEX, CLOCK_FOCUS, CLOCK_PLACE, \
+    PHENOMENON_ID, PLACE_CELL_ID
 
 
 class CtrlAllocentricView:
@@ -38,7 +27,7 @@ class CtrlAllocentricView:
             """Display the label of this cell"""
             click_point = self.view.mouse_coordinates_to_point(x, y)
             cell_x, cell_y = point_to_cell(click_point)
-            cell = self.workspace.memory.allocentric_memory.grid[cell_x][cell_y]
+            selected_cell = self.workspace.memory.allocentric_memory.grid[cell_x][cell_y]
 
             # Change cell status
             if button == mouse.RIGHT:
@@ -51,11 +40,9 @@ class CtrlAllocentricView:
                         self.workspace.memory.allocentric_memory.user_cells.remove((cell_x, cell_y))
                 # CTRL ALT: toggle COLOR FLOOR
                 elif modifiers & key.MOD_CTRL and modifiers & key.MOD_ALT:
-                    #if cell.status[0] == EXPERIENCE_FLOOR and cell.color_index > 0:
-                    if self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][STATUS_0] == EXPERIENCE_FLOOR and self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][COLOR_INDEX] > 0:
-                        #cell.status[0] = CELL_UNKNOWN
-                        self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][STATUS_0] = CELL_UNKNOWN
-                        self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][COLOR_INDEX] = 0
+                    if selected_cell[STATUS_0] == EXPERIENCE_FLOOR and selected_cell[COLOR_INDEX] > 0:
+                        selected_cell[STATUS_0] = CELL_UNKNOWN
+                        selected_cell[COLOR_INDEX] = 0
                         #cell.color_index = 0
                         if (cell_x, cell_y) in self.workspace.memory.allocentric_memory.user_cells:
                             self.workspace.memory.allocentric_memory.user_cells.remove((cell_x, cell_y))
@@ -66,11 +53,8 @@ class CtrlAllocentricView:
                         self.workspace.memory.allocentric_memory.user_cells.append((cell_x, cell_y))
                 # CTRL: Toggle FLOOR
                 elif modifiers & key.MOD_CTRL:
-                    #if cell.status[0] == EXPERIENCE_FLOOR and cell.color_index == 0:
-                    if self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][STATUS_0] == EXPERIENCE_FLOOR and self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][COLOR_INDEX] == 0:
-                        self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][STATUS_0] = CELL_UNKNOWN
-
-                        #cell.status[0] = CELL_UNKNOWN
+                    if selected_cell[STATUS_0] == EXPERIENCE_FLOOR and selected_cell[COLOR_INDEX] == 0:
+                        selected_cell[STATUS_0] = CELL_UNKNOWN
                         if (cell_x, cell_y) in self.workspace.memory.allocentric_memory.user_cells:
                             self.workspace.memory.allocentric_memory.user_cells.remove((cell_x, cell_y))
                     else:
@@ -80,9 +64,9 @@ class CtrlAllocentricView:
                         self.workspace.memory.allocentric_memory.user_cells.append((cell_x, cell_y))
                 # ALT: Toggle ECHO
                 elif modifiers & key.MOD_ALT:
-                    if self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][STATUS_1] == EXPERIENCE_ALIGNED_ECHO:
-                        self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][STATUS_1] = CELL_UNKNOWN
-                        self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][COLOR_INDEX] = 0
+                    if selected_cell[STATUS_1] == EXPERIENCE_ALIGNED_ECHO:
+                        selected_cell[STATUS_1] = CELL_UNKNOWN
+                        selected_cell[COLOR_INDEX] = 0
                         if (cell_x, cell_y) in self.workspace.memory.allocentric_memory.user_cells:
                             self.workspace.memory.allocentric_memory.user_cells.remove((cell_x, cell_y))
                     else:
@@ -102,34 +86,19 @@ class CtrlAllocentricView:
                 self.update_view()
 
             # Display this phenomenon in phenomenon window
-            if self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][PHENOMENON_ID] != -1:
-                self.workspace.ctrl_phenomenon_view.view.set_caption(f"Phenomenon {self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][PHENOMENON_ID]}")
-                self.workspace.ctrl_phenomenon_view.phenomenon_id = self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][PHENOMENON_ID]
-                # self.workspace.ctrl_phenomenon_view.update_body_robot()
-                self.workspace.ctrl_phenomenon_view.update_affordance_displays()
+            # if self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][PHENOMENON_ID] != -1:
+            #     self.workspace.ctrl_phenomenon_view.view.set_caption(f"Phenomenon {self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][PHENOMENON_ID]}")
+            #     self.workspace.ctrl_phenomenon_view.phenomenon_id = self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][PHENOMENON_ID]
+            #     self.workspace.ctrl_phenomenon_view.update_affordance_displays()
 
             # Display the place cell in place cell window
-            if self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][PLACE_CELL_ID] > 0:
-                self.workspace.ctrl_place_cell_view.view.set_caption(f"Phenomenon {self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][PLACE_CELL_ID]}")
-                self.workspace.ctrl_place_cell_view.place_cell_id = self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][PLACE_CELL_ID]
-                self.workspace.ctrl_place_cell_view.update_cue_displays()
+            self.workspace.show_place_cell(selected_cell[PLACE_CELL_ID])
 
-            self.view.label2.text = self.workspace.memory.allocentric_memory.grid[cell_x][cell_y].__str__()
-
-            # """Label of the cell for display on click in allocentricView"""
-            # label = str(self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][STATUS_0]) + " Clocks: ["
-            # label += str(self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][STATUS_1])
-            # label += str(self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][STATUS_3])
-            # label += str(self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][STATUS_4])
-            # label += str(self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][CLOCK_PLACE]) + ", "
-            # label += str(self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][CLOCK_INTERACTION]) + ", "
-            # label += str(self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][CLOCK_NO_ECHO]) + ", "
-            # label += str(self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][CLOCK_FOCUS]) + ", "
-            # label += str(self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][CLOCK_FOCUS]) + "]"
-            # # if self.phenomenon_id is not None:
-            #     label += " Phenomenon:" + str(self.phenomenon_id)
-            #
-            #     self.view.label_click.text = label
+            # Display the grid cell status
+            self.view.label2.text = f"Place {selected_cell[PLACE_CELL_ID]} " \
+                                    f"Phen. {selected_cell[PHENOMENON_ID]} " \
+                                    f"Status {tuple(selected_cell[STATUS_0: STATUS_4 + 1])} " \
+                                    f"Clock {tuple(selected_cell[CLOCK_FOCUS:CLOCK_PLACE+1])} "
 
         self.view.on_mouse_press = on_mouse_press
 

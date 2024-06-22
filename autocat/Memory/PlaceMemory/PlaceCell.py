@@ -1,6 +1,5 @@
 # A place cell is defined by a point and contains the cues to recognize it
 import math
-
 import numpy as np
 from pyrr import Matrix44
 from ..EgocentricMemory.EgocentricMemory import EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_CENTRAL_ECHO, \
@@ -38,16 +37,14 @@ class PlaceCell:
     def polar_echo_curve(self):
         """Return the curve of echoes in polar coordinates"""
         curve = np.empty((360, 2), dtype=float)
-        for t in range(0, 360, 1):
-            r = 0
-            theta = math.radians(t)
-            for cue in [cue for cue in self.cues.values()
-                        if cue.type in [EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_CENTRAL_ECHO, EXPERIENCE_LOCAL_ECHO]]:
-                r_cue, t_cue = cartesian_to_polar(cue.point())
-                if assert_almost_equal_angles(t_cue, theta, 35) and r_cue > r:
+        echo_cues = [cartesian_to_polar(cue.point()) for cue in self.cues.values() if cue.type
+                     in [EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_CENTRAL_ECHO, EXPERIENCE_LOCAL_ECHO]]
+        for theta_deg in range(0, 360, 1):
+            r, theta_rad = 0, math.radians(theta_deg)
+            for r_cue, t_cue in echo_cues:
+                if r_cue > r and assert_almost_equal_angles(t_cue, theta_rad, 35):
                     r = r_cue
-            curve[t, :] = [round(r), theta]
-        print("polar curve", curve)
+            curve[theta_deg, :] = [r, theta_rad]
         return curve
 
     def save(self):

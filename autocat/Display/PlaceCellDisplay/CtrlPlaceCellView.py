@@ -16,9 +16,10 @@ class CtrlPlaceCellView:
         self.view = InteractiveDisplay()
         self.workspace = workspace
         self.cue_displays = []
-        self.place_cell_id = -1
+        self.place_cell_id = 0
         self.selected_clock = 0
         self.graph_display = None
+        self.echo_curve = None
 
         def on_text(text):
             """Handle user keypress"""
@@ -69,13 +70,16 @@ class CtrlPlaceCellView:
                                                                  ('c4B', nb * (*name_to_rgb(FLOOR_COLORS[0]), 255)))
 
             # Draw the echo curve
+            if self.echo_curve is not None:
+                self.echo_curve.delete()
+                self.echo_curve = None
             points = polar_to_cartesian(place_cell.polar_echo_curve())
             index = []
             for i in range(0, 360 - 1):
                 index.extend([i, i + 1])
             li = points[:, 0:2].flatten().astype("int").tolist()
-            self.graph_display = self.view.batch.add_indexed(360, GL_LINES, self.view.forefront, index, ('v2i', li),
-                                                             ('c4B', 360 * (*name_to_rgb("orange"), 255)))
+            self.echo_curve = self.view.batch.add_indexed(360, GL_LINES, self.view.forefront, index, ('v2i', li),
+                                                          ('c4B', 360 * (*name_to_rgb("orange"), 255)))
 
     def main(self, dt):
         """Called every frame. Update the place cell view"""
