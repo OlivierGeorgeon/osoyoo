@@ -52,6 +52,7 @@ place_cell = PlaceCell([0, 0, 0], {cue00.id: cue00, cue01.id: cue01, cue02.id: c
 workspace.memory.place_memory.place_cells[1] = place_cell
 workspace.memory.place_memory.place_cell_id = 1
 workspace.memory.egocentric_memory.experience_id = 3
+workspace.memory.place_memory.current_robot_cell_id = 1
 
 # Move the robot
 swipe = Interaction(Action(ACTION_SWIPE, np.array([0, 300, 0], dtype=float), 0, 1.), OUTCOME_NO_FOCUS, 0)

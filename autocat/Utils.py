@@ -111,6 +111,27 @@ def point_to_head_direction_distance(point):
     return direction, distance
 
 
+def cartesian_to_polar(point):
+    """return the radius and the angle of the point """
+    r = math.hypot(point[0], point[1])
+    theta = math.atan2(point[1], point[0])
+    return r, theta
+
+
+def polar_to_cartesian(polar_points):
+    """Return the array of points in cartesian coordinates"""
+    # Extract radius (r) and angle (theta) from the polar points
+    r = polar_points[:, 0]
+    theta = polar_points[:, 1]
+    # Convert to Cartesian coordinates
+    x = r * np.cos(theta)
+    y = r * np.sin(theta)
+    z = np.zeros_like(x)
+    # Stack the x, y, and z coordinates into a single array
+    cartesian_points = np.column_stack((x, y, z))
+    return cartesian_points
+
+
 # Testing the utils
 # py autocat\Utils.py
 if __name__ == "__main__":

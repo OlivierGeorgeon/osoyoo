@@ -1,8 +1,11 @@
 # A place cell is defined by a point and contains the cues to recognize it
+import math
 
 import numpy as np
 from pyrr import Matrix44
-from ..EgocentricMemory.EgocentricMemory import EXPERIENCE_FLOOR
+from ..EgocentricMemory.EgocentricMemory import EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_CENTRAL_ECHO, \
+    EXPERIENCE_LOCAL_ECHO
+from ...Utils import cartesian_to_polar, assert_almost_equal_angles
 
 
 class PlaceCell:
@@ -23,25 +26,29 @@ class PlaceCell:
     def recognize_vector(self, cues):
         """Return the vector of the position defined by previous cues minus the position by the new cues"""
         vector = np.array([0, 0, 0])
+
+        # Similarity based on echoes
+
         # Assume FLOOR experiences come from a single point
         for new_cue in [cue for cue in cues.values() if cue.type == EXPERIENCE_FLOOR]:
             for previous_cue in [cue for cue in self.cues.values() if cue.type == EXPERIENCE_FLOOR]:
                 vector = previous_cue.point() - new_cue.point()
         return vector
 
-    # def add_cues(self, cues):
-    #     """Compute a position correction, add the cues, and return the position correction"""
-    #     position_correction = np.array([0, 0, 0])
-    #     # Assume FLOOR experiences come from a single point
-    #     for new_cue in [cue for cue in cues.values() if cue.type == EXPERIENCE_FLOOR]:
-    #         for old_cue in [cue for cue in self.cues.values() if cue.type == EXPERIENCE_FLOOR]:
-    #             position_correction = old_cue.point() - new_cue.point()
-    #     position_correction_matrix = Matrix44.from_translation(position_correction)
-    #     # shift the new cues
-    #     for cue in cues.values():
-    #         cue.pose_matrix @= position_correction_matrix
-    #     self.cues.update(cues)
-    #     return position_correction
+    def polar_echo_curve(self):
+        """Return the curve of echoes in polar coordinates"""
+        curve = np.empty((360, 2), dtype=float)
+        for t in range(0, 360, 1):
+            r = 0
+            theta = math.radians(t)
+            for cue in [cue for cue in self.cues.values()
+                        if cue.type in [EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_CENTRAL_ECHO, EXPERIENCE_LOCAL_ECHO]]:
+                r_cue, t_cue = cartesian_to_polar(cue.point())
+                if assert_almost_equal_angles(t_cue, theta, 35) and r_cue > r:
+                    r = r_cue
+            curve[t, :] = [round(r), theta]
+        print("polar curve", curve)
+        return curve
 
     def save(self):
         """Return a cloned place cell for memory snapshot"""
