@@ -22,12 +22,12 @@ class PlaceMemory:
     def add_or_update_place_cell(self, memory):
         """Create e new place cell or update the existing one"""
         # Create the cues
-        cues = {}
+        cues = []
         # The new experiences generated during this step constitute cues
         for e in [e for e in memory.egocentric_memory.experiences.values() if (e.clock >= memory.clock) and
                   e.type not in [EXPERIENCE_COMPASS, EXPERIENCE_AZIMUTH]]:
             cue = Cue(e.id, e.polar_pose_matrix(), e.type, e.clock, e.color_index, e.polar_sensor_point())
-            cues[cue.id] = cue
+            cues.append(cue)
 
         existing_id = None
 
@@ -53,18 +53,18 @@ class PlaceMemory:
             # Adjust the cue position to the place cell (add the relative position of the robot)
             d_matrix = Matrix44.from_translation(memory.allocentric_memory.robot_point -
                                                  self.place_cells[existing_id].point)
-            for cue in cues.values():
+            for cue in cues:
                 # https://pyglet.readthedocs.io/en/latest/programming_guide/math.html#matrix-multiplication
                 cue.pose_matrix @= d_matrix  # = d_matrix * cue.pose_matrix  # *= does not work: wrong order
 
             # Adjust the position from the estimation by the cues
             position_correction = self.place_cells[existing_id].recognize_vector(cues)
             position_correction_matrix = Matrix44.from_translation(position_correction)
-            for cue in cues.values():
+            for cue in cues:
                 cue.pose_matrix @= position_correction_matrix
 
             # Add the cues to the existing place cell
-            self.place_cells[existing_id].cues.update(cues)
+            self.place_cells[existing_id].cues.extend(cues)
 
             # Add the edge in the graph if different
             if self.current_robot_cell_id != existing_id:

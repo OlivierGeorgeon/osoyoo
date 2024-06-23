@@ -161,5 +161,7 @@ class Workspace:
     def show_place_cell(self, place_cell_id):
         """Display this place cell if not zero"""
         if place_cell_id > 0:
+            place_cell = self.memory.place_memory.place_cells[place_cell_id]
+            self.ctrl_place_cell_view.view.set_caption(f"Place Cell {place_cell_id} at {place_cell}")
             self.ctrl_place_cell_view.place_cell_id = place_cell_id
-            self.ctrl_place_cell_view.update_cue_displays()
+            # self.ctrl_place_cell_view.update_cue_displays()

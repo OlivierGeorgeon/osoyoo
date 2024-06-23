@@ -41,7 +41,7 @@ class AllocentricView(InteractiveDisplay):
         if self.hexagons[i][j] is None:
             if not np.all(cell[STATUS_0:STATUS_4+1] == CELL_UNKNOWN):
                 # The hexagon does not exist but the cell is known then create the hexagon
-                self.hexagons[i][j] = CellDisplay(cell, self.batch, self.groups, self.workspace.memory.clock)
+                self.hexagons[i][j] = CellDisplay(cell, self.polar_batch, self.groups, self.workspace.memory.clock)
         else:
             if not np.all(cell[STATUS_0:STATUS_4+1] == CELL_UNKNOWN):
                 # The hexagon exists and the cell is known then update the hexagon
@@ -74,8 +74,8 @@ class AllocentricView(InteractiveDisplay):
             pose_matrix = quaternion_translation_to_matrix(phenomenon.latest_added_affordance().quaternion,
                                                            phenomenon.point +
                                                            phenomenon.latest_added_affordance().point)
-            self.body_poi = PointOfInterest(pose_matrix, self.batch, self.forefront, POINT_ROBOT,
+            self.body_poi = PointOfInterest(pose_matrix, self.polar_batch, self.forefront, POINT_ROBOT,
                                             phenomenon.latest_added_affordance().clock)
-            self.robot_poi = PointOfInterest(pose_matrix, self.batch, self.forefront, EXPERIENCE_ROBOT,
+            self.robot_poi = PointOfInterest(pose_matrix, self.polar_batch, self.forefront, EXPERIENCE_ROBOT,
                                              phenomenon.latest_added_affordance().clock,
                                              color_index=phenomenon.latest_added_affordance().color_index)

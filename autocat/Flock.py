@@ -50,10 +50,12 @@ class Flock:
         for robot_id in self.workspaces.keys():
             self.ctrl_robots[robot_id].main(dt)
             self.workspaces[robot_id].main(dt)
+            loop_duration1 = time.time() - start_time
             self.ctrl_egocentric_views[robot_id].main(dt)
             self.ctrl_allocentric_views[robot_id].main(dt)
             self.ctrl_body_views[robot_id].main(dt)
             # self.ctrl_phenomenon_views[robot_id].main(dt)
+            loop_duration2 = time.time() - start_time
             self.ctrl_place_cell_views[robot_id].main(dt)
 
         # Transmit messages between robots
@@ -63,7 +65,8 @@ class Flock:
                     self.workspaces[key_receiver].receive_message(self.workspaces[key_sender].emit_message())
         main_loop_duration = time.time() - start_time
         if main_loop_duration > 0.1:
-            print(f"Main loop duration: {main_loop_duration:.3f} seconds")
+            print(f"Main loop duration: {main_loop_duration:.3f} seconds. Before display: {loop_duration1:.3f}. "
+                  f"Before place cell {loop_duration2:.3f}.")
 
         # # Pass the message from robot '2' to robot '1'
         # if all(key in self.workspaces for key in ['1', '2']):

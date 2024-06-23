@@ -25,8 +25,8 @@ class PhenomenonView(InteractiveDisplay):
                 for i in range(0, nb_points - 1):
                     index.extend([i, i + 1])
                 # v_index += [nb_points]  # Close the loop
-                self.hull_line = self.batch.add_indexed(nb_points, gl.GL_LINES, self.forefront, index, ('v2i', points),
-                                                        ('c4B', nb_points * (*name_to_rgb(color_string), 255)))
+                self.hull_line = self.polar_batch.add_indexed(nb_points, gl.GL_LINES, self.forefront, index, ('v2i', points),
+                                                              ('c4B', nb_points * (*name_to_rgb(color_string), 255)))
 
     def on_mouse_scroll(self, x, y, dx, dy):
         """ Zooming the window if the mouse is above the text"""

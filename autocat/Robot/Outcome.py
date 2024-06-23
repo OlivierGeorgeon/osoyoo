@@ -2,6 +2,7 @@ import json
 import numpy as np
 import colorsys
 from pyrr import matrix44
+from . import NO_ECHO_DISTANCE
 from ..Memory.EgocentricMemory.Experience import FLOOR_COLORS
 from ..Utils import head_angle_distance_to_matrix
 
@@ -143,10 +144,10 @@ class Outcome:
             self.compass_point = np.array([outcome_dict['compass_x'], outcome_dict['compass_y'], 0], dtype=int)
 
         # Outcome echo
-        self.echo_distance = outcome_dict.get('echo_distance', 10000)
+        self.echo_distance = outcome_dict.get('echo_distance', NO_ECHO_DISTANCE)
         self.echo_matrix = None
         self.echo_point = None
-        if self.echo_distance < 10000:
+        if self.echo_distance < NO_ECHO_DISTANCE:
             self.echo_matrix = head_angle_distance_to_matrix(outcome_dict['head_angle'], outcome_dict['echo_distance'])
             self.echo_point = matrix44.apply_to_vector(self.echo_matrix, [0, 0, 0])
 

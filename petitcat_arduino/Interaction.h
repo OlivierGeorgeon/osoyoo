@@ -48,7 +48,7 @@ protected:
   int _step = INTERACTION_BEGIN;
   int _caution = 0;
   int _span = 40;
-  int _align = 0;
+  int _align = 1;  // 0 or 1: Do not or do align head before terminating interaction
   unsigned long _duration2 = 0;
 };
 

@@ -141,7 +141,8 @@ void Head::outcome(JSONVar & outcome_object)
   outcome_object["head_angle"] = _head_angle;
 
   // The latest measure obtained from echo alignment
-  outcome_object["echo_distance"] = _min_ultrasonic_measure;
+  if (_min_ultrasonic_measure < NO_ECHO_DISTANCE)
+    outcome_object["echo_distance"] = _min_ultrasonic_measure;
 }
 
 void Head::turnHead(int head_angle)

@@ -48,8 +48,8 @@ class CtrlPlaceCellView:
             self.cue_displays = []
 
             # Recreate all cue displays
-            for cue in place_cell.cues.values():
-                cue_display = PointOfInterest(cue.pose_matrix, self.view.batch, self.view.forefront, cue.type,
+            for cue in place_cell.cues:
+                cue_display = PointOfInterest(cue.pose_matrix, self.view.polar_batch, self.view.forefront, cue.type,
                                               cue.clock, cue.color_index)
                 self.cue_displays.append(cue_display)
 
@@ -66,20 +66,21 @@ class CtrlPlaceCellView:
                 index = list(range(nb))
                 points = np.array(points) - place_cell.point
                 li = points[:, 0:2].flatten().astype("int").tolist()
-                self.graph_display = self.view.batch.add_indexed(nb, GL_LINES, self.view.forefront, index, ('v2i', li),
-                                                                 ('c4B', nb * (*name_to_rgb(FLOOR_COLORS[0]), 255)))
+                self.graph_display = self.view.polar_batch.add_indexed(nb, GL_LINES, self.view.forefront, index, ('v2i', li),
+                                                                       ('c4B', nb * (*name_to_rgb(FLOOR_COLORS[0]), 255)))
 
             # Draw the echo curve
             if self.echo_curve is not None:
                 self.echo_curve.delete()
                 self.echo_curve = None
             points = polar_to_cartesian(place_cell.polar_echo_curve())
+            nb = points.shape[0]
             index = []
-            for i in range(0, 360 - 1):
+            for i in range(0, nb - 1):
                 index.extend([i, i + 1])
             li = points[:, 0:2].flatten().astype("int").tolist()
-            self.echo_curve = self.view.batch.add_indexed(360, GL_LINES, self.view.forefront, index, ('v2i', li),
-                                                          ('c4B', 360 * (*name_to_rgb("orange"), 255)))
+            self.echo_curve = self.view.polar_batch.add_indexed(nb, GL_LINES, self.view.forefront, index, ('v2i', li),
+                                                                ('c4B', nb * (*name_to_rgb("orange"), 255)))
 
     def main(self, dt):
         """Called every frame. Update the place cell view"""
@@ -89,7 +90,7 @@ class CtrlPlaceCellView:
 
         if self.place_cell_id in self.workspace.memory.place_memory.place_cells:
             place_cell = self.workspace.memory.place_memory.place_cells[self.place_cell_id]
-            self.view.set_caption(f"Place Cell {self.place_cell_id} at {place_cell}")
+            # self.view.set_caption(f"Place Cell {self.place_cell_id} at {place_cell}")
             self.view.robot_translate = self.workspace.memory.allocentric_memory.robot_point - place_cell.point
             if self.workspace.enacter.interaction_step == ENACTION_STEP_RENDERING:
                 self.update_cue_displays()

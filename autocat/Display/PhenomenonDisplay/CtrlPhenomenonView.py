@@ -81,11 +81,11 @@ class CtrlPhenomenonView:
         affordance_displays = []
         pose_matrix = quaternion_translation_to_matrix(affordance.quaternion, affordance.point)
         if affordance.type in [EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_CENTRAL_ECHO]:
-            cone_display = PointOfInterest(pose_matrix, self.view.batch, self.view.background, POINT_CONE,
+            cone_display = PointOfInterest(pose_matrix, self.view.polar_batch, self.view.background, POINT_CONE,
                                            affordance.clock, affordance.color_index,
                                            np.linalg.norm(affordance.polar_sensor_point))
             affordance_displays.append(cone_display)
-        poi = PointOfInterest(pose_matrix, self.view.batch, self.view.forefront,
+        poi = PointOfInterest(pose_matrix, self.view.polar_batch, self.view.forefront,
                               affordance.type, affordance.clock, affordance.color_index)
         affordance_displays.append(poi)
         return affordance_displays

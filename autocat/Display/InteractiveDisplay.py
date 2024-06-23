@@ -52,7 +52,7 @@ class InteractiveDisplay(pyglet.window.Window):
         self.zoom_level = 6
 
         # The batch that displays the content of the window
-        self.batch = pyglet.graphics.Batch()
+        self.polar_batch = pyglet.graphics.Batch()
         self.background = pyglet.graphics.OrderedGroup(0)
         self.forefront = pyglet.graphics.OrderedGroup(5)
         self.screen_scale = screen_scale()
@@ -85,7 +85,7 @@ class InteractiveDisplay(pyglet.window.Window):
         glOrtho(self.left, self.right, self.bottom, self.top, 1, -1)
 
         # Draw the layer in polar coordinates
-        self.batch.draw()
+        self.polar_batch.draw()
 
         # Stack the rotation and translation of the robot's body
         glTranslatef(*self.robot_translate)

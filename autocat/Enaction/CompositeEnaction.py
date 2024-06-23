@@ -1,4 +1,5 @@
 from ..Robot.Enaction import Enaction
+from ..Proposer.Action import ACTION_SCAN
 
 
 class CompositeEnaction:
@@ -14,7 +15,11 @@ class CompositeEnaction:
             self.enactions = []
             e_memory = memory
             for interaction in interactions:
-                e = Enaction(interaction, e_memory)
+                if decider_id == 'Manual' and interaction.action.action_code == ACTION_SCAN:
+                    span = 10
+                else:
+                    span = 40
+                e = Enaction(interaction, e_memory, span=span)
                 e_memory = e.predicted_memory.save()
                 self.enactions.append(e)
 
