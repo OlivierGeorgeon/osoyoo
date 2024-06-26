@@ -793,7 +793,7 @@ YOU NEED TO KNOW THAT THIS WORKS BEFORE ADDING MORE COMPLEXITY TO YOUR PROJECT.
  -The Osoyoo ultrasonic distance measuring transducer/sensor sends out 40KHz ultrasonic sound pulses and waits for their echos to return, with the time (and thus distance) as the width of the produced TTL pulse.
 
 <p align="center">
- <img src="ultrasonic.jpg" width="400" height="600">
+ <img src="ultrasonic.jpg" width="400" height="400">
 </p>
 
 
