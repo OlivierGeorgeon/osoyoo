@@ -98,6 +98,8 @@ Tip: When you click links in these Overview document files, right-click so that 
 
 (Otherwise, this page may be replaced by the clicked page. Then you will have to press the back arrow to come back here and then find this spot again in the document.)
 
+(Yes... this image has tiny little spelling mistakes or other weird things the reader can notice -- it was created by generative AI and suffers from having made-up features, as is common with this technology at the time of writing.)
+
 <p align="center">
  <img src="rightclick.jpg" width="250" height="340">
 </p>
