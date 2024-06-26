@@ -6,7 +6,6 @@ from ..InteractiveDisplay import InteractiveDisplay
 from ..PointOfInterest import PointOfInterest
 from ...Robot.CtrlRobot import ENACTION_STEP_RENDERING
 from ...Memory.EgocentricMemory.Experience import FLOOR_COLORS
-from ...Utils import polar_to_cartesian
 
 
 class CtrlPlaceCellView:
@@ -73,7 +72,7 @@ class CtrlPlaceCellView:
             if self.echo_curve is not None:
                 self.echo_curve.delete()
                 self.echo_curve = None
-            points = polar_to_cartesian(place_cell.polar_echo_curve())
+            points = place_cell.cartesian_echo_curve
             nb = points.shape[0]
             index = []
             for i in range(0, nb - 1):

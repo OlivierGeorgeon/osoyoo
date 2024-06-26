@@ -5,8 +5,7 @@ import copy
 from ...Memory.PlaceMemory.PlaceCell import PlaceCell
 from ...Memory.PlaceMemory.Cue import Cue
 from ...Memory.EgocentricMemory.Experience import EXPERIENCE_COMPASS, EXPERIENCE_AZIMUTH
-
-MIN_PLACE_CELL_DISTANCE = 300
+from .PlaceGeometry import nearby_place_cell
 
 
 class PlaceMemory:
@@ -29,20 +28,16 @@ class PlaceMemory:
             cue = Cue(e.id, e.polar_pose_matrix(), e.type, e.clock, e.color_index, e.polar_sensor_point())
             cues.append(cue)
 
-        existing_id = None
+        # If the robot is still in the same place cell
+        # if np.linalg.norm(self.place_cells[self.current_robot_cell_id].point() - memory.allocentric_memory.robot_point) < MIN_PLACE_CELL_DISTANCE:
 
-        # Try to recognize an existing place cell (currently only based on distance)
-        pc_distance_id = {np.linalg.norm(pc.point - memory.allocentric_memory.robot_point): key for key, pc
-                          in self.place_cells.items()}
-        if len(pc_distance_id) > 0:
-            min_distance = min(pc_distance_id.keys())
-            if min_distance < MIN_PLACE_CELL_DISTANCE:
-                existing_id = pc_distance_id[min_distance]
+        existing_id = nearby_place_cell(memory.allocentric_memory.robot_point, self.place_cells)
 
-        if existing_id is None:
+        if existing_id == 0:
             # If place cell not recognized, add it
             self.place_cell_id += 1
             self.place_cells[self.place_cell_id] = PlaceCell(memory.allocentric_memory.robot_point, cues)
+            self.place_cells[self.place_cell_id].compute_echo_curve()
             if self.place_cell_id > 1:  # Don't create Node 0
                 self.place_cell_graph.add_edge(self.current_robot_cell_id, self.place_cell_id)
                 self.place_cell_distances[self.current_robot_cell_id] = {self.place_cell_id:  np.linalg.norm(self.place_cells[self.current_robot_cell_id].point - self.place_cells[self.place_cell_id].point)}
@@ -58,13 +53,14 @@ class PlaceMemory:
                 cue.pose_matrix @= d_matrix  # = d_matrix * cue.pose_matrix  # *= does not work: wrong order
 
             # Adjust the position from the estimation by the cues
-            position_correction = self.place_cells[existing_id].recognize_vector(cues)
+            position_correction = self.place_cells[existing_id].translation_estimation(cues)
             position_correction_matrix = Matrix44.from_translation(position_correction)
             for cue in cues:
                 cue.pose_matrix @= position_correction_matrix
 
             # Add the cues to the existing place cell
             self.place_cells[existing_id].cues.extend(cues)
+            self.place_cells[existing_id].compute_echo_curve()
 
             # Add the edge in the graph if different
             if self.current_robot_cell_id != existing_id:

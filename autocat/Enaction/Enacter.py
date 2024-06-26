@@ -129,8 +129,9 @@ class Enacter:
                 self.workspace.enaction.message = self.workspace.message
                 print("Message", self.workspace.message.message_string)
 
-            # Update memory, possibly create new phenomena
+            # Update memory, possibly create new place cell and phenomena
             self.workspace.memory.update(self.workspace.enaction)
+            # Show the current place cell in PlaceCellView
             self.workspace.show_place_cell(self.workspace.memory.place_memory.current_robot_cell_id)
 
             # Select the focus - May be included in the attention mechanism
