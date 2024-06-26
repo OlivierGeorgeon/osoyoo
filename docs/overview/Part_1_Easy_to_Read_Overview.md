@@ -97,7 +97,7 @@ Tip: When you click links in these Overview document files, right-click so that 
 (Otherwise, this page may be replaced by the clicked page. Then you will have to press the back arrow to come back here and then find this spot again in the document.)
 
 <p align="center">
- <img src="rightclick.jpg" width="175" height="240">
+ <img src="rightclick.jpg" width="250" height="340">
 </p>
 
 ##
