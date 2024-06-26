@@ -126,7 +126,7 @@ For a paper on using the PetitCat project for Enactive Inference by Dr Georgeon 
 ##
 Note to hobbyists, high school students, even computer scientists without a background in cognitive science:
 
-You do not need to understand the above few paragraphs to build the robot car and even use it in your own projects, even AI ones. However, doing so can be advantageous to better understanding the background of this project as well as aspects of cognition.
+You do not need to understand the above few paragraphs to build the robot car and use it in your own projects, even AI ones. However, doing so can be advantageous for better understanding the background of this project as well as aspects of cognition.
 
 ##
 
