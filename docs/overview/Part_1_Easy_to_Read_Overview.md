@@ -95,6 +95,11 @@ Embodiment also goes beyond this. For example, by having a robot body, your AI p
 Tip: When you click links in these Overview document files, right-click so that you open up a new browser page.
 
 (Otherwise, this page may be replaced by the clicked page. Then you will have to press the back arrow to come back here and then find this spot again in the document.)
+
+<p align="center">
+ <img src="rightclick.jpg" width="175" height="240">
+</p>
+
 ##
 
 For a good overview of the importance of grounding your AI/AGI please consider my paper:
