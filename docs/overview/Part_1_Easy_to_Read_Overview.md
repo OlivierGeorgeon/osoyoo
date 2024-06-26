@@ -655,16 +655,16 @@ You can skip this "step" (i.e., chapter). However, if you don't have much experi
 
 
 
--
--
-
-
 **Generative AI Approach to Troubleshooting**
+
+
 You went through the above steps. You then put the lithium batteries into the holders, turned the battery switch on (yes, there's a small black switch on the battery box!!), but nothing happened. Your robot car does not work.
 
 What to do?
 
-Well.... in the modern world we live in, you can ask ChatGPT/GPT4:
+One approach is access a moderna large language model, which may have read all the technical documentation concerning your system already. However, the prompts used can make a large difference.
+
+Let's give it a try. We will use for these examples ChatGPT/GPT4:
 
 ----
 **User**
@@ -747,6 +747,7 @@ Well.... not bad.... but still not a replacement for human troubleshooting.
 
 **The Herbert Simon and Cleveland Institute of Electronics Approach to Troubleshooting**
 
+
 Herbert A. Simon won the Nobel Prize in Economics in 1978, largely for his work on cognitive science and the beginnings of AI. In 1968 he gave the Karl Taylor Compton Lectures at MIT and these lectures were turned into the book "The Sciences of the Artificial." A link to a review of the book is, for example: https://www.science.org/doi/10.1126/science.165.3896.886.b  You can find many links actually giving PDF copies of the book elsewhere.
 Above I wrote about a section of this book:
  In Herbert Simon's "The Sciences of the Artifical" (PDF's are available from many places) he gives the story of Hora and Tempus as skilled watchmakers, but Tempus assembles full watches (faster) while Hora designs and assembles watches via combining independent modules (slower). However, Hora is actually much more efficient since he doesn't have to start over from zero if there is an interruption, but just redo the module, unlike Tempus who has to restart from zero if there is any interruption. The message is that you the reader, should also take this approach to working with complex robotic systems.
@@ -768,6 +769,7 @@ The methodology of Herbert A. Simon, Nobel Prize winner, and the Cleveland Insti
 
 **Electronic Component/Digital Oscilliscope Appraoch to Troubleshooting your Robot Car**
 
+
 Even if you have a full suite of electronics test equipment, particularly a multi-channel digital oscilliscope that can capture pulse trains at the clock speed of the Arduino board, it is not practical to troubleshoot the robot car as such. The reality is that in 2023 at the time of writing, given surface mounted components and given application-specific integrated circuits, unless you are the designer/authorized repair hub of the computer board, it is not possible/feasible/realistic to do component level repairs. 
 
 Thus, we will simply use simple logic to troubleshoot. Even a simple VOM/multimeter to measure voltages, etc is not required.
@@ -780,138 +782,14 @@ For the remainder of this section we will consider a modular approach to getting
 
 Remember, especially if you live in a winter-climate environment where there is lots of static charge in the low-humidity winter: static electricity will destroy the sensitivie chips on the little electronics boards. Ground yourself (e.g., touch a water pipe) before touching the electronics in these environments.
 
-
- **Mechanical Issues**
- This section is for troubleshooting mechanical issues and can be added to with experience, i.e., "under construction" at present.
- 
-PLEASE CONTRIBUTE TO THIS SECTION AS YOU ENCOUNTER AND TROUBLESHOOT PROBLEMS
-
- Some tips at present:
- 
- -follow the assembly manual carefully
- 
- -if you reverse the assembly of parts then take the time to disassemble and try again (it's easy to get confused with the orientation of both the metal chassis and the acrylic board)
- -make sure the Mecanum wheels are orientated exactly as shown in the manual
-
- -make sure the wheels can rotate freely -- careful with the attachments
-
-
- **Electronics Issues**
-This section is for troubleshooting electronics issues and can be added to with experience, i.e., "under construction" at present.
-
-- -->The robotic car appears to want to drive in reverse all the time when I run the Ultrasonic Obstacle avoidance lesson.
-- Put your hand in front of the Ultrasonic Transducer. Does the car then try to 'escape' the obstruction by going forward? Most likely you have reversed the wiring of the electric drive motors. Reverse the pin plug-in's to what they should be, and the car will work properly -- the car will go forward until it senses an obstruction, and then reverse to escape the obstruction.
--
-- 
-PLEASE CONTRIBUTE TO THIS SECTION AS YOU ENCOUNTER AND TROUBLESHOOT PROBLEMS
-
- Some tips at present:
- 
- - ground yourself before touching electronics boards
-
- - follow the assembly manual carefully -- double check the orientation of the electronics boards before mounting them, and double check the colors and insertion points of every wire
-
- - before putting the batteries in (or the batter switch is in the OFF position) the following lights should be on when the USB cable attaches to your computer:
- - 
-   ![cable from Arduino board to my PC](plugcable.jpg)
-
-   -when you put the batteries into the battery holder and turn the battery switch ON, then you should see a voltage number on the voltage display and the following lights on:
-
-   ![assembled robot car](robotcar.jpg)
-
-   - if you don't see a voltage level, and you have a multimeter, measure the batteries directly to make sure they are charged and have a voltage on them (or if you don't have a multimeter, trying recharging them again)
-  
-   - if you don't see lights on, a first step is to remove wires, double check with the manual their locations, and re-insert carefully the wires again
-  
-   - if the above does not work, and you have second Arduino kit, you can try swapping boards to see if you can isolate the problem to one board
-  
-   wiring of wheel motors direction issue:
-
-   
--
-------------
-
-Note:
-The wiring shown in the Osoyoo Manual causes the robot car to run in reverse when the software of Lesson 2 (ultrasound object avoidance) and Lesson 5b (cellphone Wi-Fi app to make the car go in different directions) is run. (However, if the software from Lesson 3 (photocell line tracking) is run, the direction is correct.)
-
-Thus, for Lesson 2 and for Lesson 5b reverse the following wires:
-
-AK1 <--> BK3
-
-BK1 <--> AK3
-
-And thus, when you then move onto Lesson 3, reverse the wires back to the original position. And then when moving onto Lesson 5b reverse again as shown above.
-
-Osoyoo wiring instructions for wheel motors to pin locations on the Motor Control Board Y:
-
-Front-right  BK1
-
-Front-left BK3
-
-Rear-right AK1
-
-Rear-left AK3
-
-
-Thus when we reverse the wiring we get:
-
-Front-right  BK1 --> AK3
-
-Front-left BK3 --> AK1
-
-Rear-right AK1 --> BK3
-
-Rear-left AK3 -->  BK1
-
-
-And we reverse again the wiring we get:
-
-Front-right  BK1 --> AK3 --> BK1
-
-Front-left BK3 --> AK1 --> BK3
-
-Rear-right AK1 --> BK3 --> AK1
-
-Rear-left AK3 -->  BK1 --> AK3
-
-
-These reversals can be done in software. However, this would require modifying the Osoyoo packaged software. Thus, for the moment we are not modifying the software so that you can download the software which Osoyoo provides without modifications. However, later on, we will reverse the wheel wiring virtually rather than unplug and replug cables.
-
-------------
--
--
-
- **Arduino/Computer Issues**
- This section is for troubleshooting Arduino/computer issues and can be added to with experience, i.e., "under construction" at present.
- 
-PLEASE CONTRIBUTE TO THIS SECTION AS YOU ENCOUNTER AND TROUBLESHOOT PROBLEMS
-
- Some tips at present:
- 
- - follow the assembly manual carefully
-
- - double check the orientation of the electronics boards before mounting them, and double check the colors and insertion points of every wire
-
- - use the supplied Oyosoo self-test code for the Arduino -- it should work
-
- - follow the screenshots shown above in attaching to the Arduino board and uploading code
-
- - if you have second Arduino kit, you can try swapping boards to see if you can isolate the problem to one board
-
- - you may want to consider purchasing a cheap Arduino board from a local electronics shop or online electronics retailer (e.g., Amazon sells an Arduino Uno board for US$27 at the time of writing), and setting up the Arduino IDE on your computer and making sure you can upload compiled code to the Arduino board
-
- - TAKE A MODULAR APPROACH TO STUBBORN ISSUES. For example, make sure the wires coming from the battery compartment have a voltage on them (with a simple voltage tester or multimeter) and then just install the motor controller board with only the power wires and the voltage meter wires. Does the board light come on? Is there now a voltage displayed?  If so, then hook up the four motors. Is there still a voltage displayed? Then perhaps hook up to the Arduino board without the Wi-Fi shield (pay attention to where you are inserting wires if you do this). Lights come on? Then plug your PC into the Arduino board -- is it detected?  And so on.
-   (It is unfortunate that the motor controller board does not have a fuller modular built-in self-test feature which could be used to make sure that part of the system is working before we need to consider the functioning of the Arduino board.)
-
- 
-BEFORE PROCEEDING FURTHER, MAKE SURE THE BASIC SELF-TEST PROGRAM OF YOUR OSOYOO ROBOTIC CAR WORKS. YOU NEED TO KNOW THAT THIS WORKS BEFORE ADDING MORE COMPLEXITY TO YOUR PROJECT.
-
--
--
 -
 -
 
 <h1 style="font-size: 24px;">Step #10 -- Adding the Ultrasonic and Servomechanism Components</h1>
+
+BEFORE PROCEEDING FURTHER, MAKE SURE THE BASIC SELF-TEST PROGRAM ABOVE WORKS (STEP #8 ABOVE).
+
+YOU NEED TO KNOW THAT THIS WORKS BEFORE ADDING MORE COMPLEXITY TO YOUR PROJECT.
 
  -An "ultrasonic distance sensor" is effectively an ultrasonic transducer (generates ultrasonic waves) and an ultrasonic sensor (detects ultrasonic energy). (A "transceiver" is a device that both transmits and receives a signal.) An ultrasonic transceiver can measure distances by seeing how long it takes for an ultrasonic sound wave to hit a target and reflect back to the sensor. From the the time delay and the speed of sound the distance can be computed.
 
