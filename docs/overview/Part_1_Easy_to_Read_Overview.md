@@ -81,7 +81,7 @@ I am that new learner -- trying to figure out how to even start this project. Le
 
 Artificial Cognition is an interdisciplinary field that designs and understands computational models and devices that are based on cognitive processes such as perception, reasoning, learning, problem-solving and decision-making. It obviously is inspired by human cognitive skills and the human brain. 
 
-Key areas of Artificial Cognition include cognitive architectures (a computational framework based on the human mind and brain), knowledge representation (how to model information about the world), learning (systems should learn from experiences and through such adaptations improve performance in the future), logical reasoning, and perception (how to interpret stimuli from the external world). 
+Key areas of Artificial Cognition include cognitive architectures (a computational framework based on the human mind and brain), knowledge representation (how to model information about the world), perception (how to interpret stimuli from the external world), learning (systems should learn from experiences and through such adaptations improve performance in the future), and logical reasoning. 
 
 Grounding is a key part of Artificial Cognition. In perceiving the world, grounding connects the internal symbols the system has with actual sensory inputs from the environment. In performing actions on the world, internal symbols can similarly be understood. There also can be other types of grounding such as social grounding where internal symbols are given meaning with relation to social effects of the group. 
 
