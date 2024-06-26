@@ -353,6 +353,25 @@ There is a metal bottom chassis where the drive motors will be attached.  (Note 
 
 Note that there is a separate drive motor for each of the four wheels. Note also there there is no steering apparatus. This is because these are Ilon Mecanum wheels  (or "omni wheels") that can go forwards and backwards, but also sideways. Note that the wheels are constructed of rollers at an angle of 45 degrees to the axis of rotation.
 
+##
+Note that you have 4 wheels which can go forward, go backwards or be in neutral, each individually.
+
+Thus, if you were to make a truth table of the different possible motions you would have 3^4 = 81 possible entries of activating the wheels on the robot car.
+
+We will try this out in a future Part and future Step of that Part of the documentation. Can we actually obtain 81 different linear, diagonal or circular directions of motions from the car?
+
+Something else, to think about-- each of the motors can be pulse width modulated, i.e., we can adjust its speed. If there are arbitrarily 32 different speed levels of each motor, how many possible wheel combinations are there?
+
+Well... 31 forward plus 0, and 31 backwards plus 0, so that makes 63 states for each wheel.
+
+Thus, as before, 4^63 = 15,752,961 states for the four wheels at any moment. Does this translate into 15 million different directions for the car?
+
+Something to explore later on.....
+##
+
+
+
+
 ![mecanum wheels directions of motion](mecanumwheel.png)
 
 On top of this metal bottom plate there will be a top acrylic plate. The electronics will all be mounted on this top acrylic plate.
