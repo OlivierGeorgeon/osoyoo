@@ -94,6 +94,8 @@ Embodiment also goes beyond this. For example, by having a robot body, your AI p
 ##
 Tip: When you click links in these Overview document files, right-click so that you open up a new browser page.
 
+(In the Windows Chrome browser, for example, right-clicking the link and then choosing "Open link in new tab" will place the linked web page in a new tab -- very convenient for looking at in a few seconds and then deleting when you are done. You are still in the same place in this Overview document.)
+
 (Otherwise, this page may be replaced by the clicked page. Then you will have to press the back arrow to come back here and then find this spot again in the document.)
 
 <p align="center">
