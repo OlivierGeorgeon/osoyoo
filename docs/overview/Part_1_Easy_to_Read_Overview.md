@@ -773,15 +773,11 @@ The methodology of Herbert A. Simon, Nobel Prize winner, and the Cleveland Insti
 
 Even if you have a full suite of electronics test equipment, particularly a multi-channel digital oscilliscope that can capture pulse trains at the clock speed of the Arduino board, it is not practical to troubleshoot the robot car as such. The reality is that in 2023 at the time of writing, given surface mounted components and given application-specific integrated circuits, unless you are the designer/authorized repair hub of the computer board, it is not possible/feasible/realistic to do component level repairs. 
 
-Thus, we will simply use simple logic to troubleshoot. Even a simple VOM/multimeter to measure voltages, etc is not required.
-
-![Troubleshooting with test equipment](pcbrepair.jpg)
-
-(That said, if you have electronics test equipment, it does speed up things to see what voltages, currents, pulse trains are doing -- you can isolate issues much faster with the equipment, even if you are only swapping out at the board level.)
-
-For the remainder of this section we will consider a modular approach to getting the robotic car to work.
+You can use a simple logic to troubleshoot various circuit boards and systems of boards. (That said, if you have electronics test equipment, it does speed up things to see what voltages, currents, pulse trains are doing -- you can isolate issues much faster with the equipment, even if you are only swapping out at the board level.)
 
 Remember, especially if you live in a winter-climate environment where there is lots of static charge in the low-humidity winter: static electricity will destroy the sensitivie chips on the little electronics boards. Ground yourself (e.g., touch a water pipe) before touching the electronics in these environments.
+
+![Troubleshooting with test equipment](pcbrepair.jpg)
 
 -
 -
