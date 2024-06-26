@@ -662,7 +662,7 @@ You went through the above steps. You then put the lithium batteries into the ho
 
 What to do?
 
-One approach is access a moderna large language model, which may have read all the technical documentation concerning your system already. However, the prompts used can make a large difference.
+One approach is access a modern large language model generative AI, which may have read all the technical documentation concerning your system already. However, the prompts used can make a large difference.
 
 Let's give it a try. We will use for these examples ChatGPT/GPT4:
 
