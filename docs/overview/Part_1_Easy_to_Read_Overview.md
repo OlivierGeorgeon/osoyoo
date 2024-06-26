@@ -386,6 +386,17 @@ After you construct the robot car and it is being used (especially by others) ma
 
 Before we start building the robot car, let's have a quick look at the documentation (always a good idea no matter what project you are working on).
 
+##
+A quick note on nomenclature:
+
+The PDF Manual from Osoyoo about the building the robot car contains five "lessons."
+
+This Overview Documentation about the PetitCat project (which you may be reading on GitHub) is divided into five or more (at time of this writing it is 5 but it may very well increase in the future) "Parts."  You are reading right now "Part 1."  
+
+Each "part" of the Overview Documentation is a separate markdown file (or other file if it has been converted, e.g., perhaps a PDF file). Each "part" is divided into different "steps."  These "steps" are like chapters in a book. You are reading right now "Step #5" in "Part 1" of the Overview Documentation of the PetitCat Project.
+
+##
+
 The PDF Model M2.0 documentation is divided into five "lessons." 
 
 Lesson 1 -- Assembly of the mechanical parts and the electronic parts and installing the Arduino IDE -- at this point you will have a functioning robot car that you can try out with the self test Arduino code that comes with the robot car.
