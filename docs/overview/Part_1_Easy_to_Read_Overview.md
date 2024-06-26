@@ -743,7 +743,8 @@ For specific instructions and detailed steps, refer to the assembly manual you u
 
 Well.... not bad.... but still not a replacement for human troubleshooting.
 
-
+-
+-
 
 **The Herbert Simon and Cleveland Institute of Electronics Approach to Troubleshooting**
 
