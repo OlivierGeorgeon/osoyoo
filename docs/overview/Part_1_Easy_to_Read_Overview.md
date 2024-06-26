@@ -95,6 +95,11 @@ For a good overview of the importance of grounding your AI/AGI please consider m
 
 [cca5 inductive analogical soln to grounding problem](https://www.sciencedirect.com/science/article/abs/pii/S1389041722000493?via%3Dihub) 
 
+tester
+
+<a href="https://www.sciencedirect.com/science/article/abs/pii/S1389041722000493?via%3Dihub" target="_blank">cca5 inductive analogical soln to grounding problem</a>
+
+
 [archive preprint](https://github.com/howard8888/insomnia/blob/master/analogical%20inductive%20preprint.pdf)
 
 For a good overview of the field of Artifical Cognition please consider this recent paper:
