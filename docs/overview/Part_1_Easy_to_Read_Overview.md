@@ -792,7 +792,10 @@ YOU NEED TO KNOW THAT THIS WORKS BEFORE ADDING MORE COMPLEXITY TO YOUR PROJECT.
 
  -The Osoyoo ultrasonic distance measuring transducer/sensor sends out 40KHz ultrasonic sound pulses and waits for their echos to return, with the time (and thus distance) as the width of the produced TTL pulse.
 
-![ultrasonic transducer](ultrasonic.jpg)
+<p align="center">
+ <img src="ultrasonic.jpg" width="400" height="600">
+</p>
+
 
  The Osoyoo motor is called a "micro servo motor." We tend to interchange the words "servomotor", "servo", "servomechanism", etc in Lesson #2 (i.e., adding the ultrasonic and servomechanism components) in referring to this motor. However, be aware of the actual meaning of these different terms:
  
