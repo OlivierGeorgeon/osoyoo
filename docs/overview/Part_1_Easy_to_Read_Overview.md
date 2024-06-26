@@ -1111,24 +1111,11 @@ For example, here is an inexpensive ($US10 from Amazon.com) more recent HC05 Blu
 ![hc05pins](hc05pins.png)
 
 
+Hopefully you the reader will be able to Bluetooth pair your smartphone and have more success installing and trying out the imitiation Bluetooth driving app.
+
 -given that Bluetooth is not required for the next lesson, time to move on.....
 
 
--
--
-
-I just asked GPT4 to draw a logo for the PetitCat project in the style of Jackson Pollock to illustrate my feelings. Here is what it drew (first time, no regenerations):
-
-<p align="center">
- <img src="logogpt4pollack.jpg" width="700" height="700">
-</p>
--
--
-
-Hopefully you the reader will be able to Bluetooth pair your smartphone and have more success installing and trying out the imitiation Bluetooth driving app.
-
--
--
 -
 -
 
