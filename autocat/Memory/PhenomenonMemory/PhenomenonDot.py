@@ -77,7 +77,7 @@ class PhenomenonDot:
         # The affordance points must be integers
         return np.array([a.point[0:2] for a in self.affordances.values()]).flatten().tolist()
 
-    def propose_interaction_code(self, memory):
+    def propose_interaction_code(self, memory, outcome_code):
         """Return the interaction code and updates the memory"""
         # If very playful and the dot is forward
         if memory.body_memory.neurotransmitters[SEROTONIN] > 55 and memory.egocentric_memory.focus_point[0] > \

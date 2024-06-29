@@ -141,7 +141,8 @@ class PredictionError:
 
             # If focus and head toward object  TODO test that
             if enaction.outcome_code not in [OUTCOME_LOST_FOCUS, OUTCOME_NO_FOCUS, OUTCOME_FLOOR] and \
-                    abs(actual_outcome.head_angle) > 80 and self.previous_echo_point is not None:
+                    abs(actual_outcome.head_angle) > 80 and self.previous_echo_point is not None\
+                    and hasattr(actual_outcome, 'echo_point'):
                 action_speed = enaction.action.translation_speed[1]
                 speed = abs(self.previous_echo_point[1] - actual_outcome.echo_point[1]) * 1000 / actual_outcome.duration1
                 pe = round(action_speed - speed)

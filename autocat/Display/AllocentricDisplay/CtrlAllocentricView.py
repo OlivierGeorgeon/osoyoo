@@ -93,6 +93,7 @@ class CtrlAllocentricView:
 
             # Display the place cell in place cell window
             self.workspace.show_place_cell(selected_cell[PLACE_CELL_ID])
+            self.workspace.ctrl_place_cell_view.update_cue_displays()
 
             # Display the grid cell status
             self.view.label2.text = f"Place {selected_cell[PLACE_CELL_ID]} " \

@@ -4,8 +4,8 @@
 
 import numpy as np
 from . Proposer import Proposer
-from ..Memory.EgocentricMemory.Experience import EXPERIENCE_FLOOR
-from ..Enaction.CompositeEnaction import CompositeEnaction
+from ..Memory.EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO
+from ..Enaction.CompositeEnaction import Enaction, CompositeEnaction
 
 
 class ProposerFocusPhenomenon(Proposer):
@@ -19,18 +19,25 @@ class ProposerFocusPhenomenon(Proposer):
         # If no focus phenomenon then no proposition
         p_id = self.workspace.memory.phenomenon_memory.focus_phenomenon_id
         if p_id is None:
+            print("No focus phenomenon id")
             return None
 
         e_memory = self.workspace.memory.save()
         # If focus at a dot phenomenon
         p = self.workspace.memory.phenomenon_memory.phenomena[p_id]
-        if p.phenomenon_type == EXPERIENCE_FLOOR:
+        if p.phenomenon_type in [EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO]:
             # Get the interaction and the updated e_memory
-            interaction_code = p.propose_interaction_code(e_memory)
+            interaction_code = p.propose_interaction_code(e_memory, enaction.outcome_code)
             # Return the proposed composite enaction
             if interaction_code in self.workspace.primitive_interactions:
-                return CompositeEnaction(None, "Focus", np.array([0, 1, 0]),
-                                         [self.workspace.primitive_interactions[interaction_code]], e_memory)
+                print("Prompt", e_memory.egocentric_memory.prompt_point)
+                e = Enaction(self.workspace.primitive_interactions[interaction_code], e_memory)
+                return CompositeEnaction([e], "Focus", np.array([0, 1, 0]))
+                # return CompositeEnaction(None, "Focus", np.array([0, 1, 0]),
+                #                          [self.workspace.primitive_interactions[interaction_code]], e_memory)
             elif interaction_code in self.workspace.sequence_interactions:
                 return CompositeEnaction(None, "Focus", np.array([0, 1, 0]),
                                          self.workspace.sequence_interactions[interaction_code], e_memory)
+            else:
+                # Phenomenon proposes no interaction
+                return None

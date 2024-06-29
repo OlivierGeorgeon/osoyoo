@@ -3,16 +3,19 @@
 import numpy as np
 import open3d as o3d
 from . import MIN_PLACE_CELL_DISTANCE, ICP_DISTANCE_THRESHOLD
-from ...Robot import NO_ECHO_DISTANCEEs
+from ...Robot import NO_ECHO_DISTANCE
 
 
 def transform_estimation_cue_to_cue(cues1, cues2):
-    """Return the transformation from cues1 to cues2 using o3d ICP algorithm"""
+    """Return the transformation cues1 minus cues2 using o3d ICP algorithm"""
+    # print("Cues 1", cues1)
+    # print("Cues 2", cues2)
     # Create the o3d point clouds
     pcd1 = o3d.geometry.PointCloud()
     pcd2 = o3d.geometry.PointCloud()
-    pcd1.points = o3d.utility.Vector3dVector(cues1)
-    pcd2.points = o3d.utility.Vector3dVector(cues2)
+    # Converting to integers seems to avoid rotation
+    pcd1.points = o3d.utility.Vector3dVector(np.array(cues1, dtype=int))
+    pcd2.points = o3d.utility.Vector3dVector(np.array(cues2, dtype=int))
     # Define ICP criteria and parameters
     threshold = ICP_DISTANCE_THRESHOLD
     trans_init = np.eye(4)  # Initial transformation matrix (4x4 identity matrix)
@@ -23,7 +26,7 @@ def transform_estimation_cue_to_cue(cues1, cues2):
         # Add robust kernel (e.g., TukeyLoss)
         # , loss = o3d.pipelines.registration.TukeyLoss(k=0.2)
     )
-    print("Number of iterations used (ICP):", reg_p2p.fitness)
+    print(f"ICP fitness: {reg_p2p.fitness:.2f}")
     # Return the resulting transformation
     return reg_p2p.transformation
 

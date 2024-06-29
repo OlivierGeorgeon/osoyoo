@@ -2,11 +2,11 @@ import numpy as np
 from ..Robot.CtrlRobot import ENACTION_STEP_IDLE, ENACTION_STEP_COMMANDING, ENACTION_STEP_ENACTING, \
     ENACTION_STEP_INTEGRATING, ENACTION_STEP_RENDERING
 from ..Memory.PhenomenonMemory import TERRAIN_ORIGIN_CONFIDENCE
-from ..Integrator.OutcomeCode import outcome_code
+from ..Integrator.OutcomeCode import outcome_code, outcome_code_focus
 from . import KEY_ENGAGEMENT_ROBOT, KEY_CONTROL_DECIDER, KEY_ENGAGEMENT_IMAGINARY
 from ..Robot.RobotDefine import ROBOT_FLOOR_SENSOR_X
 from ..Memory.EgocentricMemory.Experience import EXPERIENCE_FLOOR
-from ..Proposer.Interaction import OUTCOME_LOST_FOCUS
+from ..Proposer.Interaction import OUTCOME_LOST_FOCUS, OUTCOME_NO_FOCUS
 from ..Proposer.Proposer import Proposer
 from ..Proposer.ProposerFocusPhenomenon import ProposerFocusPhenomenon
 from ..Proposer.ProposerExplore import ProposerExplore
@@ -152,8 +152,10 @@ class Enacter:
                     self.workspace.enaction.outcome_code = OUTCOME_LOST_FOCUS
 
             # Manage attention
-            # Focus at the nearest dot phenomenon, or near it if it was lost
+            # Focus at the nearest phenomenon, or near the dot phenomenon it if it was lost
             self.attention_mechanism.update_focus()
+            if self.workspace.memory.egocentric_memory.focus_point is not None and self.workspace.enaction.outcome_code == OUTCOME_NO_FOCUS:
+                self.workspace.enaction.outcome_code = outcome_code_focus(self.workspace.memory.egocentric_memory.focus_point, self.workspace.memory)
 
             # Track the prediction errors
             self.workspace.prediction_error.log(self.workspace.enaction)
@@ -186,8 +188,8 @@ class Enacter:
         for proposer in self.proposers.values():
             # activation = proposer.activation_level()  # Must compute before proposing
             enaction = proposer.propose_enaction()
-            print("Proposition", enaction,  "with focus", self.workspace.memory.egocentric_memory.focus_point)
             if enaction is not None:
+                print("Proposition", enaction, "with focus", self.workspace.memory.egocentric_memory.focus_point)
                 activation = enaction.emotion_mask * self.workspace.memory.body_memory.neurotransmitters
                 propositions.append([enaction, activation.sum()])
         print("Proposed enactions:")

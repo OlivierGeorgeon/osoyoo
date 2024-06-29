@@ -28,7 +28,8 @@ void Head::beginEchoAlignment()
 {
   _is_enacting_head_alignment = true;
   // Reinitialize the measure so it will not believe that the next measure is a minimum
-  _current_ultrasonic_measure = NO_ECHO_DISTANCE - 1;
+  _previous_ultrasonic_measure  = NO_ECHO_DISTANCE;
+  //_current_ultrasonic_measure = NO_ECHO_DISTANCE; // - 1;
   // Inverse the movement to track moving objects more easily
   _head_angle_span = - _head_angle_span;
   _echo_alignment_step = 0;
@@ -61,10 +62,11 @@ void Head::update()
       //Serial.print(", Angle: "); Serial.print(_head_angle);
       //Serial.print(", measure: "); Serial.println(_current_ultrasonic_measure);
 
-      // If the echo is closer or no current echo and no previous and no penultimate
-      if ((_previous_ultrasonic_measure > _current_ultrasonic_measure ) ||
-          (_previous_ultrasonic_measure == NO_ECHO_DISTANCE)  && (_current_ultrasonic_measure == NO_ECHO_DISTANCE)
-          && (_penultimate_ultrasonic_measure == NO_ECHO_DISTANCE))
+      // If the echo is closer than the previous or no current echo and no previous and no penultimate
+      if ((_current_ultrasonic_measure < _previous_ultrasonic_measure ) ||
+          ( _current_ultrasonic_measure == NO_ECHO_DISTANCE)
+           && ( _previous_ultrasonic_measure == NO_ECHO_DISTANCE)
+           && (_penultimate_ultrasonic_measure == NO_ECHO_DISTANCE))
       {
         if ((_head_angle <= -90) || (_head_angle >= 90))
         // The head reached the limit angle
@@ -96,14 +98,14 @@ void Head::update()
       // The current echo is farther than or equal to the previous echo or both don't exist but the penultimate exists
       else
       {
-        // Reverse the head direction
+        // Reverse the head direction to go back to the previous position
         _head_angle_span = - _head_angle_span;
         _head_angle += _head_angle_span;
         turnHead(_head_angle);
         // If the penultimate echo is farther than or equal to the previous then stop the alignment
         // unless the current and the previous measure returned no echo
-        if ((_penultimate_ultrasonic_measure >= _previous_ultrasonic_measure) &&  (_echo_alignment_step > 2) &&
-            (_previous_ultrasonic_measure < NO_ECHO_DISTANCE))
+        if ((_penultimate_ultrasonic_measure >= _previous_ultrasonic_measure) &&  (_echo_alignment_step >= 2)
+            &&  (_previous_ultrasonic_measure < NO_ECHO_DISTANCE))
         {
           _min_ultrasonic_measure = _previous_ultrasonic_measure;
           //Serial.print("Aligned at angle: "); Serial.print(_head_angle);

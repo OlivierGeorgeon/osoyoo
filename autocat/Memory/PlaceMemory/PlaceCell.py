@@ -2,10 +2,10 @@
 import math
 import numpy as np
 import time
-from pyrr import Matrix44
+from pyrr import Quaternion
 from ..EgocentricMemory.EgocentricMemory import EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_CENTRAL_ECHO, \
     EXPERIENCE_LOCAL_ECHO
-from ...Utils import cartesian_to_polar, assert_almost_equal_angles, polar_to_cartesian
+from ...Utils import cartesian_to_polar, assert_almost_equal_angles, polar_to_cartesian, quaternion_to_direction_rad
 from .PlaceGeometry import transform_estimation_cue_to_cue
 
 ANGULAR_RESOLUTION = 10  # Degree
@@ -36,8 +36,13 @@ class PlaceCell:
         place_echo_cues = [c.point() for c in self.cues if c.type in [EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_CENTRAL_ECHO]]
         new_echo_cues = [c.point() for c in cues if c.type in [EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_CENTRAL_ECHO]]
         if len(place_echo_cues) > 0 and len(new_echo_cues) > 0:
-            translation = -transform_estimation_cue_to_cue(place_echo_cues, new_echo_cues)[:3, 3]
-            print("Echo translation", translation)
+            transform = transform_estimation_cue_to_cue(place_echo_cues, new_echo_cues)
+            translation = -transform[:3, 3]
+            r = math.degrees(quaternion_to_direction_rad(Quaternion.from_matrix(transform[:3, :3])))
+            print(f"Place cell rotation: {r:.0f} degree")
+            # If rotation too high then cancel the position correction
+            if abs(r) > 10:
+                translation[:] = 0
 
         # Assume FLOOR experiences come from a single point
         for new_cue in [cue for cue in cues if cue.type == EXPERIENCE_FLOOR]:
@@ -58,9 +63,8 @@ class PlaceCell:
                 if r_cue > r and assert_almost_equal_angles(t_cue, theta, 35):
                     r = r_cue
             self.polar_echo_curve[i, :] = [r, theta]
-        print(f"Cue curve time: {time.time() - start_time:.3f}")
+        # print(f"Cue curve time: {time.time() - start_time:.3f}")
         self.cartesian_echo_curve[:] = polar_to_cartesian(self.polar_echo_curve)
-        # return curve
 
     def save(self):
         """Return a cloned place cell for memory snapshot"""

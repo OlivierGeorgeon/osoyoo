@@ -1,9 +1,12 @@
 import numpy as np
+import math
 from pyrr import Vector3
 from . import PHENOMENON_RECOGNIZABLE_CONFIDENCE, PHENOMENON_CONFIDENCE_PRUNE
 from .Phenomenon import Phenomenon, PHENOMENON_DELTA
 from autocat.Memory.EgocentricMemory.Experience import EXPERIENCE_CENTRAL_ECHO, EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_BLOCK, \
     EXPERIENCE_IMPACT, EXPERIENCE_FLOOR
+from ...Proposer.Action import ACTION_TURN, ACTION_SWIPE, ACTION_FORWARD, ACTION_BACKWARD
+from ...Proposer.Interaction import OUTCOME_FOCUS_SIDE, OUTCOME_FOCUS_FRONT, OUTCOME_FOCUS_TOO_CLOSE, OUTCOME_FOCUS_FAR
 
 OBJECT_EXPERIENCE_TYPES = [EXPERIENCE_CENTRAL_ECHO, EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_BLOCK, EXPERIENCE_IMPACT]
 
@@ -124,6 +127,28 @@ class PhenomenonObject(Phenomenon):
                     self.affordances = {key: val for key, val in self.affordances.items() if val != a or key == 0}
                     break  # Remove only the first similar affordance found
             print("Prune:", nb_affordance - len(self.affordances), "affordances removed.")
+
+    def propose_interaction_code(self, memory, outcome_code):
+        """Return the interaction code and updates the memory"""
+        if outcome_code in OUTCOME_FOCUS_SIDE:
+            memory.egocentric_memory.prompt_point = memory.egocentric_memory.focus_point.copy()
+            return ACTION_TURN, OUTCOME_FOCUS_FRONT
+        elif outcome_code in [OUTCOME_FOCUS_FRONT]:
+            memory.egocentric_memory.prompt_point = None
+            return ACTION_SWIPE, OUTCOME_FOCUS_SIDE
+        elif outcome_code in [OUTCOME_FOCUS_TOO_CLOSE]:
+            memory.egocentric_memory.prompt_point = None
+            return ACTION_BACKWARD, OUTCOME_FOCUS_FRONT
+        elif outcome_code == OUTCOME_FOCUS_FAR:
+            if abs(math.degrees(math.atan2(memory.egocentric_memory.focus_point[1],
+                                memory.egocentric_memory.focus_point[0]))) < 10:
+                memory.egocentric_memory.prompt_point = None
+                return ACTION_FORWARD, OUTCOME_FOCUS_FRONT
+            else:
+                memory.egocentric_memory.prompt_point = memory.egocentric_memory.focus_point.copy()
+                return ACTION_TURN, OUTCOME_FOCUS_FRONT
+        else:
+            return None
 
     def save(self):
         """Return a clone of the phenomenon for memory snapshot"""

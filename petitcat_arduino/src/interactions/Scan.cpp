@@ -89,19 +89,19 @@ void Scan::ongoing()
 void Scan::outcome(JSONVar & outcome_object)
 {
   JSONVar echos;
-  bool has_echo = false;
+  // bool has_echo = false;
   for (int i = 0; i < MAX_SACCADES; i++)
   {
-    if (_sign_array.distances[i] > 0 and _sign_array.distances[i]< 10000)
+    if (_sign_array.distances[i] > 0 and _sign_array.distances[i] < NO_ECHO_DISTANCE)
     {
       //  https://cpp4arduino.com/2018/11/21/eight-tips-to-use-the-string-class-efficiently.html
       //  char angle_string[10]; // sprintf(angle_string, 4, "%i", _sign_array.angles[i]);
       //  itoa(_sign_array.angles[i], angle_string, 10);
       //  echos[angle_string] = _sign_array.distances[i];
       echos[String(_sign_array.angles[i])] = _sign_array.distances[i];
-      has_echo = true;
+      // has_echo = true;
     }
   }
-  if (has_echo)
-    outcome_object["echos"] = echos;
+  // if (has_echo) // May return an empty echo dictionary
+  outcome_object["echos"] = echos;
 }

@@ -1,5 +1,6 @@
 from ..Robot.Enaction import Enaction
 from ..Proposer.Action import ACTION_SCAN
+from ..Proposer.Interaction import OUTCOME_FLOOR, OUTCOME_FOCUS_FRONT
 
 
 class CompositeEnaction:
@@ -13,14 +14,23 @@ class CompositeEnaction:
         # Construct the list of enactions from the list of interactions if any
         if interactions is not None:
             self.enactions = []
-            e_memory = memory
+            # e_memory = memory
             for interaction in interactions:
                 if decider_id == 'Manual' and interaction.action.action_code == ACTION_SCAN:
                     span = 10
                 else:
                     span = 40
-                e = Enaction(interaction, e_memory, span=span)
-                e_memory = e.predicted_memory.save()
+                # Modify the prompt depending on the intended outcome
+                if interaction.outcome == OUTCOME_FLOOR:
+                    memory.egocentric_memory.prompt_point = None
+                elif interaction.outcome == OUTCOME_FOCUS_FRONT:
+                    if memory.egocentric_memory.focus_point is not None:
+                        memory.egocentric_memory.prompt_point = memory.egocentric_memory.focus_point.copy()
+                    else:
+                        memory.egocentric_memory.prompt_point = None
+
+                e = Enaction(interaction, memory, span=span)
+                memory = e.predicted_memory.save()
                 self.enactions.append(e)
 
         self.key = tuple([e.key for e in self.enactions])

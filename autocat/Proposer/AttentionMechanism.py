@@ -7,7 +7,7 @@ from ..Memory.AllocentricMemory import CLOCK_PLACE
 from ..Memory.AllocentricMemory.Geometry import point_to_cell
 from ..Proposer.Interaction import OUTCOME_LOST_FOCUS, OUTCOME_FLOOR
 from ..Memory.BodyMemory import NORADRENALINE
-from ..Memory.EgocentricMemory.Experience import EXPERIENCE_FLOOR
+from ..Memory.EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO
 from ..Robot.RobotDefine import ROBOT_FLOOR_SENSOR_X
 
 
@@ -23,24 +23,29 @@ class AttentionMechanism:
         if enaction is None:
             return
 
-        # Look for DOT phenomena
-        k_d = {k: self.workspace.memory.allocentric_to_egocentric(p.point)[0] for k, p in self.workspace.memory.phenomenon_memory.phenomena.items()
-               if p.phenomenon_type == EXPERIENCE_FLOOR and self.workspace.memory.allocentric_to_egocentric(p.point)[0] >
-               ROBOT_FLOOR_SENSOR_X}
-        if len(k_d) > 0:
-            # Focus at the closest DOT phenomenon
-            closest_key = min(k_d, key=k_d.get)
+        # The dictionary of phenomena that are in front of the robot
+        front_phenomena = {k: p for k, p in self.workspace.memory.phenomenon_memory.phenomena.items()
+                           if p.phenomenon_type in [EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO] and
+                           self.workspace.memory.allocentric_to_egocentric(p.point)[0] > ROBOT_FLOOR_SENSOR_X}
+        if len(front_phenomena) > 0:
+            # Focus at the closest phenomenon
+            # closest_key = min(k_p, key=k_p.get)
+            closest_key = min(front_phenomena, key=lambda k: np.linalg.norm(
+                self.workspace.memory.allocentric_to_egocentric(front_phenomena[k].point)))
             self.workspace.memory.phenomenon_memory.focus_phenomenon_id = closest_key
-            closest_dot_phenomenon = self.workspace.memory.phenomenon_memory.phenomena[closest_key]
-            self.workspace.memory.allocentric_memory.update_focus(closest_dot_phenomenon.point, self.workspace.memory.clock)
-            self.workspace.memory.egocentric_memory.focus_point = self.workspace.memory.allocentric_to_egocentric(closest_dot_phenomenon.point)
+            # closest_phenomenon = self.workspace.memory.phenomenon_memory.phenomena[closest_key]
+            closest_allo_point = front_phenomena[closest_key].point
+            self.workspace.memory.allocentric_memory.update_focus(closest_allo_point, self.workspace.memory.clock)
+            # self.workspace.memory.egocentric_memory.focus_point = self.workspace.memory.allocentric_to_egocentric(closest_phenomenon.point)
+            self.workspace.memory.egocentric_memory.focus_point = \
+                self.workspace.memory.allocentric_to_egocentric(closest_allo_point)
 
         # If no DOT phenomenon then don't change focus
         p_id = self.workspace.memory.phenomenon_memory.focus_phenomenon_id
         if p_id is None:
             return
 
-        # If the dot was found again then
+        # If the dot was found again then reset noradrenaline
         if enaction.outcome_code == OUTCOME_FLOOR:
             self.workspace.memory.body_memory.neurotransmitters[NORADRENALINE] = 50
             self.last_seen_focus = None

@@ -69,7 +69,7 @@ def central_echos(echos):
 
     # Create the streaks
     streaks = []
-    echo_list = [[int(a), d] for a, d in echos.items()]
+    echo_list = [[int(a), d] for a, d in echos.items() if d < NO_ECHO_DISTANCE]
     current_streak = [echo_list[0]]
     if len(echo_list) > 1:
         for angle, distance in echo_list[1:]:
