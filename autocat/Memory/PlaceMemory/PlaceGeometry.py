@@ -1,9 +1,11 @@
 # The geometrical calculus used for Place Cells
 
+import math
 import numpy as np
 import open3d as o3d
-from . import MIN_PLACE_CELL_DISTANCE, ICP_DISTANCE_THRESHOLD
+from . import MIN_PLACE_CELL_DISTANCE, ICP_DISTANCE_THRESHOLD, ANGULAR_RESOLUTION, MASK_ARRAY
 from ...Robot import NO_ECHO_DISTANCE
+from ...Utils import cartesian_to_polar
 
 
 def transform_estimation_cue_to_cue(cues1, cues2):
@@ -41,15 +43,20 @@ def nearby_place_cell(robot_point, place_cells):
     return 0
 
 
-def delta_echo_curves(polar1, cartesian1, polar2, cartesian2):
-    """Return the cartesian position difference between points with same polar angle """
-    # The points that have echoes in both curves
-    # echo_points = np.logical_and(np.where(0 < polar1[:, 0]), np.where(0 < polar2[:, 0]))
-    echo_points = np.where(np.logical_and(np.logical_and(polar1[:, 0] > 0, polar1[:, 0] < NO_ECHO_DISTANCE),
-                                          np.logical_and(polar2[:, 0] > 0, polar2[:, 0] < NO_ECHO_DISTANCE)))
-    print("Echo points", echo_points)
-    print(cartesian1[:, :][echo_points])
-    # The delta between the echo points
-    deltas = cartesian2[:, :][echo_points] - cartesian1[:, :][echo_points]
-    # The sum of the deltas
-    return np.sum(deltas, axis=0)
+def point_to_polar_array(point):
+    """Return an array representing the angular span of the cue at this point"""
+    r, theta = cartesian_to_polar(point)
+    return np.roll(MASK_ARRAY * r, round(math.degrees(theta)) // ANGULAR_RESOLUTION)
+
+# def delta_echo_curves(polar1, cartesian1, polar2, cartesian2):
+#     """Return the cartesian position difference between points with same polar angle """
+#     # The points that have echoes in both curves
+#     # echo_points = np.logical_and(np.where(0 < polar1[:, 0]), np.where(0 < polar2[:, 0]))
+#     echo_points = np.where(np.logical_and(np.logical_and(polar1[:, 0] > 0, polar1[:, 0] < NO_ECHO_DISTANCE),
+#                                           np.logical_and(polar2[:, 0] > 0, polar2[:, 0] < NO_ECHO_DISTANCE)))
+#     print("Echo points", echo_points)
+#     print(cartesian1[:, :][echo_points])
+#     # The delta between the echo points
+#     deltas = cartesian2[:, :][echo_points] - cartesian1[:, :][echo_points]
+#     # The sum of the deltas
+#     return np.sum(deltas, axis=0)

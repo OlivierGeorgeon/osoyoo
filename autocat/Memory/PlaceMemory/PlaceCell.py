@@ -3,12 +3,11 @@ import math
 import numpy as np
 import time
 from pyrr import Quaternion
+from . import ANGULAR_RESOLUTION
 from ..EgocentricMemory.EgocentricMemory import EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_CENTRAL_ECHO, \
     EXPERIENCE_LOCAL_ECHO
 from ...Utils import cartesian_to_polar, assert_almost_equal_angles, polar_to_cartesian, quaternion_to_direction_rad
-from .PlaceGeometry import transform_estimation_cue_to_cue
-
-ANGULAR_RESOLUTION = 5  # Degree
+from .PlaceGeometry import transform_estimation_cue_to_cue, point_to_polar_array
 
 
 class PlaceCell:
@@ -17,7 +16,7 @@ class PlaceCell:
         self.point = point.copy()
         self.key = round(self.point[0]), round(self.point[1])
         self.cues = cues  # List of cues
-        self.polar_echo_curve = np.empty((360 // ANGULAR_RESOLUTION, 2), dtype=float)
+        self.polar_echo_curve = np.linspace([0, 0], [0, 2 * math.pi], 360 // ANGULAR_RESOLUTION, dtype=float)
         self.cartesian_echo_curve = np.empty((360 // ANGULAR_RESOLUTION, 3), dtype=float)
 
     def __str__(self):
@@ -54,16 +53,22 @@ class PlaceCell:
         """Compute the curve of echoes in polar coordinates"""
         start_time = time.time()
         # Takes almost 300ms to compute 360 points
-        # curve = np.empty((360 // ANGULAR_RESOLUTION, 2), dtype=float)
-        echo_cues = [cartesian_to_polar(cue.point()) for cue in self.cues if cue.type
-                     in [EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_CENTRAL_ECHO, EXPERIENCE_LOCAL_ECHO]]
-        for i in range(0, 360 // ANGULAR_RESOLUTION):
-            r, theta = 0, math.radians(i * ANGULAR_RESOLUTION)
-            for r_cue, t_cue in echo_cues:
-                if r_cue > r and assert_almost_equal_angles(t_cue, theta, 25):
-                    r = r_cue
-            self.polar_echo_curve[i, :] = [r, theta]
-        # print(f"Cue curve time: {time.time() - start_time:.3f}")
+        # echo_cues = [cartesian_to_polar(cue.point()) for cue in self.cues if cue.type
+        #              in [EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_CENTRAL_ECHO, EXPERIENCE_LOCAL_ECHO]]
+        # for i in range(0, 360 // ANGULAR_RESOLUTION):
+        #     r, theta = 0, math.radians(i * ANGULAR_RESOLUTION)
+        #     for r_cue, t_cue in echo_cues:
+        #         if r_cue > r and assert_almost_equal_angles(t_cue, theta, 25):
+        #             r = r_cue
+        #     self.polar_echo_curve[i, :] = [r, theta]
+
+        echo_cues = [cue for cue in self.cues if cue.type in [EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_CENTRAL_ECHO,
+                                                              EXPERIENCE_LOCAL_ECHO]]
+        a = np.empty((360 // ANGULAR_RESOLUTION, len(echo_cues)), dtype=float)
+        for i, c in enumerate(echo_cues):
+            a[:, i] = point_to_polar_array(c.point())
+        self.polar_echo_curve[:, 0] = a.max(axis=1)
+        print(f"Cue curve time: {time.time() - start_time:.3f}")
         self.cartesian_echo_curve[:] = polar_to_cartesian(self.polar_echo_curve)
 
     def save(self):
