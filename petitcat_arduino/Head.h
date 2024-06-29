@@ -19,7 +19,7 @@
 // #define SCAN_SACCADE_SPAN 10   // (degrees) For complete-scan
 // #define SCAN_SIZE 5               // Size of the array of scans
 // #define SCAN_SIZE 18           // Size of the array of scans for complete scan
-#define ECHO_MONITOR_PERIOD 50    // 500 (ms) The period for checking whether to trigger head alignment
+#define ECHO_MONITOR_PERIOD 100    // 500 (ms) The period for checking whether to trigger head alignment
 #define ECHO_MONITOR_VARIATION 50 // (mm) The measure threshold to trigger head alignment
 #define NO_ECHO_DISTANCE 10000    // (mm) Default distance when no echo
 

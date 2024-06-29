@@ -20,3 +20,13 @@ You may invert the wheel wiring or set negative coefficients to wheels in `robot
 #define FRONT_RIGHT_WHEEL_COEF -1
 #define FRONT_LEFT_WHEEL_COEF -1
 ```
+
+## Bad detection of objects by the HC-SR04 ultrasonic module
+
+Bad reception of echo signals may result in: 
+- PetitCat often fails to detect object.
+- The outcome packet often misses the `"echo_distance"` field.
+- After a "Scan" interaction, the `"echos"` field of the outcome packet contains no or few values.  
+
+This may be caused by a poor electrical connection of the HC-SR04 ultrasonic module. 
+Please check and tighten its wiring according to the diagram in [Osoyoo Lesson 2](https://osoyoo.com/2022/07/05/v2-mecanum-wheel-metal-chassis-robotic-for-arduino-mega2560-lesson-2-obstacle-avoidance-robot/).

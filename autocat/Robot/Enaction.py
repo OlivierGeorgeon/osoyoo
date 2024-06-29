@@ -1,7 +1,6 @@
 from .Command import Command, DIRECTION_FRONT
 from ..Enaction.Predict import generate_prediction
 from ..Enaction.Trajectory import Trajectory
-from ..Proposer.Interaction import OUTCOME_FLOOR, OUTCOME_FOCUS_FRONT
 
 
 class Enaction:
@@ -15,15 +14,6 @@ class Enaction:
         self.predicted_memory = memory  # must be a clone of the current memory
         self.clock = memory.clock
 
-        # # Modify the prompt depending on the intended outcome
-        # if interaction.outcome == OUTCOME_FLOOR:
-        #     memory.egocentric_memory.prompt_point = None
-        # elif interaction.outcome == OUTCOME_FOCUS_FRONT:
-        #     if memory.egocentric_memory.focus_point is not None:
-        #         memory.egocentric_memory.prompt_point = memory.egocentric_memory.focus_point.copy()
-        #     else:
-        #         memory.egocentric_memory.prompt_point = None
-        #
         # Generate the command to the robot
         self.command = Command(self.action, memory, direction, span, caution)
 
@@ -85,12 +75,3 @@ class Enaction:
         if (self.outcome.impact > 0) != (self.predicted_outcome.impact > 0):
             return False
         return True
-        # return self.outcome.floor == self.predicted_outcome.floor and self.outcome.impact == 0
-
-    # def current_enaction(self):
-    #     """Used if the enaction is taken as a composite enaction"""
-    #     return self
-
-    # def increment(self):
-    #     """Used if the enaction is taken as a composite enaction"""
-    #     return False

@@ -8,7 +8,7 @@ from ..EgocentricMemory.EgocentricMemory import EXPERIENCE_FLOOR, EXPERIENCE_ALI
 from ...Utils import cartesian_to_polar, assert_almost_equal_angles, polar_to_cartesian, quaternion_to_direction_rad
 from .PlaceGeometry import transform_estimation_cue_to_cue
 
-ANGULAR_RESOLUTION = 10  # Degree
+ANGULAR_RESOLUTION = 5  # Degree
 
 
 class PlaceCell:
@@ -60,7 +60,7 @@ class PlaceCell:
         for i in range(0, 360 // ANGULAR_RESOLUTION):
             r, theta = 0, math.radians(i * ANGULAR_RESOLUTION)
             for r_cue, t_cue in echo_cues:
-                if r_cue > r and assert_almost_equal_angles(t_cue, theta, 35):
+                if r_cue > r and assert_almost_equal_angles(t_cue, theta, 25):
                     r = r_cue
             self.polar_echo_curve[i, :] = [r, theta]
         # print(f"Cue curve time: {time.time() - start_time:.3f}")

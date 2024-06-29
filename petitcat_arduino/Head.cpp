@@ -27,9 +27,9 @@ void Head::setup()
 void Head::beginEchoAlignment()
 {
   _is_enacting_head_alignment = true;
-  // Reinitialize the measure so it will not believe that the next measure is a minimum
+  // Reinitialize the previous measures because we don't know where they were taken
   _previous_ultrasonic_measure  = NO_ECHO_DISTANCE;
-  //_current_ultrasonic_measure = NO_ECHO_DISTANCE; // - 1;
+  _current_ultrasonic_measure = NO_ECHO_DISTANCE;
   // Inverse the movement to track moving objects more easily
   _head_angle_span = - _head_angle_span;
   _echo_alignment_step = 0;
@@ -164,7 +164,7 @@ int Head::measureUltrasonicEcho()
   digitalWrite(Trig_PIN,LOW);
   echo_distance = pulseIn(Echo_PIN,HIGH, 10000);  // Timeout 10 milliseconds, otherwise it blocks the main loop!
   echo_distance = (int)(echo_distance * 0.1657);  // Convert to mm
-  if (echo_distance == 0) echo_distance = 10000;  // Zero counts for far away
+  if (echo_distance == 0) echo_distance = NO_ECHO_DISTANCE;  // Zero counts for no echo
   //Serial.println("Angle " +String(_head_angle) + " measure " + String(echo_distance));
   return echo_distance;
 }
