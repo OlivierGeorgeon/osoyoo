@@ -201,7 +201,7 @@ At the time of writing Unitree has been getting much press about its G1 humanoid
 
 **Open Source Hardware**
 
-The open source hardware movment is similar in nature to the better known open source software movement.
+The open source hardware movement is similar in nature to the better known open source software movement.
 
 The term "open source hardware" is analogous to the term "open source software." Open source hardware refers to hardware, i.e., physical devices, whose design is open and available, and anyone can modify and distribute such hardware. Open source hardware is supposed to have adequate documentation to ensure transparency, i.e., schematics, where to obtain specialized components, software drivers, and so on, adequately disclosed.
 
