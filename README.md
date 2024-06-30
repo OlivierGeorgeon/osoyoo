@@ -13,6 +13,25 @@ The cost of all parts including the Arduino board is approximately US$120 at the
 
 ![petitcat logo](docs/petitcat_padding.png)
 
+-
+
+<h2 style="font-size: 24px;">The PetitCat Project - TL;DR </h2>
+
+
+The PetitCat Project uses open source software combined with open source hardware to enable the Python code of an AI/AGI project to interface on a real-time basis via Wi-Fi with lower-level C/C++ compiled code of a robotic embodiment. The project has lower cost software and hardware requirements than robotic projects utilizing more formal frameworks such as ROS2. Of more importance, the PetitCat Project readily allows the researcher to customize the project to her/his research requirements, and involves a very modest learning curve. While the PetitCat Project was initially created to allow symbol grounding, enaction, active inference, predictive coding, and developmental and constructivist learning, it is suitable for a wide range of people, from the student to the serious AI/AGI researcher.
+
+<p align="center">
+ <img src="openhardwarelogo.png" width=250" height="250">
+</p>
+
+<p align="center">
+ <img src="mitlicense.png" width=250" height="250">
+</p>
+
+<p align="center">
+ <img src="opensource.png" width=250" height="250">
+</p>
+
 ## Repository architecture
 
 ```
