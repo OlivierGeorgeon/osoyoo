@@ -1,5 +1,6 @@
 import json
 import numpy as np
+import pandas as pd
 import colorsys
 from pyrr import matrix44
 from . import NO_ECHO_DISTANCE
@@ -63,45 +64,62 @@ def category_color(color_sensor):
     return color_index
 
 
-def central_echos(echos):
-    """Return an array of points representing the centers of streaks of echos"""
-    _central_echos = []
+def resample_by_streak(polar_points, r_tolerance=50):
+    """Return an array of points at the middle of groups of consecutive polar points that have similar r"""
+    # Convert point array to pandas DataFrame
+    df = pd.DataFrame(polar_points, columns=['r', 'theta'])
 
-    # Create the streaks
-    streaks = []
-    echo_list = [[int(a), d] for a, d in echos.items() if d < NO_ECHO_DISTANCE]
-    current_streak = [echo_list[0]]
-    if len(echo_list) > 1:
-        for angle, distance in echo_list[1:]:
-            if abs(current_streak[-1][1] - distance) < 50 and abs(angle - current_streak[-1][0]) <= 50:
-                current_streak.append([angle, distance])
-            else:
-                streaks.append(current_streak)
-                current_streak = [[angle, distance]]
-    streaks.append(current_streak)
+    # Sort by theta
+    df = df.sort_values(by='theta').reset_index(drop=True)
 
-    # Find the middle of the streaks
-    for streak in streaks:
-        if len(streak) == 0:
-            continue
-        else:
-            if len(streak) % 2 == 0:
-                # Compute the means of angle and distance values for the two elements at the center of the array
-                a_mean = (streak[int(len(streak) / 2)][0] + streak[int(len(streak) / 2) - 1][0]) / 2.
-                d_mean = (streak[int(len(streak) / 2)][1] + streak[int(len(streak) / 2) - 1][1]) / 2.
-                _central_echos.append([a_mean, d_mean])
-            else:
-                # The central echo is at the center point of the streak
-                _central_echos.append([streak[int(len(streak) / 2)][0], streak[int(len(streak) / 2)][1]])
+    # Create a grouping key for streaks of similar r values
+    df['group'] = (df['r'].diff().abs() > r_tolerance).cumsum()
 
-    # Sort by distance
-    _central_echos = sorted(_central_echos, key=lambda e: e[1])
-    # Only return the closest central echo
-    # if len(_central_echos) > 1:
-    #     _central_echos = [_central_echos[0]]
-    print("Central echos", _central_echos)
+    # Group by the grouping key and calculate the mean r and theta for each group
+    grouped = df.groupby('group').agg({'r': 'mean', 'theta': 'mean'}).reset_index(drop=True)
+    # TODO invert r and theta to comply with standard polar coordinates
+    return grouped[['theta', 'r']].to_numpy()
 
-    return _central_echos
+
+# def central_echos(echos):
+#     """Return an array of points representing the centers of streaks of echos"""
+#     _central_echos = []
+#
+#     # Create the streaks
+#     streaks = []
+#     echo_list = [[int(a), d] for a, d in echos.items() if d < NO_ECHO_DISTANCE]
+#     current_streak = [echo_list[0]]
+#     if len(echo_list) > 1:
+#         for angle, distance in echo_list[1:]:
+#             if abs(current_streak[-1][1] - distance) < 50 and abs(angle - current_streak[-1][0]) <= 50:
+#                 current_streak.append([angle, distance])
+#             else:
+#                 streaks.append(current_streak)
+#                 current_streak = [[angle, distance]]
+#     streaks.append(current_streak)
+#
+#     # Find the middle of the streaks
+#     for streak in streaks:
+#         if len(streak) == 0:
+#             continue
+#         else:
+#             if len(streak) % 2 == 0:
+#                 # Compute the means of angle and distance values for the two elements at the center of the array
+#                 a_mean = (streak[int(len(streak) / 2)][0] + streak[int(len(streak) / 2) - 1][0]) / 2.
+#                 d_mean = (streak[int(len(streak) / 2)][1] + streak[int(len(streak) / 2) - 1][1]) / 2.
+#                 _central_echos.append([a_mean, d_mean])
+#             else:
+#                 # The central echo is at the center point of the streak
+#                 _central_echos.append([streak[int(len(streak) / 2)][0], streak[int(len(streak) / 2)][1]])
+#
+#     # Sort by distance
+#     _central_echos = sorted(_central_echos, key=lambda e: e[1])
+#     # Only return the closest central echo
+#     # if len(_central_echos) > 1:
+#     #     _central_echos = [_central_echos[0]]
+#     print("Central echos", _central_echos)
+#
+#     return _central_echos
 
 
 class Outcome:
@@ -157,7 +175,9 @@ class Outcome:
         if "echos" in outcome_dict:
             self.echos = outcome_dict['echos']
             print("Echos", self.echos)
-            self.central_echos = central_echos(self.echos)
+            self.central_echos = resample_by_streak([[d, int(a)] for a, d in self.echos.items()
+                                                     if d < NO_ECHO_DISTANCE])
+            # self.central_echos = central_echos(self.echos)
 
     def __str__(self):
         """Print the outcome dictionary as a json string"""
