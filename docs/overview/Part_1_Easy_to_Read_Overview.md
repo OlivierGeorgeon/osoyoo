@@ -17,10 +17,16 @@ Howard Schneider -- Feb 15, 2024)
 
 ![petitcatgpt4logo](petitcatgpt4logo.jpg)
 -
+-
+
+
+<h2 style="font-size: 24px;">The PetitCat Project - TL;DR </h2>
+-
+The PetitCat Project uses open source software combined with open source hardware to enable the Python code of an AI/AGI project interface on a real-time basis via Wi-Fi with lower-level C/C++ compiled code of a robotic embodiment. The project has lower cost software and hardware requirements than robotic projects utilizing more formal frameworks such as ROS2. Of more important, the PetitCat Project readily allows the researcher to customize the project to her/his research requirements, and involves a very modest learning curve. While the PetitCat Project was initially created to allow symbol grounding and autonomous bottom-up interactive learning the framework of theories of enaction, active inference, predictive coding and developmental and constructivist learning, it is suitable for a wide range of people, from the high-school student to the serious AI/AGI researcher.
 
 -
 
-<h2 style="font-size: 24px;">The PetitCat Project </h2>
+<h2 style="font-size: 24px;">The PetitCat Project - Documentation </h2>
 
 
 The "Easy-to-Read Overview" of the project is divided into five parts:
@@ -35,6 +41,8 @@ The "Easy-to-Read Overview" of the project is divided into five parts:
 **Part IV:** Integration of PetitCat with a Causal Cognitive Architecture
 
 **Part V:** Integration of PetitCat with a Large Language Model
+
+**Part VI, VII, ...:**  Pending
 
 
 The PetitCat documentation is written so that anyone with a basic education can read it and understand it. Having a deeper breadth of knowledge in software development, AI, or cognitive science, can, of course, allow greater appreciation for certain aspects of the project.
