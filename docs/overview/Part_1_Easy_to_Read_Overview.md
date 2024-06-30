@@ -209,6 +209,11 @@ Like open source software, collaboration is encouraged in the field of open sour
 
 The Arduino board used in the PetitCat project (see below), a well-known open source hardware platform -- it is fully documented, and other companies or organizations can make compatible Arduino boards.  (Of interest, the popular Raspberry Pi is actually not fully open hardware -- it uses propietary system on a chip components, and the Raspberry Pi's bootloading software is actually closed-source. However, it is pseudo-open hardware, and used by many developers, nonetheless.)
 
+The Open Source Hardware Association (OSHWA) is a non-profit organization that promotes open-source hardware. 
+
+[OSHWA](https://www.oshwa.org/)
+
+
 
 <p align="center">
  <img src="openhardwarelogo.png" width=250" height="250">
