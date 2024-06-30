@@ -205,7 +205,7 @@ The open source hardware movment is similar in nature to the better known open s
 
 The term "open source hardware" is analogous to the term "open source software." Open source hardware refers to hardware, i.e., physical devices, whose design is open and available, and anyone can modify and distribute such hardware. Open source hardware is supposed to have adequate documentation to ensure transparency, i.e., schematics, where to obtain specialized components, software drivers, and so on, adequately disclosed.
 
-Like open source software, collaboration is encouraged in the field of open source hardware, and the technology is intended to be accessible to largest possible audience.
+Like open source software, collaboration is encouraged in the field of open source hardware, and the technology is intended to be accessible to the largest possible audience.
 
 The Arduino board used in the PetitCat project (see below), a well-known open source hardware platform -- it is fully documented, and other companies or organizations can make compatible Arduino boards.  (Of interest, the popular Raspberry Pi is actually not fully open hardware -- it uses propietary system on a chip components, and the Raspberry Pi's bootloading software is actually closed-source. However, it is pseudo-open hardware, and used by many developers, nonetheless.)
 
