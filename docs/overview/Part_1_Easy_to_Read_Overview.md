@@ -198,6 +198,24 @@ At the time of writing Unitree has been getting much press about its G1 humanoid
 
 -
 
+
+**Open Source Hardware**
+
+The open source hardware movment is similar in nature to the better known open source software movement.
+
+The term "open source hardware" is analogous to the term "open source software." Open source hardware refers to hardware, i.e., physical devices, whose design is open and available, and anyone can modify and distribute such hardware. Open source hardware is supposed to have adequate documentation to ensure transparency, i.e., schematics, where to obtain specialized components, software drivers, and so on, adequately disclosed.
+
+Like open source software, collaboration is encouraged in the field of open source hardware, and the technology is intended to be accessible to largest possible audience.
+
+The Arduino board used in the PetitCat project (see below), a well-known open source hardware platform -- it is fully documented, and other companies or organizations can make compatible Arduino boards.  (Of interest, the popular Raspberry Pi is actually not fully open hardware -- it uses propietary system on a chip components, and the Raspberry Pi's bootloading software is actually closed-source. However, it is pseudo-open hardware, and used by many developers, nonetheless.)
+
+
+<p align="center">
+ <img src="openhardwarelogo.png" width=250" height="250">
+</p>
+
+-
+
 **Why Not Use ROS2?** 
 
  The Robot Operating System (ROS) is a collection of software frameworks to take care of the low-level management of a robotic system. For example, it can abstract away aspects of the hardware being used, it can control the low-level operations of the robot and coordinate communication between different operations. ROS was released in 2007 and ROS2 was released in 2017. ROS2 is open source.
