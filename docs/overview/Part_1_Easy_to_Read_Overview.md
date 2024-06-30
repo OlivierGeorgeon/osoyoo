@@ -219,6 +219,28 @@ The Open Source Hardware Association (OSHWA) is a non-profit organization that p
  <img src="openhardwarelogo.png" width=250" height="250">
 </p>
 
+
+-
+
+**Open Source Software**
+
+Yes, of course, the software of the PetitCat Project is open source software, available at no charge.
+
+Open Source Software (OSS) is software that has a license which allows any user to examine, use, modify and distribute the source code. It is intended to promote collaboration among software developers. It is often more secure than one would initially think given the transparency of open source software development and examination. 
+
+Common open source software licenses are the GNU General Public License (GPL), the Apache License, and the MIT License.
+
+<p align="center">
+ <img src="mitlicense.png" width=250" height="250">
+</p>
+
+Although the majority of open source projects are available at no cost (inluding the PetitCat Project), note that a developer can charge a fee for the software. Often commercial developers may offer the software for free but charge for its distribution and support. For example, Red Hat Enterprise Linux source code is freely available, but there are charges for support to install and maintain the software, for certification, and so on. For example, the source code of GitLab is freely available, but there are charges for advanced features. The Open Source Initiative (OSI) helps draft standards for open source software.
+
+<p align="center">
+ <img src="opensource.png" width=250" height="250">
+</p>
+
+
 -
 
 **Why Not Use ROS2?** 
