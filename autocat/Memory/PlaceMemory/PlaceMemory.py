@@ -4,7 +4,7 @@ from pyrr import Matrix44
 import copy
 from ...Memory.PlaceMemory.PlaceCell import PlaceCell
 from ...Memory.PlaceMemory.Cue import Cue
-from ...Memory.EgocentricMemory.Experience import EXPERIENCE_COMPASS, EXPERIENCE_AZIMUTH
+from ...Memory.EgocentricMemory.Experience import EXPERIENCE_COMPASS, EXPERIENCE_AZIMUTH, EXPERIENCE_CENTRAL_ECHO
 from .PlaceGeometry import nearby_place_cell
 
 
@@ -24,7 +24,7 @@ class PlaceMemory:
         cues = []
         # The new experiences generated during this step constitute cues
         for e in [e for e in memory.egocentric_memory.experiences.values() if (e.clock >= memory.clock) and
-                  e.type not in [EXPERIENCE_COMPASS, EXPERIENCE_AZIMUTH]]:
+                  e.type not in [EXPERIENCE_COMPASS, EXPERIENCE_AZIMUTH, EXPERIENCE_CENTRAL_ECHO]]:
             cue = Cue(e.id, e.polar_pose_matrix(), e.type, e.clock, e.color_index, e.polar_sensor_point())
             cues.append(cue)
 

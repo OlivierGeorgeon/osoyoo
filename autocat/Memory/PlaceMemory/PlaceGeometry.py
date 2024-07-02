@@ -2,6 +2,7 @@
 
 import math
 import numpy as np
+import pandas as pd
 import open3d as o3d
 from . import MIN_PLACE_CELL_DISTANCE, ICP_DISTANCE_THRESHOLD, ANGULAR_RESOLUTION, MASK_ARRAY
 from ...Robot import NO_ECHO_DISTANCE
@@ -47,6 +48,37 @@ def point_to_polar_array(point):
     """Return an array representing the angular span of the cue at this point"""
     r, theta = cartesian_to_polar(point)
     return np.roll(MASK_ARRAY * r, round(math.degrees(theta)) // ANGULAR_RESOLUTION)
+
+
+def resample_by_diff(polar_points, r_tolerance=50, theta_span=15):
+    """Return the array of points where difference is greater that tolerance"""
+    # Convert point array to a sorted pandas DataFrame
+    df = pd.DataFrame(polar_points, columns=['r', 'theta'])  # .sort_values(by='theta').reset_index(drop=True)
+
+    # The mask for rows where r decreases or will increase next and is not zero
+    diff_mask = ((df['r'].diff() < -r_tolerance) | (df['r'].diff() > r_tolerance).shift(-1, fill_value=False)) & \
+                (df['r'] > 0)
+    diff_points = df[diff_mask]
+
+    # Create a grouping key for streaks of similar r values
+    df['group'] = (df['r'].diff().abs() > r_tolerance).cumsum()
+
+    # Group by the grouping key and calculate the mean r and theta for each group
+    grouped = df.groupby('group').agg({'r': 'mean', 'theta': ['mean', lambda x: x.max() - x.min()]}).reset_index(drop=True)
+    grouped.columns = ['r', 'theta', 'span']
+    large_group_points = grouped[(grouped['span'] > theta_span) & (grouped['r'] > 0)]
+
+    points_of_interest = pd.concat([diff_points, large_group_points[['r', 'theta']]], ignore_index=True)
+    return points_of_interest.sort_values(by='theta').to_numpy()
+
+    # The mask for rows where r does not change within the theta_tolerance
+    # eq_mask = [(df['r'] - df['r'].shift(i)).abs() <= r_tolerance for i in range(-2, 2)]
+    # print("eq\n", eq_mask)
+
+    # Combine masks
+    # combined_mask = diff_mask + eq_mask
+    # final_mask = pd.concat(eq_mask, axis=1).any(axis=1)
+    # return df[diff_mask].to_numpy()
 
 # def delta_echo_curves(polar1, cartesian1, polar2, cartesian2):
 #     """Return the cartesian position difference between points with same polar angle """
