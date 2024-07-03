@@ -9,18 +9,16 @@ from ...Robot import NO_ECHO_DISTANCE
 from ...Utils import cartesian_to_polar
 
 
-def transform_estimation_cue_to_cue(cues1, cues2):
-    """Return the transformation cues1 minus cues2 using o3d ICP algorithm"""
+def transform_estimation_cue_to_cue(points1, points2, threshold=ICP_DISTANCE_THRESHOLD):
+    """Return the transformation points1 minus points2 using o3d ICP algorithm"""
     # print("Cues 1", cues1)
     # print("Cues 2", cues2)
     # Create the o3d point clouds
     pcd1 = o3d.geometry.PointCloud()
     pcd2 = o3d.geometry.PointCloud()
     # Converting to integers seems to avoid rotation
-    pcd1.points = o3d.utility.Vector3dVector(np.array(cues1, dtype=int))
-    pcd2.points = o3d.utility.Vector3dVector(np.array(cues2, dtype=int))
-    # Define ICP criteria and parameters
-    threshold = ICP_DISTANCE_THRESHOLD
+    pcd1.points = o3d.utility.Vector3dVector(np.array(points1, dtype=int))
+    pcd2.points = o3d.utility.Vector3dVector(np.array(points2, dtype=int))
     trans_init = np.eye(4)  # Initial transformation matrix (4x4 identity matrix)
     # Apply ICP
     reg_p2p = o3d.pipelines.registration.registration_icp(
@@ -29,6 +27,10 @@ def transform_estimation_cue_to_cue(cues1, cues2):
         # Add robust kernel (e.g., TukeyLoss)
         # , loss = o3d.pipelines.registration.TukeyLoss(k=0.2)
     )
+    print("correspondence set\n", np.asarray(reg_p2p.correspondence_set))
+    mse = np.mean([np.linalg.norm(np.asarray(pcd1.points)[i] - np.asarray(pcd2.points)[j])**2
+                   for i, j in np.asarray(reg_p2p.correspondence_set)])
+    print(f"ICP standard distance: {math.sqrt(mse):.0f}")
     print(f"ICP fitness: {reg_p2p.fitness:.2f}")
     # Return the resulting transformation
     return reg_p2p.transformation
@@ -50,9 +52,10 @@ def point_to_polar_array(point):
     return np.roll(MASK_ARRAY * r, round(math.degrees(theta)) // ANGULAR_RESOLUTION)
 
 
-def resample_by_diff(polar_points, r_tolerance=50, theta_span=15):
+def resample_by_diff(polar_points, theta_span, r_tolerance=30):
     """Return the array of points where difference is greater that tolerance"""
     # Convert point array to a sorted pandas DataFrame
+    polar_points = polar_points.copy()
     df = pd.DataFrame(polar_points, columns=['r', 'theta'])  # .sort_values(by='theta').reset_index(drop=True)
 
     # The mask for rows where r decreases or will increase next and is not zero
@@ -62,33 +65,17 @@ def resample_by_diff(polar_points, r_tolerance=50, theta_span=15):
 
     # Create a grouping key for streaks of similar r values
     df['group'] = (df['r'].diff().abs() > r_tolerance).cumsum()
+    # Theta 0 and 2pi belong to the same group
+    # max_group = max(df['group'])
+    max_group_mask = (df['group'] == max(df['group']))
+    df.loc[max_group_mask, 'theta'] = df.loc[max_group_mask, 'theta'].apply(lambda x: x - 2 * math.pi)
+    df.loc[max_group_mask, 'group'] = 0
 
     # Group by the grouping key and calculate the mean r and theta for each group
     grouped = df.groupby('group').agg({'r': 'mean', 'theta': ['mean', lambda x: x.max() - x.min()]}).reset_index(drop=True)
     grouped.columns = ['r', 'theta', 'span']
-    large_group_points = grouped[(grouped['span'] > theta_span) & (grouped['r'] > 0)]
+    large_group_points = grouped[(grouped['span'] > theta_span) & (grouped['r'] > 0) & (grouped['r'] < NO_ECHO_DISTANCE)]
+    # print("groups\n", grouped, f"theta_span {theta_span}")
 
     points_of_interest = pd.concat([diff_points, large_group_points[['r', 'theta']]], ignore_index=True)
     return points_of_interest.sort_values(by='theta').to_numpy()
-
-    # The mask for rows where r does not change within the theta_tolerance
-    # eq_mask = [(df['r'] - df['r'].shift(i)).abs() <= r_tolerance for i in range(-2, 2)]
-    # print("eq\n", eq_mask)
-
-    # Combine masks
-    # combined_mask = diff_mask + eq_mask
-    # final_mask = pd.concat(eq_mask, axis=1).any(axis=1)
-    # return df[diff_mask].to_numpy()
-
-# def delta_echo_curves(polar1, cartesian1, polar2, cartesian2):
-#     """Return the cartesian position difference between points with same polar angle """
-#     # The points that have echoes in both curves
-#     # echo_points = np.logical_and(np.where(0 < polar1[:, 0]), np.where(0 < polar2[:, 0]))
-#     echo_points = np.where(np.logical_and(np.logical_and(polar1[:, 0] > 0, polar1[:, 0] < NO_ECHO_DISTANCE),
-#                                           np.logical_and(polar2[:, 0] > 0, polar2[:, 0] < NO_ECHO_DISTANCE)))
-#     print("Echo points", echo_points)
-#     print(cartesian1[:, :][echo_points])
-#     # The delta between the echo points
-#     deltas = cartesian2[:, :][echo_points] - cartesian1[:, :][echo_points]
-#     # The sum of the deltas
-#     return np.sum(deltas, axis=0)

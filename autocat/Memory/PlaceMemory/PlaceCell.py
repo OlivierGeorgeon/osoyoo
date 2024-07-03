@@ -3,10 +3,10 @@ import math
 import numpy as np
 import time
 from pyrr import Quaternion, Matrix44
-from . import ANGULAR_RESOLUTION
+from . import ANGULAR_RESOLUTION, CONE_HALF_ANGLE
 from ..EgocentricMemory.EgocentricMemory import EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_CENTRAL_ECHO, \
     EXPERIENCE_LOCAL_ECHO
-from ...Utils import quaternion_translation_to_matrix, polar_to_cartesian, quaternion_to_direction_rad
+from ...Utils import polar_to_cartesian, quaternion_to_direction_rad, translation_quaternion_to_matrix
 from .PlaceGeometry import transform_estimation_cue_to_cue, point_to_polar_array, resample_by_diff
 from .Cue import Cue
 
@@ -53,34 +53,26 @@ class PlaceCell:
     def compute_echo_curve(self):
         """Compute the curve of echoes in polar coordinates"""
         start_time = time.time()
-        # Takes almost 300ms to compute 360 points
-        # echo_cues = [cartesian_to_polar(cue.point()) for cue in self.cues if cue.type
-        #              in [EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_CENTRAL_ECHO, EXPERIENCE_LOCAL_ECHO]]
-        # for i in range(0, 360 // ANGULAR_RESOLUTION):
-        #     r, theta = 0, math.radians(i * ANGULAR_RESOLUTION)
-        #     for r_cue, t_cue in echo_cues:
-        #         if r_cue > r and assert_almost_equal_angles(t_cue, theta, 25):
-        #             r = r_cue
-        #     self.polar_echo_curve[i, :] = [r, theta]
+        echo_cues = [cue for cue in self.cues if cue.type in [EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_LOCAL_ECHO]]
+        if len(echo_cues) > 0:
+            a = np.empty((360 // ANGULAR_RESOLUTION, len(echo_cues)), dtype=float)
+            for i, c in enumerate(echo_cues):
+                a[:, i] = point_to_polar_array(c.point())
+            self.polar_echo_curve[:, 0] = a.max(axis=1)
+            # print(f"Cue curve time: {time.time() - start_time:.3f}")
+            # Recompute the central echoes
+            self.cues = [c for c in self.cues if c.type != EXPERIENCE_CENTRAL_ECHO]
+            diff_points = resample_by_diff(self.polar_echo_curve, math.radians(2 * CONE_HALF_ANGLE))
+            for r, theta in diff_points:
+                pose_matrix = translation_quaternion_to_matrix([r, 0, 0], Quaternion.from_z_rotation(theta))
+                cue = Cue(0, pose_matrix, EXPERIENCE_CENTRAL_ECHO, 0, 0, [0, 0, 0])
+                self.cues.append(cue)
+            # Recompute the cartesian coordinates
+            self.cartesian_echo_curve[:] = polar_to_cartesian(self.polar_echo_curve)
 
-        echo_cues = [cue for cue in self.cues if cue.type in [EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_CENTRAL_ECHO,
-                                                              EXPERIENCE_LOCAL_ECHO]]
-        a = np.empty((360 // ANGULAR_RESOLUTION, len(echo_cues)), dtype=float)
-        for i, c in enumerate(echo_cues):
-            a[:, i] = point_to_polar_array(c.point())
-        self.polar_echo_curve[:, 0] = a.max(axis=1)
-        print(f"Cue curve time: {time.time() - start_time:.3f}")
-
-        # Recompute the central echoes
-        self.cues = [c for c in self.cues if c.type != EXPERIENCE_CENTRAL_ECHO]
-        diff_points = resample_by_diff(self.polar_echo_curve, 50, math.radians(50))
-        for r, theta in diff_points:
-            pose_matrix = quaternion_translation_to_matrix(Quaternion.from_z_rotation(theta), [r, 0, 0])
-            cue = Cue(0, pose_matrix, EXPERIENCE_CENTRAL_ECHO, 0, 0, [0, 0, 0])
-            print(f"Central {cue}, r: {r:.0f}, theta {math.degrees(theta):.0f}")
-            self.cues.append(cue)
-
-        self.cartesian_echo_curve[:] = polar_to_cartesian(self.polar_echo_curve)
+    def is_fully_observed(self):
+        """Return True if the echo curve is never zero"""
+        return min(self.polar_echo_curve[:, 0]) > 0
 
     def save(self):
         """Return a cloned place cell for memory snapshot"""

@@ -41,4 +41,4 @@ points = [[1000, 0],
           ]
 
 print("Test resample by diff")
-print(resample_by_diff(points, 10))
+print(resample_by_diff(points, r_tolerance=10))
