@@ -148,10 +148,20 @@ class PointOfInterest:
             self.shape.x, self.shape.y, _ = matrix44.apply_to_vector(displacement_matrix,
                                                                      [self.shape.x, self.shape.y, 0])
 
-    def delete(self):
+    # def displace_to(self, pose_matrix):
+    #     """Displace the vertices to the pose_matrix"""
+    #     # Compute the displacement from the previous pose_matrix to the new pose matrix
+    #     displacement_matrix = matrix44.multiply(self.pose_matrix.inverse, pose_matrix)
+    #     # Apply this displacement
+    #     self.displace(displacement_matrix)
+
+    def delete(self, clock=0):
         """ Delete the shape to remove it from the batch. Return True when deleted """
-        self.shape.delete()
-        return True
+        if self.is_expired(clock) or clock == 0:
+            self.shape.delete()
+            return True
+        else:
+            return False
 
     def is_expired(self, clock):
         """Return True if the age has exceeded the durability"""
@@ -169,7 +179,7 @@ class PointOfInterest:
             return False
 
     def fade(self, clock):
-        """Decrease the opacity of this point of interest as it gets older, and then delete it"""
+        """Decrease the opacity of this point of interest as it gets older"""
         # Opacity: 0 is transparent, 255 is opaque
         self.opacity = int(max(255 * (self.durability - clock + self.clock) / self.durability, 0))
         # Reset the opacity of the shape

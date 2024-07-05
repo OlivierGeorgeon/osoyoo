@@ -44,10 +44,10 @@ class PlaceCell:
             if abs(r) > 10:
                 translation[:] = 0
 
-        # Assume FLOOR experiences come from a single point
-        for new_cue in [cue for cue in cues if cue.type == EXPERIENCE_FLOOR]:
-            for previous_cue in [cue for cue in self.cues if cue.type == EXPERIENCE_FLOOR]:
-                translation = previous_cue.point() - new_cue.point()
+        # # Assume FLOOR experiences come from a single point
+        # for new_cue in [cue for cue in cues if cue.type == EXPERIENCE_FLOOR]:
+        #     for previous_cue in [cue for cue in self.cues if cue.type == EXPERIENCE_FLOOR]:
+        #         translation = previous_cue.point() - new_cue.point()
         return translation
 
     def compute_echo_curve(self):
@@ -60,6 +60,7 @@ class PlaceCell:
                 a[:, i] = point_to_polar_array(c.point())
             self.polar_echo_curve[:, 0] = a.max(axis=1)
             # print(f"Cue curve time: {time.time() - start_time:.3f}")
+
             # Recompute the central echoes
             self.cues = [c for c in self.cues if c.type != EXPERIENCE_CENTRAL_ECHO]
             diff_points = resample_by_diff(self.polar_echo_curve, math.radians(2 * CONE_HALF_ANGLE))

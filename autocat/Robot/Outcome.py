@@ -77,8 +77,8 @@ def resample_by_streak(polar_points, r_tolerance=50):
 
     # Group by the grouping key and calculate the mean r and theta for each group
     grouped = df.groupby('group').agg({'r': 'mean', 'theta': 'mean'}).reset_index(drop=True)
-    print("columns", grouped.columns)
-    print("grouped\n", grouped)
+    # print("columns", grouped.columns)
+    # print("grouped\n", grouped)
     # TODO invert r and theta to comply with standard polar coordinates
     return grouped[['theta', 'r']].to_numpy()
 
@@ -138,7 +138,6 @@ class Outcome:
             print("Echos", self.echos)
             self.central_echos = resample_by_streak([[d, int(a)] for a, d in self.echos.items()
                                                      if d < NO_ECHO_DISTANCE])
-            # self.central_echos = central_echos(self.echos)
 
     def __str__(self):
         """Print the outcome dictionary as a json string"""

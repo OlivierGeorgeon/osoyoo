@@ -68,12 +68,9 @@ class CtrlBodyView:
 
         # Update the robot display
         self.view.update_body_display(self.workspace.memory.body_memory)
-        # self.view.robot.rotate_head(self.workspace.memory.body_memory.head_direction_degree())
-        # self.view.robot.emotion_color(self.workspace.memory.body_memory.emotion_code())
-        # self.view.body_rotation_matrix = self.workspace.memory.body_memory.body_direction_matrix()
 
-        # Delete the points of interest
-        self.points_of_interest = [p for p in self.points_of_interest if not p.delete()]
+        # Delete the expired points of interest
+        self.points_of_interest = [p for p in self.points_of_interest if not p.delete(self.workspace.enaction.clock)]
 
         # Recreate the points of interest from experiences
         for e in [e for e in self.workspace.memory.egocentric_memory.experiences.values() if

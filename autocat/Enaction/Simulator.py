@@ -8,7 +8,9 @@ from ..Robot.Outcome import Outcome
 from ..Memory.AllocentricMemory.Geometry import point_to_cell
 from ..Memory.AllocentricMemory import STATUS_0, STATUS_1, COLOR_INDEX, POINT_X, POINT_Y
 from ..Memory.EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO
-from ..Utils import assert_almost_equal_angles, translation_quaternion_to_matrix, point_to_head_direction_distance
+from ..Utils import assert_almost_equal_angles, translation_quaternion_to_matrix, point_to_head_direction_distance, \
+    quaternion_to_direction_rad
+
 # from .Predict import RETREAT_YAW
 
 SIMULATION_SPEED = 1  # 0.5
@@ -72,6 +74,9 @@ class Simulator:
                                                                              memory.egocentric_memory.prompt_point)
         # Simulate the rotations in body memory
         memory.body_memory.body_quaternion = memory.body_memory.body_quaternion.cross(yaw_quaternion)
+        # memory.body_memory.simulation_rotation_deg += matrix_to_rotation_degree(displacement_matrix)
+        memory.body_memory.simulation_rotation_deg += math.degrees(quaternion_to_direction_rad(yaw_quaternion))
+        memory.body_memory.simulation_translate += translation
 
         # Simulate the movement of the head to the focus
         if memory.egocentric_memory.focus_point is not None:

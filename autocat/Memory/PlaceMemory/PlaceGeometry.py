@@ -27,11 +27,13 @@ def transform_estimation_cue_to_cue(points1, points2, threshold=ICP_DISTANCE_THR
         # Add robust kernel (e.g., TukeyLoss)
         # , loss = o3d.pipelines.registration.TukeyLoss(k=0.2)
     )
-    print("correspondence set\n", np.asarray(reg_p2p.correspondence_set))
-    mse = np.mean([np.linalg.norm(np.asarray(pcd1.points)[i] - np.asarray(pcd2.points)[j])**2
-                   for i, j in np.asarray(reg_p2p.correspondence_set)])
-    print(f"ICP standard distance: {math.sqrt(mse):.0f}")
-    print(f"ICP fitness: {reg_p2p.fitness:.2f}")
+    if len(reg_p2p.correspondence_set) == 0:
+        print("ICP no match")
+    else:
+        print(np.asarray(reg_p2p.correspondence_set))
+        mse = np.mean([np.linalg.norm(np.asarray(pcd1.points)[i] - np.asarray(pcd2.points)[j])**2
+                       for i, j in np.asarray(reg_p2p.correspondence_set)])
+        print(f"ICP standard distance: {math.sqrt(mse):.0f}, fitness: {reg_p2p.fitness:.2f}")
     # Return the resulting transformation
     return reg_p2p.transformation
 
@@ -74,7 +76,7 @@ def resample_by_diff(polar_points, theta_span, r_tolerance=30):
     # Group by the grouping key and calculate the mean r and theta for each group
     grouped = df.groupby('group').agg({'r': 'mean', 'theta': ['mean', lambda x: x.max() - x.min()]}).reset_index(drop=True)
     grouped.columns = ['r', 'theta', 'span']
-    large_group_points = grouped[(grouped['span'] > theta_span) & (grouped['r'] > 0) & (grouped['r'] < NO_ECHO_DISTANCE)]
+    large_group_points = grouped[(grouped['span'] >= theta_span) & (grouped['r'] > 0) & (grouped['r'] < NO_ECHO_DISTANCE)]
     # print("groups\n", grouped, f"theta_span {theta_span}")
 
     points_of_interest = pd.concat([diff_points, large_group_points[['r', 'theta']]], ignore_index=True)

@@ -49,10 +49,10 @@ class PlaceMemory:
             self.create_place_cell(memory.allocentric_memory.robot_point, cues)
 
         # Print similarity with other place cells
-        points = [c.point() for c in cues]
+        points = [c.point() for c in self.place_cells[self.current_robot_cell_id].cues if c.type == EXPERIENCE_CENTRAL_ECHO]
         for k, p in self.place_cells.items():
-            print(f"Similarity between cell {self.current_robot_cell_id} and cell {k} {p}:")
-            transform_estimation_cue_to_cue(points, [c.point() for c in p.cues], threshold=1000)
+            print(f"Similarity between cell {self.current_robot_cell_id} and cell {k}:")
+            transform_estimation_cue_to_cue(points, [c.point() for c in p.cues if c.type == EXPERIENCE_CENTRAL_ECHO], threshold=1000)
 
         # If the place cell is not fully observed
         if not self.place_cells[self.current_robot_cell_id].is_fully_observed():
