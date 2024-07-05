@@ -1,4 +1,5 @@
 import time
+import numpy as np
 from pyglet.window import key, mouse
 from .AllocentricView import AllocentricView
 from ...Memory.AllocentricMemory.Geometry import point_to_cell
@@ -119,18 +120,25 @@ class CtrlAllocentricView:
 
     def update_view(self):
         """Update the allocentric view from the status in the allocentric grid cells"""
-        # for c in [c for line in self.workspace.memory.allocentric_memory.grid for c in line]:
-        #     self.view.update_hexagon(c)
-        self.view.update_body_display(self.workspace.memory.body_memory)
-        for i in range(self.workspace.memory.allocentric_memory.min_i, self.workspace.memory.allocentric_memory.max_i):
-            for j in range(self.workspace.memory.allocentric_memory.min_j, self.workspace.memory.allocentric_memory.max_j):
-                self.view.update_hexagon(i, j, self.workspace.memory.allocentric_memory.grid[i][j][:])
+        start_time = time.time()
+        # TODO Update only the cells that have the current clock
+        known_cells = np.where(self.workspace.memory.allocentric_memory.grid[:, :, STATUS_0:CLOCK_PLACE+1] != 0)
+                               # [CELL_UNKNOWN, CELL_UNKNOWN, CELL_UNKNOWN, CELL_UNKNOWN, CELL_UNKNOWN])
+        for i, j in zip(known_cells[0], known_cells[1]):
+            self.view.update_hexagon(i, j, self.workspace.memory.allocentric_memory.grid[i][j][:])
+        # print(f"Update alloview {time.time() - start_time:.3f} seconds ")
+
+        # for i in range(self.workspace.memory.allocentric_memory.min_i, self.workspace.memory.allocentric_memory.max_i):
+        #     for j in range(self.workspace.memory.allocentric_memory.min_j, self.workspace.memory.allocentric_memory.max_j):
+        #         self.view.update_hexagon(i, j, self.workspace.memory.allocentric_memory.grid[i][j][:])
         # Update the other robot
         # if ROBOT1 in self.workspace.memory.phenomenon_memory.phenomena:
         #     self.view.update_robot_poi(self.workspace.memory.phenomenon_memory.phenomena[ROBOT1])
 
     def main(self, dt):
         """Refresh allocentric view"""
+        # The head and the LED color
+        self.view.update_body_display(self.workspace.memory.body_memory)
         # The position of the robot in the view
         self.view.robot_rotate = 90 - self.workspace.memory.body_memory.body_azimuth()
         self.view.robot_translate = self.workspace.memory.allocentric_memory.robot_point

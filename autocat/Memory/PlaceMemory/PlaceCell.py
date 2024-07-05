@@ -18,7 +18,7 @@ class PlaceCell:
         self.key = round(self.point[0]), round(self.point[1])
         self.cues = cues  # List of cues
         self.polar_echo_curve = np.linspace([0, 0], [0, 2 * math.pi], 360 // ANGULAR_RESOLUTION, dtype=float)
-        self.cartesian_echo_curve = np.empty((360 // ANGULAR_RESOLUTION, 3), dtype=float)
+        self.cartesian_echo_curve = np.zeros((360 // ANGULAR_RESOLUTION, 3), dtype=float)
 
     def __str__(self):
         """Return the string of the tuple of the place cell coordinates"""

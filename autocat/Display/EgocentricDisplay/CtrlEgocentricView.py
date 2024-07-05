@@ -75,7 +75,7 @@ class CtrlEgocentricView:
             displacement_matrix = self.workspace.enaction.trajectory.displacement_matrix
             p.displace(displacement_matrix)
             p.fade(self.workspace.memory.clock)
-        print(f"Displaced {len(self.points_of_interest):d} points of interest in {time.time() - start_time:.3f} seconds")
+        # print(f"Displaced {len(self.points_of_interest):d} points of interest in {time.time() - start_time:.3f} seconds")
 
         # Create the new points of interest from the new experiences
         start_time = time.time()
@@ -91,7 +91,7 @@ class CtrlEgocentricView:
                                   e.color_index, e.durability, 0)
             # poi.fade(self.workspace.memory.clock)
             self.points_of_interest.append(poi)
-        print(f"Created {len(es):d} new points of interest in {time.time() - start_time:.3f} seconds")
+        # print(f"Created {len(es):d} new points of interest in {time.time() - start_time:.3f} seconds")
 
         # Re-create the focus point with durability of 1
         if self.workspace.memory.egocentric_memory.focus_point is not None:
