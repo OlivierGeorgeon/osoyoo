@@ -101,6 +101,12 @@ def matrix_to_rotation_matrix(matrix):
     return matrix44.create_from_matrix33(matrix33.create_from_matrix44(matrix))
 
 
+# def matrix_to_rotation_degree(matrix):
+#     """Return the angle in degree represented by this matrix"""
+#     m_rotation = matrix_to_rotation_matrix(matrix)
+#     return math.degrees(quaternion_to_direction_rad(Quaternion.from_matrix(m_rotation)))
+
+
 def point_to_head_direction_distance(point):
     """Return the head direction in degrees and distance of the echo"""
     # Warning: may return a backward head direction

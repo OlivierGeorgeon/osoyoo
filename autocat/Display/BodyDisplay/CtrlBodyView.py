@@ -1,4 +1,4 @@
-from pyrr import Matrix44, Quaternion
+from pyrr import Matrix44
 import math
 import numpy as np
 from .BodyView import BodyView
@@ -9,6 +9,7 @@ from ...Utils import quaternion_to_azimuth
 from ...Integrator.Calibrator import compass_calibration
 from ...Memory.EgocentricMemory.Experience import EXPERIENCE_COMPASS, EXPERIENCE_AZIMUTH
 from ...Memory.BodyMemory import DOPAMINE, SEROTONIN, NORADRENALINE
+from ...Utils import matrix_to_rotation_matrix
 
 KEY_OFFSET = 'O'
 ENGAGEMENT_MODES = {'R': "Real", 'I': "Imaginary"}
@@ -56,65 +57,68 @@ class CtrlBodyView:
 
         self.view.push_handlers(on_mouse_press, on_text)
 
-    def add_point_of_interest(self, pose_matrix, point_type, group=None):
-        """ Adding a point of interest to the view """
-        if group is None:
-            group = self.view.forefront
-        point_of_interest = PointOfInterest(pose_matrix, self.view.polar_batch, group, point_type, self.workspace.memory.clock)
-        self.points_of_interest.append(point_of_interest)
+    # def add_point_of_interest(self, pose_matrix, point_type, group=None):
+    #     """ Adding a point of interest to the view """
+    #     if group is None:
+    #         group = self.view.forefront
+    #     point_of_interest = PointOfInterest(pose_matrix, self.view.polar_batch, group, point_type, self.workspace.memory.clock)
+    #     self.points_of_interest.append(point_of_interest)
 
     def update_body_view(self):
         """Add and update points of interest from the latest enacted interaction """
-
-        # Update the robot display
-        self.view.update_body_display(self.workspace.memory.body_memory)
-
         # Delete the expired points of interest
         self.points_of_interest = [p for p in self.points_of_interest if not p.delete(self.workspace.enaction.clock)]
 
-        # Recreate the points of interest from experiences
+        # Displace and fade the remaining points of interest
+        for p in self.points_of_interest:
+            p.fade(self.workspace.memory.clock)
+            if p.type == EXPERIENCE_COMPASS:
+                displacement_matrix = self.workspace.enaction.trajectory.displacement_matrix
+                p.displace(matrix_to_rotation_matrix(displacement_matrix))
+
+        # Create the new points of interest from the new experiences
         for e in [e for e in self.workspace.memory.egocentric_memory.experiences.values() if
-                  e.clock + 10 >= self.workspace.memory.clock and e.type in [EXPERIENCE_COMPASS, EXPERIENCE_AZIMUTH]]:
+                  e.clock == self.workspace.enaction.clock and e.type in [EXPERIENCE_COMPASS, EXPERIENCE_AZIMUTH]]:
             if e.type == EXPERIENCE_COMPASS:
                 poi = PointOfInterest(e.pose_matrix, self.view.egocentric_batch, self.view.forefront, e.type, e.clock,
-                                      color_index=e.color_index)
-                # poi.fade(self.workspace.memory.clock)
-                # self.points_of_interest.append(poi)
+                                      e.color_index, 10)
             else:
-            # if e.type == EXPERIENCE_AZIMUTH:
                 poi = PointOfInterest(e.pose_matrix, self.view.egocentric_batch, self.view.background, e.type, e.clock,
-                                      color_index=e.color_index)
-            poi.fade(self.workspace.memory.clock)
+                                      e.color_index, 10)
+            # poi.fade(self.workspace.memory.clock)
             self.points_of_interest.append(poi)
 
     def main(self, dt):
         """Called every frame. Update the body view"""
         # The position of the robot in the view
         self.view.robot_rotate = 90 - self.workspace.memory.body_memory.body_azimuth()
+        self.view.update_body_display(self.workspace.memory.body_memory)
 
         self.view.label_5HT.text = f"5-HT: {self.workspace.memory.body_memory.neurotransmitters[SEROTONIN]:d}"
-        self.view.label_5HT.color = (0, 0, 0, 255) if self.workspace.memory.body_memory.neurotransmitters[SEROTONIN] >= 50 \
-            else (255, 0, 0, 255)
+        if self.workspace.memory.body_memory.neurotransmitters[SEROTONIN] >= 50:
+            self.view.label_5HT.color = (0, 0, 0, 255)
+        else:
+            self.view.label_5HT.color = (255, 0, 0, 255)
+
         self.view.label_DA.text = f"DA: {self.workspace.memory.body_memory.neurotransmitters[DOPAMINE]:d}"
         if self.workspace.memory.body_memory.neurotransmitters[DOPAMINE] >= 50:
             self.view.label_DA.color = (0, 0, 0, 255)
         else:
             self.view.label_DA.color = (255, 0, 0, 255)
+
         self.view.label_NA.text = f"NA: {self.workspace.memory.body_memory.neurotransmitters[NORADRENALINE]:d}"
         if self.workspace.memory.body_memory.neurotransmitters[NORADRENALINE] >= 50:
             self.view.label_NA.color = (0, 0, 0, 255)
         else:
             self.view.label_NA.color = (255, 0, 0, 255)
-        self.view.label1.text = "Clock: {:d}".format(self.workspace.memory.clock) \
-                                + " | " + ENGAGEMENT_MODES[self.workspace.engagement_mode] \
-                                + " | " + self.workspace.decider_id
+
+        self.view.label1.text = f"Clock: {self.workspace.memory.clock} | " \
+                                f"{ENGAGEMENT_MODES[self.workspace.engagement_mode]} | {self.workspace.decider_id}"
         # + ", En:{:d}%".format(self.workspace.memory.body_memory.energy) \
         # + ", Ex:{:d}%".format(self.workspace.memory.body_memory.excitation) \
 
-        # During the interaction:update the head direction
-        self.view.robot.rotate_head(self.workspace.memory.body_memory.head_direction_degree())
         # At the end of interaction
-        if self.workspace.enacter.interaction_step == ENACTION_STEP_RENDERING and self.workspace.enaction.outcome is not None:
+        if self.workspace.enacter.interaction_step == ENACTION_STEP_RENDERING: # and self.workspace.enaction.outcome is not None:
             self.view.label2.text = self.body_label_azimuth(self.workspace.enaction)
             self.view.label3.text = self.body_label(self.workspace.enaction.action)
             self.update_body_view()

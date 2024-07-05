@@ -52,6 +52,9 @@ class PredictionError:
 
     def log(self, enaction):
         """Compute the prediction errors: computed - actual"""
+
+        return
+
         computed_outcome = enaction.predicted_outcome
         actual_outcome = enaction.outcome
 

@@ -110,7 +110,7 @@ class InteractiveDisplay(pyglet.window.Window):
         self.label_batch.draw()
 
     def update_body_display(self, body_memory):
-        """Updates the robot's body to display"""
+        """Updates the display of robot's head direction and emotion color"""
         self.robot.rotate_head(body_memory.head_direction_degree())
         self.robot.emotion_color(body_memory.emotion_code())
 

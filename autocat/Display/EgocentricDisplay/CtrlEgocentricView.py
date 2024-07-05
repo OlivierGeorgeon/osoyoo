@@ -85,11 +85,11 @@ class CtrlEgocentricView:
             if e.type == EXPERIENCE_ROBOT:  # Draw the body of the other robot
                 robot_shape = PointOfInterest(e.pose_matrix, self.view.polar_batch, self.view.background, POINT_ROBOT,
                                               e.clock)
-                robot_shape.fade(self.workspace.memory.clock)
+                # robot_shape.fade(self.workspace.memory.clock)
                 self.points_of_interest.append(robot_shape)
             poi = PointOfInterest(e.pose_matrix, self.view.polar_batch, self.view.forefront, e.type, e.clock,
-                                  color_index=e.color_index)
-            poi.fade(self.workspace.memory.clock)
+                                  e.color_index, e.durability, 0)
+            # poi.fade(self.workspace.memory.clock)
             self.points_of_interest.append(poi)
         print(f"Created {len(es):d} new points of interest in {time.time() - start_time:.3f} seconds")
 
