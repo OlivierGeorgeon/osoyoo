@@ -57,6 +57,10 @@ class Experience:
         """Return the pose matrix in polar centric coordinates (rotated by the body_quaternion)"""
         return Matrix44(self.body_quaternion.inverse) * self.pose_matrix
 
+    def polar_point(self):
+        """Return the point of this experience in polar coordinates"""
+        return matrix44.apply_to_vector(self.polar_pose_matrix(), [0., 0., 0.])
+
     def absolute_quaternion(self):
         """Return a quaternion representing the absolute direction of this experience"""
         # The body quaternion minus the relative direction of the experience

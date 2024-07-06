@@ -31,10 +31,12 @@ def transform_estimation_cue_to_cue(points1, points2, threshold=ICP_DISTANCE_THR
         print("ICP no match")
         standard_distance = -1
     else:
-        print(np.asarray(reg_p2p.correspondence_set))
-        standard_distance = math.sqrt(np.mean([np.linalg.norm(np.asarray(pcd1.points)[i] - np.asarray(pcd2.points)[j])**2
+        for i, j in np.asarray(reg_p2p.correspondence_set):
+            t = np.sqrt(np.linalg.norm(np.asarray(pcd1.points)[i] - np.asarray(pcd2.points)[j])**2)
+            print(f"Match {np.asarray(pcd1.points)[i, 0:2]} - {np.asarray(pcd2.points)[j, 0:2]} = {t:.0f}")
+        standard_distance = np.sqrt(np.mean([np.linalg.norm(np.asarray(pcd1.points)[i] - np.asarray(pcd2.points)[j])**2
                        for i, j in np.asarray(reg_p2p.correspondence_set)]))
-        print(f"ICP standard distance: {standard_distance:.0f}, fitness: {reg_p2p.fitness:.2f}")
+        print(f"ICP average distance: {standard_distance:.0f}, fitness: {reg_p2p.fitness:.2f}")
     # Return the resulting transformation
     return reg_p2p, standard_distance  # .transformation
 

@@ -24,17 +24,20 @@ class PlaceMemory:
     def add_or_update_place_cell(self, memory):
         """Create e new place cell or update the existing one"""
         position_correction = np.array([0, 0, 0])
+
+        experiences = [e for e in memory.egocentric_memory.experiences.values() if (e.clock >= memory.clock) and
+                       e.type not in [EXPERIENCE_COMPASS, EXPERIENCE_AZIMUTH, EXPERIENCE_CENTRAL_ECHO]]
         # Create the cues
-        cues = []
-        # The new experiences generated during this step constitute cues
-        for e in [e for e in memory.egocentric_memory.experiences.values() if (e.clock >= memory.clock) and
-                  e.type not in [EXPERIENCE_COMPASS, EXPERIENCE_AZIMUTH, EXPERIENCE_CENTRAL_ECHO]]:
-            cue = Cue(e.id, e.polar_pose_matrix(), e.type, e.clock, e.color_index, e.polar_sensor_point())
-            cues.append(cue)
+        # cues = []
+        # # The new experiences generated during this step constitute cues
+        # for e in [e for e in memory.egocentric_memory.experiences.values() if (e.clock >= memory.clock) and
+        #           e.type not in [EXPERIENCE_COMPASS, EXPERIENCE_AZIMUTH, EXPERIENCE_CENTRAL_ECHO]]:
+        #     cue = Cue(e.id, e.polar_pose_matrix(), e.type, e.clock, e.color_index, e.polar_sensor_point())
+        #     cues.append(cue)
 
         # If no place cell then create Place Cell 1
         if self.current_robot_cell_id == 0:
-            self.create_place_cell(memory.allocentric_memory.robot_point, cues)
+            self.create_place_cell(memory.allocentric_memory.robot_point, experiences)
             return np.array([0, 0, 0])
 
         # Find the closest cell if any
@@ -44,17 +47,19 @@ class PlaceMemory:
         if existing_id > 0:
             # Update the cell and adjust the robot position
             print(f"Robot at existing place {existing_id}")
-            position_correction = self.add_cues_relative_to_center(existing_id, memory.allocentric_memory.robot_point, cues)
+            position_correction = self.add_cues_relative_to_center(existing_id, memory.allocentric_memory.robot_point,
+                                                                   experiences)
         # If the robot is not near a known cell
         else:
             # Create a new place cell
-            self.create_place_cell(memory.allocentric_memory.robot_point, cues)
+            self.create_place_cell(memory.allocentric_memory.robot_point, experiences)
             print(f"Robot at new place {self.current_robot_cell_id}")
 
-        # Print similarity with other place cells based on central echos if available
-        central_echos = [c for c in cues if c.type == EXPERIENCE_LOCAL_ECHO]
-        if len(central_echos) > 10:
-            self.probable_place_cell(memory.allocentric_memory.robot_point, central_echos)
+        # Print similarity with other place cells based on local echoes if available
+        local_echo_points = [e.polar_point() for e in experiences if e.type == EXPERIENCE_LOCAL_ECHO]
+        if len(local_echo_points) > 10:
+            # Pass the point of this place cell
+            self.probable_place_cell(memory.allocentric_memory.robot_point, local_echo_points)
 
         # If the place cell is not fully observed
         if not self.place_cells[self.current_robot_cell_id].is_fully_observed():
@@ -67,8 +72,14 @@ class PlaceMemory:
 
         return position_correction
 
-    def create_place_cell(self, point, cues):
+    def create_place_cell(self, point, experiences):
         """Create a new place cell and add it to the list and to the graph"""
+        # Create the cues from the experiences
+        cues = []
+        for e in experiences:
+            cue = Cue(e.id, e.polar_pose_matrix(), e.type, e.clock, e.color_index, e.polar_sensor_point())
+            cues.append(cue)
+        # Create the place cell from the cues
         self.place_cell_id += 1
         self.place_cells[self.place_cell_id] = PlaceCell(point, cues)
         self.place_cells[self.place_cell_id].compute_echo_curve()
@@ -78,28 +89,36 @@ class PlaceMemory:
                 self.place_cells[self.current_robot_cell_id].point - self.place_cells[self.place_cell_id].point)}
         self.current_robot_cell_id = self.place_cell_id
 
-    def probable_place_cell(self, point, cues):
-        """Return the probability to be on each place cell"""
-        points = [c.point() for c in cues]
+    def probable_place_cell(self, robot_point, points):
+        """Return the probability to be on each place cell computed from robot point and local echoes"""
         standard_distances = {}
         for k, p in self.place_cells.items():
             if p.is_fully_observed():
-                # Move the points to the place
-                translation = p.point - point
-                points += translation
-                # Measure the distance from the points
+                # The translation to go from the robot to the place
+                translation = p.point - robot_point
+                # points += translation
+                # Measure the distance to transfer the echo points to the cell points (less points must go first)
                 reg_p2p, standard_distance = transform_estimation_cue_to_cue(points, [c.point() for c in p.cues if c.type == EXPERIENCE_LOCAL_ECHO], threshold=1000)
                 standard_distances[k] = standard_distance
-                print("Transformation\n", reg_p2p.transformation.astype(int))
-                print(f"Probability of Cell {k}: standard distance {standard_distance:.0f}: translation ({translation[0]},{translation[1]})")
+                # Return the polar translation from the place cell to the robot
+                # Must take the opposite to obtain the polar coordinates of the place cell
+                print("Transformation\n", reg_p2p.transformation)
+                print(f"Probability of Cell {k}: standard distance {standard_distance:.0f}: place cell polar coordiantes: ({translation[0]:.0f},{translation[1]:.0f})")
 
-    def add_cues_relative_to_center(self, place_cell_id, point, cues):
-        """Translate the cues to the place cell point and add them to the place cell"""
+    def add_cues_relative_to_center(self, place_cell_id, point, experiences):
+        """Create the cues relative to the place cell and add them"""
         # Adjust the cue position to the place cell (add the relative position of the robot)
         d_matrix = Matrix44.from_translation(point - self.place_cells[place_cell_id].point)
-        for cue in cues:
-            # https://pyglet.readthedocs.io/en/latest/programming_guide/math.html#matrix-multiplication
-            cue.pose_matrix @= d_matrix  # = d_matrix * cue.pose_matrix  # *= does not work: wrong order
+        # Create the cues from the experiences
+        cues = []
+        for e in experiences:
+            pose_matrix = d_matrix * e.polar_pose_matrix()
+            cue = Cue(e.id, pose_matrix, e.type, e.clock, e.color_index, e.polar_sensor_point())
+            cues.append(cue)
+
+        # for cue in cues:
+        #     # https://pyglet.readthedocs.io/en/latest/programming_guide/math.html#matrix-multiplication
+        #     cue.pose_matrix @= d_matrix  # = d_matrix * cue.pose_matrix  # *= does not work: wrong order
 
         # Adjust the position from the estimation by the cues
         # position_correction = self.place_cells[place_cell_id].translation_estimation(cues)
