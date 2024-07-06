@@ -6,7 +6,7 @@ from pyrr import matrix44
 from . import NO_ECHO_DISTANCE
 from ..Memory.EgocentricMemory.Experience import FLOOR_COLORS
 from ..Utils import head_angle_distance_to_matrix
-
+from ..Memory.PlaceMemory.PlaceGeometry import resample_by_diff
 
 def category_color(color_sensor):
     """Categorize the color from the sensor measure"""
@@ -79,8 +79,8 @@ def resample_by_streak(polar_points, r_tolerance=50):
     grouped = df.groupby('group').agg({'r': 'mean', 'theta': 'mean'}).reset_index(drop=True)
     # print("columns", grouped.columns)
     # print("grouped\n", grouped)
-    # TODO invert r and theta to comply with standard polar coordinates
-    return grouped[['theta', 'r']].to_numpy()
+    # return grouped[['theta', 'r']].to_numpy()
+    return grouped[['r', 'theta']].to_numpy()
 
 
 class Outcome:
@@ -138,6 +138,7 @@ class Outcome:
             print("Echos", self.echos)
             self.central_echos = resample_by_streak([[d, int(a)] for a, d in self.echos.items()
                                                      if d < NO_ECHO_DISTANCE])
+            # self.central_echos = resample_by_diff([[d, int(a)] for a, d in self.echos.items() if d < NO_ECHO_DISTANCE])
 
     def __str__(self):
         """Print the outcome dictionary as a json string"""

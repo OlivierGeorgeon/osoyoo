@@ -3,7 +3,7 @@ import time
 import numpy as np
 from pyrr import quaternion
 
-from . import STATUS_0, STATUS_1, STATUS_2, STATUS_3, STATUS_4, PHENOMENON_ID, COLOR_INDEX, CLOCK_FOCUS, \
+from . import STATUS_FLOOR, STATUS_ECHO, STATUS_2, STATUS_3, STATUS_4, PHENOMENON_ID, COLOR_INDEX, CLOCK_FOCUS, \
     CLOCK_INTERACTION, CLOCK_PROMPT, CLOCK_PHENOMENON, CLOCK_NO_ECHO, CLOCK_PLACE, POINT_X, POINT_Y, IS_POOL, \
     PLACE_CELL_ID, CLOCK_UPDATED
 from ..EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_PLACE, EXPERIENCE_FOCUS, EXPERIENCE_PROMPT, \
@@ -83,7 +83,7 @@ class AllocentricMemory:
                     for i in range(self.min_i, self.max_i):
                         for j in range(self.min_j, self.max_j):
                             if p.is_inside(self.grid[i][j][POINT_X:POINT_Y + 1]):
-                                self.grid[i][j][STATUS_0] = EXPERIENCE_FLOOR
+                                self.grid[i][j][STATUS_FLOOR] = EXPERIENCE_FLOOR
                                 self.grid[i][j][PHENOMENON_ID] = TER
                                 self.grid[i][j][CLOCK_PLACE] = memory.clock
                                 self.grid[i][j][CLOCK_UPDATED] = memory.clock
@@ -154,7 +154,7 @@ class AllocentricMemory:
         # Mark the cells traversed by the robot
         alo_covered_area = trajectory.covered_area + self.robot_point
         inside_ij = np.where(is_inside_rectangle(self.grid[:, :, POINT_X], self.grid[:, :, POINT_Y], alo_covered_area))
-        self.grid[:, :, STATUS_0][inside_ij] = EXPERIENCE_PLACE
+        self.grid[:, :, STATUS_FLOOR][inside_ij] = EXPERIENCE_PLACE
         self.grid[:, :, CLOCK_PLACE][inside_ij] = clock
         self.grid[:, :, CLOCK_UPDATED][inside_ij] = clock
         # The new position of the robot
@@ -173,7 +173,7 @@ class AllocentricMemory:
         start_time = time.time()
         outline = body_memory.outline() + self.robot_point
         inside_ij = np.where(is_inside_rectangle(self.grid[:, :, POINT_X], self.grid[:, :, POINT_Y], outline))
-        self.grid[:, :, STATUS_0][inside_ij] = EXPERIENCE_PLACE
+        self.grid[:, :, STATUS_FLOOR][inside_ij] = EXPERIENCE_PLACE
         self.grid[:, :, CLOCK_PLACE][inside_ij] = clock
         self.grid[:, :, CLOCK_UPDATED][inside_ij] = clock
         # print("Place robot time:", time.time() - start_time, "seconds")
@@ -181,12 +181,12 @@ class AllocentricMemory:
     def clear_grid_status(self, clock):
         """Reset the status of cells where there is a phenomenon, except PLACE status"""
         phenomena_ij = np.where(self.grid[:, :, PHENOMENON_ID] != -1)
-        self.grid[:, :, STATUS_1][phenomena_ij] = CELL_UNKNOWN
+        self.grid[:, :, STATUS_ECHO][phenomena_ij] = CELL_UNKNOWN
         self.grid[:, :, CLOCK_PHENOMENON][phenomena_ij] = 0
         self.grid[:, :, PHENOMENON_ID][phenomena_ij] = -1
         self.grid[:, :, CLOCK_UPDATED][phenomena_ij] = clock
-        self.grid[:, :, STATUS_0][phenomena_ij] = np.where(self.grid[:, :, STATUS_0][phenomena_ij] != EXPERIENCE_PLACE,
-                                                           CELL_UNKNOWN, self.grid[:, :, STATUS_0][phenomena_ij])
+        self.grid[:, :, STATUS_FLOOR][phenomena_ij] = np.where(self.grid[:, :, STATUS_FLOOR][phenomena_ij] != EXPERIENCE_PLACE,
+                                                               CELL_UNKNOWN, self.grid[:, :, STATUS_FLOOR][phenomena_ij])
         places_ij = np.where(self.grid[:, :, PLACE_CELL_ID] > 0)
         self.grid[:, :, PLACE_CELL_ID][places_ij] = 0
         self.grid[:, :, PLACE_CELL_ID][places_ij] = clock
@@ -196,11 +196,11 @@ class AllocentricMemory:
         if (self.min_i <= i <= self.max_i) and (self.min_j <= j <= self.max_j):
             self.grid[i][j][CLOCK_UPDATED] = clock
             if status in [EXPERIENCE_FLOOR, EXPERIENCE_PLACE]:
-                self.grid[i][j][STATUS_0] = status
+                self.grid[i][j][STATUS_FLOOR] = status
                 self.grid[i][j][CLOCK_PLACE] = max(clock, self.grid[i][j][CLOCK_PLACE])
                 self.grid[i][j][COLOR_INDEX] = color_index
             else:
-                self.grid[i][j][STATUS_1] = status
+                self.grid[i][j][STATUS_ECHO] = status
                 self.grid[i][j][CLOCK_INTERACTION] = max(clock, self.grid[i][j][CLOCK_INTERACTION])
         else:
             pass
@@ -209,7 +209,7 @@ class AllocentricMemory:
     def clear_cell(self, i, j, clock):
         """Reset status_0, color, and phenomenon of that cell"""
         if (self.min_i <= i <= self.max_i) and (self.min_j <= j <= self.max_j):
-            self.grid[i][j][STATUS_0] = CELL_UNKNOWN
+            self.grid[i][j][STATUS_FLOOR] = CELL_UNKNOWN
             self.grid[i][j][CLOCK_PLACE] = clock
             self.grid[i][j][COLOR_INDEX] = 0
             self.grid[i][j][PHENOMENON_ID] = -1

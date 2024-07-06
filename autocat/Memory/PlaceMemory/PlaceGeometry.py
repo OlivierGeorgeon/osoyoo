@@ -29,13 +29,14 @@ def transform_estimation_cue_to_cue(points1, points2, threshold=ICP_DISTANCE_THR
     )
     if len(reg_p2p.correspondence_set) == 0:
         print("ICP no match")
+        standard_distance = -1
     else:
         print(np.asarray(reg_p2p.correspondence_set))
-        mse = np.mean([np.linalg.norm(np.asarray(pcd1.points)[i] - np.asarray(pcd2.points)[j])**2
-                       for i, j in np.asarray(reg_p2p.correspondence_set)])
-        print(f"ICP standard distance: {math.sqrt(mse):.0f}, fitness: {reg_p2p.fitness:.2f}")
+        standard_distance = math.sqrt(np.mean([np.linalg.norm(np.asarray(pcd1.points)[i] - np.asarray(pcd2.points)[j])**2
+                       for i, j in np.asarray(reg_p2p.correspondence_set)]))
+        print(f"ICP standard distance: {standard_distance:.0f}, fitness: {reg_p2p.fitness:.2f}")
     # Return the resulting transformation
-    return reg_p2p.transformation
+    return reg_p2p, standard_distance  # .transformation
 
 
 def nearby_place_cell(robot_point, place_cells):

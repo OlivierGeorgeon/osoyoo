@@ -36,7 +36,7 @@ class PlaceCell:
         place_echo_cues = [c.point() for c in self.cues if c.type in [EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_CENTRAL_ECHO]]
         new_echo_cues = [c.point() for c in cues if c.type in [EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_CENTRAL_ECHO]]
         if len(place_echo_cues) > 0 and len(new_echo_cues) > 0:
-            transform = transform_estimation_cue_to_cue(place_echo_cues, new_echo_cues)
+            transform = transform_estimation_cue_to_cue(place_echo_cues, new_echo_cues).transformation
             translation = -transform[:3, 3]
             r = math.degrees(quaternion_to_direction_rad(Quaternion.from_matrix(transform[:3, :3])))
             print(f"Place cell rotation: {r:.0f} degree")
@@ -72,7 +72,7 @@ class PlaceCell:
             self.cartesian_echo_curve[:] = polar_to_cartesian(self.polar_echo_curve)
 
     def is_fully_observed(self):
-        """Return True if the echo curve is never zero"""
+        """Return True if the echo curve's radius is never zero"""
         return min(self.polar_echo_curve[:, 0]) > 0
 
     def save(self):

@@ -136,7 +136,8 @@ class EgocentricMemory:
         for e in enaction.outcome.central_echos:
             # angle = math.radians(int(e[0]))
             # point = np.array([ROBOT_HEAD_X + math.cos(angle) * e[1], math.sin(angle) * e[1], 0])
-            pose_matrix = head_angle_distance_to_matrix(int(e[0]), e[1])
+            # pose_matrix = head_angle_distance_to_matrix(int(e[0]), e[1])
+            pose_matrix = head_angle_distance_to_matrix(int(e[1]), int(e[0]))
             central_exp = Experience(experience_id=self.experience_id, pose_matrix=pose_matrix,
                                      experience_type=EXPERIENCE_CENTRAL_ECHO, clock=enaction.clock,
                                      body_quaternion=enaction.trajectory.body_quaternion,

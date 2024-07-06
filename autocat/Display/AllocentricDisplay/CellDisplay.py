@@ -9,7 +9,7 @@ from ...Memory.EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_A
     EXPERIENCE_ROBOT, FLOOR_COLORS
 from ...Memory.AllocentricMemory.AllocentricMemory import CELL_UNKNOWN, CELL_NO_ECHO
 from ...Memory import CELL_RADIUS
-from ...Memory.AllocentricMemory import STATUS_0, STATUS_1, STATUS_2, STATUS_3, STATUS_4, COLOR_INDEX, \
+from ...Memory.AllocentricMemory import STATUS_FLOOR, STATUS_ECHO, STATUS_2, STATUS_3, STATUS_4, COLOR_INDEX, \
     CLOCK_INTERACTION, CLOCK_NO_ECHO, CLOCK_PLACE, POINT_X, POINT_Y, IS_POOL, PLACE_CELL_ID
 from ...Memory import EXPERIENCE_DURABILITY, PLACE_GRID_DURABILITY
 
@@ -78,13 +78,13 @@ class CellDisplay:
         # Level 1
         color1 = name_to_rgb('blue')
         opacity1 = 255
-        if cell[STATUS_0] == CELL_UNKNOWN:
+        if cell[STATUS_FLOOR] == CELL_UNKNOWN:
             color1 = name_to_rgb('grey')
             opacity1 = 0
-        if cell[STATUS_0] == EXPERIENCE_PLACE:
+        if cell[STATUS_FLOOR] == EXPERIENCE_PLACE:
             color1 = name_to_rgb('Lavender')  # name_to_rgb('LightGreen')  # name_to_rgb(FLOOR_COLORS[0])
             opacity1 = int(max(255 * (PLACE_GRID_DURABILITY - clock + cell[CLOCK_PLACE]) / PLACE_GRID_DURABILITY, 0))
-        if cell[STATUS_0] == EXPERIENCE_FLOOR:
+        if cell[STATUS_FLOOR] == EXPERIENCE_FLOOR:
             if cell[COLOR_INDEX] == 0:
                 color1 = name_to_rgb('black')
             else:
@@ -95,26 +95,26 @@ class CellDisplay:
         # Level 2
         color2 = name_to_rgb('white')
         opacity2 = 255
-        if cell[STATUS_1] == CELL_UNKNOWN:
+        if cell[STATUS_ECHO] == CELL_UNKNOWN:
             color2 = name_to_rgb('grey')
             opacity2 = 0
-        if cell[STATUS_1] == EXPERIENCE_BLOCK:
+        if cell[STATUS_ECHO] == EXPERIENCE_BLOCK:
             color2 = name_to_rgb('salmon')
             opacity2 = int(max(255 * (EXPERIENCE_DURABILITY - clock + cell[CLOCK_INTERACTION]) / EXPERIENCE_DURABILITY,
                                0))
-        if cell[STATUS_1] == EXPERIENCE_IMPACT:
+        if cell[STATUS_ECHO] == EXPERIENCE_IMPACT:
             color2 = name_to_rgb('salmon')
             opacity2 = int(max(255 * (EXPERIENCE_DURABILITY - clock + cell[CLOCK_INTERACTION]) / EXPERIENCE_DURABILITY,
                                0))
-        if cell[STATUS_1] == EXPERIENCE_ROBOT:
+        if cell[STATUS_ECHO] == EXPERIENCE_ROBOT:
             color2 = name_to_rgb('lightSteelBlue')
             opacity2 = int(max(255 * (EXPERIENCE_DURABILITY - clock + cell[CLOCK_INTERACTION]) / EXPERIENCE_DURABILITY,
                                0))
-        if cell[STATUS_1] == EXPERIENCE_ALIGNED_ECHO:
+        if cell[STATUS_ECHO] == EXPERIENCE_ALIGNED_ECHO:
             color2 = name_to_rgb('orange')
             opacity2 = int(max(255 * (EXPERIENCE_DURABILITY - clock + cell[CLOCK_INTERACTION]) / EXPERIENCE_DURABILITY,
                                0))
-        if cell[STATUS_1] == EXPERIENCE_CENTRAL_ECHO:
+        if cell[STATUS_ECHO] == EXPERIENCE_CENTRAL_ECHO:
             color2 = name_to_rgb('sienna')
             opacity2 = int(max(255 * (EXPERIENCE_DURABILITY - clock + cell[CLOCK_INTERACTION]) / EXPERIENCE_DURABILITY,
                                0))

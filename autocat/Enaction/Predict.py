@@ -5,7 +5,7 @@ import matplotlib.path as mpath
 from ..Proposer.Action import ACTION_FORWARD, ACTION_SWIPE, ACTION_RIGHTWARD, ACTION_SCAN, ACTION_BACKWARD
 from ..Memory.PhenomenonMemory import PHENOMENON_ENCLOSED_CONFIDENCE
 from ..Memory.AllocentricMemory.Geometry import point_to_cell
-from ..Memory.AllocentricMemory import STATUS_0, COLOR_INDEX
+from ..Memory.AllocentricMemory import STATUS_FLOOR, COLOR_INDEX
 from ..Memory.EgocentricMemory.Experience import EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_FLOOR
 from ..Robot.RobotDefine import ROBOT_FLOOR_SENSOR_X, ROBOT_SETTINGS
 from ..Robot.Outcome import Outcome
@@ -152,7 +152,7 @@ def cell_color(ego_point, memory):
     floor_i, floor_j = point_to_cell(memory.egocentric_to_allocentric(ego_point))
     if (memory.allocentric_memory.min_i <= floor_i <= memory.allocentric_memory.max_i) and \
             (memory.allocentric_memory.min_j <= floor_j <= memory.allocentric_memory.max_j) and \
-            memory.allocentric_memory.grid[floor_i][floor_j][STATUS_0] == EXPERIENCE_FLOOR:
+            memory.allocentric_memory.grid[floor_i][floor_j][STATUS_FLOOR] == EXPERIENCE_FLOOR:
         return int(memory.allocentric_memory.grid[floor_i][floor_j][COLOR_INDEX])
     else:
         return 0

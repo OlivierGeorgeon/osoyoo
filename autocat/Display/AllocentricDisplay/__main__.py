@@ -11,7 +11,7 @@ from ...Memory.AllocentricMemory.AllocentricMemory import CELL_NO_ECHO
 from ...Memory import CELL_RADIUS
 from ...Memory.PhenomenonMemory.Affordance import Affordance
 from ...Utils import quaternion_translation_to_matrix
-from ...Memory.AllocentricMemory import STATUS_0, STATUS_1, STATUS_2, STATUS_3, STATUS_4, COLOR_INDEX, \
+from ...Memory.AllocentricMemory import STATUS_FLOOR, STATUS_ECHO, STATUS_2, STATUS_3, STATUS_4, COLOR_INDEX, \
     CLOCK_INTERACTION, CLOCK_NO_ECHO, CLOCK_PLACE, POINT_X, POINT_Y, IS_POOL
 
 # Testing CtrlAllocentricView by displaying Allocentric Hexagonal Memory
@@ -32,27 +32,27 @@ workspace.memory.allocentric_memory.grid[i][j][STATUS_3] = EXPERIENCE_FOCUS
 workspace.memory.allocentric_memory.grid[1][5][STATUS_2] = CELL_NO_ECHO
 
 # Add place
-workspace.memory.allocentric_memory.grid[1][0][STATUS_0] = EXPERIENCE_PLACE
-workspace.memory.allocentric_memory.grid[1][2][STATUS_0] = EXPERIENCE_FLOOR
-workspace.memory.allocentric_memory.grid[-1][-2][STATUS_0] = EXPERIENCE_PLACE
-workspace.memory.allocentric_memory.grid[-1][-3][STATUS_0] = EXPERIENCE_PLACE
+workspace.memory.allocentric_memory.grid[1][0][STATUS_FLOOR] = EXPERIENCE_PLACE
+workspace.memory.allocentric_memory.grid[1][2][STATUS_FLOOR] = EXPERIENCE_FLOOR
+workspace.memory.allocentric_memory.grid[-1][-2][STATUS_FLOOR] = EXPERIENCE_PLACE
+workspace.memory.allocentric_memory.grid[-1][-3][STATUS_FLOOR] = EXPERIENCE_PLACE
 
 # Pool cells
-workspace.memory.allocentric_memory.grid[-2][1][STATUS_1] = EXPERIENCE_ALIGNED_ECHO
-workspace.memory.allocentric_memory.grid[-1][-4][STATUS_1] = EXPERIENCE_ALIGNED_ECHO
-workspace.memory.allocentric_memory.grid[0][0][STATUS_1] = EXPERIENCE_ALIGNED_ECHO
-workspace.memory.allocentric_memory.grid[0][5][STATUS_1] = EXPERIENCE_PLACE
-workspace.memory.allocentric_memory.grid[0][-5][STATUS_1] = EXPERIENCE_ALIGNED_ECHO
-workspace.memory.allocentric_memory.grid[1][4][STATUS_1] = EXPERIENCE_ALIGNED_ECHO
-workspace.memory.allocentric_memory.grid[1][-6][STATUS_0] = EXPERIENCE_PLACE
-workspace.memory.allocentric_memory.grid[1][-1][STATUS_1] = EXPERIENCE_ALIGNED_ECHO
-workspace.memory.allocentric_memory.grid[2][-2][STATUS_0] = EXPERIENCE_PLACE
-workspace.memory.allocentric_memory.grid[2][3][STATUS_1] = EXPERIENCE_ALIGNED_ECHO
-workspace.memory.allocentric_memory.grid[3][2][STATUS_0] = EXPERIENCE_PLACE
-workspace.memory.allocentric_memory.grid[3][-2][STATUS_1] = EXPERIENCE_ALIGNED_ECHO
-workspace.memory.allocentric_memory.grid[4][2][STATUS_1] = EXPERIENCE_ALIGNED_ECHO
-workspace.memory.allocentric_memory.grid[2][-6][STATUS_1] = EXPERIENCE_ALIGNED_ECHO
-workspace.memory.allocentric_memory.grid[3][-7][STATUS_1] = EXPERIENCE_ALIGNED_ECHO
+workspace.memory.allocentric_memory.grid[-2][1][STATUS_ECHO] = EXPERIENCE_ALIGNED_ECHO
+workspace.memory.allocentric_memory.grid[-1][-4][STATUS_ECHO] = EXPERIENCE_ALIGNED_ECHO
+workspace.memory.allocentric_memory.grid[0][0][STATUS_ECHO] = EXPERIENCE_ALIGNED_ECHO
+workspace.memory.allocentric_memory.grid[0][5][STATUS_ECHO] = EXPERIENCE_PLACE
+workspace.memory.allocentric_memory.grid[0][-5][STATUS_ECHO] = EXPERIENCE_ALIGNED_ECHO
+workspace.memory.allocentric_memory.grid[1][4][STATUS_ECHO] = EXPERIENCE_ALIGNED_ECHO
+workspace.memory.allocentric_memory.grid[1][-6][STATUS_FLOOR] = EXPERIENCE_PLACE
+workspace.memory.allocentric_memory.grid[1][-1][STATUS_ECHO] = EXPERIENCE_ALIGNED_ECHO
+workspace.memory.allocentric_memory.grid[2][-2][STATUS_FLOOR] = EXPERIENCE_PLACE
+workspace.memory.allocentric_memory.grid[2][3][STATUS_ECHO] = EXPERIENCE_ALIGNED_ECHO
+workspace.memory.allocentric_memory.grid[3][2][STATUS_FLOOR] = EXPERIENCE_PLACE
+workspace.memory.allocentric_memory.grid[3][-2][STATUS_ECHO] = EXPERIENCE_ALIGNED_ECHO
+workspace.memory.allocentric_memory.grid[4][2][STATUS_ECHO] = EXPERIENCE_ALIGNED_ECHO
+workspace.memory.allocentric_memory.grid[2][-6][STATUS_ECHO] = EXPERIENCE_ALIGNED_ECHO
+workspace.memory.allocentric_memory.grid[3][-7][STATUS_ECHO] = EXPERIENCE_ALIGNED_ECHO
 
 # Other robot
 pose_matrix = quaternion_translation_to_matrix(Quaternion.from_z_rotation(math.radians(170)), [0, 0, 0])

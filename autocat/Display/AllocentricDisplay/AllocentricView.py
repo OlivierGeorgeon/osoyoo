@@ -8,7 +8,7 @@ from ...Memory.EgocentricMemory.Experience import EXPERIENCE_ROBOT
 from ..InteractiveDisplay import InteractiveDisplay
 from ..PointOfInterest import PointOfInterest, POINT_ROBOT
 from ...Memory.AllocentricMemory.AllocentricMemory import CELL_UNKNOWN
-from ...Memory.AllocentricMemory import STATUS_0, STATUS_4
+from ...Memory.AllocentricMemory import STATUS_FLOOR, STATUS_4
 
 CELL_RADIUS = 50
 ZOOM_IN_FACTOR = 1.2
@@ -39,11 +39,11 @@ class AllocentricView(InteractiveDisplay):
     def update_hexagon(self, i, j, cell):
         """Create or update or delete an hexagon in allocentric view."""
         if self.hexagons[i][j] is None:
-            if not np.all(cell[STATUS_0:STATUS_4+1] == CELL_UNKNOWN):
+            if not np.all(cell[STATUS_FLOOR:STATUS_4 + 1] == CELL_UNKNOWN):
                 # The hexagon does not exist but the cell is known then create the hexagon
                 self.hexagons[i][j] = CellDisplay(cell, self.polar_batch, self.groups, self.workspace.memory.clock)
         else:
-            if not np.all(cell[STATUS_0:STATUS_4+1] == CELL_UNKNOWN):
+            if not np.all(cell[STATUS_FLOOR:STATUS_4 + 1] == CELL_UNKNOWN):
                 # The hexagon exists and the cell is known then update the hexagon
                 self.hexagons[i][j].update_color(cell, self.workspace.memory.clock)
             else:

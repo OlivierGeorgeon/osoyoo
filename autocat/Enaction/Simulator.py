@@ -6,7 +6,7 @@ from ..Memory.PhenomenonMemory import PHENOMENON_ENCLOSED_CONFIDENCE
 from ..Proposer.Action import ACTION_SWIPE, ACTION_FORWARD, ACTION_SCAN, ACTION_BACKWARD
 from ..Robot.Outcome import Outcome
 from ..Memory.AllocentricMemory.Geometry import point_to_cell
-from ..Memory.AllocentricMemory import STATUS_0, STATUS_1, COLOR_INDEX, POINT_X, POINT_Y
+from ..Memory.AllocentricMemory import STATUS_FLOOR, STATUS_ECHO, COLOR_INDEX, POINT_X, POINT_Y
 from ..Memory.EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO
 from ..Utils import assert_almost_equal_angles, translation_quaternion_to_matrix, point_to_head_direction_distance, \
     quaternion_to_direction_rad
@@ -100,7 +100,7 @@ class Simulator:
                 # Must check before marking the place, and terminate to prevent overriding duration1
                 if (memory.allocentric_memory.min_i <= i <= memory.allocentric_memory.max_i) and \
                         (memory.allocentric_memory.min_j <= j <= memory.allocentric_memory.max_j) and \
-                        memory.allocentric_memory.grid[i][j][STATUS_0] == EXPERIENCE_FLOOR:
+                        memory.allocentric_memory.grid[i][j][STATUS_FLOOR] == EXPERIENCE_FLOOR:
                     self.is_simulating = False
                     # The simulated distance is shorter than the phenomenon location due to cell radius
                     self.simulated_outcome_dict['duration1'] = round(self.simulation_time * 1000)
@@ -130,7 +130,7 @@ class Simulator:
         # The echoes added by the user
         for ij in memory.allocentric_memory.user_cells:
             cell = memory.allocentric_memory.grid[ij[0]][ij[1]]
-            if cell[STATUS_1] == EXPERIENCE_ALIGNED_ECHO:
+            if cell[STATUS_ECHO] == EXPERIENCE_ALIGNED_ECHO:
                 p = [cell[POINT_X], cell[POINT_Y], 0]
                 a, d = point_to_head_direction_distance(memory.allocentric_to_egocentric(p))
                 if enaction.action.action_code == ACTION_SCAN and \
