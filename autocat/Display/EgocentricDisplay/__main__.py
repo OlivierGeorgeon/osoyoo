@@ -1,11 +1,15 @@
 import pyglet
+import numpy as np
 from pyrr import Quaternion
 from .CtrlEgocentricView import CtrlEgocentricView
 from autocat.Display.PointOfInterest import *
 from ...Workspace import Workspace
 from ...Memory.EgocentricMemory.Experience import Experience, EXPERIENCE_FLOOR, EXPERIENCE_ROBOT
 from ...Utils import quaternion_translation_to_matrix
-
+from ...Proposer.Interaction import Interaction, OUTCOME_NO_FOCUS
+from ...Proposer.Action import Action, ACTION_SWIPE
+from ...Robot.Enaction import Enaction
+from ...Robot.Outcome import Outcome
 
 # Displaying EgocentricView with points of interest.
 # Allow selecting points of interest and inserting and deleting phenomena
@@ -37,6 +41,18 @@ workspace.memory.egocentric_memory.experiences[2] = experience2
 # controller.points_of_interest.append(poi1)
 # poi2 = controller.add_point_of_interest(300, -300, EXPERIENCE_ALIGNED_ECHO)
 # controller.points_of_interest.append(poi2)
+
+# Create an enaction
+swipe = Interaction(Action(ACTION_SWIPE, np.array([0, 300, 0], dtype=float), 0, 1.), OUTCOME_NO_FOCUS, 0)
+#turn = Interaction(Action(ACTION_TURN, np.array([0, 0, 0], dtype=float), 0, 1.), OUTCOME_NO_FOCUS, 0)
+workspace.memory.clock += 1
+enaction = Enaction(swipe, workspace.memory.save())
+enaction.outcome = Outcome({'action': ACTION_SWIPE, 'clock': 0, 'duration1': 500, 'head_angle': 0, 'yaw': 00,
+                            'echo_distance': 200})
+enaction.terminate()
+workspace.enaction = enaction
+workspace.memory.update(enaction)
+
 
 ctrl_egocentric_view.update_points_of_interest()
 

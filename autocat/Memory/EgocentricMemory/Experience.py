@@ -1,6 +1,6 @@
-import numpy as np
-from pyrr import matrix44, Quaternion, Vector3, Matrix44, Matrix33
-from ...Robot.RobotDefine import ROBOT_HEAD_X, ROBOT_COLOR_SENSOR_X, ROBOT_FLOOR_SENSOR_X
+from pyrr import matrix44, Quaternion, Vector3, Matrix44
+from ...Robot.RobotDefine import ROBOT_HEAD_X, ROBOT_COLOR_SENSOR_X
+from .. import EXPERIENCE_DURABILITY
 
 EXPERIENCE_LOCAL_ECHO = 1
 EXPERIENCE_CENTRAL_ECHO = 2
@@ -23,8 +23,8 @@ class Experience:
     """Experiences are instances of interactions
     along with the spatial and temporal information of where and when they were enacted"""
 
-    def __init__(self, experience_id, pose_matrix, experience_type, clock, body_quaternion, durability=10,
-                 color_index=0):
+    def __init__(self, experience_id, pose_matrix, experience_type, clock, body_quaternion,
+                 durability=EXPERIENCE_DURABILITY, color_index=0):
         """Create an experience to be placed in the memory.
         Args:
         point : position of the affordance relative to the robot.

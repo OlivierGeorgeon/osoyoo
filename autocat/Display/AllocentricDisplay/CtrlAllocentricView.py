@@ -6,8 +6,9 @@ from ...Memory.AllocentricMemory.Geometry import point_to_cell
 from ...Robot.CtrlRobot import ENACTION_STEP_RENDERING, ENACTION_STEP_ENACTING
 from ...Memory.EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO
 from ...Memory.AllocentricMemory.AllocentricMemory import CELL_UNKNOWN
-from ...Memory.AllocentricMemory import STATUS_0, STATUS_1, STATUS_4, COLOR_INDEX, CLOCK_FOCUS, CLOCK_PLACE, \
-    PHENOMENON_ID, PLACE_CELL_ID
+from ...Memory.AllocentricMemory import STATUS_0, STATUS_2, STATUS_1, STATUS_3, STATUS_4, COLOR_INDEX, CLOCK_FOCUS, \
+    CLOCK_PLACE, PHENOMENON_ID, PLACE_CELL_ID, CLOCK_UPDATED
+from ...Memory import PLACE_GRID_DURABILITY
 
 
 class CtrlAllocentricView:
@@ -121,16 +122,19 @@ class CtrlAllocentricView:
     def update_view(self):
         """Update the allocentric view from the status in the allocentric grid cells"""
         start_time = time.time()
-        # TODO Update only the cells that have the current clock
-        known_cells = np.where(self.workspace.memory.allocentric_memory.grid[:, :, STATUS_0:CLOCK_PLACE+1] != 0)
-                               # [CELL_UNKNOWN, CELL_UNKNOWN, CELL_UNKNOWN, CELL_UNKNOWN, CELL_UNKNOWN])
-        for i, j in zip(known_cells[0], known_cells[1]):
+        # Select the cells that have been updated during the max durability lapse
+        # updated_ij = np.where(self.workspace.memory.allocentric_memory.grid[:, :, STATUS_0:CLOCK_PLACE+1] != 0)
+        updated_ij = np.where((self.workspace.memory.allocentric_memory.grid[:, :, CLOCK_UPDATED]
+                               >= self.workspace.memory.clock - PLACE_GRID_DURABILITY) & (
+                              (self.workspace.memory.allocentric_memory.grid[:, :, STATUS_0] != 0)
+                              | (self.workspace.memory.allocentric_memory.grid[:, :, STATUS_1] != 0)
+                              | (self.workspace.memory.allocentric_memory.grid[:, :, STATUS_2] != 0)
+                              | (self.workspace.memory.allocentric_memory.grid[:, :, STATUS_3] != 0)
+                              | (self.workspace.memory.allocentric_memory.grid[:, :, STATUS_4] != 0)))
+        for i, j in zip(updated_ij[0], updated_ij[1]):
             self.view.update_hexagon(i, j, self.workspace.memory.allocentric_memory.grid[i][j][:])
-        # print(f"Update alloview {time.time() - start_time:.3f} seconds ")
+        # print(f"Update alloview: {len(updated_ij[0])} cells in {time.time() - start_time:.3f} seconds")
 
-        # for i in range(self.workspace.memory.allocentric_memory.min_i, self.workspace.memory.allocentric_memory.max_i):
-        #     for j in range(self.workspace.memory.allocentric_memory.min_j, self.workspace.memory.allocentric_memory.max_j):
-        #         self.view.update_hexagon(i, j, self.workspace.memory.allocentric_memory.grid[i][j][:])
         # Update the other robot
         # if ROBOT1 in self.workspace.memory.phenomenon_memory.phenomena:
         #     self.view.update_robot_poi(self.workspace.memory.phenomenon_memory.phenomena[ROBOT1])
