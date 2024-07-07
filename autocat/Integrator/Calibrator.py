@@ -1,7 +1,7 @@
 import numpy as np
 import circle_fit as cf
 from pyrr import Matrix44
-from ..Memory.EgocentricMemory.Experience import EXPERIENCE_AZIMUTH, EXPERIENCE_COMPASS
+from ..Memory.EgocentricMemory.Experience import EXPERIENCE_NORTH, EXPERIENCE_COMPASS
 
 RUNNING_WINDOW_AZIMUTH = 100
 MAX_OFFSET_DISTANCE = 100
@@ -45,7 +45,7 @@ class Calibrator:
         """Update the compass offset and the compass experiences"""
         points = np.array([e.point()[0: 2] for e in self.workspace.memory.egocentric_memory.experiences.values()
                            if e.clock >= self.workspace.memory.clock - RUNNING_WINDOW_AZIMUTH and
-                           e.type == EXPERIENCE_AZIMUTH])
+                           e.type == EXPERIENCE_NORTH])
         offset_2d = compass_calibration(points)
         if offset_2d is not None:
             print("Calibrate compass by", offset_2d, f"distance: {np.linalg.norm(offset_2d):.1f}")
@@ -53,7 +53,7 @@ class Calibrator:
             self.workspace.memory.body_memory.compass_offset += offset_point
             offset_matrix = Matrix44.from_translation(-offset_point).astype('float64')
             for e in self.workspace.memory.egocentric_memory.experiences.values():
-                if e.type in [EXPERIENCE_COMPASS, EXPERIENCE_AZIMUTH]:
+                if e.type in [EXPERIENCE_COMPASS, EXPERIENCE_NORTH]:
                     e.displace(offset_matrix)
 
     def calibrate_retreat(self):

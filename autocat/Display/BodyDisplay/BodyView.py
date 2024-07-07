@@ -9,8 +9,6 @@ class BodyView(InteractiveDisplay):
     """Display the information in body memory"""
     def __init__(self, workspace, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # self.set_caption("Body Memory")
-        self.set_minimum_size(150, 150)
         self.workspace = workspace
 
         # Initialize OpenGL parameters

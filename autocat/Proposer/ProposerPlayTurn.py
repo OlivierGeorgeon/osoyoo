@@ -13,9 +13,7 @@ from ..Enaction.CompositeEnaction import CompositeEnaction
 from . Proposer import Proposer
 from ..Memory import EMOTION_CONTENT
 from ..Memory.BodyMemory import EXCITATION_LOW
-from ..Memory.EgocentricMemory.Experience import EXPERIENCE_AZIMUTH, EXPERIENCE_COMPASS
 from . Interaction import OUTCOME_FLOOR, OUTCOME_FOCUS_TOO_FAR
-from ..Integrator.Calibrator import compass_calibration
 
 STEP_INIT = 0
 STEP_CALIBRATE = 1
@@ -43,18 +41,6 @@ class ProposerPlayTurn(Proposer):
         if self.step == STEP_CALIBRATE:
             self.step = STEP_INIT
             self.workspace.calibrator.calibrate_compass()
-            # points = np.array([e.point()[0: 2] for e in self.workspace.memory.egocentric_memory.experiences.values()
-            #                    if e.clock >= enaction.clock - NB_TURN and e.type == EXPERIENCE_AZIMUTH])
-            # offset_2d = compass_calibration(points)
-            # print("Calibrate", offset_2d)
-            # if offset_2d is not None:
-            #     offset_point = np.array([offset_2d[0], offset_2d[1], 0], dtype=int)
-            #     self.workspace.memory.body_memory.compass_offset += offset_point
-            #     offset_matrix = Matrix44.from_translation(-offset_point).astype('float64')
-            #     for e in self.workspace.memory.egocentric_memory.experiences.values():
-            #         if e.type in [EXPERIENCE_COMPASS, EXPERIENCE_AZIMUTH]:
-            #             e.displace(offset_matrix)
-
         # If there is an object to play with
         if self.is_to_play() and enaction.outcome_code not in [OUTCOME_FLOOR, OUTCOME_FOCUS_TOO_FAR]:
             # self.step = STEP_CALIBRATE  Needed if automatic calibration is off

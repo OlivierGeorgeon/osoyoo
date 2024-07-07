@@ -19,7 +19,6 @@ class AllocentricView(InteractiveDisplay):
     """Create the allocentric view"""
     def __init__(self, workspace, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # self.set_caption("Allocentric Memory")
         self.set_minimum_size(150, 150)
 
         # glClearColor(0.2, 0.2, 0.7, 1.0)  # Make it look like hippocampus imaging

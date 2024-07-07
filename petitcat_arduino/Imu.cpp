@@ -337,12 +337,13 @@ void Imu::read_azimuth(JSONVar & outcome_object)
   // Vector norm = compass.readNormalize();
   Vector norm = compass.readRaw();
 
+  // Take the opposite of the compass point to get the north
+  norm.XAxis = -norm.XAxis;
+  norm.YAxis = -norm.YAxis;
+
   // Calculate heading
   float heading = atan2(norm.YAxis, norm.XAxis);
   // Serial.println("compass_x: " + String((int)norm.XAxis) + ", compass_y: " + String((int)norm.YAxis));
-
-  // Convert to degrees
-  int headingDegrees = round(heading * 180.0/M_PI);
 
   // Set declination angle on your location and fix heading
   // You can find your declination on: http://magnetic-declination.com/
@@ -352,12 +353,15 @@ void Imu::read_azimuth(JSONVar & outcome_object)
   // float declinationAngle = (2.0 + (13.0 / 60.0));
   // heading += declinationAngle;
 
-  headingDegrees += 180;
-  if (heading >= 360)
-    headingDegrees -= 360;
+  // Convert to degrees in the interval [0, 360]
+  int azimuth = (round(heading * 180.0/M_PI) + 360 ) % 360;
+
+  // headingDegrees += 180;
+  //if (headingDegrees >= 360)
+  //  headingDegrees -= 360;
 
   outcome_object["compass_x"] = round(norm.XAxis);
   outcome_object["compass_y"] = round(norm.YAxis);
-  outcome_object["azimuth"] = headingDegrees;
+  outcome_object["azimuth"] = azimuth;
 }
 #endif

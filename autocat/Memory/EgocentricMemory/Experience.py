@@ -13,7 +13,7 @@ EXPERIENCE_PROMPT = 8
 EXPERIENCE_ROBOT = 9
 EXPERIENCE_TOUCH = 10
 EXPERIENCE_COMPASS = 11
-EXPERIENCE_AZIMUTH = 12
+EXPERIENCE_NORTH = 12
 EXPERIENCE_ALIGNED_ECHO = 13
 FLOOR_COLORS = {0: 'LightSlateGrey', 1: 'red', 2: 'darkOrange', 3: 'gold', 4: 'limeGreen', 5: 'deepSkyBlue',
                 6: 'orchid', 7: 'deepPink'}

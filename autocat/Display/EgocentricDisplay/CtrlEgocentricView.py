@@ -109,15 +109,10 @@ class CtrlEgocentricView:
 
     def main(self, dt):
         """Update the egocentric view"""
-
         # Update every frame to simulate the robot's displacement
         self.view.update_body_display(self.workspace.memory.body_memory)
         self.view.egocentric_rotate = -self.workspace.memory.body_memory.simulation_rotation_deg
         self.view.egocentric_translate = -self.workspace.memory.body_memory.simulation_translate
-
-        # Update the display of egocentric memory
-        # if self.workspace.enacter.interaction_step in [ENACTION_STEP_ENACTING, ENACTION_STEP_RENDERING]:
-        #     self.update_points_of_interest()
-
+        # Update every interaction cycle to update the experiences
         if self.workspace.enacter.interaction_step in [ENACTION_STEP_RENDERING]:
             self.update_points_of_interest()

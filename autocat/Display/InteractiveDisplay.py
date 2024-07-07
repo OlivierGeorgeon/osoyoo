@@ -61,7 +61,6 @@ class InteractiveDisplay(pyglet.window.Window):
         self.robot_batch = pyglet.graphics.Batch()
         self.robot = RobotDisplay(self.robot_batch, self.background)
         self.robot_translate = np.array([0, 0, 0], dtype=float)
-        # self.view_rotate = 0
         self.robot_rotate = 0
 
         # The batch to animate the egocentric experiences

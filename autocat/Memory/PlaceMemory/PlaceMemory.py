@@ -6,7 +6,7 @@ import copy
 from . import MIN_PLACE_CELL_DISTANCE
 from ...Memory.PlaceMemory.PlaceCell import PlaceCell
 from ...Memory.PlaceMemory.Cue import Cue
-from ...Memory.EgocentricMemory.Experience import EXPERIENCE_COMPASS, EXPERIENCE_AZIMUTH, EXPERIENCE_CENTRAL_ECHO, EXPERIENCE_LOCAL_ECHO
+from ...Memory.EgocentricMemory.Experience import EXPERIENCE_COMPASS, EXPERIENCE_NORTH, EXPERIENCE_CENTRAL_ECHO, EXPERIENCE_LOCAL_ECHO
 from .PlaceGeometry import nearby_place_cell, transform_estimation_cue_to_cue
 
 
@@ -26,7 +26,7 @@ class PlaceMemory:
         position_correction = np.array([0, 0, 0])
 
         experiences = [e for e in memory.egocentric_memory.experiences.values() if (e.clock >= memory.clock) and
-                       e.type not in [EXPERIENCE_COMPASS, EXPERIENCE_AZIMUTH, EXPERIENCE_CENTRAL_ECHO]]
+                       e.type not in [EXPERIENCE_COMPASS, EXPERIENCE_NORTH, EXPERIENCE_CENTRAL_ECHO]]
         # Create the cues
         # cues = []
         # # The new experiences generated during this step constitute cues

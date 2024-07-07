@@ -89,7 +89,6 @@ class CtrlPlaceCellView:
 
         if self.place_cell_id in self.workspace.memory.place_memory.place_cells:
             place_cell = self.workspace.memory.place_memory.place_cells[self.place_cell_id]
-            # self.view.set_caption(f"Place Cell {self.place_cell_id} at {place_cell}")
             self.view.robot_translate = self.workspace.memory.allocentric_memory.robot_point - place_cell.point
             if self.workspace.enacter.interaction_step == ENACTION_STEP_RENDERING:
                 self.update_cue_displays()
