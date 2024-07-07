@@ -58,13 +58,16 @@ class InteractiveDisplay(pyglet.window.Window):
         self.screen_scale = screen_scale()
 
         # The batch that displays the robot
-        self.egocentric_batch = pyglet.graphics.Batch()
-        self.robot = RobotDisplay(self.egocentric_batch, self.background)
+        self.robot_batch = pyglet.graphics.Batch()
+        self.robot = RobotDisplay(self.robot_batch, self.background)
         self.robot_translate = np.array([0, 0, 0], dtype=float)
-        self.view_rotate = 0
+        # self.view_rotate = 0
         self.robot_rotate = 0
-        self.polar_rotate = 0
-        self.polar_translate = np.array([0., 0., 0.])
+
+        # The batch to animate the egocentric experiences
+        self.egocentric_batch = pyglet.graphics.Batch()
+        self.egocentric_rotate = 0
+        self.egocentric_translate = np.array([0., 0., 0.])
 
         # The batch that displays the labels at the bottom of the view
         self.label_batch = pyglet.graphics.Batch()
@@ -87,18 +90,17 @@ class InteractiveDisplay(pyglet.window.Window):
         # Stack the projection matrix. Centered on (0,0). Fit the window size and zoom factor
         glOrtho(self.left, self.right, self.bottom, self.top, 1, -1)
 
-        glRotatef(self.view_rotate, 0.0, 0.0, 1.0)
-
         # Draw the polar layer
-        glTranslatef(*self.polar_translate)
-        glRotatef(self.polar_rotate, 0.0, 0.0, 1.0)
         self.polar_batch.draw()
 
-        # Stack the rotation and translation of the robot's body
-        glTranslatef(*(self.robot_translate - self.polar_translate))
-        glRotatef(self.robot_rotate - self.polar_rotate, 0.0, 0.0, 1.0)
+        # Draw the robot
+        glTranslatef(*self.robot_translate)
+        glRotatef(self.robot_rotate, 0.0, 0.0, 1.0)
+        self.robot_batch.draw()
 
         # Draw the egocentric layer
+        glTranslatef(*self.egocentric_translate)
+        glRotatef(self.egocentric_rotate, 0.0, 0.0, 1.0)
         self.egocentric_batch.draw()
 
         # Reset the projection to Identity to cancel the projection of the text
@@ -123,7 +125,7 @@ class InteractiveDisplay(pyglet.window.Window):
     def mouse_to_ego_point(self, x, y, button, modifiers):
         """ Computing the position of the mouse click relative to the robot in mm and degrees """
         ego_point = self.mouse_coordinates_to_point(x, y)
-        rotation_matrix = matrix44.create_from_z_rotation(math.radians(self.robot_rotate + self.view_rotate))
+        rotation_matrix = matrix44.create_from_z_rotation(math.radians(self.robot_rotate))
         ego_point = matrix44.apply_to_vector(rotation_matrix, ego_point).astype(int)
         ego_angle = math.degrees(math.atan2(ego_point[1], ego_point[0]))
         # Display the mouse click coordinates at the bottom of the view

@@ -8,7 +8,7 @@ from ...Robot.RobotDefine import ROBOT_COLOR_SENSOR_X, ROBOT_FLOOR_SENSOR_X, ROB
     ROBOT_SETTINGS
 from ...Proposer.Action import ACTION_FORWARD, ACTION_BACKWARD, ACTION_SWIPE, ACTION_RIGHTWARD, ACTION_CIRCUMVENT, \
     ACTION_TURN
-from ...Utils import quaternion_translation_to_matrix, head_angle_distance_to_matrix, matrix_to_rotation_matrix, translation_quaternion_to_matrix
+from ...Utils import quaternion_translation_to_matrix, head_angle_distance_to_matrix, translation_quaternion_to_matrix
 
 EXPERIENCE_PERSISTENCE = 10
 
@@ -30,12 +30,12 @@ class EgocentricMemory:
         """
         # Move the existing experiences
         for experience in self.experiences.values():
-            if experience.type == EXPERIENCE_COMPASS:
-                # Get the rotation part of the displacement matrix
-                # m33 = matrix33.create_from_matrix44(enaction.trajectory.displacement_matrix)
-                # experience.displace(matrix44.create_from_matrix33(m33))
-                experience.displace(matrix_to_rotation_matrix(enaction.trajectory.displacement_matrix))
-            elif experience.type != EXPERIENCE_AZIMUTH:  # Do not move the azimuth experiences for calibration
+            # if experience.type == EXPERIENCE_COMPASS:
+            #     # Get the rotation part of the displacement matrix
+            #     # m33 = matrix33.create_from_matrix44(enaction.trajectory.displacement_matrix)
+            #     # experience.displace(matrix44.create_from_matrix33(m33))
+            #     experience.displace(matrix_to_rotation_matrix(enaction.trajectory.displacement_matrix))
+            if experience.type != EXPERIENCE_AZIMUTH:  # Do not move the azimuth experiences for calibration
                 experience.displace(enaction.trajectory.displacement_matrix)
 
         # Add the PLACE experience with the sensed color

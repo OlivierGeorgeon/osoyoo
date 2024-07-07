@@ -78,12 +78,12 @@ class PointOfInterest:
             self.points = [20, 0, 10, 17, -10, 17, -20, 0, -10, -17, 10, -17]
             self.shape = self.batch.add_indexed(6, gl.GL_TRIANGLES, group, [0, 1, 2, 0, 2, 3, 0, 3, 4, 0, 4, 5],
                                                 ('v2i', self.points), ('c4B', 6 * (*self.color, self.opacity)))
-        if self.type == EXPERIENCE_COMPASS:
+        if self.type == EXPERIENCE_AZIMUTH:
             self.color = name_to_rgb("RoyalBlue")
             self.points = [10, 0, 0, -15, 0, 15, -10, 0]
             self.shape = self.batch.add_indexed(4, gl.GL_TRIANGLES, self.group, [0, 1, 2, 1, 2, 3],
                                                 ('v2i', self.points), ('c4B', 4 * (*self.color, self.opacity)))
-        if self.type == EXPERIENCE_AZIMUTH:
+        if self.type == EXPERIENCE_COMPASS:
             self.color = name_to_rgb("SteelBlue")
             self.points = [20, 0, 0, -30, 0, 30, -20, 0]
             self.shape = self.batch.add_indexed(4, gl.GL_TRIANGLES, self.group, [0, 1, 2, 1, 2, 3],

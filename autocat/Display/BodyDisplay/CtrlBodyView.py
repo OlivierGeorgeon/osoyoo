@@ -9,7 +9,6 @@ from ...Utils import quaternion_to_azimuth
 from ...Integrator.Calibrator import compass_calibration
 from ...Memory.EgocentricMemory.Experience import EXPERIENCE_COMPASS, EXPERIENCE_AZIMUTH
 from ...Memory.BodyMemory import DOPAMINE, SEROTONIN, NORADRENALINE
-from ...Utils import matrix_to_rotation_matrix
 
 KEY_OFFSET = 'O'
 ENGAGEMENT_MODES = {'R': "Real", 'I': "Imaginary"}
@@ -69,21 +68,26 @@ class CtrlBodyView:
         # Delete the expired points of interest
         self.points_of_interest = [p for p in self.points_of_interest if not p.delete(self.workspace.enaction.clock)]
 
-        # Displace and fade the remaining points of interest
+        # Fade the remaining points of interest
         for p in self.points_of_interest:
             p.fade(self.workspace.memory.clock)
-            if p.type == EXPERIENCE_COMPASS:
-                displacement_matrix = self.workspace.enaction.trajectory.displacement_matrix
-                p.displace(matrix_to_rotation_matrix(displacement_matrix))
+            # if p.type == EXPERIENCE_COMPASS:  # Small diamonds
+            #     displacement_matrix = self.workspace.enaction.trajectory.displacement_matrix
+            #     p.displace(matrix_to_rotation_matrix(displacement_matrix))
 
         # Create the new points of interest from the new experiences
         for e in [e for e in self.workspace.memory.egocentric_memory.experiences.values() if
                   e.clock == self.workspace.enaction.clock and e.type in [EXPERIENCE_COMPASS, EXPERIENCE_AZIMUTH]]:
+            # COMPASS Big blue diamonds are shown in the robot frame
             if e.type == EXPERIENCE_COMPASS:
-                poi = PointOfInterest(e.pose_matrix, self.view.egocentric_batch, self.view.forefront, e.type, e.clock,
+                poi = PointOfInterest(e.pose_matrix, self.view.robot_batch, self.view.background, e.type, e.clock,
                                       e.color_index, 10)
+            # AZIMUTH Small blue diamonds are shown in polar frame
             else:
-                poi = PointOfInterest(e.pose_matrix, self.view.egocentric_batch, self.view.background, e.type, e.clock,
+                # Rotate the pose_matrix by the body matrix
+                pose_matrix = Matrix44.from_quaternion(self.workspace.memory.body_memory.body_quaternion.inverse) * \
+                              e.pose_matrix
+                poi = PointOfInterest(pose_matrix, self.view.polar_batch, self.view.forefront, e.type, e.clock,
                                       e.color_index, 10)
             # poi.fade(self.workspace.memory.clock)
             self.points_of_interest.append(poi)
@@ -118,7 +122,7 @@ class CtrlBodyView:
         # + ", Ex:{:d}%".format(self.workspace.memory.body_memory.excitation) \
 
         # At the end of interaction
-        if self.workspace.enacter.interaction_step == ENACTION_STEP_RENDERING: # and self.workspace.enaction.outcome is not None:
+        if self.workspace.enacter.interaction_step == ENACTION_STEP_RENDERING:
             self.view.label2.text = self.body_label_azimuth(self.workspace.enaction)
             self.view.label3.text = self.body_label(self.workspace.enaction.action)
             self.update_body_view()

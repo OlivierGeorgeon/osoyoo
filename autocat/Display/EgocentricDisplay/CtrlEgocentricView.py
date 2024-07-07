@@ -14,7 +14,7 @@ class CtrlEgocentricView:
     def __init__(self, workspace):
         self.view = InteractiveDisplay()
         self.view.zoom_level = 2
-        self.view.view_rotate = 90  # Show the robot head up
+        self.view.robot_rotate = 90  # Show the robot head up
         self.workspace = workspace
         self.points_of_interest = []
         self.last_action = None
@@ -38,7 +38,7 @@ class CtrlEgocentricView:
                             self.points_of_interest.remove(p)
                     # Mark the new prompt
                     self.workspace.memory.egocentric_memory.prompt_point = click_point
-                    prompt_poi = PointOfInterest(Matrix44.from_translation(click_point).astype(float), self.view.polar_batch,
+                    prompt_poi = PointOfInterest(Matrix44.from_translation(click_point).astype(float), self.view.egocentric_batch,
                                                  self.view.background, POINT_PROMPT, self.workspace.memory.clock, 0, 1, 0)
                     self.points_of_interest.append(prompt_poi)
 
@@ -83,11 +83,11 @@ class CtrlEgocentricView:
         es = [e for e in self.workspace.memory.egocentric_memory.experiences.values() if e.clock == self.workspace.enaction.clock]
         for e in es:
             if e.type == EXPERIENCE_ROBOT:  # Draw the body of the other robot
-                robot_shape = PointOfInterest(e.pose_matrix, self.view.polar_batch, self.view.background, POINT_ROBOT,
+                robot_shape = PointOfInterest(e.pose_matrix, self.view.egocentric_batch, self.view.background, POINT_ROBOT,
                                               e.clock)
                 # robot_shape.fade(self.workspace.memory.clock)
                 self.points_of_interest.append(robot_shape)
-            poi = PointOfInterest(e.pose_matrix, self.view.polar_batch, self.view.forefront, e.type, e.clock,
+            poi = PointOfInterest(e.pose_matrix, self.view.egocentric_batch, self.view.forefront, e.type, e.clock,
                                   e.color_index, e.durability, 0)
             # poi.fade(self.workspace.memory.clock)
             self.points_of_interest.append(poi)
@@ -96,14 +96,14 @@ class CtrlEgocentricView:
         # Re-create the focus point with durability of 1
         if self.workspace.memory.egocentric_memory.focus_point is not None:
             p = Matrix44.from_translation(self.workspace.memory.egocentric_memory.focus_point).astype(float)
-            focus_poi = PointOfInterest(p, self.view.polar_batch, self.view.forefront, EXPERIENCE_FOCUS,
+            focus_poi = PointOfInterest(p, self.view.egocentric_batch, self.view.forefront, EXPERIENCE_FOCUS,
                                         self.workspace.memory.clock, 0, 1, 0)
             self.points_of_interest.append(focus_poi)
 
         # Re-create the prompt point with durability of 1
         if self.workspace.memory.egocentric_memory.prompt_point is not None:
             p = Matrix44.from_translation(self.workspace.memory.egocentric_memory.prompt_point.astype(float))
-            prompt_poi = PointOfInterest(p, self.view.polar_batch, self.view.background, POINT_PROMPT,
+            prompt_poi = PointOfInterest(p, self.view.egocentric_batch, self.view.background, POINT_PROMPT,
                                          self.workspace.memory.clock, 0, 1, 0)
             self.points_of_interest.append(prompt_poi)
 
@@ -112,8 +112,8 @@ class CtrlEgocentricView:
 
         # Update every frame to simulate the robot's displacement
         self.view.update_body_display(self.workspace.memory.body_memory)
-        self.view.polar_rotate = -self.workspace.memory.body_memory.simulation_rotation_deg
-        self.view.polar_translate = -self.workspace.memory.body_memory.simulation_translate
+        self.view.egocentric_rotate = -self.workspace.memory.body_memory.simulation_rotation_deg
+        self.view.egocentric_translate = -self.workspace.memory.body_memory.simulation_translate
 
         # Update the display of egocentric memory
         # if self.workspace.enacter.interaction_step in [ENACTION_STEP_ENACTING, ENACTION_STEP_RENDERING]:
