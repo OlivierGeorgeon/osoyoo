@@ -56,6 +56,7 @@ class CtrlPhenomenonView:
                 phenomenon.confidence += int(np.sign(dy))
                 phenomenon.confidence = min(max(phenomenon.confidence, 0), 100)
 
+        # Stack the event functions in addition to those defined in the view
         self.view.push_handlers(on_text, on_mouse_press, on_mouse_scroll)
 
     def update_affordance_displays(self):

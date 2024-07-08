@@ -17,7 +17,7 @@ ENGAGEMENT_MODES = {'R': "Real", 'I': "Imaginary"}
 class CtrlBodyView:
     """Controls the body view"""
     def __init__(self, workspace):
-        self.view = BodyView(workspace)
+        self.view = BodyView()
         self.workspace = workspace
         self.points_of_interest = []
         self.last_action = None
@@ -54,7 +54,28 @@ class CtrlBodyView:
             else:
                 self.workspace.process_user_key(text)
 
-        self.view.push_handlers(on_mouse_press, on_text)
+        def on_mouse_scroll(x, y, dx, dy):
+            """ Zooming the window or manually updating the neurotransmitter levels"""
+            if y > 90:
+                return
+                # # Zoom the view
+                # super().on_mouse_scroll(x, y, dx, dy)
+            elif y > 60:
+                # The neurotransmitter levels
+                if x < 100:
+                    self.workspace.memory.body_memory.neurotransmitters[DOPAMINE] += int(np.sign(dy))
+                elif x < 190:
+                    self.workspace.memory.body_memory.neurotransmitters[SEROTONIN] += int(np.sign(dy))
+                else:
+                    self.workspace.memory.body_memory.neurotransmitters[NORADRENALINE] += int(np.sign(dy))
+            else:
+                # The energy levels
+                if x < 150:
+                    self.workspace.memory.body_memory.energy += int(np.sign(dy))
+                else:
+                    self.workspace.memory.body_memory.excitation += int(np.sign(dy))
+
+        self.view.push_handlers(on_mouse_press, on_text, on_mouse_scroll)
 
     def update_body_view(self):
         """Add and update points of interest from the latest enacted interaction """
@@ -77,6 +98,18 @@ class CtrlBodyView:
                 poi = PointOfInterest(e.polar_pose_matrix(), self.view.polar_batch, self.view.forefront, e.type,
                                       e.clock, e.color_index, 10)
             self.points_of_interest.append(poi)
+
+    def update_labels(self):
+        """update the labels in body view"""
+        label3 = f"Translation: ({self.workspace.enaction.action.translation_speed[0]:.0f}, " \
+                 f"{self.workspace.enaction.action.translation_speed[1]:.0f}) mm/s, " \
+                 f"rotation: {math.degrees(self.workspace.enaction.action.rotation_speed_rad):.1f}°/s"
+        self.view.label3.text = label3
+        label2 = f"Azimuth: {quaternion_to_azimuth(self.workspace.enaction.trajectory.body_quaternion):.0f}, " \
+                 f"offset: ({self.workspace.memory.body_memory.compass_offset[0]:d}, " \
+                 f"{self.workspace.memory.body_memory.compass_offset[1]:d}), " \
+                 f"residual: {math.degrees(self.workspace.enaction.trajectory.body_direction_delta):.1f}"
+        self.view.label2.text = label2
 
     def main(self, dt):
         """Update the body view every frame"""
@@ -109,22 +142,3 @@ class CtrlBodyView:
         if self.workspace.enacter.interaction_step == ENACTION_STEP_RENDERING:
             self.update_labels()
             self.update_body_view()
-
-    def update_labels(self):
-        """update the labels in body view"""
-        label3 = f"Translation: ({self.workspace.enaction.action.translation_speed[0]:.0f}, " \
-                 f"{self.workspace.enaction.action.translation_speed[1]:.0f}) mm/s, " \
-                 f"rotation: {math.degrees(self.workspace.enaction.action.rotation_speed_rad):.1f}°/s"
-        self.view.label3.text = label3
-        label2 = f"Azimuth: {quaternion_to_azimuth(self.workspace.enaction.trajectory.body_quaternion):.0f}, " \
-                 f"offset: ({self.workspace.memory.body_memory.compass_offset[0]:d}, " \
-                 f"{self.workspace.memory.body_memory.compass_offset[1]:d}), " \
-                 f"residual: {math.degrees(self.workspace.enaction.trajectory.body_direction_delta):.1f}"
-        self.view.label2.text = label2
-
-    # def body_label_azimuth(self, enaction):
-    #     """Return the label to display in the body view"""
-    #     return f"Azimuth: {quaternion_to_azimuth(enaction.trajectory.body_quaternion):.0f}, " \
-    #            f"offset: ({self.workspace.memory.body_memory.compass_offset[0]:d}, " \
-    #            f"{self.workspace.memory.body_memory.compass_offset[1]:d}), " \
-    #            f"residual: {math.degrees(enaction.trajectory.body_direction_delta):.1f}"

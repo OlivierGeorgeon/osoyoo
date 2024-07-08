@@ -15,7 +15,7 @@ class CtrlAllocentricView:
     def __init__(self, workspace):
         """Control the allocentric view"""
         self.workspace = workspace
-        self.view = AllocentricView(self.workspace)
+        self.view = AllocentricView()
         self.next_time_refresh = 0
 
         # Handlers
@@ -136,7 +136,8 @@ class CtrlAllocentricView:
                               | (self.workspace.memory.allocentric_memory.grid[:, :, CLOCK_PROMPT] >=
                                  self.workspace.memory.clock - PLACE_GRID_DURABILITY)))
         for i, j in zip(updated_ij[0], updated_ij[1]):
-            self.view.update_hexagon(i, j, self.workspace.memory.allocentric_memory.grid[i][j][:])
+            self.view.update_hexagon(i, j, self.workspace.memory.allocentric_memory.grid[i][j][:],
+                                     self.workspace.memory.clock)
         # print(f"Update alloview: {len(updated_ij[0])} cells in {time.time() - start_time:.3f} seconds")
 
         # Update the other robot

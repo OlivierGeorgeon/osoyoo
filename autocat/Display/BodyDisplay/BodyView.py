@@ -7,9 +7,9 @@ from ...Memory.BodyMemory import DOPAMINE, SEROTONIN, NORADRENALINE
 
 class BodyView(InteractiveDisplay):
     """Display the information in body memory"""
-    def __init__(self, workspace, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.workspace = workspace
+        # self.workspace = workspace
 
         # Initialize OpenGL parameters
         glClearColor(1.0, 235.0/256., 205.0/256., 1.0)
@@ -34,17 +34,17 @@ class BodyView(InteractiveDisplay):
         if y > 90:
             # Zoom the view
             super().on_mouse_scroll(x, y, dx, dy)
-        elif y > 60:
-            # The neurotransmitter levels
-            if x < 100:
-                self.workspace.memory.body_memory.neurotransmitters[DOPAMINE] += int(np.sign(dy))
-            elif x < 190:
-                self.workspace.memory.body_memory.neurotransmitters[SEROTONIN] += int(np.sign(dy))
-            else:
-                self.workspace.memory.body_memory.neurotransmitters[NORADRENALINE] += int(np.sign(dy))
-        else:
-            # The energy levels
-            if x < 150:
-                self.workspace.memory.body_memory.energy += int(np.sign(dy))
-            else:
-                self.workspace.memory.body_memory.excitation += int(np.sign(dy))
+        # elif y > 60:
+        #     # The neurotransmitter levels
+        #     if x < 100:
+        #         self.workspace.memory.body_memory.neurotransmitters[DOPAMINE] += int(np.sign(dy))
+        #     elif x < 190:
+        #         self.workspace.memory.body_memory.neurotransmitters[SEROTONIN] += int(np.sign(dy))
+        #     else:
+        #         self.workspace.memory.body_memory.neurotransmitters[NORADRENALINE] += int(np.sign(dy))
+        # else:
+        #     # The energy levels
+        #     if x < 150:
+        #         self.workspace.memory.body_memory.energy += int(np.sign(dy))
+        #     else:
+        #         self.workspace.memory.body_memory.excitation += int(np.sign(dy))
