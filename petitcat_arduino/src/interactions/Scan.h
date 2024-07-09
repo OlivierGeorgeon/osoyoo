@@ -6,19 +6,17 @@
 #ifndef Scan_h
 #define Scan_h
 
-#define MAX_SACCADES 18
+#define MAX_SCANS 181  // To scan at most every 1° from -90 to 90 (reduce if need to spare memory)
 
 #include "../../Interaction.h"
 
-struct significant_array
-{
-    // Struct to store the angles and the corresponding measures,
-    // and booleans to indicate if the measure are significant
-    int distances[MAX_SACCADES]{0}; // 180/SCAN_SACCADE_SPAN
-    int8_t angles[MAX_SACCADES]{0};
-    bool sign[MAX_SACCADES]{false};
-//    int size = 18;
-};
+//struct significant_array
+//{
+//    // Struct to store the angles and the corresponding measures,
+//    int distances[MAX_SACCADES]{0};
+//    int8_t angles[MAX_SACCADES]{0};
+////    bool sign[MAX_SACCADES]{false};
+//};
 
 
 class Scan : public Interaction
@@ -35,7 +33,9 @@ private:
   int _angle_min_ultrasonic_measure;
   int _head_angle_span;
   unsigned long _next_saccade_time;
-  significant_array _sign_array;
+  // significant_array _sign_array;
+  int distances[MAX_SCANS]{0};
+  int8_t angles[MAX_SCANS]{0};
   int _current_index;
 };
 

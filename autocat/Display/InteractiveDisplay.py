@@ -58,10 +58,15 @@ class InteractiveDisplay(pyglet.window.Window):
         self.screen_scale = screen_scale()
 
         # The batch that displays the robot
-        self.egocentric_batch = pyglet.graphics.Batch()
-        self.robot = RobotDisplay(self.egocentric_batch, self.background)
+        self.robot_batch = pyglet.graphics.Batch()
+        self.robot = RobotDisplay(self.robot_batch, self.background)
         self.robot_translate = np.array([0, 0, 0], dtype=float)
         self.robot_rotate = 0
+
+        # The batch to animate the egocentric experiences
+        self.egocentric_batch = pyglet.graphics.Batch()
+        self.egocentric_rotate = 0
+        self.egocentric_translate = np.array([0., 0., 0.])
 
         # The batch that displays the labels at the bottom of the view
         self.label_batch = pyglet.graphics.Batch()
@@ -84,14 +89,17 @@ class InteractiveDisplay(pyglet.window.Window):
         # Stack the projection matrix. Centered on (0,0). Fit the window size and zoom factor
         glOrtho(self.left, self.right, self.bottom, self.top, 1, -1)
 
-        # Draw the layer in polar coordinates
+        # Draw the polar layer
         self.polar_batch.draw()
 
-        # Stack the rotation and translation of the robot's body
+        # Draw the robot
         glTranslatef(*self.robot_translate)
         glRotatef(self.robot_rotate, 0.0, 0.0, 1.0)
+        self.robot_batch.draw()
 
-        # Draw the layer in egocentric coordinates
+        # Draw the egocentric layer
+        glTranslatef(*self.egocentric_translate)
+        glRotatef(self.egocentric_rotate, 0.0, 0.0, 1.0)
         self.egocentric_batch.draw()
 
         # Reset the projection to Identity to cancel the projection of the text
@@ -103,7 +111,7 @@ class InteractiveDisplay(pyglet.window.Window):
         self.label_batch.draw()
 
     def update_body_display(self, body_memory):
-        """Updates the robot's body to display"""
+        """Updates the display of robot's head direction and emotion color"""
         self.robot.rotate_head(body_memory.head_direction_degree())
         self.robot.emotion_color(body_memory.emotion_code())
 

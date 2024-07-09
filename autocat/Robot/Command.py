@@ -78,7 +78,7 @@ class Command:
             command_dict['speed'] = int(self.speed[0])
         if self.caution > 0:
             command_dict['caution'] = self.caution
-        if self.span != 40:
+        if self.span != 30:
             command_dict['span'] = self.span
         if self.color > 0:
             command_dict['color'] = self.color

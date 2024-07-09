@@ -8,7 +8,7 @@ from ...Memory.EgocentricMemory.Experience import EXPERIENCE_ROBOT
 from ..InteractiveDisplay import InteractiveDisplay
 from ..PointOfInterest import PointOfInterest, POINT_ROBOT
 from ...Memory.AllocentricMemory.AllocentricMemory import CELL_UNKNOWN
-from ...Memory.AllocentricMemory import STATUS_0, STATUS_4
+from ...Memory.AllocentricMemory import STATUS_FLOOR, STATUS_4
 
 CELL_RADIUS = 50
 ZOOM_IN_FACTOR = 1.2
@@ -17,39 +17,33 @@ ZOOM_OUT_FACTOR = 1/ZOOM_IN_FACTOR
 
 class AllocentricView(InteractiveDisplay):
     """Create the allocentric view"""
-    def __init__(self, workspace, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # self.set_caption("Allocentric Memory")
-        self.set_minimum_size(150, 150)
-
         # glClearColor(0.2, 0.2, 0.7, 1.0)  # Make it look like hippocampus imaging
         glClearColor(0.2, 0.2, 1.0, 1.0)  # For demonstration in Fête de la Science
-        # glClearColor(1.0, 1.0, 1.0, 1.0)
-
         self.groups = [OrderedGroup(1), OrderedGroup(2), OrderedGroup(3), OrderedGroup(4)]
-
         self.zoom_level = 3
-
-        self.workspace = workspace
-        self.hexagons = [[None for _ in range(workspace.memory.allocentric_memory.height)]
-                         for _ in range(workspace.memory.allocentric_memory.width)]
+        # self.workspace = workspace
+        # self.hexagons = [[None for _ in range(workspace.memory.allocentric_memory.height)]
+        #                  for _ in range(workspace.memory.allocentric_memory.width)]
+        self.hexagons = {}
         self.robot_poi = None  # The other robot point of interest
         self.body_poi = None
 
-    def update_hexagon(self, i, j, cell):
+    def update_hexagon(self, i, j, cell, clock):
         """Create or update or delete an hexagon in allocentric view."""
-        if self.hexagons[i][j] is None:
-            if not np.all(cell[STATUS_0:STATUS_4+1] == CELL_UNKNOWN):
+        if (i, j) not in self.hexagons:
+            if not np.all(cell[STATUS_FLOOR:STATUS_4 + 1] == CELL_UNKNOWN):
                 # The hexagon does not exist but the cell is known then create the hexagon
-                self.hexagons[i][j] = CellDisplay(cell, self.polar_batch, self.groups, self.workspace.memory.clock)
+                self.hexagons[(i, j)] = CellDisplay(cell, self.polar_batch, self.groups, clock)
         else:
-            if not np.all(cell[STATUS_0:STATUS_4+1] == CELL_UNKNOWN):
+            if not np.all(cell[STATUS_FLOOR:STATUS_4 + 1] == CELL_UNKNOWN):
                 # The hexagon exists and the cell is known then update the hexagon
-                self.hexagons[i][j].update_color(cell, self.workspace.memory.clock)
+                self.hexagons[(i, j)].update_color(cell, clock)
             else:
                 # The hexagon exists and the cell is unknown then delete the hexagon
-                self.hexagons[i][j].delete()
-                self.hexagons[i][j] = None
+                self.hexagons[(i, j)].delete()
+                del self.hexagons[(i, j)]
 
     def on_mouse_motion(self, x, y, dx, dy):
         """Display the position in allocentric memory and the cell in the grid"""

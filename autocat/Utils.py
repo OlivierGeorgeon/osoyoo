@@ -95,10 +95,10 @@ def head_angle_distance_to_point(head_direction, echo_distance):
                                     np.array([0, 0, 0])).astype(int)
 
 
-def matrix_to_rotation_matrix(matrix):
-    """Return a Matrix44 that contains only the rotation of the argument matrix"""
-    # Convert to matrix33 and then back to matrix44 to remove the translation part
-    return matrix44.create_from_matrix33(matrix33.create_from_matrix44(matrix))
+# def matrix_to_rotation_matrix(matrix):
+#     """Return a Matrix44 that contains only the rotation of the argument matrix"""
+#     # Convert to matrix33 and then back to matrix44 to remove the translation part
+#     return matrix44.create_from_matrix33(matrix33.create_from_matrix44(matrix))
 
 
 def point_to_head_direction_distance(point):

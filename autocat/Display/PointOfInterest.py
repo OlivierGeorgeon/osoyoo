@@ -4,7 +4,7 @@ from pyglet import shapes, gl
 from webcolors import name_to_rgb
 from ..Memory.EgocentricMemory.Experience import EXPERIENCE_LOCAL_ECHO, EXPERIENCE_CENTRAL_ECHO,  EXPERIENCE_PLACE, \
     EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_IMPACT, EXPERIENCE_BLOCK, FLOOR_COLORS, EXPERIENCE_FOCUS, \
-    EXPERIENCE_ROBOT, EXPERIENCE_TOUCH, EXPERIENCE_AZIMUTH, EXPERIENCE_COMPASS
+    EXPERIENCE_ROBOT, EXPERIENCE_TOUCH, EXPERIENCE_NORTH, EXPERIENCE_COMPASS
 from autocat.Display.RobotDisplay import EMOTION_COLORS
 
 
@@ -78,12 +78,12 @@ class PointOfInterest:
             self.points = [20, 0, 10, 17, -10, 17, -20, 0, -10, -17, 10, -17]
             self.shape = self.batch.add_indexed(6, gl.GL_TRIANGLES, group, [0, 1, 2, 0, 2, 3, 0, 3, 4, 0, 4, 5],
                                                 ('v2i', self.points), ('c4B', 6 * (*self.color, self.opacity)))
-        if self.type == EXPERIENCE_COMPASS:
+        if self.type == EXPERIENCE_NORTH:
             self.color = name_to_rgb("RoyalBlue")
             self.points = [10, 0, 0, -15, 0, 15, -10, 0]
             self.shape = self.batch.add_indexed(4, gl.GL_TRIANGLES, self.group, [0, 1, 2, 1, 2, 3],
                                                 ('v2i', self.points), ('c4B', 4 * (*self.color, self.opacity)))
-        if self.type == EXPERIENCE_AZIMUTH:
+        if self.type == EXPERIENCE_COMPASS:
             self.color = name_to_rgb("SteelBlue")
             self.points = [20, 0, 0, -30, 0, 30, -20, 0]
             self.shape = self.batch.add_indexed(4, gl.GL_TRIANGLES, self.group, [0, 1, 2, 1, 2, 3],
@@ -148,10 +148,20 @@ class PointOfInterest:
             self.shape.x, self.shape.y, _ = matrix44.apply_to_vector(displacement_matrix,
                                                                      [self.shape.x, self.shape.y, 0])
 
-    def delete(self):
+    # def displace_to(self, pose_matrix):
+    #     """Displace the vertices to the pose_matrix"""
+    #     # Compute the displacement from the previous pose_matrix to the new pose matrix
+    #     displacement_matrix = matrix44.multiply(self.pose_matrix.inverse, pose_matrix)
+    #     # Apply this displacement
+    #     self.displace(displacement_matrix)
+
+    def delete(self, clock=0):
         """ Delete the shape to remove it from the batch. Return True when deleted """
-        self.shape.delete()
-        return True
+        if self.is_expired(clock) or clock == 0:
+            self.shape.delete()
+            return True
+        else:
+            return False
 
     def is_expired(self, clock):
         """Return True if the age has exceeded the durability"""
@@ -169,7 +179,7 @@ class PointOfInterest:
             return False
 
     def fade(self, clock):
-        """Decrease the opacity of this point of interest as it gets older, and then delete it"""
+        """Decrease the opacity of this point of interest as it gets older"""
         # Opacity: 0 is transparent, 255 is opaque
         self.opacity = int(max(255 * (self.durability - clock + self.clock) / self.durability, 0))
         # Reset the opacity of the shape

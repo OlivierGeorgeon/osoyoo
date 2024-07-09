@@ -1,3 +1,4 @@
+import time
 from pyrr import Matrix44
 from pyglet.window import key, mouse
 # from .EgocentricView import EgocentricView
@@ -11,7 +12,6 @@ class CtrlEgocentricView:
     """Handle the logic of the egocentric view, retrieve data from the memory and convert it
     to points of interest that can be displayed in a pyglet window"""
     def __init__(self, workspace):
-        # self.view = EgocentricView()
         self.view = InteractiveDisplay()
         self.view.zoom_level = 2
         self.view.robot_rotate = 90  # Show the robot head up
@@ -39,7 +39,7 @@ class CtrlEgocentricView:
                     # Mark the new prompt
                     self.workspace.memory.egocentric_memory.prompt_point = click_point
                     prompt_poi = PointOfInterest(Matrix44.from_translation(click_point).astype(float), self.view.egocentric_batch,
-                                                 self.view.background, POINT_PROMPT, self.workspace.memory.clock)
+                                                 self.view.background, POINT_PROMPT, self.workspace.memory.clock, 0, 1, 0)
                     self.points_of_interest.append(prompt_poi)
 
         def on_key_press(symbol, modifiers):
@@ -55,6 +55,7 @@ class CtrlEgocentricView:
 
     def delete_prompt(self):
         """Delete the prompt"""
+        print("delete prompt")
         self.workspace.memory.egocentric_memory.prompt_point = None
         # Remove the selected points
         for p in self.points_of_interest:
@@ -65,43 +66,53 @@ class CtrlEgocentricView:
     def update_points_of_interest(self):
         """Retrieve all new experiences from memory, create and update the corresponding points of interest"""
 
-        # Delete the points of interest
-        self.points_of_interest = [p for p in self.points_of_interest if not p.delete()]
+        # Delete the expired points of interest
+        self.points_of_interest = [p for p in self.points_of_interest if not p.delete(self.workspace.enaction.clock)]
 
-        # Recreate the points of interest from experiences
-        for e in [e for e in self.workspace.memory.egocentric_memory.experiences.values()
-                  if (e.clock + e.durability >= self.workspace.memory.clock - 1)]:
+        # Displace the remaining points of interest
+        start_time = time.time()
+        for p in self.points_of_interest:
+            displacement_matrix = self.workspace.enaction.trajectory.displacement_matrix
+            p.displace(displacement_matrix)
+            p.fade(self.workspace.memory.clock)
+        # print(f"Displaced {len(self.points_of_interest):d} points of interest in {time.time() - start_time:.3f} seconds")
+
+        # Create the new points of interest from the new experiences
+        start_time = time.time()
+        # es = [e for e in self.workspace.memory.egocentric_memory.experiences.values() if (e.clock + e.durability >= self.workspace.memory.clock - 1)]
+        es = [e for e in self.workspace.memory.egocentric_memory.experiences.values() if e.clock == self.workspace.enaction.clock]
+        for e in es:
             if e.type == EXPERIENCE_ROBOT:  # Draw the body of the other robot
                 robot_shape = PointOfInterest(e.pose_matrix, self.view.egocentric_batch, self.view.background, POINT_ROBOT,
                                               e.clock)
-                robot_shape.fade(self.workspace.memory.clock)
+                # robot_shape.fade(self.workspace.memory.clock)
                 self.points_of_interest.append(robot_shape)
             poi = PointOfInterest(e.pose_matrix, self.view.egocentric_batch, self.view.forefront, e.type, e.clock,
-                                  color_index=e.color_index)
-            poi.fade(self.workspace.memory.clock)
+                                  e.color_index, e.durability, 0)
+            # poi.fade(self.workspace.memory.clock)
             self.points_of_interest.append(poi)
+        # print(f"Created {len(es):d} new points of interest in {time.time() - start_time:.3f} seconds")
 
-        # Re-create the focus point
+        # Re-create the focus point with durability of 1
         if self.workspace.memory.egocentric_memory.focus_point is not None:
             p = Matrix44.from_translation(self.workspace.memory.egocentric_memory.focus_point).astype(float)
             focus_poi = PointOfInterest(p, self.view.egocentric_batch, self.view.forefront, EXPERIENCE_FOCUS,
-                                        self.workspace.memory.clock)
+                                        self.workspace.memory.clock, 0, 1, 0)
             self.points_of_interest.append(focus_poi)
 
-        # Re-create the prompt point
+        # Re-create the prompt point with durability of 1
         if self.workspace.memory.egocentric_memory.prompt_point is not None:
             p = Matrix44.from_translation(self.workspace.memory.egocentric_memory.prompt_point.astype(float))
             prompt_poi = PointOfInterest(p, self.view.egocentric_batch, self.view.background, POINT_PROMPT,
-                                         self.workspace.memory.clock)
+                                         self.workspace.memory.clock, 0, 1, 0)
             self.points_of_interest.append(prompt_poi)
 
     def main(self, dt):
         """Update the egocentric view"""
-
         # Update every frame to simulate the robot's displacement
-        # self.update_body_robot()
         self.view.update_body_display(self.workspace.memory.body_memory)
-
-        # Update the display of egocentric memory
-        if self.workspace.enacter.interaction_step in [ENACTION_STEP_ENACTING, ENACTION_STEP_RENDERING]:
+        self.view.egocentric_rotate = -self.workspace.memory.body_memory.simulation_rotation_deg
+        self.view.egocentric_translate = -self.workspace.memory.body_memory.simulation_translate
+        # Update every interaction cycle to update the experiences
+        if self.workspace.enacter.interaction_step in [ENACTION_STEP_RENDERING]:
             self.update_points_of_interest()

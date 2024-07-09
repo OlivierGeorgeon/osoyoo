@@ -68,14 +68,15 @@ class Trajectory:
         if outcome.compass_point is None:
             self.body_quaternion = body_quaternion_integrated
             # Create the compass point to generate the experience and display in BodyView
-            outcome.compass_point = self.body_quaternion.inverse * Vector3([0, -330, 0])
+            outcome.compass_point = self.body_quaternion.inverse * Vector3([0, 330, 0])
             self.compass_quaternion = self.body_quaternion.copy()
         else:
             # If the robot returns compass
             # Compute the compass_quaternion. Subtract the offset from robot_define.py
             outcome.compass_point -= self.compass_offset
-            # The compass point indicates the south so we must take the opposite and rotate by pi/2
-            body_direction_rad = math.atan2(-outcome.compass_point[0], -outcome.compass_point[1])
+            # Rotate by pi/2 to get the angle from the robot's x axis
+            # body_direction_rad = math.atan2(-outcome.compass_point[0], -outcome.compass_point[1])
+            body_direction_rad = math.atan2(outcome.compass_point[0], outcome.compass_point[1])
             self.compass_quaternion = Quaternion.from_z_rotation(body_direction_rad)
 
             if outcome.clock == 0:

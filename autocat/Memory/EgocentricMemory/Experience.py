@@ -1,6 +1,6 @@
-import numpy as np
-from pyrr import matrix44, Quaternion, Vector3, Matrix44, Matrix33
-from ...Robot.RobotDefine import ROBOT_HEAD_X, ROBOT_COLOR_SENSOR_X, ROBOT_FLOOR_SENSOR_X
+from pyrr import matrix44, Quaternion, Vector3, Matrix44
+from ...Robot.RobotDefine import ROBOT_HEAD_X, ROBOT_COLOR_SENSOR_X
+from .. import EXPERIENCE_DURABILITY
 
 EXPERIENCE_LOCAL_ECHO = 1
 EXPERIENCE_CENTRAL_ECHO = 2
@@ -13,7 +13,7 @@ EXPERIENCE_PROMPT = 8
 EXPERIENCE_ROBOT = 9
 EXPERIENCE_TOUCH = 10
 EXPERIENCE_COMPASS = 11
-EXPERIENCE_AZIMUTH = 12
+EXPERIENCE_NORTH = 12
 EXPERIENCE_ALIGNED_ECHO = 13
 FLOOR_COLORS = {0: 'LightSlateGrey', 1: 'red', 2: 'darkOrange', 3: 'gold', 4: 'limeGreen', 5: 'deepSkyBlue',
                 6: 'orchid', 7: 'deepPink'}
@@ -23,8 +23,8 @@ class Experience:
     """Experiences are instances of interactions
     along with the spatial and temporal information of where and when they were enacted"""
 
-    def __init__(self, experience_id, pose_matrix, experience_type, clock, body_quaternion, durability=10,
-                 color_index=0):
+    def __init__(self, experience_id, pose_matrix, experience_type, clock, body_quaternion,
+                 durability=EXPERIENCE_DURABILITY, color_index=0):
         """Create an experience to be placed in the memory.
         Args:
         point : position of the affordance relative to the robot.
@@ -56,6 +56,10 @@ class Experience:
     def polar_pose_matrix(self):
         """Return the pose matrix in polar centric coordinates (rotated by the body_quaternion)"""
         return Matrix44(self.body_quaternion.inverse) * self.pose_matrix
+
+    def polar_point(self):
+        """Return the point of this experience in polar coordinates"""
+        return matrix44.apply_to_vector(self.polar_pose_matrix(), [0., 0., 0.])
 
     def absolute_quaternion(self):
         """Return a quaternion representing the absolute direction of this experience"""

@@ -25,6 +25,8 @@ class BodyMemory:
         self.neurotransmitters = np.array([50, 50, 50], dtype=int)  # DA, 5-HT, NA
         self.energy = 100  # [0,100] The level of energy of the robot
         self.excitation = 100  # [0, 100] The level of excitation
+        self.simulation_rotation_deg = 0
+        self.simulation_translate = np.array([0., 0., 0.])
         # self.serotonin = 50  # 5-HT
         # self.dopamine = 50  # DA
         # self.noradrenaline = 50  # NA
@@ -88,6 +90,8 @@ class BodyMemory:
         saved_body_memory.energy = self.energy
         saved_body_memory.excitation = self.excitation
         saved_body_memory.neurotransmitters[:] = self.neurotransmitters
+        saved_body_memory.simulation_rotation_deg = self.simulation_rotation_deg  # Perhaps not needed
+        saved_body_memory.simulation_translate[:] = self.simulation_translate
         # saved_body_memory.serotonin = self.serotonin
         # saved_body_memory.dopamine = self.dopamine
         # saved_body_memory.noradrenaline = self.noradrenaline

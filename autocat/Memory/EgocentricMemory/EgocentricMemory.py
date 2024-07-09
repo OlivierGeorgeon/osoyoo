@@ -3,12 +3,12 @@ import numpy as np
 from pyrr import Matrix44, Quaternion, Vector3
 from ...Memory.EgocentricMemory.Experience import Experience, EXPERIENCE_LOCAL_ECHO, EXPERIENCE_CENTRAL_ECHO, \
     EXPERIENCE_PLACE, EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_IMPACT, EXPERIENCE_ROBOT, \
-    EXPERIENCE_TOUCH, EXPERIENCE_COMPASS, EXPERIENCE_AZIMUTH
+    EXPERIENCE_TOUCH, EXPERIENCE_COMPASS, EXPERIENCE_NORTH
 from ...Robot.RobotDefine import ROBOT_COLOR_SENSOR_X, ROBOT_FLOOR_SENSOR_X, ROBOT_CHASSIS_Y, ROBOT_OUTSIDE_Y, \
     ROBOT_SETTINGS
 from ...Proposer.Action import ACTION_FORWARD, ACTION_BACKWARD, ACTION_SWIPE, ACTION_RIGHTWARD, ACTION_CIRCUMVENT, \
     ACTION_TURN
-from ...Utils import quaternion_translation_to_matrix, head_angle_distance_to_matrix, matrix_to_rotation_matrix, translation_quaternion_to_matrix
+from ...Utils import quaternion_translation_to_matrix, head_angle_distance_to_matrix, translation_quaternion_to_matrix
 
 EXPERIENCE_PERSISTENCE = 10
 
@@ -30,12 +30,12 @@ class EgocentricMemory:
         """
         # Move the existing experiences
         for experience in self.experiences.values():
-            if experience.type == EXPERIENCE_COMPASS:
-                # Get the rotation part of the displacement matrix
-                # m33 = matrix33.create_from_matrix44(enaction.trajectory.displacement_matrix)
-                # experience.displace(matrix44.create_from_matrix33(m33))
-                experience.displace(matrix_to_rotation_matrix(enaction.trajectory.displacement_matrix))
-            elif experience.type != EXPERIENCE_AZIMUTH:  # Do not move the azimuth experiences for calibration
+            # if experience.type == EXPERIENCE_COMPASS:
+            #     # Get the rotation part of the displacement matrix
+            #     # m33 = matrix33.create_from_matrix44(enaction.trajectory.displacement_matrix)
+            #     # experience.displace(matrix44.create_from_matrix33(m33))
+            #     experience.displace(matrix_to_rotation_matrix(enaction.trajectory.displacement_matrix))
+            if experience.type != EXPERIENCE_NORTH:  # Do not move the azimuth experiences for calibration
                 experience.displace(enaction.trajectory.displacement_matrix)
 
         # Add the PLACE experience with the sensed color
@@ -136,7 +136,8 @@ class EgocentricMemory:
         for e in enaction.outcome.central_echos:
             # angle = math.radians(int(e[0]))
             # point = np.array([ROBOT_HEAD_X + math.cos(angle) * e[1], math.sin(angle) * e[1], 0])
-            pose_matrix = head_angle_distance_to_matrix(int(e[0]), e[1])
+            # pose_matrix = head_angle_distance_to_matrix(int(e[0]), e[1])
+            pose_matrix = head_angle_distance_to_matrix(int(e[1]), int(e[0]))
             central_exp = Experience(experience_id=self.experience_id, pose_matrix=pose_matrix,
                                      experience_type=EXPERIENCE_CENTRAL_ECHO, clock=enaction.clock,
                                      body_quaternion=enaction.trajectory.body_quaternion,
@@ -178,7 +179,7 @@ class EgocentricMemory:
         self.experience_id += 1
         # Add the azimuth experience with durability 0
         azimuth_exp = Experience(experience_id=self.experience_id, pose_matrix=pose_m,
-                                 experience_type=EXPERIENCE_AZIMUTH, clock=enaction.clock,
+                                 experience_type=EXPERIENCE_NORTH, clock=enaction.clock,
                                  body_quaternion=enaction.trajectory.body_quaternion, durability=0, color_index=0)
         self.experiences[azimuth_exp.id] = azimuth_exp
         self.experience_id += 1

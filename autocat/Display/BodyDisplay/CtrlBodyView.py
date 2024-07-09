@@ -1,4 +1,4 @@
-from pyrr import Matrix44, Quaternion
+from pyrr import Matrix44
 import math
 import numpy as np
 from .BodyView import BodyView
@@ -7,7 +7,7 @@ from ...Robot.CtrlRobot import ENACTION_STEP_RENDERING
 from ...Workspace import KEY_DECREASE, KEY_INCREASE
 from ...Utils import quaternion_to_azimuth
 from ...Integrator.Calibrator import compass_calibration
-from ...Memory.EgocentricMemory.Experience import EXPERIENCE_COMPASS, EXPERIENCE_AZIMUTH
+from ...Memory.EgocentricMemory.Experience import EXPERIENCE_COMPASS, EXPERIENCE_NORTH
 from ...Memory.BodyMemory import DOPAMINE, SEROTONIN, NORADRENALINE
 
 KEY_OFFSET = 'O'
@@ -17,7 +17,7 @@ ENGAGEMENT_MODES = {'R': "Real", 'I': "Imaginary"}
 class CtrlBodyView:
     """Controls the body view"""
     def __init__(self, workspace):
-        self.view = BodyView(workspace)
+        self.view = BodyView()
         self.workspace = workspace
         self.points_of_interest = []
         self.last_action = None
@@ -40,7 +40,7 @@ class CtrlBodyView:
                 # self.workspace.memory_snapshot.body_memory.energy = self.workspace.memory.body_memory.energy
             if text.upper() == KEY_OFFSET:
                 # Calibrate the compass
-                points = np.array([p.point()[0: 2] for p in self.points_of_interest if (p.type == EXPERIENCE_AZIMUTH)])
+                points = np.array([p.point()[0: 2] for p in self.points_of_interest if (p.type == EXPERIENCE_NORTH)])
                 compass_xy = compass_calibration(points)
                 if compass_xy is None:
                     self.view.label2.text = "Compass calibration failed"
@@ -54,50 +54,74 @@ class CtrlBodyView:
             else:
                 self.workspace.process_user_key(text)
 
-        self.view.push_handlers(on_mouse_press, on_text)
+        def on_mouse_scroll(x, y, dx, dy):
+            """ Zooming the window or manually updating the neurotransmitter levels"""
+            if y > 90:
+                return
+                # # Zoom the view
+                # super().on_mouse_scroll(x, y, dx, dy)
+            elif y > 60:
+                # The neurotransmitter levels
+                if x < 100:
+                    self.workspace.memory.body_memory.neurotransmitters[DOPAMINE] += int(np.sign(dy))
+                elif x < 190:
+                    self.workspace.memory.body_memory.neurotransmitters[SEROTONIN] += int(np.sign(dy))
+                else:
+                    self.workspace.memory.body_memory.neurotransmitters[NORADRENALINE] += int(np.sign(dy))
+            else:
+                # The energy levels
+                if x < 150:
+                    self.workspace.memory.body_memory.energy += int(np.sign(dy))
+                else:
+                    self.workspace.memory.body_memory.excitation += int(np.sign(dy))
 
-    def add_point_of_interest(self, pose_matrix, point_type, group=None):
-        """ Adding a point of interest to the view """
-        if group is None:
-            group = self.view.forefront
-        point_of_interest = PointOfInterest(pose_matrix, self.view.polar_batch, group, point_type, self.workspace.memory.clock)
-        self.points_of_interest.append(point_of_interest)
+        self.view.push_handlers(on_mouse_press, on_text, on_mouse_scroll)
 
     def update_body_view(self):
         """Add and update points of interest from the latest enacted interaction """
+        # Delete the expired points of interest
+        self.points_of_interest = [p for p in self.points_of_interest if not p.delete(self.workspace.enaction.clock)]
 
-        # Update the robot display
-        self.view.update_body_display(self.workspace.memory.body_memory)
-        # self.view.robot.rotate_head(self.workspace.memory.body_memory.head_direction_degree())
-        # self.view.robot.emotion_color(self.workspace.memory.body_memory.emotion_code())
-        # self.view.body_rotation_matrix = self.workspace.memory.body_memory.body_direction_matrix()
+        # Fade the remaining points of interest
+        for p in self.points_of_interest:
+            p.fade(self.workspace.memory.clock)
 
-        # Delete the points of interest
-        self.points_of_interest = [p for p in self.points_of_interest if not p.delete()]
-
-        # Recreate the points of interest from experiences
+        # Create the new points of interest from the new experiences
         for e in [e for e in self.workspace.memory.egocentric_memory.experiences.values() if
-                  e.clock + 10 >= self.workspace.memory.clock and e.type in [EXPERIENCE_COMPASS, EXPERIENCE_AZIMUTH]]:
+                  e.clock == self.workspace.enaction.clock and e.type in [EXPERIENCE_COMPASS, EXPERIENCE_NORTH]]:
+            # COMPASS Big blue diamonds are shown in the robot frame
             if e.type == EXPERIENCE_COMPASS:
-                poi = PointOfInterest(e.pose_matrix, self.view.egocentric_batch, self.view.forefront, e.type, e.clock,
-                                      color_index=e.color_index)
-                # poi.fade(self.workspace.memory.clock)
-                # self.points_of_interest.append(poi)
+                poi = PointOfInterest(e.pose_matrix, self.view.robot_batch, self.view.background, e.type, e.clock,
+                                      e.color_index, 10)
+            # NORTH Small blue diamonds are shown in polar frame
             else:
-            # if e.type == EXPERIENCE_AZIMUTH:
-                poi = PointOfInterest(e.pose_matrix, self.view.egocentric_batch, self.view.background, e.type, e.clock,
-                                      color_index=e.color_index)
-            poi.fade(self.workspace.memory.clock)
+                poi = PointOfInterest(e.polar_pose_matrix(), self.view.polar_batch, self.view.forefront, e.type,
+                                      e.clock, e.color_index, 10)
             self.points_of_interest.append(poi)
 
+    def update_labels(self):
+        """update the labels in body view"""
+        label3 = f"Translation: ({self.workspace.enaction.action.translation_speed[0]:.0f}, " \
+                 f"{self.workspace.enaction.action.translation_speed[1]:.0f}) mm/s, " \
+                 f"rotation: {math.degrees(self.workspace.enaction.action.rotation_speed_rad):.1f}°/s"
+        self.view.label3.text = label3
+        label2 = f"Azimuth: {quaternion_to_azimuth(self.workspace.enaction.trajectory.body_quaternion):.0f}, " \
+                 f"offset: ({self.workspace.memory.body_memory.compass_offset[0]:d}, " \
+                 f"{self.workspace.memory.body_memory.compass_offset[1]:d}), " \
+                 f"residual: {math.degrees(self.workspace.enaction.trajectory.body_direction_delta):.1f}"
+        self.view.label2.text = label2
+
     def main(self, dt):
-        """Called every frame. Update the body view"""
+        """Update the body view every frame"""
         # The position of the robot in the view
         self.view.robot_rotate = 90 - self.workspace.memory.body_memory.body_azimuth()
-
+        self.view.update_body_display(self.workspace.memory.body_memory)
+        # Neurotransmitter display
         self.view.label_5HT.text = f"5-HT: {self.workspace.memory.body_memory.neurotransmitters[SEROTONIN]:d}"
-        self.view.label_5HT.color = (0, 0, 0, 255) if self.workspace.memory.body_memory.neurotransmitters[SEROTONIN] >= 50 \
-            else (255, 0, 0, 255)
+        if self.workspace.memory.body_memory.neurotransmitters[SEROTONIN] >= 50:
+            self.view.label_5HT.color = (0, 0, 0, 255)
+        else:
+            self.view.label_5HT.color = (255, 0, 0, 255)
         self.view.label_DA.text = f"DA: {self.workspace.memory.body_memory.neurotransmitters[DOPAMINE]:d}"
         if self.workspace.memory.body_memory.neurotransmitters[DOPAMINE] >= 50:
             self.view.label_DA.color = (0, 0, 0, 255)
@@ -108,30 +132,13 @@ class CtrlBodyView:
             self.view.label_NA.color = (0, 0, 0, 255)
         else:
             self.view.label_NA.color = (255, 0, 0, 255)
-        self.view.label1.text = "Clock: {:d}".format(self.workspace.memory.clock) \
-                                + " | " + ENGAGEMENT_MODES[self.workspace.engagement_mode] \
-                                + " | " + self.workspace.decider_id
+        # Engagement mode display
+        self.view.label1.text = f"Clock: {self.workspace.memory.clock} | " \
+                                f"{ENGAGEMENT_MODES[self.workspace.engagement_mode]} | {self.workspace.decider_id}"
         # + ", En:{:d}%".format(self.workspace.memory.body_memory.energy) \
         # + ", Ex:{:d}%".format(self.workspace.memory.body_memory.excitation) \
 
-        # During the interaction:update the head direction
-        self.view.robot.rotate_head(self.workspace.memory.body_memory.head_direction_degree())
         # At the end of interaction
-        if self.workspace.enacter.interaction_step == ENACTION_STEP_RENDERING and self.workspace.enaction.outcome is not None:
-            self.view.label2.text = self.body_label_azimuth(self.workspace.enaction)
-            self.view.label3.text = self.body_label(self.workspace.enaction.action)
+        if self.workspace.enacter.interaction_step == ENACTION_STEP_RENDERING:
+            self.update_labels()
             self.update_body_view()
-
-    def body_label(self, action):
-        """Return the label to display in the body view"""
-        # rotation_speed = "{:.1f}°/s".format(math.degrees(action.rotation_speed_rad))
-        label = f"Translation: ({action.translation_speed[0]:.0f}, {action.translation_speed[1]:.0f}) mm/s, " \
-                f"rotation: {math.degrees(action.rotation_speed_rad):.1f}°/s"
-        return label
-
-    def body_label_azimuth(self, enaction):
-        """Return the label to display in the body view"""
-        return "Azimuth: " + str(quaternion_to_azimuth(enaction.trajectory.body_quaternion)) + \
-               ", offset: ({:d}, {:d})".format(self.workspace.memory.body_memory.compass_offset[0], self.workspace.memory.body_memory.compass_offset[1]) + \
-               ", residual: {:.1f}".format(math.degrees(enaction.trajectory.body_direction_delta))
-        # ", compass: " + str(quaternion_to_azimuth(enaction.trajectory.compass_quaternion)) + \
