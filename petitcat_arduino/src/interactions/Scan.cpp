@@ -28,13 +28,13 @@ void Scan::begin()
   if (_head_angle > 0)
   {
     // If head is to the left, start from 80° and scan clockwise
-    _head_angle = 80;
+    _head_angle = 90;
     _head_angle_span = -_span;
   }
   else
   {
     // If head is to the right, start from -80° and scan counterclockwise
-    _head_angle = -80;
+    _head_angle = -90;
     _head_angle_span = _span;
   }
   _angle_min_ultrasonic_measure = _head_angle;
@@ -56,8 +56,8 @@ void Scan::ongoing()
       _min_ultrasonic_measure = _current_ultrasonic_measure;
       _angle_min_ultrasonic_measure = _head_angle;
     }
-    _sign_array.distances[_current_index] = _current_ultrasonic_measure;
-    _sign_array.angles[_current_index] = _head_angle;
+    distances[_current_index] = _current_ultrasonic_measure;
+    angles[_current_index] = _head_angle;
     // The string conversion seems to modify _head_angle in some circumstances
 //     Serial.println("Index: " + String(_current_index) + ", angle: " + String(_head_angle) + ", distance: "+ String(_current_ultrasonic_measure));
     Serial.print("Index: "); Serial.print(_current_index);
@@ -90,15 +90,15 @@ void Scan::outcome(JSONVar & outcome_object)
 {
   JSONVar echos;
   // bool has_echo = false;
-  for (int i = 0; i < MAX_SACCADES; i++)
+  for (int i = 0; i < MAX_SCANS; i++)
   {
-    if (_sign_array.distances[i] > 0 and _sign_array.distances[i] < NO_ECHO_DISTANCE)
+    if (distances[i] > 0 and distances[i] < NO_ECHO_DISTANCE)
     {
       //  https://cpp4arduino.com/2018/11/21/eight-tips-to-use-the-string-class-efficiently.html
       //  char angle_string[10]; // sprintf(angle_string, 4, "%i", _sign_array.angles[i]);
       //  itoa(_sign_array.angles[i], angle_string, 10);
       //  echos[angle_string] = _sign_array.distances[i];
-      echos[String(_sign_array.angles[i])] = _sign_array.distances[i];
+      echos[String(angles[i])] = distances[i];
       // has_echo = true;
     }
   }
