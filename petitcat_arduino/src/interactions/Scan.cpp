@@ -89,7 +89,6 @@ void Scan::ongoing()
 void Scan::outcome(JSONVar & outcome_object)
 {
   JSONVar echos;
-  // bool has_echo = false;
   for (int i = 0; i < MAX_SCANS; i++)
   {
     if (distances[i] > 0 and distances[i] < NO_ECHO_DISTANCE)
@@ -99,9 +98,8 @@ void Scan::outcome(JSONVar & outcome_object)
       //  itoa(_sign_array.angles[i], angle_string, 10);
       //  echos[angle_string] = _sign_array.distances[i];
       echos[String(angles[i])] = distances[i];
-      // has_echo = true;
     }
   }
-  // if (has_echo) // May return an empty echo dictionary
+  // May return an empty echo dictionary
   outcome_object["echos"] = echos;
 }

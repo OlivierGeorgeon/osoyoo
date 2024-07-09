@@ -4,6 +4,7 @@ import math
 import numpy as np
 import pandas as pd
 import open3d as o3d
+import matplotlib.pyplot as plt
 from . import MIN_PLACE_CELL_DISTANCE, ICP_DISTANCE_THRESHOLD, ANGULAR_RESOLUTION, MASK_ARRAY
 from ...Robot import NO_ECHO_DISTANCE
 from ...Utils import cartesian_to_polar
@@ -29,44 +30,41 @@ def transform_estimation_cue_to_cue(points1, points2, threshold=ICP_DISTANCE_THR
         # , loss = o3d.pipelines.registration.TukeyLoss(k=0.2)
     )
     # Compute the similarity
-    if len(reg_p2p.correspondence_set) == 0:
+    correspondence_set = np.asarray(reg_p2p.correspondence_set)
+    if len(correspondence_set) == 0:
         print("ICP no match")
-        standard_distance = -1
+        average_distance = -1
         mse = -1
     else:
+        # Print the correspondence
         for i, j in np.asarray(reg_p2p.correspondence_set):
             t = np.sqrt(np.linalg.norm(np.asarray(pcd1.points)[i] - np.asarray(pcd2.points)[j])**2)
             print(f"Match {np.asarray(pcd1.points)[i, 0:2]} - {np.asarray(pcd2.points)[j, 0:2]} = {t:.0f}")
-        standard_distance = np.sqrt(np.mean([np.linalg.norm(np.asarray(pcd1.points)[i] - np.asarray(pcd2.points)[j])**2
-                       for i, j in np.asarray(reg_p2p.correspondence_set)]))
-        print(f"ICP average distance: {standard_distance:.0f}, fitness: {reg_p2p.fitness:.2f}")
 
-        # Check if correspondence_set is empty
-        if len(reg_p2p.correspondence_set) == 0:
-            print("Correspondence set is empty.")
-            return None, None, None
+        average_distance = np.mean([np.linalg.norm(np.asarray(pcd1.points)[i] - np.asarray(pcd2.points)[j])
+                                    for i, j in correspondence_set])
+        print(f"ICP average source-target distance: {average_distance:.0f}, fitness: {reg_p2p.fitness:.2f}")
 
         # Apply the transformation to the source cloud
         pcd1.transform(reg_p2p.transformation)
+        source_points_transformed = np.asarray(pcd1.points)
 
         # Compute the distances between corresponding points
-        correspondence_set = np.asarray(reg_p2p.correspondence_set)
-        source_points_transformed = np.asarray(pcd1.points)
         target_points_corresponding = np.asarray(pcd2.points)[correspondence_set[:, 1]]
 
         distances = np.linalg.norm(
             source_points_transformed[correspondence_set[:, 0]] - target_points_corresponding, axis=1
         )
 
-        # Compute Mean Squared Error (MSE)
-        mse = np.sqrt(np.mean(distances ** 2))
+        # Compute Mean (not Squared Error MSE)
+        residual_distance = np.mean(distances)
 
         # Compute the proportion of good correspondences
         good_correspondences_ratio = np.mean(distances < threshold)
         # print(f"ICP residual average distance: {mse:.0f}, nb close {good_correspondences_ratio}")
 
     # Return the resulting transformation
-    return reg_p2p, mse  # .transformation
+    return reg_p2p, residual_distance, source_points_transformed  # .transformation
 
 
 def nearby_place_cell(robot_point, place_cells):
@@ -126,13 +124,44 @@ def compare_place_cells(place_cells):
     for i in range(len(place_cells)):
         k1 = keys[i]
         if place_cells[k1].is_fully_observed():
-            points1 = [c.point() for c in place_cells[k1].cues if c.type == EXPERIENCE_CENTRAL_ECHO]
+            points1 = np.array([c.point() for c in place_cells[k1].cues if c.type == EXPERIENCE_CENTRAL_ECHO])
+            np.savetxt(f"log/20_Cell_{k1}.txt", points1)
             for j in range(i + 1, len(place_cells)):
                 k2 = keys[j]
                 if place_cells[k2].is_fully_observed():
-                    points2 = [c.point() for c in place_cells[k2].cues if c.type == EXPERIENCE_CENTRAL_ECHO]
-                    reg_p2p, residual_distance = transform_estimation_cue_to_cue(points1, points2)
+                    points2 = np.array([c.point() for c in place_cells[k2].cues if c.type == EXPERIENCE_CENTRAL_ECHO])
+                    reg_p2p, residual_distance, points_transformed = transform_estimation_cue_to_cue(points1, points2)
                     print("Transformation\n", reg_p2p.transformation)
                     print(f"Compare cell {k1} to cell {k2}: "
                           f"translation: {tuple(-reg_p2p.transformation[0:2,3].astype(int))}, "
                           f"residual distance: {residual_distance:.0f}, fitness: {reg_p2p.fitness:.2f}")
+                    plot_correspondences(points1, points2, points_transformed,
+                                         np.asarray(reg_p2p.correspondence_set), k1, k2)
+
+
+def plot_correspondences(source_points, target_points, source_points_transformed, correspondence_set, k1, k2):
+    plt.figure()
+
+    # Plot original source points in red
+    plt.scatter(source_points[:, 0], source_points[:, 1], c='r', label=f"Place {k1}", marker="s")
+
+    # Plot transformed source points in blue
+    plt.scatter(source_points_transformed[:, 0], source_points_transformed[:, 1], c='b',
+                label=f"Place {k1} moved to {k2}")
+
+    # Plot target points in green
+    plt.scatter(target_points[:, 0], target_points[:, 1], c='g', label=f"Place {k2}")
+
+    # Plot lines connecting corresponding points
+    for idx in correspondence_set:
+        i, j = idx
+        plt.plot([source_points[i, 0], target_points[j, 0]],
+                 [source_points[i, 1], target_points[j, 1]], c='k')
+
+    plt.legend()
+    plt.xlabel('West-East')
+    plt.ylabel('South-North')
+    plt.title(f"Place {k1} to Place {k2}")
+    # plt.show()
+    plt.savefig(f"log/20_match_{k1}_{k2}.pdf")
+    plt.close()
