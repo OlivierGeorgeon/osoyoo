@@ -125,7 +125,7 @@ PetitCat.ino == autocat_enacter.ino == petitcat_arduino.ino
 
 https://github.com/OlivierGeorgeon/osoyoo/blob/master/petitcat_arduino/petitcat_arduino.ino
 
----> Go to this GitHub folder. You will see that in addition to the main code PetitCat.ino == autocat_enacter.ino there are a good number of header .h and code .cpp files. All these will need to be cloned and copied into the IDE later. 
+---> Go to this GitHub folder. You will see that in addition to the main code PetitCat.ino == petitcat_arduino.ino there are a good number of header .h and code .cpp files. All these will need to be cloned and copied into the IDE later. 
 
 -
 -
