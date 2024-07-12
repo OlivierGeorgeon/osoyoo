@@ -61,7 +61,7 @@ class PlaceMemory:
             self.observe_better = False
 
         # Print a comparison between place cells based on local echoes if available
-        compare_place_cells(self.place_cells)
+        # compare_place_cells(self.place_cells)
 
         return position_correction
 
