@@ -30,7 +30,7 @@ The "Easy-to-Read Overview" of the project is divided into a number of parts:
 
 **Part III:** Interfacing your Python Code with the PetitCat Project
 
-**Part IV:** Modifying the C/C++ for your Selected Embodiment
+**Part IV:** Modifying the C/C++ for your Selected Robotic Embodiment
 
 **Part V:** Integration of PetitCat with a Causal Cognitive Architecture
 
@@ -47,7 +47,7 @@ The PetitCat documentation is written so that anyone with a basic education can 
 
 -Part III is where the PetitCat project becomes more useful -- interfacing the Python code of your AI/AGI project with the PetitCat projects.
 
--Part IV allows you to modify the Arduino C/C++ code to use other embodiments than the default robot car, or to add addtional sensors and actuators to the robot car.
+-Part IV allows you to modify the Arduino C/C++ code to use other robotic embodiments than the default robot car, or to add addtional sensors and actuators to the robot car.
 
 -In Part V and VI we will integrate the PetitCat project with a cognitive architecture and then a large language model. Again, in this part, only intermediate (or even novice) Python coding abilities are required. However, we will gently guide you through the project, so that you end up with a super-human intelligent grounded autonomous robot system.
 
