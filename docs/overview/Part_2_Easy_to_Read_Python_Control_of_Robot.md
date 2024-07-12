@@ -221,7 +221,7 @@ You now need to tell the software what your Wi-Fi SSID and password are.
 
 For example, if the name of the network you log into is "Jones" then your SSID is "Jones" and if the password to log into your Wi-Fi is "test1234" then your password is "test1234".
 
---> Look at lines 180 and 181 (or equivalent lines if the software has changed since the time of this writing).  Modify the lines as follows:
+--> Look at lines 10 and 11 (or equivalent lines if the software has changed since the time of this writing).  Modify the lines as follows:
 
 char ssid[] = "Jones"
 
