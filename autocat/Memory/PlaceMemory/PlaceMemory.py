@@ -32,8 +32,6 @@ class PlaceMemory:
             self.create_place_cell(memory.allocentric_memory.robot_point, experiences)
             return np.array([0, 0, 0])
 
-        # Print a comparison between place cells based on local echoes if available
-        compare_place_cells(self.place_cells)
         # local_echo_points = [e.polar_point() for e in experiences if e.type == EXPERIENCE_LOCAL_ECHO]
         # if len(local_echo_points) > 10:
         #     self.probable_place_cell(memory.allocentric_memory.robot_point, local_echo_points)
@@ -61,6 +59,9 @@ class PlaceMemory:
         else:
             # Print similarities with other fully observed place cells
             self.observe_better = False
+
+        # Print a comparison between place cells based on local echoes if available
+        # compare_place_cells(self.place_cells)
 
         return position_correction
 

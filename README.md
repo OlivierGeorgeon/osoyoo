@@ -1,36 +1,14 @@
-# PetitCat
+# The PetitCat Project
 
-The PetitCat project allows any hobbyist, student, or AI researcher to have access to low-cost and readily available robotic parts to experiment generating life-like behaviors in robots.
+The PetitCat Project uses open source software combined with open source hardware to enable the Python code of an AI project to interface on a real-time basis via Wi-Fi with lower-level C/C++ compiled code of a robotic embodiment. 
+It implements the low-level layers of a Brain-Inspired Cognitive Architecture (BICA) to generate autonomous behaviors.
 
-AI researcher's use it for their tens of thousands of lines of Python code running on a laptop/desktop/server to bidirectionally access a mobile robot via ordinary Wi-Fi.
-
-The PetitCat project uses the free Arduino IDE to support a myriad of microcontroller boards which can control a variety of mobile robotic platforms based on open-source hardware.
-Our demonstrations are built on top of the [Osoyoo](https://osoyoo.com/2022/07/05/v2-metal-mecanum-wheel-robotic-lesson1-robot-car-assembly-model-2021006600/) platform but similar platforms could be used such as [Elegoo](https://elegoofrance.fr/products/elegoo-projet-smart-robot-car-kit-v-4-0-avec-camera-livraison-24-48-h), [4tronics](https://4tronix.co.uk/blog/?p=169), [Adafruit](https://www.adafruit.com/product/1639), [XiaoR](https://www.xiaorgeek.net/products/xiaor-geek-arduino-uno-r3-wifi-smart-programmable-robot-car), etc.
-
-The cost of all parts including the Arduino board is approximately US$120 at the time of writing, i.e., orders of magnitude less costly (and less complex) than typical robotic embodiments purchased by research laboratories. For details about the Osoyoo robot car as well as ordering parts, please see:
-[Howard Schneider's full tutorial](docs/overview/Part_1_Easy_to_Read_Overview.md) 
-
+The project has lower cost software and hardware requirements than robotic projects utilizing more formal frameworks such as ROS2. 
+Of more importance, the PetitCat Project readily allows the researcher to customize the project to her/his research requirements, and involves a modest learning curve. 
+While the PetitCat Project was initially created to allow symbol grounding, enaction, active inference, predictive coding, and developmental and constructivist learning, it is suitable for a wide range of people, from the student to the serious AI/AGI/BICA researcher.
 
 ![petitcat logo](docs/petitcat_padding.png)
 
--
-
-<h2 style="font-size: 24px;">The PetitCat Project - TL;DR </h2>
-
-
-The PetitCat Project uses open source software combined with open source hardware to enable the Python code of an AI/AGI project to interface on a real-time basis via Wi-Fi with lower-level C/C++ compiled code of a robotic embodiment. The project has lower cost software and hardware requirements than robotic projects utilizing more formal frameworks such as ROS2. Of more importance, the PetitCat Project readily allows the researcher to customize the project to her/his research requirements, and involves a very modest learning curve. While the PetitCat Project was initially created to allow symbol grounding, enaction, active inference, predictive coding, and developmental and constructivist learning, it is suitable for a wide range of people, from the student to the serious AI/AGI researcher.
-
-<p align="center">
- <img src="openhardwarelogo.png" width=250" height="250">
-</p>
-
-<p align="center">
- <img src="mitlicense.png" width=250" height="250">
-</p>
-
-<p align="center">
- <img src="opensource.png" width=250" height="250">
-</p>
 
 ## Repository architecture
 
@@ -83,3 +61,17 @@ French additional information:
 Georgeon, O. L., Lurie, D.,  Robertson, P. (2024). 
 Artificial enactive inference in three-dimensional world. Cognitive Systems Research, 101234. [doi:10.1016/j.cogsys.2024.101234](https://doi.org/10.1016/j.cogsys.2024.101234).
 ([PDF](https://hal.science/hal-04587508)).
+
+# License
+
+Copyright 2024 AFPICP and CNRS
+
+Licensed under the Creative Common, CC-BY Version 4.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at https://creativecommons.org/licenses/by/4.0/ .
+Software distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+
+![CC BY](CC-BY.png)
+![open source hardware](openhardwarelogo.png)
+
