@@ -75,6 +75,17 @@ class PlaceCell:
         """Return True if the echo curve's radius is never zero"""
         return min(self.polar_echo_curve[:, 0]) > 0
 
+    def translation_estimate_aligned_echo(self, point):
+        """Return the translation to this place cell estimate by adjusting the point to the polar echo curve"""
+        cue_direction_rad = math.atan2(point[1], point[0])
+        cue_direction_deg = round(math.degrees(cue_direction_rad))
+        r = self.polar_echo_curve[cue_direction_deg // ANGULAR_RESOLUTION, 0]
+        distance = r - np.linalg.norm(point)
+        translation = np.array([distance * math.cos(cue_direction_rad), distance * math.sin(cue_direction_rad), 0])
+        print(f"Translation estimate from echo at ({r:.0f} mm, {cue_direction_deg}°): "
+              f"{tuple(translation[:2].astype(int))}")
+        return translation
+
     def save(self):
         """Return a cloned place cell for memory snapshot"""
         saved_place_cell = PlaceCell(self.point, [cue.save() for cue in self.cues])

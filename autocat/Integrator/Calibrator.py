@@ -17,7 +17,7 @@ def compass_calibration(points):
             xc, yc, r, sigma = cf.taubinSVD(points)
             # If the circle is in bounds and not too far off
             if MIN_OFFSET_RADIUS < r < MAX_OFFSET_RADIUS and np.linalg.norm([xc, yc]) < MAX_OFFSET_DISTANCE:
-                print(f"Fit circle offset=({xc:.0f}, {yc:.0f}) radius= {r:.0f}) sigma= {sigma:.2f}")
+                print(f"Fit circle offset=({xc:.0f}, {yc:.0f}), radius= {r:.0f}, sigma= {sigma:.2f}")
                 return round(xc), round(yc)
             else:
                 print(f"Compass calibration failed. Radius out of bound: {r:.0f}, or too off-center")

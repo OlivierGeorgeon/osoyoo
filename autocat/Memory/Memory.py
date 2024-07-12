@@ -65,7 +65,7 @@ class Memory:
 
         # Create or update place cell
         position_correction = self.place_memory.add_or_update_place_cell(self)
-        print("Adjust the robot's position to place cell", position_correction)
+        print(f"Adjust the robot's position to place cell by {tuple(position_correction[:2].astype(int))}")
         self.allocentric_memory.robot_point += position_correction
 
         """Update allocentric memory on the basis of body, phenomenon, and egocentric memory"""

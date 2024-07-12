@@ -2,9 +2,11 @@ import numpy as np
 import networkx as nx
 from pyrr import Matrix44
 import copy
+from . import MIN_PLACE_CELL_DISTANCE
 from ...Memory.PlaceMemory.PlaceCell import PlaceCell
 from ...Memory.PlaceMemory.Cue import Cue
-from ...Memory.EgocentricMemory.Experience import EXPERIENCE_COMPASS, EXPERIENCE_NORTH, EXPERIENCE_CENTRAL_ECHO, EXPERIENCE_LOCAL_ECHO
+from ...Memory.EgocentricMemory.Experience import EXPERIENCE_COMPASS, EXPERIENCE_NORTH, EXPERIENCE_CENTRAL_ECHO, \
+    EXPERIENCE_LOCAL_ECHO, EXPERIENCE_ALIGNED_ECHO
 from .PlaceGeometry import nearby_place_cell, transform_estimation_cue_to_cue, compare_place_cells
 
 
@@ -32,19 +34,27 @@ class PlaceMemory:
             self.create_place_cell(memory.allocentric_memory.robot_point, experiences)
             return np.array([0, 0, 0])
 
-        # local_echo_points = [e.polar_point() for e in experiences if e.type == EXPERIENCE_LOCAL_ECHO]
-        # if len(local_echo_points) > 10:
-        #     self.probable_place_cell(memory.allocentric_memory.robot_point, local_echo_points)
-
         # Find the closest cell if any
         existing_id = nearby_place_cell(memory.allocentric_memory.robot_point, self.place_cells)
 
         # If the robot is near a known cell (the same or another)
         if existing_id > 0:
-            # Update the cell and adjust the robot position
             print(f"Robot at existing place {existing_id}")
-            position_correction = self.add_cues_relative_to_center(existing_id, memory.allocentric_memory.robot_point,
-                                                                   experiences)
+            if self.place_cells[existing_id].is_fully_observed():
+                # If the cell is fully observed, adjust the robot's position based on aligned echo
+                align_experiences = [e for e in memory.egocentric_memory.experiences.values() if (e.clock >= memory.clock) and
+                                     e .type == EXPERIENCE_ALIGNED_ECHO]
+                if len(align_experiences) > 0:
+                    point = align_experiences[0].polar_point()
+                    point += self.place_cells[existing_id].point - memory.allocentric_memory.robot_point
+                    position_correction = self.place_cells[existing_id].translation_estimate_aligned_echo(point)
+                    if np.linalg.norm(position_correction) > MIN_PLACE_CELL_DISTANCE:
+                        # Don't make the correction if too far off
+                        position_correction = 0
+            # If the cell is not fully observed, add the cues
+            else:
+                self.add_cues_relative_to_center(existing_id, memory.allocentric_memory.robot_point, experiences)
+
         # If the robot is not near a known cell
         else:
             # Create a new place cell
@@ -61,7 +71,7 @@ class PlaceMemory:
             self.observe_better = False
 
         # Print a comparison between place cells based on local echoes if available
-        # compare_place_cells(self.place_cells)
+        compare_place_cells(self.place_cells)
 
         return position_correction
 
