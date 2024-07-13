@@ -159,7 +159,7 @@ Table 2: IMU Wiring
 |SCL|SCL|
 |SDA|SDA|
 
-![image](assets/gy86wiring.jpg)
+![image](/OlivierGeorgeon/osoyoo/tree/master/docs/wiki/assets/gy86wiring.jpg)
 Figure 1: wiring of GY-86 imu
 
 # Connect the color sensor
