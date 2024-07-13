@@ -99,9 +99,30 @@ Pending documentation....
 -
 -
 -
+
+![oliviermotorwiring](oliviermotorwiring.jpg)
 -
 
-**Step # --What is a Cognitive Architecture? --**
+
+
+ We will also further modify the robot car, starting with changing the wiring of the servomechanism shortly below. Then we will go on to further modify our robot car with a digital compass, inertial measurement unit and a color sensor. Then we will consider the Python code controlling all this. If you don't know how to code in Python there are many excellent free courses available and you can still do this project. (However, I am assuming anyone doing this project and wanting to interface real-world hardware with their Python code, knows how to code the latter.) Then we will move on to consider Active Inference and how the robot car demonstrates this important principle. 
+
+You made it this far, and you will succeed again in this part.  Get on that horse. Saddle up!!  
+
+
+
+
+
+
+-
+
+<h1 style="font-size: 24px;">Step #2 -- Rewiring the ServoMechanism</h1>
+
+
+
+## The head servo is overheating
+
+
 
 .....
 
