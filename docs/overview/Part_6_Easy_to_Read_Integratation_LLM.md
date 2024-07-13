@@ -99,17 +99,17 @@ Pending documentation....
 
 
 
+<h1 style="font-size: 24px;">Step # -- What is a Large Language Model? </h1>
 
-
-
-**Step # --What is a Large Language Model? --**
 
 
 .....
 
-.....
 
-![robotllm.jpg](robotllm.jpg)
+
+<img src="robotllm.jpg" width="370" height="370">
+
+
 
 -
 -
