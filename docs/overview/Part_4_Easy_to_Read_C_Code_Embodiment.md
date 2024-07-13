@@ -235,7 +235,7 @@ Large blue squares are compass points relative to the robot's orientation.
 As the robot turns around, they draw a circle around the robot. The better this circle is centered on the robot, the better the compass is calibrated. 
 Small blue squares are compass points in an absolute position. The closest they are to each other, the better the compass and the gyroscope are calibrated.
 
-![image](assets/bodymemoryview.png)
+![image](/docs/wiki/assets/bodymemoryview.png)
 
 _Figure 1: Body Memory View. Large blue squares forming a circle: estimated positions of the south on each step relative to the robot's orientation. Small blue squares at the bottom: estimated positions of the south on each step in absolute position._
 
@@ -264,7 +264,7 @@ We use the linear accelerometer to detect impacts with obstacles.
 Figure 2 shows an example `Outcome` packet received by the PC from the robot. 
 The non-nul `impact` field indicates that the robot detected an impact.
 
-![image](assets/terminalwindow.png)
+![image](/docs/wiki/assets/terminalwindow.png)
 
 _Figure 2: The Terminal window in PyCharm. The outcome packet contains the fields `impact`, `max_x_acc`, and `min_x_acc` used to calibrate the accelerometer._
 
