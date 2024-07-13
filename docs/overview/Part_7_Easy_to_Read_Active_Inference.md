@@ -56,7 +56,7 @@ The PetitCat documentation is written so that anyone with a basic education can 
 
 -Part IV allows you to modify the Arduino C/C++ code to use other robotic embodiments than the default robot car, or to add addtional sensors and actuators to the robot car.
 
--In Part V and VI we will integrate the PetitCat project with a cognitive architecture and then a large language model. Again, in this part, only intermediate (or even novice) Python coding abilities are required. However, we will gently guide you through the project, so that you end up with a super-human intelligent grounded autonomous robot system.
+-In Parts V and VI we will integrate the PetitCat project with a cognitive architecture and then a large language model. Again, in this part, only intermediate (or even novice) Python coding abilities are required. However, we will gently guide you through the project, so that you end up with a super-human intelligent grounded autonomous robot system.
 
 -Part VII really only requires some knowledge of Python. You do not have to be an expert developer. More important, is perhaps a background in AI or cognitive science. However, there is no real background prerequisite here. Regardless of the reader's background, we provide gentle tutorials on a number of topics, and guide the learner through the concepts of active inference and implementing it in the PetitCat project.
 
