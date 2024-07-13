@@ -127,6 +127,87 @@ Ironically, the Kumon system focused on methods which are antithetical to the pr
 
 <h1 style="font-size: 24px;">i : Does Basic Robotic Car and Wi-Fi Control Work? </h1>
 -
+-Open the Arduino IDE.
+
+-Click 'Open' and load in m2-lesson5b.ino 
+-Then attach the USB cable to the Arduino board connector on the robot car.
+
+-You may now need to tell the software what your Wi-Fi SSID and password are (if this isn't already there from Part II).
+
+For example, if the name of the network you log into is "Jones" then your SSID is "Jones" and if the password to log into your Wi-Fi is "test1234" then your password is "test1234".
+
+--> Look at lines 10 and 11 (or equivalent lines if the software has changed since the time of this writing).  Modify the lines as follows:
+
+char ssid[] = "Jones"
+
+char pass[] = "test1234"
+
+![ssid](ssid.png)
+
+
+
+-Now click the upload arrow (green arrow inside a circle at the top left corner).
+
+-The software in m2-lesson5b.ino (modified with your Wi-Fi SSID and password) will now be uploaded to the Arduino board in your robotic car.
+
+![lesson5b](lesson5b.png)
+
+
+
+-Now open the Serial Monitor on the Arduino IDE. You will see something like this written:
+
+![ipconnected](ipconnected.png)
+
+Write down the IP address you, in this example, it would be "10.0.0.41" -- you will need this address for the App running on your smartphone -- it will tell the App where the robot car is connected.
+
+
+--Phone APP software--
+
+You have already downloaded the phone app in Part I and Part II. 
+
+In case you did not do this or you un-installed the app from your phone:
+
+-If you have an Apple phone then you will go to the Apple Store
+
+-However, since I have an Android phone (Pixel 7) I will go to the Google Play store
+
+-The Osoyoo Manual Lesson 5 advises to search "Osoyoo Wifi UDP Robot Car Controller"
+
+-Unfortunately when I do this search (Feb 9, 2024) the only app that appears in the Google Play store is "Osoyoo IoT UDP Robot APP" -- well, better than nothing, and maybe it will do the same thing.... so this app is installed on my Android cellphone
+
+
+---> Your smartphone App is installed. (Whether it is called "Osoyoo Wifi UDP Robot Car Controller" or "Osoyoo IoT UDP Robot APP").
+
+Now we have to go to the settings section of the phone App.
+
+-Ok we open the Osoyoo IoT UDP Robot APP
+
+-Then go to Settings and enter the IP address we saw in the Serial Monitor. In this example, we would enter "10.0.0.41" (you will enter, of course, the IP address your Serial Monitor showed you -- this is the address the robot car is using).
+
+-You can leave the other settings such as the default Ports unchanged
+
+Your smartphone App should now be able to control your robot car. Let's try it out.
+
+-Ok...now go to the main page of the app.
+
+![appsmall](appsmall.png)
+
+-Ok... turn on the robot car
+
+-Now, let's click a button on the app.... go forward
+
+The car goes forward.
+
+Click backwards, left and right.
+
+They all work .... we can control the robot car via Wi-Fi. Note that both the robot car and cellphone are attached to the same house/workplace Wi-Fi router.
+
+(If this does not work, then go back to Parts 1 and 2 to troubleshoot any issues you may be having with your hardware, software or Wi-Fi environment.)
+
+<p align="center">
+ <img src="wifiworks.jpg" width="550" height="550">
+</p>
+
 -
 
 <h1 style="font-size: 24px;">ii : Does Robotic Car and Python Wi-Fi Control Work? </h1>
