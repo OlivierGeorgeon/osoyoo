@@ -73,7 +73,7 @@ At this point your robot car should be controllable from Python code running on 
 
 Ok... you successfully completed Part II and have a robot car you can control from your Python code. Now here you are. In this Part III we will start doing a bit more serious work. But, regardless of your skill level or experience, do not worry -- this manual will gently guide you through the steps.
 
-In this Part III we will explore a bit more the software we just finished compiling and installing in Part II. We will transition to a Python module which you can use with your existing AI/AGI software, albeit, Python code. Thus, you will readily have a grounded embodiment for your AI/AGI code with a very reasonable learning curve. If you are a student and don't have pre-existing AI/AGI software, then we will create some. (In future parts you will be provided with the source code for a full cognitive architecture and can interface that to the robotic car or other robotic embodiment you are using.
+In this Part III we will explore a bit more the software we just finished compiling and installing in Part II. We will transition to a Python module which you can use with your existing AI/AGI software, albeit, Python code. Thus, you will readily have a grounded embodiment for your AI/AGI code with a very reasonable learning curve. If you are a student and don't have pre-existing AI/AGI software, then we will create some. (In future parts you will be provided with the source code for a full cognitive architecture and can interface that code to the robotic car or other robotic embodiment you are using.)
 
 You made it this far, and you will succeed again in this part.  Get on that horse. Saddle up!!  
 
@@ -83,6 +83,39 @@ You made it this far, and you will succeed again in this part.  Get on that hors
 </p>
 
 
+<h1 style="font-size: 24px;">Step #2 -- </h1>
+
+
+
+<h1 style="font-size: 24px;">Step #3 -- </h1>
+-
+
+
+<h1 style="font-size: 24px;">Step #4 -- </h1>
+-
+
+
+
+<h1 style="font-size: 24px;">Step #5 -- </h1>
+-
+
+
+
+-
+
+
+
+<h1 style="font-size: 24px;">Step #1 -- Time to Get Serious</h1>
+-
+
+
+
+<h1 style="font-size: 24px;">Step #1 -- Time to Get Serious</h1>
+-
+
+
+
+<h1 style="font-size: 24px;">Step #1 -- Time to Get Serious</h1>
 
 -
 
