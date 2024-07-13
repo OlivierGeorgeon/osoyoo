@@ -28,22 +28,19 @@ class PlaceCell:
         """Return the hash to use place cells as nodes in networkx"""
         return hash(self.key)
 
-    def translation_estimation_local_echo(self, points):
+    def translation_estimation_echo(self, points, experience_type=EXPERIENCE_LOCAL_ECHO):
         """Return the vector of the position defined by previous cues minus the position by the new cues"""
-        translation = np.array([0, 0, 0])
-
         # Translation estimation based on echoes
-        place_echo_points = np.array([c.point() for c in self.cues if c.type in [EXPERIENCE_LOCAL_ECHO]])
+        place_echo_points = np.array([c.point() for c in self.cues if c.type == experience_type])
         reg_p2p, residual_distance, points_transformed = transform_estimation_cue_to_cue(
             points, place_echo_points, MIN_PLACE_CELL_DISTANCE)
 
         # Move the robot in the same direction as moving the new local echoes to the place cell
-        translation = reg_p2p.transformation[0:3, 3]
+        translation = np.array(reg_p2p.transformation[0:3, 3])
         rotation_deg = math.degrees(quaternion_to_direction_rad(Quaternion.from_matrix(reg_p2p.transformation[:3, :3])))
-        print(f"Estimation central echo rotation: {rotation_deg:.0f} degree")
+        print(f"Estimation echo rotation: {rotation_deg:.0f} degree")
         # Plot
-        plot_correspondences(points, place_echo_points, points_transformed,
-                             np.asarray(reg_p2p.correspondence_set), 0, self.key)
+        plot_correspondences(points, place_echo_points, points_transformed, reg_p2p, residual_distance, "-", self.key)
         # If rotation too high then cancel the position correction
         if abs(rotation_deg) > 10:
             translation[:] = 0

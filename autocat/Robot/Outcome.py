@@ -134,7 +134,8 @@ class Outcome:
         self.echos = {}
         self.central_echos = []
         if "echos" in outcome_dict:
-            self.echos = outcome_dict['echos']
+            self.echos = {int(a): d for a, d in outcome_dict['echos'].items()}
+            self.echos = {a: self.echos[a] for a in sorted(self.echos)}
             print("Echos", self.echos)
             self.central_echos = resample_by_streak([[d, int(a)] for a, d in self.echos.items()
                                                      if d < NO_ECHO_DISTANCE])
