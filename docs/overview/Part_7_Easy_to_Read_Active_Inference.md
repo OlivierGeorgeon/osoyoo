@@ -62,8 +62,15 @@ The PetitCat documentation is written so that anyone with a basic education can 
 
 -
 -
+-
 
+<h1 style="font-size: 24px;">Step #1 -- 
 
+-
+
+Pending documentation....
+
+-
 
 <p align="center">
  <img src="horsetonextlesson.png" width="770" height="770">
