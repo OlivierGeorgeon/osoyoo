@@ -22,6 +22,8 @@ Howard Schneider -- Feb 15, 2024)
 <h2 style="font-size: 24px;">The PetitCat Project </h2>
 
 
+
+
 The "Easy-to-Read Overview" of the project is divided into a number of parts:
 
 **Part I:** The Basics: Assembly, Software and Using
