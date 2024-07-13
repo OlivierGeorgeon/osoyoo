@@ -12,7 +12,7 @@ Howard Schneider -- Feb 15, 2024)
 
 
 # An Easy-to-Read Overview of the Robot Car ("PetitCat") Project
-# Part V
+# Part VII
 
 ![petitcatgpt4logo](petitcatgpt4logo.jpg)
 -
@@ -58,7 +58,7 @@ The PetitCat documentation is written so that anyone with a basic education can 
 -
 -
 
-# Part V: Integration of PetitCat with a Causal Cognitive Architecture
+# Part VII: Active Inference with the PetitCat Project
 
 -
 -
