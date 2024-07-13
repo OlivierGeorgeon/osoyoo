@@ -205,7 +205,7 @@ They all work .... we can control the robot car via Wi-Fi. Note that both the ro
 (If this does not work, then go back to Parts 1 and 2 to troubleshoot any issues you may be having with your hardware, software or Wi-Fi environment.)
 
 <p align="center">
- <img src="wifiworks.jpg" width="550" height="550">
+ <img src="wifiworks.jpg" width="250" height="250">
 </p>
 
 -
@@ -375,14 +375,12 @@ Now let's try it out. Unplug the robot car from the USB and put it down on the f
 
 Ok.... we know that the basic hardware, software (both Arduino level and Python level) and Wi-Fi connectivity all work. 
 
+(If this does not work, then go back to Part 2 to troubleshoot any issues you may be having with your hardware, software or Wi-Fi environment.)
+
 <p align="center">
- <img src="wifiworks.jpg" width="550" height="550">
+ <img src="wifiworks.jpg" width="250" height="250">
 </p>
 
-![successpic](successpic.png)
-
-
--
 -
 
 
@@ -431,6 +429,12 @@ Ok.... we know that the basic hardware, software (both Arduino level and Python 
 
 --
 --
+
+
+![successpic](successpic.png)
+
+
+-
 
 
 <p align="center">
