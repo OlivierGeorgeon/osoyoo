@@ -250,13 +250,9 @@ Make sure the robot car is plugged into the USB port of your computer.
 
 Click the green circle with the right-pointing arrow (which actually is the second circle in the left-hand upper corner) -- the Arduino code will automatically compile and upload to the Arduino board of the robot car.
 
-Click Serial Monitor. This is what we see now:
+Click Serial Monitor. (If no IP address is shown in the Serial Monitor when we run our code then go back to Part II to troubleshoot this problem.)
 
-You should see something like this:
-
-![readip](readip.png) 
-
-(If no IP address is shown in the Serial Monitor when we run our code then go back to Part II to troubleshoot this problem.)
+Note the IP Address shown in the Serial Monitor.
 
 -
 -
