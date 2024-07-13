@@ -97,6 +97,10 @@ Pending documentation....
 
 
 
+-
+<img src="markovblanket.jpg" width="770" height="770">
+
+-
 
 
 -
@@ -113,10 +117,6 @@ Pending documentation....
 
 -
 -
--
--
-<img src="markovblanket.jpg" width="370" height="370">
-
 -
 
 
