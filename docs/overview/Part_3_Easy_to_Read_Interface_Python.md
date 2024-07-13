@@ -278,82 +278,14 @@ Before running a Python program take a look at it quickly. What will it do? Anyt
 
 -Ok.... now let's run the program test_remote_control_robot.py :
 
-![packetfail](packetfail.png)
-
-Well.... the Python code runs.... but unfortunately the robot car does not appear to be receiving packets -- the robot car does not respond to any of the packets.
-
------> We need to troubleshoot.
-
--
--
-
-
-<b>--TROUBLESHOOTING--</b>
-
--
-
-<b>--></b>Does the Wi-Fi board and associated hardware work properly?
-
-In the Arduino IDE load up Lesson 5b, i.e., the Osoyoo Lesson where the Arduino board uses the local area network as any access point. (Step 2 above.)
-
-Plug the USB cable from the robot to your computer.
-
-Now click the green right arrow/circle in the Arduino IDE. The Lesson 5b code is compiled and uploaded to the Arduino board in the robot car.
-
-The code compiles and uploads to the robot car successfully. In the Arduino IDE when we look at the Serial Monitor the Arduino board Wi-Fi seems to be interacting with the local area network:
-
-![lesson52bmasked](lesson52bmasked.png)
-
-
-As before in Step 2 (see above) we enter the IP Address (in this case 10.0.0.40) into the mobile phone Osoyoo IoT App. The mobile phone is on the same Wi-Fi LAN as the robot car.
-
-We click the IoT App -- Success!!  We can make the car go backwards, forewards, to the left or to the right.
-
-Ok.... so the hardware works.
-
--
-
-<b>--></b>Above, after we compiled and uploaded the Arduino code "petitcat_arduino.ino" and clicked on the Serial Monitor, unfortunately we did not see any indication that the robot car was connected to the Wi-Fi of the local area network. Let's look at this in more detail.
-
-
-![readip](readip.png) 
-
--
-
--
-
-
-![wifiesp.png](wifiesp.png)
-
--
-<b>--></b>Look at the Serial Monitor in the Arduino IDE -- there has been success now in connecting to the Wi-Fi.
-
->>>>  Look for the IP Address  <<<<
-
 You need to provide this IP Address to the Python code so it knows how to address the PetitCat robot car.
 
-In the example above we see that the IP Address is 10.0.0.40
+For example, if the IP Address is 10.0.0.40 then at the command line write:
 
->>>> You need to pass this IP Address to the Python program <<<<
-
-Thus at the command line write:
-
-"python test_remote_control_robot.py 10.0.0.40"
-
-(Note1:  In the future if the name of the PetitCat Python program changes then use whatever name it has, e.g., if it changed to "petcat" then in this case you would write "python petcat 10.0.0.40")
-
-(Note2:  On my system the IP Address is 10.0.0.40 -- on your system it might be some other address. For example, if it is 10.0.0.41 then at the command line you would write:
-
-"python test_remote_control_robot.py 10.0.0.41" )
-
-(Note3: Of course, you don't add quotes "" to your command line -- they are shown here in documentation to indicate that you are copying this text. For example in Windows terminal you would be writing after the prompt (e.g., > prompt) :
-
->python test_remote_control_robot.py 10.0.0.4
-
-And on Mac and Linux systems, of course, you will have a slightly different prompt, often a $)
+>python test_remote_control_robot.py 10.0.0.40
 
 
-Ok, let's try it out -- we will pass the IP Address 10.0.0.40 to the Python code:
+Ok, let's try it out....
 
 -
 
@@ -368,6 +300,15 @@ Now let's try it out. Unplug the robot car from the USB and put it down on the f
 Ok.... we know that the basic hardware, software (both Arduino level and Python level) and Wi-Fi connectivity all work. 
 
 (If this does not work, then go back to Part 2 to troubleshoot any issues you may be having with your hardware, software or Wi-Fi environment.)
+
+---------------
+
+Note regarding forward and reverse directions of the wheels. You may have found that in section i (i.e., Lesson 5.2b Osoyoo software) above the wheels were turning in the opposite direction of the remote control arrows but were no sure of the arrows direction -- actually the wheels were turning in the opposite direction. However, in this section ii (i.e., controlling the robotic car with the Python program via Wi-Fi, the wheels appear to following the correct directions. That is fine.
+
+See Part II for troubleshooting regarding the wheel direction, if there is a problem. However, if wheel direction with the Python program is correct, that is fine.
+
+---------------
+
 
 <p align="center">
  <img src="wifiworks.jpg" width="250" height="250">
