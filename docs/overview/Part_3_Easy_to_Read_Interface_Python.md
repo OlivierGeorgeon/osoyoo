@@ -252,19 +252,11 @@ Click the green circle with the right-pointing arrow (which actually is the seco
 
 Click Serial Monitor. This is what we see now:
 
+You should see something like this:
+
 ![readip](readip.png) 
 
-Hmmm.... the README file in the Osoyoo project repository says:
-
-"Read the robot's IP address in the arduino IDE terminal.
-
-Configure your arena and the IP address of your robots in autocat/Robot/RobotDefine.py"
-
-This is what the ReadMe/Wiki of of the project repository says we should see:
-
-![shouldsee](shouldsee.png)
-
----->We can come back to this item. No IP address is shown unfortunately in the Serial Monitor when we run our code.
+(If no IP address is shown in the Serial Monitor when we run our code then go back to Part II to troubleshoot this problem.)
 
 -
 -
