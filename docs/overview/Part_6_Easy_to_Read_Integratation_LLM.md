@@ -58,7 +58,7 @@ The PetitCat documentation is written so that anyone with a basic education can 
 -
 -
 
-# Part V: Integration of PetitCat with a Large Language Model (LLM)
+# Part VI: Integration of PetitCat with a Large Language Model (LLM)
 
 -
 -
