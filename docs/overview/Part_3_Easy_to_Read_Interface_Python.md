@@ -317,8 +317,9 @@ See Part II for troubleshooting regarding the wheel direction, if there is a pro
 -
 
 
-<h1 style="font-size: 24px;">Step #3 -- </h1>
--
+<h1 style="font-size: 24px;">Step #3 -- Installing PetitCatMain1.py </h1>
+
+We will now install 
 
 
 <h1 style="font-size: 24px;">Step #4 -- </h1>
