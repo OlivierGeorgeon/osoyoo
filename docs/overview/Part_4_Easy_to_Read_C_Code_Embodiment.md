@@ -170,10 +170,10 @@ Use PINs 20 and 21 for SDA and SCL because the other SDA and SCL PINs are used f
 For the power line, I used the 3v yellow PINs on the Wifi Shield. 
 Alternatively, the VIN PIN can be connected to a 5V PIN (red).
 
-![image](assets/TCS34725.jpg)
+![image](/docs/wiki/assets/TCS34725.jpg)
 Figure 4: TCS34725 color sensor mounted on two 40 mm pillars between the front wheel motors
 
-![image](assets/TCS34725(2).jpg)
+![image](/docs/wiki/assets/TCS34725(2).jpg)
 Figure 5: TCS34725 color sensor to Arduino MEGA wiring
 
 Table 3: TCS34725 PIN connection
@@ -192,7 +192,7 @@ More information on the [TCS34725 adafruit webpage](https://learn.adafruit.com/a
 
 Install a common cathode RGB LED as shown below. 
 
-![image](assets/rgbled.png)
+![image](/docs/wiki/assets/rgbled.png)
 
 Figure 5: RGB LED with flat side on the left. The cathode is the longest lead.
 
@@ -205,7 +205,7 @@ Table 4: RGB LED connections
 |GND|10kΩ resistor| GND |
 |Red|| 5 |
 
-![image](assets/rgbled(2).jpg)
+![image](/docs/wiki/assets/rgbled(2).jpg)
 
 .....
 
