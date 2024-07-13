@@ -377,7 +377,7 @@ Run `main.py` on a PC to open the windows shown in Figure 1. For example:
 py -m main chezOlivier 1
 ```
 
-![image](assets/gui.png)
+![image](/docs/wiki/assets/gui.png)
 Figure 1: Graphic User Interface
 
 ## Remote control the robot
