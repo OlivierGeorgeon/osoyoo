@@ -44,7 +44,7 @@ Test documentation
 
 Full project documentation in English: 
 * [The project's wiki](docs/wiki/home.md) Helps you assembly your robot, calibrate it, and run the project.
-* [Howard Schneider's full tutorial](docs/overview/Part_1_Easy_to_Read_Overview.md) Step by step explanations for beginners and experienced makers alike. The documentation is intended to give any user a pleasant experience with the project regardless of how seriously they intend to make use of the project.
+* [Howard Schneider's full tutorial](docs/overview/Part_1_Easy_to_Read_Overview.md) Step by step explanations for beginners and researchers alike. The documentation is intended to give any user a pleasant experience with the project regardless of how seriously they intend to make use of the project. An issue for many researchers in using GitHub software is that it more often fails to work (or work properly) mainly because the thousands of litte things in the heads of the developers are not made clear to the non-involved user. Here we have gone to the other extreme, to make sure that the hardward and software will work for any user, although the more advanced topics are geared more towards researchers than students.
 * [Youtube playlist](https://youtube.com/playlist?list=PLlSPp5EpW5vFb-ZMCr8m0dIOoKEQe9CIE&si=HachYRwgJR8I-BbH) Demonstrations of behaviors. 
 
 Publications
