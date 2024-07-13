@@ -59,7 +59,7 @@ The PetitCat documentation is written so that anyone with a basic education can 
 ![oliviermotorwiring](oliviermotorwiring.jpg)
 -
 
-# Part III: Active Inference of the Robot Car
+# Part III: Interfacing your Python Code with the PetitCat Project
 
 -
 -
