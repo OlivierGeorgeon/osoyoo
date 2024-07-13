@@ -63,8 +63,17 @@ The PetitCat documentation is written so that anyone with a basic education can 
 -
 -
 
-<h1 style="font-size: 24px;">Step #1 -- ----</h1>
 
+
+-
+
+<h1 style="font-size: 24px;">Step #1 -- </h1>
+
+-
+
+Pending documentation....
+
+-
 
 
 
