@@ -214,8 +214,9 @@ They all work .... we can control the robot car via Wi-Fi. Note that both the ro
 
 If you recall from Part II, the arduino_secrets.h file contains your home (or workplace) Wi-Fi identifying information and login password, hence its name and why it is kept separate from the other files in the GitHub repository.
 
---> You should have already copied "arduino_secrets.h" to \src\wifi of your Arduino PetitCat project. 
+--> You should have already copied "arduino_secrets.h" to \src\wifi of your Arduino PetitCat project. If not follow the steps below:
 
+-------------------
 (On my computer the Arduino Sketchbook is c:\Users\howar\OneDrive\Documents\Arduino. The full path to the wifi subfolder on my computer is : c:\Users\howar\OneDrive\Documents\Arduino\petitcat_arduino\src\wifi  -- your computer will have a different path, but it will also end with "\petitcat_arduino\src\wifi")
 
 --> If you don't have a file "arduino_secrets.h" in the \src\wifi subfolder of your Arduino PetitCat project, then take a look again at Part II, or else just use any text or programmming editor to create a file "arduino_secrets.h" containing the following lines:
@@ -236,15 +237,17 @@ If you recall from Part II, the arduino_secrets.h file contains your home (or wo
 
 
 --> The PetitCat project file in the Arduino IDE (which will be uploaded to the robot car) now has your Wi-Fi network information required to attached to the same network your laptop/desktop computer is running (and from which you will communicate with the robot car via your Python programs).
-
+-------------------
 -
 -
 
-Go to the Arduino IDE. Open the project "petitcat_arduino.ino"  Make sure the robot car is plugged into the USB port of your computer.
+Go to the Arduino IDE. Click 'File', 'Sketchbook', 'Osoyoo'.  Open the project "petitcat_arduino.ino" 
 
-The file arduino_secrets.h has now been populated with the necessary Wi-Fi information.
+(Or, click 'File', 'Open Recent' and you may see "petitcat_arduino.ino" there already -- click it.)
 
-Click the green circle with the right-pointing arrow (which actually is in the left-hand upper corner) -- the Arduino code will automatically compile and upload to the Arduino board of the robot car.
+Make sure the robot car is plugged into the USB port of your computer.
+
+Click the green circle with the right-pointing arrow (which actually is the second circle in the left-hand upper corner) -- the Arduino code will automatically compile and upload to the Arduino board of the robot car.
 
 Click Serial Monitor. This is what we see now:
 
