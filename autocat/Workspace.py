@@ -30,9 +30,10 @@ class Workspace:
     """The Workspace supervises the interaction cycle. It produces the intended_interaction
     and processes the enacted interaction """
 
-    def __init__(self, arena_id, robot_id="0"):
+    def __init__(self, arena_id, robot_id=""):
 
-        if arena_id not in ROBOT_SETTINGS:
+        # If the robot ID is not in RobotDefine.py then assume the arena_id is the robot's IP address
+        if robot_id not in ROBOT_SETTINGS:
             ROBOT_SETTINGS["0"]["IP"] = {"0": arena_id}
             arena_id = "0"
             robot_id = "0"
