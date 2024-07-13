@@ -115,8 +115,10 @@ Pending documentation....
 -
 -
 -
+<img src="markovblanket.jpg" width="370" height="370">
 
-**Step # --What is a Large Language Model? --**
+-
+
 
 .....
 
