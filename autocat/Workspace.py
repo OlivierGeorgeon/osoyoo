@@ -16,6 +16,7 @@ from .Enaction import KEY_ENGAGEMENT_ROBOT, KEY_CONTROL_DECIDER, KEY_ENGAGEMENT_
 from .SoundPlayer import SoundPlayer, SOUND_CLEAR
 from .Proposer.Interaction import OUTCOME_PROMPT, create_interactions
 from .Proposer.PredefinedInteractions import create_sequence_interactions
+from .Robot.RobotDefine import ROBOT_SETTINGS
 
 KEY_CONTROL_USER = "M"  # Manual mode : controlled by the user
 KEY_DECREASE = "D"
@@ -29,7 +30,13 @@ class Workspace:
     """The Workspace supervises the interaction cycle. It produces the intended_interaction
     and processes the enacted interaction """
 
-    def __init__(self, arena_id, robot_id):
+    def __init__(self, arena_id, robot_id="0"):
+
+        if arena_id not in ROBOT_SETTINGS:
+            ROBOT_SETTINGS["0"]["IP"] = {"0": arena_id}
+            arena_id = "0"
+            robot_id = "0"
+
         self.arena_id = arena_id
         self.robot_id = robot_id
 
@@ -160,7 +167,7 @@ class Workspace:
 
     def show_place_cell(self, place_cell_id):
         """Display this place cell if not zero"""
-        if place_cell_id > 0:
+        if place_cell_id > 0 and self.ctrl_place_cell_view is not None:
             place_cell = self.memory.place_memory.place_cells[place_cell_id]
             self.ctrl_place_cell_view.view.set_caption(f"Place Cell {place_cell_id} at {place_cell}")
             self.ctrl_place_cell_view.place_cell_id = place_cell_id

@@ -16,6 +16,7 @@ class CtrlAllocentricView:
         """Control the allocentric view"""
         self.workspace = workspace
         self.view = AllocentricView()
+        self.view.set_caption("Allocentric " + workspace.robot_id)
         self.next_time_refresh = 0
 
         # Handlers

@@ -13,6 +13,7 @@ class CtrlPlaceCellView:
     to points of interest that can be displayed in a pyglet window"""
     def __init__(self, workspace):
         self.view = InteractiveDisplay()
+        self.view.set_caption("Place cell " + workspace.robot_id)
         self.workspace = workspace
         self.cue_displays = []
         self.place_cell_id = 0

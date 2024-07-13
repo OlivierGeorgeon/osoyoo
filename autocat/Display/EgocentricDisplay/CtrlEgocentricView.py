@@ -13,6 +13,7 @@ class CtrlEgocentricView:
     to points of interest that can be displayed in a pyglet window"""
     def __init__(self, workspace):
         self.view = InteractiveDisplay()
+        self.view.set_caption("Egocentric " + workspace.robot_id)
         self.view.zoom_level = 2
         self.view.robot_rotate = 90  # Show the robot head up
         self.workspace = workspace

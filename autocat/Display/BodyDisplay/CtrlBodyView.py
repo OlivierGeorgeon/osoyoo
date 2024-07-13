@@ -18,6 +18,7 @@ class CtrlBodyView:
     """Controls the body view"""
     def __init__(self, workspace):
         self.view = BodyView()
+        self.view.set_caption("Robot " + workspace.robot_id)
         self.workspace = workspace
         self.points_of_interest = []
         self.last_action = None

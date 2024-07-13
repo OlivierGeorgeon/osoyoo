@@ -8,10 +8,10 @@ from .PlaceGeometry import transform_estimation_cue_to_cue, plot_correspondences
 
 polar1 = np.array([[0, -math.pi/4], [10, 0], [10, math.pi/2], [20, 3*math.pi/4]])
 cartesian1 = polar_to_cartesian(polar1)
-cartesian1 = np.array([[0, 0, 0], [10, 0, 0], [10, 10, 0], [20, 10, 0]])
+cartesian1 = np.array([[0, -500, 0], [500, 0, 0], [500, 500, 0], [-500, 500, 0]])
 polar2 = np.array([[0, -math.pi/4], [10, 0], [20, math.pi/2], [20, 3*math.pi/4]])
 cartesian2 = polar_to_cartesian(polar2)
-cartesian2 = np.array([[0, 0, 0], [10, 0, 0], [10, 10, 0], [20, 12, 0]])
+cartesian2 = np.array([[50, -500, 0], [500, 50, 0], [500, 600, 0], [-500, 600, 0]])
 
 # Test delta echoes
 # print("delta echoes", delta_echo_curves(polar1, cartesian1, polar2, cartesian2))

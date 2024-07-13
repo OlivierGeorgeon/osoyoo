@@ -17,7 +17,8 @@ DEFAULT_YAW = 45                  # (degree) Default rotation when yaw is not re
 DEFAULT_ACTION_DURATION = 1000    # (ms) The default duration of actions (value of Interaction.h/_target_duration )
 # RETREAT_DISTANCE_Y = 20  # 75     # (mm) Y displacement when line is detected on the side
 
-TERRAIN_RADIUS = {"A328": {"radius": 1100, "azimuth": 25, "short_radius": 800},  #  25 990 x 600  45},
+TERRAIN_RADIUS = {"0": {"radius": 650, "short_radius": 650, "azimuth": 90},
+                  # "A328": {"radius": 1100, "azimuth": 25, "short_radius": 800},  #  25 990 x 600  45},
                   "Circle": {"radius": 650, "short_radius": 650, "azimuth": 90},  # Petit tapis
                   "PetiteIA": {"radius": 1100, "azimuth": 55, "short_radius": 650},  # {990, 60},  # Grand tapis
                   "A301": {"radius": 1200, "azimuth": 50},
@@ -89,6 +90,7 @@ ROBOT_SETTINGS_14["IP"] = {"DOLL": "192.168.11.184"}
 ROBOT_SETTINGS_14["forward_speed"] = 210
 
 ROBOT_SETTINGS = {
+    '0': ROBOT_SETTINGS_0,
     '1': ROBOT_SETTINGS_1,
     '2': ROBOT_SETTINGS_2,
     '3': ROBOT_SETTINGS_3,

@@ -31,6 +31,8 @@ def transform_estimation_cue_to_cue(points1, points2, threshold=ICP_DISTANCE_THR
     )
     # Compute the similarity
     correspondence_set = np.asarray(reg_p2p.correspondence_set)
+    residual_distance = 0
+    source_points_transformed = np.asarray(pcd1.points)
     if len(correspondence_set) == 0:
         print("ICP no match")
         average_distance = -1
@@ -140,10 +142,14 @@ def compare_place_cells(place_cells):
 
 
 def plot_correspondences(source_points, target_points, source_points_transformed, correspondence_set, k1, k2):
+    """Save a plot of the correspondence"""
     plt.figure()
 
+    # The robot at coordinates (0, 0)
+    plt.scatter(0, 0, s=2000, color='darkSlateBlue', marker="s")
+
     # Plot original source points in red
-    plt.scatter(source_points[:, 0], source_points[:, 1], c='r', label=f"Place {k1}", marker="s")
+    plt.scatter(source_points[:, 0], source_points[:, 1], c='sienna', label=f"Place {k1}", marker="s")
 
     # Plot transformed source points in blue
     plt.scatter(source_points_transformed[:, 0], source_points_transformed[:, 1], c='b',

@@ -3,11 +3,11 @@ import math
 import numpy as np
 import time
 from pyrr import Quaternion, Matrix44
-from . import ANGULAR_RESOLUTION, CONE_HALF_ANGLE
+from . import ANGULAR_RESOLUTION, CONE_HALF_ANGLE, MIN_PLACE_CELL_DISTANCE
 from ..EgocentricMemory.EgocentricMemory import EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_CENTRAL_ECHO, \
     EXPERIENCE_LOCAL_ECHO
 from ...Utils import polar_to_cartesian, quaternion_to_direction_rad, translation_quaternion_to_matrix
-from .PlaceGeometry import transform_estimation_cue_to_cue, point_to_polar_array, resample_by_diff
+from .PlaceGeometry import transform_estimation_cue_to_cue, point_to_polar_array, resample_by_diff, plot_correspondences
 from .Cue import Cue
 
 
@@ -28,21 +28,28 @@ class PlaceCell:
         """Return the hash to use place cells as nodes in networkx"""
         return hash(self.key)
 
-    def translation_estimation(self, cues):
+    def translation_estimation_local_echo(self, points):
         """Return the vector of the position defined by previous cues minus the position by the new cues"""
         translation = np.array([0, 0, 0])
 
         # Translation estimation based on echoes
-        place_echo_cues = [c.point() for c in self.cues if c.type in [EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_CENTRAL_ECHO]]
-        new_echo_cues = [c.point() for c in cues if c.type in [EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_CENTRAL_ECHO]]
-        if len(place_echo_cues) > 0 and len(new_echo_cues) > 0:
-            transform = transform_estimation_cue_to_cue(place_echo_cues, new_echo_cues).transformation
-            translation = -transform[:3, 3]
-            r = math.degrees(quaternion_to_direction_rad(Quaternion.from_matrix(transform[:3, :3])))
-            print(f"Place cell rotation: {r:.0f} degree")
-            # If rotation too high then cancel the position correction
-            if abs(r) > 10:
-                translation[:] = 0
+        place_echo_points = np.array([c.point() for c in self.cues if c.type in [EXPERIENCE_LOCAL_ECHO]])
+        reg_p2p, residual_distance, points_transformed = transform_estimation_cue_to_cue(
+            points, place_echo_points, MIN_PLACE_CELL_DISTANCE)
+
+        # Move the robot in the same direction as moving the new local echoes to the place cell
+        translation = reg_p2p.transformation[0:3, 3]
+        rotation_deg = math.degrees(quaternion_to_direction_rad(Quaternion.from_matrix(reg_p2p.transformation[:3, :3])))
+        print(f"Estimation central echo rotation: {rotation_deg:.0f} degree")
+        # Plot
+        plot_correspondences(points, place_echo_points, points_transformed,
+                             np.asarray(reg_p2p.correspondence_set), 0, self.key)
+        # If rotation too high then cancel the position correction
+        if abs(rotation_deg) > 10:
+            translation[:] = 0
+
+        return translation
+
 
         # # Assume FLOOR experiences come from a single point
         # for new_cue in [cue for cue in cues if cue.type == EXPERIENCE_FLOOR]:
