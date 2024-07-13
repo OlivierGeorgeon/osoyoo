@@ -85,7 +85,7 @@ You made it this far, and you will succeed again in this part.  Get on that hors
 
 -
 
-<h1 style="font-size: 24px;">Step #2 -- Review and Testing of the Project Hardware and Software </h1>
+<h1 style="font-size: 24px;">Step #2 -- Review of the Project Hardware and Software </h1>
 
 In the 1950s a Japanese educator, Toru Kumon, developed a method to enable his own son to progress more rapidly through mathematics. In 1958 the Kumon Math teaching system was established and proved very successful compared to typical public school teaching methods in mathematics.
 
