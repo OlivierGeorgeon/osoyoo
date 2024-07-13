@@ -15,12 +15,18 @@ Howard Schneider -- Feb 15, 2024)
 # Part VI
 
 ![petitcatgpt4logo](petitcatgpt4logo.jpg)
--
 
 -
+
+
 
 <h2 style="font-size: 24px;">The PetitCat Project </h2>
 
+---------------
+
+Step by step explanations for beginners and researchers alike. The documentation is intended to give any user a pleasant experience with the project regardless of how seriously they intend to make use of the project. An issue for many researchers in using GitHub software is that it more often fails to work (or work properly) mainly because the thousands of litte things in the heads of the developers are not made clear to the non-involved user. Here we have gone to the other extreme, to make sure that the hardware and software will work for any user, although the more advanced topics are geared towards researchers rather than students. We have paid much attention to the main causes of poor GitHub and other open source software usability: incomplete documentation, dependency issues, environment configuration, version mismatches, non-graceful error handling, permissions and access, network/connectivity issues, stability, indadequate testing, user prerequisite knowledge. Easy-to-read, guaranteed-to-work and inexpensive may surprise you in producing an example of a superhuman AGI with robotic embodiment.
+
+----------------
 
 
 
