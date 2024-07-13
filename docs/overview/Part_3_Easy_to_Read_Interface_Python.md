@@ -237,6 +237,7 @@ If you recall from Part II, the arduino_secrets.h file contains your home (or wo
 
 
 --> The PetitCat project file in the Arduino IDE (which will be uploaded to the robot car) now has your Wi-Fi network information required to attached to the same network your laptop/desktop computer is running (and from which you will communicate with the robot car via your Python programs).
+
 -------------------
 -
 -
