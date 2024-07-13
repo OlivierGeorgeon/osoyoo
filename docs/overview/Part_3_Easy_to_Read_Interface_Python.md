@@ -89,7 +89,7 @@ You made it this far, and you will succeed again in this part.  Get on that hors
 
 In the 1950s a Japanese educator, Toru Kumon, developed a method to enable his own son to progress more rapidly through mathematics. In 1958 the Kumon Math teaching system was established and proved very successful compared to typical public school teaching methods in mathematics.
 
-Ironically, the Kumom system focused on methods which are antithetical the principles of mathematics -- memorization and review. However, the reality is that memorization and review of the foundational mathematical facts and procedures seem to work best for the human brain to then be in a stronger position to appreciate the true essence of subject, i.e., discovering methods and theories, problem solving, logical reasoning and critical thinking.  And so, in this spirit, let's very quickly review the previous two parts in terms of the performance of the robotic car.
+Ironically, the Kumom system focused on methods which are antithetical to the principles of mathematics -- memorization and review. However, the reality is that memorization and review of the foundational mathematical facts and procedures seem to work best for the human brain to then be in a stronger position to appreciate the true essence of subject, i.e., discovering methods and theories, problem solving, logical reasoning and critical thinking.  And so, in this spirit, let's very quickly review the previous two parts in terms of the performance of the robotic car.
 
 
 -
