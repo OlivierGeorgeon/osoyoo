@@ -212,6 +212,179 @@ They all work .... we can control the robot car via Wi-Fi. Note that both the ro
 
 <h1 style="font-size: 24px;">ii : Does Robotic Car and Python Wi-Fi Control Work? </h1>
 
+If you recall from Part II, the arduino_secrets.h file contains your home (or workplace) Wi-Fi identifying information and login password, hence its name and why it is kept separate from the other files in the GitHub repository.
+
+--> You should have already copied "arduino_secrets.h" to \src\wifi of your Arduino PetitCat project. 
+
+(On my computer the Arduino Sketchbook is c:\Users\howar\OneDrive\Documents\Arduino. The full path to the wifi subfolder on my computer is : c:\Users\howar\OneDrive\Documents\Arduino\petitcat_arduino\src\wifi  -- your computer will have a different path, but it will also end with "\petitcat_arduino\src\wifi")
+
+--> If you don't have a file "arduino_secrets.h" in the \src\wifi subfolder of your Arduino PetitCat project, then take a look again at Part II, or else just use any text or programmming editor to create a file "arduino_secrets.h" containing the following lines:
+
+<b>#define SECRET_WIFI_TYPE "STA" // Access point : "AP" pr Station (through router): "STA"
+
+#define SECRET_SSID "Your wifi SSID"
+
+#define SECRET_PASS "Your password"</b>
+
+--> Modify (and then save) the file "arduino_secrets.h" with the Wi-Fi information. For sake of example, below we are showing the same network info we used in the demo example in Step 2 above:
+
+<b>#define SECRET_WIFI_TYPE "STA" // Access point : "AP" pr Station (through router): "STA"
+
+#define SECRET_SSID "Jones"
+
+#define SECRET_PASS "test1234"</b>
+
+
+--> The PetitCat project file in the Arduino IDE (which will be uploaded to the robot car) now has your Wi-Fi network information required to attached to the same network your laptop/desktop computer is running (and from which you will communicate with the robot car via your Python programs).
+
+-
+-
+
+Go to the Arduino IDE. Open the project "petitcat_arduino.ino"  Make sure the robot car is plugged into the USB port of your computer.
+
+The file arduino_secrets.h has now been populated with the necessary Wi-Fi information.
+
+Click the green circle with the right-pointing arrow (which actually is in the left-hand upper corner) -- the Arduino code will automatically compile and upload to the Arduino board of the robot car.
+
+Click Serial Monitor. This is what we see now:
+
+![readip](readip.png) 
+
+Hmmm.... the README file in the Osoyoo project repository says:
+
+"Read the robot's IP address in the arduino IDE terminal.
+
+Configure your arena and the IP address of your robots in autocat/Robot/RobotDefine.py"
+
+This is what the ReadMe/Wiki of of the project repository says we should see:
+
+![shouldsee](shouldsee.png)
+
+---->We can come back to this item. No IP address is shown unfortunately in the Serial Monitor when we run our code.
+
+-
+-
+
+You need to have a working copy of Python on your laptop/desktop computer and some sort of programming environment to use it in. You may be using an advanced IDE such as Visual Studio IDE or PyCharm or a more streamlined development environment (e.g., such as Notepad++ operating in the terminal, which is what I am using). 
+
+Tip: Do not download the latest version. It may not be fully stable, as well as dependencies creep into your project, the latest version of Python often is not compatible with older dependencies whose developers have not updated them yet. Download a recent, stable version of Python. At the time of writing, I have Python 3.11.4 running on my computer although at python.org the latest release is at the time of writing version 3.12.2 (considered stable) or  version 3.13 (newest version available). 
+
+
+Go to https://github.com/OlivierGeorgeon/osoyoo/tree/master/tests  and copy the file "test_remote_control_robot.py" into your Python environment.
+
+In my case I loaded this file into my Python development tool Notepad++ :
+
+![testremote](testremote.png)
+
+-
+Before running a Python program take a look at it quickly. What will it do? Anything strange to the system? What about imports? Are there any imports requring installation of libraries from PyPI or an external library? The import's of socket, keyboard, sys and json all come from the standard library, so nothing special for us to do.
+
+-
+-
+
+-The Arduino code was successfully compiled and uploaded to the robot car. (Well... it indeed successfully compiled and uploaded. However, on the Serial Monitor we did not see the Wi-Fi/IP information that we expected it to display.)
+
+-Ok.... now let's run the program test_remote_control_robot.py :
+
+![packetfail](packetfail.png)
+
+Well.... the Python code runs.... but unfortunately the robot car does not appear to be receiving packets -- the robot car does not respond to any of the packets.
+
+-----> We need to troubleshoot.
+
+-
+-
+
+
+<b>--TROUBLESHOOTING--</b>
+
+-
+
+<b>--></b>Does the Wi-Fi board and associated hardware work properly?
+
+In the Arduino IDE load up Lesson 5b, i.e., the Osoyoo Lesson where the Arduino board uses the local area network as any access point. (Step 2 above.)
+
+Plug the USB cable from the robot to your computer.
+
+Now click the green right arrow/circle in the Arduino IDE. The Lesson 5b code is compiled and uploaded to the Arduino board in the robot car.
+
+The code compiles and uploads to the robot car successfully. In the Arduino IDE when we look at the Serial Monitor the Arduino board Wi-Fi seems to be interacting with the local area network:
+
+![lesson52bmasked](lesson52bmasked.png)
+
+
+As before in Step 2 (see above) we enter the IP Address (in this case 10.0.0.40) into the mobile phone Osoyoo IoT App. The mobile phone is on the same Wi-Fi LAN as the robot car.
+
+We click the IoT App -- Success!!  We can make the car go backwards, forewards, to the left or to the right.
+
+Ok.... so the hardware works.
+
+-
+
+<b>--></b>Above, after we compiled and uploaded the Arduino code "petitcat_arduino.ino" and clicked on the Serial Monitor, unfortunately we did not see any indication that the robot car was connected to the Wi-Fi of the local area network. Let's look at this in more detail.
+
+
+![readip](readip.png) 
+
+-
+
+-
+
+
+![wifiesp.png](wifiesp.png)
+
+-
+<b>--></b>Look at the Serial Monitor in the Arduino IDE -- there has been success now in connecting to the Wi-Fi.
+
+>>>>  Look for the IP Address  <<<<
+
+You need to provide this IP Address to the Python code so it knows how to address the PetitCat robot car.
+
+In the example above we see that the IP Address is 10.0.0.40
+
+>>>> You need to pass this IP Address to the Python program <<<<
+
+Thus at the command line write:
+
+"python test_remote_control_robot.py 10.0.0.40"
+
+(Note1:  In the future if the name of the PetitCat Python program changes then use whatever name it has, e.g., if it changed to "petcat" then in this case you would write "python petcat 10.0.0.40")
+
+(Note2:  On my system the IP Address is 10.0.0.40 -- on your system it might be some other address. For example, if it is 10.0.0.41 then at the command line you would write:
+
+"python test_remote_control_robot.py 10.0.0.41" )
+
+(Note3: Of course, you don't add quotes "" to your command line -- they are shown here in documentation to indicate that you are copying this text. For example in Windows terminal you would be writing after the prompt (e.g., > prompt) :
+
+>python test_remote_control_robot.py 10.0.0.4
+
+And on Mac and Linux systems, of course, you will have a slightly different prompt, often a $)
+
+
+Ok, let's try it out -- we will pass the IP Address 10.0.0.40 to the Python code:
+
+-
+
+![connected](connected.png)
+
+-
+
+Success!!  Everything seems to run ok.
+
+Now let's try it out. Unplug the robot car from the USB and put it down on the floor. Enter an '8' into the keyboard attached to the computer running the Python code. The car goes forward. Then enter a '2' -- the car goes backwards.  Let's try moving the servomechansim -- that works also. Success!!
+
+Ok.... we know that the basic hardware, software (both Arduino level and Python level) and Wi-Fi connectivity all work. 
+
+<p align="center">
+ <img src="wifiworks.jpg" width="550" height="550">
+</p>
+
+![successpic](successpic.png)
+
+
+-
+-
+
 
 <h1 style="font-size: 24px;">Step #3 -- </h1>
 -
