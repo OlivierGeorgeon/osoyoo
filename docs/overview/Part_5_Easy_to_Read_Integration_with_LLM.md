@@ -63,24 +63,6 @@ The PetitCat documentation is written so that anyone with a basic education can 
 -
 -
 
-<h1 style="font-size: 24px;">Step #1 -- The Biggest Questions in the Universe -- Onward to Question #3</h1>
-
-In the last Part IV we thought about what are the biggest questions in the universe. To recall, the biggest questions in the Universe may differ to each person. However, here this documentation takes the the three biggest questions in the Universe to be:
-
-1. What is space and time and where did all this come from?
-
-2. How does our brain work?
-
-3. How can we create an AGI that works even better than our brain, better than any large language model, i.e., something human but extraordinarily functioning?
-
-As we mentioned in the last part, question #1 is not for us to answer, and despite the work of Einstein et al., it obviously still remains unanswered.  In the last part, we considered a model of the mammalian and human brain that explains quite well how our brain works and how it amazingly (less amazing when the mechanisms are considered) it evolved.
-
-It this Part V we will go on to answer question #3 -- the PetitCat project will take on a form such that it becomes an AGI that is human in its core.
-
-You are probably wondering if you can really build this. Do not be hesitant. Regardless of your skill level, you have made it this far -- you have built a robot car with your hands, you have learned how to move software around (Part I) and then you learned how to write some software in C/C++, build electronic circuits and make the software control the electronics (Part II). Then you learned how to code in Python and demonstrated active inference (Part III).  Then in the last Part IV you, despite or in spite of, your knowledge of neurophysiology/AI/cognitive science/computer science/robotics you built a device that explains the human brain. Now here you are, ready to complete the journey, wondering if you are really capable of building this.
-
-Do not be hesitant -- get on that horse. Saddle up!!  The Universe and question #3 await you!!
-
 
 
 <p align="center">
