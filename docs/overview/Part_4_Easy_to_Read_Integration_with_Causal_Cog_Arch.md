@@ -98,7 +98,6 @@ The PetitCat documentation is written so that anyone with a basic education can 
 
 .....
 
-![fig4.jpg](fig4.jpg)
 
 -
 -
