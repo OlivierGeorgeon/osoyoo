@@ -397,6 +397,9 @@ Example usage:
 
 You can try this quickly out with any of your own Python code -- it should work without problem.
 
+Consider this silly program "sillyHdemo.py" to have the robot car to trace out the letter "H". 
+
+Go to https://github.com/OlivierGeorgeon/osoyoo/tree/master/tests  and copy the file "sillyHdemo.py" to your Python environment.
 
 
 
