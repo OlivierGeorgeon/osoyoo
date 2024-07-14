@@ -319,6 +319,19 @@ See Part II for troubleshooting regarding the wheel direction, if there is a pro
 
 <h1 style="font-size: 24px;">Step #3 -- Use the petitcat2.py Module to Interface Your AI/AGI Code with the Robotic Car" </h1>
 
+
+-------------------
+
+PENDING
+WORK IS NOT COMPLETE
+
+NOTE: THIS IS INCOMPLETE CODE QUICKLY WRITTEN IN 1/2 HOUR (however, it does work)
+IT IS SIMPLY TO SHOW THE CONCEPT OF HAVING AN INTERFACE BETWEEN ONE'S AI/AGI PYTHON CODE AND A ROBOTIC EMBODIMENT
+
+WORK PENDING TO COMPLETE THIS MODULE
+
+-------------------
+
 Go to https://github.com/OlivierGeorgeon/osoyoo/tree/master/tests  and copy the file "petitcat2.py" to your Python environment.
 
 Now turn on the robotic car. If the same "petitcat_arduino.ino" code is still saved on the robotic car and if your router's IP addresses have not changed since you tried out the car above in Step #2, then there is nothing do other than turn on the car. 
@@ -331,26 +344,21 @@ The demo program is self-explanatory and you can try it out.
 
 Please see the screen capture of my Windows terminal to see what it should look like:
 
-
-![petitcatrun](petitcatrun.png)
+-
 
 <p align="center">
  <img src="petitcatrun.png" width="1200" height="800">
 </p>
 
-<p align="center">
- <img src="petitcatrun.png" width="600" height="400">
-</p>
-NOTE: THIS IS INCOMPLETE CODE QUICKLY WRITTEN IN 1/2 HOUR (however, it does work)
-IT IS SIMPLY TO SHOW THE CONCEPT OF HAVING AN INTERFACE BETWEEN ONE'S AI/AGI PYTHON CODE AND A ROBOTIC EMBODIMENT
-WORK PENDING
+-
 
-PetitCatController Module for the PetitCat Project
+If you look at the Python code, you see that this module provides a class to control the PetitCat robotic device, which by default is the robotic car.
 
-This module provides a class to control the PetitCat robotic device, which by default is the robotic car.
 The purpose is to ground your AI/AGI project in the real world by providing access to such embodiments.
-The PetitCat project has a number of more advanced modules allowing, for example, active inference. This module,
-however, is to provide the basics of providing your AI/AGI project with an embodiment.
+
+The PetitCat project has a number of more advanced modules allowing, for example, active inference. These are discussed later.
+
+This module, however, is to provide the basics of providing your AI/AGI project with an embodiment.
 
 Summary of Module: It allows sending motor commands and receiving sensory inputs to/from the robotic device.
 
@@ -358,37 +366,66 @@ Nomenclature of saved files: petitcatN.py   e.g., petitcat2.py
 This file will on its own allow your AI/AGI project access to a robotic device embodiment.
 
 Example usage:
+
     # Run the program from the command line, optionally providing the IP address as a command-line argument:
+    
     python petitcat2.py <robot_ip>
 
     # If no IP address is provided on the command line, the program will prompt the user with the updated message to input the IP address.
+    
     You can find this IP address from the Arduino serial monitor after the USB cable is plugged into the device and Arduino
     code is downloaded (or already on the robotic device)
     (This IP address will be fetched automatically in future enhancements to the project.)
 
     # Example motor command
+    
     motor_code = input("Enter motor command: ")
+    
     response = controller.motor_command(motor_code)
+    
     print("Motor Command Response:", response)
+    
 
     # Example sensory input request
+    
     sensory_system = input("Enter sensory system (ultrasound/ir): ")
+    
     response = controller.sensory_input(sensory_system)
+    
     print("Sensory Input Response:", response)
 
 
-<h1 style="font-size: 24px;">Step #4 -- </h1>
+You can try this quickly out with any of your own Python code -- it should work without problem.
+
+
+
+
+<h1 style="font-size: 24px;">Step #4 --  Using the petitcat2.py Module in More Depth" </h1>
 -
 
+Ok... at this point you have used the "petitcat2.py" module to quickly interface your own Python code (or tried the litte demo code provided) to the robotic car.
+
+Let's consider the "petitcat2.py" module in more detail here.
 
 
-<h1 style="font-size: 24px;">Step #5 -- </h1>
+TO DO
+
+PENDING
+
+
+
+<h1 style="font-size: 24px;">Step #5 -- Advanced Features of the petitcat2.py Module" </h1>
+-
+TO DO
+
+PENDING
+
 -
 
+<h1 style="font-size: 24px;">Steps #6,7,8 -- Installing PetitCatMain1.py </h1>
 
-<h1 style="font-size: 24px;">Step #6,7,8 -- Installing PetitCatMain1.py </h1>
+We will now install "PetitCatMain1.py".
 
-We will now install .....
 
 Cloning of directory structure....
 
@@ -397,22 +434,12 @@ Perhaps introduce venv virtual environments?
 Explaining what concepts code is working on.....
 
 
+TO DO
+
+PENDING
 
 -
 
-
-
-<h1 style="font-size: 24px;">Step #1 -- Time to Get Serious</h1>
--
-
-
-
-<h1 style="font-size: 24px;">Step #1 -- Time to Get Serious</h1>
--
-
-
-
-<h1 style="font-size: 24px;">Step #1 -- Time to Get Serious</h1>
 
 -
 
@@ -420,12 +447,6 @@ Explaining what concepts code is working on.....
 
 
 .....
-
-<img src="rewrite.png" width="370" height="370">
-
-# thinking..... writing..... thinking..... writing....
-
-
 
 --
 --
