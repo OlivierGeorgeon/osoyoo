@@ -469,8 +469,11 @@ PENDING
 --
 
 
-![successpic](successpic.png)
 
+
+<p align="center">
+ <img src="successpic.png" width="70" height="70">
+</p>
 
 -
 
