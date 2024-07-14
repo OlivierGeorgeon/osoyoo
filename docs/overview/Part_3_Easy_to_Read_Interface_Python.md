@@ -274,11 +274,13 @@ Before running a Python program take a look at it quickly. What will it do? Anyt
 -
 -
 
--The Arduino code was successfully compiled and uploaded to the robot car. (Well... it indeed successfully compiled and uploaded. However, on the Serial Monitor we did not see the Wi-Fi/IP information that we expected it to display.)
+-The Arduino code was successfully compiled and uploaded to the robot car. 
+
+-In the Serial Monitor you can see the IP address which the robot car is using to communicate via Wi-Fi.
 
 -Ok.... now let's run the program test_remote_control_robot.py :
 
-You need to provide this IP Address to the Python code so it knows how to address the PetitCat robot car.
+You need to provide the above IP Address to the Python code so it knows how to communicate via Wi-Fi with the PetitCat robot car.
 
 For example, if the IP Address is 10.0.0.40 then at the command line write:
 
