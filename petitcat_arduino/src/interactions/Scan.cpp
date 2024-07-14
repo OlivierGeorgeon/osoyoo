@@ -100,6 +100,6 @@ void Scan::outcome(JSONVar & outcome_object)
       echos[String(angles[i])] = distances[i];
     }
   }
-  // May return an empty echo dictionary
+  // May return an "echos":null field in the outcome string
   outcome_object["echos"] = echos;
 }

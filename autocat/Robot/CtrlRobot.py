@@ -59,6 +59,8 @@ class CtrlRobot:
                             outcome_dict['yaw'] = self.workspace.enaction.command.yaw
                         # If action scan then set default value for no echo
                         if outcome_dict['action'] == ACTION_SCAN:
+                            if 'echos' not in outcome_dict or outcome_dict['echos'] is None:
+                                outcome_dict['echos'] = {}
                             for angle in range(-90, 91, self.workspace.enaction.command.span):
                                 outcome_dict['echos'][str(angle)] = outcome_dict['echos'].get(str(angle),
                                                                                               NO_ECHO_DISTANCE)
