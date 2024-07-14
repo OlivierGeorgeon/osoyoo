@@ -335,7 +335,7 @@ Please see the screen capture of my Windows terminal to see what it should look 
 ![petitcatrun](petitcatrun.png)
 
 <p align="center">
- <img src="petitcatrun.png" width="1250" height="1250">
+ <img src="petitcatrun.png" width="1250" height="880">
 </p>
 
 
