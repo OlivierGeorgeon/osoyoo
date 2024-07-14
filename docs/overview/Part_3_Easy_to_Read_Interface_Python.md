@@ -367,17 +367,17 @@ This file will on its own allow your AI/AGI project access to a robotic device e
 
 Example usage:
 
-    # Run the program from the command line, optionally providing the IP address as a command-line argument:
+    Run the program from the command line, optionally providing the IP address as a command-line argument:
     
     python petitcat2.py <robot_ip>
 
-    # If no IP address is provided on the command line, the program will prompt the user with the updated message to input the IP address.
+    If no IP address is provided on the command line, the program will prompt the user with the updated message to input the IP address.
     
     You can find this IP address from the Arduino serial monitor after the USB cable is plugged into the device and Arduino
     code is downloaded (or already on the robotic device)
     (This IP address will be fetched automatically in future enhancements to the project.)
 
-    # Example motor command
+    Example motor command
     
     motor_code = input("Enter motor command: ")
     
@@ -386,7 +386,7 @@ Example usage:
     print("Motor Command Response:", response)
     
 
-    # Example sensory input request
+    Example sensory input request
     
     sensory_system = input("Enter sensory system (ultrasound/ir): ")
     
@@ -394,12 +394,23 @@ Example usage:
     
     print("Sensory Input Response:", response)
 
+-
+-
 
-You can try this quickly out with any of your own Python code -- it should work without problem.
+
+You can try this module quickly out with any of your own Python code -- it should work without problem.
 
 Consider this silly program "sillyHdemo.py" to have the robot car to trace out the letter "H". 
 
+It uses the "petitcat2.py" module to interface to the robotic car and have it go through the silly motions of tracing out the letter "H".
+
 Go to https://github.com/OlivierGeorgeon/osoyoo/tree/master/tests  and copy the file "sillyHdemo.py" to your Python environment.
+
+Experiment a bit with the "petitcat2.py" module, and in the next Step we will consider its use in more depth in grounding your AI/AGI project.
+
+
+-
+-
 
 
 
@@ -415,6 +426,9 @@ TO DO
 
 PENDING
 
+
+-
+-
 
 
 <h1 style="font-size: 24px;">Step #5 -- Advanced Features of the petitcat2.py Module" </h1>
