@@ -338,7 +338,9 @@ Please see the screen capture of my Windows terminal to see what it should look 
  <img src="petitcatrun.png" width="1200" height="800">
 </p>
 
-
+<p align="center">
+ <img src="petitcatrun.png" width="600" height="400">
+</p>
 NOTE: THIS IS INCOMPLETE CODE QUICKLY WRITTEN IN 1/2 HOUR (however, it does work)
 IT IS SIMPLY TO SHOW THE CONCEPT OF HAVING AN INTERFACE BETWEEN ONE'S AI/AGI PYTHON CODE AND A ROBOTIC EMBODIMENT
 WORK PENDING
