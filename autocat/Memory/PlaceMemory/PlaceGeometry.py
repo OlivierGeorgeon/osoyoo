@@ -170,26 +170,29 @@ def plot_correspondences(source_points, target_points, source_points_transformed
     # The translated robot
     plt.scatter(reg_p2p.transformation[0, 3], reg_p2p.transformation[1, 3], s=1000, color='lightSteelBlue')
 
-    # Plot target points in green first in the background
-    plt.scatter(target_points[:, 0], target_points[:, 1], c='g', s=40, label=f"Place {k2}")
-
-    # Plot original source points
+    # Plot source points
     plt.scatter(source_points[:, 0], source_points[:, 1], c='sienna', label=f"Place {k1}", marker="s")
 
-    # Plot transformed source points
-    plt.scatter(source_points_transformed[:, 0], source_points_transformed[:, 1], c='sienna', marker="^",
-                label=f"Place {k1} moved to {k2}")
-
-    # Plot lines connecting corresponding points
+    # Plot segments from source points to target points
     for idx in correspondence_set:
         i, j = idx
         plt.plot([source_points[i, 0], target_points[j, 0]],
                  [source_points[i, 1], target_points[j, 1]], c='k')
+
+    # Plot target points in green first in the background
+    plt.scatter(target_points[:, 0], target_points[:, 1], c='g', label=f"Place {k2}")
+
+    # Plot transformed source points
+    plt.scatter(source_points_transformed[:, 0], source_points_transformed[:, 1], c='sienna', marker="^",
+                label=f"Place {k1} moved to {k2}")
 
     plt.legend()
     plt.xlabel('West-East')
     plt.ylabel('South-North')
     plt.title(f"Place {k1} to {k2}. Fitness: {reg_p2p.fitness:.2f}, residual distance: {residual_distance:.0f}")
     # plt.show()
-    plt.savefig(f"log/20_match_{k1}_{k2}.pdf")
+    try:
+        plt.savefig(f"log/20_match_{k1}_{k2}.pdf")
+    except PermissionError:
+        print("Permission denied")
     plt.close()
