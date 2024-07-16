@@ -35,9 +35,9 @@ class SoundPlayer:
 
     @classmethod
     def play(cls, name):
-        """Play the sound"""
-        if cls._initialized == 0:
-            cls.initialize()
+        """Play the sound if the class has been initialized"""
+        # if cls._initialized == 0:
+        #     cls.initialize()
         if cls._initialized == 2:
             cls._sounds.get(name).play()
 
