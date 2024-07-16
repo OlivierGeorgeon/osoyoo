@@ -1,14 +1,21 @@
 import numpy as np
+import json
+import time
+import socket
 from ..Robot.CtrlRobot import ENACTION_STEP_IDLE, ENACTION_STEP_COMMANDING, ENACTION_STEP_ENACTING, \
     ENACTION_STEP_INTEGRATING, ENACTION_STEP_RENDERING
 from ..Memory.PhenomenonMemory import TERRAIN_ORIGIN_CONFIDENCE
 from ..Integrator.OutcomeCode import outcome_code, outcome_code_focus
 from . import KEY_ENGAGEMENT_ROBOT, KEY_CONTROL_DECIDER, KEY_ENGAGEMENT_IMAGINARY
-from ..Robot.RobotDefine import ROBOT_FLOOR_SENSOR_X
+from ..Robot.RobotDefine import ROBOT_FLOOR_SENSOR_X, ROBOT_SETTINGS
 from ..Memory.EgocentricMemory.Experience import EXPERIENCE_FLOOR
 from ..Proposer.Interaction import OUTCOME_LOST_FOCUS, OUTCOME_NO_FOCUS
+from ..Proposer.Action import ACTION_SCAN
 from ..Proposer.Proposer import Proposer
 from ..Proposer.ProposerFocusPhenomenon import ProposerFocusPhenomenon
+from ..Robot import NO_ECHO_DISTANCE
+from ..Robot.Outcome import Outcome
+
 from ..Proposer.ProposerExplore import ProposerExplore
 from ..Proposer.ProposerWatch import ProposerWatch
 from ..Proposer.ProposerPush import ProposerPush
@@ -40,6 +47,14 @@ class Enacter:
                           # , "Play terrain": ProposerPlayTerrain(self)
                           , "Point": ProposerFocusPhenomenon(self.workspace)
                           }
+
+        self.robot_ip = ROBOT_SETTINGS[workspace.robot_id]["IP"][workspace.arena_id]
+        self.port = 8888
+        self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        # self.socket.connect((self.robot_ip, self.port))  # Not necessary for UDP. Generates an error on my mac
+        self.socket.settimeout(0)
+        self.send_time = 0.
+        self.time_out = 0.
 
     def main(self, dt):
         """Controls the enaction."""
@@ -93,16 +108,49 @@ class Enacter:
                     self.interaction_step = ENACTION_STEP_COMMANDING
 
         # COMMANDING: CtrlRobot sends the command to the robot and moves on to ENACTING
+        if self.workspace.enacter.interaction_step == ENACTION_STEP_COMMANDING:
+            self.workspace.enacter.interaction_step = ENACTION_STEP_ENACTING
+            self.send_command_to_robot()
 
         # ENACTING: Simulate the enaction in memory
         if self.interaction_step == ENACTION_STEP_ENACTING:
             self.workspace.simulator.simulate(dt)
             # If imagining then check for the end of the simulation
-            if self.is_imagining and not self.workspace.simulator.is_simulating:
-                # simulated_outcome = self.workspace.simulator.end()
-                # self.workspace.enaction.terminate(simulated_outcome)
-                self.interaction_step = ENACTION_STEP_INTEGRATING
+            if self.is_imagining:
+                if not self.workspace.simulator.is_simulating:
+                    self.interaction_step = ENACTION_STEP_INTEGRATING
             # If not imagining then CtrlRobot will terminate the enaction and proceed to INTEGRATING
+            else:
+                if time.time() < self.send_time + self.time_out:
+                    outcome_string = None
+                    try:
+                        outcome_string, _ = self.socket.recvfrom(512)
+                    except socket.timeout:  # Time out error if outcome not yet received
+                        print("t", end='')
+                    except OSError as e:
+                        if e.args[0] in [35, 10035]:
+                            print(".", end='')
+                        else:
+                            print(e)
+                    # If the outcome was received and packet longer than debug packet
+                    if outcome_string is not None and len(outcome_string) > 100:
+                        outcome_dict = json.loads(outcome_string)
+                        if outcome_dict['clock'] == self.workspace.enaction.clock:
+                            print()  # New line after the waiting dots
+                            print("Outcome:", outcome_string)
+                            # If the robot does not return the yaw (no IMU) then use the command yaw
+                            if 'yaw' not in outcome_dict:
+                                outcome_dict['yaw'] = self.workspace.enaction.command.yaw
+                            # If action scan then set default value for no echo
+                            if outcome_dict['action'] == ACTION_SCAN:
+                                if 'echos' not in outcome_dict or outcome_dict['echos'] is None:
+                                    outcome_dict['echos'] = {}
+                                for angle in range(-90, 91, self.workspace.enaction.command.span):
+                                    outcome_dict['echos'][str(angle)] = outcome_dict['echos'].get(str(angle),
+                                                                                                  NO_ECHO_DISTANCE)
+                            # Terminate the enaction
+                            self.workspace.enaction.outcome = Outcome(outcome_dict)
+                            self.workspace.enacter.interaction_step = ENACTION_STEP_INTEGRATING
 
         # INTEGRATING: the new enacted interaction
         if self.interaction_step == ENACTION_STEP_INTEGRATING:
@@ -230,3 +278,12 @@ class Enacter:
         #         closest_dot_phenomenon = memory.phenomenon_memory.phenomena[closest_key]
         #         memory.allocentric_memory.update_focus(closest_dot_phenomenon.point, memory.clock)
         #         memory.egocentric_memory.focus_point = memory.allocentric_to_egocentric(closest_dot_phenomenon.point)
+
+    def send_command_to_robot(self):
+        """Send the command string to the robot and set the timeout"""
+        command_string = self.workspace.enaction.command.serialize()
+        # print("Sending:", enaction_string)
+        self.socket.sendto(bytes(command_string, 'utf-8'), (self.robot_ip, self.port))
+        # Initialize the timeout
+        self.send_time = time.time()
+        self.time_out = self.workspace.enaction.command.timeout()

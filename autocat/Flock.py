@@ -14,10 +14,11 @@ class Flock:
     def __init__(self, arguments):
         """Create the flock of robots"""
         # Try to load sounds (it may not work on all platforms)
+        SoundPlayer.initialize()
         SoundPlayer.play(SOUND_STARTUP)
 
         self.workspaces = {}
-        self.ctrl_robots = {}
+        # self.ctrl_robots = {}
         self.ctrl_egocentric_views = {}
         self.ctrl_allocentric_views = {}
         self.ctrl_body_views = {}
@@ -26,7 +27,7 @@ class Flock:
         for i in range(2, len(arguments)):
             workspace = Workspace(arguments[1], arguments[i])
             self.workspaces[arguments[i]] = workspace
-            self.ctrl_robots[arguments[i]] = CtrlRobot(workspace)
+            # self.ctrl_robots[arguments[i]] = CtrlRobot(workspace)
             self.ctrl_egocentric_views[arguments[i]] = CtrlEgocentricView(workspace)
             self.ctrl_allocentric_views[arguments[i]] = CtrlAllocentricView(self.workspaces[arguments[i]])
             self.ctrl_body_views[arguments[i]] = CtrlBodyView(self.workspaces[arguments[i]])
@@ -44,7 +45,7 @@ class Flock:
         """Update the robots"""
         start_time = time.time()
         for robot_id in self.workspaces.keys():
-            self.ctrl_robots[robot_id].main(dt)
+            # self.ctrl_robots[robot_id].main(dt)
             self.workspaces[robot_id].main(dt)
             loop_duration1 = time.time() - start_time
             self.ctrl_egocentric_views[robot_id].main(dt)

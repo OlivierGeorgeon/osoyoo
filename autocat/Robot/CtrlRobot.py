@@ -18,8 +18,8 @@ class CtrlRobot:
 
     def __init__(self, workspace):
 
-        self.robot_ip = ROBOT_SETTINGS[workspace.robot_id]["IP"][workspace.arena_id]
         self.workspace = workspace
+        self.robot_ip = ROBOT_SETTINGS[workspace.robot_id]["IP"][workspace.arena_id]
         self.port = 8888
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         # self.socket.connect((self.robot_ip, self.port))  # Not necessary for UDP. Generates an error on my mac
