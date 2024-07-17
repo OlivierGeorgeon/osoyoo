@@ -1,3 +1,4 @@
+import math
 import json
 import numpy as np
 import pandas as pd
@@ -7,6 +8,8 @@ from . import NO_ECHO_DISTANCE
 from ..Memory.EgocentricMemory.Experience import FLOOR_COLORS
 from ..Utils import head_angle_distance_to_matrix
 from ..Memory.PlaceMemory.PlaceGeometry import resample_by_diff
+from ..Memory.PlaceMemory import CONE_HALF_ANGLE
+
 
 def category_color(color_sensor):
     """Categorize the color from the sensor measure"""
@@ -137,9 +140,11 @@ class Outcome:
             self.echos = {int(a): d for a, d in outcome_dict['echos'].items()}
             self.echos = {a: self.echos[a] for a in sorted(self.echos)}
             print("Echos", self.echos)
-            self.central_echos = resample_by_streak([[d, int(a)] for a, d in self.echos.items()
-                                                     if d < NO_ECHO_DISTANCE])
-            # self.central_echos = resample_by_diff([[d, int(a)] for a, d in self.echos.items() if d < NO_ECHO_DISTANCE])
+            # self.central_echos = resample_by_streak([[d, int(a)] for a, d in self.echos.items()
+            #                                          if d < NO_ECHO_DISTANCE])
+            # self.central_echos = resample_by_diff(
+            #     np.array([[d, a] for a, d in self.echos.items() if d < NO_ECHO_DISTANCE], dtype=float),
+            #     math.radians(2 * CONE_HALF_ANGLE))
 
     def __str__(self):
         """Print the outcome dictionary as a json string"""
