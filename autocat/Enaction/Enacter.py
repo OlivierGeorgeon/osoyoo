@@ -131,6 +131,10 @@ class Enacter:
                             # Terminate the enaction
                             self.workspace.enaction.outcome = Outcome(outcome_dict)
                             self.workspace.enacter.interaction_step = ENACTION_STEP_INTEGRATING
+                else:
+                    # Timeout: reinitialize the cycle. This will resend the enaction
+                    self.workspace.enacter.interaction_step = ENACTION_STEP_COMMANDING
+                    print(f". Timeout {self.time_out:.3f} .", end='')
 
         # INTEGRATING: the new enacted interaction
         if self.interaction_step == ENACTION_STEP_INTEGRATING:

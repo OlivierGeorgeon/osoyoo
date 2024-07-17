@@ -110,6 +110,7 @@ class CtrlEgocentricView:
 
     def reset(self):
         """Reset all the points of interest"""
+        # TODO Reload the points of interest from the experiences
         for poi in self.points_of_interest:
             poi.delete()
         self.points_of_interest = []

@@ -8,13 +8,13 @@ robot = Workspace("192.168.8.242")
 egocentric_window = CtrlEgocentricView(robot)
 
 # Initialize the automatic controller
-decider = Decider(robot)
+# decider = Decider(robot)
 
 
 # Define the update function
 def main_update(dt):
     robot.main(dt)
-    decider.main(dt)
+    # decider.main(dt)
     egocentric_window.main(dt)
 
 
