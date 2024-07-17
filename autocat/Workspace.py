@@ -78,18 +78,20 @@ class Workspace:
             self.engagement_mode = user_key.upper()
         elif user_key.upper() in ACTIONS:
             # Only process actions when the robot is IDLE
-            if self.enacter.interaction_step == ENACTION_STEP_IDLE:
+            if self.composite_enaction is None:
+            # if self.enacter.interaction_step == ENACTION_STEP_IDLE:
                 i0 = self.primitive_interactions[(user_key.upper(), OUTCOME_PROMPT)]
-                # e = Enaction(i0, self.memory.save(), span=10)
                 self.composite_enaction = CompositeEnaction(None, 'Manual', np.array([1, 1, 1]), [i0], self.memory.save())
         elif user_key.upper() == "/":
             # If key ALIGN then turn and move forward to the prompt
-            if self.enacter.interaction_step == ENACTION_STEP_IDLE:
+            if self.composite_enaction is None:
+            # if self.enacter.interaction_step == ENACTION_STEP_IDLE:
                 self.composite_enaction = CompositeEnaction(None, 'Manual', np.array([1, 1, 1]),
                                                             self.sequence_interactions["TF-P"], self.memory.save())
         elif user_key.upper() == ":" and self.memory.egocentric_memory.focus_point is not None:
             # If key ALIGN BACK then turn back and move backward to the prompt
-            if self.enacter.interaction_step == ENACTION_STEP_IDLE:
+            if self.composite_enaction is None:
+            # if self.enacter.interaction_step == ENACTION_STEP_IDLE:
                 # The first enaction: turn the back to the prompt
                 i0 = self.primitive_interactions[(ACTION_TURN, OUTCOME_PROMPT)]
                 e0 = Enaction(i0, self.memory.save(), direction=DIRECTION_BACK)
@@ -99,7 +101,8 @@ class Workspace:
                 self.composite_enaction = CompositeEnaction([e0, e1], 'Manual', np.array([1, 1, 1]))
         elif user_key.upper() == "P" and self.memory.egocentric_memory.focus_point is not None:
             # If key PUSH and has focus then create the push sequence
-            if self.enacter.interaction_step == ENACTION_STEP_IDLE:
+            if self.composite_enaction is None:
+            # if self.enacter.interaction_step == ENACTION_STEP_IDLE:
                 # First enaction: turn to the prompt
                 i0 = self.primitive_interactions[(ACTION_TURN, OUTCOME_PROMPT)]
                 e0 = Enaction(i0, self.memory.save())
@@ -116,7 +119,7 @@ class Workspace:
                 e3 = Enaction(i3, e2.predicted_memory.save())
                 self.composite_enaction = CompositeEnaction([e0, e1, e2, e3], 'Manual', np.array([1, 1, 1]))
         elif user_key.upper() == KEY_CLEAR:
-            # Clear the stack of enactions
+            # Clear the current composite enaction and reset the enaction cycle
             SoundPlayer.play(SOUND_CLEAR)
             self.composite_enaction = None
             # Restore memory

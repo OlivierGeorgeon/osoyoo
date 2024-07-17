@@ -1,7 +1,7 @@
 import time
 from .Workspace import Workspace
 from .SoundPlayer import SoundPlayer, SOUND_STARTUP
-from .Robot.CtrlRobot import CtrlRobot
+from .Proposer.Decider import Decider
 from .Display.EgocentricDisplay.CtrlEgocentricView import CtrlEgocentricView
 from .Display.AllocentricDisplay.CtrlAllocentricView import CtrlAllocentricView
 from .Display.BodyDisplay.CtrlBodyView import CtrlBodyView
@@ -18,7 +18,7 @@ class Flock:
         SoundPlayer.play(SOUND_STARTUP)
 
         self.workspaces = {}
-        # self.ctrl_robots = {}
+        self.deciders = {}
         self.ctrl_egocentric_views = {}
         self.ctrl_allocentric_views = {}
         self.ctrl_body_views = {}
@@ -27,7 +27,7 @@ class Flock:
         for i in range(2, len(arguments)):
             workspace = Workspace(arguments[1], arguments[i])
             self.workspaces[arguments[i]] = workspace
-            # self.ctrl_robots[arguments[i]] = CtrlRobot(workspace)
+            self.deciders[arguments[i]] = Decider(workspace)
             self.ctrl_egocentric_views[arguments[i]] = CtrlEgocentricView(workspace)
             self.ctrl_allocentric_views[arguments[i]] = CtrlAllocentricView(self.workspaces[arguments[i]])
             self.ctrl_body_views[arguments[i]] = CtrlBodyView(self.workspaces[arguments[i]])
@@ -48,13 +48,15 @@ class Flock:
             # self.ctrl_robots[robot_id].main(dt)
             self.workspaces[robot_id].main(dt)
             loop_duration1 = time.time() - start_time
-            self.ctrl_egocentric_views[robot_id].main(dt)
+            self.deciders[robot_id].main(dt)
             loop_duration2 = time.time() - start_time
-            self.ctrl_allocentric_views[robot_id].main(dt)
+            self.ctrl_egocentric_views[robot_id].main(dt)
             loop_duration3 = time.time() - start_time
+            self.ctrl_allocentric_views[robot_id].main(dt)
+            loop_duration4 = time.time() - start_time
             self.ctrl_body_views[robot_id].main(dt)
             # self.ctrl_phenomenon_views[robot_id].main(dt)
-            loop_duration4 = time.time() - start_time
+            loop_duration5 = time.time() - start_time
             self.ctrl_place_cell_views[robot_id].main(dt)
 
         # Transmit messages between robots
@@ -65,8 +67,9 @@ class Flock:
         main_loop_duration = time.time() - start_time
         if main_loop_duration > 0.1:
             print(f"Main loop duration: {main_loop_duration:.3f} seconds. After workspace: {loop_duration1:.3f}. "
-                  f"After ego-display {loop_duration2:.3f}. After allo-display {loop_duration3:.3f}. "
-                  f"After body display {loop_duration4:.3f}.")
+                  f"After decider {loop_duration2:.3f}. "
+                  f"After ego-display {loop_duration3:.3f}. After allo-display {loop_duration4:.3f}. "
+                  f"After body display {loop_duration5:.3f}.")
 
         # # Pass the message from robot '2' to robot '1'
         # if all(key in self.workspaces for key in ['1', '2']):

@@ -1,4 +1,3 @@
-import numpy as np
 import json
 import time
 import socket
@@ -6,25 +5,13 @@ from ..Robot.CtrlRobot import ENACTION_STEP_IDLE, ENACTION_STEP_COMMANDING, ENAC
     ENACTION_STEP_INTEGRATING, ENACTION_STEP_RENDERING
 from ..Memory.PhenomenonMemory import TERRAIN_ORIGIN_CONFIDENCE
 from ..Integrator.OutcomeCode import outcome_code, outcome_code_focus
-from . import KEY_ENGAGEMENT_ROBOT, KEY_CONTROL_DECIDER, KEY_ENGAGEMENT_IMAGINARY
+from . import KEY_ENGAGEMENT_ROBOT, KEY_ENGAGEMENT_IMAGINARY
 from ..Robot.RobotDefine import ROBOT_FLOOR_SENSOR_X, ROBOT_SETTINGS
 from ..Memory.EgocentricMemory.Experience import EXPERIENCE_FLOOR
 from ..Proposer.Interaction import OUTCOME_LOST_FOCUS, OUTCOME_NO_FOCUS
 from ..Proposer.Action import ACTION_SCAN
-from ..Proposer.Proposer import Proposer
-from ..Proposer.ProposerFocusPhenomenon import ProposerFocusPhenomenon
 from ..Robot import NO_ECHO_DISTANCE
 from ..Robot.Outcome import Outcome
-
-from ..Proposer.ProposerExplore import ProposerExplore
-from ..Proposer.ProposerWatch import ProposerWatch
-from ..Proposer.ProposerPush import ProposerPush
-from ..Proposer.ProposerWatchCenter import ProposerWatchCenter
-from ..Proposer.ProposerArrange import ProposerArrange
-from ..Proposer.ProposerPlayForward import ProposerPlayForward
-from ..Proposer.ProposerPlayTurn import ProposerPlayTurn
-from ..Proposer.ProposerPlaySwipe import ProposerPlaySwipe
-from ..Proposer.ProposerPlayTerrain import ProposerPlayTerrain
 from ..SoundPlayer import SoundPlayer, SOUND_SURPRISE
 from ..Proposer.AttentionMechanism import AttentionMechanism
 
@@ -37,16 +24,6 @@ class Enacter:
         self.memory_snapshot = None
         self.is_imagining = False
         self.memory_before_imaginary = None
-        self.proposers = {'Default': Proposer(self.workspace)
-                          # , 'Play Turn': ProposerPlayTurn(self)
-                          # , 'Explore': ProposerExplore(self)
-                          # , 'Watch': ProposerWatch(self.workspace)
-                          # , 'Watch C': ProposerWatchCenter(self),  'Arrange': ProposerArrange(self)
-                          # , 'Push': ProposerPush(self.workspace)
-                          # , 'Play': ProposerPlayForward(self)
-                          # , "Play terrain": ProposerPlayTerrain(self)
-                          , "Point": ProposerFocusPhenomenon(self.workspace)
-                          }
 
         self.robot_ip = ROBOT_SETTINGS[workspace.robot_id]["IP"][workspace.arena_id]
         self.port = 8888
@@ -77,12 +54,12 @@ class Enacter:
                     self.memory_before_imaginary = self.workspace.memory.save()
                     self.is_imagining = True
             # Next automatic decision
-            if self.workspace.composite_enaction is None:
-                if self.workspace.control_mode == KEY_CONTROL_DECIDER:
-                    # All deciders propose an enaction with an activation value
-                    self.workspace.composite_enaction = self.decide()
-                else:
-                    self.workspace.decider_id = "Manual"
+            # if self.workspace.composite_enaction is None:
+            #     if self.workspace.control_mode == KEY_CONTROL_DECIDER:
+            #         # All deciders propose an enaction with an activation value
+            #         self.workspace.composite_enaction = self.decide()
+            #     else:
+            #         self.workspace.decider_id = "Manual"
                 # Case DECIDER_KEY_USER is handled by self.process_user_key()
 
             # When the next enaction is in the stack, prepare the enaction
@@ -223,33 +200,6 @@ class Enacter:
             self.interaction_step = ENACTION_STEP_RENDERING
 
         # RENDERING: Will be reset to IDLE in the next cycle
-        # if self.interaction_step == ENACTION_STEP_RENDERING:
-        #     print("Render the views")
-
-    def decide(self):
-        """Return the selected composite enaction"""
-        # Update the focus is the dot was lost
-        # self.attention_mechanism.update_focus()
-
-        # Each proposer adds a proposition to the list
-        propositions = []
-        for proposer in self.proposers.values():
-            # activation = proposer.activation_level()  # Must compute before proposing
-            enaction = proposer.propose_enaction()
-            if enaction is not None:
-                print("Proposition", enaction, "with focus", self.workspace.memory.egocentric_memory.focus_point)
-                activation = enaction.emotion_mask * self.workspace.memory.body_memory.neurotransmitters
-                propositions.append([enaction, activation.sum()])
-        print("Proposed enactions:")
-        for p in propositions:
-            print(" ", p[0].decider_id, ":", p[0], p[1])
-            # print(" ", p[0], ":", p[1], p[2])
-
-        # Select the enaction that has the highest activation value
-        most_activated_index = propositions.index(max(propositions, key=lambda p: p[1]))
-        self.workspace.decider_id = propositions[most_activated_index][0].decider_id
-        print("Decider:", self.workspace.decider_id)
-        return propositions[most_activated_index][0]
 
     def select_focus(self, memory):
         """Select a focus based on the phenomena in memory"""
