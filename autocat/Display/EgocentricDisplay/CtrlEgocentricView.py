@@ -108,8 +108,17 @@ class CtrlEgocentricView:
                                          self.workspace.memory.clock, 0, 1, 0)
             self.points_of_interest.append(prompt_poi)
 
+    def reset(self):
+        """Reset all the points of interest"""
+        for poi in self.points_of_interest:
+            poi.delete()
+        self.points_of_interest = []
+
     def main(self, dt):
         """Update the egocentric view"""
+        # If back from imaginary mode, reset the view
+        if self.workspace.enacter.view_reset_flag:
+            self.reset()
         # Update every frame to simulate the robot's displacement
         self.view.update_body_display(self.workspace.memory.body_memory)
         self.view.egocentric_rotate = -self.workspace.memory.body_memory.simulation_rotation_deg

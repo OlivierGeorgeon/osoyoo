@@ -24,6 +24,7 @@ class Enacter:
         self.memory_snapshot = None
         self.is_imagining = False
         self.memory_before_imaginary = None
+        self.view_reset_flag = False
 
         self.robot_ip = ROBOT_SETTINGS[workspace.robot_id]["IP"][workspace.arena_id]
         self.port = 8888
@@ -38,6 +39,7 @@ class Enacter:
         # RENDERING: last only one cycle
         if self.interaction_step == ENACTION_STEP_RENDERING:
             self.interaction_step = ENACTION_STEP_IDLE
+            self.view_reset_flag = False
 
         # IDLE: Ready to choose the next intended interaction
         if self.interaction_step == ENACTION_STEP_IDLE:
@@ -48,6 +50,7 @@ class Enacter:
                     self.workspace.memory = self.memory_before_imaginary
                     self.is_imagining = False
                     self.interaction_step = ENACTION_STEP_RENDERING
+                    self.view_reset_flag = True
             else:
                 # If start imagining then take a new memory snapshot
                 if self.workspace.engagement_mode == KEY_ENGAGEMENT_IMAGINARY:
