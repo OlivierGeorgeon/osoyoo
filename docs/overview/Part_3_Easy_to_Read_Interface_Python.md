@@ -332,7 +332,7 @@ See Part II for troubleshooting regarding the wheel direction, if there is a pro
 -
 
 
-<h1 style="font-size: 24px;">Step #3 -- Use the petitcat3.py Module to Interface Your AI/AGI Code with the Robotic Car" </h1>
+<h1 style="font-size: 24px;">Step #3 -- Use the petitcat2.py Module to Interface Your AI/AGI Code with the Robotic Car" </h1>
 
 
 -------------------
@@ -346,15 +346,15 @@ WORK PENDING TO COMPLETE THIS MODULE
 
 -------------------
 
-Go to https://github.com/OlivierGeorgeon/osoyoo/tree/master/tests  and copy the file "petitcat3.py" to your Python environment.
+Go to https://github.com/OlivierGeorgeon/osoyoo/tree/master/tests  and copy the file "petitcat2.py" to your Python environment.
 
 Now turn on the robotic car. If the same "petitcat_arduino.ino" code is still saved on the robotic car and if your router's IP addresses have not changed since you tried out the car above in Step #2, then there is nothing do other than turn on the car. 
 
 (However, if you are not sure, plug the USB into the car and your computer. Open up the Arduino IDE. Upload the "petitcat_arduino.ino" code to the car. Look at the Serial Monitor for the IP address to use. If there are any issues with these steps please see the previous Step #2 or for further troubleshooting the documentation in Part #2. However, if you just completed Step #2 then this should work without problem.)
 
-Now in your Python environment (e.g., in Windows I am using the terminal and will show examples from there), run the program "petitcat3.py". 
+Now in your Python environment (e.g., in Windows I am using the terminal and will show examples from there), run the program "petitcat2.py". 
 
->python petitcat3.py
+>python petitcat2.py
 
 The program will then ask for the IP address. It is the same address as before if you have not turned off the robotic car (i.e., 10.0.0.40 in the example above). If you have reloaded the Arduino code then look at the serial monitor on the Arduino IDE to see what the IP address is. It is ok to give the IP address here -- it will work correctly.
 
