@@ -247,6 +247,17 @@ Go to the Arduino IDE. Click 'File', 'Sketchbook', 'Osoyoo'.  Open the project "
 
 (Or, click 'File', 'Open Recent' and you may see "petitcat_arduino.ino" there already -- click it.)
 
+--> In the Arduino IDE you will see one of the modules as being "Robot_define.h" -- click that Window.
+
+In an early line you will see something like:
+
+#define ROBOT_ID 0
+
+It is important that the correct robot model is specified. Usually '0' is used for the default Osoyoo robot car.
+
+Ok.... let's see if everything works....
+
+
 Make sure the robot car is plugged into the USB port of your computer.
 
 Click the green circle with the right-pointing arrow (which actually is the second circle in the left-hand upper corner) -- the Arduino code will automatically compile and upload to the Arduino board of the robot car.
