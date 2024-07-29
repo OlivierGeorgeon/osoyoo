@@ -126,10 +126,11 @@ In the 1950s a Japanese educator, Toru Kumon, developed a method to enable his o
 Ironically, the Kumon system focused on methods which are antithetical to the principles of mathematics -- memorization and review. However, the reality is that memorization and review of the foundational mathematical facts and procedures seem to work best for the human brain to then be in a stronger position to appreciate the true essence of the subject, i.e., discovering methods and theories, problem solving, logical reasoning and critical thinking.  And so, in this spirit, let's very quickly review the previous two parts in terms of the performance of the robotic car.
 
 <h1 style="font-size: 24px;">i : Does Basic Robotic Car and Wi-Fi Control Work? </h1>
--
+
 -Open the Arduino IDE.
 
 -Click 'Open' and load in m2-lesson5b.ino 
+
 -Then attach the USB cable to the Arduino board connector on the robot car.
 
 -You may now need to tell the software what your Wi-Fi SSID and password are (if this isn't already there from Part II).
