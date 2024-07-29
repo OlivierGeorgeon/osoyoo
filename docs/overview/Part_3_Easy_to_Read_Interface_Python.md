@@ -298,6 +298,7 @@ For example, if the IP Address is 10.0.0.40 then at the command line write:
 
 >python test_remote_control_robot.py 10.0.0.40
 
+(Note: If you don't add the IP address to the command line, it might seem like the code works, and then asks you for the IP address. However, often it may not work properly. Thus, please enter the IP address on the command line like in the example above.)
 
 Ok, let's try it out....
 
