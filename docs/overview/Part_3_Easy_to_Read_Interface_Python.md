@@ -430,12 +430,12 @@ Example usage:
 -
 -
 
-In Step #3 above we ran this code using the default demo code in "petitcat2.py":
+In Step #3 above we utilized this class using the default demo code in "petitcat2.py":
 
 -
 
 <p align="center">
- <img src="classcode.png" width="1200" height="800">
+ <img src="classcode.png" width="1200" height="1200">
 </p>
 
 -
