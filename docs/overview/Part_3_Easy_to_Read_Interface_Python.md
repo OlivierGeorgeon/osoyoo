@@ -435,7 +435,7 @@ In Step #3 above we utilized this class using the default demo code in "petitcat
 -
 
 <p align="center">
- <img src="classcode.png" width="1200" height="1200">
+ <img src="classcode.png" width="800" height="800">
 </p>
 
 -
