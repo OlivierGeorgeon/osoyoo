@@ -375,12 +375,16 @@ Please see the screen capture of my Windows terminal to see what it should look 
 
 -
 
-This program seems very similar to the previous test_remotve_control_robot.py, and indeed the actions and sensory inputs are. However, as we will see in the next section (i.e. next 'step' as they are called in this documentation), the code now largely consists of a Python class 'PetitCatController'. In the next section (i.e., 'step') we will explore how we can use class PetitCatController with other Python projects that want to interface with the robotic car.
+This program seems very similar to the previous test_remote_control_robot.py, and indeed the actions and sensory inputs are. However, as we will see in the next section (i.e. next 'step' as they are called in this documentation), the code now largely consists of a Python class 'PetitCatController'. In the next section (i.e., 'step') we will explore how we can use class PetitCatController with other Python projects that want to interface with the robotic car.
+
+-
 
 
 <h1 style="font-size: 24px;">Step #4 --  Looking at the Code in the petitcat2.py Module" </h1>
 
-If you look at the Python code, you see that this module provides a class to control the PetitCat robotic device, which by default is the robotic car.
+-
+
+Go to your Python IDE (i.e., where you can develop Python programs). If you look at the Python code for petitcat2.py, you see that this module provides a class "PetitCatController" to control the PetitCat robotic device, which by default is the robotic car.
 
 The purpose is to ground your AI/AGI project in the real world by providing access to such embodiments.
 
@@ -391,11 +395,12 @@ This module, however, is to provide the basics of providing your AI/AGI project 
 Summary of Module: It allows sending motor commands and receiving sensory inputs to/from the robotic device.
 
 Nomenclature of saved files: petitcatN.py   e.g., petitcat2.py
+
 This file will on its own allow your AI/AGI project access to a robotic device embodiment.
 
 Example usage:
 
-    Run the program from the command line, optionally providing the IP address as a command-line argument:
+    Run the program from the command line, optionally providing the IP address as a command-line argument (or enter it later):
     
     python petitcat2.py <robot_ip>
 
@@ -424,6 +429,20 @@ Example usage:
 
 -
 -
+
+In Step #3 above we ran this code using the default demo code in "petitcat2.py":
+
+-
+
+<p align="center">
+ <img src="classcode.png" width="1200" height="800">
+</p>
+
+-
+
+
+
+
 
 
 You can try this module quickly out with any of your own Python code -- it should work without problem.
