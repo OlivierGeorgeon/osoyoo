@@ -335,7 +335,11 @@ See Part II for troubleshooting regarding the wheel direction, if there is a pro
 <h1 style="font-size: 24px;">Step #3 -- Use the petitcat2.py Module to Interface Your AI/AGI Code with the Robotic Car" </h1>
 
 
-Ok.... you have completed Step #2 above. Very important -- make sure all the hardware and software modules are working before we start venturing off into new advanced uses of the Robotic Car.  If you did not complete Step #2 then go back and complete it!! If you can't make the system do the basics above, then troubleshoot the problem. (To do so you may have to go back to Part 2 or even Part 1 of the Easy-to-Read Documentation.) (If you don't have a technical background, e.g., MBA wanting to learn something about robotics/AI or you're a gifted high school student going through the project, then welcome to the world of engineering. Stuff sometimes doesn't work. You don't give up. You troubleshoot and rework the problem. Ok.... make sure Step #2 above works.)
+Ok.... you have completed Step #2 above. 
+
+Very important -- make sure all the hardware and software modules are working before we start venturing off into new advanced uses of the Robotic Car.  If you did not complete Step #2 then go back and complete it!! If you can't make the system do the basics above, then troubleshoot the problem.
+
+(To do so you may have to go back to Part 2 or even Part 1 of the Easy-to-Read Documentation.) (If you don't have a technical background, e.g., MBA wanting to learn something about robotics/AI or you're a gifted high school student going through the project, then welcome to the world of engineering. Stuff sometimes doesn't work. You don't give up. You troubleshoot and rework the problem. Ok.... make sure Step #2 above works.)
 
 In this section, we are going to take a baby step, and run Python code that lets you better (eventually) interface your AI/AGI project (if you have one; if not, no worries -- you can do one later or use code we will supply later) to the PetitCat project.
 
