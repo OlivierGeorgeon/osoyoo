@@ -353,7 +353,7 @@ Go to https://github.com/OlivierGeorgeon/osoyoo/tree/master/tests  and copy the 
 
 Now turn on the robotic car. Now in your Python environment (e.g., in Windows I am using the terminal and will show examples from there), run the program "petitcat2.py": 
 
->python petitcat2.py
+Windows terminal:    >python petitcat2.py
 
 
 The program will then ask for the IP address. It is the same address as before if you have not turned off the robotic car (i.e., 10.0.0.40 in the example above for my Wi-Fi). 
