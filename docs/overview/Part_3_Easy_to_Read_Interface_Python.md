@@ -363,9 +363,6 @@ The program will then ask for the IP address. It is the same address as before i
 (Note: If you have reloaded the Arduino code then look at the serial monitor on the Arduino IDE to see what the IP address is.)
 
 
-
-
-
 The demo program is self-explanatory and you can try it out.
 
 Please see the screen capture of my Windows terminal to see what it should look like:
@@ -377,6 +374,11 @@ Please see the screen capture of my Windows terminal to see what it should look 
 </p>
 
 -
+
+This program seems very similar to the previous test_remotve_control_robot.py, and indeed the actions and sensory inputs are. However, as we will see in the next section (i.e. next 'step' as they are called in this documentation), the code now largely consists of a Python class 'PetitCatController'. In the next section (i.e., 'step') we will explore how we can use class PetitCatController with other Python projects that want to interface with the robotic car.
+
+
+<h1 style="font-size: 24px;">Step #4 --  Looking at the Code in the petitcat2.py Module" </h1>
 
 If you look at the Python code, you see that this module provides a class to control the PetitCat robotic device, which by default is the robotic car.
 
