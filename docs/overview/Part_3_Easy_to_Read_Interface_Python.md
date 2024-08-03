@@ -586,7 +586,7 @@ So... you actually can get your sensory information here via a motor command.
 -
 
 <h1 style="font-size: 24px;">Step #6 -- Adding an LLM to the PetitCat Project </h1>
--
+
 This section about adding a Large Language Model is optional reading, as there will be an entire Part dedicated to the this subject further in the documentation. However, we have tried to cover all the basics of the PetitCat Project, i.e., the robotic embodiment (which is a robotic car but could be virtually any robotic embodiment controlled by an Arduino board), the lower level C/C++ code compiled by the Arduino IDE into machine code to run a microcontroller which controls the robotic embodiment, the basic electronics and mechatronics of the robotic embodiment and Arduino board interface, the Wi-Fi communication with the Arduino board, and finally the Python code which communicates with the Arduino baord and which can be used with your AI/AGI Python code to allow grounding (i.e., essentially interfacing) with the robotic embodiment.
 
 Most readers will be familiar with large language models at this time, e.g., ChatGPT, and many others, of course. A large language model (LLM) is a type of artificial intelligence (AI) model designed to understand and generate human language. These models are trained on vast amounts of text data and are capable of performing a wide range of language-related tasks, such as text generation, translation, summarization, and answering questions. 
@@ -605,7 +605,7 @@ If you look at the code you will see that the program starts off by importing a 
 
 In the constants section of the code you can see a number of the prompts which we will use with the LLM. Some of these prompts are for solving a travelling salesperson problem and for solving a compositionality problem, which will be used as comparisons when we interface the PetitCat project to a cognitive architecture, in later Parts of the documentation.
 
-Looking at the initializations section of the code you can see the details how we initialize the OpenAI LLM API. Note that the licensed key required for using this API are stored in the host computer's environmental variables, so as to prevent needing to disclose them publicly in the Python source code.
+Looking at the initializations section of the code you can see the details how we initialize the OpenAI LLM API. Note that the licensed key required for using this API is stored in the host computer's environmental variables, so as to prevent needing to disclose them publicly in the Python source code.
 
 Many of the LLM APIs available now do require paid licenses, although the fees are modest monthly ones. However, better performing open source free LLM API's are starting to emerge at the time of this writing, and hopefully can be used with future versions of the PetitCat Project. Thus, in order to try out the code below, you would need a paid subscription to OpenAI's ChatGPT product (i.e., the lowest cost consumer-level subscription is fine -- it is not very expensive and can be cancelled after one month) to actually use the code below with the LLM.
 
