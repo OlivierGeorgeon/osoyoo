@@ -495,7 +495,45 @@ This function uses ctrl.motor_command() and a value of "8" is passed as paramete
 <h1 style="font-size: 24px;">Step #5 --  Considering the Return Data from the Robotic Car" </h1>
 -
 
-Ok
+Ok.... run petitcat2.py.
+
+(Which means:
+
+#1 -- Plug the USB into the car and your computer. Open up the Arduino IDE. Upload the "petitcat_arduino.ino" code to the car. (Not necessary if this code is already running on your robotic car's Arduino board.)
+
+#2 -- Look at the Serial Monitor for the IP address to use. (Not necessary if car was not powered off and your Wi-Fi remains stable.)
+
+#3 -- Go to https://github.com/OlivierGeorgeon/osoyoo/tree/master/tests  and copy the file "petitcat2.py" to your Python environment. (Not necessary if this file is already in your Python environment.)
+
+#4 -- Now turn on the robotic car. Now in your Python environment (e.g., in Windows I am using the terminal and will show examples from there), run the program "petitcat2.py": 
+
+Windows terminal:    >python petitcat2.py    )
+
+If you enter the code '2' so that the robot car goes backwards, note that the following sensory data appears as shown in the screenshot below. (Note that the PetitCat project grew out of a strong sense of grounding as well as active inference where there is emphasis on the action-sense cycle to make sense of the world, rather than the stereotypical sense-action cycle of other artificial systems.)
+
+---------------------------
+Small theoretical divergence here (optional to read):
+
+Traditional engineered systems often follow a sense-action cycle, which is more reactive. The system senses the environment, processes the data, and then takes an action based on that sensory input.
+
+In the context of active inference, the action-sense cycle means that actions are taken to reduce prediction errors. The PetitCat system is proactive, using actions to gather data that will refine its understanding of the environment.
+
+Active inference is a theory from neuroscience and cognitive science, primarily associated with the work of Karl Friston. It posits that organisms (or systems) actively try to minimize the difference between their predictions about the world and the actual sensory data they receive.
+
+This involves both perception (updating beliefs based on sensory input) and action (changing the environment to align sensory input with predictions).
+
+In the context of active inference, the action-sense cycle means that actions are taken to reduce prediction errors. The system is proactive, using actions to gather data that will refine its understanding of the environment.
+
+In the context of traditional engineering systems (i.e., the courses you may have taken in university as part of an engineering degree) systems often follow a sense-action cycle, which is more reactive. The system senses the environment, processes the data, and then takes an action based on that sensory input.
+
+Thus, much of the code surrounding the PetitCat project tends to be an action-sense cycle. HOWEVER.... yes, you can easily change this to a traditional sense-action cycle, and we do indeed do this in later Parts of the documentation for some small projects.
+
+---------------------------
+
+<p align="center">
+ <img src="statussign.png" width="800" height="800">
+</p>
+
 
 
 
@@ -504,7 +542,7 @@ Ok
 -
 
 
-<h1 style="font-size: 24px;">Step #5 -- Advanced Features of the petitcat2.py Module" </h1>
+<h1 style="font-size: 24px;">Step #6 -- Advanced Features of the petitcat2.py Module" </h1>
 -
 TO DO
 
@@ -512,7 +550,7 @@ PENDING
 
 -
 
-<h1 style="font-size: 24px;">Steps #6,7,8 -- Installing PetitCatMain1.py </h1>
+<h1 style="font-size: 24px;">Steps #7,8 -- Installing PetitCatMain1.py </h1>
 
 We will now install "PetitCatMain1.py".
 
