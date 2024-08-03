@@ -440,38 +440,64 @@ In Step #3 above we utilized this class using the default demo code in "petitcat
 
 -
 
+Let's take a look at the demonstration code.
+
+It starts off by instantiating the PetitCatController class with an instance called "controller".
+
+Then the demo code goes into While-loop, which requires the user to input 'exit' to leave.
+
+First in the loop there is:  response = controller.motor_command(motor_code)
+
+"motor_code" is a value the user enters and which will be send to the robotic car. The codes are similar to the ones used in the above sections. For example, if you enter '2' the wheels of the robotic car will spin backwards.
+
+Note that we get a response put into the variable "response" from controller.motor_command().
+
+The next item in the While loop is: response = controller.sensory_input(sensory_system)
+
+The requested sensory system will send back a response.
+
+Examine the code for more details.
+
+Now try to write a module of your own that allows the car to trace out the letter "H" using the PetitCatController() class.
+
+(Or you can download such a Python program from: Go to https://github.com/OlivierGeorgeon/osoyoo/tree/master/tests  and copy the file "sillyHdemo.py" to your Python environment.)
+
+Did you try out your code?
+
+If you want to look at sillyHdemo.py code, let's consider the start of the program:
+
+<p align="center">
+ <img src="silly.png" width="800" height="800">
+</p>
 
 
+Note that we have to import "PetitCatController" class now from the module petitcat2.py.
+
+Not shown in the code segment above are the lines at the end of the code. Let's show it here:
+
+<p align="center">
+ <img src="mainsilly.png" width="800" height="800">
+</p>
 
 
+Note that we instantiate the class PetitCatController with "controller" and we pass "controller" into the function trace_h(controller).
 
-You can try this module quickly out with any of your own Python code -- it should work without problem.
+The function trace_h(ctrl=controller) then calls forward, backward, right and left turn functions to trace out the letter H by the robot car.
 
-Consider this silly program "sillyHdemo.py" to have the robot car to trace out the letter "H". 
+If you look at the code above you see the code for the function move_foward(ctrl=controller, duration_in_seconds).
 
-It uses the "petitcat2.py" module to interface to the robotic car and have it go through the silly motions of tracing out the letter "H".
-
-Go to https://github.com/OlivierGeorgeon/osoyoo/tree/master/tests  and copy the file "sillyHdemo.py" to your Python environment.
-
-Experiment a bit with the "petitcat2.py" module, and in the next Step we will consider its use in more depth in grounding your AI/AGI project.
+This function uses ctrl.motor_command() and a value of "8" is passed as parameter to go forwards. Other functions for going backwards, left, right, etc are similar but pass different values.
 
 
 -
+
+
+<h1 style="font-size: 24px;">Step #5 --  Considering the Return Data from the Robotic Car" </h1>
 -
 
+Ok
 
 
-<h1 style="font-size: 24px;">Step #4 --  Using the petitcat2.py Module in More Depth" </h1>
--
-
-Ok... at this point you have used the "petitcat2.py" module to quickly interface your own Python code (or tried the litte demo code provided) to the robotic car.
-
-Let's consider the "petitcat2.py" module in more detail here.
-
-
-TO DO
-
-PENDING
 
 
 -
