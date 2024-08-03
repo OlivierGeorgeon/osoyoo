@@ -531,7 +531,7 @@ Thus, much of the code surrounding the PetitCat project tends to be an action-se
 ---------------------------
 
 <p align="center">
- <img src="statussign.png" width="800" height="800">
+ <img src="statussig.png" width="800" height="800">
 </p>
 
 
