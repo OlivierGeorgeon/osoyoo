@@ -530,21 +530,87 @@ Thus, much of the code surrounding the PetitCat project tends to be an action-se
 
 ---------------------------
 
+
+Ok..... se we enter '2' for a motor command, the robot goes backwards, and we see the following response from this motor command:
+
+
 <p align="center">
  <img src="statussig.png" width="700" height="300">
 </p>
 
 
+What do these parameters mean?
 
+clock -- counting the number of action-sense cycles and which one this is
+
+action -- the action value entered, which was a '2' in the example above
+
+duration1 -- how many milliseconds the action lasted for, which was about 1 second the car was going backwards
+
+duration -- the total duration of this 'clock cycle', which was about 1.3 seconds here
+
+head_angle -- the head angle of the ultrasonic sensor in + or - degrees from straight ahead, so, the -50 degrees shown is 50 degrees to the right of the robot with 0 degrees being straight ahead
+
+echo_distance -- the distance in mm from which the ultrasonic echo occurred, so the -50 degrees echo occurred 400 mm, i.e., 40 cm, away
+
+floor and status -- if there is a transition in the floor color from reflecting to a black line or area you will see '1's returned; these will be discussed in more detail later. Generally if no change there will be 0 returned, 1 if a change to the right, 2 if a change to the left, and 3 if a change to both the right and the left
+
+The motor commands which you can enter are as follows:
+
+'1' - turn left
+
+'2' - go backwards
+
+'3' - turn right
+
+'4' - swipe left (omnidirectional wheels allow the robot car to actually go left, i.e., not turn left but move left)
+
+'6- - swipe right
+
+'8' - go forwards
+
+'-' - ultrasonic scan
+
+Let's try the '-' command. Perhaps put an object in front of the robot. I just put a glass in front of the robot. At the prompt "Enter motor command" I then entered '-'  (i.e., just the dash without the quotes, of course) and pressed Enter. This motor command is to move the servomechanism holding the ultrasonic transducer in an arc. You then see something like this returned as the response:  
+
+{"clock":20,"action":"-","duration1":1118,"head_angle":0,"echo_distance":37,"floor":0,"duration":1426,"echos":{"-90":417,"-60":570,"-30":51,"0":37,"30":65,"90":997},"status":"0"}'
+
+Note that there are echos at 90 degrees to the right, 60 degrees to the right, 30 degrees to the right, 0 degrees straight ahead (the glass about 4 cm away), 30 degrees to the left, 60 degrees to the left and 90 degrees to the left.
+
+So... you actually can get your sensory information here via a motor command. 
+
+(We will discuss the Sensory Input Response possible input parameters and the response later.)
 
 
 -
 -
 
-
-<h1 style="font-size: 24px;">Step #6 -- Advanced Features of the petitcat2.py Module" </h1>
+<h1 style="font-size: 24px;">Step #6 -- Adding an LLM to the PetitCat Project </h1>
 -
-TO DO
+This section about adding a Large Language Model is optional reading, as there will be an entire Part dedicated to the this subject further in the documentation. However, we have tried to cover all the basics of the PetitCat Project, i.e., the robotic embodiment (which is a robotic car but could be virtually any robotic embodiment controlled by an Arduino board), the lower level C/C++ code compiled by the Arduino IDE into machine code to run a microcontroller which controls the robotic embodiment, the basic electronics and mechatronics of the robotic embodiment and Arduino board interface, the Wi-Fi communication with the Arduino board, and finally the Python code which communicates with the Arduino baord and which can be used with your AI/AGI Python code to allow grounding (i.e., essentially interfacing) with the robotic embodiment.
+
+Most readers will be familiar with large language models at this time, e.g., ChatGPT, and many others, of course. A large language model (LLM) is a type of artificial intelligence (AI) model designed to understand and generate human language. These models are trained on vast amounts of text data and are capable of performing a wide range of language-related tasks, such as text generation, translation, summarization, and answering questions. 
+
+Below we will interface an LLM API, one of the ChatGPT API's (it may change from the time of the writing) with the PetitCat project. We will continue with the source code of petitcat2.py and modify it, and save the new Python file interfaced with the LLM API as petitcatllm.py
+
+The file petitcatllm.py can be downloaded from the PetitCat project pages at GitHub.
+
+Go to https://github.com/OlivierGeorgeon/osoyoo/tree/master/tests  and copy the file "petitcatllm.py" to your Python environment.
+
+If you look at the code you will see that the program starts off by importing a library that abstracts away many of the details ot interfacing with LLM API's, and that we are using the library modules for OpenAI's LLM APIs:
+
+<p align="center">
+ <img src="importopenai.png" width="700" height="300">
+</p>
+
+In the constants section of the code you can see a number of the prompts which we will use with the LLM. Some of these prompts are for solving a travelling salesperson problem and for solving a compositionality problem, which will be used as comparisons when we interface the PetitCat project to a cognitive architecture, in later Parts of the documentation.
+
+Looking at the initializations section of the code you can see the details how we initialize the OpenAI LLM API. Note that the licensed key required for using this API are stored in the host computer's environmental variables, so as to prevent needing to disclose them publicly in the Python source code.
+
+Many of the LLM APIs available now do require paid licenses, although the fees are modest monthly ones. However, better performing open source free LLM API's are starting to emerge at the time of this writing, and hopefully can be used with future versions of the PetitCat Project. Thus, in order to try out the code below, you would need a paid subscription to OpenAI's ChatGPT product (i.e., the lowest cost consumer-level subscription is fine -- it is not very expensive and can be cancelled after one month) to actually use the code below with the LLM.
+
+
+
 
 PENDING
 
