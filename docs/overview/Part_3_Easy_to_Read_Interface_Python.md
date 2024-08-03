@@ -616,28 +616,21 @@ PENDING
 
 -
 
-<h1 style="font-size: 24px;">Steps #7,8 -- Installing PetitCatMain1.py </h1>
+<h1 style="font-size: 24px;">Step #7 -- Installing PetitCatMain1.py </h1>
 
-We will now install "PetitCatMain1.py".
+We will now install "PetitCatMain1.py" which will demonstrate some of the grid cell features of the PetitCat project.
 
-
-Cloning of directory structure....
-
-Perhaps introduce venv virtual environments?
-
-Explaining what concepts code is working on.....
-
-
-TO DO
 
 PENDING
 
+Perhaps also cloning of directory structure, perhaps introduce venv virtual environments?
+
+
+
 -
 
 
 -
-
-
 
 
 .....
