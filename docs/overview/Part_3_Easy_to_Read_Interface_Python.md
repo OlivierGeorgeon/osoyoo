@@ -597,7 +597,7 @@ The file petitcatllm.py can be downloaded from the PetitCat project pages at Git
 
 Go to https://github.com/OlivierGeorgeon/osoyoo/tree/master/tests  and copy the file "petitcatllm.py" to your Python environment.
 
-If you look at the code you will see that the program starts off by importing a library that abstracts away many of the details ot interfacing with LLM API's, and that we are using the library modules for OpenAI's LLM APIs:
+If you look at the code you will see that the program starts off by importing a library that abstracts away many of the details of interfacing with LLM API's, and that we are using the library modules for OpenAI's LLM APIs:
 
 <p align="center">
  <img src="importopenai.png" width="700" height="300">
