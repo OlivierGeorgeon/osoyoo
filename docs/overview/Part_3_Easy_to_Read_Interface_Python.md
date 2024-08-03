@@ -467,7 +467,7 @@ Did you try out your code?
 If you want to look at sillyHdemo.py code, let's consider the start of the program:
 
 <p align="center">
- <img src="silly.png" width="800" height="800">
+ <img src="silly.png" width="400" height="400">
 </p>
 
 
@@ -476,7 +476,7 @@ Note that we have to import "PetitCatController" class now from the module petit
 Not shown in the code segment above are the lines at the end of the code. Let's show it here:
 
 <p align="center">
- <img src="mainsilly.png" width="800" height="800">
+ <img src="mainsilly.png" width="400" height="400">
 </p>
 
 
