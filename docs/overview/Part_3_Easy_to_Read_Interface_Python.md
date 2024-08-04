@@ -609,6 +609,16 @@ Looking at the initializations section of the code you can see the details how w
 
 Many of the LLM APIs available now do require paid licenses, although the fees are modest monthly ones. However, better performing open source free LLM API's are starting to emerge at the time of this writing, and hopefully can be used with future versions of the PetitCat Project. Thus, in order to try out the code below, you would need a paid subscription to OpenAI's ChatGPT product (i.e., the lowest cost consumer-level subscription is fine -- it is not very expensive and can be cancelled after one month) to actually use the code below with the LLM.
 
+The LangChain Python framework used in the code, as discussed in the imports above, is an open -source library and at the time of writing is free to download and use, in keeping with the open-source philosophy of the PetitCat project. We have not modified the source code of LangChain but are using the latest version installed without changes at the time of writing. We use LangChain to abstract away many of the lower-level details of interfacing to an LLM, although, for example, we could have relatively easily directly interfaced to the OpenAI GPT API directly without LangChain in the code above. An advantage of LangChain is that it can interface to not only the LLM's from OpenAI but, at the time of this writing, the LLMs from Google Gemini, Microsoft Asure OpenAI, Amazon API Gateway (limited features), Anthropic, AI21, Cohere, Hugging Face, Meta LLaMA, and others. At the time of writing the various integrations and the extent (some integrations do not adequately support the LLM) can be checked at:  https://python.langchain.com/v0.2/docs/integrations/llms/    
+
+<p align="center">
+ <img src="langchain.png" width="300" height="100">
+</p>
+
+Although not utilized at present, in the future some users might be interested in lightweight LLMs that can be better utilized by embedded systems, such as Google's Gemma small LLMs. The LangChain library does support the "langchain-google-vertexai" package which allows interaction with the various Gemma models. The Gemma model can actually be downloaded from GitHub. However, suitable GPUs with sufficient memory would be required, obviously orders of magnitude more than the Arduino board could handle, although some PC's/servers could be adequately configured to run this in a self-contained manner.
+
+So, in summary, although many LLM's can be used with the LangChain library, including lightweight models, for the initial integration of the PetitCat Project with an LLM we are using versions of the popular ChatGPT language model. Although this requires a very modest subscription fee to OpenAI (which includes utilization of many features of their other products which can useful in a myriad of different ways besides the PetitCat project) we are getting a well-tested API that is continuously maintained. However, we expect to transition to a non-license-fee product (e.g., LLaMa) in the near future.
+
 
 
 
