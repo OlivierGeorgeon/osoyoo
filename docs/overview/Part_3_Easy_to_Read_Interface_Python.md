@@ -619,10 +619,20 @@ Although not utilized at present, in the future some users might be interested i
 
 So, in summary, although many LLM's can be used with the LangChain library, including lightweight models, for the initial integration of the PetitCat Project with an LLM we are using versions of the popular ChatGPT language model. Although this requires a very modest subscription fee to OpenAI (which includes utilization of many features of their other products which can useful in a myriad of different ways besides the PetitCat project) we are getting a well-tested API that is continuously maintained. However, we expect to transition to a non-license-fee product (e.g., LLaMa) in the near future.
 
+Let's run the code.
+
+At the command line pelase enter:
+
+>python petitcatllm.py
 
 
+If the robotic car is turned on with code running as described above, then you should see something like this on the monitor, and the car should be driving around the room, attempting to avoid objects.
 
-PENDING
+<p align="center">
+ <img src="cardemollm.png" width="300" height="100">
+</p>
+
+Experiment with the code and see what behaviour you can get out of the LLM interfacted to the robotic car.
 
 -
 
