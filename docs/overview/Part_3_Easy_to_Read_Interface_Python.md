@@ -629,7 +629,7 @@ At the command line pelase enter:
 If the robotic car is turned on with code running as described above, then you should see something like this on the monitor, and the car should be driving around the room, attempting to avoid objects.
 
 <p align="center">
- <img src="cardemollm.png" width="300" height="100">
+ <img src="cardemollm.png" width="900" height="400">
 </p>
 
 Experiment with the code and see what behaviour you can get out of the LLM interfacted to the robotic car.
