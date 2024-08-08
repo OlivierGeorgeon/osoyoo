@@ -6,8 +6,14 @@
 # pylint: disable=redefined-outer-name
 """
 PetitCatController Module for the PetitCat Project
+This code currently written for Overview Documentation, Part III -- proof of concept of integrating an LLM framework (LangChain) with
+the PetitCatController class and using this to control the simple Osoyoo robotic car embodiment.
 
-LLM API is added.
+(See documentation -- there are a number of Parts (i.e., volumes)  taking a user from the assembly of a simple PetitCat embodiment (the Osoyoo robotic car) all the way
+to a full humanoid robotic embodiment interfaced to the Causal Cognitive Architecture with hybridization of an LLM module and von Neumann module.)
+
+LLM API is added here to the PetitCatController class. Very straightforward code produces somewhat sophisticated behavior on the part of the robotic embodiment.
+(User should have done Parts I and Part II. This module discussed in Part III.)
 
 This module provides a class to control the PetitCat robotic device, which by default is the robotic car.
 The purpose is to ground your AI/AGI project in the real world by providing access to such embodiments.
