@@ -20,37 +20,10 @@ The purpose is to ground your AI/AGI project in the real world by providing acce
 The PetitCat project has a number of more advanced modules allowing, for example, active inference. This module,
 however, is to provide the basics of providing your AI/AGI project with an embodiment.
 
-Summary of Module: It allows sending motor commands and receiving sensory inputs to/from the robotic device.
+Summary of Module: It allows sending motor commands and receiving sensory inputs to/from the robotic device like the previous PetitCatController 
+class, which indeed is used again. However, an LLM of your choice via the LangChain framework now is sending motor commands and interpreting
+sensory inputs autonomously.
 
-Nomenclature of saved files: petitcatN.py   e.g., petitcat2.py
-This file will on its own allow your AI/AGI project access to a robotic device embodiment.
-
-Example usage:
-    # Run the program from the command line, optionally providing the IP address as a command-line argument:
-    python petitcat2.py <robot_ip>
-
-    # If no IP address is provided on the command line, the program will prompt the user with the updated message to input the IP address.
-    You can find this IP address from the Arduino serial monitor after the USB cable is plugged into the device and Arduino
-    code is downloaded (or already on the robotic device)
-    (This IP address will be fetched automatically in future enhancements to the project.)
-
-    # Example motor command
-    motor_code = input("Enter motor command: ")
-    response = controller.motor_command(motor_code)
-    print("Motor Command Response:", response)
-
-    # Example sensory input request
-    sensory_system = input("Enter sensory system (ultrasound/ir): ")
-    response = controller.sensory_input(sensory_system)
-    print("Sensory Input Response:", response)
-
-This code is for demonstration purposes.
-Further work could:
-    -split the script into separate modules
-    -better specific exception handling
-    -logging instead of the more convenient print statements used below
-    -more versatile usage of argparse
-    -better documentation in the docstrings
 
 """
 
