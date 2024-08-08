@@ -13,7 +13,8 @@ the PetitCatController class and using this to control the simple Osoyoo robotic
 to a full humanoid robotic embodiment interfaced to the Causal Cognitive Architecture with hybridization of an LLM module and von Neumann module.)
 
 LLM API is added here to the PetitCatController class. Very straightforward code produces somewhat sophisticated behavior on the part of the robotic embodiment.
-(User should have done Parts I and Part II. This module discussed in Part III.)
+(User should have read Parts I and Part II of the Overview documentation -- you need the appropriate C/C++ code compiled by the Arduino IDE and running on your
+robot's compatible microcontroller. This module discussed in Part III of the Overview documentation.)
 
 This module provides a class to control the PetitCat robotic device, which by default is the robotic car.
 The purpose is to ground your AI/AGI project in the real world by providing access to such embodiments.
