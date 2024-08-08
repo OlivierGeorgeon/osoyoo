@@ -21,6 +21,10 @@ The purpose is to ground your AI/AGI project in the real world by providing acce
 The PetitCat project has a number of more advanced modules allowing, for example, active inference. This module,
 however, is to provide the basics of providing your AI/AGI project with an embodiment.
 
+The functions to allow an LLM to attempt solutions to a travelling salesperson problem (TSP) and a compositionality problem are included below. They were originally
+used to simulate an Alien AGI for comparisons of performance in a paper. They remain since we will integrate the robotic embodiment of the Causal Cognitive Architecture
+with these problems for actual physical solutions in the near future.
+
 Summary of Module: It allows sending motor commands and receiving sensory inputs to/from the robotic device like the previous PetitCatController 
 class, which indeed is used again. However, an LLM of your choice via the LangChain framework now is sending motor commands and interpreting
 sensory inputs autonomously.
