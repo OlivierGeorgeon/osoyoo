@@ -45,7 +45,8 @@ Test documentation
 * Other Python programs in this repository allow interfacing an LLM to the PetitCat project
 
 Slide Presentation About the PetitCat Project -- BICA*AI 2024 Conference, Seattle, Washington and Virtual
-*[PetitCat BICA slides 2024](https://easychair.org/smart-slide/slide/QFRw#)
+
+[PetitCat BICA slides 2024](https://easychair.org/smart-slide/slide/QFRw#)
 
 Full project documentation in English: 
 * [The project's wiki](docs/wiki/home.md) Helps you assemble your robot, calibrate it, and run the project.
