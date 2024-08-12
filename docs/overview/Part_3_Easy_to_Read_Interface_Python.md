@@ -559,7 +559,7 @@ The motor commands which you can enter are as follows:
 
 Let's try the '-' command. Perhaps put an object in front of the robot. I just put a glass in front of the robot. At the prompt "Enter motor command" I then entered '-'  (i.e., just the dash without the quotes, of course) and pressed Enter. This motor command is to move the servomechanism holding the ultrasonic transducer in an arc. You then see something like this returned as the response:  
 
-{"clock":20,"action":"-","duration1":1118,"head_angle":0,"echo_distance":37,"floor":0,"duration":1426,"echos":{"-90":417,"-60":570,"-30":51,"0":37,"30":65,"90":997},"status":"0"}'
+    {"clock":20,"action":"-","duration1":1118,"head_angle":0,"echo_distance":37,"floor":0,"duration":1426,"echos":{"-90":417,"-60":570,"-30":51,"0":37,"30":65,"90":997},"status":"0"}'
 
 Note that there are echos at 90 degrees to the right, 60 degrees to the right, 30 degrees to the right, 0 degrees straight ahead (the glass about 4 cm away), 30 degrees to the left, 60 degrees to the left and 90 degrees to the left.
 
@@ -568,10 +568,7 @@ So... you actually can get your sensory information here via a motor command.
 (We will discuss the Sensory Input Response possible input parameters and the response later.)
 
 
--
--
-
-<h1 style="font-size: 24px;">Step #6 -- Adding an LLM to the PetitCat Project </h1>
+# Step #6 -- Adding an LLM to the PetitCat Project
 
 This section about adding a Large Language Model is optional reading, as there will be an entire Part dedicated to the this subject further in the documentation. However, we have tried to cover all the basics of the PetitCat Project, i.e., the robotic embodiment (which is a robotic car but could be virtually any robotic embodiment controlled by an Arduino board), the lower level C/C++ code compiled by the Arduino IDE into machine code to run a microcontroller which controls the robotic embodiment, the basic electronics and mechatronics of the robotic embodiment and Arduino board interface, the Wi-Fi communication with the Arduino board, and finally the Python code which communicates with the Arduino baord and which can be used with your AI/AGI Python code to allow grounding (i.e., essentially interfacing) with the robotic embodiment.
 
@@ -595,7 +592,7 @@ Looking at the initializations section of the code you can see the details how w
 
 Many of the LLM APIs available now do require paid licenses, although the fees are modest monthly ones. However, better performing open source free LLM API's are starting to emerge at the time of this writing, and hopefully can be used with future versions of the PetitCat Project. Thus, in order to try out the code below, you would need a paid subscription to OpenAI's ChatGPT product (i.e., the lowest cost consumer-level subscription is fine -- it is not very expensive and can be cancelled after one month) to actually use the code below with the LLM.
 
-The LangChain Python framework used in the code, as discussed in the imports above, is an open -source library and at the time of writing is free to download and use, in keeping with the open-source philosophy of the PetitCat project. We have not modified the source code of LangChain but are using the latest version installed without changes at the time of writing. We use LangChain to abstract away many of the lower-level details of interfacing to an LLM, although, for example, we could have relatively easily directly interfaced to the OpenAI GPT API directly without LangChain in the code above. An advantage of LangChain is that it can interface to not only the LLM's from OpenAI but, at the time of this writing, the LLMs from Google Gemini, Microsoft Asure OpenAI, Amazon API Gateway (limited features), Anthropic, AI21, Cohere, Hugging Face, Meta LLaMA, and others. At the time of writing the various integrations and the extent (some integrations do not adequately support the LLM) can be checked at:  https://python.langchain.com/v0.2/docs/integrations/llms/    
+The LangChain Python framework used in the code, as discussed in the imports above, is an open-source library and at the time of writing is free to download and use, in keeping with the open-source philosophy of the PetitCat project. We have not modified the source code of LangChain but are using the latest version installed without changes at the time of writing. We use LangChain to abstract away many of the lower-level details of interfacing to an LLM, although, for example, we could have relatively easily directly interfaced to the OpenAI GPT API directly without LangChain in the code above. An advantage of LangChain is that it can interface to not only the LLM's from OpenAI but, at the time of this writing, the LLMs from Google Gemini, Microsoft Asure OpenAI, Amazon API Gateway (limited features), Anthropic, AI21, Cohere, Hugging Face, Meta LLaMA, and others. At the time of writing the various integrations and the extent (some integrations do not adequately support the LLM) can be checked at:  https://python.langchain.com/v0.2/docs/integrations/llms/    
 
 <p align="center">
  <img src="langchain.png" width="300" height="100">
@@ -607,7 +604,7 @@ So, in summary, although many LLM's can be used with the LangChain library, incl
 
 Let's run the code.
 
-At the command line pelase enter:
+At the command line please enter:
 
 >python petitcatllm.py
 
@@ -618,7 +615,7 @@ If the robotic car is turned on with code running as described above, then you s
 
 Experiment with the code and see what behaviour you can get out of the LLM interfacted to the robotic car.
 
--
+
 
 # Step #7 -- Installing PetitCatMain1.py
 
