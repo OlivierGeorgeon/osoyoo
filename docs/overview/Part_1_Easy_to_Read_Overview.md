@@ -1,8 +1,3 @@
-
-##
-
-
-
 # PETITCAT PROJECT DISCLAIMER
 
 **Date:** July 1, 2024
@@ -36,19 +31,14 @@ If you contribute to this project, you assert that your contributions are given 
 If any content should not be here or if there are any legal concerns, please advise, and a correction will be made in a suitable time period.
 
 
-##
-
-
 
 # An Easy-to-Read Overview of the Robot Car ("PetitCat") Project
 # Part I
 
 ![petitcatgpt4logo](petitcatgpt4logo.jpg)
--
--
 
 
-<h2 style="font-size: 24px;">The PetitCat Project - TL;DR </h2>
+## The PetitCat Project
 
 
 The PetitCat Project uses open source software combined with open source hardware to enable the Python code of an AI/AGI project to interface on a real-time basis via Wi-Fi with lower-level C/C++ compiled code of a robotic embodiment. The project has lower cost software and hardware requirements than robotic projects utilizing more formal frameworks such as ROS2. Of more importance, the PetitCat Project readily allows the researcher to customize the project to her/his research requirements, and involves a very modest learning curve. While the PetitCat Project was initially created to allow symbol grounding, enaction, active inference, predictive coding, and developmental and constructivist learning, it is suitable for a wide range of people, from the student to the serious AI/AGI researcher.
@@ -84,20 +74,19 @@ The "Easy-to-Read Overview" of the project is divided into a number of parts:
 
 The PetitCat documentation is written so that anyone with a basic education can read it and understand it. Having a deeper breadth of knowledge in software development, AI, or cognitive science, can, of course, allow greater appreciation for certain aspects of the project.
 
--Part I does not require any specialized background knowledge. You should be familiar with moving files around in either your Windows, Mac or Linux desktop/laptop computer. Other than that, no specialized knoweldge is needed. Part I is perfectly fine for high school students and hobbyists.
+- Part I does not require any specialized background knowledge. You should be familiar with moving files around in either your Windows, Mac or Linux desktop/laptop computer. Other than that, no specialized knoweldge is needed. Part I is perfectly fine for high school students and hobbyists.
 
--Part II may be fine for high school students, college students and hobbyists as well, given a willingness of some effort to learn things here and there. However, the documentation will guide you on this learning journey. The lower level software of the PetitCat project is written in C\C++ in the Arduino IDE. You don't need to know these languages or environment in order to use Python with the project. However, we provide a very basic C\C++\Arduino tutorial which may be sufficient for most readers who do want to have a bit more control over the Arduino board coding. We just touch upon the Python control of the project at the end of Part II, so you are not expected to have much Python knowledge in this part, unless you want to start modifying the Python files.
+- Part II may be fine for high school students, college students and hobbyists as well, given a willingness of some effort to learn things here and there. However, the documentation will guide you on this learning journey. The lower level software of the PetitCat project is written in C\C++ in the Arduino IDE. You don't need to know these languages or environment in order to use Python with the project. However, we provide a very basic C\C++\Arduino tutorial which may be sufficient for most readers who do want to have a bit more control over the Arduino board coding. We just touch upon the Python control of the project at the end of Part II, so you are not expected to have much Python knowledge in this part, unless you want to start modifying the Python files.
 
--Part III is where the PetitCat project becomes more useful -- interfacing the Python code of your AI/AGI project with the PetitCat projects.
+- Part III is where the PetitCat project becomes more useful -- interfacing the Python code of your AI/AGI project with the PetitCat projects.
 
--Part IV allows you to modify the Arduino C/C++ code to use other robotic embodiments than the default robot car, or to add addtional sensors and actuators to the robot car.
+- Part IV allows you to modify the Arduino C/C++ code to use other robotic embodiments than the default robot car, or to add addtional sensors and actuators to the robot car.
 
--In Parts V and VI we will integrate the PetitCat project with a cognitive architecture and then a large language model. Again, in this part, only intermediate (or even novice) Python coding abilities are required. However, we will gently guide you through the project, so that you end up with a super-human intelligent grounded autonomous robot system.
+- In Parts V and VI we will integrate the PetitCat project with a cognitive architecture and then a large language model. Again, in this part, only intermediate (or even novice) Python coding abilities are required. However, we will gently guide you through the project, so that you end up with a super-human intelligent grounded autonomous robot system.
 
--Part VII really only requires some knowledge of Python. You do not have to be an expert developer. More important, is perhaps a background in AI or cognitive science. However, there is no real background prerequisite here. Regardless of the reader's background, we provide gentle tutorials on a number of topics, and guide the learner through the concepts of active inference and implementing it in the PetitCat project.
+- Part VII really only requires some knowledge of Python. You do not have to be an expert developer. More important, is perhaps a background in AI or cognitive science. However, there is no real background prerequisite here. Regardless of the reader's background, we provide gentle tutorials on a number of topics, and guide the learner through the concepts of active inference and implementing it in the PetitCat project.
 
--
--
+
 
 # Part I: The Basics
 
@@ -138,7 +127,7 @@ Embodiment technically means to give an AI program some way to sense the environ
 
 Embodiment also goes beyond this. For example, by having a robot body, your AI program can learn in context, i.e., it can associate the stimuli that the environment provides and the actions the robot performs, with the outcome that results. As well, the robot, i.e., the embodiment for your AI program, can get immediate feedback on an action it performs, and thus it can continually improve the links between symbols and their effect on the environment.
 
-##
+## 
 Tip: When you click links in these Overview document files, right-click so that you open up a new browser page.
 
 (In the Windows Chrome browser, for example, right-clicking the link and then choosing "Open link in new tab" will place the linked web page in a new tab -- very convenient for looking at when you are ready, and then deleting when you are done. You are still in the same place in this Overview document.)
@@ -151,7 +140,7 @@ Tip: When you click links in these Overview document files, right-click so that 
  <img src="rightclick.jpg" width="250" height="340">
 </p>
 
-##
+## 
 
 For a good overview of the importance of grounding your AI/AGI please consider my paper:
 
@@ -170,12 +159,12 @@ For a paper on using the PetitCat project for Enactive Inference by Dr Georgeon 
 
 (We will discuss the concept of active inference in a later Part of the documentation. The main idea behind active inference, as developed by psychiatrist and neuroimaging expert Karl Friston, is that organisms keep a stable state by minimizing "free energy" which is related to prediction errors in their models of the world. (If you recall your high school chemistry classes, Gibbs Free Energy is whether a chemical reacton will occur spontaneously, i.e., a system's potential to perform work. When a system is in equilibrium, the free energy is minimized. If you studied thermodynamics in university, then you have a more detailed understanding of free energy, e.g., Helmholtz, Boltzmann, etc.  Friston's use of free energy is similar, where there is minimal mismatch between an organism's prediction of the world and what they perceive of the real world, and thus the organism stays in a stable, equilibrium state as such in its environment. If there is a mismatch detected, then the organism will adapt its behavior to minimize this prediction error.) Thus, the organism is constantly updating its internal modle of the world in order to minimize prediction errors with regard to the actual sensory signals coming in from the real world. Enactivism is related to a philosophy that emphasizes the active role an organism has in shaping its perception and cognition, i.e., it does not simply process information in the act of perception, but is deeply grounded in its environment, and by interacting with its environment, it shapes it perceptions and model of the world. Thus, in enactive inference, cognition must be embodied and grounded such the organism creates its own reality by interactions with the environment. Enactive inference generally is considered to focus more on the embodied interaction than the internal models of active inference. We will discuss these concepts in later Parts of the documentation, but the interested reader should consult Georgeon and colleagues' paper above.)
 
-##
+## 
 Note to hobbyists, high school students, even computer scientists without a background in cognitive science:
 
 You do not need to understand the above few paragraphs to build the robot car and use it in your own projects, even AI ones. However, doing so can be advantageous for better understanding the background of this project as well as aspects of cognition.
 
-##
+## 
 
 
 
@@ -299,7 +288,7 @@ Future robotic embodiments are interesting to consider but the reality is that t
 
 
 
-<h1 style="font-size: 24px;">Step #1 -- Decide if you want to do the Project</h1>
+# Step #1 -- Decide if you want to do the Project
 
 Your first step should be to decide to build this robotic car project. Are you working on an AI/AGI project that it could be useful for? (Actually, it is probably useful for most projects, including LLMs. Please read above about grounding and about artificial cognition.) Do you have an interest in robotics and would like to see an interface to an AI project? 
 
@@ -323,12 +312,7 @@ Don't be hesitant. Climb up on that horse and start your journey. Saddle up!!
 
 
 
--
--
--
--
-
-<h1 style="font-size: 24px;">Step #2 -- Purchase the Robot Car kit</h1>
+# Step #2 -- Purchase the Robot Car kit
 
 I assume you already have a Windows, Linux or Mac computer to use with this project. I used a Windows PC, and thus I will be describing my experience from a Windows point of view. However, running Arduino and Python code within Linux or Mac environments should be straightforward if that's what you are using.
 
@@ -358,7 +342,7 @@ Note: The Amazon website says this is a kit for teens while the Osoyoo website s
 -
 -
 
-<h1 style="font-size: 24px;">Step #3 -- Purchase the Extra Electronic Parts</h1>
+# Step #3 -- Purchase the Extra Electronic Parts
 
 You may not need these extra navigation parts immediately, but since they are purchased from AliExpress and generally delivered from China via slow delivery means (given that the sum total of the parts is about US$30), you may want to order these parts once you decide to go ahead with the project.
 
@@ -381,7 +365,7 @@ I will provide the exact AliExpress link I used to purchase these extra navigati
 -
 -
 
-<h1 style="font-size: 24px;">Step #4 -- Receiving the Robot Car Kit -- Finding the Documentation</h1>
+# Step #4 -- Receiving the Robot Car Kit -- Finding the Documentation
 
 A few days (or day -- Amazon.com is very efficient) have gone by and a package arrives at your lab, office (or home perhaps). It's the Osoyoo robotic car kit.
 
@@ -435,7 +419,7 @@ The online version of this manual has a useful parts list which links to the Oso
 -
 -
 
-<h1 style="font-size: 24px;">Step #5 -- Overview of the Parts and of the Documentation</h1>
+# Step #5 -- Overview of the Parts and of the Documentation
 
 Ok... at this point you've downloaded the correct PDF manual for your robot car kit.
 Again, as noted above --I am using the Model 2 manual in my overview of the robot car:  [model 2 PDF manual](https://osoyoo.com/manual/202000600-m2.pdf)
@@ -447,7 +431,7 @@ There is a metal bottom chassis where the drive motors will be attached.  (Note 
 
 Note that there is a separate drive motor for each of the four wheels. Note also there there is no steering apparatus. This is because these are Ilon Mecanum wheels  (or "omni wheels") that can go forwards and backwards, but also sideways. Note that the wheels are constructed of rollers at an angle of 45 degrees to the axis of rotation.
 
-##
+## 
 Note that you have 4 wheels which can go forward, go backwards or be in neutral, each individually.
 
 Thus, if you were to make a truth table of the different possible motions you would have 3^4 = 81 possible entries of activating the wheels on the robot car.
@@ -461,7 +445,7 @@ Well... 31 forward plus 0, and 31 backwards plus 0, so that makes 63 states for 
 Thus, as before, 4^63 = 15,752,961 states for the four wheels at any moment. Does this translate into 15 million different directions for the car?
 
 Something to explore later on.....
-##
+## 
 
 
 
@@ -499,7 +483,7 @@ After you construct the robot car and it is being used (especially by others) ma
 
 Before we start building the robot car, let's have a quick look at the documentation (always a good idea no matter what project you are working on).
 
-##
+## 
 A quick note on nomenclature:
 
 The PDF Manual from Osoyoo about the building the robot car contains five "lessons."
@@ -508,7 +492,7 @@ This Overview Documentation about the PetitCat project (which you may be reading
 
 Each "part" of the Overview Documentation is a separate markdown file (or other file if it has been converted, e.g., perhaps a PDF file). Each "part" is divided into different "steps."  These "steps" are like chapters in a book. You are reading right now "Step #5" in "Part 1" of the Overview Documentation of the PetitCat Project.
 
-##
+## 
 
 The PDF Model M2.0 documentation is divided into five "lessons." 
 
@@ -557,7 +541,7 @@ The Wi-Fi board will now actively interface to the Arduino board:
 -
 -
 
-<h1 style="font-size: 24px;">Step #6 -- Assembly of the Parts on the Underside of the Chassis</h1>
+# Step #6 -- Assembly of the Parts on the Underside of the Chassis
 
 -Follow the instruction manual to bolt into place the motor holders. Then install the jackscrews and couplings on the motors, and install the motors as shown in the manual. There are nylon tie wraps to hold the extra wires. Note that these motors (one for each wheel) have Hall sensors (the white, yellow, orange, green lines) but they are apparently not being used and are just tucked away. Only the ground black and power red wires will go to the electronics through the center hole in the chassis.
 
@@ -573,16 +557,16 @@ Assembled chassis (Note that the straps are still loose until the assembly is co
 -
 -
 
-<h1 style="font-size: 24px;">Step #7 -- Assembly of Electronic Parts on the Acrylic Board above the Chassis</h1>
+# Step #7 -- Assembly of Electronic Parts on the Acrylic Board above the Chassis
 
--Follow the instruction manual to prepare the acrylic board and then install the electronic modules as shown.
+- Follow the instruction manual to prepare the acrylic board and then install the electronic modules as shown.
 
--To avoid static damage to the electronic components I would strongly advise doing these steps near a sink. Hold onto one of the water pipes to ground yourself and then you can do an operation. Then ground yourself again with each operation. It's ok to let go of the water pipe when you insert the electronics -- if you're not walking around it's unlikely you'll build up much static in a few seconds.
+- To avoid static damage to the electronic components I would strongly advise doing these steps near a sink. Hold onto one of the water pipes to ground yourself and then you can do an operation. Then ground yourself again with each operation. It's ok to let go of the water pipe when you insert the electronics -- if you're not walking around it's unlikely you'll build up much static in a few seconds.
 
--Follow the manual very carefully to orientate the electronic modules as shown.
+- Follow the manual very carefully to orientate the electronic modules as shown.
 
--Then follow the manual and insert the wires connecting the motors to the motor control board.
--Tip: Careful about not wasting wire in threading through the center hole and to the motor control board -- there will not be much excess wire on one side.
+- Then follow the manual and insert the wires connecting the motors to the motor control board.
+- Tip: Careful about not wasting wire in threading through the center hole and to the motor control board -- there will not be much excess wire on one side.
 (Also, note that only the red power and black ground wire from the motors are controlled by the motor board. The other colored wires are from the motor's Hall sensor and are not used at this point in the project. Hall sensors can measure the magnitude and orientation of a magnetic field, so, usually a pair or equivalent of magnets rotate without any physical contact and the Hall sensor detects their location, i.e., effectively the location of the rotor of the motor, which can be very useful in precision robotic applications.)
 
 (The Osoyoo "Model Y 2.0 Motor Driver Board for Arduino Robotic Car Kit" is a 4-channel H-bridge motor driver. H-bridge circuits allow voltage to be applied across a load in either direction, which is very useful for controlling the rotation direction of a DC motor such as used in the robotic car. A simple, silicon transistor H-bridge circuit is shown below -- as can be seen it looks like an 'H' thus the name. The Osoyoo board uses the PT5126 chip as a DC motor driver, which can supply up to 2.8Amps at a voltage of 2 - 24 volts, useful for bidirectional control of electric motors. It is a single-channel chip.  They specify using two such chips in their product specifications, although just by looking at the layout of the PCB it looks like there are 4 such chips which makes more sense given it is a single channel. The lettering on the chip packages are faded so I cannot read the parts numbers. However, the chip part number comes up on the Alibaba website at the time of writing at 13 cents per chip and shows a picture resembling the 8-lead slim packages soldered to the PCB. From another site I was able to find the specs for this chip:  controls 2V- 24V at 2.8 amps, as noted above; accepts logic signals of 1.6V to VCC; VCC can be 2.7V to 5.5V (which means can work with other Arduino boards that operate at 3.3 volts); good PWM specs with up to 200KHz signals allowed; and very importantly seems to have protection for back-EMF from the motor although terms used don't say this exactly; also thermal shut-down protection; draws less than 50 nanoamps (not milliamps or microamps but nanoamps, i.e., .05 microamps) when bridge is turned off -- seems like an impressive integrated circuit for 13 cents !! )
@@ -604,11 +588,11 @@ Assembled chassis (Note that the straps are still loose until the assembly is co
 
 ![oliviermotorwiring](oliviermotorwiring.jpg)
 
--Now connect the motor controller board to the Arduino board and the Wi-Fi shield pass through connectors as shown in the diagram in the manual:
+- Now connect the motor controller board to the Arduino board and the Wi-Fi shield pass through connectors as shown in the diagram in the manual:
 ![connect arduino to motor controller](arduinoconnect.png)
 
--
--
+- 
+- 
 ------------
 
 Note:
@@ -648,6 +632,7 @@ These reversals can be done in software. However, this would require modifying t
 
 
 ![connect other modules](otherconnect.png)
+
 -
 -
 -
@@ -732,9 +717,9 @@ https://www.youtube.com/watch?v=SWa4VOoAa1U
 -
 -
 
-<h1 style="font-size: 24px;">Step #9 -- Troubleshooting</h1>
--
--
+
+# Step #9 -- Troubleshooting
+
 
 <p align="center">
  <img src="logogpt4psychocat.jpg" width="400" height="600">
@@ -742,10 +727,10 @@ https://www.youtube.com/watch?v=SWa4VOoAa1U
 
 Sometimes we feel like we are losing control of project when things don't work or make sense. You must have a disciplined approach to troubleshooting when this happens. (Image generated by GPT4.)
 
-##
+## 
 You can skip this "step" (i.e., chapter). However, if you don't have much experience with building mechatronic systems and coding systems, it might be useful to employ some of the strategies discussed  here if parts of the project seem to be experiencing difficulties. As well, perhaps in the future, users can update this section with particular difficulties experienced with the PetitCat Project and ways they were resolved.
 
-##
+## 
 
 
 
@@ -1157,19 +1142,19 @@ Picture showing the missing slots for the higher numbered D pins and the hack (f
 
 Now you need to download the software for controlling the robotic car with Bluetooth.
 
--The link shown in the manual works fine -- you will have folder containing m2-lesson4.ino which will work with the Arduino development environment (IDE). The manual also shows you what some of the Arduino IDE screens will look like.
+- The link shown in the manual works fine -- you will have folder containing m2-lesson4.ino which will work with the Arduino development environment (IDE). The manual also shows you what some of the Arduino IDE screens will look like.
 
--Always virus scan files when you download them. I virus scanned this file -- it is fine according to NAV Feb 8, 2024 (of course, as would be expected).
+- Always virus scan files when you download them. I virus scanned this file -- it is fine according to NAV Feb 8, 2024 (of course, as would be expected).
 
--Then open the Arduino IDE exactly as described above. As well, the manual shows several screens of the Arduino IDE. Make sure your Arduino IDE is configured exactly like before (i.e., correct Arduino board is specified).
+- Then open the Arduino IDE exactly as described above. As well, the manual shows several screens of the Arduino IDE. Make sure your Arduino IDE is configured exactly like before (i.e., correct Arduino board is specified).
 
--Click 'Open' and load in m2-lesson4.ino
+- Click 'Open' and load in m2-lesson4.ino
 
--Then attach the USB cable to the Arduino board connector on the robot car, exactly like you did above when we uploaded software to the car's Arduino board. (The power on your robot car should be turned off -- the cable will supply power to the Arduino board. )
+- Then attach the USB cable to the Arduino board connector on the robot car, exactly like you did above when we uploaded software to the car's Arduino board. (The power on your robot car should be turned off -- the cable will supply power to the Arduino board. )
 
--Now click the upload arrow (green arrow inside a circle at the top left corner).
+- Now click the upload arrow (green arrow inside a circle at the top left corner).
 
--The software in m2-lesson4.ino will now be uploaded to the Arduino board in your robotic car.
+- The software in m2-lesson4.ino will now be uploaded to the Arduino board in your robotic car.
 
 
 Ok... software successfully loaded. Let's see if I can pair my cellphone (an Android Pixel 7) with the Bluetooth board on the robotic car. Success -- it detects a device called HC02 which is from the robotic car and successfully pairs with it.
@@ -1188,13 +1173,13 @@ Aghhh.... would have liked to have tried out the app.... but can come back to th
 
 Plan at this time:
 
--can consider Bluetooth in the future as communication medium if essential, e.g., get an Arduino library routine for Bluetooth, perhaps try another Bluetooth board, and get a PyPI library routine for Bluetooth, and see if my Python programs can communicate with the Arduino board
+- can consider Bluetooth in the future as communication medium if essential, e.g., get an Arduino library routine for Bluetooth, perhaps try another Bluetooth board, and get a PyPI library routine for Bluetooth, and see if my Python programs can communicate with the Arduino board
 
--at this time, given that no Android version of the app exists and my friend's iPhone cannot pair with the Bluetooth board (iPhone's are nicely engineered products) although my Pixel can pair (although it seems the abilities of my Pixel are better than any phone I've ever used -- always robust no matter how terrible cell phone signals or Wi-Fi signals are --incredibly engineered), I'm not going to expend more effort on this issue
+- at this time, given that no Android version of the app exists and my friend's iPhone cannot pair with the Bluetooth board (iPhone's are nicely engineered products) although my Pixel can pair (although it seems the abilities of my Pixel are better than any phone I've ever used -- always robust no matter how terrible cell phone signals or Wi-Fi signals are --incredibly engineered), I'm not going to expend more effort on this issue
 
--perhaps try another friend's cellphone if the opportunity presents itself (the iPhone I tried was 4 years old; perhaps newer iPhones are as robust as the Pixel7 cellphone in pairing with Bluetooth devices)
+- perhaps try another friend's cellphone if the opportunity presents itself (the iPhone I tried was 4 years old; perhaps newer iPhones are as robust as the Pixel7 cellphone in pairing with Bluetooth devices)
 
--research into Bluetooth board used by Osoyoo -- it is the "HC02 Bluetooth Module" which supports Bluetooth 2.0 although it talks about Bluetooth BLE 4.0; perhaps try a different more recently released pin-compatible Bluetooth module for the Arduino board and quickly see if it can pair more easily with an iPhone (since we need an iPhone to run the app) and if it works compatibly with the Osoyoo setup and software
+- research into Bluetooth board used by Osoyoo -- it is the "HC02 Bluetooth Module" which supports Bluetooth 2.0 although it talks about Bluetooth BLE 4.0; perhaps try a different more recently released pin-compatible Bluetooth module for the Arduino board and quickly see if it can pair more easily with an iPhone (since we need an iPhone to run the app) and if it works compatibly with the Osoyoo setup and software
 
 ![hc02pins](hc02pins.png)
 
@@ -1207,7 +1192,7 @@ For example, here is an inexpensive ($US10 from Amazon.com) more recent HC05 Blu
 
 Hopefully you the reader will be able to Bluetooth pair your smartphone and have more success installing and trying out the imitiation Bluetooth driving app.
 
--given that Bluetooth is not required for the next lesson, time to move on.....
+- given that Bluetooth is not required for the next lesson, time to move on.....
 
 
 -
@@ -1228,10 +1213,10 @@ The Wi-Fi shield was installed into the Arduino board above when the robotic car
 
 New wiring changes to make:
 
--Remove the connections from the Wi-Fi B_TX and B_RX to D18 and D19 (the ones requiring a hack above).
+- Remove the connections from the Wi-Fi B_TX and B_RX to D18 and D19 (the ones requiring a hack above).
 (In my case I just removed from the Wi-Fi board since we will still require connection to D18 and D19 for the Wi-Fi functionality.)
 
--Now connect D18 and D19 to E_RX and E_TX on the Wi-Fi board.
+- Now connect D18 and D19 to E_RX and E_TX on the Wi-Fi board.
 
 (Note. In the picture below the orange wire actually is going to E_TX and then the male-male hacked connection and then to D19, and similarly the yellow wire is going to E_RX and then to D18 via the other male-to-male hacked connection, which is a reveral of the yellow and orange in the schematic diagram, i.e., colors are reversed, but the wiring is the same.)
 
@@ -1299,37 +1284,37 @@ A folder WiFiEsp-master.zip will download
 
 Just like the other Steps above (i.e., "Lessons" in the Osoyoo manual) there is demo software that will work with the Wi-Fi shield in your robotic car.
 
--The link shown in the manual works fine -- you will download a folder containing m2-lesson5.ino which will work with the Arduino development environment (IDE). The manual also shows you what some of the Arduino IDE screens will look like.
+- The link shown in the manual works fine -- you will download a folder containing m2-lesson5.ino which will work with the Arduino development environment (IDE). The manual also shows you what some of the Arduino IDE screens will look like.
 
--Unlike the other lessons, in this lesson there is a lesson5a and a lesson5b software demos.  In the lesson5a demo the Wi-Fi board on the robot car becomes the Wi-Fi access point ("hotspot" is the term used by the Osoyoo manual) and your cellphone (aghhhh.... let's hope Osoyoo created a valid app for Android this time :) becomes the client. In the lesson5b demo the Wi-Fi board on the robot car becomes a node (i.e., a client) in the LAN where the robot car is operating -- we will specify the LAN's router's Wi-Fi SSID and password to the robot car, but still end up using the cellphone app to control the car (agghhh.... given what I wrote above let's hope Osoyoo created working apps for Android this time :)  
+- Unlike the other lessons, in this lesson there is a lesson5a and a lesson5b software demos.  In the lesson5a demo the Wi-Fi board on the robot car becomes the Wi-Fi access point ("hotspot" is the term used by the Osoyoo manual) and your cellphone (aghhhh.... let's hope Osoyoo created a valid app for Android this time :) becomes the client. In the lesson5b demo the Wi-Fi board on the robot car becomes a node (i.e., a client) in the LAN where the robot car is operating -- we will specify the LAN's router's Wi-Fi SSID and password to the robot car, but still end up using the cellphone app to control the car (agghhh.... given what I wrote above let's hope Osoyoo created working apps for Android this time :)  
 
--OK.... it is usually simpler for a device to become a hotspot (i.e., simpler from the software creation point of view; many new products on Kickstarter start-up innovation site, for example, just have their Internet-enabled device become a hotspot so they don't have to worry about logging into a LAN (which always becomes more complicated than it sounds due to security layers on some LANs). Thus let's choose lesson5a software where the Wi-Fi car becomes the hotspot.
+- OK.... it is usually simpler for a device to become a hotspot (i.e., simpler from the software creation point of view; many new products on Kickstarter start-up innovation site, for example, just have their Internet-enabled device become a hotspot so they don't have to worry about logging into a LAN (which always becomes more complicated than it sounds due to security layers on some LANs). Thus let's choose lesson5a software where the Wi-Fi car becomes the hotspot.
 
--(I would have chosen the option where I don't have to use a mobile phone app, but given that both 5a and 5b use an Osoyoo mobile phone app, let's go with lesson5a demo.)
+- (I would have chosen the option where I don't have to use a mobile phone app, but given that both 5a and 5b use an Osoyoo mobile phone app, let's go with lesson5a demo.)
 
--Ok... when you unzip folder m2-lesson5 folder, you will see the folder m2-lesson5a
+- Ok... when you unzip folder m2-lesson5 folder, you will see the folder m2-lesson5a
 
--Always virus scan files when you download them and when you extract them. I virus scanned this folder -- it is fine according to NAV Feb 9, 2024 (of course, as would be expected).
+- Always virus scan files when you download them and when you extract them. I virus scanned this folder -- it is fine according to NAV Feb 9, 2024 (of course, as would be expected).
 
--Then open the Arduino IDE exactly as described above in earlier Steps (or "lessons"). As well, the manual shows several screens of the Arduino IDE. Make sure your Arduino IDE is configured exactly like before (i.e., correct Arduino board is specified).
+- Then open the Arduino IDE exactly as described above in earlier Steps (or "lessons"). As well, the manual shows several screens of the Arduino IDE. Make sure your Arduino IDE is configured exactly like before (i.e., correct Arduino board is specified).
 
--Click 'Open' and load in m2-lesson5a.ino
+- Click 'Open' and load in m2-lesson5a.ino
 
--Then attach the USB cable to the Arduino board connector on the robot car, exactly like you did above when we uploaded software to the car's Arduino board. (The power on your robot car should be turned off -- the cable will supply power to the Arduino board. )
+- Then attach the USB cable to the Arduino board connector on the robot car, exactly like you did above when we uploaded software to the car's Arduino board. (The power on your robot car should be turned off -- the cable will supply power to the Arduino board. )
 
--Now click the upload arrow (green arrow inside a circle at the top left corner).
+- Now click the upload arrow (green arrow inside a circle at the top left corner).
 
--The software in m2-lesson5a.ino will now be uploaded to the Arduino board in your robotic car.
+- The software in m2-lesson5a.ino will now be uploaded to the Arduino board in your robotic car.
 
 
 ![downloadlesson5a](downloadlesson5a.png)
 
 
--To make sure that the Wi-Fi board (mounted on the Arduino board) in your robot car is now acting as a hotspot, you need to open your Arduino "serial monitor" -- click Tools and then click Serial Monitor
+- To make sure that the Wi-Fi board (mounted on the Arduino board) in your robot car is now acting as a hotspot, you need to open your Arduino "serial monitor" -- click Tools and then click Serial Monitor
 
 ![choosemonitor](choosemonitor.png)
 
--This is the screenshot from my computer -- after a few seconds you will see that the Wi-Fi board is acting as a local access point (i.e., hotspot). The IP address shown on my computer (i.e., on the Serial Monitor) is 192.168.4.1 with a message to browse to http://192.168.4.1 for access.
+- This is the screenshot from my computer -- after a few seconds you will see that the Wi-Fi board is acting as a local access point (i.e., hotspot). The IP address shown on my computer (i.e., on the Serial Monitor) is 192.168.4.1 with a message to browse to http://192.168.4.1 for access.
 
 ![serialmonitor](serialmonitor.png)
 
@@ -1339,13 +1324,13 @@ Ok.... now we need the Osoyoo mobile app to access the Wi-Fi hotspot on your rob
 
 --Installing the Osoyoo Mobile App--
 
--If you have an Apple phone then you will go to the Apple Store
+- If you have an Apple phone then you will go to the Apple Store
 
--However, since I have an Android phone (Pixel 7) I will go to the Google Play store
+- However, since I have an Android phone (Pixel 7) I will go to the Google Play store
 
--The Osoyoo Manual Lesson 5 advises to search "Osoyoo Wifi UDP Robot Car Controller"
+- The Osoyoo Manual Lesson 5 advises to search "Osoyoo Wifi UDP Robot Car Controller"
 
--Unfortunately when I do this search (Feb 9, 2024) the only app that appears in the Google Play store is "Osoyoo IoT UDP Robot APP" -- well, better than nothing, and maybe it will do the same thing.... so this app is installed on my Android cellphone
+- Unfortunately when I do this search (Feb 9, 2024) the only app that appears in the Google Play store is "Osoyoo IoT UDP Robot APP" -- well, better than nothing, and maybe it will do the same thing.... so this app is installed on my Android cellphone
 
 
 <p align="center">
@@ -1401,7 +1386,7 @@ Let's take a look at some of the code we've been transferring to the Arduino boa
 -
 
 
-<h1 style="font-size: 24px;">Step #15 -- Software Modifications -- Basic Parameter Changes</h1>
+# Step #15 -- Software Modifications -- Basic Parameter Changes
 
 For this Step #15, please open the Arduino IDE exactly as described above in earlier Steps (or "lessons").
 
@@ -1450,21 +1435,21 @@ Go to Line 14 and change the value of the SPEED parameter to 55. Line 14 should 
 
 This program, i.e., Sketch, is human readable and actually essentially C-like code with a structure and specialized functions for the Arduino environment. We now have to convert this C-like code (i.e., the Sketch program you just modified) into the binary code which will run on the Mega2560 Ardinuo board in our robot car, and then actually upload the compiled binary code to the Mega2560 board.
 
--Just as in the demo software examples in the various steps above, attach the USB cable to the Arduino board connector on the robot car, exactly like you did above when we uploaded software to the car's Arduino board. (The power on your robot car should be turned off -- the cable will supply power to the Arduino board.) 
+- Just as in the demo software examples in the various steps above, attach the USB cable to the Arduino board connector on the robot car, exactly like you did above when we uploaded software to the car's Arduino board. (The power on your robot car should be turned off -- the cable will supply power to the Arduino board.) 
 
--Now click the upload arrow (green arrow inside a circle at the top left corner). Look at the bottom of the Arduino IDE -- you will see messages as the human readable Sketch gets compiled into binary bytes and uploaded to the Arduino board.
+- Now click the upload arrow (green arrow inside a circle at the top left corner). Look at the bottom of the Arduino IDE -- you will see messages as the human readable Sketch gets compiled into binary bytes and uploaded to the Arduino board.
 
--The modified software (i.e., where you set SPEED parameter to a value of 55) is now in the robot car. Let's try it out.
+- The modified software (i.e., where you set SPEED parameter to a value of 55) is now in the robot car. Let's try it out.
 
--Unplug the cable from the car to the computer.
+- Unplug the cable from the car to the computer.
 
--Turn on the car.
+- Turn on the car.
 
--Go to your cellphone and go to Settings. Then change your Internet Wi-Fi to "osoyoo_robot"
+- Go to your cellphone and go to Settings. Then change your Internet Wi-Fi to "osoyoo_robot"
 
--Ok now open the Osoyoo IoT UDP Robot APP (or, if you have, like me, the OSOYOO IoT APP, then open that one).
+- Ok now open the Osoyoo IoT UDP Robot APP (or, if you have, like me, the OSOYOO IoT APP, then open that one).
 
--(Settings should be saved from when you used the App previously, but if not, go to Settings on the App and enter the IP address this app should access (since we want it to access the Wi-Fi board on the robot car) (You can see the IP address in the Arduino IDE. In my setup it was 192.168.4.1 with UDP Incoming Port 8888))
+- (Settings should be saved from when you used the App previously, but if not, go to Settings on the App and enter the IP address this app should access (since we want it to access the Wi-Fi board on the robot car) (You can see the IP address in the Arduino IDE. In my setup it was 192.168.4.1 with UDP Incoming Port 8888))
 
 --Ok...now go to the main page of the Osoyoo IoT UDP Robot APP/OSOYOO IoT APP, and press the forward button. The car will go forward, but much slower.
 
@@ -1481,9 +1466,6 @@ Initial draft Feb 9, 2024
 (This is a public document that can be modified by others who have access -- if anything doesn't make sense, please ignore.)
 (No use of high voltage or anything dangerous is or should be specified in this document.)
 
--
--
-
 
 <p align="center">
  <img src="altlogo.png" width="470" height="470">
@@ -1495,27 +1477,3 @@ Initial draft Feb 9, 2024
 
 end of document
 ****
-##
-
--
--
--
--
-
-
-
-
-
-
-
-
-
-
-
--
-
--
- 
-
- 
- 

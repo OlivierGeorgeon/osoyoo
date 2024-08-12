@@ -1,8 +1,4 @@
 
-##
-
-
-
 # PETITCAT PROJECT DISCLAIMER
 
 **Date:** July 1, 2024
@@ -36,7 +32,7 @@ If you contribute to this project, you assert that your contributions are given 
 If any content should not be here or if there are any legal concerns, please advise, and a correction will be made in a suitable time period.
 
 
-##
+## 
 
 
 
@@ -44,11 +40,10 @@ If any content should not be here or if there are any legal concerns, please adv
 # Part III
 
 ![petitcatgpt4logo](petitcatgpt4logo.jpg)
--
- 
--
 
-<h2 style="font-size: 24px;">The PetitCat Project </h2>
+ 
+
+## The PetitCat Project
 
 ---------------
 
@@ -76,28 +71,26 @@ The "Easy-to-Read Overview" of the project is divided into a number of parts:
 
 The PetitCat documentation is written so that anyone with a basic education can read it and understand it. Having a deeper breadth of knowledge in software development, AI, or cognitive science, can, of course, allow greater appreciation for certain aspects of the project.
 
--Part I does not require any specialized background knowledge. You should be familiar with moving files around in either your Windows, Mac or Linux desktop/laptop computer. Other than that, no specialized knoweldge is needed. Part I is perfectly fine for high school students and hobbyists.
+- Part I does not require any specialized background knowledge. You should be familiar with moving files around in either your Windows, Mac or Linux desktop/laptop computer. Other than that, no specialized knoweldge is needed. Part I is perfectly fine for high school students and hobbyists.
 
--Part II may be fine for high school students, college students and hobbyists as well, given a willingness of some effort to learn things here and there. However, the documentation will guide you on this learning journey. The lower level software of the PetitCat project is written in C\C++ in the Arduino IDE. You don't need to know these languages or environment in order to use Python with the project. However, we provide a very basic C\C++\Arduino tutorial which may be sufficient for most readers who do want to have a bit more control over the Arduino board coding. We just touch upon the Python control of the project at the end of Part II, so you are not expected to have much Python knowledge in this part, unless you want to start modifying the Python files.
+- Part II may be fine for high school students, college students and hobbyists as well, given a willingness of some effort to learn things here and there. However, the documentation will guide you on this learning journey. The lower level software of the PetitCat project is written in C\C++ in the Arduino IDE. You don't need to know these languages or environment in order to use Python with the project. However, we provide a very basic C\C++\Arduino tutorial which may be sufficient for most readers who do want to have a bit more control over the Arduino board coding. We just touch upon the Python control of the project at the end of Part II, so you are not expected to have much Python knowledge in this part, unless you want to start modifying the Python files.
 
--Part III is where the PetitCat project becomes more useful -- interfacing the Python code of your AI/AGI project with the PetitCat projects.
+- Part III is where the PetitCat project becomes more useful -- interfacing the Python code of your AI/AGI project with the PetitCat projects.
 
--Part IV allows you to modify the Arduino C/C++ code to use other robotic embodiments than the default robot car, or to add addtional sensors and actuators to the robot car.
+- Part IV allows you to modify the Arduino C/C++ code to use other robotic embodiments than the default robot car, or to add addtional sensors and actuators to the robot car.
 
--In Parts V and VI we will integrate the PetitCat project with a cognitive architecture and then a large language model. Again, in this part, only intermediate (or even novice) Python coding abilities are required. However, we will gently guide you through the project, so that you end up with a super-human intelligent grounded autonomous robot system.
+- In Parts V and VI we will integrate the PetitCat project with a cognitive architecture and then a large language model. Again, in this part, only intermediate (or even novice) Python coding abilities are required. However, we will gently guide you through the project, so that you end up with a super-human intelligent grounded autonomous robot system.
 
--Part VII really only requires some knowledge of Python. You do not have to be an expert developer. More important, is perhaps a background in AI or cognitive science. However, there is no real background prerequisite here. Regardless of the reader's background, we provide gentle tutorials on a number of topics, and guide the learner through the concepts of active inference and implementing it in the PetitCat project.
+- Part VII really only requires some knowledge of Python. You do not have to be an expert developer. More important, is perhaps a background in AI or cognitive science. However, there is no real background prerequisite here. Regardless of the reader's background, we provide gentle tutorials on a number of topics, and guide the learner through the concepts of active inference and implementing it in the PetitCat project.
 
--
 
 
 
 # Part III: Interfacing your Python Code with the PetitCat Project
 
--
--
 
-<h1 style="font-size: 24px;">Step #1 -- Time to Get Serious</h1>
+
+# Step #1 -- Time to Get Serious
 
 Regardless of your skill level, you have made it this far -- you have built a robot car with your hands, you have learned how to move software around (Part I) and then you learned how to write some software in C/C++, build electronic circuits and make the software control the electronics (Part II). 
 
@@ -117,9 +110,7 @@ You made it this far, and you will succeed again in this part.  Get on that hors
 </p>
 -
 
--
-
-<h1 style="font-size: 24px;">Step #2 -- Review of the Project Hardware and Software </h1>
+# Step #2 -- Review of the Project Hardware and Software
 
 In the 1950s a Japanese educator, Toru Kumon, developed a method to enable his own son to progress more rapidly through mathematics. In 1958 the Kumon Math teaching system was established and proved very successful compared to typical public school teaching methods in mathematics.
 
@@ -168,34 +159,34 @@ You have already downloaded the phone app in Part I and Part II.
 
 In case you did not do this or you un-installed the app from your phone:
 
--If you have an Apple phone then you will go to the Apple Store
+- If you have an Apple phone then you will go to the Apple Store
 
--However, since I have an Android phone (Pixel 7) I will go to the Google Play store
+ -However, since I have an Android phone (Pixel 7) I will go to the Google Play store
 
--The Osoyoo Manual Lesson 5 advises to search "Osoyoo Wifi UDP Robot Car Controller"
+- The Osoyoo Manual Lesson 5 advises to search "Osoyoo Wifi UDP Robot Car Controller"
 
--Unfortunately when I do this search (Feb 9, 2024) the only app that appears in the Google Play store is "Osoyoo IoT UDP Robot APP" -- well, better than nothing, and maybe it will do the same thing.... so this app is installed on my Android cellphone
+- Unfortunately when I do this search (Feb 9, 2024) the only app that appears in the Google Play store is "Osoyoo IoT UDP Robot APP" -- well, better than nothing, and maybe it will do the same thing.... so this app is installed on my Android cellphone
 
 
 ---> Your smartphone App is installed. (Whether it is called "Osoyoo Wifi UDP Robot Car Controller" or "Osoyoo IoT UDP Robot APP").
 
 Now we have to go to the settings section of the phone App.
 
--Ok we open the Osoyoo IoT UDP Robot APP
+- Ok we open the Osoyoo IoT UDP Robot APP
 
--Then go to Settings and enter the IP address we saw in the Serial Monitor. In this example, we would enter "10.0.0.41" (you will enter, of course, the IP address your Serial Monitor showed you -- this is the address the robot car is using).
+- Then go to Settings and enter the IP address we saw in the Serial Monitor. In this example, we would enter "10.0.0.41" (you will enter, of course, the IP address your Serial Monitor showed you -- this is the address the robot car is using).
 
--You can leave the other settings such as the default Ports unchanged
+- You can leave the other settings such as the default Ports unchanged
 
 Your smartphone App should now be able to control your robot car. Let's try it out.
 
--Ok...now go to the main page of the app.
+- Ok...now go to the main page of the app.
 
 ![appsmall](appsmall.png)
 
--Ok... turn on the robot car
+- Ok... turn on the robot car
 
--Now, let's click a button on the app.... go forward
+- Now, let's click a button on the app.... go forward
 
 The car goes forward.
 
@@ -209,9 +200,8 @@ They all work .... we can control the robot car via Wi-Fi. Note that both the ro
  <img src="wifiworks.jpg" width="250" height="250">
 </p>
 
--
 
-<h1 style="font-size: 24px;">ii : Does Robotic Car and Python Wi-Fi Control Work? </h1>
+## ii : Does Robotic Car and Python Wi-Fi Control Work? 
 
 If you recall from Part II, the arduino_secrets.h file contains your home (or workplace) Wi-Fi identifying information and login password, hence its name and why it is kept separate from the other files in the GitHub repository.
 
@@ -224,9 +214,9 @@ If you recall from Part II, the arduino_secrets.h file contains your home (or wo
 
 <b>#define SECRET_WIFI_TYPE "STA" // Access point : "AP" pr Station (through router): "STA"
 
-#define SECRET_SSID "Your wifi SSID"
+    #define SECRET_SSID "Your wifi SSID"
 
-#define SECRET_PASS "Your password"</b>
+    #define SECRET_PASS "Your password"</b>
 
 --> Modify (and then save) the file "arduino_secrets.h" with the Wi-Fi information. For sake of example, below we are showing the same network info we used in the demo example in Step 2 above:
 
@@ -251,7 +241,7 @@ Go to the Arduino IDE. Click 'File', 'Sketchbook', 'Osoyoo'.  Open the project "
 
 In an early line you will see something like:
 
-#define ROBOT_ID 0
+    #Define ROBOT_ID 0
 
 It is important that the correct robot model is specified. Usually '0' is used for the default Osoyoo robot car.
 
@@ -283,14 +273,14 @@ In my case I loaded this file into my Python development tool Notepad++ :
 -
 Before running a Python program take a look at it quickly. What will it do? Anything strange to the system? What about imports? Are there any imports requring installation of libraries from PyPI or an external library? The import's of socket, keyboard, sys and json all come from the standard library, so nothing special for us to do.
 
--
--
+- 
+- 
 
--The Arduino code was successfully compiled and uploaded to the robot car. 
+- The Arduino code was successfully compiled and uploaded to the robot car. 
 
--In the Serial Monitor you can see the IP address which the robot car is using to communicate via Wi-Fi.
+- In the Serial Monitor you can see the IP address which the robot car is using to communicate via Wi-Fi.
 
--Ok.... now let's run the program test_remote_control_robot.py :
+- Ok.... now let's run the program test_remote_control_robot.py :
 
 You need to provide the above IP Address to the Python code so it knows how to communicate via Wi-Fi with the PetitCat robot car.
 
@@ -329,10 +319,8 @@ See Part II for troubleshooting regarding the wheel direction, if there is a pro
  <img src="wifiworks.jpg" width="250" height="250">
 </p>
 
--
 
-
-<h1 style="font-size: 24px;">Step #3 -- Use the petitcat2.py Module to Interface Your AI/AGI Code with the Robotic Car" </h1>
+# Step #3 -- Use the petitcat2.py Module to Interface Your AI/AGI Code with the Robotic Car"
 
 
 Ok.... you have completed Step #2 above. 
@@ -380,9 +368,8 @@ This program seems very similar to the previous test_remote_control_robot.py, an
 -
 
 
-<h1 style="font-size: 24px;">Step #4 --  Looking at the Code in the petitcat2.py Module" </h1>
+# Step #4 --  Looking at the Code in the petitcat2.py Module"
 
--
 
 Go to your Python IDE (i.e., where you can develop Python programs). If you look at the Python code for petitcat2.py, you see that this module provides a class "PetitCatController" to control the PetitCat robotic device, which by default is the robotic car.
 
@@ -492,20 +479,19 @@ This function uses ctrl.motor_command() and a value of "8" is passed as paramete
 -
 
 
-<h1 style="font-size: 24px;">Step #5 --  Considering the Return Data from the Robotic Car" </h1>
--
+# Step #5 --  Considering the Return Data from the Robotic Car"
 
 Ok.... run petitcat2.py.
 
 (Which means:
 
-#1 -- Plug the USB into the car and your computer. Open up the Arduino IDE. Upload the "petitcat_arduino.ino" code to the car. (Not necessary if this code is already running on your robotic car's Arduino board.)
+- 1 -- Plug the USB into the car and your computer. Open up the Arduino IDE. Upload the "petitcat_arduino.ino" code to the car. (Not necessary if this code is already running on your robotic car's Arduino board.)
 
-#2 -- Look at the Serial Monitor for the IP address to use. (Not necessary if car was not powered off and your Wi-Fi remains stable.)
+- 2 -- Look at the Serial Monitor for the IP address to use. (Not necessary if car was not powered off and your Wi-Fi remains stable.)
 
-#3 -- Go to https://github.com/OlivierGeorgeon/osoyoo/tree/master/tests  and copy the file "petitcat2.py" to your Python environment. (Not necessary if this file is already in your Python environment.)
+- 3 -- Go to https://github.com/OlivierGeorgeon/osoyoo/tree/master/tests  and copy the file "petitcat2.py" to your Python environment. (Not necessary if this file is already in your Python environment.)
 
-#4 -- Now turn on the robotic car. Now in your Python environment (e.g., in Windows I am using the terminal and will show examples from there), run the program "petitcat2.py": 
+- 4 -- Now turn on the robotic car. Now in your Python environment (e.g., in Windows I am using the terminal and will show examples from there), run the program "petitcat2.py": 
 
 Windows terminal:    >python petitcat2.py    )
 
@@ -628,15 +614,13 @@ At the command line pelase enter:
 
 If the robotic car is turned on with code running as described above, then you should see something like this on the monitor, and the car should be driving around the room, attempting to avoid objects.
 
-<p align="center">
- <img src="cardemollm.png" width="900" height="400">
-</p>
+![cardemollm](cardemollm.png)
 
 Experiment with the code and see what behaviour you can get out of the LLM interfacted to the robotic car.
 
 -
 
-<h1 style="font-size: 24px;">Step #7 -- Installing PetitCatMain1.py </h1>
+# Step #7 -- Installing PetitCatMain1.py
 
 We will now install "PetitCatMain1.py" which will demonstrate some of the grid cell features of the PetitCat project.
 
@@ -679,8 +663,3 @@ Perhaps also cloning of directory structure, perhaps introduce venv virtual envi
 
 end of document
 ****
-##
-
-
-
-

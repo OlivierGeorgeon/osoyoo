@@ -1,8 +1,3 @@
-
-##
-
-
-
 # PETITCAT PROJECT DISCLAIMER
 
 **Date:** July 1, 2024
@@ -36,17 +31,12 @@ If you contribute to this project, you assert that your contributions are given 
 If any content should not be here or if there are any legal concerns, please advise, and a correction will be made in a suitable time period.
 
 
-##
-
-
 
 # An Easy-to-Read Overview of the Robot Car ("PetitCat") Project
 # Part IV
 
 ![petitcatgpt4logo](petitcatgpt4logo.jpg)
--
 
--
 
 <h2 style="font-size: 24px;">The PetitCat Project </h2>
 
@@ -77,50 +67,33 @@ The "Easy-to-Read Overview" of the project is divided into a number of parts:
 
 The PetitCat documentation is written so that anyone with a basic education can read it and understand it. Having a deeper breadth of knowledge in software development, AI, or cognitive science, can, of course, allow greater appreciation for certain aspects of the project.
 
--Part I does not require any specialized background knowledge. You should be familiar with moving files around in either your Windows, Mac or Linux desktop/laptop computer. Other than that, no specialized knoweldge is needed. Part I is perfectly fine for high school students and hobbyists.
+- Part I does not require any specialized background knowledge. You should be familiar with moving files around in either your Windows, Mac or Linux desktop/laptop computer. Other than that, no specialized knoweldge is needed. Part I is perfectly fine for high school students and hobbyists.
 
--Part II may be fine for high school students, college students and hobbyists as well, given a willingness of some effort to learn things here and there. However, the documentation will guide you on this learning journey. The lower level software of the PetitCat project is written in C\C++ in the Arduino IDE. You don't need to know these languages or environment in order to use Python with the project. However, we provide a very basic C\C++\Arduino tutorial which may be sufficient for most readers who do want to have a bit more control over the Arduino board coding. We just touch upon the Python control of the project at the end of Part II, so you are not expected to have much Python knowledge in this part, unless you want to start modifying the Python files.
+- Part II may be fine for high school students, college students and hobbyists as well, given a willingness of some effort to learn things here and there. However, the documentation will guide you on this learning journey. The lower level software of the PetitCat project is written in C\C++ in the Arduino IDE. You don't need to know these languages or environment in order to use Python with the project. However, we provide a very basic C\C++\Arduino tutorial which may be sufficient for most readers who do want to have a bit more control over the Arduino board coding. We just touch upon the Python control of the project at the end of Part II, so you are not expected to have much Python knowledge in this part, unless you want to start modifying the Python files.
 
--Part III is where the PetitCat project becomes more useful -- interfacing the Python code of your AI/AGI project with the PetitCat projects.
+- Part III is where the PetitCat project becomes more useful -- interfacing the Python code of your AI/AGI project with the PetitCat projects.
 
--Part IV allows you to modify the Arduino C/C++ code to use other robotic embodiments than the default robot car, or to add addtional sensors and actuators to the robot car.
+- Part IV allows you to modify the Arduino C/C++ code to use other robotic embodiments than the default robot car, or to add addtional sensors and actuators to the robot car.
 
--In Parts V and VI we will integrate the PetitCat project with a cognitive architecture and then a large language model. Again, in this part, only intermediate (or even novice) Python coding abilities are required. However, we will gently guide you through the project, so that you end up with a super-human intelligent grounded autonomous robot system.
+- In Parts V and VI we will integrate the PetitCat project with a cognitive architecture and then a large language model. Again, in this part, only intermediate (or even novice) Python coding abilities are required. However, we will gently guide you through the project, so that you end up with a super-human intelligent grounded autonomous robot system.
 
--Part VII really only requires some knowledge of Python. You do not have to be an expert developer. More important, is perhaps a background in AI or cognitive science. However, there is no real background prerequisite here. Regardless of the reader's background, we provide gentle tutorials on a number of topics, and guide the learner through the concepts of active inference and implementing it in the PetitCat project.
+- Part VII really only requires some knowledge of Python. You do not have to be an expert developer. More important, is perhaps a background in AI or cognitive science. However, there is no real background prerequisite here. Regardless of the reader's background, we provide gentle tutorials on a number of topics, and guide the learner through the concepts of active inference and implementing it in the PetitCat project.
 
--
--
+
 
 # Part IV: Modifying the C/C++ for your Selected Robotic Embodiment
 
--
--
+
+## Step #1 --
 
 
-
--
-
-<h1 style="font-size: 24px;">Step #1 -- </h1>
-
--
 
 Pending documentation....
 
--
 
 
 
-<p align="center">
- <img src="horsetonextlesson.png" width="770" height="770">
-</p>
-
-
-
--
--
--
--
+![horsetonextlesson](horsetonextlesson.png)
 
 
 .....
@@ -130,12 +103,9 @@ Pending documentation....
 # thinking..... writing..... thinking..... writing....
 
 
--
--
--
 
 ![oliviermotorwiring](oliviermotorwiring.jpg)
--
+
 
 
 
@@ -148,22 +118,21 @@ You made it this far, and you will succeed again in this part.  Get on that hors
 
 
 
--
 
-<h1 style="font-size: 24px;">Step #2 -- Rewiring the ServoMechanism</h1>
-
-
-
-## The head servo is overheating
+## Step #2 -- Rewiring the ServoMechanism
 
 
 
-## Optionally change the servo
+### The head servo is overheating
+
+
+
+### Optionally change the servo
 
 The servo `LACC200610` provided by Osoyoo was jittering when the wheels were moving. I replaced it with the `SG90` servo from my Elegoo kit, which solved the problem.
 
 
-# Modify some wiring
+### Modify some wiring
 
 We have modified some wiring from the original osoyoo robot as listed in Table 1.
 
@@ -193,7 +162,7 @@ Table 2: IMU Wiring
 |SCL|SCL|
 |SDA|SDA|
 
-![image](/docs/wiki/assets/gy86wiring.jpg)
+![image](../wiki/assets/gy86wiring.jpg)
 Figure 1: wiring of GY-86 imu
 
 # Connect the color sensor
@@ -204,10 +173,10 @@ Use PINs 20 and 21 for SDA and SCL because the other SDA and SCL PINs are used f
 For the power line, I used the 3v yellow PINs on the Wifi Shield. 
 Alternatively, the VIN PIN can be connected to a 5V PIN (red).
 
-![image](/docs/wiki/assets/TCS34725.jpg)
+![image](../wiki/assets/TCS34725.jpg)
 Figure 4: TCS34725 color sensor mounted on two 40 mm pillars between the front wheel motors
 
-![image](/docs/wiki/assets/TCS34725(2).jpg)
+![image](../wiki/assets/TCS34725(2).jpg)
 Figure 5: TCS34725 color sensor to Arduino MEGA wiring
 
 Table 3: TCS34725 PIN connection
@@ -222,11 +191,11 @@ Table 3: TCS34725 PIN connection
 
 More information on the [TCS34725 adafruit webpage](https://learn.adafruit.com/adafruit-color-sensors/overview).
 
-# The emotion LED
+## The emotion LED
 
 Install a common cathode RGB LED as shown below. 
 
-![image](/docs/wiki/assets/rgbled.png)
+![image](../wiki/assets/rgbled.png)
 
 Figure 5: RGB LED with flat side on the left. The cathode is the longest lead.
 
@@ -239,14 +208,14 @@ Table 4: RGB LED connections
 |GND|10kΩ resistor| GND |
 |Red|| 5 |
 
-![image](/docs/wiki/assets/rgbled(2).jpg)
+![image](../wiki/assets/rgbled(2).jpg)
 
 .....
 
 .....
 
 
-,# Center the head
+## Center the head
 
 Place an object in front of the robot. Press `"-"` to remote control the robot to perform a scan and align its head towards the object.
 Switch off the robot.
@@ -269,9 +238,9 @@ Large blue squares are compass points relative to the robot's orientation.
 As the robot turns around, they draw a circle around the robot. The better this circle is centered on the robot, the better the compass is calibrated. 
 Small blue squares are compass points in an absolute position. The closest they are to each other, the better the compass and the gyroscope are calibrated.
 
-![image](/docs/wiki/assets/bodymemoryview.png)
+![image](../wiki/assets/bodymemoryview.png)
 
-_Figure 1: Body Memory View. Large blue squares forming a circle: estimated positions of the south on each step relative to the robot's orientation. Small blue squares at the bottom: estimated positions of the south on each step in absolute position._
+Figure 1: Body Memory View. Large blue squares forming a circle: estimated positions of the south on each step relative to the robot's orientation. Small blue squares at the bottom: estimated positions of the south on each step in absolute position._
 
 To calibrate the compass, remote control the robot to make it turn at least 8 times of 45°.
 
@@ -298,9 +267,9 @@ We use the linear accelerometer to detect impacts with obstacles.
 Figure 2 shows an example `Outcome` packet received by the PC from the robot. 
 The non-nul `impact` field indicates that the robot detected an impact.
 
-![image](/docs/wiki/assets/terminalwindow.png)
+![image](../wiki/assets/terminalwindow.png)
 
-_Figure 2: The Terminal window in PyCharm. The outcome packet contains the fields `impact`, `max_x_acc`, and `min_x_acc` used to calibrate the accelerometer._
+Figure 2: The Terminal window in PyCharm. The outcome packet contains the fields `impact`, `max_x_acc`, and `min_x_acc` used to calibrate the accelerometer._
 
 ## Calibrate the linear accelerometer offset
 
@@ -411,7 +380,7 @@ Run `main.py` on a PC to open the windows shown in Figure 1. For example:
 py -m main chezOlivier 1
 ```
 
-![image](/docs/wiki/assets/gui.png)
+![image](../wiki/assets/gui.png)
 Figure 1: Graphic User Interface
 
 ## Remote control the robot

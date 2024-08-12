@@ -1,6 +1,3 @@
-##
-
-
 
 # PETITCAT PROJECT DISCLAIMER
 
@@ -35,7 +32,6 @@ If you contribute to this project, you assert that your contributions are given 
 If any content should not be here or if there are any legal concerns, please advise, and a correction will be made in a suitable time period.
 
 
-##
 
 
 
@@ -43,11 +39,10 @@ If any content should not be here or if there are any legal concerns, please adv
 # Part II
 
 ![petitcatgpt4logo](petitcatgpt4logo.jpg)
--
 
--
 
-<h2 style="font-size: 24px;">The PetitCat Project </h2>
+
+## The PetitCat Project
 
 
 ---------------
@@ -76,25 +71,22 @@ The "Easy-to-Read Overview" of the project is divided into a number of parts:
 
 The PetitCat documentation is written so that anyone with a basic education can read it and understand it. Having a deeper breadth of knowledge in software development, AI, or cognitive science, can, of course, allow greater appreciation for certain aspects of the project.
 
--Part I does not require any specialized background knowledge. You should be familiar with moving files around in either your Windows, Mac or Linux desktop/laptop computer. Other than that, no specialized knoweldge is needed. Part I is perfectly fine for high school students and hobbyists.
+- Part I does not require any specialized background knowledge. You should be familiar with moving files around in either your Windows, Mac or Linux desktop/laptop computer. Other than that, no specialized knoweldge is needed. Part I is perfectly fine for high school students and hobbyists.
 
--Part II may be fine for high school students, college students and hobbyists as well, given a willingness of some effort to learn things here and there. However, the documentation will guide you on this learning journey. The lower level software of the PetitCat project is written in C\C++ in the Arduino IDE. You don't need to know these languages or environment in order to use Python with the project. However, we provide a very basic C\C++\Arduino tutorial which may be sufficient for most readers who do want to have a bit more control over the Arduino board coding. We just touch upon the Python control of the project at the end of Part II, so you are not expected to have much Python knowledge in this part, unless you want to start modifying the Python files.
+- Part II may be fine for high school students, college students and hobbyists as well, given a willingness of some effort to learn things here and there. However, the documentation will guide you on this learning journey. The lower level software of the PetitCat project is written in C\C++ in the Arduino IDE. You don't need to know these languages or environment in order to use Python with the project. However, we provide a very basic C\C++\Arduino tutorial which may be sufficient for most readers who do want to have a bit more control over the Arduino board coding. We just touch upon the Python control of the project at the end of Part II, so you are not expected to have much Python knowledge in this part, unless you want to start modifying the Python files.
 
--Part III is where the PetitCat project becomes more useful -- interfacing the Python code of your AI/AGI project with the PetitCat projects.
+- Part III is where the PetitCat project becomes more useful -- interfacing the Python code of your AI/AGI project with the PetitCat projects.
 
--Part IV allows you to modify the Arduino C/C++ code to use other robotic embodiments than the default robot car, or to add addtional sensors and actuators to the robot car.
+- Part IV allows you to modify the Arduino C/C++ code to use other robotic embodiments than the default robot car, or to add addtional sensors and actuators to the robot car.
 
--In Parts V and VI we will integrate the PetitCat project with a cognitive architecture and then a large language model. Again, in this part, only intermediate (or even novice) Python coding abilities are required. However, we will gently guide you through the project, so that you end up with a super-human intelligent grounded autonomous robot system.
+- In Parts V and VI we will integrate the PetitCat project with a cognitive architecture and then a large language model. Again, in this part, only intermediate (or even novice) Python coding abilities are required. However, we will gently guide you through the project, so that you end up with a super-human intelligent grounded autonomous robot system.
 
--Part VII really only requires some knowledge of Python. You do not have to be an expert developer. More important, is perhaps a background in AI or cognitive science. However, there is no real background prerequisite here. Regardless of the reader's background, we provide gentle tutorials on a number of topics, and guide the learner through the concepts of active inference and implementing it in the PetitCat project.
+- Part VII really only requires some knowledge of Python. You do not have to be an expert developer. More important, is perhaps a background in AI or cognitive science. However, there is no real background prerequisite here. Regardless of the reader's background, we provide gentle tutorials on a number of topics, and guide the learner through the concepts of active inference and implementing it in the PetitCat project.
 
--
--
+
 
 # Part II: Modifying the Robot Car for Python Control
 
--
--
 
 Ok... in the previous Part I we built the robot car, installed software on it, and tried out its many features.
 
@@ -108,11 +100,7 @@ Saddle up!! Let's get going on the most exciting part of our journey....
 </p>
 
 
--
--
-
-
-<h1 style="font-size: 24px;">Step #1 -- The Big Picture: The PetitCat Project</h1>
+# Step #1 -- The Big Picture: The PetitCat Project
 
 Ok.... you are in the saddle, riding high on your horse. Now it's time to survey the landscape before moving on....
 
@@ -138,29 +126,31 @@ As this project evolves, names used to describe various parts of the project may
 
 Let's review the nomenclature of the project, i.e., the names referring to different parts of the project.
 
--Overall project:
+### Overall project:
 
 The "PetitCat" project == the "Robot Car" project == the "Osoyoo Robot Car" project 
 
--GibHub folder for project:   https://github.com/OlivierGeorgeon/osoyoo
+### GibHub folder for project:   
+
+https://github.com/OlivierGeorgeon/osoyoo
 
 
--Python main file:
+### Python main file:
 
-PetitCat.py == PetitCaMain.py == PetitCatTester.py == test_remote_control_robot.py
+PetitCat.py == PetitCatMain.py == PetitCatTester.py == test_remote_control_robot.py
 
--GitHub folder for Python files: /osoyoo/tests/
+### GitHub folder for Python files: /osoyoo/tests/
 
 https://github.com/OlivierGeorgeon/osoyoo/tree/master/tests
 
 ---> Go to this GitHub folder. If you click open PetitCat.py == PetitCaMain.py == PetitCatTester.py == test_remote_control_robot.py you see the standard library files PYthon will import automatically. 
 
 
--Arduino board main file:
+### Arduino board main file:
 
 PetitCat.ino == autocat_enacter.ino == petitcat_arduino.ino
 
--GitHub folder for Arduino files:
+### GitHub folder for Arduino files:
 
 /osoyoo/petitcat_arduino/
 
@@ -168,12 +158,9 @@ https://github.com/OlivierGeorgeon/osoyoo/blob/master/petitcat_arduino/petitcat_
 
 ---> Go to this GitHub folder. You will see that in addition to the main code PetitCat.ino == petitcat_arduino.ino there are a good number of header .h and code .cpp files. All these will need to be cloned and copied into the IDE later. 
 
--
--
 
 
-
-<h1 style="font-size: 24px;">Step #2 -- Using your House/Workplace Wi-Fi to Communicate with the Robot Car</h1>
+# Step #2 -- Using your House/Workplace Wi-Fi to Communicate with the Robot Car
 
 In Part I in one of the last Steps we created a Wi-Fi server ("hotspot") out of the Arduino board's Wi-Fi shield, and we logged our smartphone into this Wi-Fi server ("hotspot"). Then we used an app on our phone to control the robot car via a Wi-Fi linkage between the two.
 
@@ -183,9 +170,9 @@ In this Step #2 we will not be doing any programming of our own, but use the sof
 
 Before you start this step you need to find out the following information about the Wi-Fi in your house/workplace:
 
--SSID -- this is the name of your network, e.g., if the name of the network you log into is "Jones" then your SSID is "Jones".
+- SSID -- this is the name of your network, e.g., if the name of the network you log into is "Jones" then your SSID is "Jones".
 
--Pasword -- this is your password you use to log into your network, e.g., if the password to log into your Wi-Fi is "test1234" then your password is "test1234".
+- Pasword -- this is your password you use to log into your network, e.g., if the password to log into your Wi-Fi is "test1234" then your password is "test1234".
 
 
 
@@ -201,9 +188,9 @@ Similarly, we already made the wiring changes in the Step in Part I when we trie
 
 Previously (should already be done) wiring changes to make:
 
--Remove the connections from the Wi-Fi B_TX and B_RX.
+- Remove the connections from the Wi-Fi B_TX and B_RX.
 
--Now connect D18 and D19 to E_RX and E_TX on the Wi-Fi board.
+- Now connect D18 and D19 to E_RX and E_TX on the Wi-Fi board.
 
 (Note. In the picture below the orange wire actually is going to E_TX and then the male-male hacked connection and then to D19, and similarly the yellow wire is going to E_RX and then to D18 via the other male-to-male hacked connection, which is a reveral of the yellow and orange in the schematic diagram, i.e., colors are reversed, but the wiring is the same.)
 
@@ -223,15 +210,16 @@ In case you did not do this or the Arduino IDE was re-installed:
 
 In this step there is now an extra requirement to download and update an Arduino library zip file.
 
--download the library zip file from the link provided in the Osoyoo Manual Lesson 5 
+- download the library zip file from the link provided in the Osoyoo Manual Lesson 5 
 (In the Manual version I was using the link went to:  http://osoyoo.com/driver/mecanum_metal_chassis/for_mega2560/WiFiEsp-master.zip )
 A folder WiFiEsp-master.zip will download
 
--virus scan the file always after downloading and before clicking or using
+- virus scan the file always after downloading and before clicking or using
 
--Open up the Arduino IDE (similar to above in earlier steps) but this time click Sketch, Library, Add ZIP Library, select WiFiEsp-master.zip
+- Open up the Arduino IDE (similar to above in earlier steps) but this time click Sketch, Library, Add ZIP Library, select WiFiEsp-master.zip
 
 ![addlibrary](addlibrary.png)
+
 Lesson5b Arduino code being compiled and uploaded to the robot car -- with this new code the robot car's Wi-Fi board will log onto your house/workplace Wi-Fi
 
 
@@ -240,21 +228,21 @@ Lesson5b Arduino code being compiled and uploaded to the robot car -- with this 
 
 Just like the other Steps in Part I (i.e., "Lessons" in the Osoyoo manual) there is demo software that will work with the Wi-Fi shield in your robotic car. We will use Osoyoo software for this Step. (However, later for controlling the robot car from our Python program we will be using our own created software, not Osoyoo's software.)
 
--The link shown in the manual works fine -- you will download a folder containing m2-lesson5.ino which will work with the Arduino development environment (IDE). The manual also shows you what some of the Arduino IDE screens will look like.
+- The link shown in the manual works fine -- you will download a folder containing m2-lesson5.ino which will work with the Arduino development environment (IDE). The manual also shows you what some of the Arduino IDE screens will look like.
 
--Unlike the other lessons, in this lesson there is a lesson5a and a lesson5b software demos.  In the lesson5a demo the Wi-Fi board on the robot car becomes the Wi-Fi access point ("hotspot" is the term used by the Osoyoo manual) and your cellphone becomes the client. We already did this in one the Steps towards the end of Part I.
+- Unlike the other lessons, in this lesson there is a lesson5a and a lesson5b software demos.  In the lesson5a demo the Wi-Fi board on the robot car becomes the Wi-Fi access point ("hotspot" is the term used by the Osoyoo manual) and your cellphone becomes the client. We already did this in one the Steps towards the end of Part I.
 
 In the lesson5b demo the Wi-Fi board on the robot car becomes a node (i.e., a client) in the LAN where the robot car is operating -- we will specify the LAN's router's Wi-Fi SSID and password to the robot car, but still end up using the cellphone app to control the car. ---> WE WILL TRY OUT LESSON5B DEMO SOFTWARE NOW.  
 
--Ok... when you unzip folder m2-lesson5 folder, you will see the folder m2-lesson5b
+- Ok... when you unzip folder m2-lesson5 folder, you will see the folder m2-lesson5b
 
--Always virus scan files when you download them and when you extract them.
+- Always virus scan files when you download them and when you extract them.
 
--Then open the Arduino IDE exactly as described in Part I. As well, the manual shows several screens of the Arduino IDE. Make sure your Arduino IDE is configured exactly like before (i.e., correct Arduino board is specified).
+- Then open the Arduino IDE exactly as described in Part I. As well, the manual shows several screens of the Arduino IDE. Make sure your Arduino IDE is configured exactly like before (i.e., correct Arduino board is specified).
 
--Click 'Open' and load in m2-lesson5b.ino
+- Click 'Open' and load in m2-lesson5b.ino
 
--Then attach the USB cable to the Arduino board connector on the robot car, exactly like you did in Part I Steps when we uploaded software to the car's Arduino board. (The power on your robot car should be turned off -- the cable will supply power to the Arduino board. )
+- Then attach the USB cable to the Arduino board connector on the robot car, exactly like you did in Part I Steps when we uploaded software to the car's Arduino board. (The power on your robot car should be turned off -- the cable will supply power to the Arduino board. )
 
 --> YOU NEED TO MODIFY THIS SOFTWARE
 
@@ -264,23 +252,23 @@ For example, if the name of the network you log into is "Jones" then your SSID i
 
 --> Look at lines 10 and 11 (or equivalent lines if the software has changed since the time of this writing).  Modify the lines as follows:
 
-char ssid[] = "Jones"
+    char ssid[] = "Jones"
 
-char pass[] = "test1234"
+    char pass[] = "test1234"
 
 ![ssid](ssid.png)
 
 
 
--Now click the upload arrow (green arrow inside a circle at the top left corner).
+- Now click the upload arrow (green arrow inside a circle at the top left corner).
 
--The software in m2-lesson5b.ino (modified with your Wi-Fi SSID and password) will now be uploaded to the Arduino board in your robotic car.
+- The software in m2-lesson5b.ino (modified with your Wi-Fi SSID and password) will now be uploaded to the Arduino board in your robotic car.
 
 ![lesson5b](lesson5b.png)
 
 
 
--Now open the Serial Monitor on the Arduino IDE. You will see something like this written:
+- Now open the Serial Monitor on the Arduino IDE. You will see something like this written:
 
 ![ipconnected](ipconnected.png)
 
@@ -293,34 +281,34 @@ We already add the phone app software in the Step in Part I when we tried out th
 
 In case you did not do this or you un-installed the app from your phone:
 
--If you have an Apple phone then you will go to the Apple Store
+- If you have an Apple phone then you will go to the Apple Store
 
--However, since I have an Android phone (Pixel 7) I will go to the Google Play store
+- However, since I have an Android phone (Pixel 7) I will go to the Google Play store
 
--The Osoyoo Manual Lesson 5 advises to search "Osoyoo Wifi UDP Robot Car Controller"
+- The Osoyoo Manual Lesson 5 advises to search "Osoyoo Wifi UDP Robot Car Controller"
 
--Unfortunately when I do this search (Feb 9, 2024) the only app that appears in the Google Play store is "Osoyoo IoT UDP Robot APP" -- well, better than nothing, and maybe it will do the same thing.... so this app is installed on my Android cellphone
+- Unfortunately when I do this search (Feb 9, 2024) the only app that appears in the Google Play store is "Osoyoo IoT UDP Robot APP" -- well, better than nothing, and maybe it will do the same thing.... so this app is installed on my Android cellphone
 
 
 ---> Your smartphone App is installed. (Whether it is called "Osoyoo Wifi UDP Robot Car Controller" or "Osoyoo IoT UDP Robot APP").
 
 Now we have to go to the settings section of the phone App.
 
--Ok we open the Osoyoo IoT UDP Robot APP
+- Ok we open the Osoyoo IoT UDP Robot APP
 
--Then go to Settings and enter the IP address we saw in the Serial Monitor. In this example, we would enter "10.0.0.41" (you will enter, of course, the IP address your Serial Monitor showed you -- this is the address the robot car is using).
+- Then go to Settings and enter the IP address we saw in the Serial Monitor. In this example, we would enter "10.0.0.41" (you will enter, of course, the IP address your Serial Monitor showed you -- this is the address the robot car is using).
 
--You can leave the other settings such as the default Ports unchanged
+- You can leave the other settings such as the default Ports unchanged
 
 Your smartphone App should now be able to control your robot car. Let's try it out.
 
--Ok...now go to the main page of the app.
+- Ok...now go to the main page of the app.
 
 ![appsmall](appsmall.png)
 
--Ok... turn on the robot car
+- Ok... turn on the robot car
 
--Now, let's click a button on the app.... go forward
+- Now, let's click a button on the app.... go forward
 
 The car goes forward.
 
@@ -342,7 +330,7 @@ For a moment, you can pretend you just created a great new robot to be used on t
  <img src="logogpt4startrek.jpg" width="550" height="550">
 </p>
 
--
+
 -------------------------
 
 At this point the basic Osoyoo hardware and pre-packaged software have been installed for your robot car.
@@ -359,18 +347,15 @@ I hope in the future to write our own diagnostic routines so that you do not nee
 
 Note: In the PetitCat project software, you can modify wheel direction (i.e., without swapping cables) as follows:
 
-#define REAR_RIGHT_WHEEL_COEF -1
+    #define REAR_RIGHT_WHEEL_COEF -1
 
-#define REAR_LEFT_WHEEL_COEF -1
+    #define REAR_LEFT_WHEEL_COEF -1
 
-#define FRONT_RIGHT_WHEEL_COEF -1
+    #define FRONT_RIGHT_WHEEL_COEF -1
 
-#define FRONT_LEFT_WHEEL_COEF -1
+    #define FRONT_LEFT_WHEEL_COEF -1
 
 -------------------------
--
-
--
 
 
 <h1 style="font-size: 24px;">Step #3 --Getting More Experience with the Arduino IDE -- The Library Manager</h1>
@@ -413,9 +398,9 @@ NOTE:  Feb 27, 2024:  The HLC5883L code is now within the GitHub repository and 
 
 (If you go ahead and install the HLC5883L library anyway,this should not cause any problems -- the repository HLC5883L code will be used in any case. You can see this if you inspect the code in Imu.cpp :
 
-// #include <HMC5883L.h>
+    // #include <HMC5883L.h>
 
-#include "src/lib/HMC5883L.h"   )
+    #include "src/lib/HMC5883L.h"
 
 --------------
 
@@ -466,17 +451,12 @@ As mentioned above, on the Arduino IDE click 'Sketch' and then 'Include Library'
 
 If you click Sketch, Include Libraries, you will see at the bottom of the menu a list of "Contributed Libraries':
 
-Adafruit BusIO
-
-Adafruit TCS34725
-
-Arduino JSON
-
-Aduino-HMC5883L
-
-Arduino-MPU6050
-
-Wifi-Esp
+- Adafruit BusIO
+- Adafruit TCS34725
+- Arduino JSON
+- Aduino-HMC5883L
+- Arduino-MPU6050
+- Wifi-Esp
 
 ![contriblibs](contriblibs.png)
 
@@ -486,13 +466,8 @@ At the time of this writing the project is specified to use these libraries:
 ![libsused](libsused.png)
 
 
--
--
--
--
 
-
-<h1 style="font-size: 24px;">Step #4 --Simple C/C++ Coding and (Possibly) Preventing Dementia</h1>
+# Step #4 --Simple C/C++ Coding and (Possibly) Preventing Dementia
 
 No, this section title is not a typo. Keep reading, and see how with acquiring very simple C/C++ knowledge (which most readers probably already have) one could possibly prevent or delay Alzheimer's (and possibly other types of) dementia with the robot car. 
 
@@ -557,16 +532,16 @@ You can name the Sketch (i.e., program) whatever you'd like -- just click on the
 
 Even if you have coded in C/C++ before, the Arduino IDE uses specialized functions. Let's review some of them right now.
 
--pinMode(pin, mode) -- It tells Arduino IDE that a specific pin should be configured to behave as an input (mode=INPUT) or an output (mode=OUTPUT).
+- pinMode(pin, mode) -- It tells Arduino IDE that a specific pin should be configured to behave as an input (mode=INPUT) or an output (mode=OUTPUT).
 
 -digitalWrite(pin, value) -- It tells a particular pin on the Arduino board to go to value=LOW or value=HIGH. If value is HIGH then the pin will go to 5 volts (the voltage used in the Arduino board in the robot car) and thus if an LED is attached the LED will turn on. If the vlaue is LOW then the pin will go to ground (i.e., 0 volts).
 
--delay(value) -- It tells the Arduino microcontroller to stop running the program for the specified delay (in milliseconds) and then once the delay period is over to continue executing the program.
+- delay(value) -- It tells the Arduino microcontroller to stop running the program for the specified delay (in milliseconds) and then once the delay period is over to continue executing the program.
 (An advanced way of doing this is using the millis() function to return the number of milliseconds that have elapsed and so the Arduino board can be checking other inputs or doing other things rather than just totally shutting down, as occurs with the delay() function.)
 
--Also, in C/C++ coding and in Arduino programs, a double forward slash, i.e., //, means a comment -- text you write which is for other human programmers (or you at a later time when you might have forgotten what the code is supposed to do), and which the computer ignores
+- Also, in C/C++ coding and in Arduino programs, a double forward slash, i.e., //, means a comment -- text you write which is for other human programmers (or you at a later time when you might have forgotten what the code is supposed to do), and which the computer ignores
 
--Also, in C/C++ coding and in Arduino programs, lines of code typically end with a semicolon, i.e., ;  (although if a loop or if/then is being specified then after the 'if', 'for' or 'while' keyword, there will be braces, e.g.,  for (int i =0; i<5; i++) { ...... lines of code here }
+- Also, in C/C++ coding and in Arduino programs, lines of code typically end with a semicolon, i.e., ;  (although if a loop or if/then is being specified then after the 'if', 'for' or 'while' keyword, there will be braces, e.g.,  for (int i =0; i<5; i++) { ...... lines of code here }
 
 Now that you know what the structure of an Arduino program looks like and now that you know these very important functions (well, important for programming Arduino boards), try to write an Arduino program that blinks the LED on the robot car's Arduino board.
 
@@ -786,12 +761,7 @@ You have mastered simple C/C++ coding for the Arduino and simple electronics for
 </p>
 
 
--
--
--
--
-
-<h1 style="font-size: 24px;">Step #6 --Getting More Experience with Arduino Coding</h1>
+# Step #6 --Getting More Experience with Arduino Coding
 
 Before moving on to consider the Arduino and Python code of the PetitCat project, getting a bit more experience with Arduino coding may be helpful. Again, while you are not expected to do C/C++ coding for the the PetitCat project (indeed, the purpose of PetitCat is to abstract away the C/C++/Arduino coding and let you interface your Python code to the robot car project), learning a bit more simple coding can help you better understand what the project code is doing.
 
@@ -922,9 +892,9 @@ At present I am working on the code and documentation of the code portions parti
 
 --USING THE SERIAL MONITOR FOR INPUTS--
 
-Serial.available()
+    Serial.available()
 
-ch = Serial.read()
+    ch = Serial.read()
 
 --MEASUREMENTS WITH YOUR MULTIMETER--
 
@@ -935,20 +905,20 @@ ch = Serial.read()
 
 --DIGITAL OUTPUTS--
 
-pinMode(outPin, OUTPUT)
+    pinMode(outPin, OUTPUT)
 
-digitalWrite(outPin, HIGH)
+    digitalWrite(outPin, HIGH)
 
-digitalWrite(outPin, LOW)
+    digitalWrite(outPin, LOW)
 
 
 --DIGITAL INPUTS--
 
-pinMode(inputPin, INPUT)
+    pinMode(inputPin, INPUT)
 
-pinMode(inputPin, INPUT_PULLUP)
+    pinMode(inputPin, INPUT_PULLUP)
 
-int x = digitalRead(inputPin)
+    int x = digitalRead(inputPin)
 
 
 --WHAT IS A PULL-UP RESISTOR?--
@@ -963,54 +933,54 @@ int x = digitalRead(inputPin)
 ![debouncecircuit](debouncecircuit.png)
 
 
-// Constants
-const int buttonPin = 2;    // The pin that the pushbutton is attached to
+    // Constants
+    const int buttonPin = 2;    // The pin that the pushbutton is attached to
                             // <------- need to try out on the actual Mega Arduino board
-const int ledPin = 13;      // The pin that the LED is attached to
-const unsigned long debounceDelay = 50;  // the debounce time in milliseconds; increase if the output flickers
+    const int ledPin = 13;      // The pin that the LED is attached to
+    const unsigned long debounceDelay = 50;  // the debounce time in milliseconds; increase if the output flickers
                                           // <---- need to try out and experiment with
 
-// Variables
-int buttonState;            // the current reading from the input pin
-int lastButtonState = HIGH;   // the previous reading from the input pin
-unsigned long lastDebounceTime = 0;  // the last time the output pin was toggled
+    // Variables
+    int buttonState;            // the current reading from the input pin
+    int lastButtonState = HIGH;   // the previous reading from the input pin
+    unsigned long lastDebounceTime = 0;  // the last time the output pin was toggled
 
-void setup() {
-  pinMode(buttonPin, INPUT_PULLUP);
-  pinMode(ledPin, OUTPUT);
+    void setup() {
+      pinMode(buttonPin, INPUT_PULLUP);
+      pinMode(ledPin, OUTPUT);
   
-  // Set initial LED state
-  digitalWrite(ledPin, LOW);
-}
-
-void loop() {
-  // read the state of the switch into a local variable:
-  int reading = digitalRead(buttonPin);
-
-  // check if the button state has changed
-  if (reading != lastButtonState) {
-    // reset the debouncing timer
-    lastDebounceTime = millis();
-  }
-
-  if ((millis() - lastDebounceTime) > debounceDelay) {
-    // whatever the reading is at, it's been there for longer than the debounce
-    // delay, so take it as the actual current state:
-
-    // if the button state has changed:
-    if (reading != buttonState) {
-      buttonState = reading;
-
-      // only toggle the LED if the new button state is LOW
-      if (buttonState == LOW) {
-        digitalWrite(ledPin, !digitalRead(ledPin));
-      }
+      // Set initial LED state
+      digitalWrite(ledPin, LOW);
     }
-  }
 
-  // save the reading. Next time through the loop, it'll be the lastButtonState:
-  lastButtonState = reading;
-}
+    void loop() {
+      // read the state of the switch into a local variable:
+      int reading = digitalRead(buttonPin);
+
+      // check if the button state has changed
+      if (reading != lastButtonState) {
+        // reset the debouncing timer
+        lastDebounceTime = millis();
+      }
+
+      if ((millis() - lastDebounceTime) > debounceDelay) {
+        // whatever the reading is at, it's been there for longer than the debounce
+        // delay, so take it as the actual current state:
+
+        // if the button state has changed:
+        if (reading != buttonState) {
+          buttonState = reading;
+
+          // only toggle the LED if the new button state is LOW
+          if (buttonState == LOW) {
+            digitalWrite(ledPin, !digitalRead(ledPin));
+          }
+       }
+    }
+
+    // save the reading. Next time through the loop, it'll be the lastButtonState:
+    lastButtonState = reading;
+    }
 
 
 --ANALOG OUTPUTS--
@@ -1024,11 +994,11 @@ analogWrite(outPin, float value)
 
 --ANALOG INPUTS--
 
-pinMode -- not required (set automatically)
+    pinMode -- not required (set automatically)
 
-int reading = analogRead(inputPin) 
+    int reading = analogRead(inputPin) 
 
-returns a value of 0 to 1023 over an input range 0 to 5 volts
+    returns a value of 0 to 1023 over an input range 0 to 5 volts
 
 
 
@@ -1053,19 +1023,19 @@ I hope in the future to write our own diagnostic routines so that you do not nee
 
 Note: In the PetitCat project software, you can modify wheel direction (i.e., without swapping cables) as follows:
 
-#define REAR_RIGHT_WHEEL_COEF -1
-
-#define REAR_LEFT_WHEEL_COEF -1
-
-#define FRONT_RIGHT_WHEEL_COEF -1
-
-#define FRONT_LEFT_WHEEL_COEF -1
+    #define REAR_RIGHT_WHEEL_COEF -1
+    
+    #define REAR_LEFT_WHEEL_COEF -1
+  
+    #define FRONT_RIGHT_WHEEL_COEF -1
+  
+    #define FRONT_LEFT_WHEEL_COEF -1
 
 -------------------------
 -
 
 
-<h1 style="font-size: 24px;">Step #8 --Compiling the PetitCat Code</h1>
+# Step #8 --Compiling the PetitCat Code
 
 Now that we have a working robot car (Part I) and that we have acquired further knowledge about coding for the Arduino board (this Part II of the documentation), we are ready to start implementing the actual code of the PetitCat robot car project.
 
@@ -1085,29 +1055,29 @@ As this project evolves, names used to describe various parts of the project may
 
 Let's review the nomenclature of the project, i.e., the names referring to different parts of the project.
 
--Overall project:
+- Overall project:
 
 The "PetitCat" project == the "Robot Car" project == the "Osoyoo Robot Car" project 
 
--GibHub folder for project:   https://github.com/OlivierGeorgeon/osoyoo
+- GibHub folder for project:   https://github.com/OlivierGeorgeon/osoyoo
 
 
--Python main file:
+- Python main file:
 
 PetitCat.py == PetitCaMain.py == PetitCatTester.py == test_remote_control_robot.py
 
--GitHub folder for Python files: /osoyoo/tests/
+- GitHub folder for Python files: /osoyoo/tests/
 
 https://github.com/OlivierGeorgeon/osoyoo/tree/master/tests
 
 If you go to this GitHub folder. If you click open PetitCat.py == PetitCaMain.py == PetitCatTester.py == test_remote_control_robot.py you see the standard library files PYthon will import automatically. 
 
 
--Arduino board main file:
+- Arduino board main file:
 
 PetitCat.ino == autocat_enacter.ino == petitcat_arduino.ino
 
--GitHub folder for Arduino files:
+- GitHub folder for Arduino files:
 
 /osoyoo/petitcat_arduino/
 
@@ -1138,19 +1108,19 @@ If you open this directory you will see it looks the same as what is on the GitH
 
 In order to compile the project software, we must make sure that our Arduino IDE has access to it.
 
--The Arduino IDE should be open on your desktop/laptop computer.
+- The Arduino IDE should be open on your desktop/laptop computer.
 
--Go to File, Preferences and note the location of your Sketchbook. On my computer it is:
+- Go to File, Preferences and note the location of your Sketchbook. On my computer it is:
 
 c:\Users\howar\OneDrive\Documents\Arduino  (<--note: this is for my PC; yours will be different!!)
 
--In the cloned project repo we now have to look for Arduino sketch files (i.e., 'ino' file extension). We see this in the subfolder 'petitcat_arduino'. Thus we copy 'petitcat_arduino' to the Sketchbook location which in my case is c:\Users\howar\OneDrive\Documents\Arduino
+- In the cloned project repo we now have to look for Arduino sketch files (i.e., 'ino' file extension). We see this in the subfolder 'petitcat_arduino'. Thus we copy 'petitcat_arduino' to the Sketchbook location which in my case is c:\Users\howar\OneDrive\Documents\Arduino
 
--In the Arduino IDE, now click File, Sketchbook -- you will see the choice of "osoyoo" which when you click will bring up "petitcat_arduino".
+- In the Arduino IDE, now click File, Sketchbook -- you will see the choice of "osoyoo" which when you click will bring up "petitcat_arduino".
 
 ![findino](findino.png)
 
--Select "petitcat_arduino" and it will open the Sketch "petitcat_arduino" within Arduino IDE.
+- Select "petitcat_arduino" and it will open the Sketch "petitcat_arduino" within Arduino IDE.
 
 ![petitcatide](petitcatide.png)
 
@@ -1160,12 +1130,9 @@ In my case it did not -- "compilation error: arduino_secrets.h: no such file or 
 
 ![secretsh](secretsh.png)
 
--
--
+
 
 --TROUBLESHOOTING COMPILATION ERRORS--
--
--
 
 
 Ok.... the program did not compile. Let's look at the extended compiler messages, and start troubleshooting:
@@ -1182,14 +1149,14 @@ Using core 'arduino' from platform in folder: C:\Users\howar\AppData\Local\Ardui
 
 ..
 
-ResolveLibrary(arduino_secrets.h)
+    ResolveLibrary(arduino_secrets.h)
 
   -> candidates: []
   
 C:\Users\howar\OneDrive\Documents\Arduino\osoyoo\petitcat_arduino\src\wifi\WifiCat.cpp:11:10: fatal error: arduino_secrets.h: No such file or directory
 
- #include "arduino_secrets.h"
-          ^~~~~~~~~~~~~~~~~~~
+    #include "arduino_secrets.h"
+             ^~~~~~~~~~~~~~~~~~~
 	  
 compilation terminated.
 
@@ -1208,11 +1175,11 @@ Indeed, if we explore around the robot car project GitHub repository, we find in
 
 ---------------------------------------------------
 
-#define SECRET_WIFI_TYPE "STA" // Access point : "AP" pr Station (through router): "STA"
+    #define SECRET_WIFI_TYPE "STA" // Access point : "AP" pr Station (through router): "STA"
 
-#define SECRET_SSID "Your wifi SSID"
+    #define SECRET_SSID "Your wifi SSID"
 
-#define SECRET_PASS "Your password"
+    #define SECRET_PASS "Your password"
 
 ---------------------------------------------------
 
@@ -1234,14 +1201,10 @@ Success !!
 ![compilesuccess](compilesuccess.png)
 
 
--
--
--
 
-<h1 style="font-size: 24px;">Step #9 --Preliminary Testing of the PetitCat Code: Python <--> Arduino</h1>
+# Step #9 --Preliminary Testing of the PetitCat Code: Python <--> Arduino
 
--
--
+
 
 <b>--SETTING UP THE ARDUINO_SECRETS.H FILE--</b>
 
@@ -1257,15 +1220,15 @@ The arduino_secrets.h file contains your home (or workplace) Wi-Fi identifying i
 
 <b>#define SECRET_WIFI_TYPE "STA" // Access point : "AP" pr Station (through router): "STA"
 
-#define SECRET_SSID "Your wifi SSID"
+    #define SECRET_SSID "Your wifi SSID"
 
-#define SECRET_PASS "Your password"</b>
+    #define SECRET_PASS "Your password"</b>
 
 --> Above in Step #2 we set up the Osoyoo supplied program so that the robot car could act as an ordinary device on our home/workplace LAN. If you recall, before you started working on that Step, you needed to find out the following information about the Wi-Fi in your house/workplace:
 
--SSID -- this is the name of your network, e.g., if the name of the network you log into is "Jones" then your SSID is "Jones".
+- SSID -- this is the name of your network, e.g., if the name of the network you log into is "Jones" then your SSID is "Jones".
 
--Pasword -- this is your password you use to log into your network, e.g., if the password to log into your Wi-Fi is "test1234" then your password is "test1234".
+- Pasword -- this is your password you use to log into your network, e.g., if the password to log into your Wi-Fi is "test1234" then your password is "test1234".
 
 You will need this same information again to enter in the "arduino_secrets.h" file.
 
@@ -1279,9 +1242,9 @@ However, the Arduino IDE contains a built-in external editor. The project "petit
 
 <b>#define SECRET_WIFI_TYPE "STA" // Access point : "AP" pr Station (through router): "STA"
 
-#define SECRET_SSID "Jones"
+    #define SECRET_SSID "Jones"
 
-#define SECRET_PASS "test1234"</b>
+    #define SECRET_PASS "test1234"</b>
 
 
 --> The PetitCat project file in the Arduino IDE (which will be uploaded to the robot car) now has your Wi-Fi network information required to attached to the same network your laptop/desktop computer is running (and from which you will communicate with the robot car via your Python programs).
@@ -1348,9 +1311,9 @@ Before running a Python program take a look at it quickly. What will it do? Anyt
 
 <b>--RUNNING THE PETITCAT PROJECT: PYTHON + ARDUINO CODE --</b>
 
--The Arduino code was successfully compiled and uploaded to the robot car. (Well... it indeed successfully compiled and uploaded. However, on the Serial Monitor we did not see the Wi-Fi/IP information that we expected it to display.)
+- The Arduino code was successfully compiled and uploaded to the robot car. (Well... it indeed successfully compiled and uploaded. However, on the Serial Monitor we did not see the Wi-Fi/IP information that we expected it to display.)
 
--Ok.... now let's run the program test_remote_control_robot.py :
+- Ok.... now let's run the program test_remote_control_robot.py :
 
 ![packetfail](packetfail.png)
 
@@ -1470,7 +1433,6 @@ In the next part of the Overview series, Part 3, we will review in more depth th
 
 end of document
 ****
-##
 
 
 
