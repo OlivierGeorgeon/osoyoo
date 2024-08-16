@@ -8,7 +8,8 @@ from .Robot.Command import DIRECTION_BACK
 from .Robot.Message import Message
 from .Enaction.Enacter import Enacter
 from .Enaction.Simulator import Simulator
-from .Robot.CtrlRobot import ENACTION_STEP_IDLE, ENACTION_STEP_RENDERING
+# from .Robot.CtrlRobot import ENACTION_STEP_IDLE, ENACTION_STEP_RENDERING
+from .Enaction import ENACTION_STEP_RENDERING
 from .Enaction.CompositeEnaction import CompositeEnaction
 from .Integrator.PredictionError import PredictionError
 from .Integrator.Calibrator import Calibrator

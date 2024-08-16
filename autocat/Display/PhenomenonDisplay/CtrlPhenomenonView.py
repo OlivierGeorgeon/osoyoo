@@ -3,7 +3,8 @@ import numpy as np
 from .PhenomenonView import PhenomenonView
 from ..PointOfInterest import PointOfInterest, POINT_CONE
 from ...Workspace import KEY_ENCLOSE
-from ...Robot.CtrlRobot import ENACTION_STEP_RENDERING
+# from ...Robot.CtrlRobot import ENACTION_STEP_RENDERING
+from ...Enaction import ENACTION_STEP_RENDERING
 from ...Utils import quaternion_translation_to_matrix
 from ...Memory.EgocentricMemory.Experience import EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_CENTRAL_ECHO
 from ...Memory.PhenomenonMemory.PhenomenonMemory import TER

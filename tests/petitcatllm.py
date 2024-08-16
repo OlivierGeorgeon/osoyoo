@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-##PRAGMAS
+# PRAGMAS
 # pylint: disable=line-too-long
 # pylint: disable=invalid-name
 # pylint: disable=broad-exception-caught
@@ -32,7 +32,7 @@ sensory inputs autonomously.
 
 """
 
-## IMPORTS
+# IMPORTS
 import socket
 import json
 import sys
@@ -42,7 +42,7 @@ from langchain_openai import OpenAI
 
 
 
-## CONSTANTS
+# CONSTANTS
 LLM_ERROR_MESSAGE = """
 The key required for the currently used LLM is "openai_api_key" which
 appears to read on your system as {key} which is unlikely to work.
@@ -93,7 +93,7 @@ MOTOR_CODES = (
     "'4' means shuffle to the right, '6' means shuffle to the left, '8' means go forwards. Please just output a single digit, nothing else. ")
 
 
-## INITIALIZATIONS (incl Class PetitController)
+# INITIALIZATIONS (incl Class PetitController)
 def initialize_llm() -> OpenAI:
     """Initialize the LLM with the API key
     -Currently using OpenAI API but many other LLM API's
@@ -114,11 +114,11 @@ def initialize_llm() -> OpenAI:
         print(LLM_ERROR_MESSAGE.format(key=openai_api_key))
         print('Program will terminate as a result since will not run otherwise. Please fix this issue.\n')
         sys.exit(1)
-    llm = OpenAI(api_key=openai_api_key) #type: ignore[arg-type]
-    #mypy will indicate that the OpenAI class is expecting a "SecretStr" type
+    llm = OpenAI(api_key=openai_api_key)  # type: ignore[arg-type]
+    # mypy will indicate that the OpenAI class is expecting a "SecretStr" type
     # rather than read or cast as such, the mypy warning bypassed as variable
     # llm is only used locally
-    #as can be seen by print statement below a typical value for variable "llm" may be:
+    # as can be seen by print statement below a typical value for variable "llm" may be:
     #  OpenAI Params: {'model_name': 'gpt-3.5-turbo-instruct', 'temperature': 0.7, 'top_p': 1,
     #  'frequency_penalty': 0, 'presence_penalty': 0, 'n': 1, 'logit_bias': {}, 'max_tokens': 256}
     print('\nThe features of the LLM API just initialized are:\n', llm, '\n')
@@ -141,7 +141,7 @@ def test_llm_initial_response(llm, bypass=False) -> bool:
     return True
 
 
-#START class PetitCatController
+# START class PetitCatController
 class PetitCatController:
     """
     A class to control the PetitCat robotic device.
@@ -250,11 +250,12 @@ class PetitCatController:
         if outcome:
             self.clock += 1
         return outcome
-#END class PetitCatController
-##End initializations
+
+# END class PetitCatController
+# End initializations
 
 
-##PROBLEMS AND ADDITIONAL PROMPTS FOR LLM
+# PROBLEMS AND ADDITIONAL PROMPTS FOR LLM
 def solve_tsp_problem(llm) -> None:
     """Solve the TSP problem using the LLM.
     This is used for Alien AGI Simulation, i.e., not cog arch simulations.
@@ -267,7 +268,7 @@ def solve_tsp_problem(llm) -> None:
     "Give the total distance (units are miles). Tell me how you solved this problem. Give the shortest path. {distances}")
     """
     for i in range(TOTAL_LIMITED_TRIALS):
-        input_text = TSP_INPUT_TEXT_TEMPLATE.format(distances=DISTANCES) #prompt instruction plus distance matrix
+        input_text = TSP_INPUT_TEXT_TEMPLATE.format(distances=DISTANCES)  # prompt instruction plus distance matrix
         response = llm.invoke(input=input_text)
         print(f"\nTSP Problem: Run {i}: Response from OpenAI simulating Alien AGI:", response)
 
@@ -285,17 +286,18 @@ def solve_compositionality_problem(llm) -> None:
         response = llm.invoke(input=COMPOSITIONALITY_INPUT_TEXT) #see above for prompt contents
         print(f"\nCompositionality Problem: Run {i}: Response from OpenAI simulating Alien AGI:", response)
 
+
 def extract_first_digit(input_string):
-    '''Use to extract a digit representing a motor code from the
+    """Use to extract a digit representing a motor code from the
     LLM output
-    '''
+    """
     match = re.search(r'\d', input_string)
     if match:
         return match.group()
     return None
 
 
-##MAIN
+# MAIN
 def main():
     """initialize an instance of PetitCatController and define which
     code blocks to run
@@ -309,24 +311,24 @@ def main():
 
 
     """
-    #initialize the LLM
-    llm = initialize_llm()  #"llm" variable is needed for various llm operations in the other functions
+    # initialize the LLM
+    llm = initialize_llm()  # "llm" variable is needed for various llm operations in the other functions
     test_llm_initial_response(llm, bypass=False)
 
-    #initialize the PetitCat robotics
-    controller = PetitCatController()  #instance of this class for robot sensory and motor communication
+    # initialize the PetitCat robotics
+    controller = PetitCatController()  # instance of this class for robot sensory and motor communication
 
-    #decide which code blocks to run
-    #code_blocks_to_run = ['tsp', 'compositionality', 'robotsense'] #use LLM with this code block
-    code_blocks_to_run = ['robotsense'] #use LLM with this code block
+    # decide which code blocks to run
+    # code_blocks_to_run = ['tsp', 'compositionality', 'robotsense'] #use LLM with this code block
+    code_blocks_to_run = ['robotsense']  # use LLM with this code block
     if not code_blocks_to_run:
         code_blocks_to_run = ['robotsense']  # update as needed
     print('\nThe LLM and the PetitCat controller have been successfully initialized.')
     print('(at this point unable to tell if Arduino code is running or not on the robotic embodiment but will see soon)')
     print(f'System note: codeblocks which will be run: {code_blocks_to_run}\n')
 
-    #possible code blocks to run
-    #pylint: disable=pointless-string-statement
+    # Possible code blocks to run
+    # pylint: disable=pointless-string-statement
     if 'tsp' in code_blocks_to_run:
         '''code block to demonstrate the travelling salesperson problem via LLM and PetitCat embodiment
         -pending integration with PetitCat
@@ -353,34 +355,33 @@ def main():
         -pending more instructive LLM prompts, although limited prompts used surprinsingly work adequately
         -purpose at this time largely as demonstration code
         '''
-        for trial in range(TOTAL_TRIALS):  #2 at time of writing, TOTAL_TRIALS is 20 at time of writing
+        for trial in range(TOTAL_TRIALS):  # 2 at time of writing, TOTAL_TRIALS is 20 at time of writing
             print(f'\nrobotsense code block trial # {trial}\n')
-            #scan envrt for ultrasonic readings
-            motor_code = "-" #initial motor code to scan the ultrasonic sensors
-            response = controller.motor_command(motor_code) #this response will have ultrasonic data
+            # scan envrt for ultrasonic readings
+            motor_code = "-"  # initial motor code to scan the ultrasonic sensors
+            response = controller.motor_command(motor_code)  # this response will have ultrasonic data
             print("ultrasonic sensory data:", response)
             if response is None:
                 decoded_response = 'no_response'
             else:
-                decoded_response = response.decode('utf-8') # decode the byte response to a string
-            #feed envrt sensory scan to LLM to generate motor code
+                decoded_response = response.decode('utf-8')  # decode the byte response to a string
+            # feed envrt sensory scan to LLM to generate motor code
             instruction = "What do you make of this data from a mobile robot with an ultrasonic sensor: " + decoded_response
             print(llm.invoke(input=instruction))
-            llmresponse = llm.invoke(input=MOTOR_CODES+" It is very important here to just output a single number and nothing else here.")
+            llmresponse = llm.invoke(input=MOTOR_CODES + " It is very important here to just output a single number and nothing else here.")
             print('\nllm motor code produced:', llmresponse)
-            #now try out suggested motor code
+            # now try out suggested motor code
             motor_code = extract_first_digit(llmresponse)
             print(f'\nmotor_code to be sent to the robotic car: {motor_code}')
             response = controller.motor_command(motor_code)
             print("\nMotor Command Response:", response)
 
-
-    #end program
+    # end program
     print('\nDemonstration code to show LLM integrated with PetitCat Project is now over.')
     print('No data is being saved. No files to initialize. No return values.\n')
 
 
 if __name__ == '__main__':
-    #note that if petitcatllm.py is not run from command line then main() will not run, but can use
-    #the various functions and classes of this module
+    # Note that if petitcatllm.py is not run from command line then main() will not run, but can use
+    # the various functions and classes of this module
     main()
