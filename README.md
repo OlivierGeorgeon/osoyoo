@@ -72,7 +72,7 @@ Artificial enactive inference in three-dimensional world. Cognitive Systems Rese
 
 # License
 
-Copyright 2024 AFPICL and CNRS
+Copyright 2024 AFPICL, CNRS, and DOLL Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this software except in compliance with the License.

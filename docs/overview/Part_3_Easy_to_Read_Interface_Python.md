@@ -422,7 +422,7 @@ In Step #3 above we utilized this class using the default demo code in "petitcat
 -
 
 <p align="center">
- <img src="classcode.png" width="800" height="800">
+ <img src="classcode.png" width="800">
 </p>
 
 -
@@ -521,7 +521,7 @@ Ok..... se we enter '2' for a motor command, the robot goes backwards, and we se
 
 
 <p align="center">
- <img src="statussig.png" width="700" height="300">
+ <img src="statussig.png" width="700">
 </p>
 
 
@@ -595,7 +595,7 @@ Many of the LLM APIs available now do require paid licenses, although the fees a
 The LangChain Python framework used in the code, as discussed in the imports above, is an open-source library and at the time of writing is free to download and use, in keeping with the open-source philosophy of the PetitCat project. We have not modified the source code of LangChain but are using the latest version installed without changes at the time of writing. We use LangChain to abstract away many of the lower-level details of interfacing to an LLM, although, for example, we could have relatively easily directly interfaced to the OpenAI GPT API directly without LangChain in the code above. An advantage of LangChain is that it can interface to not only the LLM's from OpenAI but, at the time of this writing, the LLMs from Google Gemini, Microsoft Asure OpenAI, Amazon API Gateway (limited features), Anthropic, AI21, Cohere, Hugging Face, Meta LLaMA, and others. At the time of writing the various integrations and the extent (some integrations do not adequately support the LLM) can be checked at:  https://python.langchain.com/v0.2/docs/integrations/llms/    
 
 <p align="center">
- <img src="langchain.png" width="300" height="100">
+ <img src="langchain.png" width="300">
 </p>
 
 Although not utilized at present, in the future some users might be interested in lightweight LLMs that can be better utilized by embedded systems, such as Google's Gemma small LLMs. The LangChain library does support the "langchain-google-vertexai" package which allows interaction with the various Gemma models. The Gemma model can actually be downloaded from GitHub. However, suitable GPUs with sufficient memory would be required, obviously orders of magnitude more than the Arduino board could handle, although some PC's/servers could be adequately configured to run this in a self-contained manner.

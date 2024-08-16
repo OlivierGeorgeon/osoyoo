@@ -4,7 +4,8 @@ from webcolors import name_to_rgb
 from pyglet.gl import GL_LINES
 from ..InteractiveDisplay import InteractiveDisplay
 from ..PointOfInterest import PointOfInterest
-from ...Robot.CtrlRobot import ENACTION_STEP_RENDERING
+# from ...Robot.CtrlRobot import ENACTION_STEP_RENDERING
+from ...Enaction import ENACTION_STEP_RENDERING
 from ...Memory.EgocentricMemory.Experience import FLOOR_COLORS
 
 

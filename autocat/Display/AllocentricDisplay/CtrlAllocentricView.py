@@ -3,7 +3,8 @@ import numpy as np
 from pyglet.window import key, mouse
 from .AllocentricView import AllocentricView
 from ...Memory.AllocentricMemory.Geometry import point_to_cell
-from ...Robot.CtrlRobot import ENACTION_STEP_RENDERING, ENACTION_STEP_ENACTING
+# from ...Robot.CtrlRobot import ENACTION_STEP_RENDERING, ENACTION_STEP_ENACTING
+from ...Enaction import ENACTION_STEP_RENDERING, ENACTION_STEP_ENACTING
 from ...Memory.EgocentricMemory.Experience import EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO
 from ...Memory.AllocentricMemory.AllocentricMemory import CELL_UNKNOWN
 from ...Memory.AllocentricMemory import STATUS_FLOOR, STATUS_2, STATUS_ECHO, STATUS_3, STATUS_4, COLOR_INDEX, CLOCK_FOCUS, \

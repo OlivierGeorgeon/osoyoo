@@ -5,7 +5,7 @@ from pyglet.window import key, mouse
 from ..InteractiveDisplay import InteractiveDisplay
 from ..PointOfInterest import PointOfInterest, POINT_PROMPT, POINT_ROBOT
 from ...Memory.EgocentricMemory.Experience import EXPERIENCE_FOCUS, EXPERIENCE_ROBOT
-from ...Robot.CtrlRobot import ENACTION_STEP_ENACTING, ENACTION_STEP_RENDERING
+from ...Enaction import ENACTION_STEP_RENDERING
 
 
 class CtrlEgocentricView:

@@ -3,7 +3,8 @@ import math
 import numpy as np
 from .BodyView import BodyView
 from autocat.Display.PointOfInterest import PointOfInterest
-from ...Robot.CtrlRobot import ENACTION_STEP_RENDERING
+# from ...Robot.CtrlRobot import ENACTION_STEP_RENDERING
+from ...Enaction import ENACTION_STEP_RENDERING
 from ...Workspace import KEY_DECREASE, KEY_INCREASE
 from ...Utils import quaternion_to_azimuth
 from ...Integrator.Calibrator import compass_calibration
