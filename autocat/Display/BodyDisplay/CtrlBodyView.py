@@ -3,9 +3,8 @@ import math
 import numpy as np
 from .BodyView import BodyView
 from autocat.Display.PointOfInterest import PointOfInterest
-# from ...Robot.CtrlRobot import ENACTION_STEP_RENDERING
 from ...Enaction import ENACTION_STEP_RENDERING
-from ...Workspace import KEY_DECREASE, KEY_INCREASE
+# from ...Workspace import KEY_DECREASE, KEY_INCREASE
 from ...Utils import quaternion_to_azimuth
 from ...Integrator.Calibrator import compass_calibration
 from ...Memory.EgocentricMemory.Experience import EXPERIENCE_COMPASS, EXPERIENCE_NORTH
@@ -34,12 +33,12 @@ class CtrlBodyView:
 
         def on_text(text):
             """Process the user key or forward it to the Workspace to handle"""
-            if text.upper() == KEY_DECREASE:
-                self.workspace.memory.body_memory.energy = max(0, self.workspace.memory.body_memory.energy - 10)
-                # self.workspace.memory_snapshot.body_memory.energy = self.workspace.memory.body_memory.energy
-            elif text.upper() == KEY_INCREASE:
-                self.workspace.memory.body_memory.energy = min(self.workspace.memory.body_memory.energy + 10, 100)
-                # self.workspace.memory_snapshot.body_memory.energy = self.workspace.memory.body_memory.energy
+            # if text.upper() == KEY_DECREASE:
+            #     self.workspace.memory.body_memory.energy = max(0, self.workspace.memory.body_memory.energy - 10)
+            #     # self.workspace.memory_snapshot.body_memory.energy = self.workspace.memory.body_memory.energy
+            # elif text.upper() == KEY_INCREASE:
+            #     self.workspace.memory.body_memory.energy = min(self.workspace.memory.body_memory.energy + 10, 100)
+            #     # self.workspace.memory_snapshot.body_memory.energy = self.workspace.memory.body_memory.energy
             if text.upper() == KEY_OFFSET:
                 # Calibrate the compass
                 points = np.array([p.point()[0: 2] for p in self.points_of_interest if (p.type == EXPERIENCE_NORTH)])

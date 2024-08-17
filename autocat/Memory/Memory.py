@@ -64,9 +64,9 @@ class Memory:
         integrate(self)
 
         # Create or update place cell
-        position_correction = self.place_memory.add_or_update_place_cell(self)
-        print(f"Adjust the robot's position to place cell by {tuple(position_correction[:2].astype(int))}")
-        self.allocentric_memory.robot_point += position_correction
+        self.place_memory.add_or_update_place_cell(self)
+        # print(f"Adjust the robot's position to place cell by {tuple(position_correction[:2].astype(int))}")
+        # self.allocentric_memory.robot_point += position_correction
 
         """Update allocentric memory on the basis of body, phenomenon, and egocentric memory"""
         # Mark the cells where is the robot
@@ -140,6 +140,13 @@ class Memory:
             return self.allocentric_memory.robot_point - self.phenomenon_memory.terrain().point
         else:
             return self.allocentric_memory.robot_point
+
+    def adjust_robot_position(self):
+        """Adjust the robot's position by the correction from place cell memory"""
+        position_correction = self.place_memory.position_correction
+        print(f"Adjusting the robot's position to place cell {self.place_memory.current_robot_cell_id} "
+              f"by {tuple(position_correction[:2].astype(int))}")
+        self.allocentric_memory.robot_point += position_correction
 
     def save(self):
         """Return a clone of memory for memory snapshot"""

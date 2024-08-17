@@ -19,11 +19,11 @@ class PlaceMemory:
         self.place_cell_graph = nx.Graph()
         self.place_cell_distances = dict(dict())
         self.current_robot_cell_id = 0  # The place cell where the robot currently is
+        self.position_correction = np.array([0, 0, 0])
         self.observe_better = False
 
     def add_or_update_place_cell(self, memory):
         """Create e new place cell or update the existing one"""
-        position_correction = np.array([0, 0, 0])
 
         # The new experiences for place cell
         experiences = [e for e in memory.egocentric_memory.experiences.values() if (e.clock >= memory.clock) and
@@ -49,7 +49,7 @@ class PlaceMemory:
                     # try to adjust the robot's position based on local echoes
                     points = np.array([e.polar_point() for e in local_experiences])
                     points += self.place_cells[existing_id].point - memory.allocentric_memory.robot_point
-                    position_correction = self.place_cells[existing_id].translation_estimation_echo(points)
+                    self.position_correction[:] = self.place_cells[existing_id].translation_estimation_echo(points)
                 # If no local echoes then try to adjust the position based on aligned echo
                 else:
                     align_experiences = [e for e in memory.egocentric_memory.experiences.values() if (e.clock >= memory.clock) and
@@ -57,10 +57,10 @@ class PlaceMemory:
                     if len(align_experiences) > 0:
                         point = align_experiences[0].polar_point()
                         point += self.place_cells[existing_id].point - memory.allocentric_memory.robot_point
-                        # position_correction = self.place_cells[existing_id].translation_estimate_aligned_echo(point)
-                # if the position correction is too far off then cancel the correction
-                if np.linalg.norm(position_correction) > MIN_PLACE_CELL_DISTANCE:
-                    position_correction[:] = 0
+                        self.position_correction[:] = self.place_cells[existing_id].translation_estimate_aligned_echo(point)
+                # # if the position correction is too far off then cancel the correction
+                # if np.linalg.norm(position_correction) > MIN_PLACE_CELL_DISTANCE:
+                #     position_correction[:] = 0
             # If the cell is not fully observed then add the cues
             else:
                 self.add_cues_relative_to_center(existing_id, memory.allocentric_memory.robot_point, experiences)
@@ -72,9 +72,9 @@ class PlaceMemory:
                     if nearest > 0:
                         points_of_nearest = np.array([cue.point() for cue in self.place_cells[nearest].cues if cue.type == EXPERIENCE_CENTRAL_ECHO])
                         points_of_nearest += self.place_cells[nearest].point - self.place_cells[existing_id].point
-                        # position_correction = self.place_cells[existing_id].translation_estimation_echo(points_of_nearest, EXPERIENCE_CENTRAL_ECHO)
-                        print(f"Estimated correction of place cell position {tuple(position_correction[:2].astype(int))}")
-                        position_correction[:] = 0  # Not yet implemented
+                        self.position_correction[:] = self.place_cells[existing_id].translation_estimation_echo(points_of_nearest, EXPERIENCE_CENTRAL_ECHO)
+                        # print(f"Estimated correction of place cell position {tuple(position_correction[:2].astype(int))}")
+                        # position_correction[:] = 0  # Not yet implemented
 
                 # Adjust the graph of place cells?
 
@@ -92,7 +92,10 @@ class PlaceMemory:
             self.create_place_cell(memory.allocentric_memory.robot_point, experiences)
             print(f"Robot at new place {self.current_robot_cell_id}")
 
-        return position_correction
+        # self.position_correction[:] = position_correction
+        print(f"Position correction relative to place cell {self.current_robot_cell_id}: "
+              f"{tuple(self.position_correction[0:2].astype(int))}")
+        # return np.array([0, 0, 0])  # position_correction
 
     def create_place_cell(self, point, experiences):
         """Create a new place cell and add it to the list and to the graph"""

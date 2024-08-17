@@ -20,11 +20,12 @@ from .Proposer.PredefinedInteractions import create_sequence_interactions
 from .Robot.RobotDefine import ROBOT_SETTINGS
 
 KEY_CONTROL_USER = "M"  # Manual mode : controlled by the user
-KEY_DECREASE = "D"
-KEY_INCREASE = "P"
+# KEY_DECREASE = "D"
+# KEY_INCREASE = "P"
 KEY_CLEAR = "C"  # Clear the stack of interactions to enact next
 KEY_PREDICTION_ERROR = "E"
 KEY_ENCLOSE = "N"
+KEY_POSITION = "P"
 
 
 class Workspace:
@@ -100,25 +101,25 @@ class Workspace:
                 i1 = self.primitive_interactions[(ACTION_BACKWARD, OUTCOME_PROMPT)]
                 e1 = Enaction(i1, e0.predicted_memory.save())
                 self.composite_enaction = CompositeEnaction([e0, e1], 'Manual', np.array([1, 1, 1]))
-        elif user_key.upper() == "P" and self.memory.egocentric_memory.focus_point is not None:
-            # If key PUSH and has focus then create the push sequence
-            if self.composite_enaction is None:
-            # if self.enacter.interaction_step == ENACTION_STEP_IDLE:
-                # First enaction: turn to the prompt
-                i0 = self.primitive_interactions[(ACTION_TURN, OUTCOME_PROMPT)]
-                e0 = Enaction(i0, self.memory.save())
-                # Second enaction: move forward to the prompt
-                i1 = self.primitive_interactions[(ACTION_FORWARD, OUTCOME_PROMPT)]
-                e1 = Enaction(i1, e0.predicted_memory.save())
-                # Third enaction: turn to the prompt which is copied from the focus because it may be cleared
-                i2 = self.primitive_interactions[(ACTION_TURN, OUTCOME_PROMPT)]
-                e2_memory = e1.predicted_memory.save()
-                e2_memory.egocentric_memory.prompt_point = e1.predicted_memory.egocentric_memory.focus_point.copy()
-                e2 = Enaction(i2, e2_memory)
-                # Fourth enaction: move forward to the new prompt
-                i3 = self.primitive_interactions[(ACTION_FORWARD, OUTCOME_PROMPT)]
-                e3 = Enaction(i3, e2.predicted_memory.save())
-                self.composite_enaction = CompositeEnaction([e0, e1, e2, e3], 'Manual', np.array([1, 1, 1]))
+        # elif user_key.upper() == "P" and self.memory.egocentric_memory.focus_point is not None:
+        #     # If key PUSH and has focus then create the push sequence
+        #     if self.composite_enaction is None:
+        #     # if self.enacter.interaction_step == ENACTION_STEP_IDLE:
+        #         # First enaction: turn to the prompt
+        #         i0 = self.primitive_interactions[(ACTION_TURN, OUTCOME_PROMPT)]
+        #         e0 = Enaction(i0, self.memory.save())
+        #         # Second enaction: move forward to the prompt
+        #         i1 = self.primitive_interactions[(ACTION_FORWARD, OUTCOME_PROMPT)]
+        #         e1 = Enaction(i1, e0.predicted_memory.save())
+        #         # Third enaction: turn to the prompt which is copied from the focus because it may be cleared
+        #         i2 = self.primitive_interactions[(ACTION_TURN, OUTCOME_PROMPT)]
+        #         e2_memory = e1.predicted_memory.save()
+        #         e2_memory.egocentric_memory.prompt_point = e1.predicted_memory.egocentric_memory.focus_point.copy()
+        #         e2 = Enaction(i2, e2_memory)
+        #         # Fourth enaction: move forward to the new prompt
+        #         i3 = self.primitive_interactions[(ACTION_FORWARD, OUTCOME_PROMPT)]
+        #         e3 = Enaction(i3, e2.predicted_memory.save())
+        #         self.composite_enaction = CompositeEnaction([e0, e1, e2, e3], 'Manual', np.array([1, 1, 1]))
         elif user_key.upper() == KEY_CLEAR:
             # Clear the current composite enaction and reset the enaction cycle
             SoundPlayer.play(SOUND_CLEAR)
@@ -134,6 +135,9 @@ class Workspace:
             # TODO: prevent a crash when the enaction has been cleared and then an outcome is received after
         elif user_key.upper() == KEY_PREDICTION_ERROR:
             self.prediction_error.plot()
+        elif user_key.upper() == KEY_POSITION:
+            # Move the robot by the position correction from place cell memory
+            self.memory.adjust_robot_position()
 
     def emit_message(self):
         """Return the message to answer to another robot"""
