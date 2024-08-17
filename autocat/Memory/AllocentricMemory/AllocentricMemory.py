@@ -185,11 +185,11 @@ class AllocentricMemory:
         self.grid[:, :, CLOCK_PHENOMENON][phenomena_ij] = 0
         self.grid[:, :, PHENOMENON_ID][phenomena_ij] = -1
         self.grid[:, :, CLOCK_UPDATED][phenomena_ij] = clock
-        self.grid[:, :, STATUS_FLOOR][phenomena_ij] = np.where(self.grid[:, :, STATUS_FLOOR][phenomena_ij] != EXPERIENCE_PLACE,
-                                                               CELL_UNKNOWN, self.grid[:, :, STATUS_FLOOR][phenomena_ij])
+        self.grid[:, :, STATUS_FLOOR][phenomena_ij] = np.where(
+            self.grid[:, :, STATUS_FLOOR][phenomena_ij] != EXPERIENCE_PLACE, CELL_UNKNOWN,
+            self.grid[:, :, STATUS_FLOOR][phenomena_ij])
         places_ij = np.where(self.grid[:, :, PLACE_CELL_ID] > 0)
         self.grid[:, :, PLACE_CELL_ID][places_ij] = 0
-        self.grid[:, :, PLACE_CELL_ID][places_ij] = clock
 
     def apply_status_to_cell(self, i, j, status, clock, color_index):
         """Change the cell status. Keep the max clock"""

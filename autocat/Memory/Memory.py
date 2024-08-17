@@ -143,10 +143,32 @@ class Memory:
 
     def adjust_robot_position(self):
         """Adjust the robot's position by the correction from place cell memory"""
+        # The position correction
         position_correction = self.place_memory.position_correction
         print(f"Adjusting the robot's position to place cell {self.place_memory.current_robot_cell_id} "
               f"by {tuple(position_correction[:2].astype(int))}")
+        # Move the robot by the position correction
         self.allocentric_memory.robot_point += position_correction
+        # Propagate the origin position error to all the affordances since the last origin affordance
+        last_position_clock = self.place_memory.place_cells[self.place_memory.current_robot_cell_id].last_position_clock
+        self.place_memory.place_cells[self.place_memory.current_robot_cell_id].last_position_clock = self.clock
+        ps = {k: p for k, p in self.place_memory.place_cells.items() if p.last_visited_clock > last_position_clock}
+        n = len(ps)
+        if n > 0:
+            i = 1
+            sorted_ps = dict(sorted(ps.items(), key=lambda x: x[1].last_visited_clock))
+            for k, p in sorted_ps.items():
+                # The older the place cell, the smaller the position correction
+                correction_coefficient = (p.last_visited_clock - last_position_clock) / (self.clock - last_position_clock)
+                correction_coefficient = i / n
+                i += 1
+                ac = np.array(position_correction * correction_coefficient, dtype=int)
+                p.point += ac
+                print(f"Place {k} adjusted by: {tuple(ac[0:2].astype(int))} coef: {correction_coefficient:.2f}")
+
+        # Move the cell by the position correction
+        # self.place_memory.place_cells[self.place_memory.current_robot_cell_id].point += position_correction
+        self.allocentric_memory.update_grid(self)
 
     def save(self):
         """Return a clone of memory for memory snapshot"""

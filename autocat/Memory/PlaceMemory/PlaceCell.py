@@ -19,6 +19,8 @@ class PlaceCell:
         self.cues = cues  # List of cues
         self.polar_echo_curve = np.linspace([0, 0], [0, 2 * math.pi], 360 // ANGULAR_RESOLUTION, dtype=float)
         self.cartesian_echo_curve = np.zeros((360 // ANGULAR_RESOLUTION, 3), dtype=float)
+        self.last_visited_clock = cues[0].clock
+        self.last_position_clock = cues[0].clock
 
     def __str__(self):
         """Return the string of the tuple of the place cell coordinates"""
@@ -46,7 +48,6 @@ class PlaceCell:
             translation[:] = 0
 
         return translation
-
 
         # # Assume FLOOR experiences come from a single point
         # for new_cue in [cue for cue in cues if cue.type == EXPERIENCE_FLOOR]:
@@ -95,4 +96,6 @@ class PlaceCell:
         saved_place_cell = PlaceCell(self.point, [cue.save() for cue in self.cues])
         saved_place_cell.polar_echo_curve[:] = self.polar_echo_curve
         saved_place_cell.cartesian_echo_curve[:] = self.cartesian_echo_curve
+        saved_place_cell.last_visited_clock = self.last_visited_clock
+        saved_place_cell.last_position_clock = self.last_position_clock
         return saved_place_cell

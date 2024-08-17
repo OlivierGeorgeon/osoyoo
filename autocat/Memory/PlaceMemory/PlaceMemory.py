@@ -40,15 +40,14 @@ class PlaceMemory:
         # If the robot is near a known cell (the same or another)
         if existing_id > 0:
             print(f"Robot at existing place {existing_id}")
-            # If the cell is fully observed then try to adjust the position
+            # If the cell is fully observed then compute the position adjustment
             if self.place_cells[existing_id].is_fully_observed():
                 local_experiences = [e for e in memory.egocentric_memory.experiences.values() if (e.clock >= memory.clock) and
                                      e .type == EXPERIENCE_LOCAL_ECHO]
                 # If a scan has been performed then find the position correction based on local echoes
                 if len(local_experiences) > 0:
-                    # try to adjust the robot's position based on local echoes
                     points = np.array([e.polar_point() for e in local_experiences])
-                    points += self.place_cells[existing_id].point - memory.allocentric_memory.robot_point
+                    # points += self.place_cells[existing_id].point - memory.allocentric_memory.robot_point
                     self.position_correction[:] = self.place_cells[existing_id].translation_estimation_echo(points)
                 # If no local echoes then try to adjust the position based on aligned echo
                 else:
@@ -56,7 +55,7 @@ class PlaceMemory:
                                          e .type == EXPERIENCE_ALIGNED_ECHO]
                     if len(align_experiences) > 0:
                         point = align_experiences[0].polar_point()
-                        point += self.place_cells[existing_id].point - memory.allocentric_memory.robot_point
+                        # point += self.place_cells[existing_id].point - memory.allocentric_memory.robot_point
                         self.position_correction[:] = self.place_cells[existing_id].translation_estimate_aligned_echo(point)
                 # # if the position correction is too far off then cancel the correction
                 # if np.linalg.norm(position_correction) > MIN_PLACE_CELL_DISTANCE:
@@ -76,8 +75,6 @@ class PlaceMemory:
                         # print(f"Estimated correction of place cell position {tuple(position_correction[:2].astype(int))}")
                         # position_correction[:] = 0  # Not yet implemented
 
-                # Adjust the graph of place cells?
-
             # If the robot just moved to an existing place cell
             if existing_id != self.current_robot_cell_id:
                 # Add the edge and the distance from the previous place cell to the newly recognized one
@@ -92,10 +89,9 @@ class PlaceMemory:
             self.create_place_cell(memory.allocentric_memory.robot_point, experiences)
             print(f"Robot at new place {self.current_robot_cell_id}")
 
-        # self.position_correction[:] = position_correction
+        self.place_cells[self.current_robot_cell_id].last_visited_clock = memory.clock
         print(f"Position correction relative to place cell {self.current_robot_cell_id}: "
               f"{tuple(self.position_correction[0:2].astype(int))}")
-        # return np.array([0, 0, 0])  # position_correction
 
     def create_place_cell(self, point, experiences):
         """Create a new place cell and add it to the list and to the graph"""
@@ -172,4 +168,5 @@ class PlaceMemory:
         saved_place_memory.current_robot_cell_id = self.current_robot_cell_id
         saved_place_memory.place_cell_distances = copy.deepcopy(self.place_cell_distances)
         saved_place_memory.observe_better = self.observe_better
+        saved_place_memory.position_correction[:] = self.position_correction
         return saved_place_memory

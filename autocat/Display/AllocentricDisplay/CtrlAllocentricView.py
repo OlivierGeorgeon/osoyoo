@@ -95,16 +95,16 @@ class CtrlAllocentricView:
             #     self.workspace.ctrl_phenomenon_view.phenomenon_id = self.workspace.memory.allocentric_memory.grid[cell_x][cell_y][PHENOMENON_ID]
             #     self.workspace.ctrl_phenomenon_view.update_affordance_displays()
 
-            # Display the place cell in place cell window
-            self.workspace.show_place_cell(selected_cell[PLACE_CELL_ID])
-            self.workspace.ctrl_place_cell_view.update_cue_displays()
-
             # Display the grid cell status
             self.view.label2.text = f"Place {selected_cell[PLACE_CELL_ID]} " \
                                     f"Phen. {selected_cell[PHENOMENON_ID]} " \
                                     f"Update {selected_cell[CLOCK_UPDATED]} " \
                                     f"Status {tuple(selected_cell[STATUS_FLOOR: STATUS_4 + 1])} " \
                                     f"Clock {tuple(selected_cell[CLOCK_FOCUS:CLOCK_PLACE+1])} "
+
+            # Display the place cell in place cell window
+            self.workspace.show_place_cell(selected_cell[PLACE_CELL_ID])
+            self.workspace.ctrl_place_cell_view.update_cue_displays()
 
         self.view.on_mouse_press = on_mouse_press
 

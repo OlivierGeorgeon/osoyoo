@@ -106,10 +106,10 @@ class CtrlBodyView:
                  f"{self.workspace.enaction.action.translation_speed[1]:.0f}) mm/s, " \
                  f"rotation: {math.degrees(self.workspace.enaction.action.rotation_speed_rad):.1f}°/s"
         self.view.label3.text = label3
-        label2 = f"Azimuth: {quaternion_to_azimuth(self.workspace.enaction.trajectory.body_quaternion):.0f}, " \
+        label2 = f"Azimuth: {quaternion_to_azimuth(self.workspace.enaction.trajectory.body_quaternion):.0f}°, " \
                  f"offset: ({self.workspace.memory.body_memory.compass_offset[0]:d}, " \
                  f"{self.workspace.memory.body_memory.compass_offset[1]:d}), " \
-                 f"residual: {math.degrees(self.workspace.enaction.trajectory.body_direction_delta):.1f}"
+                 f"residual: {math.degrees(self.workspace.enaction.trajectory.body_direction_delta):.1f}°"
         self.view.label2.text = label2
 
     def main(self, dt):
