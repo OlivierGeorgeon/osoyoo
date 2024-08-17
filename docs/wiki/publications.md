@@ -14,7 +14,7 @@ Artificial enactive inference in three-dimensional world. Cognitive Systems Rese
 
 Schneider, H., Georgeon O. L. (in press). Grounding Artificial General Intelligence with Robotics: The PetitCat Project. 
 Proceedings of Brain Inspired Cognitive Architecture, Artificial General intelligence (AGI2024). Seattle, August 15.
-([PDF](assets/PetitCat_AGI24.pdf)).
+([PDF](assets/PetitCat_AGI24.pdf), [presentation slides](https://easychair.org/smart-slide/slide/QFRw#)).
 
 Georgeon, O. L., de Montéra, B., Robertson P. (in press). 
 Reducing intuitive physics prediction error through playing. 

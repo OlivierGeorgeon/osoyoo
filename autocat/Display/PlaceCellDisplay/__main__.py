@@ -16,7 +16,7 @@ from ...Robot.Enaction import Enaction
 from ...Robot.Outcome import Outcome
 from ...Proposer.Interaction import Interaction, OUTCOME_NO_FOCUS
 from ...Proposer.Action import ACTION_SWIPE, Action, ACTION_TURN
-from ...Robot.CtrlRobot import ENACTION_STEP_RENDERING
+from ...Enaction import ENACTION_STEP_RENDERING
 
 
 # Initialize the workspace

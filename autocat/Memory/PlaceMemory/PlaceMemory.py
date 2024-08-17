@@ -78,20 +78,19 @@ class PlaceMemory:
 
                 # Adjust the graph of place cells?
 
+            # If the robot just moved to an existing place cell
+            if existing_id != self.current_robot_cell_id:
+                # Add the edge and the distance from the previous place cell to the newly recognized one
+                self.place_cell_graph.add_edge(self.current_robot_cell_id, existing_id)
+                self.place_cell_distances[existing_id] = {self.current_robot_cell_id: np.linalg.norm(
+                    self.place_cells[existing_id].point - self.place_cells[self.current_robot_cell_id].point)}
+                self.current_robot_cell_id = existing_id
+
         # If the robot is not near a known cell
         else:
             # Create a new place cell
             self.create_place_cell(memory.allocentric_memory.robot_point, experiences)
             print(f"Robot at new place {self.current_robot_cell_id}")
-
-        # # If the place cell is not fully observed
-        # if not self.place_cells[self.current_robot_cell_id].is_fully_observed():
-        #     # Ask to fully observe the current place cell
-        #     self.observe_better = True
-        # # If the place cell is fully observed,
-        # else:
-        #     # Print similarities with other fully observed place cells
-        #     self.observe_better = False
 
         return position_correction
 
@@ -106,6 +105,7 @@ class PlaceMemory:
         self.place_cell_id += 1
         self.place_cells[self.place_cell_id] = PlaceCell(point, cues)
         self.place_cells[self.place_cell_id].compute_echo_curve()
+        # Add the edge and the distance from the previous place cell to the new one
         if self.place_cell_id > 1:  # Don't create Node 0
             self.place_cell_graph.add_edge(self.current_robot_cell_id, self.place_cell_id)
             self.place_cell_distances[self.current_robot_cell_id] = {self.place_cell_id: np.linalg.norm(
@@ -150,11 +150,11 @@ class PlaceMemory:
         # Recompute the echo curve
         self.place_cells[place_cell_id].compute_echo_curve()
         # Add the edge in the place cell graph if different
-        if self.current_robot_cell_id != place_cell_id:
-            self.place_cell_graph.add_edge(self.current_robot_cell_id, place_cell_id)
-            # TODO check if this edge already existed
-            self.place_cell_distances[self.current_robot_cell_id] = {place_cell_id: np.linalg.norm(
-                self.place_cells[self.current_robot_cell_id].point - self.place_cells[place_cell_id].point)}
+        # if self.current_robot_cell_id != place_cell_id:
+        #     self.place_cell_graph.add_edge(self.current_robot_cell_id, place_cell_id)
+        #     # TODO check if this edge already existed
+        #     self.place_cell_distances[self.current_robot_cell_id] = {place_cell_id: np.linalg.norm(
+        #         self.place_cells[self.current_robot_cell_id].point - self.place_cells[place_cell_id].point)}
         # The robot is at this place cell
         self.current_robot_cell_id = place_cell_id
         # Return robot position correction

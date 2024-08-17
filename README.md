@@ -44,18 +44,13 @@ Test documentation
 * Other Python programs in this repository allow interfacing your Python AI/AGI/BICA project with the PetitCat project
 * Other Python programs in this repository allow interfacing an LLM to the PetitCat project
 
-Slide Presentation About the PetitCat Project -- BICA*AI 2024 Conference, Seattle, Washington and Virtual
-
-* [PetitCat BICA slides 2024](https://easychair.org/smart-slide/slide/QFRw#)
-
-
 Full project documentation in English: 
 * [The project's wiki](docs/wiki/home.md) Helps you assemble your robot, calibrate it, and run the project.
 * [Howard Schneider's full tutorial](docs/overview/Part_1_Easy_to_Read_Overview.md) Step by step explanations for beginners and researchers alike. The documentation is intended to give any user a pleasant experience with the project regardless of how seriously they intend to make use of the project. An issue for many researchers in using GitHub software is that it more often fails to work (or work properly) mainly because the thousands of litte things in the heads of the developers are not made clear to the non-involved user. Here we have gone to the other extreme, to make sure that the hardware and software will work for any user, although the more advanced topics are geared towards researchers rather than students. We have paid much attention to the main causes of poor GitHub and other open source software usability: incomplete documentation, dependency issues, environment configuration, version mismatches, non-graceful error handling, permissions and access, network/connectivity issues, stability, indadequate testing, user prerequisite knowledge. Easy-to-read, guaranteed-to-work and inexpensive may surprise you in producing an example of a superhuman AGI with robotic embodiment.
 * [Youtube playlist](https://youtube.com/playlist?list=PLlSPp5EpW5vFb-ZMCr8m0dIOoKEQe9CIE&si=HachYRwgJR8I-BbH) Demonstrations of behaviors. 
 
 Publications
-* [Publications](docs/wiki/publications.md)
+* [Publications](docs/wiki/publications.md) including some slides of oral presentations
 
 French additional information:
 * [La documentation écrite par les étudiants](docs/first_step/premier_pas.md)
@@ -81,5 +76,5 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 This project provides open-source software designed for seamless integration with open-source hardware platforms such as Arduino, Raspberry Pi, and BeagleBone.
 
-![open source hardware](openhardwarelogo.png)
+![open source hardware](docs/openhardwarelogo.png)
 

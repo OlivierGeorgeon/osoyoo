@@ -8,7 +8,7 @@ Tighten the head on the servo axis such that the angle between the head directio
 
 Follow instructions in [Lesson 3](https://osoyoo.com/2022/07/05/v2-metal-chassis-mecanum-wheel-robotic-for-arduino-mega2560-lesson3-5-point-line-tracking/). The adjustment of the potentiometer can be quite sensitive. It may be helpful to place the robot on shims to raise it by a few millimeters to prevent it from moving when it detects the black line.
 
-# Calibrate the floor color sensor
+# Calibrate the TCS34725 color sensor
 
 Place the robot on a white sheet of paper. 
 Press `"-"` to remote control the robot to perform a scan while staying in place. 
