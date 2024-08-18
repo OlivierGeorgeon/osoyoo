@@ -10,9 +10,9 @@ from ..PointOfInterest import PointOfInterest, POINT_ROBOT
 from ...Memory.AllocentricMemory.AllocentricMemory import CELL_UNKNOWN
 from ...Memory.AllocentricMemory import STATUS_FLOOR, STATUS_4
 
-CELL_RADIUS = 50
-ZOOM_IN_FACTOR = 1.2
-ZOOM_OUT_FACTOR = 1/ZOOM_IN_FACTOR
+# CELL_RADIUS = 50
+# ZOOM_IN_FACTOR = 1.2
+# ZOOM_OUT_FACTOR = 1/ZOOM_IN_FACTOR
 
 
 class AllocentricView(InteractiveDisplay):
@@ -23,9 +23,6 @@ class AllocentricView(InteractiveDisplay):
         glClearColor(0.2, 0.2, 1.0, 1.0)  # For demonstration in Fête de la Science
         self.groups = [OrderedGroup(1), OrderedGroup(2), OrderedGroup(3), OrderedGroup(4)]
         self.zoom_level = 3
-        # self.workspace = workspace
-        # self.hexagons = [[None for _ in range(workspace.memory.allocentric_memory.height)]
-        #                  for _ in range(workspace.memory.allocentric_memory.width)]
         self.hexagons = {}
         self.robot_poi = None  # The other robot point of interest
         self.body_poi = None

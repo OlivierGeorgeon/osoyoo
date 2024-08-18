@@ -149,13 +149,18 @@ class Enacter:
             # Terminate the enaction using the outcome that come from the robot or from the simulation
             self.workspace.enaction.terminate()
 
-            # Restore the memory from the snapshot
+            # Restore the memory from the snapshot. TODO make it more elegant
             neurotransmitters = self.workspace.memory.body_memory.neurotransmitters.copy()
             confidence = self.workspace.memory.phenomenon_memory.terrain_confidence()
+            position_confidence = None
+            if self.workspace.memory.place_memory.current_place_cell() is not None:
+                position_confidence = self.workspace.memory.place_memory.current_place_cell().position_confidence
             self.workspace.memory = self.memory_snapshot
             self.workspace.memory.body_memory.neurotransmitters[:] = neurotransmitters
             if self.workspace.memory.phenomenon_memory.terrain() is not None:
                 self.workspace.memory.phenomenon_memory.terrain().confidence = confidence
+            if self.workspace.memory.place_memory.current_place_cell() is not None:
+                self.workspace.memory.place_memory.current_place_cell().position_confidence = position_confidence
 
             # Retrieve possible message from other robot
             if self.workspace.memory.phenomenon_memory.terrain_confidence() >= TERRAIN_ORIGIN_CONFIDENCE and \
@@ -166,7 +171,7 @@ class Enacter:
             # Update memory, possibly create new place cell and phenomena
             self.workspace.memory.update(self.workspace.enaction)
             # Show the current place cell in PlaceCellView
-            self.workspace.show_place_cell(self.workspace.memory.place_memory.current_robot_cell_id)
+            self.workspace.show_place_cell(self.workspace.memory.place_memory.current_cell_id)
 
             # Select the focus - May be included in the attention mechanism
             # self.select_focus(self.workspace.memory)

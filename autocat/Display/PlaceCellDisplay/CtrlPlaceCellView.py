@@ -21,6 +21,7 @@ class CtrlPlaceCellView:
         self.selected_clock = 0
         self.graph_display = None
         self.echo_curve = None
+        self.view.label3.text = 'Position confidence:'
 
         def on_text(text):
             """Handle user keypress"""
@@ -36,7 +37,22 @@ class CtrlPlaceCellView:
                 self.selected_clock = selected_clocks[0]
                 self.view.label1.text = f"Clock: {self.selected_clock}"
 
+        # Add these event functions to the window
         self.view.push_handlers(on_text, on_mouse_press)
+
+        def on_mouse_scroll(x, y, dx, dy):
+            """ Zoom or modify the phenomenon's confidence """
+            # If scroll in the footer then modify the confidence
+            if y < 50 and self.place_cell_id > 0:
+                place_cell = self.workspace.memory.place_memory.place_cells[self.place_cell_id]
+                place_cell.position_confidence += int(np.sign(dy)) * 10
+                place_cell.position_confidence = min(max(place_cell.position_confidence, 0), 100)
+            # If scroll above the footer then zoom
+            else:
+                self.view.zoom(dy)
+
+        # Replace the window's scroll event function
+        self.view.on_mouse_scroll = on_mouse_scroll
 
     def update_cue_displays(self):
         """Retrieve the new affordances in a phenomenon and create the corresponding points of interest"""
@@ -91,6 +107,7 @@ class CtrlPlaceCellView:
 
         if self.place_cell_id in self.workspace.memory.place_memory.place_cells:
             place_cell = self.workspace.memory.place_memory.place_cells[self.place_cell_id]
+            self.view.label3.text = f'Position confidence: {place_cell.position_confidence}'
             self.view.robot_translate = self.workspace.memory.allocentric_memory.robot_point - place_cell.point
             if self.workspace.enacter.interaction_step == ENACTION_STEP_RENDERING:
                 self.update_cue_displays()

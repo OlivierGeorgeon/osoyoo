@@ -2,10 +2,9 @@
 import math
 import numpy as np
 import time
-from pyrr import Quaternion, Matrix44
+from pyrr import Quaternion
 from . import ANGULAR_RESOLUTION, CONE_HALF_ANGLE, MIN_PLACE_CELL_DISTANCE
-from ..EgocentricMemory.EgocentricMemory import EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_CENTRAL_ECHO, \
-    EXPERIENCE_LOCAL_ECHO
+from ..EgocentricMemory.EgocentricMemory import EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_CENTRAL_ECHO, EXPERIENCE_LOCAL_ECHO
 from ...Utils import polar_to_cartesian, quaternion_to_direction_rad, translation_quaternion_to_matrix
 from .PlaceGeometry import transform_estimation_cue_to_cue, point_to_polar_array, resample_by_diff, plot_correspondences
 from .Cue import Cue
@@ -21,6 +20,7 @@ class PlaceCell:
         self.cartesian_echo_curve = np.zeros((360 // ANGULAR_RESOLUTION, 3), dtype=float)
         self.last_visited_clock = cues[0].clock
         self.last_position_clock = cues[0].clock
+        self.position_confidence = 0
 
     def __str__(self):
         """Return the string of the tuple of the place cell coordinates"""
@@ -29,6 +29,11 @@ class PlaceCell:
     def __hash__(self):
         """Return the hash to use place cells as nodes in networkx"""
         return hash(self.key)
+
+    def allocentric_to_place_centric(self, point):
+        """Return the point in place-cell coordinates from the point in allocentric coordinates"""
+        if point is not None:
+            return point - self.point
 
     def translation_estimation_echo(self, points, experience_type=EXPERIENCE_LOCAL_ECHO):
         """Return the vector of the position defined by previous cues minus the position by the new cues"""
@@ -98,4 +103,5 @@ class PlaceCell:
         saved_place_cell.cartesian_echo_curve[:] = self.cartesian_echo_curve
         saved_place_cell.last_visited_clock = self.last_visited_clock
         saved_place_cell.last_position_clock = self.last_position_clock
+        saved_place_cell.position_confidence = self.position_confidence
         return saved_place_cell

@@ -20,7 +20,7 @@ class CtrlAllocentricView:
         self.view.set_caption("Allocentric " + workspace.robot_id)
         self.next_time_refresh = 0
 
-        # Handlers
+        # Handlers of event functions that need access to workspace
         def on_text(text):
             """Send user keypress to the workspace to handle"""
             self.workspace.process_user_key(text)
