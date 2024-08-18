@@ -138,6 +138,7 @@ class Workspace:
         elif user_key.upper() == KEY_POSITION:
             # Move the robot by the position correction from place cell memory
             self.memory.adjust_robot_position()
+            self.show_place_cell(self.memory.place_memory.current_cell_id)
             self.enacter.interaction_step = ENACTION_STEP_RENDERING
 
     def emit_message(self):

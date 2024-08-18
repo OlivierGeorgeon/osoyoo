@@ -30,7 +30,7 @@ ROBOT_SETTINGS_0 = {
     "forward_speed": 300,  # (mm/s) Forward translation speed.
     "lateral_speed": 140,  # (mm/s) Lateral translation speed.
     "retreat_distance": [90, 30, 0],  # (mm) Distance of the line after retreat
-    "retreat_yaw": 40,  # 35 (degree) Yaw after retreat
+    "retreat_yaw": 30,  # (degree) Yaw after retreat. IWAI paper: 40 to show calibration
     "compass_offset": [0, 0, 0]  # Compass offset can also be added into the C++ code.
     }
 

@@ -20,20 +20,21 @@ class PlaceCell:
         self.cartesian_echo_curve = np.zeros((360 // ANGULAR_RESOLUTION, 3), dtype=float)
         self.last_visited_clock = cues[0].clock
         self.last_position_clock = cues[0].clock
-        self.position_confidence = 0
+        self.position_confidence = 50
 
     def __str__(self):
         """Return the string of the tuple of the place cell coordinates"""
+        return tuple(self.point[0:2].astype(int)).__str__()
         return self.key.__str__()
 
-    def __hash__(self):
-        """Return the hash to use place cells as nodes in networkx"""
-        return hash(self.key)
-
-    def allocentric_to_place_centric(self, point):
+    # def __hash__(self):
+    #     """Return the hash to use place cells as nodes in networkx"""
+    #     return hash(self.key)
+    #
+    def place_centric_to_allocentric(self, point):
         """Return the point in place-cell coordinates from the point in allocentric coordinates"""
         if point is not None:
-            return point - self.point
+            return point + self.point
 
     def translation_estimation_echo(self, points, experience_type=EXPERIENCE_LOCAL_ECHO):
         """Return the vector of the position defined by previous cues minus the position by the new cues"""

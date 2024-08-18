@@ -90,7 +90,7 @@ class PlaceMemory:
             print(f"Robot at new place {self.current_cell_id}")
 
         self.place_cells[self.current_cell_id].last_visited_clock = memory.clock
-        print(f"Position correction relative to place cell {self.current_cell_id}: "
+        print(f"Position relative to place cell {self.current_cell_id}: "
               f"{tuple(self.estimated_robot_point[0:2].astype(int))}")
 
     def create_place_cell(self, point, experiences):
