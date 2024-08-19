@@ -184,12 +184,12 @@ def plot_correspondences(source_points, target_points, source_points_transformed
 
     # Plot transformed source points
     plt.scatter(source_points_transformed[:, 0], source_points_transformed[:, 1], c='sienna', marker="^",
-                label=f"Place {k1} moved to {k2}")
+                label=f"{k1} moved to {k2}")
 
     plt.legend()
     plt.xlabel('West-East')
     plt.ylabel('South-North')
-    plt.title(f"Place {k1} to {k2}. Fitness: {reg_p2p.fitness:.2f}, residual distance: {residual_distance:.0f}")
+    plt.title(f"{k1} to {k2}. Fitness: {reg_p2p.fitness:.2f}, residual distance: {residual_distance:.0f}")
     # plt.show()
     try:
         plt.savefig(f"log/20_match_{k1}_{k2}.pdf")

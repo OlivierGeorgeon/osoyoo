@@ -75,6 +75,7 @@ class AllocentricMemory:
         # start_time = time.time()
         # Clear the previous phenomena and place cells
         self.clear_grid_status(memory.clock)
+
         # Place the phenomena again
         for p_id, p in memory.phenomenon_memory.phenomena.items():
             # Mark the cells outside the terrain (for BICA 2023 paper)
@@ -180,6 +181,7 @@ class AllocentricMemory:
 
     def clear_grid_status(self, clock):
         """Reset the status of cells where there is a phenomenon, except PLACE status"""
+        # Reset the phenomena
         phenomena_ij = np.where(self.grid[:, :, PHENOMENON_ID] != -1)
         self.grid[:, :, STATUS_ECHO][phenomena_ij] = CELL_UNKNOWN
         self.grid[:, :, CLOCK_PHENOMENON][phenomena_ij] = 0
@@ -188,6 +190,7 @@ class AllocentricMemory:
         self.grid[:, :, STATUS_FLOOR][phenomena_ij] = np.where(
             self.grid[:, :, STATUS_FLOOR][phenomena_ij] != EXPERIENCE_PLACE, CELL_UNKNOWN,
             self.grid[:, :, STATUS_FLOOR][phenomena_ij])
+        # Reset the place cells
         places_ij = np.where(self.grid[:, :, PLACE_CELL_ID] > 0)
         self.grid[:, :, PLACE_CELL_ID][places_ij] = 0
 

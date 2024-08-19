@@ -55,12 +55,12 @@ class CtrlBodyView:
             else:
                 self.workspace.process_user_key(text)
 
+        self.view.push_handlers(on_mouse_press, on_text)
+
         def on_mouse_scroll(x, y, dx, dy):
             """ Zooming the window or manually updating the neurotransmitter levels"""
             if y > 90:
-                return
-                # # Zoom the view
-                # super().on_mouse_scroll(x, y, dx, dy)
+                self.view.zoom(dy)
             elif y > 60:
                 # The neurotransmitter levels
                 if x < 100:
@@ -76,7 +76,7 @@ class CtrlBodyView:
                 else:
                     self.workspace.memory.body_memory.excitation += int(np.sign(dy))
 
-        self.view.push_handlers(on_mouse_press, on_text, on_mouse_scroll)
+        self.view.on_mouse_scroll = on_mouse_scroll
 
     def update_body_view(self):
         """Add and update points of interest from the latest enacted interaction """

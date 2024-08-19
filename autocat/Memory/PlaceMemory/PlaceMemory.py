@@ -102,7 +102,7 @@ class PlaceMemory:
             cues.append(cue)
         # Create the place cell from the cues
         self.place_cell_id += 1
-        self.place_cells[self.place_cell_id] = PlaceCell(point, cues)
+        self.place_cells[self.place_cell_id] = PlaceCell(self.place_cell_id, point, cues)
         self.place_cells[self.place_cell_id].compute_echo_curve()
         # Add the edge and the distance from the previous place cell to the new one
         if self.place_cell_id > 1:  # Don't create Node 0

@@ -11,10 +11,10 @@ from .Cue import Cue
 
 
 class PlaceCell:
-    def __init__(self, point, cues):
+    def __init__(self, place_cell_id, point, cues):
         """initialize the place cell from its point and list of cues"""
+        self.key = place_cell_id
         self.point = point.copy()
-        self.key = round(self.point[0]), round(self.point[1])
         self.cues = cues  # List of cues
         self.polar_echo_curve = np.linspace([0, 0], [0, 2 * math.pi], 360 // ANGULAR_RESOLUTION, dtype=float)
         self.cartesian_echo_curve = np.zeros((360 // ANGULAR_RESOLUTION, 3), dtype=float)
@@ -25,7 +25,6 @@ class PlaceCell:
     def __str__(self):
         """Return the string of the tuple of the place cell coordinates"""
         return tuple(self.point[0:2].astype(int)).__str__()
-        return self.key.__str__()
 
     # def __hash__(self):
     #     """Return the hash to use place cells as nodes in networkx"""
@@ -48,10 +47,10 @@ class PlaceCell:
         rotation_deg = math.degrees(quaternion_to_direction_rad(Quaternion.from_matrix(reg_p2p.transformation[:3, :3])))
         print(f"Estimation echo rotation: {rotation_deg:.0f} degree")
         # Plot
-        plot_correspondences(points, place_echo_points, points_transformed, reg_p2p, residual_distance, "-", self.key)
+        plot_correspondences(points, place_echo_points, points_transformed, reg_p2p, residual_distance, "Scan", self.key)
         # If rotation too high then cancel the position correction
-        if abs(rotation_deg) > 10:
-            translation[:] = 0
+        # if abs(rotation_deg) > 10:
+        #     translation[:] = 0
 
         return translation
 
@@ -99,7 +98,7 @@ class PlaceCell:
 
     def save(self):
         """Return a cloned place cell for memory snapshot"""
-        saved_place_cell = PlaceCell(self.point, [cue.save() for cue in self.cues])
+        saved_place_cell = PlaceCell(self.key, self.point, [cue.save() for cue in self.cues])
         saved_place_cell.polar_echo_curve[:] = self.polar_echo_curve
         saved_place_cell.cartesian_echo_curve[:] = self.cartesian_echo_curve
         saved_place_cell.last_visited_clock = self.last_visited_clock
