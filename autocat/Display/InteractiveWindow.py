@@ -27,6 +27,7 @@ def screen_scale():
 
 class InteractiveWindow(pyglet.window.Window):
     """The parent class of interactive windows"""
+
     def __init__(self, width=350, height=350, *args, **kwargs):
         conf = Config(sample_buffers=1, samples=4, depth_size=0, double_buffer=True)
         super().__init__(width, height, resizable=True, config=conf, *args, **kwargs)
@@ -85,7 +86,7 @@ class InteractiveWindow(pyglet.window.Window):
         glClear(GL_COLOR_BUFFER_BIT)
         glLoadIdentity()
 
-        # Stack the projection matrix. Centered on (0,0). Fit the window size and zoom factor
+        # Stack the projection matrix. Fit the window corners.
         glOrtho(self.left, self.right, self.bottom, self.top, 1, -1)
 
         # Draw the polar layer

@@ -11,7 +11,7 @@ from .Cue import Cue
 
 
 class PlaceCell:
-    def __init__(self, place_cell_id, point, cues):
+    def __init__(self, place_cell_id, point, cues, confidence):
         """initialize the place cell from its point and list of cues"""
         self.key = place_cell_id
         self.point = point.copy()
@@ -20,7 +20,7 @@ class PlaceCell:
         self.cartesian_echo_curve = np.zeros((360 // ANGULAR_RESOLUTION, 3), dtype=float)
         self.last_visited_clock = cues[0].clock
         self.last_position_clock = cues[0].clock
-        self.position_confidence = 100  # Do not modify the position of the place cell
+        self.position_confidence = confidence
 
     def __str__(self):
         """Return the string of the tuple of the place cell coordinates"""
@@ -87,18 +87,30 @@ class PlaceCell:
 
     def translation_estimate_aligned_echo(self, point):
         """Return the translation to this place cell estimate by adjusting the point to the polar echo curve"""
-        cue_direction_rad = math.atan2(point[1], point[0])
-        cue_direction_deg = round(math.degrees(cue_direction_rad))
-        r = self.polar_echo_curve[cue_direction_deg // ANGULAR_RESOLUTION, 0]
-        distance = r - np.linalg.norm(point)
-        translation = np.array([distance * math.cos(cue_direction_rad), distance * math.sin(cue_direction_rad), 0])
-        print(f"Translation estimate from curve point ({r:.0f} mm, {cue_direction_deg}°): "
-              f"{tuple(translation[:2].astype(int))}")
-        return translation
+        # Propose a correction to match the point to the nearest central echo
+        central_cues = [c for c in self.cues if c.type == EXPERIENCE_CENTRAL_ECHO]
+        if len(central_cues) > 0:
+            nearest_central_cue = min(central_cues, key=lambda c: np.linalg.norm(c.point() - point))
+            proposed_correction = nearest_central_cue.point() - point
+            print(f"Central echo: {tuple(point[:2].astype(int))}, "
+                  f"nearest central echo: {tuple(nearest_central_cue.point()[:2].astype(int))}")
+            return proposed_correction
+        else:
+            return np.array([0, 0, 0])
+
+        # # Propoes a correction to match the point to the curve in the direction of the point
+        # cue_direction_rad = math.atan2(point[1], point[0])
+        # cue_direction_deg = round(math.degrees(cue_direction_rad))
+        # r = self.polar_echo_curve[cue_direction_deg // ANGULAR_RESOLUTION, 0]
+        # distance = r - np.linalg.norm(point)
+        # translation = np.array([distance * math.cos(cue_direction_rad), distance * math.sin(cue_direction_rad), 0])
+        # print(f"Translation estimate from curve point ({r:.0f} mm, {cue_direction_deg}°): "
+        #       f"{tuple(translation[:2].astype(int))}")
+        # return translation
 
     def save(self):
         """Return a cloned place cell for memory snapshot"""
-        saved_place_cell = PlaceCell(self.key, self.point, [cue.save() for cue in self.cues])
+        saved_place_cell = PlaceCell(self.key, self.point, [cue.save() for cue in self.cues], 100)
         saved_place_cell.polar_echo_curve[:] = self.polar_echo_curve
         saved_place_cell.cartesian_echo_curve[:] = self.cartesian_echo_curve
         saved_place_cell.last_visited_clock = self.last_visited_clock

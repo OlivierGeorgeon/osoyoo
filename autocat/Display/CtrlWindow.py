@@ -4,6 +4,8 @@ from ..Memory.PlaceMemory.PlaceGeometry import compare_place_cells
 
 
 class CtrlWindow:
+    """The parent class of the controller of all the pyglet windows"""
+
     def __init__(self, workspace):
         self.view = InteractiveWindow()
         self.workspace = workspace

@@ -17,6 +17,7 @@ class PlaceMemory:
         self.place_cell_id = 0  # Incremental cell id (first cell is 1)
         self.place_cell_graph = nx.Graph()
         self.place_cell_distances = dict(dict())
+        self.previous_cell_id = 0
         self.current_cell_id = 0  # The place cell where the robot currently is
         self.proposed_correction = np.array([0, 0, 0])  # Proposed correction of robot and place cell position
         self.observe_better = False
@@ -39,7 +40,6 @@ class PlaceMemory:
 
         # If the robot is near a known cell (the same or another)
         if existing_id > 0:
-            print(f"Robot at existing place {existing_id}")
             # If the cell is fully observed
             if self.place_cells[existing_id].is_fully_observed():
                 # Add the new cues except the local echos
@@ -63,13 +63,17 @@ class PlaceMemory:
                                          if (e.clock >= memory.clock) and e .type == EXPERIENCE_ALIGNED_ECHO]
                     if len(align_experiences) == 1:  # One algine echo experience
                         point = align_experiences[0].polar_point()
-                        estimated_robot_point = self.place_cells[existing_id].translation_estimate_aligned_echo(point)
-                        estimated_allo_robot_point = estimated_robot_point + self.place_cells[existing_id].point
-                        # The robot position correction
-                        self.proposed_correction[:] = estimated_allo_robot_point - memory.allocentric_memory.robot_point
-                        print(f"Position relative to place cell {self.current_cell_id}: "
-                              f"{tuple(estimated_robot_point[:2].astype(int))}, "
-                              f"proposed correction: {tuple(self.proposed_correction[:2].astype(int))}")
+                        self.proposed_correction[:] = self.place_cells[existing_id].translation_estimate_aligned_echo(
+                            point)
+                        print(f"Proposed correction to nearest central echo: "
+                              f"{tuple(self.proposed_correction[:2].astype(int))}")
+                        # estimated_robot_point = self.place_cells[existing_id].translation_estimate_aligned_echo(point)
+                        # estimated_allo_robot_point = estimated_robot_point + self.place_cells[existing_id].point
+                        # # The robot position correction
+                        # self.proposed_correction[:] = estimated_allo_robot_point - memory.allocentric_memory.robot_point
+                        # print(f"Position relative to place cell {self.current_cell_id}: "
+                        #       f"{tuple(estimated_robot_point[:2].astype(int))}, "
+                        #       f"proposed correction: {tuple(self.proposed_correction[:2].astype(int))}")
             # If the cell is not fully observed
             else:
                 # Add the cues including the local echoes
@@ -77,29 +81,23 @@ class PlaceMemory:
                 # Recompute the echo curve
                 self.place_cells[existing_id].compute_echo_curve()
 
-                # If the cell is now fully observed then compare it with other fully observed place cells
-                # if self.place_cells[existing_id].is_fully_observed():
-                #     compare_place_cells(existing_id, self.place_cells)
-                #     # Adjust the position of the place cell relative to the nearest fully observed place cell
-                #     nearest = nearest_place_cell(existing_id, self.place_cells)
-                #     if nearest > 0:
-                #         points_of_nearest = np.array([cue.point() for cue in self.place_cells[nearest].cues if cue.type == EXPERIENCE_CENTRAL_ECHO])
-                #         points_of_nearest += self.place_cells[nearest].point - self.place_cells[existing_id].point
-                #         self.position_correction[:] = self.place_cells[existing_id].translation_estimation_echo(points_of_nearest, EXPERIENCE_CENTRAL_ECHO)
-
             # If the robot just moved to an existing place cell
             if existing_id != self.current_cell_id:
                 # Add the edge and the distance from the previous place cell to the newly recognized one
                 self.place_cell_graph.add_edge(self.current_cell_id, existing_id)
                 self.place_cell_distances[existing_id] = {self.current_cell_id: np.linalg.norm(
                     self.place_cells[existing_id].point - self.place_cells[self.current_cell_id].point)}
+                self.previous_cell_id = self.current_cell_id
                 self.current_cell_id = existing_id
+                print(f"Moving from Place {self.previous_cell_id} to existing Place {self.current_cell_id}")
+            else:
+                print(f"Coming from Place {self.previous_cell_id} and staying at Place {self.current_cell_id}")
 
         # If the robot is not near a known cell
         else:
             # Create a new place cell
             self.create_place_cell(memory.allocentric_memory.robot_point, experiences)
-            print(f"Robot at new place {self.current_cell_id}")
+            print(f"Moving from Place {self.previous_cell_id} to new Place {self.current_cell_id}")
 
         self.place_cells[self.current_cell_id].last_visited_clock = memory.clock
 
@@ -110,9 +108,15 @@ class PlaceMemory:
         for e in experiences:
             cue = Cue(e.id, e.polar_pose_matrix(), e.type, e.clock, e.color_index, e.polar_sensor_point())
             cues.append(cue)
+        # The new place cell gets half the confidence of the previous one
+        self.previous_cell_id = self.current_cell_id
+        if self.previous_cell_id > 0:
+            confidence = self.place_cells[self.previous_cell_id].position_confidence // 2
+        else:
+            confidence = 100
         # Create the place cell from the cues
         self.place_cell_id += 1
-        self.place_cells[self.place_cell_id] = PlaceCell(self.place_cell_id, point, cues)
+        self.place_cells[self.place_cell_id] = PlaceCell(self.place_cell_id, point, cues, confidence)
         self.place_cells[self.place_cell_id].compute_echo_curve()
         # Add the edge and the distance from the previous place cell to the new one
         if self.place_cell_id > 1:  # Don't create Node 0
@@ -171,6 +175,7 @@ class PlaceMemory:
         saved_place_memory.place_cells = {k: p.save() for k, p in self.place_cells.items()}
         saved_place_memory.place_cell_id = self.place_cell_id
         saved_place_memory.place_cell_graph = self.place_cell_graph.copy()
+        saved_place_memory.previous_cell_id = self.previous_cell_id
         saved_place_memory.current_cell_id = self.current_cell_id
         saved_place_memory.place_cell_distances = copy.deepcopy(self.place_cell_distances)
         saved_place_memory.observe_better = self.observe_better

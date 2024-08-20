@@ -46,7 +46,7 @@ e02 = Experience(2, pose_matrix, EXPERIENCE_ALIGNED_ECHO, 0, workspace.memory.bo
 cue02 = Cue(e02.id, e02.polar_pose_matrix(), e02.type, e02.clock, e02.color_index, e02.polar_sensor_point())
 
 # Create the place cell
-place_cell = PlaceCell([0, 0, 0], [cue00, cue01, cue02])
+place_cell = PlaceCell([0, 0, 0], [cue00, cue01, cue02], 100)
 
 # Load the place cell in place memory
 workspace.memory.place_memory.place_cells[1] = place_cell
