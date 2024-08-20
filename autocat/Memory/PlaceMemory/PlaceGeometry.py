@@ -133,16 +133,13 @@ def compare_place_cells(cell_id, place_cells):
     if len(place_cells) < 2:
         return
 
-    # Initialize the comparison file with headers
-    with open(f"log/01_compare_{cell_id}.csv", 'w', newline='') as file:
-        csv.writer(file).writerow(["cell", "translate_x", "translate_y", "rotation", "residual", "fitness"])
-
     points1 = np.array([c.point() for c in place_cells[cell_id].cues if c.type == EXPERIENCE_CENTRAL_ECHO])
+    comparisons = {}
     for k, p in place_cells.items():
         if k != cell_id and p.is_fully_observed():
             points2 = np.array([c.point() for c in place_cells[k].cues if c.type == EXPERIENCE_CENTRAL_ECHO])
             reg_p2p, residual_distance, points_transformed = transform_estimation_cue_to_cue(points1, points2)
-            print("Transformation\n", reg_p2p.transformation)
+            # print("Transformation\n", reg_p2p.transformation)
             translation = -reg_p2p.transformation[0:2, 3].astype(int)
             rotation_deg = round(math.degrees(
                 quaternion_to_direction_rad(Quaternion.from_matrix(reg_p2p.transformation[:3, :3]))))
@@ -153,10 +150,16 @@ def compare_place_cells(cell_id, place_cells):
             # Save the plot
             plot_correspondences(points1, points2, points_transformed, reg_p2p, residual_distance, cell_id, k)
             # Save the comparison
-            with open(f"log/01_compare_{cell_id}.csv", 'a', newline='') as file:
-                writer = csv.writer(file)
-                writer.writerow([k, translation[0], translation[1], rotation_deg, round(residual_distance),
-                                 round(reg_p2p.fitness, 2)])
+            comparisons[k] = (translation[0], translation[1], rotation_deg, round(residual_distance),
+                              round(reg_p2p.fitness, 2))
+
+    # Save the comparison file
+    with open(f"log/01_compare_{cell_id}.csv", 'w', newline='') as file:
+        csv.writer(file).writerow(["cell", "translate_x", "translate_y", "rotation", "residual", "fitness"])
+    with open(f"log/01_compare_{cell_id}.csv", 'a', newline='') as file:
+        writer = csv.writer(file)
+        for k, v in comparisons.items():
+            writer.writerow([k, *v])
 
 
 def plot_correspondences(source_points, target_points, source_points_transformed, reg_p2p, residual_distance, k1, k2):
@@ -187,9 +190,9 @@ def plot_correspondences(source_points, target_points, source_points_transformed
                 label=f"{k1} moved to {k2}")
 
     plt.legend()
-    plt.xlabel('West-East')
-    plt.ylabel('South-North')
-    plt.title(f"{k1} to {k2}. Fitness: {reg_p2p.fitness:.2f}, residual distance: {residual_distance:.0f}")
+    plt.xlabel('West - East')
+    plt.ylabel('South - North')
+    plt.title(f"Compare {k1} to {k2}. Residual: {residual_distance:.0f}, fitness: {reg_p2p.fitness:.2f}")
     # plt.show()
     try:
         plt.savefig(f"log/02_compare_{k1}_{k2}.pdf")

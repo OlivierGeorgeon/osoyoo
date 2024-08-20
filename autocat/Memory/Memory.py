@@ -145,18 +145,18 @@ class Memory:
         """Adjust the robot's position by the correction from place cell memory"""
         current_cell = self.place_memory.current_place_cell()
         # The position of the robot estimated from the current cell
-        estimated_allo_robot_point = current_cell.place_centric_to_allocentric(self.place_memory.estimated_robot_point)
+        # estimated_allo_robot_point = current_cell.place_centric_to_allocentric(self.place_memory.estimated_robot_point)
         # The robot position correction
-        position_correction = estimated_allo_robot_point - self.allocentric_memory.robot_point
-        robot_position_correction = position_correction * current_cell.position_confidence / 100
+        # position_correction = estimated_allo_robot_point - self.allocentric_memory.robot_point
+        robot_correction = self.place_memory.proposed_correction * current_cell.position_confidence / 100
         print(f"Adjusting the robot's position to place cell {self.place_memory.current_cell_id} "
-              f"by {tuple(robot_position_correction[:2].astype(int))}")
+              f"by {tuple(robot_correction[:2].astype(int))}")
         # Move the robot by the position correction proportionally to the place cell confidence
-        self.allocentric_memory.robot_point += robot_position_correction
+        self.allocentric_memory.robot_point += robot_correction
 
         # Propagate the position error to all the place cells since last position correction
         # Proportionally to the complementary of the place cell position confidence
-        position_correction *= (current_cell.position_confidence - 100) / 100
+        cell_correction = self.place_memory.proposed_correction * (current_cell.position_confidence - 100) / 100
         last_position_clock = self.place_memory.place_cells[self.place_memory.current_cell_id].last_position_clock
         self.place_memory.place_cells[self.place_memory.current_cell_id].last_position_clock = self.clock
         # ps = {k: p for k, p in self.place_memory.place_cells.items() if p.last_visited_clock > last_position_clock}
@@ -170,7 +170,7 @@ class Memory:
                 # The older the place cell, the smaller the position correction
                 correction_coefficient = i / n
                 i += 1
-                ac = np.array(position_correction * correction_coefficient, dtype=int)
+                ac = np.array(cell_correction * correction_coefficient, dtype=int)
                 p.point += ac
                 print(f"Place {p.key} adjusted by: {tuple(ac[0:2].astype(int))} coef: {correction_coefficient:.2f}")
 

@@ -92,7 +92,7 @@ class PlaceCell:
         r = self.polar_echo_curve[cue_direction_deg // ANGULAR_RESOLUTION, 0]
         distance = r - np.linalg.norm(point)
         translation = np.array([distance * math.cos(cue_direction_rad), distance * math.sin(cue_direction_rad), 0])
-        print(f"Translation estimate from echo at ({r:.0f} mm, {cue_direction_deg}°): "
+        print(f"Translation estimate from curve point ({r:.0f} mm, {cue_direction_deg}°): "
               f"{tuple(translation[:2].astype(int))}")
         return translation
 

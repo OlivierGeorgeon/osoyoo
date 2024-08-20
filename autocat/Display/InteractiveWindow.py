@@ -14,7 +14,6 @@ ZOOM_OUT_FACTOR = 1/ZOOM_IN_FACTOR
 def screen_scale():
     """Return 1 on normal screens, and 2 on mac for retina displays """
     # Not sure how to deal with a Mac that has a non-retina additional screen
-    # TODO test with a Mac
     if platform.system() != 'Darwin':
         # This is not a Mac
         return 1
@@ -27,7 +26,7 @@ def screen_scale():
 
 
 class InteractiveWindow(pyglet.window.Window):
-    """The parent class of interactive views"""
+    """The parent class of interactive windows"""
     def __init__(self, width=350, height=350, *args, **kwargs):
         conf = Config(sample_buffers=1, samples=4, depth_size=0, double_buffer=True)
         super().__init__(width, height, resizable=True, config=conf, *args, **kwargs)
@@ -165,47 +164,3 @@ class InteractiveWindow(pyglet.window.Window):
             self.right *= f
             self.bottom *= f
             self.top *= f
-
-    # Zoom based on mouse position
-    # def on_mouse_scroll(self, x, y, dx, dy):
-    #     # Get scale factor
-    #     f = ZOOM_OUT_FACTOR if dy > 0 else ZOOM_IN_FACTOR if dy < 0 else 1
-    #     # If zoom_level is in the proper range
-    #     if .2 < self.zoom_level * f < 5:
-    #         self.zoom_level *= f
-    #
-    #         mouse_x = x / self.width
-    #         mouse_y = y / self.height
-    #
-    #         mouse_x_in_world = self.left + mouse_x * self.zoomed_width
-    #         mouse_y_in_world = self.bottom + mouse_y * self.zoomed_height
-    #
-    #         self.zoomed_width *= f
-    #         self.zoomed_height *= f
-    #
-    #         self.left = mouse_x_in_world - mouse_x * self.zoomed_width
-    #         self.right = mouse_x_in_world + (1 - mouse_x) * self.zoomed_width
-    #         self.bottom = mouse_y_in_world - mouse_y * self.zoomed_height
-    #         self.top = mouse_y_in_world + (1 - mouse_y) * self.zoomed_height
-
-    # Zoom based on center of window
-    # def on_mouse_scroll(self, x, y, dx, dy):
-    #     # Get scale factor
-    #     f = ZOOM_OUT_FACTOR if dy > 0 else ZOOM_IN_FACTOR if dy < 0 else 1
-    #     # If zoom_level is in the proper range
-    #     if .2 < self.zoom_level * f < 5:
-    #         self.zoom_level *= f
-    #
-    #         center_x = self.width / 2
-    #         center_y = self.height / 2
-    #
-    #         mouse_x_in_world = self.left + center_x * self.zoomed_width / self.width
-    #         mouse_y_in_world = self.bottom + center_y * self.zoomed_height / self.height
-    #
-    #         self.zoomed_width *= f
-    #         self.zoomed_height *= f
-    #
-    #         self.left = mouse_x_in_world - center_x * self.zoomed_width / self.width
-    #         self.right = mouse_x_in_world + (self.width - center_x) * self.zoomed_width / self.width
-    #         self.bottom = mouse_y_in_world - center_y * self.zoomed_height / self.height
-    #         self.top = mouse_y_in_world + (self.height - center_y) * self.zoomed_height / self.height

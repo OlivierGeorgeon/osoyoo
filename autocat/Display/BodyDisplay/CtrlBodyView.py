@@ -24,11 +24,6 @@ class CtrlBodyView:
         self.points_of_interest = []
         self.view = InteractiveWindow()
         self.view.set_caption("Robot " + workspace.robot_id)
-        # self.last_action = None
-        # self.mouse_press_x = 0
-        # self.mouse_press_y = 0
-        # self.mouse_press_angle = 0
-        # self.last_used_id = -1
         self.view.zoom_level = 2.6
         glClearColor(1.0, 235.0/256., 205.0/256., 1.0)
 

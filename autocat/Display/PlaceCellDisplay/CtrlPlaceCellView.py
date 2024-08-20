@@ -5,19 +5,20 @@ from pyglet.gl import GL_LINES
 from pyglet.window import key
 from ..InteractiveWindow import InteractiveWindow
 from ..ShapeDisplay import ShapeDisplay
-# from ...Robot.CtrlRobot import ENACTION_STEP_RENDERING
 from ...Enaction import ENACTION_STEP_RENDERING
 from ...Memory.EgocentricMemory.Experience import FLOOR_COLORS
 from ...Memory.PlaceMemory.PlaceGeometry import compare_place_cells
+from ..CtrlWindow import CtrlWindow
 
 
-class CtrlPlaceCellView:
+class CtrlPlaceCellView(CtrlWindow):
     """Handle the logic of the phenomenon view, retrieve data from the phenomenon and convert it
     to points of interest that can be displayed in a pyglet window"""
     def __init__(self, workspace):
-        self.view = InteractiveWindow()
+        super().__init__(workspace)
+        # self.view = InteractiveWindow()
         self.view.set_caption("Place cell " + workspace.robot_id)
-        self.workspace = workspace
+        # self.workspace = workspace
         self.cue_displays = []
         self.place_cell_id = 0
         self.selected_clock = 0
@@ -25,19 +26,19 @@ class CtrlPlaceCellView:
         self.echo_curve = None
         self.view.label3.text = 'Position confidence:'
 
-        def on_text(text):
-            """Handle user keypress"""
-            self.workspace.process_user_key(text)
-
-        def on_key_press(symbol, modifiers):
-            """handle single key press"""
-            if symbol == key.F1:
-                # Save the comparison of the current place cells with all others
-                cell_id = self.workspace.memory.place_memory.current_cell_id
-                print(f"Comparing cell {cell_id} to other fully observed cells")
-                if cell_id > 0:
-                    compare_place_cells(cell_id, self.workspace.memory.place_memory.place_cells)
-
+        # def on_text(text):
+        #     """Handle user keypress"""
+        #     self.workspace.process_user_key(text)
+        #
+        # def on_key_press(symbol, modifiers):
+        #     """handle single key press"""
+        #     if symbol == key.F1:
+        #         # Save the comparison of the current place cells with all others
+        #         cell_id = self.workspace.memory.place_memory.current_cell_id
+        #         print(f"Comparing cell {cell_id} to other fully observed cells")
+        #         if cell_id > 0:
+        #             compare_place_cells(cell_id, self.workspace.memory.place_memory.place_cells)
+        #
         def on_mouse_press(x, y, button, modifiers):
             """ Computing the position of the mouse click relative to the place cell in mm and degrees """
             point = self.view.mouse_coordinates_to_point(x, y)
@@ -49,7 +50,7 @@ class CtrlPlaceCellView:
                 self.view.label1.text = f"Clock: {self.selected_clock}"
 
         # Add these event functions to the window
-        self.view.push_handlers(on_text, on_mouse_press, on_key_press)
+        self.view.push_handlers(on_mouse_press)
 
         def on_mouse_scroll(x, y, dx, dy):
             """ Zoom or modify the phenomenon's confidence """

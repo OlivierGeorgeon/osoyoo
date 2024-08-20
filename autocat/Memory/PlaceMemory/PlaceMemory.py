@@ -18,7 +18,7 @@ class PlaceMemory:
         self.place_cell_graph = nx.Graph()
         self.place_cell_distances = dict(dict())
         self.current_cell_id = 0  # The place cell where the robot currently is
-        self.estimated_robot_point = np.array([0, 0, 0])  # The estimated position of the robot in the current cell
+        self.proposed_correction = np.array([0, 0, 0])  # Proposed correction of robot and place cell position
         self.observe_better = False
         self.graph_start_id = 1  # The first place cell of the current graph to display
 
@@ -50,15 +50,26 @@ class PlaceMemory:
                 # If a scan has been performed then find the position correction based on local echoes
                 if len(local_echoes) > 0:
                     points = np.array([e.polar_point() for e in local_echoes])
-                    self.estimated_robot_point[:] = self.place_cells[existing_id].translation_estimation_echo(points)
+                    estimated_robot_point = self.place_cells[existing_id].translation_estimation_echo(points)
+                    estimated_allo_robot_point = estimated_robot_point + self.place_cells[existing_id].point
+                    # The robot position correction
+                    self.proposed_correction[:] = estimated_allo_robot_point - memory.allocentric_memory.robot_point
+                    print(f"Position relative to place cell {self.current_cell_id}: "
+                          f"{tuple(estimated_robot_point[:2].astype(int))}, "
+                          f" propose correction:  {tuple(self.proposed_correction[:2].astype(int))}")
                 # If no local echoes then try to adjust the position based on aligned echo
                 else:
                     align_experiences = [e for e in memory.egocentric_memory.experiences.values()
                                          if (e.clock >= memory.clock) and e .type == EXPERIENCE_ALIGNED_ECHO]
-                    if len(align_experiences) > 0:
+                    if len(align_experiences) == 1:  # One algine echo experience
                         point = align_experiences[0].polar_point()
-                        self.estimated_robot_point[:] = \
-                            self.place_cells[existing_id].translation_estimate_aligned_echo(point)
+                        estimated_robot_point = self.place_cells[existing_id].translation_estimate_aligned_echo(point)
+                        estimated_allo_robot_point = estimated_robot_point + self.place_cells[existing_id].point
+                        # The robot position correction
+                        self.proposed_correction[:] = estimated_allo_robot_point - memory.allocentric_memory.robot_point
+                        print(f"Position relative to place cell {self.current_cell_id}: "
+                              f"{tuple(estimated_robot_point[:2].astype(int))}, "
+                              f"proposed correction: {tuple(self.proposed_correction[:2].astype(int))}")
             # If the cell is not fully observed
             else:
                 # Add the cues including the local echoes
@@ -91,8 +102,6 @@ class PlaceMemory:
             print(f"Robot at new place {self.current_cell_id}")
 
         self.place_cells[self.current_cell_id].last_visited_clock = memory.clock
-        print(f"Position relative to place cell {self.current_cell_id}: "
-              f"{tuple(self.estimated_robot_point[0:2].astype(int))}")
 
     def create_place_cell(self, point, experiences):
         """Create a new place cell and add it to the list and to the graph"""
@@ -165,5 +174,5 @@ class PlaceMemory:
         saved_place_memory.current_cell_id = self.current_cell_id
         saved_place_memory.place_cell_distances = copy.deepcopy(self.place_cell_distances)
         saved_place_memory.observe_better = self.observe_better
-        saved_place_memory.estimated_robot_point[:] = self.estimated_robot_point
+        saved_place_memory.proposed_correction[:] = self.proposed_correction
         return saved_place_memory

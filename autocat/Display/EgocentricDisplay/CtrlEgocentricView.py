@@ -6,19 +6,21 @@ from ..InteractiveWindow import InteractiveWindow
 from ..ShapeDisplay import ShapeDisplay, POINT_PROMPT, POINT_ROBOT
 from ...Memory.EgocentricMemory.Experience import EXPERIENCE_FOCUS, EXPERIENCE_ROBOT
 from ...Enaction import ENACTION_STEP_RENDERING
+from ..CtrlWindow import CtrlWindow
 
 
-class CtrlEgocentricView:
+class CtrlEgocentricView(CtrlWindow):
     """Handle the logic of the egocentric view, retrieve data from the memory and convert it
     to points of interest that can be displayed in a pyglet window"""
     def __init__(self, workspace):
-        self.view = InteractiveWindow()
+        super().__init__(workspace)
+        # self.view = InteractiveWindow()
         self.view.set_caption("Egocentric " + workspace.robot_id)
         self.view.zoom_level = 2
         self.view.robot_rotate = 90  # Show the robot head up
-        self.workspace = workspace
+        # self.workspace = workspace
         self.points_of_interest = []
-        self.last_action = None
+        # self.last_action = None
 
         def on_mouse_press(x, y, button, modifiers):
             """ Selecting or unselecting points of interest """
@@ -48,11 +50,11 @@ class CtrlEgocentricView:
             if symbol == key.DELETE:
                 self.delete_prompt()
 
-        def on_text(text):
-            """Send user keypress to the workspace to handle"""
-            self.workspace.process_user_key(text)
+        # def on_text(text):
+        #     """Send user keypress to the workspace to handle"""
+        #     self.workspace.process_user_key(text)
 
-        self.view.push_handlers(on_mouse_press, on_key_press, on_text)
+        self.view.push_handlers(on_mouse_press, on_key_press)
 
     def delete_prompt(self):
         """Delete the prompt"""
