@@ -26,7 +26,7 @@ def screen_scale():
     return 1
 
 
-class InteractiveDisplay(pyglet.window.Window):
+class InteractiveWindow(pyglet.window.Window):
     """The parent class of interactive views"""
     def __init__(self, width=350, height=350, *args, **kwargs):
         conf = Config(sample_buffers=1, samples=4, depth_size=0, double_buffer=True)

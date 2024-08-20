@@ -1,9 +1,9 @@
 from pyglet.gl import *
 from webcolors import name_to_rgb
-from ..InteractiveDisplay import InteractiveDisplay
+from ..InteractiveWindow import InteractiveWindow
 
 
-class PhenomenonView(InteractiveDisplay):
+class PhenomenonView(InteractiveWindow):
     """Display a phenomenon"""
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

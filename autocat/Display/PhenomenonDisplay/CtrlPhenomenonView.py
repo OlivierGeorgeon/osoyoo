@@ -1,7 +1,7 @@
 import math
 import numpy as np
 from .PhenomenonView import PhenomenonView
-from ..PointOfInterest import PointOfInterest, POINT_CONE
+from ..ShapeDisplay import ShapeDisplay, POINT_CONE
 from ...Workspace import KEY_ENCLOSE
 # from ...Robot.CtrlRobot import ENACTION_STEP_RENDERING
 from ...Enaction import ENACTION_STEP_RENDERING
@@ -91,12 +91,12 @@ class CtrlPhenomenonView:
         affordance_displays = []
         pose_matrix = quaternion_translation_to_matrix(affordance.quaternion, affordance.point)
         if affordance.type in [EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_CENTRAL_ECHO]:
-            cone_display = PointOfInterest(pose_matrix, self.view.polar_batch, self.view.background, POINT_CONE,
-                                           affordance.clock, affordance.color_index,
-                                           np.linalg.norm(affordance.polar_sensor_point))
+            cone_display = ShapeDisplay(pose_matrix, self.view.polar_batch, self.view.background, POINT_CONE,
+                                        affordance.clock, affordance.color_index,
+                                        np.linalg.norm(affordance.polar_sensor_point))
             affordance_displays.append(cone_display)
-        poi = PointOfInterest(pose_matrix, self.view.polar_batch, self.view.forefront,
-                              affordance.type, affordance.clock, affordance.color_index)
+        poi = ShapeDisplay(pose_matrix, self.view.polar_batch, self.view.forefront,
+                           affordance.type, affordance.clock, affordance.color_index)
         affordance_displays.append(poi)
         return affordance_displays
 

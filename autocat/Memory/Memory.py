@@ -159,18 +159,20 @@ class Memory:
         position_correction *= (current_cell.position_confidence - 100) / 100
         last_position_clock = self.place_memory.place_cells[self.place_memory.current_cell_id].last_position_clock
         self.place_memory.place_cells[self.place_memory.current_cell_id].last_position_clock = self.clock
-        ps = {k: p for k, p in self.place_memory.place_cells.items() if p.last_visited_clock > last_position_clock}
+        # ps = {k: p for k, p in self.place_memory.place_cells.items() if p.last_visited_clock > last_position_clock}
+        ps = [p for p in self.place_memory.place_cells.values() if p.last_visited_clock > last_position_clock]
         n = len(ps)
         if n > 0:
             i = 1
-            sorted_ps = dict(sorted(ps.items(), key=lambda x: x[1].last_visited_clock))
-            for k, p in sorted_ps.items():
+            # sorted_ps = dict(sorted(ps.items(), key=lambda x: x[1].last_visited_clock))
+            sorted_ps = sorted(ps, key=lambda p: p.last_visited_clock)
+            for p in sorted_ps:
                 # The older the place cell, the smaller the position correction
                 correction_coefficient = i / n
                 i += 1
                 ac = np.array(position_correction * correction_coefficient, dtype=int)
                 p.point += ac
-                print(f"Place {k} adjusted by: {tuple(ac[0:2].astype(int))} coef: {correction_coefficient:.2f}")
+                print(f"Place {p.key} adjusted by: {tuple(ac[0:2].astype(int))} coef: {correction_coefficient:.2f}")
 
         # Move the cell by the position correction
         self.allocentric_memory.update_grid(self)

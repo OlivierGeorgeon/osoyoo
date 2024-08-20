@@ -2,18 +2,20 @@ import math
 import numpy as np
 from webcolors import name_to_rgb
 from pyglet.gl import GL_LINES
-from ..InteractiveDisplay import InteractiveDisplay
-from ..PointOfInterest import PointOfInterest
+from pyglet.window import key
+from ..InteractiveWindow import InteractiveWindow
+from ..ShapeDisplay import ShapeDisplay
 # from ...Robot.CtrlRobot import ENACTION_STEP_RENDERING
 from ...Enaction import ENACTION_STEP_RENDERING
 from ...Memory.EgocentricMemory.Experience import FLOOR_COLORS
+from ...Memory.PlaceMemory.PlaceGeometry import compare_place_cells
 
 
 class CtrlPlaceCellView:
     """Handle the logic of the phenomenon view, retrieve data from the phenomenon and convert it
     to points of interest that can be displayed in a pyglet window"""
     def __init__(self, workspace):
-        self.view = InteractiveDisplay()
+        self.view = InteractiveWindow()
         self.view.set_caption("Place cell " + workspace.robot_id)
         self.workspace = workspace
         self.cue_displays = []
@@ -27,6 +29,15 @@ class CtrlPlaceCellView:
             """Handle user keypress"""
             self.workspace.process_user_key(text)
 
+        def on_key_press(symbol, modifiers):
+            """handle single key press"""
+            if symbol == key.F1:
+                # Save the comparison of the current place cells with all others
+                cell_id = self.workspace.memory.place_memory.current_cell_id
+                print(f"Comparing cell {cell_id} to other fully observed cells")
+                if cell_id > 0:
+                    compare_place_cells(cell_id, self.workspace.memory.place_memory.place_cells)
+
         def on_mouse_press(x, y, button, modifiers):
             """ Computing the position of the mouse click relative to the place cell in mm and degrees """
             point = self.view.mouse_coordinates_to_point(x, y)
@@ -38,7 +49,7 @@ class CtrlPlaceCellView:
                 self.view.label1.text = f"Clock: {self.selected_clock}"
 
         # Add these event functions to the window
-        self.view.push_handlers(on_text, on_mouse_press)
+        self.view.push_handlers(on_text, on_mouse_press, on_key_press)
 
         def on_mouse_scroll(x, y, dx, dy):
             """ Zoom or modify the phenomenon's confidence """
@@ -66,8 +77,8 @@ class CtrlPlaceCellView:
 
             # Recreate all cue displays
             for cue in place_cell.cues:
-                cue_display = PointOfInterest(cue.pose_matrix, self.view.polar_batch, self.view.forefront, cue.type,
-                                              cue.clock, cue.color_index)
+                cue_display = ShapeDisplay(cue.pose_matrix, self.view.polar_batch, self.view.forefront, cue.type,
+                                           cue.clock, cue.color_index)
                 self.cue_displays.append(cue_display)
 
             # Draw the graph of place cells
@@ -76,8 +87,9 @@ class CtrlPlaceCellView:
                 self.graph_display = None
             points = []
             for u, v in self.workspace.memory.place_memory.place_cell_graph.edges:
-                points.append(self.workspace.memory.place_memory.place_cells[u].point)
-                points.append(self.workspace.memory.place_memory.place_cells[v].point)
+                if u >= self.workspace.memory.place_memory.graph_start_id:  # Only display the graph from current start
+                    points.append(self.workspace.memory.place_memory.place_cells[u].point)
+                    points.append(self.workspace.memory.place_memory.place_cells[v].point)
             nb = len(points)
             if nb > 0:
                 index = list(range(nb))

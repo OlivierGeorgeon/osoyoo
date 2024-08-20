@@ -20,7 +20,7 @@ class PlaceCell:
         self.cartesian_echo_curve = np.zeros((360 // ANGULAR_RESOLUTION, 3), dtype=float)
         self.last_visited_clock = cues[0].clock
         self.last_position_clock = cues[0].clock
-        self.position_confidence = 50
+        self.position_confidence = 100  # Do not modify the position of the place cell
 
     def __str__(self):
         """Return the string of the tuple of the place cell coordinates"""

@@ -2,7 +2,7 @@ import pyglet
 import numpy as np
 from pyrr import Quaternion
 from .CtrlEgocentricView import CtrlEgocentricView
-from autocat.Display.PointOfInterest import *
+from autocat.Display.ShapeDisplay import *
 from ...Workspace import Workspace
 from ...Memory.EgocentricMemory.Experience import Experience, EXPERIENCE_FLOOR, EXPERIENCE_ROBOT
 from ...Utils import quaternion_translation_to_matrix

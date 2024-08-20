@@ -5,8 +5,8 @@ from ...Utils import quaternion_translation_to_matrix
 from .CellDisplay import CellDisplay
 from ...Memory.AllocentricMemory.Geometry import point_to_cell
 from ...Memory.EgocentricMemory.Experience import EXPERIENCE_ROBOT
-from ..InteractiveDisplay import InteractiveDisplay
-from ..PointOfInterest import PointOfInterest, POINT_ROBOT
+from ..InteractiveWindow import InteractiveWindow
+from ..ShapeDisplay import ShapeDisplay, POINT_ROBOT
 from ...Memory.AllocentricMemory.AllocentricMemory import CELL_UNKNOWN
 from ...Memory.AllocentricMemory import STATUS_FLOOR, STATUS_4
 
@@ -15,7 +15,7 @@ from ...Memory.AllocentricMemory import STATUS_FLOOR, STATUS_4
 # ZOOM_OUT_FACTOR = 1/ZOOM_IN_FACTOR
 
 
-class AllocentricView(InteractiveDisplay):
+class AllocentricView(InteractiveWindow):
     """Create the allocentric view"""
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -65,8 +65,8 @@ class AllocentricView(InteractiveDisplay):
             pose_matrix = quaternion_translation_to_matrix(phenomenon.latest_added_affordance().quaternion,
                                                            phenomenon.point +
                                                            phenomenon.latest_added_affordance().point)
-            self.body_poi = PointOfInterest(pose_matrix, self.polar_batch, self.forefront, POINT_ROBOT,
-                                            phenomenon.latest_added_affordance().clock)
-            self.robot_poi = PointOfInterest(pose_matrix, self.polar_batch, self.forefront, EXPERIENCE_ROBOT,
-                                             phenomenon.latest_added_affordance().clock,
-                                             color_index=phenomenon.latest_added_affordance().color_index)
+            self.body_poi = ShapeDisplay(pose_matrix, self.polar_batch, self.forefront, POINT_ROBOT,
+                                         phenomenon.latest_added_affordance().clock)
+            self.robot_poi = ShapeDisplay(pose_matrix, self.polar_batch, self.forefront, EXPERIENCE_ROBOT,
+                                          phenomenon.latest_added_affordance().clock,
+                                          color_index=phenomenon.latest_added_affordance().color_index)

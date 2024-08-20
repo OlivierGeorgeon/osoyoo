@@ -17,7 +17,7 @@ POINT_CONE = 'Cone'
 POINT_ROBOT = 'PRobot'  # To draw the body of the other robot
 
 
-class PointOfInterest:
+class ShapeDisplay:
     def __init__(self, pose_matrix, batch, group, point_type, clock, color_index=None, durability=10, size=0):
         self.pose_matrix = matrix44.create_identity()  # The shape will be displaced to the pose_matrix
         self.batch = batch

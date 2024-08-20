@@ -4,11 +4,14 @@ import math
 import numpy as np
 import pandas as pd
 import open3d as o3d
+import csv
 import matplotlib.pyplot as plt
+from pyrr import Quaternion
 from . import MIN_PLACE_CELL_DISTANCE, ICP_DISTANCE_THRESHOLD, ANGULAR_RESOLUTION, MASK_ARRAY
 from ...Robot import NO_ECHO_DISTANCE
 from ...Utils import cartesian_to_polar
 from ...Memory.EgocentricMemory.Experience import EXPERIENCE_CENTRAL_ECHO
+from ...Utils import quaternion_to_direction_rad
 
 
 def transform_estimation_cue_to_cue(points1, points2, threshold=ICP_DISTANCE_THRESHOLD):
@@ -37,13 +40,13 @@ def transform_estimation_cue_to_cue(points1, points2, threshold=ICP_DISTANCE_THR
         print("ICP no match")
     else:
         # Print the correspondence
-        for i, j in np.asarray(reg_p2p.correspondence_set):
-            t = np.sqrt(np.linalg.norm(np.asarray(pcd1.points)[i] - np.asarray(pcd2.points)[j])**2)
-            print(f"Match {np.asarray(pcd1.points)[i, 0:2]} - {np.asarray(pcd2.points)[j, 0:2]} = {t:.0f}")
+        # for i, j in np.asarray(reg_p2p.correspondence_set):
+        #     t = np.sqrt(np.linalg.norm(np.asarray(pcd1.points)[i] - np.asarray(pcd2.points)[j])**2)
+        #     print(f"Match {np.asarray(pcd1.points)[i, 0:2]} - {np.asarray(pcd2.points)[j, 0:2]} = {t:.0f}")
 
-        average_distance = np.mean([np.linalg.norm(np.asarray(pcd1.points)[i] - np.asarray(pcd2.points)[j])
-                                    for i, j in correspondence_set])
-        print(f"ICP average source-target distance: {average_distance:.0f}, fitness: {reg_p2p.fitness:.2f}")
+        # average_distance = np.mean([np.linalg.norm(np.asarray(pcd1.points)[i] - np.asarray(pcd2.points)[j])
+        #                             for i, j in correspondence_set])
+        # print(f"ICP average source-target distance: {average_distance:.0f}, fitness: {reg_p2p.fitness:.2f}")
 
         # Apply the transformation to the source cloud
         pcd1.transform(reg_p2p.transformation)
@@ -129,34 +132,31 @@ def compare_place_cells(cell_id, place_cells):
     """Print a comparison of this place cell with all others"""
     if len(place_cells) < 2:
         return
+
+    # Initialize the comparison file with headers
+    with open(f"log/01_compare_{cell_id}.csv", 'w', newline='') as file:
+        csv.writer(file).writerow(["cell", "translate_x", "translate_y", "rotation", "residual", "fitness"])
+
     points1 = np.array([c.point() for c in place_cells[cell_id].cues if c.type == EXPERIENCE_CENTRAL_ECHO])
     for k, p in place_cells.items():
         if k != cell_id and p.is_fully_observed():
             points2 = np.array([c.point() for c in place_cells[k].cues if c.type == EXPERIENCE_CENTRAL_ECHO])
             reg_p2p, residual_distance, points_transformed = transform_estimation_cue_to_cue(points1, points2)
             print("Transformation\n", reg_p2p.transformation)
+            translation = -reg_p2p.transformation[0:2, 3].astype(int)
+            rotation_deg = round(math.degrees(
+                quaternion_to_direction_rad(Quaternion.from_matrix(reg_p2p.transformation[:3, :3]))))
             print(f"Compare cell {cell_id} to cell {k}: "
-                  f"translation: {tuple(-reg_p2p.transformation[0:2, 3].astype(int))}, "
-                  f"residual distance: {residual_distance:.0f}, fitness: {reg_p2p.fitness:.2f}")
+                  f"translation: {tuple(translation)}, "
+                  f"rotation: {rotation_deg:.0f}, "
+                  f"residual: {residual_distance:.0f}, fitness: {reg_p2p.fitness:.2f}")
+            # Save the plot
             plot_correspondences(points1, points2, points_transformed, reg_p2p, residual_distance, cell_id, k)
-
-    # keys = list(place_cells.keys())
-    # for i in range(len(place_cells)):
-    #     k1 = keys[i]
-    #     if place_cells[k1].is_fully_observed():
-    #         points1 = np.array([c.point() for c in place_cells[k1].cues if c.type == EXPERIENCE_CENTRAL_ECHO])
-    #         np.savetxt(f"log/20_Cell_{k1}.txt", points1)
-    #         for j in range(i + 1, len(place_cells)):
-    #             k2 = keys[j]
-    #             if place_cells[k2].is_fully_observed():
-    #                 points2 = np.array([c.point() for c in place_cells[k2].cues if c.type == EXPERIENCE_CENTRAL_ECHO])
-    #                 reg_p2p, residual_distance, points_transformed = transform_estimation_cue_to_cue(points1, points2)
-    #                 print("Transformation\n", reg_p2p.transformation)
-    #                 print(f"Compare cell {k1} to cell {k2}: "
-    #                       f"translation: {tuple(-reg_p2p.transformation[0:2,3].astype(int))}, "
-    #                       f"residual distance: {residual_distance:.0f}, fitness: {reg_p2p.fitness:.2f}")
-    #                 plot_correspondences(points1, points2, points_transformed,
-    #                                      np.asarray(reg_p2p.correspondence_set), k1, k2)
+            # Save the comparison
+            with open(f"log/01_compare_{cell_id}.csv", 'a', newline='') as file:
+                writer = csv.writer(file)
+                writer.writerow([k, translation[0], translation[1], rotation_deg, round(residual_distance),
+                                 round(reg_p2p.fitness, 2)])
 
 
 def plot_correspondences(source_points, target_points, source_points_transformed, reg_p2p, residual_distance, k1, k2):
@@ -192,7 +192,7 @@ def plot_correspondences(source_points, target_points, source_points_transformed
     plt.title(f"{k1} to {k2}. Fitness: {reg_p2p.fitness:.2f}, residual distance: {residual_distance:.0f}")
     # plt.show()
     try:
-        plt.savefig(f"log/20_match_{k1}_{k2}.pdf")
+        plt.savefig(f"log/02_compare_{k1}_{k2}.pdf")
     except PermissionError:
         print("Permission denied")
     plt.close()

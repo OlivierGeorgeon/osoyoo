@@ -20,6 +20,7 @@ class PlaceMemory:
         self.current_cell_id = 0  # The place cell where the robot currently is
         self.estimated_robot_point = np.array([0, 0, 0])  # The estimated position of the robot in the current cell
         self.observe_better = False
+        self.graph_start_id = 1  # The first place cell of the current graph to display
 
     def add_or_update_place_cell(self, memory):
         """Create e new place cell or update the existing one"""

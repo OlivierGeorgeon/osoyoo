@@ -1,8 +1,11 @@
+import pyglet
+from pyglet.gl import glClearColor
 from pyrr import Matrix44
 import math
 import numpy as np
-from .BodyView import BodyView
-from autocat.Display.PointOfInterest import PointOfInterest
+# from .BodyView import BodyView
+from ..InteractiveWindow import InteractiveWindow
+from autocat.Display.ShapeDisplay import ShapeDisplay
 from ...Enaction import ENACTION_STEP_RENDERING
 # from ...Workspace import KEY_DECREASE, KEY_INCREASE
 from ...Utils import quaternion_to_azimuth
@@ -17,15 +20,31 @@ ENGAGEMENT_MODES = {'R': "Real", 'I': "Imaginary"}
 class CtrlBodyView:
     """Controls the body view"""
     def __init__(self, workspace):
-        self.view = BodyView()
-        self.view.set_caption("Robot " + workspace.robot_id)
         self.workspace = workspace
         self.points_of_interest = []
-        self.last_action = None
-        self.mouse_press_x = 0
-        self.mouse_press_y = 0
-        self.mouse_press_angle = 0
-        self.last_used_id = -1
+        self.view = InteractiveWindow()
+        self.view.set_caption("Robot " + workspace.robot_id)
+        # self.last_action = None
+        # self.mouse_press_x = 0
+        # self.mouse_press_y = 0
+        # self.mouse_press_angle = 0
+        # self.last_used_id = -1
+        self.view.zoom_level = 2.6
+        glClearColor(1.0, 235.0/256., 205.0/256., 1.0)
+
+        # Define the text area at the bottom of the view
+        self.view.label_DA = pyglet.text.Label('DA: ', font_name='Verdana', font_size=10, x=10, y=70)
+        self.view.label_DA.color = (0, 0, 0, 255)
+        self.view.label_DA.batch = self.view.label_batch
+        self.view.label_5HT = pyglet.text.Label('5-HT: ', font_name='Verdana', font_size=10, x=100, y=70)
+        self.view.label_5HT.color = (0, 0, 0, 255)
+        self.view.label_5HT.batch = self.view.label_batch
+        self.view.label_NA = pyglet.text.Label('NA: ', font_name='Verdana', font_size=10, x=190, y=70)
+        self.view.label_NA.color = (0, 0, 0, 255)
+        self.view.label_NA.batch = self.view.label_batch
+
+        self.view.label2.text = 'Azimuth: 90'
+        self.view.label3.text = 'Speed: (0, 0)'
 
         def on_mouse_press(x, y, button, modifiers):
             """ Selecting or unselecting points of interest """
@@ -92,12 +111,12 @@ class CtrlBodyView:
                   e.clock == self.workspace.enaction.clock and e.type in [EXPERIENCE_COMPASS, EXPERIENCE_NORTH]]:
             # COMPASS Big blue diamonds are shown in the robot frame
             if e.type == EXPERIENCE_COMPASS:
-                poi = PointOfInterest(e.pose_matrix, self.view.robot_batch, self.view.background, e.type, e.clock,
-                                      e.color_index, 10)
+                poi = ShapeDisplay(e.pose_matrix, self.view.robot_batch, self.view.background, e.type, e.clock,
+                                   e.color_index, 10)
             # NORTH Small blue diamonds are shown in polar frame
             else:
-                poi = PointOfInterest(e.polar_pose_matrix(), self.view.polar_batch, self.view.forefront, e.type,
-                                      e.clock, e.color_index, 10)
+                poi = ShapeDisplay(e.polar_pose_matrix(), self.view.polar_batch, self.view.forefront, e.type,
+                                   e.clock, e.color_index, 10)
             self.points_of_interest.append(poi)
 
     def update_labels(self):

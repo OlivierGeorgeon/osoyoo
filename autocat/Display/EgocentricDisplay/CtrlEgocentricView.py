@@ -2,8 +2,8 @@ import time
 from pyrr import Matrix44
 from pyglet.window import key, mouse
 # from .EgocentricView import EgocentricView
-from ..InteractiveDisplay import InteractiveDisplay
-from ..PointOfInterest import PointOfInterest, POINT_PROMPT, POINT_ROBOT
+from ..InteractiveWindow import InteractiveWindow
+from ..ShapeDisplay import ShapeDisplay, POINT_PROMPT, POINT_ROBOT
 from ...Memory.EgocentricMemory.Experience import EXPERIENCE_FOCUS, EXPERIENCE_ROBOT
 from ...Enaction import ENACTION_STEP_RENDERING
 
@@ -12,7 +12,7 @@ class CtrlEgocentricView:
     """Handle the logic of the egocentric view, retrieve data from the memory and convert it
     to points of interest that can be displayed in a pyglet window"""
     def __init__(self, workspace):
-        self.view = InteractiveDisplay()
+        self.view = InteractiveWindow()
         self.view.set_caption("Egocentric " + workspace.robot_id)
         self.view.zoom_level = 2
         self.view.robot_rotate = 90  # Show the robot head up
@@ -39,8 +39,8 @@ class CtrlEgocentricView:
                             self.points_of_interest.remove(p)
                     # Mark the new prompt
                     self.workspace.memory.egocentric_memory.prompt_point = click_point
-                    prompt_poi = PointOfInterest(Matrix44.from_translation(click_point).astype(float), self.view.egocentric_batch,
-                                                 self.view.background, POINT_PROMPT, self.workspace.memory.clock, 0, 1, 0)
+                    prompt_poi = ShapeDisplay(Matrix44.from_translation(click_point).astype(float), self.view.egocentric_batch,
+                                              self.view.background, POINT_PROMPT, self.workspace.memory.clock, 0, 1, 0)
                     self.points_of_interest.append(prompt_poi)
 
         def on_key_press(symbol, modifiers):
@@ -84,12 +84,12 @@ class CtrlEgocentricView:
         es = [e for e in self.workspace.memory.egocentric_memory.experiences.values() if e.clock == self.workspace.enaction.clock]
         for e in es:
             if e.type == EXPERIENCE_ROBOT:  # Draw the body of the other robot
-                robot_shape = PointOfInterest(e.pose_matrix, self.view.egocentric_batch, self.view.background, POINT_ROBOT,
-                                              e.clock)
+                robot_shape = ShapeDisplay(e.pose_matrix, self.view.egocentric_batch, self.view.background, POINT_ROBOT,
+                                           e.clock)
                 # robot_shape.fade(self.workspace.memory.clock)
                 self.points_of_interest.append(robot_shape)
-            poi = PointOfInterest(e.pose_matrix, self.view.egocentric_batch, self.view.forefront, e.type, e.clock,
-                                  e.color_index, e.durability, 0)
+            poi = ShapeDisplay(e.pose_matrix, self.view.egocentric_batch, self.view.forefront, e.type, e.clock,
+                               e.color_index, e.durability, 0)
             # poi.fade(self.workspace.memory.clock)
             self.points_of_interest.append(poi)
         # print(f"Created {len(es):d} new points of interest in {time.time() - start_time:.3f} seconds")
@@ -97,15 +97,15 @@ class CtrlEgocentricView:
         # Re-create the focus point with durability of 1
         if self.workspace.memory.egocentric_memory.focus_point is not None:
             p = Matrix44.from_translation(self.workspace.memory.egocentric_memory.focus_point).astype(float)
-            focus_poi = PointOfInterest(p, self.view.egocentric_batch, self.view.forefront, EXPERIENCE_FOCUS,
-                                        self.workspace.memory.clock, 0, 1, 0)
+            focus_poi = ShapeDisplay(p, self.view.egocentric_batch, self.view.forefront, EXPERIENCE_FOCUS,
+                                     self.workspace.memory.clock, 0, 1, 0)
             self.points_of_interest.append(focus_poi)
 
         # Re-create the prompt point with durability of 1
         if self.workspace.memory.egocentric_memory.prompt_point is not None:
             p = Matrix44.from_translation(self.workspace.memory.egocentric_memory.prompt_point.astype(float))
-            prompt_poi = PointOfInterest(p, self.view.egocentric_batch, self.view.background, POINT_PROMPT,
-                                         self.workspace.memory.clock, 0, 1, 0)
+            prompt_poi = ShapeDisplay(p, self.view.egocentric_batch, self.view.background, POINT_PROMPT,
+                                      self.workspace.memory.clock, 0, 1, 0)
             self.points_of_interest.append(prompt_poi)
 
     def reset(self):

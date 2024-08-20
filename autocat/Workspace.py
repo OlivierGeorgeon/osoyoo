@@ -23,9 +23,10 @@ KEY_CONTROL_USER = "M"  # Manual mode : controlled by the user
 # KEY_DECREASE = "D"
 # KEY_INCREASE = "P"
 KEY_CLEAR = "C"  # Clear the stack of interactions to enact next
-KEY_PREDICTION_ERROR = "E"
+KEY_PREDICTION_ERROR = "E"  # Compute the prediction errors
 KEY_ENCLOSE = "N"
 KEY_POSITION = "P"
+KEY_COMPARE = ""
 
 
 class Workspace:
