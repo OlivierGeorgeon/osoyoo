@@ -1,4 +1,5 @@
 import time
+import math
 from pyrr import Matrix44
 from pyglet.window import key, mouse
 from ..ShapeDisplay import ShapeDisplay, POINT_PROMPT, POINT_ROBOT
@@ -20,7 +21,7 @@ class CtrlEgocentricView(CtrlWindow):
 
         def on_mouse_press(x, y, button, modifiers):
             """ Selecting or unselecting points of interest """
-            click_point = self.view.mouse_to_ego_point(x, y, button, modifiers)
+            click_point = self.view.window_to_ego_centric(x, y)
             # Right click: insert a prompt
             if button == mouse.RIGHT:
                 self.workspace.memory.egocentric_memory.prompt_point = click_point
@@ -30,7 +31,7 @@ class CtrlEgocentricView(CtrlWindow):
             # Left click: select a point of interest
             else:
                 for p in [p for p in self.points_of_interest if p.select_if_near(click_point)]:
-                    self.view.label2.text = "Point clock: " + str(p.clock)
+                    self.view.label2.text = "Clock: " + str(p.clock)
 
         def on_key_press(symbol, modifiers):
             """ Delete the prompt """
@@ -97,6 +98,13 @@ class CtrlEgocentricView(CtrlWindow):
             poi.delete()
         self.points_of_interest = []
         self.update_prompt()
+
+    def display_mouse(self, ego_point):
+        """Display the mouse information"""
+        ego_angle = math.degrees(math.atan2(ego_point[1], ego_point[0]))
+        allo_point = self.workspace.memory.egocentric_to_allocentric(ego_point)
+        self.view.label3.text = f"Ego: {tuple(ego_point[0:2])}, {ego_angle:.0f}°. " \
+                                f"Allo: {tuple(allo_point[:2].astype(int))}"
 
     def main(self, dt):
         """Update the egocentric view"""

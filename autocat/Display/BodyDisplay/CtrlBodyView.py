@@ -41,10 +41,10 @@ class CtrlBodyView:
         self.view.label2.text = 'Azimuth: 90'
         self.view.label3.text = 'Speed: (0, 0)'
 
-        def on_mouse_press(x, y, button, modifiers):
-            """ Selecting or unselecting points of interest """
-            self.view.mouse_to_ego_point(x, y, button, modifiers)
-
+        # def on_mouse_press(x, y, button, modifiers):
+        #     """ Selecting or unselecting points of interest """
+        #     self.view.mouse_to_ego_point(x, y, button, modifiers)
+        #
         def on_text(text):
             """Process the user key or forward it to the Workspace to handle"""
             # if text.upper() == KEY_DECREASE:
@@ -69,7 +69,7 @@ class CtrlBodyView:
             else:
                 self.workspace.process_user_key(text)
 
-        self.view.push_handlers(on_mouse_press, on_text)
+        self.view.push_handlers(on_text)
 
         def on_mouse_scroll(x, y, dx, dy):
             """ Zooming the window or manually updating the neurotransmitter levels"""

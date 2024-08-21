@@ -16,29 +16,13 @@ class CtrlPlaceCellView(CtrlWindow):
     to points of interest that can be displayed in a pyglet window"""
     def __init__(self, workspace):
         super().__init__(workspace)
-        # self.view = InteractiveWindow()
         self.view.set_caption("Place cell " + workspace.robot_id)
-        # self.workspace = workspace
         self.cue_displays = []
         self.place_cell_id = 0
         self.selected_clock = 0
         self.graph_display = None
         self.echo_curve = None
-        self.view.label3.text = 'Position confidence:'
 
-        # def on_text(text):
-        #     """Handle user keypress"""
-        #     self.workspace.process_user_key(text)
-        #
-        # def on_key_press(symbol, modifiers):
-        #     """handle single key press"""
-        #     if symbol == key.F1:
-        #         # Save the comparison of the current place cells with all others
-        #         cell_id = self.workspace.memory.place_memory.current_cell_id
-        #         print(f"Comparing cell {cell_id} to other fully observed cells")
-        #         if cell_id > 0:
-        #             compare_place_cells(cell_id, self.workspace.memory.place_memory.place_cells)
-        #
         def on_mouse_press(x, y, button, modifiers):
             """ Computing the position of the mouse click relative to the place cell in mm and degrees """
             point = self.view.mouse_coordinates_to_point(x, y)
@@ -112,6 +96,18 @@ class CtrlPlaceCellView(CtrlWindow):
             self.echo_curve = self.view.polar_batch.add_indexed(nb, GL_LINES, self.view.forefront, index, ('v2i', li),
                                                                 ('c4B', nb * (*name_to_rgb("orange"), 255)))
 
+    def display_mouse(self, ego_point):
+        """Display the mouse information"""
+        if self.place_cell_id in self.workspace.memory.place_memory.place_cells:
+            ego_angle = math.degrees(math.atan2(ego_point[1], ego_point[0]))
+            allo_point = self.workspace.memory.egocentric_to_allocentric(ego_point)
+            place_cell = self.workspace.memory.place_memory.place_cells[self.place_cell_id]
+            place_point = allo_point - place_cell.point
+            place_dir = math.degrees(math.atan2(place_point[1], place_point[0]))
+            self.view.label3.text = f"Ego: {tuple(ego_point[0:2])}, {ego_angle:.0f}°. " \
+                                    f"Place: {tuple(place_point[:2].astype(int))}, {place_dir:.0f}°. " \
+                                    f"Allo: {tuple(allo_point[:2].astype(int))}"
+
     def main(self, dt):
         """Called every frame. Update the place cell view"""
         # The position of the robot in the view
@@ -120,7 +116,7 @@ class CtrlPlaceCellView(CtrlWindow):
 
         if self.place_cell_id in self.workspace.memory.place_memory.place_cells:
             place_cell = self.workspace.memory.place_memory.place_cells[self.place_cell_id]
-            self.view.label3.text = f'Position confidence: {place_cell.position_confidence}'
+            self.view.label2.text = f'Position confidence: {place_cell.position_confidence}'
             self.view.robot_translate = self.workspace.memory.allocentric_memory.robot_point - place_cell.point
             if self.workspace.enacter.interaction_step == ENACTION_STEP_RENDERING:
                 self.update_cue_displays()

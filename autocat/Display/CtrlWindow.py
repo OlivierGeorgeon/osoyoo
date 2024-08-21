@@ -1,3 +1,4 @@
+import math
 from .InteractiveWindow import InteractiveWindow
 from pyglet.window import key
 from ..Memory.PlaceMemory.PlaceGeometry import compare_all_place_cells
@@ -14,6 +15,11 @@ class CtrlWindow:
             """Handle user keypress"""
             self.workspace.process_user_key(text)
 
+        def on_mouse_motion(x, y, dx, dy):
+            """Display the position in allocentric memory and the cell in the grid"""
+            ego_point = self.view.window_to_ego_centric(x, y)
+            self.display_mouse(ego_point)
+
         def on_key_press(symbol, modifiers):
             """handle single key press"""
             # F1: save the comparison of the current place cells with all others
@@ -28,4 +34,9 @@ class CtrlWindow:
             # F3:
 
         # Add the event functions to the window
-        self.view.push_handlers(on_text, on_key_press)
+        self.view.push_handlers(on_text, on_mouse_motion, on_key_press)
+
+    def display_mouse(self, ego_point):
+        """Display the mouse information"""
+        ego_angle = math.degrees(math.atan2(ego_point[1], ego_point[0]))
+        self.view.label3.text = f"Ego: {tuple(ego_point[:2])}, {ego_angle:.0f}°"

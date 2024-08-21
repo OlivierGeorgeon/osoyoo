@@ -1,5 +1,6 @@
 from ..Proposer.Proposer import Proposer
 from ..Proposer.ProposerFocusPhenomenon import ProposerFocusPhenomenon
+from ..Proposer.ProposerPlaceCell import ProposerPlaceCell
 from ..Enaction import KEY_CONTROL_DECIDER
 
 
@@ -16,7 +17,8 @@ class Decider:
                           # , 'Push': ProposerPush(self.workspace)
                           # , 'Play': ProposerPlayForward(self)
                           # , "Play terrain": ProposerPlayTerrain(self)
-                          , "Point": ProposerFocusPhenomenon(self.workspace)
+                          # , "Point": ProposerFocusPhenomenon(self.workspace)
+                          , "Place_cell": ProposerPlaceCell(self.workspace)
                           }
 
     def main(self, dt):
@@ -48,7 +50,7 @@ class Decider:
             # print(" ", p[0], ":", p[1], p[2])
 
         # Select the enaction that has the highest activation value
-        most_activated_index = propositions.index(max(propositions, key=lambda p: p[1]))
+        most_activated_index = propositions.index(max(propositions, key=lambda x: x[1]))
         self.workspace.decider_id = propositions[most_activated_index][0].decider_id
         print("Decider:", self.workspace.decider_id)
         return propositions[most_activated_index][0]

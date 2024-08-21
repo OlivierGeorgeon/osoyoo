@@ -121,16 +121,22 @@ class InteractiveWindow(pyglet.window.Window):
         point_y = (y - self.drag_y - self.height / 2) * self.zoom_level
         return Vector3([point_x, point_y, 0], dtype=int)
 
-    def mouse_to_ego_point(self, x, y, button, modifiers):
-        """ Computing the position of the mouse click relative to the robot in mm and degrees """
-        ego_point = self.mouse_coordinates_to_point(x, y)
+    def window_to_ego_centric(self, x, y):
+        """ Return the egocentric from mouse x and y """
+        ego_point = self.mouse_coordinates_to_point(x, y) - self.robot_translate
         rotation_matrix = matrix44.create_from_z_rotation(math.radians(self.robot_rotate))
-        ego_point = matrix44.apply_to_vector(rotation_matrix, ego_point).astype(int)
-        ego_angle = math.degrees(math.atan2(ego_point[1], ego_point[0]))
-        # Display the mouse click coordinates at the bottom of the view
-        self.label3.text = f"Click: ({ego_point[0]:.0f}, {ego_point[1]:.0f}), angle: {ego_angle:.0f}°"
-        # Return the click position to the controller
-        return ego_point
+        return matrix44.apply_to_vector(rotation_matrix, ego_point).astype(int)
+
+    # def mouse_to_ego_point(self, x, y, button, modifiers):
+    #     """ Computing the position of the mouse click relative to the robot in mm and degrees """
+    #     ego_point = self.mouse_coordinates_to_point(x, y)
+    #     rotation_matrix = matrix44.create_from_z_rotation(math.radians(self.robot_rotate))
+    #     ego_point = matrix44.apply_to_vector(rotation_matrix, ego_point).astype(int)
+    #     ego_angle = math.degrees(math.atan2(ego_point[1], ego_point[0]))
+    #     # Display the mouse click coordinates at the bottom of the view
+    #     self.label3.text = f"Click: ({ego_point[0]:.0f}, {ego_point[1]:.0f}), angle: {ego_angle:.0f}°"
+    #     # Return the click position to the controller
+    #     return ego_point
 
     def on_resize(self, width, height):
         """ Adjusting the viewport when resizing the window """
