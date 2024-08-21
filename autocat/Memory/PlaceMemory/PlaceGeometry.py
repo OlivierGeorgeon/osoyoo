@@ -6,6 +6,7 @@ import pandas as pd
 import open3d as o3d
 import csv
 import matplotlib.pyplot as plt
+import threading
 from pyrr import Quaternion
 from . import MIN_PLACE_CELL_DISTANCE, ICP_DISTANCE_THRESHOLD, ANGULAR_RESOLUTION, MASK_ARRAY
 from ...Robot import NO_ECHO_DISTANCE
@@ -14,60 +15,24 @@ from ...Memory.EgocentricMemory.Experience import EXPERIENCE_CENTRAL_ECHO
 from ...Utils import quaternion_to_direction_rad
 
 
-def transform_estimation_cue_to_cue(points1, points2, threshold=ICP_DISTANCE_THRESHOLD):
+def transform_estimation_cue_to_cue(points1, points2, threshold=ICP_DISTANCE_THRESHOLD, trans_init=None):
     """Return the transformation from points1 to points2 using o3d ICP algorithm"""
-    # print("Cues 1", cues1)
-    # print("Cues 2", cues2)
     # Create the o3d point clouds
     pcd1 = o3d.geometry.PointCloud()
     pcd2 = o3d.geometry.PointCloud()
     # Converting to integers seems to avoid rotation
     pcd1.points = o3d.utility.Vector3dVector(np.array(points1, dtype=int))
     pcd2.points = o3d.utility.Vector3dVector(np.array(points2, dtype=int))
-    trans_init = np.eye(4)  # Initial transformation matrix (4x4 identity matrix)
+    if trans_init is None:
+        trans_init = np.eye(4)  # Initial transformation matrix (4x4 identity matrix)
+
     # Apply ICP
-    reg_p2p = o3d.pipelines.registration.registration_icp(
-        pcd1, pcd2, threshold, trans_init,
-        o3d.pipelines.registration.TransformationEstimationPointToPoint()
-        # Add robust kernel (e.g., TukeyLoss)
-        # , loss = o3d.pipelines.registration.TukeyLoss(k=0.2)
-    )
-    # Compute the similarity
-    correspondence_set = np.asarray(reg_p2p.correspondence_set)
-    residual_distance = 0
-    source_points_transformed = np.asarray(pcd1.points)
-    if len(correspondence_set) == 0:
-        print("ICP no match")
-    else:
-        # Print the correspondence
-        # for i, j in np.asarray(reg_p2p.correspondence_set):
-        #     t = np.sqrt(np.linalg.norm(np.asarray(pcd1.points)[i] - np.asarray(pcd2.points)[j])**2)
-        #     print(f"Match {np.asarray(pcd1.points)[i, 0:2]} - {np.asarray(pcd2.points)[j, 0:2]} = {t:.0f}")
-
-        # average_distance = np.mean([np.linalg.norm(np.asarray(pcd1.points)[i] - np.asarray(pcd2.points)[j])
-        #                             for i, j in correspondence_set])
-        # print(f"ICP average source-target distance: {average_distance:.0f}, fitness: {reg_p2p.fitness:.2f}")
-
-        # Apply the transformation to the source cloud
-        pcd1.transform(reg_p2p.transformation)
-        source_points_transformed = np.asarray(pcd1.points)
-
-        # Compute the distances between corresponding points
-        target_points_corresponding = np.asarray(pcd2.points)[correspondence_set[:, 1]]
-
-        distances = np.linalg.norm(
-            source_points_transformed[correspondence_set[:, 0]] - target_points_corresponding, axis=1
-        )
-
-        # Compute Mean (not Squared Error MSE)
-        residual_distance = np.mean(distances)
-
-        # Compute the proportion of good correspondences
-        good_correspondences_ratio = np.mean(distances < threshold)
-        # print(f"ICP residual average distance: {mse:.0f}, nb close {good_correspondences_ratio}")
-
+    estimation_method = o3d.pipelines.registration.TransformationEstimationPointToPoint()
+    # criteria = o3d.pipelines.registration.ICPConvergenceCriteria()
+    reg_p2p = o3d.pipelines.registration.registration_icp(pcd1, pcd2, threshold, trans_init, estimation_method)
+                                                          # criteria=criteria)
     # Return the resulting transformation
-    return reg_p2p, residual_distance, source_points_transformed  # .transformation
+    return reg_p2p
 
 
 def nearby_place_cell(robot_point, place_cells):
@@ -128,7 +93,7 @@ def resample_by_diff(polar_points, theta_span, r_tolerance=30):
     return points_of_interest.sort_values(by='theta').to_numpy()
 
 
-def compare_place_cells(cell_id, place_cells):
+def compare_all_place_cells(cell_id, place_cells):
     """Print a comparison of this place cell with all others"""
     if len(place_cells) < 2:
         return
@@ -138,7 +103,7 @@ def compare_place_cells(cell_id, place_cells):
     for k, p in place_cells.items():
         if k != cell_id and p.is_fully_observed():
             points2 = np.array([c.point() for c in place_cells[k].cues if c.type == EXPERIENCE_CENTRAL_ECHO])
-            reg_p2p, residual_distance, points_transformed = transform_estimation_cue_to_cue(points1, points2)
+            reg_p2p = transform_estimation_cue_to_cue(points1, points2)
             # print("Transformation\n", reg_p2p.transformation)
             translation = -reg_p2p.transformation[0:2, 3].astype(int)
             rotation_deg = round(math.degrees(
@@ -146,54 +111,88 @@ def compare_place_cells(cell_id, place_cells):
             print(f"Compare cell {cell_id} to cell {k}: "
                   f"translation: {tuple(translation)}, "
                   f"rotation: {rotation_deg:.0f}, "
-                  f"residual: {residual_distance:.0f}, fitness: {reg_p2p.fitness:.2f}")
+                  f"fitness: {reg_p2p.fitness:.2f}, "
+                  f"rmse: {reg_p2p.inlier_rmse:.0f}")  # Root mean square error (residual distance)
             # Save the plot
-            plot_correspondences(points1, points2, points_transformed, reg_p2p, residual_distance, cell_id, k)
+            plot_correspondences(points1, points2, reg_p2p, cell_id, k)
             # Save the comparison
-            comparisons[k] = (translation[0], translation[1], rotation_deg, round(residual_distance),
-                              round(reg_p2p.fitness, 2))
+            comparisons[k] = (translation[0], translation[1], rotation_deg,
+                              round(reg_p2p.fitness, 2), round(reg_p2p.inlier_rmse))
 
     # Save the comparison file
     with open(f"log/01_compare_{cell_id}.csv", 'w', newline='') as file:
-        csv.writer(file).writerow(["cell", "translate_x", "translate_y", "rotation", "residual", "fitness"])
+        csv.writer(file).writerow(["cell", "translate_x", "translate_y", "rotation", "fitness", "rmse"])
     with open(f"log/01_compare_{cell_id}.csv", 'a', newline='') as file:
         writer = csv.writer(file)
         for k, v in comparisons.items():
             writer.writerow([k, *v])
 
 
-def plot_correspondences(source_points, target_points, source_points_transformed, reg_p2p, residual_distance, k1, k2):
+def compare_place_cells(place_source, place_target):
+    """Compare two place cells based on central echoes"""
+    points1 = np.array([c.point() for c in place_source.cues if c.type == EXPERIENCE_CENTRAL_ECHO])
+    points2 = np.array([c.point() for c in place_target.cues if c.type == EXPERIENCE_CENTRAL_ECHO])
+    trans_init = np.eye(4)  # Initial transformation matrix (4x4 identity matrix)
+    trans_init[0:3, 3] = place_source.point - place_target.point
+    # print(f"Comparing Place {place_source.key} to Place {place_target.key} "
+    #       f"with trans_init: {tuple(trans_init[0:2, 3].astype(int))}")
+    reg_p2p = transform_estimation_cue_to_cue(points1, points2, 100, trans_init)
+    translation = -reg_p2p.transformation[:3, 3].astype(int)
+    rotation_deg = round(math.degrees(
+        quaternion_to_direction_rad(Quaternion.from_matrix(reg_p2p.transformation[:3, :3]))))
+    print(f"Compare cell {place_source.key} to cell {place_target.key}: "
+          f"translation: {tuple(translation[:2])}, "
+          f"rotation: {rotation_deg:.0f}, "
+          f"fitness: {reg_p2p.fitness:.2f}, "
+          f"rmse: {reg_p2p.inlier_rmse:.0f}")  # Root mean square error (residual distance)
+    # Save the plot
+    plot_correspondences(points1, points2, reg_p2p, place_source.key, place_target.key)
+
+    return translation
+
+
+def plot_correspondences(source_points, target_points, reg_p2p, k1, k2):
     """Save a plot of the correspondence"""
     plt.figure()
 
-    correspondence_set = np.asarray(reg_p2p.correspondence_set)
+    # Plot invisible points to scale the axes
+    plt.axis('equal')
+    plt.plot(1000, 1000, marker=' ')
+    plt.plot(-1000, -1000, marker=' ')
 
-    # The robot at coordinates (0, 0)
+    # Plot the robot at coordinates (0, 0)
     plt.scatter(0, 0, s=1000, color='darkSlateBlue')
-    # The translated robot
+
+    # Plot the robot translate by the transformation
     plt.scatter(reg_p2p.transformation[0, 3], reg_p2p.transformation[1, 3], s=1000, color='lightSteelBlue')
 
-    # Plot source points
-    plt.scatter(source_points[:, 0], source_points[:, 1], c='sienna', label=f"Place {k1}", marker="s")
+    # Plot the source points
+    plt.scatter(source_points[:, 0], source_points[:, 1], c='sienna', label=f"Place {k1}")
 
-    # Plot segments from source points to target points
-    for idx in correspondence_set:
+    # Plot the segments from source points to target points
+    # correspondence_set = np.asarray(reg_p2p.correspondence_set)
+    for idx in np.asarray(reg_p2p.correspondence_set):
         i, j = idx
-        plt.plot([source_points[i, 0], target_points[j, 0]],
-                 [source_points[i, 1], target_points[j, 1]], c='k')
+        plt.plot([source_points[i, 0], target_points[j, 0]],[source_points[i, 1], target_points[j, 1]], c='k')
 
-    # Plot target points in green first in the background
-    plt.scatter(target_points[:, 0], target_points[:, 1], c='g', label=f"Place {k2}")
-
-    # Plot transformed source points
+    # Plot the transformed source points
+    pcd1 = o3d.geometry.PointCloud()
+    pcd1.points = o3d.utility.Vector3dVector(np.array(source_points, dtype=int))
+    pcd1.transform(reg_p2p.transformation)
+    source_points_transformed = np.asarray(pcd1.points)
     plt.scatter(source_points_transformed[:, 0], source_points_transformed[:, 1], c='sienna', marker="^",
                 label=f"{k1} moved to {k2}")
 
+    # Plot the target points in green first in the background
+    plt.scatter(target_points[:, 0], target_points[:, 1], c='#ffb366', label=f"Place {k2}")
+
+    # Plot the axis and legends
     plt.legend()
     plt.xlabel('West - East')
     plt.ylabel('South - North')
-    plt.title(f"Compare {k1} to {k2}. Residual: {residual_distance:.0f}, fitness: {reg_p2p.fitness:.2f}")
-    # plt.show()
+    plt.title(f"Compare {k1} to {k2}. Fitness: {reg_p2p.fitness:.2f}. RMSE: {reg_p2p.inlier_rmse:.0f}")
+
+    # Save the plot
     try:
         plt.savefig(f"log/02_compare_{k1}_{k2}.pdf")
     except PermissionError:

@@ -7,7 +7,7 @@ from ..InteractiveWindow import InteractiveWindow
 from ..ShapeDisplay import ShapeDisplay
 from ...Enaction import ENACTION_STEP_RENDERING
 from ...Memory.EgocentricMemory.Experience import FLOOR_COLORS
-from ...Memory.PlaceMemory.PlaceGeometry import compare_place_cells
+from ...Memory.PlaceMemory.PlaceGeometry import compare_all_place_cells
 from ..CtrlWindow import CtrlWindow
 
 

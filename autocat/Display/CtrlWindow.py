@@ -1,6 +1,6 @@
 from .InteractiveWindow import InteractiveWindow
 from pyglet.window import key
-from ..Memory.PlaceMemory.PlaceGeometry import compare_place_cells
+from ..Memory.PlaceMemory.PlaceGeometry import compare_all_place_cells
 
 
 class CtrlWindow:
@@ -21,7 +21,7 @@ class CtrlWindow:
                 cell_id = self.workspace.memory.place_memory.current_cell_id
                 print(f"Comparing cell {cell_id} to other fully observed cells")
                 if cell_id > 0:
-                    compare_place_cells(cell_id, self.workspace.memory.place_memory.place_cells)
+                    compare_all_place_cells(cell_id, self.workspace.memory.place_memory.place_cells)
             # F2: start a new subgraph
             if symbol == key.F2:
                 self.workspace.memory.place_memory.graph_start_id = self.workspace.memory.place_memory.place_cell_id + 1

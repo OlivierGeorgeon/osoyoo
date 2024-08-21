@@ -54,6 +54,6 @@ workspace.enaction = enaction
 workspace.memory.update(enaction)
 
 
-ctrl_egocentric_view.update_points_of_interest()
+ctrl_egocentric_view.move_and_add_shapes()
 
 pyglet.app.run()

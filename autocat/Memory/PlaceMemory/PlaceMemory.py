@@ -6,7 +6,7 @@ from ...Memory.PlaceMemory.PlaceCell import PlaceCell
 from ...Memory.PlaceMemory.Cue import Cue
 from ...Memory.EgocentricMemory.Experience import EXPERIENCE_COMPASS, EXPERIENCE_NORTH, EXPERIENCE_CENTRAL_ECHO, \
     EXPERIENCE_LOCAL_ECHO, EXPERIENCE_ALIGNED_ECHO
-from .PlaceGeometry import nearby_place_cell, transform_estimation_cue_to_cue
+from .PlaceGeometry import nearby_place_cell, transform_estimation_cue_to_cue, compare_place_cells
 
 
 class PlaceMemory:
@@ -56,7 +56,7 @@ class PlaceMemory:
                     self.proposed_correction[:] = estimated_allo_robot_point - memory.allocentric_memory.robot_point
                     print(f"Position relative to place cell {self.current_cell_id}: "
                           f"{tuple(estimated_robot_point[:2].astype(int))}, "
-                          f" propose correction:  {tuple(self.proposed_correction[:2].astype(int))}")
+                          f"propose correction: {tuple(self.proposed_correction[:2].astype(int))}")
                 # If no local echoes then try to adjust the position based on aligned echo
                 else:
                     align_experiences = [e for e in memory.egocentric_memory.experiences.values()
@@ -80,6 +80,12 @@ class PlaceMemory:
                 self.add_cues_relative_to_center(existing_id, memory.allocentric_memory.robot_point, experiences)
                 # Recompute the echo curve
                 self.place_cells[existing_id].compute_echo_curve()
+                # If the cell is now fully observed then plot the comparison with the previous cell
+                if self.place_cells[existing_id].is_fully_observed() and self.previous_cell_id > 0 and \
+                        self.place_cells[self.previous_cell_id].is_fully_observed():
+                    t = compare_place_cells(self.place_cells[existing_id], self.place_cells[self.previous_cell_id])
+                    self.proposed_correction[:] = self.place_cells[self.previous_cell_id].point - t - self.place_cells[existing_id].point
+                    print(f"propose correction: {tuple(self.proposed_correction[:2].astype(int))}")
 
             # If the robot just moved to an existing place cell
             if existing_id != self.current_cell_id:
@@ -157,12 +163,6 @@ class PlaceMemory:
             pose_matrix = d_matrix * e.polar_pose_matrix()
             cue = Cue(e.id, pose_matrix, e.type, e.clock, e.color_index, e.polar_sensor_point())
             self.place_cells[place_cell_id].cues.append(cue)
-        # Add the cues to the existing place cell
-        # self.place_cells[place_cell_id].cues.extend(cues)
-        # Recompute the echo curve
-        # self.place_cells[place_cell_id].compute_echo_curve()
-        # The robot is at this place cell
-        # self.current_robot_cell_id = place_cell_id
 
     def current_place_cell(self):
         """Return the current place cell"""

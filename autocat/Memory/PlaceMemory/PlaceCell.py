@@ -26,10 +26,6 @@ class PlaceCell:
         """Return the string of the tuple of the place cell coordinates"""
         return tuple(self.point[0:2].astype(int)).__str__()
 
-    # def __hash__(self):
-    #     """Return the hash to use place cells as nodes in networkx"""
-    #     return hash(self.key)
-    #
     def place_centric_to_allocentric(self, point):
         """Return the point in place-cell coordinates from the point in allocentric coordinates"""
         if point is not None:
@@ -39,25 +35,18 @@ class PlaceCell:
         """Return the vector of the position defined by previous cues minus the position by the new cues"""
         # Translation estimation based on echoes
         place_echo_points = np.array([c.point() for c in self.cues if c.type == experience_type])
-        reg_p2p, residual_distance, points_transformed = transform_estimation_cue_to_cue(
-            points, place_echo_points, MIN_PLACE_CELL_DISTANCE)
+        reg_p2p = transform_estimation_cue_to_cue(points, place_echo_points, MIN_PLACE_CELL_DISTANCE)
 
         # Move the robot in the same direction as moving the new local echoes to the place cell
         translation = np.array(reg_p2p.transformation[0:3, 3])
         rotation_deg = math.degrees(quaternion_to_direction_rad(Quaternion.from_matrix(reg_p2p.transformation[:3, :3])))
         print(f"Estimation echo rotation: {rotation_deg:.0f} degree")
         # Plot
-        plot_correspondences(points, place_echo_points, points_transformed, reg_p2p, residual_distance, "Scan", self.key)
+        plot_correspondences(points, place_echo_points, reg_p2p, "Scan", self.key)
         # If rotation too high then cancel the position correction
         # if abs(rotation_deg) > 10:
         #     translation[:] = 0
 
-        return translation
-
-        # # Assume FLOOR experiences come from a single point
-        # for new_cue in [cue for cue in cues if cue.type == EXPERIENCE_FLOOR]:
-        #     for previous_cue in [cue for cue in self.cues if cue.type == EXPERIENCE_FLOOR]:
-        #         translation = previous_cue.point() - new_cue.point()
         return translation
 
     def compute_echo_curve(self):
@@ -92,7 +81,7 @@ class PlaceCell:
         if len(central_cues) > 0:
             nearest_central_cue = min(central_cues, key=lambda c: np.linalg.norm(c.point() - point))
             proposed_correction = nearest_central_cue.point() - point
-            print(f"Central echo: {tuple(point[:2].astype(int))}, "
+            print(f"Aligned echo: {tuple(point[:2].astype(int))}, "
                   f"nearest central echo: {tuple(nearest_central_cue.point()[:2].astype(int))}")
             return proposed_correction
         else:
