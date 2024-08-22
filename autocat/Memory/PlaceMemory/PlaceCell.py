@@ -6,7 +6,7 @@ from pyrr import Quaternion
 from . import ANGULAR_RESOLUTION, CONE_HALF_ANGLE, MIN_PLACE_CELL_DISTANCE
 from ..EgocentricMemory.EgocentricMemory import EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_CENTRAL_ECHO, EXPERIENCE_LOCAL_ECHO
 from ...Utils import polar_to_cartesian, quaternion_to_direction_rad, translation_quaternion_to_matrix
-from .PlaceGeometry import transform_estimation_cue_to_cue, point_to_polar_array, resample_by_diff, plot_correspondences
+from .PlaceGeometry import transform_estimation_cue_to_cue, point_to_polar_array, resample_by_diff, plot_compare
 from .Cue import Cue
 
 
@@ -42,7 +42,7 @@ class PlaceCell:
         rotation_deg = math.degrees(quaternion_to_direction_rad(Quaternion.from_matrix(reg_p2p.transformation[:3, :3])))
         print(f"Estimation echo rotation: {rotation_deg:.0f} degree")
         # Plot
-        plot_correspondences(points, place_echo_points, reg_p2p, "Scan", self.key)
+        plot_compare(points, place_echo_points, reg_p2p, "Scan", self.key)
         # If rotation too high then cancel the position correction
         # if abs(rotation_deg) > 10:
         #     translation[:] = 0

@@ -156,7 +156,7 @@ class Memory:
         current_cell.point += cell_correction
         print(f"Place {self.place_memory.current_cell_id} adjusted by: "
               f"{tuple(cell_correction[0:2].astype(int))}")
-        # Propagate the confidence of the previous place cell if it is lower
+        # Propagate the confidence of the previous place cell
         current_cell.position_confidence = max(current_cell.position_confidence, self.place_memory.place_cells[
             self.place_memory.previous_cell_id].position_confidence)
 

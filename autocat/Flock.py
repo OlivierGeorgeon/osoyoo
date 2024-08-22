@@ -45,7 +45,6 @@ class Flock:
         """Update the robots"""
         start_time = time.time()
         for robot_id in self.workspaces.keys():
-            # self.ctrl_robots[robot_id].main(dt)
             self.workspaces[robot_id].main(dt)
             loop_duration1 = time.time() - start_time
             self.deciders[robot_id].main(dt)
@@ -66,10 +65,9 @@ class Flock:
                     self.workspaces[key_receiver].receive_message(self.workspaces[key_sender].emit_message())
         main_loop_duration = time.time() - start_time
         if main_loop_duration > 0.1:
-            print(f"Main loop duration: {main_loop_duration:.3f} seconds. After workspace: {loop_duration1:.3f}. "
-                  f"After decider {loop_duration2:.3f}. "
-                  f"After ego-display {loop_duration3:.3f}. After allo-display {loop_duration4:.3f}. "
-                  f"After body display {loop_duration5:.3f}.")
+            print(f"Main loop duration: {main_loop_duration:.3f}s. Workspace {loop_duration1:.3f}s "
+                  f"Decider {loop_duration2:.3f}s Ego_display {loop_duration3:.3f}s "
+                  f"Allo_display {loop_duration4:.3f}s Body_display: {loop_duration5:.3f}s")
 
         # # Pass the message from robot '2' to robot '1'
         # if all(key in self.workspaces for key in ['1', '2']):

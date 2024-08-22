@@ -4,8 +4,8 @@
 import math
 import numpy as np
 from ...Utils import polar_to_cartesian
-from .PlaceGeometry import transform_estimation_cue_to_cue, plot_correspondences, unscanned_direction, open_direction, \
-    open_direction2, point_to_polar_array, resample_by_diff
+from .PlaceGeometry import transform_estimation_cue_to_cue, plot_compare, unscanned_direction, open_direction, \
+    open_direction, point_to_polar_array, resample_by_diff
 
 polar1 = np.array([[0, -math.pi/4], [10, 0], [10, math.pi/2], [20, 3*math.pi/4]])
 cartesian1 = polar_to_cartesian(polar1)
@@ -19,7 +19,7 @@ cartesian2 = np.array([[50, -500, 0], [500, 50, 0], [500, 600, 0], [-500, 600, 0
 
 # Test transformation estimation
 reg_p2p = transform_estimation_cue_to_cue(cartesian1, cartesian2, 5)
-plot_correspondences(cartesian1, cartesian2, reg_p2p, 0, 0)
+# plot_compare(cartesian1, cartesian2, reg_p2p, 0, 0)
 print("Transformation\n", reg_p2p.transformation)
 
 
@@ -37,19 +37,21 @@ points = [[1500, 0],
           [1300, 50/180 * math.pi],
           [1300, 60/180 * math.pi],
           [1300, 70/180 * math.pi],
-          [10, 80/180 * math.pi],
+          [0, 80/180 * math.pi],
           [1400, 90/180 * math.pi],
           [1400, 100/180 * math.pi],
           [10, 110/180 * math.pi],
           [1500, 120/180 * math.pi]
           ]
 
-print("Test resample by diff")
+# print("Test resample by diff")
 # print(resample_by_diff(points, 20, r_tolerance=10))
-theta, span = unscanned_direction(points)
+
+# theta, span = unscanned_direction(points)
 # print(f"Direction unscanned {round(math.degrees(theta))}°, span {round(math.degrees(span))}")
 
 # print(f"Open direction {round(math.degrees(open_direction(points)))}°")
 
 print("Open direction > 500")
-print(f"Open direction 2: {open_direction2(points)}")
+a, min, max = open_direction(points)
+print(f"Open_direction: average: {a}, min: {min}, max: {max}")

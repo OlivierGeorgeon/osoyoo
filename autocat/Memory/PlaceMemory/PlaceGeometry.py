@@ -81,16 +81,21 @@ def resample_by_diff(polar_points, theta_span, r_tolerance=30):
         df.loc[max_group_mask, 'theta'] = df.loc[max_group_mask, 'theta'].apply(lambda x: x - 2 * math.pi)
         df.loc[max_group_mask, 'group'] = 0
 
-    # Group by the grouping key and calculate the mean r, mean theta, and span for each group
-    grouped = df.groupby('group').agg(
-        {'r': 'mean', 'theta': ['mean', lambda x: x.max() - x.min()]}
-    ).reset_index(drop=True)
-    grouped.columns = ['r', 'theta', 'span']
-    large_group_points = grouped[(grouped['span'] >= theta_span) & (grouped['r'] > 0)
-                                 & (grouped['r'] < NO_ECHO_DISTANCE)]
+    # Group by the grouping key
+    grouped = df.groupby('group')
+
+    # Calculate the mean r, mean theta, and span for each group
+    # result = grouped.agg({'r': 'mean', 'theta': ['mean', lambda x: x.max() - x.min()]})  # .reset_index(drop=True)
+    result = grouped.agg(r=('r', 'mean'), theta=('theta', 'mean'), span=('theta', lambda x: x.max() - x.min()))
+    # grouped.columns = ['r', 'theta', 'span']
+
+    # The points
+    large_group_points = result[(result['span'] >= theta_span) & (result['r'] > 0) & (result['r'] < NO_ECHO_DISTANCE)]
     # print("groups\n", grouped, f"theta_span {theta_span}")
 
+    # Concatenate the diff points and the large group points
     points_of_interest = pd.concat([diff_points, large_group_points[['r', 'theta']]], ignore_index=True)
+
     return points_of_interest.sort_values(by='theta').to_numpy()
 
 
@@ -110,51 +115,51 @@ def unscanned_direction(polar_points):
         df.loc[max_group_mask, 'theta'] = df.loc[max_group_mask, 'theta'].apply(lambda x: x - 2 * math.pi)
         df.loc[max_group_mask, 'group'] = 0
 
-    # Group by the grouping key and calculate the mean r, mean theta, and span for each group
-    grouped = df.groupby('group').agg(
-        {'r': 'mean', 'theta': ['mean', lambda x: x.max() - x.min()]}
-    ).reset_index(drop=True)
-    grouped.columns = ['r', 'theta', 'span']
-    print(grouped)
+    # Group by the grouping key
+    grouped = df.groupby('group')
 
-    matches = grouped.loc[grouped['r'] == 0, ['theta', 'span']]
-    # Check if there are any matching rows
+    # Calculate the mean r, mean theta, and span for each group
+    result = grouped.agg(r=('r', 'mean'), theta=('theta', 'mean'), span=('theta', lambda x: x.max() - x.min()))
+    # print(result)
+
+    # Find the group for which r is zero
+    matches = result.loc[result['r'] == 0, ['theta', 'span']]
+    # Check if there are any matching rows and retrieve it
     if matches.empty:
         theta_unscanned, span_unscanned = None, None
     else:
-        # Retrieve the first 'theta' and 'span' values from the filtered DataFrame
         theta_unscanned, span_unscanned = matches.iloc[0]
+
     return theta_unscanned, span_unscanned
 
 
+# def open_direction(polar_points):
+#     """Return the array of points where difference is greater that tolerance"""
+#     # Convert point array to a sorted pandas DataFrame
+#     polar_points = polar_points.copy()
+#     df = pd.DataFrame(polar_points, columns=['r', 'theta'])  # .sort_values(by='theta').reset_index(drop=True)
+#
+#     # Create a grouping key for streaks of similar r values
+#     df['group'] = (df['r'].diff().abs() > 30).cumsum()
+#
+#     # If same group at 0 and 2pi
+#     if abs(df['r'].iloc[0] - df['r'].iloc[-1]) < 30:
+#         # Subtract 2pi to the last group and name it group 0 to wrap the last streak
+#         max_group_mask = (df['group'] == max(df['group']))
+#         df.loc[max_group_mask, 'theta'] = df.loc[max_group_mask, 'theta'].apply(lambda x: x - 2 * math.pi)
+#         df.loc[max_group_mask, 'group'] = 0
+#
+#     # Group by the grouping key
+#     grouped = df.groupby('group')
+#
+#     # Calculate the mean r and theta, and span for each group
+#     result = grouped.agg(r=('r', 'mean'), theta=('theta', 'mean'), span=('theta', lambda x: x.max() - x.min()))
+#
+#     print(result)
+#     return result.at[result['r'].idxmax(), 'theta']
+
+
 def open_direction(polar_points):
-    """Return the array of points where difference is greater that tolerance"""
-    # Convert point array to a sorted pandas DataFrame
-    polar_points = polar_points.copy()
-    df = pd.DataFrame(polar_points, columns=['r', 'theta'])  # .sort_values(by='theta').reset_index(drop=True)
-
-    # Create a grouping key for streaks of similar r values
-    df['group'] = (df['r'].diff().abs() > 30).cumsum()
-
-    # If same group at 0 and 2pi
-    if abs(df['r'].iloc[0] - df['r'].iloc[-1]) < 30:
-        # Subtract 2pi to the last group and name it group 0 to wrap the last streak
-        max_group_mask = (df['group'] == max(df['group']))
-        df.loc[max_group_mask, 'theta'] = df.loc[max_group_mask, 'theta'].apply(lambda x: x - 2 * math.pi)
-        df.loc[max_group_mask, 'group'] = 0
-
-    # Group by the grouping key and calculate the mean r and theta for each group
-    grouped = df.groupby('group').agg(
-        {'r': 'mean', 'theta': ['mean', lambda x: x.max() - x.min()]}
-    ).reset_index(drop=True)
-    grouped.columns = ['r', 'theta', 'span']
-    print(grouped)
-    max_value_index = grouped['r'].idxmax()
-    # print(f"Max value index {max_value_index}")
-    return grouped.at[max_value_index, 'theta']
-
-
-def open_direction2(polar_points):
     """Return the array of points where difference is greater that tolerance"""
     # Convert point array to a sorted pandas DataFrame
     polar_points = polar_points.copy()
@@ -169,24 +174,25 @@ def open_direction2(polar_points):
     df['group'] = (greater_than_threshold != greater_than_threshold.shift()).cumsum()
     # If same group at 0 and 2pi
     if df['r'].iloc[0] > 500 and df['r'].iloc[-1] > 500:
-        print("round group")
+        # print("round group")
         # Subtract 2pi to the last group and name it group 0 to wrap the last streak
         max_group_mask = (df['group'] == max(df['group']))
         df.loc[max_group_mask, 'theta'] = df.loc[max_group_mask, 'theta'].apply(lambda x: x - 2 * math.pi)
         df.loc[max_group_mask, 'group'] = 1  # For some reason the first group is 1 and not 0
-    print("df\n", df)
+    # print("df\n", df)
 
     # Group by the consecutive groups and filter for those that meet the threshold condition
-    # grouped = df[greater_than_threshold].groupby(consecutive_groups)
     grouped = df[greater_than_threshold].groupby('group')
 
     # Calculate the average theta and the span for each group
-    result = grouped['theta'].agg(theta=('mean'), span=(lambda x: x.max() - x.min()))
+    # result = grouped['theta'].agg(theta=('mean'), span=(lambda x: x.max() - x.min()), size=('size'))
+    result = grouped.agg(r=('r', 'mean'), theta=('theta', 'mean'), min_theta=('theta', 'min'),
+                         max_theta=('theta', 'max'), span=('theta', lambda x: x.max() - x.min()))
 
     # Display the result
     print(result)
     max_value_index = result['span'].idxmax()
-    return result.at[max_value_index, 'theta']
+    return tuple(result.loc[max_value_index, ['theta', 'min_theta', 'max_theta']])
 
 
 def compare_all_place_cells(cell_id, place_cells):
@@ -210,7 +216,7 @@ def compare_all_place_cells(cell_id, place_cells):
                   f"fitness: {reg_p2p.fitness:.2f}, "
                   f"rmse: {reg_p2p.inlier_rmse:.0f}")  # Root mean square error (residual distance)
             # Save the plot
-            plot_correspondences(points1, points2, reg_p2p, cell_id, k)
+            plot_compare(points1, points2, reg_p2p, cell_id, k)
             # Save the comparison
             comparisons[k] = (translation[0], translation[1], rotation_deg,
                               round(reg_p2p.fitness, 2), round(reg_p2p.inlier_rmse))
@@ -241,13 +247,19 @@ def compare_place_cells(place_source, place_target):
           f"rotation: {rotation_deg:.0f}, "
           f"fitness: {reg_p2p.fitness:.2f}, "
           f"rmse: {reg_p2p.inlier_rmse:.0f}")  # Root mean square error (residual distance)
-    # Save the plot
-    plot_correspondences(points1, points2, reg_p2p, place_source.key, place_target.key)
+
+    # Save the plot in an asynchronous thread
+    thread = threading.Thread(target=plot_compare, args=(points1, points2, reg_p2p, place_source.key, place_target.key))
+    thread.start()
+
+    # If less than three points match or rotation then cancel the translation
+    if len(reg_p2p.correspondence_set) < 3 or rotation_deg > 10:
+        translation = None
 
     return translation
 
 
-def plot_correspondences(source_points, target_points, reg_p2p, k1, k2):
+def plot_compare(source_points, target_points, reg_p2p, k1, k2):
     """Save a plot of the correspondence"""
     plt.figure()
 
