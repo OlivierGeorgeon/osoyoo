@@ -7,6 +7,7 @@ from ...Memory.PlaceMemory.Cue import Cue
 from ...Memory.EgocentricMemory.Experience import EXPERIENCE_COMPASS, EXPERIENCE_NORTH, EXPERIENCE_CENTRAL_ECHO, \
     EXPERIENCE_LOCAL_ECHO, EXPERIENCE_ALIGNED_ECHO
 from .PlaceGeometry import nearby_place_cell, transform_estimation_cue_to_cue, compare_place_cells
+from ...SoundPlayer import SoundPlayer, SOUND_SURPRISE, SOUND_PLACE_CELL
 
 
 class PlaceMemory:
@@ -60,6 +61,7 @@ class PlaceMemory:
                     if np.linalg.norm(self.proposed_correction[:]) < 200:
                         # Adjust the position and confidence
                         memory.adjust_robot_position(self.place_cells[existing_id])
+                        SoundPlayer.play(SOUND_SURPRISE)
             # If the cell is not fully observed
             else:
                 # Add the cues including the local echoes
@@ -98,6 +100,7 @@ class PlaceMemory:
                                 memory.body_memory.head_direction_degree()) < 40:
                             # Adjust the position and increase confidence
                             memory.adjust_robot_position(self.place_cells[existing_id])
+                            SoundPlayer.play(SOUND_SURPRISE)
                         else:
                             self.observe_better = True
                     else:
@@ -118,6 +121,7 @@ class PlaceMemory:
             # Create a new place cell
             self.create_place_cell(memory.allocentric_memory.robot_point, experiences)
             print(f"Moving from Place {self.previous_cell_id} to new Place {self.current_cell_id}")
+            SoundPlayer.play(SOUND_PLACE_CELL)
 
         self.place_cells[self.current_cell_id].last_visited_clock = memory.clock
 

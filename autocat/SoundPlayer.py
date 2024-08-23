@@ -8,6 +8,7 @@ SOUND_MESSAGE = 'chirp.wav'
 SOUND_FLOOR = 'cyberpunk3.wav'
 SOUND_IMPACT = 'cute_beep1.wav'
 SOUND_SURPRISE = 'chirp3.mp3'
+SOUND_PLACE_CELL = 'R7.wav'
 
 
 class SoundPlayer:
@@ -28,6 +29,7 @@ class SoundPlayer:
                 cls._sounds[SOUND_FLOOR] = pyglet.media.load(f'autocat/Assets/{SOUND_FLOOR}', streaming=False)
                 cls._sounds[SOUND_IMPACT] = pyglet.media.load(f'autocat/Assets/{SOUND_IMPACT}', streaming=False)
                 cls._sounds[SOUND_SURPRISE] = pyglet.media.load(f'autocat/Assets/{SOUND_SURPRISE}', streaming=False)
+                cls._sounds[SOUND_PLACE_CELL] = pyglet.media.load(f'autocat/Assets/{SOUND_PLACE_CELL}', streaming=False)
                 cls._initialized = 2
             except pyglet.media.codecs.wave.WAVEDecodeException as e:
                 print("Error loading sound files", e)
