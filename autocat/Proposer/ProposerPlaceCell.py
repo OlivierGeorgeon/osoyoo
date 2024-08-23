@@ -23,6 +23,7 @@ class ProposerPlaceCell(Proposer):
 
         # If no place or observe better cell then scan
         if self.workspace.memory.place_memory.current_cell_id == 0 or self.workspace.memory.place_memory.observe_better:
+            e_memory.body_memory.neurotransmitters[:] = [50, 50, 60]  # Noradrenaline
             i0 = self.workspace.primitive_interactions[(ACTION_SCAN, OUTCOME_PROMPT)]
             e0 = Enaction(i0, e_memory, span=10)
             self.workspace.memory.place_memory.observe_better = False
@@ -31,6 +32,7 @@ class ProposerPlaceCell(Proposer):
         place_cell = self.workspace.memory.place_memory.current_place_cell()
         # If the current place cell is not fully observed
         if not place_cell.is_fully_observed():
+            e_memory.body_memory.neurotransmitters[:] = [50, 60, 50]  # Serotonin
             theta_unscanned, span_unscanned = unscanned_direction(place_cell.polar_echo_curve)
             print(f"Unscanned direction {math.degrees(theta_unscanned):.0f}, "
                   f"body direction {math.degrees(self.workspace.memory.body_memory.get_body_direction_rad()):.0f}")
@@ -51,6 +53,7 @@ class ProposerPlaceCell(Proposer):
                 return CompositeEnaction([e0], 'place_cell', np.array([1, 1, 1]))
         # If the current place cell is fully observed
         else:
+            e_memory.body_memory.neurotransmitters[:] = [60, 50, 50]  # Dopamine
             theta_open, min_theta_open, max_theta_open = open_direction(place_cell.polar_echo_curve)
             theta_q = Quaternion.from_z_rotation(theta_open)
             short_to_theta_open = short_angle(self.workspace.memory.body_memory.body_quaternion, theta_q)

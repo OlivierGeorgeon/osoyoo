@@ -3,11 +3,9 @@ from pyglet.gl import glClearColor
 from pyrr import Matrix44
 import math
 import numpy as np
-# from .BodyView import BodyView
 from ..InteractiveWindow import InteractiveWindow
 from autocat.Display.ShapeDisplay import ShapeDisplay
 from ...Enaction import ENACTION_STEP_RENDERING
-# from ...Workspace import KEY_DECREASE, KEY_INCREASE
 from ...Utils import quaternion_to_azimuth
 from ...Integrator.Calibrator import compass_calibration
 from ...Memory.EgocentricMemory.Experience import EXPERIENCE_COMPASS, EXPERIENCE_NORTH
@@ -41,10 +39,6 @@ class CtrlBodyView:
         self.view.label2.text = 'Azimuth: 90'
         self.view.label3.text = 'Speed: (0, 0)'
 
-        # def on_mouse_press(x, y, button, modifiers):
-        #     """ Selecting or unselecting points of interest """
-        #     self.view.mouse_to_ego_point(x, y, button, modifiers)
-        #
         def on_text(text):
             """Process the user key or forward it to the Workspace to handle"""
             # if text.upper() == KEY_DECREASE:

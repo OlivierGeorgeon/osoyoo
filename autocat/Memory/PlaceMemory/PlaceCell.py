@@ -2,6 +2,7 @@
 import math
 import numpy as np
 import time
+import threading
 from pyrr import Quaternion
 from . import ANGULAR_RESOLUTION, CONE_HALF_ANGLE, MIN_PLACE_CELL_DISTANCE
 from ..EgocentricMemory.EgocentricMemory import EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_CENTRAL_ECHO, EXPERIENCE_LOCAL_ECHO
@@ -31,22 +32,21 @@ class PlaceCell:
         if point is not None:
             return point + self.point
 
-    def translation_estimation_echo(self, points, experience_type=EXPERIENCE_LOCAL_ECHO):
+    def translation_estimation_echo(self, points, robot_point):
         """Return the vector of the position defined by previous cues minus the position by the new cues"""
         # Translation estimation based on echoes
-        place_echo_points = np.array([c.point() for c in self.cues if c.type == experience_type])
-        reg_p2p = transform_estimation_cue_to_cue(points, place_echo_points, MIN_PLACE_CELL_DISTANCE)
+        place_echo_points = np.array([c.point() for c in self.cues if c.type == EXPERIENCE_LOCAL_ECHO])
+        translation_init = robot_point - self.point
+        reg_p2p = transform_estimation_cue_to_cue(points, place_echo_points, MIN_PLACE_CELL_DISTANCE, translation_init)
 
         # Move the robot in the same direction as moving the new local echoes to the place cell
         translation = np.array(reg_p2p.transformation[0:3, 3])
         rotation_deg = math.degrees(quaternion_to_direction_rad(Quaternion.from_matrix(reg_p2p.transformation[:3, :3])))
-        print(f"Estimation echo rotation: {rotation_deg:.0f} degree")
-        # Plot
-        plot_compare(points, place_echo_points, reg_p2p, "Scan", self.key)
-        # If rotation too high then cancel the position correction
-        # if abs(rotation_deg) > 10:
-        #     translation[:] = 0
-
+        # print(f"Estimation echo rotation: {rotation_deg:.0f}°")
+        # Save the plot in an asynchronous thread
+        thread = threading.Thread(target=plot_compare, args=(points, place_echo_points, reg_p2p, "Scan", self.key))
+        thread.start()
+        # plot_compare(points, place_echo_points, reg_p2p, "Scan", self.key)
         return translation
 
     def compute_echo_curve(self):
@@ -74,28 +74,18 @@ class PlaceCell:
         """Return True if the echo curve's radius is never zero"""
         return min(self.polar_echo_curve[:, 0]) > 0
 
-    def translation_estimate_aligned_echo(self, point):
+    def translation_estimate_aligned_echo(self, allo_point):
         """Return the translation to this place cell estimate by adjusting the point to the polar echo curve"""
         # Propose a correction to match the point to the nearest central echo
-        central_cues = [c for c in self.cues if c.type == EXPERIENCE_CENTRAL_ECHO]
+        central_cues = [c for c in self.cues if c.type == EXPERIENCE_ALIGNED_ECHO]
         if len(central_cues) > 0:
-            nearest_central_cue = min(central_cues, key=lambda c: np.linalg.norm(c.point() - point))
-            proposed_correction = nearest_central_cue.point() - point
-            print(f"Aligned echo: {tuple(point[:2].astype(int))}, "
-                  f"nearest central echo: {tuple(nearest_central_cue.point()[:2].astype(int))}")
+            nearest_central_cue = min(central_cues, key=lambda c: np.linalg.norm(c.point() - allo_point))
+            proposed_correction = nearest_central_cue.point() + self.point - allo_point
+            print(f"Aligned echo: {tuple(allo_point[:2].astype(int))}, "
+                  f"nearest place's aligned echo: {tuple(nearest_central_cue.point()[:2].astype(int))}")
             return proposed_correction
         else:
             return np.array([0, 0, 0])
-
-        # # Propoes a correction to match the point to the curve in the direction of the point
-        # cue_direction_rad = math.atan2(point[1], point[0])
-        # cue_direction_deg = round(math.degrees(cue_direction_rad))
-        # r = self.polar_echo_curve[cue_direction_deg // ANGULAR_RESOLUTION, 0]
-        # distance = r - np.linalg.norm(point)
-        # translation = np.array([distance * math.cos(cue_direction_rad), distance * math.sin(cue_direction_rad), 0])
-        # print(f"Translation estimate from curve point ({r:.0f} mm, {cue_direction_deg}°): "
-        #       f"{tuple(translation[:2].astype(int))}")
-        # return translation
 
     def save(self):
         """Return a cloned place cell for memory snapshot"""

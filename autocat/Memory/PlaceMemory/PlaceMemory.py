@@ -49,7 +49,8 @@ class PlaceMemory:
                 # If a scan has been performed then find the position correction based on local echoes
                 if len(local_echoes) > 0:
                     points = np.array([e.polar_point() for e in local_echoes])
-                    estimated_robot_point = self.place_cells[existing_id].translation_estimation_echo(points)
+                    estimated_robot_point = self.place_cells[existing_id].translation_estimation_echo(
+                        points, memory.allocentric_memory.robot_point)
                     estimated_allo_robot_point = estimated_robot_point + self.place_cells[existing_id].point
                     # The robot position correction
                     self.proposed_correction[:] = estimated_allo_robot_point - memory.allocentric_memory.robot_point
@@ -57,8 +58,8 @@ class PlaceMemory:
                           f"{tuple(estimated_robot_point[:2].astype(int))}, "
                           f"propose correction: {tuple(self.proposed_correction[:2].astype(int))}")
                     if np.linalg.norm(self.proposed_correction[:]) < 200:
-                        # Adjust the position and increase confidence
-                        memory.adjust_robot_position()
+                        # Adjust the position and confidence
+                        memory.adjust_robot_position(self.place_cells[existing_id])
             # If the cell is not fully observed
             else:
                 # Add the cues including the local echoes
@@ -77,8 +78,7 @@ class PlaceMemory:
                                                       - estimated_translation - self.place_cells[existing_id].point
                         print(f"propose correction: {tuple(self.proposed_correction[:2].astype(int))}")
                         # Adjust the position and increase confidence to 50
-                        memory.adjust_robot_position()
-                        self.place_cells[existing_id].position_confidence = 50
+                        memory.adjust_robot_position(self.place_cells[existing_id])
 
             # If the robot just moved to an existing place cell
             if existing_id != self.current_cell_id:
@@ -88,18 +88,21 @@ class PlaceMemory:
                     align_experiences = [e for e in memory.egocentric_memory.experiences.values()
                                          if (e.clock >= memory.clock) and e.type == EXPERIENCE_ALIGNED_ECHO]
                     if len(align_experiences) == 1:  # One aligned echo experience
-                        point = align_experiences[0].polar_point()
+                        allo_point = align_experiences[0].polar_point() + memory.allocentric_memory.robot_point
                         self.proposed_correction[:] = self.place_cells[existing_id].translation_estimate_aligned_echo(
-                            point)
+                            allo_point)
                         print(f"Proposed correction to nearest central echo: "
                               f"{tuple(self.proposed_correction[:2].astype(int))}")
                         # If the proposed correction is not too great then make the correction
                         if np.linalg.norm(self.proposed_correction[:]) < 100 and abs(
                                 memory.body_memory.head_direction_degree()) < 40:
                             # Adjust the position and increase confidence
-                            memory.adjust_robot_position()
+                            memory.adjust_robot_position(self.place_cells[existing_id])
                         else:
                             self.observe_better = True
+                    else:
+                        print("No echo: scan")
+                        self.observe_better = True
                 # Add the edge and the distance from the previous place cell to the newly recognized one
                 self.place_cell_graph.add_edge(self.current_cell_id, existing_id)
                 self.place_cell_distances[existing_id] = {self.current_cell_id: np.linalg.norm(
@@ -128,7 +131,7 @@ class PlaceMemory:
         # The new place cell gets half the confidence of the previous one
         self.previous_cell_id = self.current_cell_id
         if self.previous_cell_id > 0:
-            confidence = self.place_cells[self.previous_cell_id].position_confidence // 3
+            confidence = self.place_cells[self.previous_cell_id].position_confidence // 2
         else:
             confidence = 100
         # Create the place cell from the cues

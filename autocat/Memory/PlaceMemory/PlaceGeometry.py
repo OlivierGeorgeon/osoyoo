@@ -15,7 +15,7 @@ from ...Memory.EgocentricMemory.Experience import EXPERIENCE_CENTRAL_ECHO
 from ...Utils import quaternion_to_direction_rad
 
 
-def transform_estimation_cue_to_cue(points1, points2, threshold=ICP_DISTANCE_THRESHOLD, trans_init=None):
+def transform_estimation_cue_to_cue(points1, points2, threshold=ICP_DISTANCE_THRESHOLD, translation_init=None):
     """Return the transformation from points1 to points2 using o3d ICP algorithm"""
     # Create the o3d point clouds
     pcd1 = o3d.geometry.PointCloud()
@@ -23,8 +23,9 @@ def transform_estimation_cue_to_cue(points1, points2, threshold=ICP_DISTANCE_THR
     # Converting to integers seems to avoid rotation
     pcd1.points = o3d.utility.Vector3dVector(np.array(points1, dtype=int))
     pcd2.points = o3d.utility.Vector3dVector(np.array(points2, dtype=int))
-    if trans_init is None:
-        trans_init = np.eye(4)  # Initial transformation matrix (4x4 identity matrix)
+    trans_init = np.eye(4)  # Initial transformation matrix (4x4 identity matrix)
+    if translation_init is not None:
+        trans_init[0:3, 3] = translation_init
 
     # Apply ICP
     estimation_method = o3d.pipelines.registration.TransformationEstimationPointToPoint()
@@ -133,32 +134,6 @@ def unscanned_direction(polar_points):
     return theta_unscanned, span_unscanned
 
 
-# def open_direction(polar_points):
-#     """Return the array of points where difference is greater that tolerance"""
-#     # Convert point array to a sorted pandas DataFrame
-#     polar_points = polar_points.copy()
-#     df = pd.DataFrame(polar_points, columns=['r', 'theta'])  # .sort_values(by='theta').reset_index(drop=True)
-#
-#     # Create a grouping key for streaks of similar r values
-#     df['group'] = (df['r'].diff().abs() > 30).cumsum()
-#
-#     # If same group at 0 and 2pi
-#     if abs(df['r'].iloc[0] - df['r'].iloc[-1]) < 30:
-#         # Subtract 2pi to the last group and name it group 0 to wrap the last streak
-#         max_group_mask = (df['group'] == max(df['group']))
-#         df.loc[max_group_mask, 'theta'] = df.loc[max_group_mask, 'theta'].apply(lambda x: x - 2 * math.pi)
-#         df.loc[max_group_mask, 'group'] = 0
-#
-#     # Group by the grouping key
-#     grouped = df.groupby('group')
-#
-#     # Calculate the mean r and theta, and span for each group
-#     result = grouped.agg(r=('r', 'mean'), theta=('theta', 'mean'), span=('theta', lambda x: x.max() - x.min()))
-#
-#     print(result)
-#     return result.at[result['r'].idxmax(), 'theta']
-
-
 def open_direction(polar_points):
     """Return the array of points where difference is greater that tolerance"""
     # Convert point array to a sorted pandas DataFrame
@@ -234,11 +209,10 @@ def compare_place_cells(place_source, place_target):
     """Compare two place cells based on central echoes"""
     points1 = np.array([c.point() for c in place_source.cues if c.type == EXPERIENCE_CENTRAL_ECHO])
     points2 = np.array([c.point() for c in place_target.cues if c.type == EXPERIENCE_CENTRAL_ECHO])
-    trans_init = np.eye(4)  # Initial transformation matrix (4x4 identity matrix)
-    trans_init[0:3, 3] = place_source.point - place_target.point
+    translation_init = place_source.point - place_target.point
     # print(f"Comparing Place {place_source.key} to Place {place_target.key} "
     #       f"with trans_init: {tuple(trans_init[0:2, 3].astype(int))}")
-    reg_p2p = transform_estimation_cue_to_cue(points1, points2, 100, trans_init)
+    reg_p2p = transform_estimation_cue_to_cue(points1, points2, 100, translation_init)
     translation = -reg_p2p.transformation[:3, 3].astype(int)
     rotation_deg = round(math.degrees(
         quaternion_to_direction_rad(Quaternion.from_matrix(reg_p2p.transformation[:3, :3]))))
@@ -255,7 +229,7 @@ def compare_place_cells(place_source, place_target):
     # If less than three points match or rotation then cancel the translation
     if len(reg_p2p.correspondence_set) < 3 or rotation_deg > 10:
         translation = None
-
+        print(f"Adjustment cancelled points: {reg_p2p.correspondence_set}, rotation: {rotation_deg:.0f}")
     return translation
 
 
@@ -297,7 +271,8 @@ def plot_compare(source_points, target_points, reg_p2p, k1, k2):
     plt.legend()
     plt.xlabel('West - East')
     plt.ylabel('South - North')
-    plt.title(f"Compare {k1} to {k2}. Fitness: {reg_p2p.fitness:.2f}. RMSE: {reg_p2p.inlier_rmse:.0f}")
+    distance = np.linalg.norm(reg_p2p.transformation[:3, 3])
+    plt.title(f"{k1} to {k2}. Dist: {distance:.0f}. Fitness: {reg_p2p.fitness:.2f}. RMSE: {reg_p2p.inlier_rmse:.0f}")
 
     # Save the plot
     try:

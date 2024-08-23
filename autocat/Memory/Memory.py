@@ -11,8 +11,6 @@ from ..Enaction.Predict import push_objects
 from .PlaceMemory.PlaceMemory import PlaceMemory
 
 NEAR_HOME = 300    # (mm) Max distance to consider near home
-# ARRANGE_MIN_RADIUS = 100
-# ARRANGE_MAX_RADIUS = 400
 
 
 class Memory:
@@ -141,46 +139,32 @@ class Memory:
         else:
             return self.allocentric_memory.robot_point
 
-    def adjust_robot_position(self):
+    def adjust_robot_position(self, current_cell):
         """Adjust the robot's position by the correction from place cell memory"""
-        current_cell = self.place_memory.current_place_cell()
+
+        adjsutment_scale = 1.
+        # If the previous cell has mord confidence than the current then adjust the cell position
+        if self.place_memory.place_cells[self.place_memory.previous_cell_id].position_confidence >= current_cell.position_confidence:
+            adjsutment_scale = current_cell.position_confidence / 100.
+            # Increase the current cell confidence no more than the previous cell confidence
+            current_cell.position_confidence = min(current_cell.position_confidence + 20, self.place_memory.place_cells[self.place_memory.previous_cell_id].position_confidence)
 
         # Move the robot by the proposed correction proportionally to the place cell confidence
-        robot_correction = self.place_memory.proposed_correction * current_cell.position_confidence / 100
+        robot_correction = self.place_memory.proposed_correction * adjsutment_scale
         print(f"Adjusting the robot's position to place cell {self.place_memory.current_cell_id} "
               f"by {tuple(robot_correction[:2].astype(int))}")
         self.allocentric_memory.robot_point += robot_correction
 
         # Move the place cell by the complementary of the position correction in the other direction
-        cell_correction = self.place_memory.proposed_correction * (current_cell.position_confidence - 100) / 100
+        # cell_correction = self.place_memory.proposed_correction * (current_cell.position_confidence - 100) / 100
+        cell_correction = self.place_memory.proposed_correction * (adjsutment_scale - 1)
         current_cell.point += cell_correction
         print(f"Place {self.place_memory.current_cell_id} adjusted by: "
               f"{tuple(cell_correction[0:2].astype(int))}")
         # Propagate the confidence of the previous place cell
-        current_cell.position_confidence = max(current_cell.position_confidence, self.place_memory.place_cells[
-            self.place_memory.previous_cell_id].position_confidence)
+        # current_cell.position_confidence = max(current_cell.position_confidence, self.place_memory.place_cells[
+        #     self.place_memory.previous_cell_id].position_confidence)
 
-        # # Propagate the position error to all the place cells since last position correction
-        # # Proportionally to the complementary of the place cell position confidence
-        # cell_correction = self.place_memory.proposed_correction * (current_cell.position_confidence - 100) / 100
-        # last_position_clock = self.place_memory.place_cells[self.place_memory.current_cell_id].last_position_clock
-        # self.place_memory.place_cells[self.place_memory.current_cell_id].last_position_clock = self.clock
-        # # ps = {k: p for k, p in self.place_memory.place_cells.items() if p.last_visited_clock > last_position_clock}
-        # ps = [p for p in self.place_memory.place_cells.values() if p.last_visited_clock > last_position_clock]
-        # n = len(ps)
-        # if n > 0:
-        #     i = 1
-        #     # sorted_ps = dict(sorted(ps.items(), key=lambda x: x[1].last_visited_clock))
-        #     sorted_ps = sorted(ps, key=lambda p: p.last_visited_clock)
-        #     for p in sorted_ps:
-        #         # The older the place cell, the smaller the position correction
-        #         correction_coefficient = i / n
-        #         i += 1
-        #         ac = np.array(cell_correction * correction_coefficient, dtype=int)
-        #         p.point += ac
-        #         print(f"Place {p.key} adjusted by: {tuple(ac[0:2].astype(int))} coef: {correction_coefficient:.2f}")
-
-        # Move the cell by the position correction
         self.allocentric_memory.update_grid(self)
 
     def save(self):
@@ -188,7 +172,6 @@ class Memory:
         # start_time = time.time()
         saved_memory = Memory(self.phenomenon_memory.arena_id, self.robot_id)
         saved_memory.clock = self.clock
-        # saved_memory.emotion_code = self.emotion_code
         # Clone body memory
         saved_memory.body_memory = self.body_memory.save()
         # Clone egocentric memory
