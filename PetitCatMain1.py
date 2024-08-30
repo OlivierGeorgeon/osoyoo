@@ -1,5 +1,5 @@
 import pyglet
-from autocat import Workspace, CtrlEgocentricView, Decider
+from petitbrain import Workspace, CtrlEgocentricView, Decider
 
 # Initialize the robot
 robot = Workspace("192.168.8.242")

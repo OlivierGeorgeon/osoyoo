@@ -21,7 +21,7 @@
 
 import sys
 import pyglet
-from autocat import Flock
+from petitbrain import Flock
 
 # Try to fix some mouse-press issue on Mac but it does not solve the problem
 # https://github.com/pyglet/pyglet/issues/171

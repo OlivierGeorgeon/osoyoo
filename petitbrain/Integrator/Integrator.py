@@ -1,6 +1,6 @@
 from pyrr import Quaternion
 from ..Memory.EgocentricMemory.Experience import EXPERIENCE_CENTRAL_ECHO, EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_FLOOR
-from autocat.Memory.PhenomenonMemory.Affordance import Affordance
+from petitbrain.Memory.PhenomenonMemory.Affordance import Affordance
 from ..Display.AllocentricDisplay import DISPLAY_CONE
 from ..Memory.BodyMemory import SEROTONIN, NORADRENALINE
 

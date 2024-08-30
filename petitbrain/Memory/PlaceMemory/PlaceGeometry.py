@@ -165,7 +165,7 @@ def open_direction(polar_points):
                          max_theta=('theta', 'max'), span=('theta', lambda x: x.max() - x.min()))
 
     # Display the result
-    print(result)
+    # print(result)
     max_value_index = result['span'].idxmax()
     return tuple(result.loc[max_value_index, ['theta', 'min_theta', 'max_theta']])
 

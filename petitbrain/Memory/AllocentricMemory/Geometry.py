@@ -8,7 +8,7 @@
 ########################################################################################
 
 import numpy as np
-from autocat.Memory import CELL_RADIUS, GRID_WIDTH, GRID_HEIGHT
+from petitbrain.Memory import CELL_RADIUS, GRID_WIDTH, GRID_HEIGHT
 
 
 def cell_to_point(q, r, radius=CELL_RADIUS):

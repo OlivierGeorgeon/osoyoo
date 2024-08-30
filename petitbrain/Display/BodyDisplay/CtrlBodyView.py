@@ -4,7 +4,7 @@ from pyrr import Matrix44
 import math
 import numpy as np
 from ..InteractiveWindow import InteractiveWindow
-from autocat.Display.ShapeDisplay import ShapeDisplay
+from petitbrain.Display.ShapeDisplay import ShapeDisplay
 from ...Enaction import ENACTION_STEP_RENDERING
 from ...Utils import quaternion_to_azimuth
 from ...Integrator.Calibrator import compass_calibration

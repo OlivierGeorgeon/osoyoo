@@ -1,5 +1,7 @@
-/petitcat_arduino/src/wifi/arduino_secrets.h
+/petitcat/src/wifi/arduino_secrets.h
 __pycache__/
 .idea/
 venv/
 log/
+experiments/
+tests/.pytest_cache

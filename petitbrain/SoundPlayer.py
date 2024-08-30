@@ -21,15 +21,15 @@ class SoundPlayer:
         if not cls._initialized:
             # Try to load sounds (it may not work on all platforms)
             try:
-                cls._sounds[SOUND_STARTUP] = pyglet.media.load(f'autocat/Assets/{SOUND_STARTUP}', streaming=False)
-                cls._sounds[SOUND_CLEAR] = pyglet.media.load(f'autocat/Assets/{SOUND_CLEAR}', streaming=False)
-                cls._sounds[SOUND_NEAR_HOME] = pyglet.media.load(f'autocat/Assets/{SOUND_NEAR_HOME}', streaming=False)
-                cls._sounds[SOUND_PUSH] = pyglet.media.load(f'autocat/Assets/{SOUND_PUSH}', streaming=False)
-                cls._sounds[SOUND_MESSAGE] = pyglet.media.load(f'autocat/Assets/{SOUND_MESSAGE}', streaming=False)
-                cls._sounds[SOUND_FLOOR] = pyglet.media.load(f'autocat/Assets/{SOUND_FLOOR}', streaming=False)
-                cls._sounds[SOUND_IMPACT] = pyglet.media.load(f'autocat/Assets/{SOUND_IMPACT}', streaming=False)
-                cls._sounds[SOUND_SURPRISE] = pyglet.media.load(f'autocat/Assets/{SOUND_SURPRISE}', streaming=False)
-                cls._sounds[SOUND_PLACE_CELL] = pyglet.media.load(f'autocat/Assets/{SOUND_PLACE_CELL}', streaming=False)
+                cls._sounds[SOUND_STARTUP] = pyglet.media.load(f'petitbrain/Assets/{SOUND_STARTUP}', streaming=False)
+                cls._sounds[SOUND_CLEAR] = pyglet.media.load(f'petitbrain/Assets/{SOUND_CLEAR}', streaming=False)
+                cls._sounds[SOUND_NEAR_HOME] = pyglet.media.load(f'petitbrain/Assets/{SOUND_NEAR_HOME}', streaming=False)
+                cls._sounds[SOUND_PUSH] = pyglet.media.load(f'petitbrain/Assets/{SOUND_PUSH}', streaming=False)
+                cls._sounds[SOUND_MESSAGE] = pyglet.media.load(f'petitbrain/Assets/{SOUND_MESSAGE}', streaming=False)
+                cls._sounds[SOUND_FLOOR] = pyglet.media.load(f'petitbrain/Assets/{SOUND_FLOOR}', streaming=False)
+                cls._sounds[SOUND_IMPACT] = pyglet.media.load(f'petitbrain/Assets/{SOUND_IMPACT}', streaming=False)
+                cls._sounds[SOUND_SURPRISE] = pyglet.media.load(f'petitbrain/Assets/{SOUND_SURPRISE}', streaming=False)
+                cls._sounds[SOUND_PLACE_CELL] = pyglet.media.load(f'petitbrain/Assets/{SOUND_PLACE_CELL}', streaming=False)
                 cls._initialized = 2
             except pyglet.media.codecs.wave.WAVEDecodeException as e:
                 print("Error loading sound files", e)

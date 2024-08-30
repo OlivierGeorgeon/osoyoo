@@ -1,22 +1,22 @@
 # Testing the Phenomenon View
-# py -m autocat.Display.PlaceCellDisplay
+# py -m autocat.Display
 
 import numpy as np
 import math
 import pyglet
 from pyrr import Quaternion, Matrix44
-from .CtrlPlaceCellView import CtrlPlaceCellView
-from ...Robot.RobotDefine import ROBOT_COLOR_SENSOR_X, ROBOT_SETTINGS_4, ROBOT_FLOOR_SENSOR_X, ROBOT_HEAD_X
-from ...Workspace import Workspace
-from ...Memory.PlaceMemory.PlaceCell import PlaceCell
-from ...Memory.PlaceMemory.Cue import Cue
-from ...Memory.EgocentricMemory.Experience import Experience, EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_PLACE
-from ...Utils import quaternion_translation_to_matrix
-from ...Robot.Enaction import Enaction
-from ...Robot.Outcome import Outcome
-from ...Proposer.Interaction import Interaction, OUTCOME_NO_FOCUS
-from ...Proposer.Action import ACTION_SWIPE, Action, ACTION_TURN
-from ...Enaction import ENACTION_STEP_RENDERING
+from petitbrain.Display.PlaceCellDisplay.CtrlPlaceCellView import CtrlPlaceCellView
+from petitbrain.Robot.RobotDefine import ROBOT_COLOR_SENSOR_X, ROBOT_SETTINGS_4, ROBOT_FLOOR_SENSOR_X, ROBOT_HEAD_X
+from petitbrain.Workspace import Workspace
+from petitbrain.Memory.PlaceMemory.PlaceCell import PlaceCell
+from petitbrain.Memory.PlaceMemory.Cue import Cue
+from petitbrain.Memory.EgocentricMemory.Experience import Experience, EXPERIENCE_FLOOR, EXPERIENCE_ALIGNED_ECHO, EXPERIENCE_PLACE
+from petitbrain.Utils import quaternion_translation_to_matrix
+from petitbrain.Robot.Enaction import Enaction
+from petitbrain.Robot.Outcome import Outcome
+from petitbrain.Proposer.Interaction import Interaction, OUTCOME_NO_FOCUS
+from petitbrain.Proposer.Action import ACTION_SWIPE, Action, ACTION_TURN
+from petitbrain.Enaction import ENACTION_STEP_RENDERING
 
 
 # Initialize the workspace
@@ -46,7 +46,7 @@ e02 = Experience(2, pose_matrix, EXPERIENCE_ALIGNED_ECHO, 0, workspace.memory.bo
 cue02 = Cue(e02.id, e02.polar_pose_matrix(), e02.type, e02.clock, e02.color_index, e02.polar_sensor_point())
 
 # Create the place cell
-place_cell = PlaceCell([0, 0, 0], [cue00, cue01, cue02], 100)
+place_cell = PlaceCell(0, np.array([0, 0, 0]), [cue00, cue01, cue02], 100)
 
 # Load the place cell in place memory
 workspace.memory.place_memory.place_cells[1] = place_cell
