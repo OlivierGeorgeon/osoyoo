@@ -1,7 +1,7 @@
 # Test the wifi connection with Robot
 
-This page explains how to test the [PetitCat](https://github.com/OlivierGeorgeon/osoyoo/wiki) robot using the [test_remote_control_robot.py](../../tests/test_remote_control_robot.py) file. 
-Alternatively, you can use the [test_remote_control_robot.ipynb](../../tests/test_remote_control_robot.ipynb) notebook.
+This page explains how to test the [PetitCat](https://github.com/OlivierGeorgeon/osoyoo/wiki) robot using the [teleop_console.py](../../petitbrain/teleop_console.py) file. 
+Alternatively, you can use the [teleop_tutorial.ipynb](teleop_tutorial.ipynb) notebook.
 
 ## Run the test
 
@@ -9,17 +9,17 @@ Switch on the robot and read its IP address in the Arduino IDE terminal.
 
 Make sure your PC is connected to the same wifi as the robot.
 
-Clone this project or download the file [test_remote_control_robot.py](../../tests/test_remote_control_robot.py).
+Clone this project or download the file [teleop_console.py](../../petitbrain/teleop_console.py).
 
-Run `test_remote_control_robot.py` with the IP address of you robot as an argument. For example: 
+Run `teleop_console.py` with the IP address of you robot as an argument. For example: 
 
 ```
-py test_remote_control_robot.py 192.168.8.242
+py petitbrain\teleop_console.py 192.168.8.242
 ```
 
 Press the action keys (Table 1). The robot executes your commands. Your python terminal displays the logs as in Figure 1. 
 
-![trace](trace.png)
+![trace](../tests/trace.png)
 Figure 1: The trace showing the enaction of three interactions
 
 When you press a key, the program sends the command packet to the robot via UDP. The field `"clock"` is an incremental number. The field `"action"` is your key.

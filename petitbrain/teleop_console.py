@@ -11,7 +11,7 @@ UDP_IP = "192.168.4.1"
 UDP_TIMEOUT = 5  # Seconds
 
 
-class PetitCatTester:
+class Teleop:
     def __init__(self, ip, time_out, port=8888):
         self.IP = ip
         self.port = port
@@ -74,7 +74,7 @@ if __name__ == '__main__':
     print("Connecting to robot: " + robot_ip)
     print("Action keys: 1: Turn left, 2: Backward, 3: Turn right, 4: Swipe left, 6: Swipe right, 8: Forward, -: Scan")
     print("Ctrl+C and ENTER to abort")
-    petitcat_tester = PetitCatTester(robot_ip, UDP_TIMEOUT)
+    teleop = Teleop(robot_ip, UDP_TIMEOUT)
     clock = 0
     action = ""
     while True:
@@ -83,7 +83,7 @@ if __name__ == '__main__':
         action = input("Enter action key:")
         action_string = '{"clock":' + str(clock) + ', "action":"' + action + '"}'
         print("Sending packet:", action_string)
-        outcome = petitcat_tester.enact(action_string)
+        outcome = teleop.enact(action_string)
         print("Received packet:", outcome)
         if outcome is not None:
             clock += 1

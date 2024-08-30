@@ -167,6 +167,10 @@ class Memory:
 
         self.allocentric_memory.update_grid(self)
 
+    def trace_dict(self):
+        """Return a dictionary of fields that should be traced"""
+        return {"correction": round(np.linalg.norm(self.place_memory.proposed_correction))}
+
     def save(self):
         """Return a clone of memory for memory snapshot"""
         # start_time = time.time()

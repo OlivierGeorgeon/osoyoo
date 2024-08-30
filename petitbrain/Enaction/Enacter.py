@@ -76,8 +76,11 @@ class Enacter:
                 self.memory_snapshot = self.workspace.memory.save()
                 # Show the prompt in memory
                 if self.workspace.enaction.trajectory.prompt_point is not None:
-                    self.workspace.memory.egocentric_memory.prompt_point = self.workspace.enaction.trajectory.prompt_point.copy()
-                    self.workspace.memory.allocentric_memory.update_prompt(self.workspace.memory.egocentric_to_allocentric(self.workspace.memory.egocentric_memory.prompt_point), self.workspace.memory.clock)
+                    self.workspace.memory.egocentric_memory.prompt_point = \
+                        self.workspace.enaction.trajectory.prompt_point.copy()
+                    self.workspace.memory.allocentric_memory.update_prompt(
+                        self.workspace.memory.egocentric_to_allocentric(
+                            self.workspace.memory.egocentric_memory.prompt_point), self.workspace.memory.clock)
                 # Begin the enaction
                 self.workspace.enaction.begin(self.workspace.memory.body_memory.body_quaternion)
                 # Begin the simulation
@@ -193,13 +196,20 @@ class Enacter:
             # Manage attention
             # Focus at the nearest phenomenon, or near the dot phenomenon it if it was lost
             self.attention_mechanism.update_focus()
-            if self.workspace.memory.egocentric_memory.focus_point is not None and self.workspace.enaction.outcome_code == OUTCOME_NO_FOCUS:
-                self.workspace.enaction.outcome_code = outcome_code_focus(self.workspace.memory.egocentric_memory.focus_point, self.workspace.memory)
+            if self.workspace.memory.egocentric_memory.focus_point is not None \
+                    and self.workspace.enaction.outcome_code == OUTCOME_NO_FOCUS:
+                self.workspace.enaction.outcome_code = outcome_code_focus(
+                    self.workspace.memory.egocentric_memory.focus_point, self.workspace.memory)
 
             # Track the prediction errors
             self.workspace.prediction_error.log(self.workspace.enaction)
             # Calibrate
             self.workspace.calibrator.calibrate()
+
+            # Log the trace
+            self.workspace.tracer = self.workspace.tracer.bind(**self.workspace.memory.trace_dict())
+            self.workspace.tracer.info("", **self.workspace.enaction.trace_dict())
+            self.workspace.tracer = self.workspace.tracer.new()
 
             # Increment the clock
             if self.workspace.enaction.clock >= self.workspace.memory.clock:  # don't increment if the robot is behind

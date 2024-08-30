@@ -1,5 +1,6 @@
 import json
 import numpy as np
+import structlog
 from .Proposer.Action import create_actions, ACTION_FORWARD, ACTIONS, ACTION_TURN, ACTION_BACKWARD
 from .Memory.Memory import Memory
 from .Memory.PhenomenonMemory import TERRAIN_ORIGIN_CONFIDENCE
@@ -64,6 +65,9 @@ class Workspace:
         # Controls which phenomenon view to display
         self.ctrl_phenomenon_view = None
         self.ctrl_place_cell_view = None
+
+        # The tracer
+        self.tracer = structlog.get_logger()
 
         # Message from other robot
         self.message = None

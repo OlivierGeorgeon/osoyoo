@@ -75,3 +75,7 @@ class Enaction:
         if (self.outcome.impact > 0) != (self.predicted_outcome.impact > 0):
             return False
         return True
+
+    def trace_dict(self):
+        """Return the dictionary for tracing the enaction"""
+        return self.outcome._dict
