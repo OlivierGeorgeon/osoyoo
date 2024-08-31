@@ -1,7 +1,7 @@
 # Test the wifi connection with Robot
 
-This page explains how to test the [PetitCat](https://github.com/OlivierGeorgeon/osoyoo/wiki) robot using the [teleop_console.py](../../petitbrain/prompt_teleop.py) file. 
-Alternatively, you can use the [teleop_tutorial.ipynb](teleop_tutorial.ipynb) notebook.
+This page explains how to test the [PetitCat](https://github.com/OlivierGeorgeon/osoyoo/wiki) robot using the [prompt_teleop.py](../../petitbrain/prompt_teleop.py) file. 
+Alternatively, you can use the [prompt_teleop.ipynb](prompt_teleop.ipynb) notebook.
 
 ## Run the test
 
@@ -9,12 +9,12 @@ Switch on the robot and read its IP address in the Arduino IDE terminal.
 
 Make sure your PC is connected to the same wifi as the robot.
 
-Clone this project or download the file [teleop_console.py](../../petitbrain/prompt_teleop.py).
+Clone this project or download the file [prompt_teleop.py](../../petitbrain/prompt_teleop.py).
 
 Run `teleop_console.py` with the IP address of you robot as an argument. For example: 
 
 ```
-py petitbrain\teleop_console.py 192.168.8.242
+py petitbrain\prompt_teleop.py 192.168.8.242
 ```
 
 Press the action keys (Table 1). The robot executes your commands. Your python terminal displays the logs as in Figure 1. 

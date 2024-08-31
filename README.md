@@ -40,7 +40,7 @@ While the PetitCat Project was initially created to allow symbol grounding, enac
 ## Documentation 
 
 Test documentation 
-* [teleop.md](docs/tutorials/teleop.md) Helps you test the communication between your PC and your robot.
+* [prompt_teleop.md](docs/tutorials/prompt_teleop.md) Helps you test the communication between your PC and your robot.
 * Other Python programs in this repository allow interfacing your Python AI/AGI/BICA project with the PetitCat project
 * Other Python programs in this repository allow interfacing an LLM to the PetitCat project
 

@@ -46,4 +46,5 @@ exclude = ["log", "petitcat", "experiments", "docs"]
 Homepage = "https://github.com/UCLy/INIT2"
 
 [project.scripts]
-realpython = "petitbrain:teleop_console"
+realpython = "petitbrain:prompt_teleop"
+realpython = "petitbrain:reliable_teleop"
