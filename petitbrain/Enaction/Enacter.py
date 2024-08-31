@@ -58,14 +58,6 @@ class Enacter:
                 if self.workspace.engagement_mode == KEY_ENGAGEMENT_IMAGINARY:
                     self.memory_before_imaginary = self.workspace.memory.save()
                     self.is_imagining = True
-            # Next automatic decision
-            # if self.workspace.composite_enaction is None:
-            #     if self.workspace.control_mode == KEY_CONTROL_DECIDER:
-            #         # All deciders propose an enaction with an activation value
-            #         self.workspace.composite_enaction = self.decide()
-            #     else:
-            #         self.workspace.decider_id = "Manual"
-                # Case DECIDER_KEY_USER is handled by self.process_user_key()
 
             # When the next enaction is in the stack, prepare the enaction
             if self.workspace.composite_enaction is not None:

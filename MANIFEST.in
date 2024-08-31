@@ -1,0 +1,3 @@
+# MANIFEST.in
+
+include *.toml, petitbrain/Assets/*.mp3, petitbrain/Assets/*.wav

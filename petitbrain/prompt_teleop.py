@@ -1,17 +1,16 @@
 #!/usr/bin/env python
 # Olivier Georgeon, 2023.
-# This code is used to to test the PetitCat robot.
+# This code is used to tele-operate the robot from input prompts.
 
 import socket
 import sys
 import json
-# import keyboard  # Uncomment to use instead of input()
 
 UDP_IP = "192.168.4.1"
 UDP_TIMEOUT = 5  # Seconds
 
 
-class Teleop:
+class PromptTeleop:
     def __init__(self, ip, time_out, port=8888):
         self.IP = ip
         self.port = port
@@ -25,11 +24,11 @@ class Teleop:
         self.angle = None
         self.span = None
 
-    def enact(self, _action_string):
+    def send_command(self, command_string):
         """ Sending the action string, waiting for the outcome, and returning the outcome bytes """
         _outcome = None  # Default if timeout
         # print("sending " + action)
-        self.socket.sendto(bytes(_action_string, 'utf-8'), (self.IP, self.port))
+        self.socket.sendto(bytes(command_string, 'utf-8'), (self.IP, self.port))
         try:
             _outcome, address = self.socket.recvfrom(512)
         except socket.error as error:  # Time out error when robot is not connected
@@ -51,7 +50,7 @@ class Teleop:
             command_dict['angle'] = self.angle
         _action_string = json.dumps(command_dict)
         print("Sending packet:", _action_string)
-        _outcome = self.enact(_action_string)
+        _outcome = self.send_command(_action_string)
         print("Received packet:", _outcome)
         if _outcome is not None:
             self.clock += 1
@@ -60,8 +59,8 @@ class Teleop:
 
 
 # Test the wifi interface by controlling the robot from the console
-# Provide the Robot's IP address as a launch argument
-# py test_remote_control_robot.py 192.168.8.242
+# Provide the Robot's IP address as a launch argument. For example:
+# py prompt_teleop.py 192.168.8.242
 if __name__ == '__main__':
     robot_ip = UDP_IP
     if len(sys.argv) > 1:
@@ -74,16 +73,14 @@ if __name__ == '__main__':
     print("Connecting to robot: " + robot_ip)
     print("Action keys: 1: Turn left, 2: Backward, 3: Turn right, 4: Swipe left, 6: Swipe right, 8: Forward, -: Scan")
     print("Ctrl+C and ENTER to abort")
-    teleop = Teleop(robot_ip, UDP_TIMEOUT)
+    teleop = PromptTeleop(robot_ip, UDP_TIMEOUT)
     clock = 0
     action = ""
     while True:
-        # print("Press action key:")
-        # action = keyboard.read_key().upper()
         action = input("Enter action key:")
         action_string = '{"clock":' + str(clock) + ', "action":"' + action + '"}'
         print("Sending packet:", action_string)
-        outcome = teleop.enact(action_string)
+        outcome = teleop.send_command(action_string)
         print("Received packet:", outcome)
         if outcome is not None:
             clock += 1
