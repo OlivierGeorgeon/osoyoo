@@ -643,6 +643,9 @@ Although it may contain one, HAL in this case is not a simple hardware abstracti
 
 ![image](https://github.com/user-attachments/assets/e33eca03-72be-40d0-b43e-a48dde2312c5)
 
+![image](https://github.com/user-attachments/assets/17c0c5dd-89f9-4f35-8336-17d8d0458b29)
+
+
  "Humanoid robots are highly integrated robotic systems with many sensors and actuators. The DLR Hand Arm system has 52 motors and 430 sensors. Design goal is to operate the robot with high-performance feedback control at cycles beyond 1kHz but to retain the flexibility of prototyping control algorithms. This is achieved with the concept of a Hardware Abstraction Layer (HAL) that provides a convenient high-level interface to the entire robotic hardware. The requirements for the design of a HAL in terms of functionality and implementation are presented that improve the integration of complex robot hardware with prototype control applications."--  The Hardware Abstraction Layer — Supporting control design by tackling the complexity of humanoid robot hardware, 2014 IEEE International Conference on Robotics and Automation (ICRA), Hong Kong, China, 2014, pp. 6427-6433, doi: 10.1109/ICRA.2014.6907808.  
 
 
