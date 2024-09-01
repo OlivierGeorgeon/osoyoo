@@ -32,7 +32,7 @@ class PlaceCell:
         if point is not None:
             return point + self.point
 
-    def translation_estimation_echo(self, points, robot_point):
+    def translation_estimation_echo(self, points, robot_point, clock):
         """Return the vector of the position defined by previous cues minus the position by the new cues"""
         # Translation estimation based on echoes
         place_echo_points = np.array([c.point() for c in self.cues if c.type == EXPERIENCE_LOCAL_ECHO])
@@ -44,7 +44,8 @@ class PlaceCell:
         rotation_deg = math.degrees(quaternion_to_direction_rad(Quaternion.from_matrix(reg_p2p.transformation[:3, :3])))
         # print(f"Estimation echo rotation: {rotation_deg:.0f}°")
         # Save the plot in an asynchronous thread
-        thread = threading.Thread(target=plot_compare, args=(points, place_echo_points, reg_p2p, "Scan", self.key))
+        thread = threading.Thread(target=plot_compare, args=(
+            points, place_echo_points, reg_p2p, "Scan", self.key, clock))
         thread.start()
         # plot_compare(points, place_echo_points, reg_p2p, "Scan", self.key)
         return translation

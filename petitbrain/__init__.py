@@ -5,7 +5,3 @@ from .Display.EgocentricDisplay.CtrlEgocentricView import CtrlEgocentricView
 from .Display.AllocentricDisplay.CtrlAllocentricView import CtrlAllocentricView
 from .Display.BodyDisplay.CtrlBodyView import CtrlBodyView
 from .Display.PhenomenonDisplay.CtrlPhenomenonView import CtrlPhenomenonView
-
-TRACE_HEADERS = ["clock", "timestamp", "action", "head_angle", "echo_distance", "floor", "yaw", "duration1",
-                 "correction"]
-TRACE_FILE = 'log/trace.csv'

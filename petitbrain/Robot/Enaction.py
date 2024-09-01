@@ -1,6 +1,8 @@
 from .Command import Command, DIRECTION_FRONT
 from ..Enaction.Predict import generate_prediction
 from ..Enaction.Trajectory import Trajectory
+from ..constants import LOG_CLOCK, LOG_ACTION, LOG_EMOTION, LOG_HEAD_ANGLE, LOG_ECHO_DISTANCE, LOG_FLOOR, LOG_YAW, \
+    LOG_DURATION1, LOG_OUTCOME, LOG_PREDICTED_OUTCOME, LOG_AZIMUTH
 
 
 class Enaction:
@@ -78,4 +80,8 @@ class Enaction:
 
     def trace_dict(self):
         """Return the dictionary for tracing the enaction"""
-        return self.outcome._dict
+        return {LOG_CLOCK: self.clock, LOG_EMOTION: self.command.color, LOG_ACTION: self.action.action_code,
+                LOG_OUTCOME: self.outcome_code,
+                LOG_PREDICTED_OUTCOME: self.predicted_outcome_code,
+                LOG_HEAD_ANGLE: self.outcome.head_angle, LOG_ECHO_DISTANCE: self.outcome.echo_distance,
+                LOG_FLOOR: self.outcome.floor, LOG_YAW: self.outcome.yaw, LOG_DURATION1: self.outcome.duration1}

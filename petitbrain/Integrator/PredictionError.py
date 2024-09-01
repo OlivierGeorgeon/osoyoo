@@ -10,6 +10,7 @@ from ..Proposer.Interaction import OUTCOME_LOST_FOCUS, OUTCOME_NO_FOCUS, OUTCOME
 from ..Utils import short_angle, point_to_head_direction_distance
 from .PlotSequence import plot, plot_places
 from ..Memory.BodyMemory import SEROTONIN
+from ..constants import LOG_RE_YAW, LOG_RE_COMPASS, LOG_SPEED, LOG_FORWARD_PE
 
 PREDICTION_ERROR_WINDOW = 200
 RUNNING_AVERAGE_COEF = 0.25
@@ -50,11 +51,10 @@ class PredictionError:
         if not os.path.exists("log"):
             os.makedirs("log")
 
-    def log(self, enaction):
-        """Compute the prediction errors: computed - actual"""
+    def log(self):
+        """Compute the prediction errors: computed - actual and log it"""
 
-        return
-
+        enaction = self.workspace.enaction
         computed_outcome = enaction.predicted_outcome
         actual_outcome = enaction.outcome
 
@@ -62,10 +62,10 @@ class PredictionError:
         pe = int(enaction.predicted_outcome_code != enaction.outcome_code)
         self.pe_outcome_code[enaction.clock] = pe
         self.pe_outcome_code.pop(actual_outcome.clock - PREDICTION_ERROR_WINDOW, None)
-        print("Prediction Error Outcome Code",
-              f"(predicted:{enaction.predicted_outcome_code}, actual:{enaction.outcome_code})= {pe}",
-              f"Average: {np.mean(list(self.pe_outcome_code.values())):.1f}",
-              f"std: {np.std(list(self.pe_outcome_code.values())):.1f}")
+        # print("Prediction Error Outcome Code",
+        #       f"(predicted:{enaction.predicted_outcome_code}, actual:{enaction.outcome_code})= {pe}",
+        #       f"Average: {np.mean(list(self.pe_outcome_code.values())):.1f}",
+        #       f"std: {np.std(list(self.pe_outcome_code.values())):.1f}")
 
         # Translation FORWARD duration1
 
@@ -73,13 +73,16 @@ class PredictionError:
             pe = (computed_outcome.duration1 - actual_outcome.duration1) / 1000  # / actual_outcome.duration1
             self.pe_forward_duration1[enaction.clock] = pe
             self.pe_forward_duration1.pop(actual_outcome.clock - PREDICTION_ERROR_WINDOW, None)
-            print(f"Prediction Error Translate duration1 (simulation - measured)= {pe:.3f}",
-                  f"Average: {np.mean(list(self.pe_forward_duration1.values())):.3f}",
-                  f"std: {np.std(list(self.pe_forward_duration1.values())):.3f}")
+            # print(f"Prediction Error Translate duration1 (simulation - measured)= {pe:.3f}",
+            #       f"Average: {np.mean(list(self.pe_forward_duration1.values())):.3f}",
+            #       f"std: {np.std(list(self.pe_forward_duration1.values())):.3f}")
 
             # Forward speed
 
             self.value_speed_forward[enaction.clock] = self.workspace.actions[ACTION_FORWARD].translation_speed[0]
+            self.workspace.tracer = self.workspace.tracer.bind(
+                **{LOG_SPEED: round(self.workspace.actions[ACTION_FORWARD].translation_speed[0])}
+            )
             self.x_speed[enaction.clock] = self.workspace.actions[ACTION_FORWARD].translation_speed[0]
             if abs(actual_outcome.head_angle) < 11 and \
                     enaction.outcome_code not in [OUTCOME_LOST_FOCUS, OUTCOME_NO_FOCUS, OUTCOME_FLOOR]:
@@ -88,18 +91,18 @@ class PredictionError:
                 pe = round(action_speed - speed)
                 self.pe_speed_forward[enaction.clock] = pe
                 self.pe_speed_forward.pop(actual_outcome.clock - PREDICTION_ERROR_WINDOW, None)
-                print(f"Prediction Error Speed (simulation {action_speed:.0f}, - measured {speed:.0f})= {pe}",
-                      "Average:", round(float(np.mean(list(self.pe_speed_forward.values()))), 1),
-                      "std:", round(float(np.std(list(self.pe_speed_forward.values())))), 1)
+                # print(f"Prediction Error Speed (simulation {action_speed:.0f}, - measured {speed:.0f})= {pe}",
+                #       "Average:", round(float(np.mean(list(self.pe_speed_forward.values()))), 1),
+                #       "std:", round(float(np.std(list(self.pe_speed_forward.values())))), 1)
                 # Update the speed of the action
                 self.workspace.actions[ACTION_FORWARD].translation_speed[0] = action_speed * (1. - RUNNING_AVERAGE_COEF) + speed * RUNNING_AVERAGE_COEF
 
                 # Use the same speed forward and backward
                 self.pe_x_speed[enaction.clock] = pe
                 self.pe_x_speed.pop(actual_outcome.clock - PREDICTION_ERROR_WINDOW, None)
-                print(f"Prediction Error X Speed (simulation {action_speed:.0f}, - measured {speed:.0f})= {pe}",
-                      "Average:", round(float(np.mean(list(self.pe_x_speed.values()))), 1),
-                      "std:", round(float(np.std(list(self.pe_x_speed.values())))), 1)
+                # print(f"Prediction Error X Speed (simulation {action_speed:.0f}, - measured {speed:.0f})= {pe}",
+                #       "Average:", round(float(np.mean(list(self.pe_x_speed.values()))), 1),
+                #       "std:", round(float(np.std(list(self.pe_x_speed.values())))), 1)
                 self.workspace.actions[ACTION_BACKWARD].translation_speed[0] = - action_speed * (1. - RUNNING_AVERAGE_COEF) - speed * RUNNING_AVERAGE_COEF
 
         # Translation Backward
@@ -115,17 +118,17 @@ class PredictionError:
                 pe = round(action_speed - speed)
                 self.pe_speed_backward[enaction.clock] = pe
                 self.pe_speed_backward.pop(actual_outcome.clock - PREDICTION_ERROR_WINDOW, None)
-                print(f"Prediction Error Speed Back (simulation {action_speed:.0f}, - measured {speed:.0f})= {pe}",
-                      "Average:", round(float(np.mean(list(self.pe_speed_backward.values()))), 1),
-                      "std:", round(float(np.std(list(self.pe_speed_backward.values())))), 1)
+                # print(f"Prediction Error Speed Back (simulation {action_speed:.0f}, - measured {speed:.0f})= {pe}",
+                #       "Average:", round(float(np.mean(list(self.pe_speed_backward.values()))), 1),
+                #       "std:", round(float(np.std(list(self.pe_speed_backward.values())))), 1)
                 # Update the speed of the action
                 self.workspace.actions[ACTION_BACKWARD].translation_speed[0] = action_speed * (1. - RUNNING_AVERAGE_COEF) + speed * RUNNING_AVERAGE_COEF
                 # Use the same speed forward and backward
                 self.pe_x_speed[enaction.clock] = - pe  # Opposite
                 self.pe_x_speed.pop(actual_outcome.clock - PREDICTION_ERROR_WINDOW, None)
-                print(f"Prediction Error X Speed (simulation {action_speed:.0f}, - measured {speed:.0f})= {pe}",
-                      "Average:", round(float(np.mean(list(self.pe_x_speed.values()))), 1),
-                      "std:", round(float(np.std(list(self.pe_x_speed.values())))), 1)
+                # print(f"Prediction Error X Speed (simulation {action_speed:.0f}, - measured {speed:.0f})= {pe}",
+                #       "Average:", round(float(np.mean(list(self.pe_x_speed.values()))), 1),
+                #       "std:", round(float(np.std(list(self.pe_x_speed.values())))), 1)
                 # Update the action speed
                 self.workspace.actions[ACTION_FORWARD].translation_speed[0] = - action_speed * (1. - RUNNING_AVERAGE_COEF) - speed * RUNNING_AVERAGE_COEF
 
@@ -138,9 +141,9 @@ class PredictionError:
             pe = (computed_outcome.duration1 - actual_outcome.duration1) / 1000  # / actual_outcome.duration1
             self.pe_lateral_duration1[enaction.clock] = pe
             self.pe_lateral_duration1.pop(actual_outcome.clock - PREDICTION_ERROR_WINDOW, None)
-            print(f"Prediction Error Swipe duration1 (simulation - measured)= {pe:.3f}",
-                  f"Average: {np.mean(list(self.pe_lateral_duration1.values())):.2f}",
-                  f"std: {np.std(list(self.pe_lateral_duration1.values())):.2f}")
+            # print(f"Prediction Error Swipe duration1 (simulation - measured)= {pe:.3f}",
+            #       f"Average: {np.mean(list(self.pe_lateral_duration1.values())):.2f}",
+            #       f"std: {np.std(list(self.pe_lateral_duration1.values())):.2f}")
 
             # If focus and head toward object  TODO test that
             if enaction.outcome_code not in [OUTCOME_LOST_FOCUS, OUTCOME_NO_FOCUS, OUTCOME_FLOOR] and \
@@ -151,9 +154,9 @@ class PredictionError:
                 pe = round(action_speed - speed)
                 self.pe_y_speed[enaction.clock] = pe
                 self.pe_y_speed.pop(actual_outcome.clock - PREDICTION_ERROR_WINDOW, None)
-                print(f"Prediction Error Y Speed (simulation {action_speed:.0f}, - measured {speed:.0f})= {pe}",
-                      f"Average: {np.mean(list(self.pe_y_speed.values())):.1f}",
-                      f"std: {np.std(list(self.pe_y_speed.values())):.1f}")
+                # print(f"Prediction Error Y Speed (simulation {action_speed:.0f}, - measured {speed:.0f})= {pe}",
+                #       f"Average: {np.mean(list(self.pe_y_speed.values())):.1f}",
+                #       f"std: {np.std(list(self.pe_y_speed.values())):.1f}")
                 # Update the action speed
                 self.workspace.actions[ACTION_SWIPE].translation_speed[1] = action_speed * (1. - RUNNING_AVERAGE_COEF) + speed * RUNNING_AVERAGE_COEF
 
@@ -169,8 +172,8 @@ class PredictionError:
                                        enaction.trajectory.yaw_quaternion))
         self.pe_yaw[enaction.clock] = pe
         self.pe_yaw.pop(enaction.clock - PREDICTION_ERROR_WINDOW, None)
-        print(f"Prediction Error Yaw (command - measure)= {pe:.1f} Average: {np.mean(list(self.pe_yaw.values())):.1f}",
-              f"std: {np.std(list(self.pe_yaw.values())):.1f}")
+        # print(f"Prediction Error Yaw (command - measure)= {pe:.1f} Average: {np.mean(list(self.pe_yaw.values())):.1f}",
+        #       f"std: {np.std(list(self.pe_yaw.values())):.1f}")
 
         # Yaw residual error
 
@@ -182,9 +185,9 @@ class PredictionError:
             re = math.degrees(-short_angle(q_computed, enaction.trajectory.yaw_quaternion))
             self.re_yaw[enaction.clock] = re
             self.re_yaw.pop(enaction.clock - PREDICTION_ERROR_WINDOW, None)
-            print(f"Residual Error Withdraw Yaw (computed - measured)= {re:.1f}",
-                  f"Average: {np.mean(list(self.re_yaw.values())):.1f}",
-                  f"std: {np.std(list(self.re_yaw.values())):.1f}")
+            # print(f"Residual Error Withdraw Yaw (computed - measured)= {re:.1f}",
+            #       f"Average: {np.mean(list(self.re_yaw.values())):.1f}",
+            #       f"std: {np.std(list(self.re_yaw.values())):.1f}")
             # If residual error increased then decrease serotonine (not fun!)
             if abs(self.previous_yaw_re) <= abs(re):
                 self.workspace.memory.body_memory.neurotransmitters[SEROTONIN] = max(40, self.workspace.memory.body_memory.neurotransmitters[SEROTONIN] - 1)
@@ -196,10 +199,10 @@ class PredictionError:
 
         self.re_compass[enaction.clock] = math.degrees(enaction.trajectory.body_direction_delta)
         self.re_compass.pop(actual_outcome.clock - PREDICTION_ERROR_WINDOW, None)
-        print("Residual Error Compass (integrated direction - compass measure)=",
-              round(self.re_compass[enaction.clock], 2), "Average:",
-              round(float(np.mean(list(self.re_compass.values()))), 2), "std:",
-              round(float(np.std(list(self.re_compass.values()))), 2))
+        # print("Residual Error Compass (integrated direction - compass measure)=",
+        #       round(self.re_compass[enaction.clock], 2), "Average:",
+        #       round(float(np.mean(list(self.re_compass.values()))), 2), "std:",
+        #       round(float(np.std(list(self.re_compass.values()))), 2))
 
         # The echo prediction error when focus is confident
 
@@ -207,19 +210,19 @@ class PredictionError:
         pe = computed_outcome.head_angle - actual_outcome.head_angle
         self.pe_echo_direction[actual_outcome.clock] = pe
         self.pe_echo_direction.pop(actual_outcome.clock - PREDICTION_ERROR_WINDOW, None)
-        print("Prediction Error Head Direction (prediction - measure)=", pe,
-              # enaction.trajectory.focus_direction_prediction_error,
-              "Average:", round(float(np.mean(list(self.pe_echo_direction.values())))),
-              "std:", round(float(np.std(list(self.pe_echo_direction.values())))))
+        # print("Prediction Error Head Direction (prediction - measure)=", pe,
+        #       # enaction.trajectory.focus_direction_prediction_error,
+        #       "Average:", round(float(np.mean(list(self.pe_echo_direction.values())))),
+        #       "std:", round(float(np.std(list(self.pe_echo_direction.values())))))
 
         if computed_outcome.echo_distance < 10000 and actual_outcome.echo_distance < 10000:
             pe = computed_outcome.echo_distance - actual_outcome.echo_distance
             self.pe_echo_distance[enaction.clock] = pe
             self.pe_echo_distance.pop(enaction.clock - PREDICTION_ERROR_WINDOW, None)
-            print("Prediction Error Echo Distance (prediction - measure)=", pe,
-                  # enaction.trajectory.focus_distance_prediction_error,
-                  "Average:", round(float(np.mean(list(self.pe_echo_distance.values())))),
-                  "std:", round(float(np.std(list(self.pe_echo_distance.values())))))
+            # print("Prediction Error Echo Distance (prediction - measure)=", pe,
+            #       # enaction.trajectory.focus_distance_prediction_error,
+            #       "Average:", round(float(np.mean(list(self.pe_echo_distance.values())))),
+            #       "std:", round(float(np.std(list(self.pe_echo_distance.values())))))
 
         # The focus prediction error
 
@@ -228,25 +231,25 @@ class PredictionError:
             ma, md = point_to_head_direction_distance(enaction.trajectory.focus_point)
             self.pe_focus_direction[actual_outcome.clock] = round(pa - ma)
             self.pe_focus_direction.pop(actual_outcome.clock - PREDICTION_ERROR_WINDOW, None)
-            print("Prediction Error Focus Direction (prediction - measure)=", round(pa - ma),
-                  "Average:", round(float(np.mean(list(self.pe_focus_direction.values())))),
-                  "std:", round(float(np.std(list(self.pe_focus_direction.values())))))
+            # print("Prediction Error Focus Direction (prediction - measure)=", round(pa - ma),
+            #       "Average:", round(float(np.mean(list(self.pe_focus_direction.values())))),
+            #       "std:", round(float(np.std(list(self.pe_focus_direction.values())))))
             self.pe_focus_distance[enaction.clock] = round(pd - md)
             self.pe_focus_distance.pop(enaction.clock - PREDICTION_ERROR_WINDOW, None)
-            print("Prediction Error Focus Distance (prediction - measure)=", round(pd - md),
-                  "Average:", round(float(np.mean(list(self.pe_focus_distance.values())))),
-                  "std:", round(float(np.std(list(self.pe_focus_distance.values())))))
+            # print("Prediction Error Focus Distance (prediction - measure)=", round(pd - md),
+            #       "Average:", round(float(np.mean(list(self.pe_focus_distance.values())))),
+            #       "std:", round(float(np.std(list(self.pe_focus_distance.values())))))
 
         # The terrain origin prediction error
 
         terrain = self.workspace.memory.phenomenon_memory.terrain()
         if terrain is not None:
             terrain.origin_prediction_error.pop(enaction.clock - PREDICTION_ERROR_WINDOW, None)
-            if enaction.clock in terrain.origin_prediction_error:
-                print("Prediction Error Terrain origin (integration - measure)=",
-                      round(terrain.origin_prediction_error[enaction.clock]),
-                      "Average:", round(float(np.mean(list(terrain.origin_prediction_error.values())))),
-                      "std:", round(float(np.std(list(terrain.origin_prediction_error.values())))))
+            # if enaction.clock in terrain.origin_prediction_error:
+                # print("Prediction Error Terrain origin (integration - measure)=",
+                #       round(terrain.origin_prediction_error[enaction.clock]),
+                #       "Average:", round(float(np.mean(list(terrain.origin_prediction_error.values())))),
+                #       "std:", round(float(np.std(list(terrain.origin_prediction_error.values())))))
 
         # Trace the enaction
         position_pe = ""
@@ -254,24 +257,26 @@ class PredictionError:
                 hasattr(self.workspace.memory.phenomenon_memory.phenomena[self.workspace.memory.phenomenon_memory.focus_phenomenon_id], 'position_pe') and \
                 enaction.clock in self.workspace.memory.phenomenon_memory.phenomena[self.workspace.memory.phenomenon_memory.focus_phenomenon_id].position_pe:
             position_pe = round(self.workspace.memory.phenomenon_memory.phenomena[self.workspace.memory.phenomenon_memory.focus_phenomenon_id].position_pe[enaction.clock])
-            # Reduce serotonin if prediction error is low
-            # if position_pe < 50:
-            #     self.workspace.memory.body_memory.serotonin = max(40, self.workspace.memory.body_memory.serotonin - 1)
 
-        if enaction.clock == 0:
-            # Initialize the file with headers
-            with open("log/00_Trace.csv", 'w', newline='') as file:
-                csv.writer(file).writerow(["clock", "action", "predicted_outcome", "outcome_code", "pe_code", "floor",
-                                           "pe_yaw", "re_yaw", "re_compass", "forward_pe", "position_pe", "serotonin"])
-        # Append the enaction line
-        with open("log/00_Trace.csv", 'a', newline='') as file:
-            writer = csv.writer(file)
-            writer.writerow([enaction.clock, enaction.command.action.action_code, enaction.predicted_outcome_code,
-                             enaction.outcome_code, self.pe_outcome_code[enaction.clock], enaction.outcome.floor,
-                             self.pe_yaw.get(enaction.clock, ""),
-                             self.re_yaw.get(enaction.clock, ""), self.re_compass.get(enaction.clock, ""),
-                             self.pe_speed_forward.get(enaction.clock, ""), position_pe,
-                             self.workspace.memory.body_memory.neurotransmitters[SEROTONIN]])
+        self.workspace.tracer = self.workspace.tracer.bind(
+            **{LOG_RE_YAW: self.re_yaw.get(enaction.clock, ""),
+               LOG_RE_COMPASS: round(self.re_compass.get(enaction.clock, 0), 1)}
+        )
+
+        # if enaction.clock == 0:
+        #     # Initialize the file with headers
+        #     with open("log/00_Trace.csv", 'w', newline='') as file:
+        #         csv.writer(file).writerow(["clock", "action", "predicted_outcome", "outcome_code", "pe_code", "floor",
+        #                                    "pe_yaw", "re_yaw", "re_compass", "forward_pe", "position_pe", "serotonin"])
+        # # Append the enaction line
+        # with open("log/00_Trace.csv", 'a', newline='') as file:
+        #     writer = csv.writer(file)
+        #     writer.writerow([enaction.clock, enaction.command.action.action_code, enaction.predicted_outcome_code,
+        #                      enaction.outcome_code, self.pe_outcome_code[enaction.clock], enaction.outcome.floor,
+        #                      self.pe_yaw.get(enaction.clock, ""),
+        #                      self.re_yaw.get(enaction.clock, ""), self.re_compass.get(enaction.clock, ""),
+        #                      self.pe_speed_forward.get(enaction.clock, ""), position_pe,
+        #                      self.workspace.memory.body_memory.neurotransmitters[SEROTONIN]])
 
     def plot(self):
         """Show the prediction error plots"""

@@ -24,7 +24,8 @@ import pyglet
 import logging
 import structlog
 import csv
-from petitbrain import Flock, TRACE_HEADERS, TRACE_FILE
+from petitbrain import Flock
+from constants import TRACE_HEADERS, TRACE_FILE
 
 # Try to fix some mouse-press issue on Mac but it does not solve the problem
 # https://github.com/pyglet/pyglet/issues/171
@@ -35,17 +36,17 @@ pyglet.options['osx_alt_loop'] = True
 # File handler formatter
 file_formatter = logging.Formatter('%(message)s')
 # Console handler formatter
-# console_formatter = logging.Formatter('%(levelname)s: %(message)s')
-console_formatter = logging.Formatter('%(message)s')
+console_formatter = logging.Formatter('TRACE: %(message)s')
+# console_formatter = logging.Formatter('%(levelname)s: %(name)s: %(message)s')
 # File handler
 file_handler = logging.FileHandler(TRACE_FILE)
 file_handler.setLevel(logging.INFO)  # Set the log level for the file
 file_handler.setFormatter(file_formatter)
 # Console handler
 console_handler = logging.StreamHandler()
-console_handler.setLevel(logging.DEBUG)  # Set the log level for the console
+console_handler.setLevel(logging.INFO)  # Set the log level for the console
 console_handler.setFormatter(console_formatter)
-logging.basicConfig(level=logging.DEBUG, handlers=[file_handler, console_handler])
+logging.basicConfig(level=logging.INFO, handlers=[file_handler, console_handler])
 
 
 # Define a custom processor to format the log into a CSV row

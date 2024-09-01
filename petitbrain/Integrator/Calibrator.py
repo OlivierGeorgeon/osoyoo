@@ -2,6 +2,7 @@ import numpy as np
 import circle_fit as cf
 from pyrr import Matrix44
 from ..Memory.EgocentricMemory.Experience import EXPERIENCE_NORTH, EXPERIENCE_COMPASS
+from ..Proposer.Action import ACTION_FORWARD
 
 RUNNING_WINDOW_AZIMUTH = 100
 MAX_OFFSET_DISTANCE = 100
@@ -40,6 +41,7 @@ class Calibrator:
         """Run all the automatic calibration procedures"""
         self.calibrate_compass()
         self.calibrate_retreat()
+        self.calibrate_forward_speed()
 
     def calibrate_compass(self):
         """Update the compass offset and the compass experiences"""
@@ -70,3 +72,10 @@ class Calibrator:
                 av = (0.3 * self.workspace.enaction.outcome.yaw + 0.7 * self.workspace.memory.body_memory.retreat_yaw)  # /2
             self.workspace.memory.body_memory.retreat_yaw = round(av)
             print(f"Calibrate withdraw yaw to: {av:.0f}, difference {dif:.1f}")
+
+    def calibrate_forward_speed(self):
+        """Calibrate the forward speed"""
+        if self.workspace.memory.place_memory.estimated_distance is not None:
+            distance_pe = self.workspace.memory.place_memory.estimated_distance - self.workspace.actions[ACTION_FORWARD].translation_speed[0]
+            self.workspace.actions[ACTION_FORWARD].translation_speed[0] += distance_pe / 2
+            print("Calibrate forward speed to", self.workspace.actions[ACTION_FORWARD].translation_speed[0])

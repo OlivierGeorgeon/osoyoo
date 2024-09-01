@@ -191,7 +191,7 @@ def compare_all_place_cells(cell_id, place_cells):
                   f"fitness: {reg_p2p.fitness:.2f}, "
                   f"rmse: {reg_p2p.inlier_rmse:.0f}")  # Root mean square error (residual distance)
             # Save the plot
-            plot_compare(points1, points2, reg_p2p, cell_id, k)
+            plot_compare(points1, points2, reg_p2p, cell_id, k, place_cells[cell_id].last_visited_clock)
             # Save the comparison
             comparisons[k] = (translation[0], translation[1], rotation_deg,
                               round(reg_p2p.fitness, 2), round(reg_p2p.inlier_rmse))
@@ -205,7 +205,7 @@ def compare_all_place_cells(cell_id, place_cells):
             writer.writerow([k, *v])
 
 
-def compare_place_cells(place_source, place_target):
+def compare_place_cells(place_source, place_target, clock):
     """Compare two place cells based on central echoes"""
     points1 = np.array([c.point() for c in place_source.cues if c.type == EXPERIENCE_CENTRAL_ECHO])
     points2 = np.array([c.point() for c in place_target.cues if c.type == EXPERIENCE_CENTRAL_ECHO])
@@ -223,7 +223,8 @@ def compare_place_cells(place_source, place_target):
           f"rmse: {reg_p2p.inlier_rmse:.0f}")  # Root mean square error (residual distance)
 
     # Save the plot in an asynchronous thread
-    thread = threading.Thread(target=plot_compare, args=(points1, points2, reg_p2p, place_source.key, place_target.key))
+    thread = threading.Thread(target=plot_compare, args=(
+        points1, points2, reg_p2p, place_source.key, place_target.key, clock))
     thread.start()
 
     # If less than three points match or rotation then cancel the translation
@@ -233,7 +234,7 @@ def compare_place_cells(place_source, place_target):
     return translation
 
 
-def plot_compare(source_points, target_points, reg_p2p, k1, k2):
+def plot_compare(source_points, target_points, reg_p2p, k1, k2, clock):
     """Save a plot of the correspondence"""
     plt.figure()
 
@@ -276,7 +277,7 @@ def plot_compare(source_points, target_points, reg_p2p, k1, k2):
 
     # Save the plot
     try:
-        plt.savefig(f"log/02_compare_{k1}_{k2}.pdf")
+        plt.savefig(f"log/01_{clock}_compare_{k1}_{k2}.pdf")
     except PermissionError:
         print("Permission denied")
     plt.close()

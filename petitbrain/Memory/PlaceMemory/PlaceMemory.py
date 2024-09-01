@@ -8,6 +8,7 @@ from ...Memory.EgocentricMemory.Experience import EXPERIENCE_COMPASS, EXPERIENCE
     EXPERIENCE_LOCAL_ECHO, EXPERIENCE_ALIGNED_ECHO
 from .PlaceGeometry import nearby_place_cell, transform_estimation_cue_to_cue, compare_place_cells
 from ...SoundPlayer import SoundPlayer, SOUND_SURPRISE, SOUND_PLACE_CELL
+from ...constants import LOG_CELL, LOG_POSITION_PE
 
 
 class PlaceMemory:
@@ -20,12 +21,17 @@ class PlaceMemory:
         self.place_cell_distances = dict(dict())
         self.previous_cell_id = 0
         self.current_cell_id = 0  # The place cell where the robot currently is
-        self.proposed_correction = np.array([0, 0, 0])  # Proposed correction of robot and place cell position
+        self.position_pe = np.array([0, 0, 0])  # Position prediction error used to correct the positon
         self.observe_better = True  # Trigger scan on initialisation. Reset by decider
         self.graph_start_id = 1  # The first place cell of the current graph to display
+        self.estimated_distance = None
 
     def add_or_update_place_cell(self, memory):
         """Create e new place cell or update the existing one. Set the proposed correction"""
+
+        # Reset the position_correction
+        self.position_pe[:] = 0
+        self.estimated_distance = None
 
         # The new experiences for place cell
         experiences = [e for e in memory.egocentric_memory.experiences.values() if (e.clock >= memory.clock) and
@@ -51,15 +57,16 @@ class PlaceMemory:
                 if len(local_echoes) > 0:
                     points = np.array([e.polar_point() for e in local_echoes])
                     estimated_robot_point = self.place_cells[existing_id].translation_estimation_echo(
-                        points, memory.allocentric_memory.robot_point)
+                        points, memory.allocentric_memory.robot_point, memory.clock)
                     estimated_allo_robot_point = estimated_robot_point + self.place_cells[existing_id].point
                     # The robot position correction
-                    self.proposed_correction[:] = estimated_allo_robot_point - memory.allocentric_memory.robot_point
+                    proposed_correction = estimated_allo_robot_point - memory.allocentric_memory.robot_point
                     print(f"Position relative to place cell {self.current_cell_id}: "
                           f"{tuple(estimated_robot_point[:2].astype(int))}, "
-                          f"propose correction: {tuple(self.proposed_correction[:2].astype(int))}")
-                    if np.linalg.norm(self.proposed_correction[:]) < 200:
+                          f"propose correction: {tuple(proposed_correction[:2].astype(int))}")
+                    if np.linalg.norm(proposed_correction) < 200:
                         # Adjust the position and confidence
+                        self.position_pe[:] = proposed_correction
                         memory.adjust_robot_position(self.place_cells[existing_id])
                         SoundPlayer.play(SOUND_SURPRISE)
             # If the cell is not fully observed
@@ -73,12 +80,13 @@ class PlaceMemory:
                         self.place_cells[self.previous_cell_id].is_fully_observed():
                     # Estimate the translation from the previous place cell based on echoes. Plot the comparison
                     estimated_translation = compare_place_cells(
-                        self.place_cells[existing_id], self.place_cells[self.previous_cell_id])
+                        self.place_cells[existing_id], self.place_cells[self.previous_cell_id], memory.clock)
                     # If at least three points match and no rotation
                     if estimated_translation is not None:
-                        self.proposed_correction[:] = self.place_cells[self.previous_cell_id].point \
-                                                      - estimated_translation - self.place_cells[existing_id].point
-                        print(f"propose correction: {tuple(self.proposed_correction[:2].astype(int))}")
+                        self.estimated_distance = np.linalg.norm(estimated_translation)
+                        self.position_pe[:] = self.place_cells[self.previous_cell_id].point \
+                                              - estimated_translation - self.place_cells[existing_id].point
+                        print(f"Position correction: {tuple(self.position_pe[:2].astype(int))}")
                         # Adjust the position and increase confidence to 50
                         memory.adjust_robot_position(self.place_cells[existing_id])
 
@@ -91,14 +99,15 @@ class PlaceMemory:
                                          if (e.clock >= memory.clock) and e.type == EXPERIENCE_ALIGNED_ECHO]
                     if len(align_experiences) == 1:  # One aligned echo experience
                         allo_point = align_experiences[0].polar_point() + memory.allocentric_memory.robot_point
-                        self.proposed_correction[:] = self.place_cells[existing_id].translation_estimate_aligned_echo(
+                        proposed_correction = self.place_cells[existing_id].translation_estimate_aligned_echo(
                             allo_point)
                         print(f"Proposed correction to nearest central echo: "
-                              f"{tuple(self.proposed_correction[:2].astype(int))}")
+                              f"{tuple(proposed_correction[:2].astype(int))}")
                         # If the proposed correction is not too great then make the correction
-                        if np.linalg.norm(self.proposed_correction[:]) < 100 and abs(
+                        if np.linalg.norm(proposed_correction) < 100 and abs(
                                 memory.body_memory.head_direction_degree()) < 40:
                             # Adjust the position and increase confidence
+                            self.position_pe[:] = proposed_correction
                             memory.adjust_robot_position(self.place_cells[existing_id])
                             SoundPlayer.play(SOUND_SURPRISE)
                         else:
@@ -187,6 +196,10 @@ class PlaceMemory:
         if self.current_cell_id > 0:
             return self.place_cells[self.current_cell_id]
 
+    def trace_dict(self):
+        """Return a dictionary of fields that should be traced"""
+        return {LOG_CELL: self.current_cell_id, LOG_POSITION_PE: round(np.linalg.norm(self.position_pe))}
+
     def save(self):
         """Return a clone of place memory for memory snapshot"""
         saved_place_memory = PlaceMemory()
@@ -197,5 +210,5 @@ class PlaceMemory:
         saved_place_memory.current_cell_id = self.current_cell_id
         saved_place_memory.place_cell_distances = copy.deepcopy(self.place_cell_distances)
         saved_place_memory.observe_better = self.observe_better
-        saved_place_memory.proposed_correction[:] = self.proposed_correction
+        saved_place_memory.position_pe[:] = self.position_pe
         return saved_place_memory

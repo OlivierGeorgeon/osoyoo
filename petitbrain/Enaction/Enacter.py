@@ -1,8 +1,6 @@
 import json
 import time
 import socket
-# from ..Robot.CtrlRobot import ENACTION_STEP_IDLE, ENACTION_STEP_COMMANDING, ENACTION_STEP_ENACTING, \
-#     ENACTION_STEP_INTEGRATING, ENACTION_STEP_RENDERING
 from . import ENACTION_STEP_IDLE, ENACTION_STEP_COMMANDING, ENACTION_STEP_ENACTING, ENACTION_STEP_INTEGRATING, \
     ENACTION_STEP_RENDERING
 from ..Memory.PhenomenonMemory import TERRAIN_ORIGIN_CONFIDENCE
@@ -16,6 +14,8 @@ from ..Robot import NO_ECHO_DISTANCE
 from ..Robot.Outcome import Outcome
 from ..SoundPlayer import SoundPlayer, SOUND_SURPRISE
 from ..Proposer.AttentionMechanism import AttentionMechanism
+from ..constants import LOG_FORWARD_PE
+from ..Proposer.Action import ACTION_FORWARD
 
 
 class Enacter:
@@ -193,15 +193,17 @@ class Enacter:
                 self.workspace.enaction.outcome_code = outcome_code_focus(
                     self.workspace.memory.egocentric_memory.focus_point, self.workspace.memory)
 
-            # Track the prediction errors
-            self.workspace.prediction_error.log(self.workspace.enaction)
-            # Calibrate
-            self.workspace.calibrator.calibrate()
-
-            # Log the trace
+            # Track the prediction errors and log the trace
+            self.workspace.prediction_error.log()
+            if self.workspace.memory.place_memory.estimated_distance is not None:
+                forward_pe = round(self.workspace.memory.place_memory.estimated_distance - self.workspace.actions[ACTION_FORWARD].translation_speed[0])
+                self.workspace.tracer = self.workspace.tracer.bind(**{LOG_FORWARD_PE: forward_pe})
             self.workspace.tracer = self.workspace.tracer.bind(**self.workspace.memory.trace_dict())
             self.workspace.tracer.info("", **self.workspace.enaction.trace_dict())
             self.workspace.tracer = self.workspace.tracer.new()
+
+            # Calibrate
+            self.workspace.calibrator.calibrate()
 
             # Increment the clock
             if self.workspace.enaction.clock >= self.workspace.memory.clock:  # don't increment if the robot is behind

@@ -9,6 +9,7 @@ from .PhenomenonMemory import PHENOMENON_ENCLOSED_CONFIDENCE
 from ..Integrator.Integrator import integrate
 from ..Enaction.Predict import push_objects
 from .PlaceMemory.PlaceMemory import PlaceMemory
+from ..constants import LOG_AZIMUTH
 
 NEAR_HOME = 300    # (mm) Max distance to consider near home
 
@@ -150,14 +151,14 @@ class Memory:
             current_cell.position_confidence = min(current_cell.position_confidence + 20, self.place_memory.place_cells[self.place_memory.previous_cell_id].position_confidence)
 
         # Move the robot by the proposed correction proportionally to the place cell confidence
-        robot_correction = self.place_memory.proposed_correction * adjsutment_scale
+        robot_correction = self.place_memory.position_pe * adjsutment_scale
         print(f"Adjusting the robot's position to place cell {self.place_memory.current_cell_id} "
               f"by {tuple(robot_correction[:2].astype(int))}")
         self.allocentric_memory.robot_point += robot_correction
 
         # Move the place cell by the complementary of the position correction in the other direction
         # cell_correction = self.place_memory.proposed_correction * (current_cell.position_confidence - 100) / 100
-        cell_correction = self.place_memory.proposed_correction * (adjsutment_scale - 1)
+        cell_correction = self.place_memory.position_pe * (adjsutment_scale - 1)
         current_cell.point += cell_correction
         print(f"Place {self.place_memory.current_cell_id} adjusted by: "
               f"{tuple(cell_correction[0:2].astype(int))}")
@@ -169,7 +170,9 @@ class Memory:
 
     def trace_dict(self):
         """Return a dictionary of fields that should be traced"""
-        return {"correction": round(np.linalg.norm(self.place_memory.proposed_correction))}
+        trace_dict = self.place_memory.trace_dict()
+        trace_dict[LOG_AZIMUTH] = self.body_memory.body_azimuth()
+        return trace_dict
 
     def save(self):
         """Return a clone of memory for memory snapshot"""
