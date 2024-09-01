@@ -617,7 +617,7 @@ Experiment with the code and see what behaviour you can get out of the LLM inter
 
 
 
-# Step #7 -- A Python Device Layer -- the "Python Hardware Abstraction Layer" (P-HAL)
+# Step #7 -- A Python Device Layer
 
 Ok.... at this point we've experimented with the robot car electronics and microcontroller software. We've also experimented with using a Python program on a personal computer to use Wi-Fi to communicate and control the robot car. And in the last section (i.e., "Step #6") we even quickly added a large language model (LLM) to the Python software and let it control the robot car.
 
@@ -653,7 +653,115 @@ Ok.... let's start to work on our P-HAL (Python Hardware Abstraction Layer). Ins
 
 In mechanisms such as active inference and other detailed embodiment mechanisms, it is taught that the lower-level motor and sensory mechanisms cannot be teased away from each other or cognition in general. Whether or not that is true, the P-HAL will not affect that. 
 
-Ok.... let's make sure the file organization on the GitHub page corresponds to the concepts of "lower-level software" and "higher-level software." The P-HAL will be in between these two, but it is part of the "higher-level software" in the PetitCat Project.
+Ok.... let's make sure the file organization on the GitHub page corresponds to the concepts of "lower-level software" and "higher-level software." The P-HAL will be in between these two, but it is part of the "higher-level software" in the PetitCat Project. Sometimes it is useful to make a litte chart to map fancy names given to folders or files to more descriptive, industry-standard names.
+
+Navigate to https://github.com/OlivierGeorgeon/osoyoo
+
+"docs" --  This is the "documentation" of the PetitCat project -- if you click it you will see "overview" which is this "Easy to Read Overview Documentation" of the project.
+
+"petitcat" -- This is the "lower-level software" of the Petitcat project -- when you see this folder just ignore that it is named the same as the project and think "lower-level software". We have already loaded this software in earlier Parts of the documentation onto the Arduino board and used it for the lower level control of the robot car. This repository does not represent the whole PetitCat project. Just think "lower-level software" when you see this folder.
+
+Be aware that the Arduino IDE does not support multiple levels of folder/repository hierarchy, and so, you will not be able to see the "ARC" sub-repository of "petitcat" in the Arduino IDE. We have already previously discussed this. Nonetheless, it will still get compiled. Also, be aware you may have lateral scrolling to do in order to deal with the plethora of cpp and header files. But as discussed, nonetheless, everything will get compiled, and as long as it is not in sub-repository, you will be able to edit it with the Arduino IDE.
+
+You will see two more repositories now:
+
+"petitbrain"  and "tests" -- This the "higher-level software" of the PetitCat project. Pretend that "tests" is actually within "petitbrain" (it is not of course, so sometimes you will have to open it up and explore there for programs). They both contain the "higher-level software" of the PetitCat project.
+
+If you go to the "petitbrain" repository, you will see the Python module "PHAL01.py" -- this is the Python Hardware Abstraction Layer for the robot car.
+
+We will use it in the next step.
+
+In summary:
+
+"docs" -- documentation for the PetitCat project
+"petitcat"  -- think "low-level software" -- C/C++ code compiled to the Arduino board
+"petitbrain" -- think "higher-level software" -- Python
+"tests" -- think "higher-level software that is part of petitbrain"
+
+If you go into the "petitbrain" repository, you will see "PHAL01.py" -- the Python Hardware Abstraction Layer ver01 for the Osoyoo Robot Car.
+
+
+# Step #8 -- Using the "Python Hardware Abstraction Layer" (P-HAL)
+
+--> You should have already copied "arduino_secrets.h" to \src\wifi of your Arduino PetitCat project. If not follow the steps below:
+
+-------------------
+(On my computer the Arduino Sketchbook is c:\Users\howar\OneDrive\Documents\Arduino. The full path to the wifi subfolder on my computer is : c:\Users\howar\OneDrive\Documents\Arduino\petitcat_arduino\src\wifi  -- your computer will have a different path, but it will also end with "\petitcat_arduino\src\wifi")
+
+--> If you don't have a file "arduino_secrets.h" in the \src\wifi subfolder of your Arduino PetitCat project, then take a look again at Part II, or else just use any text or programmming editor to create a file "arduino_secrets.h" containing the following lines:
+
+<b>#define SECRET_WIFI_TYPE "STA" // Access point : "AP" pr Station (through router): "STA"
+
+    #define SECRET_SSID "Your wifi SSID"
+
+    #define SECRET_PASS "Your password"</b>
+
+--> Modify (and then save) the file "arduino_secrets.h" with the Wi-Fi information. For sake of example, below we are showing the same network info we used in the demo example in Step 2 above:
+
+<b>#define SECRET_WIFI_TYPE "STA" // Access point : "AP" pr Station (through router): "STA"
+
+#define SECRET_SSID "Jones"
+
+#define SECRET_PASS "test1234"</b>
+
+
+--> The PetitCat project file in the Arduino IDE (which will be uploaded to the robot car) now has your Wi-Fi network information required to attached to the same network your laptop/desktop computer is running (and from which you will communicate with the robot car via your Python programs).
+
+-------------------
+-
+-
+
+Go to the Arduino IDE. Click 'File', 'Sketchbook', 'Osoyoo'.  Open the project "petitcat_arduino.ino" 
+
+(Or, click 'File', 'Open Recent' and you may see "petitcat_arduino.ino" there already -- click it.)
+
+--> In the Arduino IDE you will see one of the modules as being "Robot_define.h" -- click that Window.
+
+In an early line you will see something like:
+
+    #Define ROBOT_ID 0
+
+It is important that the correct robot model is specified. Usually '0' is used for the default Osoyoo robot car.
+
+Ok.... let's see if everything works....
+
+
+Make sure the robot car is plugged into the USB port of your computer.
+
+Click the green circle with the right-pointing arrow (which actually is the second circle in the left-hand upper corner) -- the Arduino code will automatically compile and upload to the Arduino board of the robot car.
+
+Click Serial Monitor. (If no IP address is shown in the Serial Monitor when we run our code then go back to Part II to troubleshoot this problem.)
+
+Note the IP Address shown in the Serial Monitor.
+
+-
+-
+
+You need to have a working copy of Python on your laptop/desktop computer and some sort of programming environment to use it in. You may be using an advanced IDE such as Visual Studio IDE or PyCharm or a more streamlined development environment (e.g., such as Notepad++ operating in the terminal, which is what I am using). 
+
+Tip: Do not download the latest version. It may not be fully stable, as well as dependencies creep into your project, the latest version of Python often is not compatible with older dependencies whose developers have not updated them yet. Download a recent, stable version of Python. At the time of writing, I have Python 3.11.4 running on my computer although at python.org the latest release is at the time of writing version 3.12.2 (considered stable) or  version 3.13 (newest version available). 
+
+
+Go to [https://github.com/OlivierGeorgeon/osoyoo/tree/master/tests](https://github.com/OlivierGeorgeon/osoyoo/tree/master/petitbrain)  and copy the file "PHAL01.py" to your Python environment. 
+
+Now turn on the robotic car. Now in your Python environment (e.g., in Windows I am using the terminal and will show examples from there), run the program "PHAL01.py": 
+
+Windows terminal:    >python PHAL01.py
+
+
+The program will then ask for the IP address. It is the same address as before if you have not turned off the robotic car (i.e., 10.0.0.40 in the example above for my Wi-Fi). 
+
+(Note: It is ok to give the IP address here -- it will work correctly. You don't have to type it at the command linke like in Step #2 above.) 
+
+(Note: If you have reloaded the Arduino code then look at the serial monitor on the Arduino IDE to see what the IP address is.)
+
+
+
+
+
+
+
+
 
 
 PENDING
