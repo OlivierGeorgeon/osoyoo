@@ -613,13 +613,25 @@ If the robotic car is turned on with code running as described above, then you s
 
 ![cardemollm](cardemollm.png)
 
-Experiment with the code and see what behaviour you can get out of the LLM interfacted to the robotic car.
+Experiment with the code and see what behaviour you can get out of the LLM interfaced to the robotic car.
 
 
 
-# Step #7 -- Installing PetitCatMain1.py
+# Step #7 -- A Python Device Layer -- the "Python Hardware Abstraction Layer" (P-HAL)
 
-We will now install "PetitCatMain1.py" which will demonstrate some of the grid cell features of the PetitCat project.
+Ok.... at this point we've experimented with the robot car electronics and microcontroller software. We've also experimented with using a Python program on a personal computer to use Wi-Fi to communicate and control the robot car. And in the last section (i.e., "Step #6") we even quickly added a large language model (LLM) to the Python software and let it control the robot car.
+
+Now let's start to move into more industry-standard robotics organization.
+
+Low-level software typically refers to the code that interacts directly with hardware, such as motor control, sensor reading, and basic input/output operations. In our case, this would be the C/C++ code running on the Arduino microcontroller controlling the robot car.  Thus, we will use the term "low-level software" for the software controlling the microcontroller which in turn controls our hardware embodiment (i.e., at this time the Osoyoo robot car but perhaps this can be changed to a robotic arm or perhaps at one point an (economical) humanoid robot).
+
+High-level software generally refers to software that performs more abstract, complex tasks, often involving algorithms, data processing, or decision-making. Our Python software running on the personal computer, which handled AI in Step #6, and communicates with the robot, fits this description well.
+
+A "hardware abstraction layer" ("HAL") is a common term that describes high-level software that abstracts the details of hardware interactions, making it easier to write high-level code that is hardware-agnostic. In our case, we will now develop a Python hardware abstraction layer (P-HAL). This Python module will interface via Wi-Fi again with the hardware embodiment. In this case right now, it's a robotic car, but in the future it could be a different hardware embodiment.
+
+
+![image](https://github.com/user-attachments/assets/b28760c2-25aa-4acc-899a-49712f8db611)
+Although it may contain one, HAL in this case is not a simple hardware abstraction layer, but instead the most famous computer in science fiction history (movie 2001).
 
 
 PENDING
