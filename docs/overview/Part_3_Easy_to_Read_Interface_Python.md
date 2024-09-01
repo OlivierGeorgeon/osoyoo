@@ -631,7 +631,17 @@ A "hardware abstraction layer" ("HAL") is a common term that describes high-leve
 
 
 ![image](https://github.com/user-attachments/assets/b28760c2-25aa-4acc-899a-49712f8db611)
+
 Although it may contain one, HAL in this case is not a simple hardware abstraction layer, but instead the most famous computer in science fiction history (movie 2001).
+
+-
+![image](https://github.com/user-attachments/assets/59b62fc1-8339-4c74-978b-252cf5cc2845)
+
+"A HAL (or Hardware Abstraction Layer) is a software layer that separates the hardware of the phsical system from the application software. It provides a consistent development interface to the underlying hardware which helps developers create software independently of the specific hardware details. This makes it easier for test software developers to create software that can run on different hardware configurations."   (https://www.youtube.com/watch?v=YK698iSBgiE) 
+
+-
+
+
 
 
 PENDING
