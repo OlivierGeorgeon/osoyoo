@@ -2,7 +2,7 @@
 #Python-Hardware Abstraction Layer
 
 
- Olivier Georgeon, 2024.
+# Olivier Georgeon, 2024.
 # This code is used to demonstrates the reliable wifi protocol between the PC and the robot.
 
 # After sending the command string, the PC expects to receive the outcome string within a timeout.
