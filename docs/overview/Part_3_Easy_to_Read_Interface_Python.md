@@ -637,11 +637,20 @@ Although it may contain one, HAL in this case is not a simple hardware abstracti
 -
 ![image](https://github.com/user-attachments/assets/59b62fc1-8339-4c74-978b-252cf5cc2845)
 
-"A HAL (or Hardware Abstraction Layer) is a software layer that separates the hardware of the phsical system from the application software. It provides a consistent development interface to the underlying hardware which helps developers create software independently of the specific hardware details. This makes it easier for test software developers to create software that can run on different hardware configurations."   (https://www.youtube.com/watch?v=YK698iSBgiE) 
+"A HAL (or Hardware Abstraction Layer) is a software layer that separates the hardware of the physical system from the application software. It provides a consistent development interface to the underlying hardware which helps developers create software independently of the specific hardware details. This makes it easier for test software developers to create software that can run on different hardware configurations."   (https://www.youtube.com/watch?v=YK698iSBgiE) 
 
 -
 
+![image](https://github.com/user-attachments/assets/e33eca03-72be-40d0-b43e-a48dde2312c5)
 
+"Analogous to the HAL concept of operating systems the Hardware Abstraction Layer separates core functionality from hardware details. In contrast to OS kernels the core functionality of robot systems is their high-feedback control algorithms. In order to achieve high performance the implementation of the entire stack should be governed by a common system model." --  The Hardware Abstraction Layer — Supporting control design by tackling the complexity of humanoid robot hardware, 2014 IEEE International Conference on Robotics and Automation (ICRA), Hong Kong, China, 2014, pp. 6427-6433, doi: 10.1109/ICRA.2014.6907808.  "Humanoid robots are highly integrated robotic systems with many sensors and actuators. The DLR Hand Arm system has 52 motors and 430 sensors. Design goal is to operate the robot with high-performance feedback control at cycles beyond 1kHz but to retain the flexibility of prototyping control algorithms. This is achieved with the concept of a Hardware Abstraction Layer (HAL) that provides a convenient high-level interface to the entire robotic hardware. The requirements for the design of a HAL in terms of functionality and implementation are presented that improve the integration of complex robot hardware with prototype control applications."
+
+
+Ok.... let's start to work on our P-HAL (Python Hardware Abstraction Layer). Instead of plugging in our Python programs including AI applications such as the LLM in the previous Step #6 directly into the Python code communicating with the Arduino board (e.g., Step #6) we will use the P-HAL for communication with and control of the lower-level software and hardware embodiment. 
+
+In mechanisms such as active inference and other detailed embodiment mechanisms, it is taught that the lower-level motor and sensory mechanisms cannot be teased away from each other or cognition in general. Whether or not that is true, the P-HAL will not affect that. 
+
+Ok.... let's make sure the file organization on the GitHub page corresponds to the concepts of "lower-level software" and "higher-level software." The P-HAL will be in between these two, but it is part of the "higher-level software" in the PetitCat Project.
 
 
 PENDING
