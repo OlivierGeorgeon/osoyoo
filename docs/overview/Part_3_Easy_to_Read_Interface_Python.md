@@ -661,7 +661,7 @@ Navigate to https://github.com/OlivierGeorgeon/osoyoo
 
 "petitcat" -- This is the "lower-level software" of the Petitcat project -- when you see this folder just ignore that it is named the same as the project and think "lower-level software". We have already loaded this software in earlier Parts of the documentation onto the Arduino board and used it for the lower level control of the robot car. This repository does not represent the whole PetitCat project. Just think "lower-level software" when you see this folder.
 
-Be aware that the Arduino IDE does not support multiple levels of folder/repository hierarchy, and so, you will not be able to see the "ARC" sub-repository of "petitcat" in the Arduino IDE. We have already previously discussed this. Nonetheless, it will still get compiled. Also, be aware you may have lateral scrolling to do in order to deal with the plethora of cpp and header files. But as discussed, nonetheless, everything will get compiled, and as long as it is not in sub-repository, you will be able to edit it with the Arduino IDE.
+Be aware that the Arduino IDE does not support multiple levels of folder/repository hierarchy, and so, you will not be able to see the "SRC" sub-repository of "petitcat" in the Arduino IDE. We have already previously discussed this. Nonetheless, it will still get compiled. Also, be aware you may have lateral scrolling to do in order to deal with the plethora of cpp and header files. But as discussed, nonetheless, everything will get compiled, and as long as it is not in sub-repository, you will be able to edit it with the Arduino IDE.
 
 You will see two more repositories now:
 
@@ -674,9 +674,13 @@ We will use it in the next step.
 In summary:
 
 "docs" -- documentation for the PetitCat project
+
 "petitcat"  -- think "low-level software" -- C/C++ code compiled to the Arduino board
+
 "petitbrain" -- think "higher-level software" -- Python
+
 "tests" -- think "higher-level software that is part of petitbrain"
+
 
 If you go into the "petitbrain" repository, you will see "PHAL01.py" -- the Python Hardware Abstraction Layer ver01 for the Osoyoo Robot Car.
 
@@ -742,7 +746,7 @@ You need to have a working copy of Python on your laptop/desktop computer and so
 Tip: Do not download the latest version. It may not be fully stable, as well as dependencies creep into your project, the latest version of Python often is not compatible with older dependencies whose developers have not updated them yet. Download a recent, stable version of Python. At the time of writing, I have Python 3.11.4 running on my computer although at python.org the latest release is at the time of writing version 3.12.2 (considered stable) or  version 3.13 (newest version available). 
 
 
-Go to [https://github.com/OlivierGeorgeon/osoyoo/tree/master/tests](https://github.com/OlivierGeorgeon/osoyoo/tree/master/petitbrain)  and copy the file "PHAL01.py" to your Python environment. 
+Go to [https://github.com/OlivierGeorgeon/osoyoo/tree/master/petitbrain)](https://github.com/OlivierGeorgeon/osoyoo/tree/master/petitbrain)  and copy the file "PHAL01.py" to your Python environment. 
 
 Now turn on the robotic car. Now in your Python environment (e.g., in Windows I am using the terminal and will show examples from there), run the program "PHAL01.py": 
 
