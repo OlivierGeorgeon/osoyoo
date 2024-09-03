@@ -735,6 +735,7 @@ Make sure the robot car is plugged into the USB port of your computer.
 Click the green circle with the right-pointing arrow (which actually is the second circle in the left-hand upper corner) -- the Arduino code will automatically compile and upload to the Arduino board of the robot car.
 
 Click Serial Monitor. (If no IP address is shown in the Serial Monitor when we run our code then go back to Part II to troubleshoot this problem.)
+
 -
 
 ![image](https://github.com/user-attachments/assets/ae3abd5c-e6b7-4726-9e28-f558263d8edd)
@@ -769,7 +770,9 @@ The program will then ask for the IP address. It is the same address as before i
 
 Note: Some early versions of the program will not work if you enter the IP address at the prompt. 
 
-![image](https://github.com/user-attachments/assets/af7d9e26-f8d4-4818-a837-efd2b3f62b21)
+
+![image](https://github.com/user-attachments/assets/92ca6115-99d5-41db-be0c-16a44b8d8fc7)
+
 
 You can overcome this issue by entering the IP address at the command line:
 
@@ -783,7 +786,7 @@ You can overcome this issue by entering the IP address at the command line:
 
 
 
-![image](https://github.com/user-attachments/assets/92ca6115-99d5-41db-be0c-16a44b8d8fc7)
+
 
 
 
