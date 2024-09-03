@@ -1,4 +1,16 @@
-# PETITCAT PROJECT DISCLAIMER
+# PETITCAT PROJECT DISCLAIMERF
+
+****
+
+Note:  Sept 3, 2024
+
+File repository links and names have been changed in the PetitCat GitHub site.
+
+Hopefully, these can be updated in the near future.
+
+*****
+
+
 
 **Date:** July 1, 2024
 
