@@ -780,25 +780,21 @@ You can overcome this issue by entering the IP address at the command line:
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+********************************************
 
 PENDING
 
-Perhaps also cloning of directory structure, perhaps introduce venv virtual environments?
+To discuss with Olivier:
+
+1. Possibility for HAL to act like more normal industry standard HAL, i.e., able to send motor signals and and able to request/gate sensory signals. Or HAL to be active inference-based and the HAL layer optionally strips off sensory info and sends a motor request in order to request sensory information.
+
+2. Need documentation of sensory signals. (If not, need to go through the C/C++ source code and more of the Python source code, as well as set up experiments to determine what they are, but most likely the codes, etc are known.)
+
+3. Once above is clarified, development of P-HAL layer.
+
+4. Interface of P-HAL layer with newer LLM, i.e., GPT4 API.
+
+********************************************
 
 
 
