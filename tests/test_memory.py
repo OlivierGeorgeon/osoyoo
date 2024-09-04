@@ -24,3 +24,13 @@ def test_cell_to_point():
                          [[225., 216.50635095],
                           [225., 303.10889132]]])
     np.testing.assert_allclose(result, expected), "Wrong points"
+
+
+def test_calculate_forward_pe(workspace_fixture):
+    workspace_fixture.memory.place_memory.calculate_forward_pe()
+    assert workspace_fixture.memory.place_memory.forward_pe == 0
+
+    # Test position_pe by the same value
+    workspace_fixture.memory.place_memory.position_pe = workspace_fixture.memory.place_memory.place_cells[2].point
+    workspace_fixture.memory.place_memory.calculate_forward_pe()
+    assert workspace_fixture.memory.place_memory.forward_pe == 300

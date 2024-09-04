@@ -8,7 +8,8 @@ import csv
 import matplotlib.pyplot as plt
 import threading
 from pyrr import Quaternion
-from . import MIN_PLACE_CELL_DISTANCE, ICP_DISTANCE_THRESHOLD, ANGULAR_RESOLUTION, MASK_ARRAY
+from . import MIN_PLACE_CELL_DISTANCE, ICP_DISTANCE_THRESHOLD, ANGULAR_RESOLUTION, MASK_ARRAY, ICP_MIN_POINTS, \
+    ICP_MAX_ROTATION
 from ...Robot import NO_ECHO_DISTANCE
 from ...Utils import cartesian_to_polar
 from ...Memory.EgocentricMemory.Experience import EXPERIENCE_CENTRAL_ECHO
@@ -228,7 +229,7 @@ def compare_place_cells(place_source, place_target, clock):
     thread.start()
 
     # If less than three points match or rotation then cancel the translation
-    if len(reg_p2p.correspondence_set) < 3 or rotation_deg > 10:
+    if len(reg_p2p.correspondence_set) < ICP_MIN_POINTS or rotation_deg > ICP_MAX_ROTATION:
         translation = None
         print(f"Adjustment cancelled points: {reg_p2p.correspondence_set}, rotation: {rotation_deg:.0f}")
     return translation

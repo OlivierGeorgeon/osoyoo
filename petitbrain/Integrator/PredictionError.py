@@ -95,7 +95,7 @@ class PredictionError:
                 #       "Average:", round(float(np.mean(list(self.pe_speed_forward.values()))), 1),
                 #       "std:", round(float(np.std(list(self.pe_speed_forward.values())))), 1)
                 # Update the speed of the action
-                self.workspace.actions[ACTION_FORWARD].translation_speed[0] = action_speed * (1. - RUNNING_AVERAGE_COEF) + speed * RUNNING_AVERAGE_COEF
+                # self.workspace.actions[ACTION_FORWARD].translation_speed[0] = action_speed * (1. - RUNNING_AVERAGE_COEF) + speed * RUNNING_AVERAGE_COEF
 
                 # Use the same speed forward and backward
                 self.pe_x_speed[enaction.clock] = pe
@@ -103,7 +103,7 @@ class PredictionError:
                 # print(f"Prediction Error X Speed (simulation {action_speed:.0f}, - measured {speed:.0f})= {pe}",
                 #       "Average:", round(float(np.mean(list(self.pe_x_speed.values()))), 1),
                 #       "std:", round(float(np.std(list(self.pe_x_speed.values())))), 1)
-                self.workspace.actions[ACTION_BACKWARD].translation_speed[0] = - action_speed * (1. - RUNNING_AVERAGE_COEF) - speed * RUNNING_AVERAGE_COEF
+                # self.workspace.actions[ACTION_BACKWARD].translation_speed[0] = - action_speed * (1. - RUNNING_AVERAGE_COEF) - speed * RUNNING_AVERAGE_COEF
 
         # Translation Backward
 
@@ -122,7 +122,7 @@ class PredictionError:
                 #       "Average:", round(float(np.mean(list(self.pe_speed_backward.values()))), 1),
                 #       "std:", round(float(np.std(list(self.pe_speed_backward.values())))), 1)
                 # Update the speed of the action
-                self.workspace.actions[ACTION_BACKWARD].translation_speed[0] = action_speed * (1. - RUNNING_AVERAGE_COEF) + speed * RUNNING_AVERAGE_COEF
+                # self.workspace.actions[ACTION_BACKWARD].translation_speed[0] = action_speed * (1. - RUNNING_AVERAGE_COEF) + speed * RUNNING_AVERAGE_COEF
                 # Use the same speed forward and backward
                 self.pe_x_speed[enaction.clock] = - pe  # Opposite
                 self.pe_x_speed.pop(actual_outcome.clock - PREDICTION_ERROR_WINDOW, None)
@@ -130,7 +130,7 @@ class PredictionError:
                 #       "Average:", round(float(np.mean(list(self.pe_x_speed.values()))), 1),
                 #       "std:", round(float(np.std(list(self.pe_x_speed.values())))), 1)
                 # Update the action speed
-                self.workspace.actions[ACTION_FORWARD].translation_speed[0] = - action_speed * (1. - RUNNING_AVERAGE_COEF) - speed * RUNNING_AVERAGE_COEF
+                # self.workspace.actions[ACTION_FORWARD].translation_speed[0] = - action_speed * (1. - RUNNING_AVERAGE_COEF) - speed * RUNNING_AVERAGE_COEF
 
         self.previous_echo_distance = actual_outcome.echo_distance
 

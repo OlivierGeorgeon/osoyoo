@@ -1,6 +1,6 @@
 import numpy as np
 import circle_fit as cf
-from pyrr import Matrix44
+from pyrr import Matrix44, Vector3, vector3
 from ..Memory.EgocentricMemory.Experience import EXPERIENCE_NORTH, EXPERIENCE_COMPASS
 from ..Proposer.Action import ACTION_FORWARD
 
@@ -74,8 +74,6 @@ class Calibrator:
             print(f"Calibrate withdraw yaw to: {av:.0f}, difference {dif:.1f}")
 
     def calibrate_forward_speed(self):
-        """Calibrate the forward speed"""
-        if self.workspace.memory.place_memory.estimated_distance is not None:
-            distance_pe = self.workspace.memory.place_memory.estimated_distance - self.workspace.actions[ACTION_FORWARD].translation_speed[0]
-            self.workspace.actions[ACTION_FORWARD].translation_speed[0] += distance_pe / 2
-            print("Calibrate forward speed to", self.workspace.actions[ACTION_FORWARD].translation_speed[0])
+        """Calibrate the forward speed by adding the forward prediction error / 2"""
+        self.workspace.actions[ACTION_FORWARD].translation_speed[0] += self.workspace.memory.place_memory.forward_pe / 2
+        print("Calibrate forward speed to", self.workspace.actions[ACTION_FORWARD].translation_speed[0])

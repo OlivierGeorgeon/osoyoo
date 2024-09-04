@@ -1,5 +1,5 @@
 # Testing the Phenomenon View
-# py -m autocat.Display
+# py -m petitbrain.Display
 
 import numpy as np
 import math
@@ -46,7 +46,7 @@ e02 = Experience(2, pose_matrix, EXPERIENCE_ALIGNED_ECHO, 0, workspace.memory.bo
 cue02 = Cue(e02.id, e02.polar_pose_matrix(), e02.type, e02.clock, e02.color_index, e02.polar_sensor_point())
 
 # Create the place cell
-place_cell = PlaceCell(0, np.array([0, 0, 0]), [cue00, cue01, cue02], 100)
+place_cell = PlaceCell(1, np.array([0, 0, 0]), [cue00, cue01, cue02], 100)
 
 # Load the place cell in place memory
 workspace.memory.place_memory.place_cells[1] = place_cell
@@ -59,7 +59,7 @@ swipe = Interaction(Action(ACTION_SWIPE, np.array([0, 300, 0], dtype=float), 0, 
 #turn = Interaction(Action(ACTION_TURN, np.array([0, 0, 0], dtype=float), 0, 1.), OUTCOME_NO_FOCUS, 0)
 workspace.memory.clock += 1
 enaction = Enaction(swipe, workspace.memory.save())
-enaction.outcome = Outcome({'action': ACTION_SWIPE, 'clock': 0, 'duration1': 500, 'head_angle': 0, 'yaw': 00,
+enaction.outcome = Outcome({'action': ACTION_SWIPE, 'clock': 0, 'duration1': 1000, 'head_angle': 0, 'yaw': 00,
                             'echo_distance': 200})
 enaction.terminate()
 workspace.memory.update(enaction)

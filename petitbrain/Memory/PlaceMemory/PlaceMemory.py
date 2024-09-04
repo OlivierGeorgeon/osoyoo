@@ -1,6 +1,6 @@
 import numpy as np
 import networkx as nx
-from pyrr import Matrix44
+from pyrr import Matrix44, vector3, Vector3
 import copy
 from ...Memory.PlaceMemory.PlaceCell import PlaceCell
 from ...Memory.PlaceMemory.Cue import Cue
@@ -8,7 +8,7 @@ from ...Memory.EgocentricMemory.Experience import EXPERIENCE_COMPASS, EXPERIENCE
     EXPERIENCE_LOCAL_ECHO, EXPERIENCE_ALIGNED_ECHO
 from .PlaceGeometry import nearby_place_cell, transform_estimation_cue_to_cue, compare_place_cells
 from ...SoundPlayer import SoundPlayer, SOUND_SURPRISE, SOUND_PLACE_CELL
-from ...constants import LOG_CELL, LOG_POSITION_PE
+from ...constants import LOG_CELL, LOG_POSITION_PE, LOG_FORWARD_PE
 
 
 class PlaceMemory:
@@ -25,6 +25,7 @@ class PlaceMemory:
         self.observe_better = True  # Trigger scan on initialisation. Reset by decider
         self.graph_start_id = 1  # The first place cell of the current graph to display
         self.estimated_distance = None
+        self.forward_pe = 0
 
     def add_or_update_place_cell(self, memory):
         """Create e new place cell or update the existing one. Set the proposed correction"""
@@ -32,6 +33,7 @@ class PlaceMemory:
         # Reset the position_correction
         self.position_pe[:] = 0
         self.estimated_distance = None
+        self.forward_pe = 0
 
         # The new experiences for place cell
         experiences = [e for e in memory.egocentric_memory.experiences.values() if (e.clock >= memory.clock) and
@@ -87,6 +89,7 @@ class PlaceMemory:
                         self.position_pe[:] = self.place_cells[self.previous_cell_id].point \
                                               - estimated_translation - self.place_cells[existing_id].point
                         print(f"Position correction: {tuple(self.position_pe[:2].astype(int))}")
+                        self.calculate_forward_pe()
                         # Adjust the position and increase confidence to 50
                         memory.adjust_robot_position(self.place_cells[existing_id])
 
@@ -198,7 +201,17 @@ class PlaceMemory:
 
     def trace_dict(self):
         """Return a dictionary of fields that should be traced"""
-        return {LOG_CELL: self.current_cell_id, LOG_POSITION_PE: round(np.linalg.norm(self.position_pe))}
+        return {LOG_CELL: self.current_cell_id, LOG_POSITION_PE: round(np.linalg.norm(self.position_pe)),
+                LOG_FORWARD_PE: round(self.forward_pe)}
+
+    def calculate_forward_pe(self):
+        place_change_v = vector3.normalise(Vector3(self.place_cells[self.current_cell_id].point -
+                                                   self.place_cells[self.previous_cell_id].point))
+        self.forward_pe = np.dot(place_change_v, self.position_pe)
+        print(f"current cell {self.current_cell_id}, previous cell {self.previous_cell_id}",
+              f"place change v {tuple(place_change_v[:2])}, "
+              f"position pe {tuple(self.position_pe[:2].astype(int))}, "
+              f"Forward pe", self.forward_pe)
 
     def save(self):
         """Return a clone of place memory for memory snapshot"""
@@ -211,4 +224,6 @@ class PlaceMemory:
         saved_place_memory.place_cell_distances = copy.deepcopy(self.place_cell_distances)
         saved_place_memory.observe_better = self.observe_better
         saved_place_memory.position_pe[:] = self.position_pe
+        saved_place_memory.estimated_distance = self.estimated_distance
+        saved_place_memory.forward_pe = self.forward_pe
         return saved_place_memory

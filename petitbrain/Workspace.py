@@ -9,7 +9,6 @@ from .Robot.Command import DIRECTION_BACK
 from .Robot.Message import Message
 from .Enaction.Enacter import Enacter
 from .Enaction.Simulator import Simulator
-# from .Robot.CtrlRobot import ENACTION_STEP_IDLE, ENACTION_STEP_RENDERING
 from .Enaction import ENACTION_STEP_RENDERING
 from .Enaction.CompositeEnaction import CompositeEnaction
 from .Integrator.PredictionError import PredictionError
@@ -21,8 +20,6 @@ from .Proposer.PredefinedInteractions import create_sequence_interactions
 from .Robot.RobotDefine import ROBOT_SETTINGS
 
 KEY_CONTROL_USER = "M"  # Manual mode : controlled by the user
-# KEY_DECREASE = "D"
-# KEY_INCREASE = "P"
 KEY_CLEAR = "C"  # Clear the stack of interactions to enact next
 KEY_PREDICTION_ERROR = "E"  # Compute the prediction errors
 KEY_ENCLOSE = "N"
