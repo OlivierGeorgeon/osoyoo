@@ -126,6 +126,71 @@ class RobotController:
 # To run this demonstration, provide the Robot's IP address as a launch argument. For example:
 # py reliable_teleop.py 1
 
+
+''' scavenged documentation concerning command codes and signals returned:
+    
+    Table 1 summarizes the recognized actions. The choice of keys was made for a standard keyboard numerical pad. 
+These actions are interrupted if the robot detects a black line on the floor or an impact against an obstacle.
+
+Table 1: Main recognized commands
+
+|Action key| Command|
+|---|---|
+| 1 | Turn in the spot to the left by 45°|
+| 2 | Move backward during 1000ms|
+| 3 | Turn in the spot to the right by 45°|
+| 4 | Swipe left during 1000ms|
+| 6 | Swipe right during 1000ms|
+| 8 | Move forward during 1000ms|
+| - | Scan the environment with the head|
+
+# Main command fields
+
+Table 2 summarizes the main fields of the command packet sent to the robot. 
+To try the optional fields, you must modify `test_remote_control_robot.py`.
+Some optional fields only apply to some commands indicated in the _Command_ column.
+
+|Field| Command | Status | Description |
+|---|---|---|---|
+| `"clock"` | all | Required | The incremental number of the interaction since startup. | 
+| `"action"` | all | Required | The action code | 
+| `"focus_x"` | all except -| Optional | The x coordinates of the focus point in mm |
+| `"focus_y"` | all except -| Optional | The y coordinates of the focus point in mm |
+| `"color"` | all | Optional | The color code of the emotion led: 0: off, 1: white, 2: green, 3: bleue, 4: red, 5: orange. |
+| `"duration"` | 2, 4, 8| Optional | The duration of the translation in milliseconds| 
+| `"angle"` | 1 | Optional | The angle of rotation in degrees. Negative angles turn right |
+| `"span"` | - | Optional | The span of the saccades during the scan in degrees |
+| `"caution"` | 8 | Optional | =1: move cautiously means stopping when touching an object|
+
+During the interaction, the robot will keep its head towards the focus point defined by `"focus_x"` and `"focus_y"` coordinates. 
+
+# Main outcome fields
+
+Table 3 summarizes the main fields sent by the robots in the outcome packet.
+Some fields are not returned for all the interactions.
+
+Table 3: Main outcome fields.
+
+|Field| Description |
+|---|---|
+| `"clock"` | The clock sent back for checking | 
+| `"action"` | The action sent back for checking | 
+| `"yaw"` | The angle of rotation during the interaction | 
+| `"duration1"` | The duration of the interaction before interruption due to black line or impact | 
+| `"head_angle"` | The direction of the head in degrees at the end of the interaction. 0° is forward. | 
+| `"echo_distance"` | The distance of the ultrasonic echo in mm at the end of the interaction. | 
+| `"floor"` | Black line detection event: 0: None, 1: right, 2: left, 3: front. | 
+| `"color"` | RGB+Clear color measured by the floor color sensor at the end of the interaction| 
+| `"azimuth"` | The azimuth in degrees (angle from North) measured by the compass in the IMU board | 
+| `"duration"` | Total duration of the interaction in ms. | 
+| `"impact"` | Impact event triggered by the IMU board: 0: None, 1: left, 2: right, 3: front. | 
+| `"echoes"` | The array of echoes gathered during scanning. | 
+| `"touch"` | The touch sensor senses an object in front of the robot (to be documented)|
+
+'''
+
+
+
 if __name__ == '__main__':
     # Check the robot's IP address
     robot_ip = UDP_IP
