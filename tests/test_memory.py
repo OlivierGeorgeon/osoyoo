@@ -1,4 +1,5 @@
 import numpy as np
+import pytest
 from petitbrain.Memory.AllocentricMemory.AllocentricMemory import AllocentricMemory
 from petitbrain.Memory.AllocentricMemory.Geometry import cell_to_point
 from petitbrain.Memory import CELL_RADIUS
@@ -34,3 +35,18 @@ def test_calculate_forward_pe(workspace_fixture):
     workspace_fixture.memory.place_memory.position_pe = workspace_fixture.memory.place_memory.place_cells[2].point
     workspace_fixture.memory.place_memory.calculate_forward_pe()
     assert workspace_fixture.memory.place_memory.forward_pe == 300
+
+
+@pytest.fixture
+def forward_fixture(workspace_fixture):
+    workspace_fixture.memory.place_memory.place_cells[1].point = np.array([0, 0, 0])
+    workspace_fixture.memory.place_memory.place_cells[1].last_robot_point_in_cell = np.array([100, 0, 0])
+    workspace_fixture.memory.place_memory.place_cells[2].point = np.array([400, 0, 0])
+    workspace_fixture.memory.place_memory.position_pe = np.array([30, 0, 0])
+    return workspace_fixture
+
+
+def test_calculate_forward_pe2(forward_fixture):
+    forward_fixture.memory.place_memory.calculate_forward_pe()
+    assert forward_fixture.memory.place_memory.forward_pe == 30
+

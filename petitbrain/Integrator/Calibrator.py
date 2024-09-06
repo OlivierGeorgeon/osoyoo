@@ -75,5 +75,6 @@ class Calibrator:
 
     def calibrate_forward_speed(self):
         """Calibrate the forward speed by adding the forward prediction error / 2"""
+        # Assume that the translation lasted 1s
         self.workspace.actions[ACTION_FORWARD].translation_speed[0] += self.workspace.memory.place_memory.forward_pe / 2
-        print("Calibrate forward speed to", self.workspace.actions[ACTION_FORWARD].translation_speed[0])
+        # print("Calibrate forward speed to", round(self.workspace.actions[ACTION_FORWARD].translation_speed[0]))

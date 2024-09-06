@@ -142,29 +142,47 @@ class Memory:
 
     def adjust_robot_position(self, current_cell):
         """Adjust the robot's position by the correction from place cell memory"""
+        """Executed when the robot comes back to a previously fully scanned cell"""
 
-        adjsutment_scale = 1.
+        adjustment_scale = 1.
         # If the previous cell has mord confidence than the current then adjust the cell position
         if self.place_memory.place_cells[self.place_memory.previous_cell_id].position_confidence >= current_cell.position_confidence:
-            adjsutment_scale = current_cell.position_confidence / 100.
+            adjustment_scale = current_cell.position_confidence / 100.
             # Increase the current cell confidence no more than the previous cell confidence
             current_cell.position_confidence = min(current_cell.position_confidence + 20, self.place_memory.place_cells[self.place_memory.previous_cell_id].position_confidence)
 
         # Move the robot by the proposed correction proportionally to the place cell confidence
-        robot_correction = self.place_memory.position_pe * adjsutment_scale
+        robot_correction = self.place_memory.position_pe * adjustment_scale
         print(f"Adjusting the robot's position to place cell {self.place_memory.current_cell_id} "
               f"by {tuple(robot_correction[:2].astype(int))}")
         self.allocentric_memory.robot_point += robot_correction
 
         # Move the place cell by the complementary of the position correction in the other direction
         # cell_correction = self.place_memory.proposed_correction * (current_cell.position_confidence - 100) / 100
-        cell_correction = self.place_memory.position_pe * (adjsutment_scale - 1)
+        cell_correction = self.place_memory.position_pe * (adjustment_scale - 1)
         current_cell.point += cell_correction
         print(f"Place {self.place_memory.current_cell_id} adjusted by: "
               f"{tuple(cell_correction[0:2].astype(int))}")
         # Propagate the confidence of the previous place cell
         # current_cell.position_confidence = max(current_cell.position_confidence, self.place_memory.place_cells[
         #     self.place_memory.previous_cell_id].position_confidence)
+
+        self.allocentric_memory.update_grid(self)
+
+    def adjust_cell_position(self, current_cell):
+        """Adjust the robot's and the cell's position by the correction from place cell memory"""
+        """Only executed after the cell was created and fully scanned"""
+
+        adjustment_scale = 1. - current_cell.position_confidence / 100.
+        # Increase the current cell confidence no more than the previous cell confidence
+        current_cell.position_confidence = min(current_cell.position_confidence + 20, self.place_memory.place_cells[self.place_memory.previous_cell_id].position_confidence)
+
+        # Move the robot and the place by the proposed correction proportionally to the place cell confidence
+        position_correction = self.place_memory.position_pe * adjustment_scale
+        print(f"Adjusting the robot's and place cell {self.place_memory.current_cell_id}'s position "
+              f"by {tuple(position_correction[:2].astype(int))}")
+        self.allocentric_memory.robot_point += position_correction
+        current_cell.point += position_correction
 
         self.allocentric_memory.update_grid(self)
 

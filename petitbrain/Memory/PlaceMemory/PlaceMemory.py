@@ -86,12 +86,17 @@ class PlaceMemory:
                     # If at least three points match and no rotation
                     if estimated_translation is not None:
                         self.estimated_distance = np.linalg.norm(estimated_translation)
-                        self.position_pe[:] = self.place_cells[self.previous_cell_id].point \
-                                              - estimated_translation - self.place_cells[existing_id].point
-                        print(f"Position correction: {tuple(self.position_pe[:2].astype(int))}")
+                        place_distance = self.place_cells[existing_id].point - self.place_cells[self.previous_cell_id].point
+                        self.position_pe[:] = -estimated_translation - place_distance
+                        # self.position_pe[:] = self.place_cells[self.previous_cell_id].point \
+                        #                       - estimated_translation - self.place_cells[existing_id].point
+                                              #  + self.place_cells[self.previous_cell_id].last_robot_point_in_cell\
+                        print(f"Position pe : {tuple(self.position_pe[:2].astype(int))} = "
+                              f"echo estimation {tuple(-estimated_translation[:2].astype(int))} - "
+                              f"speed estimation {tuple(place_distance[:2].astype(int))} - ")
                         self.calculate_forward_pe()
                         # Adjust the position and increase confidence to 50
-                        memory.adjust_robot_position(self.place_cells[existing_id])
+                        memory.adjust_cell_position(self.place_cells[existing_id])
 
             # If the robot just moved to an existing place cell
             if existing_id != self.current_cell_id:
@@ -128,6 +133,9 @@ class PlaceMemory:
             else:
                 print(f"Coming from Place {self.previous_cell_id} and staying at Place {self.current_cell_id}")
 
+            # update the position of the robot in the current place cell
+            self.place_cells[existing_id].update_robot_point_in_cell(memory.allocentric_memory.robot_point)
+
         # If the robot is not near a known cell
         else:
             # Create a new place cell
@@ -144,8 +152,9 @@ class PlaceMemory:
         for e in experiences:
             cue = Cue(e.id, e.polar_pose_matrix(), e.type, e.clock, e.color_index, e.polar_sensor_point())
             cues.append(cue)
-        # The new place cell gets half the confidence of the previous one
+        # Memorize the previous cell id
         self.previous_cell_id = self.current_cell_id
+        # The new place cell gets half the confidence of the previous one
         if self.previous_cell_id > 0:
             confidence = self.place_cells[self.previous_cell_id].position_confidence // 2
         else:
@@ -205,13 +214,18 @@ class PlaceMemory:
                 LOG_FORWARD_PE: round(self.forward_pe)}
 
     def calculate_forward_pe(self):
-        place_change_v = vector3.normalise(Vector3(self.place_cells[self.current_cell_id].point -
-                                                   self.place_cells[self.previous_cell_id].point))
-        self.forward_pe = np.dot(place_change_v, self.position_pe)
-        print(f"current cell {self.current_cell_id}, previous cell {self.previous_cell_id}",
-              f"place change v {tuple(place_change_v[:2])}, "
-              f"position pe {tuple(self.position_pe[:2].astype(int))}, "
-              f"Forward pe", self.forward_pe)
+        predicted_translation = vector3.normalise(Vector3(self.place_cells[self.current_cell_id].point -
+                                                   self.place_cells[self.previous_cell_id].point -
+                                                   self.place_cells[self.previous_cell_id].last_robot_point_in_cell,
+                                                  dtype=float))
+        # place_change_v = Vector3(self.place_cells[self.current_cell_id].point - self.new_cell_point, dtype=float)
+        # place_change_v.normalize()
+        self.forward_pe = np.dot(predicted_translation, self.position_pe)
+        print(f"Current cell {self.current_cell_id}, previous cell {self.previous_cell_id}. "
+              f"Last robot point in cell {tuple(self.place_cells[self.previous_cell_id].last_robot_point_in_cell[:2].astype(int))}. "
+              f"Predicted translation vector {tuple(predicted_translation[:2])}. "
+              f"Position pe {tuple(self.position_pe[:2].astype(int))}. "
+              f"Forward pe {round(self.forward_pe)}")
 
     def save(self):
         """Return a clone of place memory for memory snapshot"""

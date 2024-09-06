@@ -39,6 +39,6 @@ def test_open_in_front(proposer_fixture):
     assert not result
     result = proposer_fixture.open_in_front(math.radians(bod_dir_deg - 31), math.radians(30))
     assert not result
-    result = proposer_fixture.open_in_front(math.radians(101), math.radians(221))
+    result = proposer_fixture.open_in_front(math.radians(101), math.radians(121))
     assert result
 

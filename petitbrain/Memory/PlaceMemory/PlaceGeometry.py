@@ -229,7 +229,7 @@ def compare_place_cells(place_source, place_target, clock):
     thread.start()
 
     # If less than three points match or rotation then cancel the translation
-    if len(reg_p2p.correspondence_set) < ICP_MIN_POINTS or rotation_deg > ICP_MAX_ROTATION:
+    if len(reg_p2p.correspondence_set) < ICP_MIN_POINTS or abs(rotation_deg) > ICP_MAX_ROTATION:
         translation = None
         print(f"Adjustment cancelled points: {reg_p2p.correspondence_set}, rotation: {rotation_deg:.0f}")
     return translation
