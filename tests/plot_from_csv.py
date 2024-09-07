@@ -19,7 +19,7 @@ with open(file_path, mode='r') as file:
 
     # Read the header (first row)
     header = next(csv_reader)
-    plot_title = header[column_index]
+    plot_title = header[column_index].capitalize()
 
     # Iterate through the remaining rows in the CSV file
     row_number = 1
@@ -29,7 +29,7 @@ with open(file_path, mode='r') as file:
             # Convert the value to a float and store it
             y_values.append(float(row[column_index]))
             # Store the row number
-            x_values.append(row_number)
+            x_values.append(row_number - 1)
         row_number += 1
 
 # Plot the numbers

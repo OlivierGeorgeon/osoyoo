@@ -76,7 +76,7 @@ def test_resample_by_diff(scan_points_fix):
     expected = np.array([[1.20000000e+03, 3.49065850e-01],
                          [1.20000000e+03, 6.98131701e-01],
                          [1.00000000e+01, 1.91986218e+00]])
-    np.testing.assert_allclose(result, expected), "Wrong points"
+    np.testing.assert_allclose(result, expected)
 
 
 def test_unscanned_direction(scan_points_fix):

@@ -1,5 +1,5 @@
 import numpy as np
-from pyrr import quaternion
+from pyrr import quaternion, Vector3
 from . import GRID_WIDTH, GRID_HEIGHT, CELL_RADIUS
 from .EgocentricMemory.EgocentricMemory import EgocentricMemory
 from .AllocentricMemory.AllocentricMemory import AllocentricMemory
@@ -10,6 +10,7 @@ from ..Integrator.Integrator import integrate
 from ..Enaction.Predict import push_objects
 from .PlaceMemory.PlaceMemory import PlaceMemory
 from ..constants import LOG_AZIMUTH
+from ..Proposer.Action import ACTION_FORWARD
 
 NEAR_HOME = 300    # (mm) Max distance to consider near home
 
@@ -28,6 +29,8 @@ class Memory:
         self.allocentric_memory = AllocentricMemory(GRID_WIDTH, GRID_HEIGHT, cell_radius=CELL_RADIUS)
         self.phenomenon_memory = PhenomenonMemory(arena_id)
         self.place_memory = PlaceMemory()
+        self.last_normalized_forward = Vector3([0., 0., 0.])
+        self.last_forward_floor = 0
 
     def __str__(self):
         return "Memory Robot position (" + str(round(self.allocentric_memory.robot_point[0])) + "," +\
@@ -67,7 +70,6 @@ class Memory:
         # print(f"Adjust the robot's position to place cell by {tuple(position_correction[:2].astype(int))}")
         # self.allocentric_memory.robot_point += position_correction
 
-        """Update allocentric memory on the basis of body, phenomenon, and egocentric memory"""
         # Mark the cells where is the robot
         self.allocentric_memory.place_robot(self.body_memory, self.clock)
 
@@ -81,6 +83,11 @@ class Memory:
         # Update the prompt in allocentric memory
         allo_prompt = self.egocentric_to_allocentric(self.egocentric_memory.prompt_point)
         self.allocentric_memory.update_prompt(allo_prompt, self.clock)
+
+        # Memorize the last forward normalized direction vector
+        if enaction.action.action_code == ACTION_FORWARD:
+            self.last_normalized_forward[:] = self.body_memory.get_body_direction_normalized()
+            self.last_forward_floor = enaction.outcome.floor
 
     def egocentric_to_polar_egocentric(self, point):
         """Convert the position of a point from egocentric to polar-egocentric reference"""
@@ -207,8 +214,10 @@ class Memory:
         saved_memory.phenomenon_memory = self.phenomenon_memory.save()
         # Clone place memory
         saved_memory.place_memory = self.place_memory.save()
-        # print("Save memory duration:", time.time() - start_time, "seconds")
 
+        saved_memory.last_normalized_forward[:] = self.last_normalized_forward
+        saved_memory.last_forward_floor = self.last_forward_floor
+        # print("Save memory duration:", time.time() - start_time, "seconds")
         return saved_memory
 
     def is_outside_terrain(self, ego_point):

@@ -1,3 +1,4 @@
+from pyrr import Vector3, vector3
 from .Command import Command, DIRECTION_FRONT
 from ..Enaction.Predict import generate_prediction
 from ..Enaction.Trajectory import Trajectory

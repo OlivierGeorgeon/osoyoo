@@ -60,6 +60,7 @@ def workspace_fixture():
     # turn = Interaction(Action(ACTION_TURN, np.array([0, 0, 0], dtype=float), 0, 1.), OUTCOME_NO_FOCUS, 0)
     workspace.memory.clock += 1
     enaction = Enaction(swipe, workspace.memory.save())
+    workspace.enaction = enaction
     enaction.outcome = Outcome({'action': ACTION_SWIPE, 'clock': 0, 'duration1': 1000, 'head_angle': 0, 'yaw': 00,
                                 'echo_distance': 200})
     enaction.terminate()

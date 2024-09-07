@@ -24,17 +24,18 @@ def test_cell_to_point():
                           [150., 259.80762114]],
                          [[225., 216.50635095],
                           [225., 303.10889132]]])
-    np.testing.assert_allclose(result, expected), "Wrong points"
+    np.testing.assert_allclose(result, expected)
 
 
 def test_calculate_forward_pe(workspace_fixture):
-    workspace_fixture.memory.place_memory.calculate_forward_pe()
+    result = workspace_fixture.memory.body_memory.get_body_direction_normalized()
+    np.testing.assert_allclose(np.array(result), np.array([0.8660254, 0.5, 0.]))
     assert workspace_fixture.memory.place_memory.forward_pe == 0
 
-    # Test position_pe by the same value
-    workspace_fixture.memory.place_memory.position_pe = workspace_fixture.memory.place_memory.place_cells[2].point
-    workspace_fixture.memory.place_memory.calculate_forward_pe()
-    assert workspace_fixture.memory.place_memory.forward_pe == 300
+
+def test_cue(workspace_fixture):
+    result = workspace_fixture.memory.place_memory.place_cells[1].cues[0].point()
+    np.testing.assert_allclose(result, np.array([43.30127, 25., 0]))
 
 
 @pytest.fixture
@@ -44,9 +45,3 @@ def forward_fixture(workspace_fixture):
     workspace_fixture.memory.place_memory.place_cells[2].point = np.array([400, 0, 0])
     workspace_fixture.memory.place_memory.position_pe = np.array([30, 0, 0])
     return workspace_fixture
-
-
-def test_calculate_forward_pe2(forward_fixture):
-    forward_fixture.memory.place_memory.calculate_forward_pe()
-    assert forward_fixture.memory.place_memory.forward_pe == 30
-

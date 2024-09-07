@@ -1,6 +1,6 @@
 import numpy as np
 import pytest
-from petitbrain.Integrator.Calibrator import Calibrator
+from petitbrain.Integrator.Calibrator import Calibrator, CALIBRATION_SPEED_WEIGHT
 from petitbrain.Proposer.Action import ACTION_FORWARD
 
 
@@ -14,5 +14,5 @@ def test_calibrate_forward_speed(calibrator_fixture):
     """Test add half of the forward prediction error to the forward speed"""
     calibrator_fixture.workspace.memory.place_memory.forward_pe = -20
     calibrator_fixture.calibrate_forward_speed()
-    assert calibrator_fixture.workspace.actions[ACTION_FORWARD].translation_speed[0] == 290
+    assert calibrator_fixture.workspace.actions[ACTION_FORWARD].translation_speed[0] == 300 - 20 / CALIBRATION_SPEED_WEIGHT
 
