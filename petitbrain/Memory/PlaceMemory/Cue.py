@@ -24,7 +24,7 @@ class Cue:
     def point(self):
         """Return the point of this cue. """
         # Translate the origin point by the pose
-        return matrix44.apply_to_vector(self.pose_matrix, [0., 0., 0.])
+        return matrix44.apply_to_vector(self.pose_matrix, [0, 0, 0])
 
     def save(self):
         """Return a cloned cue for memory snapshot"""

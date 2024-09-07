@@ -22,6 +22,7 @@ class PlaceCell:
         self.last_visited_clock = cues[0].clock
         self.last_position_clock = cues[0].clock
         self.position_confidence = confidence
+        self.last_robot_point_in_cell = np.array([0, 0, 0])  # Used to compute the distance to the next cell
 
     def __str__(self):
         """Return the string of the tuple of the place cell coordinates"""
@@ -88,6 +89,10 @@ class PlaceCell:
         else:
             return np.array([0, 0, 0])
 
+    def update_robot_point_in_cell(self, allo_point):
+        """Update the last position of the robot in the cell from the allocentric robot position"""
+        self.last_robot_point_in_cell[:] = allo_point - self.point
+
     def save(self):
         """Return a cloned place cell for memory snapshot"""
         saved_place_cell = PlaceCell(self.key, self.point, [cue.save() for cue in self.cues], 100)
@@ -96,4 +101,5 @@ class PlaceCell:
         saved_place_cell.last_visited_clock = self.last_visited_clock
         saved_place_cell.last_position_clock = self.last_position_clock
         saved_place_cell.position_confidence = self.position_confidence
+        saved_place_cell.last_robot_point_in_cell[:] = self.last_robot_point_in_cell
         return saved_place_cell

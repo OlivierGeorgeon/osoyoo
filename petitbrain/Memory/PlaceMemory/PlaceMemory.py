@@ -1,6 +1,6 @@
 import numpy as np
 import networkx as nx
-from pyrr import Matrix44
+from pyrr import Matrix44, vector3, Vector3
 import copy
 from ...Memory.PlaceMemory.PlaceCell import PlaceCell
 from ...Memory.PlaceMemory.Cue import Cue
@@ -8,7 +8,7 @@ from ...Memory.EgocentricMemory.Experience import EXPERIENCE_COMPASS, EXPERIENCE
     EXPERIENCE_LOCAL_ECHO, EXPERIENCE_ALIGNED_ECHO
 from .PlaceGeometry import nearby_place_cell, transform_estimation_cue_to_cue, compare_place_cells
 from ...SoundPlayer import SoundPlayer, SOUND_SURPRISE, SOUND_PLACE_CELL
-from ...constants import LOG_CELL, LOG_POSITION_PE
+from ...constants import LOG_CELL, LOG_POSITION_PE, LOG_FORWARD_PE
 
 
 class PlaceMemory:
@@ -25,6 +25,7 @@ class PlaceMemory:
         self.observe_better = True  # Trigger scan on initialisation. Reset by decider
         self.graph_start_id = 1  # The first place cell of the current graph to display
         self.estimated_distance = None
+        self.forward_pe = 0
 
     def add_or_update_place_cell(self, memory):
         """Create e new place cell or update the existing one. Set the proposed correction"""
@@ -32,6 +33,7 @@ class PlaceMemory:
         # Reset the position_correction
         self.position_pe[:] = 0
         self.estimated_distance = None
+        self.forward_pe = 0
 
         # The new experiences for place cell
         experiences = [e for e in memory.egocentric_memory.experiences.values() if (e.clock >= memory.clock) and
@@ -68,6 +70,7 @@ class PlaceMemory:
                         # Adjust the position and confidence
                         self.position_pe[:] = proposed_correction
                         memory.adjust_robot_position(self.place_cells[existing_id])
+                        # self.calculate_forward_pe()
                         SoundPlayer.play(SOUND_SURPRISE)
             # If the cell is not fully observed
             else:
@@ -84,11 +87,17 @@ class PlaceMemory:
                     # If at least three points match and no rotation
                     if estimated_translation is not None:
                         self.estimated_distance = np.linalg.norm(estimated_translation)
-                        self.position_pe[:] = self.place_cells[self.previous_cell_id].point \
-                                              - estimated_translation - self.place_cells[existing_id].point
-                        print(f"Position correction: {tuple(self.position_pe[:2].astype(int))}")
+                        place_distance = self.place_cells[existing_id].point - self.place_cells[self.previous_cell_id].point
+                        self.position_pe[:] = -estimated_translation - place_distance
+                        # self.position_pe[:] = self.place_cells[self.previous_cell_id].point \
+                        #                       - estimated_translation - self.place_cells[existing_id].point
+                                              #  + self.place_cells[self.previous_cell_id].last_robot_point_in_cell\
+                        print(f"Position pe : {tuple(self.position_pe[:2].astype(int))} = "
+                              f"echo estimation {tuple(-estimated_translation[:2].astype(int))} - "
+                              f"speed estimation {tuple(place_distance[:2].astype(int))} - ")
+                        # self.calculate_forward_pe()
                         # Adjust the position and increase confidence to 50
-                        memory.adjust_robot_position(self.place_cells[existing_id])
+                        memory.adjust_cell_position(self.place_cells[existing_id])
 
             # If the robot just moved to an existing place cell
             if existing_id != self.current_cell_id:
@@ -109,6 +118,7 @@ class PlaceMemory:
                             # Adjust the position and increase confidence
                             self.position_pe[:] = proposed_correction
                             memory.adjust_robot_position(self.place_cells[existing_id])
+                            # self.calculate_forward_pe()
                             SoundPlayer.play(SOUND_SURPRISE)
                         else:
                             self.observe_better = True
@@ -124,6 +134,13 @@ class PlaceMemory:
                 print(f"Moving from Place {self.previous_cell_id} to existing Place {self.current_cell_id}")
             else:
                 print(f"Coming from Place {self.previous_cell_id} and staying at Place {self.current_cell_id}")
+
+            # update the position of the robot in the current place cell
+            self.place_cells[existing_id].update_robot_point_in_cell(memory.allocentric_memory.robot_point)
+            if memory.last_forward_floor == 0:
+                self.forward_pe = np.dot(memory.last_normalized_forward, self.position_pe)
+                print(f"Forward_pe: {self.forward_pe}. Normalized dir {tuple(memory.last_normalized_forward)}. Position pe: {tuple(self.position_pe[:2].astype(int))}")
+            # self.calculate_forward_pe()
 
         # If the robot is not near a known cell
         else:
@@ -141,8 +158,9 @@ class PlaceMemory:
         for e in experiences:
             cue = Cue(e.id, e.polar_pose_matrix(), e.type, e.clock, e.color_index, e.polar_sensor_point())
             cues.append(cue)
-        # The new place cell gets half the confidence of the previous one
+        # Memorize the previous cell id
         self.previous_cell_id = self.current_cell_id
+        # The new place cell gets half the confidence of the previous one
         if self.previous_cell_id > 0:
             confidence = self.place_cells[self.previous_cell_id].position_confidence // 2
         else:
@@ -198,7 +216,23 @@ class PlaceMemory:
 
     def trace_dict(self):
         """Return a dictionary of fields that should be traced"""
-        return {LOG_CELL: self.current_cell_id, LOG_POSITION_PE: round(np.linalg.norm(self.position_pe))}
+        return {LOG_CELL: self.current_cell_id, LOG_POSITION_PE: round(np.linalg.norm(self.position_pe)),
+                LOG_FORWARD_PE: round(self.forward_pe)}
+
+    # def calculate_forward_pe(self):
+    #     """The forward_pe is the projection of the position_pe on the axis of the predicted translation"""
+    #     predicted_translation = vector3.normalise(Vector3(self.place_cells[self.current_cell_id].point -
+    #                                                self.place_cells[self.previous_cell_id].point -
+    #                                                self.place_cells[self.previous_cell_id].last_robot_point_in_cell,
+    #                                               dtype=float))
+    #     # place_change_v = Vector3(self.place_cells[self.current_cell_id].point - self.new_cell_point, dtype=float)
+    #     # place_change_v.normalize()
+    #     self.forward_pe = np.dot(predicted_translation, self.position_pe)
+    #     print(f"Current cell {self.current_cell_id}, previous cell {self.previous_cell_id}. "
+    #           f"Last robot point in cell {tuple(self.place_cells[self.previous_cell_id].last_robot_point_in_cell[:2].astype(int))}. "
+    #           f"Predicted translation vector {tuple(predicted_translation[:2])}. "
+    #           f"Position pe {tuple(self.position_pe[:2].astype(int))}. "
+    #           f"Forward pe {round(self.forward_pe)}")
 
     def save(self):
         """Return a clone of place memory for memory snapshot"""
@@ -211,4 +245,6 @@ class PlaceMemory:
         saved_place_memory.place_cell_distances = copy.deepcopy(self.place_cell_distances)
         saved_place_memory.observe_better = self.observe_better
         saved_place_memory.position_pe[:] = self.position_pe
+        saved_place_memory.estimated_distance = self.estimated_distance
+        saved_place_memory.forward_pe = self.forward_pe
         return saved_place_memory

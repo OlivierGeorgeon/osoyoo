@@ -8,7 +8,8 @@ import csv
 import matplotlib.pyplot as plt
 import threading
 from pyrr import Quaternion
-from . import MIN_PLACE_CELL_DISTANCE, ICP_DISTANCE_THRESHOLD, ANGULAR_RESOLUTION, MASK_ARRAY
+from . import MIN_PLACE_CELL_DISTANCE, ICP_DISTANCE_THRESHOLD, ANGULAR_RESOLUTION, MASK_ARRAY, ICP_MIN_POINTS, \
+    ICP_MAX_ROTATION
 from ...Robot import NO_ECHO_DISTANCE
 from ...Utils import cartesian_to_polar
 from ...Memory.EgocentricMemory.Experience import EXPERIENCE_CENTRAL_ECHO
@@ -23,15 +24,14 @@ def transform_estimation_cue_to_cue(points1, points2, threshold=ICP_DISTANCE_THR
     # Converting to integers seems to avoid rotation
     pcd1.points = o3d.utility.Vector3dVector(np.array(points1, dtype=int))
     pcd2.points = o3d.utility.Vector3dVector(np.array(points2, dtype=int))
-    trans_init = np.eye(4)  # Initial transformation matrix (4x4 identity matrix)
+    trans_init = np.eye(4, dtype=int)  # Initial transformation matrix (4x4 identity matrix)
     if translation_init is not None:
         trans_init[0:3, 3] = translation_init
 
     # Apply ICP
     estimation_method = o3d.pipelines.registration.TransformationEstimationPointToPoint()
-    # criteria = o3d.pipelines.registration.ICPConvergenceCriteria()
+    # estimation_method = o3d.pipelines.registration.TransformationEstimationPointToPlane()
     reg_p2p = o3d.pipelines.registration.registration_icp(pcd1, pcd2, threshold, trans_init, estimation_method)
-                                                          # criteria=criteria)
     # Return the resulting transformation
     return reg_p2p
 
@@ -212,7 +212,7 @@ def compare_place_cells(place_source, place_target, clock):
     translation_init = place_source.point - place_target.point
     # print(f"Comparing Place {place_source.key} to Place {place_target.key} "
     #       f"with trans_init: {tuple(trans_init[0:2, 3].astype(int))}")
-    reg_p2p = transform_estimation_cue_to_cue(points1, points2, 100, translation_init)
+    reg_p2p = transform_estimation_cue_to_cue(points1, points2, ICP_DISTANCE_THRESHOLD, translation_init)
     translation = -reg_p2p.transformation[:3, 3].astype(int)
     rotation_deg = round(math.degrees(
         quaternion_to_direction_rad(Quaternion.from_matrix(reg_p2p.transformation[:3, :3]))))
@@ -228,9 +228,9 @@ def compare_place_cells(place_source, place_target, clock):
     thread.start()
 
     # If less than three points match or rotation then cancel the translation
-    if len(reg_p2p.correspondence_set) < 3 or rotation_deg > 10:
+    if len(reg_p2p.correspondence_set) < ICP_MIN_POINTS or abs(rotation_deg) > ICP_MAX_ROTATION:
         translation = None
-        print(f"Adjustment cancelled points: {reg_p2p.correspondence_set}, rotation: {rotation_deg:.0f}")
+        print(f"Adjustment cancelled. Nb points: {len(reg_p2p.correspondence_set)}, rotation: {rotation_deg:.0f}°")
     return translation
 
 

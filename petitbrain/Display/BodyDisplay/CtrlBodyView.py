@@ -10,17 +10,19 @@ from ...Utils import quaternion_to_azimuth
 from ...Integrator.Calibrator import compass_calibration
 from ...Memory.EgocentricMemory.Experience import EXPERIENCE_COMPASS, EXPERIENCE_NORTH
 from ...Memory.BodyMemory import DOPAMINE, SEROTONIN, NORADRENALINE
+from ..CtrlWindow import CtrlWindow
 
 KEY_OFFSET = 'O'
 ENGAGEMENT_MODES = {'R': "Real", 'I': "Imaginary"}
 
 
-class CtrlBodyView:
+class CtrlBodyView(CtrlWindow):
     """Controls the body view"""
     def __init__(self, workspace):
-        self.workspace = workspace
+        super().__init__(workspace)
+        # self.workspace = workspace
+        # self.view = InteractiveWindow()
         self.points_of_interest = []
-        self.view = InteractiveWindow()
         self.view.set_caption("Robot " + workspace.robot_id)
         self.view.zoom_level = 2.6
         glClearColor(1.0, 235.0/256., 205.0/256., 1.0)
@@ -61,9 +63,11 @@ class CtrlBodyView:
                         p.displace(position_matrix)
                     self.view.label2.text = "Compass adjusted by " + str(compass_xy)
             else:
-                self.workspace.process_user_key(text)
+                # self.workspace.process_user_key(text)
+                self.process_user_key(text)
 
-        self.view.push_handlers(on_text)
+        # self.view.push_handlers(on_text)
+        self.view.on_text = on_text
 
         def on_mouse_scroll(x, y, dx, dy):
             """ Zooming the window or manually updating the neurotransmitter levels"""

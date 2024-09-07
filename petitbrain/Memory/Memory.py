@@ -1,5 +1,5 @@
 import numpy as np
-from pyrr import quaternion
+from pyrr import quaternion, Vector3
 from . import GRID_WIDTH, GRID_HEIGHT, CELL_RADIUS
 from .EgocentricMemory.EgocentricMemory import EgocentricMemory
 from .AllocentricMemory.AllocentricMemory import AllocentricMemory
@@ -10,6 +10,7 @@ from ..Integrator.Integrator import integrate
 from ..Enaction.Predict import push_objects
 from .PlaceMemory.PlaceMemory import PlaceMemory
 from ..constants import LOG_AZIMUTH
+from ..Proposer.Action import ACTION_FORWARD
 
 NEAR_HOME = 300    # (mm) Max distance to consider near home
 
@@ -28,6 +29,8 @@ class Memory:
         self.allocentric_memory = AllocentricMemory(GRID_WIDTH, GRID_HEIGHT, cell_radius=CELL_RADIUS)
         self.phenomenon_memory = PhenomenonMemory(arena_id)
         self.place_memory = PlaceMemory()
+        self.last_normalized_forward = Vector3([0., 0., 0.])
+        self.last_forward_floor = 0
 
     def __str__(self):
         return "Memory Robot position (" + str(round(self.allocentric_memory.robot_point[0])) + "," +\
@@ -67,7 +70,6 @@ class Memory:
         # print(f"Adjust the robot's position to place cell by {tuple(position_correction[:2].astype(int))}")
         # self.allocentric_memory.robot_point += position_correction
 
-        """Update allocentric memory on the basis of body, phenomenon, and egocentric memory"""
         # Mark the cells where is the robot
         self.allocentric_memory.place_robot(self.body_memory, self.clock)
 
@@ -81,6 +83,11 @@ class Memory:
         # Update the prompt in allocentric memory
         allo_prompt = self.egocentric_to_allocentric(self.egocentric_memory.prompt_point)
         self.allocentric_memory.update_prompt(allo_prompt, self.clock)
+
+        # Memorize the last forward normalized direction vector
+        if enaction.action.action_code == ACTION_FORWARD:
+            self.last_normalized_forward[:] = self.body_memory.get_body_direction_normalized()
+            self.last_forward_floor = enaction.outcome.floor
 
     def egocentric_to_polar_egocentric(self, point):
         """Convert the position of a point from egocentric to polar-egocentric reference"""
@@ -142,29 +149,47 @@ class Memory:
 
     def adjust_robot_position(self, current_cell):
         """Adjust the robot's position by the correction from place cell memory"""
+        """Executed when the robot comes back to a previously fully scanned cell"""
 
-        adjsutment_scale = 1.
+        adjustment_scale = 1.
         # If the previous cell has mord confidence than the current then adjust the cell position
         if self.place_memory.place_cells[self.place_memory.previous_cell_id].position_confidence >= current_cell.position_confidence:
-            adjsutment_scale = current_cell.position_confidence / 100.
+            adjustment_scale = current_cell.position_confidence / 100.
             # Increase the current cell confidence no more than the previous cell confidence
             current_cell.position_confidence = min(current_cell.position_confidence + 20, self.place_memory.place_cells[self.place_memory.previous_cell_id].position_confidence)
 
         # Move the robot by the proposed correction proportionally to the place cell confidence
-        robot_correction = self.place_memory.position_pe * adjsutment_scale
+        robot_correction = self.place_memory.position_pe * adjustment_scale
         print(f"Adjusting the robot's position to place cell {self.place_memory.current_cell_id} "
               f"by {tuple(robot_correction[:2].astype(int))}")
         self.allocentric_memory.robot_point += robot_correction
 
         # Move the place cell by the complementary of the position correction in the other direction
         # cell_correction = self.place_memory.proposed_correction * (current_cell.position_confidence - 100) / 100
-        cell_correction = self.place_memory.position_pe * (adjsutment_scale - 1)
+        cell_correction = self.place_memory.position_pe * (adjustment_scale - 1)
         current_cell.point += cell_correction
         print(f"Place {self.place_memory.current_cell_id} adjusted by: "
               f"{tuple(cell_correction[0:2].astype(int))}")
         # Propagate the confidence of the previous place cell
         # current_cell.position_confidence = max(current_cell.position_confidence, self.place_memory.place_cells[
         #     self.place_memory.previous_cell_id].position_confidence)
+
+        self.allocentric_memory.update_grid(self)
+
+    def adjust_cell_position(self, current_cell):
+        """Adjust the robot's and the cell's position by the correction from place cell memory"""
+        """Only executed after the cell was created and fully scanned"""
+
+        adjustment_scale = 1. - current_cell.position_confidence / 100.
+        # Increase the current cell confidence no more than the previous cell confidence
+        current_cell.position_confidence = min(current_cell.position_confidence + 20, self.place_memory.place_cells[self.place_memory.previous_cell_id].position_confidence)
+
+        # Move the robot and the place by the proposed correction proportionally to the place cell confidence
+        position_correction = self.place_memory.position_pe * adjustment_scale
+        print(f"Adjusting the robot's and place cell {self.place_memory.current_cell_id}'s position "
+              f"by {tuple(position_correction[:2].astype(int))}")
+        self.allocentric_memory.robot_point += position_correction
+        current_cell.point += position_correction
 
         self.allocentric_memory.update_grid(self)
 
@@ -189,8 +214,10 @@ class Memory:
         saved_memory.phenomenon_memory = self.phenomenon_memory.save()
         # Clone place memory
         saved_memory.place_memory = self.place_memory.save()
-        # print("Save memory duration:", time.time() - start_time, "seconds")
 
+        saved_memory.last_normalized_forward[:] = self.last_normalized_forward
+        saved_memory.last_forward_floor = self.last_forward_floor
+        # print("Save memory duration:", time.time() - start_time, "seconds")
         return saved_memory
 
     def is_outside_terrain(self, ego_point):

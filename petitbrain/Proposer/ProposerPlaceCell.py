@@ -55,16 +55,19 @@ class ProposerPlaceCell(Proposer):
         else:
             e_memory.body_memory.neurotransmitters[:] = [60, 50, 50]  # Dopamine
             theta_open, min_theta_open, max_theta_open = open_direction(place_cell.polar_echo_curve)
-            theta_q = Quaternion.from_z_rotation(theta_open)
-            short_to_theta_open = short_angle(self.workspace.memory.body_memory.body_quaternion, theta_q)
-            safe_min_theta = min_theta_open + 50/180 * math.pi
-            safe_max_theta = max_theta_open - 50/180 * math.pi
-            print(f"Open direction {math.degrees(theta_open):.0f}°, min {math.degrees(safe_min_theta):.0f}°, "
-                  f"max {math.degrees(safe_max_theta):.0f}°, "
+            short_to_theta_open = self.short_body_to_angle(theta_open)
+            # theta_q = Quaternion.from_z_rotation(theta_open)
+            # short_to_theta_open = short_angle(self.workspace.memory.body_memory.body_quaternion, theta_q)
+            safe_span = theta_open - min_theta_open - 50/180 * math.pi  # Decrease the span of openness by 50°
+            # safe_min_theta = min_theta_open + 50/180 * math.pi
+            # safe_max_theta = max_theta_open - 50/180 * math.pi
+            print(f"Open direction {math.degrees(theta_open):.0f}°, min {math.degrees(min_theta_open)}"
+                  f", max {math.degrees(max_theta_open)}, safe span {math.degrees(safe_span):.0f}°, "
                   f"body direction {math.degrees(self.workspace.memory.body_memory.get_body_direction_rad()):.0f}")
 
             # If open in front then forward
-            if abs(short_to_theta_open) < theta_open - safe_min_theta:
+            if self.open_in_front(theta_open, safe_span):
+            # if abs(short_to_theta_open) < theta_open - safe_min_theta:
                 e_memory.egocentric_memory.prompt_point = None
                 i0 = self.workspace.primitive_interactions[(ACTION_FORWARD, OUTCOME_PROMPT)]
                 e0 = Enaction(i0, e_memory)
@@ -83,10 +86,13 @@ class ProposerPlaceCell(Proposer):
                     e0 = Enaction(i0, e_memory)
                     return CompositeEnaction([e0], 'place_cell', np.array([1, 1, 1]))
                 else:
-                    very_safe_min_q = Quaternion.from_z_rotation(safe_min_theta + 15/180 * math.pi)
-                    short_to_min = short_angle(self.workspace.memory.body_memory.body_quaternion, very_safe_min_q)
-                    very_safe_max_q = Quaternion.from_z_rotation(safe_max_theta - 15/180 * math.pi)
-                    short_to_max = short_angle(self.workspace.memory.body_memory.body_quaternion, very_safe_max_q)
+                    # very_safe_min_q = Quaternion.from_z_rotation(safe_min_theta + 15/180 * math.pi)
+                    very_safe_min = min_theta_open + 65/180 * math.pi
+                    # short_to_min = short_angle(self.workspace.memory.body_memory.body_quaternion, very_safe_min_q)
+                    short_to_min = self.short_body_to_angle(very_safe_min)
+                    very_safe_max = max_theta_open - 65/180 * math.pi
+                    # short_to_max = short_angle(self.workspace.memory.body_memory.body_quaternion, very_safe_max_q)
+                    short_to_max = self.short_body_to_angle(very_safe_max)
                     # Turn by the nearest limit angle
                     if abs(short_to_min) < abs(short_to_max):
                         ego_prompt = np.array([200 * np.cos(short_to_min), 200 * np.sin(short_to_min), 0])
@@ -98,3 +104,13 @@ class ProposerPlaceCell(Proposer):
                     i0 = self.workspace.primitive_interactions[(ACTION_TURN, OUTCOME_PROMPT)]
                     e0 = Enaction(i0, e_memory)
                     return CompositeEnaction([e0], 'place_cell', np.array([1, 1, 1]))
+
+    def short_body_to_angle(self, polar_angle):
+        """Return the short angle in radian for the robot to turn to a polar angle in radian"""
+        theta_q = Quaternion.from_z_rotation(polar_angle)
+        return short_angle(self.workspace.memory.body_memory.body_quaternion, theta_q)
+
+    def open_in_front(self, theta_open, span_rad):
+        """Return True if the the body is in the direction of theta_open modulo the span_rad"""
+        theta_open_q = Quaternion.from_z_rotation(theta_open)
+        return abs(short_angle(self.workspace.memory.body_memory.body_quaternion, theta_open_q)) < span_rad

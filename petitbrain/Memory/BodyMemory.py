@@ -61,6 +61,10 @@ class BodyMemory:
         """Return the body direction in rad in polar-egocentric coordinates"""
         return quaternion_to_direction_rad(self.body_quaternion)
 
+    def get_body_direction_normalized(self):
+        """Return a normalized vector indicating the body direction"""
+        return self.body_quaternion * Vector3([1., 0., 0.])
+
     def head_absolute_direction(self):
         """The head's direction in polar-egocentric reference"""
         return self.get_body_direction_rad() + self.head_direction_rad

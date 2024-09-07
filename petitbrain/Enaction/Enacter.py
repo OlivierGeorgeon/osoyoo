@@ -14,8 +14,6 @@ from ..Robot import NO_ECHO_DISTANCE
 from ..Robot.Outcome import Outcome
 from ..SoundPlayer import SoundPlayer, SOUND_SURPRISE
 from ..Proposer.AttentionMechanism import AttentionMechanism
-from ..constants import LOG_FORWARD_PE
-from ..Proposer.Action import ACTION_FORWARD
 
 
 class Enacter:
@@ -195,9 +193,6 @@ class Enacter:
 
             # Track the prediction errors and log the trace
             self.workspace.prediction_error.log()
-            if self.workspace.memory.place_memory.estimated_distance is not None:
-                forward_pe = round(self.workspace.memory.place_memory.estimated_distance - self.workspace.actions[ACTION_FORWARD].translation_speed[0])
-                self.workspace.tracer = self.workspace.tracer.bind(**{LOG_FORWARD_PE: forward_pe})
             self.workspace.tracer = self.workspace.tracer.bind(**self.workspace.memory.trace_dict())
             self.workspace.tracer.info("", **self.workspace.enaction.trace_dict())
             self.workspace.tracer = self.workspace.tracer.new()
