@@ -22,8 +22,9 @@ TERRAIN_RADIUS = {"0": {"radius": 650, "short_radius": 650, "azimuth": 90},
                   "Circle": {"radius": 650, "short_radius": 650, "azimuth": 90},  # Petit tapis
                   "PetiteIA": {"radius": 1100, "azimuth": 55, "short_radius": 650},  # {990, 60},  # Grand tapis
                   "A301": {"radius": 1200, "azimuth": 50},
-                  "DOLL": {"radius": 1200, "azimuth": 0, "short_radius": 1000}      # To be defined
-}
+                  "DOLL": {"radius": 1200, "azimuth": 0, "short_radius": 1000},      # To be defined
+                  "AP": {"radius": 1200, "azimuth": 0, "short_radius": 1000}  # To be defined
+                  }
 
 ROBOT_SETTINGS_0 = {
     "IP": {},
@@ -36,7 +37,7 @@ ROBOT_SETTINGS_0 = {
 
 # Robot 1 in Lyon.
 ROBOT_SETTINGS_1 = ROBOT_SETTINGS_0.copy()
-ROBOT_SETTINGS_1["IP"] = {"A328": "192.168.8.230", "PetiteIA": "192.168.8.0"}
+ROBOT_SETTINGS_1["IP"] = {"A328": "192.168.8.230", "PetiteIA": "192.168.8.0", "AP": "192.168.4.1"}
 ROBOT_SETTINGS_1["forward_speed"] = 300  # (mm/s) Forward translation speed.
 ROBOT_SETTINGS_1["lateral_speed"] = 260  # (mm/s) Lateral translation speed.
 ROBOT_SETTINGS_1["retreat_distance"] = [90, 30, 0]   # (mm) Distance of the line after retreat
@@ -44,7 +45,7 @@ ROBOT_SETTINGS_1["compass_offset"] = [57, 21, 0]  # [0, 0, 0]  # Compass offset 
 
 # Robot 2 in Lyon.
 ROBOT_SETTINGS_2 = ROBOT_SETTINGS_0.copy()
-ROBOT_SETTINGS_2["IP"] = {"A328": "192.168.8.189", "PetiteIA": "192.168.8.189"}
+ROBOT_SETTINGS_2["IP"] = {"A328": "192.168.8.189", "PetiteIA": "192.168.8.189", "AP": "192.168.4.1"}
 ROBOT_SETTINGS_2["forward_speed"] = 230  # (mm/s) Forward translation speed.
 ROBOT_SETTINGS_2["lateral_speed"] = 140  # (mm/s) Lateral translation speed.
 ROBOT_SETTINGS_2["retreat_distance"] = [90, 30, 0]

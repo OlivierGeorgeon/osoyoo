@@ -20,9 +20,9 @@ class Interaction:
         self.valence = valence
 
     def __str__(self):
-        """ Print interaction in the form <action><outcome>(<valence>) """
-        return self.key.__str__() + "<" + str(self.valence) + ">"
-        # return str(self.action) + str(self.outcome) + "(" + str(self.valence) + ")"
+        """ Print interaction in the form <action>_<outcome>:<valence> """
+        return f"{self.action}_{self.outcome}:{self.valence}"
+        # return self.key.__str__() + "<" + str(self.valence) + ">"
 
     def __hash__(self):
         """ The hash is necessary to use interactions as keys in a dictionary """

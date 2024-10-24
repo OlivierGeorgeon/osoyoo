@@ -14,9 +14,9 @@ While the PetitCat Project was initially created to allow symbol grounding, enac
 
 ```
 .
-├── autocat          # The python application
+├── petitbrain       # The python application
 ├── docs             # Documentation
-├── petitcat_arduino # The arduino application
+├── petitcat         # The arduino application
 ├── tests            # Test scripts
 ├── LICENSE          # License terms
 ├── main.py          # Run this program on your PC            
