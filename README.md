@@ -31,7 +31,7 @@ While the PetitCat Project was initially created to allow symbol grounding, enac
 * Download file [petitcat.ino](petitcat/petitcat.ino) to the robot using the arduino IDE.
 * Read the robot's IP address in the arduino IDE terminal.
 * Connect your PC to the same wifi as the robot
-* Run [prompt_teleop.ipynb](docs/tutorials/prompt_teleop.ipynb) or [prompt_teleop.py](pretitbrain/prompt_teleop.py) on your PC to test remote controlling the robot. 
+* Run [prompt_teleop.ipynb](docs/tutorials/prompt_teleop.ipynb) or [prompt_teleop.py](petitbrain/prompt_teleop.py) on your PC to test remote controlling the robot. 
 * Configure your arena and the IP address of your robots in [RobotDefine.py](petitbrain/Robot/RobotDefine.py)
 * Run the [main.py](main.py) python application on your PC with the name of your arena and of your robots as arguments. For example: `python -m main chezOlivier 1`
 
