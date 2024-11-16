@@ -47,7 +47,7 @@ Table 1: Main recognized commands
 # Main command fields
 
 Table 2 summarizes the main fields of the command packet sent to the robot. 
-To try the optional fields, you must modify `test_remote_control_robot.py`.
+To try the optional fields, you must modify `prompt_teleop.py`.
 Some optional fields only apply to some commands indicated in the _Command_ column.
 
 |Field| Command | Status | Description |
