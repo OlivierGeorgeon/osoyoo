@@ -34,12 +34,13 @@ Sequencer::Sequencer(Floor& FLO, Head& HEA, Imu& IMU, Led& LED) :
 }
 
 // Initialize the connexion with the PC
-void Sequencer::setup()
+int Sequencer::setup()
 {
   _WIFI.begin();
+  return _WIFI.status;
 }
 
-// Monitor the interaction recieved from the PC
+// Monitor the interaction received from the PC
 void Sequencer::update(int& interaction_step, int& interaction_direction)
 {
   // If no ongoing interaction then monitor the Wi-Fi

@@ -10,7 +10,7 @@ from ..Memory.PlaceMemory.PlaceGeometry import unscanned_direction, open_directi
 from ..Utils import assert_almost_equal_angles, short_angle
 from . Action import ACTION_TURN, ACTION_FORWARD, ACTION_SCAN
 from ..Enaction.CompositeEnaction import Enaction, CompositeEnaction
-from .Interaction import OUTCOME_PROMPT
+from .Interaction import OUTCOME_PROMPT, OUTCOME_FLOOR
 from ..Memory.EgocentricMemory.EgocentricMemory import EXPERIENCE_LOCAL_ECHO
 
 
@@ -20,6 +20,14 @@ class ProposerPlaceCell(Proposer):
         """Propose enaction to generate the place cell graph"""
 
         e_memory = self.workspace.memory.save()
+
+        # If outcome floor then turn around (for Bordeaux)
+        if self.workspace.enaction is not None and self.workspace.enaction.outcome_code == OUTCOME_FLOOR:
+            ego_prompt = np.array([-200, 0, 0])
+            e_memory.egocentric_memory.prompt_point = ego_prompt
+            i0 = self.workspace.primitive_interactions[(ACTION_TURN, OUTCOME_PROMPT)]
+            e0 = Enaction(i0, e_memory)
+            return CompositeEnaction([e0], 'place_cell', np.array([1, 1, 1]))
 
         # If no place or observe better cell then scan
         if self.workspace.memory.place_memory.current_cell_id == 0 or self.workspace.memory.place_memory.observe_better:
