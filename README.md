@@ -26,7 +26,7 @@ While the PetitCat Project was initially created to allow symbol grounding, enac
 ## Getting started
 
 * Clone the projet to your local machine.
-* Move file [arduino_secrets.h](docs/first_step/arduino_secrets.h) into folder `peticat_arduino/src/wifi` and specify your wifi parameters in it. 
+* Move file [arduino_secrets.h](docs/first_step/arduino_secrets.h) into folder `petitcat/src/wifi` and specify your wifi parameters in it. 
 * Set default value `#define ROBOT_ID 0` or configure your robot's specifics in [Robot_define.h](petitcat/Robot_define.h).
 * Download file [petitcat.ino](petitcat/petitcat.ino) to the robot using the arduino IDE.
 * Read the robot's IP address in the arduino IDE terminal.
