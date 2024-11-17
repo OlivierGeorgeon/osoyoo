@@ -1,6 +1,8 @@
 from ..Proposer.Proposer import Proposer
 from ..Proposer.ProposerFocusPhenomenon import ProposerFocusPhenomenon
 from ..Proposer.ProposerPlaceCell import ProposerPlaceCell
+# from .ProposerPlayTerrain import ProposerPlayTerrain
+from .ProposerExplore import ProposerExplore
 from ..Enaction import KEY_CONTROL_DECIDER
 
 
