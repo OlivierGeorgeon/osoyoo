@@ -19,7 +19,7 @@ class Sequencer
 {
 public:
   Sequencer(Floor& FLO, Head& HEA, Imu& IMU, Led& LED);
-  void setup();
+  int setup();
   void update(int& interaction_step, int& interaction_direction);
 private:
   Floor& _FLO;

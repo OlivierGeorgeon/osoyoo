@@ -38,7 +38,7 @@ void WifiCat::begin()
 
   // Connect to the wifi network
 
-  int status = WL_IDLE_STATUS;
+  // status = WL_IDLE_STATUS;
   // Connection depends on the Wifi parameters in arduino_secret.h
   if (SECRET_WIFI_TYPE == "AP")
   {
@@ -53,11 +53,13 @@ void WifiCat::begin()
     // Connecting to wifi as a Station (STA)
     char ssid[] = SECRET_SSID;
     char pass[] = SECRET_PASS;
-    while (status != WL_CONNECTED)
+    // while (status != WL_CONNECTED)
     {
       Serial.print("Attempting to connect to WPA SSID: ");
       Serial.println(ssid);
       status = WiFi.begin(ssid, pass);
+      // if (status == WL_CONNECTED)
+        // break;
     }
   }
 
@@ -75,7 +77,7 @@ void WifiCat::begin()
 int WifiCat::read(char* packetBuffer)
 {
   int len = 0;
-  if (Udp.parsePacket())
+  if (status == WL_CONNECTED && Udp.parsePacket())
   {
     len = Udp.read(packetBuffer, UDP_BUFFER_SIZE - 1);
     packetBuffer[len] = 0;

@@ -87,7 +87,7 @@ def resample_by_streak(polar_points, r_tolerance=50):
 
 
 class Outcome:
-    """The class thant contains the outcome recieved from the robot"""
+    """The class thant contains the outcome received from the robot"""
     def __init__(self, outcome_dict):
         self._dict = outcome_dict  # For print
 

@@ -35,7 +35,8 @@ void Forward::ongoing()
 
   // If caution mode and obstacle then proceed to step 2
   // if (_caution > 0 && _HEA.get_ultrasonic_measure() < 200) // 200
-  if (_caution > 0 && !digitalRead(TOUCH_PIN))
+  if (_HEA.get_ultrasonic_measure() < 200) // 200
+  // if (_caution > 0 && !digitalRead(TOUCH_PIN))
   {
     if (!_HEA._is_enacting_head_alignment)
       _HEA.beginEchoAlignment();  // Force to look at the obstacle

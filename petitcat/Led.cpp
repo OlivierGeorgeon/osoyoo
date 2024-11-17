@@ -43,7 +43,10 @@ void Led::update()
   }
 
   // Pulse the emotion led with period 1000ms
-  float sinValue = sin(0.00628 * millis());  // Calculate the sine value (* 2 * PI / period)
+  // float sinValue = sin(0.00628 * millis());  // Calculate the sine value (* 2 * PI / period)
+  float sinValue = sin(2. * 3.1416 / breath_period * millis());  // Calculate the sine value (* 2 * PI / period)
+  // from https://makersportal.com/blog/2020/3/27/simple-breathing-led-in-arduino
+  //float sinValue = exp(-(pow(((ii/500)-0.5)/0.14,2.0))/2.0);
 
   analogWrite(RED_LED_PIN, (sinValue + 1.) * 100. * emotion_red);     // [0,200] Set the LED brightness using PWM
   analogWrite(GREEN_LED_PIN, (sinValue + 1.) * 110. * emotion_green); // [0,220]

@@ -23,7 +23,7 @@ void Color::setup()
   // Initialize the sensor
   if (_tcs.begin())
   {
-    Serial.println("Color sensor initialized");
+    Serial.println("-- Color sensor initialized");
     // tcs.disable();
     _tcs.setGain(TCS34725_GAIN_4X);
     // Set the integration time in the chip's register without adding an unnecessary delay to the getRawData() function

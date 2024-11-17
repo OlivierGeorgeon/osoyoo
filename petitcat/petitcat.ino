@@ -32,6 +32,7 @@
 #include "Led.h"
 #include "Robot_define.h"
 #include "Sequencer.h"
+#include <WiFiEsp.h>
 
 Floor FLO;
 Head HEA;
@@ -50,17 +51,21 @@ void setup()
   Serial.print("Petitcat Arduino 0.1.6 for Robot ");
   Serial.println(ROBOT_ID);
 
-  // Initialize the LEDs
-
-  LED.setup();
-
   // First attempt to initialize IMU
 
   IMU.setup();
 
   // Connect to the wifi
 
-  ACT.setup();
+  int wifi_status = ACT.setup();
+
+  // Initialize the LEDs
+
+  LED.setup();
+  if (wifi_status == WL_CONNECTED)
+    LED.color(1); // Initialize at white if WiFi
+  else
+    LED.color(3); // Initialize at blue if no WiFi
 
   // Second attempt to initialize IMU (try again because sometimes it fails the first time)
   // Not sure why. Perhaps needs time after switched on

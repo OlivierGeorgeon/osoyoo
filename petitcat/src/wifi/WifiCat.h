@@ -23,6 +23,7 @@ class WifiCat
     int read(char* packetBuffer);
     // Send the outcome UDP string to the PC
     void send(String message);
+    int status = WL_IDLE_STATUS;
   private:
     // The UDP object used to receive and send data
     WiFiEspUDP Udp;

@@ -8,6 +8,7 @@
 #define Led_h
 
 #define BLINK_PERIOD 100  // (ms) The period of blinking 10Hz
+#define BREATH_PERIOD 3000  // (ms) The period of the emotion LED 0.33Hz
 
 class Led
 {
@@ -25,6 +26,7 @@ private:
   float emotion_red = 0.;
   float emotion_green = 0.;
   float emotion_blue = 0.;
+  float breath_period = BREATH_PERIOD;
 };
 
 #endif

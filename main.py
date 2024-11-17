@@ -25,7 +25,8 @@ import logging
 import structlog
 import csv
 from petitbrain import Flock
-from constants import TRACE_HEADERS, TRACE_FILE
+from petitbrain.constants import TRACE_HEADERS, TRACE_FILE
+import os
 
 # Try to fix some mouse-press issue on Mac but it does not solve the problem
 # https://github.com/pyglet/pyglet/issues/171
@@ -38,6 +39,9 @@ file_formatter = logging.Formatter('%(message)s')
 # Console handler formatter
 console_formatter = logging.Formatter('TRACE: %(message)s')
 # console_formatter = logging.Formatter('%(levelname)s: %(name)s: %(message)s')
+# Create the log directory if it does not exist to avoid error
+if not os.path.exists("log"):
+    os.makedirs("log")
 # File handler
 file_handler = logging.FileHandler(TRACE_FILE)
 file_handler.setLevel(logging.INFO)  # Set the log level for the file
