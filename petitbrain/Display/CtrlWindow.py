@@ -76,10 +76,10 @@ class CtrlWindow:
                 self.workspace.composite_enaction = CompositeEnaction(None, 'Manual', np.array([1, 1, 1]), [i0], self.workspace.memory.save())
         elif user_key.upper() == "/":
             # If key ALIGN then turn and move forward to the prompt
-            if self.composite_enaction is None:
-            # if self.enacter.interaction_step == ENACTION_STEP_IDLE:
-                self.workspace.composite_enaction = CompositeEnaction(None, 'Manual', np.array([1, 1, 1]),
-                                                            self.workspace.sequence_interactions["TF-P"], self.workspace.memory.save())
+            if self.workspace.composite_enaction is None:
+                self.workspace.composite_enaction = CompositeEnaction(
+                    None, 'Manual', np.array([1, 1, 1]), self.workspace.sequence_interactions["TF-P"],
+                    self.workspace.memory.save())
         elif user_key.upper() == ":" and self.workspace.memory.egocentric_memory.focus_point is not None:
             # If key ALIGN BACK then turn back and move backward to the prompt
             if self.workspace.composite_enaction is None:

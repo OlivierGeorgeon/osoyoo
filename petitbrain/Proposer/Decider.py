@@ -1,6 +1,7 @@
 from ..Proposer.Proposer import Proposer
 from ..Proposer.ProposerFocusPhenomenon import ProposerFocusPhenomenon
 from ..Proposer.ProposerPlaceCell import ProposerPlaceCell
+from .ProposerPlayFlower import ProposerPlayFlower
 from ..Enaction import KEY_CONTROL_DECIDER
 
 
@@ -19,6 +20,7 @@ class Decider:
                           # , "Play terrain": ProposerPlayTerrain(self)
                           # , "Point": ProposerFocusPhenomenon(self.workspace)
                           , "Place_cell": ProposerPlaceCell(self.workspace)
+                          , "Play_flower": ProposerPlayFlower(self.workspace)
                           }
 
     def main(self, dt):
@@ -32,7 +34,7 @@ class Decider:
 
     def decide(self):
         """Return the selected composite enaction"""
-        # Update the focus is the dot was lost
+        # Update the focus if the dot was lost
         # self.attention_mechanism.update_focus()
 
         # Each proposer adds a proposition to the list

@@ -20,6 +20,7 @@ class ProposerPlaceCell(Proposer):
         """Propose enaction to generate the place cell graph"""
 
         e_memory = self.workspace.memory.save()
+        emotion_mask = np.array([1, 0, 0])
 
         # If no place or observe better cell then scan
         if self.workspace.memory.place_memory.current_cell_id == 0 or self.workspace.memory.place_memory.observe_better:
@@ -27,7 +28,7 @@ class ProposerPlaceCell(Proposer):
             i0 = self.workspace.primitive_interactions[(ACTION_SCAN, OUTCOME_PROMPT)]
             e0 = Enaction(i0, e_memory, span=10)
             self.workspace.memory.place_memory.observe_better = False
-            return CompositeEnaction([e0], 'place_cell', np.array([1, 1, 1]))
+            return CompositeEnaction([e0], 'place_cell', emotion_mask)
 
         place_cell = self.workspace.memory.place_memory.current_place_cell()
         # If the current place cell is not fully observed
@@ -42,7 +43,7 @@ class ProposerPlaceCell(Proposer):
                     or span_unscanned > math.pi:
                 i0 = self.workspace.primitive_interactions[(ACTION_SCAN, OUTCOME_PROMPT)]
                 e0 = Enaction(i0, e_memory, span=10)
-                return CompositeEnaction([e0], 'place_cell', np.array([1, 1, 1]))
+                return CompositeEnaction([e0], 'place_cell', emotion_mask)
             # If scanned in front then turn to the unscanned angle
             else:
                 ego_prompt = self.workspace.memory.polar_egocentric_to_egocentric(
@@ -50,7 +51,7 @@ class ProposerPlaceCell(Proposer):
                 e_memory.egocentric_memory.prompt_point = ego_prompt
                 i0 = self.workspace.primitive_interactions[(ACTION_TURN, OUTCOME_PROMPT)]
                 e0 = Enaction(i0, e_memory)
-                return CompositeEnaction([e0], 'place_cell', np.array([1, 1, 1]))
+                return CompositeEnaction([e0], 'place_cell', emotion_mask)
         # If the current place cell is fully observed
         else:
             e_memory.body_memory.neurotransmitters[:] = [60, 50, 50]  # Dopamine
@@ -71,7 +72,7 @@ class ProposerPlaceCell(Proposer):
                 e_memory.egocentric_memory.prompt_point = None
                 i0 = self.workspace.primitive_interactions[(ACTION_FORWARD, OUTCOME_PROMPT)]
                 e0 = Enaction(i0, e_memory)
-                return CompositeEnaction([e0], 'place_cell', np.array([1, 1, 1]))
+                return CompositeEnaction([e0], 'place_cell', emotion_mask)
             # If not open in front then turn
             else:
                 # If too close to the nearest echo then go to theta_open
@@ -84,7 +85,7 @@ class ProposerPlaceCell(Proposer):
                     e_memory.egocentric_memory.prompt_point = ego_prompt
                     i0 = self.workspace.primitive_interactions[(ACTION_TURN, OUTCOME_PROMPT)]
                     e0 = Enaction(i0, e_memory)
-                    return CompositeEnaction([e0], 'place_cell', np.array([1, 1, 1]))
+                    return CompositeEnaction([e0], 'place_cell', emotion_mask)
                 else:
                     # very_safe_min_q = Quaternion.from_z_rotation(safe_min_theta + 15/180 * math.pi)
                     very_safe_min = min_theta_open + 65/180 * math.pi
@@ -103,7 +104,7 @@ class ProposerPlaceCell(Proposer):
                     e_memory.egocentric_memory.prompt_point = ego_prompt
                     i0 = self.workspace.primitive_interactions[(ACTION_TURN, OUTCOME_PROMPT)]
                     e0 = Enaction(i0, e_memory)
-                    return CompositeEnaction([e0], 'place_cell', np.array([1, 1, 1]))
+                    return CompositeEnaction([e0], 'place_cell', emotion_mask)
 
     def short_body_to_angle(self, polar_angle):
         """Return the short angle in radian for the robot to turn to a polar angle in radian"""
