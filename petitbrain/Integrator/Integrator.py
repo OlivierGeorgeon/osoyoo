@@ -4,6 +4,8 @@ from petitbrain.Memory.PhenomenonMemory.Affordance import Affordance
 from ..Display.AllocentricDisplay import DISPLAY_CONE
 from ..Memory.BodyMemory import SEROTONIN, NORADRENALINE
 
+MAX_SEROTONIN_FLOWER = 60
+
 
 def integrate(memory):
     """Create phenomena and update cells in allocentric memory"""
@@ -37,10 +39,10 @@ def integrate(memory):
     # Create new hypothetical phenomena from remaining affordances
     new_phenomena_ids = memory.phenomenon_memory.create_phenomena(new_affordances)
     # If new phenomena were created then play with them
-    # if len(new_phenomena_ids) > 0:
     for p in new_phenomena_ids.values():
         if p.phenomenon_type == EXPERIENCE_FLOOR:
-            memory.body_memory.neurotransmitters[SEROTONIN] = max(60, memory.body_memory.neurotransmitters[SEROTONIN])
+            memory.body_memory.neurotransmitters[SEROTONIN] = max(
+                MAX_SEROTONIN_FLOWER - p.color, memory.body_memory.neurotransmitters[SEROTONIN])
             # Move the allocentric memory to the point
             # memory.allocentric_memory.roll(p.point)
             # p.point[:] = 0

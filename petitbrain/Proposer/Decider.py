@@ -1,7 +1,8 @@
 from ..Proposer.Proposer import Proposer
 from ..Proposer.ProposerFocusPhenomenon import ProposerFocusPhenomenon
-from ..Proposer.ProposerPlaceCell import ProposerPlaceCell
+from .ProposerPlaceCell import ProposerPlaceCell
 from .ProposerPlayFlower import ProposerPlayFlower
+from .ProposerManual import ProposerManual
 from ..Enaction import KEY_CONTROL_DECIDER
 
 
@@ -21,6 +22,7 @@ class Decider:
                           # , "Point": ProposerFocusPhenomenon(self.workspace)
                           , "Place_cell": ProposerPlaceCell(self.workspace)
                           , "Play_flower": ProposerPlayFlower(self.workspace)
+                          # , "Manual": ProposerManual(self.workspace)
                           }
 
     def main(self, dt):

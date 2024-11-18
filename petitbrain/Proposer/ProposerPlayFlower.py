@@ -18,6 +18,7 @@ from ..Memory.BodyMemory import SEROTONIN
 
 PLAY_DISTANCE_CLOSE = 200  # Between robot center and object center
 PLAY_DISTANCE_WITHDRAW = 250  # From where the robot has stopped
+VERY_PLAYFUL = 55  # Above this threshold play forward
 
 
 class ProposerPlayFlower(Proposer):
@@ -39,7 +40,7 @@ class ProposerPlayFlower(Proposer):
         p = self.workspace.memory.phenomenon_memory.phenomena[p_id]
         if p.phenomenon_type == EXPERIENCE_FLOOR:
             # If very playful and the dot is forward
-            if self.workspace.memory.body_memory.neurotransmitters[SEROTONIN] > 55 and \
+            if self.workspace.memory.body_memory.neurotransmitters[SEROTONIN] > VERY_PLAYFUL and \
                     e_memory.egocentric_memory.focus_point[0] > ROBOT_FLOOR_SENSOR_X:
                 if abs(e_memory.egocentric_memory.focus_point[1]) < 20:
                     # If in front then go to the dot

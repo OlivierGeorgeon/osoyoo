@@ -28,7 +28,7 @@ class ProposerPlaceCell(Proposer):
             e_memory.egocentric_memory.prompt_point = ego_prompt
             i0 = self.workspace.primitive_interactions[(ACTION_TURN, OUTCOME_PROMPT)]
             e0 = Enaction(i0, e_memory)
-            return CompositeEnaction([e0], 'place_cell', np.array([1, 1, 1]))
+            return CompositeEnaction([e0], 'place_cell', emotion_mask)
 
         # If no place or observe better cell then scan
         if self.workspace.memory.place_memory.current_cell_id == 0 or self.workspace.memory.place_memory.observe_better:

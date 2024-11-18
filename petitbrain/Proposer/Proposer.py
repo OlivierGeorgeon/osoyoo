@@ -32,7 +32,7 @@ class Proposer:
         if self.workspace.enaction is None:
             i0 = self.workspace.primitive_interactions[(ACTION_FORWARD, OUTCOME_PROMPT)]
             e = Enaction(i0, self.workspace.memory.save())
-            return CompositeEnaction([e], 'Default', np.array([0, 0, 0]))
+            return CompositeEnaction([e], 'Default', np.array([0.5, 0, 0]))
         return self.select_enaction(self.workspace.enaction)
 
     def select_enaction(self, enaction):
@@ -64,7 +64,7 @@ class Proposer:
         # Add the enaction to the stack
         i0 = self.workspace.primitive_interactions[(action.action_code, OUTCOME_PROMPT)]
         e = Enaction(i0, e_memory, span=span)
-        return CompositeEnaction([e], 'Default', np.array([0, 0, 0]))
+        return CompositeEnaction([e], 'Default', np.array([0.5, 0, 0]))
 
     def select_action(self, enaction):
         """The sequence learning mechanism that proposes the next action"""
