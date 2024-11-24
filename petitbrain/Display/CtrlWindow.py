@@ -69,17 +69,24 @@ class CtrlWindow:
         elif user_key.upper() in [KEY_ENGAGEMENT_ROBOT, KEY_ENGAGEMENT_IMAGINARY]:
             self.workspace.engagement_mode = user_key.upper()
         elif user_key.upper() in ACTIONS:
-            # Only process actions when the robot is IDLE
+            i0 = self.workspace.primitive_interactions[(user_key.upper(), OUTCOME_PROMPT)]
+            self.workspace.manual_composite_interaction = CompositeEnaction(
+                None, 'Manual', np.array([1, 1, 1]), [i0], self.workspace.memory.save())
+            # if the stack is empty then add this interaction to the stack
             if self.workspace.composite_enaction is None:
-            # if self.enacter.interaction_step == ENACTION_STEP_IDLE:
-                i0 = self.workspace.primitive_interactions[(user_key.upper(), OUTCOME_PROMPT)]
-                self.workspace.composite_enaction = CompositeEnaction(None, 'Manual', np.array([1, 1, 1]), [i0], self.workspace.memory.save())
+                self.workspace.composite_enaction = self.workspace.manual_composite_interaction
+                self.workspace.manual_composite_interaction = None
+                # i0 = self.workspace.primitive_interactions[(user_key.upper(), OUTCOME_PROMPT)]
+                # self.workspace.composite_enaction = CompositeEnaction(None, 'Manual', np.array([1, 1, 1]), [i0], self.workspace.memory.save())
+
         elif user_key.upper() == "/":
             # If key ALIGN then turn and move forward to the prompt
-            if self.composite_enaction is None:
-            # if self.enacter.interaction_step == ENACTION_STEP_IDLE:
-                self.workspace.composite_enaction = CompositeEnaction(None, 'Manual', np.array([1, 1, 1]),
-                                                            self.workspace.sequence_interactions["TF-P"], self.workspace.memory.save())
+            self.workspace.manual_composite_interaction = CompositeEnaction(
+                None, 'Manual', np.array([1, 1, 1]), self.workspace.sequence_interactions["TF-P"],
+                self.workspace.memory.save())
+            if self.workspace.composite_enaction is None:
+                self.workspace.composite_enaction = self.workspace.manual_composite_interaction
+                self.workspace.manual_composite_interaction = None
         elif user_key.upper() == ":" and self.workspace.memory.egocentric_memory.focus_point is not None:
             # If key ALIGN BACK then turn back and move backward to the prompt
             if self.workspace.composite_enaction is None:

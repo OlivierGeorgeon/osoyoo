@@ -69,6 +69,9 @@ class Workspace:
         # Message from other robot
         self.message = None
 
+        # The last composite interaction proposed manually
+        self.manual_composite_interaction = None
+
     def main(self, dt):
         """The main handler of the interaction cycle:
         organize the generation of the intended_interaction and the processing of the enacted_interaction."""

@@ -102,9 +102,11 @@ class PhenomenonMemory:
     def create_phenomenon(self, affordance):
         """Create a new phenomenon depending of the type of the affordance"""
         # Must always create a phenomenon
-        if affordance.type == EXPERIENCE_FLOOR and affordance.color_index == 0:
+        # Create a flower phenomenon if black spot and color
+        if affordance.type == EXPERIENCE_FLOOR and affordance.color_index > 0:
             self.phenomenon_id += 1
             self.phenomena[self.phenomenon_id] = PhenomenonDot(affordance)
+            print(f"Create flower: {self.phenomenon_id}")
             return self.phenomenon_id
         # If color affordance then recognize the terrain (for imaginary tests)
         elif affordance.type == EXPERIENCE_FLOOR and affordance.color_index > 0:

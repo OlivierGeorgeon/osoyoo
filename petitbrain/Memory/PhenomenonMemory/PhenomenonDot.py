@@ -21,6 +21,7 @@ class PhenomenonDot:
         self.point = affordance.point.copy()
         affordance.point[:] = 0  # Array-wise reset in place
         self.affordances = {0: affordance}
+        self.color = affordance.color_index
 
         self.position_pe = {}  # (mm) The distance between predicted position and measured position
 
@@ -112,4 +113,5 @@ class PhenomenonDot:
         saved_phenomenon.point[:] = self.point
         saved_phenomenon.affordances = {key: a.save() for key, a in self.affordances.items()}
         saved_phenomenon.affordance_id = self.affordance_id
+        saved_phenomenon.color = self.color
         return saved_phenomenon

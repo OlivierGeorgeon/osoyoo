@@ -29,14 +29,12 @@ class AttentionMechanism:
                            self.workspace.memory.allocentric_to_egocentric(p.point)[0] > ROBOT_FLOOR_SENSOR_X}
         if len(front_phenomena) > 0:
             # Focus at the closest phenomenon
-            # closest_key = min(k_p, key=k_p.get)
             closest_key = min(front_phenomena, key=lambda k: np.linalg.norm(
                 self.workspace.memory.allocentric_to_egocentric(front_phenomena[k].point)))
             self.workspace.memory.phenomenon_memory.focus_phenomenon_id = closest_key
             # closest_phenomenon = self.workspace.memory.phenomenon_memory.phenomena[closest_key]
             closest_allo_point = front_phenomena[closest_key].point
             self.workspace.memory.allocentric_memory.update_focus(closest_allo_point, self.workspace.memory.clock)
-            # self.workspace.memory.egocentric_memory.focus_point = self.workspace.memory.allocentric_to_egocentric(closest_phenomenon.point)
             self.workspace.memory.egocentric_memory.focus_point = \
                 self.workspace.memory.allocentric_to_egocentric(closest_allo_point)
 

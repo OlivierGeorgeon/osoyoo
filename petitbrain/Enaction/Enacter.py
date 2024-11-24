@@ -170,8 +170,8 @@ class Enacter:
             # self.select_focus(self.workspace.memory)
 
             # Compute the outcome code which depends on the updated memory
-            self.workspace.enaction.outcome_code = outcome_code(self.workspace.memory,
-                                                   self.workspace.enaction.trajectory, self.workspace.enaction.outcome)
+            self.workspace.enaction.outcome_code = outcome_code(
+                self.workspace.memory, self.workspace.enaction.trajectory, self.workspace.enaction.outcome)
 
             # Express surprise if the enaction failed
             if not self.workspace.enaction.succeed():
