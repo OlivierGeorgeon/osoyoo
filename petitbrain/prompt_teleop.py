@@ -57,6 +57,9 @@ class PromptTeleop:
         print("Next clock:", self.clock)
         return _outcome
 
+def usage():
+    print("Action keys: 1: Turn left, 2: Backward, 3: Turn right, 4: Swipe left, 6: Swipe right, 8: Forward, -: Scan")
+    print("Ctrl+C and ENTER to abort")
 
 # Test the wifi interface by controlling the robot from the console
 # Provide the Robot's IP address as a launch argument. For example:
@@ -71,8 +74,7 @@ if __name__ == '__main__':
             robot_ip = UDP_IP
 
     print("Connecting to robot: " + robot_ip)
-    print("Action keys: 1: Turn left, 2: Backward, 3: Turn right, 4: Swipe left, 6: Swipe right, 8: Forward, -: Scan")
-    print("Ctrl+C and ENTER to abort")
+    usage()
     teleop = PromptTeleop(robot_ip, UDP_TIMEOUT)
     clock = 0
     action = ""
@@ -83,4 +85,9 @@ if __name__ == '__main__':
         outcome = teleop.send_command(action_string)
         print("Received packet:", outcome)
         if outcome is not None:
-            clock += 1
+            outcome_dict = json.loads(outcome)
+            if outcome_dict.get("status") == "Unknown":
+                print("Unknown command. Please choose from:")
+                usage()
+            else:
+                clock += 1
